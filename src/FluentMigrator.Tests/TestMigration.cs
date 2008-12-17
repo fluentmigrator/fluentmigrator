@@ -8,9 +8,9 @@ namespace FluentMigrator.Tests
 		{
 			Create.Table("Users")
 				.WithColumn("UserId").AsInt32().Identity().PrimaryKey()
-				.WithColumn("UserName").AsString().WithSize(32).NotNullable();
+				.WithColumn("UserName").AsString(32).NotNullable();
 
-			Create.Column("Foo").OnTable("Users").AsInt16().WithSize(123).Indexed();
+			Create.Column("Foo").OnTable("Users").AsInt16().Indexed();
 
 			Create.ForeignKey().FromTable("Users").ForeignColumn("GroupId").ToTable("Groups").PrimaryColumn("GroupId");
 		}

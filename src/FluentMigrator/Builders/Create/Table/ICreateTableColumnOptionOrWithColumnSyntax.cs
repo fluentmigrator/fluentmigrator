@@ -3,8 +3,7 @@
 namespace FluentMigrator.Builders.Create.Table
 {
 	public interface ICreateTableColumnOptionOrWithColumnSyntax : ICreateTableWithColumnSyntax
-	{
-		ICreateTableColumnOptionOrWithColumnSyntax WithSize(int size);
+	{		
 		ICreateTableColumnOptionOrWithColumnSyntax WithDefaultValue(object value);
 		ICreateTableColumnOptionOrWithColumnSyntax ForeignKey();
 		ICreateTableColumnOptionOrWithColumnSyntax Identity();

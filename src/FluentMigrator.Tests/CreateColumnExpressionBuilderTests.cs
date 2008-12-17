@@ -14,19 +14,19 @@ namespace FluentMigrator.Tests
 		[Fact]
 		public void CallingAsAnsiStringSetsColumnDbTypeToAnsiString()
 		{
-			VerifyColumnDbType(DbType.AnsiString, b => b.AsAnsiString());
+			VerifyColumnDbType(DbType.AnsiString, b => b.AsAnsiString(255));
 		}
 
 		[Fact]
 		public void CallingAsFixedLengthAnsiStringSetsColumnDbTypeToAnsiStringFixedLength()
 		{
-			VerifyColumnDbType(DbType.AnsiStringFixedLength, b => b.AsFixedLengthAnsiString());
+			VerifyColumnDbType(DbType.AnsiStringFixedLength, b => b.AsFixedLengthAnsiString(255));
 		}
 
 		[Fact]
 		public void CallingAsBinarySetsColumnDbTypeToBinary()
 		{
-			VerifyColumnDbType(DbType.Binary, b => b.AsBinary());
+			VerifyColumnDbType(DbType.Binary, b => b.AsBinary(255));
 		}
 
 		[Fact]
@@ -62,7 +62,7 @@ namespace FluentMigrator.Tests
 		[Fact]
 		public void CallingAsDecimalSetsColumnDbTypeToDecimal()
 		{
-			VerifyColumnDbType(DbType.Decimal, b => b.AsDecimal());
+			VerifyColumnDbType(DbType.Decimal, b => b.AsDecimal(19,5));
 		}
 
 		[Fact]
@@ -92,13 +92,13 @@ namespace FluentMigrator.Tests
 		[Fact]
 		public void CallingAsStringSetsColumnDbTypeToString()
 		{
-			VerifyColumnDbType(DbType.String, b => b.AsString());
+			VerifyColumnDbType(DbType.String, b => b.AsString(255));
 		}
 
 		[Fact]
 		public void CallingAsFixedLengthStringSetsColumnDbTypeToStringFixedLength()
 		{
-			VerifyColumnDbType(DbType.StringFixedLength, e => e.AsFixedLengthString());
+			VerifyColumnDbType(DbType.StringFixedLength, e => e.AsFixedLengthString(255));
 		}
 
 		public void VerifyColumnDbType(DbType expected, Action<CreateColumnExpressionBuilder> callToTest)

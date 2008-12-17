@@ -13,15 +13,17 @@ namespace FluentMigrator.Builders.Create.Table
 		{
 		}
 
-		public ICreateTableColumnOptionOrWithColumnSyntax AsAnsiString()
+		public ICreateTableColumnOptionOrWithColumnSyntax AsAnsiString(int size)
 		{
 			Expression.CurrentColumn.Type = DbType.AnsiString;
+            Expression.CurrentColumn.Size = size;
 			return this;
 		}
 
-		public ICreateTableColumnOptionOrWithColumnSyntax AsBinary()
+		public ICreateTableColumnOptionOrWithColumnSyntax AsBinary(int size)
 		{
 			Expression.CurrentColumn.Type = DbType.Binary;
+            Expression.CurrentColumn.Size = size;
 			return this;
 		}
 
@@ -55,9 +57,11 @@ namespace FluentMigrator.Builders.Create.Table
 			return this;
 		}
 
-		public ICreateTableColumnOptionOrWithColumnSyntax AsDecimal()
+		public ICreateTableColumnOptionOrWithColumnSyntax AsDecimal(int size, int precision)
 		{
 			Expression.CurrentColumn.Type = DbType.Decimal;
+            Expression.CurrentColumn.Size = size;
+		    Expression.CurrentColumn.Precision = precision;
 			return this;
 		}
 
@@ -67,15 +71,17 @@ namespace FluentMigrator.Builders.Create.Table
 			return this;
 		}
 
-		public ICreateTableColumnOptionOrWithColumnSyntax AsFixedLengthString()
+        public ICreateTableColumnOptionOrWithColumnSyntax AsFixedLengthString(int size)
 		{
 			Expression.CurrentColumn.Type = DbType.StringFixedLength;
+            Expression.CurrentColumn.Size = size;
 			return this;
 		}
 
-		public ICreateTableColumnOptionOrWithColumnSyntax AsFixedLengthAnsiString()
+        public ICreateTableColumnOptionOrWithColumnSyntax AsFixedLengthAnsiString(int size)
 		{
 			Expression.CurrentColumn.Type = DbType.AnsiStringFixedLength;
+            Expression.CurrentColumn.Size = size;
 			return this;
 		}
 
@@ -84,6 +90,12 @@ namespace FluentMigrator.Builders.Create.Table
 			Expression.CurrentColumn.Type = DbType.Single;
 			return this;
 		}
+
+        public ICreateTableColumnOptionOrWithColumnSyntax AsGuid()
+        {
+            Expression.CurrentColumn.Type = DbType.Guid;
+            return this;
+        }
 
 		public ICreateTableColumnOptionOrWithColumnSyntax AsInt16()
 		{
@@ -103,9 +115,10 @@ namespace FluentMigrator.Builders.Create.Table
 			return this;
 		}
 
-		public ICreateTableColumnOptionOrWithColumnSyntax AsString()
+		public ICreateTableColumnOptionOrWithColumnSyntax AsString(int size)
 		{
 			Expression.CurrentColumn.Type = DbType.String;
+            Expression.CurrentColumn.Size = size;
 			return this;
 		}
 
@@ -115,9 +128,10 @@ namespace FluentMigrator.Builders.Create.Table
 			return this;
 		}
 
-		public ICreateTableColumnOptionOrWithColumnSyntax AsXml()
+		public ICreateTableColumnOptionOrWithColumnSyntax AsXml(int size)
 		{
 			Expression.CurrentColumn.Type = DbType.Xml;
+		    Expression.CurrentColumn.Size = size;
 			return this;
 		}
 
@@ -127,13 +141,7 @@ namespace FluentMigrator.Builders.Create.Table
 			Expression.Columns.Add(column);
 			return this;
 		}
-
-		public ICreateTableColumnOptionOrWithColumnSyntax WithSize(int size)
-		{
-			Expression.CurrentColumn.Size = size;
-			return this;
-		}
-
+        
 		public ICreateTableColumnOptionOrWithColumnSyntax WithDefaultValue(object value)
 		{
 			Expression.CurrentColumn.DefaultValue = value;

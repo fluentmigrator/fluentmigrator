@@ -18,15 +18,17 @@ namespace FluentMigrator.Builders.Create.Column
 			return this;
 		}
 
-		public ICreateColumnOptionSyntax AsAnsiString()
+		public ICreateColumnOptionSyntax AsAnsiString(int size)
 		{
 			Expression.Column.Type = DbType.AnsiString;
+		    Expression.Column.Size = size;
 			return this;
-		}
+		}        
 
-		public ICreateColumnOptionSyntax AsBinary()
+		public ICreateColumnOptionSyntax AsBinary(int size)
 		{
 			Expression.Column.Type = DbType.Binary;
+		    Expression.Column.Size = size;
 			return this;
 		}
 
@@ -60,9 +62,11 @@ namespace FluentMigrator.Builders.Create.Column
 			return this;
 		}
 
-		public ICreateColumnOptionSyntax AsDecimal()
+		public ICreateColumnOptionSyntax AsDecimal(int size, int precision)
 		{
 			Expression.Column.Type = DbType.Decimal;
+		    Expression.Column.Size = size;
+		    Expression.Column.Precision = precision;
 			return this;
 		}
 
@@ -72,15 +76,17 @@ namespace FluentMigrator.Builders.Create.Column
 			return this;
 		}
 
-		public ICreateColumnOptionSyntax AsFixedLengthString()
+		public ICreateColumnOptionSyntax AsFixedLengthString(int size)
 		{
 			Expression.Column.Type = DbType.StringFixedLength;
+		    Expression.Column.Size = size;
 			return this;
 		}
 
-		public ICreateColumnOptionSyntax AsFixedLengthAnsiString()
+		public ICreateColumnOptionSyntax AsFixedLengthAnsiString(int size)
 		{
 			Expression.Column.Type = DbType.AnsiStringFixedLength;
+		    Expression.Column.Size = size;
 			return this;
 		}
 
@@ -89,6 +95,12 @@ namespace FluentMigrator.Builders.Create.Column
 			Expression.Column.Type = DbType.Single;
 			return this;
 		}
+
+        public ICreateColumnOptionSyntax AsGuid()
+        {
+            Expression.Column.Type = DbType.Guid;
+            return this;
+        }
 
 		public ICreateColumnOptionSyntax AsInt16()
 		{
@@ -108,27 +120,23 @@ namespace FluentMigrator.Builders.Create.Column
 			return this;
 		}
 
-		public ICreateColumnOptionSyntax AsString()
+		public ICreateColumnOptionSyntax AsString(int size)
 		{
 			Expression.Column.Type = DbType.String;
+            Expression.Column.Size = size;
 			return this;
 		}
 
-		public ICreateColumnOptionSyntax AsTime()
+        public ICreateColumnOptionSyntax AsTime()
 		{
 			Expression.Column.Type = DbType.Time;
 			return this;
 		}
 
-		public ICreateColumnOptionSyntax AsXml()
+		public ICreateColumnOptionSyntax AsXml(int size)
 		{
 			Expression.Column.Type = DbType.Xml;
-			return this;
-		}
-
-		public ICreateColumnOptionSyntax WithSize(int size)
-		{
-			Expression.Column.Size = size;
+		    Expression.Column.Size = size;
 			return this;
 		}
 
