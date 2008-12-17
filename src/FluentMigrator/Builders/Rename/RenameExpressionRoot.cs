@@ -16,7 +16,7 @@ namespace FluentMigrator.Builders.Rename
 
 		public IRenameTableToNameSyntax Table(string oldName)
 		{
-			var expression = new RenameTableExpression(oldName);
+			var expression = new RenameTableExpression { OldName = oldName };
 			_context.Expressions.Add(expression);
 			return new RenameTableExpressionBuilder(expression);
 		}

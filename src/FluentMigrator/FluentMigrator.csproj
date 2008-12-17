@@ -72,6 +72,10 @@
     <Compile Include="Builders\Create\Column\ICreateColumnAsTypeSyntax.cs" />
     <Compile Include="Builders\Create\Table\ICreateTableWithColumnSyntax.cs" />
     <Compile Include="Builders\Create\Table\CreateTableExpressionBuilder.cs" />
+    <Compile Include="Infrastructure\ExtensionsForICustomAttributeProvider.cs" />
+    <Compile Include="Infrastructure\ExtensionsForIEnumerableOfString.cs" />
+    <Compile Include="Infrastructure\DefaultMigrationConventions.cs" />
+    <Compile Include="MigrationAttribute.cs" />
     <Compile Include="Expressions\RenameTableExpression.cs" />
     <Compile Include="Expressions\DeleteForeignKeyExpression.cs" />
     <Compile Include="Infrastructure\IFluentSyntax.cs" />

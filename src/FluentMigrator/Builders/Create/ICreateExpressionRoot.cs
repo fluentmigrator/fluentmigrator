@@ -8,8 +8,8 @@ namespace FluentMigrator.Builders.Create
 {
 	public interface ICreateExpressionRoot : IFluentSyntax
 	{
-		ICreateTableWithColumnSyntax Table(string name);
-		ICreateColumnOnTableSyntax Column(string name);
+		ICreateTableWithColumnSyntax Table(string tableName);
+		ICreateColumnOnTableSyntax Column(string columnName);
 		ICreateForeignKeyFromTableSyntax ForeignKey();
 	}
 }

@@ -11,9 +11,9 @@ namespace FluentMigrator.Builders.Delete.Column
 		{
 		}
 
-		public void FromTable(string name)
+		public void FromTable(string tableName)
 		{
-			Expression.Table = name;
+			Expression.TableName = tableName;
 		}
 	}
 }

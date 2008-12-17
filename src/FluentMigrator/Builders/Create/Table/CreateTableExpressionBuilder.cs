@@ -15,7 +15,7 @@ namespace FluentMigrator.Builders.Create.Table
 
 		public ICreateTableColumnAsTypeSyntax WithColumn(string name)
 		{
-			var column = new ColumnDefinition(name);
+			var column = new ColumnDefinition { Name = name };
 			Expression.Columns.Add(column);
 			return this;
 		}

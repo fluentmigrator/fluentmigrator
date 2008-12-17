@@ -15,10 +15,5 @@ namespace FluentMigrator.Model
 		public bool IsPrimaryKey { get; set; }
 		public bool IsNullable { get; set; }
 		public bool IsUnique { get; set; }
-
-		public ColumnDefinition(string name)
-		{
-			Name = name;
-		}
 	}
 }

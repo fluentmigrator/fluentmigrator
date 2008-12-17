@@ -15,15 +15,15 @@ namespace FluentMigrator.Builders.Delete
 			_context = context;
 		}
 
-		public void Table(string name)
+		public void Table(string tableName)
 		{
-			var expression = new DeleteTableExpression(name);
+			var expression = new DeleteTableExpression { TableName = tableName };
 			_context.Expressions.Add(expression);
 		}
 
-		public IDeleteColumnFromTableSyntax Column(string name)
+		public IDeleteColumnFromTableSyntax Column(string columnName)
 		{
-			var expression = new DeleteColumnExpression(name);
+			var expression = new DeleteColumnExpression { ColumnName = columnName };
 			_context.Expressions.Add(expression);
 			return new DeleteColumnExpressionBuilder(expression);
 		}

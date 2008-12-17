@@ -16,16 +16,16 @@ namespace FluentMigrator.Builders.Create
 			_context = context;
 		}
 
-		public ICreateTableWithColumnSyntax Table(string name)
+		public ICreateTableWithColumnSyntax Table(string tableName)
 		{
-			var expression = new CreateTableExpression(name);
+			var expression = new CreateTableExpression { TableName = tableName };
 			_context.Expressions.Add(expression);
 			return new CreateTableExpressionBuilder(expression);
 		}
 
-		public ICreateColumnOnTableSyntax Column(string name)
+		public ICreateColumnOnTableSyntax Column(string columnName)
 		{
-			var expression = new CreateColumnExpression(name);
+			var expression = new CreateColumnExpression { Column = { Name = columnName } };
 			_context.Expressions.Add(expression);
 			return new CreateColumnExpressionBuilder(expression);
 		}

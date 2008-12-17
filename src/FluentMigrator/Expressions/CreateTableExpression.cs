@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
 	public class CreateTableExpression : IMigrationExpression
 	{
-		public string Name { get; set; }
+		public string TableName { get; set; }
 		public IList<ColumnDefinition> Columns { get; private set; }
 
 		public ColumnDefinition CurrentColumn
@@ -15,9 +14,8 @@ namespace FluentMigrator.Expressions
 			get { return Columns[Columns.Count - 1]; }
 		}
 
-		public CreateTableExpression(string name)
+		public CreateTableExpression()
 		{
-			Name = name;
 			Columns = new List<ColumnDefinition>();
 		}
 

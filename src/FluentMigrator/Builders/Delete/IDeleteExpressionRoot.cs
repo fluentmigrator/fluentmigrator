@@ -7,8 +7,8 @@ namespace FluentMigrator.Builders.Delete
 {
 	public interface IDeleteExpressionRoot : IFluentSyntax
 	{
-		void Table(string name);
-		IDeleteColumnFromTableSyntax Column(string name);
+		void Table(string tableName);
+		IDeleteColumnFromTableSyntax Column(string columnName);
 		IDeleteForeignKeyFromTableSyntax ForeignKey();
 	}
 }

@@ -5,6 +5,6 @@ namespace FluentMigrator.Builders.Delete.Column
 {
 	public interface IDeleteColumnFromTableSyntax : IFluentSyntax
 	{
-		void FromTable(string name);
+		void FromTable(string tableName);
 	}
 }

@@ -1,5 +1,4 @@
 ﻿using System;
-using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
@@ -7,11 +6,6 @@ namespace FluentMigrator.Expressions
 	{
 		public string OldName { get; set; }
 		public string NewName { get; set; }
-
-		public RenameTableExpression(string oldName)
-		{
-			OldName = oldName;
-		}
 
 		public void ExecuteWith(IMigrationProcessor processor)
 		{

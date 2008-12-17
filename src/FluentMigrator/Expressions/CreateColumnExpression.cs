@@ -1,5 +1,4 @@
 ﻿using System;
-using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
@@ -9,9 +8,9 @@ namespace FluentMigrator.Expressions
 		public string Table { get; set; }
 		public ColumnDefinition Column { get; set; }
 
-		public CreateColumnExpression(string name)
+		public CreateColumnExpression()
 		{
-			Column = new ColumnDefinition(name);
+			Column = new ColumnDefinition();
 		}
 
 		public void ExecuteWith(IMigrationProcessor processor)
