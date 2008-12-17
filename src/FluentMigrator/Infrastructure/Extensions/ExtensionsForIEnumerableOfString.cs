@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace FluentMigrator.Infrastructure
+namespace FluentMigrator.Infrastructure.Extensions
 {
 	public static class ExtensionsForIEnumerableOfString
 	{

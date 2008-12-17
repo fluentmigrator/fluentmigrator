@@ -1,7 +1,7 @@
 using System;
 using System.Reflection;
 
-namespace FluentMigrator.Infrastructure
+namespace FluentMigrator.Infrastructure.Extensions
 {
 	public static class ExtensionsForICustomAttributeProvider
 	{

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Text;
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Infrastructure
 {
@@ -11,28 +13,27 @@ namespace FluentMigrator.Infrastructure
 			return "PK_" + expression.TableName;
 		}
 
-		public static string GetForeignKeyName(CreateForeignKeyExpression expression)
+		public static string GetForeignKeyName(ForeignKeyDefinition foreignKey)
 		{
 			var sb = new StringBuilder();
 
 			sb.Append("FK_");
-			sb.Append(expression.ForeignTable);
+			sb.Append(foreignKey.ForeignTable);
 
-			foreach (string foreignColumn in expression.ForeignColumns)
+			foreach (string foreignColumn in foreignKey.ForeignColumns)
 			{
+				sb.Append("_");
 				sb.Append(foreignColumn);
-				sb.Append("_");
 			}
 
-			sb.Append(expression.PrimaryTable);
+			sb.Append("_");
+			sb.Append(foreignKey.PrimaryTable);
 
-			foreach (string primaryColumn in expression.PrimaryColumns)
+			foreach (string primaryColumn in foreignKey.PrimaryColumns)
 			{
-				sb.Append(primaryColumn);
 				sb.Append("_");
+				sb.Append(primaryColumn);
 			}
-
-			sb.Remove(sb.Length - 1, 1);
 
 			return sb.ToString();
 		}
@@ -42,10 +43,10 @@ namespace FluentMigrator.Infrastructure
 			return typeof(IMigration).IsAssignableFrom(type) && type.HasAttribute<MigrationAttribute>();
 		}
 
-		public static long GetMigrationVersion(Type type)
+		public static MigrationMetadata GetMetadataForMigration(Type type)
 		{
 			var attribute = type.GetOneAttribute<MigrationAttribute>();
-			return attribute.Version;
+			return new MigrationMetadata { Type = type, Version = attribute.Version };
 		}
 	}
 }

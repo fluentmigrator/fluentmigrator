@@ -72,9 +72,11 @@
     <Compile Include="Builders\Create\Column\ICreateColumnAsTypeSyntax.cs" />
     <Compile Include="Builders\Create\Table\ICreateTableWithColumnSyntax.cs" />
     <Compile Include="Builders\Create\Table\CreateTableExpressionBuilder.cs" />
-    <Compile Include="Infrastructure\ExtensionsForICustomAttributeProvider.cs" />
-    <Compile Include="Infrastructure\ExtensionsForIEnumerableOfString.cs" />
+    <Compile Include="Infrastructure\ICanBeValidated.cs" />
+    <Compile Include="Infrastructure\Extensions\ExtensionsForICustomAttributeProvider.cs" />
+    <Compile Include="Infrastructure\Extensions\ExtensionsForIEnumerableOfString.cs" />
     <Compile Include="Infrastructure\DefaultMigrationConventions.cs" />
+    <Compile Include="Infrastructure\MigrationMetadata.cs" />
     <Compile Include="MigrationAttribute.cs" />
     <Compile Include="Expressions\RenameTableExpression.cs" />
     <Compile Include="Expressions\DeleteForeignKeyExpression.cs" />
@@ -92,6 +94,7 @@
     <Compile Include="IMigration.cs" />
     <Compile Include="Migration.cs" />
     <Compile Include="Model\ColumnDefinition.cs" />
+    <Compile Include="Model\ForeignKeyDefinition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Builders\Create\Table\ICreateTableColumnOptionOrWithColumnSyntax.cs" />
     <Compile Include="Builders\Create\Table\ICreateTableColumnAsTypeSyntax.cs" />

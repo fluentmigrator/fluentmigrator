@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
 	public class CreateForeignKeyExpression : IMigrationExpression
 	{
-		public string ForeignTable { get; set; }
-		public ICollection<string> ForeignColumns { get; set; }
-		public string PrimaryTable { get; set; }
-		public ICollection<string> PrimaryColumns { get; set; }
+		public ForeignKeyDefinition ForeignKey { get; private set; }
 
 		public CreateForeignKeyExpression()
 		{
-			ForeignColumns = new List<string>();
-			PrimaryColumns = new List<string>();
+			ForeignKey = new ForeignKeyDefinition();
+		}
+
+		public void CollectValidationErrors(ICollection<string> errors)
+		{
+			ForeignKey.CollectValidationErrors(errors);
 		}
 
 		public void ExecuteWith(IMigrationProcessor processor)

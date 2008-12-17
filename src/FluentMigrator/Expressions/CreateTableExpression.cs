@@ -19,6 +19,15 @@ namespace FluentMigrator.Expressions
 			Columns = new List<ColumnDefinition>();
 		}
 
+		public void CollectValidationErrors(ICollection<string> errors)
+		{
+			if (String.IsNullOrEmpty(TableName))
+				errors.Add(String.Format("The {0} does not have a valid table name", GetType().Name));
+
+			foreach (ColumnDefinition column in Columns)
+				column.CollectValidationErrors(errors);
+		}
+
 		public void ExecuteWith(IMigrationProcessor processor)
 		{
 			processor.Process(this);

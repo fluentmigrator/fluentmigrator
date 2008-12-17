@@ -1,8 +1,8 @@
 ﻿using System;
 
-namespace FluentMigrator.Runner
+namespace FluentMigrator.Infrastructure
 {
-	public class MigrationDefinition
+	public class MigrationMetadata
 	{
 		public Type Type { get; set; }
 		public long Version { get; set; }

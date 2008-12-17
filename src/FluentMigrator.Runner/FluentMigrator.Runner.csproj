@@ -46,7 +46,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="MigrationLoader.cs" />
-    <Compile Include="MigrationDefinition.cs" />
     <Compile Include="IMigrationLoader.cs" />
     <Compile Include="MigrationRunner.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

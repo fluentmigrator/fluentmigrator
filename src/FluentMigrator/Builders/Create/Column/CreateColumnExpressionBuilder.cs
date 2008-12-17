@@ -14,7 +14,7 @@ namespace FluentMigrator.Builders.Create.Column
 
 		public ICreateColumnAsTypeSyntax OnTable(string name)
 		{
-			Expression.Table = name;
+			Expression.TableName = name;
 			return this;
 		}
 

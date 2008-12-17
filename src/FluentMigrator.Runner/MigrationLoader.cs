@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Runner
 {
@@ -13,15 +14,12 @@ namespace FluentMigrator.Runner
 			Conventions = conventions;
 		}
 
-		public IEnumerable<MigrationDefinition> FindMigrationsIn(Assembly assembly)
+		public IEnumerable<MigrationMetadata> FindMigrationsIn(Assembly assembly)
 		{
 			foreach (Type type in assembly.GetExportedTypes())
 			{
 				if (Conventions.TypeIsMigration(type))
-				{
-					long version = Conventions.GetMigrationVersion(type);
-					yield return new MigrationDefinition { Type = type, Version = version };
-				}
+					yield return Conventions.GetMetadataForMigration(type);
 			}
 		}
 	}

@@ -13,39 +13,39 @@ namespace FluentMigrator.Builders.Create.ForeignKey
 
 		public ICreateForeignKeyForeignColumnSyntax FromTable(string table)
 		{
-			Expression.ForeignTable = table;
+			Expression.ForeignKey.ForeignTable = table;
 			return this;
 		}
 
 		public ICreateForeignKeyToTableSyntax ForeignColumn(string column)
 		{
-			Expression.ForeignColumns.Add(column);
+			Expression.ForeignKey.ForeignColumns.Add(column);
 			return this;
 		}
 
 		public ICreateForeignKeyToTableSyntax ForeignColumns(params string[] columns)
 		{
 			foreach (string column in columns)
-				Expression.ForeignColumns.Add(column);
+				Expression.ForeignKey.ForeignColumns.Add(column);
 
 			return this;
 		}
 
 		public ICreateForeignKeyPrimaryColumnSyntax ToTable(string table)
 		{
-			Expression.PrimaryTable = table;
+			Expression.ForeignKey.PrimaryTable = table;
 			return this;
 		}
 
 		public void PrimaryColumn(string column)
 		{
-			Expression.PrimaryColumns.Add(column);
+			Expression.ForeignKey.PrimaryColumns.Add(column);
 		}
 
 		public void PrimaryColumns(params string[] columns)
 		{
 			foreach (string column in columns)
-				Expression.PrimaryColumns.Add(column);
+				Expression.ForeignKey.PrimaryColumns.Add(column);
 		}
 	}
 }

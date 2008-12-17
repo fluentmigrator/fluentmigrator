@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Model
 {
-	public class ColumnDefinition
+	public class ColumnDefinition : ICanBeValidated
 	{
 		public string Name { get; set; }
 		public DbType Type { get; set; }
@@ -15,5 +17,9 @@ namespace FluentMigrator.Model
 		public bool IsPrimaryKey { get; set; }
 		public bool IsNullable { get; set; }
 		public bool IsUnique { get; set; }
+
+		public void CollectValidationErrors(ICollection<string> errors)
+		{
+		}
 	}
 }
