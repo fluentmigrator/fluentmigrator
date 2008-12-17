@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Builders\IColumnTypeSyntax.cs" />
     <Compile Include="Builders\Create\ICreateExpressionRoot.cs" />
     <Compile Include="Builders\Delete\IDeleteExpressionRoot.cs" />
     <Compile Include="Builders\Rename\IRenameExpressionRoot.cs" />

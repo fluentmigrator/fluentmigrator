@@ -6,10 +6,10 @@ namespace FluentMigrator.Expressions
 {
 	public class CreateTableExpression : IMigrationExpression
 	{
-		public string TableName { get; set; }
-		public IList<ColumnDefinition> Columns { get; private set; }
+		public virtual string TableName { get; set; }
+		public virtual IList<ColumnDefinition> Columns { get; private set; }
 
-		public ColumnDefinition CurrentColumn
+		public virtual ColumnDefinition CurrentColumn
 		{
 			get { return Columns[Columns.Count - 1]; }
 		}
@@ -19,7 +19,7 @@ namespace FluentMigrator.Expressions
 			Columns = new List<ColumnDefinition>();
 		}
 
-		public void CollectValidationErrors(ICollection<string> errors)
+		public virtual void CollectValidationErrors(ICollection<string> errors)
 		{
 			if (String.IsNullOrEmpty(TableName))
 				errors.Add(String.Format("The {0} does not have a valid table name", GetType().Name));
@@ -28,7 +28,7 @@ namespace FluentMigrator.Expressions
 				column.CollectValidationErrors(errors);
 		}
 
-		public void ExecuteWith(IMigrationProcessor processor)
+		public virtual void ExecuteWith(IMigrationProcessor processor)
 		{
 			processor.Process(this);
 		}

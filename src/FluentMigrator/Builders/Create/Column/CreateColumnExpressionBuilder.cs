@@ -18,6 +18,78 @@ namespace FluentMigrator.Builders.Create.Column
 			return this;
 		}
 
+		public ICreateColumnOptionSyntax AsAnsiString()
+		{
+			Expression.Column.Type = DbType.AnsiString;
+			return this;
+		}
+
+		public ICreateColumnOptionSyntax AsBinary()
+		{
+			Expression.Column.Type = DbType.Binary;
+			return this;
+		}
+
+		public ICreateColumnOptionSyntax AsBoolean()
+		{
+			Expression.Column.Type = DbType.Boolean;
+			return this;
+		}
+
+		public ICreateColumnOptionSyntax AsByte()
+		{
+			Expression.Column.Type = DbType.Byte;
+			return this;
+		}
+
+		public ICreateColumnOptionSyntax AsCurrency()
+		{
+			Expression.Column.Type = DbType.Currency;
+			return this;
+		}
+
+		public ICreateColumnOptionSyntax AsDate()
+		{
+			Expression.Column.Type = DbType.Date;
+			return this;
+		}
+
+		public ICreateColumnOptionSyntax AsDateTime()
+		{
+			Expression.Column.Type = DbType.DateTime;
+			return this;
+		}
+
+		public ICreateColumnOptionSyntax AsDecimal()
+		{
+			Expression.Column.Type = DbType.Decimal;
+			return this;
+		}
+
+		public ICreateColumnOptionSyntax AsDouble()
+		{
+			Expression.Column.Type = DbType.Double;
+			return this;
+		}
+
+		public ICreateColumnOptionSyntax AsFixedLengthString()
+		{
+			Expression.Column.Type = DbType.StringFixedLength;
+			return this;
+		}
+
+		public ICreateColumnOptionSyntax AsFixedLengthAnsiString()
+		{
+			Expression.Column.Type = DbType.AnsiStringFixedLength;
+			return this;
+		}
+
+		public ICreateColumnOptionSyntax AsFloat()
+		{
+			Expression.Column.Type = DbType.Single;
+			return this;
+		}
+
 		public ICreateColumnOptionSyntax AsInt16()
 		{
 			Expression.Column.Type = DbType.Int16;
@@ -42,9 +114,15 @@ namespace FluentMigrator.Builders.Create.Column
 			return this;
 		}
 
-		public ICreateColumnOptionSyntax AsFixedLengthString()
+		public ICreateColumnOptionSyntax AsTime()
 		{
-			Expression.Column.Type = DbType.StringFixedLength;
+			Expression.Column.Type = DbType.Time;
+			return this;
+		}
+
+		public ICreateColumnOptionSyntax AsXml()
+		{
+			Expression.Column.Type = DbType.Xml;
 			return this;
 		}
 

@@ -53,6 +53,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CreateColumnExpressionBuilderTests.cs" />
     <Compile Include="DefaultMigrationConventionsTests.cs" />
     <Compile Include="TestMigration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

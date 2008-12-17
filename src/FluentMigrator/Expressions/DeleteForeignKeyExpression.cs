@@ -6,19 +6,19 @@ namespace FluentMigrator.Expressions
 {
 	public class DeleteForeignKeyExpression : IMigrationExpression
 	{
-		public ForeignKeyDefinition ForeignKey { get; private set; }
+		public virtual ForeignKeyDefinition ForeignKey { get; private set; }
 
 		public DeleteForeignKeyExpression()
 		{
 			ForeignKey = new ForeignKeyDefinition();
 		}
 
-		public void CollectValidationErrors(ICollection<string> errors)
+		public virtual void CollectValidationErrors(ICollection<string> errors)
 		{
 			ForeignKey.CollectValidationErrors(errors);
 		}
 
-		public void ExecuteWith(IMigrationProcessor processor)
+		public virtual void ExecuteWith(IMigrationProcessor processor)
 		{
 			processor.Process(this);
 		}

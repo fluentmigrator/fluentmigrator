@@ -13,10 +13,75 @@ namespace FluentMigrator.Builders.Create.Table
 		{
 		}
 
-		public ICreateTableColumnAsTypeSyntax WithColumn(string name)
+		public ICreateTableColumnOptionOrWithColumnSyntax AsAnsiString()
 		{
-			var column = new ColumnDefinition { Name = name };
-			Expression.Columns.Add(column);
+			Expression.CurrentColumn.Type = DbType.AnsiString;
+			return this;
+		}
+
+		public ICreateTableColumnOptionOrWithColumnSyntax AsBinary()
+		{
+			Expression.CurrentColumn.Type = DbType.Binary;
+			return this;
+		}
+
+		public ICreateTableColumnOptionOrWithColumnSyntax AsBoolean()
+		{
+			Expression.CurrentColumn.Type = DbType.Boolean;
+			return this;
+		}
+
+		public ICreateTableColumnOptionOrWithColumnSyntax AsByte()
+		{
+			Expression.CurrentColumn.Type = DbType.Byte;
+			return this;
+		}
+
+		public ICreateTableColumnOptionOrWithColumnSyntax AsCurrency()
+		{
+			Expression.CurrentColumn.Type = DbType.Currency;
+			return this;
+		}
+
+		public ICreateTableColumnOptionOrWithColumnSyntax AsDate()
+		{
+			Expression.CurrentColumn.Type = DbType.Date;
+			return this;
+		}
+
+		public ICreateTableColumnOptionOrWithColumnSyntax AsDateTime()
+		{
+			Expression.CurrentColumn.Type = DbType.DateTime;
+			return this;
+		}
+
+		public ICreateTableColumnOptionOrWithColumnSyntax AsDecimal()
+		{
+			Expression.CurrentColumn.Type = DbType.Decimal;
+			return this;
+		}
+
+		public ICreateTableColumnOptionOrWithColumnSyntax AsDouble()
+		{
+			Expression.CurrentColumn.Type = DbType.Double;
+			return this;
+		}
+
+		public ICreateTableColumnOptionOrWithColumnSyntax AsFixedLengthString()
+		{
+			Expression.CurrentColumn.Type = DbType.StringFixedLength;
+			return this;
+		}
+
+		public ICreateTableColumnOptionOrWithColumnSyntax AsFixedLengthAnsiString()
+		{
+			Expression.CurrentColumn.Type = DbType.AnsiStringFixedLength;
+			return this;
+		}
+
+		public ICreateTableColumnOptionOrWithColumnSyntax AsFloat()
+		{
+			Expression.CurrentColumn.Type = DbType.Single;
 			return this;
 		}
 
@@ -44,9 +109,22 @@ namespace FluentMigrator.Builders.Create.Table
 			return this;
 		}
 
-		public ICreateTableColumnOptionOrWithColumnSyntax AsFixedLengthString()
+		public ICreateTableColumnOptionOrWithColumnSyntax AsTime()
 		{
-			Expression.CurrentColumn.Type = DbType.StringFixedLength;
+			Expression.CurrentColumn.Type = DbType.Time;
+			return this;
+		}
+
+		public ICreateTableColumnOptionOrWithColumnSyntax AsXml()
+		{
+			Expression.CurrentColumn.Type = DbType.Xml;
+			return this;
+		}
+
+		public ICreateTableColumnAsTypeSyntax WithColumn(string name)
+		{
+			var column = new ColumnDefinition {Name = name};
+			Expression.Columns.Add(column);
 			return this;
 		}
 
