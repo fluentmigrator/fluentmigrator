@@ -15,6 +15,7 @@
 	</Target>
 	
 	<Target Name="Test" DependsOnTargets="Build">
+		<MakeDir Directories="build\reports" />
 		<exec 
 			Command="..\..\tools\ncover\NCover.Console.exe &quot;..\..\tools\xunit\xunit.console.exe&quot; &quot;FluentMigrator.Tests.dll&quot; //w &quot;.&quot; //x &quot;..\reports\Coverage.xml&quot;"
 				WorkingDirectory="build\$(BuildType)\">						
