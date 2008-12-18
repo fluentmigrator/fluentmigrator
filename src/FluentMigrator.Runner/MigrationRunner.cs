@@ -1,6 +1,7 @@
 ﻿using System;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Processors;
 
 namespace FluentMigrator.Runner
 {
@@ -20,8 +21,12 @@ namespace FluentMigrator.Runner
 			var context = new MigrationContext(Conventions);
 			migration.GetUpExpressions(context);
 
+			// BeginTransaction
+
 			foreach (IMigrationExpression expression in context.Expressions)
 				expression.ExecuteWith(Processor);
+
+			// CommitTransaction
 		}
 
 		public void Down(IMigration migration)
@@ -29,8 +34,12 @@ namespace FluentMigrator.Runner
 			var context = new MigrationContext(Conventions);
 			migration.GetDownExpressions(context);
 
+			// BeginTransaction
+
 			foreach (IMigrationExpression expression in context.Expressions)
 				expression.ExecuteWith(Processor);
+
+			// CommitTransaction
 		}
 	}
 }

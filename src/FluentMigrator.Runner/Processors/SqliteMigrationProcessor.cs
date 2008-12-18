@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Data.SqlClient;
 using FluentMigrator.Expressions;
+using FluentMigrator.Processors;
+using FluentMigrator.Runner.Processors;
 
 namespace FluentMigrator.Runner.Processors
 {
-	public class SqlServerMigrationProcessor : IMigrationProcessor
+	public class SqliteMigrationProcessor : IMigrationProcessor
 	{
 		public SqlConnection Connection { get; set; }
 
-		public SqlServerMigrationProcessor(SqlConnection connection)
+		public SqliteMigrationProcessor(SqlConnection connection)
 		{
 			Connection = connection;
 		}
@@ -21,6 +23,11 @@ namespace FluentMigrator.Runner.Processors
 		public void Process(CreateColumnExpression expression)
 		{
 			throw new NotImplementedException();
+		}
+
+		public void Process(RenameColumnExpression expression)
+		{
+			throw new System.NotImplementedException();
 		}
 
 		public void Process(DeleteTableExpression expression)

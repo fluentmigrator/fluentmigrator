@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IMigrationProcessor.cs" />
     <Compile Include="Model\Direction.cs" />
     <Compile Include="Model\IndexColumnDefinition.cs" />
     <Compile Include="Builders\Create\Index\CreateIndexExpressionBuilder.cs" />
@@ -80,6 +81,7 @@
     <Compile Include="Builders\Create\Column\ICreateColumnAsTypeSyntax.cs" />
     <Compile Include="Builders\Create\Table\ICreateTableWithColumnSyntax.cs" />
     <Compile Include="Builders\Create\Table\CreateTableExpressionBuilder.cs" />
+    <Compile Include="Expressions\RenameColumnExpression.cs" />
     <Compile Include="Infrastructure\ICanBeValidated.cs" />
     <Compile Include="Infrastructure\Extensions\ExtensionsForICustomAttributeProvider.cs" />
     <Compile Include="Infrastructure\Extensions\ExtensionsForIEnumerableOfString.cs" />
@@ -98,7 +100,6 @@
     <Compile Include="Expressions\CreateColumnExpression.cs" />
     <Compile Include="Expressions\CreateTableExpression.cs" />
     <Compile Include="Expressions\IMigrationExpression.cs" />
-    <Compile Include="IMigrationProcessor.cs" />
     <Compile Include="IMigration.cs" />
     <Compile Include="Migration.cs" />
     <Compile Include="Model\ColumnDefinition.cs" />

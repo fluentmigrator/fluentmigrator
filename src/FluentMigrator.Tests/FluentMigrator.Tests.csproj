@@ -56,6 +56,7 @@
     <Compile Include="CreateTableExpressionBuilderTests.cs" />
     <Compile Include="CreateColumnExpressionBuilderTests.cs" />
     <Compile Include="DefaultMigrationConventionsTests.cs" />
+    <Compile Include="RenameColumnExpressionBuilderTests.cs" />
     <Compile Include="TestMigration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
