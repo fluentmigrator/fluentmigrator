@@ -21,8 +21,7 @@ namespace FluentMigrator.Builders.Create.Index
 
 		public ICreateIndexColumnOptionsSyntax OnColumn(string name)
 		{
-			currentColumnDefinition = new IndexColumnDefinition();
-			currentColumnDefinition.ColumnName = name;
+			currentColumnDefinition = new IndexColumnDefinition { ColumnName = name };
 			Expression.Columns.Add(currentColumnDefinition);
 			return this;
 		}

@@ -63,6 +63,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Builders\DeleteForeignKeyExpressionBuilderTests.cs" />
+    <Compile Include="Builders\RenameTableExpressionBuilderTests.cs" />
+    <Compile Include="Builders\RenameColumnExpressionBuilderTests.cs" />
+    <Compile Include="Builders\DeleteColumnExpressionBuilderTests.cs" />
+    <Compile Include="Builders\CreateForeignKeyExpressionBuilderTests.cs" />
     <Compile Include="Builders\CreateTableExpressionBuilderTests.cs" />
     <Compile Include="Builders\CreateColumnExpressionBuilderTests.cs" />
     <Compile Include="DefaultMigrationConventionsTests.cs" />
