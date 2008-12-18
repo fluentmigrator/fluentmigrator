@@ -12,5 +12,6 @@ namespace FluentMigrator
 		void Process(CreateForeignKeyExpression expression);
 		void Process(DeleteForeignKeyExpression expression);
 		void Process(RenameTableExpression expression);
+		void Process(CreateIndexExpression expression);
 	}
 }

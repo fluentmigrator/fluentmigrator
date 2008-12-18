@@ -45,6 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\Direction.cs" />
+    <Compile Include="Model\IndexColumnDefinition.cs" />
+    <Compile Include="Builders\Create\Index\CreateIndexExpressionBuilder.cs" />
+    <Compile Include="Expressions\CreateIndexExpression.cs" />
+    <Compile Include="Builders\Create\Index\ICreateIndexForTableSyntax.cs" />
+    <Compile Include="Builders\Create\Index\ICreateIndexOnColumnSyntax.cs" />
     <Compile Include="Builders\IColumnTypeSyntax.cs" />
     <Compile Include="Builders\Create\ICreateExpressionRoot.cs" />
     <Compile Include="Builders\Delete\IDeleteExpressionRoot.cs" />
