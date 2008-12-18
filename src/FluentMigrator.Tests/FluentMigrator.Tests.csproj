@@ -70,7 +70,15 @@
     <Compile Include="Builders\CreateForeignKeyExpressionBuilderTests.cs" />
     <Compile Include="Builders\CreateTableExpressionBuilderTests.cs" />
     <Compile Include="Builders\CreateColumnExpressionBuilderTests.cs" />
+    <Compile Include="Definitions\IndexColumnDefinitionTests.cs" />
+    <Compile Include="Definitions\ForeignKeyDefinitionTests.cs" />
+    <Compile Include="Expressions\RenameTableExpressionTests.cs" />
+    <Compile Include="Expressions\DeleteTableExpressionTests.cs" />
+    <Compile Include="Expressions\DeleteColumnExpressionTests.cs" />
+    <Compile Include="Expressions\CreateColumnExpressionTests.cs" />
+    <Compile Include="ValidationHelper.cs" />
     <Compile Include="DefaultMigrationConventionsTests.cs" />
+    <Compile Include="Definitions\ColumnDefinitionTests.cs" />
     <Compile Include="Expressions\RenameColumnExpressionTests.cs" />
     <Compile Include="TestMigration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

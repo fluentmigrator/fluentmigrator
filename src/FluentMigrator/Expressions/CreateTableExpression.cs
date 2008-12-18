@@ -9,11 +9,6 @@ namespace FluentMigrator.Expressions
 		public virtual string TableName { get; set; }
 		public virtual IList<ColumnDefinition> Columns { get; set; }
 
-		public virtual ColumnDefinition CurrentColumn
-		{
-			get { return Columns[Columns.Count - 1]; }
-		}
-
 		public CreateTableExpression()
 		{
 			Columns = new List<ColumnDefinition>();

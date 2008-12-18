@@ -6,35 +6,21 @@ namespace FluentMigrator.Expressions
 {
 	public class CreateIndexExpression : IMigrationExpression
 	{
-		public string TableName { get; set; }
-		
-		private readonly IList<IndexColumnDefinition> columns = new List<IndexColumnDefinition>();
-		public IList<IndexColumnDefinition> Columns
+		public virtual IndexDefinition Index { get; set; }
+
+		public CreateIndexExpression()
 		{
-			get
-			{
-				return columns;
-			}
+			Index = new IndexDefinition();
 		}
 
-		#region IMigrationExpression Members
-
-		public void CollectValidationErrors(ICollection<string> errors)
+		public virtual void CollectValidationErrors(ICollection<string> errors)
 		{
-			if (String.IsNullOrEmpty(TableName))
-				errors.Add(String.Format("The {0} does not have a valid table name", GetType().Name));
-
-			foreach (IndexColumnDefinition indexColumn in columns)
-			{
-				indexColumn.CollectValidationErrors(errors);
-			}			
+			Index.CollectValidationErrors(errors);
 		}
 
-		public void ExecuteWith(IMigrationProcessor processor)
+		public virtual void ExecuteWith(IMigrationProcessor processor)
 		{
 			processor.Process(this);
 		}
-
-		#endregion		
 	}
 }

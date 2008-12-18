@@ -38,6 +38,22 @@ namespace FluentMigrator.Infrastructure
 			return sb.ToString();
 		}
 
+		public static string GetIndexName(IndexDefinition index)
+		{
+			var sb = new StringBuilder();
+
+			sb.Append("IX_");
+			sb.Append(index.TableName);
+
+			foreach (IndexColumnDefinition column in index.Columns)
+			{
+				sb.Append("_");
+				sb.Append(column.ColumnName);
+			}
+
+			return sb.ToString();
+		}
+
 		public static bool TypeIsMigration(Type type)
 		{
 			return typeof(IMigration).IsAssignableFrom(type) && type.HasAttribute<MigrationAttribute>();

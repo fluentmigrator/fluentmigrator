@@ -193,10 +193,10 @@ namespace FluentMigrator.Tests.Builders
 			columnMock.ExpectSet(c => c.DefaultValue, value).AtMostOnce();
 
 			var expressionMock = new Mock<CreateTableExpression>();
-			expressionMock.ExpectGet(e => e.CurrentColumn).Returns(columnMock.Object);
 
 			var builder = new CreateTableExpressionBuilder(expressionMock.Object);
-			builder.WithDefaultValue(value);
+			builder.CurrentColumn = columnMock.Object;
+			builder.WithDefaultValue(42);
 
 			columnMock.VerifyAll();
 		}
@@ -267,9 +267,11 @@ namespace FluentMigrator.Tests.Builders
 			columnMock.ExpectSet(columnExpression, expected).AtMostOnce();
 
 			var expressionMock = new Mock<CreateTableExpression>();
-			expressionMock.ExpectGet(e => e.CurrentColumn).Returns(columnMock.Object);
 
-			callToTest(new CreateTableExpressionBuilder(expressionMock.Object));
+			var builder = new CreateTableExpressionBuilder(expressionMock.Object);
+			builder.CurrentColumn = columnMock.Object;
+
+			callToTest(builder);
 
 			columnMock.VerifyAll();
 			expressionMock.VerifyAll();
@@ -281,9 +283,11 @@ namespace FluentMigrator.Tests.Builders
 			columnMock.ExpectSet(c => c.Type, expected).AtMostOnce();
 
 			var expressionMock = new Mock<CreateTableExpression>();
-			expressionMock.ExpectGet(e => e.CurrentColumn).Returns(columnMock.Object);
 
-			callToTest(new CreateTableExpressionBuilder(expressionMock.Object));
+			var builder = new CreateTableExpressionBuilder(expressionMock.Object);
+			builder.CurrentColumn = columnMock.Object;
+
+			callToTest(builder);
 
 			columnMock.VerifyAll();
 			expressionMock.VerifyAll();
@@ -295,9 +299,11 @@ namespace FluentMigrator.Tests.Builders
 			columnMock.ExpectSet(c => c.Size, expected).AtMostOnce();
 
 			var expressionMock = new Mock<CreateTableExpression>();
-			expressionMock.ExpectGet(e => e.CurrentColumn).Returns(columnMock.Object);
 
-			callToTest(new CreateTableExpressionBuilder(expressionMock.Object));
+			var builder = new CreateTableExpressionBuilder(expressionMock.Object);
+			builder.CurrentColumn = columnMock.Object;
+
+			callToTest(builder);
 
 			columnMock.VerifyAll();
 		}
@@ -308,9 +314,11 @@ namespace FluentMigrator.Tests.Builders
 			columnMock.ExpectSet(c => c.Precision, expected).AtMostOnce();
 
 			var expressionMock = new Mock<CreateTableExpression>();
-			expressionMock.ExpectGet(e => e.CurrentColumn).Returns(columnMock.Object);
 
-			callToTest(new CreateTableExpressionBuilder(expressionMock.Object));
+			var builder = new CreateTableExpressionBuilder(expressionMock.Object);
+			builder.CurrentColumn = columnMock.Object;
+
+			callToTest(builder);
 
 			columnMock.VerifyAll();
 		}

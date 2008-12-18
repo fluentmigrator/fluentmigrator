@@ -4,8 +4,9 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Model
 {
-	public class ForeignKeyDefinition : ICanBeValidated
+	public class ForeignKeyDefinition : ICanBeConventional, ICanBeValidated
 	{
+		public virtual string Name { get; set; }
 		public virtual string ForeignTable { get; set; }
 		public virtual string PrimaryTable { get; set; }
 		public virtual ICollection<string> ForeignColumns { get; set; }
@@ -17,19 +18,31 @@ namespace FluentMigrator.Model
 			PrimaryColumns = new List<string>();
 		}
 
+		public void ApplyConventions(MigrationConventions conventions)
+		{
+			if (String.IsNullOrEmpty(Name))
+				Name = conventions.GetForeignKeyName(this);
+		}
+
 		public virtual void CollectValidationErrors(ICollection<string> errors)
 		{
+			if (String.IsNullOrEmpty(Name))
+				errors.Add(ErrorMessages.ForeignKeyNameCannotBeNullOrEmpty);
+
 			if (String.IsNullOrEmpty(ForeignTable))
-				errors.Add(String.Format("The {0} does not have a valid foreign table name.", GetType().Name));
+				errors.Add(ErrorMessages.ForeignTableNameCannotBeNullOrEmpty);
 
 			if (String.IsNullOrEmpty(PrimaryTable))
-				errors.Add(String.Format("The {0} does not have a valid primary table name.", GetType().Name));
+				errors.Add(ErrorMessages.PrimaryTableNameCannotBeNullOrEmpty);
+
+			if (!String.IsNullOrEmpty(ForeignTable) && !String.IsNullOrEmpty(PrimaryTable) && ForeignTable.Equals(PrimaryTable))
+				errors.Add(ErrorMessages.ForeignKeyCannotBeSelfReferential);
 
 			if (ForeignColumns.Count == 0)
-				errors.Add(String.Format("The {0} does not have one or more foreign column names.", GetType().Name));
+				errors.Add(ErrorMessages.ForeignKeyMustHaveOneOrMoreForeignColumns);
 
 			if (PrimaryColumns.Count == 0)
-				errors.Add(String.Format("The {0} does not have one or more primary column names.", GetType().Name));
+				errors.Add(ErrorMessages.ForeignKeyMustHaveOneOrMorePrimaryColumns);
 		}
 	}
 }

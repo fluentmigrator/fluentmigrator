@@ -38,5 +38,36 @@ namespace FluentMigrator.Tests
 
 			Assert.Equal("FK_Users_ColumnA_ColumnB_Groups_ColumnC_ColumnD", DefaultMigrationConventions.GetForeignKeyName(foreignKey));
 		}
+
+		[Fact]
+		public void GetIndexNameReturnsValidIndexNameForSimpleIndex()
+		{
+			var index = new IndexDefinition
+			{
+				TableName = "Bacon",
+				Columns =
+				{
+					new IndexColumnDefinition { ColumnName = "BaconName", Direction = Direction.Ascending }
+				}
+			};
+
+			Assert.Equal("IX_Bacon_BaconName", DefaultMigrationConventions.GetIndexName(index));
+		}
+
+		[Fact]
+		public void GetIndexNameReturnsValidIndexNameForComplexIndex()
+		{
+			var index = new IndexDefinition
+			{
+				TableName = "Bacon",
+				Columns =
+				{
+					new IndexColumnDefinition { ColumnName = "BaconName", Direction = Direction.Ascending },
+					new IndexColumnDefinition { ColumnName = "BaconSpice", Direction = Direction.Descending }
+				}
+			};
+
+			Assert.Equal("IX_Bacon_BaconName_BaconSpice", DefaultMigrationConventions.GetIndexName(index));
+		}
 	}
 }

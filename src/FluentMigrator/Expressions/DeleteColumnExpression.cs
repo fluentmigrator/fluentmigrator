@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
@@ -11,10 +12,10 @@ namespace FluentMigrator.Expressions
 		public virtual void CollectValidationErrors(ICollection<string> errors)
 		{
 			if (String.IsNullOrEmpty(TableName))
-				errors.Add(String.Format("The {0} does not have a valid table name", GetType().Name));
+				errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
 
 			if (String.IsNullOrEmpty(ColumnName))
-				errors.Add(String.Format("The {0} does not have a valid column name", GetType().Name));
+				errors.Add(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
 		}
 
 		public virtual void ExecuteWith(IMigrationProcessor processor)

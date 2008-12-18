@@ -48,6 +48,11 @@ namespace FluentMigrator.Runner.Processors
 			throw new NotImplementedException();
 		}
 
+		public void Process(DeleteIndexExpression expression)
+		{
+			throw new NotImplementedException();
+		}
+
 		public void Process(RenameTableExpression expression)
 		{
 			throw new NotImplementedException();

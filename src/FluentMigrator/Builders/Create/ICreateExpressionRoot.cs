@@ -12,6 +12,8 @@ namespace FluentMigrator.Builders.Create
 		ICreateTableWithColumnSyntax Table(string tableName);
 		ICreateColumnOnTableSyntax Column(string columnName);
 		ICreateForeignKeyFromTableSyntax ForeignKey();
+		ICreateForeignKeyFromTableSyntax ForeignKey(string foreignKeyName);
 		ICreateIndexForTableSyntax Index();
+		ICreateIndexForTableSyntax Index(string indexName);
 	}
 }

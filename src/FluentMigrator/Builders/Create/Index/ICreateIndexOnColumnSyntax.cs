@@ -1,15 +1,9 @@
 using System;
 
-namespace FluentMigrator.Builders.Create
+namespace FluentMigrator.Builders.Create.Index
 {
-    public interface ICreateIndexOnColumnSyntax
-    {
-        ICreateIndexColumnOptionsSyntax OnColumn(string name);
-    }
-
-    public interface ICreateIndexColumnOptionsSyntax
-    {
-        ICreateIndexOnColumnSyntax Ascending();
-        ICreateIndexOnColumnSyntax Descending();
-    }
+	public interface ICreateIndexOnColumnSyntax
+	{
+		ICreateIndexColumnOptionsSyntax OnColumn(string columnName);
+	}
 }

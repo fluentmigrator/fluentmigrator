@@ -38,9 +38,23 @@ namespace FluentMigrator.Builders.Create
 			return new CreateForeignKeyExpressionBuilder(expression);
 		}
 
+		public ICreateForeignKeyFromTableSyntax ForeignKey(string foreignKeyName)
+		{
+			var expression = new CreateForeignKeyExpression { ForeignKey = { Name = foreignKeyName } };
+			_context.Expressions.Add(expression);
+			return new CreateForeignKeyExpressionBuilder(expression);
+		}
+
 		public ICreateIndexForTableSyntax Index()
 		{
 			var expression = new CreateIndexExpression();
+			_context.Expressions.Add(expression);
+			return new CreateIndexExpressionBuilder(expression);
+		}
+
+		public ICreateIndexForTableSyntax Index(string indexName)
+		{
+			var expression = new CreateIndexExpression { Index = { Name = indexName } };
 			_context.Expressions.Add(expression);
 			return new CreateIndexExpressionBuilder(expression);
 		}

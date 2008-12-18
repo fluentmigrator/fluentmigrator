@@ -6,35 +6,36 @@ namespace FluentMigrator.Builders.Create.Index
 {
 	public class CreateIndexExpressionBuilder : ExpressionBuilderBase<CreateIndexExpression>,
 		ICreateIndexForTableSyntax, ICreateIndexOnColumnSyntax, ICreateIndexColumnOptionsSyntax
-	{		
-		private IndexColumnDefinition currentColumnDefinition;
+	{
+		public IndexColumnDefinition CurrentColumn { get; set; }
 		
-		public CreateIndexExpressionBuilder(CreateIndexExpression expression) : base(expression)
+		public CreateIndexExpressionBuilder(CreateIndexExpression expression)
+			: base(expression)
 		{
 		}
 
-		public ICreateIndexOnColumnSyntax OnTable(string name)
+		public ICreateIndexOnColumnSyntax OnTable(string tableName)
 		{
-			Expression.TableName = name;
+			Expression.Index.TableName = tableName;
 			return this;
 		}
 
-		public ICreateIndexColumnOptionsSyntax OnColumn(string name)
+		public ICreateIndexColumnOptionsSyntax OnColumn(string columnName)
 		{
-			currentColumnDefinition = new IndexColumnDefinition { ColumnName = name };
-			Expression.Columns.Add(currentColumnDefinition);
+			CurrentColumn = new IndexColumnDefinition { ColumnName = columnName };
+			Expression.Index.Columns.Add(CurrentColumn);
 			return this;
 		}
 
 		public ICreateIndexOnColumnSyntax Ascending()
 		{
-			currentColumnDefinition.Ascending = true;
+			CurrentColumn.Direction = Direction.Ascending;
 			return this;
 		}
 
 		public ICreateIndexOnColumnSyntax Descending()
 		{
-			currentColumnDefinition.Ascending = false;
+			CurrentColumn.Direction = Direction.Descending;
 			return this;
 		}
 	}

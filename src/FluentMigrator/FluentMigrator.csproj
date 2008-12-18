@@ -55,10 +55,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Builders\Create\Index\ICreateIndexColumnOptionsSyntax.cs" />
+    <Compile Include="Builders\Delete\Index\DeleteIndexExpressionBuilder.cs" />
+    <Compile Include="Builders\Delete\Index\IDeleteIndexForTableSyntax.cs" />
+    <Compile Include="Builders\Delete\Index\IDeleteIndexOnColumnSyntax.cs" />
     <Compile Include="Builders\Rename\Column\IRenameColumnToSyntax.cs" />
     <Compile Include="Builders\Rename\Column\RenameColumnExpressionBuilder.cs" />
+    <Compile Include="Expressions\DeleteIndexExpression.cs" />
     <Compile Include="Expressions\RenameColumnExpression.cs" />
     <Compile Include="IMigrationProcessor.cs" />
+    <Compile Include="Infrastructure\ICanBeConventional.cs" />
+    <Compile Include="Infrastructure\ErrorMessages.cs" />
+    <Compile Include="Model\IndexDefinition.cs" />
     <Compile Include="Model\Direction.cs" />
     <Compile Include="Model\IndexColumnDefinition.cs" />
     <Compile Include="Builders\Create\Index\CreateIndexExpressionBuilder.cs" />
@@ -96,7 +104,6 @@
     <Compile Include="Builders\Create\Table\CreateTableExpressionBuilder.cs" />
     <Compile Include="Infrastructure\ICanBeValidated.cs" />
     <Compile Include="Infrastructure\Extensions\ExtensionsForICustomAttributeProvider.cs" />
-    <Compile Include="Infrastructure\Extensions\ExtensionsForIEnumerableOfString.cs" />
     <Compile Include="Infrastructure\DefaultMigrationConventions.cs" />
     <Compile Include="Infrastructure\MigrationMetadata.cs" />
     <Compile Include="MigrationAttribute.cs" />

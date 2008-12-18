@@ -13,7 +13,7 @@ namespace FluentMigrator.Tests
 
 			Create.Column("Foo").OnTable("Users").AsInt16().Indexed();
 
-			Create.ForeignKey().FromTable("Users").ForeignColumn("GroupId").ToTable("Groups").PrimaryColumn("GroupId");
+			Create.ForeignKey("Foo").FromTable("Users").ForeignColumn("GroupId").ToTable("Groups").PrimaryColumn("GroupId");
 
 			Create.Index().OnTable("Users")
 				.OnColumn("UserName").Ascending()
@@ -25,6 +25,8 @@ namespace FluentMigrator.Tests
 
 		public override void Down()
 		{
+			Delete.ForeignKey("FK_Foo");
+
 			Delete.ForeignKey().FromTable("Users").ForeignColumn("GroupId").ToTable("Groups").PrimaryColumn("GroupId");
 
 			Delete.Column("Foo").FromTable("Users");
