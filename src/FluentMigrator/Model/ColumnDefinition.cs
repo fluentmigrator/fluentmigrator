@@ -17,9 +17,9 @@ namespace FluentMigrator.Model
 		public virtual bool IsPrimaryKey { get; set; }
 		public virtual bool IsNullable { get; set; }
 		public virtual bool IsUnique { get; set; }
-	    public int Precision { get; set; }
+		public virtual int Precision { get; set; }
 
-	    public virtual void CollectValidationErrors(ICollection<string> errors)
+		public virtual void CollectValidationErrors(ICollection<string> errors)
 		{
 		}
 	}

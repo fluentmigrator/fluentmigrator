@@ -48,6 +48,7 @@
     <Compile Include="Builders\IColumnTypeSyntax.cs" />
     <Compile Include="Builders\Create\ICreateExpressionRoot.cs" />
     <Compile Include="Builders\Delete\IDeleteExpressionRoot.cs" />
+    <Compile Include="Builders\IColumnOptionSyntax.cs" />
     <Compile Include="Builders\Rename\IRenameExpressionRoot.cs" />
     <Compile Include="Builders\Rename\Table\RenameTableExpressionBuilder.cs" />
     <Compile Include="Builders\Rename\Table\IRenameTableToNameSyntax.cs" />

@@ -1,17 +1,8 @@
 ﻿using System;
-using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Create.Column
 {
-	public interface ICreateColumnOptionSyntax : IFluentSyntax
+	public interface ICreateColumnOptionSyntax : IColumnOptionSyntax<ICreateColumnOptionSyntax>
 	{		
-		ICreateColumnOptionSyntax WithDefaultValue(object value);
-		ICreateColumnOptionSyntax ForeignKey();
-		ICreateColumnOptionSyntax Identity();
-		ICreateColumnOptionSyntax Indexed();
-		ICreateColumnOptionSyntax PrimaryKey();
-		ICreateColumnOptionSyntax Nullable();
-		ICreateColumnOptionSyntax NotNullable();
-		ICreateColumnOptionSyntax Unique();
 	}
 }

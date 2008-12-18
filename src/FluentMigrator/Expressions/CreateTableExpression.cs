@@ -7,7 +7,7 @@ namespace FluentMigrator.Expressions
 	public class CreateTableExpression : IMigrationExpression
 	{
 		public virtual string TableName { get; set; }
-		public virtual IList<ColumnDefinition> Columns { get; private set; }
+		public virtual IList<ColumnDefinition> Columns { get; set; }
 
 		public virtual ColumnDefinition CurrentColumn
 		{
