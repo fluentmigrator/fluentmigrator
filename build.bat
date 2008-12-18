@@ -1,0 +1,1 @@
+%windir%\Microsoft.NET\Framework\v3.5\MSBuild.exe fluentmigrator.msbuild
