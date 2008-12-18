@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using FluentMigrator.Expressions;
-using FluentMigrator.Processors;
 
-namespace FluentMigrator.Runner.Processors
+namespace FluentMigrator.Expressions
 {
 	public class RenameColumnExpression : IMigrationExpression
 	{
@@ -17,12 +15,11 @@ namespace FluentMigrator.Runner.Processors
 
 			if (String.IsNullOrEmpty(NewName))
 				errors.Add(String.Format("The {0} does not have a valid new column name", NewName));
-
 		}
 
 		public void ExecuteWith(IMigrationProcessor processor)
 		{
-			throw new System.NotImplementedException();
+			processor.Process(this);
 		}
 	}
 }

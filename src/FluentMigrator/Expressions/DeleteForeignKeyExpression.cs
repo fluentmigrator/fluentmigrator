@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using FluentMigrator.Model;
-using FluentMigrator.Processors;
 
 namespace FluentMigrator.Expressions
 {

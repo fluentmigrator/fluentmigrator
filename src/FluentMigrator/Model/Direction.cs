@@ -1,3 +1,5 @@
+using System;
+
 namespace FluentMigrator.Model
 {
 	public enum Direction

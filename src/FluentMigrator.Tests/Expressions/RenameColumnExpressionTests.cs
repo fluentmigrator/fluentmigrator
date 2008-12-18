@@ -1,10 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using FluentMigrator.Runner.Processors;
+using FluentMigrator.Expressions;
 using Xunit;
 
-namespace FluentMigrator.Tests
+namespace FluentMigrator.Tests.Expressions
 {
 	public class RenameColumnExpressionTests
 	{
@@ -18,14 +18,14 @@ namespace FluentMigrator.Tests
 		}
 
 		[Fact]
-		public void OmmittingNewNameWillAddError()
+		public void OmittingNewNameWillAddError()
 		{
 			_renameColumnExpression.OldName = "Bacon";
 			ExpectedErrorsAreAdded();
 		}
 
 		[Fact]
-		public void OmmittingOldNameWillAddError()
+		public void OmittingOldNameWillAddError()
 		{
 			_renameColumnExpression.NewName = "ChunkierBacon";
 			ExpectedErrorsAreAdded();

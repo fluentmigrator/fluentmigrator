@@ -45,6 +45,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Builders\Rename\Column\IRenameColumnToSyntax.cs" />
+    <Compile Include="Builders\Rename\Column\RenameColumnExpressionBuilder.cs" />
+    <Compile Include="Expressions\RenameColumnExpression.cs" />
     <Compile Include="IMigrationProcessor.cs" />
     <Compile Include="Model\Direction.cs" />
     <Compile Include="Model\IndexColumnDefinition.cs" />
@@ -58,7 +61,7 @@
     <Compile Include="Builders\IColumnOptionSyntax.cs" />
     <Compile Include="Builders\Rename\IRenameExpressionRoot.cs" />
     <Compile Include="Builders\Rename\Table\RenameTableExpressionBuilder.cs" />
-    <Compile Include="Builders\Rename\Table\IRenameTableToNameSyntax.cs" />
+    <Compile Include="Builders\Rename\Table\IRenameTableToSyntax.cs" />
     <Compile Include="Builders\Rename\RenameExpressionRoot.cs" />
     <Compile Include="Builders\Delete\ForeignKey\DeleteForeignKeyExpressionBuilder.cs" />
     <Compile Include="Builders\Delete\ForeignKey\IDeleteForeignKeyForeignColumnSyntax.cs" />
@@ -81,7 +84,6 @@
     <Compile Include="Builders\Create\Column\ICreateColumnAsTypeSyntax.cs" />
     <Compile Include="Builders\Create\Table\ICreateTableWithColumnSyntax.cs" />
     <Compile Include="Builders\Create\Table\CreateTableExpressionBuilder.cs" />
-    <Compile Include="Expressions\RenameColumnExpression.cs" />
     <Compile Include="Infrastructure\ICanBeValidated.cs" />
     <Compile Include="Infrastructure\Extensions\ExtensionsForICustomAttributeProvider.cs" />
     <Compile Include="Infrastructure\Extensions\ExtensionsForIEnumerableOfString.cs" />

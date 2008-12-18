@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+using System;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 

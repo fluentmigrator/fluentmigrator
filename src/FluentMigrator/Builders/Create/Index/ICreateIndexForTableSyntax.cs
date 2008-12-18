@@ -1,3 +1,5 @@
+using System;
+
 namespace FluentMigrator.Builders.Create.Index
 {
     public interface ICreateIndexForTableSyntax

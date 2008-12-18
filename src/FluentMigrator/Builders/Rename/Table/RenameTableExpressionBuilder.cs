@@ -4,7 +4,7 @@ using FluentMigrator.Expressions;
 namespace FluentMigrator.Builders.Rename.Table
 {
 	public class RenameTableExpressionBuilder : ExpressionBuilderBase<RenameTableExpression>,
-		IRenameTableToNameSyntax
+		IRenameTableToSyntax
 	{
 		public RenameTableExpressionBuilder(RenameTableExpression expression)
 			: base(expression)

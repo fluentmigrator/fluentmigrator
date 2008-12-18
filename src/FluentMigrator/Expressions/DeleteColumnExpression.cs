@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using FluentMigrator.Processors;
 
 namespace FluentMigrator.Expressions
 {

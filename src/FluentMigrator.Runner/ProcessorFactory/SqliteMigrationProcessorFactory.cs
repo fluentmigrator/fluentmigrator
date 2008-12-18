@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Data.SqlClient;
-using FluentMigrator.Processors;
-using FluentMigrator.Runner.Processors;
 
 namespace FluentMigrator.Runner.Processors
 {

@@ -1,3 +1,5 @@
+using System;
+
 namespace FluentMigrator.Builders.Create
 {
     public interface ICreateIndexOnColumnSyntax

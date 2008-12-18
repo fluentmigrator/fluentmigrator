@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Data.SqlClient;
 using FluentMigrator.Expressions;
-using FluentMigrator.Processors;
-using FluentMigrator.Runner.Processors;
 
 namespace FluentMigrator.Runner.Processors
 {
@@ -27,7 +25,7 @@ namespace FluentMigrator.Runner.Processors
 
 		public void Process(RenameColumnExpression expression)
 		{
-			throw new System.NotImplementedException();
+			throw new NotImplementedException();
 		}
 
 		public void Process(DeleteTableExpression expression)

@@ -3,7 +3,7 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Rename.Table
 {
-	public interface IRenameTableToNameSyntax : IFluentSyntax
+	public interface IRenameTableToSyntax : IFluentSyntax
 	{
 		void To(string name);
 	}

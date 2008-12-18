@@ -1,25 +1,18 @@
-﻿using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Processors;
+﻿using System;
+using FluentMigrator.Expressions;
 
-namespace FluentMigrator.Processors
+namespace FluentMigrator
 {
 	public interface IMigrationProcessor
 	{
-		// Tables
 		void Process(CreateTableExpression expression);
-		void Process(RenameTableExpression expression);
-		void Process(DeleteTableExpression expression);
-
-		// Columns
 		void Process(CreateColumnExpression expression);
-		void Process(RenameColumnExpression expression);
+		void Process(DeleteTableExpression expression);
 		void Process(DeleteColumnExpression expression);
-
-		// Keys
 		void Process(CreateForeignKeyExpression expression);
 		void Process(DeleteForeignKeyExpression expression);
-
-		// Indexes
+		void Process(RenameTableExpression expression);
+		void Process(RenameColumnExpression expression);
 		void Process(CreateIndexExpression expression);
 	}
 }

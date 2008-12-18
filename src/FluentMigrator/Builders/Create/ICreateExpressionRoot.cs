@@ -1,3 +1,4 @@
+using System;
 using FluentMigrator.Builders.Create.Column;
 using FluentMigrator.Builders.Create.ForeignKey;
 using FluentMigrator.Builders.Create.Index;

@@ -1,4 +1,6 @@
-﻿namespace FluentMigrator.Tests
+﻿using System;
+
+namespace FluentMigrator.Tests
 {
 	public class TestMigration : Migration
 	{
@@ -16,6 +18,9 @@
 			Create.Index().OnTable("Users")
 				.OnColumn("UserName").Ascending()
 				.OnColumn("Password").Descending();
+
+			Rename.Table("Foo").To("Bar");
+			Rename.Column("Fizz").To("Buzz");
 		}
 
 		public override void Down()
