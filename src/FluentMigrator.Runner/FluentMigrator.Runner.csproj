@@ -45,9 +45,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="IMigrationProcessorFactory.cs" />
     <Compile Include="MigrationLoader.cs" />
     <Compile Include="IMigrationLoader.cs" />
     <Compile Include="MigrationRunner.cs" />
+    <Compile Include="Processors\SqlServerMigrationProcessor.cs" />
+    <Compile Include="Processors\SqlServerMigrationProcessorFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
