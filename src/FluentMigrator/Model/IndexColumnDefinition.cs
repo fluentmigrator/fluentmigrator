@@ -6,12 +6,12 @@ namespace FluentMigrator.Model
 {
 	public class IndexColumnDefinition : ICanBeValidated
 	{
-		public string ColumnName { get; set; }
-		public Direction Direction { get; set; }
+		public virtual string Name { get; set; }
+		public virtual Direction Direction { get; set; }
 
-		public void CollectValidationErrors(ICollection<string> errors)
+		public virtual void CollectValidationErrors(ICollection<string> errors)
 		{
-			if (String.IsNullOrEmpty(ColumnName))
+			if (String.IsNullOrEmpty(Name))
 				errors.Add(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
 		}
 	}

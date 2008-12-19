@@ -17,7 +17,7 @@ namespace FluentMigrator.Tests.Definitions
 		[Fact]
 		public void ErrorIsReturnedWhenColumnNameIsNull()
 		{
-			var column = new IndexColumnDefinition { ColumnName = null };
+			var column = new IndexColumnDefinition { Name = null };
 			var errors = ValidationHelper.CollectErrors(column);
 			Assert.Contains(ErrorMessages.ColumnNameCannotBeNullOrEmpty, errors);
 		}
@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Definitions
 		[Fact]
 		public void ErrorIsReturnedWhenColumnNameIsEmptyString()
 		{
-			var column = new IndexColumnDefinition { ColumnName = String.Empty };
+			var column = new IndexColumnDefinition { Name = String.Empty };
 			var errors = ValidationHelper.CollectErrors(column);
 			Assert.Contains(ErrorMessages.ColumnNameCannotBeNullOrEmpty, errors);
 		}
@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Definitions
 		[Fact]
 		public void ErrorIsNotReturnedWhenColumnNameIsNotNullOrEmptyString()
 		{
-			var column = new IndexColumnDefinition { ColumnName = "Bacon" };
+			var column = new IndexColumnDefinition { Name = "Bacon" };
 			var errors = ValidationHelper.CollectErrors(column);
 			Assert.DoesNotContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty, errors);
 		}

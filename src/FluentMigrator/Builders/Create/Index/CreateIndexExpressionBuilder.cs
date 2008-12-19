@@ -22,7 +22,7 @@ namespace FluentMigrator.Builders.Create.Index
 
 		public ICreateIndexColumnOptionsSyntax OnColumn(string columnName)
 		{
-			CurrentColumn = new IndexColumnDefinition { ColumnName = columnName };
+			CurrentColumn = new IndexColumnDefinition { Name = columnName };
 			Expression.Index.Columns.Add(CurrentColumn);
 			return this;
 		}

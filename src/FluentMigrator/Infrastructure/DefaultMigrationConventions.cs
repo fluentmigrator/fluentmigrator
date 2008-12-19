@@ -48,7 +48,7 @@ namespace FluentMigrator.Infrastructure
 			foreach (IndexColumnDefinition column in index.Columns)
 			{
 				sb.Append("_");
-				sb.Append(column.ColumnName);
+				sb.Append(column.Name);
 			}
 
 			return sb.ToString();

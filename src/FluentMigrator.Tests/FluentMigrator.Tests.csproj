@@ -63,6 +63,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Builders\Create\CreateIndexExpressionBuilderTests.cs" />
     <Compile Include="Builders\Create\CreateExpressionRootTests.cs" />
     <Compile Include="Builders\Delete\DeleteExpressionRootTests.cs" />
     <Compile Include="Builders\Delete\DeleteForeignKeyExpressionBuilderTests.cs" />

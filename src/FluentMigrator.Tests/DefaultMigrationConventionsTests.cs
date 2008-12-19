@@ -47,7 +47,7 @@ namespace FluentMigrator.Tests
 				TableName = "Bacon",
 				Columns =
 				{
-					new IndexColumnDefinition { ColumnName = "BaconName", Direction = Direction.Ascending }
+					new IndexColumnDefinition { Name = "BaconName", Direction = Direction.Ascending }
 				}
 			};
 
@@ -62,8 +62,8 @@ namespace FluentMigrator.Tests
 				TableName = "Bacon",
 				Columns =
 				{
-					new IndexColumnDefinition { ColumnName = "BaconName", Direction = Direction.Ascending },
-					new IndexColumnDefinition { ColumnName = "BaconSpice", Direction = Direction.Descending }
+					new IndexColumnDefinition { Name = "BaconName", Direction = Direction.Ascending },
+					new IndexColumnDefinition { Name = "BaconSpice", Direction = Direction.Descending }
 				}
 			};
 
