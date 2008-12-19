@@ -9,7 +9,7 @@ namespace FluentMigrator
 	{
 		void SetTypeMap(DbType type, string template);
 		void SetTypeMap(DbType type, string template, int maxSize);
-		string GetTypeMap(DbType type, int size, int precision);		
+		string GetTypeMap(DbType type, int size, int precision);
 
 		string Generate(CreateTableExpression expression);
 		string Generate(CreateColumnExpression expression);

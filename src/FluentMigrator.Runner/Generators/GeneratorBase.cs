@@ -38,7 +38,7 @@ namespace FluentMigrator.Runner.Generators
 				int capacity = entry.Key;
 				string template = entry.Value;
 
-				if (capacity <= size)
+                if (size <= capacity)
 					return ReplacePlaceholders(template, size, precision);
 			}
 

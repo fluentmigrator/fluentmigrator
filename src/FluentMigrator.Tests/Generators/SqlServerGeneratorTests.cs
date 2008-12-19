@@ -44,6 +44,38 @@ namespace FluentMigrator.Tests.Generators
 			Assert.Equal("DROP TABLE NewTable", sql);
 		}
 
+        [Fact]
+        public void CanDropColumn()
+        {
+            string tableName = "NewTable";
+            string columnName = "NewColumn";
+            
+            var expression = new DeleteColumnExpression();
+            expression.TableName = tableName;
+            expression.ColumnName = columnName;
+
+            string sql = generator.Generate(expression);
+            Assert.Equal("ALTER TABLE NewTable DROP COLUMN NewColumn", sql);
+        }
+
+        [Fact]
+        public void CanAddColumn()
+        {
+            string tableName = "NewTable";
+            
+            var columnDefinition = new ColumnDefinition();
+            columnDefinition.Name = "NewColumn";
+            columnDefinition.Size = 5;
+            columnDefinition.Type = DbType.String;
+
+            var expression = new CreateColumnExpression();
+            expression.Column = columnDefinition;
+            expression.TableName = tableName;
+
+            string sql = generator.Generate(expression);
+            Assert.Equal("ALTER TABLE NewTable ADD NewColumn NVARCHAR(5)", sql);
+        }
+
 		private DeleteTableExpression GetDeleteTableExpression(string tableName)
 		{
 			return new DeleteTableExpression { TableName = tableName };

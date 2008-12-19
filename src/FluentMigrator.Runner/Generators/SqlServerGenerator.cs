@@ -95,22 +95,23 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(CreateTableExpression expression)
 		{
-			return FormatExpression("CREATE TABLE {0} ({1})", expression.TableName, GetColumnDDL(expression.Columns));
+			return FormatExpression("CREATE TABLE [{0}] ({1})", expression.TableName, GetColumnDDL(expression.Columns));
 		}
 
 		public override string Generate(CreateColumnExpression expression)
 		{
-			throw new NotImplementedException();
+		    return FormatExpression("ALTER TABLE [{0}] ADD {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
 		}
 
 		public override string Generate(DeleteTableExpression expression)
 		{
-			return FormatExpression("DROP TABLE {0}", expression.TableName);
+			return FormatExpression("DROP TABLE [{0}]", expression.TableName);
 		}
 
 		public override string Generate(DeleteColumnExpression expression)
 		{
-			throw new NotImplementedException();
+
+		    return FormatExpression("ALTER TABLE [{0}] DROP COLUMN {1}", expression.TableName, expression.ColumnName);            
 		}
 
 		public override string Generate(CreateForeignKeyExpression expression)
