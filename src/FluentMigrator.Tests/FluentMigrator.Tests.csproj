@@ -79,6 +79,7 @@
     <Compile Include="Builders\Create\CreateForeignKeyExpressionBuilderTests.cs" />
     <Compile Include="Builders\Create\CreateTableExpressionBuilderTests.cs" />
     <Compile Include="Builders\Create\CreateColumnExpressionBuilderTests.cs" />
+    <Compile Include="Helpers\SqlServerTestTable.cs" />
     <Compile Include="Definitions\IndexColumnDefinitionTests.cs" />
     <Compile Include="Definitions\ForeignKeyDefinitionTests.cs" />
     <Compile Include="Expressions\RenameTableExpressionTests.cs" />
@@ -86,6 +87,7 @@
     <Compile Include="Expressions\DeleteColumnExpressionTests.cs" />
     <Compile Include="Expressions\CreateColumnExpressionTests.cs" />
     <Compile Include="Processors\SqliteProcessorTests.cs" />
+    <Compile Include="Processors\SqlServerMigrationProcessorTests.cs" />
     <Compile Include="ValidationHelper.cs" />
     <Compile Include="DefaultMigrationConventionsTests.cs" />
     <Compile Include="Definitions\ColumnDefinitionTests.cs" />
