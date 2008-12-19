@@ -76,6 +76,29 @@ namespace FluentMigrator.Tests.Generators
             Assert.Equal("ALTER TABLE NewTable ADD NewColumn NVARCHAR(5)", sql);
         }
 
+        [Fact]
+        public void CanRenameTable()
+        {
+            var expression = new RenameTableExpression();
+            expression.OldName = "Table1";
+            expression.NewName = "Table2";
+
+            string sql = generator.Generate(expression);
+            Assert.Equal("sp_rename [Table1], [Table2]", sql);
+        }
+
+        [Fact]
+        public void CanRenameColumn()
+        {
+            var expression = new RenameColumnExpression();
+            expression.TableName = "Table1";
+            expression.OldName = "Column1";
+            expression.NewName = "Column2";
+
+            string sql = generator.Generate(expression);
+            Assert.Equal("sp_rename '[Table1].[Column1]', [Column2]", sql);
+        }
+
 		private DeleteTableExpression GetDeleteTableExpression(string tableName)
 		{
 			return new DeleteTableExpression { TableName = tableName };

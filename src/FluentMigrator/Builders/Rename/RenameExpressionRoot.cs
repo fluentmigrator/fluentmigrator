@@ -22,7 +22,7 @@ namespace FluentMigrator.Builders.Rename
 			return new RenameTableExpressionBuilder(expression);
 		}
 
-		public IRenameColumnToSyntax Column(string oldName)
+		public IRenameColumnTableSyntax Column(string oldName)
 		{
 			var expression = new RenameColumnExpression { OldName = oldName };
 			_context.Expressions.Add(expression);

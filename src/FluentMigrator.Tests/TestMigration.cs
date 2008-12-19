@@ -21,7 +21,7 @@ namespace FluentMigrator.Tests
 				.OnColumn("Password").Descending();
 
 			Rename.Table("Foo").To("Bar");
-			Rename.Column("Fizz").To("Buzz");
+			Rename.Column("Fizz").OnTable("Foo").To("Buzz");            
 		}
 
 		public override void Down()

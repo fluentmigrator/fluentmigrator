@@ -8,8 +8,9 @@ namespace FluentMigrator.Expressions
 	{
 		public virtual string OldName { get; set; }
 		public virtual string NewName { get; set; }
+	    public virtual string TableName { get; set; }
 
-		public void CollectValidationErrors(ICollection<string> errors)
+	    public void CollectValidationErrors(ICollection<string> errors)
 		{
 			if (String.IsNullOrEmpty(OldName))
 				errors.Add(ErrorMessages.OldColumnNameCannotBeNullOrEmpty);

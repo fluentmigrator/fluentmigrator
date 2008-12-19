@@ -136,12 +136,12 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(RenameTableExpression expression)
 		{
-			throw new NotImplementedException();
+		    return FormatExpression("sp_rename [{0}], [{1}]", expression.OldName, expression.NewName);
 		}
 
 		public override string Generate(RenameColumnExpression expression)
 		{
-			throw new NotImplementedException();
+		    return FormatExpression("sp_rename '[{0}].[{1}]', [{2}]", expression.TableName, expression.OldName, expression.NewName);
 		}
 
 		private IList<ColumnDefinition> GetPrimaryKeyColumns(IList<ColumnDefinition> columns)
