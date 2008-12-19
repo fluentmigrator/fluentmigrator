@@ -55,7 +55,12 @@ namespace FluentMigrator.Runner.Generators
 			
 			sb.Append(column.Name);
 			sb.Append(" ");
-			sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));			
+			sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
+
+			if (column.IsPrimaryKey)
+			{
+				sb.Append(" PRIMARY KEY CLUSTERED");
+			}
 
 			return sb.ToString();
 		}
@@ -153,7 +158,7 @@ namespace FluentMigrator.Runner.Generators
 
 		private string AddPrimaryKeyConstraint(IList<ColumnDefinition> primaryKeyColumns, string result)
 		{
-			if (primaryKeyColumns.Count > 0)
+			if (primaryKeyColumns.Count > 1)
 			{
 				string keyName = "";
 				string keyColumns = "";

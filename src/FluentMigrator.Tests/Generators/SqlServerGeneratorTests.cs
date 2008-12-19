@@ -22,7 +22,17 @@ namespace FluentMigrator.Tests.Generators
 			string tableName = "NewTable";
 			CreateTableExpression expression = GetCreateTableExpression(tableName);
 			string sql = generator.Generate(expression);
-			Assert.Equal("CREATE TABLE NewTable (ColumnName1 NVARCHAR(255), ColumnName2 INT)", sql);			
+			Assert.Equal("CREATE TABLE NewTable (ColumnName1 NVARCHAR(255), ColumnName2 INT)", sql);
+		}
+
+		[Fact]
+		public void CanCreateTableWithPrimaryKey()
+		{
+			string tableName = "NewTable";
+			CreateTableExpression expression = GetCreateTableExpression(tableName);
+			expression.Columns[0].IsPrimaryKey = true;
+			string sql = generator.Generate(expression);
+			Assert.Equal("CREATE TABLE NewTable (ColumnName1 NVARCHAR(255) PRIMARY KEY CLUSTERED, ColumnName2 INT)", sql);
 		}
 
 		[Fact]
@@ -44,17 +54,12 @@ namespace FluentMigrator.Tests.Generators
 			string columnName1 = "ColumnName1";
 			string columnName2 = "ColumnName2";
 
-			var column1 = new Mock<ColumnDefinition>();
-			column1.ExpectGet(c => c.Name).Returns(columnName1);
-			column1.ExpectGet(c => c.Type).Returns(DbType.String);
-
-			var column2 = new Mock<ColumnDefinition>();
-			column2.ExpectGet(c => c.Name).Returns(columnName2);
-			column2.ExpectGet(c => c.Type).Returns(DbType.Int32);
+			var column1 = new ColumnDefinition {Name = columnName1, Type = DbType.String};
+			var column2 = new ColumnDefinition {Name = columnName2, Type = DbType.Int32};
 
 			var expression = new CreateTableExpression { TableName = tableName };
-			expression.Columns.Add(column1.Object);
-			expression.Columns.Add(column2.Object);
+			expression.Columns.Add(column1);
+			expression.Columns.Add(column2);
 			return expression;
 		}	    
 	}
