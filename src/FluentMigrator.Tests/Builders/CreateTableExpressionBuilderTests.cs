@@ -15,14 +15,19 @@ namespace FluentMigrator.Tests.Builders
 		[Fact]
 		public void CallingAsAnsiStringSetsColumnDbTypeToAnsiString()
 		{
+			VerifyColumnDbType(DbType.AnsiString, b => b.AsAnsiString());
+		}
+
+		[Fact]
+		public void CallingAsAnsiStringWithSizeSetsColumnDbTypeToAnsiString()
+		{
 			VerifyColumnDbType(DbType.AnsiString, b => b.AsAnsiString(255));
 		}
 
 		[Fact]
 		public void CallingAsAnsiStringSetsColumnSizeToSpecifiedValue()
 		{
-			const int size = 255;
-			VerifyColumnSize(size, b => b.AsAnsiString(size));
+			VerifyColumnSize(255, b => b.AsAnsiString(255));
 		}
 
 		[Fact]
@@ -34,8 +39,7 @@ namespace FluentMigrator.Tests.Builders
 		[Fact]
 		public void CallingAsBinarySetsColumnSizeToSpecifiedValue()
 		{
-			const int size = 255;
-			VerifyColumnSize(size, b => b.AsBinary(size));
+			VerifyColumnSize(255, b => b.AsBinary(255));
 		}
 
 		[Fact]
@@ -71,23 +75,25 @@ namespace FluentMigrator.Tests.Builders
 		[Fact]
 		public void CallingAsDecimalSetsColumnDbTypeToDecimal()
 		{
-			VerifyColumnDbType(DbType.Decimal, b => b.AsDecimal(19,5));
+			VerifyColumnDbType(DbType.Decimal, b => b.AsDecimal());
+		}
+
+		[Fact]
+		public void CallingAsDecimalWithSizeSetsColumnDbTypeToDecimal()
+		{
+			VerifyColumnDbType(DbType.Decimal, b => b.AsDecimal(1, 2));
 		}
 
 		[Fact]
 		public void CallingAsDecimalStringSetsColumnSizeToSpecifiedValue()
 		{
-			const int size = 5;
-			const int precision = 3;
-			VerifyColumnSize(size, b => b.AsDecimal(size, precision));
+			VerifyColumnSize(1, b => b.AsDecimal(1, 2));
 		}
 
 		[Fact]
 		public void CallingAsDecimalStringSetsColumnPrecisionToSpecifiedValue()
 		{
-			const int size = 5;
-			const int precision = 3;
-			VerifyColumnPrecision(precision, b => b.AsDecimal(size, precision));
+			VerifyColumnPrecision(2, b => b.AsDecimal(1, 2));
 		}
 
 		[Fact]
@@ -111,8 +117,7 @@ namespace FluentMigrator.Tests.Builders
 		[Fact]
 		public void CallingAsFixedLengthStringSetsColumnSizeToSpecifiedValue()
 		{
-			const int size = 255;
-			VerifyColumnSize(size, b => b.AsFixedLengthString(size));
+			VerifyColumnSize(255, b => b.AsFixedLengthString(255));
 		}
 
 		[Fact]
@@ -124,8 +129,7 @@ namespace FluentMigrator.Tests.Builders
 		[Fact]
 		public void CallingAsFixedLengthAnsiStringSetsColumnSizeToSpecifiedValue()
 		{
-			const int size = 255;
-			VerifyColumnSize(size, b => b.AsFixedLengthAnsiString(size));
+			VerifyColumnSize(255, b => b.AsFixedLengthAnsiString(255));
 		}
 
 		[Fact]
@@ -155,14 +159,19 @@ namespace FluentMigrator.Tests.Builders
 		[Fact]
 		public void CallingAsStringSetsColumnDbTypeToString()
 		{
+			VerifyColumnDbType(DbType.String, b => b.AsString());
+		}
+
+		[Fact]
+		public void CallingAsStringWithSizeSetsColumnDbTypeToString()
+		{
 			VerifyColumnDbType(DbType.String, b => b.AsString(255));
 		}
 
 		[Fact]
 		public void CallingAsStringSetsColumnSizeToSpecifiedValue()
 		{
-			const int size = 255;
-			VerifyColumnSize(size, b => b.AsFixedLengthAnsiString(size));
+			VerifyColumnSize(255, b => b.AsFixedLengthAnsiString(255));
 		}
 
 		[Fact]
@@ -174,14 +183,19 @@ namespace FluentMigrator.Tests.Builders
 		[Fact]
 		public void CallingAsXmlSetsColumnDbTypeToXml()
 		{
+			VerifyColumnDbType(DbType.Xml, b => b.AsXml());
+		}
+
+		[Fact]
+		public void CallingAsXmlWithSizeSetsColumnDbTypeToXml()
+		{
 			VerifyColumnDbType(DbType.Xml, b => b.AsXml(255));
 		}
 
 		[Fact]
 		public void CallingAsXmlSetsColumnSizeToSpecifiedValue()
 		{
-			const int size = 255;
-			VerifyColumnSize(size, b => b.AsXml(size));
+			VerifyColumnSize(255, b => b.AsXml(255));
 		}
 
 		[Fact]

@@ -18,10 +18,22 @@ namespace FluentMigrator.Builders.Create.Column
 			return this;
 		}
 
+		public ICreateColumnOptionSyntax AsAnsiString()
+		{
+			Expression.Column.Type = DbType.AnsiString;
+			return this;
+		}
+
 		public ICreateColumnOptionSyntax AsAnsiString(int size)
 		{
 			Expression.Column.Type = DbType.AnsiString;
 			Expression.Column.Size = size;
+			return this;
+		}
+
+		public ICreateColumnOptionSyntax AsBinary()
+		{
+			Expression.Column.Type = DbType.Binary;
 			return this;
 		}
 
@@ -59,6 +71,12 @@ namespace FluentMigrator.Builders.Create.Column
 		public ICreateColumnOptionSyntax AsDateTime()
 		{
 			Expression.Column.Type = DbType.DateTime;
+			return this;
+		}
+
+		public ICreateColumnOptionSyntax AsDecimal()
+		{
+			Expression.Column.Type = DbType.Decimal;
 			return this;
 		}
 
@@ -120,6 +138,12 @@ namespace FluentMigrator.Builders.Create.Column
 			return this;
 		}
 
+		public ICreateColumnOptionSyntax AsString()
+		{
+			Expression.Column.Type = DbType.String;
+			return this;
+		}
+
 		public ICreateColumnOptionSyntax AsString(int size)
 		{
 			Expression.Column.Type = DbType.String;
@@ -130,6 +154,12 @@ namespace FluentMigrator.Builders.Create.Column
 		public ICreateColumnOptionSyntax AsTime()
 		{
 			Expression.Column.Type = DbType.Time;
+			return this;
+		}
+
+		public ICreateColumnOptionSyntax AsXml()
+		{
+			Expression.Column.Type = DbType.Xml;
 			return this;
 		}
 

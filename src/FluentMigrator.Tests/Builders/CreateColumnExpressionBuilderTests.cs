@@ -27,27 +27,37 @@ namespace FluentMigrator.Tests.Builders
 		[Fact]
 		public void CallingAsAnsiStringSetsColumnDbTypeToAnsiString()
 		{
-			VerifyColumnDbType(DbType.AnsiString, b => b.AsAnsiString(255));
+			VerifyColumnDbType(DbType.AnsiString, b => b.AsAnsiString());
 		}
 
 		[Fact]
-		public void CallingAsAnsiStringSetsColumnSizeToSpecifiedValue()
+		public void CallingAsAnsiStringWithSizeSetsColumnDbTypeToAnsiString()
 		{
-			const int size = 255;
-			VerifyColumnSize(size, b => b.AsAnsiString(size));
+			VerifyColumnDbType(DbType.AnsiString, b => b.AsAnsiString(42));
+		}
+
+		[Fact]
+		public void CallingAsAnsiStringWithSizeSetsColumnSizeToSpecifiedValue()
+		{
+			VerifyColumnSize(42, b => b.AsAnsiString(42));
 		}
 
 		[Fact]
 		public void CallingAsBinarySetsColumnDbTypeToBinary()
 		{
-			VerifyColumnDbType(DbType.Binary, b => b.AsBinary(255));
+			VerifyColumnDbType(DbType.Binary, b => b.AsBinary());
 		}
 
 		[Fact]
-		public void CallingAsBinarySetsColumnSizeToSpecifiedValue()
+		public void CallingAsBinaryWithSizeSetsColumnDbTypeToBinary()
 		{
-			const int size = 255;
-			VerifyColumnSize(size, b => b.AsBinary(size));
+			VerifyColumnDbType(DbType.Binary, b => b.AsBinary(42));
+		}
+
+		[Fact]
+		public void CallingAsBinaryWithSizeSetsColumnSizeToSpecifiedValue()
+		{
+			VerifyColumnSize(42, b => b.AsBinary(42));
 		}
 
 		[Fact]
@@ -83,23 +93,25 @@ namespace FluentMigrator.Tests.Builders
 		[Fact]
 		public void CallingAsDecimalSetsColumnDbTypeToDecimal()
 		{
-			VerifyColumnDbType(DbType.Decimal, b => b.AsDecimal(19,5));
+			VerifyColumnDbType(DbType.Decimal, b => b.AsDecimal());
+		}
+
+		[Fact]
+		public void CallingAsDecimalWithSizeAndPrecisionSetsColumnDbTypeToDecimal()
+		{
+			VerifyColumnDbType(DbType.Decimal, b => b.AsDecimal(1, 2));
 		}
 
 		[Fact]
 		public void CallingAsDecimalStringSetsColumnSizeToSpecifiedValue()
 		{
-			const int size = 5;
-			const int precision = 3;
-			VerifyColumnSize(size, b => b.AsDecimal(size, precision));
+			VerifyColumnSize(1, b => b.AsDecimal(1, 2));
 		}
 
 		[Fact]
 		public void CallingAsDecimalStringSetsColumnPrecisionToSpecifiedValue()
 		{
-			const int size = 5;
-			const int precision = 3;
-			VerifyColumnPrecision(precision, b => b.AsDecimal(size, precision));
+			VerifyColumnPrecision(2, b => b.AsDecimal(1, 2));
 		}
 
 		[Fact]
@@ -123,8 +135,7 @@ namespace FluentMigrator.Tests.Builders
 		[Fact]
 		public void CallingAsFixedLengthStringSetsColumnSizeToSpecifiedValue()
 		{
-			const int size = 255;
-			VerifyColumnSize(size, b => b.AsFixedLengthString(size));
+			VerifyColumnSize(255, b => b.AsFixedLengthString(255));
 		}
 
 		[Fact]
@@ -136,8 +147,7 @@ namespace FluentMigrator.Tests.Builders
 		[Fact]
 		public void CallingAsFixedLengthAnsiStringSetsColumnSizeToSpecifiedValue()
 		{
-			const int size = 255;
-			VerifyColumnSize(size, b => b.AsFixedLengthAnsiString(size));
+			VerifyColumnSize(255, b => b.AsFixedLengthAnsiString(255));
 		}
 
 		[Fact]
@@ -167,14 +177,19 @@ namespace FluentMigrator.Tests.Builders
 		[Fact]
 		public void CallingAsStringSetsColumnDbTypeToString()
 		{
+			VerifyColumnDbType(DbType.String, b => b.AsString());
+		}
+
+		[Fact]
+		public void CallingAsStringWithLengthSetsColumnDbTypeToString()
+		{
 			VerifyColumnDbType(DbType.String, b => b.AsString(255));
 		}
 
 		[Fact]
 		public void CallingAsStringSetsColumnSizeToSpecifiedValue()
 		{
-			const int size = 255;
-			VerifyColumnSize(size, b => b.AsFixedLengthAnsiString(size));
+			VerifyColumnSize(255, b => b.AsFixedLengthAnsiString(255));
 		}
 
 		[Fact]
@@ -186,14 +201,19 @@ namespace FluentMigrator.Tests.Builders
 		[Fact]
 		public void CallingAsXmlSetsColumnDbTypeToXml()
 		{
+			VerifyColumnDbType(DbType.Xml, b => b.AsXml());
+		}
+
+		[Fact]
+		public void CallingAsXmlWithSizeSetsColumnDbTypeToXml()
+		{
 			VerifyColumnDbType(DbType.Xml, b => b.AsXml(255));
 		}
 
 		[Fact]
 		public void CallingAsXmlSetsColumnSizeToSpecifiedValue()
 		{
-			const int size = 255;
-			VerifyColumnSize(size, b => b.AsXml(size));
+			VerifyColumnSize(255, b => b.AsXml(255));
 		}
 
 		[Fact]
