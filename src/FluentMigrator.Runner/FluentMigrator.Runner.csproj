@@ -59,16 +59,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Dialects\ITypeMap.cs" />
-    <Compile Include="Dialects\TypeMap.cs" />
-    <Compile Include="ProcessorFactory\SqlServerMigrationProcessorFactory.cs" />
+    <Compile Include="Dialects\SqlServer2005Dialect.cs" />
+    <Compile Include="Dialects\IDialect.cs" />
+    <Compile Include="Dialects\DialectBase.cs" />
+    <Compile Include="ProcessorFactory\SqlServerProcessorFactory.cs" />
     <Compile Include="ProcessorFactory\IMigrationProcessorFactory.cs" />
     <Compile Include="MigrationLoader.cs" />
     <Compile Include="IMigrationLoader.cs" />
     <Compile Include="MigrationRunner.cs" />
     <Compile Include="Processors\SqliteProcessor.cs" />
     <Compile Include="ProcessorFactory\SqliteProcessorFactory.cs" />
-    <Compile Include="Processors\SqlServerMigrationProcessor.cs" />
+    <Compile Include="Processors\SqlServerProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

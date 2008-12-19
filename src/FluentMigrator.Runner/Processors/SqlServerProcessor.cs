@@ -3,16 +3,20 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Text;
 using FluentMigrator.Expressions;
+using FluentMigrator.Model;
+using FluentMigrator.Runner.Dialects;
 
 namespace FluentMigrator.Runner.Processors
 {
-	public class SqlServerMigrationProcessor : IMigrationProcessor
+	public class SqlServerProcessor : IMigrationProcessor
 	{
 		public virtual SqlConnection Connection { get; set; }
+		public virtual IDialect Dialect { get; set; }
 
-		public SqlServerMigrationProcessor(SqlConnection connection)
+		public SqlServerProcessor(SqlConnection connection, IDialect dialect)
 		{
 			Connection = connection;
+			Dialect = dialect;
 		}
 
 		public virtual void Process(CreateTableExpression expression)
@@ -77,12 +81,7 @@ namespace FluentMigrator.Runner.Processors
 
 		public bool ConstraintExists(string tableName, string constraintName)
 		{
-			const string template =
-				"SELECT * FROM "
-			+ "(SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_CATALOG = DB_NAME() AND TABLE_NAME = '{0}') "
-			+ "WHERE CONSTRAINT_NAME = '{1}'";
-
-			return Exists(template, tableName, constraintName);
+			return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_CATALOG = DB_NAME() AND TABLE_NAME = '{0}' AND CONSTRAINT_NAME = '{1}'", tableName, constraintName);
 		}
 
 		public void ExecuteNonQuery(string template, params object[] args)

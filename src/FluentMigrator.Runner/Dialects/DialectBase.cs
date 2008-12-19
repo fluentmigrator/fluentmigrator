@@ -1,36 +1,36 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Dialects
 {
-	public class TypeMap : ITypeMap
+	public abstract class DialectBase : IDialect
 	{
-		private const string SizePlaceholder = "$size";
-		private const string PrecisionPlaceholder = "$precision";
-		private const string ScalePlaceholder = "$scale";
+		protected const string SizePlaceholder = "$size";
+		protected const string PrecisionPlaceholder = "$precision";
 
 		private readonly Dictionary<DbType, SortedList<int, string>> _templates = new Dictionary<DbType, SortedList<int, string>>();
 
-		public void Set(DbType type, string template)
+		public void SetTypeMap(DbType type, string template)
 		{
 			EnsureHasList(type);
 			_templates[type][0] = template;
 		}
 
-		public void Set(DbType type, int maxSize, string template)
+		public void SetTypeMap(DbType type, string template, int maxSize)
 		{
 			EnsureHasList(type);
 			_templates[type][maxSize] = template;
 		}
 
-		public string Get(DbType type, int size, int precision, int scale)
+		public string GetTypeMap(DbType type, int size, int precision)
 		{
 			if (!_templates.ContainsKey(type))
 				throw new NotSupportedException(String.Format("Unsupported DbType '{0}'", type));
 
 			if (size == 0)
-				return ReplacePlaceholders(_templates[type][0], size, precision, scale);
+				return ReplacePlaceholders(_templates[type][0], size, precision);
 
 			foreach (KeyValuePair<int, string> entry in _templates[type])
 			{
@@ -38,17 +38,18 @@ namespace FluentMigrator.Runner.Dialects
 				string template = entry.Value;
 
 				if (capacity <= size)
-					return ReplacePlaceholders(template, size, precision, scale);
+					return ReplacePlaceholders(template, size, precision);
 			}
 
 			throw new NotSupportedException(String.Format("Unsupported DbType '{0}'", type));
 		}
 
-		private string ReplacePlaceholders(string value, int size, int precision, int scale)
+		public abstract string GenerateDDLForColumn(ColumnDefinition column);
+
+		protected string ReplacePlaceholders(string value, int size, int precision)
 		{
 			return value.Replace(SizePlaceholder, size.ToString())
-				.Replace(PrecisionPlaceholder, precision.ToString())
-				.Replace(ScalePlaceholder, scale.ToString());
+				.Replace(PrecisionPlaceholder, precision.ToString());
 		}
 
 		private void EnsureHasList(DbType type)

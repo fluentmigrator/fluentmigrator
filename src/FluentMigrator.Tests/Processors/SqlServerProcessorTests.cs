@@ -2,21 +2,27 @@
 using System.Data;
 using System.Data.SqlClient;
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Dialects;
 using FluentMigrator.Runner.Processors;
 using Xunit;
 
 namespace FluentMigrator.Tests.Processors
 {
-	public class SqlServerMigrationProcessorTests
+	public class SqlServerProcessorTests
 	{
 		public SqlConnection Connection { get; set; }
-		public SqlServerMigrationProcessor Processor { get; set; }
+		public SqlServer2005Dialect Dialect { get; set; }
+		public SqlServerProcessor Processor { get; set; }
 
-		public SqlServerMigrationProcessorTests()
+		public SqlServerProcessorTests()
 		{
 			Connection = new SqlConnection("server=(local);uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator");
 			Connection.Open();
-			Processor = new SqlServerMigrationProcessor(Connection);
+
+			// TODO (nkohari) -- mock the dialect?
+			Dialect = new SqlServer2005Dialect();
+
+			Processor = new SqlServerProcessor(Connection, Dialect);
 		}
 
 		[Fact]
