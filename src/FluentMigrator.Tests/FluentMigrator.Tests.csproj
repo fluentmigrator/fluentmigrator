@@ -86,9 +86,9 @@
     <Compile Include="Expressions\DeleteTableExpressionTests.cs" />
     <Compile Include="Expressions\DeleteColumnExpressionTests.cs" />
     <Compile Include="Expressions\CreateColumnExpressionTests.cs" />
+    <Compile Include="Helpers\ValidationHelper.cs" />
     <Compile Include="Processors\SqliteProcessorTests.cs" />
     <Compile Include="Processors\SqlServerMigrationProcessorTests.cs" />
-    <Compile Include="ValidationHelper.cs" />
     <Compile Include="DefaultMigrationConventionsTests.cs" />
     <Compile Include="Definitions\ColumnDefinitionTests.cs" />
     <Compile Include="Expressions\RenameColumnExpressionTests.cs" />

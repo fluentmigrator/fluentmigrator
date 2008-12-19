@@ -69,7 +69,6 @@
     <Compile Include="Processors\SqliteProcessor.cs" />
     <Compile Include="ProcessorFactory\SqliteProcessorFactory.cs" />
     <Compile Include="Processors\SqlServerMigrationProcessor.cs" />
-    <Compile Include="Processors\SqliteMigrationProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
