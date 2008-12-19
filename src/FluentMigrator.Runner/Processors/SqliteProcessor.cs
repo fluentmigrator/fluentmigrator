@@ -1,26 +1,49 @@
 ﻿using System;
-using System.Data.SqlClient;
+using System.Data;
+using System.Data.SQLite;
 using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Processors
 {
-	public class SqliteMigrationProcessor : IMigrationProcessor
+	public class SqliteProcessor : IMigrationProcessor
 	{
-		public SqlConnection Connection { get; set; }
+		public SQLiteConnection Connection { get; set; }
 
-		public SqliteMigrationProcessor(SqlConnection connection)
+		public SqliteProcessor(SQLiteConnection connection)
 		{
 			Connection = connection;
 		}
 
+		private string JoinColumns(CreateTableExpression expression)
+		{
+			string columns = "";
+			int total = expression.Columns.Count - 1;
+			for (int i = 0; i < expression.Columns.Count; i++)
+			{
+				columns += expression.Columns[i];
+
+				if (i != total)
+					columns += ", ";
+			}
+
+			return columns;
+		}
+
 		public void Process(CreateTableExpression expression)
 		{
-			throw new NotImplementedException();
+			SQLiteCommand cmd = Connection.CreateCommand();
+			cmd.CommandType = CommandType.Text;
+			cmd.CommandText = string.Format("CREATE TABLE {0} ({1})", expression.TableName, JoinColumns(expression));
+			cmd.ExecuteNonQuery();
 		}
 
 		public void Process(CreateColumnExpression expression)
 		{
-			throw new NotImplementedException();
+			SQLiteCommand cmd = Connection.CreateCommand();
+			cmd.CommandType = CommandType.Text;
+			cmd.CommandText = string.Format("ALTER TABLE {0} ADD COLUMN {1}", expression.TableName, expression.Column.Name);
+			cmd.ExecuteNonQuery();
 		}
 
 		public void Process(RenameColumnExpression expression)

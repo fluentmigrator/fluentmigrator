@@ -45,6 +45,10 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data.SQLite, Version=1.0.48.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\System.Data.SQLite.DLL</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -59,8 +63,8 @@
     <Compile Include="MigrationLoader.cs" />
     <Compile Include="IMigrationLoader.cs" />
     <Compile Include="MigrationRunner.cs" />
-    <Compile Include="Processors\SqliteMigrationProcessor.cs" />
-    <Compile Include="ProcessorFactory\SqliteMigrationProcessorFactory.cs" />
+    <Compile Include="Processors\SqliteProcessor.cs" />
+    <Compile Include="ProcessorFactory\SqliteProcessorFactory.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -49,6 +49,10 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
+    <Reference Include="System.Data.SQLite, Version=1.0.48.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\System.Data.SQLite.DLL</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -81,6 +85,7 @@
     <Compile Include="Expressions\DeleteTableExpressionTests.cs" />
     <Compile Include="Expressions\DeleteColumnExpressionTests.cs" />
     <Compile Include="Expressions\CreateColumnExpressionTests.cs" />
+    <Compile Include="Processors\SqliteProcessorTests.cs" />
     <Compile Include="ValidationHelper.cs" />
     <Compile Include="DefaultMigrationConventionsTests.cs" />
     <Compile Include="Definitions\ColumnDefinitionTests.cs" />

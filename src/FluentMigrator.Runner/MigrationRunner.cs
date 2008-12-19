@@ -21,7 +21,7 @@ namespace FluentMigrator.Runner
 			migration.GetUpExpressions(context);
 
 			// BeginTransaction
-
+			//Processor.Connection
 			foreach (IMigrationExpression expression in context.Expressions)
 				expression.ExecuteWith(Processor);
 
