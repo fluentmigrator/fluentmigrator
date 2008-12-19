@@ -79,6 +79,7 @@
     <Compile Include="Builders\Create\CreateForeignKeyExpressionBuilderTests.cs" />
     <Compile Include="Builders\Create\CreateTableExpressionBuilderTests.cs" />
     <Compile Include="Builders\Create\CreateColumnExpressionBuilderTests.cs" />
+    <Compile Include="Generators\SqlServerGeneratorTests.cs" />
     <Compile Include="Helpers\SqlServerTestTable.cs" />
     <Compile Include="Definitions\IndexColumnDefinitionTests.cs" />
     <Compile Include="Definitions\ForeignKeyDefinitionTests.cs" />

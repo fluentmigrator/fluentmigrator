@@ -18,7 +18,7 @@ namespace FluentMigrator.Expressions
 				errors.Add(ErrorMessages.NewColumnNameCannotBeNullOrEmpty);
 		}
 
-		public void ExecuteWith(IMigrationProcessor processor)
+		public virtual void ExecuteWith(IMigrationProcessor processor)
 		{
 			processor.Process(this);
 		}

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using FluentMigrator.Runner.Processors;
 
 namespace FluentMigrator.Runner
 {

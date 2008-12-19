@@ -1,6 +1,6 @@
-﻿using System;
-using System.Data.SqlClient;
-using FluentMigrator.Runner.Dialects;
+﻿using System.Data.SqlClient;
+using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Processors;
 
 namespace FluentMigrator.Runner.Processors
 {
@@ -9,8 +9,7 @@ namespace FluentMigrator.Runner.Processors
 		public IMigrationProcessor Create(string connectionString)
 		{
 			var connection = new SqlConnection(connectionString);
-			var dialect = new SqlServer2005Dialect();
-			return new SqlServerProcessor(connection, dialect);
+			return new SqlServerProcessor(connection, new SqlServerGenerator());
 		}
 	}
 }
