@@ -1,17 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq.Expressions;
-using FluentMigrator.Builders.Create.Table;
+using FluentMigrator.Builders.Create.Column;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using Moq;
+using Moq.Stub;
 using Xunit;
 
-namespace FluentMigrator.Tests.Builders
+namespace FluentMigrator.Tests.Builders.Create
 {
-	public class CreateTableExpressionBuilderTests
+	public class CreateColumnExpressionBuilderTests
 	{
+		[Fact]
+		public void CallingOnTableSetsTableName()
+		{
+			var expressionMock = new Mock<CreateColumnExpression>();
+			expressionMock.ExpectSet(x => x.TableName, "Bacon").AtMostOnce();
+
+			var builder = new CreateColumnExpressionBuilder(expressionMock.Object);
+			builder.OnTable("Bacon");
+
+			expressionMock.VerifyAll();
+		}
+
 		[Fact]
 		public void CallingAsAnsiStringSetsColumnDbTypeToAnsiString()
 		{
@@ -21,25 +33,31 @@ namespace FluentMigrator.Tests.Builders
 		[Fact]
 		public void CallingAsAnsiStringWithSizeSetsColumnDbTypeToAnsiString()
 		{
-			VerifyColumnDbType(DbType.AnsiString, b => b.AsAnsiString(255));
+			VerifyColumnDbType(DbType.AnsiString, b => b.AsAnsiString(42));
 		}
 
 		[Fact]
-		public void CallingAsAnsiStringSetsColumnSizeToSpecifiedValue()
+		public void CallingAsAnsiStringWithSizeSetsColumnSizeToSpecifiedValue()
 		{
-			VerifyColumnSize(255, b => b.AsAnsiString(255));
+			VerifyColumnSize(42, b => b.AsAnsiString(42));
 		}
 
 		[Fact]
 		public void CallingAsBinarySetsColumnDbTypeToBinary()
 		{
-			VerifyColumnDbType(DbType.Binary, b => b.AsBinary(255));
+			VerifyColumnDbType(DbType.Binary, b => b.AsBinary());
 		}
 
 		[Fact]
-		public void CallingAsBinarySetsColumnSizeToSpecifiedValue()
+		public void CallingAsBinaryWithSizeSetsColumnDbTypeToBinary()
 		{
-			VerifyColumnSize(255, b => b.AsBinary(255));
+			VerifyColumnDbType(DbType.Binary, b => b.AsBinary(42));
+		}
+
+		[Fact]
+		public void CallingAsBinaryWithSizeSetsColumnSizeToSpecifiedValue()
+		{
+			VerifyColumnSize(42, b => b.AsBinary(42));
 		}
 
 		[Fact]
@@ -79,7 +97,7 @@ namespace FluentMigrator.Tests.Builders
 		}
 
 		[Fact]
-		public void CallingAsDecimalWithSizeSetsColumnDbTypeToDecimal()
+		public void CallingAsDecimalWithSizeAndPrecisionSetsColumnDbTypeToDecimal()
 		{
 			VerifyColumnDbType(DbType.Decimal, b => b.AsDecimal(1, 2));
 		}
@@ -163,7 +181,7 @@ namespace FluentMigrator.Tests.Builders
 		}
 
 		[Fact]
-		public void CallingAsStringWithSizeSetsColumnDbTypeToString()
+		public void CallingAsStringWithLengthSetsColumnDbTypeToString()
 		{
 			VerifyColumnDbType(DbType.String, b => b.AsString(255));
 		}
@@ -206,11 +224,14 @@ namespace FluentMigrator.Tests.Builders
 			var columnMock = new Mock<ColumnDefinition>();
 			columnMock.ExpectSet(c => c.DefaultValue, value).AtMostOnce();
 
-			var expressionMock = new Mock<CreateTableExpression>();
+			var expressionMock = new Mock<CreateColumnExpression>();
+			expressionMock.Stub(e => e.Column);
 
-			var builder = new CreateTableExpressionBuilder(expressionMock.Object);
-			builder.CurrentColumn = columnMock.Object;
-			builder.WithDefaultValue(42);
+			var expression = expressionMock.Object;
+			expression.Column = columnMock.Object;
+
+			var builder = new CreateColumnExpressionBuilder(expressionMock.Object);
+			builder.WithDefaultValue(value);
 
 			columnMock.VerifyAll();
 		}
@@ -257,82 +278,66 @@ namespace FluentMigrator.Tests.Builders
 			VerifyColumnProperty(true, c => c.IsUnique, b => b.Unique());
 		}
 
-		[Fact]
-		public void CallingWithColumnAddsNewColumnToExpression()
-		{
-			const string name = "BaconId";
-
-			var collectionMock = new Mock<IList<ColumnDefinition>>();
-			collectionMock.Expect(x => x.Add(It.Is<ColumnDefinition>(c => c.Name.Equals(name)))).AtMostOnce();
-
-			var expressionMock = new Mock<CreateTableExpression>();
-			expressionMock.ExpectGet(e => e.Columns).Returns(collectionMock.Object).AtMostOnce();
-
-			var builder = new CreateTableExpressionBuilder(expressionMock.Object);
-			builder.WithColumn(name);
-
-			collectionMock.VerifyAll();
-			expressionMock.VerifyAll();
-		}
-
-		private void VerifyColumnProperty<T>(T expected, Expression<Func<ColumnDefinition, T>> columnExpression, Action<CreateTableExpressionBuilder> callToTest)
+		private void VerifyColumnProperty<T>(T expected, Expression<Func<ColumnDefinition, T>> columnExpression, Action<CreateColumnExpressionBuilder> callToTest)
 		{
 			var columnMock = new Mock<ColumnDefinition>();
 			columnMock.ExpectSet(columnExpression, expected).AtMostOnce();
 
-			var expressionMock = new Mock<CreateTableExpression>();
+			var expressionMock = new Mock<CreateColumnExpression>();
+			expressionMock.Stub(e => e.Column);
 
-			var builder = new CreateTableExpressionBuilder(expressionMock.Object);
-			builder.CurrentColumn = columnMock.Object;
+			var expression = expressionMock.Object;
+			expression.Column = columnMock.Object;
 
-			callToTest(builder);
+			callToTest(new CreateColumnExpressionBuilder(expression));
 
 			columnMock.VerifyAll();
-			expressionMock.VerifyAll();
 		}
 
-		private void VerifyColumnDbType(DbType expected, Action<CreateTableExpressionBuilder> callToTest)
+		private void VerifyColumnDbType(DbType expected, Action<CreateColumnExpressionBuilder> callToTest)
 		{
 			var columnMock = new Mock<ColumnDefinition>();
 			columnMock.ExpectSet(c => c.Type, expected).AtMostOnce();
 
-			var expressionMock = new Mock<CreateTableExpression>();
+			var expressionMock = new Mock<CreateColumnExpression>();
+			expressionMock.Stub(e => e.Column);
 
-			var builder = new CreateTableExpressionBuilder(expressionMock.Object);
-			builder.CurrentColumn = columnMock.Object;
+			var expression = expressionMock.Object;
+			expression.Column = columnMock.Object;
 
-			callToTest(builder);
+			callToTest(new CreateColumnExpressionBuilder(expression));
 
 			columnMock.VerifyAll();
-			expressionMock.VerifyAll();
 		}
 
-		private void VerifyColumnSize(int expected, Action<CreateTableExpressionBuilder> callToTest)
+		private void VerifyColumnSize(int expected, Action<CreateColumnExpressionBuilder> callToTest)
 		{
 			var columnMock = new Mock<ColumnDefinition>();
 			columnMock.ExpectSet(c => c.Size, expected).AtMostOnce();
 
-			var expressionMock = new Mock<CreateTableExpression>();
+			var expressionMock = new Mock<CreateColumnExpression>();
+			expressionMock.Stub(e => e.Column);
 
-			var builder = new CreateTableExpressionBuilder(expressionMock.Object);
-			builder.CurrentColumn = columnMock.Object;
+			var expression = expressionMock.Object;
+			expression.Column = columnMock.Object;
 
-			callToTest(builder);
+			callToTest(new CreateColumnExpressionBuilder(expression));
 
 			columnMock.VerifyAll();
 		}
 
-		private void VerifyColumnPrecision(int expected, Action<CreateTableExpressionBuilder> callToTest)
+		private void VerifyColumnPrecision(int expected, Action<CreateColumnExpressionBuilder> callToTest)
 		{
 			var columnMock = new Mock<ColumnDefinition>();
 			columnMock.ExpectSet(c => c.Precision, expected).AtMostOnce();
 
-			var expressionMock = new Mock<CreateTableExpression>();
+			var expressionMock = new Mock<CreateColumnExpression>();
+			expressionMock.Stub(e => e.Column);
 
-			var builder = new CreateTableExpressionBuilder(expressionMock.Object);
-			builder.CurrentColumn = columnMock.Object;
+			var expression = expressionMock.Object;
+			expression.Column = columnMock.Object;
 
-			callToTest(builder);
+			callToTest(new CreateColumnExpressionBuilder(expression));
 
 			columnMock.VerifyAll();
 		}

@@ -63,13 +63,16 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Builders\DeleteForeignKeyExpressionBuilderTests.cs" />
-    <Compile Include="Builders\RenameTableExpressionBuilderTests.cs" />
-    <Compile Include="Builders\RenameColumnExpressionBuilderTests.cs" />
-    <Compile Include="Builders\DeleteColumnExpressionBuilderTests.cs" />
-    <Compile Include="Builders\CreateForeignKeyExpressionBuilderTests.cs" />
-    <Compile Include="Builders\CreateTableExpressionBuilderTests.cs" />
-    <Compile Include="Builders\CreateColumnExpressionBuilderTests.cs" />
+    <Compile Include="Builders\Create\CreateExpressionRootTests.cs" />
+    <Compile Include="Builders\Delete\DeleteExpressionRootTests.cs" />
+    <Compile Include="Builders\Delete\DeleteForeignKeyExpressionBuilderTests.cs" />
+    <Compile Include="Builders\Rename\RenameExpressionRootTests.cs" />
+    <Compile Include="Builders\Rename\RenameTableExpressionBuilderTests.cs" />
+    <Compile Include="Builders\Rename\RenameColumnExpressionBuilderTests.cs" />
+    <Compile Include="Builders\Delete\DeleteColumnExpressionBuilderTests.cs" />
+    <Compile Include="Builders\Create\CreateForeignKeyExpressionBuilderTests.cs" />
+    <Compile Include="Builders\Create\CreateTableExpressionBuilderTests.cs" />
+    <Compile Include="Builders\Create\CreateColumnExpressionBuilderTests.cs" />
     <Compile Include="Definitions\IndexColumnDefinitionTests.cs" />
     <Compile Include="Definitions\ForeignKeyDefinitionTests.cs" />
     <Compile Include="Expressions\RenameTableExpressionTests.cs" />

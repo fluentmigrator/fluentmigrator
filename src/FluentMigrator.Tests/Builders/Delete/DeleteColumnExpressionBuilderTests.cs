@@ -4,7 +4,7 @@ using FluentMigrator.Expressions;
 using Moq;
 using Xunit;
 
-namespace FluentMigrator.Tests.Builders
+namespace FluentMigrator.Tests.Builders.Delete
 {
 	public class DeleteColumnExpressionBuilderTests
 	{
