@@ -68,6 +68,7 @@
     <Compile Include="Generators\SqliteGenerator.cs" />
     <Compile Include="ProcessorFactory\SqliteProcessorFactory.cs" />
     <Compile Include="Generators\SqlServerGenerator.cs" />
+    <Compile Include="Processors\ProcessorBase.cs" />
     <Compile Include="Processors\SqliteProcessor.cs" />
     <Compile Include="Processors\SqlServerProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
