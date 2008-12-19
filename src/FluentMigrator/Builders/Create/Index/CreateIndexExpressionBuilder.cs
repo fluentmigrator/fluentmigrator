@@ -5,7 +5,7 @@ using FluentMigrator.Model;
 namespace FluentMigrator.Builders.Create.Index
 {
 	public class CreateIndexExpressionBuilder : ExpressionBuilderBase<CreateIndexExpression>,
-		ICreateIndexForTableSyntax, ICreateIndexOnColumnSyntax, ICreateIndexColumnOptionsSyntax
+		ICreateIndexForTableSyntax, ICreateIndexOnColumnSyntax, ICreateIndexColumnOptionsSyntax, ICreateIndexOptionsSyntax
 	{
 		public IndexColumnDefinition CurrentColumn { get; set; }
 		
@@ -27,7 +27,12 @@ namespace FluentMigrator.Builders.Create.Index
 			return this;
 		}
 
-		public ICreateIndexOnColumnSyntax Ascending()
+	    public ICreateIndexOptionsSyntax WithOptions()
+	    {
+	        return this;
+	    }
+
+	    public ICreateIndexOnColumnSyntax Ascending()
 		{
 			CurrentColumn.Direction = Direction.Ascending;
 			return this;
@@ -38,5 +43,23 @@ namespace FluentMigrator.Builders.Create.Index
 			CurrentColumn.Direction = Direction.Descending;
 			return this;
 		}
+
+	    public ICreateIndexOptionsSyntax Unique()
+	    {
+	        Expression.Index.IsUnique = true;
+	        return this;
+	    }
+
+	    public ICreateIndexOptionsSyntax NonClustered()
+	    {
+	        Expression.Index.IsClustered = false;
+            return this;
+	    }
+
+	    public ICreateIndexOptionsSyntax Clustered()
+	    {
+            Expression.Index.IsClustered = true;
+            return this;
+	    }
 	}
 }

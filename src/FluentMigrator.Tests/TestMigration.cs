@@ -16,9 +16,10 @@ namespace FluentMigrator.Tests
 
 			Create.ForeignKey("Foo").FromTable("Users").ForeignColumn("GroupId").ToTable("Groups").PrimaryColumn("GroupId");
 
-			Create.Index().OnTable("Users")
-				.OnColumn("UserName").Ascending()
-				.OnColumn("Password").Descending();
+		    Create.Index().OnTable("Users")
+		        .OnColumn("UserName").Ascending()
+		        .OnColumn("Password").Descending()
+		        .WithOptions().Unique().Clustered();
 
 			Rename.Table("Foo").To("Bar");
 			Rename.Column("Fizz").OnTable("Foo").To("Buzz");            

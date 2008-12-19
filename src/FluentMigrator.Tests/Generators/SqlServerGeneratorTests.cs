@@ -99,6 +99,21 @@ namespace FluentMigrator.Tests.Generators
             Assert.Equal("sp_rename '[Table1].[Column1]', [Column2]", sql);
         }
 
+        [Fact]
+        public void CanCreateIndex()
+        {
+            var expression = new CreateIndexExpression();
+            expression.Index.Name = "IX_TEST";
+            expression.Index.TableName = "TEST_TABLE";
+            expression.Index.IsUnique = true;
+            expression.Index.IsClustered = true;
+            expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Ascending, Name = "Column1" });
+            expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Descending, Name = "Column2" });
+
+            string sql = generator.Generate(expression);
+            Assert.Equal("CREATE UNIQUE CLUSTERED INDEX IX_TEST ON TEST_TABLE (Column1 ASC,Column2 DESC)", sql);
+        }
+
 		private DeleteTableExpression GetDeleteTableExpression(string tableName)
 		{
 			return new DeleteTableExpression { TableName = tableName };

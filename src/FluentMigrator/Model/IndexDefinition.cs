@@ -9,9 +9,10 @@ namespace FluentMigrator.Model
 		public virtual string Name { get; set; }
 		public virtual string TableName { get; set; }
 		public virtual bool IsUnique { get; set; }
-		public virtual ICollection<IndexColumnDefinition> Columns { get; set; }
-
-		public IndexDefinition()
+        public bool IsClustered { get; set; }
+        public virtual ICollection<IndexColumnDefinition> Columns { get; set; }
+	    
+	    public IndexDefinition()
 		{
 			Columns = new List<IndexColumnDefinition>();
 		}

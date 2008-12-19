@@ -126,7 +126,38 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(CreateIndexExpression expression)
 		{
-			throw new NotImplementedException();
+		    string result = "CREATE";
+            if (expression.Index.IsUnique)
+            {
+                result += " UNIQUE";
+            }
+
+            if (expression.Index.IsClustered)
+            {
+                result += " CLUSTERED";
+            }
+            else
+            {
+                result += " NONCLUSTERED";
+            }
+
+		    result += " INDEX {0} ON {1} ({2})";
+
+		    var columns = new StringBuilder();
+            foreach (IndexColumnDefinition column in expression.Index.Columns)
+            {
+                columns.Append(column.Name);
+                if (column.Direction == Direction.Ascending)
+                {
+                    columns.Append(" ASC,");
+                }
+                else
+                {
+                    columns.Append(" DESC,");
+                }
+            }
+            
+		    return FormatExpression(result, expression.Index.Name, expression.Index.TableName, columns.ToString().TrimEnd(','));            
 		}
 
 		public override string Generate(DeleteIndexExpression expression)
