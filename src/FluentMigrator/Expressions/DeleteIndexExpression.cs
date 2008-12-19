@@ -1,26 +1,21 @@
 using System;
 using System.Collections.Generic;
-using FluentMigrator.Infrastructure;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
 	public class DeleteIndexExpression : IMigrationExpression
 	{
-		public virtual string TableName { get; set; }
-		public virtual ICollection<string> Columns { get; set; }
+		public virtual IndexDefinition Index { get; set; }
 
 		public DeleteIndexExpression()
 		{
-			Columns = new List<string>();
+			Index = new IndexDefinition();
 		}
 
 		public virtual void CollectValidationErrors(ICollection<string> errors)
 		{
-			if (String.IsNullOrEmpty(TableName))
-				errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
-
-			if (Columns.Count == 0)
-				errors.Add(ErrorMessages.IndexMustHaveOneOrMoreColumns);
+			Index.CollectValidationErrors(errors);
 		}
 
 		public virtual void ExecuteWith(IMigrationProcessor processor)

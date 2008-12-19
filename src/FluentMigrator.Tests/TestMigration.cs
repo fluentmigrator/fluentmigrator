@@ -2,6 +2,7 @@
 
 namespace FluentMigrator.Tests
 {
+	[Migration(1)]
 	public class TestMigration : Migration
 	{
 		public override void Up()

@@ -69,5 +69,50 @@ namespace FluentMigrator.Tests
 
 			Assert.Equal("IX_Bacon_BaconName_BaconSpice", DefaultMigrationConventions.GetIndexName(index));
 		}
+
+		[Fact]
+		public void TypeIsMigrationReturnsTrueIfTypeExtendsMigrationAndHasMigrationAttribute()
+		{
+			Assert.True(DefaultMigrationConventions.TypeIsMigration(typeof(DefaultConventionMigration)));
+		}
+
+		[Fact]
+		public void TypeIsMigrationReturnsFalseIfTypeDoesNotExtendMigration()
+		{
+			Assert.False(DefaultMigrationConventions.TypeIsMigration(typeof(object)));
+		}
+
+		[Fact]
+		public void TypeIsMigrationReturnsFalseIfTypeDoesNotHaveMigrationAttribute()
+		{
+			Assert.False(DefaultMigrationConventions.TypeIsMigration(typeof(MigrationWithoutAttribute)));
+		}
+
+		[Fact]
+		public void MigrationMetadataTypePropertyMatchesDecoratedType()
+		{
+			var metadata = DefaultMigrationConventions.GetMetadataForMigration(typeof(DefaultConventionMigration));
+			Assert.Equal(typeof(DefaultConventionMigration), metadata.Type);
+		}
+
+		[Fact]
+		public void MigrationMetadataCollectsVersionFromMigrationAttribute()
+		{
+			var metadata = DefaultMigrationConventions.GetMetadataForMigration(typeof(DefaultConventionMigration));
+			Assert.Equal(123, metadata.Version);
+		}
+	}
+
+	[Migration(123)]
+	internal class DefaultConventionMigration : Migration
+	{
+		public override void Up() { throw new NotImplementedException(); }
+		public override void Down() { throw new NotImplementedException(); }
+	}
+
+	internal class MigrationWithoutAttribute : Migration
+	{
+		public override void Up() { throw new NotImplementedException(); }
+		public override void Down() { throw new NotImplementedException(); }
 	}
 }

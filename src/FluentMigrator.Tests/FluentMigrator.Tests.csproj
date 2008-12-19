@@ -65,6 +65,7 @@
   <ItemGroup>
     <Compile Include="Builders\Create\CreateIndexExpressionBuilderTests.cs" />
     <Compile Include="Builders\Create\CreateExpressionRootTests.cs" />
+    <Compile Include="Builders\Delete\DeleteIndexExpressionBuilderTests.cs" />
     <Compile Include="Builders\Delete\DeleteExpressionRootTests.cs" />
     <Compile Include="Builders\Delete\DeleteForeignKeyExpressionBuilderTests.cs" />
     <Compile Include="Builders\Rename\RenameExpressionRootTests.cs" />
