@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using FluentMigrator.Infrastructure;
 
-namespace FluentMigrator.Tests
+namespace FluentMigrator.Tests.Helpers
 {
 	public static class ValidationHelper
 	{

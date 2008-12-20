@@ -2,9 +2,10 @@ using System;
 using System.Data;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+using FluentMigrator.Tests.Helpers;
 using Xunit;
 
-namespace FluentMigrator.Tests.Definitions
+namespace FluentMigrator.Tests.Unit.Definitions
 {
 	public class ColumnDefinitionTests
 	{

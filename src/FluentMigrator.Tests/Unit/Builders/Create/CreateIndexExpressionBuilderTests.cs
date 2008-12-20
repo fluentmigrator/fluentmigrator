@@ -6,7 +6,7 @@ using FluentMigrator.Model;
 using Moq;
 using Xunit;
 
-namespace FluentMigrator.Tests.Builders.Create
+namespace FluentMigrator.Tests.Unit.Builders.Create
 {
 	public class CreateIndexExpressionBuilderTests
 	{

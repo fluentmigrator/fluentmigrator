@@ -1,9 +1,10 @@
 using System;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Tests.Helpers;
 using Xunit;
 
-namespace FluentMigrator.Tests.Expressions
+namespace FluentMigrator.Tests.Unit.Expressions
 {
 	public class RenameTableExpressionTests
 	{

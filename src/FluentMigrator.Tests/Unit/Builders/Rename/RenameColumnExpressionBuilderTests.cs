@@ -4,7 +4,7 @@ using FluentMigrator.Expressions;
 using Moq;
 using Xunit;
 
-namespace FluentMigrator.Tests.Builders.Rename
+namespace FluentMigrator.Tests.Unit.Builders.Rename
 {
 	public class RenameColumnExpressionBuilderTests
 	{

@@ -1,20 +1,21 @@
 ﻿using System.Data.SqlClient;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Tests.Helpers;
 using Xunit;
 
-namespace FluentMigrator.Tests.Processors
+namespace FluentMigrator.Tests.Integration.Processors
 {
 	public class SqlServerProcessorTests
 	{
-		public SqlConnection Connection { get; set; }		
+		public SqlConnection Connection { get; set; }
 		public SqlServerProcessor Processor { get; set; }
 
 		public SqlServerProcessorTests()
 		{
 			Connection = new SqlConnection(@"server=(local)\SQLSERVER2005;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator");
 			Connection.Open();
-						
+
 			Processor = new SqlServerProcessor(Connection, new SqlServerGenerator());
 		}
 

@@ -4,7 +4,7 @@ using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using Xunit;
 
-namespace FluentMigrator.Tests
+namespace FluentMigrator.Tests.Unit
 {
 	public class DefaultMigrationConventionsTests
 	{

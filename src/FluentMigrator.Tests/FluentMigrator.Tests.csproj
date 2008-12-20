@@ -67,32 +67,33 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Builders\Create\CreateIndexExpressionBuilderTests.cs" />
-    <Compile Include="Builders\Create\CreateExpressionRootTests.cs" />
-    <Compile Include="Builders\Delete\DeleteIndexExpressionBuilderTests.cs" />
-    <Compile Include="Builders\Delete\DeleteExpressionRootTests.cs" />
-    <Compile Include="Builders\Delete\DeleteForeignKeyExpressionBuilderTests.cs" />
-    <Compile Include="Builders\Rename\RenameExpressionRootTests.cs" />
-    <Compile Include="Builders\Rename\RenameTableExpressionBuilderTests.cs" />
-    <Compile Include="Builders\Rename\RenameColumnExpressionBuilderTests.cs" />
-    <Compile Include="Builders\Delete\DeleteColumnExpressionBuilderTests.cs" />
-    <Compile Include="Builders\Create\CreateForeignKeyExpressionBuilderTests.cs" />
-    <Compile Include="Builders\Create\CreateTableExpressionBuilderTests.cs" />
-    <Compile Include="Builders\Create\CreateColumnExpressionBuilderTests.cs" />
-    <Compile Include="Generators\SqlServerGeneratorTests.cs" />
+    <Compile Include="Unit\Builders\Create\CreateIndexExpressionBuilderTests.cs" />
+    <Compile Include="Unit\Builders\Create\CreateExpressionRootTests.cs" />
+    <Compile Include="Unit\Builders\Delete\DeleteIndexExpressionBuilderTests.cs" />
+    <Compile Include="Unit\Builders\Delete\DeleteExpressionRootTests.cs" />
+    <Compile Include="Unit\Builders\Delete\DeleteForeignKeyExpressionBuilderTests.cs" />
+    <Compile Include="Unit\Builders\Rename\RenameExpressionRootTests.cs" />
+    <Compile Include="Unit\Builders\Rename\RenameTableExpressionBuilderTests.cs" />
+    <Compile Include="Unit\Builders\Rename\RenameColumnExpressionBuilderTests.cs" />
+    <Compile Include="Unit\Builders\Delete\DeleteColumnExpressionBuilderTests.cs" />
+    <Compile Include="Unit\Builders\Create\CreateForeignKeyExpressionBuilderTests.cs" />
+    <Compile Include="Unit\Builders\Create\CreateTableExpressionBuilderTests.cs" />
+    <Compile Include="Unit\Builders\Create\CreateColumnExpressionBuilderTests.cs" />
+    <Compile Include="Unit\Generators\SqliteGeneratorTests.cs" />
+    <Compile Include="Unit\Generators\SqlServerGeneratorTests.cs" />
     <Compile Include="Helpers\SqlServerTestTable.cs" />
-    <Compile Include="Definitions\IndexColumnDefinitionTests.cs" />
-    <Compile Include="Definitions\ForeignKeyDefinitionTests.cs" />
-    <Compile Include="Expressions\RenameTableExpressionTests.cs" />
-    <Compile Include="Expressions\DeleteTableExpressionTests.cs" />
-    <Compile Include="Expressions\DeleteColumnExpressionTests.cs" />
-    <Compile Include="Expressions\CreateColumnExpressionTests.cs" />
+    <Compile Include="Unit\Definitions\IndexColumnDefinitionTests.cs" />
+    <Compile Include="Unit\Definitions\ForeignKeyDefinitionTests.cs" />
+    <Compile Include="Unit\Expressions\RenameTableExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\DeleteTableExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\DeleteColumnExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\CreateColumnExpressionTests.cs" />
     <Compile Include="Helpers\ValidationHelper.cs" />
-    <Compile Include="Processors\SqliteProcessorTests.cs" />
-    <Compile Include="Processors\SqlServerProcessorTests.cs" />
-    <Compile Include="DefaultMigrationConventionsTests.cs" />
-    <Compile Include="Definitions\ColumnDefinitionTests.cs" />
-    <Compile Include="Expressions\RenameColumnExpressionTests.cs" />
+    <Compile Include="Integration\Processors\SqliteProcessorTests.cs" />
+    <Compile Include="Integration\Processors\SqlServerProcessorTests.cs" />
+    <Compile Include="Unit\DefaultMigrationConventionsTests.cs" />
+    <Compile Include="Unit\Definitions\ColumnDefinitionTests.cs" />
+    <Compile Include="Unit\Expressions\RenameColumnExpressionTests.cs" />
     <Compile Include="TestMigration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

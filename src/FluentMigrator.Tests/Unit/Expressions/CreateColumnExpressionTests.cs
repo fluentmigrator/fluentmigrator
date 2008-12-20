@@ -1,32 +1,33 @@
 using System;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Tests.Helpers;
 using Xunit;
 
-namespace FluentMigrator.Tests.Expressions
+namespace FluentMigrator.Tests.Unit.Expressions
 {
-	public class DeleteTableExpressionTests
+	public class CreateColumnExpressionTests
 	{
 		[Fact]
-		public void ErrorIsReturnedWhenTableNameIsNull()
+		public void ErrorIsReturnedWhenOldNameIsNull()
 		{
-			var expression = new DeleteTableExpression { TableName = null };
+			var expression = new CreateColumnExpression { TableName = null };
 			var errors = ValidationHelper.CollectErrors(expression);
 			Assert.Contains(ErrorMessages.TableNameCannotBeNullOrEmpty, errors);
 		}
 
 		[Fact]
-		public void ErrorIsReturnedWhenTableNameIsEmptyString()
+		public void ErrorIsReturnedWhenOldNameIsEmptyString()
 		{
-			var expression = new DeleteTableExpression { TableName = String.Empty };
+			var expression = new CreateColumnExpression { TableName = String.Empty };
 			var errors = ValidationHelper.CollectErrors(expression);
 			Assert.Contains(ErrorMessages.TableNameCannotBeNullOrEmpty, errors);
 		}
 
 		[Fact]
-		public void ErrorIsNotReturnedWhenTableNameIsNotNullEmptyString()
+		public void ErrorIsNotReturnedWhenOldNameIsNotNullEmptyString()
 		{
-			var expression = new DeleteTableExpression { TableName = "Bacon" };
+			var expression = new CreateColumnExpression { TableName = "Bacon" };
 			var errors = ValidationHelper.CollectErrors(expression);
 			Assert.DoesNotContain(ErrorMessages.TableNameCannotBeNullOrEmpty, errors);
 		}

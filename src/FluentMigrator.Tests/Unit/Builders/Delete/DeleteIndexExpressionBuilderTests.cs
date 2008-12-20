@@ -6,7 +6,7 @@ using FluentMigrator.Model;
 using Moq;
 using Xunit;
 
-namespace FluentMigrator.Tests.Builders.Delete
+namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
 	public class DeleteIndexExpressionBuilderTests
 	{

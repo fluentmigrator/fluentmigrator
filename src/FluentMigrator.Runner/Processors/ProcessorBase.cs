@@ -5,7 +5,7 @@ namespace FluentMigrator.Runner.Processors
 	public abstract class ProcessorBase : IMigrationProcessor
 	{
 		protected IMigrationGenerator generator;
-        
+
 		public virtual void Process(CreateTableExpression expression)
 		{
 			Process(generator.Generate(expression));
@@ -56,6 +56,6 @@ namespace FluentMigrator.Runner.Processors
 			Process(generator.Generate(expression));
 		}
 
-		protected abstract void Process(string sql);		
+		protected abstract void Process(string sql);
 	}
 }

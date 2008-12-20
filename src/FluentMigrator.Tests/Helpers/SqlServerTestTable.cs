@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
 
-namespace FluentMigrator.Tests
+namespace FluentMigrator.Tests.Helpers
 {
 	public class SqlServerTestTable : IDisposable
 	{

@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using FluentMigrator.Expressions;
@@ -17,7 +16,7 @@ namespace FluentMigrator.Runner.Generators
 		public const int DecimalCapacity = 19;
 		public const int XmlCapacity = 1073741823;
 
-		public SqlServerGenerator()
+		protected override void SetupTypeMaps()
 		{
 			SetTypeMap(DbType.AnsiStringFixedLength, "CHAR(255)");
 			SetTypeMap(DbType.AnsiStringFixedLength, "CHAR($size)", AnsiStringCapacity);
@@ -47,50 +46,6 @@ namespace FluentMigrator.Runner.Generators
 			SetTypeMap(DbType.String, "NTEXT", UnicodeTextCapacity);
 			SetTypeMap(DbType.Time, "DATETIME");
 			SetTypeMap(DbType.Xml, "XML", XmlCapacity);
-		}
-
-		public virtual string GenerateDDLForColumn(ColumnDefinition column)
-		{
-			var sb = new StringBuilder();
-			
-			sb.Append(column.Name);
-			sb.Append(" ");
-			sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
-
-			if (column.IsPrimaryKey)
-			{
-				sb.Append(" PRIMARY KEY CLUSTERED");
-			}
-
-			return sb.ToString();
-		}
-
-		private string GetColumnDDL(IList<ColumnDefinition> columns)
-		{
-			string result = "";
-			int total = columns.Count - 1;
-
-			//if more than one column is a primary key, then it needs to be added separately            
-			IList<ColumnDefinition> primaryKeyColumns = GetPrimaryKeyColumns(columns);
-			if (primaryKeyColumns.Count > 1)
-			{
-				foreach (ColumnDefinition column in primaryKeyColumns)
-				{
-					column.IsPrimaryKey = false;
-				}
-			}
-
-			for (int i = 0; i < columns.Count; i++)
-			{
-				result += GenerateDDLForColumn(columns[i]);
-
-				if (i != total)
-					result += ", ";
-			}
-
-			result = AddPrimaryKeyConstraint(primaryKeyColumns, result);
-
-			return result;
 		}
 
 		public override string Generate(CreateTableExpression expression)
@@ -173,37 +128,6 @@ namespace FluentMigrator.Runner.Generators
 		public override string Generate(RenameColumnExpression expression)
 		{
 		    return FormatExpression("sp_rename '[{0}].[{1}]', [{2}]", expression.TableName, expression.OldName, expression.NewName);
-		}
-
-		private IList<ColumnDefinition> GetPrimaryKeyColumns(IList<ColumnDefinition> columns)
-		{
-			IList<ColumnDefinition> primaryKeyColumns = new List<ColumnDefinition>();
-			foreach (ColumnDefinition column in columns)
-			{
-				if (column.IsPrimaryKey)
-				{
-					primaryKeyColumns.Add(column);
-				}
-			}
-			return primaryKeyColumns;
-		}
-
-		private string AddPrimaryKeyConstraint(IList<ColumnDefinition> primaryKeyColumns, string result)
-		{
-			if (primaryKeyColumns.Count > 1)
-			{
-				string keyName = "";
-				string keyColumns = "";
-				foreach (ColumnDefinition column in primaryKeyColumns)
-				{
-					keyName += column.Name + "_";
-					keyColumns += column.Name + ",";
-				}
-				keyName += "PK";
-				keyColumns = keyColumns.TrimEnd(',');
-				result += String.Format(", CONSTRAINT {0} PRIMARY KEY ({1})", keyName, keyColumns);
-			}
-			return result;
 		}
 
 		public string FormatExpression(string template, params object[] args)

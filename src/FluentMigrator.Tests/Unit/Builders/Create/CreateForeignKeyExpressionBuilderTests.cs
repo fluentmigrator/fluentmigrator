@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using FluentMigrator.Builders.Delete.ForeignKey;
+using FluentMigrator.Builders.Create.ForeignKey;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using Moq;
 using Xunit;
 
-namespace FluentMigrator.Tests.Builders.Delete
+namespace FluentMigrator.Tests.Unit.Builders.Create
 {
-	public class DeleteForeignKeyExpressionBuilderTests
+	public class CreateForeignKeyExpressionBuilderTests
 	{
 		[Fact]
 		public void CallingFromTableSetsForeignTableName()
@@ -16,10 +16,10 @@ namespace FluentMigrator.Tests.Builders.Delete
 			var foreignKeyMock = new Mock<ForeignKeyDefinition>();
 			foreignKeyMock.ExpectSet(f => f.ForeignTable, "Bacon").AtMostOnce();
 
-			var expressionMock = new Mock<DeleteForeignKeyExpression>();
+			var expressionMock = new Mock<CreateForeignKeyExpression>();
 			expressionMock.ExpectGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMostOnce();
 
-			var builder = new DeleteForeignKeyExpressionBuilder(expressionMock.Object);
+			var builder = new CreateForeignKeyExpressionBuilder(expressionMock.Object);
 			builder.FromTable("Bacon");
 
 			foreignKeyMock.VerifyAll();
@@ -32,10 +32,10 @@ namespace FluentMigrator.Tests.Builders.Delete
 			var foreignKeyMock = new Mock<ForeignKeyDefinition>();
 			foreignKeyMock.ExpectSet(f => f.PrimaryTable, "Bacon").AtMostOnce();
 
-			var expressionMock = new Mock<DeleteForeignKeyExpression>();
+			var expressionMock = new Mock<CreateForeignKeyExpression>();
 			expressionMock.ExpectGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMostOnce();
 
-			var builder = new DeleteForeignKeyExpressionBuilder(expressionMock.Object);
+			var builder = new CreateForeignKeyExpressionBuilder(expressionMock.Object);
 			builder.ToTable("Bacon");
 
 			foreignKeyMock.VerifyAll();
@@ -51,10 +51,10 @@ namespace FluentMigrator.Tests.Builders.Delete
 			var foreignKeyMock = new Mock<ForeignKeyDefinition>();
 			foreignKeyMock.ExpectGet(f => f.ForeignColumns).Returns(collectionMock.Object).AtMostOnce();
 
-			var expressionMock = new Mock<DeleteForeignKeyExpression>();
+			var expressionMock = new Mock<CreateForeignKeyExpression>();
 			expressionMock.ExpectGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMostOnce();
 
-			var builder = new DeleteForeignKeyExpressionBuilder(expressionMock.Object);
+			var builder = new CreateForeignKeyExpressionBuilder(expressionMock.Object);
 			builder.ForeignColumn("BaconId");
 
 			collectionMock.VerifyAll();
@@ -72,10 +72,10 @@ namespace FluentMigrator.Tests.Builders.Delete
 			var foreignKeyMock = new Mock<ForeignKeyDefinition>();
 			foreignKeyMock.ExpectGet(f => f.ForeignColumns).Returns(collectionMock.Object).AtMost(2);
 
-			var expressionMock = new Mock<DeleteForeignKeyExpression>();
+			var expressionMock = new Mock<CreateForeignKeyExpression>();
 			expressionMock.ExpectGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMost(2);
 
-			var builder = new DeleteForeignKeyExpressionBuilder(expressionMock.Object);
+			var builder = new CreateForeignKeyExpressionBuilder(expressionMock.Object);
 			builder.ForeignColumns("BaconId", "EggsId");
 
 			collectionMock.VerifyAll();
@@ -92,10 +92,10 @@ namespace FluentMigrator.Tests.Builders.Delete
 			var foreignKeyMock = new Mock<ForeignKeyDefinition>();
 			foreignKeyMock.ExpectGet(f => f.PrimaryColumns).Returns(collectionMock.Object).AtMostOnce();
 
-			var expressionMock = new Mock<DeleteForeignKeyExpression>();
+			var expressionMock = new Mock<CreateForeignKeyExpression>();
 			expressionMock.ExpectGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMostOnce();
 
-			var builder = new DeleteForeignKeyExpressionBuilder(expressionMock.Object);
+			var builder = new CreateForeignKeyExpressionBuilder(expressionMock.Object);
 			builder.PrimaryColumn("BaconId");
 
 			collectionMock.VerifyAll();
@@ -113,10 +113,10 @@ namespace FluentMigrator.Tests.Builders.Delete
 			var foreignKeyMock = new Mock<ForeignKeyDefinition>();
 			foreignKeyMock.ExpectGet(f => f.PrimaryColumns).Returns(collectionMock.Object).AtMost(2);
 
-			var expressionMock = new Mock<DeleteForeignKeyExpression>();
+			var expressionMock = new Mock<CreateForeignKeyExpression>();
 			expressionMock.ExpectGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMost(2);
 
-			var builder = new DeleteForeignKeyExpressionBuilder(expressionMock.Object);
+			var builder = new CreateForeignKeyExpressionBuilder(expressionMock.Object);
 			builder.PrimaryColumns("BaconId", "EggsId");
 
 			collectionMock.VerifyAll();

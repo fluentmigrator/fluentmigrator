@@ -27,7 +27,7 @@ namespace FluentMigrator.Runner.Processors
 		{
 			return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_CATALOG = DB_NAME() AND TABLE_NAME = '{0}' AND CONSTRAINT_NAME = '{1}'", tableName, constraintName);
 		}
-        
+
 		public bool Exists(string template, params object[] args)
 		{
 			using (var command = new SqlCommand(String.Format(template, args), Connection))
@@ -36,7 +36,7 @@ namespace FluentMigrator.Runner.Processors
 				return reader.Read();
 			}
 		}
-        
+
 		protected override void Process(string sql)
 		{
 			using (var command = new SqlCommand(sql, Connection))
