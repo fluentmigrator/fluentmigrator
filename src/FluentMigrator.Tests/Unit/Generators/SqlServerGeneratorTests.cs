@@ -114,6 +114,12 @@ namespace FluentMigrator.Tests.Generators
 			Assert.Equal("CREATE UNIQUE CLUSTERED INDEX IX_TEST ON TEST_TABLE (Column1 ASC,Column2 DESC)", sql);
 		}
 
+		[Fact]
+		public void CanCreateForeignKey()
+		{
+			
+		}
+
 		private DeleteTableExpression GetDeleteTableExpression(string tableName)
 		{
 			return new DeleteTableExpression { TableName = tableName };

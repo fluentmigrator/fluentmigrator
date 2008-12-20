@@ -71,48 +71,59 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(CreateForeignKeyExpression expression)
 		{
+			/*ALTER TABLE <table_name>
+				ADD <constraint_name> FOREIGN KEY
+					(<column_name1> ,
+					<column_name2> )
+				REFERENCES <table_name>
+					(<column_name1> ,
+					<column_name2>)*/
+ 
 			throw new NotImplementedException();
 		}
 
 		public override string Generate(DeleteForeignKeyExpression expression)
 		{
+			/*ALTER TABLE <table_name>
+				DROP FOREIGN KEY <foreignkey_name>*/
+
 			throw new NotImplementedException();
 		}
 
 		public override string Generate(CreateIndexExpression expression)
 		{
-		    string result = "CREATE";
-            if (expression.Index.IsUnique)
-            {
-                result += " UNIQUE";
-            }
+		    var result = new StringBuilder("CREATE");
+            if (expression.Index.IsUnique)            
+                result.Append(" UNIQUE");
 
-            if (expression.Index.IsClustered)
-            {
-                result += " CLUSTERED";
-            }
-            else
-            {
-                result += " NONCLUSTERED";
-            }
+            if (expression.Index.IsClustered)            
+                result.Append(" CLUSTERED");            
+            else            
+                result.Append(" NONCLUSTERED");            
 
-		    result += " INDEX {0} ON {1} ({2})";
+		    result.Append(" INDEX {0} ON {1} (");
 
-		    var columns = new StringBuilder();
+			bool first = true;
             foreach (IndexColumnDefinition column in expression.Index.Columns)
             {
-                columns.Append(column.Name);
+				if (first)	
+					first = false;				
+				else			
+					result.Append(",");
+
+                result.Append(column.Name);
                 if (column.Direction == Direction.Ascending)
                 {
-                    columns.Append(" ASC,");
+                    result.Append(" ASC");
                 }
                 else
                 {
-                    columns.Append(" DESC,");
+                    result.Append(" DESC");
                 }
             }
-            
-		    return FormatExpression(result, expression.Index.Name, expression.Index.TableName, columns.ToString().TrimEnd(','));            
+			result.Append(")");
+
+		    return FormatExpression(result.ToString(), expression.Index.Name, expression.Index.TableName);
 		}
 
 		public override string Generate(DeleteIndexExpression expression)
