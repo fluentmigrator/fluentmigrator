@@ -13,7 +13,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 
 		public SqlServerProcessorTests()
 		{
-			Connection = new SqlConnection(@"server=(local)\SQLSERVER2005;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator");
+			Connection = new SqlConnection(@"server=(local);uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator");
 			Connection.Open();
 
 			Processor = new SqlServerProcessor(Connection, new SqlServerGenerator());
