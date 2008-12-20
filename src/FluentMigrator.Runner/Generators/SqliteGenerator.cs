@@ -51,6 +51,16 @@ namespace FluentMigrator.Runner.Generators
 			return string.Format("CREATE TABLE {0} ({1})", expression.TableName, GetColumnDDL(expression.Columns));
 		}
 
+		public override string Generate(RenameTableExpression expression)
+		{
+			return string.Format("ALTER TABLE {0} RENAME TO {1}", expression.OldName, expression.NewName);
+		}
+
+		public override string Generate(DeleteTableExpression expression)
+		{
+			return string.Format("DROP TABLE {0}", expression.TableName);
+		}
+
 		public override string Generate(CreateColumnExpression expression)
 		{
 			return string.Format("ALTER TABLE {0} ADD COLUMN {1}", expression.TableName, expression.Column.Name);
@@ -61,14 +71,9 @@ namespace FluentMigrator.Runner.Generators
 			return string.Format("UPDATE {0} SET {1}={2}", expression.TableName, expression.OldName, expression.NewName);
 		}
 
-		public override string Generate(DeleteTableExpression expression)
-		{
-			throw new NotImplementedException();
-		}
-
 		public override string Generate(DeleteColumnExpression expression)
 		{
-			throw new NotImplementedException();
+			return string.Format("ALTER TABLE {0} DROP COLUMN {1}", expression.TableName, expression.ColumnName);
 		}
 
 		public override string Generate(CreateForeignKeyExpression expression)
@@ -81,17 +86,12 @@ namespace FluentMigrator.Runner.Generators
 			throw new NotImplementedException();
 		}
 
-		public override string Generate(DeleteIndexExpression expression)
-		{
-			throw new NotImplementedException();
-		}
-
-		public override string Generate(RenameTableExpression expression)
-		{
-			throw new NotImplementedException();
-		}
-
 		public override string Generate(CreateIndexExpression expression)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override string Generate(DeleteIndexExpression expression)
 		{
 			throw new NotImplementedException();
 		}
