@@ -11,8 +11,7 @@ namespace FluentMigrator.Tests.Unit
 		[Fact]
 		public void GetPrimaryKeyNamePrefixesTableNameWithPKAndUnderscore()
 		{
-			var expression = new CreateTableExpression { TableName = "Foo" };
-			Assert.Equal("PK_Foo", DefaultMigrationConventions.GetPrimaryKeyName(expression));
+			Assert.Equal("PK_Foo", DefaultMigrationConventions.GetPrimaryKeyName("Foo"));
 		}
 
 		[Fact]

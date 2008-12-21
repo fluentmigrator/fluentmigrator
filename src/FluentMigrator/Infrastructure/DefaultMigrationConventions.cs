@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Text;
-using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 
@@ -8,9 +7,9 @@ namespace FluentMigrator.Infrastructure
 {
 	public static class DefaultMigrationConventions
 	{
-		public static string GetPrimaryKeyName(CreateTableExpression expression)
+		public static string GetPrimaryKeyName(string tableName)
 		{
-			return "PK_" + expression.TableName;
+			return "PK_" + tableName;
 		}
 
 		public static string GetForeignKeyName(ForeignKeyDefinition foreignKey)
@@ -61,8 +60,13 @@ namespace FluentMigrator.Infrastructure
 
 		public static MigrationMetadata GetMetadataForMigration(Type type)
 		{
-			var attribute = type.GetOneAttribute<MigrationAttribute>();
-			return new MigrationMetadata { Type = type, Version = attribute.Version };
+			var migrationAttribute = type.GetOneAttribute<MigrationAttribute>();
+			var metadata = new MigrationMetadata { Type = type, Version = migrationAttribute.Version };
+
+			foreach (MigrationTraitAttribute traitAttribute in type.GetAllAttributes<MigrationTraitAttribute>())
+				metadata.AddTrait(traitAttribute.Name, traitAttribute.Value);
+
+			return metadata;
 		}
 	}
 }

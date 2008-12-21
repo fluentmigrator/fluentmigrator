@@ -79,6 +79,7 @@
     <Compile Include="Unit\Builders\Create\CreateForeignKeyExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateTableExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateColumnExpressionBuilderTests.cs" />
+    <Compile Include="Unit\MigrationMetadataTests.cs" />
     <Compile Include="Unit\Generators\SqliteGeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServerGeneratorTests.cs" />
     <Compile Include="Helpers\SqlServerTestTable.cs" />

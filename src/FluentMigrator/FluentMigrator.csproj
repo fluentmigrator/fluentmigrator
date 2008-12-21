@@ -63,6 +63,7 @@
     <Compile Include="Builders\Rename\Column\IRenameColumnToSyntax.cs" />
     <Compile Include="Builders\Rename\Column\RenameColumnExpressionBuilder.cs" />
     <Compile Include="Builders\Rename\IRenameColumnTableSyntax.cs" />
+    <Compile Include="MigrationTraitAttribute.cs" />
     <Compile Include="Expressions\DeleteIndexExpression.cs" />
     <Compile Include="Expressions\RenameColumnExpression.cs" />
     <Compile Include="IMigrationGenerator.cs" />
