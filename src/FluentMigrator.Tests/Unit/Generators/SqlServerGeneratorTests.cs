@@ -117,7 +117,26 @@ namespace FluentMigrator.Tests.Generators
 		[Fact]
 		public void CanCreateForeignKey()
 		{
-			
+			var expression = new CreateForeignKeyExpression();
+			expression.ForeignKey.Name = "FK_Test";
+			expression.ForeignKey.PrimaryTable = "TestPrimaryTable";
+			expression.ForeignKey.ForeignTable = "TestForeignTable";
+			expression.ForeignKey.PrimaryColumns = new[] {"Column1", "Column2"};
+			expression.ForeignKey.ForeignColumns = new[] { "Column3", "Column4" };
+
+			string sql = generator.Generate(expression);
+			Assert.Equal("ALTER TABLE [TestPrimaryTable] ADD FK_Test FOREIGN KEY (Column1,Column2) REFERENCES [TestForeignTable] (Column3,Column4)", sql);
+		}
+
+		[Fact]
+		public void CanDropForeignKey()
+		{
+			var expression = new DeleteForeignKeyExpression();
+			expression.ForeignKey.Name = "FK_Test";
+			expression.ForeignKey.PrimaryTable = "TestPrimaryTable";
+
+			string sql = generator.Generate(expression);
+			Assert.Equal("ALTER TABLE [TestPrimaryTable] DROP FOREIGN KEY FK_Test", sql);
 		}
 
 		private DeleteTableExpression GetDeleteTableExpression(string tableName)

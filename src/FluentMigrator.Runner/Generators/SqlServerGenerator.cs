@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Text;
 using FluentMigrator.Expressions;
@@ -70,24 +71,33 @@ namespace FluentMigrator.Runner.Generators
 		}
 
 		public override string Generate(CreateForeignKeyExpression expression)
+		{			
+			string primaryColumns = GetColumnList(expression.ForeignKey.PrimaryColumns);
+			string foreignColumns = GetColumnList(expression.ForeignKey.ForeignColumns);
+
+			string sql = "ALTER TABLE [{0}] ADD {1} FOREIGN KEY ({2}) REFERENCES [{3}] ({4})";
+
+			return String.Format(sql, expression.ForeignKey.PrimaryTable,
+			              expression.ForeignKey.Name,
+			              primaryColumns,
+			              expression.ForeignKey.ForeignTable,
+			              foreignColumns);			
+		}
+
+		private string GetColumnList(IEnumerable<string> columns)
 		{
-			/*ALTER TABLE <table_name>
-				ADD <constraint_name> FOREIGN KEY
-					(<column_name1> ,
-					<column_name2> )
-				REFERENCES <table_name>
-					(<column_name1> ,
-					<column_name2>)*/
- 
-			throw new NotImplementedException();
+			string result = "";
+			foreach (string column in columns)
+			{
+				result += column + ",";
+			}
+			return result.TrimEnd(',');
 		}
 
 		public override string Generate(DeleteForeignKeyExpression expression)
 		{
-			/*ALTER TABLE <table_name>
-				DROP FOREIGN KEY <foreignkey_name>*/
-
-			throw new NotImplementedException();
+			string sql = "ALTER TABLE [{0}] DROP FOREIGN KEY {1}";
+			return String.Format(sql, expression.ForeignKey.PrimaryTable, expression.ForeignKey.Name);			
 		}
 
 		public override string Generate(CreateIndexExpression expression)
