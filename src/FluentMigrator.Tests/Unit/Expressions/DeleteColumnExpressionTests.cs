@@ -55,5 +55,12 @@ namespace FluentMigrator.Tests.Unit.Expressions
 			var errors = ValidationHelper.CollectErrors(expression);
 			Assert.DoesNotContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty, errors);
 		}
+
+		[Fact]
+		public void ReverseThrowsException()
+		{
+			var expression = new DeleteColumnExpression();
+			Assert.Throws<NotSupportedException>(() => expression.Reverse());
+		}
 	}
 }

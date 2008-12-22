@@ -4,13 +4,13 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
-	public class RenameColumnExpression : IMigrationExpression
+	public class RenameColumnExpression : MigrationExpressionBase
 	{
+		public virtual string TableName { get; set; }
 		public virtual string OldName { get; set; }
 		public virtual string NewName { get; set; }
-	    public virtual string TableName { get; set; }
 
-	    public void CollectValidationErrors(ICollection<string> errors)
+		public override void CollectValidationErrors(ICollection<string> errors)
 		{
 			if (String.IsNullOrEmpty(OldName))
 				errors.Add(ErrorMessages.OldColumnNameCannotBeNullOrEmpty);
@@ -19,9 +19,14 @@ namespace FluentMigrator.Expressions
 				errors.Add(ErrorMessages.NewColumnNameCannotBeNullOrEmpty);
 		}
 
-		public virtual void ExecuteWith(IMigrationProcessor processor)
+		public override void ExecuteWith(IMigrationProcessor processor)
 		{
 			processor.Process(this);
+		}
+
+		public override IMigrationExpression Reverse()
+		{
+			return new RenameColumnExpression { TableName = TableName, OldName = NewName, NewName = OldName };
 		}
 	}
 }

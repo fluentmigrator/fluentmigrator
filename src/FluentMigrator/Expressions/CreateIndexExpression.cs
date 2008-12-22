@@ -4,7 +4,7 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-	public class CreateIndexExpression : IMigrationExpression
+	public class CreateIndexExpression : MigrationExpressionBase
 	{
 		public virtual IndexDefinition Index { get; set; }
 
@@ -13,14 +13,19 @@ namespace FluentMigrator.Expressions
 			Index = new IndexDefinition();
 		}
 
-		public virtual void CollectValidationErrors(ICollection<string> errors)
+		public override void CollectValidationErrors(ICollection<string> errors)
 		{
 			Index.CollectValidationErrors(errors);
 		}
 
-		public virtual void ExecuteWith(IMigrationProcessor processor)
+		public override void ExecuteWith(IMigrationProcessor processor)
 		{
 			processor.Process(this);
+		}
+
+		public override IMigrationExpression Reverse()
+		{
+			return new DeleteIndexExpression { Index = Index.Clone() as IndexDefinition };
 		}
 	}
 }

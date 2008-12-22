@@ -4,7 +4,7 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Model
 {
-	public class ForeignKeyDefinition : ICanBeConventional, ICanBeValidated
+	public class ForeignKeyDefinition : ICloneable, ICanBeConventional, ICanBeValidated
 	{
 		public virtual string Name { get; set; }
 		public virtual string ForeignTable { get; set; }
@@ -43,6 +43,18 @@ namespace FluentMigrator.Model
 
 			if (PrimaryColumns.Count == 0)
 				errors.Add(ErrorMessages.ForeignKeyMustHaveOneOrMorePrimaryColumns);
+		}
+
+		public object Clone()
+		{
+			return new ForeignKeyDefinition
+			{
+				Name = Name,
+				ForeignTable = ForeignTable,
+				PrimaryTable = PrimaryTable,
+				ForeignColumns = new List<string>(ForeignColumns),
+				PrimaryColumns = new List<string>(PrimaryColumns)
+			};
 		}
 	}
 }

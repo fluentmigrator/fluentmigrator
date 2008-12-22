@@ -6,8 +6,8 @@ namespace FluentMigrator.Infrastructure
 {
 	public class MigrationContext : IMigrationContext
 	{
-		public MigrationConventions Conventions { get; private set; }
-		public ICollection<IMigrationExpression> Expressions { get; private set; }
+		public virtual MigrationConventions Conventions { get; set; }
+		public virtual ICollection<IMigrationExpression> Expressions { get; set; }
 
 		public MigrationContext(MigrationConventions conventions)
 		{

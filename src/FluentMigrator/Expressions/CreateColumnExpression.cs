@@ -5,7 +5,7 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-	public class CreateColumnExpression : IMigrationExpression
+	public class CreateColumnExpression : MigrationExpressionBase
 	{
 		public virtual string TableName { get; set; }
 		public virtual ColumnDefinition Column { get; set; }
@@ -15,7 +15,7 @@ namespace FluentMigrator.Expressions
 			Column = new ColumnDefinition();
 		}
 
-		public virtual void CollectValidationErrors(ICollection<string> errors)
+		public override void CollectValidationErrors(ICollection<string> errors)
 		{
 			if (String.IsNullOrEmpty(TableName))
 				errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
@@ -23,9 +23,14 @@ namespace FluentMigrator.Expressions
 			Column.CollectValidationErrors(errors);
 		}
 
-		public virtual void ExecuteWith(IMigrationProcessor processor)
+		public override void ExecuteWith(IMigrationProcessor processor)
 		{
 			processor.Process(this);
+		}
+
+		public override IMigrationExpression Reverse()
+		{
+			return new DeleteColumnExpression { TableName = TableName, ColumnName = Column.Name };
 		}
 	}
 }

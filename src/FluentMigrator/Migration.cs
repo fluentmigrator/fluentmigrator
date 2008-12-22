@@ -14,7 +14,7 @@ namespace FluentMigrator
 		public abstract void Up();
 		public abstract void Down();
 
-		public void GetUpExpressions(IMigrationContext context)
+		public virtual void GetUpExpressions(IMigrationContext context)
 		{
 			lock (_mutex)
 			{
@@ -24,7 +24,7 @@ namespace FluentMigrator
 			}
 		}
 
-		public void GetDownExpressions(IMigrationContext context)
+		public virtual void GetDownExpressions(IMigrationContext context)
 		{
 			lock (_mutex)
 			{

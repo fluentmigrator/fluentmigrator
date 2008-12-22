@@ -5,7 +5,7 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Model
 {
-	public class ColumnDefinition : ICanBeValidated
+	public class ColumnDefinition : ICloneable, ICanBeValidated
 	{
 		public virtual string Name { get; set; }
 		public virtual DbType? Type { get; set; }
@@ -26,6 +26,11 @@ namespace FluentMigrator.Model
 
 			if (Type == null)
 				errors.Add(ErrorMessages.ColumnTypeMustBeDefined);
+		}
+
+		public object Clone()
+		{
+			return MemberwiseClone();
 		}
 	}
 }

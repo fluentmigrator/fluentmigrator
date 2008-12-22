@@ -31,5 +31,22 @@ namespace FluentMigrator.Tests.Unit.Expressions
 			var errors = ValidationHelper.CollectErrors(expression);
 			Assert.DoesNotContain(ErrorMessages.TableNameCannotBeNullOrEmpty, errors);
 		}
+
+		[Fact]
+		public void ReverseReturnsDeleteColumnExpression()
+		{
+			var expression = new CreateColumnExpression { TableName = "Bacon", Column = { Name = "BaconId" } };
+			var reverse = expression.Reverse();
+			Assert.IsType<DeleteColumnExpression>(reverse);
+		}
+
+		[Fact]
+		public void ReverseSetsTableNameAndColumnNameOnGeneratedExpression()
+		{
+			var expression = new CreateColumnExpression { TableName = "Bacon", Column = { Name = "BaconId" } };
+			var reverse = expression.Reverse() as DeleteColumnExpression;
+			Assert.Equal(reverse.TableName, "Bacon");
+			Assert.Equal(reverse.ColumnName, "BaconId");
+		}
 	}
 }

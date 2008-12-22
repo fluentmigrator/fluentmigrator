@@ -1,18 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Infrastructure.Extensions;
 
 namespace FluentMigrator.Model
 {
-	public class IndexDefinition : ICanBeConventional, ICanBeValidated
+	public class IndexDefinition : ICloneable, ICanBeConventional, ICanBeValidated
 	{
 		public virtual string Name { get; set; }
 		public virtual string TableName { get; set; }
 		public virtual bool IsUnique { get; set; }
-        public bool IsClustered { get; set; }
-        public virtual ICollection<IndexColumnDefinition> Columns { get; set; }
-	    
-	    public IndexDefinition()
+		public bool IsClustered { get; set; }
+		public virtual ICollection<IndexColumnDefinition> Columns { get; set; }
+
+		public IndexDefinition()
 		{
 			Columns = new List<IndexColumnDefinition>();
 		}
@@ -36,6 +38,18 @@ namespace FluentMigrator.Model
 
 			foreach (IndexColumnDefinition column in Columns)
 				column.CollectValidationErrors(errors);
+		}
+
+		public object Clone()
+		{
+			return new IndexDefinition
+			{
+				Name = Name,
+				TableName = TableName,
+				IsUnique = IsUnique,
+				IsClustered = IsClustered,
+				Columns = Columns.CloneAll().ToList()
+			};
 		}
 	}
 }

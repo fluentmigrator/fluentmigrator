@@ -55,5 +55,23 @@ namespace FluentMigrator.Tests.Unit.Expressions
 			var errors = ValidationHelper.CollectErrors(expression);
 			Assert.DoesNotContain(ErrorMessages.NewColumnNameCannotBeNullOrEmpty, errors);
 		}
+
+		[Fact]
+		public void ReverseReturnsRenameColumnExpression()
+		{
+			var expression = new RenameColumnExpression { TableName = "Bacon", OldName = "BaconId", NewName = "ChunkyBaconId" };
+			var reverse = expression.Reverse();
+			Assert.IsType<RenameColumnExpression>(reverse);
+		}
+
+		[Fact]
+		public void ReverseSetsTableNameOldNameAndNewNameOnGeneratedExpression()
+		{
+			var expression = new RenameColumnExpression { TableName = "Bacon", OldName = "BaconId", NewName = "ChunkyBaconId" };
+			var reverse = expression.Reverse() as RenameColumnExpression;
+			Assert.Equal("Bacon", reverse.TableName);
+			Assert.Equal("ChunkyBaconId", reverse.OldName);
+			Assert.Equal("BaconId", reverse.NewName);
+		}
 	}
 }

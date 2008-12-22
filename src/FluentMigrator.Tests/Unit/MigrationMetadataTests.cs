@@ -2,7 +2,7 @@
 using FluentMigrator.Infrastructure;
 using Xunit;
 
-namespace FluentMigrator.Tests
+namespace FluentMigrator.Tests.Unit
 {
 	public class MigrationMetadataTests
 	{

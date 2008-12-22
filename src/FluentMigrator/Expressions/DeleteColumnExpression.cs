@@ -4,12 +4,12 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
-	public class DeleteColumnExpression : IMigrationExpression
+	public class DeleteColumnExpression : MigrationExpressionBase
 	{
 		public virtual string TableName { get; set; }
 		public virtual string ColumnName { get; set; }
 
-		public virtual void CollectValidationErrors(ICollection<string> errors)
+		public override void CollectValidationErrors(ICollection<string> errors)
 		{
 			if (String.IsNullOrEmpty(TableName))
 				errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
@@ -18,7 +18,7 @@ namespace FluentMigrator.Expressions
 				errors.Add(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
 		}
 
-		public virtual void ExecuteWith(IMigrationProcessor processor)
+		public override void ExecuteWith(IMigrationProcessor processor)
 		{
 			processor.Process(this);
 		}

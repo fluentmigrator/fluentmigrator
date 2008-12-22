@@ -7,6 +7,6 @@ namespace FluentMigrator.Infrastructure
 	public interface IMigrationContext
 	{
 		MigrationConventions Conventions { get; }
-		ICollection<IMigrationExpression> Expressions { get; }
+		ICollection<IMigrationExpression> Expressions { get; set; }
 	}
 }
