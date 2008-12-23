@@ -1,3 +1,4 @@
+using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Processors
@@ -56,6 +57,11 @@ namespace FluentMigrator.Runner.Processors
 			Process(generator.Generate(expression));
 		}
 
-		protected abstract void Process(string sql);
+	    public void Process(InsertDataExpression expression)
+	    {
+	        Process(generator.Generate(expression));
+	    }
+
+	    protected abstract void Process(string sql);
 	}
 }

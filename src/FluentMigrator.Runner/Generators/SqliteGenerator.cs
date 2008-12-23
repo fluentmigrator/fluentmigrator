@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Generators
@@ -71,7 +72,12 @@ namespace FluentMigrator.Runner.Generators
 			return string.Format("UPDATE {0} SET {1}={2}", expression.TableName, expression.OldName, expression.NewName);
 		}
 
-		public override string Generate(DeleteColumnExpression expression)
+	    public override string Generate(InsertDataExpression expression)
+	    {
+	        throw new System.NotImplementedException();
+	    }
+
+	    public override string Generate(DeleteColumnExpression expression)
 		{
 			return string.Format("ALTER TABLE {0} DROP COLUMN {1}", expression.TableName, expression.ColumnName);
 		}

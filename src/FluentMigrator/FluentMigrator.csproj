@@ -60,6 +60,12 @@
     <Compile Include="Builders\Delete\Index\DeleteIndexExpressionBuilder.cs" />
     <Compile Include="Builders\Delete\Index\IDeleteIndexForTableSyntax.cs" />
     <Compile Include="Builders\Delete\Index\IDeleteIndexOnColumnSyntax.cs" />
+    <Compile Include="Builders\Insert\IInsertDataSyntax.cs" />
+    <Compile Include="Builders\Insert\IInsertExpressionRoot.cs" />
+    <Compile Include="Builders\Insert\InsertDataExpression.cs" />
+    <Compile Include="Builders\Insert\InsertDataExpressionBuilder.cs" />
+    <Compile Include="Builders\Insert\InsertExpressionRoot.cs" />
+    <Compile Include="Builders\Insert\InsertionData.cs" />
     <Compile Include="Builders\Rename\Column\IRenameColumnToSyntax.cs" />
     <Compile Include="Builders\Rename\Column\RenameColumnExpressionBuilder.cs" />
     <Compile Include="Builders\Rename\IRenameColumnTableSyntax.cs" />

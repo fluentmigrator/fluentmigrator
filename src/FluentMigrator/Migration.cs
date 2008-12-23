@@ -1,6 +1,7 @@
 ﻿using System;
 using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.Delete;
+using FluentMigrator.Builders.Insert;
 using FluentMigrator.Builders.Rename;
 using FluentMigrator.Infrastructure;
 
@@ -48,5 +49,10 @@ namespace FluentMigrator
 		{
 			get { return new RenameExpressionRoot(_context); }
 		}
+
+	    public IInsertExpressionRoot Insert
+	    {
+            get { return new InsertExpressionRoot(_context); }
+	    }
 	}
 }

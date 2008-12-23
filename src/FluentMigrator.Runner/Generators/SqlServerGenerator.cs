@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
+using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 
@@ -84,16 +85,6 @@ namespace FluentMigrator.Runner.Generators
 			              foreignColumns);			
 		}
 
-		private string GetColumnList(IEnumerable<string> columns)
-		{
-			string result = "";
-			foreach (string column in columns)
-			{
-				result += column + ",";
-			}
-			return result.TrimEnd(',');
-		}
-
 		public override string Generate(DeleteForeignKeyExpression expression)
 		{
 			string sql = "ALTER TABLE [{0}] DROP FOREIGN KEY {1}";
@@ -151,9 +142,56 @@ namespace FluentMigrator.Runner.Generators
 		    return FormatExpression("sp_rename '[{0}].[{1}]', [{2}]", expression.TableName, expression.OldName, expression.NewName);
 		}
 
-		public string FormatExpression(string template, params object[] args)
+	    public override string Generate(InsertDataExpression expression)
+	    {
+	        var result = new StringBuilder();
+            foreach (InsertionData row in expression.Rows)
+            {
+                List<string> columnNames = new List<string>();
+                List<object> columnData = new List<object>();
+                foreach (KeyValuePair<string, object> item in row)
+                {
+                    columnNames.Add(item.Key);
+                    columnData.Add(item.Value);
+                }
+
+                string columns = GetColumnList(columnNames);
+                string data = GetDataList(columnData);
+                result.Append(FormatExpression("INSERT INTO [{0}] ({1}) VALUES ({2});", expression.TableName, columns, data));
+            }
+	        return result.ToString();
+	    }
+
+	    public string FormatExpression(string template, params object[] args)
 		{
 			return String.Format(template, args);
 		}
+
+        private string GetColumnList(IEnumerable<string> columns)
+        {
+            string result = "";
+            foreach (string column in columns)
+            {
+                result += column + ",";
+            }
+            return result.TrimEnd(',');
+        }
+
+        private string GetDataList(List<object> data)
+        {
+            string result = "";
+            foreach (object column in data)
+            {
+                if (column.GetType() == typeof(string))
+                {
+                    result += "\"" + column + "\",";    
+                }
+                else
+                {
+                    result += column + ",";
+                }
+            }
+            return result.TrimEnd(',');
+        }
 	}
 }

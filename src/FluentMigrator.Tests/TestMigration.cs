@@ -22,7 +22,9 @@ namespace FluentMigrator.Tests
 		        .WithOptions().Unique().Clustered();
 
 			Rename.Table("Foo").To("Bar");
-			Rename.Column("Fizz").OnTable("Foo").To("Buzz");            
+			Rename.Column("Fizz").OnTable("Foo").To("Buzz");
+            
+		    Insert.IntoTable("Users").Row(new { Data1 = "Data1", Data2 = "Data2" });
 		}
 
 		public override void Down()

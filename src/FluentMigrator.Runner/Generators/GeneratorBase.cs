@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
+using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 
@@ -75,8 +76,9 @@ namespace FluentMigrator.Runner.Generators
 		public abstract string Generate(DeleteIndexExpression expression);
 		public abstract string Generate(RenameTableExpression expression);
 		public abstract string Generate(RenameColumnExpression expression);
+	    public abstract string Generate(InsertDataExpression expression);	    
 
-		public virtual string GenerateDDLForColumn(ColumnDefinition column)
+	    public virtual string GenerateDDLForColumn(ColumnDefinition column)
 		{
 			var sb = new StringBuilder();
 			

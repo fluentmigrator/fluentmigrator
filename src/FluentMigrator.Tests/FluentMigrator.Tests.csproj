@@ -72,6 +72,8 @@
     <Compile Include="Unit\Builders\Delete\DeleteIndexExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Delete\DeleteExpressionRootTests.cs" />
     <Compile Include="Unit\Builders\Delete\DeleteForeignKeyExpressionBuilderTests.cs" />
+    <Compile Include="Unit\Builders\Insert\InsertDataExpressionBuilderTests.cs" />
+    <Compile Include="Unit\Builders\Insert\InsertExpressionRootTests.cs" />
     <Compile Include="Unit\Builders\Rename\RenameExpressionRootTests.cs" />
     <Compile Include="Unit\Builders\Rename\RenameTableExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Rename\RenameColumnExpressionBuilderTests.cs" />
