@@ -93,38 +93,38 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(CreateIndexExpression expression)
 		{
-		    var result = new StringBuilder("CREATE");
-            if (expression.Index.IsUnique)            
-                result.Append(" UNIQUE");
+			var result = new StringBuilder("CREATE");
+			if (expression.Index.IsUnique)
+				result.Append(" UNIQUE");
 
-            if (expression.Index.IsClustered)            
-                result.Append(" CLUSTERED");            
-            else            
-                result.Append(" NONCLUSTERED");            
+			if (expression.Index.IsClustered)
+				result.Append(" CLUSTERED");
+			else
+				result.Append(" NONCLUSTERED");
 
-		    result.Append(" INDEX {0} ON {1} (");
+			result.Append(" INDEX {0} ON {1} (");
 
 			bool first = true;
-            foreach (IndexColumnDefinition column in expression.Index.Columns)
-            {
-				if (first)	
-					first = false;				
-				else			
+			foreach (IndexColumnDefinition column in expression.Index.Columns)
+			{
+				if (first)
+					first = false;
+				else
 					result.Append(",");
 
-                result.Append(column.Name);
-                if (column.Direction == Direction.Ascending)
-                {
-                    result.Append(" ASC");
-                }
-                else
-                {
-                    result.Append(" DESC");
-                }
-            }
+				result.Append(column.Name);
+				if (column.Direction == Direction.Ascending)
+				{
+					result.Append(" ASC");
+				}
+				else
+				{
+					result.Append(" DESC");
+				}
+			}
 			result.Append(")");
 
-		    return FormatExpression(result.ToString(), expression.Index.Name, expression.Index.TableName);
+			return FormatExpression(result.ToString(), expression.Index.Name, expression.Index.TableName);
 		}
 
 		public override string Generate(DeleteIndexExpression expression)

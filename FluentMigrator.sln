@@ -7,6 +7,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Tests", "src
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator", "src\FluentMigrator\FluentMigrator.csproj", "{FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Runners", "Runners", "{CB10ADAF-FB42-457B-ADFE-7CF866C5DA6E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{C17FACD1-2740-44B5-8E6E-B7FF0D54CA40}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D264186F-3ED6-482D-8E1A-F41C2F83C711}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Console", "FluentMigrator.Console\FluentMigrator.Console.csproj", "{664C7334-B44B-4D62-A0F8-063805D630AA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		AutomatedRelease|Any CPU = AutomatedRelease|Any CPU
@@ -32,8 +40,20 @@ Global
 		{FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{664C7334-B44B-4D62-A0F8-063805D630AA}.AutomatedRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{664C7334-B44B-4D62-A0F8-063805D630AA}.AutomatedRelease|Any CPU.Build.0 = Release|Any CPU
+		{664C7334-B44B-4D62-A0F8-063805D630AA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{664C7334-B44B-4D62-A0F8-063805D630AA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{664C7334-B44B-4D62-A0F8-063805D630AA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{664C7334-B44B-4D62-A0F8-063805D630AA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{CB468AD6-60C2-42E9-B3B0-01968EF94C65} = {CB10ADAF-FB42-457B-ADFE-7CF866C5DA6E}
+		{664C7334-B44B-4D62-A0F8-063805D630AA} = {CB10ADAF-FB42-457B-ADFE-7CF866C5DA6E}
+		{FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8} = {C17FACD1-2740-44B5-8E6E-B7FF0D54CA40}
+		{5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C} = {D264186F-3ED6-482D-8E1A-F41C2F83C711}
 	EndGlobalSection
 EndGlobal

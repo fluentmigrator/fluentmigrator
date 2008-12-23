@@ -5,11 +5,11 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{CB468AD6-60C2-42E9-B3B0-01968EF94C65}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{664C7334-B44B-4D62-A0F8-063805D630AA}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FluentMigrator.Runner</RootNamespace>
-    <AssemblyName>FluentMigrator.Runner</AssemblyName>
+    <RootNamespace>FluentMigrator.Console</RootNamespace>
+    <AssemblyName>FluentMigrator.Console</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -30,24 +30,10 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AutomatedRelease|AnyCPU' ">
-    <OutputPath>..\..\build\AutomatedRelease\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
-    <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
-    <ErrorReport>prompt</ErrorReport>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data.SQLite, Version=1.0.48.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\System.Data.SQLite.DLL</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -59,23 +45,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Generators\GeneratorBase.cs" />
-    <Compile Include="ProcessorFactory\ProcessorFactory.cs" />
-    <Compile Include="ProcessorFactory\SqlServerProcessorFactory.cs" />
-    <Compile Include="ProcessorFactory\IMigrationProcessorFactory.cs" />
-    <Compile Include="MigrationLoader.cs" />
-    <Compile Include="IMigrationLoader.cs" />
-    <Compile Include="MigrationRunner.cs" />
-    <Compile Include="Generators\SqliteGenerator.cs" />
-    <Compile Include="ProcessorFactory\SqliteProcessorFactory.cs" />
-    <Compile Include="Generators\SqlServerGenerator.cs" />
-    <Compile Include="Processors\ProcessorBase.cs" />
-    <Compile Include="Processors\SqliteProcessor.cs" />
-    <Compile Include="Processors\SqlServerProcessor.cs" />
+    <Compile Include="MigratorConsole.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj">
+    <ProjectReference Include="..\src\FluentMigrator.Runner\FluentMigrator.Runner.csproj">
+      <Project>{CB468AD6-60C2-42E9-B3B0-01968EF94C65}</Project>
+      <Name>FluentMigrator.Runner</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\src\FluentMigrator\FluentMigrator.csproj">
       <Project>{FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8}</Project>
       <Name>FluentMigrator</Name>
     </ProjectReference>

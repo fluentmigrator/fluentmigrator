@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System.Collections.Generic;
+using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators;
@@ -16,6 +17,9 @@ namespace FluentMigrator.Tests.Unit.Generators
 		string column = "Column";
 		string oldColumn = "OldColumn";
 		string newColumn = "NewColumn";
+
+		string indexName = "indexed-column";
+		string indexColumn = "IndexColumn";
 
 		public SqliteGeneratorTests()
 		{
@@ -73,15 +77,22 @@ namespace FluentMigrator.Tests.Unit.Generators
 		// CreateForeignKey -- Not supported in Sqlite
 		// DeleteForeignKey -- Not supported in Sqlite
 
-		// CreateIndex
 		[Fact]
-		public void CanCreateIndex()
+		public void CanCreateBasicIndex()
 		{
-//			ColumnDefinition 
-//			CreateIndexExpression expression = new CreateIndexExpression { new IndexDefinition {}};
+			CreateIndexExpression expression = GetCreateIndexExpression();
+			string sql = generator.Generate(expression);
+			Assert.Equal(string.Format("CREATE INDEX IF NOT EXISTS {0} ON {1} ({2})", indexName, table, indexColumn), sql);
 		}
 
 		// DeleteIndex
+
+		private CreateIndexExpression GetCreateIndexExpression()
+		{
+			IndexColumnDefinition indexColumnDefinition = new IndexColumnDefinition { Name = indexColumn };
+			IndexDefinition indexDefinition = new IndexDefinition { TableName = table, Name = indexName, Columns = new List<IndexColumnDefinition> { indexColumnDefinition } };
+			return new CreateIndexExpression { Index = indexDefinition };
+		}
 
 		private RenameColumnExpression GetRenameColumnExpression()
 		{

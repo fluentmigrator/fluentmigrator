@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Data;
 using FluentMigrator.Builders.Insert;
+using System.Text;
 using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Generators
 {
@@ -94,7 +96,31 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(CreateIndexExpression expression)
 		{
-			throw new NotImplementedException();
+			var result = new StringBuilder("CREATE");
+			if (expression.Index.IsUnique)
+				result.Append(" UNIQUE");
+
+			result.Append(" INDEX IF NOT EXISTS {0} ON {1} (");
+
+			bool first = true;
+			foreach (IndexColumnDefinition column in expression.Index.Columns)
+			{
+				if (first)
+					first = false;
+				else
+					result.Append(",");
+
+				result.Append(column.Name);
+
+// Not yet implemented correctly
+//				if (column.Direction == Direction.Ascending)
+//					result.Append(" ASC");
+//				else
+//					result.Append(" DESC");
+			}
+			result.Append(")");
+
+			return FormatExpression(result.ToString(), expression.Index.Name, expression.Index.TableName);
 		}
 
 		public override string Generate(DeleteIndexExpression expression)

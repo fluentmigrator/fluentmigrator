@@ -7,7 +7,7 @@ using FluentMigrator.Runner.Processors;
 using Moq;
 using Xunit;
 
-namespace FluentMigrator.Tests.Processors
+namespace FluentMigrator.Tests.Integration.Processors
 {
 	public class SqliteProcessorTests
 	{

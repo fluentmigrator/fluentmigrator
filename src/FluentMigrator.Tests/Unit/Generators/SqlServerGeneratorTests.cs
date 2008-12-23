@@ -4,10 +4,9 @@ using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators;
-using Moq;
 using Xunit;
 
-namespace FluentMigrator.Tests.Generators
+namespace FluentMigrator.Tests.Unit.Generators
 {
 	public class SqlServerGeneratorTests
 	{

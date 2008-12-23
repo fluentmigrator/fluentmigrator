@@ -152,5 +152,10 @@ namespace FluentMigrator.Runner.Generators
 			}
 			return result;
 		}
+
+		public string FormatExpression(string template, params object[] args)
+		{
+			return String.Format(template, args);
+		}
 	}
 }
