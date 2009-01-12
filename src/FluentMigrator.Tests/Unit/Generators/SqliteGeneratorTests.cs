@@ -31,7 +31,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			CreateTableExpression expression = GetCreateTableExpression();
 			string sql = generator.Generate(expression);
-			Assert.Equal(string.Format("CREATE TABLE {0} (NewColumn NVARCHAR(255))", table), sql);
+			Assert.Equal(string.Format("CREATE TABLE {0} (NewColumn NVARCHAR(255) NOT NULL)", table), sql);
 		}
 
 		[Fact]

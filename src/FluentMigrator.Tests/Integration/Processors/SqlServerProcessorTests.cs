@@ -49,7 +49,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 		public void CallingColumnExistsReturnsFalseIfColumnDoesNotExist()
 		{
 			using (var table = new SqlServerTestTable(Connection, "id int"))
-				Assert.False(Processor.ColumnExists(table.Name, "DoesNotExist"));
-		}
+				Assert.False(Processor.ColumnExists(table.Name, "DoesNotExist"));            
+		}        
 	}
 }

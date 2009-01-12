@@ -67,6 +67,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Integration\MigrationRunnerTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateIndexExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateExpressionRootTests.cs" />
     <Compile Include="Unit\Builders\Delete\DeleteIndexExpressionBuilderTests.cs" />

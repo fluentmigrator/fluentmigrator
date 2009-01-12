@@ -56,8 +56,8 @@ namespace FluentMigrator.Runner.Generators
 		}
 
 		public override string Generate(CreateColumnExpression expression)
-		{
-		    return FormatExpression("ALTER TABLE [{0}] ADD {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
+		{		    
+            return FormatExpression("ALTER TABLE [{0}] ADD {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
 		}
 
 		public override string Generate(DeleteTableExpression expression)
@@ -76,13 +76,15 @@ namespace FluentMigrator.Runner.Generators
 			string primaryColumns = GetColumnList(expression.ForeignKey.PrimaryColumns);
 			string foreignColumns = GetColumnList(expression.ForeignKey.ForeignColumns);
 
-			string sql = "ALTER TABLE [{0}] ADD {1} FOREIGN KEY ({2}) REFERENCES [{3}] ({4})";
+			string sql = "ALTER TABLE [{0}] ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES [{3}] ({4})";
 
-			return String.Format(sql, expression.ForeignKey.PrimaryTable,
+			return String.Format(sql, 
+                          expression.ForeignKey.ForeignTable,                          
 			              expression.ForeignKey.Name,
-			              primaryColumns,
-			              expression.ForeignKey.ForeignTable,
-			              foreignColumns);			
+			              foreignColumns,
+                          expression.ForeignKey.PrimaryTable,
+                          primaryColumns                          
+			              );			
 		}
 
 		public override string Generate(DeleteForeignKeyExpression expression)
@@ -182,14 +184,7 @@ namespace FluentMigrator.Runner.Generators
             string result = "";
             foreach (object column in data)
             {
-                if (column.GetType() == typeof(string))
-                {
-                    result += "\"" + column + "\",";    
-                }
-                else
-                {
-                    result += column + ",";
-                }
+                result += GetConstantValue(column) + ",";                
             }
             return result.TrimEnd(',');
         }

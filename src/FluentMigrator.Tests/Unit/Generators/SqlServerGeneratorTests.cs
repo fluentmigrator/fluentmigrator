@@ -23,7 +23,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			string tableName = "NewTable";
 			CreateTableExpression expression = GetCreateTableExpression(tableName);
 			string sql = generator.Generate(expression);
-			Assert.Equal("CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255), ColumnName2 INT)", sql);
+			Assert.Equal("CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL, ColumnName2 INT NOT NULL)", sql);
 		}
 
 		[Fact]
@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			CreateTableExpression expression = GetCreateTableExpression(tableName);
 			expression.Columns[0].IsPrimaryKey = true;
 			string sql = generator.Generate(expression);
-			Assert.Equal("CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) PRIMARY KEY CLUSTERED, ColumnName2 INT)", sql);
+            Assert.Equal("CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL PRIMARY KEY CLUSTERED, ColumnName2 INT NOT NULL)", sql);
 		}
 
 		[Fact]
@@ -74,7 +74,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.TableName = tableName;
 
 			string sql = generator.Generate(expression);
-			Assert.Equal("ALTER TABLE [NewTable] ADD NewColumn NVARCHAR(5)", sql);
+			Assert.Equal("ALTER TABLE [NewTable] ADD NewColumn NVARCHAR(5) NOT NULL", sql);
 		}
 
 		[Fact]
@@ -126,7 +126,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.ForeignKey.ForeignColumns = new[] { "Column3", "Column4" };
 
 			string sql = generator.Generate(expression);
-			Assert.Equal("ALTER TABLE [TestPrimaryTable] ADD FK_Test FOREIGN KEY (Column1,Column2) REFERENCES [TestForeignTable] (Column3,Column4)", sql);
+            Assert.Equal("ALTER TABLE [TestForeignTable] ADD CONSTRAINT FK_Test FOREIGN KEY (Column3,Column4) REFERENCES [TestPrimaryTable] (Column1,Column2)", sql);
 		}
 
 		[Fact]
@@ -154,8 +154,8 @@ namespace FluentMigrator.Tests.Unit.Generators
 
             string sql = generator.Generate(expression);
 
-            string expected = "INSERT INTO [TestTable] (Id,Name,Website) VALUES (1,\"Justin\",\"codethinked.com\");";
-            expected += "INSERT INTO [TestTable] (Id,Name,Website) VALUES (2,\"Nate\",\"kohari.org\");";
+            string expected = "INSERT INTO [TestTable] (Id,Name,Website) VALUES (1,'Justin','codethinked.com');";
+            expected += "INSERT INTO [TestTable] (Id,Name,Website) VALUES (2,'Nate','kohari.org');";
 
             Assert.Equal(expected, sql);
         }

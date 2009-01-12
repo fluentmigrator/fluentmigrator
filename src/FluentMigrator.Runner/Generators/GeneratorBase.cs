@@ -86,6 +86,22 @@ namespace FluentMigrator.Runner.Generators
 			sb.Append(" ");
 			sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
 
+            if (!column.IsNullable)
+            {
+                sb.Append(" NOT NULL");
+            }
+
+            if (column.DefaultValue != null)
+            {
+                sb.Append(" DEFAULT ");
+                sb.Append(GetConstantValue(column.DefaultValue));                
+            }
+
+            if (column.IsIdentity)
+            {
+                sb.Append(" IDENTITY(1,1)");
+            }
+
 			if (column.IsPrimaryKey)
 			{
 				sb.Append(" PRIMARY KEY CLUSTERED");
@@ -94,7 +110,7 @@ namespace FluentMigrator.Runner.Generators
 			return sb.ToString();
 		}
 
-		protected string GetColumnDDL(IList<ColumnDefinition> columns)
+	    protected string GetColumnDDL(IList<ColumnDefinition> columns)
 		{
 			string result = "";
 			int total = columns.Count - 1;
@@ -157,5 +173,15 @@ namespace FluentMigrator.Runner.Generators
 		{
 			return String.Format(template, args);
 		}
+
+        protected virtual string GetConstantValue(object value)
+        {
+            string stringValue = value as string;
+            if (stringValue != null)
+            {
+                return "'" + stringValue.Replace("'", "''") + "'";
+            }
+            return value.ToString();
+        }
 	}
 }

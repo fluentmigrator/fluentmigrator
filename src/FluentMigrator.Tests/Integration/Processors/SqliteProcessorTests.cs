@@ -32,13 +32,15 @@ namespace FluentMigrator.Tests.Integration.Processors
 			tableName = "NewTable";
 			columnName = "ColumnName";
 			column.ExpectGet(c => c.Name).Returns(columnName);
+		    column.ExpectGet(c => c.IsNullable).Returns(true);
+		    column.ExpectGet(c => c.Type).Returns(DbType.Int32);
 		}
 
 		[Fact]
 		public void CanCreateTableExpression()
 		{
-			CreateTableExpression expression = new CreateTableExpression { TableName = tableName };
-			expression.Columns.Add(column.Object);
+			CreateTableExpression expression = new CreateTableExpression { TableName = tableName };			
+            expression.Columns.Add(column.Object);
 
 			using (connection)
 			{
