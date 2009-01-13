@@ -20,7 +20,7 @@ namespace FluentMigrator.Runner
 			var context = new MigrationContext(Conventions);
 			migration.GetUpExpressions(context);
 
-			//Processor.Connection
+			//Processor.Connection			
 			foreach (IMigrationExpression expression in context.Expressions)
 				expression.ExecuteWith(Processor);
 		}

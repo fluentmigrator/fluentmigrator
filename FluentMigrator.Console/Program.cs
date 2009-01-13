@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using FluentMigrator.Tests.Unit.Runners;
 
 namespace FluentMigrator.Console
 {
@@ -9,8 +10,7 @@ namespace FluentMigrator.Console
 	{
 		static void Main(string[] args)
 		{
-//			MigratorConsole console = new MigratorConsole(args);
-//			return console.Run();
+			var console = new MigratorConsole(args);			
 		}
 	}
 }
