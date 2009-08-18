@@ -1,0 +1,16 @@
+C:\dev\fluentmigrator\src\FluentMigrator.Tests\bin\Debug\FluentMigrator.Tests.dll
+C:\dev\fluentmigrator\src\FluentMigrator.Tests\bin\Debug\FluentMigrator.Tests.pdb
+C:\dev\fluentmigrator\src\FluentMigrator.Tests\bin\Debug\FluentMigrator.Console.exe
+C:\dev\fluentmigrator\src\FluentMigrator.Tests\bin\Debug\FluentMigrator.dll
+C:\dev\fluentmigrator\src\FluentMigrator.Tests\bin\Debug\FluentMigrator.Runner.dll
+C:\dev\fluentmigrator\src\FluentMigrator.Tests\bin\Debug\Moq.dll
+C:\dev\fluentmigrator\src\FluentMigrator.Tests\bin\Debug\System.Data.SQLite.DLL
+C:\dev\fluentmigrator\src\FluentMigrator.Tests\bin\Debug\xunit.dll
+C:\dev\fluentmigrator\src\FluentMigrator.Tests\bin\Debug\FluentMigrator.Runner.pdb
+C:\dev\fluentmigrator\src\FluentMigrator.Tests\bin\Debug\xunit.xml
+C:\dev\fluentmigrator\src\FluentMigrator.Tests\bin\Debug\FluentMigrator.Console.pdb
+C:\dev\fluentmigrator\src\FluentMigrator.Tests\bin\Debug\FluentMigrator.pdb
+C:\dev\fluentmigrator\src\FluentMigrator.Tests\bin\Debug\Moq.xml
+C:\dev\fluentmigrator\src\FluentMigrator.Tests\obj\Debug\ResolveAssemblyReference.cache
+C:\dev\fluentmigrator\src\FluentMigrator.Tests\obj\Debug\FluentMigrator.Tests.dll
+C:\dev\fluentmigrator\src\FluentMigrator.Tests\obj\Debug\FluentMigrator.Tests.pdb
