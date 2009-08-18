@@ -37,7 +37,7 @@ namespace FluentMigrator.Runner.Generators
 			SetTypeMap(DbType.Double, "DOUBLE PRECISION");
 			SetTypeMap(DbType.Guid, "UNIQUEIDENTIFIER");
 			SetTypeMap(DbType.Int16, "SMALLINT");
-			SetTypeMap(DbType.Int32, "INT");
+			SetTypeMap(DbType.Int32, "INTEGER");
 			SetTypeMap(DbType.Int64, "BIGINT");
 			SetTypeMap(DbType.Single, "REAL");
 			SetTypeMap(DbType.StringFixedLength, "NCHAR(255)");
@@ -48,6 +48,38 @@ namespace FluentMigrator.Runner.Generators
 			SetTypeMap(DbType.Time, "DATETIME");
 			SetTypeMap(DbType.Xml, "XML", XmlCapacity);
 		}
+
+        public override string GenerateDDLForColumn(ColumnDefinition column)
+        {
+            var sb = new StringBuilder();
+
+            sb.Append(column.Name);
+            sb.Append(" ");
+            sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
+
+            if (!column.IsNullable)
+            {
+                sb.Append(" NOT NULL");
+            }
+
+            if (column.DefaultValue != null)
+            {
+                sb.Append(" DEFAULT ");
+                sb.Append(GetConstantValue(column.DefaultValue));
+            }
+
+            if (column.IsIdentity)
+            {
+                sb.Append(" IDENTITY");
+            }
+
+            if (column.IsPrimaryKey)
+            {
+                sb.Append(" PRIMARY KEY");
+            }
+
+            return sb.ToString();
+        }
 
 		public override string Generate(CreateTableExpression expression)
 		{			
@@ -66,7 +98,8 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(CreateColumnExpression expression)
 		{
-			return string.Format("ALTER TABLE {0} ADD COLUMN {1}", expression.TableName, expression.Column.Name);
+			//return string.Format("ALTER TABLE {0} ADD COLUMN {1}", expression.TableName, expression.Column.Name);
+            return FormatExpression("ALTER TABLE [{0}] ADD {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
 		}
 
 		public override string Generate(RenameColumnExpression expression)

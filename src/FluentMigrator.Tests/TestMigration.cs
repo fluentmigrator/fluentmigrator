@@ -8,7 +8,7 @@ namespace FluentMigrator.Tests
         public override void Up()
         {
             Create.Table("Users")
-                .WithColumn("UserId").AsInt32().Identity()
+                .WithColumn("UserId").AsInt32().Identity().PrimaryKey()
                 .WithColumn("GroupId").AsInt32().NotNullable()
                 .WithColumn("UserName").AsString(32).NotNullable()
                 .WithColumn("Password").AsString(32).NotNullable();

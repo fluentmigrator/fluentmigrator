@@ -58,6 +58,14 @@ namespace FluentMigrator.Tests.Unit.Generators
 			Assert.Equal(string.Format("ALTER TABLE {0} ADD COLUMN {1}", table, newColumn), sql);
 		}
 
+        [Fact]
+        public void CanCreateAutoIncrementColumn()
+        {
+            CreateColumnExpression expression = GetCreateAutoIncrementColumnExpression();
+            string sql = generator.Generate(expression);
+            Assert.Equal(string.Format("ALTER TABLE {0} ADD COLUMN {1}", table, newColumn), sql);
+        }
+
 		[Fact]
 		public void CanRenameColumn()
 		{
@@ -104,6 +112,12 @@ namespace FluentMigrator.Tests.Unit.Generators
 			ColumnDefinition column = new ColumnDefinition { Name = newColumn };
 			return new CreateColumnExpression { TableName = table, Column = column };
 		}
+
+        private CreateColumnExpression GetCreateAutoIncrementColumnExpression()
+        {
+            ColumnDefinition column = new ColumnDefinition { Name = newColumn, IsIdentity = true, IsPrimaryKey = true, Type = DbType.String };
+            return new CreateColumnExpression { TableName = table, Column = column };
+        }
 
 		private CreateTableExpression GetCreateTableExpression()
 		{
