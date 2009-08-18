@@ -1,5 +1,0 @@
-C:\dev\fluentmigrator\src\FluentMigrator\obj\Debug\ResolveAssemblyReference.cache
-C:\dev\fluentmigrator\src\FluentMigrator\bin\Debug\FluentMigrator.dll
-C:\dev\fluentmigrator\src\FluentMigrator\bin\Debug\FluentMigrator.pdb
-C:\dev\fluentmigrator\src\FluentMigrator\obj\Debug\FluentMigrator.dll
-C:\dev\fluentmigrator\src\FluentMigrator\obj\Debug\FluentMigrator.pdb

@@ -1,8 +1,0 @@
-C:\dev\fluentmigrator\src\FluentMigrator.Runner\bin\Debug\FluentMigrator.Runner.dll
-C:\dev\fluentmigrator\src\FluentMigrator.Runner\bin\Debug\FluentMigrator.Runner.pdb
-C:\dev\fluentmigrator\src\FluentMigrator.Runner\bin\Debug\FluentMigrator.dll
-C:\dev\fluentmigrator\src\FluentMigrator.Runner\bin\Debug\System.Data.SQLite.DLL
-C:\dev\fluentmigrator\src\FluentMigrator.Runner\bin\Debug\FluentMigrator.pdb
-C:\dev\fluentmigrator\src\FluentMigrator.Runner\obj\Debug\ResolveAssemblyReference.cache
-C:\dev\fluentmigrator\src\FluentMigrator.Runner\obj\Debug\FluentMigrator.Runner.dll
-C:\dev\fluentmigrator\src\FluentMigrator.Runner\obj\Debug\FluentMigrator.Runner.pdb
