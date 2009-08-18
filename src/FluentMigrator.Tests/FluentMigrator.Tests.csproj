@@ -68,6 +68,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Integration\MigrationRunnerTests.cs" />
+    <Compile Include="Integration\MigrationVersionRunnerTests.cs" />
+    <Compile Include="Integration\VersionMigrationTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateIndexExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateExpressionRootTests.cs" />
     <Compile Include="Unit\Builders\Delete\DeleteIndexExpressionBuilderTests.cs" />
@@ -82,6 +84,7 @@
     <Compile Include="Unit\Builders\Create\CreateForeignKeyExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateTableExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateColumnExpressionBuilderTests.cs" />
+    <Compile Include="Unit\MigrationLoaderTests.cs" />
     <Compile Include="Unit\MigrationMetadataTests.cs" />
     <Compile Include="Unit\Generators\SqliteGeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServerGeneratorTests.cs" />

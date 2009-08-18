@@ -35,10 +35,11 @@ namespace FluentMigrator.Builders.Delete
 			return new DeleteForeignKeyExpressionBuilder(expression);
 		}
 
-		public void ForeignKey(string foreignKeyName)
+        public IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName)
 		{
 			var expression = new DeleteForeignKeyExpression { ForeignKey = { Name = foreignKeyName } };
 			_context.Expressions.Add(expression);
+            return new DeleteForeignKeyExpressionBuilder(expression);
 		}
 	}
 }

@@ -10,6 +10,6 @@ namespace FluentMigrator.Builders.Delete
 		void Table(string tableName);
 		IDeleteColumnFromTableSyntax Column(string columnName);
 		IDeleteForeignKeyFromTableSyntax ForeignKey();
-		void ForeignKey(string foreignKeyName);
+        IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName);
 	}
 }

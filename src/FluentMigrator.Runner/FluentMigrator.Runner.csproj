@@ -60,6 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Generators\GeneratorBase.cs" />
+    <Compile Include="MigrationVersionRunner.cs" />
     <Compile Include="ProcessorFactory\ProcessorFactory.cs" />
     <Compile Include="ProcessorFactory\SqlServerProcessorFactory.cs" />
     <Compile Include="ProcessorFactory\IMigrationProcessorFactory.cs" />
@@ -73,6 +74,8 @@
     <Compile Include="Processors\SqliteProcessor.cs" />
     <Compile Include="Processors\SqlServerProcessor.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Versioning\VersionInfo.cs" />
+    <Compile Include="Versioning\VersionMigration.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj">

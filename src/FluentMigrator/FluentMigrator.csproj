@@ -57,6 +57,7 @@
   <ItemGroup>
     <Compile Include="Builders\Create\Index\ICreateIndexColumnOptionsSyntax.cs" />
     <Compile Include="Builders\Create\Index\ICreateIndexOptionsSyntax.cs" />
+    <Compile Include="Builders\Delete\ForeignKey\IDeleteForeignKeyOnTableSyntax.cs" />
     <Compile Include="Builders\Delete\Index\DeleteIndexExpressionBuilder.cs" />
     <Compile Include="Builders\Delete\Index\IDeleteIndexForTableSyntax.cs" />
     <Compile Include="Builders\Delete\Index\IDeleteIndexOnColumnSyntax.cs" />

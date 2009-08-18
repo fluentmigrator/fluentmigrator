@@ -5,6 +5,6 @@ namespace FluentMigrator.Builders.Delete.ForeignKey
 {
 	public interface IDeleteForeignKeyToTableSyntax : IFluentSyntax
 	{
-		IDeleteForeignKeyPrimaryColumnSyntax ToTable(string table);
+		void ToTable(string table);
 	}
 }

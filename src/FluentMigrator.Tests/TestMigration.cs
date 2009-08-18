@@ -2,39 +2,47 @@
 
 namespace FluentMigrator.Tests
 {
-	[Migration(1)]
-	public class TestMigration : Migration
-	{
-		public override void Up()
-		{
-			Create.Table("Users")
-				.WithColumn("UserId").AsInt32().Identity().PrimaryKey()
-				.WithColumn("UserName").AsString(32).NotNullable()
-				.WithColumn("Password").AsString(32).NotNullable();
+    [Migration(1)]
+    public class TestMigration : Migration
+    {
+        public override void Up()
+        {
+            Create.Table("Users")
+                .WithColumn("UserId").AsInt32().Identity().PrimaryKey()
+                .WithColumn("GroupId").AsInt32().NotNullable()
+                .WithColumn("UserName").AsString(32).NotNullable()
+                .WithColumn("Password").AsString(32).NotNullable();
 
-			Create.Column("Foo").OnTable("Users").AsInt16().Indexed();
+            Create.Table("Groups")
+                .WithColumn("GroupId").AsInt32().Identity().PrimaryKey()
+                .WithColumn("Name").AsString(32).NotNullable();
 
-			Create.ForeignKey("Foo").FromTable("Users").ForeignColumn("GroupId").ToTable("Groups").PrimaryColumn("GroupId");
+            Create.Column("Foo").OnTable("Users").AsInt16().Indexed();
 
-		    Create.Index().OnTable("Users")
-		        .OnColumn("UserName").Ascending()
-		        .OnColumn("Password").Descending()
-		        .WithOptions().Unique().Clustered();
+            Create.ForeignKey("FK_Foo").FromTable("Users").ForeignColumn("GroupId").ToTable("Groups").PrimaryColumn("GroupId");
 
-			Rename.Table("Foo").To("Bar");
-			Rename.Column("Fizz").OnTable("Foo").To("Buzz");
-            
-		    Insert.IntoTable("Users").Row(new { Data1 = "Data1", Data2 = "Data2" });
-		}
+            //Create.Index("IDX_Users_Username_Password").OnTable("Users")
+            //    .OnColumn("UserName").Ascending()
+            //    .OnColumn("Password").Descending()
+            //    .WithOptions().Unique().Clustered();
 
-		public override void Down()
-		{
-			Delete.ForeignKey("FK_Foo");
+            Create.Table("Foo")
+                .WithColumn("Fizz").AsString(32);
 
-			Delete.ForeignKey().FromTable("Users").ForeignColumn("GroupId").ToTable("Groups").PrimaryColumn("GroupId");
+            Rename.Table("Foo").To("Bar");
+            Rename.Column("Fizz").OnTable("Bar").To("Buzz");
 
-			Delete.Column("Foo").FromTable("Users");
-			Delete.Table("Users");
-		}
-	}
+            //Insert.IntoTable("Users").Row(new { Data1 = "Data1", Data2 = "Data2" });
+        }
+
+        public override void Down()
+        {
+            Delete.ForeignKey("FK_Foo").OnTable("Users");
+            //Delete.ForeignKey().FromTable("Users").ForeignColumn("GroupId").ToTable("Groups").PrimaryColumn("GroupId");
+            Delete.Table("Bar");
+            Delete.Column("Foo").FromTable("Users");
+            Delete.Table("Users");
+            Delete.Table("Groups");
+        }
+    }
 }

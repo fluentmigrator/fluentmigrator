@@ -137,7 +137,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.ForeignKey.PrimaryTable = "TestPrimaryTable";
 
 			string sql = generator.Generate(expression);
-			Assert.Equal("ALTER TABLE [TestPrimaryTable] DROP FOREIGN KEY FK_Test", sql);
+			Assert.Equal("ALTER TABLE [TestPrimaryTable] DROP CONSTRAINT FK_Test", sql);
 		}
 
         [Fact]

@@ -4,7 +4,7 @@ using FluentMigrator.Expressions;
 namespace FluentMigrator.Builders.Delete.ForeignKey
 {
 	public class DeleteForeignKeyExpressionBuilder : ExpressionBuilderBase<DeleteForeignKeyExpression>,
-		IDeleteForeignKeyFromTableSyntax, IDeleteForeignKeyForeignColumnSyntax, IDeleteForeignKeyToTableSyntax, IDeleteForeignKeyPrimaryColumnSyntax
+        IDeleteForeignKeyFromTableSyntax, IDeleteForeignKeyForeignColumnSyntax, IDeleteForeignKeyToTableSyntax, IDeleteForeignKeyPrimaryColumnSyntax, IDeleteForeignKeyOnTableSyntax
 	{
 		public DeleteForeignKeyExpressionBuilder(DeleteForeignKeyExpression expression)
 			: base(expression)
@@ -31,10 +31,10 @@ namespace FluentMigrator.Builders.Delete.ForeignKey
 			return this;
 		}
 
-		public IDeleteForeignKeyPrimaryColumnSyntax ToTable(string table)
+        public void ToTable(string table)
 		{
 			Expression.ForeignKey.PrimaryTable = table;
-			return this;
+			//return this;
 		}
 
 		public void PrimaryColumn(string column)
@@ -47,5 +47,10 @@ namespace FluentMigrator.Builders.Delete.ForeignKey
 			foreach (string column in columns)
 				Expression.ForeignKey.PrimaryColumns.Add(column);
 		}
+
+        public void OnTable(string table)
+        {
+            Expression.ForeignKey.PrimaryTable = table;
+        }
 	}
 }

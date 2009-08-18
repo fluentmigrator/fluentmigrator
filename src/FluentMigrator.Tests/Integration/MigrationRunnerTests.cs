@@ -11,7 +11,7 @@ namespace FluentMigrator.Tests.Integration
         [Fact]
         public void CanRunMigration()
         {
-            string connectionString = @"server=(local);uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator";
+            string connectionString = @"server=(local)\sqlexpress;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator";
             var conventions = new MigrationConventions();
             var connection = new SqlConnection(connectionString);
             connection.Open();
