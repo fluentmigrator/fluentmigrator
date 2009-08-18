@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.Runners
 
 		private void CreateProcessor()
 		{
-			IMigrationProcessorFactory processorFactory = ProcessorFactory.GetFactory(ProcessorType);
+			IMigrationProcessorFactory processorFactory = ProcessorFactory.GetFactory(ProcessorType);            
 			Processor = processorFactory.Create(Connection);
 		}
 

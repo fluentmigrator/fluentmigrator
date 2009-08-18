@@ -19,10 +19,14 @@ namespace FluentMigrator.Tests.Integration
             var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
             var runner = new MigrationRunner(conventions, processor);
 
+            //ensure table doesn't exist
+            if(processor.TableExists(VersionInfo.TABLE_NAME))
+                runner.Down(new VersionMigration());
+
             runner.Up(new VersionMigration());
-            Assert.True(processor.TableExists("VersionInfo"));
+            Assert.True(processor.TableExists(VersionInfo.TABLE_NAME));
             runner.Down(new VersionMigration());
-            Assert.False(processor.TableExists("VersionInfo"));
+            Assert.False(processor.TableExists(VersionInfo.TABLE_NAME));
         }
     }
 }

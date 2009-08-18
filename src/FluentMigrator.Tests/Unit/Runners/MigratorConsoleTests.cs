@@ -10,6 +10,7 @@ namespace FluentMigrator.Tests.Unit.Runners
 		string database = "Sqlite";
 		string connection = "Data Source=:memory:;Version=3;New=True;";
 		string log = "1";
+        string target = "FluentMigrator.Tests.dll";
 
 		[Fact]
 		public void MustInitializeConsoleWithDatabaseArgument()
@@ -28,7 +29,7 @@ namespace FluentMigrator.Tests.Unit.Runners
 		[Fact]
 		public void CanInitMigratorConsoleWithValidArguments()
 		{
-			string[] args = { "/db", database, "/connection", connection, "/log" };
+			string[] args = { "/db", database, "/connection", connection, "/log", "/target", target };
 
 			MigratorConsole console = new MigratorConsole(args);
 			Assert.Equal(typeof(SqliteProcessor), console.Processor.GetType());

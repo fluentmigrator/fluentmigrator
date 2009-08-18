@@ -32,6 +32,8 @@ namespace FluentMigrator.Runner.Processors
 
         public override void Execute(string template, params object[] args)
         {
+            if (Connection.State != ConnectionState.Open) Connection.Open();
+
             using (var command = new SqlCommand(String.Format(template, args), Connection))
             {
                 command.ExecuteNonQuery();
@@ -40,6 +42,8 @@ namespace FluentMigrator.Runner.Processors
 
         public override bool Exists(string template, params object[] args)
         {
+            if (Connection.State != ConnectionState.Open) Connection.Open();
+
             using (var command = new SqlCommand(String.Format(template, args), Connection))
             using (var reader = command.ExecuteReader())
             {
@@ -54,6 +58,8 @@ namespace FluentMigrator.Runner.Processors
 
         public override DataSet Read(string template, params object[] args)
         {
+            if (Connection.State != ConnectionState.Open) Connection.Open();
+
             DataSet ds = new DataSet();
             using (var command = new SqlCommand(String.Format(template, args), Connection))
             using (SqlDataAdapter adapter = new SqlDataAdapter(command))
@@ -65,6 +71,8 @@ namespace FluentMigrator.Runner.Processors
 
 		protected override void Process(string sql)
 		{
+            if (Connection.State != ConnectionState.Open) Connection.Open();
+
 			using (var command = new SqlCommand(sql, Connection))
 				command.ExecuteNonQuery();
 		}
