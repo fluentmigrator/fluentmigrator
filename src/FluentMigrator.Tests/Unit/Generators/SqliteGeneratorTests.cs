@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			CreateColumnExpression expression = GetCreateColumnExpression();
 			string sql = generator.Generate(expression);
-			Assert.Equal(string.Format("ALTER TABLE {0} ADD COLUMN {1}", table, newColumn), sql);
+            Assert.Equal(string.Format("ALTER TABLE [{0}] ADD COLUMN {1} NVARCHAR(255) NOT NULL", table, newColumn), sql);
 		}
 
         [Fact]
@@ -63,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             CreateColumnExpression expression = GetCreateAutoIncrementColumnExpression();
             string sql = generator.Generate(expression);
-            Assert.Equal(string.Format("ALTER TABLE [{0}] ADD {1} NVARCHAR(255) NOT NULL PRIMARY KEY AUTOINCREMENT", table, newColumn), sql);
+            Assert.Equal(string.Format("ALTER TABLE [{0}] ADD COLUMN {1} NVARCHAR(255) NOT NULL PRIMARY KEY AUTOINCREMENT", table, newColumn), sql);
         }
 
 		[Fact]
@@ -109,7 +109,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 
 		private CreateColumnExpression GetCreateColumnExpression()
 		{
-			ColumnDefinition column = new ColumnDefinition { Name = newColumn };
+			ColumnDefinition column = new ColumnDefinition { Name = newColumn, Type = DbType.String };
 			return new CreateColumnExpression { TableName = table, Column = column };
 		}
 
@@ -122,7 +122,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		private CreateTableExpression GetCreateTableExpression()
 		{
 			CreateTableExpression expression = new CreateTableExpression() { TableName = table, };
-			expression.Columns.Add(new ColumnDefinition { Name = "NewColumn", Type = DbType.String });
+			expression.Columns.Add(new ColumnDefinition { Name = newColumn, Type = DbType.String });
 			return expression;
 		}
 	}

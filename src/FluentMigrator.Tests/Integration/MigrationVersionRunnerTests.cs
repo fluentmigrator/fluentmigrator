@@ -22,8 +22,6 @@ namespace FluentMigrator.Tests.Integration
 
             var runner = new MigrationVersionRunner(conventions, processor, typeof(MigrationVersionRunnerTests));
 
-            runner.LoadAssemblyMigrations();
-
             Assert.NotNull(runner.Migrations);
         }
 
@@ -38,9 +36,7 @@ namespace FluentMigrator.Tests.Integration
 
             var runner = new MigrationVersionRunner(conventions, processor, typeof(MigrationVersionRunnerTests));
 
-            runner.LoadVersionInfo();
-
-            Assert.NotNull(runner.Version);
+            Assert.NotNull(runner.Version);            
         }
 
         [Fact]
@@ -61,7 +57,6 @@ namespace FluentMigrator.Tests.Integration
             //now step down to 0
             long last = 0;
             runner.StepDown(runner.CurrentVersion, 0, out last);
-            runner.SaveVersionState(last, runner.CurrentVersion);
 
             Assert.Equal<long>((long)0, runner.CurrentVersion);
         }

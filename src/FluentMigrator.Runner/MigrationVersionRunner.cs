@@ -11,9 +11,29 @@ namespace FluentMigrator.Runner
     public class MigrationVersionRunner
     {
         private Assembly asm;
+        private VersionInfo versionInfo;
 
-        public VersionInfo Version { get; private set;}
-        public SortedList<long, Migration> Migrations {get; private set;}
+        public VersionInfo Version 
+        {
+            get
+            {
+                if (versionInfo == null) LoadVersionInfo();
+                return versionInfo;
+            }
+            private set { versionInfo = value; }
+        }
+
+        private SortedList<long, Migration> migrations;
+        public SortedList<long, Migration> Migrations 
+        {
+            get
+            {
+                if (migrations == null) LoadAssemblyMigrations();
+                return migrations;
+            }
+            private set { migrations = value; }
+        }
+
         public MigrationConventions Conventions { get; private set; }
         public IMigrationProcessor Processor { get; private set; }
 
@@ -74,29 +94,16 @@ namespace FluentMigrator.Runner
 
         public long CurrentVersion
         {
-            get
-            {
-                //load the version info if its mising
-                if (Version == null) LoadVersionInfo();
-                return Version.CurrentVersion;
-            }
+            get { return Version.CurrentVersion; }
         }
 
         public long LastVersion
         {
-            get
-            {
-                //load version info
-                if (Version == null) LoadVersionInfo();
-                return Version.PreviousVersion;
-            }
+            get { return Version.PreviousVersion; }
         }
 
         public void StepUp(long fromVersion, long toVersion, out long lastVersionAttempted)
         {
-            //make sure migrations are loaded
-            if (Migrations == null) LoadAssemblyMigrations();
-
             //set steps
             int fromStep = Migrations.IndexOfKey(fromVersion);
             int toStep = Migrations.IndexOfKey(toVersion);
@@ -120,13 +127,13 @@ namespace FluentMigrator.Runner
                 lastVersionAttempted = nextStepVersion;
                 step++;
             }
+
+            //save version info
+            SaveVersionState(lastVersionAttempted, CurrentVersion);
         }
 
         public void StepDown(long fromVersion, long toVersion, out long lastVersionAttempted)
         {
-            //make sure migrations are loaded
-            if (Migrations == null) LoadAssemblyMigrations();
-
             //set steps
             int fromStep = Migrations.IndexOfKey(fromVersion);
             int toStep = (toVersion==0) ? -1 : Migrations.IndexOfKey(toVersion);
@@ -152,11 +159,13 @@ namespace FluentMigrator.Runner
             }
 
             if (step < 0) lastVersionAttempted = 0;
+
+            //save version info
+            SaveVersionState(lastVersionAttempted, CurrentVersion);
         }
 
         public void UpgradeToVersion(long number, bool autoRollback)
         {
-            if (Migrations == null) LoadAssemblyMigrations();
             if (!Migrations.ContainsKey(number)) throw new Exception(String.Format("Version {0} is missing.", number));
             if (CurrentVersion != 0 && !Migrations.ContainsKey(CurrentVersion)) throw new Exception(String.Format("Current version {0} is not defined.", CurrentVersion));
             
@@ -167,7 +176,6 @@ namespace FluentMigrator.Runner
             try
             {
                 StepUp(CurrentVersion, number, out lastVersionRun);
-                SaveVersionState(lastVersionRun, CurrentVersion);
             }
             catch (Exception er)
             {
@@ -177,12 +185,8 @@ namespace FluentMigrator.Runner
                     long rollbackVersion = 0;
                     StepDown(lastVersionRun, CurrentVersion, out rollbackVersion);
                 }
-                else if(lastVersionRun != 0) //save last version
-                    SaveVersionState(lastVersionRun, CurrentVersion);
                 throw;
             }
-
-            SaveVersionState(number, CurrentVersion);
         }
 
         public void SaveVersionState(long currentVersion, long previousVersion)

@@ -102,7 +102,7 @@ namespace FluentMigrator.Runner.Generators
 		public override string Generate(CreateColumnExpression expression)
 		{
 			//return string.Format("ALTER TABLE {0} ADD COLUMN {1}", expression.TableName, expression.Column.Name);
-            return FormatExpression("ALTER TABLE [{0}] ADD {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
+            return FormatExpression("ALTER TABLE [{0}] ADD COLUMN {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
 		}
 
 		public override string Generate(RenameColumnExpression expression)

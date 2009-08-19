@@ -17,7 +17,7 @@ namespace FluentMigrator.Tests
                 .WithColumn("GroupId").AsInt32().Identity().PrimaryKey()
                 .WithColumn("Name").AsString(32).NotNullable();
 
-            Create.Column("Foo").OnTable("Users").AsInt16().Indexed();
+            Create.Column("Foo").OnTable("Users").AsInt16().Indexed().WithDefaultValue(1);
 
             Create.ForeignKey("FK_Foo").FromTable("Users").ForeignColumn("GroupId").ToTable("Groups").PrimaryColumn("GroupId");
             
