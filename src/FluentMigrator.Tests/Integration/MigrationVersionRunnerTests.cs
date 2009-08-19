@@ -11,10 +11,11 @@ namespace FluentMigrator.Tests.Integration
 {
     public class MigrationVersionRunnerTests
     {
+        private string connectionString = @"server=(local)\SQLEXPRESS;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator";
+
         [Fact]
         public void CanLoadMigrations()
-        {
-            string connectionString = @"server=(local)\SQLEXPRESS;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator";
+        {   
             var conventions = new MigrationConventions();
             var connection = new SqlConnection(connectionString);
             connection.Open();
@@ -28,7 +29,6 @@ namespace FluentMigrator.Tests.Integration
         [Fact]
         public void CanLoadVersion()
         {
-            string connectionString = @"server=(local)\SQLEXPRESS;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator";
             var conventions = new MigrationConventions();
             var connection = new SqlConnection(connectionString);
             connection.Open();
@@ -42,7 +42,6 @@ namespace FluentMigrator.Tests.Integration
         [Fact]
         public void CanRunMigration()
         {
-            string connectionString = @"server=(local)\SQLEXPRESS;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator";
             var conventions = new MigrationConventions();
             var connection = new SqlConnection(connectionString);
             connection.Open();

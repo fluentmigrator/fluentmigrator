@@ -105,13 +105,13 @@ namespace FluentMigrator.Tests.Unit
 	[Migration(123)]
 	internal class DefaultConventionMigration : Migration
 	{
-		public override void Up() { throw new NotImplementedException(); }
-		public override void Down() { throw new NotImplementedException(); }
+		public override void Up() { }
+		public override void Down() { }
 	}
 
 	internal class MigrationWithoutAttribute : Migration
 	{
-		public override void Up() { throw new NotImplementedException(); }
-		public override void Down() { throw new NotImplementedException(); }
+		public override void Up() { }
+		public override void Down() { }
 	}
 }

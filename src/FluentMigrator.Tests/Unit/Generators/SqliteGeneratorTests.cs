@@ -66,13 +66,13 @@ namespace FluentMigrator.Tests.Unit.Generators
             Assert.Equal(string.Format("ALTER TABLE [{0}] ADD COLUMN {1} NVARCHAR(255) NOT NULL PRIMARY KEY AUTOINCREMENT", table, newColumn), sql);
         }
 
-		[Fact]
-		public void CanRenameColumn()
-		{
-			RenameColumnExpression expression = GetRenameColumnExpression();
-			string sql = generator.Generate(expression);
-			Assert.Equal(string.Format("UPDATE {0} SET {1}={2}", table, oldColumn, newColumn), sql);
-		}
+        //[Fact]
+        //public void CanRenameColumn()
+        //{
+        //    RenameColumnExpression expression = GetRenameColumnExpression();
+        //    string sql = generator.Generate(expression);
+        //    Assert.Equal(string.Format("UPDATE {0} SET {1}={2}", table, oldColumn, newColumn), sql);
+        //}
 
 		[Fact]
 		public void CanDeleteColumn()

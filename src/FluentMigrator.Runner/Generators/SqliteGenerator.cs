@@ -107,7 +107,7 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(RenameColumnExpression expression)
 		{
-			return string.Format("UPDATE {0} SET {1}={2}", expression.TableName, expression.OldName, expression.NewName);
+            throw new System.NotImplementedException();
 		}
 
 	    public override string Generate(InsertDataExpression expression)
