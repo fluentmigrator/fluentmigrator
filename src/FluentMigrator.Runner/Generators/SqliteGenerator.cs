@@ -78,6 +78,9 @@ namespace FluentMigrator.Runner.Generators
                 sb.Append(" PRIMARY KEY");
             }
 
+            //Assume that if its IDENTITY and PRIMARY KEY, the it should be an AUTOINCREMENT column
+            sb.Replace(" IDENTITY PRIMARY KEY", " PRIMARY KEY AUTOINCREMENT");
+
             return sb.ToString();
         }
 
