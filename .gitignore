@@ -1,0 +1,12 @@
+FluentMigratorVS2008.4.5.resharper.user
+FluentMigratorVS2008.suo
+FluentMigrator.suo
+_ReSharper.FluentMigratorVS2008/
+_ReSharper.FluentMigrator/
+src/FluentMigrator.Runner/bin/
+src/FluentMigrator.Runner/obj/
+src/FluentMigrator.Tests/bin/
+src/FluentMigrator.Tests/obj/
+src/FluentMigrator/bin/
+src/FluentMigrator/obj/
+
