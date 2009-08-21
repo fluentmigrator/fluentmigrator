@@ -137,7 +137,7 @@
     <Compile Include="Unit\Runners\ProcessorFactoryTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\FluentMigrator.Console\FluentMigrator.Console.csproj">
+    <ProjectReference Include="..\FluentMigrator.Console\FluentMigrator.Console.csproj">
       <Project>{664C7334-B44B-4D62-A0F8-063805D630AA}</Project>
       <Name>FluentMigrator.Console</Name>
     </ProjectReference>
