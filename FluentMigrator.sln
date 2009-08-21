@@ -13,7 +13,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{C17FACD1-2
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D264186F-3ED6-482D-8E1A-F41C2F83C711}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Console", "FluentMigrator.Console\FluentMigrator.Console.csproj", "{664C7334-B44B-4D62-A0F8-063805D630AA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Console", "src\FluentMigrator.Console\FluentMigrator.Console.csproj", "{664C7334-B44B-4D62-A0F8-063805D630AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

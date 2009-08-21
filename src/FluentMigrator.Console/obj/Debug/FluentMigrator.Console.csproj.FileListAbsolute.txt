@@ -18,3 +18,13 @@ C:\Tools\fluentmigrator\src\FluentMigrator.Console\bin\Debug\FluentMigrator.pdb
 C:\Tools\fluentmigrator\src\FluentMigrator.Console\obj\Debug\ResolveAssemblyReference.cache
 C:\Tools\fluentmigrator\src\FluentMigrator.Console\obj\Debug\FluentMigrator.Console.exe
 C:\Tools\fluentmigrator\src\FluentMigrator.Console\obj\Debug\FluentMigrator.Console.pdb
+C:\Dev\fluentmigrator\src\FluentMigrator.Console\bin\Debug\FluentMigrator.Console.exe
+C:\Dev\fluentmigrator\src\FluentMigrator.Console\bin\Debug\FluentMigrator.Console.pdb
+C:\Dev\fluentmigrator\src\FluentMigrator.Console\bin\Debug\FluentMigrator.dll
+C:\Dev\fluentmigrator\src\FluentMigrator.Console\bin\Debug\FluentMigrator.Runner.dll
+C:\Dev\fluentmigrator\src\FluentMigrator.Console\bin\Debug\System.Data.SQLite.dll
+C:\Dev\fluentmigrator\src\FluentMigrator.Console\bin\Debug\FluentMigrator.Runner.pdb
+C:\Dev\fluentmigrator\src\FluentMigrator.Console\bin\Debug\FluentMigrator.pdb
+C:\Dev\fluentmigrator\src\FluentMigrator.Console\obj\Debug\ResolveAssemblyReference.cache
+C:\Dev\fluentmigrator\src\FluentMigrator.Console\obj\Debug\FluentMigrator.Console.exe
+C:\Dev\fluentmigrator\src\FluentMigrator.Console\obj\Debug\FluentMigrator.Console.pdb
