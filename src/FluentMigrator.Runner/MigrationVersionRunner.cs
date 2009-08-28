@@ -13,6 +13,11 @@ namespace FluentMigrator.Runner
         private Assembly asm;
         private VersionInfo versionInfo;
 
+        public MigrationConventions Conventions { get; private set; }
+        public IMigrationProcessor Processor { get; private set; }
+        public bool SilentlyFail { get; set; }
+        public IList<Exception> CaughtExceptions { get; private set; }
+
         public VersionInfo Version 
         {
             get
@@ -34,11 +39,10 @@ namespace FluentMigrator.Runner
             private set { migrations = value; }
         }
 
-        public MigrationConventions Conventions { get; private set; }
-        public IMigrationProcessor Processor { get; private set; }
-
         public MigrationVersionRunner(MigrationConventions conventions, IMigrationProcessor processor, Assembly asm)
 		{
+            SilentlyFail = false;
+            CaughtExceptions = new List<Exception>();
 			Conventions = conventions;
 			Processor = processor;
             this.asm = asm;
@@ -48,11 +52,18 @@ namespace FluentMigrator.Runner
 
         public MigrationVersionRunner(MigrationConventions conventions, IMigrationProcessor processor, Type getAssemblyByType)
         {
+            SilentlyFail = false;
+            CaughtExceptions = new List<Exception>();
             Conventions = conventions;
             Processor = processor;
             this.asm = getAssemblyByType.Assembly;
             this.Version = null;
             this.Migrations = null;
+        }
+
+        public void ClearCaughtExceptions()
+        {
+            CaughtExceptions = new List<Exception>();
         }
 
         public void LoadVersionInfo()
@@ -102,6 +113,16 @@ namespace FluentMigrator.Runner
             get { return Version.PreviousVersion; }
         }
 
+        public void CaptureSilentFailures(IList<Exception> fails)
+        {
+            if (SilentlyFail)
+            {
+                //capture all the caught exceptions
+                foreach (Exception er in fails)
+                    this.CaughtExceptions.Add(er);
+            }
+        }
+
         public void StepUp(long fromVersion, long toVersion, out long lastVersionAttempted)
         {
             //set steps
@@ -123,9 +144,12 @@ namespace FluentMigrator.Runner
                 long nextStepVersion = Migrations.Keys[step + 1];
                 var nextMigration = Migrations[nextStepVersion];
                 //step up to next version
+                runner.SilentlyFail = this.SilentlyFail;
                 runner.Up(nextMigration);
                 lastVersionAttempted = nextStepVersion;
                 step++;
+                //now handle silent failures
+                CaptureSilentFailures(runner.CaughtExceptions);
             }
 
             //save version info
@@ -153,9 +177,12 @@ namespace FluentMigrator.Runner
                 long nextStepVersion = Migrations.Keys[step];
                 var nextMigration = Migrations[nextStepVersion];
                 //step up to next version
+                runner.SilentlyFail = this.SilentlyFail;
                 runner.Down(nextMigration);
                 lastVersionAttempted = nextStepVersion;
                 step--;
+                //now handle silent failures
+                CaptureSilentFailures(runner.CaughtExceptions);
             }
 
             if (step < 0) lastVersionAttempted = 0;

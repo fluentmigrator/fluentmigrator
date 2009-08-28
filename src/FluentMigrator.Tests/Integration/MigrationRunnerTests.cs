@@ -23,6 +23,52 @@ namespace FluentMigrator.Tests.Integration
             runner.Down(new TestCreateAndDropTableMigration());
             Assert.False(processor.TableExists("TestTable"));
         }
+
+        [Fact]
+        public void CanSilentlyFail()
+        {
+            //need to run a known failure against sqlite and make sure it executes but only captures the exception
+            var connection = new System.Data.SQLite.SQLiteConnection { ConnectionString = "Data Source=:memory:;Version=3;New=True;" };
+            connection.Open();
+            var conventions = new MigrationConventions();
+            var processor = new SqliteProcessor(connection, new SqliteGenerator());
+            var runner = new MigrationRunner(conventions, processor);
+
+            runner.SilentlyFail = true;
+
+            runner.Up(new TestForeignKeySilentFailure());
+
+            Assert.True(runner.CaughtExceptions.Count > 0);
+
+            runner.Down(new TestForeignKeySilentFailure());
+
+            Assert.True(runner.CaughtExceptions.Count > 0);
+        }
+    }
+
+    internal class TestForeignKeySilentFailure : Migration
+    {
+        public override void Up()
+        {
+            Create.Table("Users")
+                .WithColumn("UserId").AsInt32().Identity().PrimaryKey()
+                .WithColumn("GroupId").AsInt32().NotNullable()
+                .WithColumn("UserName").AsString(32).NotNullable()
+                .WithColumn("Password").AsString(32).NotNullable();
+
+            Create.Table("Groups")
+                .WithColumn("GroupId").AsInt32().Identity().PrimaryKey()
+                .WithColumn("Name").AsString(32).NotNullable();
+
+            Create.ForeignKey("FK_Foo").FromTable("Users").ForeignColumn("GroupId").ToTable("Groups").PrimaryColumn("GroupId");
+        }
+
+        public override void Down()
+        {
+            Delete.ForeignKey("FK_Foo").OnTable("Users");
+            Delete.Table("Users");
+            Delete.Table("Groups");
+        }
     }
 
     internal class TestCreateAndDropTableMigration: Migration
