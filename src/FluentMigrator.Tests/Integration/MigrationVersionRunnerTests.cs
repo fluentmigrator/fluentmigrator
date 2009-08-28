@@ -59,5 +59,26 @@ namespace FluentMigrator.Tests.Integration
 
             Assert.Equal<long>((long)0, runner.CurrentVersion);
         }
+
+        [Fact]
+        public void CanUpdgradeToLatest()
+        {
+            var conventions = new MigrationConventions();
+            var connection = new SqlConnection(connectionString);
+            connection.Open();
+            var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
+
+            var runner = new MigrationVersionRunner(conventions, processor, typeof(MigrationVersionRunnerTests));
+
+            runner.UpgradeToLatest(false);
+
+            Assert.True(true); //made it this far..
+
+            //now step down to 0
+            long last = 0;
+            runner.StepDown(runner.CurrentVersion, 0, out last);
+
+            Assert.Equal<long>((long)0, runner.CurrentVersion);
+        }
     }
 }

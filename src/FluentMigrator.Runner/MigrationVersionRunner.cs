@@ -189,6 +189,21 @@ namespace FluentMigrator.Runner
             }
         }
 
+        /// <summary>
+        /// determine the latest schema version and step up to that version
+        /// </summary>
+        /// <param name="autoRollback"></param>
+        public void UpgradeToLatest(bool autoRollback)
+        {
+            //upgrade to latest
+            long latestVersion = this.Migrations.Keys[this.Migrations.Keys.Count - 1];
+
+            //exit early if already at current verions
+            if (latestVersion == CurrentVersion) return;
+
+            this.UpgradeToVersion(latestVersion, false);
+        }
+
         public void SaveVersionState(long currentVersion, long previousVersion)
         {
             //save
