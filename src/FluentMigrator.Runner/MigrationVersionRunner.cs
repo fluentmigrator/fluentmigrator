@@ -222,13 +222,15 @@ namespace FluentMigrator.Runner
         /// <param name="autoRollback"></param>
         public void UpgradeToLatest(bool autoRollback)
         {
+            if (this.Migrations == null || this.Migrations.Count == 0) return;
+
             //upgrade to latest
             long latestVersion = this.Migrations.Keys[this.Migrations.Keys.Count - 1];
 
             //exit early if already at current verions
             if (latestVersion == CurrentVersion) return;
 
-            this.UpgradeToVersion(latestVersion, false);
+            this.UpgradeToVersion(latestVersion, autoRollback);
         }
 
         public void SaveVersionState(long currentVersion, long previousVersion)
