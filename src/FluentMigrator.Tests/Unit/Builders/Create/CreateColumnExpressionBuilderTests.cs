@@ -239,46 +239,46 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		[Fact]
 		public void CallingForeignKeySetsIsForeignKeyToTrue()
 		{
-			VerifyColumnProperty(true, c => c.IsForeignKey, b => b.ForeignKey());
+			VerifyColumnProperty(c => c.IsForeignKey = true, b => b.ForeignKey());
 		}
 
 		[Fact]
 		public void CallingIdentitySetsIsIdentityToTrue()
 		{
-			VerifyColumnProperty(true, c => c.IsIdentity, b => b.Identity());
+			VerifyColumnProperty(c => c.IsIdentity = true, b => b.Identity());
 		}
 
 		[Fact]
 		public void CallingIndexedSetsIsIndexedToTrue()
 		{
-			VerifyColumnProperty(true, c => c.IsIndexed, b => b.Indexed());
+			VerifyColumnProperty(c => c.IsIndexed = true, b => b.Indexed());
 		}
 
 		[Fact]
 		public void CallingPrimaryKeySetsIsPrimaryKeyToTrue()
 		{
-			VerifyColumnProperty(true, c => c.IsPrimaryKey, b => b.PrimaryKey());
+			VerifyColumnProperty(c => c.IsPrimaryKey = true, b => b.PrimaryKey());
 		}
 
 		[Fact]
 		public void CallingNullableSetsIsNullableToTrue()
 		{
-			VerifyColumnProperty(true, c => c.IsNullable, b => b.Nullable());
+			VerifyColumnProperty(c => c.IsNullable = true, b => b.Nullable());
 		}
 
 		[Fact]
 		public void CallingNotNullableSetsIsNullableToFalse()
 		{
-			VerifyColumnProperty(false, c => c.IsNullable, b => b.NotNullable());
+			VerifyColumnProperty(c => c.IsNullable = false, b => b.NotNullable());
 		}
 
 		[Fact]
 		public void CallingUniqueSetsIsUniqueToTrue()
 		{
-			VerifyColumnProperty(true, c => c.IsUnique, b => b.Unique());
+			VerifyColumnProperty(c => c.IsUnique = true, b => b.Unique());
 		}
 
-		private void VerifyColumnProperty<T>(T expected, Expression<Func<ColumnDefinition, T>> columnExpression, Action<CreateColumnExpressionBuilder> callToTest)
+		private void VerifyColumnProperty(Action<ColumnDefinition> columnExpression, Action<CreateColumnExpressionBuilder> callToTest)
 		{
 			var columnMock = new Mock<ColumnDefinition>();
 			columnMock.SetupSet(columnExpression).AtMostOnce();
