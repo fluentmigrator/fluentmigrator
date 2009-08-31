@@ -12,12 +12,30 @@ namespace FluentMigrator.Tests.Integration
         public void CanLoadMigrations(IMigrationProcessor processor)
         {   
             var conventions = new MigrationConventions();
+<<<<<<< HEAD:src/FluentMigrator.Tests/Integration/MigrationVersionRunnerTests.cs
             
+            var runner = new MigrationVersionRunner(conventions, processor, typeof(MigrationVersionRunnerTests));
+=======
+            var connection = new SqlConnection(connectionString);
+            connection.Open();
+            var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
+
             var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
+>>>>>>> upstream/master:src/FluentMigrator.Tests/Integration/MigrationVersionRunnerTests.cs
 
             Assert.NotNull(runner.Migrations);
         }
 
+<<<<<<< HEAD:src/FluentMigrator.Tests/Integration/MigrationVersionRunnerTests.cs
+        [Theory]
+        [Sqlite]
+        [SqlServer]
+        public void CanLoadVersion(IMigrationProcessor processor)
+        {
+            var conventions = new MigrationConventions();
+            
+            var runner = new MigrationVersionRunner(conventions, processor, typeof(MigrationVersionRunnerTests));
+=======
         //[Fact]
         //public void CanLoadMigrationsByCallingAssembly()
         //{
@@ -31,14 +49,16 @@ namespace FluentMigrator.Tests.Integration
         //    Assert.NotNull(runner.Migrations);
         //}
 
-        [Theory]
-        [Sqlite]
-        [SqlServer]
-        public void CanLoadVersion(IMigrationProcessor processor)
+        [Fact]
+        public void CanLoadVersion()
         {
             var conventions = new MigrationConventions();
-            
+            var connection = new SqlConnection(connectionString);
+            connection.Open();
+            var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
+
             var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
+>>>>>>> upstream/master:src/FluentMigrator.Tests/Integration/MigrationVersionRunnerTests.cs
 
             Assert.NotNull(runner.Version);            
         }

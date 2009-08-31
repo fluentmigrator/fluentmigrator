@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using FluentMigrator;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Versioning;
@@ -9,14 +10,15 @@ using FluentMigrator.Runner.Versioning;
 namespace FluentMigrator.Runner
 {
     public class MigrationVersionRunner
-    {
-        private Assembly asm;
+    {   
         private VersionInfo versionInfo;
 
-        public MigrationConventions Conventions { get; private set; }
+        public Assembly MigrationAssembly { get; private set; }
+        public IMigrationConventions Conventions { get; private set; }
         public IMigrationProcessor Processor { get; private set; }
         public bool SilentlyFail { get; set; }
         public IList<Exception> CaughtExceptions { get; private set; }
+        private IMigrationLoader MigrationLoader { get; set; }
 
         public VersionInfo Version 
         {
@@ -39,26 +41,26 @@ namespace FluentMigrator.Runner
             private set { migrations = value; }
         }
 
-        public MigrationVersionRunner(MigrationConventions conventions, IMigrationProcessor processor, Assembly asm)
-		{
-            SilentlyFail = false;
-            CaughtExceptions = new List<Exception>();
-			Conventions = conventions;
-			Processor = processor;
-            this.asm = asm;
-            this.Version = null;
-            this.Migrations = null;
-		}
+        public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader)
+            : this(conventions, processor, loader, Assembly.GetCallingAssembly())
+        {
+        }
 
-        public MigrationVersionRunner(MigrationConventions conventions, IMigrationProcessor processor, Type getAssemblyByType)
+        public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader, Type getAssemblyByType)
+            : this(conventions, processor, loader, getAssemblyByType.Assembly)
+        {
+        }
+
+        public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader, Assembly assembly)
         {
             SilentlyFail = false;
             CaughtExceptions = new List<Exception>();
             Conventions = conventions;
             Processor = processor;
-            this.asm = getAssemblyByType.Assembly;
-            this.Version = null;
-            this.Migrations = null;
+            MigrationAssembly = assembly;
+            Version = null;
+            Migrations = null;
+            MigrationLoader = loader;
         }
 
         public void ClearCaughtExceptions()
@@ -88,8 +90,9 @@ namespace FluentMigrator.Runner
         public void LoadAssemblyMigrations()
         {
             Migrations = new SortedList<long, Migration>();
-            var loader = new MigrationLoader(Conventions);
-            IEnumerable<MigrationMetadata> migrationList = loader.FindMigrationsIn(asm);
+            IEnumerable<MigrationMetadata> migrationList = this.MigrationLoader.FindMigrationsIn(this.MigrationAssembly);
+
+            if (migrationList == null) return;
 
             var en = migrationList.GetEnumerator();
             while (en.MoveNext())
@@ -222,10 +225,9 @@ namespace FluentMigrator.Runner
         /// <param name="autoRollback"></param>
         public void UpgradeToLatest(bool autoRollback)
         {
-            if (this.Migrations == null || this.Migrations.Count == 0) return;
-
+            if(Migrations==null || Migrations.Count==0) return;
             //upgrade to latest
-            long latestVersion = this.Migrations.Keys[this.Migrations.Keys.Count - 1];
+            long latestVersion = Migrations.Keys[this.Migrations.Keys.Count - 1];
 
             //exit early if already at current verions
             if (latestVersion == CurrentVersion) return;

@@ -14,10 +14,10 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingOnTableSetsTableNameToSpecifiedValue()
 		{
 			var indexMock = new Mock<IndexDefinition>();
-			indexMock.ExpectSet(x => x.TableName, "Bacon").AtMostOnce();
+			indexMock.SetupSet(x => x.TableName = "Bacon").AtMostOnce();
 
 			var expressionMock = new Mock<CreateIndexExpression>();
-			expressionMock.ExpectGet(e => e.Index).Returns(indexMock.Object).AtMostOnce();
+			expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object).AtMostOnce();
 
 			var builder = new CreateIndexExpressionBuilder(expressionMock.Object);
 			builder.OnTable("Bacon");
@@ -30,13 +30,13 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingOnColumnAddsNewColumnToExpression()
 		{
 			var collectionMock = new Mock<IList<IndexColumnDefinition>>();
-			collectionMock.Expect(x => x.Add(It.Is<IndexColumnDefinition>(c => c.Name.Equals("BaconId")))).AtMostOnce();
+			collectionMock.Setup(x => x.Add(It.Is<IndexColumnDefinition>(c => c.Name.Equals("BaconId")))).AtMostOnce();
 
 			var indexMock = new Mock<IndexDefinition>();
-			indexMock.ExpectGet(x => x.Columns).Returns(collectionMock.Object).AtMostOnce();
+			indexMock.SetupGet(x => x.Columns).Returns(collectionMock.Object).AtMostOnce();
 
 			var expressionMock = new Mock<CreateIndexExpression>();
-			expressionMock.ExpectGet(e => e.Index).Returns(indexMock.Object).AtMostOnce();
+			expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object).AtMostOnce();
 
 			var builder = new CreateIndexExpressionBuilder(expressionMock.Object);
 			builder.OnColumn("BaconId");
@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingAscendingSetsDirectionToAscending()
 		{
 			var columnMock = new Mock<IndexColumnDefinition>();
-			columnMock.ExpectSet(c => c.Direction, Direction.Ascending).AtMostOnce();
+			columnMock.SetupSet(c => c.Direction = Direction.Ascending).AtMostOnce();
 			var expressionMock = new Mock<CreateIndexExpression>();
 
 			var builder = new CreateIndexExpressionBuilder(expressionMock.Object);
@@ -65,7 +65,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingDescendingSetsDirectionToDescending()
 		{
 			var columnMock = new Mock<IndexColumnDefinition>();
-			columnMock.ExpectSet(c => c.Direction, Direction.Descending).AtMostOnce();
+			columnMock.SetupSet(c => c.Direction = Direction.Descending).AtMostOnce();
 			var expressionMock = new Mock<CreateIndexExpression>();
 
 			var builder = new CreateIndexExpressionBuilder(expressionMock.Object);

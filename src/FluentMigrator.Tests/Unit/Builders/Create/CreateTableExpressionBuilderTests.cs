@@ -204,7 +204,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 			const int value = 42;
 
 			var columnMock = new Mock<ColumnDefinition>();
-			columnMock.ExpectSet(c => c.DefaultValue, value).AtMostOnce();
+			columnMock.SetupSet(c => c.DefaultValue = value).AtMostOnce();
 
 			var expressionMock = new Mock<CreateTableExpression>();
 
@@ -263,10 +263,10 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 			const string name = "BaconId";
 
 			var collectionMock = new Mock<IList<ColumnDefinition>>();
-			collectionMock.Expect(x => x.Add(It.Is<ColumnDefinition>(c => c.Name.Equals(name)))).AtMostOnce();
+			collectionMock.Setup(x => x.Add(It.Is<ColumnDefinition>(c => c.Name.Equals(name)))).AtMostOnce();
 
 			var expressionMock = new Mock<CreateTableExpression>();
-			expressionMock.ExpectGet(e => e.Columns).Returns(collectionMock.Object).AtMostOnce();
+			expressionMock.SetupGet(e => e.Columns).Returns(collectionMock.Object).AtMostOnce();
 
 			var builder = new CreateTableExpressionBuilder(expressionMock.Object);
 			builder.WithColumn(name);
@@ -278,7 +278,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		private void VerifyColumnProperty<T>(T expected, Expression<Func<ColumnDefinition, T>> columnExpression, Action<CreateTableExpressionBuilder> callToTest)
 		{
 			var columnMock = new Mock<ColumnDefinition>();
-			columnMock.ExpectSet(columnExpression, expected).AtMostOnce();
+			columnMock.SetupSet(columnExpression).AtMostOnce();
 
 			var expressionMock = new Mock<CreateTableExpression>();
 
@@ -294,7 +294,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		private void VerifyColumnDbType(DbType expected, Action<CreateTableExpressionBuilder> callToTest)
 		{
 			var columnMock = new Mock<ColumnDefinition>();
-			columnMock.ExpectSet(c => c.Type, expected).AtMostOnce();
+			columnMock.SetupSet(c => c.Type = expected).AtMostOnce();
 
 			var expressionMock = new Mock<CreateTableExpression>();
 
@@ -310,7 +310,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		private void VerifyColumnSize(int expected, Action<CreateTableExpressionBuilder> callToTest)
 		{
 			var columnMock = new Mock<ColumnDefinition>();
-			columnMock.ExpectSet(c => c.Size, expected).AtMostOnce();
+			columnMock.SetupSet(c => c.Size = expected).AtMostOnce();
 
 			var expressionMock = new Mock<CreateTableExpression>();
 
@@ -325,7 +325,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		private void VerifyColumnPrecision(int expected, Action<CreateTableExpressionBuilder> callToTest)
 		{
 			var columnMock = new Mock<ColumnDefinition>();
-			columnMock.ExpectSet(c => c.Precision, expected).AtMostOnce();
+			columnMock.SetupSet(c => c.Precision = expected).AtMostOnce();
 
 			var expressionMock = new Mock<CreateTableExpression>();
 

@@ -7,12 +7,12 @@ namespace FluentMigrator.Runner
 {
 	public class MigrationRunner
 	{
-		public MigrationConventions Conventions { get; private set; }
+		public IMigrationConventions Conventions { get; private set; }
 		public IMigrationProcessor Processor { get; private set; }
         public IList<Exception> CaughtExceptions { get; private set; }
         public bool SilentlyFail { get; set; }
 
-		public MigrationRunner(MigrationConventions conventions, IMigrationProcessor processor)
+		public MigrationRunner(IMigrationConventions conventions, IMigrationProcessor processor)
 		{
             SilentlyFail = false;
             CaughtExceptions = null;

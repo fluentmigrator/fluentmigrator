@@ -4,7 +4,7 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator
 {
-	public class MigrationConventions
+	public class MigrationConventions : IMigrationConventions
 	{
 		public Func<string, string> GetPrimaryKeyName { get; set; }
 		public Func<ForeignKeyDefinition, string> GetForeignKeyName { get; set; }

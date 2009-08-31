@@ -16,10 +16,10 @@ namespace FluentMigrator.Tests.Unit.Builders.Rename
 		public void CallingTableAddsRenameTableExpressionToContextWithSpecifiedOldName()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Expect(x => x.Add(It.Is<RenameTableExpression>(e => e.OldName.Equals("Bacon")))).AtMostOnce();
+			collectionMock.Setup(x => x.Add(It.Is<RenameTableExpression>(e => e.OldName.Equals("Bacon")))).AtMostOnce();
 
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.ExpectGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
 
 			var root = new RenameExpressionRoot(contextMock.Object);
 			root.Table("Bacon");
@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Rename
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.ExpectGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
 
 			var root = new RenameExpressionRoot(contextMock.Object);
 			var builder = root.Table("Bacon");
@@ -46,10 +46,10 @@ namespace FluentMigrator.Tests.Unit.Builders.Rename
 		public void CallingColumnAddsRenameColumnExpressionToContextWithSpecifiedOldName()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Expect(x => x.Add(It.Is<RenameColumnExpression>(e => e.OldName.Equals("Bacon")))).AtMostOnce();
+			collectionMock.Setup(x => x.Add(It.Is<RenameColumnExpression>(e => e.OldName.Equals("Bacon")))).AtMostOnce();
 
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.ExpectGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
 
 			var root = new RenameExpressionRoot(contextMock.Object);
 			root.Column("Bacon");
@@ -63,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Rename
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.ExpectGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
 
 			var root = new RenameExpressionRoot(contextMock.Object);
 			var builder = root.Column("Bacon");

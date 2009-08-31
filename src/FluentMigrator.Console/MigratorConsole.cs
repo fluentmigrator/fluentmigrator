@@ -60,8 +60,8 @@ namespace FluentMigrator.Tests.Unit.Runners
 				TargetAssembly = Path.GetFullPath(TargetAssembly);
 			}
 		    Assembly assembly = Assembly.LoadFile(TargetAssembly);
-		    var runner = new MigrationVersionRunner(new MigrationConventions(), Processor, assembly);
-			
+		    var runner = new MigrationVersionRunner(new MigrationConventions(), Processor, new MigrationLoader(new MigrationConventions()), assembly);
+			runner.LoadAssemblyMigrations();
             runner.UpgradeToLatest(true);
 		}		
 	}

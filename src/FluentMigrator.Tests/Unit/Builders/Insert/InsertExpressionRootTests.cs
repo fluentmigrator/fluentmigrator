@@ -14,10 +14,10 @@ namespace FluentMigrator.Tests.Unit.Builders.Insert
         public void CallingIntoTableSetsTableName()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Expect(x => x.Add(It.Is<InsertDataExpression>(e => e.TableName.Equals("Bacon")))).AtMostOnce();
+			collectionMock.Setup(x => x.Add(It.Is<InsertDataExpression>(e => e.TableName.Equals("Bacon")))).AtMostOnce();
 
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.ExpectGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
 
 			var root = new InsertExpressionRoot(contextMock.Object);
             root.IntoTable("Bacon");			
