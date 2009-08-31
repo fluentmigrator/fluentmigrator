@@ -5,8 +5,8 @@ using System.Data.SqlClient;
 
 namespace FluentMigrator.Runner.Processors
 {
-	public class SqlServerProcessor: ProcessorBase
-	{
+    public class SqlServerProcessor: ProcessorBase
+    {
 		public virtual SqlConnection Connection { get; set; }
 
 		public SqlServerProcessor(SqlConnection connection, IMigrationGenerator generator)

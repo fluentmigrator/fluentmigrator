@@ -93,12 +93,18 @@
     <Reference Include="System.Xml" />
     <Reference Include="xunit, Version=1.1.0.1323, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\xunit.dll</HintPath>
+      <HintPath>..\..\tools\xUnit\xunit.dll</HintPath>
+    </Reference>
+    <Reference Include="xunit.extensions, Version=1.1.0.1323, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\tools\xUnit\xunit.extensions.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Integration\MigrationRunnerTests.cs" />
     <Compile Include="Integration\MigrationVersionRunnerTests.cs" />
+    <Compile Include="Integration\SqliteAttribute.cs" />
+    <Compile Include="Integration\SqlServerAttribute.cs" />
     <Compile Include="Integration\VersionMigrationTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateIndexExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateExpressionRootTests.cs" />

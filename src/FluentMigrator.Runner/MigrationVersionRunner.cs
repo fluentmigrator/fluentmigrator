@@ -237,7 +237,7 @@ namespace FluentMigrator.Runner
         {
             //save
             Processor.UpdateTable(VersionInfo.TABLE_NAME, new List<string>() { "CurrentVersion", "PreviousVersion", "LastUpdated" },
-                new List<string>() { String.Format("'{0}'", currentVersion), String.Format("'{0}'", previousVersion), String.Format("'{0}'", DateTime.UtcNow.ToString()) });
+                new List<string>() { String.Format("'{0}'", currentVersion), String.Format("'{0}'", previousVersion), String.Format("'{0}'", DateTime.UtcNow.ToISO8601()) });
 
             //load versionInfo
             LoadVersionInfo();

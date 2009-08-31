@@ -13,3 +13,4 @@ src/FluentMigrator/bin/
 src/FluentMigrator/obj/
 build
 *.sln.cache
+*.csproj.user

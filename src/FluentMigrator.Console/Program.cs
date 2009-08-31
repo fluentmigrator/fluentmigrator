@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using FluentMigrator.Tests.Unit.Runners;
+﻿using FluentMigrator.Tests.Unit.Runners;
 
 namespace FluentMigrator.Console
 {

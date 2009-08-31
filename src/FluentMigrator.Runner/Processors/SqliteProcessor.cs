@@ -19,10 +19,10 @@ namespace FluentMigrator.Runner.Processors
         {
             //select count(*) from sqlite_master where name='tableName'
             //select * from sqlite_master where name={0}
-            return Exists("select * from sqlite_master where name={0}", tableName);
+            return Exists("select * from sqlite_master where name='{0}'", tableName);
         }
 
-        public override void Execute(string template, params object[] args)
+	    public override void Execute(string template, params object[] args)
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
 

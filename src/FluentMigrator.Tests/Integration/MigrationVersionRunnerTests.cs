@@ -1,51 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SqlClient;
-using FluentMigrator.Runner;
-using FluentMigrator.Runner.Generators;
-using FluentMigrator.Runner.Processors;
-using FluentMigrator.Runner.Versioning;
+﻿using FluentMigrator.Runner;
 using Xunit;
+using Xunit.Extensions;
 
 namespace FluentMigrator.Tests.Integration
 {
     public class MigrationVersionRunnerTests
     {
-        private string connectionString = @"server=(local)\SQLEXPRESS;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator";
-
-        [Fact]
-        public void CanLoadMigrations()
+        [Theory]
+        [Sqlite]
+        [SqlServer]
+        public void CanLoadMigrations(IMigrationProcessor processor)
         {   
             var conventions = new MigrationConventions();
-            var connection = new SqlConnection(connectionString);
-            connection.Open();
-            var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
-
+            
             var runner = new MigrationVersionRunner(conventions, processor, typeof(MigrationVersionRunnerTests));
 
             Assert.NotNull(runner.Migrations);
         }
 
-        [Fact]
-        public void CanLoadVersion()
+        [Theory]
+        [Sqlite]
+        [SqlServer]
+        public void CanLoadVersion(IMigrationProcessor processor)
         {
             var conventions = new MigrationConventions();
-            var connection = new SqlConnection(connectionString);
-            connection.Open();
-            var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
-
+            
             var runner = new MigrationVersionRunner(conventions, processor, typeof(MigrationVersionRunnerTests));
 
             Assert.NotNull(runner.Version);            
         }
 
-        [Fact]
-        public void CanRunMigration()
+        [Theory]
+        [Sqlite]
+        [SqlServer]
+        public void CanRunMigration(IMigrationProcessor processor)
         {
             var conventions = new MigrationConventions();
-            var connection = new SqlConnection(connectionString);
-            connection.Open();
-            var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
 
             var runner = new MigrationVersionRunner(conventions, processor, typeof(MigrationVersionRunnerTests));
 
@@ -60,13 +50,12 @@ namespace FluentMigrator.Tests.Integration
             Assert.Equal<long>((long)0, runner.CurrentVersion);
         }
 
-        [Fact]
-        public void CanUpdgradeToLatest()
+        [Theory]
+        [Sqlite]
+        [SqlServer]
+        public void CanUpdgradeToLatest(IMigrationProcessor processor)
         {
             var conventions = new MigrationConventions();
-            var connection = new SqlConnection(connectionString);
-            connection.Open();
-            var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
 
             var runner = new MigrationVersionRunner(conventions, processor, typeof(MigrationVersionRunnerTests));
 

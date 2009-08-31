@@ -1,21 +1,23 @@
+using System;
 using System.Data.SqlClient;
+using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors;
+using Moq;
 using Xunit;
+using Xunit.Extensions;
 
 namespace FluentMigrator.Tests.Integration
 {
     public class MigrationRunnerTests
     {
-        [Fact]
-        public void CanRunMigration()
+        [Theory]
+        [Sqlite]
+        [SqlServer]
+        public void CanRunMigration(IMigrationProcessor processor)
         {
-            string connectionString = @"server=(local)\sqlexpress;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator";
             var conventions = new MigrationConventions();
-            var connection = new SqlConnection(connectionString);
-            connection.Open();
-            var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
             var runner = new MigrationRunner(conventions, processor);
 
             runner.Up(new TestCreateAndDropTableMigration());
@@ -27,12 +29,15 @@ namespace FluentMigrator.Tests.Integration
         [Fact]
         public void CanSilentlyFail()
         {
-            //need to run a known failure against sqlite and make sure it executes but only captures the exception
-            var connection = new System.Data.SQLite.SQLiteConnection { ConnectionString = "Data Source=:memory:;Version=3;New=True;" };
-            connection.Open();
+            // sqlite processor now ignores foreign keys (so i can use foreign keys on sqlserver and but ignore them in sqlite)
+            // mocked instead
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Expect(x => x.Process(It.IsAny<CreateForeignKeyExpression>())).Throws(new Exception("Error"));
+            processor.Expect(x => x.Process(It.IsAny<DeleteForeignKeyExpression>())).Throws(new Exception("Error"));
+
             var conventions = new MigrationConventions();
-            var processor = new SqliteProcessor(connection, new SqliteGenerator());
-            var runner = new MigrationRunner(conventions, processor);
+            var runner = new MigrationRunner(conventions, processor.Object);
 
             runner.SilentlyFail = true;
 
