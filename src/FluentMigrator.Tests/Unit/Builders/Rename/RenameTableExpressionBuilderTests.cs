@@ -12,7 +12,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Rename
 		public void CallingToSetsNewName()
 		{
 			var expressionMock = new Mock<RenameTableExpression>();
-			expressionMock.ExpectSet(x => x.NewName, "Bacon").AtMostOnce();
+			expressionMock.SetupSet(x => x.NewName = "Bacon").AtMostOnce();
 
 			var builder = new RenameTableExpressionBuilder(expressionMock.Object);
 			builder.To("Bacon");

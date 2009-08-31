@@ -39,6 +39,18 @@ namespace FluentMigrator.Runner
             private set { migrations = value; }
         }
 
+        //public MigrationVersionRunner(MigrationConventions conventions, IMigrationProcessor processor)
+        //{
+        //    SilentlyFail = false;
+        //    CaughtExceptions = new List<Exception>();
+        //    Conventions = conventions;
+        //    Processor = processor;
+        //    this.Version = null;
+        //    this.Migrations = null;
+        //    //get assembly from calling dll
+        //    this.asm = System.Reflection.Assembly.GetCallingAssembly();
+        //}
+
         public MigrationVersionRunner(MigrationConventions conventions, IMigrationProcessor processor, Assembly asm)
 		{
             SilentlyFail = false;
@@ -222,8 +234,7 @@ namespace FluentMigrator.Runner
         /// <param name="autoRollback"></param>
         public void UpgradeToLatest(bool autoRollback)
         {
-            if (this.Migrations == null || this.Migrations.Count == 0) return;
-
+            if(this.Migrations==null || this.Migrations.Count==0) return;
             //upgrade to latest
             long latestVersion = this.Migrations.Keys[this.Migrations.Keys.Count - 1];
 

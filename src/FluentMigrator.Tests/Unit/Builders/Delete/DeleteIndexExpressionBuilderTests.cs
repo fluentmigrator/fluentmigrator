@@ -14,10 +14,10 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 		public void CallingOnTableSetsTableNameToSpecifiedValue()
 		{
 			var indexMock = new Mock<IndexDefinition>();
-			indexMock.ExpectSet(x => x.TableName, "Bacon").AtMostOnce();
+			indexMock.SetupSet(x => x.TableName = "Bacon").AtMostOnce();
 
 			var expressionMock = new Mock<DeleteIndexExpression>();
-			expressionMock.ExpectGet(e => e.Index).Returns(indexMock.Object).AtMostOnce();
+			expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object).AtMostOnce();
 
 			var builder = new DeleteIndexExpressionBuilder(expressionMock.Object);
 			builder.OnTable("Bacon");
@@ -30,13 +30,13 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 		public void CallingOnColumnAddsNewColumnToExpression()
 		{
 			var collectionMock = new Mock<IList<IndexColumnDefinition>>();
-			collectionMock.Expect(x => x.Add(It.Is<IndexColumnDefinition>(c => c.Name.Equals("BaconId")))).AtMostOnce();
+			collectionMock.Setup(x => x.Add(It.Is<IndexColumnDefinition>(c => c.Name.Equals("BaconId")))).AtMostOnce();
 
 			var indexMock = new Mock<IndexDefinition>();
-			indexMock.ExpectGet(x => x.Columns).Returns(collectionMock.Object).AtMostOnce();
+			indexMock.SetupGet(x => x.Columns).Returns(collectionMock.Object).AtMostOnce();
 
 			var expressionMock = new Mock<DeleteIndexExpression>();
-			expressionMock.ExpectGet(e => e.Index).Returns(indexMock.Object).AtMostOnce();
+			expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object).AtMostOnce();
 
 			var builder = new DeleteIndexExpressionBuilder(expressionMock.Object);
 			builder.OnColumn("BaconId");
@@ -50,14 +50,14 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 		public void CallingOnColumnsAddsMultipleNewColumnsToExpression()
 		{
 			var collectionMock = new Mock<IList<IndexColumnDefinition>>();
-			collectionMock.Expect(x => x.Add(It.Is<IndexColumnDefinition>(c => c.Name.Equals("BaconId")))).AtMostOnce();
-			collectionMock.Expect(x => x.Add(It.Is<IndexColumnDefinition>(c => c.Name.Equals("EggsId")))).AtMostOnce();
+			collectionMock.Setup(x => x.Add(It.Is<IndexColumnDefinition>(c => c.Name.Equals("BaconId")))).AtMostOnce();
+			collectionMock.Setup(x => x.Add(It.Is<IndexColumnDefinition>(c => c.Name.Equals("EggsId")))).AtMostOnce();
 
 			var indexMock = new Mock<IndexDefinition>();
-			indexMock.ExpectGet(x => x.Columns).Returns(collectionMock.Object).AtMost(2);
+			indexMock.SetupGet(x => x.Columns).Returns(collectionMock.Object).AtMost(2);
 
 			var expressionMock = new Mock<DeleteIndexExpression>();
-			expressionMock.ExpectGet(e => e.Index).Returns(indexMock.Object).AtMost(2);
+			expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object).AtMost(2);
 
 			var builder = new DeleteIndexExpressionBuilder(expressionMock.Object);
 			builder.OnColumns("BaconId", "EggsId");

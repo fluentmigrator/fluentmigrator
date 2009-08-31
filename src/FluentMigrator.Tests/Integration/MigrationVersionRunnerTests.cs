@@ -26,6 +26,19 @@ namespace FluentMigrator.Tests.Integration
             Assert.NotNull(runner.Migrations);
         }
 
+        //[Fact]
+        //public void CanLoadMigrationsByCallingAssembly()
+        //{
+        //    var conventions = new MigrationConventions();
+        //    var connection = new SqlConnection(connectionString);
+        //    connection.Open();
+        //    var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
+
+        //    var runner = new MigrationVersionRunner(conventions, processor);
+
+        //    Assert.NotNull(runner.Migrations);
+        //}
+
         [Fact]
         public void CanLoadVersion()
         {

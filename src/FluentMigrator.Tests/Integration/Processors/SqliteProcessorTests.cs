@@ -31,9 +31,9 @@ namespace FluentMigrator.Tests.Integration.Processors
 			column = new Mock<ColumnDefinition>();
 			tableName = "NewTable";
 			columnName = "ColumnName";
-			column.ExpectGet(c => c.Name).Returns(columnName);
-		    column.ExpectGet(c => c.IsNullable).Returns(true);
-		    column.ExpectGet(c => c.Type).Returns(DbType.Int32);
+			column.SetupGet(c => c.Name).Returns(columnName);
+		    column.SetupGet(c => c.IsNullable).Returns(true);
+		    column.SetupGet(c => c.Type).Returns(DbType.Int32);
 		}
 
 		[Fact]

@@ -14,10 +14,10 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingFromTableSetsForeignTableName()
 		{
 			var foreignKeyMock = new Mock<ForeignKeyDefinition>();
-			foreignKeyMock.ExpectSet(f => f.ForeignTable, "Bacon").AtMostOnce();
+			foreignKeyMock.SetupSet(f => f.ForeignTable = "Bacon").AtMostOnce();
 
 			var expressionMock = new Mock<CreateForeignKeyExpression>();
-			expressionMock.ExpectGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMostOnce();
+			expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMostOnce();
 
 			var builder = new CreateForeignKeyExpressionBuilder(expressionMock.Object);
 			builder.FromTable("Bacon");
@@ -30,10 +30,10 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingToTableSetsPrimaryTableName()
 		{
 			var foreignKeyMock = new Mock<ForeignKeyDefinition>();
-			foreignKeyMock.ExpectSet(f => f.PrimaryTable, "Bacon").AtMostOnce();
+			foreignKeyMock.SetupSet(f => f.PrimaryTable = "Bacon").AtMostOnce();
 
 			var expressionMock = new Mock<CreateForeignKeyExpression>();
-			expressionMock.ExpectGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMostOnce();
+			expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMostOnce();
 
 			var builder = new CreateForeignKeyExpressionBuilder(expressionMock.Object);
 			builder.ToTable("Bacon");
@@ -46,13 +46,13 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingForeignColumnAddsColumnNameToForeignColumnCollection()
 		{
 			var collectionMock = new Mock<IList<string>>();
-			collectionMock.Expect(x => x.Add("BaconId")).AtMostOnce();
+			collectionMock.Setup(x => x.Add("BaconId")).AtMostOnce();
 
 			var foreignKeyMock = new Mock<ForeignKeyDefinition>();
-			foreignKeyMock.ExpectGet(f => f.ForeignColumns).Returns(collectionMock.Object).AtMostOnce();
+			foreignKeyMock.SetupGet(f => f.ForeignColumns).Returns(collectionMock.Object).AtMostOnce();
 
 			var expressionMock = new Mock<CreateForeignKeyExpression>();
-			expressionMock.ExpectGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMostOnce();
+			expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMostOnce();
 
 			var builder = new CreateForeignKeyExpressionBuilder(expressionMock.Object);
 			builder.ForeignColumn("BaconId");
@@ -66,14 +66,14 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingForeignColumnsAddsColumnNamesToForeignColumnCollection()
 		{
 			var collectionMock = new Mock<IList<string>>();
-			collectionMock.Expect(x => x.Add("BaconId")).AtMostOnce();
-			collectionMock.Expect(x => x.Add("EggsId")).AtMostOnce();
+			collectionMock.Setup(x => x.Add("BaconId")).AtMostOnce();
+			collectionMock.Setup(x => x.Add("EggsId")).AtMostOnce();
 
 			var foreignKeyMock = new Mock<ForeignKeyDefinition>();
-			foreignKeyMock.ExpectGet(f => f.ForeignColumns).Returns(collectionMock.Object).AtMost(2);
+			foreignKeyMock.SetupGet(f => f.ForeignColumns).Returns(collectionMock.Object).AtMost(2);
 
 			var expressionMock = new Mock<CreateForeignKeyExpression>();
-			expressionMock.ExpectGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMost(2);
+			expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMost(2);
 
 			var builder = new CreateForeignKeyExpressionBuilder(expressionMock.Object);
 			builder.ForeignColumns("BaconId", "EggsId");
@@ -87,13 +87,13 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingPrimaryColumnAddsColumnNameToPrimaryColumnCollection()
 		{
 			var collectionMock = new Mock<IList<string>>();
-			collectionMock.Expect(x => x.Add("BaconId")).AtMostOnce();
+			collectionMock.Setup(x => x.Add("BaconId")).AtMostOnce();
 
 			var foreignKeyMock = new Mock<ForeignKeyDefinition>();
-			foreignKeyMock.ExpectGet(f => f.PrimaryColumns).Returns(collectionMock.Object).AtMostOnce();
+			foreignKeyMock.SetupGet(f => f.PrimaryColumns).Returns(collectionMock.Object).AtMostOnce();
 
 			var expressionMock = new Mock<CreateForeignKeyExpression>();
-			expressionMock.ExpectGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMostOnce();
+			expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMostOnce();
 
 			var builder = new CreateForeignKeyExpressionBuilder(expressionMock.Object);
 			builder.PrimaryColumn("BaconId");
@@ -107,14 +107,14 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingPrimaryColumnsAddsColumnNamesToForeignColumnCollection()
 		{
 			var collectionMock = new Mock<IList<string>>();
-			collectionMock.Expect(x => x.Add("BaconId")).AtMostOnce();
-			collectionMock.Expect(x => x.Add("EggsId")).AtMostOnce();
+			collectionMock.Setup(x => x.Add("BaconId")).AtMostOnce();
+			collectionMock.Setup(x => x.Add("EggsId")).AtMostOnce();
 
 			var foreignKeyMock = new Mock<ForeignKeyDefinition>();
-			foreignKeyMock.ExpectGet(f => f.PrimaryColumns).Returns(collectionMock.Object).AtMost(2);
+			foreignKeyMock.SetupGet(f => f.PrimaryColumns).Returns(collectionMock.Object).AtMost(2);
 
 			var expressionMock = new Mock<CreateForeignKeyExpression>();
-			expressionMock.ExpectGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMost(2);
+			expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMost(2);
 
 			var builder = new CreateForeignKeyExpressionBuilder(expressionMock.Object);
 			builder.PrimaryColumns("BaconId", "EggsId");

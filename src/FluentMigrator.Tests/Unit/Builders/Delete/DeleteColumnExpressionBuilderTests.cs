@@ -12,7 +12,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 		public void CallingFromTableSetsTableName()
 		{
 			var expressionMock = new Mock<DeleteColumnExpression>();
-			expressionMock.ExpectSet(x => x.TableName, "Bacon").AtMostOnce();
+			expressionMock.SetupSet(x => x.TableName = "Bacon").AtMostOnce();
 
 			var builder = new DeleteColumnExpressionBuilder(expressionMock.Object);
 			builder.FromTable("Bacon");

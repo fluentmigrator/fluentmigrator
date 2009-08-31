@@ -16,10 +16,10 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 		public void CallingTableAddsDeleteTableExpressionToContextWithSpecifiedName()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Expect(x => x.Add(It.Is<DeleteTableExpression>(e => e.TableName.Equals("Bacon")))).AtMostOnce();
+			collectionMock.Setup(x => x.Add(It.Is<DeleteTableExpression>(e => e.TableName.Equals("Bacon")))).AtMostOnce();
 
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.ExpectGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
 
 			var root = new DeleteExpressionRoot(contextMock.Object);
 			root.Table("Bacon");
@@ -32,10 +32,10 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 		public void CallingColumnAddsDeleteColumnExpressionToContextWithSpecifiedName()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Expect(x => x.Add(It.Is<DeleteColumnExpression>(e => e.ColumnName.Equals("Bacon")))).AtMostOnce();
+			collectionMock.Setup(x => x.Add(It.Is<DeleteColumnExpression>(e => e.ColumnName.Equals("Bacon")))).AtMostOnce();
 
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.ExpectGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
 
 			var root = new DeleteExpressionRoot(contextMock.Object);
 			root.Column("Bacon");
@@ -49,7 +49,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.ExpectGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
 
 			var root = new DeleteExpressionRoot(contextMock.Object);
 			var builder = root.Column("Bacon");
@@ -62,10 +62,10 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 		public void CallingForeignKeyAddsDeleteForeignKeyExpressionToContext()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Expect(x => x.Add(It.IsAny<DeleteForeignKeyExpression>())).AtMostOnce();
+			collectionMock.Setup(x => x.Add(It.IsAny<DeleteForeignKeyExpression>())).AtMostOnce();
 
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.ExpectGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
 
 			var root = new DeleteExpressionRoot(contextMock.Object);
 			root.ForeignKey();
@@ -79,7 +79,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.ExpectGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
 
 			var root = new DeleteExpressionRoot(contextMock.Object);
 			var builder = root.ForeignKey();
@@ -92,10 +92,10 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 		public void CallingForeignKeyWithNameAddsDeleteForeignKeyExpressionToContextWithSpecifiedName()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Expect(x => x.Add(It.Is<DeleteForeignKeyExpression>(e => e.ForeignKey.Name.Equals("FK_Bacon")))).AtMostOnce();
+			collectionMock.Setup(x => x.Add(It.Is<DeleteForeignKeyExpression>(e => e.ForeignKey.Name.Equals("FK_Bacon")))).AtMostOnce();
 
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.ExpectGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
 
 			var root = new DeleteExpressionRoot(contextMock.Object);
 			root.ForeignKey("FK_Bacon");
