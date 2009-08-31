@@ -21,7 +21,7 @@ namespace FluentMigrator.Tests.Integration
             connection.Open();
             var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
 
-            var runner = new MigrationVersionRunner(conventions, processor, typeof(MigrationVersionRunnerTests));
+            var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
 
             Assert.NotNull(runner.Migrations);
         }
@@ -47,7 +47,7 @@ namespace FluentMigrator.Tests.Integration
             connection.Open();
             var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
 
-            var runner = new MigrationVersionRunner(conventions, processor, typeof(MigrationVersionRunnerTests));
+            var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
 
             Assert.NotNull(runner.Version);            
         }
@@ -60,7 +60,7 @@ namespace FluentMigrator.Tests.Integration
             connection.Open();
             var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
 
-            var runner = new MigrationVersionRunner(conventions, processor, typeof(MigrationVersionRunnerTests));
+            var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
 
             runner.UpgradeToVersion(2, false);
 
@@ -81,7 +81,7 @@ namespace FluentMigrator.Tests.Integration
             connection.Open();
             var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
 
-            var runner = new MigrationVersionRunner(conventions, processor, typeof(MigrationVersionRunnerTests));
+            var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
 
             runner.UpgradeToLatest(false);
 

@@ -7,9 +7,9 @@ namespace FluentMigrator.Runner
 {
 	public class MigrationLoader : IMigrationLoader
 	{
-		public MigrationConventions Conventions { get; private set; }
+		public IMigrationConventions Conventions { get; private set; }
 
-		public MigrationLoader(MigrationConventions conventions)
+		public MigrationLoader(IMigrationConventions conventions)
 		{
 			Conventions = conventions;
 		}

@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using FluentMigrator;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Versioning;
@@ -9,14 +10,15 @@ using FluentMigrator.Runner.Versioning;
 namespace FluentMigrator.Runner
 {
     public class MigrationVersionRunner
-    {
-        private Assembly asm;
+    {   
         private VersionInfo versionInfo;
 
-        public MigrationConventions Conventions { get; private set; }
+        public Assembly MigrationAssembly { get; private set; }
+        public IMigrationConventions Conventions { get; private set; }
         public IMigrationProcessor Processor { get; private set; }
         public bool SilentlyFail { get; set; }
         public IList<Exception> CaughtExceptions { get; private set; }
+        private IMigrationLoader MigrationLoader { get; set; }
 
         public VersionInfo Version 
         {
@@ -39,38 +41,29 @@ namespace FluentMigrator.Runner
             private set { migrations = value; }
         }
 
-        //public MigrationVersionRunner(MigrationConventions conventions, IMigrationProcessor processor)
-        //{
-        //    SilentlyFail = false;
-        //    CaughtExceptions = new List<Exception>();
-        //    Conventions = conventions;
-        //    Processor = processor;
-        //    this.Version = null;
-        //    this.Migrations = null;
-        //    //get assembly from calling dll
-        //    this.asm = System.Reflection.Assembly.GetCallingAssembly();
-        //}
-
-        public MigrationVersionRunner(MigrationConventions conventions, IMigrationProcessor processor, Assembly asm)
-		{
-            SilentlyFail = false;
-            CaughtExceptions = new List<Exception>();
-			Conventions = conventions;
-			Processor = processor;
-            this.asm = asm;
-            this.Version = null;
-            this.Migrations = null;
-		}
-
-        public MigrationVersionRunner(MigrationConventions conventions, IMigrationProcessor processor, Type getAssemblyByType)
+        public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader)
         {
             SilentlyFail = false;
             CaughtExceptions = new List<Exception>();
             Conventions = conventions;
             Processor = processor;
-            this.asm = getAssemblyByType.Assembly;
             this.Version = null;
             this.Migrations = null;
+            //get assembly from calling dll
+            this.MigrationAssembly = System.Reflection.Assembly.GetCallingAssembly();
+            this.MigrationLoader = loader;
+        }
+
+        public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader, Type getAssemblyByType)
+        {
+            SilentlyFail = false;
+            CaughtExceptions = new List<Exception>();
+            Conventions = conventions;
+            Processor = processor;
+            this.MigrationAssembly = getAssemblyByType.Assembly;
+            this.Version = null;
+            this.Migrations = null;
+            this.MigrationLoader = loader;
         }
 
         public void ClearCaughtExceptions()
@@ -100,8 +93,9 @@ namespace FluentMigrator.Runner
         public void LoadAssemblyMigrations()
         {
             Migrations = new SortedList<long, Migration>();
-            var loader = new MigrationLoader(Conventions);
-            IEnumerable<MigrationMetadata> migrationList = loader.FindMigrationsIn(asm);
+            IEnumerable<MigrationMetadata> migrationList = this.MigrationLoader.FindMigrationsIn(this.MigrationAssembly);
+
+            if (migrationList == null) return;
 
             var en = migrationList.GetEnumerator();
             while (en.MoveNext())
