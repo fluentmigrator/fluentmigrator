@@ -3,10 +3,13 @@ FluentMigratorVS2008.suo
 FluentMigrator.suo
 _ReSharper.FluentMigratorVS2008/
 _ReSharper.FluentMigrator/
+src/FluentMigrator.Console/bin/
+src/FluentMigrator.Console/obj/
 src/FluentMigrator.Runner/bin/
 src/FluentMigrator.Runner/obj/
 src/FluentMigrator.Tests/bin/
 src/FluentMigrator.Tests/obj/
 src/FluentMigrator/bin/
 src/FluentMigrator/obj/
-
+build
+*.sln.cache

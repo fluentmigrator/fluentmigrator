@@ -11,7 +11,7 @@
 		<MSBuild
 			Projects="FluentMigrator.sln"
 			Targets="Build"
-			Properties="Configuration=$(BuildType)"/>
+			Properties="Architecture=x86;Configuration=$(BuildType)"/>
 	</Target>
 	
   
