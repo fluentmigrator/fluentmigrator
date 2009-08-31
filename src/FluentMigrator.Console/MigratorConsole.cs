@@ -27,6 +27,7 @@ namespace FluentMigrator.Tests.Unit.Runners
 		{
 			IMigrationProcessorFactory processorFactory = ProcessorFactory.GetFactory(ProcessorType);            
 			Processor = processorFactory.Create(Connection);
+            
 		}
 
 		private void ParseArguments(string[] args)
