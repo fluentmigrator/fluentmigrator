@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.SqlServer;
 using Xunit.Extensions;
 
 namespace FluentMigrator.Tests.Integration

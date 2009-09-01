@@ -56,8 +56,8 @@ namespace FluentMigrator.Runner.Generators
 		}
 
 		public override string Generate(CreateColumnExpression expression)
-		{		    
-            return FormatExpression("ALTER TABLE [{0}] ADD {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
+		{
+			return FormatExpression("ALTER TABLE [{0}] ADD {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
 		}
 
 		public override string Generate(DeleteTableExpression expression)
@@ -68,29 +68,29 @@ namespace FluentMigrator.Runner.Generators
 		public override string Generate(DeleteColumnExpression expression)
 		{
 
-		    return FormatExpression("ALTER TABLE [{0}] DROP COLUMN {1}", expression.TableName, expression.ColumnName);            
+			return FormatExpression("ALTER TABLE [{0}] DROP COLUMN {1}", expression.TableName, expression.ColumnName);
 		}
 
 		public override string Generate(CreateForeignKeyExpression expression)
-		{			
+		{
 			string primaryColumns = GetColumnList(expression.ForeignKey.PrimaryColumns);
 			string foreignColumns = GetColumnList(expression.ForeignKey.ForeignColumns);
 
 			string sql = "ALTER TABLE [{0}] ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES [{3}] ({4})";
 
-			return String.Format(sql, 
-                          expression.ForeignKey.ForeignTable,                          
-			              expression.ForeignKey.Name,
-			              foreignColumns,
-                          expression.ForeignKey.PrimaryTable,
-                          primaryColumns                          
-			              );			
+			return String.Format(sql,
+						  expression.ForeignKey.ForeignTable,
+						  expression.ForeignKey.Name,
+						  foreignColumns,
+						  expression.ForeignKey.PrimaryTable,
+						  primaryColumns
+						  );
 		}
 
 		public override string Generate(DeleteForeignKeyExpression expression)
 		{
 			string sql = "ALTER TABLE [{0}] DROP CONSTRAINT {1}";
-			return String.Format(sql, expression.ForeignKey.PrimaryTable, expression.ForeignKey.Name);			
+			return String.Format(sql, expression.ForeignKey.PrimaryTable, expression.ForeignKey.Name);
 		}
 
 		public override string Generate(CreateIndexExpression expression)
@@ -136,57 +136,57 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(RenameTableExpression expression)
 		{
-		    return FormatExpression("sp_rename [{0}], [{1}]", expression.OldName, expression.NewName);
+			return FormatExpression("sp_rename [{0}], [{1}]", expression.OldName, expression.NewName);
 		}
 
 		public override string Generate(RenameColumnExpression expression)
 		{
-		    return FormatExpression("sp_rename '[{0}].[{1}]', [{2}]", expression.TableName, expression.OldName, expression.NewName);
+			return FormatExpression("sp_rename '[{0}].[{1}]', [{2}]", expression.TableName, expression.OldName, expression.NewName);
 		}
 
-	    public override string Generate(InsertDataExpression expression)
-	    {
-	        var result = new StringBuilder();
-            foreach (InsertionData row in expression.Rows)
-            {
-                List<string> columnNames = new List<string>();
-                List<object> columnData = new List<object>();
-                foreach (KeyValuePair<string, object> item in row)
-                {
-                    columnNames.Add(item.Key);
-                    columnData.Add(item.Value);
-                }
+		public override string Generate(InsertDataExpression expression)
+		{
+			var result = new StringBuilder();
+			foreach (InsertionData row in expression.Rows)
+			{
+				List<string> columnNames = new List<string>();
+				List<object> columnData = new List<object>();
+				foreach (KeyValuePair<string, object> item in row)
+				{
+					columnNames.Add(item.Key);
+					columnData.Add(item.Value);
+				}
 
-                string columns = GetColumnList(columnNames);
-                string data = GetDataList(columnData);
-                result.Append(FormatExpression("INSERT INTO [{0}] ({1}) VALUES ({2});", expression.TableName, columns, data));
-            }
-	        return result.ToString();
-	    }
+				string columns = GetColumnList(columnNames);
+				string data = GetDataList(columnData);
+				result.Append(FormatExpression("INSERT INTO [{0}] ({1}) VALUES ({2});", expression.TableName, columns, data));
+			}
+			return result.ToString();
+		}
 
-	    public string FormatExpression(string template, params object[] args)
+		public string FormatExpression(string template, params object[] args)
 		{
 			return String.Format(template, args);
 		}
 
-        private string GetColumnList(IEnumerable<string> columns)
-        {
-            string result = "";
-            foreach (string column in columns)
-            {
-                result += column + ",";
-            }
-            return result.TrimEnd(',');
-        }
+		private string GetColumnList(IEnumerable<string> columns)
+		{
+			string result = "";
+			foreach (string column in columns)
+			{
+				result += column + ",";
+			}
+			return result.TrimEnd(',');
+		}
 
-        private string GetDataList(List<object> data)
-        {
-            string result = "";
-            foreach (object column in data)
-            {
-                result += GetConstantValue(column) + ",";                
-            }
-            return result.TrimEnd(',');
-        }
+		private string GetDataList(List<object> data)
+		{
+			string result = "";
+			foreach (object column in data)
+			{
+				result += GetConstantValue(column) + ",";
+			}
+			return result.TrimEnd(',');
+		}
 	}
 }

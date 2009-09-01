@@ -1,6 +1,6 @@
 ﻿using System.Data.SqlClient;
 using FluentMigrator.Runner.Generators;
-using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Helpers;
 using Xunit;
 

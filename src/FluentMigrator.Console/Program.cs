@@ -6,7 +6,7 @@ namespace FluentMigrator.Console
 	{
 		static void Main(string[] args)
 		{
-			var console = new MigratorConsole(args);			
+			new MigratorConsole(args);
 		}
 	}
 }

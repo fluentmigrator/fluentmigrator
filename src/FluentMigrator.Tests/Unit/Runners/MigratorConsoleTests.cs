@@ -1,6 +1,6 @@
 ﻿using System;
 using FluentMigrator;
-using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.Sqlite;
 using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Runners

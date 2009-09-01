@@ -23,13 +23,6 @@ namespace FluentMigrator.Tests.Unit.Runners
 			ExecuteMigrations();
 		}
 
-		private void CreateProcessor()
-		{
-			IMigrationProcessorFactory processorFactory = ProcessorFactory.GetFactory(ProcessorType);            
-			Processor = processorFactory.Create(Connection);
-            
-		}
-
 		private void ParseArguments(string[] args)
 		{
 			for (int i = 0; i < args.Length; i++)
@@ -51,6 +44,12 @@ namespace FluentMigrator.Tests.Unit.Runners
 				throw new ArgumentException("Database Type is required (/database)");
 			if (string.IsNullOrEmpty(Connection))
 				throw new ArgumentException("Connection String is required (/connection");
+		}
+
+		private void CreateProcessor()
+		{
+			IMigrationProcessorFactory processorFactory = ProcessorFactory.GetFactory(ProcessorType);
+			Processor = processorFactory.Create(Connection);
 		}
 
 		private void ExecuteMigrations()

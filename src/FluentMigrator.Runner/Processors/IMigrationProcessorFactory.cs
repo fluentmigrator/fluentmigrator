@@ -1,6 +1,4 @@
-﻿using FluentMigrator.Runner.Processors;
-
-namespace FluentMigrator.Runner
+﻿namespace FluentMigrator.Runner.Processors
 {
 	public interface IMigrationProcessorFactory
 	{

@@ -1,6 +1,5 @@
-FluentMigratorVS2008.4.5.resharper.user
-FluentMigratorVS2008.suo
-FluentMigrator.suo
+*.resharper.user
+*.suo
 _ReSharper.FluentMigratorVS2008/
 _ReSharper.FluentMigrator/
 src/FluentMigrator.Console/bin/
@@ -14,3 +13,5 @@ src/FluentMigrator/obj/
 build
 *.sln.cache
 *.csproj.user
+bin
+obj

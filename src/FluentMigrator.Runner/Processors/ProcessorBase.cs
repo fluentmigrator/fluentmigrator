@@ -58,17 +58,17 @@ namespace FluentMigrator.Runner.Processors
 			Process(generator.Generate(expression));
 		}
 
-	    public void Process(InsertDataExpression expression)
-	    {
-	        Process(generator.Generate(expression));
-	    }
+		public void Process(InsertDataExpression expression)
+		{
+			Process(generator.Generate(expression));
+		}
 
-	    protected abstract void Process(string sql);
-        public abstract System.Data.DataSet ReadTableData(string tableName);
-        public abstract System.Data.DataSet Read(string template, params object[] args);
-        public abstract bool TableExists(string tableName);
-        public abstract bool Exists(string template, params object[] args);
-        public abstract void Execute(string template, params object[] args);
-        public abstract void UpdateTable(string tableName, List<string> columns, List<string> formattedValues);
+		protected abstract void Process(string sql);
+		public abstract System.Data.DataSet ReadTableData(string tableName);
+		public abstract System.Data.DataSet Read(string template, params object[] args);
+		public abstract bool TableExists(string tableName);
+		public abstract bool Exists(string template, params object[] args);
+		public abstract void Execute(string template, params object[] args);
+		public abstract void UpdateTable(string tableName, List<string> columns, List<string> formattedValues);
 	}
 }

@@ -13,23 +13,23 @@ namespace FluentMigrator.Tests.Integration
         {   
             var conventions = new MigrationConventions();
             
-            var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
+			var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
 
-            Assert.NotNull(runner.Migrations);
-        }
+			Assert.NotNull(runner.Migrations);
+		}
 
-        //[Fact]
-        //public void CanLoadMigrationsByCallingAssembly()
-        //{
-        //    var conventions = new MigrationConventions();
-        //    var connection = new SqlConnection(connectionString);
-        //    connection.Open();
-        //    var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
+		//[Fact]
+		//public void CanLoadMigrationsByCallingAssembly()
+		//{
+		//    var conventions = new MigrationConventions();
+		//    var connection = new SqlConnection(connectionString);
+		//    connection.Open();
+		//    var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
 
-        //    var runner = new MigrationVersionRunner(conventions, processor);
+		//    var runner = new MigrationVersionRunner(conventions, processor);
 
-        //    Assert.NotNull(runner.Migrations);
-        //}
+		//    Assert.NotNull(runner.Migrations);
+		//}
 
         [Theory]
         [Sqlite]
@@ -38,10 +38,10 @@ namespace FluentMigrator.Tests.Integration
         {
             var conventions = new MigrationConventions();
             
-            var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
+			var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
 
-            Assert.NotNull(runner.Version);            
-        }
+			Assert.NotNull(runner.Version);
+		}
 
         [Theory]
         [Sqlite]
@@ -50,18 +50,18 @@ namespace FluentMigrator.Tests.Integration
         {
             var conventions = new MigrationConventions();
 
-            var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
+			var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
 
-            runner.UpgradeToVersion(2, false);
+			runner.UpgradeToVersion(2, false);
 
-            Assert.Equal<long>((long)2, runner.Version.CurrentVersion);
+			Assert.Equal<long>((long)2, runner.Version.CurrentVersion);
 
-            //now step down to 0
-            long last = 0;
-            runner.StepDown(runner.CurrentVersion, 0, out last);
+			//now step down to 0
+			long last = 0;
+			runner.StepDown(runner.CurrentVersion, 0, out last);
 
-            Assert.Equal<long>((long)0, runner.CurrentVersion);
-        }
+			Assert.Equal<long>((long)0, runner.CurrentVersion);
+		}
 
         [Theory]
         [Sqlite]
@@ -70,17 +70,17 @@ namespace FluentMigrator.Tests.Integration
         {
             var conventions = new MigrationConventions();
 
-            var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
+			var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
 
-            runner.UpgradeToLatest(false);
+			runner.UpgradeToLatest(false);
 
-            Assert.True(true); //made it this far..
+			Assert.True(true); //made it this far..
 
-            //now step down to 0
-            long last = 0;
-            runner.StepDown(runner.CurrentVersion, 0, out last);
+			//now step down to 0
+			long last = 0;
+			runner.StepDown(runner.CurrentVersion, 0, out last);
 
-            Assert.Equal<long>((long)0, runner.CurrentVersion);
-        }
-    }
+			Assert.Equal<long>((long)0, runner.CurrentVersion);
+		}
+	}
 }
