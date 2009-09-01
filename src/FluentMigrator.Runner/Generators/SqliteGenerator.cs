@@ -49,43 +49,43 @@ namespace FluentMigrator.Runner.Generators
 			SetTypeMap(DbType.Xml, "XML", XmlCapacity);
 		}
 
-        public override string GenerateDDLForColumn(ColumnDefinition column)
-        {
-            var sb = new StringBuilder();
+		public override string GenerateDDLForColumn(ColumnDefinition column)
+		{
+			var sb = new StringBuilder();
 
-            sb.Append(column.Name);
-            sb.Append(" ");
-            sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
+			sb.Append(column.Name);
+			sb.Append(" ");
+			sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
 
-            if (!column.IsNullable)
-            {
-                sb.Append(" NOT NULL");
-            }
+			if (!column.IsNullable)
+			{
+				sb.Append(" NOT NULL");
+			}
 
-            if (column.DefaultValue != null)
-            {
-                sb.Append(" DEFAULT ");
-                sb.Append(GetConstantValue(column.DefaultValue));
-            }
+			if (column.DefaultValue != null)
+			{
+				sb.Append(" DEFAULT ");
+				sb.Append(GetConstantValue(column.DefaultValue));
+			}
 
-            if (column.IsIdentity)
-            {
-                sb.Append(" IDENTITY");
-            }
+			if (column.IsIdentity)
+			{
+				sb.Append(" IDENTITY");
+			}
 
-            if (column.IsPrimaryKey)
-            {
-                sb.Append(" PRIMARY KEY");
-            }
+			if (column.IsPrimaryKey)
+			{
+				sb.Append(" PRIMARY KEY");
+			}
 
-            //Assume that if its IDENTITY and PRIMARY KEY, the it should be an AUTOINCREMENT column
-            sb.Replace(" IDENTITY PRIMARY KEY", " PRIMARY KEY AUTOINCREMENT");
+			//Assume that if its IDENTITY and PRIMARY KEY, the it should be an AUTOINCREMENT column
+			sb.Replace(" IDENTITY PRIMARY KEY", " PRIMARY KEY AUTOINCREMENT");
 
-            return sb.ToString();
-        }
+			return sb.ToString();
+		}
 
 		public override string Generate(CreateTableExpression expression)
-		{			
+		{
 			return string.Format("CREATE TABLE {0} ({1})", expression.TableName, GetColumnDDL(expression.Columns));
 		}
 
@@ -102,20 +102,20 @@ namespace FluentMigrator.Runner.Generators
 		public override string Generate(CreateColumnExpression expression)
 		{
 			//return string.Format("ALTER TABLE {0} ADD COLUMN {1}", expression.TableName, expression.Column.Name);
-            return FormatExpression("ALTER TABLE [{0}] ADD COLUMN {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
+			return FormatExpression("ALTER TABLE [{0}] ADD COLUMN {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
 		}
 
 		public override string Generate(RenameColumnExpression expression)
 		{
-            throw new System.NotImplementedException();
+			throw new System.NotImplementedException();
 		}
 
-	    public override string Generate(InsertDataExpression expression)
-	    {
-	        throw new System.NotImplementedException();
-	    }
+		public override string Generate(InsertDataExpression expression)
+		{
+			throw new System.NotImplementedException();
+		}
 
-	    public override string Generate(DeleteColumnExpression expression)
+		public override string Generate(DeleteColumnExpression expression)
 		{
 			return string.Format("ALTER TABLE {0} DROP COLUMN {1}", expression.TableName, expression.ColumnName);
 		}
@@ -148,11 +148,11 @@ namespace FluentMigrator.Runner.Generators
 
 				result.Append(column.Name);
 
-// Not yet implemented correctly
-//				if (column.Direction == Direction.Ascending)
-//					result.Append(" ASC");
-//				else
-//					result.Append(" DESC");
+				// Not yet implemented correctly
+				//				if (column.Direction == Direction.Ascending)
+				//					result.Append(" ASC");
+				//				else
+				//					result.Append(" DESC");
 			}
 			result.Append(")");
 

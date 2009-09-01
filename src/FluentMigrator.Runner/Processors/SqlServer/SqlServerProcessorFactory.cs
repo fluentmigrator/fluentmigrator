@@ -1,8 +1,7 @@
 ﻿using System.Data.SqlClient;
 using FluentMigrator.Runner.Generators;
-using FluentMigrator.Runner.Processors;
 
-namespace FluentMigrator.Runner.Processors
+namespace FluentMigrator.Runner.Processors.SqlServer
 {
 	public class SqlServerProcessorFactory : IMigrationProcessorFactory
 	{

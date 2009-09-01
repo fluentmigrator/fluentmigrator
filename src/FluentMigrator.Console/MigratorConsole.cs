@@ -23,12 +23,6 @@ namespace FluentMigrator.Tests.Unit.Runners
 			ExecuteMigrations();
 		}
 
-		private void CreateProcessor()
-		{
-			IMigrationProcessorFactory processorFactory = ProcessorFactory.GetFactory(ProcessorType);            
-			Processor = processorFactory.Create(Connection);
-		}
-
 		private void ParseArguments(string[] args)
 		{
 			for (int i = 0; i < args.Length; i++)
@@ -52,31 +46,37 @@ namespace FluentMigrator.Tests.Unit.Runners
 				throw new ArgumentException("Connection String is required (/connection");
 		}
 
+		private void CreateProcessor()
+		{
+			IMigrationProcessorFactory processorFactory = ProcessorFactory.GetFactory(ProcessorType);
+			Processor = processorFactory.Create(Connection);
+		}
+
 		private void ExecuteMigrations()
-		{		    
-            var runner = new MigrationRunner(null, Processor);
+		{
+			var runner = new MigrationRunner(null, Processor);
 			if (!Path.IsPathRooted(TargetAssembly))
 			{
 				TargetAssembly = Path.GetFullPath(TargetAssembly);
 			}
-			Assembly assembly = Assembly.LoadFile(TargetAssembly);                        
+			Assembly assembly = Assembly.LoadFile(TargetAssembly);
 
 			Type[] types = assembly.GetTypes();
 
-			var migrations = new Dictionary<long,IMigration>();
+			var migrations = new Dictionary<long, IMigration>();
 			foreach (Type type in types)
 			{
 				if (type.IsDefined(typeof(MigrationAttribute), false))
 				{
-					var attributes = (MigrationAttribute[]) type.GetCustomAttributes(typeof (MigrationAttribute), false);				    
+					var attributes = (MigrationAttribute[])type.GetCustomAttributes(typeof(MigrationAttribute), false);
 					migrations.Add(attributes[0].Version, (IMigration)assembly.CreateInstance(type.FullName));
 				}
 			}
-			
+
 			foreach (long key in migrations.Keys.OrderBy(k => k))
 			{
 				runner.Up(migrations[key]);
-			}            
-		}		
+			}
+		}
 	}
 }

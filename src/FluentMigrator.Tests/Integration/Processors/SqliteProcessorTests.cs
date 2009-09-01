@@ -3,7 +3,7 @@ using System.Data.SQLite;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators;
-using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.Sqlite;
 using Moq;
 using Xunit;
 

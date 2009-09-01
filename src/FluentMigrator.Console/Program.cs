@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using FluentMigrator.Tests.Unit.Runners;
+﻿using FluentMigrator.Tests.Unit.Runners;
 
 namespace FluentMigrator.Console
 {
@@ -10,7 +6,7 @@ namespace FluentMigrator.Console
 	{
 		static void Main(string[] args)
 		{
-			var console = new MigratorConsole(args);			
+			new MigratorConsole(args);
 		}
 	}
 }

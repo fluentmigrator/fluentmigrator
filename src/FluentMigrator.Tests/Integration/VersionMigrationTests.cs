@@ -1,7 +1,7 @@
 ﻿using System.Data.SqlClient;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators;
-using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Runner.Versioning;
 using Xunit;
 

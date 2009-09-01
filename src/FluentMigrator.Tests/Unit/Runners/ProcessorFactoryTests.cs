@@ -1,16 +1,24 @@
-using FluentMigrator.Runner;
 using FluentMigrator.Runner.Processors;
-using Xunit;
-
+using FluentMigrator.Runner.Processors.Sqlite;
+using FluentMigrator.Runner.Processors.SqlServer;
+using NUnit.Framework;
 namespace FluentMigrator.Tests.Unit.Runners
 {
-	public class ProcessorFactoryTests
+	[TestFixture]
+	public class ProcessFactoryTests
 	{
-		[Fact]
-		public void CanRetrieveFactoryWithProcessorTypeString()
+		[Test]
+		public void CanRetrieveFactoryWithArgumentString()
 		{
 			IMigrationProcessorFactory factory = ProcessorFactory.GetFactory("Sqlite");
-			Assert.True(factory.GetType() == typeof(SqliteProcessorFactory));
+			Assert.IsTrue(factory.GetType() == typeof(SqliteProcessorFactory));
+		}
+
+		[Test]
+		public void CanRetrieveSqlServerFactoryWithArgumentString()
+		{
+			IMigrationProcessorFactory factory = ProcessorFactory.GetFactory("SqlServer");
+			Assert.IsTrue(factory.GetType() == typeof(SqlServerProcessorFactory));
 		}
 	}
 }
