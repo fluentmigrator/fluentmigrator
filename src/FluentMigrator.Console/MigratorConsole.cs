@@ -54,29 +54,14 @@ namespace FluentMigrator.Tests.Unit.Runners
 
 		private void ExecuteMigrations()
 		{
-			var runner = new MigrationRunner(null, Processor);
-			if (!Path.IsPathRooted(TargetAssembly))
+		    if (!Path.IsPathRooted(TargetAssembly))
 			{
 				TargetAssembly = Path.GetFullPath(TargetAssembly);
 			}
-			Assembly assembly = Assembly.LoadFile(TargetAssembly);
-
-			Type[] types = assembly.GetTypes();
-
-			var migrations = new Dictionary<long, IMigration>();
-			foreach (Type type in types)
-			{
-				if (!type.IsDefined(typeof(MigrationAttribute), false))
-					continue;
-
-				var attributes = (MigrationAttribute[])type.GetCustomAttributes(typeof(MigrationAttribute), false);
-				migrations.Add(attributes[0].Version, (IMigration)assembly.CreateInstance(type.FullName));
-			}
-
-			foreach (long key in migrations.Keys.OrderBy(k => k))
-			{
-				runner.Up(migrations[key]);
-			}
-		}
+		    Assembly assembly = Assembly.LoadFile(TargetAssembly);
+		    var runner = new MigrationVersionRunner(new MigrationConventions(), Processor, new MigrationLoader(new MigrationConventions()), assembly);
+			runner.LoadAssemblyMigrations();
+            runner.UpgradeToLatest(true);
+		}		
 	}
 }
