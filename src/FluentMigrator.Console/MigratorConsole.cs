@@ -66,11 +66,11 @@ namespace FluentMigrator.Tests.Unit.Runners
 			var migrations = new Dictionary<long, IMigration>();
 			foreach (Type type in types)
 			{
-				if (type.IsDefined(typeof(MigrationAttribute), false))
-				{
-					var attributes = (MigrationAttribute[])type.GetCustomAttributes(typeof(MigrationAttribute), false);
-					migrations.Add(attributes[0].Version, (IMigration)assembly.CreateInstance(type.FullName));
-				}
+				if (!type.IsDefined(typeof(MigrationAttribute), false))
+					continue;
+
+				var attributes = (MigrationAttribute[])type.GetCustomAttributes(typeof(MigrationAttribute), false);
+				migrations.Add(attributes[0].Version, (IMigration)assembly.CreateInstance(type.FullName));
 			}
 
 			foreach (long key in migrations.Keys.OrderBy(k => k))
