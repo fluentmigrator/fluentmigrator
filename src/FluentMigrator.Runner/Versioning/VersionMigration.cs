@@ -21,7 +21,7 @@ namespace FluentMigrator.Runner.Versioning
         }
     }
 
-    public static class DateTimeExtensions
+	internal static class DateTimeExtensions
     {
         public static string ToISO8601(this DateTime dateTime)
         {
