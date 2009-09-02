@@ -10,7 +10,7 @@ h2. Project Info
 
 h2. Example Migration
 
-{% highlight csharp %}
+<pre><code>
 [Migration(1)]
 public class TestCreateAndDropTableMigration: Migration
 {
@@ -42,8 +42,7 @@ public class TestCreateAndDropTableMigration: Migration
 		Delete.Table("TestTable2");
 		Delete.Table("TestTable");
 	}
-}
-{% endhighlight %}
+}</code></pre>
 
 h2. Example usage of console runner
 
