@@ -2,13 +2,13 @@
 using FluentMigrator.Builders.Rename.Table;
 using FluentMigrator.Expressions;
 using Moq;
-using Xunit;
+using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Builders.Rename
 {
 	public class RenameTableExpressionBuilderTests
 	{
-		[Fact]
+		[Test]
 		public void CallingToSetsNewName()
 		{
 			var expressionMock = new Mock<RenameTableExpression>();

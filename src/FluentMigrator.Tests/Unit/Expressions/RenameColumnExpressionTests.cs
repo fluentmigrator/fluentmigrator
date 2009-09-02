@@ -2,76 +2,78 @@ using System;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Tests.Helpers;
-using Xunit;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
 	public class RenameColumnExpressionTests
 	{
-		[Fact]
+		[Test]
 		public void ErrorIsReturnedWhenOldNameIsNull()
 		{
 			var expression = new RenameColumnExpression { OldName = null };
 			var errors = ValidationHelper.CollectErrors(expression);
-			Assert.Contains(ErrorMessages.OldColumnNameCannotBeNullOrEmpty, errors);
+			errors.ShouldContain(ErrorMessages.OldColumnNameCannotBeNullOrEmpty);
 		}
 
-		[Fact]
+		[Test]
 		public void ErrorIsReturnedWhenOldNameIsEmptyString()
 		{
 			var expression = new RenameColumnExpression { OldName = String.Empty };
 			var errors = ValidationHelper.CollectErrors(expression);
-			Assert.Contains(ErrorMessages.OldColumnNameCannotBeNullOrEmpty, errors);
+			errors.ShouldContain(ErrorMessages.OldColumnNameCannotBeNullOrEmpty);
 		}
 
-		[Fact]
+		[Test]
 		public void ErrorIsNotReturnedWhenOldNameIsNotNullEmptyString()
 		{
 			var expression = new RenameColumnExpression { OldName = "Bacon" };
 			var errors = ValidationHelper.CollectErrors(expression);
-			Assert.DoesNotContain(ErrorMessages.OldColumnNameCannotBeNullOrEmpty, errors);
+			errors.ShouldContain(ErrorMessages.OldColumnNameCannotBeNullOrEmpty);
 		}
 
-		[Fact]
+		[Test]
 		public void ErrorIsReturnedWhenNewNameIsNull()
 		{
 			var expression = new RenameColumnExpression { NewName = null };
 			var errors = ValidationHelper.CollectErrors(expression);
-			Assert.Contains(ErrorMessages.NewColumnNameCannotBeNullOrEmpty, errors);
+			errors.ShouldContain(ErrorMessages.NewColumnNameCannotBeNullOrEmpty);
 		}
 
-		[Fact]
+		[Test]
 		public void ErrorIsReturnedWhenNewNameIsEmptyString()
 		{
 			var expression = new RenameColumnExpression { NewName = String.Empty };
 			var errors = ValidationHelper.CollectErrors(expression);
-			Assert.Contains(ErrorMessages.NewColumnNameCannotBeNullOrEmpty, errors);
+			errors.ShouldContain(ErrorMessages.NewColumnNameCannotBeNullOrEmpty);
 		}
 
-		[Fact]
+		[Test]
 		public void ErrorIsNotReturnedWhenNewNameIsNotNullOrEmptyString()
 		{
 			var expression = new RenameColumnExpression { NewName = "Bacon" };
 			var errors = ValidationHelper.CollectErrors(expression);
-			Assert.DoesNotContain(ErrorMessages.NewColumnNameCannotBeNullOrEmpty, errors);
+			errors.ShouldNotContain(ErrorMessages.NewColumnNameCannotBeNullOrEmpty);
 		}
 
-		[Fact]
+		[Test]
 		public void ReverseReturnsRenameColumnExpression()
 		{
 			var expression = new RenameColumnExpression { TableName = "Bacon", OldName = "BaconId", NewName = "ChunkyBaconId" };
 			var reverse = expression.Reverse();
-			Assert.IsType<RenameColumnExpression>(reverse);
+			reverse.ShouldBeOfType<RenameColumnExpression>();
 		}
 
-		[Fact]
+		[Test]
 		public void ReverseSetsTableNameOldNameAndNewNameOnGeneratedExpression()
 		{
 			var expression = new RenameColumnExpression { TableName = "Bacon", OldName = "BaconId", NewName = "ChunkyBaconId" };
 			var reverse = expression.Reverse() as RenameColumnExpression;
-			Assert.Equal("Bacon", reverse.TableName);
-			Assert.Equal("ChunkyBaconId", reverse.OldName);
-			Assert.Equal("BaconId", reverse.NewName);
+
+			reverse.TableName.ShouldBe("Bacon");
+			reverse.OldName.ShouldBe("ChunkyBaconId");
+			reverse.NewName.ShouldBe("BaconId");
 		}
 	}
 }

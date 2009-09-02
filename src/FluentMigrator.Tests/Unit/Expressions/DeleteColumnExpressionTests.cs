@@ -2,65 +2,66 @@ using System;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Tests.Helpers;
-using Xunit;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
 	public class DeleteColumnExpressionTests
 	{
-		[Fact]
+		[Test]
 		public void ErrorIsReturnedWhenTableNameIsNull()
 		{
 			var expression = new DeleteColumnExpression { TableName = null };
 			var errors = ValidationHelper.CollectErrors(expression);
-			Assert.Contains(ErrorMessages.TableNameCannotBeNullOrEmpty, errors);
+			errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
 		}
 
-		[Fact]
+		[Test]
 		public void ErrorIsReturnedWhenTableNameIsEmptyString()
 		{
 			var expression = new DeleteColumnExpression { TableName = String.Empty };
 			var errors = ValidationHelper.CollectErrors(expression);
-			Assert.Contains(ErrorMessages.TableNameCannotBeNullOrEmpty, errors);
+			errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
 		}
 
-		[Fact]
+		[Test]
 		public void ErrorIsNotReturnedWhenTableNameIsNotNullEmptyString()
 		{
 			var expression = new DeleteColumnExpression { TableName = "Bacon" };
 			var errors = ValidationHelper.CollectErrors(expression);
-			Assert.DoesNotContain(ErrorMessages.TableNameCannotBeNullOrEmpty, errors);
+			errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
 		}
 
-		[Fact]
+		[Test]
 		public void ErrorIsReturnedWhenColumnNameIsNull()
 		{
 			var expression = new DeleteColumnExpression { ColumnName = null };
 			var errors = ValidationHelper.CollectErrors(expression);
-			Assert.Contains(ErrorMessages.ColumnNameCannotBeNullOrEmpty, errors);
+			errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
 		}
 
-		[Fact]
+		[Test]
 		public void ErrorIsReturnedWhenColumnNameIsEmptyString()
 		{
 			var expression = new DeleteColumnExpression { ColumnName = String.Empty };
 			var errors = ValidationHelper.CollectErrors(expression);
-			Assert.Contains(ErrorMessages.ColumnNameCannotBeNullOrEmpty, errors);
+			errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
 		}
 
-		[Fact]
+		[Test]
 		public void ErrorIsNotReturnedWhenColumnNameIsNotNullEmptyString()
 		{
 			var expression = new DeleteColumnExpression { ColumnName = "Bacon" };
 			var errors = ValidationHelper.CollectErrors(expression);
-			Assert.DoesNotContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty, errors);
+			errors.ShouldNotContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
 		}
 
-		[Fact]
+		[Test]
+		[ExpectedException(typeof(NotSupportedException))]
 		public void ReverseThrowsException()
 		{
-			var expression = new DeleteColumnExpression();
-			Assert.Throws<NotSupportedException>(() => expression.Reverse());
+			new DeleteColumnExpression().Reverse();
 		}
 	}
 }

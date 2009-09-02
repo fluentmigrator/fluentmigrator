@@ -1,52 +1,46 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.SQLite;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Reflection;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Generators;
-using FluentMigrator.Runner.Processors;
-using FluentMigrator.Runner.Versioning;
-using Xunit;
 using Moq;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit
 {
-    public class MigrationVersionRunnerUnitTests
-    {
-        [Fact]
-        public void LoadsCorrectCallingAssembly()
-        {
-            //mock up the dependencies
-            var conventionMock = new Mock<IMigrationConventions>(MockBehavior.Loose);
-            var processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
-            var loaderMock = new Mock<IMigrationLoader>(MockBehavior.Loose);
-            
-            var vrunner = new MigrationVersionRunner(conventionMock.Object, processorMock.Object, loaderMock.Object);
+	public class MigrationVersionRunnerUnitTests
+	{
+		[Test]
+		public void LoadsCorrectCallingAssembly()
+		{
+			//mock up the dependencies
+			var conventionMock = new Mock<IMigrationConventions>(MockBehavior.Loose);
+			var processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
+			var loaderMock = new Mock<IMigrationLoader>(MockBehavior.Loose);
 
-            Assert.True(vrunner.MigrationAssembly == Assembly.GetAssembly(typeof(MigrationVersionRunnerUnitTests)));
-        }
+			var vrunner = new MigrationVersionRunner(conventionMock.Object, processorMock.Object, loaderMock.Object);
 
-        [Fact]
-        public void HandlesNullMigrationList()
-        {
-            //mock up the dependencies
-            var conventionMock = new Mock<IMigrationConventions>(MockBehavior.Loose);
-            var processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
-            var loaderMock = new Mock<IMigrationLoader>(MockBehavior.Loose);
+			vrunner.MigrationAssembly.ShouldBe(Assembly.GetAssembly(typeof(MigrationVersionRunnerUnitTests)));
+		}
 
-            //set migrations to return empty list
-            var asm = Assembly.GetAssembly( typeof(MigrationVersionRunnerUnitTests) );
-            loaderMock.Setup(x => x.FindMigrationsIn(asm)).Returns<IEnumerable<Migration>>(null);
+		[Test]
+		public void HandlesNullMigrationList()
+		{
+			//mock up the dependencies
+			var conventionMock = new Mock<IMigrationConventions>(MockBehavior.Loose);
+			var processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
+			var loaderMock = new Mock<IMigrationLoader>(MockBehavior.Loose);
 
-            var vrunner = new MigrationVersionRunner(conventionMock.Object, processorMock.Object, loaderMock.Object);
+			//set migrations to return empty list
+			var asm = Assembly.GetAssembly(typeof(MigrationVersionRunnerUnitTests));
+			loaderMock.Setup(x => x.FindMigrationsIn(asm)).Returns<IEnumerable<Migration>>(null);
 
-            Assert.True(vrunner.Migrations.Count == 0);
+			var vrunner = new MigrationVersionRunner(conventionMock.Object, processorMock.Object, loaderMock.Object);
 
-            vrunner.UpgradeToLatest(false);
+			vrunner.Migrations.Count.ShouldBe(0);
 
-            loaderMock.VerifyAll();
-        }
-    }
+			vrunner.UpgradeToLatest(false);
+
+			loaderMock.VerifyAll();
+		}
+	}
 }

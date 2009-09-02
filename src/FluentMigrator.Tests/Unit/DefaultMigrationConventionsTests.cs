@@ -1,20 +1,20 @@
-﻿using System;
-using FluentMigrator.Expressions;
-using FluentMigrator.Infrastructure;
+﻿using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
-using Xunit;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit
 {
+	[TestFixture]
 	public class DefaultMigrationConventionsTests
 	{
-		[Fact]
+		[Test]
 		public void GetPrimaryKeyNamePrefixesTableNameWithPKAndUnderscore()
 		{
-			Assert.Equal("PK_Foo", DefaultMigrationConventions.GetPrimaryKeyName("Foo"));
+			DefaultMigrationConventions.GetPrimaryKeyName("Foo").ShouldBe("PK_Foo");
 		}
 
-		[Fact]
+		[Test]
 		public void GetForeignKeyNameReturnsValidForeignKeyNameForSimpleForeignKey()
 		{
 			var foreignKey = new ForeignKeyDefinition
@@ -23,10 +23,10 @@ namespace FluentMigrator.Tests.Unit
 				PrimaryTable = "Groups", PrimaryColumns = new[] { "Id" }
 			};
 
-			Assert.Equal("FK_Users_GroupId_Groups_Id", DefaultMigrationConventions.GetForeignKeyName(foreignKey));
+			DefaultMigrationConventions.GetForeignKeyName(foreignKey).ShouldBe("FK_Users_GroupId_Groups_Id");
 		}
 
-		[Fact]
+		[Test]
 		public void GetForeignKeyNameReturnsValidForeignKeyNameForComplexForeignKey()
 		{
 			var foreignKey = new ForeignKeyDefinition
@@ -35,10 +35,10 @@ namespace FluentMigrator.Tests.Unit
 				PrimaryTable = "Groups", PrimaryColumns = new[] { "ColumnC", "ColumnD" }
 			};
 
-			Assert.Equal("FK_Users_ColumnA_ColumnB_Groups_ColumnC_ColumnD", DefaultMigrationConventions.GetForeignKeyName(foreignKey));
+			DefaultMigrationConventions.GetForeignKeyName(foreignKey).ShouldBe("FK_Users_ColumnA_ColumnB_Groups_ColumnC_ColumnD");
 		}
 
-		[Fact]
+		[Test]
 		public void GetIndexNameReturnsValidIndexNameForSimpleIndex()
 		{
 			var index = new IndexDefinition
@@ -50,10 +50,10 @@ namespace FluentMigrator.Tests.Unit
 				}
 			};
 
-			Assert.Equal("IX_Bacon_BaconName", DefaultMigrationConventions.GetIndexName(index));
+			DefaultMigrationConventions.GetIndexName(index).ShouldBe("IX_Bacon_BaconName");
 		}
 
-		[Fact]
+		[Test]
 		public void GetIndexNameReturnsValidIndexNameForComplexIndex()
 		{
 			var index = new IndexDefinition
@@ -66,50 +66,53 @@ namespace FluentMigrator.Tests.Unit
 				}
 			};
 
-			Assert.Equal("IX_Bacon_BaconName_BaconSpice", DefaultMigrationConventions.GetIndexName(index));
+			DefaultMigrationConventions.GetIndexName(index).ShouldBe("IX_Bacon_BaconName_BaconSpice");
 		}
 
-		[Fact]
+		[Test]
 		public void TypeIsMigrationReturnsTrueIfTypeExtendsMigrationAndHasMigrationAttribute()
 		{
-			Assert.True(DefaultMigrationConventions.TypeIsMigration(typeof(DefaultConventionMigration)));
+			DefaultMigrationConventions.TypeIsMigration(typeof(DefaultConventionMigrationFake))
+				.ShouldBeTrue();
 		}
 
-		[Fact]
+		[Test]
 		public void TypeIsMigrationReturnsFalseIfTypeDoesNotExtendMigration()
 		{
-			Assert.False(DefaultMigrationConventions.TypeIsMigration(typeof(object)));
+			DefaultMigrationConventions.TypeIsMigration(typeof(object))
+				.ShouldBeFalse();
 		}
 
-		[Fact]
+		[Test]
 		public void TypeIsMigrationReturnsFalseIfTypeDoesNotHaveMigrationAttribute()
 		{
-			Assert.False(DefaultMigrationConventions.TypeIsMigration(typeof(MigrationWithoutAttribute)));
+			DefaultMigrationConventions.TypeIsMigration(typeof(MigrationWithoutAttributeFake))
+				.ShouldBeFalse();
 		}
 
-		[Fact]
+		[Test]
 		public void MigrationMetadataTypePropertyMatchesDecoratedType()
 		{
-			var metadata = DefaultMigrationConventions.GetMetadataForMigration(typeof(DefaultConventionMigration));
-			Assert.Equal(typeof(DefaultConventionMigration), metadata.Type);
+			var metadata = DefaultMigrationConventions.GetMetadataForMigration(typeof(DefaultConventionMigrationFake));
+			metadata.Type.ShouldBeOfType<DefaultConventionMigrationFake>();
 		}
 
-		[Fact]
+		[Test]
 		public void MigrationMetadataCollectsVersionFromMigrationAttribute()
 		{
-			var metadata = DefaultMigrationConventions.GetMetadataForMigration(typeof(DefaultConventionMigration));
-			Assert.Equal(123, metadata.Version);
+			var metadata = DefaultMigrationConventions.GetMetadataForMigration(typeof(DefaultConventionMigrationFake));
+			metadata.Version.ShouldBe(123);
 		}
 	}
 
 	[Migration(123)]
-	internal class DefaultConventionMigration : Migration
+	internal class DefaultConventionMigrationFake : Migration
 	{
 		public override void Up() { }
 		public override void Down() { }
 	}
 
-	internal class MigrationWithoutAttribute : Migration
+	internal class MigrationWithoutAttributeFake : Migration
 	{
 		public override void Up() { }
 		public override void Down() { }

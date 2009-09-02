@@ -2,41 +2,42 @@ using System;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Tests.Helpers;
-using Xunit;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Definitions
 {
 	public class IndexColumnDefinitionTests
 	{
-		[Fact]
+		[Test]
 		public void DirectionIsAscendingIfNotSpecified()
 		{
 			var column = new IndexColumnDefinition();
-			Assert.Equal(Direction.Ascending, column.Direction);
+			column.Direction.ShouldBe(Direction.Ascending);
 		}
 
-		[Fact]
+		[Test]
 		public void ErrorIsReturnedWhenColumnNameIsNull()
 		{
 			var column = new IndexColumnDefinition { Name = null };
 			var errors = ValidationHelper.CollectErrors(column);
-			Assert.Contains(ErrorMessages.ColumnNameCannotBeNullOrEmpty, errors);
+			errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
 		}
 
-		[Fact]
+		[Test]
 		public void ErrorIsReturnedWhenColumnNameIsEmptyString()
 		{
 			var column = new IndexColumnDefinition { Name = String.Empty };
 			var errors = ValidationHelper.CollectErrors(column);
-			Assert.Contains(ErrorMessages.ColumnNameCannotBeNullOrEmpty, errors);
+			errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
 		}
 
-		[Fact]
+		[Test]
 		public void ErrorIsNotReturnedWhenColumnNameIsNotNullOrEmptyString()
 		{
 			var column = new IndexColumnDefinition { Name = "Bacon" };
 			var errors = ValidationHelper.CollectErrors(column);
-			Assert.DoesNotContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty, errors);
+			errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
 		}
 	}
 }

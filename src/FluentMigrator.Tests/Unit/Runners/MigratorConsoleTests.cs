@@ -1,40 +1,43 @@
 ﻿using System;
-using FluentMigrator;
 using FluentMigrator.Runner.Processors.Sqlite;
-using Xunit;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Runners
 {
+	[TestFixture]
 	public class MigratorConsoleTests
 	{
 		string database = "Sqlite";
 		string connection = "Data Source=:memory:;Version=3;New=True;";
-		string log = "1";
-        string target = "FluentMigrator.Tests.dll";
+		string target = "FluentMigrator.Tests.dll";
 
-		[Fact]
+		[Test]
+		[ExpectedException(typeof(ArgumentException))]
 		public void MustInitializeConsoleWithDatabaseArgument()
 		{
 			string[] args = { "/connection", connection, "/log" };
-			Assert.Throws<ArgumentException>(() => new MigratorConsole(args));
+			new MigratorConsole(args);
 		}
 
-		[Fact]
+		[Test]
+		[ExpectedException(typeof(ArgumentException))]
 		public void MustInitializeConsoleWithConnectionArgument()
 		{
 			string[] args = { "/db", database, "/log" };
-			Assert.Throws<ArgumentException>(() => new MigratorConsole(args));
+			new MigratorConsole(args);
 		}
 
-		[Fact]
+		[Test]
 		public void CanInitMigratorConsoleWithValidArguments()
 		{
 			string[] args = { "/db", database, "/connection", connection, "/log", "/target", target };
 
 			MigratorConsole console = new MigratorConsole(args);
-			Assert.Equal(typeof(SqliteProcessor), console.Processor.GetType());
-			Assert.Equal(connection, console.Connection);
-			Assert.True(console.Log);
+
+			console.Processor.ShouldBeOfType<SqliteProcessor>();
+			console.Connection.ShouldBe(connection);
+			console.Log.ShouldBeTrue();
 		}
 	}
 }

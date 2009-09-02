@@ -2,15 +2,17 @@
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors.SqlServer;
-using Xunit;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Integration
 {
+	[TestFixture]
 	public class MigrationVersionRunnerTests
 	{
 		private string connectionString = @"server=(local)\SQLEXPRESS;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator";
 
-		[Fact]
+		[Test]
 		public void CanLoadMigrations()
 		{
 			var conventions = new MigrationConventions();
@@ -20,23 +22,10 @@ namespace FluentMigrator.Tests.Integration
 
 			var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
 
-			Assert.NotNull(runner.Migrations);
+			runner.Migrations.ShouldNotBeNull();
 		}
 
-		//[Fact]
-		//public void CanLoadMigrationsByCallingAssembly()
-		//{
-		//    var conventions = new MigrationConventions();
-		//    var connection = new SqlConnection(connectionString);
-		//    connection.Open();
-		//    var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
-
-		//    var runner = new MigrationVersionRunner(conventions, processor);
-
-		//    Assert.NotNull(runner.Migrations);
-		//}
-
-		[Fact]
+		[Test]
 		public void CanLoadVersion()
 		{
 			var conventions = new MigrationConventions();
@@ -46,10 +35,10 @@ namespace FluentMigrator.Tests.Integration
 
 			var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
 
-			Assert.NotNull(runner.Version);
+			runner.Version.ShouldNotBeNull();
 		}
 
-		[Fact]
+		[Test]
 		public void CanRunMigration()
 		{
 			var conventions = new MigrationConventions();
@@ -60,17 +49,15 @@ namespace FluentMigrator.Tests.Integration
 			var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
 
 			runner.UpgradeToVersion(2, false);
-
-			Assert.Equal<long>((long)2, runner.Version.CurrentVersion);
+			runner.Version.CurrentVersion.ShouldBe((long)2);
 
 			//now step down to 0
 			long last = 0;
 			runner.StepDown(runner.CurrentVersion, 0, out last);
-
-			Assert.Equal<long>((long)0, runner.CurrentVersion);
+			runner.CurrentVersion.ShouldBe((long) 0);
 		}
 
-		[Fact]
+		[Test]
 		public void CanUpdgradeToLatest()
 		{
 			var conventions = new MigrationConventions();
@@ -82,13 +69,10 @@ namespace FluentMigrator.Tests.Integration
 
 			runner.UpgradeToLatest(false);
 
-			Assert.True(true); //made it this far..
-
 			//now step down to 0
-			long last = 0;
+			long last;
 			runner.StepDown(runner.CurrentVersion, 0, out last);
-
-			Assert.Equal<long>((long)0, runner.CurrentVersion);
+			runner.CurrentVersion.ShouldBe((long)0);
 		}
 	}
 }

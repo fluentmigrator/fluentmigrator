@@ -23,27 +23,27 @@
       <Item value="return" priority="3" />
       <Item value="AssemblyKeyFileAttribute" priority="0" />
       <Item value="var" priority="0" />
-      <Item value="typeof" priority="2" />
+      <Item value="typeof" priority="6" />
       <Item value="Assembly" priority="0" />
       <Item value="FindAllProcessors" priority="0" />
       <Item value="assembly" priority="3" />
       <Item value="static" priority="1" />
-      <Item value="bool" priority="0" />
+      <Item value="bool" priority="1" />
       <Item value="Type" priority="3" />
       <Item value="type" priority="0" />
-      <Item value="IMigrationProcessor" priority="1" />
+      <Item value="IMigrationProcessor" priority="2" />
       <Item value="if" priority="1" />
       <Item value="processorType" priority="3" />
       <Item value="processorName" priority="3" />
-      <Item value="as" priority="1" />
+      <Item value="as" priority="2" />
       <Item value="IMigrationProcessorFactory" priority="3" />
       <Item value="FindAllProcessorsIn" priority="0" />
       <Item value="p" priority="0" />
-      <Item value="ArgumentException" priority="0" />
+      <Item value="ArgumentException" priority="2" />
       <Item value="string" priority="3" />
       <Item value="FindMatchingProcessor" priority="0" />
       <Item value="Fact" priority="0" />
-      <Item value="public" priority="1" />
+      <Item value="public" priority="2" />
       <Item value="void" priority="0" />
       <Item value="class" priority="0" />
       <Item value="Test" priority="1" />
@@ -51,6 +51,26 @@
       <Item value="fullProcessorName" priority="0" />
       <Item value="ProcessorBase" priority="0" />
       <Item value="Activator" priority="0" />
+      <Item value="TestFixture" priority="0" />
+      <Item value="command" priority="0" />
+      <Item value="Processor" priority="0" />
+      <Item value="table" priority="0" />
+      <Item value="runner" priority="5" />
+      <Item value="MigrationRunner" priority="0" />
+      <Item value="IMigrationConventions" priority="0" />
+      <Item value="long" priority="1" />
+      <Item value="metadata" priority="0" />
+      <Item value="errors" priority="28" />
+      <Item value="ErrorMessages" priority="1" />
+      <Item value="ExpectedException" priority="3" />
+      <Item value="NotSupportedException" priority="1" />
+      <Item value="reverse" priority="9" />
+      <Item value="RenameTableExpression" priority="1" />
+      <Item value="count" priority="0" />
+      <Item value="RenameColumnExpression" priority="0" />
+      <Item value="DeleteColumnExpression" priority="0" />
+      <Item value="console" priority="2" />
+      <Item value="SqliteProcessor" priority="0" />
     </ItemStatistics>
     <ItemStatistics item="Qualified:System.Reflection.Assembly">
       <Item value="GetExportedTypes" priority="1" />
@@ -72,74 +92,144 @@
     <ItemStatistics item="Qualified:@System.Activator">
       <Item value="CreateInstance" priority="0" />
     </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Data.SQLite.SQLiteCommand">
+      <Item value="ExecuteReader" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Data.SQLite.SQLiteDataReader">
+      <Item value="Read" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:FluentMigrator.Runner.Processors.SqlServer.SqlServerProcessor">
+      <Item value="TableExists" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Boolean">
+      <Item value="ShouldBeTrue" priority="1" />
+      <Item value="ShouldBeFalse" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:FluentMigrator.Runner.MigrationRunner">
+      <Item value="CaughtExceptions" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Collections.Generic.IList`1">
+      <Item value="Count" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:FluentMigrator.Runner.MigrationVersionRunner">
+      <Item value="MigrationAssembly" priority="0" />
+      <Item value="Version" priority="1" />
+      <Item value="CurrentVersion" priority="1" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:FluentMigrator.Runner.Versioning.VersionInfo">
+      <Item value="CurrentVersion" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:FluentMigrator.Infrastructure.MigrationMetadata">
+      <Item value="Trait" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Object">
+      <Item value="ShouldBe" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.String">
+      <Item value="ShouldBe" priority="10" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:@FluentMigrator.Infrastructure.ErrorMessages">
+      <Item value="ColumnNameCannotBeNullOrEmpty" priority="1" />
+      <Item value="TableNameCannotBeNullOrEmpty" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:System.Collections.Generic.ICollection`1">
+      <Item value="Contains" priority="1" />
+      <Item value="ShouldContain" priority="11" />
+      <Item value="ShouldNotContain" priority="4" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:FluentMigrator.Expressions.DeleteColumnExpression">
+      <Item value="Reverse" priority="0" />
+      <Item value="TableName" priority="0" />
+      <Item value="ColumnName" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:FluentMigrator.Expressions.IMigrationExpression">
+      <Item value="ShouldBeOfType" priority="2" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:FluentMigrator.Expressions.RenameTableExpression">
+      <Item value="OldName" priority="0" />
+      <Item value="NewName" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:FluentMigrator.Expressions.RenameColumnExpression">
+      <Item value="TableName" priority="0" />
+      <Item value="OldName" priority="0" />
+      <Item value="NewName" priority="0" />
+    </ItemStatistics>
+    <ItemStatistics item="Qualified:FluentMigrator.Tests.Unit.Runners.MigratorConsole">
+      <Item value="Processor" priority="0" />
+      <Item value="Connection" priority="0" />
+      <Item value="Log" priority="0" />
+    </ItemStatistics>
   </CompletionStatisticsManager>
   <RecentFiles>
     <RecentFiles>
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:Generators/f:SqliteGenerator.cs" caret="0" fromTop="0" />
-      <File id="664C7334-B44B-4D62-A0F8-063805D630AA/f:Program.cs" caret="0" fromTop="0" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:ProcessorFactory/f:IMigrationProcessorFactory.cs" caret="158" fromTop="6" />
-      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Integration/f:MigrationVersionRunnerTests.cs" caret="152" fromTop="4" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:ProcessorFactory/f:SqlServerProcessorFactory.cs" caret="350" fromTop="10" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:Processors/f:SqliteProcessor.cs" caret="193" fromTop="7" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:ProcessorFactory/f:SqliteProcessorFactory.cs" caret="400" fromTop="13" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:ProcessorFactory/f:ProcessorFactory.cs" caret="562" fromTop="16" />
-      <File id="FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8/f:MigrationAttribute.cs" caret="145" fromTop="5" />
-      <File id="FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8/d:Infrastructure/f:MigrationContext.cs" caret="342" fromTop="11" />
-      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Runners/f:ProcessorFactoryTests.cs" caret="490" fromTop="14" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/f:MigrationLoader.cs" caret="421" fromTop="16" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:Versioning/f:VersionMigration.cs" caret="0" fromTop="0" />
-      <File id="FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8/f:MigrationConventions.cs" caret="177" fromTop="8" />
-      <File id="FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8/d:Builders/d:Create/f:ICreateExpressionRoot.cs" caret="304" fromTop="9" />
-      <File id="FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8/d:Infrastructure/f:IMigrationContext.cs" caret="242" fromTop="9" />
-      <File id="FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8/f:IMigration.cs" caret="125" fromTop="7" />
-      <File id="FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8/d:Builders/d:Create/f:CreateExpressionRoot.cs" caret="444" fromTop="11" />
-      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Integration/f:MigrationRunnerTests.cs" caret="3040" fromTop="13" />
-      <File id="FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8/f:Migration.cs" caret="572" fromTop="9" />
-      <File id="FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8/d:Expressions/f:IMigrationExpression.cs" caret="173" fromTop="7" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:Generators/f:SqlServerGenerator.cs" caret="2209" fromTop="8" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:Processors/f:SqlServerProcessor.cs" caret="2245" fromTop="13" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:Processors/f:ProcessorBase.cs" caret="1324" fromTop="5" />
-      <File id="FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8/f:IMigrationProcessor.cs" caret="587" fromTop="15" />
-      <File id="FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8/d:Expressions/f:CreateTableExpression.cs" caret="709" fromTop="10" />
-      <File id="FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8/d:Expressions/f:MigrationExpressionBase.cs" caret="116" fromTop="5" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/f:MigrationVersionRunner.cs" caret="2375" fromTop="11" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/f:MigrationRunner.cs" caret="202" fromTop="0" />
-      <File id="664C7334-B44B-4D62-A0F8-063805D630AA/f:MigratorConsole.cs" caret="0" fromTop="0" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Integration/f:VersionMigrationTests.cs" caret="759" fromTop="21" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/f:MigrationMetadataTests.cs" caret="692" fromTop="15" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Builders/d:Delete/f:DeleteForeignKeyExpressionBuilderTests.cs" caret="198" fromTop="6" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Generators/f:SqliteGeneratorTests.cs" caret="184" fromTop="6" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Builders/d:Rename/f:RenameColumnExpressionBuilderTests.cs" caret="0" fromTop="0" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Builders/d:Create/f:CreateForeignKeyExpressionBuilderTests.cs" caret="200" fromTop="7" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Generators/f:SqlServerGeneratorTests.cs" caret="450" fromTop="18" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Builders/d:Insert/f:InsertExpressionRootTests.cs" caret="844" fromTop="27" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Builders/d:Create/f:CreateIndexExpressionBuilderTests.cs" caret="0" fromTop="0" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Builders/d:Delete/f:DeleteColumnExpressionBuilderTests.cs" caret="0" fromTop="0" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Builders/d:Delete/f:DeleteIndexExpressionBuilderTests.cs" caret="0" fromTop="0" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Builders/d:Create/f:CreateColumnExpressionBuilderTests.cs" caret="35" fromTop="2" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Builders/d:Rename/f:RenameExpressionRootTests.cs" caret="0" fromTop="0" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Builders/d:Delete/f:DeleteExpressionRootTests.cs" caret="898" fromTop="24" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Builders/d:Create/f:CreateTableExpressionBuilderTests.cs" caret="247" fromTop="9" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Builders/d:Rename/f:RenameTableExpressionBuilderTests.cs" caret="131" fromTop="5" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Builders/d:Create/f:CreateExpressionRootTests.cs" caret="384" fromTop="11" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Definitions/f:IndexColumnDefinitionTests.cs" caret="710" fromTop="19" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Definitions/f:ForeignKeyDefinitionTests.cs" caret="514" fromTop="16" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Expressions/f:DeleteTableExpressionTests.cs" caret="1280" fromTop="25" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Expressions/f:DeleteColumnExpressionTests.cs" caret="834" fromTop="20" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Expressions/f:RenameTableExpressionTests.cs" caret="2573" fromTop="31" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/f:MigrationLoaderTests.cs" caret="791" fromTop="15" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Expressions/f:RenameColumnExpressionTests.cs" caret="2565" fromTop="26" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Expressions/f:CreateColumnExpressionTests.cs" caret="1742" fromTop="28" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Definitions/f:ColumnDefinitionTests.cs" caret="1599" fromTop="28" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Runners/f:MigratorConsoleTests.cs" caret="788" fromTop="28" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Builders/d:Insert/f:InsertDataExpressionBuilderTests.cs" caret="546" fromTop="19" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/f:MigrationVersionRunnerUnitTests.cs" caret="661" fromTop="18" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/f:DefaultMigrationConventionsTests.cs" caret="0" fromTop="0" />
     </RecentFiles>
     <RecentEdits>
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:ProcessorFactory/f:SqliteProcessorFactory.cs" caret="204" fromTop="6" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:ProcessorFactory/f:IMigrationProcessorFactory.cs" caret="0" fromTop="0" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:ProcessorFactory/f:SqliteProcessorFactory.cs" caret="66" fromTop="1" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:Processors/f:SqliteProcessor.cs" caret="205" fromTop="7" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:Processors/f:SqlServerProcessor.cs" caret="214" fromTop="7" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:ProcessorFactory/f:SqlServerProcessorFactory.cs" caret="69" fromTop="1" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:ProcessorFactory/f:ProcessorFactory.cs" caret="754" fromTop="22" />
-      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Integration/f:MigrationVersionRunnerTests.cs" caret="3066" fromTop="27" />
-      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Integration/f:MigrationVersionRunnerTests.cs" caret="0" fromTop="0" />
-      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Integration/f:MigrationVersionRunnerTests.cs" caret="152" fromTop="4" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:ProcessorFactory/f:ProcessorFactory.cs" caret="15" fromTop="1" />
-      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Runners/f:ProcessorFactoryTests.cs" caret="738" fromTop="21" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:ProcessorFactory/f:SqlServerProcessorFactory.cs" caret="380" fromTop="11" />
-      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Runners/f:ProcessorFactoryTests.cs" caret="277" fromTop="13" />
-      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Runners/f:ProcessorFactoryTests.cs" caret="738" fromTop="20" />
-      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Runners/f:ProcessorFactoryTests.cs" caret="1" fromTop="0" />
-      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Runners/f:ProcessorFactoryTests.cs" caret="162" fromTop="3" />
-      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Runners/f:ProcessorFactoryTests.cs" caret="428" fromTop="13" />
-      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Runners/f:ProcessorFactoryTests.cs" caret="668" fromTop="20" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:ProcessorFactory/f:ProcessorFactory.cs" caret="309" fromTop="12" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:ProcessorFactory/f:ProcessorFactory.cs" caret="673" fromTop="20" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:ProcessorFactory/f:ProcessorFactory.cs" caret="457" fromTop="13" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:ProcessorFactory/f:ProcessorFactory.cs" caret="854" fromTop="23" />
-      <File id="FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8/f:Migration.cs" caret="503" fromTop="11" />
-      <File id="FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8/f:Migration.cs" caret="826" fromTop="16" />
-      <File id="FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8/d:Builders/d:Create/f:CreateExpressionRoot.cs" caret="695" fromTop="19" />
-      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Integration/f:MigrationRunnerTests.cs" caret="3057" fromTop="13" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/f:MigrationRunner.cs" caret="1300" fromTop="12" />
-      <File id="CB468AD6-60C2-42E9-B3B0-01968EF94C65/d:Processors/f:ProcessorBase.cs" caret="2128" fromTop="27" />
-      <File id="664C7334-B44B-4D62-A0F8-063805D630AA/f:MigratorConsole.cs" caret="1864" fromTop="16" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Expressions/f:RenameTableExpressionTests.cs" caret="1679" fromTop="27" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Expressions/f:RenameTableExpressionTests.cs" caret="1977" fromTop="29" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Expressions/f:RenameTableExpressionTests.cs" caret="2238" fromTop="22" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Expressions/f:RenameTableExpressionTests.cs" caret="2573" fromTop="31" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/f:MigrationLoaderTests.cs" caret="791" fromTop="21" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Expressions/f:RenameColumnExpressionTests.cs" caret="537" fromTop="16" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Expressions/f:RenameColumnExpressionTests.cs" caret="827" fromTop="24" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Expressions/f:RenameColumnExpressionTests.cs" caret="1122" fromTop="31" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Expressions/f:RenameColumnExpressionTests.cs" caret="1397" fromTop="24" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Expressions/f:RenameColumnExpressionTests.cs" caret="1687" fromTop="32" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Expressions/f:RenameColumnExpressionTests.cs" caret="1987" fromTop="19" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Expressions/f:RenameColumnExpressionTests.cs" caret="2278" fromTop="27" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Expressions/f:RenameColumnExpressionTests.cs" caret="2565" fromTop="26" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Expressions/f:CreateColumnExpressionTests.cs" caret="535" fromTop="16" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Expressions/f:CreateColumnExpressionTests.cs" caret="823" fromTop="24" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Expressions/f:CreateColumnExpressionTests.cs" caret="1119" fromTop="32" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Expressions/f:CreateColumnExpressionTests.cs" caret="1393" fromTop="25" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Expressions/f:CreateColumnExpressionTests.cs" caret="1742" fromTop="28" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Definitions/f:ColumnDefinitionTests.cs" caret="530" fromTop="18" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Definitions/f:ColumnDefinitionTests.cs" caret="801" fromTop="19" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Definitions/f:ColumnDefinitionTests.cs" caret="1084" fromTop="27" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Definitions/f:ColumnDefinitionTests.cs" caret="1333" fromTop="20" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Definitions/f:ColumnDefinitionTests.cs" caret="1599" fromTop="28" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Runners/f:MigratorConsoleTests.cs" caret="637" fromTop="16" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Runners/f:MigratorConsoleTests.cs" caret="369" fromTop="9" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Runners/f:MigratorConsoleTests.cs" caret="416" fromTop="8" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Runners/f:MigratorConsoleTests.cs" caret="573" fromTop="12" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Runners/f:MigratorConsoleTests.cs" caret="1156" fromTop="32" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Runners/f:MigratorConsoleTests.cs" caret="786" fromTop="20" />
+      <File id="5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C/d:Unit/d:Builders/d:Insert/f:InsertDataExpressionBuilderTests.cs" caret="546" fromTop="19" />
     </RecentEdits>
   </RecentFiles>
   <UnitTestRunner>
     <Providers />
   </UnitTestRunner>
+  <UnitTestRunnerMSTest>
+    <UseTestRunConfigFromMetadataFile>False</UseTestRunConfigFromMetadataFile>
+  </UnitTestRunnerMSTest>
 </Configuration>

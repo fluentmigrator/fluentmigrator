@@ -1,14 +1,13 @@
-﻿using System;
-using FluentMigrator.Builders.Rename.Column;
+﻿using FluentMigrator.Builders.Rename.Column;
 using FluentMigrator.Expressions;
 using Moq;
-using Xunit;
+using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Builders.Rename
 {
 	public class RenameColumnExpressionBuilderTests
 	{
-		[Fact]
+		[Test]
 		public void CallingToSetsNewName()
 		{
 			var expressionMock = new Mock<RenameColumnExpression>();

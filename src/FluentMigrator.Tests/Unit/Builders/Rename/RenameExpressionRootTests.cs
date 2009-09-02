@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FluentMigrator.Builders.Rename;
 using FluentMigrator.Builders.Rename.Column;
 using FluentMigrator.Builders.Rename.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using Moq;
-using Xunit;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Builders.Rename
 {
 	public class RenameExpressionRootTests
 	{
-		[Fact]
+		[Test]
 		public void CallingTableAddsRenameTableExpressionToContextWithSpecifiedOldName()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -28,7 +28,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Rename
 			contextMock.VerifyAll();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingTableReturnsRenameTableExpressionBuilder()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -38,11 +38,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Rename
 			var root = new RenameExpressionRoot(contextMock.Object);
 			var builder = root.Table("Bacon");
 
-			Assert.IsType<RenameTableExpressionBuilder>(builder);
+			builder.ShouldBeOfType<RenameTableExpressionBuilder>();
 			contextMock.VerifyAll();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingColumnAddsRenameColumnExpressionToContextWithSpecifiedOldName()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -58,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Rename
 			contextMock.VerifyAll();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingColumnReturnsRenameColumnExpressionBuilder()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -68,7 +68,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Rename
 			var root = new RenameExpressionRoot(contextMock.Object);
 			var builder = root.Column("Bacon");
 
-			Assert.IsType<RenameColumnExpressionBuilder>(builder);
+			builder.ShouldBeOfType<RenameColumnExpressionBuilder>();
 			contextMock.VerifyAll();
 		}
 	}

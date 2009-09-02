@@ -3,7 +3,8 @@ using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators;
-using Xunit;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {
@@ -26,71 +27,71 @@ namespace FluentMigrator.Tests.Unit.Generators
 			generator = new SqliteGenerator();
 		}
 
-		[Fact]
+		[Test]
 		public void CanCreateTable()
 		{
 			CreateTableExpression expression = GetCreateTableExpression();
 			string sql = generator.Generate(expression);
-			Assert.Equal(string.Format("CREATE TABLE {0} (NewColumn NVARCHAR(255) NOT NULL)", table), sql);
+			sql.ShouldBe(string.Format("CREATE TABLE {0} (NewColumn NVARCHAR(255) NOT NULL)", table));
 		}
 
-		[Fact]
+		[Test]
 		public void CanRenameTable()
 		{
 			RenameTableExpression expression = new RenameTableExpression { OldName = oldTable, NewName = newTable };
 			string sql = generator.Generate(expression);
-			Assert.Equal(string.Format("ALTER TABLE {0} RENAME TO {1}", oldTable, newTable), sql);
+			sql.ShouldBe(string.Format("ALTER TABLE {0} RENAME TO {1}", oldTable, newTable));
 		}
 
-		[Fact]
+		[Test]
 		public void CanDeleteTable()
 		{
 			DeleteTableExpression expression = new DeleteTableExpression { TableName = table };
 			string sql = generator.Generate(expression);
-			Assert.Equal(string.Format("DROP TABLE {0}", table), sql);
+			sql.ShouldBe(string.Format("DROP TABLE {0}", table));
 		}
 
-		[Fact]
+		[Test]
 		public void CanCreateColumn()
 		{
 			CreateColumnExpression expression = GetCreateColumnExpression();
 			string sql = generator.Generate(expression);
-            Assert.Equal(string.Format("ALTER TABLE [{0}] ADD COLUMN {1} NVARCHAR(255) NOT NULL", table, newColumn), sql);
+			sql.ShouldBe(string.Format("ALTER TABLE [{0}] ADD COLUMN {1} NVARCHAR(255) NOT NULL", table, newColumn));
 		}
 
-        [Fact]
-        public void CanCreateAutoIncrementColumn()
-        {
-            CreateColumnExpression expression = GetCreateAutoIncrementColumnExpression();
-            string sql = generator.Generate(expression);
-            Assert.Equal(string.Format("ALTER TABLE [{0}] ADD COLUMN {1} NVARCHAR(255) NOT NULL PRIMARY KEY AUTOINCREMENT", table, newColumn), sql);
-        }
+		[Test]
+		public void CanCreateAutoIncrementColumn()
+		{
+			CreateColumnExpression expression = GetCreateAutoIncrementColumnExpression();
+			string sql = generator.Generate(expression);
+			sql.ShouldBe(string.Format("ALTER TABLE [{0}] ADD COLUMN {1} NVARCHAR(255) NOT NULL PRIMARY KEY AUTOINCREMENT", table, newColumn));
+		}
 
-        //[Fact]
-        //public void CanRenameColumn()
-        //{
-        //    RenameColumnExpression expression = GetRenameColumnExpression();
-        //    string sql = generator.Generate(expression);
-        //    Assert.Equal(string.Format("UPDATE {0} SET {1}={2}", table, oldColumn, newColumn), sql);
-        //}
+		//[Test]
+		//public void CanRenameColumn()
+		//{
+		//    RenameColumnExpression expression = GetRenameColumnExpression();
+		//    string sql = generator.Generate(expression);
+		//    sql.ShouldBe(string.Format("UPDATE {0} SET {1}={2}", table, oldColumn, newColumn));
+		//}
 
-		[Fact]
+		[Test]
 		public void CanDeleteColumn()
 		{
 			DeleteColumnExpression expression = new DeleteColumnExpression { TableName = table, ColumnName = column };
 			string sql = generator.Generate(expression);
-			Assert.Equal(string.Format("ALTER TABLE {0} DROP COLUMN {1}", table, column), sql);
+			sql.ShouldBe(string.Format("ALTER TABLE {0} DROP COLUMN {1}", table, column));
 		}
 
 		// CreateForeignKey -- Not supported in Sqlite
 		// DeleteForeignKey -- Not supported in Sqlite
 
-		[Fact]
+		[Test]
 		public void CanCreateBasicIndex()
 		{
 			CreateIndexExpression expression = GetCreateIndexExpression();
 			string sql = generator.Generate(expression);
-			Assert.Equal(string.Format("CREATE INDEX IF NOT EXISTS {0} ON {1} ({2})", indexName, table, indexColumn), sql);
+			sql.ShouldBe(string.Format("CREATE INDEX IF NOT EXISTS {0} ON {1} ({2})", indexName, table, indexColumn));
 		}
 
 		// DeleteIndex
@@ -113,11 +114,11 @@ namespace FluentMigrator.Tests.Unit.Generators
 			return new CreateColumnExpression { TableName = table, Column = column };
 		}
 
-        private CreateColumnExpression GetCreateAutoIncrementColumnExpression()
-        {
-            ColumnDefinition column = new ColumnDefinition { Name = newColumn, IsIdentity = true, IsPrimaryKey = true, Type = DbType.String };
-            return new CreateColumnExpression { TableName = table, Column = column };
-        }
+		private CreateColumnExpression GetCreateAutoIncrementColumnExpression()
+		{
+			ColumnDefinition column = new ColumnDefinition { Name = newColumn, IsIdentity = true, IsPrimaryKey = true, Type = DbType.String };
+			return new CreateColumnExpression { TableName = table, Column = column };
+		}
 
 		private CreateTableExpression GetCreateTableExpression()
 		{

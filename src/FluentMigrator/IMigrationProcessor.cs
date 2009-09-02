@@ -13,6 +13,7 @@ namespace FluentMigrator
         DataSet Read(string template, params object[] args);
         bool TableExists(string tableName);
         bool Exists(string template, params object[] args);
+
 		void Process(CreateTableExpression expression);
 		void Process(CreateColumnExpression expression);
 		void Process(DeleteTableExpression expression);

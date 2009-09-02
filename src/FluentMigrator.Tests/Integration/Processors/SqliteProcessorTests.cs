@@ -5,10 +5,12 @@ using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors.Sqlite;
 using Moq;
-using Xunit;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Integration.Processors
 {
+	[TestFixture]
 	public class SqliteProcessorTests
 	{
 		private SQLiteConnection connection;
@@ -32,21 +34,22 @@ namespace FluentMigrator.Tests.Integration.Processors
 			tableName = "NewTable";
 			columnName = "ColumnName";
 			column.SetupGet(c => c.Name).Returns(columnName);
-		    column.SetupGet(c => c.IsNullable).Returns(true);
-		    column.SetupGet(c => c.Type).Returns(DbType.Int32);
+			column.SetupGet(c => c.IsNullable).Returns(true);
+			column.SetupGet(c => c.Type).Returns(DbType.Int32);
 		}
 
-		[Fact]
+		[Test]
 		public void CanCreateTableExpression()
 		{
 			CreateTableExpression expression = new CreateTableExpression { TableName = tableName };			
-            expression.Columns.Add(column.Object);
+			expression.Columns.Add(column.Object);
 
 			using (connection)
 			{
 				processor.Process(expression);
 				command.CommandText = string.Format("SELECT name FROM sqlite_master WHERE type='table' and name='{0}'", tableName);
-				Assert.True(command.ExecuteReader().Read());
+
+				command.ExecuteReader().Read().ShouldBeTrue();
 			}
 		}
 
@@ -58,7 +61,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 			cmd.ExecuteNonQuery();
 		}
 
-		/*[Fact]
+		/*[Test]
 		public void CanCreateColumnExpression()
 		{
 			InsertTable();

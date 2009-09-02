@@ -1,38 +1,46 @@
 ﻿using System;
 using FluentMigrator.Infrastructure;
-using Xunit;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit
 {
+	[TestFixture]
 	public class MigrationMetadataTests
 	{
-		private MigrationMetadata metadata = new MigrationMetadata();
+		private MigrationMetadata metadata;
 
-		[Fact]
+		[SetUp]
+		public void SetUp()
+		{
+			metadata = new MigrationMetadata();
+		}
+
+		[Test]
 		public void HasTraitReturnsTrueWhenTraitIsDefined()
 		{
 			metadata.AddTrait("foo", 42);
-			Assert.True(metadata.HasTrait("foo"));
+			metadata.HasTrait("foo").ShouldBeTrue();
 		}
 
-		[Fact]
+		[Test]
 		public void HasTraitReturnsFalseWhenTraitIsNotDefined()
 		{
-			Assert.False(metadata.HasTrait("foo"));
+			metadata.HasTrait("foo").ShouldBeFalse();
 		}
 
-		[Fact]
+		[Test]
 		public void TraitMethodReturnsTraitValue()
 		{
 			const string value = "bar";
 			metadata.AddTrait("foo", value);
-			Assert.Same(value, metadata.Trait("foo"));
+			value.ShouldBeSameAs(metadata.Trait("foo"));
 		}
 
-		[Fact]
+		[Test]
 		public void TraitMethodReturnsNullForNonExistentTrait()
 		{
-			Assert.Null(metadata.Trait("foo"));
+			metadata.Trait("foo").ShouldBeNull();
 		}
 	}
 }

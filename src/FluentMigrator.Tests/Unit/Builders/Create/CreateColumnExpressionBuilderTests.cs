@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Data;
-using System.Linq.Expressions;
 using FluentMigrator.Builders.Create.Column;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using Moq;
-using Moq.Stub;
-using Xunit;
+using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
 	public class CreateColumnExpressionBuilderTests
 	{
-		[Fact]
+		[Test]
 		public void CallingOnTableSetsTableName()
 		{
 			var expressionMock = new Mock<CreateColumnExpression>();
@@ -24,199 +22,199 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 			expressionMock.VerifyAll();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsAnsiStringSetsColumnDbTypeToAnsiString()
 		{
 			VerifyColumnDbType(DbType.AnsiString, b => b.AsAnsiString());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsAnsiStringWithSizeSetsColumnDbTypeToAnsiString()
 		{
 			VerifyColumnDbType(DbType.AnsiString, b => b.AsAnsiString(42));
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsAnsiStringWithSizeSetsColumnSizeToSpecifiedValue()
 		{
 			VerifyColumnSize(42, b => b.AsAnsiString(42));
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsBinarySetsColumnDbTypeToBinary()
 		{
 			VerifyColumnDbType(DbType.Binary, b => b.AsBinary());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsBinaryWithSizeSetsColumnDbTypeToBinary()
 		{
 			VerifyColumnDbType(DbType.Binary, b => b.AsBinary(42));
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsBinaryWithSizeSetsColumnSizeToSpecifiedValue()
 		{
 			VerifyColumnSize(42, b => b.AsBinary(42));
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsBooleanSetsColumnDbTypeToBoolean()
 		{
 			VerifyColumnDbType(DbType.Boolean, b => b.AsBoolean());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsByteSetsColumnDbTypeToByte()
 		{
 			VerifyColumnDbType(DbType.Byte, b => b.AsByte());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsCurrencySetsColumnDbTypeToCurrency()
 		{
 			VerifyColumnDbType(DbType.Currency, b => b.AsCurrency());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsDateSetsColumnDbTypeToDate()
 		{
 			VerifyColumnDbType(DbType.Date, b => b.AsDate());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsDateTimeSetsColumnDbTypeToDateTime()
 		{
 			VerifyColumnDbType(DbType.DateTime, b => b.AsDateTime());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsDecimalSetsColumnDbTypeToDecimal()
 		{
 			VerifyColumnDbType(DbType.Decimal, b => b.AsDecimal());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsDecimalWithSizeAndPrecisionSetsColumnDbTypeToDecimal()
 		{
 			VerifyColumnDbType(DbType.Decimal, b => b.AsDecimal(1, 2));
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsDecimalStringSetsColumnSizeToSpecifiedValue()
 		{
 			VerifyColumnSize(1, b => b.AsDecimal(1, 2));
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsDecimalStringSetsColumnPrecisionToSpecifiedValue()
 		{
 			VerifyColumnPrecision(2, b => b.AsDecimal(1, 2));
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsDoubleSetsColumnDbTypeToDouble()
 		{
 			VerifyColumnDbType(DbType.Double, b => b.AsDouble());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsGuidSetsColumnDbTypeToGuid()
 		{
 			VerifyColumnDbType(DbType.Guid, b => b.AsGuid());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsFixedLengthStringSetsColumnDbTypeToStringFixedLength()
 		{
 			VerifyColumnDbType(DbType.StringFixedLength, e => e.AsFixedLengthString(255));
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsFixedLengthStringSetsColumnSizeToSpecifiedValue()
 		{
 			VerifyColumnSize(255, b => b.AsFixedLengthString(255));
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsFixedLengthAnsiStringSetsColumnDbTypeToAnsiStringFixedLength()
 		{
 			VerifyColumnDbType(DbType.AnsiStringFixedLength, b => b.AsFixedLengthAnsiString(255));
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsFixedLengthAnsiStringSetsColumnSizeToSpecifiedValue()
 		{
 			VerifyColumnSize(255, b => b.AsFixedLengthAnsiString(255));
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsFloatSetsColumnDbTypeToSingle()
 		{
 			VerifyColumnDbType(DbType.Single, b => b.AsFloat());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsInt16SetsColumnDbTypeToInt16()
 		{
 			VerifyColumnDbType(DbType.Int16, b => b.AsInt16());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsInt32SetsColumnDbTypeToInt32()
 		{
 			VerifyColumnDbType(DbType.Int32, b => b.AsInt32());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsInt64SetsColumnDbTypeToInt64()
 		{
 			VerifyColumnDbType(DbType.Int64, b => b.AsInt64());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsStringSetsColumnDbTypeToString()
 		{
 			VerifyColumnDbType(DbType.String, b => b.AsString());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsStringWithLengthSetsColumnDbTypeToString()
 		{
 			VerifyColumnDbType(DbType.String, b => b.AsString(255));
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsStringSetsColumnSizeToSpecifiedValue()
 		{
 			VerifyColumnSize(255, b => b.AsFixedLengthAnsiString(255));
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsTimeSetsColumnDbTypeToTime()
 		{
 			VerifyColumnDbType(DbType.Time, b => b.AsTime());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsXmlSetsColumnDbTypeToXml()
 		{
 			VerifyColumnDbType(DbType.Xml, b => b.AsXml());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsXmlWithSizeSetsColumnDbTypeToXml()
 		{
 			VerifyColumnDbType(DbType.Xml, b => b.AsXml(255));
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAsXmlSetsColumnSizeToSpecifiedValue()
 		{
 			VerifyColumnSize(255, b => b.AsXml(255));
 		}
 
-		[Fact]
+		[Test]
 		public void CallingWithDefaultValueSetsDefaultValue()
 		{
 			const int value = 42;
@@ -236,43 +234,43 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 			columnMock.VerifyAll();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingForeignKeySetsIsForeignKeyToTrue()
 		{
 			VerifyColumnProperty(c => c.IsForeignKey = true, b => b.ForeignKey());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingIdentitySetsIsIdentityToTrue()
 		{
 			VerifyColumnProperty(c => c.IsIdentity = true, b => b.Identity());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingIndexedSetsIsIndexedToTrue()
 		{
 			VerifyColumnProperty(c => c.IsIndexed = true, b => b.Indexed());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingPrimaryKeySetsIsPrimaryKeyToTrue()
 		{
 			VerifyColumnProperty(c => c.IsPrimaryKey = true, b => b.PrimaryKey());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingNullableSetsIsNullableToTrue()
 		{
 			VerifyColumnProperty(c => c.IsNullable = true, b => b.Nullable());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingNotNullableSetsIsNullableToFalse()
 		{
 			VerifyColumnProperty(c => c.IsNullable = false, b => b.NotNullable());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingUniqueSetsIsUniqueToTrue()
 		{
 			VerifyColumnProperty(c => c.IsUnique = true, b => b.Unique());

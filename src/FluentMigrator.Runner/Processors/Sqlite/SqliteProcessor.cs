@@ -17,8 +17,6 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
 		public override bool TableExists(string tableName)
 		{
-			//select count(*) from sqlite_master where name='tableName'
-			//select * from sqlite_master where name={0}
 			return Exists("select * from sqlite_master where name={0}", tableName);
 		}
 
@@ -48,6 +46,14 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 			return Read("select * from {0}", tableName);
 		}
 
+		protected override void Process(string sql)
+		{
+			if (Connection.State != ConnectionState.Open) Connection.Open();
+
+			using (var command = new SQLiteCommand(sql, Connection))
+				command.ExecuteNonQuery();
+		}
+
 		public override DataSet Read(string template, params object[] args)
 		{
 			if (Connection.State != ConnectionState.Open) Connection.Open();
@@ -59,14 +65,6 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 				adapter.Fill(ds);
 				return ds;
 			}
-		}
-        
-		protected override void Process(string sql)
-		{
-			if (Connection.State != ConnectionState.Open) Connection.Open();
-
-			using (var command = new SQLiteCommand(sql, Connection))
-				command.ExecuteNonQuery();
 		}
 
 		public override void UpdateTable(string tableName, List<string> columns, List<string> formattedValues)

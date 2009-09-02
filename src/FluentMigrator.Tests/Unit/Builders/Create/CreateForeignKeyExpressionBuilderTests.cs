@@ -4,13 +4,13 @@ using FluentMigrator.Builders.Create.ForeignKey;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using Moq;
-using Xunit;
+using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
 	public class CreateForeignKeyExpressionBuilderTests
 	{
-		[Fact]
+		[Test]
 		public void CallingFromTableSetsForeignTableName()
 		{
 			var foreignKeyMock = new Mock<ForeignKeyDefinition>();
@@ -26,7 +26,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 			expressionMock.VerifyAll();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingToTableSetsPrimaryTableName()
 		{
 			var foreignKeyMock = new Mock<ForeignKeyDefinition>();
@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 			expressionMock.VerifyAll();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingForeignColumnAddsColumnNameToForeignColumnCollection()
 		{
 			var collectionMock = new Mock<IList<string>>();
@@ -62,7 +62,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 			expressionMock.VerifyAll();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingForeignColumnsAddsColumnNamesToForeignColumnCollection()
 		{
 			var collectionMock = new Mock<IList<string>>();
@@ -83,7 +83,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 			expressionMock.VerifyAll();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingPrimaryColumnAddsColumnNameToPrimaryColumnCollection()
 		{
 			var collectionMock = new Mock<IList<string>>();
@@ -103,7 +103,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 			expressionMock.VerifyAll();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingPrimaryColumnsAddsColumnNamesToForeignColumnCollection()
 		{
 			var collectionMock = new Mock<IList<string>>();

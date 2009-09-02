@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using Moq;
-using Xunit;
+using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
 	public class CreateIndexExpressionBuilderTests
 	{
-		[Fact]
+		[Test]
 		public void CallingOnTableSetsTableNameToSpecifiedValue()
 		{
 			var indexMock = new Mock<IndexDefinition>();
@@ -26,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 			expressionMock.VerifyAll();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingOnColumnAddsNewColumnToExpression()
 		{
 			var collectionMock = new Mock<IList<IndexColumnDefinition>>();
@@ -46,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 			expressionMock.VerifyAll();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingAscendingSetsDirectionToAscending()
 		{
 			var columnMock = new Mock<IndexColumnDefinition>();
@@ -61,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 			columnMock.VerifyAll();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingDescendingSetsDirectionToDescending()
 		{
 			var columnMock = new Mock<IndexColumnDefinition>();

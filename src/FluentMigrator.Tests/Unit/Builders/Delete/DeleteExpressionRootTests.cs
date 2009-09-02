@@ -1,18 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FluentMigrator.Builders.Delete;
 using FluentMigrator.Builders.Delete.Column;
 using FluentMigrator.Builders.Delete.ForeignKey;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using Moq;
-using Xunit;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
 	public class DeleteExpressionRootTests
 	{
-		[Fact]
+		[Test]
 		public void CallingTableAddsDeleteTableExpressionToContextWithSpecifiedName()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -28,7 +28,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 			contextMock.VerifyAll();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingColumnAddsDeleteColumnExpressionToContextWithSpecifiedName()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 			contextMock.VerifyAll();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingColumnReturnsDeleteColumnExpressionBuilder()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -54,11 +54,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 			var root = new DeleteExpressionRoot(contextMock.Object);
 			var builder = root.Column("Bacon");
 
-			Assert.IsType<DeleteColumnExpressionBuilder>(builder);
+			builder.ShouldBeOfType<DeleteColumnExpressionBuilder>();
 			contextMock.VerifyAll();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingForeignKeyAddsDeleteForeignKeyExpressionToContext()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -74,7 +74,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 			contextMock.VerifyAll();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingForeignKeyReturnsDeleteForeignKeyExpressionBuilder()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -84,11 +84,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 			var root = new DeleteExpressionRoot(contextMock.Object);
 			var builder = root.ForeignKey();
 
-			Assert.IsType<DeleteForeignKeyExpressionBuilder>(builder);
+			builder.ShouldBeOfType<DeleteForeignKeyExpressionBuilder>();
 			contextMock.VerifyAll();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingForeignKeyWithNameAddsDeleteForeignKeyExpressionToContextWithSpecifiedName()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();

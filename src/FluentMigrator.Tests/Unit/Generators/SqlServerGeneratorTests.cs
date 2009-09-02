@@ -4,7 +4,8 @@ using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators;
-using Xunit;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {
@@ -17,35 +18,35 @@ namespace FluentMigrator.Tests.Unit.Generators
 			generator = new SqlServerGenerator();
 		}
 
-		[Fact]
+		[Test]
 		public void CanCreateTable()
 		{
 			string tableName = "NewTable";
 			CreateTableExpression expression = GetCreateTableExpression(tableName);
 			string sql = generator.Generate(expression);
-			Assert.Equal("CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL, ColumnName2 INT NOT NULL)", sql);
+			sql.ShouldBe("CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL, ColumnName2 INT NOT NULL)");
 		}
 
-		[Fact]
+		[Test]
 		public void CanCreateTableWithPrimaryKey()
 		{
 			string tableName = "NewTable";
 			CreateTableExpression expression = GetCreateTableExpression(tableName);
 			expression.Columns[0].IsPrimaryKey = true;
 			string sql = generator.Generate(expression);
-            Assert.Equal("CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL PRIMARY KEY CLUSTERED, ColumnName2 INT NOT NULL)", sql);
+			sql.ShouldBe("CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL PRIMARY KEY CLUSTERED, ColumnName2 INT NOT NULL)");
 		}
 
-		[Fact]
+		[Test]
 		public void CanDropTable()
 		{
 			string tableName = "NewTable";
 			DeleteTableExpression expression = GetDeleteTableExpression(tableName);
 			string sql = generator.Generate(expression);
-			Assert.Equal("DROP TABLE [NewTable]", sql);
+			sql.ShouldBe("DROP TABLE [NewTable]");
 		}
 
-		[Fact]
+		[Test]
 		public void CanDropColumn()
 		{
 			string tableName = "NewTable";
@@ -56,10 +57,10 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.ColumnName = columnName;
 
 			string sql = generator.Generate(expression);
-			Assert.Equal("ALTER TABLE [NewTable] DROP COLUMN NewColumn", sql);
+			sql.ShouldBe("ALTER TABLE [NewTable] DROP COLUMN NewColumn");
 		}
 
-		[Fact]
+		[Test]
 		public void CanAddColumn()
 		{
 			string tableName = "NewTable";
@@ -74,10 +75,10 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.TableName = tableName;
 
 			string sql = generator.Generate(expression);
-			Assert.Equal("ALTER TABLE [NewTable] ADD NewColumn NVARCHAR(5) NOT NULL", sql);
+			sql.ShouldBe("ALTER TABLE [NewTable] ADD NewColumn NVARCHAR(5) NOT NULL");
 		}
 
-		[Fact]
+		[Test]
 		public void CanRenameTable()
 		{
 			var expression = new RenameTableExpression();
@@ -85,10 +86,10 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.NewName = "Table2";
 
 			string sql = generator.Generate(expression);
-			Assert.Equal("sp_rename [Table1], [Table2]", sql);
+			sql.ShouldBe("sp_rename [Table1], [Table2]");
 		}
 
-		[Fact]
+		[Test]
 		public void CanRenameColumn()
 		{
 			var expression = new RenameColumnExpression();
@@ -97,10 +98,10 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.NewName = "Column2";
 
 			string sql = generator.Generate(expression);
-			Assert.Equal("sp_rename '[Table1].[Column1]', [Column2]", sql);
+			sql.ShouldBe("sp_rename '[Table1].[Column1]', [Column2]");
 		}
 
-		[Fact]
+		[Test]
 		public void CanCreateIndex()
 		{
 			var expression = new CreateIndexExpression();
@@ -112,10 +113,10 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Descending, Name = "Column2" });
 
 			string sql = generator.Generate(expression);
-			Assert.Equal("CREATE UNIQUE CLUSTERED INDEX IX_TEST ON TEST_TABLE (Column1 ASC,Column2 DESC)", sql);
+			sql.ShouldBe("CREATE UNIQUE CLUSTERED INDEX IX_TEST ON TEST_TABLE (Column1 ASC,Column2 DESC)");
 		}
 
-		[Fact]
+		[Test]
 		public void CanCreateForeignKey()
 		{
 			var expression = new CreateForeignKeyExpression();
@@ -126,10 +127,10 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.ForeignKey.ForeignColumns = new[] { "Column3", "Column4" };
 
 			string sql = generator.Generate(expression);
-            Assert.Equal("ALTER TABLE [TestForeignTable] ADD CONSTRAINT FK_Test FOREIGN KEY (Column3,Column4) REFERENCES [TestPrimaryTable] (Column1,Column2)", sql);
+            sql.ShouldBe("ALTER TABLE [TestForeignTable] ADD CONSTRAINT FK_Test FOREIGN KEY (Column3,Column4) REFERENCES [TestPrimaryTable] (Column1,Column2)");
 		}
 
-		[Fact]
+		[Test]
 		public void CanDropForeignKey()
 		{
 			var expression = new DeleteForeignKeyExpression();
@@ -137,10 +138,10 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.ForeignKey.PrimaryTable = "TestPrimaryTable";
 
 			string sql = generator.Generate(expression);
-			Assert.Equal("ALTER TABLE [TestPrimaryTable] DROP CONSTRAINT FK_Test", sql);
+			sql.ShouldBe("ALTER TABLE [TestPrimaryTable] DROP CONSTRAINT FK_Test");
 		}
 
-        [Fact]
+        [Test]
         public void CanInsertData()
         {
             var expression = new InsertDataExpression();
@@ -157,7 +158,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             string expected = "INSERT INTO [TestTable] (Id,Name,Website) VALUES (1,'Justin','codethinked.com');";
             expected += "INSERT INTO [TestTable] (Id,Name,Website) VALUES (2,'Nate','kohari.org');";
 
-            Assert.Equal(expected, sql);
+            sql.ShouldBe(expected);
         }
 
 		private DeleteTableExpression GetDeleteTableExpression(string tableName)

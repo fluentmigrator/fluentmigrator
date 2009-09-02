@@ -1,16 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FluentMigrator.Builders.Delete.Index;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using Moq;
-using Xunit;
+using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
 	public class DeleteIndexExpressionBuilderTests
 	{
-		[Fact]
+		[Test]
 		public void CallingOnTableSetsTableNameToSpecifiedValue()
 		{
 			var indexMock = new Mock<IndexDefinition>();
@@ -26,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 			expressionMock.VerifyAll();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingOnColumnAddsNewColumnToExpression()
 		{
 			var collectionMock = new Mock<IList<IndexColumnDefinition>>();
@@ -46,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 			expressionMock.VerifyAll();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingOnColumnsAddsMultipleNewColumnsToExpression()
 		{
 			var collectionMock = new Mock<IList<IndexColumnDefinition>>();

@@ -2,10 +2,12 @@
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Helpers;
-using Xunit;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Integration.Processors
 {
+	[TestFixture]
 	public class SqlServerProcessorTests
 	{
 		public SqlConnection Connection { get; set; }
@@ -19,37 +21,37 @@ namespace FluentMigrator.Tests.Integration.Processors
 			Processor = new SqlServerProcessor(Connection, new SqlServerGenerator());
 		}
 
-		[Fact]
+		[Test]
 		public void CallingTableExistsReturnsTrueIfTableExists()
 		{
 			using (var table = new SqlServerTestTable(Connection, "id int"))
-				Assert.True(Processor.TableExists(table.Name));
+				Processor.TableExists(table.Name).ShouldBeTrue();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingTableExistsReturnsFalseIfTableDoesNotExist()
 		{
-			Assert.False(Processor.TableExists("DoesNotExist"));
+			Processor.TableExists("DoesNotExist").ShouldBeFalse();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingColumnExistsReturnsTrueIfColumnExists()
 		{
 			using (var table = new SqlServerTestTable(Connection, "id int"))
-				Assert.True(Processor.ColumnExists(table.Name, "id"));
+				Processor.ColumnExists(table.Name, "id").ShouldBeTrue();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingColumnExistsReturnsFalseIfTableDoesNotExist()
 		{
-			Assert.False(Processor.ColumnExists("DoesNotExist", "DoesNotExist"));
+			Processor.ColumnExists("DoesNotExist", "DoesNotExist").ShouldBeFalse();
 		}
 
-		[Fact]
+		[Test]
 		public void CallingColumnExistsReturnsFalseIfColumnDoesNotExist()
 		{
 			using (var table = new SqlServerTestTable(Connection, "id int"))
-				Assert.False(Processor.ColumnExists(table.Name, "DoesNotExist"));            
-		}        
+				Processor.ColumnExists(table.Name, "DoesNotExist").ShouldBeFalse();
+		}
 	}
 }

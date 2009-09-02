@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
-using FluentMigrator;
-using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Versioning;
 
@@ -47,11 +44,11 @@ namespace FluentMigrator.Runner
 			CaughtExceptions = new List<Exception>();
 			Conventions = conventions;
 			Processor = processor;
-			this.Version = null;
-			this.Migrations = null;
+			Version = null;
+			Migrations = null;
 			//get assembly from calling dll
-			this.MigrationAssembly = System.Reflection.Assembly.GetCallingAssembly();
-			this.MigrationLoader = loader;
+			MigrationAssembly = Assembly.GetCallingAssembly();
+			MigrationLoader = loader;
 		}
 
 		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader, Type getAssemblyByType)
@@ -60,10 +57,10 @@ namespace FluentMigrator.Runner
 			CaughtExceptions = new List<Exception>();
 			Conventions = conventions;
 			Processor = processor;
-			this.MigrationAssembly = getAssemblyByType.Assembly;
-			this.Version = null;
-			this.Migrations = null;
-			this.MigrationLoader = loader;
+			MigrationAssembly = getAssemblyByType.Assembly;
+			Version = null;
+			Migrations = null;
+			MigrationLoader = loader;
 		}
 
 		public void ClearCaughtExceptions()

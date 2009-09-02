@@ -1,14 +1,13 @@
-﻿using System;
-using FluentMigrator.Builders.Delete.Column;
+﻿using FluentMigrator.Builders.Delete.Column;
 using FluentMigrator.Expressions;
 using Moq;
-using Xunit;
+using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
 	public class DeleteColumnExpressionBuilderTests
 	{
-		[Fact]
+		[Test]
 		public void CallingFromTableSetsTableName()
 		{
 			var expressionMock = new Mock<DeleteColumnExpression>();
