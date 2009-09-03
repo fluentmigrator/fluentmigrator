@@ -101,6 +101,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Integration\IntegrationTestBase.cs" />
     <Compile Include="Integration\MigrationRunnerTests.cs" />
     <Compile Include="Integration\MigrationVersionRunnerTests.cs" />
     <Compile Include="Integration\Processors\FileProcessorTests.cs" />

@@ -1,74 +1,72 @@
-﻿using System.Data.SqlClient;
-using FluentMigrator.Runner;
-using FluentMigrator.Runner.Generators;
-using FluentMigrator.Runner.Processors.SqlServer;
+﻿using FluentMigrator.Runner;
 using NUnit.Framework;
 using NUnit.Should;
 
 namespace FluentMigrator.Tests.Integration
 {
 	[TestFixture]
-	public class MigrationVersionRunnerTests
+	public class MigrationVersionRunnerTests : IntegrationTestBase
 	{
-		private string connectionString = @"server=(local)\SQLEXPRESS;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator";
-
 		[Test]
 		public void CanLoadMigrations()
 		{
-			var conventions = new MigrationConventions();
-			var connection = new SqlConnection(connectionString);
-			connection.Open();
-			var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
-			var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
+			ExecuteWithSupportedProcessors(processor =>
+				{
+					var conventions = new MigrationConventions();
 
-			runner.Migrations.ShouldNotBeNull();
+					var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
+
+					runner.Migrations.ShouldNotBeNull();
+				});
 		}
 
 		[Test]
 		public void CanLoadVersion()
 		{
-			var conventions = new MigrationConventions();
-			var connection = new SqlConnection(connectionString);
-			connection.Open();
-			var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
-			var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
+			ExecuteWithSupportedProcessors(processor =>
+				{
+					var conventions = new MigrationConventions();
 
-			runner.Version.ShouldNotBeNull();
+					var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
+
+					runner.Version.ShouldNotBeNull();
+				});
 		}
 
 		[Test]
 		public void CanRunMigration()
 		{
-			var conventions = new MigrationConventions();
-			var connection = new SqlConnection(connectionString);
-			connection.Open();
-			var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
-			var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
+			ExecuteWithSupportedProcessors(processor =>
+				{
+					var conventions = new MigrationConventions();
+					var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
 
-			runner.UpgradeToVersion(2, false);
-			runner.Version.CurrentVersion.ShouldBe((long)2);
+					runner.UpgradeToVersion(2, false);
+					runner.Version.CurrentVersion.ShouldBe((long)2);
 
-			//now step down to 0
-			long last = 0;
-			runner.StepDown(runner.CurrentVersion, 0, out last);
-			runner.CurrentVersion.ShouldBe((long) 0);
+					//now step down to 0
+					long last = 0;
+					runner.StepDown(runner.CurrentVersion, 0, out last);
+					runner.CurrentVersion.ShouldBe((long)0);
+				});
 		}
 
 		[Test]
 		public void CanUpdgradeToLatest()
 		{
-			var conventions = new MigrationConventions();
-			var connection = new SqlConnection(connectionString);
-			connection.Open();
-			var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
-			var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
+			ExecuteWithSupportedProcessors(processor =>
+				{
+					var conventions = new MigrationConventions();
 
-			runner.UpgradeToLatest(false);
+					var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
 
-			//now step down to 0
-			long last;
-			runner.StepDown(runner.CurrentVersion, 0, out last);
-			runner.CurrentVersion.ShouldBe((long)0);
+					runner.UpgradeToLatest(false);
+
+					//now step down to 0
+					long last;
+					runner.StepDown(runner.CurrentVersion, 0, out last);
+					runner.CurrentVersion.ShouldBe((long)0);
+				});
 		}
 	}
 }

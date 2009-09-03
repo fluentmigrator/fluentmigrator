@@ -11,41 +11,40 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Integration
 {
 	[TestFixture]
-	public class MigrationRunnerTests
+	public class MigrationRunnerTests : IntegrationTestBase
 	{
 		[Test]
 		public void CanRunMigration()
 		{
-			string connectionString = @"server=(local)\sqlexpress;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator";
-			var conventions = new MigrationConventions();
-			var connection = new SqlConnection(connectionString);
-			connection.Open();
-			
-			var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
-			var runner = new MigrationRunner(conventions, processor);
+			ExecuteWithSupportedProcessors(processor =>
+				{
+					var conventions = new MigrationConventions();
 
-			runner.Up(new TestCreateAndDropTableMigration());
-			processor.TableExists("TestTable").ShouldBeTrue();
-			
-			runner.Down(new TestCreateAndDropTableMigration());
-			processor.TableExists("TestTable").ShouldBeFalse();
+					var runner = new MigrationRunner(conventions, processor);
+
+					runner.Up(new TestCreateAndDropTableMigration());
+					processor.TableExists("TestTable").ShouldBeTrue();
+
+					runner.Down(new TestCreateAndDropTableMigration());
+					processor.TableExists("TestTable").ShouldBeFalse();
+				});
 		}
 
 		[Test, Ignore("failing becacase of assertion on line 45")]
 		public void CanSilentlyFail()
 		{
-			//need to run a known failure against sqlite and make sure it executes but only captures the exception
-			var connection = new System.Data.SQLite.SQLiteConnection { ConnectionString = "Data Source=:memory:;Version=3;New=True;" };
-			connection.Open();
-			var conventions = new MigrationConventions();
-			var processor = new SqliteProcessor(connection, new SqliteGenerator());
-			var runner = new MigrationRunner(conventions, processor) { SilentlyFail = true };
+			ExecuteWithSupportedProcessors(processor =>
+				{
+					var conventions = new MigrationConventions();
+					
+					var runner = new MigrationRunner(conventions, processor) { SilentlyFail = true };
 
-			runner.Up(new TestForeignKeySilentFailure());
-			runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
+					runner.Up(new TestForeignKeySilentFailure());
+					runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
 
-			runner.Down(new TestForeignKeySilentFailure());
-			runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
+					runner.Down(new TestForeignKeySilentFailure());
+					runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
+				});
 		}
 	}
 
