@@ -14,23 +14,45 @@ namespace FluentMigrator.Tests.Integration.Processors
 	public class FileProcessorTests
 	{
 		private string _dumpFile;
+		private FileProcessor _fileDumpProcessor;
+		private SqliteGenerator _generator;
+		private string _tableName;
+		private string _columnName;
+
+		[SetUp]
+		public void SetUp()
+		{
+			_dumpFile = "createtable.dump.sql";
+			_tableName = "sample_table";
+			_columnName = "sample_column_id";
+
+			_generator = new SqliteGenerator();
+			_fileDumpProcessor = new FileProcessor(_dumpFile, _generator);
+		}
 
 		[Test]
 		public void CanDumpCreateTableExpression()
 		{
-			string testTableName = "sample_table";
-			_dumpFile = "createtable.dump.sql";
-			var generator = new SqliteGenerator();
-			var fileDumpProcessor = new FileProcessor(_dumpFile, generator);
+			var expression = new CreateTableExpression { TableName = _tableName };
+			string expectedSql = _generator.Generate(expression);
 
-			CreateTableExpression expression = new CreateTableExpression { TableName = testTableName };
-			fileDumpProcessor.Process(expression);
-			string expectedSql = generator.Generate(expression);
+			_fileDumpProcessor.Process(expression);
 
-			DumpedLines.ShouldContain(expectedSql);
+			Lines.ShouldContain(expectedSql);
 		}
 
-		private IEnumerable<string> DumpedLines
+		[Test]
+		public void CanDumpCreateColumnExpression()
+		{
+			var expression = new CreateColumnExpression { TableName = _tableName, Column = { Name = _columnName, IsIdentity = true, IsPrimaryKey = true, Type = DbType.String } };
+			string expectedSql = _generator.Generate(expression);
+
+			_fileDumpProcessor.Process(expression);
+
+			Lines.ShouldContain(expectedSql);
+		}
+
+		private IEnumerable<string> Lines
 		{
 			get
 			{
