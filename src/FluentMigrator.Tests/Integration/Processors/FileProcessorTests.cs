@@ -6,34 +6,51 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors;
 using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Integration.Processors
 {
 	[TestFixture]
-	public class FileDumpProcessorTests
+	public class FileProcessorTests
 	{
+		private string _dumpFile;
+
 		[Test]
 		public void CanDumpCreateTableExpression()
 		{
-//			string testTableName = "sample_table";
-//			var fileDumpProcessor = new FileDumpProcessor(new SqliteGenerator());
-//			CreateTableExpression expression = new CreateTableExpression { TableName = testTableName };
-//			fileDumpProcessor.Process(expression);
-//
+			string testTableName = "sample_table";
+			_dumpFile = "createtable.dump.sql";
+			var generator = new SqliteGenerator();
+			var fileDumpProcessor = new FileProcessor(_dumpFile, generator);
 
+			CreateTableExpression expression = new CreateTableExpression { TableName = testTableName };
+			fileDumpProcessor.Process(expression);
+			string expectedSql = generator.Generate(expression);
+
+			DumpedLines.ShouldContain(expectedSql);
+		}
+
+		private IEnumerable<string> DumpedLines
+		{
+			get
+			{
+				string line;
+				using (var stream = File.OpenText(_dumpFile))
+					while ((line = stream.ReadLine()) != null)
+						yield return line;
+			}
 		}
 	}
 
-	public class FileDumpProcessor : ProcessorBase
+	public class FileProcessor : ProcessorBase
 	{
-		public FileDumpProcessor(IMigrationGenerator generator)
+		public FileProcessor(string dumpFile, IMigrationGenerator generator)
 		{
-			DumpFilename = string.Format("dump_{0}.sql", DateTime.Now.ToShortDateString());
+			DumpFilename = dumpFile;
 			File.Delete(DumpFilename);
 			this.generator = generator;
 		}
 
-		
 		protected string DumpFilename { get; set; }
 
 		protected override void Process(string sql)
