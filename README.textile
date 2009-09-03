@@ -5,9 +5,8 @@ Fluent migrations for .NET!
 h2. Project Info
 
 * *Project Home*: "http://code.google.com/p/fluentmigrator/":code.google.com/p/fluentmigrator
-* *Source*: "http://github.com/enkari/fluentmigrator/tree/master":github.com/enkari/fluentmigrator/tree/master
 * *Discussions*: "http://groups.google.com/group/fluentmigrator-google-group":fluentmigrator-google-group@googlegroups.com
-* *Bug/Feature Tracking*: "http://fluentmigrator.lighthouseapp.com":http://fluentmigrator.lighthouseapp.com
+* *Bug/Feature Tracking*: "http://code.google.com/p/fluentmigrator/issues/":code.google.com/p/fluentmigrator/issues
 
 h2. Example Migration
 
