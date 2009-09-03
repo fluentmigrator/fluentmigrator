@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using FluentMigrator.Builders.Insert;
 using System.Text;
@@ -110,24 +111,60 @@ namespace FluentMigrator.Runner.Generators
 			throw new System.NotImplementedException();
 		}
 
-		public override string Generate(InsertDataExpression expression)
-		{
-			throw new System.NotImplementedException();
-		}
+	    public override string Generate(InsertDataExpression expression)
+	    {
+            var result = new StringBuilder();
+            foreach (InsertionData row in expression.Rows)
+            {
+                List<string> columnNames = new List<string>();
+                List<object> columnData = new List<object>();
+                foreach (KeyValuePair<string, object> item in row)
+                {
+                    columnNames.Add(item.Key);
+                    columnData.Add(item.Value);
+                }
 
-		public override string Generate(DeleteColumnExpression expression)
+                string columns = GetColumnList(columnNames);
+                string data = GetDataList(columnData);
+                result.Append(FormatExpression("INSERT INTO [{0}] ({1}) VALUES ({2});", expression.TableName, columns, data));
+            }
+            return result.ToString();
+	    }
+
+        private string GetColumnList(IEnumerable<string> columns)
+        {
+            string result = "";
+            foreach (string column in columns)
+            {
+                result += column + ",";
+            }
+            return result.TrimEnd(',');
+        }
+
+        private string GetDataList(List<object> data)
+        {
+            string result = "";
+            foreach (object column in data)
+            {
+                result += GetConstantValue(column) + ",";
+            }
+            return result.TrimEnd(',');
+        }
+
+	    public override string Generate(DeleteColumnExpression expression)
 		{
 			return string.Format("ALTER TABLE {0} DROP COLUMN {1}", expression.TableName, expression.ColumnName);
 		}
 
 		public override string Generate(CreateForeignKeyExpression expression)
 		{
-			throw new NotImplementedException();
+            // Ignore foreign keys for SQLite
+		    return "";
 		}
 
 		public override string Generate(DeleteForeignKeyExpression expression)
 		{
-			throw new NotImplementedException();
+		    return "";
 		}
 
 		public override string Generate(CreateIndexExpression expression)

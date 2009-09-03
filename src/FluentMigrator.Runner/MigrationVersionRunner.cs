@@ -39,25 +39,22 @@ namespace FluentMigrator.Runner
 		}
 
 		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader)
+			: this(conventions, processor, loader, Assembly.GetCallingAssembly())
 		{
-			SilentlyFail = false;
-			CaughtExceptions = new List<Exception>();
-			Conventions = conventions;
-			Processor = processor;
-			Version = null;
-			Migrations = null;
-			//get assembly from calling dll
-			MigrationAssembly = Assembly.GetCallingAssembly();
-			MigrationLoader = loader;
 		}
 
 		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader, Type getAssemblyByType)
+			: this(conventions, processor, loader, getAssemblyByType.Assembly)
+		{
+		}
+
+		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader, Assembly assembly)
 		{
 			SilentlyFail = false;
 			CaughtExceptions = new List<Exception>();
 			Conventions = conventions;
 			Processor = processor;
-			MigrationAssembly = getAssemblyByType.Assembly;
+			MigrationAssembly = assembly;
 			Version = null;
 			Migrations = null;
 			MigrationLoader = loader;
@@ -239,7 +236,7 @@ namespace FluentMigrator.Runner
 		{
 			//save
 			Processor.UpdateTable(VersionInfo.TABLE_NAME, new List<string>() { "CurrentVersion", "PreviousVersion", "LastUpdated" },
-				new List<string>() { String.Format("'{0}'", currentVersion), String.Format("'{0}'", previousVersion), String.Format("'{0}'", DateTime.UtcNow.ToString()) });
+				new List<string>() { String.Format("'{0}'", currentVersion), String.Format("'{0}'", previousVersion), String.Format("'{0}'", DateTime.UtcNow.ToISO8601()) });
 
 			//load versionInfo
 			LoadVersionInfo();

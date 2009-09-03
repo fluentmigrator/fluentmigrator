@@ -1,4 +1,6 @@
+using System;
 using System.Data.SqlClient;
+using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors.Sqlite;

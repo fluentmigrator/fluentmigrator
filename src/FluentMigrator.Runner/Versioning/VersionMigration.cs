@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using FluentMigrator;
 
 namespace FluentMigrator.Runner.Versioning
 {
@@ -16,12 +12,20 @@ namespace FluentMigrator.Runner.Versioning
                 .WithColumn("LastUpdated").AsDateTime().NotNullable();
 
             Insert.IntoTable(VersionInfo.TABLE_NAME)
-                .Row(new { CurrentVersion = 0, PreviousVersion = 0, LastUpdated = DateTime.UtcNow.ToString() });
+                .Row(new { CurrentVersion = 0, PreviousVersion = 0, LastUpdated = DateTime.UtcNow.ToISO8601() });
         }
 
         public override void Down()
         {
             Delete.Table(VersionInfo.TABLE_NAME);
+        }
+    }
+
+	internal static class DateTimeExtensions
+    {
+        public static string ToISO8601(this DateTime dateTime)
+        {
+            return dateTime.ToString("u").Replace("Z", ""); // to support sqlite
         }
     }
 }

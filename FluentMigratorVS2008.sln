@@ -9,6 +9,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator", "src\Fluen
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Console", "src\FluentMigrator.Console\FluentMigrator.Console.csproj", "{664C7334-B44B-4D62-A0F8-063805D630AA}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{0089ACAC-0C21-42B3-9020-BB994FDD03FB}"
+	ProjectSection(SolutionItems) = preProject
+		.gitignore = .gitignore
+		build.bat = build.bat
+		FluentMigrator.msbuild = FluentMigrator.msbuild
+		README.textile = README.textile
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		AutomatedRelease|Any CPU = AutomatedRelease|Any CPU

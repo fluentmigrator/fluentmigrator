@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Data;
+using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators;
@@ -96,6 +97,26 @@ namespace FluentMigrator.Tests.Unit.Generators
 		}
 
 		// DeleteIndex
+
+        [Fact]
+        public void CanInsertData()
+        {
+            var expression = new InsertDataExpression();
+            expression.TableName = "TestTable";
+            expression.Rows.Add(new InsertionData { new KeyValuePair<string, object>("Id", 1), 
+                                                    new KeyValuePair<string, object>("Name", "Justin"),
+                                                    new KeyValuePair<string, object>("Website", "codethinked.com") });
+            expression.Rows.Add(new InsertionData { new KeyValuePair<string, object>("Id", 2), 
+                                                    new KeyValuePair<string, object>("Name", "Nate"),
+                                                    new KeyValuePair<string, object>("Website", "kohari.org") });
+
+            string sql = generator.Generate(expression);
+
+            string expected = "INSERT INTO [TestTable] (Id,Name,Website) VALUES (1,'Justin','codethinked.com');";
+            expected += "INSERT INTO [TestTable] (Id,Name,Website) VALUES (2,'Nate','kohari.org');";
+
+            Assert.Equal(expected, sql);
+        }
 
 		private CreateIndexExpression GetCreateIndexExpression()
 		{
