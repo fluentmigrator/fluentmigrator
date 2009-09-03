@@ -21,7 +21,9 @@ namespace FluentMigrator.Runner
 		{
 			get
 			{
-				if (versionInfo == null) LoadVersionInfo();
+				if (versionInfo == null)
+					LoadVersionInfo();
+
 				return versionInfo;
 			}
 			private set { versionInfo = value; }
@@ -87,7 +89,7 @@ namespace FluentMigrator.Runner
 		public void LoadAssemblyMigrations()
 		{
 			Migrations = new SortedList<long, Migration>();
-			IEnumerable<MigrationMetadata> migrationList = this.MigrationLoader.FindMigrationsIn(this.MigrationAssembly);
+			IEnumerable<MigrationMetadata> migrationList = MigrationLoader.FindMigrationsIn(MigrationAssembly);
 
 			if (migrationList == null) return;
 
@@ -132,10 +134,12 @@ namespace FluentMigrator.Runner
 			//track last version atempted
 			lastVersionAttempted = fromVersion;
 
-			if (fromStep > toStep) throw new Exception(String.Format("Version {0} is greater than the target version {1}", fromVersion, toVersion));
-			if (fromStep == toStep) return; //nothing to do
+			if (fromStep > toStep)
+				throw new Exception(String.Format("Version {0} is greater than the target version {1}", fromVersion, toVersion));
 
-			//runer to execture schema Up()
+			if (fromStep == toStep)
+				return;
+
 			var runner = new MigrationRunner(Conventions, Processor);
 
 			int step = fromStep;
@@ -143,12 +147,12 @@ namespace FluentMigrator.Runner
 			{
 				long nextStepVersion = Migrations.Keys[step + 1];
 				var nextMigration = Migrations[nextStepVersion];
-				//step up to next version
-				runner.SilentlyFail = this.SilentlyFail;
+				
+				runner.SilentlyFail = SilentlyFail;
 				runner.Up(nextMigration);
 				lastVersionAttempted = nextStepVersion;
 				step++;
-				//now handle silent failures
+
 				CaptureSilentFailures(runner.CaughtExceptions);
 			}
 
@@ -193,10 +197,14 @@ namespace FluentMigrator.Runner
 
 		public void UpgradeToVersion(long number, bool autoRollback)
 		{
-			if (!Migrations.ContainsKey(number)) throw new Exception(String.Format("Version {0} is missing.", number));
-			if (CurrentVersion != 0 && !Migrations.ContainsKey(CurrentVersion)) throw new Exception(String.Format("Current version {0} is not defined.", CurrentVersion));
+			if (!Migrations.ContainsKey(number))
+				throw new Exception(String.Format("Version {0} is missing.", number));
+
+			if (CurrentVersion != 0 && !Migrations.ContainsKey(CurrentVersion))
+				throw new Exception(String.Format("Current version {0} is not defined.", CurrentVersion));
 
 			//runer to execture schema Up()
+			// schambers: this isn't being used?
 			var runner = new MigrationRunner(Conventions, Processor);
 
 			long lastVersionRun = 0;
@@ -222,14 +230,17 @@ namespace FluentMigrator.Runner
 		/// <param name="autoRollback"></param>
 		public void UpgradeToLatest(bool autoRollback)
 		{
-			if (this.Migrations == null || this.Migrations.Count == 0) return;
+			if (Migrations == null || Migrations.Count == 0)
+				return;
+
 			//upgrade to latest
-			long latestVersion = this.Migrations.Keys[this.Migrations.Keys.Count - 1];
+			long latestVersion = Migrations.Keys[Migrations.Keys.Count - 1];
 
 			//exit early if already at current verions
-			if (latestVersion == CurrentVersion) return;
+			if (latestVersion == CurrentVersion)
+				return;
 
-			this.UpgradeToVersion(latestVersion, autoRollback);
+			UpgradeToVersion(latestVersion, autoRollback);
 		}
 
 		public void SaveVersionState(long currentVersion, long previousVersion)

@@ -71,7 +71,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
 		protected override void Process(string sql)
 		{
-			if (Connection.State != ConnectionState.Open) Connection.Open();
+			if (Connection.State != ConnectionState.Open)
+				Connection.Open();
 
 			using (var command = new SqlCommand(sql, Connection))
 				command.ExecuteNonQuery();

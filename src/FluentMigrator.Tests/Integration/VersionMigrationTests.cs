@@ -1,4 +1,7 @@
-﻿using FluentMigrator.Runner;
+﻿using System.Data.SqlClient;
+using FluentMigrator.Runner;
+using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Runner.Versioning;
 using NUnit.Framework;
 using NUnit.Should;

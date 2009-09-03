@@ -103,8 +103,7 @@
   <ItemGroup>
     <Compile Include="Integration\MigrationRunnerTests.cs" />
     <Compile Include="Integration\MigrationVersionRunnerTests.cs" />
-    <Compile Include="Integration\SqliteAttribute.cs" />
-    <Compile Include="Integration\SqlServerAttribute.cs" />
+    <Compile Include="Integration\Processors\FileDumpProcessorTests.cs" />
     <Compile Include="Integration\VersionMigrationTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateIndexExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateExpressionRootTests.cs" />

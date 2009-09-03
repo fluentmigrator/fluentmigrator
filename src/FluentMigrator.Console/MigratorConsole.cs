@@ -1,7 +1,5 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Processors;
@@ -54,14 +52,13 @@ namespace FluentMigrator.Tests.Unit.Runners
 
 		private void ExecuteMigrations()
 		{
-		    if (!Path.IsPathRooted(TargetAssembly))
-			{
+			if (!Path.IsPathRooted(TargetAssembly))
 				TargetAssembly = Path.GetFullPath(TargetAssembly);
-			}
-		    Assembly assembly = Assembly.LoadFile(TargetAssembly);
-		    var runner = new MigrationVersionRunner(new MigrationConventions(), Processor, new MigrationLoader(new MigrationConventions()), assembly);
+
+			Assembly assembly = Assembly.LoadFile(TargetAssembly);
+			var runner = new MigrationVersionRunner(new MigrationConventions(), Processor, new MigrationLoader(new MigrationConventions()), assembly);
 			runner.LoadAssemblyMigrations();
-            runner.UpgradeToLatest(true);
-		}		
+			runner.UpgradeToLatest(true);
+		}
 	}
 }

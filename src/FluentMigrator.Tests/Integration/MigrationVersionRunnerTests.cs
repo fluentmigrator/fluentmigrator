@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ﻿using System.Data.SqlClient;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators;
@@ -20,30 +19,11 @@ namespace FluentMigrator.Tests.Integration
 			var connection = new SqlConnection(connectionString);
 			connection.Open();
 			var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
-
-=======
-﻿using FluentMigrator.Runner;
-using Xunit;
-using Xunit.Extensions;
-
-namespace FluentMigrator.Tests.Integration
-{
-    public class MigrationVersionRunnerTests
-    {
-        [Theory]
-        [Sqlite]
-        [SqlServer]
-        public void CanLoadMigrations(IMigrationProcessor processor)
-        {   
-            var conventions = new MigrationConventions();
-            
->>>>>>> b903629e0b0bf79e322fc338e596cdc6d596059e
 			var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
 
 			runner.Migrations.ShouldNotBeNull();
 		}
 
-<<<<<<< HEAD
 		[Test]
 		public void CanLoadVersion()
 		{
@@ -51,35 +31,11 @@ namespace FluentMigrator.Tests.Integration
 			var connection = new SqlConnection(connectionString);
 			connection.Open();
 			var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
-
-=======
-		//[Fact]
-		//public void CanLoadMigrationsByCallingAssembly()
-		//{
-		//    var conventions = new MigrationConventions();
-		//    var connection = new SqlConnection(connectionString);
-		//    connection.Open();
-		//    var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
-
-		//    var runner = new MigrationVersionRunner(conventions, processor);
-
-		//    Assert.NotNull(runner.Migrations);
-		//}
-
-        [Theory]
-        [Sqlite]
-        [SqlServer]
-        public void CanLoadVersion(IMigrationProcessor processor)
-        {
-            var conventions = new MigrationConventions();
-            
->>>>>>> b903629e0b0bf79e322fc338e596cdc6d596059e
 			var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
 
 			runner.Version.ShouldNotBeNull();
 		}
 
-<<<<<<< HEAD
 		[Test]
 		public void CanRunMigration()
 		{
@@ -87,15 +43,6 @@ namespace FluentMigrator.Tests.Integration
 			var connection = new SqlConnection(connectionString);
 			connection.Open();
 			var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
-=======
-        [Theory]
-        [Sqlite]
-        [SqlServer]
-        public void CanRunMigration(IMigrationProcessor processor)
-        {
-            var conventions = new MigrationConventions();
->>>>>>> b903629e0b0bf79e322fc338e596cdc6d596059e
-
 			var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
 
 			runner.UpgradeToVersion(2, false);
@@ -107,7 +54,6 @@ namespace FluentMigrator.Tests.Integration
 			runner.CurrentVersion.ShouldBe((long) 0);
 		}
 
-<<<<<<< HEAD
 		[Test]
 		public void CanUpdgradeToLatest()
 		{
@@ -115,15 +61,6 @@ namespace FluentMigrator.Tests.Integration
 			var connection = new SqlConnection(connectionString);
 			connection.Open();
 			var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
-=======
-        [Theory]
-        [Sqlite]
-        [SqlServer]
-        public void CanUpdgradeToLatest(IMigrationProcessor processor)
-        {
-            var conventions = new MigrationConventions();
->>>>>>> b903629e0b0bf79e322fc338e596cdc6d596059e
-
 			var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
 
 			runner.UpgradeToLatest(false);
