@@ -5,6 +5,7 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors.Sqlite;
 using FluentMigrator.Runner.Processors.SqlServer;
+using Moq;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -30,21 +31,23 @@ namespace FluentMigrator.Tests.Integration
 				});
 		}
 
-		[Test, Ignore("failing becacase of assertion on line 45")]
+		[Test]
 		public void CanSilentlyFail()
 		{
-			ExecuteWithSupportedProcessors(processor =>
-				{
-					var conventions = new MigrationConventions();
-					
-					var runner = new MigrationRunner(conventions, processor) { SilentlyFail = true };
 
-					runner.Up(new TestForeignKeySilentFailure());
-					runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
+			var processor = new Mock<IMigrationProcessor>();
+			processor.Setup(x => x.Process(It.IsAny<CreateForeignKeyExpression>())).Throws(new Exception("Error"));
+			processor.Setup(x => x.Process(It.IsAny<DeleteForeignKeyExpression>())).Throws(new Exception("Error"));
 
-					runner.Down(new TestForeignKeySilentFailure());
-					runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
-				});
+			var conventions = new MigrationConventions();
+			
+			var runner = new MigrationRunner(conventions, processor.Object) { SilentlyFail = true };
+
+			runner.Up(new TestForeignKeySilentFailure());
+			runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
+
+			runner.Down(new TestForeignKeySilentFailure());
+			runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
 		}
 	}
 
