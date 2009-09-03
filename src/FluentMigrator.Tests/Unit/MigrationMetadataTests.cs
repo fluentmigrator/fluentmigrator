@@ -1,5 +1,4 @@
-﻿using System;
-using FluentMigrator.Infrastructure;
+﻿using FluentMigrator.Infrastructure;
 using NUnit.Framework;
 using NUnit.Should;
 

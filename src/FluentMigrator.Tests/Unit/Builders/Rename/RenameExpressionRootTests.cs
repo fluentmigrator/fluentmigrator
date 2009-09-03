@@ -10,6 +10,7 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Builders.Rename
 {
+	[TestFixture]
 	public class RenameExpressionRootTests
 	{
 		[Test]

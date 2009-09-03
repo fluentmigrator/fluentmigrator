@@ -7,6 +7,7 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
+	[TestFixture]
 	public class DeleteColumnExpressionTests
 	{
 		[Test]
@@ -30,7 +31,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
 		{
 			var expression = new DeleteColumnExpression { TableName = "Bacon" };
 			var errors = ValidationHelper.CollectErrors(expression);
-			errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
+			errors.ShouldNotContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
 		}
 
 		[Test]

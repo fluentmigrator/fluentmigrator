@@ -8,6 +8,7 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Definitions
 {
+	[TestFixture]
 	public class ColumnDefinitionTests
 	{
 		[Test]

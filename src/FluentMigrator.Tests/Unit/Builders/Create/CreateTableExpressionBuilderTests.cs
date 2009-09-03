@@ -10,6 +10,7 @@ using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
+	[TestFixture]
 	public class CreateTableExpressionBuilderTests
 	{
 		[Test]

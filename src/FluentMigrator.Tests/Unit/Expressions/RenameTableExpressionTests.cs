@@ -7,6 +7,7 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
+	[TestFixture]
 	public class RenameTableExpressionTests
 	{
 		[Test]

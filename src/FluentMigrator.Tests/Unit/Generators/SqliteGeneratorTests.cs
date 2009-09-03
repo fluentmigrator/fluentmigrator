@@ -8,6 +8,7 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {
+	[TestFixture]
 	public class SqliteGeneratorTests
 	{
 		SqliteGenerator generator;

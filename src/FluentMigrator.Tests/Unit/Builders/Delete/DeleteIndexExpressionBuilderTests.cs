@@ -7,6 +7,7 @@ using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
+	[TestFixture]
 	public class DeleteIndexExpressionBuilderTests
 	{
 		[Test]

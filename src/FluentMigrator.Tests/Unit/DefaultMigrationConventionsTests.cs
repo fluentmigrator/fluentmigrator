@@ -94,7 +94,7 @@ namespace FluentMigrator.Tests.Unit
 		public void MigrationMetadataTypePropertyMatchesDecoratedType()
 		{
 			var metadata = DefaultMigrationConventions.GetMetadataForMigration(typeof(DefaultConventionMigrationFake));
-			metadata.Type.ShouldBeOfType<DefaultConventionMigrationFake>();
+			metadata.Type.ShouldBe(typeof(DefaultConventionMigrationFake));
 		}
 
 		[Test]

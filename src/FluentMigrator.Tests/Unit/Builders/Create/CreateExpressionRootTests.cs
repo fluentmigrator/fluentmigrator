@@ -13,6 +13,7 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
+	[TestFixture]
 	public class CreateExpressionRootTests
 	{
 		[Test]

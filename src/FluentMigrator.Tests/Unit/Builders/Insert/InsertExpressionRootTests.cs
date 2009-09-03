@@ -7,6 +7,7 @@ using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Builders.Insert
 {
+	[TestFixture]
 	public class InsertExpressionRootTests
 	{
 		[Test]

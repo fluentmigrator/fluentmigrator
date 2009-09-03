@@ -7,6 +7,7 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
+	[TestFixture]
 	public class RenameColumnExpressionTests
 	{
 		[Test]
@@ -30,7 +31,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
 		{
 			var expression = new RenameColumnExpression { OldName = "Bacon" };
 			var errors = ValidationHelper.CollectErrors(expression);
-			errors.ShouldContain(ErrorMessages.OldColumnNameCannotBeNullOrEmpty);
+			errors.ShouldNotContain(ErrorMessages.OldColumnNameCannotBeNullOrEmpty);
 		}
 
 		[Test]

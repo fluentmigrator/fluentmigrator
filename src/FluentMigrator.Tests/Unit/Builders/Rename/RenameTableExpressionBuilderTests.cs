@@ -1,11 +1,11 @@
-﻿using System;
-using FluentMigrator.Builders.Rename.Table;
+﻿using FluentMigrator.Builders.Rename.Table;
 using FluentMigrator.Expressions;
 using Moq;
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Builders.Rename
 {
+	[TestFixture]
 	public class RenameTableExpressionBuilderTests
 	{
 		[Test]

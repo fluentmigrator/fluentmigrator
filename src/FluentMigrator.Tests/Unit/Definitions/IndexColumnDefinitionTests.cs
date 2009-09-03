@@ -7,6 +7,7 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Definitions
 {
+	[TestFixture]
 	public class IndexColumnDefinitionTests
 	{
 		[Test]
@@ -37,7 +38,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
 		{
 			var column = new IndexColumnDefinition { Name = "Bacon" };
 			var errors = ValidationHelper.CollectErrors(column);
-			errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
+			errors.ShouldNotContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
 		}
 	}
 }

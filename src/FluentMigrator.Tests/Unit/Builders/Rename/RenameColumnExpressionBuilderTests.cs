@@ -5,6 +5,7 @@ using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Builders.Rename
 {
+	[TestFixture]
 	public class RenameColumnExpressionBuilderTests
 	{
 		[Test]

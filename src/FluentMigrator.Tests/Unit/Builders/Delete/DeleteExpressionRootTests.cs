@@ -10,6 +10,7 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
+	[TestFixture]
 	public class DeleteExpressionRootTests
 	{
 		[Test]

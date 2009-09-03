@@ -7,6 +7,7 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit
 {
+	[TestFixture]
 	public class MigrationVersionRunnerUnitTests
 	{
 		[Test]
