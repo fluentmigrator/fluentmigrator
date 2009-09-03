@@ -13,7 +13,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 	[TestFixture]
 	public class FileProcessorTests
 	{
-		private string _dumpFile;
+		private string _dumpFilename;
 		private FileProcessor _fileDumpProcessor;
 		private SqliteGenerator _generator;
 		private string _tableName;
@@ -22,12 +22,25 @@ namespace FluentMigrator.Tests.Integration.Processors
 		[SetUp]
 		public void SetUp()
 		{
-			_dumpFile = "createtable.dump.sql";
+			_dumpFilename = "createtable.dump";
 			_tableName = "sample_table";
 			_columnName = "sample_column_id";
 
 			_generator = new SqliteGenerator();
-			_fileDumpProcessor = new FileProcessor(_dumpFile, _generator);
+			_fileDumpProcessor = new FileProcessor(_dumpFilename, _generator);
+		}
+
+		[Test]
+		public void DumpFilenameShouldContainDateTime()
+		{
+			//_fileDumpProcessor.DumpFilename.ShouldBe();
+		}
+
+		[Test]
+		public void DumpFilenameShouldHaveProperFileExtension()
+		{
+			int startIndex = _fileDumpProcessor.DumpFilename.Length - 4;
+			_fileDumpProcessor.DumpFilename.Substring(startIndex, 4).ShouldBe(".sql");
 		}
 
 		[Test]
@@ -57,7 +70,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 			get
 			{
 				string line;
-				using (var stream = File.OpenText(_dumpFile))
+				using (var stream = File.OpenText(_dumpFilename))
 					while ((line = stream.ReadLine()) != null)
 						yield return line;
 			}
@@ -66,14 +79,14 @@ namespace FluentMigrator.Tests.Integration.Processors
 
 	public class FileProcessor : ProcessorBase
 	{
-		public FileProcessor(string dumpFile, IMigrationGenerator generator)
+		public FileProcessor(string dumpFilename, IMigrationGenerator generator)
 		{
-			DumpFilename = dumpFile;
+			DumpFilename = string.Format("{0}.sql", dumpFilename);
 			File.Delete(DumpFilename);
 			this.generator = generator;
 		}
 
-		protected string DumpFilename { get; set; }
+		public string DumpFilename { get; set; }
 
 		protected override void Process(string sql)
 		{
