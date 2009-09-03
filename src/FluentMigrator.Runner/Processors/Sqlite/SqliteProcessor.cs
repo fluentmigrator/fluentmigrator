@@ -17,7 +17,7 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
 		public override bool TableExists(string tableName)
 		{
-			return Exists("select * from sqlite_master where name={0}", tableName);
+			return Exists("select * from sqlite_master where name='{0}'", tableName);
 		}
 
 		public override void Execute(string template, params object[] args)
