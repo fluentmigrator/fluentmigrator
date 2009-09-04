@@ -5,41 +5,43 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors.Sqlite;
 using FluentMigrator.Runner.Processors.SqlServer;
+using Moq;
 using NUnit.Framework;
 using NUnit.Should;
 
 namespace FluentMigrator.Tests.Integration
 {
 	[TestFixture]
-	public class MigrationRunnerTests
+	public class MigrationRunnerTests : IntegrationTestBase
 	{
 		[Test]
 		public void CanRunMigration()
 		{
-			string connectionString = @"server=(local)\sqlexpress;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator";
-			var conventions = new MigrationConventions();
-			var connection = new SqlConnection(connectionString);
-			connection.Open();
-			
-			var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
-			var runner = new MigrationRunner(conventions, processor);
+			ExecuteWithSupportedProcessors(processor =>
+				{
+					var conventions = new MigrationConventions();
 
-			runner.Up(new TestCreateAndDropTableMigration());
-			processor.TableExists("TestTable").ShouldBeTrue();
-			
-			runner.Down(new TestCreateAndDropTableMigration());
-			processor.TableExists("TestTable").ShouldBeFalse();
+					var runner = new MigrationRunner(conventions, processor);
+
+					runner.Up(new TestCreateAndDropTableMigration());
+					processor.TableExists("TestTable").ShouldBeTrue();
+
+					runner.Down(new TestCreateAndDropTableMigration());
+					processor.TableExists("TestTable").ShouldBeFalse();
+				});
 		}
 
-		[Test, Ignore("failing becacase of assertion on line 45")]
+		[Test]
 		public void CanSilentlyFail()
 		{
-			//need to run a known failure against sqlite and make sure it executes but only captures the exception
-			var connection = new System.Data.SQLite.SQLiteConnection { ConnectionString = "Data Source=:memory:;Version=3;New=True;" };
-			connection.Open();
+
+			var processor = new Mock<IMigrationProcessor>();
+			processor.Setup(x => x.Process(It.IsAny<CreateForeignKeyExpression>())).Throws(new Exception("Error"));
+			processor.Setup(x => x.Process(It.IsAny<DeleteForeignKeyExpression>())).Throws(new Exception("Error"));
+
 			var conventions = new MigrationConventions();
-			var processor = new SqliteProcessor(connection, new SqliteGenerator());
-			var runner = new MigrationRunner(conventions, processor) { SilentlyFail = true };
+			
+			var runner = new MigrationRunner(conventions, processor.Object) { SilentlyFail = true };
 
 			runner.Up(new TestForeignKeySilentFailure());
 			runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
