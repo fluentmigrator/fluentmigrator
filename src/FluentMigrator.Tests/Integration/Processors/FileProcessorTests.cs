@@ -33,7 +33,9 @@ namespace FluentMigrator.Tests.Integration.Processors
 		[Test]
 		public void DumpFilenameShouldContainDateTime()
 		{
-			//_fileDumpProcessor.DumpFilename.ShouldBe();
+			string formattedDateTime = DateTime.Now.ToString("yyyyMMdd");
+			string expectedFilename = string.Format("{0}.{1}.sql", _dumpFilename, formattedDateTime);
+			_fileDumpProcessor.DumpFilename.ShouldBe(expectedFilename);
 		}
 
 		[Test]
@@ -81,12 +83,16 @@ namespace FluentMigrator.Tests.Integration.Processors
 	{
 		public FileProcessor(string dumpFilename, IMigrationGenerator generator)
 		{
-			DumpFilename = string.Format("{0}.sql", dumpFilename);
-			File.Delete(DumpFilename);
 			this.generator = generator;
+			DumpFilename = string.Format("{0}.{1}.sql", dumpFilename, FormattedDateTime);
+			File.Delete(DumpFilename);
 		}
 
 		public string DumpFilename { get; set; }
+		private string FormattedDateTime
+		{
+			get { return DateTime.Now.ToString("yyyyMMdd"); }
+		}
 
 		protected override void Process(string sql)
 		{
