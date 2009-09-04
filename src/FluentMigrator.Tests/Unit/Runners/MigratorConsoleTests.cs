@@ -28,7 +28,7 @@ namespace FluentMigrator.Tests.Unit.Runners
 			new MigratorConsole(args);
 		}
 
-		[Test,Ignore("failing for some reason. need to investigate")]
+		[Test]
 		public void CanInitMigratorConsoleWithValidArguments()
 		{
 			string[] args = { "/db", database, "/connection", connection, "/log", "/target", target };
@@ -39,5 +39,7 @@ namespace FluentMigrator.Tests.Unit.Runners
 			console.Connection.ShouldBe(connection);
 			console.Log.ShouldBeTrue();
 		}
+
+
 	}
 }
