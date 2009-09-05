@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using FluentMigrator.Builders.Insert;
@@ -161,6 +162,20 @@ namespace FluentMigrator.Tests.Unit.Generators
 
             sql.ShouldBe(expected);
         }
+
+		[Test]
+		public void CanInsertGuidData()
+		{
+			var gid = Guid.NewGuid();
+			var expression = new InsertDataExpression() { TableName = "TestTable" };
+			expression.Rows.Add(new InsertionData { new KeyValuePair<string, object>("guid", gid) });
+
+			string sql = generator.Generate(expression);
+
+			string expected = String.Format( "INSERT INTO [TestTable] (guid) VALUES ('{0}');", gid.ToString());
+
+			sql.ShouldBe(expected);
+		}
 
 		private DeleteTableExpression GetDeleteTableExpression(string tableName)
 		{

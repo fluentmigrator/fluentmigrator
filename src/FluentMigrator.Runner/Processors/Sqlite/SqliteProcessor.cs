@@ -17,7 +17,8 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
 		public override bool TableExists(string tableName)
 		{
-			return Exists("select * from sqlite_master where name='{0}'", tableName);
+			//return Exists("select * from sqlite_master where name='{0}'", tableName);
+			return Exists("select count(*) from sqlite_master where name='{0}'", tableName);
 		}
 
 		public override void Execute(string template, params object[] args)
@@ -37,7 +38,16 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 			using (var command = new SQLiteCommand(String.Format(template, args), Connection))
 			using (var reader = command.ExecuteReader())
 			{
-				return reader.Read();
+				try
+				{
+					if (!reader.Read()) return false;
+					if (int.Parse(reader[0].ToString()) <= 0) return false;
+					return true;
+				}
+				catch
+				{
+					return false;
+				}
 			}
 		}
 
