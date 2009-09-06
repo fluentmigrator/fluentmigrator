@@ -34,7 +34,6 @@ namespace FluentMigrator.Tests.Integration
 		[Test]
 		public void CanSilentlyFail()
 		{
-
 			var processor = new Mock<IMigrationProcessor>();
 			processor.Setup(x => x.Process(It.IsAny<CreateForeignKeyExpression>())).Throws(new Exception("Error"));
 			processor.Setup(x => x.Process(It.IsAny<DeleteForeignKeyExpression>())).Throws(new Exception("Error"));
