@@ -21,9 +21,11 @@ src/FluentMigrator.Example/tools/FluentMigrator. cd into the example project and
 
 rake
 
-rake -T
+rake -T</code></pre>
 
-rake clean
+This will list the available commands
+
+<pre><code>rake clean
 rake compile
 rake db:delete
 rake db:migrate
