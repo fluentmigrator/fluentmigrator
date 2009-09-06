@@ -24,5 +24,10 @@ namespace FluentMigrator.Runner.Versioning
 		{
 			return _versionsApplied.Contains(migration);
 		}
+
+		public IEnumerable<long> AppliedMigrations()
+		{
+			return _versionsApplied.OrderByDescending(x => x).AsEnumerable();
+		}
 	}
 }

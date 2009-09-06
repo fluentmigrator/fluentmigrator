@@ -107,34 +107,40 @@ namespace FluentMigrator.Runner
 
 		public void MigrateUp()
 		{
-			var appliedMigrations = new List<long>();
-			foreach (var migrationNumber in Migrations.Keys)
+			foreach (var version in Migrations.Keys)
 			{
-				if (!VersionInfo.HasAppliedMigration(migrationNumber))
-				{
-					_migrationRunner.Up(Migrations[migrationNumber]);
-					appliedMigrations.Add(migrationNumber);
-				}
+				MigrateUp(version);
 			}
-			updateVersionInfoWithAppliedMigrations(appliedMigrations);
 			_versionInfo = null;
 		}
 
-		private void updateVersionInfoWithAppliedMigrations(IEnumerable<long> migrations)
+		public void MigrateUp(long version)
 		{
-			foreach (var migration in migrations)
+			migrateUp(version);
+			_versionInfo = null;
+		}
+
+		private void migrateUp(long version)
+		{
+			if (!VersionInfo.HasAppliedMigration(version))
 			{
-				var dataExpression = new InsertDataExpression();
-				var data = new InsertionData {new KeyValuePair<string, object>(VersionInfo.COLUMN_NAME, migration)};
-				dataExpression.Rows.Add(data);
-				dataExpression.TableName = VersionInfo.TABLE_NAME;
-				dataExpression.ExecuteWith(_migrationProcessor);
+				_migrationRunner.Up(Migrations[version]);
+				updateVersionInfoWithAppliedMigration(version);
 			}
+		}
+
+		private void updateVersionInfoWithAppliedMigration(long version)
+		{
+			var dataExpression = new InsertDataExpression();
+			var data = new InsertionData {new KeyValuePair<string, object>(VersionInfo.COLUMN_NAME, version)};
+			dataExpression.Rows.Add(data);
+			dataExpression.TableName = VersionInfo.TABLE_NAME;
+			dataExpression.ExecuteWith(_migrationProcessor);
 		}
 
 		public void Rollback(int steps)
 		{
-			foreach (var migrationNumber in Migrations.Keys.OrderByDescending(x => x).Take(steps))
+			foreach (var migrationNumber in VersionInfo.AppliedMigrations().Take(steps))
 			{
 				_migrationRunner.Down(Migrations[migrationNumber]);
 				_migrationProcessor.DeleteWhere(VersionInfo.TABLE_NAME, VersionInfo.COLUMN_NAME, migrationNumber.ToString());

@@ -8,14 +8,20 @@ namespace FluentMigrator.Tests.Integration
 	[TestFixture]
 	public class MigrationVersionRunnerTests : IntegrationTestBase
 	{
+		private MigrationConventions _conventions;
+
+		[SetUp]
+		public void SetUp()
+		{
+			_conventions = new MigrationConventions();			
+		}
+
 		[Test]
 		public void CanLoadMigrations()
 		{
 			ExecuteWithSupportedProcessors(processor =>
 				{
-					var conventions = new MigrationConventions();
-
-					var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(TestMigration).Namespace);
+					var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(TestMigration).Namespace);
 
 					runner.Migrations.ShouldNotBeNull();
 				});
@@ -26,9 +32,7 @@ namespace FluentMigrator.Tests.Integration
 		{
 			ExecuteWithSupportedProcessors(processor =>
 				{
-					var conventions = new MigrationConventions();
-
-					var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(TestMigration).Namespace);
+					var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(TestMigration).Namespace);
 
 					runner.VersionInfo.ShouldNotBeNull();
 				});
@@ -39,8 +43,7 @@ namespace FluentMigrator.Tests.Integration
 		{
 			ExecuteWithSupportedProcessors(processor =>
 				{
-					var conventions = new MigrationConventions();
-					var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(TestMigration).Namespace);
+					var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(TestMigration).Namespace);
 
 					runner.MigrateUp();
 					runner.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
@@ -58,15 +61,13 @@ namespace FluentMigrator.Tests.Integration
 
 		private void runMigrationsInNamespace(IMigrationProcessor processor, string @namespace)
 		{
-			var conventions = new MigrationConventions();
-
-			var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests).Assembly, @namespace);
+			var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, @namespace);
 
 			runner.MigrateUp();
 		}
 
 		[Test]
-		public void CanMigratePreviousUnappliedMigrations()
+		public void CanMigrateInterleavedMigrations()
 		{
 			ExecuteWithSupportedProcessors(processor =>
 				{
@@ -77,9 +78,7 @@ namespace FluentMigrator.Tests.Integration
 					processor.TableExists("UserRoles").ShouldBeTrue();
 					processor.TableExists("User").ShouldBeTrue();
 
-					var conventions = new MigrationConventions();
-
-					var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests).Assembly, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3");
+					var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3");
 
 					runner.VersionInfo.HasAppliedMigration(200909060953).ShouldBeTrue();
 					runner.VersionInfo.HasAppliedMigration(200909060935).ShouldBeTrue();
@@ -93,6 +92,26 @@ namespace FluentMigrator.Tests.Integration
 					processor.TableExists("User").ShouldBeFalse();
 
 					runner.RemoveVersionTable();
+				});
+		}
+
+		[Test]
+		public void CanMigrateASpecificVersion()
+		{
+			ExecuteWithSupportedProcessors(processor =>
+				{
+					var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, "FluentMigrator.Tests.Integration.Migrations");
+
+					runner.MigrateUp(1);
+
+					runner.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
+					processor.TableExists("Users").ShouldBeTrue();
+
+
+					runner.Rollback(1);
+
+					runner.VersionInfo.HasAppliedMigration(1).ShouldBeFalse();
+					processor.TableExists("Users").ShouldBeFalse();
 				});
 		}
 	}
