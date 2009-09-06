@@ -1,8 +1,6 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
-using FluentMigrator.Model;
 
 namespace FluentMigrator
 {
@@ -22,6 +20,6 @@ namespace FluentMigrator
 		string Generate(DeleteIndexExpression expression);
 		string Generate(RenameTableExpression expression);
 		string Generate(RenameColumnExpression expression);
-	    string Generate(InsertDataExpression expression);
+		string Generate(InsertDataExpression expression);
 	}
 }

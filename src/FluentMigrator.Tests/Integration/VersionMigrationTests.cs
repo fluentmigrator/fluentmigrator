@@ -14,20 +14,20 @@ namespace FluentMigrator.Tests.Integration
 		[Test]
 		public void CanUseVersionInfo()
 		{
-            ExecuteWithSupportedProcessors(processor =>
-                {
-                    var runner = new MigrationRunner(new MigrationConventions(), processor);
+			ExecuteWithSupportedProcessors(processor =>
+				{
+					var runner = new MigrationRunner(new MigrationConventions(), processor);
 
-                    //ensure table doesn't exist
-                    if (processor.TableExists(VersionInfo.TABLE_NAME))
-                        runner.Down(new VersionMigration());
+					//ensure table doesn't exist
+					if (processor.TableExists(VersionInfo.TABLE_NAME))
+						runner.Down(new VersionMigration());
 
-                    runner.Up(new VersionMigration());
-                    processor.TableExists(VersionInfo.TABLE_NAME).ShouldBeTrue();
+					runner.Up(new VersionMigration());
+					processor.TableExists(VersionInfo.TABLE_NAME).ShouldBeTrue();
 
-                    runner.Down(new VersionMigration());
-                    processor.TableExists(VersionInfo.TABLE_NAME).ShouldBeFalse();
-                });
+					runner.Down(new VersionMigration());
+					processor.TableExists(VersionInfo.TABLE_NAME).ShouldBeFalse();
+				});
 			
 		}
 	}

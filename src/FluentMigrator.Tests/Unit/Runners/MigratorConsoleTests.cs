@@ -31,13 +31,13 @@ namespace FluentMigrator.Tests.Unit.Runners
 		[Test]
 		public void CanInitMigratorConsoleWithValidArguments()
 		{
-            string[] args = { "/db", database, "/connection", connection, "/log", "/target", target, "/namespace", "FluentMigrator.Tests.Integration.Migrations" };
+			string[] args = { "/db", database, "/connection", connection, "/log", "/target", target, "/namespace", "FluentMigrator.Tests.Integration.Migrations" };
 
 			MigratorConsole console = new MigratorConsole(args);
 
 			console.Processor.ShouldBeOfType<SqliteProcessor>();
 			console.Connection.ShouldBe(connection);
-		    console.Namespace.ShouldBe("FluentMigrator.Tests.Integration.Migrations");
+			console.Namespace.ShouldBe("FluentMigrator.Tests.Integration.Migrations");
 			console.Log.ShouldBeTrue();
 		}
 

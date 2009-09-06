@@ -91,9 +91,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 		}
 
 
-        public override void DeleteWhere(string tableName, string column, string equals)
-        {
-            Execute("DELETE FROM {0} WHERE {1}='{2}'", tableName, column, equals);
-        }
+		public override void DeleteWhere(string tableName, string column, string equals)
+		{
+			Execute("DELETE FROM {0} WHERE {1}='{2}'", tableName, column, equals);
+		}
 	}
 }

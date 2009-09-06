@@ -1,5 +1,4 @@
-﻿using System;
-using FluentMigrator.Builders.Delete.Column;
+﻿using FluentMigrator.Builders.Delete.Column;
 using FluentMigrator.Builders.Delete.ForeignKey;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -35,11 +34,11 @@ namespace FluentMigrator.Builders.Delete
 			return new DeleteForeignKeyExpressionBuilder(expression);
 		}
 
-        public IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName)
+		public IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName)
 		{
 			var expression = new DeleteForeignKeyExpression { ForeignKey = { Name = foreignKeyName } };
 			_context.Expressions.Add(expression);
-            return new DeleteForeignKeyExpressionBuilder(expression);
+			return new DeleteForeignKeyExpressionBuilder(expression);
 		}
 	}
 }

@@ -18,7 +18,7 @@ namespace FluentMigrator.Tests.Integration
 			ExecuteWithSqlite(test);
 		}
 
-	    public void ExecuteWithSqlServer(Action<IMigrationProcessor> test)
+		public void ExecuteWithSqlServer(Action<IMigrationProcessor> test)
 		{
 			var connection = new SqlConnection(sqlServerConnectionString);
 			connection.Open();
@@ -26,7 +26,7 @@ namespace FluentMigrator.Tests.Integration
 			test(processor);
 		}
 
-	    public void ExecuteWithSqlite(Action<IMigrationProcessor> test)
+		public void ExecuteWithSqlite(Action<IMigrationProcessor> test)
 		{
 			var connection = new SQLiteConnection(sqliteConnectionString);
 			var processor = new SqliteProcessor(connection, new SqliteGenerator());

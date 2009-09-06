@@ -50,9 +50,9 @@ namespace FluentMigrator
 			get { return new RenameExpressionRoot(_context); }
 		}
 
-	    public IInsertExpressionRoot Insert
-	    {
-            get { return new InsertExpressionRoot(_context); }
-	    }
+		public IInsertExpressionRoot Insert
+		{
+			get { return new InsertExpressionRoot(_context); }
+		}
 	}
 }

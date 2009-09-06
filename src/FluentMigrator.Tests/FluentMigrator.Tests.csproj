@@ -112,6 +112,7 @@
     <Compile Include="Integration\MigrationVersionRunnerTests.cs" />
     <Compile Include="Integration\Processors\FileProcessorTests.cs" />
     <Compile Include="Integration\VersionMigrationTests.cs" />
+    <Compile Include="Unit\AnnouncerTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateIndexExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateExpressionRootTests.cs" />
     <Compile Include="Unit\Builders\Delete\DeleteIndexExpressionBuilderTests.cs" />

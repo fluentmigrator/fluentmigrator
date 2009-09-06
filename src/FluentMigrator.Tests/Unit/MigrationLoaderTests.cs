@@ -29,15 +29,15 @@ namespace FluentMigrator.Tests.Unit
 			count.ShouldBeGreaterThan(0);
 		}
 
-        [Test]
-        public void CanFindMigrationsInNamespace()
-        {
-            var conventions = new MigrationConventions();
-            var loader = new MigrationLoader(conventions);
-            var asm = Assembly.GetExecutingAssembly();
-            var migrationList = loader.FindMigrationsIn(asm, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1");
-            migrationList.Select(x => x.Type).ShouldNotContain(typeof(VersionedMigration));
-            migrationList.Count().ShouldBeGreaterThan(0);
-        }
+		[Test]
+		public void CanFindMigrationsInNamespace()
+		{
+			var conventions = new MigrationConventions();
+			var loader = new MigrationLoader(conventions);
+			var asm = Assembly.GetExecutingAssembly();
+			var migrationList = loader.FindMigrationsIn(asm, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1");
+			migrationList.Select(x => x.Type).ShouldNotContain(typeof(VersionedMigration));
+			migrationList.Count().ShouldBeGreaterThan(0);
+		}
 	}
 }

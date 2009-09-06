@@ -7,14 +7,14 @@ namespace FluentMigrator
 {
 	public interface IMigrationProcessor
 	{
-        void UpdateTable(string tableName, List<string> columns, List<string> formattedValues);
-	    void DeleteWhere(string tableName, string column, string equals);
+		void UpdateTable(string tableName, List<string> columns, List<string> formattedValues);
+		void DeleteWhere(string tableName, string column, string equals);
 
-        void Execute(string template, params object[] args);
-        DataSet ReadTableData(string tableName);
-        DataSet Read(string template, params object[] args);
-        bool TableExists(string tableName);
-        bool Exists(string template, params object[] args);
+		void Execute(string template, params object[] args);
+		DataSet ReadTableData(string tableName);
+		DataSet Read(string template, params object[] args);
+		bool TableExists(string tableName);
+		bool Exists(string template, params object[] args);
 
 		void Process(CreateTableExpression expression);
 		void Process(CreateColumnExpression expression);
@@ -26,6 +26,6 @@ namespace FluentMigrator
 		void Process(DeleteIndexExpression expression);
 		void Process(RenameTableExpression expression);
 		void Process(RenameColumnExpression expression);
-	    void Process(InsertDataExpression expression);
+		void Process(InsertDataExpression expression);
 	}
 }

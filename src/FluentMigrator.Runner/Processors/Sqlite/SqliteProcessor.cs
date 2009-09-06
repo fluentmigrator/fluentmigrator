@@ -20,7 +20,7 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 			return Exists("select count(*) from sqlite_master where name='{0}'", tableName);
 		}
 
-	    public override void Execute(string template, params object[] args)
+		public override void Execute(string template, params object[] args)
 		{
 			if (Connection.State != ConnectionState.Open) Connection.Open();
 
@@ -30,7 +30,7 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 			}
 		}
 
-	    public override bool Exists(string template, params object[] args)
+		public override bool Exists(string template, params object[] args)
 		{
 			if (Connection.State != ConnectionState.Open) Connection.Open();
 
@@ -88,9 +88,9 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 			Execute("update {0} set {1} ", tableName, setParam);
 		}
 
-        public override void DeleteWhere(string tableName, string column, string equals)
-        {
-            Execute("delete from {0} where {1}='{2}'", tableName, column, equals);
-        }
+		public override void DeleteWhere(string tableName, string column, string equals)
+		{
+			Execute("delete from {0} where {1}='{2}'", tableName, column, equals);
+		}
 	}
 }

@@ -72,9 +72,9 @@ namespace FluentMigrator.Tests.Unit.Generators
 		//[Test]
 		//public void CanRenameColumn()
 		//{
-		//    RenameColumnExpression expression = GetRenameColumnExpression();
-		//    string sql = generator.Generate(expression);
-		//    sql.ShouldBe(string.Format("UPDATE {0} SET {1}={2}", table, oldColumn, newColumn));
+		//	RenameColumnExpression expression = GetRenameColumnExpression();
+		//	string sql = generator.Generate(expression);
+		//	sql.ShouldBe(string.Format("UPDATE {0} SET {1}={2}", table, oldColumn, newColumn));
 		//}
 
 		[Test]
@@ -104,11 +104,11 @@ namespace FluentMigrator.Tests.Unit.Generators
 			var expression = new InsertDataExpression();
 			expression.TableName = "TestTable";
 			expression.Rows.Add(new InsertionData { new KeyValuePair<string, object>("Id", 1), 
-                                                    new KeyValuePair<string, object>("Name", "Justin"),
-                                                    new KeyValuePair<string, object>("Website", "codethinked.com") });
+													new KeyValuePair<string, object>("Name", "Justin"),
+													new KeyValuePair<string, object>("Website", "codethinked.com") });
 			expression.Rows.Add(new InsertionData { new KeyValuePair<string, object>("Id", 2), 
-                                                    new KeyValuePair<string, object>("Name", "Nate"),
-                                                    new KeyValuePair<string, object>("Website", "kohari.org") });
+													new KeyValuePair<string, object>("Name", "Nate"),
+													new KeyValuePair<string, object>("Website", "kohari.org") });
 
 			string sql = generator.Generate(expression);
 

@@ -47,7 +47,7 @@ namespace FluentMigrator.Runner.Generators
 				int capacity = entry.Key;
 				string template = entry.Value;
 
-                if (size <= capacity)
+				if (size <= capacity)
 					return ReplacePlaceholders(template, size, precision);
 			}
 
@@ -76,9 +76,9 @@ namespace FluentMigrator.Runner.Generators
 		public abstract string Generate(DeleteIndexExpression expression);
 		public abstract string Generate(RenameTableExpression expression);
 		public abstract string Generate(RenameColumnExpression expression);
-	    public abstract string Generate(InsertDataExpression expression);	    
+		public abstract string Generate(InsertDataExpression expression);		
 
-	    public virtual string GenerateDDLForColumn(ColumnDefinition column)
+		public virtual string GenerateDDLForColumn(ColumnDefinition column)
 		{
 			var sb = new StringBuilder();
 			
@@ -86,21 +86,21 @@ namespace FluentMigrator.Runner.Generators
 			sb.Append(" ");
 			sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
 
-            if (!column.IsNullable)
-            {
-                sb.Append(" NOT NULL");
-            }
+			if (!column.IsNullable)
+			{
+				sb.Append(" NOT NULL");
+			}
 
-            if (column.DefaultValue != null)
-            {
-                sb.Append(" DEFAULT ");
-                sb.Append(GetConstantValue(column.DefaultValue));                
-            }
+			if (column.DefaultValue != null)
+			{
+				sb.Append(" DEFAULT ");
+				sb.Append(GetConstantValue(column.DefaultValue));				
+			}
 
-            if (column.IsIdentity)
-            {
-                sb.Append(" IDENTITY(1,1)");
-            }
+			if (column.IsIdentity)
+			{
+				sb.Append(" IDENTITY(1,1)");
+			}
 
 			if (column.IsPrimaryKey)
 			{
@@ -110,12 +110,12 @@ namespace FluentMigrator.Runner.Generators
 			return sb.ToString();
 		}
 
-	    protected string GetColumnDDL(IList<ColumnDefinition> columns)
+		protected string GetColumnDDL(IList<ColumnDefinition> columns)
 		{
 			string result = "";
 			int total = columns.Count - 1;
 
-			//if more than one column is a primary key, then it needs to be added separately            
+			//if more than one column is a primary key, then it needs to be added separately			
 			IList<ColumnDefinition> primaryKeyColumns = GetPrimaryKeyColumns(columns);
 			if (primaryKeyColumns.Count > 1)
 			{
@@ -174,18 +174,18 @@ namespace FluentMigrator.Runner.Generators
 			return String.Format(template, args);
 		}
 
-        protected virtual string GetConstantValue(object value)
-        {
-            string stringValue = value as string;
-            if (stringValue != null)
-            {
-                return "'" + stringValue.Replace("'", "''") + "'";
-            }
+		protected virtual string GetConstantValue(object value)
+		{
+			string stringValue = value as string;
+			if (stringValue != null)
+			{
+				return "'" + stringValue.Replace("'", "''") + "'";
+			}
 			else if (value is Guid)
 			{
 				return "'" + ((Guid)value).ToString().Replace("'", "''") + "'";
 			}
-            return value.ToString();
-        }
+			return value.ToString();
+		}
 	}
 }

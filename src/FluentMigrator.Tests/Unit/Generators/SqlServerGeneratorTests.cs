@@ -129,7 +129,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.ForeignKey.ForeignColumns = new[] { "Column3", "Column4" };
 
 			string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [TestForeignTable] ADD CONSTRAINT FK_Test FOREIGN KEY (Column3,Column4) REFERENCES [TestPrimaryTable] (Column1,Column2)");
+			sql.ShouldBe("ALTER TABLE [TestForeignTable] ADD CONSTRAINT FK_Test FOREIGN KEY (Column3,Column4) REFERENCES [TestPrimaryTable] (Column1,Column2)");
 		}
 
 		[Test]
@@ -143,25 +143,25 @@ namespace FluentMigrator.Tests.Unit.Generators
 			sql.ShouldBe("ALTER TABLE [TestPrimaryTable] DROP CONSTRAINT FK_Test");
 		}
 
-        [Test]
-        public void CanInsertData()
-        {
-            var expression = new InsertDataExpression();
-            expression.TableName = "TestTable";
-            expression.Rows.Add(new InsertionData { new KeyValuePair<string, object>("Id", 1), 
-                                                    new KeyValuePair<string, object>("Name", "Justin"),
-                                                    new KeyValuePair<string, object>("Website", "codethinked.com") });
-            expression.Rows.Add(new InsertionData { new KeyValuePair<string, object>("Id", 2), 
-                                                    new KeyValuePair<string, object>("Name", "Nate"),
-                                                    new KeyValuePair<string, object>("Website", "kohari.org") });
+		[Test]
+		public void CanInsertData()
+		{
+			var expression = new InsertDataExpression();
+			expression.TableName = "TestTable";
+			expression.Rows.Add(new InsertionData { new KeyValuePair<string, object>("Id", 1), 
+													new KeyValuePair<string, object>("Name", "Justin"),
+													new KeyValuePair<string, object>("Website", "codethinked.com") });
+			expression.Rows.Add(new InsertionData { new KeyValuePair<string, object>("Id", 2), 
+													new KeyValuePair<string, object>("Name", "Nate"),
+													new KeyValuePair<string, object>("Website", "kohari.org") });
 
-            string sql = generator.Generate(expression);
+			string sql = generator.Generate(expression);
 
-            string expected = "INSERT INTO [TestTable] (Id,Name,Website) VALUES (1,'Justin','codethinked.com');";
-            expected += "INSERT INTO [TestTable] (Id,Name,Website) VALUES (2,'Nate','kohari.org');";
+			string expected = "INSERT INTO [TestTable] (Id,Name,Website) VALUES (1,'Justin','codethinked.com');";
+			expected += "INSERT INTO [TestTable] (Id,Name,Website) VALUES (2,'Nate','kohari.org');";
 
-            sql.ShouldBe(expected);
-        }
+			sql.ShouldBe(expected);
+		}
 
 		[Test]
 		public void CanInsertGuidData()

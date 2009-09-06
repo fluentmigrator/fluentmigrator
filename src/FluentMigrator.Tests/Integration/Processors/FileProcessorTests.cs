@@ -129,9 +129,9 @@ namespace FluentMigrator.Tests.Integration.Processors
 			throw new NotImplementedException();
 		}
 
-        public override void DeleteWhere(string tableName, string column, string equals)
-        {
-            throw new NotImplementedException();
-        }
+		public override void DeleteWhere(string tableName, string column, string equals)
+		{
+			throw new NotImplementedException();
+		}
 	}
 }

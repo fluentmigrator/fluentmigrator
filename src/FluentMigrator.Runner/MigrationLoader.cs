@@ -24,13 +24,13 @@ namespace FluentMigrator.Runner
 			}
 		}
 
-	    public IEnumerable<MigrationMetadata> FindMigrationsIn(Assembly assembly, string @namespace)
-	    {
-            foreach (Type type in assembly.GetExportedTypes().Where(x => x.Namespace == @namespace))
-            {
-                if (Conventions.TypeIsMigration(type))
-                    yield return Conventions.GetMetadataForMigration(type);
-            }
-	    }
+		public IEnumerable<MigrationMetadata> FindMigrationsIn(Assembly assembly, string @namespace)
+		{
+			foreach (Type type in assembly.GetExportedTypes().Where(x => x.Namespace == @namespace))
+			{
+				if (Conventions.TypeIsMigration(type))
+					yield return Conventions.GetMetadataForMigration(type);
+			}
+		}
 	}
 }

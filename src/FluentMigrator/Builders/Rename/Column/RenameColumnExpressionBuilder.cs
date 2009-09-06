@@ -1,5 +1,4 @@
-﻿using System;
-using FluentMigrator.Expressions;
+﻿using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Builders.Rename.Column
 {
@@ -16,10 +15,10 @@ namespace FluentMigrator.Builders.Rename.Column
 			Expression.NewName = name;
 		}
 
-	    public IRenameColumnToSyntax OnTable(string tableName)
-	    {
-	        Expression.TableName = tableName;
-	        return this;
-	    }
+		public IRenameColumnToSyntax OnTable(string tableName)
+		{
+			Expression.TableName = tableName;
+			return this;
+		}
 	}
 }
