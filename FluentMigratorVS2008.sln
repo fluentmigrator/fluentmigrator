@@ -14,7 +14,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{0089ACAC
 		.gitignore = .gitignore
 		build.bat = build.bat
 		FluentMigrator.msbuild = FluentMigrator.msbuild
-		Rakefile2 = Rakefile2
+		Rakefile = Rakefile
 		README.textile = README.textile
 	EndProjectSection
 EndProject
