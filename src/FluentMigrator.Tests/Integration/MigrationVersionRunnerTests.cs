@@ -1,4 +1,5 @@
 ﻿using FluentMigrator.Runner;
+using FluentMigrator.Tests.Integration.Migrations;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -14,7 +15,7 @@ namespace FluentMigrator.Tests.Integration
 				{
 					var conventions = new MigrationConventions();
 
-					var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
+                    var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(TestMigration).Namespace);
 
 					runner.Migrations.ShouldNotBeNull();
 				});
@@ -27,7 +28,7 @@ namespace FluentMigrator.Tests.Integration
 				{
 					var conventions = new MigrationConventions();
 
-					var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
+                    var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(TestMigration).Namespace);
 
 					runner.Version.ShouldNotBeNull();
 				});
@@ -39,7 +40,7 @@ namespace FluentMigrator.Tests.Integration
 			ExecuteWithSupportedProcessors(processor =>
 				{
 					var conventions = new MigrationConventions();
-					var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
+                    var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(TestMigration).Namespace);
 
 					runner.UpgradeToVersion(2, false);
 					runner.Version.CurrentVersion.ShouldBe((long)2);
@@ -58,7 +59,7 @@ namespace FluentMigrator.Tests.Integration
 				{
 					var conventions = new MigrationConventions();
 
-					var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests));
+                    var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(TestMigration).Namespace);
 
 					runner.UpgradeToLatest(false);
 
@@ -68,5 +69,29 @@ namespace FluentMigrator.Tests.Integration
 					runner.CurrentVersion.ShouldBe((long)0);
 				});
 		}
+
+        private void runMigrationsInNamespace(IMigrationProcessor processor, string @namespace)
+        {
+            var conventions = new MigrationConventions();
+
+            var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests).Assembly, @namespace);
+
+            runner.UpgradeToLatest(false);
+        }
+
+        [Test]
+        public void CanMigratePreviousUnappliedMigrations()
+        {
+            ExecuteWithSqlite(processor =>
+               {
+                   runMigrationsInNamespace(processor, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1");
+                   runMigrationsInNamespace(processor, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass2");
+                   runMigrationsInNamespace(processor, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3");
+
+                   processor.TableExists("UserRoles").ShouldBeTrue();
+                   processor.TableExists("User").ShouldBeTrue();
+
+               });
+        }
 	}
 }

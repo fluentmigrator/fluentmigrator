@@ -103,6 +103,12 @@
   <ItemGroup>
     <Compile Include="Integration\IntegrationTestBase.cs" />
     <Compile Include="Integration\MigrationRunnerTests.cs" />
+    <Compile Include="Integration\Migrations\Interleaved\Pass1\3_UserRoles.cs" />
+    <Compile Include="Integration\Migrations\Interleaved\Pass2\1_User.cs" />
+    <Compile Include="Integration\Migrations\Interleaved\Pass2\3_UserRoles.cs" />
+    <Compile Include="Integration\Migrations\Interleaved\Pass3\1_User.cs" />
+    <Compile Include="Integration\Migrations\Interleaved\Pass3\3_UserRoles.cs" />
+    <Compile Include="Integration\Migrations\Interleaved\Pass3\2_UserEmail.cs" />
     <Compile Include="Integration\MigrationVersionRunnerTests.cs" />
     <Compile Include="Integration\Processors\FileProcessorTests.cs" />
     <Compile Include="Integration\VersionMigrationTests.cs" />
@@ -137,11 +143,12 @@
     <Compile Include="Unit\DefaultMigrationConventionsTests.cs" />
     <Compile Include="Unit\Definitions\ColumnDefinitionTests.cs" />
     <Compile Include="Unit\Expressions\RenameColumnExpressionTests.cs" />
-    <Compile Include="TestMigration.cs" />
+    <Compile Include="Integration\Migrations\TestMigration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Unit\MigrationVersionRunnerUnitTests.cs" />
     <Compile Include="Unit\Runners\MigratorConsoleTests.cs" />
     <Compile Include="Unit\Runners\ProcessorFactoryTests.cs" />
+    <Compile Include="Integration\Migrations\VersionedMigration.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.Console\FluentMigrator.Console.csproj">

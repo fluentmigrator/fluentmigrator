@@ -2,8 +2,10 @@
 using System.Collections.Generic;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
+using FluentMigrator.Tests.Integration.Migrations;
 using NUnit.Framework;
 using NUnit.Should;
+using System.Linq;
 
 namespace FluentMigrator.Tests.Unit
 {
@@ -26,21 +28,16 @@ namespace FluentMigrator.Tests.Unit
 
 			count.ShouldBeGreaterThan(0);
 		}
-	}
 
-	[Migration(2)]
-	public class VersionedMigration : Migration
-	{
-		public override void Up()
-		{
-			Create.Table("VersionedMigration")
-				.WithColumn("Id").AsInt32().Identity().NotNullable().PrimaryKey()
-				.WithColumn("PooBah").AsString(32).Nullable();
-		}
-
-		public override void Down()
-		{
-			Delete.Table("VersionedMigration");
-		}
+        [Test]
+        public void CanFindMigrationsInNamespace()
+        {
+            var conventions = new MigrationConventions();
+            var loader = new MigrationLoader(conventions);
+            var asm = Assembly.GetExecutingAssembly();
+            var migrationList = loader.FindMigrationsIn(asm, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1");
+            migrationList.Select(x => x.Type).ShouldNotContain(typeof(VersionedMigration));
+            migrationList.Count().ShouldBeGreaterThan(0);
+        }
 	}
 }

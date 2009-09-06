@@ -13,8 +13,9 @@ namespace FluentMigrator.Tests.Unit.Runners
 		public string Connection;
 		public bool Log;
 		private string TargetAssembly;
+	    public string Namespace;
 
-		public MigratorConsole(string[] args)
+	    public MigratorConsole(string[] args)
 		{
 			ParseArguments(args);
 			CreateProcessor();
@@ -36,6 +37,9 @@ namespace FluentMigrator.Tests.Unit.Runners
 
 				if (args[i].Contains("/log"))
 					Log = true;
+
+                if (args[i].Contains("/namespace"))
+                    Namespace = args[i + 1];
 			}
 
 			if (string.IsNullOrEmpty(ProcessorType))
@@ -56,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Runners
 				TargetAssembly = Path.GetFullPath(TargetAssembly);
 
 			Assembly assembly = Assembly.LoadFile(TargetAssembly);
-			var runner = new MigrationVersionRunner(new MigrationConventions(), Processor, new MigrationLoader(new MigrationConventions()), assembly);
+			var runner = new MigrationVersionRunner(new MigrationConventions(), Processor, new MigrationLoader(new MigrationConventions()), assembly, Namespace);
 			runner.LoadAssemblyMigrations();
 			runner.UpgradeToLatest(true);
 		}

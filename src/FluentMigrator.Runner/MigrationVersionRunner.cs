@@ -16,6 +16,7 @@ namespace FluentMigrator.Runner
 		public bool SilentlyFail { get; set; }
 		public IList<Exception> CaughtExceptions { get; private set; }
 		private IMigrationLoader MigrationLoader { get; set; }
+	    private string @namespace;
 
 		public VersionInfo Version
 		{
@@ -41,16 +42,16 @@ namespace FluentMigrator.Runner
 		}
 
 		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader)
-			: this(conventions, processor, loader, Assembly.GetCallingAssembly())
+			: this(conventions, processor, loader, Assembly.GetCallingAssembly(), null)
 		{
 		}
 
 		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader, Type getAssemblyByType)
-			: this(conventions, processor, loader, getAssemblyByType.Assembly)
+			: this(conventions, processor, loader, getAssemblyByType.Assembly, null)
 		{
 		}
 
-		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader, Assembly assembly)
+		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader, Assembly assembly, string @namespace)
 		{
 			SilentlyFail = false;
 			CaughtExceptions = new List<Exception>();
@@ -60,6 +61,7 @@ namespace FluentMigrator.Runner
 			Version = null;
 			Migrations = null;
 			MigrationLoader = loader;
+		    this.@namespace = @namespace;
 		}
 
 		public void ClearCaughtExceptions()
@@ -89,7 +91,7 @@ namespace FluentMigrator.Runner
 		public void LoadAssemblyMigrations()
 		{
 			Migrations = new SortedList<long, Migration>();
-			IEnumerable<MigrationMetadata> migrationList = MigrationLoader.FindMigrationsIn(MigrationAssembly);
+            IEnumerable<MigrationMetadata> migrationList = string.IsNullOrEmpty(@namespace) ? MigrationLoader.FindMigrationsIn(MigrationAssembly) : MigrationLoader.FindMigrationsIn(MigrationAssembly, @namespace);
 
 			if (migrationList == null) return;
 
