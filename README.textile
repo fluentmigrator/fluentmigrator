@@ -8,7 +8,7 @@ h2. Project Info
 * *Discussions*: "fluentmigrator-google-group@googlegroups.com":http://groups.google.com/group/fluentmigrator-google-group
 * *Bug/Feature Tracking*: "fluentmigrator.lighthouseapp.com/":http://fluentmigrator.lighthouseapp.com
 
-h2. Getting the example project running
+h2. Getting started with the example project
 
 The example project is a class library that contains the migrations, and a rakefile to wrap the Migrator.Console.exe calls. 
 You will need ruby, rubygems and the rake gem installed. Instructions to do this can be found "here":http://rubyonrails.org/download
@@ -33,8 +33,13 @@ rake db:migrate:up
 rake db:migrate:down
 rake db:rollback</code></pre>
 
-The db:migrate commands can take an optional VERSION parameter so <pre><code>rake db:migrate VERSION=20090906205342</code></pre> 
-will only migrate the first migration. db:rollback can take an optional STEPS parameter.
+The db:migrate commands can take an optional VERSION parameter
+
+<pre><code>rake db:migrate VERSION=20090906205342</code></pre> 
+
+db:rollback can take an optional STEPS parameter.
+
+<pre><code>rake db:rollback STEPS=2</code></pre> 
 
 h2. Example Migration
 
