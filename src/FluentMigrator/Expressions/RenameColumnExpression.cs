@@ -28,5 +28,10 @@ namespace FluentMigrator.Expressions
 		{
 			return new RenameColumnExpression { TableName = TableName, OldName = NewName, NewName = OldName };
 		}
+
+		public override string ToString()
+		{
+			return base.ToString() + TableName + " " + OldName + " to " + NewName;
+		}
 	}
 }

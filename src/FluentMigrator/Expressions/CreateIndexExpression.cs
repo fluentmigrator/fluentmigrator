@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using FluentMigrator.Model;
+using System.Linq;
 
 namespace FluentMigrator.Expressions
 {
@@ -26,6 +27,11 @@ namespace FluentMigrator.Expressions
 		public override IMigrationExpression Reverse()
 		{
 			return new DeleteIndexExpression { Index = Index.Clone() as IndexDefinition };
+		}
+
+		public override string ToString()
+		{
+			return base.ToString() + Index.TableName + " (" + string.Join(", ", Index.Columns.Select(x => x.Name).ToArray()) + ")";
 		}
 	}
 }

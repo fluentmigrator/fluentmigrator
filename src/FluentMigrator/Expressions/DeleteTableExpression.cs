@@ -18,5 +18,10 @@ namespace FluentMigrator.Expressions
 		{
 			processor.Process(this);
 		}
+
+		public override string ToString()
+		{
+			return base.ToString() + TableName;
+		}
 	}
 }

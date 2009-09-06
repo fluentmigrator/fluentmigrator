@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 
 namespace FluentMigrator.Runner
 {
@@ -25,18 +26,21 @@ namespace FluentMigrator.Runner
 			{
 				_writer.Write("=");
 			}
+			_writer.Write(Environment.NewLine);
 		}
 
 		public void Say(string message)
 		{
 			_writer.Write("-- ");
 			_writer.Write(message);
+			_writer.Write(Environment.NewLine);
 		}
 
 		public void SaySubItem(string message)
 		{
 			_writer.Write("   -> ");
 			_writer.Write(message);
+			_writer.Write(Environment.NewLine);
 		}
 	}
 }

@@ -81,7 +81,7 @@ namespace FluentMigrator.Runner
 			{
 				try
 				{
-					expression.ExecuteWith(Processor);
+					time(expression.ToString(), () => expression.ExecuteWith(Processor));
 				}
 				catch (Exception er)
 				{
@@ -95,6 +95,21 @@ namespace FluentMigrator.Runner
 					throw;
 				}
 			}
+		}
+
+		private void time(string message, Action action)
+		{
+			_announcer.Say(message);
+
+			_stopWatch.Start();
+
+			action();
+
+			_stopWatch.Stop();
+
+			var elapsed = _stopWatch.ElapsedTime().TotalSeconds;
+
+			_announcer.SaySubItem(elapsed + "s");
 		}
 	}
 }

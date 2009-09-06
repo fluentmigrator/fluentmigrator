@@ -76,5 +76,12 @@ namespace FluentMigrator.Tests.Unit.Expressions
 			reverse.OldName.ShouldBe("ChunkyBaconId");
 			reverse.NewName.ShouldBe("BaconId");
 		}
+
+		[Test]
+		public void ToStringIsDescriptive()
+		{
+			var expression = new RenameColumnExpression { TableName = "Bacon", OldName = "BaconId", NewName = "ChunkyBaconId" };
+			expression.ToString().ShouldBe("RenameColumn Bacon BaconId to ChunkyBaconId");		
+		}
 	}
 }

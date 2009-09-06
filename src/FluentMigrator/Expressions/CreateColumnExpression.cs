@@ -32,5 +32,10 @@ namespace FluentMigrator.Expressions
 		{
 			return new DeleteColumnExpression { TableName = TableName, ColumnName = Column.Name };
 		}
+
+		public override string ToString()
+		{
+			return base.ToString() + TableName + " " + Column.Name + " " + Column.Type;
+		}
 	}
 }

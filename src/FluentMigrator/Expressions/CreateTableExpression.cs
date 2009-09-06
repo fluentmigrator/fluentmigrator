@@ -32,5 +32,10 @@ namespace FluentMigrator.Expressions
 		{
 			return new DeleteTableExpression { TableName = TableName };
 		}
+
+		public override string ToString()
+		{
+			return base.ToString() + TableName;
+		}
 	}
 }

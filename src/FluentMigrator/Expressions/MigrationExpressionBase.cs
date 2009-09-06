@@ -12,5 +12,10 @@ namespace FluentMigrator.Expressions
 		{
 			throw new NotSupportedException(String.Format("The {0} cannot be automatically reversed", GetType().Name));
 		}
+
+		public override string ToString()
+		{
+			return GetType().Name.Replace("Expression", "") + " ";
+		}
 	}
 }

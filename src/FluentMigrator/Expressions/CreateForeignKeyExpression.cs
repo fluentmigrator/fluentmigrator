@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using FluentMigrator.Model;
+using System.Linq;
 
 namespace FluentMigrator.Expressions
 {
@@ -26,6 +27,13 @@ namespace FluentMigrator.Expressions
 		public override IMigrationExpression Reverse()
 		{
 			return new DeleteForeignKeyExpression { ForeignKey = ForeignKey.Clone() as ForeignKeyDefinition };
+		}
+
+		public override string ToString()
+		{
+			return base.ToString() + ForeignKey.Name + " " 
+				+ ForeignKey.ForeignTable + " (" + string.Join(", ", ForeignKey.ForeignColumns.ToArray()) + ") "
+				+ ForeignKey.PrimaryTable + " (" + string.Join(", ", ForeignKey.PrimaryColumns.ToArray()) + ")";
 		}
 	}
 }

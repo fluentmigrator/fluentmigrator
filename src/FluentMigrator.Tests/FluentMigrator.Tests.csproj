@@ -127,6 +127,11 @@
     <Compile Include="Unit\Builders\Create\CreateForeignKeyExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateTableExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateColumnExpressionBuilderTests.cs" />
+    <Compile Include="Unit\Expressions\DeleteIndexExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\DeleteForeignKeyExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\CreateForeignKeyExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\CreateIndexExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\CreateTableExpressionTests.cs" />
     <Compile Include="Unit\MigrationLoaderTests.cs" />
     <Compile Include="Unit\MigrationMetadataTests.cs" />
     <Compile Include="Unit\Generators\SqliteGeneratorTests.cs" />

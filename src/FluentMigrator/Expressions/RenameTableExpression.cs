@@ -27,5 +27,10 @@ namespace FluentMigrator.Expressions
 		{
 			return new RenameTableExpression { OldName = NewName, NewName = OldName };
 		}
+
+		public override string ToString()
+		{
+			return base.ToString() + OldName + " " + NewName;
+		}
 	}
 }

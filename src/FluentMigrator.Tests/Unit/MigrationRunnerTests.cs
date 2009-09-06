@@ -96,7 +96,30 @@ namespace FluentMigrator.Tests.Unit
 			}
 
 			_announcer.VerifyAll();
+		}
 
+		[Test]
+		public void CanSayExpression()
+		{
+			_announcer.Setup(x => x.Say(It.IsRegex(containsAll("CreateTable"))));
+
+			_stopWatch.Setup(x => x.ElapsedTime()).Returns(new TimeSpan(0, 0, 0, 1, 3));
+
+			_runner.Up(new TestMigration());
+
+			_announcer.VerifyAll();
+		}
+
+		[Test]
+		public void CanTimeExpression()
+		{
+			_announcer.Setup(x => x.SaySubItem(It.IsRegex(containsAll("1.003s"))));
+
+			_stopWatch.Setup(x => x.ElapsedTime()).Returns(new TimeSpan(0, 0, 0, 1, 3));
+
+			_runner.Up(new TestMigration());
+
+			_announcer.VerifyAll();
 		}
 
 		private string containsAll(params string[] words)

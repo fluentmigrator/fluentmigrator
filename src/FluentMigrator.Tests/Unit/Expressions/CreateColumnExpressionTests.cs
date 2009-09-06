@@ -1,4 +1,5 @@
 using System;
+using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Tests.Helpers;
@@ -49,6 +50,13 @@ namespace FluentMigrator.Tests.Unit.Expressions
 			var reverse = expression.Reverse() as DeleteColumnExpression;
 			reverse.TableName.ShouldBe("Bacon");
 			reverse.ColumnName.ShouldBe("BaconId");
+		}
+
+		[Test]
+		public void ToStringIsDescriptive()
+		{
+			var expression = new CreateColumnExpression { TableName = "Bacon", Column = { Name = "BaconId", Type = DbType.Int32 } };
+			expression.ToString().ShouldBe("CreateColumn Bacon BaconId Int32");	
 		}
 	}
 }

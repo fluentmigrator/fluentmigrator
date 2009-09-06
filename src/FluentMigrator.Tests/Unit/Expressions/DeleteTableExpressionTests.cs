@@ -40,5 +40,12 @@ namespace FluentMigrator.Tests.Unit.Expressions
 		{
 			new DeleteColumnExpression().Reverse();
 		}
+
+		[Test]
+		public void ToStringIsDescriptive()
+		{
+			var expression = new DeleteTableExpression { TableName = "Bacon" };
+			expression.ToString().ShouldBe("DeleteTable Bacon");
+		}
 	}
 }

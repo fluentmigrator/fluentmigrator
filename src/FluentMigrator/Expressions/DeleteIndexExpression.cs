@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using FluentMigrator.Model;
+using System.Linq;
 
 namespace FluentMigrator.Expressions
 {
@@ -21,6 +22,11 @@ namespace FluentMigrator.Expressions
 		public override void ExecuteWith(IMigrationProcessor processor)
 		{
 			processor.Process(this);
+		}
+
+		public override string ToString()
+		{
+			return base.ToString() + Index.TableName + " (" + string.Join(", ", Index.Columns.Select(x => x.Name).ToArray()) + ")";
 		}
 	}
 }
