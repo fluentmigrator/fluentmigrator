@@ -7,3 +7,4 @@ dist
 *.suo
 *resharper*
 *.user
+TestResult.xml

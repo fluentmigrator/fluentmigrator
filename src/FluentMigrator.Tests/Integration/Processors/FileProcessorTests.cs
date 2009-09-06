@@ -72,7 +72,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 			get
 			{
 				string line;
-				using (var stream = File.OpenText(_dumpFilename))
+				using (var stream = File.OpenText(_fileDumpProcessor.DumpFilename))
 					while ((line = stream.ReadLine()) != null)
 						yield return line;
 			}
