@@ -84,8 +84,8 @@ namespace FluentMigrator.Runner
 			var row = ds.Tables[0].Rows[0];
 
 			//set variable
-			Version = new VersionInfo(int.Parse(row["CurrentVersion"].ToString()),
-				int.Parse(row["PreviousVersion"].ToString()), DateTime.Parse(row["LastUpdated"].ToString()));
+			Version = new VersionInfo(long.Parse(row["CurrentVersion"].ToString()),
+				long.Parse(row["PreviousVersion"].ToString()), DateTime.Parse(row["LastUpdated"].ToString()));
 		}
 
 		public void LoadAssemblyMigrations()

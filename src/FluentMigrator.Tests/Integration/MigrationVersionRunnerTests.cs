@@ -79,7 +79,7 @@ namespace FluentMigrator.Tests.Integration
             runner.UpgradeToLatest(false);
         }
 
-        [Test]
+        [Test, Ignore("Interleaved migrations not supported yet")]
         public void CanMigratePreviousUnappliedMigrations()
         {
             ExecuteWithSqlite(processor =>

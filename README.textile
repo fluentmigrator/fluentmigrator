@@ -4,9 +4,9 @@ Fluent migrations for .NET!
 
 h2. Project Info
 
-* *Project Home*: "http://code.google.com/p/fluentmigrator/":code.google.com/p/fluentmigrator
-* *Discussions*: "http://groups.google.com/group/fluentmigrator-google-group":fluentmigrator-google-group@googlegroups.com
-* *Bug/Feature Tracking*: "http://code.google.com/p/fluentmigrator/issues/":code.google.com/p/fluentmigrator/issues
+* *Project Home*: "code.google.com/p/fluentmigrator":http://code.google.com/p/fluentmigrator/
+* *Discussions*: "fluentmigrator-google-group@googlegroups.com":http://groups.google.com/group/fluentmigrator-google-group
+* *Bug/Feature Tracking*: "fluentmigrator.lighthouseapp.com/":http://fluentmigrator.lighthouseapp.com
 
 h2. Example Migration
 
