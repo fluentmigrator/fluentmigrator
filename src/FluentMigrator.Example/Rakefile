@@ -22,7 +22,7 @@ namespace :db do
   
   namespace :migrate do
     desc 'migrates the database'
-	task :down => [:clean, :compile] do
+	task :up => [:clean, :compile] do
 	  FluentMigratorWrapper.execute('migrate:up', ENV.include?('VERSION') ? ENV['VERSION'] : 0)
 	end
 	
