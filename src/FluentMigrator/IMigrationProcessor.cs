@@ -8,6 +8,8 @@ namespace FluentMigrator
 	public interface IMigrationProcessor
 	{
         void UpdateTable(string tableName, List<string> columns, List<string> formattedValues);
+	    void DeleteWhere(string tableName, string column, string equals);
+
         void Execute(string template, params object[] args);
         DataSet ReadTableData(string tableName);
         DataSet Read(string template, params object[] args);

@@ -1,47 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Reflection;
+using FluentMigrator.Builders.Insert;
+using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Versioning;
+using System.Linq;
 
 namespace FluentMigrator.Runner
 {
-	public class MigrationVersionRunner
-	{
-		private VersionInfo versionInfo;
+    public class MigrationVersionRunner
+    {
+        private IMigrationConventions _migrationConventions;
+        private IMigrationProcessor _migrationProcessor;
+        private IMigrationLoader _migrationLoader;
+        private Assembly _migrationAssembly;
+        private string _namespace;
+        private VersionInfo _versionInfo;
+        private MigrationRunner _migrationRunner;
 
-		public Assembly MigrationAssembly { get; private set; }
-		public IMigrationConventions Conventions { get; private set; }
-		public IMigrationProcessor Processor { get; private set; }
-		public bool SilentlyFail { get; set; }
-		public IList<Exception> CaughtExceptions { get; private set; }
-		private IMigrationLoader MigrationLoader { get; set; }
-	    private string @namespace;
-
-		public VersionInfo Version
-		{
-			get
-			{
-				if (versionInfo == null)
-					LoadVersionInfo();
-
-				return versionInfo;
-			}
-			private set { versionInfo = value; }
-		}
-
-		private SortedList<long, Migration> migrations;
-		public SortedList<long, Migration> Migrations
-		{
-			get
-			{
-				if (migrations == null) LoadAssemblyMigrations();
-				return migrations;
-			}
-			private set { migrations = value; }
-		}
-
-		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader)
+        public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader)
 			: this(conventions, processor, loader, Assembly.GetCallingAssembly(), null)
 		{
 		}
@@ -53,206 +32,120 @@ namespace FluentMigrator.Runner
 
 		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader, Assembly assembly, string @namespace)
 		{
-			SilentlyFail = false;
-			CaughtExceptions = new List<Exception>();
-			Conventions = conventions;
-			Processor = processor;
-			MigrationAssembly = assembly;
-			Version = null;
-			Migrations = null;
-			MigrationLoader = loader;
-		    this.@namespace = @namespace;
+			_migrationConventions = conventions;
+			_migrationProcessor = processor;
+            _migrationAssembly = assembly;
+		    _migrationLoader = loader;
+		    _namespace = @namespace;
+            _migrationRunner = new MigrationRunner(conventions, processor);
 		}
 
-		public void ClearCaughtExceptions()
-		{
-			CaughtExceptions = new List<Exception>();
-		}
+        public Assembly MigrationAssembly
+        {
+            get { return _migrationAssembly; }
+        }
 
-		public void LoadVersionInfo()
-		{
-			//ensure table exists
-			if (!Processor.TableExists(VersionInfo.TABLE_NAME))
-			{
-				//need to load version info
-				var runner = new MigrationRunner(Conventions, Processor);
-				runner.Up(new VersionMigration());
-			}
+        public VersionInfo VersionInfo
+        {
+            get
+            {
+                if (_versionInfo == null)
+                    loadVersionInfo();
+                return _versionInfo;
+            }
+        }
 
-			//fetch info
-			var ds = Processor.ReadTableData(VersionInfo.TABLE_NAME);
-			var row = ds.Tables[0].Rows[0];
+        private void loadVersionInfo()
+        {
+            if (!_migrationProcessor.TableExists(VersionInfo.TABLE_NAME))
+            {
+                var runner = new MigrationRunner(_migrationConventions, _migrationProcessor);
+                runner.Up(new VersionMigration());
+            }
+            var dataSet = _migrationProcessor.ReadTableData(VersionInfo.TABLE_NAME);
+            _versionInfo = new VersionInfo();
+            foreach (DataRow row in dataSet.Tables[0].Rows)
+            {
+                _versionInfo.AddAppliedMigration(long.Parse(row[0].ToString()));
+            }
+        }
 
-			//set variable
-			Version = new VersionInfo(long.Parse(row["CurrentVersion"].ToString()),
-				long.Parse(row["PreviousVersion"].ToString()), DateTime.Parse(row["LastUpdated"].ToString()));
-		}
+        private SortedList<long, Migration> _migrations;
+        public SortedList<long, Migration> Migrations
+        {
+            get
+            {
+                if (_migrations == null)
+                    loadMigrations();
+                return _migrations;
+            }
+        }
 
-		public void LoadAssemblyMigrations()
-		{
-			Migrations = new SortedList<long, Migration>();
-            IEnumerable<MigrationMetadata> migrationList = string.IsNullOrEmpty(@namespace) ? MigrationLoader.FindMigrationsIn(MigrationAssembly) : MigrationLoader.FindMigrationsIn(MigrationAssembly, @namespace);
 
-			if (migrationList == null) return;
+        private void loadMigrations()
+        {
+            _migrations = new SortedList<long, Migration>();
+            IEnumerable<MigrationMetadata> migrationList;
+            
+            if (string.IsNullOrEmpty(_namespace))
+                migrationList = _migrationLoader.FindMigrationsIn(_migrationAssembly);
+            else
+                migrationList = _migrationLoader.FindMigrationsIn(_migrationAssembly, _namespace);
 
-			var en = migrationList.GetEnumerator();
-			while (en.MoveNext())
-			{
-				if (Migrations.ContainsKey(en.Current.Version))
-					throw new Exception(String.Format("Duplicate migration version {0}.", en.Current.Version));
+            if (migrationList == null)
+                return;
 
-				//create instance of migration class and add to list
-				var mig = en.Current.Type.Assembly.CreateInstance(en.Current.Type.FullName);
-				Migrations.Add(en.Current.Version, mig as Migration);
-			}
-		}
+            foreach (var migrationMetadata in migrationList)
+            {
+                if (_migrations.ContainsKey(migrationMetadata.Version))
+                    throw new Exception(String.Format("Duplicate migration version {0}.", migrationMetadata.Version));
 
-		public long CurrentVersion
-		{
-			get { return Version.CurrentVersion; }
-		}
+                var migration = migrationMetadata.Type.Assembly.CreateInstance(migrationMetadata.Type.FullName);
+                _migrations.Add(migrationMetadata.Version, migration as Migration);
+            }
+        }
 
-		public long LastVersion
-		{
-			get { return Version.PreviousVersion; }
-		}
+        public void MigrateUp()
+        {
+            var appliedMigrations = new List<long>();
+            foreach (var migrationNumber in Migrations.Keys)
+            {
+                if (!VersionInfo.HasAppliedMigration(migrationNumber))
+                {
+                    _migrationRunner.Up(Migrations[migrationNumber]);
+                    appliedMigrations.Add(migrationNumber);
+                }
+            }
+            updateVersionInfoWithAppliedMigrations(appliedMigrations);
+            _versionInfo = null;
+        }
 
-		public void CaptureSilentFailures(IList<Exception> fails)
-		{
-			if (SilentlyFail)
-			{
-				//capture all the caught exceptions
-				foreach (Exception er in fails)
-					this.CaughtExceptions.Add(er);
-			}
-		}
+        private void updateVersionInfoWithAppliedMigrations(IEnumerable<long> migrations)
+        {
+            foreach (var migration in migrations)
+            {
+                var dataExpression = new InsertDataExpression();
+                var data = new InsertionData {new KeyValuePair<string, object>(VersionInfo.COLUMN_NAME, migration)};
+                dataExpression.Rows.Add(data);
+                dataExpression.TableName = VersionInfo.TABLE_NAME;
+                dataExpression.ExecuteWith(_migrationProcessor);
+            }
+        }
 
-		public void StepUp(long fromVersion, long toVersion, out long lastVersionAttempted)
-		{
-			//set steps
-			int fromStep = Migrations.IndexOfKey(fromVersion);
-			int toStep = Migrations.IndexOfKey(toVersion);
+        public void Rollback(int steps)
+        {
+            foreach (var migrationNumber in Migrations.Keys.OrderByDescending(x => x).Take(steps))
+            {
+                _migrationRunner.Down(Migrations[migrationNumber]);
+                _migrationProcessor.DeleteWhere(VersionInfo.TABLE_NAME, VersionInfo.COLUMN_NAME, migrationNumber.ToString());
+            }
+            _versionInfo = null;
+        }
 
-			//track last version atempted
-			lastVersionAttempted = fromVersion;
-
-			if (fromStep > toStep)
-				throw new Exception(String.Format("Version {0} is greater than the target version {1}", fromVersion, toVersion));
-
-			if (fromStep == toStep)
-				return;
-
-			var runner = new MigrationRunner(Conventions, Processor);
-
-			int step = fromStep;
-			while (step < toStep)
-			{
-				long nextStepVersion = Migrations.Keys[step + 1];
-				var nextMigration = Migrations[nextStepVersion];
-				
-				runner.SilentlyFail = SilentlyFail;
-				runner.Up(nextMigration);
-				lastVersionAttempted = nextStepVersion;
-				step++;
-
-				CaptureSilentFailures(runner.CaughtExceptions);
-			}
-
-			//save version info
-			SaveVersionState(lastVersionAttempted, CurrentVersion);
-		}
-
-		public void StepDown(long fromVersion, long toVersion, out long lastVersionAttempted)
-		{
-			//set steps
-			int fromStep = Migrations.IndexOfKey(fromVersion);
-			int toStep = (toVersion == 0) ? -1 : Migrations.IndexOfKey(toVersion);
-
-			//track last version atempted
-			lastVersionAttempted = fromVersion;
-
-			if (fromStep < toStep) throw new Exception(String.Format("Version {0} is less than the target version {1}", fromVersion, toVersion));
-			if (fromStep == toStep) return; //nothing to do
-
-			//runer to execture schema Up()
-			var runner = new MigrationRunner(Conventions, Processor);
-
-			int step = fromStep;
-			while (step > toStep)
-			{
-				long nextStepVersion = Migrations.Keys[step];
-				var nextMigration = Migrations[nextStepVersion];
-				//step up to next version
-				runner.SilentlyFail = this.SilentlyFail;
-				runner.Down(nextMigration);
-				lastVersionAttempted = nextStepVersion;
-				step--;
-				//now handle silent failures
-				CaptureSilentFailures(runner.CaughtExceptions);
-			}
-
-			if (step < 0) lastVersionAttempted = 0;
-
-			//save version info
-			SaveVersionState(lastVersionAttempted, CurrentVersion);
-		}
-
-		public void UpgradeToVersion(long number, bool autoRollback)
-		{
-			if (!Migrations.ContainsKey(number))
-				throw new Exception(String.Format("Version {0} is missing.", number));
-
-			if (CurrentVersion != 0 && !Migrations.ContainsKey(CurrentVersion))
-				throw new Exception(String.Format("Current version {0} is not defined.", CurrentVersion));
-
-			//runer to execture schema Up()
-			// schambers: this isn't being used?
-			var runner = new MigrationRunner(Conventions, Processor);
-
-			long lastVersionRun = 0;
-			try
-			{
-				StepUp(CurrentVersion, number, out lastVersionRun);
-			}
-			catch (Exception er)
-			{
-				//gracefully handle rollback
-				if (lastVersionRun != 0 && autoRollback)
-				{
-					long rollbackVersion = 0;
-					StepDown(lastVersionRun, CurrentVersion, out rollbackVersion);
-				}
-				throw;
-			}
-		}
-
-		/// <summary>
-		/// determine the latest schema version and step up to that version
-		/// </summary>
-		/// <param name="autoRollback"></param>
-		public void UpgradeToLatest(bool autoRollback)
-		{
-			if (Migrations == null || Migrations.Count == 0)
-				return;
-
-			//upgrade to latest
-			long latestVersion = Migrations.Keys[Migrations.Keys.Count - 1];
-
-			//exit early if already at current verions
-			if (latestVersion == CurrentVersion)
-				return;
-
-			UpgradeToVersion(latestVersion, autoRollback);
-		}
-
-		public void SaveVersionState(long currentVersion, long previousVersion)
-		{
-			//save
-			Processor.UpdateTable(VersionInfo.TABLE_NAME, new List<string>() { "CurrentVersion", "PreviousVersion", "LastUpdated" },
-				new List<string>() { String.Format("'{0}'", currentVersion), String.Format("'{0}'", previousVersion), String.Format("'{0}'", DateTime.UtcNow.ToISO8601()) });
-
-			//load versionInfo
-			LoadVersionInfo();
-		}
-	}
+        public void RemoveVersionTable()
+        {
+            var expression = new DeleteTableExpression {TableName = VersionInfo.TABLE_NAME};
+            expression.ExecuteWith(_migrationProcessor);
+        }
+    }
 }

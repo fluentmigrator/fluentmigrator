@@ -9,27 +9,26 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Integration
 {
 	[TestFixture]
-	public class VersionMigrationTests
+	public class VersionMigrationTests : IntegrationTestBase
 	{
 		[Test]
 		public void CanUseVersionInfo()
 		{
-			string connectionString = @"server=(local)\SQLEXPRESS;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator";
-			var conventions = new MigrationConventions();
-			var connection = new SqlConnection(connectionString);
-			connection.Open();
-			var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
-			var runner = new MigrationRunner(conventions, processor);
+            ExecuteWithSupportedProcessors(processor =>
+                {
+                    var runner = new MigrationRunner(new MigrationConventions(), processor);
 
-			//ensure table doesn't exist
-			if (processor.TableExists(VersionInfo.TABLE_NAME))
-				runner.Down(new VersionMigration());
+                    //ensure table doesn't exist
+                    if (processor.TableExists(VersionInfo.TABLE_NAME))
+                        runner.Down(new VersionMigration());
 
-			runner.Up(new VersionMigration());
-			processor.TableExists(VersionInfo.TABLE_NAME).ShouldBeTrue();
+                    runner.Up(new VersionMigration());
+                    processor.TableExists(VersionInfo.TABLE_NAME).ShouldBeTrue();
 
-			runner.Down(new VersionMigration());
-			processor.TableExists(VersionInfo.TABLE_NAME).ShouldBeFalse();
+                    runner.Down(new VersionMigration());
+                    processor.TableExists(VersionInfo.TABLE_NAME).ShouldBeFalse();
+                });
+			
 		}
 	}
 }

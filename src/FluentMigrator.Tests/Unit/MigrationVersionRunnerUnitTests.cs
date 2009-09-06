@@ -13,7 +13,6 @@ namespace FluentMigrator.Tests.Unit
 		[Test]
 		public void LoadsCorrectCallingAssembly()
 		{
-			//mock up the dependencies
 			var conventionMock = new Mock<IMigrationConventions>(MockBehavior.Loose);
 			var processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
 			var loaderMock = new Mock<IMigrationLoader>(MockBehavior.Loose);
@@ -39,7 +38,7 @@ namespace FluentMigrator.Tests.Unit
 
 			vrunner.Migrations.Count.ShouldBe(0);
 
-			vrunner.UpgradeToLatest(false);
+			vrunner.MigrateUp();
 
 			loaderMock.VerifyAll();
 		}

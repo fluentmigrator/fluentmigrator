@@ -61,8 +61,7 @@ namespace FluentMigrator.Tests.Unit.Runners
 
 			Assembly assembly = Assembly.LoadFile(TargetAssembly);
 			var runner = new MigrationVersionRunner(new MigrationConventions(), Processor, new MigrationLoader(new MigrationConventions()), assembly, Namespace);
-			runner.LoadAssemblyMigrations();
-			runner.UpgradeToLatest(true);
+			runner.MigrateUp();
 		}
 	}
 }

@@ -30,44 +30,30 @@ namespace FluentMigrator.Tests.Integration
 
                     var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(TestMigration).Namespace);
 
-					runner.Version.ShouldNotBeNull();
+					runner.VersionInfo.ShouldNotBeNull();
 				});
 		}
 
 		[Test]
-		public void CanRunMigration()
+		public void CanRunMigrations()
 		{
-			ExecuteWithSupportedProcessors(processor =>
+            ExecuteWithSupportedProcessors(processor =>
 				{
 					var conventions = new MigrationConventions();
                     var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(TestMigration).Namespace);
 
-					runner.UpgradeToVersion(2, false);
-					runner.Version.CurrentVersion.ShouldBe((long)2);
+                    runner.MigrateUp();
+				    runner.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
+				    runner.VersionInfo.HasAppliedMigration(2).ShouldBeTrue();
+                    runner.VersionInfo.Latest().ShouldBe(2);
 
-					//now step down to 0
-					long last = 0;
-					runner.StepDown(runner.CurrentVersion, 0, out last);
-					runner.CurrentVersion.ShouldBe((long)0);
-				});
-		}
+				    runner.Rollback(2);
+                    runner.VersionInfo.HasAppliedMigration(1).ShouldBeFalse();
+                    runner.VersionInfo.HasAppliedMigration(2).ShouldBeFalse();
+                    runner.VersionInfo.Latest().ShouldBe(0);
 
-		[Test]
-		public void CanUpdgradeToLatest()
-		{
-			ExecuteWithSupportedProcessors(processor =>
-				{
-					var conventions = new MigrationConventions();
-
-                    var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(TestMigration).Namespace);
-
-					runner.UpgradeToLatest(false);
-
-					//now step down to 0
-					long last;
-					runner.StepDown(runner.CurrentVersion, 0, out last);
-					runner.CurrentVersion.ShouldBe((long)0);
-				});
+				    runner.RemoveVersionTable();
+                });
 		}
 
         private void runMigrationsInNamespace(IMigrationProcessor processor, string @namespace)
@@ -76,13 +62,13 @@ namespace FluentMigrator.Tests.Integration
 
             var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests).Assembly, @namespace);
 
-            runner.UpgradeToLatest(false);
+            runner.MigrateUp();
         }
 
-        [Test, Ignore("Interleaved migrations not supported yet")]
+        [Test]
         public void CanMigratePreviousUnappliedMigrations()
         {
-            ExecuteWithSqlite(processor =>
+            ExecuteWithSupportedProcessors(processor =>
                {
                    runMigrationsInNamespace(processor, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1");
                    runMigrationsInNamespace(processor, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass2");
@@ -91,6 +77,22 @@ namespace FluentMigrator.Tests.Integration
                    processor.TableExists("UserRoles").ShouldBeTrue();
                    processor.TableExists("User").ShouldBeTrue();
 
+                   var conventions = new MigrationConventions();
+
+                   var runner = new MigrationVersionRunner(conventions, processor, new MigrationLoader(conventions), typeof(MigrationVersionRunnerTests).Assembly, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3");
+
+                   runner.VersionInfo.HasAppliedMigration(200909060953).ShouldBeTrue();
+                   runner.VersionInfo.HasAppliedMigration(200909060935).ShouldBeTrue();
+                   runner.VersionInfo.HasAppliedMigration(200909060930).ShouldBeTrue();
+
+                   runner.VersionInfo.Latest().ShouldBe(200909060953);
+
+                   runner.Rollback(3);
+
+                   processor.TableExists("UserRoles").ShouldBeFalse();
+                   processor.TableExists("User").ShouldBeFalse();
+
+                   runner.RemoveVersionTable();
                });
         }
 	}

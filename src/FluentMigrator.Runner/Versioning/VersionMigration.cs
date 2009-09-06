@@ -7,12 +7,7 @@ namespace FluentMigrator.Runner.Versioning
         public override void Up()
         {
             Create.Table(VersionInfo.TABLE_NAME)
-                .WithColumn("CurrentVersion").AsInt64().NotNullable()
-                .WithColumn("PreviousVersion").AsInt64().NotNullable()
-                .WithColumn("LastUpdated").AsDateTime().NotNullable();
-
-            Insert.IntoTable(VersionInfo.TABLE_NAME)
-                .Row(new { CurrentVersion = 0, PreviousVersion = 0, LastUpdated = DateTime.UtcNow.ToISO8601() });
+                .WithColumn(VersionInfo.COLUMN_NAME).AsInt64().NotNullable();
         }
 
         public override void Down()
@@ -25,7 +20,7 @@ namespace FluentMigrator.Runner.Versioning
     {
         public static string ToISO8601(this DateTime dateTime)
         {
-            return dateTime.ToString("u").Replace("Z", ""); // to support sqlite
+            return dateTime.ToString("u").Replace("Z", "");
         }
     }
 }

@@ -149,6 +149,7 @@
     <Compile Include="Unit\Runners\MigratorConsoleTests.cs" />
     <Compile Include="Unit\Runners\ProcessorFactoryTests.cs" />
     <Compile Include="Integration\Migrations\VersionedMigration.cs" />
+    <Compile Include="Unit\Versioning\VersionInfoTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.Console\FluentMigrator.Console.csproj">

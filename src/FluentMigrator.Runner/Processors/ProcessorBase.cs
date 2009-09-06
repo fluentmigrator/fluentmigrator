@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
@@ -69,6 +70,7 @@ namespace FluentMigrator.Runner.Processors
 		public abstract bool TableExists(string tableName);
 		public abstract bool Exists(string template, params object[] args);
 		public abstract void Execute(string template, params object[] args);
-		public abstract void UpdateTable(string tableName, List<string> columns, List<string> formattedValues);
+	    public abstract void UpdateTable(string tableName, List<string> columns, List<string> formattedValues);
+        public abstract void DeleteWhere(string tableName, string column, string equals);
 	}
 }

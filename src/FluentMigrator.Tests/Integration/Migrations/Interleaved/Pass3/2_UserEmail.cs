@@ -5,12 +5,11 @@
     {
         public override void Up()
         {
-            Create.Column("Email").OnTable("User").AsString();
+            Create.Column("Email").OnTable("User").AsString().Nullable();
         }
 
         public override void Down()
         {
-            Delete.Column("Email").FromTable("User");
         }
     }
 }
