@@ -14,9 +14,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{0089ACAC
 		.gitignore = .gitignore
 		build.bat = build.bat
 		FluentMigrator.msbuild = FluentMigrator.msbuild
-		Rakefile = Rakefile
+		Rakefile2 = Rakefile2
 		README.textile = README.textile
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Example", "src\FluentMigrator.Example\FluentMigrator.Example\FluentMigrator.Example.csproj", "{2311E80D-B026-4A8E-942B-20C6CEC73B77}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -76,6 +78,15 @@ Global
 		{664C7334-B44B-4D62-A0F8-063805D630AA}.Release|Any CPU.Build.0 = Release|Any CPU
 		{664C7334-B44B-4D62-A0F8-063805D630AA}.Release|x86.ActiveCfg = Release|x86
 		{664C7334-B44B-4D62-A0F8-063805D630AA}.Release|x86.Build.0 = Release|x86
+		{2311E80D-B026-4A8E-942B-20C6CEC73B77}.AutomatedRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{2311E80D-B026-4A8E-942B-20C6CEC73B77}.AutomatedRelease|Any CPU.Build.0 = Release|Any CPU
+		{2311E80D-B026-4A8E-942B-20C6CEC73B77}.AutomatedRelease|x86.ActiveCfg = Release|Any CPU
+		{2311E80D-B026-4A8E-942B-20C6CEC73B77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2311E80D-B026-4A8E-942B-20C6CEC73B77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2311E80D-B026-4A8E-942B-20C6CEC73B77}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{2311E80D-B026-4A8E-942B-20C6CEC73B77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2311E80D-B026-4A8E-942B-20C6CEC73B77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2311E80D-B026-4A8E-942B-20C6CEC73B77}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
