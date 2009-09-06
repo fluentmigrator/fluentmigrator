@@ -8,3 +8,4 @@ dist
 *resharper*
 *.user
 TestResult.xml
+src/FluentMigrator.Example/tools/FluentMigrator

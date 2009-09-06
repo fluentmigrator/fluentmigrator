@@ -8,14 +8,16 @@ task :clean do
 end
 
 desc 'compile'
-task :compile do
+task :compile => :clean do
   msbuild_path = File.join(ENV['windir'].dup, 'Microsoft.NET', 'Framework', 'v3.5', 'msbuild.exe')
   sh "#{msbuild_path} FluentMigratorVS2008.sln /maxcpucount /v:m /property:BuildInParallel=false /property:Configuration=debug /property:Architecture=x86 /t:Rebuild"
   
+  exampleToolsDir = 'src/FluentMigrator.Example/tools/FluentMigrator'
   FileUtils.mkdir_p 'build'
+  FileUtils.mkdir_p exampleToolsDir
   Dir.glob(File.join('src/FluentMigrator.Console/bin/Debug', "*.{dll,pdb,xml}")) do |file|
-    puts file
-	copy(file, 'build') 
+	copy(file, 'build')
+	copy(file, exampleToolsDir)
   end
 end
 
