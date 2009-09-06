@@ -1,6 +1,4 @@
-﻿using FluentMigrator.Tests.Unit.Runners;
-
-namespace FluentMigrator.Console
+﻿namespace FluentMigrator.Console
 {
 	class Program
 	{

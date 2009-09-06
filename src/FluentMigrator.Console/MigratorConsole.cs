@@ -4,7 +4,7 @@ using System.Reflection;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Processors;
 
-namespace FluentMigrator.Tests.Unit.Runners
+namespace FluentMigrator.Console
 {
 	public class MigratorConsole
 	{
@@ -14,6 +14,9 @@ namespace FluentMigrator.Tests.Unit.Runners
 		public bool Log;
 		private string TargetAssembly;
 		public string Namespace;
+		public string Task;
+		public long Version;
+		public int Steps;
 
 		public MigratorConsole(string[] args)
 		{
@@ -40,12 +43,23 @@ namespace FluentMigrator.Tests.Unit.Runners
 
 				if (args[i].Contains("/namespace"))
 					Namespace = args[i + 1];
+
+				if (args[i].Contains("/task"))
+					Task = args[i + 1];
+
+				if (args[i].Contains("/version"))
+					Version = long.Parse(args[i + 1]);
+
+				if (args[i].Contains("/steps"))
+					Steps = int.Parse(args[i + 1]);
 			}
 
 			if (string.IsNullOrEmpty(ProcessorType))
 				throw new ArgumentException("Database Type is required (/database)");
 			if (string.IsNullOrEmpty(Connection))
 				throw new ArgumentException("Connection String is required (/connection");
+			if (string.IsNullOrEmpty(Task))
+				Task = "migrate";
 		}
 
 		private void CreateProcessor()
@@ -61,7 +75,7 @@ namespace FluentMigrator.Tests.Unit.Runners
 
 			Assembly assembly = Assembly.LoadFile(TargetAssembly);
 			var runner = new MigrationVersionRunner(new MigrationConventions(), Processor, new MigrationLoader(new MigrationConventions()), assembly, Namespace);
-			runner.MigrateUp();
+			new TaskExecutor(runner, Version, Steps).Execute(Task);
 		}
 	}
 }

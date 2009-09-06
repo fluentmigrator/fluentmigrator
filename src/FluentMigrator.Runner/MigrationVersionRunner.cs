@@ -10,7 +10,18 @@ using System.Linq;
 
 namespace FluentMigrator.Runner
 {
-	public class MigrationVersionRunner
+	public interface IMigrationVersionRunner
+	{
+		Assembly MigrationAssembly { get; }
+		VersionInfo VersionInfo { get; }
+		void MigrateUp();
+		void MigrateUp(long version);
+		void Rollback(int steps);
+		void MigrateDown(long version);
+		void RemoveVersionTable();
+	}
+
+	public class MigrationVersionRunner : IMigrationVersionRunner
 	{
 		private IMigrationConventions _migrationConventions;
 		private IMigrationProcessor _migrationProcessor;
@@ -142,10 +153,21 @@ namespace FluentMigrator.Runner
 		{
 			foreach (var migrationNumber in VersionInfo.AppliedMigrations().Take(steps))
 			{
-				_migrationRunner.Down(Migrations[migrationNumber]);
-				_migrationProcessor.DeleteWhere(VersionInfo.TABLE_NAME, VersionInfo.COLUMN_NAME, migrationNumber.ToString());
+				migrateDown(migrationNumber);
 			}
 			_versionInfo = null;
+		}
+
+		public void MigrateDown(long version)
+		{
+			migrateDown(version);
+			_versionInfo = null;
+		}
+
+		private void migrateDown(long version)
+		{
+			_migrationRunner.Down(Migrations[version]);
+			_migrationProcessor.DeleteWhere(VersionInfo.TABLE_NAME, VersionInfo.COLUMN_NAME, version.ToString());
 		}
 
 		public void RemoveVersionTable()

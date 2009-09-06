@@ -114,5 +114,25 @@ namespace FluentMigrator.Tests.Integration
 					processor.TableExists("Users").ShouldBeFalse();
 				});
 		}
+
+		[Test]
+		public void CanMigrateASpecificVersionDown()
+		{
+			ExecuteWithSupportedProcessors(processor =>
+			{
+				var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, "FluentMigrator.Tests.Integration.Migrations");
+
+				runner.MigrateUp(1);
+
+				runner.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
+				processor.TableExists("Users").ShouldBeTrue();
+
+
+				runner.MigrateDown(1);
+
+				runner.VersionInfo.HasAppliedMigration(1).ShouldBeFalse();
+				processor.TableExists("Users").ShouldBeFalse();
+			});
+		}
 	}
 }

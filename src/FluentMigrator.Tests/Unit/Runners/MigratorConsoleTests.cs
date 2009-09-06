@@ -1,4 +1,5 @@
 ﻿using System;
+using FluentMigrator.Console;
 using FluentMigrator.Runner.Processors.Sqlite;
 using NUnit.Framework;
 using NUnit.Should;
@@ -31,7 +32,10 @@ namespace FluentMigrator.Tests.Unit.Runners
 		[Test]
 		public void CanInitMigratorConsoleWithValidArguments()
 		{
-			string[] args = { "/db", database, "/connection", connection, "/log", "/target", target, "/namespace", "FluentMigrator.Tests.Integration.Migrations" };
+			string[] args = { "/db", database, "/connection", connection, "/log", "/target", target, 
+								"/namespace", "FluentMigrator.Tests.Integration.Migrations", 
+								"/task", "migrate:up",
+								"/version", "1"};
 
 			MigratorConsole console = new MigratorConsole(args);
 
@@ -39,8 +43,9 @@ namespace FluentMigrator.Tests.Unit.Runners
 			console.Connection.ShouldBe(connection);
 			console.Namespace.ShouldBe("FluentMigrator.Tests.Integration.Migrations");
 			console.Log.ShouldBeTrue();
+			console.Task.ShouldBe("migrate:up");
+			console.Version.ShouldBe(1);
 		}
-
 
 	}
 }
