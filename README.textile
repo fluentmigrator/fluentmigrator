@@ -33,7 +33,7 @@ rake db:migrate:up
 rake db:migrate:down
 rake db:rollback</code></pre>
 
-The db:migrate commands can take an optional VERSION parameter so <pre><code>rake db:migrate VERSION=20090906205342</pre></code> 
+The db:migrate commands can take an optional VERSION parameter so <pre><code>rake db:migrate VERSION=20090906205342</code></pre> 
 will only migrate the first migration. db:rollback can take an optional STEPS parameter.
 
 h2. Example Migration
