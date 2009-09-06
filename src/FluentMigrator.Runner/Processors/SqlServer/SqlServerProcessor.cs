@@ -77,23 +77,5 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 			using (var command = new SqlCommand(sql, Connection))
 				command.ExecuteNonQuery();
 		}
-
-		public override void UpdateTable(string tableName, List<string> columns, List<string> formattedValues)
-		{
-			var setParam = string.Empty;
-			for (int index = 0; index < columns.Count; index++)
-			{
-				setParam += columns[index] + " = " + formattedValues[index];
-				if (index < columns.Count - 1) setParam += ",";
-			}
-
-			Execute("UPDATE {0} SET {1} ", tableName, setParam);
-		}
-
-
-		public override void DeleteWhere(string tableName, string column, string equals)
-		{
-			Execute("DELETE FROM {0} WHERE {1}='{2}'", tableName, column, equals);
-		}
 	}
 }

@@ -104,11 +104,6 @@ namespace FluentMigrator.Tests.Integration.Processors
 			throw new NotImplementedException();
 		}
 
-		public override void UpdateTable(string tableName, List<string> columns, List<string> formattedValues)
-		{
-			throw new NotImplementedException();
-		}
-
 		public override DataSet ReadTableData(string tableName)
 		{
 			throw new NotImplementedException();
@@ -125,11 +120,6 @@ namespace FluentMigrator.Tests.Integration.Processors
 		}
 
 		public override bool Exists(string template, params object[] args)
-		{
-			throw new NotImplementedException();
-		}
-
-		public override void DeleteWhere(string tableName, string column, string equals)
 		{
 			throw new NotImplementedException();
 		}

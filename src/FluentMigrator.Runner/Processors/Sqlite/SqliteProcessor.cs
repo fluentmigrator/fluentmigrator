@@ -75,22 +75,5 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 				return ds;
 			}
 		}
-
-		public override void UpdateTable(string tableName, List<string> columns, List<string> formattedValues)
-		{
-			var setParam = string.Empty;
-			for (int index = 0; index < columns.Count; index++)
-			{
-				setParam += columns[index] + " = " + formattedValues[index];
-				if (index < columns.Count - 1) setParam += ",";
-			}
-
-			Execute("update {0} set {1} ", tableName, setParam);
-		}
-
-		public override void DeleteWhere(string tableName, string column, string equals)
-		{
-			Execute("delete from {0} where {1}='{2}'", tableName, column, equals);
-		}
 	}
 }

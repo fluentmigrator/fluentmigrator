@@ -167,7 +167,7 @@ namespace FluentMigrator.Runner
 		private void migrateDown(long version)
 		{
 			_migrationRunner.Down(Migrations[version]);
-			_migrationProcessor.DeleteWhere(VersionInfo.TABLE_NAME, VersionInfo.COLUMN_NAME, version.ToString());
+			_migrationProcessor.Execute("DELETE FROM {0} WHERE {1}='{2}'", VersionInfo.TABLE_NAME, VersionInfo.COLUMN_NAME, version.ToString());
 		}
 
 		public void RemoveVersionTable()

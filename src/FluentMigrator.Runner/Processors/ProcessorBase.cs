@@ -70,7 +70,5 @@ namespace FluentMigrator.Runner.Processors
 		public abstract bool TableExists(string tableName);
 		public abstract bool Exists(string template, params object[] args);
 		public abstract void Execute(string template, params object[] args);
-		public abstract void UpdateTable(string tableName, List<string> columns, List<string> formattedValues);
-		public abstract void DeleteWhere(string tableName, string column, string equals);
 	}
 }
