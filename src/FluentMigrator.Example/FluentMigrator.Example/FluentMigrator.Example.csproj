@@ -33,7 +33,7 @@
   <ItemGroup>
     <Reference Include="FluentMigrator, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\tools\FluentMigrator\FluentMigrator.dll</HintPath>
+      <HintPath>..\..\FluentMigrator\bin\Debug\FluentMigrator.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
