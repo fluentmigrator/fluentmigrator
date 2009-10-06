@@ -61,5 +61,30 @@ namespace FluentMigrator.Tests.Unit
 
 			_vrunner.MigrateUp();
 		}
+
+	    [Test]
+        public void HandlesMigrationThatDoesNotInheritFromMigrationBaseClass()
+	    {
+            _loaderMock.Setup(x => x.FindMigrationsIn(It.IsAny<Assembly>())).Returns(new List<MigrationMetadata>
+			                                                                         	{
+			                                                                         		new MigrationMetadata {Version = 1, Type = typeof(MigrationThatDoesNotInheritFromMigrationBaseClass)},
+			                                                                         	});
+
+            _vrunner.Migrations[1].ShouldNotBeNull();
+            _vrunner.Migrations[1].ShouldBeOfType<MigrationThatDoesNotInheritFromMigrationBaseClass>();
+	    }
+
+        private class MigrationThatDoesNotInheritFromMigrationBaseClass : IMigration
+        {
+            public void GetUpExpressions(IMigrationContext context)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void GetDownExpressions(IMigrationContext context)
+            {
+                throw new NotImplementedException();
+            }
+        }
 	}
 }

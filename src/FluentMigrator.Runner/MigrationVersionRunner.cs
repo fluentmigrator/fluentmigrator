@@ -81,8 +81,8 @@ namespace FluentMigrator.Runner
 			}
 		}
 
-		private SortedList<long, Migration> _migrations;
-		public SortedList<long, Migration> Migrations
+		private SortedList<long, IMigration> _migrations;
+		public SortedList<long, IMigration> Migrations
 		{
 			get
 			{
@@ -95,7 +95,7 @@ namespace FluentMigrator.Runner
 
 		private void loadMigrations()
 		{
-			_migrations = new SortedList<long, Migration>();
+			_migrations = new SortedList<long, IMigration>();
 			IEnumerable<MigrationMetadata> migrationList;
 			
 			if (string.IsNullOrEmpty(_namespace))
@@ -112,7 +112,7 @@ namespace FluentMigrator.Runner
 					throw new Exception(String.Format("Duplicate migration version {0}.", migrationMetadata.Version));
 
 				var migration = migrationMetadata.Type.Assembly.CreateInstance(migrationMetadata.Type.FullName);
-				_migrations.Add(migrationMetadata.Version, migration as Migration);
+				_migrations.Add(migrationMetadata.Version, migration as IMigration);
 			}
 		}
 
