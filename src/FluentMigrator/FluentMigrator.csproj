@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>9.0.21022</ProductVersion>
+    <ProductVersion>9.0.30729</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -91,6 +91,8 @@
     <Compile Include="Builders\Delete\Index\DeleteIndexExpressionBuilder.cs" />
     <Compile Include="Builders\Delete\Index\IDeleteIndexForTableSyntax.cs" />
     <Compile Include="Builders\Delete\Index\IDeleteIndexOnColumnSyntax.cs" />
+    <Compile Include="Builders\Execute\ExecuteExpressionRoot.cs" />
+    <Compile Include="Builders\Execute\IExecuteExpressionRoot.cs" />
     <Compile Include="Builders\Insert\IInsertDataSyntax.cs" />
     <Compile Include="Builders\Insert\IInsertExpressionRoot.cs" />
     <Compile Include="Builders\Insert\InsertDataExpression.cs" />
@@ -101,6 +103,7 @@
     <Compile Include="Builders\Rename\Column\RenameColumnExpressionBuilder.cs" />
     <Compile Include="Builders\Rename\IRenameColumnTableSyntax.cs" />
     <Compile Include="AutoReversingMigration.cs" />
+    <Compile Include="Expressions\ExecuteSqlStatementExpression.cs" />
     <Compile Include="Expressions\MigrationExpressionBase.cs" />
     <Compile Include="IMigrationConventions.cs" />
     <Compile Include="Infrastructure\Extensions\ExtensionsForIEnumerable.cs" />

@@ -132,6 +132,7 @@
     <Compile Include="Unit\Expressions\CreateForeignKeyExpressionTests.cs" />
     <Compile Include="Unit\Expressions\CreateIndexExpressionTests.cs" />
     <Compile Include="Unit\Expressions\CreateTableExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\ExecuteSqlStatementExpressionTests.cs" />
     <Compile Include="Unit\MigrationLoaderTests.cs" />
     <Compile Include="Unit\MigrationMetadataTests.cs" />
     <Compile Include="Unit\Generators\SqliteGeneratorTests.cs" />

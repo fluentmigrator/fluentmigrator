@@ -4,6 +4,7 @@ using FluentMigrator.Builders.Delete;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Builders.Rename;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator
 {
@@ -54,5 +55,10 @@ namespace FluentMigrator
 		{
 			get { return new InsertExpressionRoot(_context); }
 		}
+
+	    public IExecuteExpressionRoot Execute
+	    {
+	        get { return new ExecuteExpressionRoot(_context);}
+	    }
 	}
 }
