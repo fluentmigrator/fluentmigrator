@@ -30,6 +30,7 @@ namespace FluentMigrator.Runner
 		private string _namespace;
 		private VersionInfo _versionInfo;
 		private MigrationRunner _migrationRunner;
+	    private IMigration _versionMigration;
 
 		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader)
 			: this(conventions, processor, loader, Assembly.GetCallingAssembly(), null)
@@ -49,12 +50,19 @@ namespace FluentMigrator.Runner
 			_migrationLoader = loader;
 			_namespace = @namespace;
 			_migrationRunner = new MigrationRunner(conventions, processor);
+		    _versionMigration = new VersionMigration();
 		}
 
 		public Assembly MigrationAssembly
 		{
 			get { return _migrationAssembly; }
 		}
+
+	    public IMigration VersionMigration
+	    {
+            get { return _versionMigration; }
+            set { _versionMigration = value; }
+	    }
 
 		public VersionInfo VersionInfo
 		{
@@ -71,7 +79,7 @@ namespace FluentMigrator.Runner
 			if (!_migrationProcessor.TableExists(VersionInfo.TABLE_NAME))
 			{
 				var runner = new MigrationRunner(_migrationConventions, _migrationProcessor);
-				runner.Up(new VersionMigration());
+				runner.Up(_versionMigration);
 			}
 			var dataSet = _migrationProcessor.ReadTableData(VersionInfo.TABLE_NAME);
 			_versionInfo = new VersionInfo();
@@ -143,11 +151,15 @@ namespace FluentMigrator.Runner
 		private void updateVersionInfoWithAppliedMigration(long version)
 		{
 			var dataExpression = new InsertDataExpression();
-			var data = new InsertionData {new KeyValuePair<string, object>(VersionInfo.COLUMN_NAME, version)};
-			dataExpression.Rows.Add(data);
+            dataExpression.Rows.Add(createVersionInfoInsertionData(version));
 			dataExpression.TableName = VersionInfo.TABLE_NAME;
 			dataExpression.ExecuteWith(_migrationProcessor);
 		}
+
+        protected virtual InsertionData createVersionInfoInsertionData(long version)
+        {
+            return new InsertionData { new KeyValuePair<string, object>(VersionInfo.COLUMN_NAME, version) };
+        }
 
 		public void Rollback(int steps)
 		{
