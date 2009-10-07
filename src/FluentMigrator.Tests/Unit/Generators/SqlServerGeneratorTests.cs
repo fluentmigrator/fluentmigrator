@@ -81,6 +81,25 @@ namespace FluentMigrator.Tests.Unit.Generators
 		}
 
 		[Test]
+		public void CanAddDecimalColumn()
+		{
+			string tableName = "NewTable";
+
+			var columnDefinition = new ColumnDefinition();
+			columnDefinition.Name = "NewColumn";
+			columnDefinition.Size = 19;
+			columnDefinition.Precision = 2;
+			columnDefinition.Type = DbType.Decimal;
+
+			var expression = new CreateColumnExpression();
+			expression.Column = columnDefinition;
+			expression.TableName = tableName;
+
+			string sql = generator.Generate(expression);
+			sql.ShouldBe("ALTER TABLE [NewTable] ADD NewColumn DECIMAL(19,2) NOT NULL");
+		}
+
+		[Test]
 		public void CanRenameTable()
 		{
 			var expression = new RenameTableExpression();
@@ -175,7 +194,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			string expected = String.Format( "INSERT INTO [TestTable] (guid) VALUES ('{0}');", gid.ToString());
 
 			sql.ShouldBe(expected);
-		}
+		}		
 
 		private DeleteTableExpression GetDeleteTableExpression(string tableName)
 		{

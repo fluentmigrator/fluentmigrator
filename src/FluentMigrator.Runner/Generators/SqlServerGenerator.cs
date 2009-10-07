@@ -34,7 +34,7 @@ namespace FluentMigrator.Runner.Generators
 			SetTypeMap(DbType.Date, "DATETIME");
 			SetTypeMap(DbType.DateTime, "DATETIME");
 			SetTypeMap(DbType.Decimal, "DECIMAL(19,5)");
-			SetTypeMap(DbType.Decimal, "DECIMAL(19,$size)", DecimalCapacity);
+			SetTypeMap(DbType.Decimal, "DECIMAL($size,$precision)", DecimalCapacity);
 			SetTypeMap(DbType.Double, "DOUBLE PRECISION");
 			SetTypeMap(DbType.Guid, "UNIQUEIDENTIFIER");
 			SetTypeMap(DbType.Int16, "SMALLINT");
