@@ -62,6 +62,25 @@ namespace FluentMigrator.Tests.Unit.Generators
 		}
 
 		[Test]
+		public void CanAddDecimalColumn()
+		{
+			string tableName = "NewTable";
+
+			var columnDefinition = new ColumnDefinition();
+			columnDefinition.Name = "NewColumn";
+			columnDefinition.Size = 19;
+			columnDefinition.Precision = 2;
+			columnDefinition.Type = DbType.Decimal;
+
+			var expression = new CreateColumnExpression();
+			expression.Column = columnDefinition;
+			expression.TableName = tableName;
+
+			string sql = generator.Generate(expression);
+			sql.ShouldBe("ALTER TABLE [NewTable] ADD COLUMN NewColumn DECIMAL(19,2) NOT NULL");
+		}
+
+		[Test]
 		public void CanCreateAutoIncrementColumn()
 		{
 			CreateColumnExpression expression = GetCreateAutoIncrementColumnExpression();
