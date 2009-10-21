@@ -28,6 +28,7 @@ namespace FluentMigrator.Runner.Generators
 			SetTypeMap(DbType.AnsiString, "TEXT", AnsiTextCapacity);
 			SetTypeMap(DbType.Binary, "VARBINARY(8000)");
 			SetTypeMap(DbType.Binary, "VARBINARY($size)", AnsiStringCapacity);
+			SetTypeMap(DbType.Binary, "VARBINARY(MAX)", int.MaxValue);
 			SetTypeMap(DbType.Binary, "IMAGE", ImageCapacity);
 			SetTypeMap(DbType.Boolean, "BIT");
 			SetTypeMap(DbType.Byte, "TINYINT");
@@ -46,6 +47,7 @@ namespace FluentMigrator.Runner.Generators
 			SetTypeMap(DbType.StringFixedLength, "NCHAR($size)", UnicodeStringCapacity);
 			SetTypeMap(DbType.String, "NVARCHAR(255)");
 			SetTypeMap(DbType.String, "NVARCHAR($size)", UnicodeStringCapacity);
+			SetTypeMap(DbType.String, "NVARCHAR(MAX)", int.MaxValue);
 			SetTypeMap(DbType.String, "NTEXT", UnicodeTextCapacity);
 			SetTypeMap(DbType.Time, "DATETIME");
 			SetTypeMap(DbType.Xml, "XML", XmlCapacity);
