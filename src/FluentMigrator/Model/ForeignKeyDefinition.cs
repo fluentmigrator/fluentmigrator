@@ -18,7 +18,7 @@ namespace FluentMigrator.Model
 			PrimaryColumns = new List<string>();
 		}
 
-		public void ApplyConventions(MigrationConventions conventions)
+		public void ApplyConventions(IMigrationConventions conventions)
 		{
 			if (String.IsNullOrEmpty(Name))
 				Name = conventions.GetForeignKeyName(this);

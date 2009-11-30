@@ -13,7 +13,7 @@ namespace FluentMigrator.Tests.Integration
 		[SetUp]
 		public void SetUp()
 		{
-			_conventions = new MigrationConventions();			
+		   _conventions = new MigrationConventions();
 		}
 
 		[Test]

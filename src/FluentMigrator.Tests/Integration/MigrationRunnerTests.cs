@@ -1,9 +1,9 @@
 using System;
 using System.Data.SqlClient;
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators;
-using FluentMigrator.Runner.Processors.Sqlite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using Moq;
 using NUnit.Framework;
@@ -48,7 +48,85 @@ namespace FluentMigrator.Tests.Integration
 			runner.Down(new TestForeignKeySilentFailure());
 			runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
 		}
+
+      [Test]
+      public void CanApplyForeignKeyConvention()
+      {
+         var connection = new SqlConnection(sqlServerConnectionString);
+			connection.Open();
+			var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
+
+         var conventions = new MigrationConventions();
+         var runner = new MigrationRunner(conventions, processor);
+
+         runner.Up(new TestForeignKeyNamingConvention());
+         processor.TableExists("Users").ShouldBeTrue();
+         processor.ConstraintExists( "Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeTrue();
+
+         runner.Down(new TestForeignKeyNamingConvention());
+         processor.TableExists("Users").ShouldBeFalse();
+      }
+
+      [Test]
+      public void CanApplyIndexConvention()
+      {
+         var connection = new SqlConnection(sqlServerConnectionString);
+         connection.Open();
+         var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
+
+         var conventions = new MigrationConventions();
+         var runner = new MigrationRunner(conventions, processor);
+
+         runner.Up(new TestIndexNamingConvention());
+         processor.TableExists("Users").ShouldBeTrue();
+
+         runner.Down(new TestIndexNamingConvention());
+         processor.TableExists("Users").ShouldBeFalse();
+      }
 	}
+
+   internal class TestForeignKeyNamingConvention : Migration
+   {
+      public override void Up()
+      {
+         Create.Table("Users")
+            .WithColumn("UserId").AsInt32().Identity().PrimaryKey()
+            .WithColumn("GroupId").AsInt32().NotNullable()
+            .WithColumn("UserName").AsString(32).NotNullable()
+            .WithColumn("Password").AsString(32).NotNullable();
+
+         Create.Table("Groups")
+            .WithColumn("GroupId").AsInt32().Identity().PrimaryKey()
+            .WithColumn("Name").AsString(32).NotNullable();
+
+         Create.ForeignKey().FromTable("Users").ForeignColumn("GroupId").ToTable("Groups").PrimaryColumn("GroupId");
+      }
+
+      public override void Down()
+      {
+         Delete.Table("Users");
+         Delete.Table("Groups");
+      }
+   }
+
+   internal class TestIndexNamingConvention : Migration
+   {
+      public override void Up()
+      {
+         Create.Table("Users")
+            .WithColumn("UserId").AsInt32().Identity().PrimaryKey()
+            .WithColumn("GroupId").AsInt32().NotNullable()
+            .WithColumn("UserName").AsString(32).NotNullable()
+            .WithColumn("Password").AsString(32).NotNullable();
+
+         Create.Index().OnTable( "Users" ).OnColumn( "GroupId" ).Ascending();
+      }
+
+      public override void Down()
+      {
+         Delete.Table("Users");
+      }
+   }
 
 	internal class TestForeignKeySilentFailure : Migration
 	{

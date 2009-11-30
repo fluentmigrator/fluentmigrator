@@ -50,7 +50,7 @@ namespace FluentMigrator.Runner
 			_migrationLoader = loader;
 			_namespace = @namespace;
 			_migrationRunner = new MigrationRunner(conventions, processor);
-		    _versionMigration = new VersionMigration();
+		   _versionMigration = new VersionMigration();
 		}
 
 		public Assembly MigrationAssembly
@@ -81,8 +81,10 @@ namespace FluentMigrator.Runner
 				var runner = new MigrationRunner(_migrationConventions, _migrationProcessor);
 				runner.Up(_versionMigration);
 			}
+
 			var dataSet = _migrationProcessor.ReadTableData(VersionInfo.TABLE_NAME);
 			_versionInfo = new VersionInfo();
+
 			foreach (DataRow row in dataSet.Tables[0].Rows)
 			{
 				_versionInfo.AddAppliedMigration(long.Parse(row[0].ToString()));
@@ -99,7 +101,6 @@ namespace FluentMigrator.Runner
 				return _migrations;
 			}
 		}
-
 
 		private void loadMigrations()
 		{

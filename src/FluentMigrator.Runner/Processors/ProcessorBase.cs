@@ -1,5 +1,3 @@
-using System;
-using System.Collections.Generic;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 

@@ -12,11 +12,11 @@ namespace FluentMigrator.Console
 		public IMigrationProcessor Processor;
 		public string Connection;
 		public bool Log;
-		private string TargetAssembly;
 		public string Namespace;
 		public string Task;
 		public long Version;
 		public int Steps;
+      private string TargetAssembly;
 
 		public MigratorConsole(string[] args)
 		{
@@ -55,9 +55,11 @@ namespace FluentMigrator.Console
 			}
 
 			if (string.IsNullOrEmpty(ProcessorType))
-				throw new ArgumentException("Database Type is required (/database)");
+				throw new ArgumentException("Database Type is required \"/db [db type]\". Available db types is [sqlserver], [sqlite]");
 			if (string.IsNullOrEmpty(Connection))
-				throw new ArgumentException("Connection String is required (/connection");
+				throw new ArgumentException("Connection String is required \"/connection\"");
+         if (string.IsNullOrEmpty(TargetAssembly))
+            throw new ArgumentException("Target Assembly is required \"/target [assembly path]\"");
 			if (string.IsNullOrEmpty(Task))
 				Task = "migrate";
 		}

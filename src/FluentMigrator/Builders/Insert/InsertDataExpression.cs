@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using FluentMigrator.Expressions;
 
@@ -26,5 +27,9 @@ namespace FluentMigrator.Builders.Insert
 		{
 			return null;
 		}
+
+	   public void ApplyConventions( IMigrationConventions conventions )
+	   {
+	   }
 	}
 }

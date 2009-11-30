@@ -18,6 +18,9 @@
 			Create.Column("Foo").OnTable("Users").AsInt16().Indexed().WithDefaultValue(1);
 
 			//commenting out the FK so it passes the sqlite tests
+         Create.ForeignKey()
+            .FromTable( "Users" ).ForeignColumn( "GroupId" )
+            .ToTable( "Groups" ).PrimaryColumn( "GroupId" );
 			//Create.ForeignKey("FK_Foo").FromTable("Users").ForeignColumn("GroupId").ToTable("Groups").PrimaryColumn("GroupId");
 
 			Create.Table("Foo")

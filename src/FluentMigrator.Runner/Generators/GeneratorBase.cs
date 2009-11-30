@@ -115,7 +115,7 @@ namespace FluentMigrator.Runner.Generators
 			string result = "";
 			int total = columns.Count - 1;
 
-			//if more than one column is a primary key, then it needs to be added separately			
+			//if more than one column is a primary key, then it needs to be added separately
 			IList<ColumnDefinition> primaryKeyColumns = GetPrimaryKeyColumns(columns);
 			if (primaryKeyColumns.Count > 1)
 			{

@@ -24,7 +24,7 @@ namespace FluentMigrator.Runner.Processors
 
 			return assembly.GetExportedTypes()
 				.Where(t => typeof(IMigrationProcessorFactory).IsAssignableFrom(t)
-					&& t.Name == fullProcessorName)
+					&& t.Name.ToLower() == fullProcessorName.ToLower())
 				.SingleOrDefault();
 		}
 	}

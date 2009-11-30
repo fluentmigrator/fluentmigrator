@@ -14,6 +14,11 @@ namespace FluentMigrator.Expressions
 			ForeignKey = new ForeignKeyDefinition();
 		}
 
+      public override void ApplyConventions(IMigrationConventions conventions)
+      {
+         ForeignKey.ApplyConventions( conventions );
+      }
+
 		public override void CollectValidationErrors(ICollection<string> errors)
 		{
 			ForeignKey.CollectValidationErrors(errors);
