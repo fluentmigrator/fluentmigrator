@@ -18,6 +18,7 @@ namespace FluentMigrator.Runner
 			: this(conventions, processor, new Announcer(Console.Out), new StopWatch())
 		{
 		}
+
 		public MigrationRunner(IMigrationConventions conventions, IMigrationProcessor processor, IAnnouncer announcer, IStopWatch stopWatch)
 		{
 			_announcer = announcer;

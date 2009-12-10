@@ -94,7 +94,7 @@ namespace FluentMigrator.Runner.Generators
 			if (column.DefaultValue != null)
 			{
 				sb.Append(" DEFAULT ");
-				sb.Append(GetConstantValue(column.DefaultValue));				
+				sb.Append(GetConstantValue(column.DefaultValue));
 			}
 
 			if (column.IsIdentity)
