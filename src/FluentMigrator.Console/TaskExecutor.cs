@@ -33,6 +33,12 @@ namespace FluentMigrator.Console
 						_steps = 1;
 					_migrationVersionRunner.Rollback(_steps);
 					break;
+            case "rollback:toversion":
+               _migrationVersionRunner.RollbackToVersion( _version );
+			      break;
+            case "rollback:all":
+               _migrationVersionRunner.RollbackToVersion(0);
+			      break;
 				case "migrate:down":
 					_migrationVersionRunner.MigrateDown(_version);
 					break;

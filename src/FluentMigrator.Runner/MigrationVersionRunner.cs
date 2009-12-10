@@ -17,6 +17,7 @@ namespace FluentMigrator.Runner
 		void MigrateUp();
 		void MigrateUp(long version);
 		void Rollback(int steps);
+	   void RollbackToVersion( long version );
 		void MigrateDown(long version);
 		void RemoveVersionTable();
 	}
@@ -171,8 +172,26 @@ namespace FluentMigrator.Runner
 			_versionInfo = null;
 		}
 
+      public void RollbackToVersion(long version)
+      {
+         // Get the migrations between current and the to version
+         foreach (var migrationNumber in VersionInfo.AppliedMigrations())
+         {
+            if (version < migrationNumber || version == 0)
+            {
+               migrateDown(migrationNumber);
+            }
+         }
+
+         if (version == 0)
+            RemoveVersionTable();
+
+         _versionInfo = null;
+      }
+
 		public void MigrateDown(long version)
 		{
+
 			migrateDown(version);
 			_versionInfo = null;
 		}
