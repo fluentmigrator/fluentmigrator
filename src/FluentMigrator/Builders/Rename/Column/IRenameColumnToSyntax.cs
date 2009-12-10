@@ -1,5 +1,4 @@
-﻿using System;
-using FluentMigrator.Infrastructure;
+﻿using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Rename.Column
 {

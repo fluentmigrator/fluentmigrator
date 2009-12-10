@@ -140,7 +140,8 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(RenameColumnExpression expression)
 		{
-			return FormatExpression("ALTER TABLE {0} CHANGE COLUMN {1} {2} definition", expression.TableName, expression.OldName, expression.NewName);
+			// may need to add definition to end. blerg
+			return FormatExpression("ALTER TABLE {0} CHANGE COLUMN {1} {2}", expression.TableName, expression.OldName, expression.NewName);
 		}
 
 		public override string Generate(InsertDataExpression expression)

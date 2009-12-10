@@ -71,6 +71,10 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="MySql.Data, Version=1.0.10.1, Culture=neutral, PublicKeyToken=c5687fc88969c44d">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\MySql.Data.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -90,8 +94,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Announcer.cs" />
+    <Compile Include="Generators\MySqlGenerator.cs" />
     <Compile Include="Generators\GeneratorBase.cs" />
     <Compile Include="MigrationVersionRunner.cs" />
+    <Compile Include="Processors\MySql\MySqlProcessor.cs" />
+    <Compile Include="Processors\MySql\MySqlProcessorFactory.cs" />
     <Compile Include="Processors\ProcessorFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServerProcessorFactory.cs" />
     <Compile Include="Processors\IMigrationProcessorFactory.cs" />
