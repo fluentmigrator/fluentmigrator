@@ -159,9 +159,41 @@ namespace FluentMigrator.Runner.Generators
 
 				string columns = GetColumnList(columnNames);
 				string data = GetDataList(columnData);
-				result.Append(FormatExpression("INSERT INTO [{0}] ({1}) VALUES ({2});", expression.TableName, columns, data));
+				result.Append(FormatExpression("INSERT INTO {0} ({1}) VALUES ({2});", expression.TableName, columns, data));
 			}
 			return result.ToString();
+		}
+
+		public override string GenerateDDLForColumn(ColumnDefinition column)
+		{
+			var sb = new StringBuilder();
+
+			sb.Append(column.Name);
+			sb.Append(" ");
+			sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
+
+			if (!column.IsNullable)
+			{
+				sb.Append(" NOT NULL");
+			}
+
+			if (column.DefaultValue != null)
+			{
+				sb.Append(" DEFAULT ");
+				sb.Append(GetConstantValue(column.DefaultValue));
+			}
+
+			if (column.IsIdentity)
+			{
+				sb.Append(" AUTO_INCREMENT");
+			}
+
+			if (column.IsPrimaryKey)
+			{
+				sb.Append(string.Format(", PRIMARY KEY (`{0}`)", column.Name));
+			}
+
+			return sb.ToString();
 		}
 
 		public string FormatExpression(string template, params object[] args)

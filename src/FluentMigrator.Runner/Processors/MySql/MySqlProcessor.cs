@@ -16,7 +16,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
 		public override bool TableExists(string tableName)
 		{
-			return Exists("select count(*) from sqlite_master where name='{0}'", tableName);
+			return Exists("select count(*) from information_schema.tables where table_name='{0}'", tableName);
 		}
 
 		public override void Execute(string template, params object[] args)
@@ -38,9 +38,10 @@ namespace FluentMigrator.Runner.Processors.MySql
 			{
 				try
 				{
-					if (!reader.Read()) return false;
-					if (int.Parse(reader[0].ToString()) <= 0) return false;
-					return true;
+					if (!reader.Read())
+						return false;
+
+					return int.Parse(reader[0].ToString()) > 0;
 				}
 				catch
 				{
