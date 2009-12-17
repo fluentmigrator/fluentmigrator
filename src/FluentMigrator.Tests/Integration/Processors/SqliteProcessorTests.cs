@@ -46,7 +46,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 			column.IsIdentity = true;
 			column.IsPrimaryKey = true;
 			column.Type = DbType.Int64;
-			column.IsNullable = true;
+			column.IsNullable = false;
 
 			CreateTableExpression expression = new CreateTableExpression { TableName = tableName };
 			expression.Columns.Add(column);
