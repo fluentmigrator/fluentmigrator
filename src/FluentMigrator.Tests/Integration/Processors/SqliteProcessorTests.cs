@@ -39,9 +39,31 @@ namespace FluentMigrator.Tests.Integration.Processors
 		}
 
 		[Test]
+		public void CanDefaultAutoIncrementColumnTypeToInteger()
+		{
+			ColumnDefinition column = new ColumnDefinition();
+			column.Name = "Id";
+			column.IsIdentity = true;
+			column.IsPrimaryKey = true;
+			column.Type = DbType.Int64;
+			column.IsNullable = true;
+
+			CreateTableExpression expression = new CreateTableExpression { TableName = tableName };
+			expression.Columns.Add(column);
+
+			using (connection)
+			{
+				processor.Process( expression );
+				command.CommandText = string.Format("SELECT name FROM sqlite_master WHERE type='table' and name='{0}'", tableName);
+
+				command.ExecuteReader().Read().ShouldBeTrue();
+			}
+		}
+
+		[Test]
 		public void CanCreateTableExpression()
 		{
-			CreateTableExpression expression = new CreateTableExpression { TableName = tableName };			
+			CreateTableExpression expression = new CreateTableExpression { TableName = tableName };
 			expression.Columns.Add(column.Object);
 
 			using (connection)
