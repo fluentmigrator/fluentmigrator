@@ -68,5 +68,10 @@ namespace FluentMigrator.Infrastructure
 
 			return metadata;
 		}
+
+		public static string GetWorkingDirectory()
+		{
+			return Environment.CurrentDirectory;
+		}
 	}
 }

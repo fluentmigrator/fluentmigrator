@@ -1,4 +1,6 @@
-﻿using FluentMigrator.Infrastructure;
+﻿using System.IO;
+using System.Reflection;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using NUnit.Framework;
 using NUnit.Should;
@@ -102,6 +104,15 @@ namespace FluentMigrator.Tests.Unit
 		{
 			var metadata = DefaultMigrationConventions.GetMetadataForMigration(typeof(DefaultConventionMigrationFake));
 			metadata.Version.ShouldBe(123);
+		}
+
+		[Test]
+		public void WorkingDirectoryConventionDefaultsToAssemblyFolder()
+		{
+			var defaultWorkingDirectory = DefaultMigrationConventions.GetWorkingDirectory();
+
+			defaultWorkingDirectory.ShouldNotBeNull();
+			defaultWorkingDirectory.Contains( "bin" ).ShouldBeTrue();
 		}
 	}
 
