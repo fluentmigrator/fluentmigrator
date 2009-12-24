@@ -1,7 +1,6 @@
 using System;
 using System.Data.SqlClient;
 using FluentMigrator.Expressions;
-using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors.SqlServer;
