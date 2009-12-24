@@ -16,7 +16,8 @@ namespace FluentMigrator.Console
 		public string Task;
 		public long Version;
 		public int Steps;
-      private string TargetAssembly;
+		private string TargetAssembly;
+		private string WorkingDirectory;
 
 		public MigratorConsole(string[] args)
 		{
@@ -52,14 +53,17 @@ namespace FluentMigrator.Console
 
 				if (args[i].Contains("/steps"))
 					Steps = int.Parse(args[i + 1]);
+
+				if (args[i].Contains("/workingdirectory"))
+					WorkingDirectory = args[i + 1];
 			}
 
 			if (string.IsNullOrEmpty(ProcessorType))
 				throw new ArgumentException("Database Type is required \"/db [db type]\". Available db types is [sqlserver], [sqlite]");
 			if (string.IsNullOrEmpty(Connection))
 				throw new ArgumentException("Connection String is required \"/connection\"");
-         if (string.IsNullOrEmpty(TargetAssembly))
-            throw new ArgumentException("Target Assembly is required \"/target [assembly path]\"");
+			if (string.IsNullOrEmpty(TargetAssembly))
+				throw new ArgumentException("Target Assembly is required \"/target [assembly path]\"");
 			if (string.IsNullOrEmpty(Task))
 				Task = "migrate";
 		}
@@ -75,8 +79,12 @@ namespace FluentMigrator.Console
 			if (!Path.IsPathRooted(TargetAssembly))
 				TargetAssembly = Path.GetFullPath(TargetAssembly);
 
+			var migrationConventions = new MigrationConventions();
+			if (!string.IsNullOrEmpty(WorkingDirectory))
+				migrationConventions.GetWorkingDirectory = () => WorkingDirectory;
+
 			Assembly assembly = Assembly.LoadFile(TargetAssembly);
-			var runner = new MigrationVersionRunner(new MigrationConventions(), Processor, new MigrationLoader(new MigrationConventions()), assembly, Namespace);
+			var runner = new MigrationVersionRunner(migrationConventions, Processor, new MigrationLoader(migrationConventions), assembly, Namespace);
 			new TaskExecutor(runner, Version, Steps).Execute(Task);
 		}
 	}

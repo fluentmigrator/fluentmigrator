@@ -112,7 +112,7 @@ namespace FluentMigrator.Tests.Unit
 			var defaultWorkingDirectory = DefaultMigrationConventions.GetWorkingDirectory();
 
 			defaultWorkingDirectory.ShouldNotBeNull();
-			defaultWorkingDirectory.Contains( "bin" ).ShouldBeTrue();
+			defaultWorkingDirectory.Contains("bin").ShouldBeTrue();
 		}
 	}
 

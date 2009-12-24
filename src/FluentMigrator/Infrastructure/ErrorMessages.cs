@@ -19,6 +19,7 @@ namespace FluentMigrator.Infrastructure
 		public const string ForeignKeyCannotBeSelfReferential = "The foreign key's foreign table cannot be the same as its primary table";
 		public const string IndexNameCannotBeNullOrEmpty = "The index's name cannot be null or an empty string";
 		public const string IndexMustHaveOneOrMoreColumns = "The index must have one or more columns";
-	    public const string SqlStatementCannotBeNullOrEmpty = "The sql statement cannot be null or an empty string";
+		public const string SqlStatementCannotBeNullOrEmpty = "The sql statement cannot be null or an empty string";
+		public const string SqlScriptCannotBeNullOrEmpty = "The sql script cannot be null or an empty string";
 	}
 }

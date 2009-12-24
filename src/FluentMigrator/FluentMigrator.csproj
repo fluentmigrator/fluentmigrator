@@ -103,6 +103,7 @@
     <Compile Include="Builders\Rename\Column\RenameColumnExpressionBuilder.cs" />
     <Compile Include="Builders\Rename\IRenameColumnTableSyntax.cs" />
     <Compile Include="AutoReversingMigration.cs" />
+    <Compile Include="Expressions\ExecuteSqlScriptExpression.cs" />
     <Compile Include="Expressions\ExecuteSqlStatementExpression.cs" />
     <Compile Include="Expressions\MigrationExpressionBase.cs" />
     <Compile Include="IMigrationConventions.cs" />

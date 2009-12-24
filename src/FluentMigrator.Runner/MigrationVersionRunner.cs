@@ -51,7 +51,7 @@ namespace FluentMigrator.Runner
 			_migrationLoader = loader;
 			_namespace = @namespace;
 			_migrationRunner = new MigrationRunner(conventions, processor);
-		   _versionMigration = new VersionMigration();
+			_versionMigration = new VersionMigration();
 		}
 
 		public Assembly MigrationAssembly
@@ -59,11 +59,11 @@ namespace FluentMigrator.Runner
 			get { return _migrationAssembly; }
 		}
 
-	    public IMigration VersionMigration
-	    {
-            get { return _versionMigration; }
-            set { _versionMigration = value; }
-	    }
+		public IMigration VersionMigration
+		{
+			get { return _versionMigration; }
+			set { _versionMigration = value; }
+		}
 
 		public VersionInfo VersionInfo
 		{
