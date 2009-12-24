@@ -1,4 +1,5 @@
-﻿using System.Data.SqlClient;
+﻿using System.Data;
+using System.Data.SqlClient;
 using FluentMigrator.Runner.Generators;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
@@ -10,6 +11,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 			var connection = new SqlConnection(connectionString);
 			connection.Open();
 			return new SqlServerProcessor(connection, new SqlServerGenerator());
+		}
+
+		public IMigrationProcessor Create(IDbConnection connection)
+		{
+			return new SqlServerProcessor((SqlConnection)connection, new SqliteGenerator());
 		}
 	}
 }

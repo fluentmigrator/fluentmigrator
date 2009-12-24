@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using FluentMigrator.Runner.Generators;
@@ -13,6 +14,11 @@ namespace FluentMigrator.Runner.Processors.MySql
 		{
 			var connection = new MySqlConnection(connectionString);
 			return new MySqlProcessor(connection, new MySqlGenerator());
+		}
+
+		public IMigrationProcessor Create( IDbConnection connection )
+		{
+			return new MySqlProcessor((MySqlConnection)connection, new MySqlGenerator());
 		}
 	}
 }

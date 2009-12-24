@@ -1,4 +1,6 @@
-﻿using System.Data.SQLite;
+﻿using System;
+using System.Data;
+using System.Data.SQLite;
 using FluentMigrator.Runner.Generators;
 
 namespace FluentMigrator.Runner.Processors.Sqlite
@@ -9,6 +11,11 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 		{
 			var connection = new SQLiteConnection(connectionString);
 			return new SqliteProcessor(connection, new SqliteGenerator());
+		}
+
+		public IMigrationProcessor Create( IDbConnection connection )
+		{
+			return new SqliteProcessor((SQLiteConnection)connection, new SqliteGenerator());
 		}
 	}
 }
