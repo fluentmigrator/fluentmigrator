@@ -85,7 +85,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			CreateColumnExpression expression = GetCreateAutoIncrementColumnExpression();
 			string sql = generator.Generate(expression);
-			sql.ShouldBe(string.Format("ALTER TABLE [{0}] ADD COLUMN {1} NVARCHAR(255) NOT NULL PRIMARY KEY AUTOINCREMENT", table, newColumn));
+			sql.ShouldBe(string.Format("ALTER TABLE [{0}] ADD COLUMN {1} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT", table, newColumn));
 		}
 
 		//[Test]

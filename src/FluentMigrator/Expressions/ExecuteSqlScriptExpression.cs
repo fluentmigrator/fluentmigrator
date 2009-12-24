@@ -27,5 +27,10 @@ namespace FluentMigrator.Expressions
 			if (string.IsNullOrEmpty(SqlScript))
 				errors.Add(ErrorMessages.SqlScriptCannotBeNullOrEmpty);
 		}
+
+		public override string ToString()
+		{
+			return base.ToString() + SqlScript;
+		}
 	}
 }

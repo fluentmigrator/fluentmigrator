@@ -1,7 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.IO;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Tests.Helpers;
@@ -14,6 +12,9 @@ namespace FluentMigrator.Tests.Unit.Expressions
 	[TestFixture]
 	public class ExecuteSqlScriptExpressionTests
 	{
+		private string testSqlScript = "testscript.sql";
+		private string scriptContents = "TEST SCRIPT";
+
 		[Test]
 		public void ErrorIsReturnWhenSqlScriptIsNullOrEmpty()
 		{
@@ -25,10 +26,10 @@ namespace FluentMigrator.Tests.Unit.Expressions
 		[Test]
 		public void ExecutesTheStatement()
 		{
-			var expression = new ExecuteSqlScriptExpression { SqlScript = "somefile.sql" };
+			var expression = new ExecuteSqlScriptExpression { SqlScript = testSqlScript };
 
 			var processor = new Mock<IMigrationProcessor>();
-			processor.Setup(x => x.Execute(expression.SqlScript)).Verifiable();
+			processor.Setup(x => x.Execute(scriptContents)).Verifiable();
 
 			expression.ExecuteWith(processor.Object);
 			processor.Verify();
@@ -37,8 +38,8 @@ namespace FluentMigrator.Tests.Unit.Expressions
 		[Test]
 		public void ToStringIsDescriptive()
 		{
-			var expression = new ExecuteSqlScriptExpression { SqlScript = "somefile.sql" };
-			expression.ToString().ShouldBe("ExecuteSqlScript somefile.sql");
+			var expression = new ExecuteSqlScriptExpression { SqlScript = testSqlScript };
+			expression.ToString().ShouldBe("ExecuteSqlScript testscript.sql");
 		}
 	}
 }
