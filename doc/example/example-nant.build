@@ -1,19 +1,21 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<project name="fluentmigrator" xmlns="http://nant.sf.net/release/0.85/nant.xsd">
+<project name="fluentmigrator" xmlns="http://nant.sf.net/release/0.85/nant.xsd" default="migrate">
 	<loadtasks assembly="../../build/FluentMigrator.NAnt.dll" />
 
 	<target name="migrate" description="Migrate the database to the latest version">
 	  	<migrate
-	    		database="MySql"
-	    		connection="Data Source=localhost;Database=test;User Id=root;Password=;"
+	    		database="sqlite"
+	    		connection="Data Source=:memory:;Version=3;New=True;"
+			namespace="FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3"
 	    		target="../../build/FluentMigrator.Tests.dll"
 		/>
 	</target>
 
 	<target name="migrate-rollback" description="Migrate the database back one version">
 	  	<migrate
-	    		database="MySql"
-	    		connection="Data Source=localhost;Database=test;User Id=root;Password=;"
+	    		database="sqlite"
+	    		connection="Data Source=:memory:;Version=3;New=True;"
+			namespace="FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3"
 	    		target="../../build/FluentMigrator.Tests.dll"
 			task="rollback"
 		/>
@@ -21,8 +23,9 @@
 
 	<target name="migrate-rollback-all" description="Migrates the database back to original state prior to applying migrations">
 	  	<migrate
-	    		database="MySql"
-	    		connection="Data Source=localhost;Database=test;User Id=root;Password=;"
+	    		database="sqlite"
+	    		connection="Data Source=:memory:;Version=3;New=True;"
+			namespace="FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3"
 	    		target="../../build/FluentMigrator.Tests.dll"
 			task="rollback:all"
 		/>
