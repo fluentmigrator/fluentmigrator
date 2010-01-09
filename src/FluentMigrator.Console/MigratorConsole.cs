@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 
 namespace FluentMigrator.Console
@@ -76,16 +77,20 @@ namespace FluentMigrator.Console
 
 		private void ExecuteMigrations()
 		{
-			if (!Path.IsPathRooted(TargetAssembly))
-				TargetAssembly = Path.GetFullPath(TargetAssembly);
+			var migrationContext = new RunnerContext
+			{
+				Database = ProcessorType,
+				Connection = Connection,
+				Target = TargetAssembly,
+				LoggingEnabled = Log,
+				Namespace = Namespace,
+				Task = Task,
+				Version = Version,
+				Steps = Steps,
+				WorkingDirectory = WorkingDirectory
+			};
 
-			var migrationConventions = new MigrationConventions();
-			if (!string.IsNullOrEmpty(WorkingDirectory))
-				migrationConventions.GetWorkingDirectory = () => WorkingDirectory;
-
-			Assembly assembly = Assembly.LoadFile(TargetAssembly);
-			var runner = new MigrationVersionRunner(migrationConventions, Processor, new MigrationLoader(migrationConventions), assembly, Namespace);
-			new TaskExecutor(runner, Version, Steps).Execute(Task);
+			new TaskExecutor(migrationContext).Execute();
 		}
 	}
 }
