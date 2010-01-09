@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<project name="migrator" default="build" xmlns="http://nant.sf.net/release/0.85/nant.xsd">
+
+    <!-- Paths to various parts of the build -->
+    <property name="dir.bin" value="build" />
+
+    <target name="build" description="Builds the app" depends="clean">
+		<msbuild project="FluentMigrator.sln">
+			<property name="Configuration" value="AutomatedRelease" />
+			<property name="OutDir" value="..\..\${dir.bin}\\" />
+		</msbuild>
+    </target>
+
+    <target name="clean" description="Deletes the output folders for a clean build">
+        <delete dir="${dir.bin}"/>
+    </target>
+
+</project>

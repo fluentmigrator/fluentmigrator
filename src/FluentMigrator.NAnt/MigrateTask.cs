@@ -1,9 +1,4 @@
-﻿using System;
-using System.IO;
-using System.Reflection;
-using FluentMigrator.Console;
-using FluentMigrator.Runner;
-using FluentMigrator.Runner.Processors;
+﻿using FluentMigrator.Runner.Initialization;
 using NAnt.Core;
 using NAnt.Core.Attributes;
 
@@ -22,7 +17,7 @@ namespace FluentMigrator.NAnt
 		public string Target { get; set; }
 
 		[TaskAttribute("log")]
-		public bool Logging { get; set; }
+		public bool LoggingEnabled { get; set; }
 
 		[TaskAttribute("namespace")]
 		public string Namespace { get; set; }
@@ -31,7 +26,7 @@ namespace FluentMigrator.NAnt
 		public string Task { get; set; }
 
 		[TaskAttribute("to")]
-		public long To { get; set; }
+		public long Version { get; set; }
 
 		[TaskAttribute("steps")]
 		public int Steps { get; set; }
@@ -39,29 +34,22 @@ namespace FluentMigrator.NAnt
 		[TaskAttribute("workingdirectory")]
 		public string WorkingDirectory { get; set; }
 
-		protected IMigrationProcessor Processor { get; set; }
-
-		private void CreateProcessor()
-		{
-			IMigrationProcessorFactory processorFactory = ProcessorFactory.GetFactory(Database);
-			Processor = processorFactory.Create(Connection);
-		}
-
 		protected override void ExecuteTask()
 		{
-			CreateProcessor();
+			var runnerContext = new RunnerContext()
+									{
+										Database = Database,
+										Connection = Connection,
+										Target = Target,
+										LoggingEnabled = LoggingEnabled,
+										Namespace = Namespace,
+										Task = Task,
+										Version = Version,
+										Steps = Steps,
+										WorkingDirectory = WorkingDirectory
+									};
 
-			if (!Path.IsPathRooted(Target))
-				Target = Path.GetFullPath(Target);
-
-			var migrationConventions = new MigrationConventions();
-			if (!string.IsNullOrEmpty(WorkingDirectory))
-				migrationConventions.GetWorkingDirectory = () => WorkingDirectory;
-
-//			Assembly assembly = Assembly.LoadFile(Target);
-//			var runner = new MigrationVersionRunner(migrationConventions, Processor, new MigrationLoader(migrationConventions), assembly, Namespace);
-//			new TaskExecutor(runner, To, Steps).Execute(Task);
-			throw new NotImplementedException();
+			new TaskExecutor(runnerContext).Execute();
 		}
 	}
 }
