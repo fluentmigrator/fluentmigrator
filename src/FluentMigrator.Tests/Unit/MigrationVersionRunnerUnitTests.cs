@@ -39,7 +39,7 @@ namespace FluentMigrator.Tests.Unit
 		{
 			//set migrations to return empty list
 			var asm = Assembly.GetAssembly(typeof(MigrationVersionRunnerUnitTests));
-			_loaderMock.Setup(x => x.FindMigrationsIn(asm)).Returns<IEnumerable<Migration>>(null);
+			_loaderMock.Setup(x => x.FindMigrationsIn(asm, null)).Returns<IEnumerable<Migration>>(null);
 
 
 			_vrunner.Migrations.Count.ShouldBe(0);
@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Unit
 		[Test, ExpectedException(typeof(Exception))]
 		public void ShouldThrowExceptionIfDuplicateVersionNumbersAreLoaded()
 		{
-			_loaderMock.Setup(x => x.FindMigrationsIn(It.IsAny<Assembly>())).Returns(new List<MigrationMetadata>
+			_loaderMock.Setup(x => x.FindMigrationsIn(It.IsAny<Assembly>(), null)).Returns(new List<MigrationMetadata>
 			                                                                         	{
 			                                                                         		new MigrationMetadata {Version = 1, Type = typeof(UserToRole)},
 			                                                                         		new MigrationMetadata {Version = 2, Type = typeof(FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass2.UserToRole)},
@@ -65,7 +65,7 @@ namespace FluentMigrator.Tests.Unit
 	    [Test]
         public void HandlesMigrationThatDoesNotInheritFromMigrationBaseClass()
 	    {
-            _loaderMock.Setup(x => x.FindMigrationsIn(It.IsAny<Assembly>())).Returns(new List<MigrationMetadata>
+            _loaderMock.Setup(x => x.FindMigrationsIn(It.IsAny<Assembly>(), null)).Returns(new List<MigrationMetadata>
 			                                                                         	{
 			                                                                         		new MigrationMetadata {Version = 1, Type = typeof(MigrationThatDoesNotInheritFromMigrationBaseClass)},
 			                                                                         	});

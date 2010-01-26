@@ -15,22 +15,15 @@ namespace FluentMigrator.Runner
 			Conventions = conventions;
 		}
 
-		public IEnumerable<MigrationMetadata> FindMigrationsIn(Assembly assembly)
-		{
-			foreach (Type type in assembly.GetExportedTypes())
-			{
-				if (Conventions.TypeIsMigration(type))
-					yield return Conventions.GetMetadataForMigration(type);
-			}
-		}
-
 		public IEnumerable<MigrationMetadata> FindMigrationsIn(Assembly assembly, string @namespace)
 		{
-			foreach (Type type in assembly.GetExportedTypes().Where(x => x.Namespace == @namespace))
-			{
-				if (Conventions.TypeIsMigration(type))
-					yield return Conventions.GetMetadataForMigration(type);
-			}
+			IEnumerable<Type> matchedTypes = assembly.GetExportedTypes().Where(t => Conventions.TypeIsMigration(t));
+
+			if (!string.IsNullOrEmpty(@namespace))
+				matchedTypes = assembly.GetExportedTypes().Where(t => t.Namespace == @namespace && Conventions.TypeIsMigration(t));
+
+			foreach (Type type in matchedTypes)
+				yield return Conventions.GetMetadataForMigration(type);
 		}
 	}
 }

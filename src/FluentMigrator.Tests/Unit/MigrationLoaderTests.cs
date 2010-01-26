@@ -18,7 +18,7 @@ namespace FluentMigrator.Tests.Unit
 			var conventions = new MigrationConventions();
 			var loader = new MigrationLoader(conventions);
 			var asm = Assembly.GetExecutingAssembly();
-			IEnumerable<MigrationMetadata> migrationList = loader.FindMigrationsIn(asm);
+			IEnumerable<MigrationMetadata> migrationList = loader.FindMigrationsIn(asm, string.Empty);
 
 			//if this works, there will be at least one migration class because i've included on in this code file
 			var en = migrationList.GetEnumerator();

@@ -1,5 +1,9 @@
-﻿using FluentMigrator.Runner;
+﻿using System.Data.SqlClient;
+using FluentMigrator.Runner;
+using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Integration.Migrations;
+using FluentMigrator.Tests.Integration.Migrations.Invalid;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -13,7 +17,7 @@ namespace FluentMigrator.Tests.Integration
 		[SetUp]
 		public void SetUp()
 		{
-		   _conventions = new MigrationConventions();
+			_conventions = new MigrationConventions();
 		}
 
 		[Test]
@@ -127,12 +131,30 @@ namespace FluentMigrator.Tests.Integration
 				runner.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
 				processor.TableExists("Users").ShouldBeTrue();
 
-
 				runner.MigrateDown(1);
 
 				runner.VersionInfo.HasAppliedMigration(1).ShouldBeFalse();
 				processor.TableExists("Users").ShouldBeFalse();
 			});
+		}
+
+		[Test]
+		public void SqlServerMigrationsAreTransactional()
+		{
+			var connection = new SqlConnection(sqlServerConnectionString);
+			connection.Open();
+			var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
+			var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(InvalidMigration).Namespace);
+
+			try
+			{
+				runner.MigrateUp();
+			}
+			catch
+			{
+			}
+
+			processor.TableExists("Users").ShouldBeFalse();
 		}
 	}
 }

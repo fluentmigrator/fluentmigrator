@@ -55,14 +55,6 @@ namespace FluentMigrator.Runner.Processors.MySql
 			return Read("select * from {0}", tableName);
 		}
 
-		protected override void Process(string sql)
-		{
-			if (Connection.State != ConnectionState.Open) Connection.Open();
-
-			using (var command = new MySqlCommand(sql, Connection))
-				command.ExecuteNonQuery();
-		}
-
 		public override DataSet Read(string template, params object[] args)
 		{
 			if (Connection.State != ConnectionState.Open) Connection.Open();
@@ -74,6 +66,14 @@ namespace FluentMigrator.Runner.Processors.MySql
 				adapter.Fill(ds);
 				return ds;
 			}
+		}
+
+		protected override void Process(string sql)
+		{
+			if (Connection.State != ConnectionState.Open) Connection.Open();
+
+			using (var command = new MySqlCommand(sql, Connection))
+				command.ExecuteNonQuery();
 		}
 	}
 }

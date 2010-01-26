@@ -7,11 +7,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 	public class SqlServerProcessor : ProcessorBase
 	{
 		public virtual SqlConnection Connection { get; set; }
+		public SqlTransaction Transaction { get; private set; }
 
 		public SqlServerProcessor(SqlConnection connection, IMigrationGenerator generator)
 		{
 			this.generator = generator;
 			Connection = connection;
+			Transaction = Connection.BeginTransaction();
 		}
 
 		public override bool TableExists(string tableName)
@@ -31,9 +33,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
 		public override void Execute(string template, params object[] args)
 		{
-			if (Connection.State != ConnectionState.Open) Connection.Open();
+			if (Connection.State != ConnectionState.Open)
+				Connection.Open();
 
-			using (var command = new SqlCommand(String.Format(template, args), Connection))
+			using (var command = new SqlCommand(String.Format(template, args), Connection, Transaction))
 			{
 				command.ExecuteNonQuery();
 			}
@@ -41,9 +44,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
 		public override bool Exists(string template, params object[] args)
 		{
-			if (Connection.State != ConnectionState.Open) Connection.Open();
+			if (Connection.State != ConnectionState.Open)
+				Connection.Open();
 
-			using (var command = new SqlCommand(String.Format(template, args), Connection))
+			using (var command = new SqlCommand(String.Format(template, args), Connection, Transaction))
 			using (var reader = command.ExecuteReader())
 			{
 				return reader.Read();
@@ -60,7 +64,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 			if (Connection.State != ConnectionState.Open) Connection.Open();
 
 			DataSet ds = new DataSet();
-			using (var command = new SqlCommand(String.Format(template, args), Connection))
+			using (var command = new SqlCommand(String.Format(template, args), Connection, Transaction))
 			using (SqlDataAdapter adapter = new SqlDataAdapter(command))
 			{
 				adapter.Fill(ds);
@@ -68,12 +72,22 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 			}
 		}
 
+		public override void CommitTransaction()
+		{
+			Transaction.Commit();
+		}
+
+		public override void RollbackTransaction()
+		{
+			Transaction.Rollback();
+		}
+
 		protected override void Process(string sql)
 		{
 			if (Connection.State != ConnectionState.Open)
 				Connection.Open();
 
-			using (var command = new SqlCommand(sql, Connection))
+			using (var command = new SqlCommand(sql, Connection, Transaction))
 				command.ExecuteNonQuery();
 		}
 	}

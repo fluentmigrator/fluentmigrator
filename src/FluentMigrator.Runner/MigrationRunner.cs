@@ -87,6 +87,7 @@ namespace FluentMigrator.Runner
 				catch (Exception er)
 				{
 					_announcer.Say(er.Message);
+
 					//catch the error and move onto the next expression
 					if (SilentlyFail)
 					{

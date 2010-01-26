@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SqlClient;
 using System.Reflection;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
@@ -94,12 +95,8 @@ namespace FluentMigrator.Runner
 		private void loadMigrations()
 		{
 			_migrations = new SortedList<long, IMigration>();
-			IEnumerable<MigrationMetadata> migrationList;
-			
-			if (string.IsNullOrEmpty(_namespace))
-				migrationList = _migrationLoader.FindMigrationsIn(_migrationAssembly);
-			else
-				migrationList = _migrationLoader.FindMigrationsIn(_migrationAssembly, _namespace);
+
+			IEnumerable<MigrationMetadata> migrationList = _migrationLoader.FindMigrationsIn(_migrationAssembly, _namespace);
 
 			if (migrationList == null)
 				return;
@@ -116,20 +113,30 @@ namespace FluentMigrator.Runner
 
 		public void MigrateUp()
 		{
-			foreach (var version in Migrations.Keys)
+			try
 			{
-				MigrateUp(version);
+				foreach (var version in Migrations.Keys)
+				{
+					MigrateUp(version);
+				}
+
+				_migrationProcessor.CommitTransaction();
+				_versionInfo = null;
 			}
-			_versionInfo = null;
+			catch (Exception)
+			{
+				_migrationProcessor.RollbackTransaction();
+				throw;
+			}
 		}
 
 		public void MigrateUp(long version)
 		{
-			migrateUp(version);
+			ApplyMigrationUp(version);
 			_versionInfo = null;
 		}
 
-		private void migrateUp(long version)
+		private void ApplyMigrationUp(long version)
 		{
 			if (!VersionInfo.HasAppliedMigration(version))
 			{
@@ -141,50 +148,63 @@ namespace FluentMigrator.Runner
 		private void updateVersionInfoWithAppliedMigration(long version)
 		{
 			var dataExpression = new InsertDataExpression();
-            dataExpression.Rows.Add(createVersionInfoInsertionData(version));
+			dataExpression.Rows.Add(createVersionInfoInsertionData(version));
 			dataExpression.TableName = VersionInfo.TABLE_NAME;
 			dataExpression.ExecuteWith(_migrationProcessor);
 		}
 
-        protected virtual InsertionData createVersionInfoInsertionData(long version)
-        {
-            return new InsertionData { new KeyValuePair<string, object>(VersionInfo.COLUMN_NAME, version) };
-        }
+		protected virtual InsertionData createVersionInfoInsertionData(long version)
+		{
+			return new InsertionData { new KeyValuePair<string, object>(VersionInfo.COLUMN_NAME, version) };
+		}
 
 		public void Rollback(int steps)
 		{
 			foreach (var migrationNumber in VersionInfo.AppliedMigrations().Take(steps))
 			{
-				migrateDown(migrationNumber);
+				ApplyMigrationDown(migrationNumber);
 			}
+
+			_migrationProcessor.CommitTransaction();
+
 			_versionInfo = null;
 		}
 
-      public void RollbackToVersion(long version)
-      {
-         // Get the migrations between current and the to version
-         foreach (var migrationNumber in VersionInfo.AppliedMigrations())
-         {
-            if (version < migrationNumber || version == 0)
-            {
-               migrateDown(migrationNumber);
-            }
-         }
+		public void RollbackToVersion(long version)
+		{
+			// Get the migrations between current and the to version
+			foreach (var migrationNumber in VersionInfo.AppliedMigrations())
+			{
+				if (version < migrationNumber || version == 0)
+				{
+					ApplyMigrationDown(migrationNumber);
+				}
+			}
 
-         if (version == 0)
-            RemoveVersionTable();
+			if (version == 0)
+				RemoveVersionTable();
 
-         _versionInfo = null;
-      }
+			_migrationProcessor.CommitTransaction();
+			_versionInfo = null;
+		}
 
 		public void MigrateDown(long version)
 		{
+			try
+			{
+				ApplyMigrationDown(version);
 
-			migrateDown(version);
-			_versionInfo = null;
+				_migrationProcessor.CommitTransaction();
+				_versionInfo = null;
+			}
+			catch(Exception)
+			{
+				_migrationProcessor.RollbackTransaction();
+				throw;
+			}
 		}
 
-		private void migrateDown(long version)
+		private void ApplyMigrationDown(long version)
 		{
 			_migrationRunner.Down(Migrations[version]);
 			_migrationProcessor.Execute("DELETE FROM {0} WHERE {1}='{2}'", VersionInfo.TABLE_NAME, VersionInfo.COLUMN_NAME, version.ToString());

@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 		[Test]
 		public void CallingTableExistsReturnsTrueIfTableExists()
 		{
-			using (var table = new SqlServerTestTable(Connection, "id int"))
+			using (var table = new SqlServerTestTable(Processor, "id int"))
 				Processor.TableExists(table.Name).ShouldBeTrue();
 		}
 
@@ -37,7 +37,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 		[Test]
 		public void CallingColumnExistsReturnsTrueIfColumnExists()
 		{
-			using (var table = new SqlServerTestTable(Connection, "id int"))
+			using (var table = new SqlServerTestTable(Processor, "id int"))
 				Processor.ColumnExists(table.Name, "id").ShouldBeTrue();
 		}
 
@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 		[Test]
 		public void CallingColumnExistsReturnsFalseIfColumnDoesNotExist()
 		{
-			using (var table = new SqlServerTestTable(Connection, "id int"))
+			using (var table = new SqlServerTestTable(Processor, "id int"))
 				Processor.ColumnExists(table.Name, "DoesNotExist").ShouldBeFalse();
 		}
 	}
