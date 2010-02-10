@@ -82,6 +82,7 @@ namespace FluentMigrator.Runner
 			{
 				try
 				{
+					expression.ApplyConventions( Conventions );
 					time(expression.ToString(), () => expression.ExecuteWith(Processor));
 				}
 				catch (Exception er)
