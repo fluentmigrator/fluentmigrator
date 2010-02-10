@@ -16,6 +16,12 @@ namespace FluentMigrator
 		public abstract void Up();
 		public abstract void Down();
 
+		public void ApplyConventions(IMigrationContext context)
+		{
+			foreach (var expression in context.Expressions)
+				expression.ApplyConventions( context.Conventions );
+		}
+
 		public virtual void GetUpExpressions(IMigrationContext context)
 		{
 			lock (_mutex)
@@ -24,14 +30,6 @@ namespace FluentMigrator
 				Up();
 				_context = null;
 			}
-
-			ApplyConventions( context );
-		}
-
-		public void ApplyConventions(IMigrationContext context)
-		{
-			foreach (var expression in context.Expressions)
-				expression.ApplyConventions( context.Conventions );
 		}
 
 		public virtual void GetDownExpressions(IMigrationContext context)
