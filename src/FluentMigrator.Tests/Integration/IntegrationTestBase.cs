@@ -38,7 +38,7 @@ namespace FluentMigrator.Tests.Integration
 			ExecuteWithMySql(test, IntegrationTestOptions.MySql);
 		}
 
-		private static void ExecuteWithSqlServer(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
+		protected static void ExecuteWithSqlServer(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
 		{
 			if (!serverOptions.IsEnabled)
 				return;
@@ -49,7 +49,7 @@ namespace FluentMigrator.Tests.Integration
 			test(processor);
 		}
 
-		private static void ExecuteWithSqlite(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
+		protected static void ExecuteWithSqlite(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
 		{
 			if (!serverOptions.IsEnabled)
 				return;
@@ -59,7 +59,7 @@ namespace FluentMigrator.Tests.Integration
 			test(processor);
 		}
 
-		private static void ExecuteWithMySql(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
+		protected static void ExecuteWithMySql(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
 		{
 			if (!serverOptions.IsEnabled)
 				return;

@@ -17,6 +17,7 @@
 #endregion
 
 using System.Data;
+using FluentMigrator.Builders.Execute;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 
@@ -46,5 +47,6 @@ namespace FluentMigrator
 		void Process(RenameTableExpression expression);
 		void Process(RenameColumnExpression expression);
 		void Process(InsertDataExpression expression);
+		void Process(PerformDBOperationExpression expression);
 	}
 }

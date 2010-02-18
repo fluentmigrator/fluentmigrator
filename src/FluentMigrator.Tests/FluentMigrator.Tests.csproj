@@ -134,6 +134,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IntegrationTestOptions.cs" />
+    <Compile Include="Integration\PerformDBOperationTests.cs" />
     <Compile Include="Integration\IntegrationTestBase.cs" />
     <Compile Include="Integration\MigrationRunnerTests.cs" />
     <Compile Include="Integration\Migrations\Interleaved\Pass1\3_UserRoles.cs" />
@@ -172,6 +173,7 @@
     <Compile Include="Unit\Expressions\ExecuteSqlScriptExpressionTests.cs" />
     <Compile Include="Unit\Expressions\ExecuteSqlStatementExpressionTests.cs" />
     <Compile Include="Unit\Generators\OracleGeneratorTests.cs" />
+    <Compile Include="Unit\Expressions\PerformDBOperationExpressionTests.cs" />
     <Compile Include="Unit\MigrationLoaderTests.cs" />
     <Compile Include="Unit\MigrationMetadataTests.cs" />
     <Compile Include="Unit\Generators\SqliteGeneratorTests.cs" />

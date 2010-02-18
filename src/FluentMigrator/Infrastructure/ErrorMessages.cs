@@ -39,5 +39,6 @@ namespace FluentMigrator.Infrastructure
 		public const string IndexMustHaveOneOrMoreColumns = "The index must have one or more columns";
 		public const string SqlStatementCannotBeNullOrEmpty = "The sql statement cannot be null or an empty string";
 		public const string SqlScriptCannotBeNullOrEmpty = "The sql script cannot be null or an empty string";
+		public const string OperationCannotBeNull = "The operation to be performed using the database connection cannot be null";
 	}
 }

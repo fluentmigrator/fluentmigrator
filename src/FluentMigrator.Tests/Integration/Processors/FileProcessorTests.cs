@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using FluentMigrator.Builders.Execute;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
@@ -112,6 +113,11 @@ namespace FluentMigrator.Tests.Integration.Processors
 		private string FormattedDateTime
 		{
 			get { return DateTime.Now.ToString("yyyyMMdd"); }
+		}
+
+		public override void Process(PerformDBOperationExpression expression)
+		{
+			throw new NotImplementedException();
 		}
 
 		protected override void Process(string sql)

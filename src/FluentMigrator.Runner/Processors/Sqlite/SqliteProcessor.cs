@@ -20,6 +20,7 @@
 using System;
 using System.Data;
 using System.Data.SQLite;
+using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.Sqlite
 {
@@ -81,6 +82,14 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 		public override DataSet ReadTableData(string tableName)
 		{
 			return Read("select * from {0}", tableName);
+		}
+
+		public override void Process(PerformDBOperationExpression expression)
+		{
+			if (Connection.State != ConnectionState.Open) Connection.Open();
+				
+			if (expression.Operation != null)
+				expression.Operation(Connection, null);
 		}
 
 		protected override void Process(string sql)
