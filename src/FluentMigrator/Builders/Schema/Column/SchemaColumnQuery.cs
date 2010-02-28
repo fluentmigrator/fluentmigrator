@@ -10,14 +10,14 @@ namespace FluentMigrator.Builders.Schema.Column
 
 		public SchemaColumnQuery(string tableName, string columnName, IMigrationContext context)
 		{
-			this._tableName = tableName;
-			this._columnName = columnName;
-			this._context = context;
+			_tableName = tableName;
+			_columnName = columnName;
+			_context = context;
 		}
 
 		public bool Exists()
 		{
-			return this._context.QuerySchema.ColumnExists(this._tableName, this._columnName);
+			return _context.QuerySchema.ColumnExists(_tableName, _columnName);
 		}
 	}
 }

@@ -10,12 +10,12 @@ namespace FluentMigrator.Builders.Schema
 
 		public SchemaExpressionRoot(IMigrationContext context)
 		{
-			this._context = context;
+			_context = context;
 		}
 
 		public ISchemaTableSyntax Table(string tableName)
 		{
-			return new SchemaTableQuery(this._context, tableName);
+			return new SchemaTableQuery(_context, tableName);
 		}
 	}
 }

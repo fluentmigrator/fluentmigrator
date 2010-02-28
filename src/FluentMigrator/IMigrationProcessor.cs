@@ -4,7 +4,7 @@ using FluentMigrator.Expressions;
 
 namespace FluentMigrator
 {
-	public interface IMigrationProcessor:IQuerySchema
+	public interface IMigrationProcessor : IQuerySchema
 	{
 		void Execute(string template, params object[] args);
 		DataSet ReadTableData(string tableName);

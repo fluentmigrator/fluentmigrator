@@ -64,11 +64,6 @@ namespace FluentMigrator.Runner.Processors
 
 		protected abstract void Process(string sql);
 
-		public abstract System.Data.DataSet ReadTableData(string tableName);
-		public abstract System.Data.DataSet Read(string template, params object[] args);
-		public abstract bool Exists(string template, params object[] args);
-		public abstract void Execute(string template, params object[] args);
-		
 		public virtual void CommitTransaction()
 		{
 		}
@@ -77,12 +72,12 @@ namespace FluentMigrator.Runner.Processors
 		{
 		}
 
-		#region IQuerySchema
-
+		public abstract System.Data.DataSet ReadTableData(string tableName);
+		public abstract System.Data.DataSet Read(string template, params object[] args);
+		public abstract bool Exists(string template, params object[] args);
+		public abstract void Execute(string template, params object[] args);
 		public abstract bool TableExists(string tableName);
 		public abstract bool ColumnExists(string tableName, string columnName);
 		public abstract bool ConstraintExists(string tableName, string constraintName);
-
-		#endregion
 	}
 }
