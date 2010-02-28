@@ -21,16 +21,16 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 			return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{0}'", tableName);
 		}
 
-		public bool ColumnExists(string tableName, string columnName)
+		public override bool ColumnExists(string tableName, string columnName)
 		{
 			return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'", tableName, columnName);
 		}
 
-		public bool ConstraintExists(string tableName, string constraintName)
+		public override bool ConstraintExists(string tableName, string constraintName)
 		{
 			return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_CATALOG = DB_NAME() AND TABLE_NAME = '{0}' AND CONSTRAINT_NAME = '{1}'", tableName, constraintName);
 		}
-
+		
 		public override void Execute(string template, params object[] args)
 		{
 			if (Connection.State != ConnectionState.Open)

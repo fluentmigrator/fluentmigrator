@@ -119,6 +119,16 @@ namespace FluentMigrator.Tests.Integration.Processors
 			throw new NotImplementedException();
 		}
 
+		public override bool ColumnExists(string tableName, string columnName)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override bool ConstraintExists(string tableName, string constraintName)
+		{
+			throw new NotImplementedException();
+		}
+
 		public override bool Exists(string template, params object[] args)
 		{
 			throw new NotImplementedException();

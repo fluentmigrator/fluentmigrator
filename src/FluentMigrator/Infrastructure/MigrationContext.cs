@@ -8,11 +8,13 @@ namespace FluentMigrator.Infrastructure
 	{
 		public virtual IMigrationConventions Conventions { get; set; }
 		public virtual ICollection<IMigrationExpression> Expressions { get; set; }
+		public virtual IQuerySchema QuerySchema { get; set; }
 
-		public MigrationContext(IMigrationConventions conventions)
+		public MigrationContext(IMigrationConventions conventions,IQuerySchema querySchema)
 		{
 			Conventions = conventions;
 			Expressions = new List<IMigrationExpression>();
+			QuerySchema = querySchema;
 		}
 	}
 }

@@ -19,6 +19,22 @@ namespace FluentMigrator.Runner.Processors.MySql
 			return Exists("select count(*) from information_schema.tables where table_name='{0}'", tableName);
 		}
 
+		public override bool ColumnExists(string tableName, string columnName)
+		{
+			string sql = @"select column_name from information_schema.columns
+                            where table_name='{0}'
+                              and column_name='{1}'";
+			return Exists(sql, tableName, columnName);
+		}
+
+		public override bool ConstraintExists(string tableName, string constraintName)
+		{
+			string sql = @"select column_name from information_schema.table_constraints
+                            where table_name='{0}'
+                              and constraint_name='{1}'";
+			return Exists(sql, tableName, constraintName);
+		}
+
 		public override void Execute(string template, params object[] args)
 		{
 			if (Connection.State != ConnectionState.Open) Connection.Open();

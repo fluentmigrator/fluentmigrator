@@ -19,6 +19,16 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 			return Exists("select count(*) from sqlite_master where name='{0}'", tableName);
 		}
 
+		public override bool ColumnExists(string tableName, string columnName)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override bool ConstraintExists(string tableName, string constraintName)
+		{
+			return false;
+		}
+
 		public override void Execute(string template, params object[] args)
 		{
 			if (Connection.State != ConnectionState.Open) Connection.Open();

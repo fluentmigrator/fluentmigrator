@@ -3,6 +3,7 @@ using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.Delete;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Builders.Rename;
+using FluentMigrator.Builders.Schema;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Builders.Execute;
 
@@ -66,5 +67,10 @@ namespace FluentMigrator
 	    {
 	        get { return new ExecuteExpressionRoot(_context);}
 	    }
+
+		public ISchemaExpressionRoot Schema
+		{
+			get { return new SchemaExpressionRoot(_context); }
+		}
 	}
 }

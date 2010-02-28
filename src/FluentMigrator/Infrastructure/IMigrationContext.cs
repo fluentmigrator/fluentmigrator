@@ -8,5 +8,6 @@ namespace FluentMigrator.Infrastructure
 	{
 		IMigrationConventions Conventions { get; }
 		ICollection<IMigrationExpression> Expressions { get; set; }
+		IQuerySchema QuerySchema { get; } 
 	}
 }
