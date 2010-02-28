@@ -36,7 +36,7 @@ namespace FluentMigrator.Runner
 			
 			CaughtExceptions = new List<Exception>();
 
-			var context = new MigrationContext(Conventions);
+			var context = new MigrationContext(Conventions,Processor);
 
 			migration.GetUpExpressions(context);
 
@@ -58,7 +58,7 @@ namespace FluentMigrator.Runner
 			
 			CaughtExceptions = new List<Exception>();
 
-			var context = new MigrationContext(Conventions);
+			var context = new MigrationContext(Conventions,Processor);
 			migration.GetDownExpressions(context);
 
 			_stopWatch.Start();

@@ -38,6 +38,8 @@
 		{
 			//Delete.ForeignKey("FK_Foo").OnTable("Users");
 
+			Schema.Table("Bar").Exists();
+
 			Delete.Table("Bar");
 			Delete.Table("Users");
 			Delete.Table("Groups");
