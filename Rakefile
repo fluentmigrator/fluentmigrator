@@ -10,7 +10,7 @@ end
 desc 'compile'
 task :compile => :clean do
   msbuild_path = File.join(ENV['windir'].dup, 'Microsoft.NET', 'Framework', 'v3.5', 'msbuild.exe')
-  sh "#{msbuild_path} FluentMigratorVS2008.sln /maxcpucount /v:m /property:BuildInParallel=false /property:Configuration=debug /property:Architecture=x86 /t:Rebuild"
+  sh "#{msbuild_path} FluentMigrator.sln /maxcpucount /v:m /property:BuildInParallel=false /property:Configuration=debug /property:Architecture=x86 /t:Rebuild"
   
   exampleToolsDir = 'src/FluentMigrator.Example/tools/FluentMigrator'
   FileUtils.mkdir_p 'build'
@@ -37,7 +37,7 @@ desc 'opens the sln file'
 task :sln do
   Thread.new do
     devenv = 'C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE\devenv.exe'
-    path = File.join(Dir.pwd, 'FluentMigratorVS2008.sln')
+    path = File.join(Dir.pwd, 'FluentMigrator.sln')
     sh "\"#{devenv}\" #{path}"
   end
 end
