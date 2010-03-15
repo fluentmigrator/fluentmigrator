@@ -35,8 +35,15 @@ end
 
 desc 'opens the sln file'
 task :sln do
+
+  if ENV['PROCESSOR_ARCHITECTURE'] == 'x86' then
+    program_files_32 = ENV['ProgramFiles']
+  else
+    program_files_32 = ENV['ProgramFiles(x86)']
+  end
+  
   Thread.new do
-    devenv = 'C:\Program Files (x86)\Microsoft Visual Studio 9.0\Common7\IDE\devenv.exe'
+    devenv = "#{program_files_32}\\Microsoft Visual Studio 9.0\\Common7\\IDE\\devenv.exe"
     path = File.join(Dir.pwd, 'FluentMigrator.sln')
     sh "\"#{devenv}\" #{path}"
   end
