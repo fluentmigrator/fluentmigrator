@@ -35,7 +35,7 @@ namespace FluentMigrator.Expressions
 
 		public override string ToString()
 		{
-			return base.ToString() + TableName + " " + Column.Name + " " + Column.Type;
+			return base.ToString() + TableName + " " + Column.Name + " " + Column.Type ?? Column.CustomType;
 		}
 	}
 }

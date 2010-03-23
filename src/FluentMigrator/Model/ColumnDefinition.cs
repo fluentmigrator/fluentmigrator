@@ -11,6 +11,7 @@ namespace FluentMigrator.Model
 		public virtual DbType? Type { get; set; }
 		public virtual int Size { get; set; }
 		public virtual int Precision { get; set; }
+        public virtual string CustomType { get; set; }
 		public virtual object DefaultValue { get; set; }
 		public virtual bool IsForeignKey { get; set; }
 		public virtual bool IsIdentity { get; set; }
@@ -24,7 +25,7 @@ namespace FluentMigrator.Model
 			if (String.IsNullOrEmpty(Name))
 				errors.Add(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
 
-			if (Type == null)
+			if (Type == null && CustomType == null)
 				errors.Add(ErrorMessages.ColumnTypeMustBeDefined);
 		}
 

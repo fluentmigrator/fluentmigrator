@@ -170,7 +170,15 @@ namespace FluentMigrator.Runner.Generators
 
 			sb.Append(column.Name);
 			sb.Append(" ");
-			sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
+
+            if (column.Type.HasValue)
+            {
+                sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
+            }
+            else
+            {
+                sb.Append(column.CustomType);
+            }
 
 			if (!column.IsNullable)
 			{

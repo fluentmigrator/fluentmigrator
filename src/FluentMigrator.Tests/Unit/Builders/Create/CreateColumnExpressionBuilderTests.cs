@@ -215,6 +215,13 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 			VerifyColumnSize(255, b => b.AsXml(255));
 		}
 
+        [Test]
+        public void CallingAsCustomSetsTypeToNullAndSetsCustomType()
+        {
+            this.VerifyColumnProperty(c => c.Type = null, b => b.AsCustom("Test"));
+            this.VerifyColumnProperty(c => c.CustomType = "Test", b => b.AsCustom("Test"));
+        }
+
 		[Test]
 		public void CallingWithDefaultValueSetsDefaultValue()
 		{
