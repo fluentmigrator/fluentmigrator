@@ -97,6 +97,10 @@
     <Compile Include="Generators\MySqlGenerator.cs" />
     <Compile Include="Generators\GeneratorBase.cs" />
     <Compile Include="IMigrationVersionRunner.cs" />
+    <Compile Include="Initialization\AssemblyLoader\AssemblyLoaderFactory.cs" />
+    <Compile Include="Initialization\AssemblyLoader\AssemblyLoaderFromFile.cs" />
+    <Compile Include="Initialization\AssemblyLoader\AssemblyLoaderFromName.cs" />
+    <Compile Include="Initialization\AssemblyLoader\IAssemblyLoader.cs" />
     <Compile Include="Initialization\IRunnerContext.cs" />
     <Compile Include="Initialization\RunnerContext.cs" />
     <Compile Include="Initialization\TaskExecutor.cs" />
