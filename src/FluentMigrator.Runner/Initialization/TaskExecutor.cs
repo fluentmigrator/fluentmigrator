@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Reflection;
+using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Processors;
 
 namespace FluentMigrator.Runner.Initialization
@@ -20,14 +21,13 @@ namespace FluentMigrator.Runner.Initialization
 
 		private void Initialize()
 		{
-			if (!Path.IsPathRooted(RunnerContext.Target))
-				RunnerContext.Target = Path.GetFullPath(RunnerContext.Target);
-
 			var migrationConventions = new MigrationConventions();
 			if (!string.IsNullOrEmpty(RunnerContext.WorkingDirectory))
 				migrationConventions.GetWorkingDirectory = () => RunnerContext.WorkingDirectory;
 
-			Assembly assembly = Assembly.LoadFile(RunnerContext.Target);
+
+			Assembly assembly = AssemblyLoaderFactory.GetAssemblyLoader(RunnerContext.Target).Load();
+
 			Runner = new MigrationVersionRunner(migrationConventions, RunnerContext.Processor, new MigrationLoader(migrationConventions), assembly, RunnerContext.Namespace);
 		}
 
