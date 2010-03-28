@@ -170,6 +170,13 @@ namespace FluentMigrator.Builders.Create.Column
 			return this;
 		}
 
+        public ICreateColumnOptionSyntax AsCustom(string customType)
+        {
+            Expression.Column.Type = null;
+            Expression.Column.CustomType = customType;
+            return this;
+        }
+
 		public ICreateColumnOptionSyntax WithDefaultValue(object value)
 		{
 			Expression.Column.DefaultValue = value;

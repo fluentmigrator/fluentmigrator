@@ -39,6 +39,18 @@ namespace FluentMigrator.Tests.Unit.Generators
 			sql.ShouldBe("CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL PRIMARY KEY CLUSTERED, ColumnName2 INT NOT NULL)");
 		}
 
+        [Test]
+        public void CanCreateTableWithCustomColumnType()
+        {
+			string tableName = "NewTable";
+			CreateTableExpression expression = GetCreateTableExpression(tableName);
+			expression.Columns[0].IsPrimaryKey = true;
+            expression.Columns[1].Type = null;
+            expression.Columns[1].CustomType = "[timestamp]";
+			string sql = generator.Generate(expression);
+			sql.ShouldBe("CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL PRIMARY KEY CLUSTERED, ColumnName2 [timestamp] NOT NULL)");
+        }
+
 		[Test]
 		public void CanDropTable()
 		{

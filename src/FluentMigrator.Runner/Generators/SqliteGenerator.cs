@@ -59,8 +59,15 @@ namespace FluentMigrator.Runner.Generators
 
 			if (!column.IsIdentity)
 			{
-				sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
-			}
+                if (column.Type.HasValue)
+                {
+                    sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
+                }
+                else
+                {
+                    sb.Append(column.CustomType);
+                }
+            }
 			else
 			{
 				sb.Append(GetTypeMap(DbType.Int32, column.Size, column.Precision));

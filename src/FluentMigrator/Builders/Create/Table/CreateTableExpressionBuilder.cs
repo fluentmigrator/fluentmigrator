@@ -169,6 +169,13 @@ namespace FluentMigrator.Builders.Create.Table
 			return this;
 		}
 
+		public ICreateTableColumnOptionOrWithColumnSyntax AsCustom(string customType)
+		{
+			CurrentColumn.Type = null;
+		    CurrentColumn.CustomType = customType;
+			return this;
+		}
+
 		public ICreateTableColumnOptionOrWithColumnSyntax WithDefaultValue(object value)
 		{
 			CurrentColumn.DefaultValue = value;
