@@ -5,8 +5,6 @@ namespace FluentMigrator.Runner.Versioning
 {
 	public class VersionInfo
 	{
-		public const string TABLE_NAME = "VersionInfo";
-		public const string COLUMN_NAME = "Version";
 
 		private IList<long> _versionsApplied = new List<long>();
 

@@ -2,6 +2,7 @@
 using System.Text;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
+using FluentMigrator.VersionTableInfo;
 
 namespace FluentMigrator.Infrastructure
 {
@@ -56,6 +57,11 @@ namespace FluentMigrator.Infrastructure
 		public static bool TypeIsMigration(Type type)
 		{
 			return typeof(IMigration).IsAssignableFrom(type) && type.HasAttribute<MigrationAttribute>();
+		}
+
+		public static bool TypeIsVersionTableMetaData(Type type)
+		{
+			return typeof(IVersionTableMetaData).IsAssignableFrom(type) && type.HasAttribute<VersionTableMetaDataAttribute>();
 		}
 
 		public static MigrationMetadata GetMetadataForMigration(Type type)
