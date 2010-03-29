@@ -1,0 +1,19 @@
+<?xml version="1.0"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Migrate">
+
+   <UsingTask TaskName="FluentMigrator.MSBuild.Migrate" 
+        AssemblyFile="FluentMigrator.MSBuild.dll"/>
+
+  <Target Name="Migrate" >
+    <Message Text="Starting FluentMigrator Migration"/>
+
+    <!-- Important: Target must be your Migrations assembly name, not your dll file name.  The dll must be located where dotnet assembly loader can find it (usually same folder as the fluentmigrator dlls) -->
+
+    <Migrate Database="sqlserver"
+             Connection="Data Source=(local)\sqlexpress;Database=yourDB;Trusted_Connection=true"
+             LoggingEnabled="true"
+             Target="Your.Migrations.AssemblyName">
+    </Migrate>
+  </Target>
+
+</Project>
