@@ -1,6 +1,4 @@
-﻿
-using System;
-using FluentMigrator.Runner.Initialization;
+﻿using FluentMigrator.Runner.Initialization;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
@@ -8,7 +6,7 @@ namespace FluentMigrator.MSBuild
 {
 	public class Migrate : Task
 	{
-	   
+
 		[Required]
 		public string Database {get;set;}
 
@@ -30,10 +28,7 @@ namespace FluentMigrator.MSBuild
 
 		public int Steps { get; set; }
 
-		
 		public string WorkingDirectory { get; set; }
-
-
 
 		public override bool Execute()
 		{
@@ -58,4 +53,3 @@ namespace FluentMigrator.MSBuild
 		}
 	}
 }
-

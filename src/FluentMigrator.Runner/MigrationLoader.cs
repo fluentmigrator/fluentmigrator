@@ -27,20 +27,16 @@ namespace FluentMigrator.Runner
 				yield return Conventions.GetMetadataForMigration(type);
 		}
 
-		public IVersionTableMetaData GetVersionTableMetaData (Assembly assembly)
+		public IVersionTableMetaData GetVersionTableMetaData(Assembly assembly)
 		{
 			Type matchedType = assembly.GetExportedTypes().Where(t => Conventions.TypeIsVersionTableMetaData(t)).FirstOrDefault();
 
-			if (matchedType==null)
+			if (matchedType == null)
 			{
 				return new DefaultVersionTableMetaData();
 			}
-			else
-			{
-				IVersionTableMetaData versionTableMetaData = (IVersionTableMetaData) Activator.CreateInstance(matchedType);
-				return versionTableMetaData;
-			}
 
+			return (IVersionTableMetaData)Activator.CreateInstance(matchedType);
 		}
 	}
 }

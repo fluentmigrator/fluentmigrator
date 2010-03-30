@@ -50,9 +50,8 @@ namespace FluentMigrator.Tests.Unit
 			var loader = new MigrationLoader(conventions);
 			var asm = Assembly.GetExecutingAssembly();
 			IVersionTableMetaData versionTableMetaData = loader.GetVersionTableMetaData(asm);
-			versionTableMetaData.ShouldBeOfType<DefaultVersionTableMetaData>();
+			versionTableMetaData.ShouldBeOfType<TestVersionTableMetaData>();
 		}
-
 
 		[Test]
 		public void CanLoadCustomVersionTableMetaData()

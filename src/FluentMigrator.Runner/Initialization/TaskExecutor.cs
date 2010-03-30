@@ -25,7 +25,6 @@ namespace FluentMigrator.Runner.Initialization
 			if (!string.IsNullOrEmpty(RunnerContext.WorkingDirectory))
 				migrationConventions.GetWorkingDirectory = () => RunnerContext.WorkingDirectory;
 
-
 			Assembly assembly = AssemblyLoaderFactory.GetAssemblyLoader(RunnerContext.Target).Load();
 
 			Runner = new MigrationVersionRunner(migrationConventions, RunnerContext.Processor, new MigrationLoader(migrationConventions), assembly, RunnerContext.Namespace);

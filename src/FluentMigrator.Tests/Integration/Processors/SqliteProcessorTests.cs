@@ -20,7 +20,8 @@ namespace FluentMigrator.Tests.Integration.Processors
 		private string columnName;
 		private string tableName;
 
-		public SqliteProcessorTests()
+		[SetUp]
+		public void SetUp()
 		{
 			// This connection used in the tests
 			connection = new SQLiteConnection { ConnectionString = "Data Source=:memory:;Version=3;New=True;" };
@@ -51,11 +52,10 @@ namespace FluentMigrator.Tests.Integration.Processors
 			CreateTableExpression expression = new CreateTableExpression { TableName = tableName };
 			expression.Columns.Add(column);
 
-			using (connection)
+			using (command)
 			{
-				processor.Process( expression );
+				processor.Process(expression);
 				command.CommandText = string.Format("SELECT name FROM sqlite_master WHERE type='table' and name='{0}'", tableName);
-
 				command.ExecuteReader().Read().ShouldBeTrue();
 			}
 		}
@@ -66,11 +66,10 @@ namespace FluentMigrator.Tests.Integration.Processors
 			CreateTableExpression expression = new CreateTableExpression { TableName = tableName };
 			expression.Columns.Add(column.Object);
 
-			using (connection)
+			using (command)
 			{
-				processor.Process(expression);
-				command.CommandText = string.Format("SELECT name FROM sqlite_master WHERE type='table' and name='{0}'", tableName);
-
+				processor.Process( expression );
+				command.CommandText = string.Format( "SELECT name FROM sqlite_master WHERE type='table' and name='{0}'", tableName );
 				command.ExecuteReader().Read().ShouldBeTrue();
 			}
 		}
@@ -82,20 +81,5 @@ namespace FluentMigrator.Tests.Integration.Processors
 			cmd.CommandText = string.Format("CREATE TABLE {0} ({1})", tableName, columnName);
 			cmd.ExecuteNonQuery();
 		}
-
-		/*[Test]
-		public void CanCreateColumnExpression()
-		{
-			InsertTable();
-			CreateColumnExpression expression = new CreateColumnExpression { TableName = tableName, Column = column.Object };
-
-			using (connection)
-			{
-				processor.Generate(expression);
-				command.CommandText = string.Format("SELECT {0} FROM {1}", columnName, expression.TableName);
-
-				Assert.True(command.ExecuteReader().Read());
-			}
-		}*/
 	}
 }

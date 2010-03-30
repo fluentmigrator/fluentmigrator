@@ -3,7 +3,7 @@
 namespace FluentMigrator.Tests.Unit
 {
 	[VersionTableMetaData]
-	public class TestVersionTableMetaData:IVersionTableMetaData 
+	public class TestVersionTableMetaData : IVersionTableMetaData 
 	{
 		public const string TABLENAME = "testTableName";
 		public const string COLUMNNAME = "testColumnName";

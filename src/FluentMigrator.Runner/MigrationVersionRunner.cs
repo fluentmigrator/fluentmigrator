@@ -21,7 +21,7 @@ namespace FluentMigrator.Runner
 		private string _namespace;
 		private VersionInfo _versionInfo;
 		private MigrationRunner _migrationRunner;
-	    private IMigration _versionMigration;
+		private IMigration _versionMigration;
 		private IVersionTableMetaData _versionTableMetaData;
 
 		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader)
@@ -46,7 +46,6 @@ namespace FluentMigrator.Runner
 			_versionMigration = new VersionMigration(_versionTableMetaData);
 		}
 
-
 		public Assembly MigrationAssembly
 		{
 			get { return _migrationAssembly; }
@@ -70,13 +69,13 @@ namespace FluentMigrator.Runner
 
 		private void loadVersionInfo()
 		{
-			if (!_migrationProcessor.TableExists(this._versionTableMetaData.TableName))
+			if (!_migrationProcessor.TableExists(_versionTableMetaData.TableName))
 			{
 				var runner = new MigrationRunner(_migrationConventions, _migrationProcessor);
 				runner.Up(_versionMigration);
 			}
 
-			var dataSet = _migrationProcessor.ReadTableData(this._versionTableMetaData.TableName);
+			var dataSet = _migrationProcessor.ReadTableData(_versionTableMetaData.TableName);
 			_versionInfo = new VersionInfo();
 
 			foreach (DataRow row in dataSet.Tables[0].Rows)
