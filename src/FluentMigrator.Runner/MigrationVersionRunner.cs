@@ -8,6 +8,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Versioning;
 using System.Linq;
+using FluentMigrator.VersionTableInfo;
 
 namespace FluentMigrator.Runner
 {
@@ -21,6 +22,7 @@ namespace FluentMigrator.Runner
 		private VersionInfo _versionInfo;
 		private MigrationRunner _migrationRunner;
 	    private IMigration _versionMigration;
+		private IVersionTableMetaData _versionTableMetaData;
 
 		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader)
 			: this(conventions, processor, loader, Assembly.GetCallingAssembly(), null)
@@ -40,8 +42,10 @@ namespace FluentMigrator.Runner
 			_migrationLoader = loader;
 			_namespace = @namespace;
 			_migrationRunner = new MigrationRunner(conventions, processor);
-			_versionMigration = new VersionMigration();
+			_versionTableMetaData = loader.GetVersionTableMetaData(assembly);
+			_versionMigration = new VersionMigration(_versionTableMetaData);
 		}
+
 
 		public Assembly MigrationAssembly
 		{
@@ -66,13 +70,13 @@ namespace FluentMigrator.Runner
 
 		private void loadVersionInfo()
 		{
-			if (!_migrationProcessor.TableExists(VersionInfo.TABLE_NAME))
+			if (!_migrationProcessor.TableExists(this._versionTableMetaData.TableName))
 			{
 				var runner = new MigrationRunner(_migrationConventions, _migrationProcessor);
 				runner.Up(_versionMigration);
 			}
 
-			var dataSet = _migrationProcessor.ReadTableData(VersionInfo.TABLE_NAME);
+			var dataSet = _migrationProcessor.ReadTableData(this._versionTableMetaData.TableName);
 			_versionInfo = new VersionInfo();
 
 			foreach (DataRow row in dataSet.Tables[0].Rows)
@@ -149,13 +153,13 @@ namespace FluentMigrator.Runner
 		{
 			var dataExpression = new InsertDataExpression();
 			dataExpression.Rows.Add(createVersionInfoInsertionData(version));
-			dataExpression.TableName = VersionInfo.TABLE_NAME;
+			dataExpression.TableName = _versionTableMetaData.TableName;
 			dataExpression.ExecuteWith(_migrationProcessor);
 		}
 
 		protected virtual InsertionData createVersionInfoInsertionData(long version)
 		{
-			return new InsertionData { new KeyValuePair<string, object>(VersionInfo.COLUMN_NAME, version) };
+			return new InsertionData { new KeyValuePair<string, object>(this._versionTableMetaData.ColumnName, version) };
 		}
 
 		public void Rollback(int steps)
@@ -207,12 +211,12 @@ namespace FluentMigrator.Runner
 		private void ApplyMigrationDown(long version)
 		{
 			_migrationRunner.Down(Migrations[version]);
-			_migrationProcessor.Execute("DELETE FROM {0} WHERE {1}='{2}'", VersionInfo.TABLE_NAME, VersionInfo.COLUMN_NAME, version.ToString());
+			_migrationProcessor.Execute("DELETE FROM {0} WHERE {1}='{2}'", this._versionTableMetaData.TableName, this._versionTableMetaData.ColumnName, version.ToString());
 		}
 
 		public void RemoveVersionTable()
 		{
-			var expression = new DeleteTableExpression {TableName = VersionInfo.TABLE_NAME};
+			var expression = new DeleteTableExpression { TableName = this._versionTableMetaData.TableName};
 			expression.ExecuteWith(_migrationProcessor);
 		}
 	}

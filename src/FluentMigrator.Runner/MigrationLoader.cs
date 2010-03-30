@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using FluentMigrator.Infrastructure;
 using System.Linq;
+using FluentMigrator.VersionTableInfo;
 
 namespace FluentMigrator.Runner
 {
@@ -24,6 +25,22 @@ namespace FluentMigrator.Runner
 
 			foreach (Type type in matchedTypes)
 				yield return Conventions.GetMetadataForMigration(type);
+		}
+
+		public IVersionTableMetaData GetVersionTableMetaData (Assembly assembly)
+		{
+			Type matchedType = assembly.GetExportedTypes().Where(t => Conventions.TypeIsVersionTableMetaData(t)).FirstOrDefault();
+
+			if (matchedType==null)
+			{
+				return new DefaultVersionTableMetaData();
+			}
+			else
+			{
+				IVersionTableMetaData versionTableMetaData = (IVersionTableMetaData) Activator.CreateInstance(matchedType);
+				return versionTableMetaData;
+			}
+
 		}
 	}
 }

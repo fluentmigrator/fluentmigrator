@@ -8,6 +8,7 @@ namespace FluentMigrator
 		Func<Type, Infrastructure.MigrationMetadata> GetMetadataForMigration { get; set; }
 		Func<string, string> GetPrimaryKeyName { get; set; }
 		Func<Type, bool> TypeIsMigration { get; set; }
+		Func<Type, bool> TypeIsVersionTableMetaData { get; set; }
 		Func<string> GetWorkingDirectory { get; set; }
 	}
 }

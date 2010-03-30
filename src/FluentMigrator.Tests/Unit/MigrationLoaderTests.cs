@@ -1,8 +1,11 @@
-﻿using System.Reflection;
+﻿using System.CodeDom;
+using System.CodeDom.Compiler;
+using System.Reflection;
 using System.Collections.Generic;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Tests.Integration.Migrations;
+using FluentMigrator.VersionTableInfo;
 using NUnit.Framework;
 using NUnit.Should;
 using System.Linq;
@@ -39,5 +42,51 @@ namespace FluentMigrator.Tests.Unit
 			migrationList.Select(x => x.Type).ShouldNotContain(typeof(VersionedMigration));
 			migrationList.Count().ShouldBeGreaterThan(0);
 		}
+
+		[Test]
+		public void CanLoadDefaultVersionTableMetaData()
+		{
+			var conventions = new MigrationConventions();
+			var loader = new MigrationLoader(conventions);
+			var asm = Assembly.GetExecutingAssembly();
+			IVersionTableMetaData versionTableMetaData = loader.GetVersionTableMetaData(asm);
+			versionTableMetaData.ShouldBeOfType<DefaultVersionTableMetaData>();
+		}
+
+
+		[Test]
+		public void CanLoadCustomVersionTableMetaData()
+		{
+			var conventions = new MigrationConventions();
+			var loader = new MigrationLoader(conventions);
+			var asm = GetAssemblyWithCustomVersionTableMetaData();
+			IVersionTableMetaData versionTableMetaData = loader.GetVersionTableMetaData(asm);
+			Assert.AreEqual(TestVersionTableMetaData.TABLENAME,versionTableMetaData.TableName);
+			Assert.AreEqual(TestVersionTableMetaData.COLUMNNAME, versionTableMetaData.ColumnName);
+		}
+
+
+		/// <summary>
+		/// Creates an assembly by dynamically compiling TestVersionTableMetaData.cs
+		/// </summary>
+		/// <returns></returns>
+		private Assembly GetAssemblyWithCustomVersionTableMetaData()
+		{
+			CodeDomProvider provider = new Microsoft.CSharp.CSharpCodeProvider();
+			ICodeCompiler compiler = provider.CreateCompiler();
+			CompilerParameters parms = new CompilerParameters();
+
+			// Configure parameters
+			parms.GenerateExecutable = false;
+			parms.GenerateInMemory = true;
+			parms.IncludeDebugInformation = false;
+			parms.ReferencedAssemblies.Add("System.dll");
+			parms.ReferencedAssemblies.Add("FluentMigrator.dll");
+
+			CompilerResults results = compiler.CompileAssemblyFromFile(parms, "..\\..\\Unit\\TestVersionTableMetaData.cs");
+			Assert.AreEqual(0, results.Errors.Count);
+			return results.CompiledAssembly;
+		}
 	}
 }
+

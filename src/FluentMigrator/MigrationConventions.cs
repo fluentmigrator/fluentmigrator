@@ -10,6 +10,7 @@ namespace FluentMigrator
 		public Func<ForeignKeyDefinition, string> GetForeignKeyName { get; set; }
 		public Func<IndexDefinition, string> GetIndexName { get; set; }
 		public Func<Type, bool> TypeIsMigration { get; set; }
+		public Func<Type, bool> TypeIsVersionTableMetaData {get;set;}
 		public Func<Type, MigrationMetadata> GetMetadataForMigration { get; set; }
 		public Func<string> GetWorkingDirectory { get; set; }
 
@@ -19,6 +20,7 @@ namespace FluentMigrator
 			GetForeignKeyName = DefaultMigrationConventions.GetForeignKeyName;
 			GetIndexName = DefaultMigrationConventions.GetIndexName;
 			TypeIsMigration = DefaultMigrationConventions.TypeIsMigration;
+			TypeIsVersionTableMetaData = DefaultMigrationConventions.TypeIsVersionTableMetaData;
 			GetMetadataForMigration = DefaultMigrationConventions.GetMetadataForMigration;
 			GetWorkingDirectory = DefaultMigrationConventions.GetWorkingDirectory;
 		}
