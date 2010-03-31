@@ -85,6 +85,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\SolutionInfo.cs">
+      <Link>SolutionInfo.cs</Link>
+    </Compile>
     <Compile Include="Builders\Create\Index\ICreateIndexColumnOptionsSyntax.cs" />
     <Compile Include="Builders\Create\Index\ICreateIndexOptionsSyntax.cs" />
     <Compile Include="Builders\Delete\ForeignKey\IDeleteForeignKeyOnTableSyntax.cs" />

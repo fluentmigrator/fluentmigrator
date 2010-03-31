@@ -93,6 +93,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\..\SolutionInfo.cs">
+      <Link>SolutionInfo.cs</Link>
+    </Compile>
     <Compile Include="Announcer.cs" />
     <Compile Include="Generators\MySqlGenerator.cs" />
     <Compile Include="Generators\GeneratorBase.cs" />
