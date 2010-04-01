@@ -68,34 +68,35 @@ namespace FluentMigrator.Runner.Generators
 			return FormatExpression("DROP TABLE [{0}]", expression.TableName);
 		}
 
-        public override string Generate(DeleteColumnExpression expression)
-        {
-            // before we drop a column, we have to drop any default value constraints in SQL Server
-            string sql = @"
-            DECLARE @default sysname, @sql nvarchar(max);
+		public override string Generate(DeleteColumnExpression expression)
+		{
+			// before we drop a column, we have to drop any default value constraints in SQL Server
+			string sql = @"
+			DECLARE @default sysname, @sql nvarchar(max);
 
-            -- get name of default constraint
-            SELECT @default = name 
-            FROM sys.default_constraints 
-            WHERE parent_object_id = object_id('{0}')
-            AND type = 'D'
-            AND parent_column_id = (
-                SELECT column_id 
-                FROM sys.columns 
-                WHERE object_id = object_id('{0}')
-                AND name = '{1}'
-            );
+			-- get name of default constraint
+			SELECT @default = name
+			FROM sys.default_constraints 
+			WHERE parent_object_id = object_id('{0}')
+			AND type = 'D'
+			AND parent_column_id = (
+				SELECT column_id 
+				FROM sys.columns 
+				WHERE object_id = object_id('{0}')
+				AND name = '{1}'
+			);
 
-            -- create alter table command as string and run it
-            SET @sql = N'ALTER TABLE [{0}] DROP CONSTRAINT ' + @default;
-            EXEC sp_executesql @sql;
+			-- create alter table command as string and run it
+			SET @sql = N'ALTER TABLE [{0}] DROP CONSTRAINT ' + @default;
+			EXEC sp_executesql @sql;
 
-            -- now we can finally drop column
-            ALTER TABLE [{0}] DROP COLUMN [{1}];";
+			-- now we can finally drop column
+			ALTER TABLE [{0}] DROP COLUMN [{1}];";
 
-            return FormatExpression(sql, expression.TableName, expression.ColumnName);
+			return FormatExpression(sql, expression.TableName, expression.ColumnName);
 
-        }
+		}
+
 		public override string Generate(CreateForeignKeyExpression expression)
 		{
 			string primaryColumns = GetColumnList(expression.ForeignKey.PrimaryColumns);
