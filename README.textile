@@ -6,8 +6,7 @@ h2. Project Info
 
 * *Project Home*: "code.google.com/p/fluentmigrator":http://code.google.com/p/fluentmigrator/
 * *Discussions*: "fluentmigrator-google-group@googlegroups.com":http://groups.google.com/group/fluentmigrator-google-group
-* *Bug/Feature Tracking*: "fluentmigrator.lighthouseapp.com/":http://fluentmigrator.lighthouseapp.com
-
+* *Bug/Feature Tracking*: "http://github.com/schambers/fluentmigrator/issues":http://github.com/schambers/fluentmigrator/issues
 h2. Getting started with the example project
 
 The example project is a class library that contains the migrations, and a rakefile to wrap the Migrator.Console.exe calls. 
