@@ -31,6 +31,8 @@ namespace FluentMigrator.Console
 			{
 				System.Console.WriteLine("!! An error has occurred.  The error is:");
 				System.Console.WriteLine(ex);
+				//set Exit code to failure
+				System.Environment.ExitCode = 1;
 			}
 		}
 
