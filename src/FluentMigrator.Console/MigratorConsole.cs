@@ -40,9 +40,16 @@ namespace FluentMigrator.Console
 
 		public MigratorConsole(string[] args)
 		{
-			ParseArguments(args);
-			CreateProcessor();
-			ExecuteMigrations();
+			try {
+				ParseArguments(args);
+				CreateProcessor();
+				ExecuteMigrations();
+			}
+			catch (Exception ex)
+			{
+				System.Console.WriteLine("!! An error has occurred.  The error is:");
+				System.Console.WriteLine(ex);
+			}
 		}
 
 		private void ParseArguments(string[] args)
