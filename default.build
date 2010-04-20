@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <project name="migrator" default="build" xmlns="http://nant.sf.net/release/0.85/nant.xsd">
-    <loadtasks assembly="tools\nant\NAnt.CommentTasks.dll" />
 
     <!-- Paths to various parts of the build -->
     <property name="dir.bin" value="build" />
 
     <target name="build" description="Builds the app" depends="clean">
-		<comment source="comment_header.txt">
-			<fileset basedir=".\tools\apache_header.txt">
-				<include name="**\*.cs" />
-			</fileset>
-		</comment>
-
 		<msbuild project="FluentMigrator.sln">
 			<property name="Configuration" value="AutomatedRelease" />
 			<property name="OutDir" value="..\..\${dir.bin}\\" />
