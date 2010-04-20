@@ -1,22 +1,5 @@
-#region License
-// 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-#endregion
-
 using System;
+using System.Configuration;
 using System.IO;
 using System.Reflection;
 using FluentMigrator.Runner;
@@ -40,9 +23,15 @@ namespace FluentMigrator.Console
 
 		public MigratorConsole(string[] args)
 		{
-			ParseArguments(args);
-			CreateProcessor();
-			ExecuteMigrations();
+		    try {
+		        ParseArguments(args);
+		        ExecuteMigrations();
+		    }
+		    catch (Exception ex) {
+                System.Console.WriteLine("!! An error has occurred.  The error is:");
+		        System.Console.WriteLine(ex);
+                Environment.ExitCode = 1;
+		    }
 		}
 
 		private void ParseArguments(string[] args)
@@ -76,21 +65,11 @@ namespace FluentMigrator.Console
 				if (args[i].Contains("/workingdirectory"))
 					WorkingDirectory = args[i + 1];
 			}
-
-			if (string.IsNullOrEmpty(ProcessorType))
-				throw new ArgumentException("Database Type is required \"/db [db type]\". Available db types is [sqlserver], [sqlite]");
-			if (string.IsNullOrEmpty(Connection))
-				throw new ArgumentException("Connection String is required \"/connection\"");
-			if (string.IsNullOrEmpty(TargetAssembly))
-				throw new ArgumentException("Target Assembly is required \"/target [assembly path]\"");
+            if (string.IsNullOrEmpty(TargetAssembly))
+                throw new ArgumentException("Target Assembly is required \"/target [assembly path]\"");
+			
 			if (string.IsNullOrEmpty(Task))
 				Task = "migrate";
-		}
-
-		private void CreateProcessor()
-		{
-			IMigrationProcessorFactory processorFactory = ProcessorFactory.GetFactory(ProcessorType);
-			Processor = processorFactory.Create(Connection);
 		}
 
 		private void ExecuteMigrations()

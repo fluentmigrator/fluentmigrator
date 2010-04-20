@@ -1,27 +1,17 @@
-#region License
-// 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-#endregion
-
+using System;
+using System.Configuration;
+using System.IO;
+using System.Linq;
 using FluentMigrator.Runner.Processors;
 
-namespace FluentMigrator.Runner.Initialization
-{
-	public class RunnerContext : IRunnerContext
-	{
+namespace FluentMigrator.Runner.Initialization {
+	public class RunnerContext : IRunnerContext {
+		private string ConnectionString;
+		private bool NotUsingConfig = true;
+		private IMigrationProcessor _processor;
+
+		#region IRunnerContext Members
+
 		public string Database { get; set; }
 		public string Connection { get; set; }
 		public string Target { get; set; }
@@ -32,19 +22,55 @@ namespace FluentMigrator.Runner.Initialization
 		public int Steps { get; set; }
 		public string WorkingDirectory { get; set; }
 
-		private IMigrationProcessor _processor;
-
-		public IMigrationProcessor Processor
-		{
-			get
-			{
-				if (_processor != null)
+		public IMigrationProcessor Processor {
+			get {
+				if(_processor != null) {
 					return _processor;
+				}
+
+				string configFile = Path.Combine(Environment.CurrentDirectory, Target) + ".config";
+				if(File.Exists(configFile)) {
+					Configuration config = ConfigurationManager.OpenExeConfiguration(configFile);
+					ConnectionStringSettingsCollection connections = config.ConnectionStrings.ConnectionStrings;
+					if(connections.Count > 1) {
+						ReadConnectionString(connections[Connection]);
+					}
+					else if(connections.Count == 1) {
+						ReadConnectionString(connections[0]);
+					}
+				}
+
+				if(NotUsingConfig && !string.IsNullOrEmpty(Connection)) {
+					ConnectionString = Connection;
+				}
+
+				if(string.IsNullOrEmpty(Database)) {
+					throw new ArgumentException(
+						"Database Type is required \"/db [db type]\". Available db types is [sqlserver], [sqlite]");
+				}
+
+				if(string.IsNullOrEmpty(ConnectionString)) {
+					throw new ArgumentException("Connection String or Name is required \"/connection\"");
+				}
 
 				IMigrationProcessorFactory processorFactory = ProcessorFactory.GetFactory(Database);
-				_processor = processorFactory.Create(Connection);
+				_processor = processorFactory.Create(ConnectionString);
 
 				return _processor;
+			}
+		}
+
+		#endregion
+
+		private void ReadConnectionString(ConnectionStringSettings connection) {
+			if(connection != null) {
+				IMigrationProcessorFactory factory =
+					ProcessorFactory.Factories.Where(f => f.IsForProvider(connection.ProviderName)).FirstOrDefault();
+				if(factory != null) {
+					Database = factory.Name;
+					ConnectionString = connection.ConnectionString;
+					NotUsingConfig = false;
+				}
 			}
 		}
 	}
