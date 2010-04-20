@@ -7,7 +7,7 @@ using FluentMigrator.Runner.Processors;
 namespace FluentMigrator.Runner.Initialization {
 	public class RunnerContext : IRunnerContext {
 		private string ConnectionString;
-		private bool NotUsingConfig = true;
+		private string ConfigFile;
 		private IMigrationProcessor _processor;
 
 		#region IRunnerContext Members
@@ -33,22 +33,16 @@ namespace FluentMigrator.Runner.Initialization {
 					Configuration config = ConfigurationManager.OpenExeConfiguration(configFile);
 					ConnectionStringSettingsCollection connections = config.ConnectionStrings.ConnectionStrings;
 
-					System.Console.WriteLine("Found {0} connections in {1}", connections.Count, config.FilePath);
-					foreach (ConnectionStringSettings connection in connections) {
-						System.Console.WriteLine("\t{0} : {1} => {2}", connection.Name, connection.ProviderName, connection.ConnectionString);
-					}
-
 					if (connections.Count > 1) {
 						if (string.IsNullOrEmpty(Connection)) {
-							Console.Out.WriteLine(Environment.MachineName);
-							ReadConnectionString(connections[Environment.MachineName]);
+							ReadConnectionString(connections[Environment.MachineName], config.FilePath);
 						}
 						else {
-							ReadConnectionString(connections[Connection]);
+							ReadConnectionString(connections[Connection], config.FilePath);
 						}
 					}
 					else if (connections.Count == 1) {
-						ReadConnectionString(connections[0]);
+						ReadConnectionString(connections[0], config.FilePath);
 					}
 				}
 
@@ -64,7 +58,12 @@ namespace FluentMigrator.Runner.Initialization {
 					throw new ArgumentException("Database Type is required \"/db [db type]\". Available db types is [sqlserver], [sqlite]");
 				}
 
-				System.Console.WriteLine("Using Database {0} and Connection String {1}", Database, ConnectionString);
+				if(NotUsingConfig) {
+					Console.WriteLine("Using Database {0} and Connection String {1}", Database, ConnectionString);
+				}
+				else {
+					Console.WriteLine("Using Connection {0} from Configuration file {1}", Connection, ConfigFile);
+				}
 
 				IMigrationProcessorFactory processorFactory = ProcessorFactory.GetFactory(Database);
 				_processor = processorFactory.Create(ConnectionString);
@@ -75,13 +74,18 @@ namespace FluentMigrator.Runner.Initialization {
 
 		#endregion
 
-		private void ReadConnectionString(ConnectionStringSettings connection) {
+		private bool NotUsingConfig {
+			get { return string.IsNullOrEmpty(ConfigFile); }
+		}
+
+		private void ReadConnectionString(ConnectionStringSettings connection, string configurationFile) {
 			if(connection != null) {
 				IMigrationProcessorFactory factory = ProcessorFactory.Factories.Where(f => f.IsForProvider(connection.ProviderName)).FirstOrDefault();
 				if(factory != null) {
 					Database = factory.Name;
+					Connection = connection.Name;
 					ConnectionString = connection.ConnectionString;
-					NotUsingConfig = false;
+					ConfigFile = configurationFile;
 				}
 			}
 			else {
