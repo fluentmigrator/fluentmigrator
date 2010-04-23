@@ -1,4 +1,22 @@
-﻿using System;
+#region License
+// 
+// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
@@ -68,34 +86,35 @@ namespace FluentMigrator.Runner.Generators
 			return FormatExpression("DROP TABLE [{0}]", expression.TableName);
 		}
 
-        public override string Generate(DeleteColumnExpression expression)
-        {
-            // before we drop a column, we have to drop any default value constraints in SQL Server
-            string sql = @"
-            DECLARE @default sysname, @sql nvarchar(max);
+		public override string Generate(DeleteColumnExpression expression)
+		{
+			// before we drop a column, we have to drop any default value constraints in SQL Server
+			string sql = @"
+			DECLARE @default sysname, @sql nvarchar(max);
 
-            -- get name of default constraint
-            SELECT @default = name 
-            FROM sys.default_constraints 
-            WHERE parent_object_id = object_id('{0}')
-            AND type = 'D'
-            AND parent_column_id = (
-                SELECT column_id 
-                FROM sys.columns 
-                WHERE object_id = object_id('{0}')
-                AND name = '{1}'
-            );
+			-- get name of default constraint
+			SELECT @default = name
+			FROM sys.default_constraints 
+			WHERE parent_object_id = object_id('{0}')
+			AND type = 'D'
+			AND parent_column_id = (
+				SELECT column_id 
+				FROM sys.columns 
+				WHERE object_id = object_id('{0}')
+				AND name = '{1}'
+			);
 
-            -- create alter table command as string and run it
-            SET @sql = N'ALTER TABLE [{0}] DROP CONSTRAINT ' + @default;
-            EXEC sp_executesql @sql;
+			-- create alter table command as string and run it
+			SET @sql = N'ALTER TABLE [{0}] DROP CONSTRAINT ' + @default;
+			EXEC sp_executesql @sql;
 
-            -- now we can finally drop column
-            ALTER TABLE [{0}] DROP COLUMN [{1}];";
+			-- now we can finally drop column
+			ALTER TABLE [{0}] DROP COLUMN [{1}];";
 
-            return FormatExpression(sql, expression.TableName, expression.ColumnName);
+			return FormatExpression(sql, expression.TableName, expression.ColumnName);
 
-        }
+		}
+
 		public override string Generate(CreateForeignKeyExpression expression)
 		{
 			string primaryColumns = GetColumnList(expression.ForeignKey.PrimaryColumns);
