@@ -56,7 +56,7 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(CreateTableExpression expression)
 		{
-			return FormatExpression("CREATE TABLE {0} ({1}) ENGINE = INNODB", expression.TableName, GetColumnDDL(expression.Columns));
+			return FormatExpression("CREATE TABLE {0} ({1}) ENGINE = INNODB", expression.TableName, GetColumnDDL(expression));
 		}
 
 		public override string Generate(CreateColumnExpression expression)

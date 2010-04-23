@@ -75,6 +75,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\MySql.Data.dll</HintPath>
     </Reference>
+    <Reference Include="Oracle.DataAccess, Version=2.112.1.1, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Oracle.DataAccess.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -99,6 +103,7 @@
     <Compile Include="Announcer.cs" />
     <Compile Include="Generators\MySqlGenerator.cs" />
     <Compile Include="Generators\GeneratorBase.cs" />
+    <Compile Include="Generators\OracleGenerator.cs" />
     <Compile Include="IMigrationVersionRunner.cs" />
     <Compile Include="Initialization\AssemblyLoader\AssemblyLoaderFactory.cs" />
     <Compile Include="Initialization\AssemblyLoader\AssemblyLoaderFromFile.cs" />
@@ -110,6 +115,8 @@
     <Compile Include="MigrationVersionRunner.cs" />
     <Compile Include="Processors\MySql\MySqlProcessor.cs" />
     <Compile Include="Processors\MySql\MySqlProcessorFactory.cs" />
+    <Compile Include="Processors\Oracle\OracleProcessor.cs" />
+    <Compile Include="Processors\Oracle\OracleProcessorFactory.cs" />
     <Compile Include="Processors\ProcessorFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServerProcessorFactory.cs" />
     <Compile Include="Processors\IMigrationProcessorFactory.cs" />

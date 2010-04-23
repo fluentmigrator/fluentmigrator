@@ -118,8 +118,9 @@ namespace FluentMigrator.Runner.Generators
 			return sb.ToString();
 		}
 
-		protected string GetColumnDDL(IList<ColumnDefinition> columns)
+		protected string GetColumnDDL(CreateTableExpression expression)
 		{
+			IList<ColumnDefinition> columns = expression.Columns;
 			string result = "";
 			int total = columns.Count - 1;
 
@@ -141,7 +142,7 @@ namespace FluentMigrator.Runner.Generators
 					result += ", ";
 			}
 
-			result = AddPrimaryKeyConstraint(primaryKeyColumns, result);
+			result = AddPrimaryKeyConstraint(expression.TableName, primaryKeyColumns, result);
 
 			return result;
 		}
@@ -159,22 +160,35 @@ namespace FluentMigrator.Runner.Generators
 			return primaryKeyColumns;
 		}
 
-		private string AddPrimaryKeyConstraint(IList<ColumnDefinition> primaryKeyColumns, string result)
+		private string AddPrimaryKeyConstraint(string tableName, IList<ColumnDefinition> primaryKeyColumns, string result)
 		{
 			if (primaryKeyColumns.Count > 1)
 			{
-				string keyName = "";
 				string keyColumns = "";
 				foreach (ColumnDefinition column in primaryKeyColumns)
 				{
-					keyName += column.Name + "_";
 					keyColumns += column.Name + ",";
 				}
-				keyName += "PK";
 				keyColumns = keyColumns.TrimEnd(',');
-				result += String.Format(", CONSTRAINT {0} PRIMARY KEY ({1})", keyName, keyColumns);
+				result += String.Format(", {0} PRIMARY KEY ({1})", GetPrimaryKeyConstraintName(primaryKeyColumns,tableName), keyColumns);
 			}
 			return result;
+		}
+
+		/// <summary>
+		/// Gets the name of the primary key constraint. Some Generators may need to override if the constraint name is limited
+		/// </summary>
+		/// <returns></returns>
+		protected virtual string GetPrimaryKeyConstraintName(IList<ColumnDefinition> primaryKeyColumns, string tableName )
+		{
+			string keyName = string.Empty;
+			foreach (ColumnDefinition column in primaryKeyColumns)
+			{
+				keyName += column.Name + "_";
+			}
+
+			keyName += "PK";
+			return string.Format("CONSTRAINT {0}",keyName);
 		}
 
 		public string FormatExpression(string template, params object[] args)
