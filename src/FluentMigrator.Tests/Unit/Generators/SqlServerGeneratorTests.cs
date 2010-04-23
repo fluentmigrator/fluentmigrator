@@ -71,7 +71,31 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.ColumnName = columnName;
 
 			string sql = generator.Generate(expression);
-			sql.ShouldBe("ALTER TABLE [NewTable] DROP COLUMN NewColumn");
+
+			string expectedSql = 
+@"
+            DECLARE @default sysname, @sql nvarchar(max);
+
+            -- get name of default constraint
+            SELECT @default = name 
+            FROM sys.default_constraints 
+            WHERE parent_object_id = object_id('NewTable')
+            AND type = 'D'
+            AND parent_column_id = (
+                SELECT column_id 
+                FROM sys.columns 
+                WHERE object_id = object_id('NewTable')
+                AND name = 'NewColumn'
+            );
+
+            -- create alter table command as string and run it
+            SET @sql = N'ALTER TABLE [NewTable] DROP CONSTRAINT ' + @default;
+            EXEC sp_executesql @sql;
+
+            -- now we can finally drop column
+            ALTER TABLE [NewTable] DROP COLUMN [NewColumn];";
+
+			sql.ShouldBe(expectedSql);
 		}
 
 		[Test]
