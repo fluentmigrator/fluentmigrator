@@ -32,19 +32,19 @@ namespace FluentMigrator.Tests.Unit.Runners
 		string target = "FluentMigrator.Tests.dll";
 
 		[Test]
-		[ExpectedException(typeof(ArgumentException))]
 		public void MustInitializeConsoleWithDatabaseArgument()
 		{
 			string[] args = { "/connection", connection, "/log" };
 			new MigratorConsole(args);
+			Assert.That(Environment.ExitCode == 1);
 		}
 
 		[Test]
-		[ExpectedException(typeof(ArgumentException))]
 		public void MustInitializeConsoleWithConnectionArgument()
 		{
 			string[] args = { "/db", database, "/log" };
 			new MigratorConsole(args);
+			Assert.That(Environment.ExitCode == 1);
 		}
 
 		[Test]
