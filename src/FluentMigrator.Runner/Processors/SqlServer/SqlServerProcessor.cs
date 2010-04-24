@@ -19,6 +19,7 @@
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
@@ -105,8 +106,20 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 			if (Connection.State != ConnectionState.Open)
 				Connection.Open();
 
-			using (var command = new SqlCommand(sql, Connection, Transaction))
-				command.ExecuteNonQuery();
+			using (var command = new SqlCommand(sql, Connection, Transaction)) {
+				try {
+					command.ExecuteNonQuery();
+				}
+				catch(Exception ex) {
+					using (StringWriter message = new StringWriter()) {
+						message.WriteLine("An error occured executing the following sql:");
+						message.WriteLine(sql);
+						message.WriteLine("The error was {0}", ex.Message);
+
+						throw new Exception(message.ToString(), ex);
+					}
+				}	
+			}
 		}
 	}
 }
