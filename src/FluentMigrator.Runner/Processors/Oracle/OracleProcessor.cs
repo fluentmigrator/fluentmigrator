@@ -12,7 +12,8 @@ namespace FluentMigrator.Runner.Processors.Oracle
 		public OracleProcessor(OracleConnection connection, IMigrationGenerator generator)
 		{
 			this.generator = generator;
-			this.Connection = connection;
+			Connection = connection;
+
 			//oracle does not support ddl transactions
 			//this.Transaction = this.Connection.BeginTransaction();
 		}
@@ -35,10 +36,10 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
 		public override void Execute(string template, params object[] args)
 		{
-			if (this.Connection.State != ConnectionState.Open)
-				this.Connection.Open();
+			if (Connection.State != ConnectionState.Open)
+				Connection.Open();
 
-			using (var command = new OracleCommand(String.Format(template, args), this.Connection))
+			using (var command = new OracleCommand(String.Format(template, args), Connection))
 			{
 				command.ExecuteNonQuery();
 			}
@@ -46,10 +47,10 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
 		public override bool Exists(string template, params object[] args)
 		{
-			if (this.Connection.State != ConnectionState.Open)
-				this.Connection.Open();
+			if (Connection.State != ConnectionState.Open)
+				Connection.Open();
 
-			using (var command = new OracleCommand(String.Format(template, args), this.Connection))
+			using (var command = new OracleCommand(String.Format(template, args), Connection))
 			using (var reader = command.ExecuteReader())
 			{
 				return reader.Read();
@@ -63,10 +64,10 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
 		public override DataSet Read(string template, params object[] args)
 		{
-			if (this.Connection.State != ConnectionState.Open) this.Connection.Open();
+			if (Connection.State != ConnectionState.Open) Connection.Open();
 
 			DataSet ds = new DataSet();
-			using (var command = new OracleCommand(String.Format(template, args), this.Connection))
+			using (var command = new OracleCommand(String.Format(template, args), Connection))
 			using (OracleDataAdapter adapter = new OracleDataAdapter(command))
 			{
 				adapter.Fill(ds);
@@ -74,24 +75,12 @@ namespace FluentMigrator.Runner.Processors.Oracle
 			}
 		}
 
-		public override void CommitTransaction()
-		{
-			//oracle does not support ddl transactions
-			//this.Transaction.Commit();
-		}
-
-		public override void RollbackTransaction()
-		{
-			//oracle does not support ddl transactions
-			//this.Transaction.Rollback();
-		}
-
 		protected override void Process(string sql)
 		{
-			if (this.Connection.State != ConnectionState.Open)
-				this.Connection.Open();
+			if (Connection.State != ConnectionState.Open)
+				Connection.Open();
 
-			using (var command = new OracleCommand(sql, this.Connection))
+			using (var command = new OracleCommand(sql, Connection))
 				command.ExecuteNonQuery();
 		}
 	}
