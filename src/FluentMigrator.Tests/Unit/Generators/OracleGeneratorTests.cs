@@ -1,21 +1,3 @@
-#region License
-// 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-#endregion
-
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -29,13 +11,13 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Unit.Generators
 {
 	[TestFixture]
-	public class SqlServerGeneratorTests
+	public class OracleGeneratorTests
 	{
-		private SqlServerGenerator generator;
+		private OracleGenerator generator;
 
-		public SqlServerGeneratorTests()
+		public OracleGeneratorTests()
 		{
-			generator = new SqlServerGenerator();
+			generator = new OracleGenerator();
 		}
 
 		[Test]
@@ -44,7 +26,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			string tableName = "NewTable";
 			CreateTableExpression expression = GetCreateTableExpression(tableName);
 			string sql = generator.Generate(expression);
-			sql.ShouldBe("CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL, ColumnName2 INT NOT NULL)");
+			sql.ShouldBe("CREATE TABLE NewTable (ColumnName1 NVARCHAR2(255) NOT NULL, ColumnName2 NUMBER(10,0) NOT NULL)");
 		}
 
 		[Test]
@@ -54,20 +36,8 @@ namespace FluentMigrator.Tests.Unit.Generators
 			CreateTableExpression expression = GetCreateTableExpression(tableName);
 			expression.Columns[0].IsPrimaryKey = true;
 			string sql = generator.Generate(expression);
-			sql.ShouldBe("CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL PRIMARY KEY CLUSTERED, ColumnName2 INT NOT NULL)");
+			sql.ShouldBe("CREATE TABLE NewTable (ColumnName1 NVARCHAR2(255) NOT NULL PRIMARY KEY, ColumnName2 NUMBER(10,0) NOT NULL)");
 		}
-
-        [Test]
-        public void CanCreateTableWithCustomColumnType()
-        {
-			string tableName = "NewTable";
-			CreateTableExpression expression = GetCreateTableExpression(tableName);
-			expression.Columns[0].IsPrimaryKey = true;
-            expression.Columns[1].Type = null;
-            expression.Columns[1].CustomType = "[timestamp]";
-			string sql = generator.Generate(expression);
-			sql.ShouldBe("CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL PRIMARY KEY CLUSTERED, ColumnName2 [timestamp] NOT NULL)");
-        }
 
 		[Test]
 		public void CanDropTable()
@@ -75,11 +45,10 @@ namespace FluentMigrator.Tests.Unit.Generators
 			string tableName = "NewTable";
 			DeleteTableExpression expression = GetDeleteTableExpression(tableName);
 			string sql = generator.Generate(expression);
-			sql.ShouldBe("DROP TABLE [NewTable]");
+			sql.ShouldBe("DROP TABLE NewTable");
 		}
 
 		[Test]
-		[Ignore("need better way to test this")]
 		public void CanDropColumn()
 		{
 			string tableName = "NewTable";
@@ -90,31 +59,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.ColumnName = columnName;
 
 			string sql = generator.Generate(expression);
-
-			string expectedSql = 
-@"
-            DECLARE @default sysname, @sql nvarchar(max);
-
-            -- get name of default constraint
-            SELECT @default = name 
-            FROM sys.default_constraints 
-            WHERE parent_object_id = object_id('NewTable')
-            AND type = 'D'
-            AND parent_column_id = (
-                SELECT column_id 
-                FROM sys.columns 
-                WHERE object_id = object_id('NewTable')
-                AND name = 'NewColumn'
-            );
-
-            -- create alter table command as string and run it
-            SET @sql = N'ALTER TABLE [NewTable] DROP CONSTRAINT ' + @default;
-            EXEC sp_executesql @sql;
-
-            -- now we can finally drop column
-            ALTER TABLE [NewTable] DROP COLUMN [NewColumn];";
-
-			sql.ShouldBe(expectedSql);
+			sql.ShouldBe("ALTER TABLE NewTable DROP COLUMN NewColumn");
 		}
 
 		[Test]
@@ -132,7 +77,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.TableName = tableName;
 
 			string sql = generator.Generate(expression);
-			sql.ShouldBe("ALTER TABLE [NewTable] ADD NewColumn NVARCHAR(5) NOT NULL");
+			sql.ShouldBe("ALTER TABLE NewTable ADD NewColumn NVARCHAR2(5) NOT NULL");
 		}
 
 		[Test]
@@ -151,7 +96,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.TableName = tableName;
 
 			string sql = generator.Generate(expression);
-			sql.ShouldBe("ALTER TABLE [NewTable] ADD NewColumn DECIMAL(19,2) NOT NULL");
+			sql.ShouldBe("ALTER TABLE NewTable ADD NewColumn NUMBER(19,2) NOT NULL");
 		}
 
 		[Test]
@@ -162,7 +107,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.NewName = "Table2";
 
 			string sql = generator.Generate(expression);
-			sql.ShouldBe("sp_rename [Table1], [Table2]");
+			sql.ShouldBe("ALTER TABLE Table1 RENAME TO Table2");
 		}
 
 		[Test]
@@ -174,7 +119,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.NewName = "Column2";
 
 			string sql = generator.Generate(expression);
-			sql.ShouldBe("sp_rename '[Table1].[Column1]', [Column2]");
+			sql.ShouldBe("ALTER TABLE Table1 RENAME COLUMN Column1 TO Column2");
 		}
 
 		[Test]
@@ -189,7 +134,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Descending, Name = "Column2" });
 
 			string sql = generator.Generate(expression);
-			sql.ShouldBe("CREATE UNIQUE CLUSTERED INDEX IX_TEST ON TEST_TABLE (Column1 ASC,Column2 DESC)");
+			sql.ShouldBe("CREATE UNIQUE INDEX IX_TEST ON TEST_TABLE (Column1 ASC,Column2 DESC)");
 		}
 
 		[Test]
@@ -203,7 +148,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.ForeignKey.ForeignColumns = new[] { "Column3", "Column4" };
 
 			string sql = generator.Generate(expression);
-			sql.ShouldBe("ALTER TABLE [TestForeignTable] ADD CONSTRAINT FK_Test FOREIGN KEY (Column3,Column4) REFERENCES [TestPrimaryTable] (Column1,Column2)");
+			sql.ShouldBe("ALTER TABLE TestForeignTable ADD CONSTRAINT FK_Test FOREIGN KEY (Column3,Column4) REFERENCES TestPrimaryTable (Column1,Column2)");
 		}
 
 		[Test]
@@ -214,7 +159,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.ForeignKey.PrimaryTable = "TestPrimaryTable";
 
 			string sql = generator.Generate(expression);
-			sql.ShouldBe("ALTER TABLE [TestPrimaryTable] DROP CONSTRAINT FK_Test");
+			sql.ShouldBe("ALTER TABLE TestPrimaryTable DROP CONSTRAINT FK_Test");
 		}
 
 		[Test]
@@ -231,13 +176,15 @@ namespace FluentMigrator.Tests.Unit.Generators
 
 			string sql = generator.Generate(expression);
 
-			string expected = "INSERT INTO [TestTable] (Id,Name,Website) VALUES (1,'Justin','codethinked.com');";
-			expected += "INSERT INTO [TestTable] (Id,Name,Website) VALUES (2,'Nate','kohari.org');";
+			string expected = "INSERT ALL INTO TestTable (Id,Name,Website) VALUES (1,'Justin','codethinked.com')";
+			expected += " INTO TestTable (Id,Name,Website) VALUES (2,'Nate','kohari.org')";
+			expected += " SELECT 1 FROM DUAL";
 
 			sql.ShouldBe(expected);
 		}
 
 		[Test]
+		[Ignore("Oracle can not insert GUID data using string representation")]
 		public void CanInsertGuidData()
 		{
 			var gid = Guid.NewGuid();
@@ -246,7 +193,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 
 			string sql = generator.Generate(expression);
 
-			string expected = String.Format( "INSERT INTO [TestTable] (guid) VALUES ('{0}');", gid.ToString());
+			string expected = String.Format( "INSERT ALL INTO TestTable (guid) VALUES ('{0}') SELECT 1 FROM DUAL", gid.ToString());
 
 			sql.ShouldBe(expected);
 		}		

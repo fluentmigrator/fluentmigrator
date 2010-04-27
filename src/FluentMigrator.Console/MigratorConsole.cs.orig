@@ -23,8 +23,20 @@ namespace FluentMigrator.Console
 
 		public MigratorConsole(string[] args)
 		{
+<<<<<<< HEAD
+		    try {
+		        ParseArguments(args);
+		        ExecuteMigrations();
+		    }
+		    catch (Exception ex) {
+                System.Console.WriteLine("!! An error has occurred.  The error is:");
+		        System.Console.WriteLine(ex);
+                Environment.ExitCode = 1;
+		    }
+=======
 			try {
 				ParseArguments(args);
+				CreateProcessor();
 				ExecuteMigrations();
 			}
 			catch (Exception ex)
@@ -34,6 +46,7 @@ namespace FluentMigrator.Console
 				//set Exit code to failure
 				System.Environment.ExitCode = 1;
 			}
+>>>>>>> upstream/master
 		}
 
 		private void ParseArguments(string[] args)

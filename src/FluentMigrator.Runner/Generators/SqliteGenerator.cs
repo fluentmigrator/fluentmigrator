@@ -120,7 +120,7 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(CreateTableExpression expression)
 		{
-			return string.Format("CREATE TABLE {0} ({1})", expression.TableName, GetColumnDDL(expression.Columns));
+			return string.Format("CREATE TABLE {0} ({1})", expression.TableName, GetColumnDDL(expression));
 		}
 
 		public override string Generate(RenameTableExpression expression)
