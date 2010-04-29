@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 
@@ -96,12 +97,21 @@ namespace FluentMigrator.Runner
 		/// <param name="expressions"></param>
 		protected void ExecuteExpressions(ICollection<IMigrationExpression> expressions)
 		{
+		    long insertTicks = 0;
+            int insertCount = 0;
 			foreach (IMigrationExpression expression in expressions)
 			{
 				try
 				{
 					expression.ApplyConventions( Conventions );
-					time(expression.ToString(), () => expression.ExecuteWith(Processor));
+                    if (expression is InsertDataExpression) {
+                        insertTicks += time(() => expression.ExecuteWith(Processor));
+                        insertCount++;
+                    }
+                    else {
+                        time(expression.ToString(), () => expression.ExecuteWith(Processor));
+                    }
+					
 				}
 				catch (Exception er)
 				{
@@ -116,6 +126,13 @@ namespace FluentMigrator.Runner
 					throw;
 				}
 			}
+
+            if(insertCount > 0) {
+                var avg = new TimeSpan(insertTicks/insertCount);
+                var msg = string.Format("{0} Insert operations completed in {1} taking an average of {2}", insertCount, new TimeSpan(insertTicks), avg);
+                _announcer.Say(msg); 
+            }
+            
 		}
 
 		private void time(string message, Action action)
@@ -132,5 +149,15 @@ namespace FluentMigrator.Runner
 
 			_announcer.SaySubItem(elapsed + "s");
 		}
+
+        private long time(Action action) {
+            _stopWatch.Start();
+
+            action();
+
+            _stopWatch.Stop();
+
+            return _stopWatch.ElapsedTime().Ticks;
+        }
 	}
 }
