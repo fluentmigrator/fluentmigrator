@@ -229,7 +229,10 @@ namespace FluentMigrator.Runner.Generators
 			if(value is char) {
 				return "'" + value + "'";
 			}
-			if (value is Guid)
+			if(value is bool) {
+				return ((bool)value) ? 1.ToString() : 0.ToString();
+			}
+			if(value is Guid)
 			{
 				return "'" + ((Guid)value).ToString().Replace("'", "''") + "'";
 			}
