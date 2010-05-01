@@ -1,6 +1,7 @@
 #region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2010, Nathan Brown
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -38,35 +39,36 @@ namespace FluentMigrator.Runner.Generators
 
 		protected override void SetupTypeMaps()
 		{
-			SetTypeMap(DbType.AnsiStringFixedLength, "CHAR(255)");
-			SetTypeMap(DbType.AnsiStringFixedLength, "CHAR($size)", AnsiStringCapacity);
-			SetTypeMap(DbType.AnsiString, "VARCHAR(255)");
-			SetTypeMap(DbType.AnsiString, "VARCHAR($size)", AnsiStringCapacity);
-			SetTypeMap(DbType.AnsiString, "TEXT", AnsiTextCapacity);
-			SetTypeMap(DbType.Binary, "VARBINARY(8000)");
-			SetTypeMap(DbType.Binary, "VARBINARY($size)", AnsiStringCapacity);
-			SetTypeMap(DbType.Binary, "IMAGE", ImageCapacity);
-			SetTypeMap(DbType.Boolean, "BIT");
-			SetTypeMap(DbType.Byte, "TINYINT");
-			SetTypeMap(DbType.Currency, "MONEY");
-			SetTypeMap(DbType.Date, "DATETIME");
-			SetTypeMap(DbType.DateTime, "DATETIME");
-			SetTypeMap(DbType.Decimal, "DECIMAL(19,5)");
-			SetTypeMap(DbType.Decimal, "DECIMAL($size,$precision)", DecimalCapacity);
-			SetTypeMap(DbType.Double, "DOUBLE PRECISION");
-			SetTypeMap(DbType.Guid, "UNIQUEIDENTIFIER");
-			SetTypeMap(DbType.Int16, "SMALLINT");
-			SetTypeMap(DbType.Int32, "INTEGER");
-			SetTypeMap(DbType.Int64, "BIGINT");
-			SetTypeMap(DbType.Single, "REAL");
-			SetTypeMap(DbType.StringFixedLength, "NCHAR(255)");
-			SetTypeMap(DbType.StringFixedLength, "NCHAR($size)", UnicodeStringCapacity);
-			SetTypeMap(DbType.String, "NVARCHAR(255)");
-			SetTypeMap(DbType.String, "NVARCHAR($size)", UnicodeStringCapacity);
-			SetTypeMap(DbType.String, "NTEXT", UnicodeTextCapacity);
-			SetTypeMap(DbType.Time, "DATETIME");
-			SetTypeMap(DbType.Xml, "XML", XmlCapacity);
+            SetTypeMap(DbType.Binary, "BLOB");
+            SetTypeMap(DbType.Byte, "INTEGER");
+            SetTypeMap(DbType.Int16, "INTEGER");
+            SetTypeMap(DbType.Int32, "INTEGER");
+            SetTypeMap(DbType.Int64, "INTEGER");
+            SetTypeMap(DbType.SByte, "INTEGER");
+            SetTypeMap(DbType.UInt16, "INTEGER");
+            SetTypeMap(DbType.UInt32, "INTEGER");
+            SetTypeMap(DbType.UInt64, "INTEGER");
+            SetTypeMap(DbType.Currency, "NUMERIC");
+            SetTypeMap(DbType.Decimal, "NUMERIC");
+            SetTypeMap(DbType.Double, "NUMERIC");
+            SetTypeMap(DbType.Single, "NUMERIC");
+            SetTypeMap(DbType.VarNumeric, "NUMERIC");
+            SetTypeMap(DbType.AnsiString, "TEXT");
+            SetTypeMap(DbType.String, "TEXT");
+            SetTypeMap(DbType.AnsiStringFixedLength, "TEXT");
+            SetTypeMap(DbType.StringFixedLength, "TEXT");
+
+            SetTypeMap(DbType.Date, "DATETIME");
+            SetTypeMap(DbType.DateTime, "DATETIME");
+            SetTypeMap(DbType.Time, "DATETIME");
+            SetTypeMap(DbType.Boolean, "INTEGER");
+            SetTypeMap(DbType.Guid, "UNIQUEIDENTIFIER");
 		}
+
+        public override string GetTypeMap(DbType type, int size, int precision)
+        {
+            return base.GetTypeMap(type, 0, 0);
+        }
 
 		public override string GenerateDDLForColumn(ColumnDefinition column)
 		{

@@ -52,7 +52,7 @@ namespace FluentMigrator.Runner.Generators
 			_templates[type][maxSize] = template;
 		}
 
-		public string GetTypeMap(DbType type, int size, int precision)
+		public virtual string GetTypeMap(DbType type, int size, int precision)
 		{
 			if (!_templates.ContainsKey(type))
 				throw new NotSupportedException(String.Format("Unsupported DbType '{0}'", type));

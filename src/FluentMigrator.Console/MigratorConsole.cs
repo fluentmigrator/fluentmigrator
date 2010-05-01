@@ -87,11 +87,11 @@ namespace FluentMigrator.Console
 			}
 
 			if (string.IsNullOrEmpty(ProcessorType))
-				throw new ArgumentException("Database Type is required \"/db [db type]\". Available db types is [sqlserver], [sqlite]");
+                throw new ArgumentException("Database Type is required \"/db [db type]\". Where [db types] is one of SqlServer, SqlServer2000, SqlServer2005, SqlServer2008, Sqlite, Oracle, or MySql.");
 			if (string.IsNullOrEmpty(Connection))
-				throw new ArgumentException("Connection String is required \"/connection\"");
+				throw new ArgumentException("Connection String is required \"/connection\" [connection string]");
 			if (string.IsNullOrEmpty(TargetAssembly))
-				throw new ArgumentException("Target Assembly is required \"/target [assembly path]\"");
+				throw new ArgumentException("Target Assembly is required \"/target [assembly path]\" [path]");
 			if (string.IsNullOrEmpty(Task))
 				Task = "migrate";
 		}

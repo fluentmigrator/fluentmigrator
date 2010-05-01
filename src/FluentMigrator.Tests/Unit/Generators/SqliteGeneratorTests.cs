@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			CreateTableExpression expression = GetCreateTableExpression();
 			string sql = generator.Generate(expression);
-			sql.ShouldBe(string.Format("CREATE TABLE {0} (NewColumn NVARCHAR(255) NOT NULL)", table));
+			sql.ShouldBe(string.Format("CREATE TABLE {0} (NewColumn TEXT NOT NULL)", table));
 		}
 
 		[Test]
@@ -76,7 +76,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			CreateColumnExpression expression = GetCreateColumnExpression();
 			string sql = generator.Generate(expression);
-			sql.ShouldBe(string.Format("ALTER TABLE [{0}] ADD COLUMN {1} NVARCHAR(255) NOT NULL", table, newColumn));
+			sql.ShouldBe(string.Format("ALTER TABLE [{0}] ADD COLUMN {1} TEXT NOT NULL", table, newColumn));
 		}
 
 		[Test]
@@ -95,7 +95,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.TableName = tableName;
 
 			string sql = generator.Generate(expression);
-			sql.ShouldBe("ALTER TABLE [NewTable] ADD COLUMN NewColumn DECIMAL(19,2) NOT NULL");
+			sql.ShouldBe("ALTER TABLE [NewTable] ADD COLUMN NewColumn NUMERIC NOT NULL");
 		}
 
 		[Test]

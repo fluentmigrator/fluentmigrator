@@ -1,6 +1,7 @@
 #region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2010, Nathan Brown
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -69,36 +70,36 @@ namespace FluentMigrator.Tests.Integration
       [Test]
       public void CanApplyForeignKeyConvention()
       {
-         var connection = new SqlConnection(sqlServerConnectionString);
-			connection.Open();
-			var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
+          ExecuteWithSupportedProcessors(
+              processor =>
+                  {
+                      var conventions = new MigrationConventions();
+                      var runner = new MigrationRunner(conventions, processor);
 
-         var conventions = new MigrationConventions();
-         var runner = new MigrationRunner(conventions, processor);
+                      runner.Up(new TestForeignKeyNamingConvention());
+                      processor.TableExists("Users").ShouldBeTrue();
+                      processor.ConstraintExists("Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeTrue();
 
-         runner.Up(new TestForeignKeyNamingConvention());
-         processor.TableExists("Users").ShouldBeTrue();
-         processor.ConstraintExists( "Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeTrue();
-
-         runner.Down(new TestForeignKeyNamingConvention());
-         processor.TableExists("Users").ShouldBeFalse();
+                      runner.Down(new TestForeignKeyNamingConvention());
+                      processor.TableExists("Users").ShouldBeFalse();
+                  });
       }
 
       [Test]
       public void CanApplyIndexConvention()
       {
-         var connection = new SqlConnection(sqlServerConnectionString);
-         connection.Open();
-         var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
+          ExecuteWithSupportedProcessors(
+              processor =>
+                  {
+                      var conventions = new MigrationConventions();
+                      var runner = new MigrationRunner(conventions, processor);
 
-         var conventions = new MigrationConventions();
-         var runner = new MigrationRunner(conventions, processor);
+                      runner.Up(new TestIndexNamingConvention());
+                      processor.TableExists("Users").ShouldBeTrue();
 
-         runner.Up(new TestIndexNamingConvention());
-         processor.TableExists("Users").ShouldBeTrue();
-
-         runner.Down(new TestIndexNamingConvention());
-         processor.TableExists("Users").ShouldBeFalse();
+                      runner.Down(new TestIndexNamingConvention());
+                      processor.TableExists("Users").ShouldBeFalse();
+                  });
       }
 	}
 

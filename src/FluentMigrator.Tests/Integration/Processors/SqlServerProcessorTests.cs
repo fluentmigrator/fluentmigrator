@@ -36,7 +36,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 			Connection = new SqlConnection(@"server=(local)\sqlexpress;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator");
 			Connection.Open();
 
-			Processor = new SqlServerProcessor(Connection, new SqlServerGenerator());
+			Processor = new SqlServerProcessor(Connection, new SqlServer2000Generator());
 		}
 
 		[Test]

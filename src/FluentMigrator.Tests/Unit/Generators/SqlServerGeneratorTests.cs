@@ -31,11 +31,11 @@ namespace FluentMigrator.Tests.Unit.Generators
 	[TestFixture]
 	public class SqlServerGeneratorTests
 	{
-		private SqlServerGenerator generator;
+		private SqlServer2000Generator generator;
 
 		public SqlServerGeneratorTests()
 		{
-			generator = new SqlServerGenerator();
+			generator = new SqlServer2000Generator();
 		}
 
 		[Test]

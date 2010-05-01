@@ -1,6 +1,7 @@
 #region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2010, Nathan Brown
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -49,13 +50,8 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
 		public override void Execute(string template, params object[] args)
 		{
-			if (Connection.State != ConnectionState.Open) Connection.Open();
-
-			using (var command = new SQLiteCommand(String.Format(template, args), Connection))
-			{
-				command.ExecuteNonQuery();
-			}
-		}
+            this.Process(String.Format(template, args));
+        }
 
 		public override bool Exists(string template, params object[] args)
 		{
@@ -87,7 +83,16 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 			if (Connection.State != ConnectionState.Open) Connection.Open();
 
 			using (var command = new SQLiteCommand(sql, Connection))
-				command.ExecuteNonQuery();
+			{
+                try
+                {
+                    command.ExecuteNonQuery();
+                }
+                catch (SQLiteException ex)
+                {
+                    throw new SQLiteException(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
+                }
+            }
 		}
 
 		public override DataSet Read(string template, params object[] args)
