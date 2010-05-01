@@ -23,7 +23,7 @@ using System.Data.SQLite;
 
 namespace FluentMigrator.Runner.Processors.Sqlite
 {
-	public class SqliteProcessor: ProcessorBase
+	public class SqliteProcessor : ProcessorBase
 	{
 		public SQLiteConnection Connection { get; set; }
 
@@ -50,8 +50,8 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
 		public override void Execute(string template, params object[] args)
 		{
-            this.Process(String.Format(template, args));
-        }
+			Process(String.Format(template, args));
+		}
 
 		public override bool Exists(string template, params object[] args)
 		{
@@ -84,15 +84,15 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
 			using (var command = new SQLiteCommand(sql, Connection))
 			{
-                try
-                {
-                    command.ExecuteNonQuery();
-                }
-                catch (SQLiteException ex)
-                {
-                    throw new SQLiteException(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
-                }
-            }
+				try
+				{
+					command.ExecuteNonQuery();
+				}
+				catch (SQLiteException ex)
+				{
+					throw new SQLiteException(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
+				}
+			}
 		}
 
 		public override DataSet Read(string template, params object[] args)

@@ -34,7 +34,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
 		public IMigrationProcessor Create(IDbConnection connection)
 		{
-            return new SqlServerProcessor((SqlConnection)connection, new SqlServer2005Generator());
+			return new SqlServerProcessor((SqlConnection)connection, new SqlServer2005Generator());
 		}
 	}
 }

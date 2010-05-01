@@ -40,7 +40,8 @@ namespace FluentMigrator.Console
 
 		public MigratorConsole(string[] args)
 		{
-			try {
+			try
+			{
 				ParseArguments(args);
 				CreateProcessor();
 				ExecuteMigrations();
@@ -87,11 +88,14 @@ namespace FluentMigrator.Console
 			}
 
 			if (string.IsNullOrEmpty(ProcessorType))
-                throw new ArgumentException("Database Type is required \"/db [db type]\". Where [db types] is one of SqlServer, SqlServer2000, SqlServer2005, SqlServer2008, Sqlite, Oracle, or MySql.");
+				throw new ArgumentException(string.Format("Database Type is required \"/db [db type]\". Where [db type] is one of {0}.", ProcessorFactory.ListAvailableProcessorTypes()));
+
 			if (string.IsNullOrEmpty(Connection))
 				throw new ArgumentException("Connection String is required \"/connection\" [connection string]");
+
 			if (string.IsNullOrEmpty(TargetAssembly))
 				throw new ArgumentException("Target Assembly is required \"/target [assembly path]\" [path]");
+
 			if (string.IsNullOrEmpty(Task))
 				Task = "migrate";
 		}

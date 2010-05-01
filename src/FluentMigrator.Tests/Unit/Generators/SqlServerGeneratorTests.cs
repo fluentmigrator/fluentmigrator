@@ -57,17 +57,17 @@ namespace FluentMigrator.Tests.Unit.Generators
 			sql.ShouldBe("CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL PRIMARY KEY CLUSTERED, ColumnName2 INT NOT NULL)");
 		}
 
-        [Test]
-        public void CanCreateTableWithCustomColumnType()
-        {
+		[Test]
+		public void CanCreateTableWithCustomColumnType()
+		{
 			string tableName = "NewTable";
 			CreateTableExpression expression = GetCreateTableExpression(tableName);
 			expression.Columns[0].IsPrimaryKey = true;
-            expression.Columns[1].Type = null;
-            expression.Columns[1].CustomType = "[timestamp]";
+			expression.Columns[1].Type = null;
+			expression.Columns[1].CustomType = "[timestamp]";
 			string sql = generator.Generate(expression);
 			sql.ShouldBe("CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL PRIMARY KEY CLUSTERED, ColumnName2 [timestamp] NOT NULL)");
-        }
+		}
 
 		[Test]
 		public void CanDropTable()
@@ -91,7 +91,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 
 			string sql = generator.Generate(expression);
 
-			string expectedSql = 
+			string expectedSql =
 @"
             DECLARE @default sysname, @sql nvarchar(max);
 
@@ -199,7 +199,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.ForeignKey.Name = "FK_Test";
 			expression.ForeignKey.PrimaryTable = "TestPrimaryTable";
 			expression.ForeignKey.ForeignTable = "TestForeignTable";
-			expression.ForeignKey.PrimaryColumns = new[] {"Column1", "Column2"};
+			expression.ForeignKey.PrimaryColumns = new[] { "Column1", "Column2" };
 			expression.ForeignKey.ForeignColumns = new[] { "Column3", "Column4" };
 
 			string sql = generator.Generate(expression);
@@ -246,10 +246,10 @@ namespace FluentMigrator.Tests.Unit.Generators
 
 			string sql = generator.Generate(expression);
 
-			string expected = String.Format( "INSERT INTO [TestTable] (guid) VALUES ('{0}');", gid.ToString());
+			string expected = String.Format("INSERT INTO [TestTable] (guid) VALUES ('{0}');", gid.ToString());
 
 			sql.ShouldBe(expected);
-		}		
+		}
 
 		private DeleteTableExpression GetDeleteTableExpression(string tableName)
 		{
