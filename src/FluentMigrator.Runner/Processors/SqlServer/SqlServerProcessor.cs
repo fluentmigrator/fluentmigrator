@@ -52,7 +52,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 		
 		public override void Execute(string template, params object[] args)
 		{
-			this.Process(String.Format(template, args));
+			Process(String.Format(template, args));
 		}
 
 		public override bool Exists(string template, params object[] args)

@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
@@ -34,6 +35,24 @@ namespace FluentMigrator.Runner.Processors
 				throw new ArgumentException("Processor Type not found");
 
 			return Activator.CreateInstance(processorType) as IMigrationProcessorFactory;
+		}
+
+		public static string ListAvailableProcessorTypes()
+		{
+			IEnumerable<Type> processorTypes = typeof(IMigrationProcessorFactory).Assembly.GetExportedTypes()
+				.Where(t => typeof(IMigrationProcessorFactory).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface);
+
+			string processorList = string.Empty;
+			foreach (Type processorType in processorTypes)
+			{
+				string name = processorType.Name;
+
+				if (!string.IsNullOrEmpty(processorList))
+					processorList = processorList + ", ";
+				processorList += name.Substring( 0, name.IndexOf( "ProcessorFactory" ) ).ToLowerInvariant();
+			}
+
+			return processorList;
 		}
 
 		private static Type FindMatchingProcessorIn(Assembly assembly, string processorName)

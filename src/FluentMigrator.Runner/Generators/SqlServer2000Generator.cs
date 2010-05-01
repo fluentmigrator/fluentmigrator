@@ -22,7 +22,6 @@ using System.Data;
 using System.Text;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
-using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Generators

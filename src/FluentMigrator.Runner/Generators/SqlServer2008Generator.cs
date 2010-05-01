@@ -16,23 +16,20 @@
 //
 #endregion
 
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Text;
 
 namespace FluentMigrator.Runner.Generators
 {
-    public class SqlServer2008Generator : SqlServer2005Generator
-    {
-        protected override void SetupTypeMaps()
-        {
-            base.SetupTypeMaps();
+	public class SqlServer2008Generator : SqlServer2005Generator
+	{
+		protected override void SetupTypeMaps()
+		{
+			base.SetupTypeMaps();
 
-            SetTypeMap(DbType.DateTime2, "DATETIME2");
-            SetTypeMap(DbType.DateTimeOffset, "DATETIMEOFFSET");
-            SetTypeMap(DbType.Date, "DATE");
-            SetTypeMap(DbType.Time, "TIME");
-        }
-    }
+			SetTypeMap(DbType.DateTime2, "DATETIME2");
+			SetTypeMap(DbType.DateTimeOffset, "DATETIMEOFFSET");
+			SetTypeMap(DbType.Date, "DATE");
+			SetTypeMap(DbType.Time, "TIME");
+		}
+	}
 }
