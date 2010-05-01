@@ -23,18 +23,18 @@ using FluentMigrator.Runner.Generators;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-	public class SqlServerProcessorFactory : IMigrationProcessorFactory
+	public class SqlServer2008ProcessorFactory : IMigrationProcessorFactory
 	{
 		public IMigrationProcessor Create(string connectionString)
 		{
 			var connection = new SqlConnection(connectionString);
 			connection.Open();
-			return new SqlServerProcessor(connection, new SqlServer2000Generator());
+			return new SqlServerProcessor(connection, new SqlServer2008Generator());
 		}
 
 		public IMigrationProcessor Create(IDbConnection connection)
 		{
-            return new SqlServerProcessor((SqlConnection)connection, new SqlServer2000Generator());
+            return new SqlServerProcessor((SqlConnection)connection, new SqlServer2008Generator());
 		}
 	}
 }

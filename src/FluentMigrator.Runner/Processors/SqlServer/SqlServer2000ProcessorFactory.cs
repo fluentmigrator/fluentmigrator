@@ -23,7 +23,7 @@ using FluentMigrator.Runner.Generators;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-	public class SqlServerProcessorFactory : IMigrationProcessorFactory
+	public class SqlServer2000ProcessorFactory : IMigrationProcessorFactory
 	{
 		public IMigrationProcessor Create(string connectionString)
 		{

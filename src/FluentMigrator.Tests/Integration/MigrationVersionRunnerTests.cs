@@ -161,7 +161,7 @@ namespace FluentMigrator.Tests.Integration
 		{
 			var connection = new SqlConnection(sqlServerConnectionString);
 			connection.Open();
-			var processor = new SqlServerProcessor(connection, new SqlServerGenerator());
+			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator());
 			var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(InvalidMigration).Namespace);
 
 			try

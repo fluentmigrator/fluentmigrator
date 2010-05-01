@@ -1,6 +1,7 @@
 #region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2010, Nathan Brown
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -51,13 +52,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 		
 		public override void Execute(string template, params object[] args)
 		{
-			if (Connection.State != ConnectionState.Open)
-				Connection.Open();
-
-			using (var command = new SqlCommand(String.Format(template, args), Connection, Transaction))
-			{
-				command.ExecuteNonQuery();
-			}
+			this.Process(String.Format(template, args));
 		}
 
 		public override bool Exists(string template, params object[] args)
