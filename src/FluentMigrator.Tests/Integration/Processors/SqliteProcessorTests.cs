@@ -48,7 +48,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 			command = connection.CreateCommand();
 
 			// SUT
-			processor = new SqliteProcessor(connection, new SqliteGenerator(), new Announcer(System.Console.Out));
+			processor = new SqliteProcessor(connection, new SqliteGenerator(), new TextWriterAnnouncer(System.Console.Out));
 
 			column = new Mock<ColumnDefinition>();
 			tableName = "NewTable";

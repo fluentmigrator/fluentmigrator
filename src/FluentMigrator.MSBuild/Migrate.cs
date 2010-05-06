@@ -16,7 +16,6 @@
 //
 #endregion
 
-using System;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
 using Microsoft.Build.Framework;
@@ -36,9 +35,9 @@ namespace FluentMigrator.MSBuild
 		[Required]
 		public string Target { get; set; }
 
-
 		public bool LoggingEnabled { get; set; }
 
+		public bool Verbose { get; set; }
 
 		public string Namespace { get; set; }
 
@@ -53,7 +52,12 @@ namespace FluentMigrator.MSBuild
 		public override bool Execute()
 		{
 			Log.LogCommandLine(MessageImportance.Low, "Creating Context");
-			var runnerContext = new RunnerContext(new Announcer(Console.Out))
+			var announcer = new BaseAnnouncer(msg => Log.LogCommandLine(MessageImportance.Normal, msg))
+								{
+									ShowElapsedTime = Verbose,
+									ShowSql = Verbose
+								};
+			var runnerContext = new RunnerContext(announcer)
 									{
 										Database = Database,
 										Connection = Connection,

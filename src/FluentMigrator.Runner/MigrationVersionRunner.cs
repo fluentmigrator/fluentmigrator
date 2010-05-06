@@ -89,7 +89,7 @@ namespace FluentMigrator.Runner
 		{
 			if (!_migrationProcessor.TableExists(_versionTableMetaData.TableName))
 			{
-				var runner = new MigrationRunner(_migrationConventions, _migrationProcessor, new Announcer(Console.Out), new StopWatch());
+				var runner = new MigrationRunner(_migrationConventions, _migrationProcessor, new TextWriterAnnouncer(Console.Out), new StopWatch());
 				runner.Up(_versionMigration);
 			}
 

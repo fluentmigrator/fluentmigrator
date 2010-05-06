@@ -27,14 +27,18 @@ namespace FluentMigrator.Tests.Unit
 	[TestFixture]
 	public class AnnouncerTests
 	{
-		private Announcer _announcer;
+		private TextWriterAnnouncer _announcer;
 		private StringWriter _stringWriter;
 
 		[SetUp]
 		public void SetUp()
 		{
 			_stringWriter = new StringWriter();
-			_announcer = new Announcer(_stringWriter);
+			_announcer = new TextWriterAnnouncer(_stringWriter)
+							{
+								ShowElapsedTime = true,
+								ShowSql = true
+							};
 		}
 
 		public string Output
@@ -49,7 +53,7 @@ namespace FluentMigrator.Tests.Unit
 		public void CanAnnounceAndPadWithEquals()
 		{
 			_announcer.Heading("Test");
-			Output.ShouldBe("-- Test ======================================================================" + Environment.NewLine);
+			Output.ShouldBe("-- Test ======================================================================" + Environment.NewLine + Environment.NewLine);
 		}
 
 		[Test]
@@ -63,7 +67,7 @@ namespace FluentMigrator.Tests.Unit
 		public void CanSayTimeSpan()
 		{
 			_announcer.ElapsedTime(new TimeSpan(0, 0, 5));
-			Output.ShouldBe("-- -> 5s" + Environment.NewLine);
+			Output.ShouldBe("-- -> 5s" + Environment.NewLine + Environment.NewLine);
 		}
 
 		[Test]

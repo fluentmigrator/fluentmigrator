@@ -111,7 +111,7 @@ namespace FluentMigrator.Console
 
 		private void ExecuteMigrations()
 		{
-			using (var announcer = new Announcer(_announcerOutput)
+			using (var announcer = new TextWriterAnnouncer(_announcerOutput)
 									{
 										ShowElapsedTime = Verbose,
 										ShowSql = Verbose

@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Integration
 		{
 			ExecuteWithSupportedProcessors(processor =>
 				{
-					var runner = new MigrationRunner(new MigrationConventions(), processor, new Announcer(System.Console.Out), new StopWatch());
+					var runner = new MigrationRunner(new MigrationConventions(), processor, new TextWriterAnnouncer(System.Console.Out), new StopWatch());
 
 					IVersionTableMetaData tableMetaData = new DefaultVersionTableMetaData();
 

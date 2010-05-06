@@ -47,7 +47,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 			_columnName = "sample_column_id";
 
 			_generator = new SqliteGenerator();
-			_fileDumpProcessor = new FileProcessor(_dumpFilename, _generator, new Announcer(System.Console.Out));
+			_fileDumpProcessor = new FileProcessor(_dumpFilename, _generator, new TextWriterAnnouncer(System.Console.Out));
 		}
 
 		[Test]

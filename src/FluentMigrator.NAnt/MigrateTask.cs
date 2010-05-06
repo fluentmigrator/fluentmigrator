@@ -55,7 +55,12 @@ namespace FluentMigrator.NAnt
 
 		protected override void ExecuteTask()
 		{
-			var runnerContext = new RunnerContext(new Announcer(System.Console.Out))
+			var announcer = new TextWriterAnnouncer(System.Console.Out)
+			{
+				ShowElapsedTime = Verbose,
+				ShowSql = Verbose
+			};
+			var runnerContext = new RunnerContext(announcer)
 									{
 										Database = Database,
 										Connection = Connection,

@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit
 			_processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
 			_loaderMock = new Mock<IMigrationLoader>(MockBehavior.Loose);
 
-			_vrunner = new MigrationVersionRunner(_conventionMock.Object, _processorMock.Object, _loaderMock.Object, new Announcer(System.Console.Out));
+			_vrunner = new MigrationVersionRunner(_conventionMock.Object, _processorMock.Object, _loaderMock.Object, new TextWriterAnnouncer(System.Console.Out));
 		}
 
 		[Test]

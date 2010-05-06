@@ -45,21 +45,21 @@ namespace FluentMigrator.Tests.Integration
 		{
 			var connection = new SqlConnection(sqlServerConnectionString);
 			connection.Open();
-			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new Announcer(System.Console.Out));
+			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out));
 			test(processor);
 		}
 
 		public void ExecuteWithSqlite(Action<IMigrationProcessor> test)
 		{
 			var connection = new SQLiteConnection(sqliteConnectionString);
-			var processor = new SqliteProcessor(connection, new SqliteGenerator(), new Announcer(System.Console.Out));
+			var processor = new SqliteProcessor(connection, new SqliteGenerator(), new TextWriterAnnouncer(System.Console.Out));
 			test(processor);
 		}
 
 		private void ExecuteWithMySql(Action<IMigrationProcessor> test)
 		{
 			var connection = new MySqlConnection(mySqlConnectionString);
-			var processor = new MySqlProcessor(connection, new MySqlGenerator(), new Announcer(System.Console.Out));
+			var processor = new MySqlProcessor(connection, new MySqlGenerator(), new TextWriterAnnouncer(System.Console.Out));
 			test(processor);
 		}
 	}
