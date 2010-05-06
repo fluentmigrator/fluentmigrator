@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.IO;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
@@ -25,10 +26,12 @@ namespace FluentMigrator.Console
 {
 	public class MigratorConsole
 	{
+		private readonly TextWriter _announcerOutput;
 		public string ProcessorType;
 		public IMigrationProcessor Processor;
 		public string Connection;
 		public bool Log;
+		public bool Verbose;
 		public string Namespace;
 		public string Task;
 		public long Version;
@@ -36,8 +39,9 @@ namespace FluentMigrator.Console
 		private string TargetAssembly;
 		private string WorkingDirectory;
 
-		public MigratorConsole(string[] args)
+		public MigratorConsole(TextWriter announcerOutput, params string[] args)
 		{
+			_announcerOutput = announcerOutput;
 			try
 			{
 				ParseArguments(args);
@@ -50,6 +54,11 @@ namespace FluentMigrator.Console
 				//set Exit code to failure
 				System.Environment.ExitCode = 1;
 			}
+		}
+
+		public MigratorConsole(params string[] args)
+			: this(System.Console.Out, args)
+		{
 		}
 
 		private void ParseArguments(string[] args)
@@ -67,6 +76,9 @@ namespace FluentMigrator.Console
 
 				if (args[i].Contains("/log"))
 					Log = true;
+
+				if (args[i].Contains("/verbose"))
+					Verbose = true;
 
 				if (args[i].Contains("/namespace"))
 					Namespace = args[i + 1];
@@ -99,7 +111,11 @@ namespace FluentMigrator.Console
 
 		private void ExecuteMigrations()
 		{
-			using (var announcer = new Announcer(System.Console.Out))
+			using (var announcer = new Announcer(_announcerOutput)
+									{
+										ShowElapsedTime = Verbose,
+										ShowSql = Verbose
+									})
 			{
 				var migrationContext = new RunnerContext(announcer)
 				{

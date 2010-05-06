@@ -87,16 +87,20 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
 		public override void CommitTransaction()
 		{
+			Announcer.Say("Commiting transaction");
 			Transaction.Commit();
 		}
 
 		public override void RollbackTransaction()
 		{
+			Announcer.Say("Rolling back transaction");
 			Transaction.Rollback();
 		}
 
 		protected override void Process(string sql)
 		{
+			Announcer.Sql(sql);
+
 			if (Connection.State != ConnectionState.Open)
 				Connection.Open();
 

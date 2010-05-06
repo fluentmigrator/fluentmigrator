@@ -30,11 +30,16 @@ namespace FluentMigrator.Runner.Announcers
 		public Announcer(TextWriter writer)
 		{
 			_writer = writer;
+			ShowSql = false;
+			ShowElapsedTime = false;
 		}
+
+		public bool ShowSql { get; set; }
+		public bool ShowElapsedTime { get; set; }
 
 		#region IAnnouncer Members
 
-		public void Announce(string message)
+		public void Heading(string message)
 		{
 			_writer.Write("-- " + message + " ");
 			for (var i = 0; i < 75 - (message.Length + 1); i++)
@@ -42,25 +47,38 @@ namespace FluentMigrator.Runner.Announcers
 				_writer.Write("=");
 			}
 			_writer.Write(Environment.NewLine);
+			_writer.Write(Environment.NewLine);
 		}
 
 		public void Say(string message)
 		{
-			_writer.Write("-- ");
-			_writer.Write(message);
+			Info("-- " + message);
+		}
+
+		public void Sql(string sql)
+		{
+			if (!ShowSql)
+				return;
+
+			if (!string.IsNullOrEmpty(sql))
+				Info(sql);
+			else
+				Say("No SQL statement executed.");
+		}
+
+		public void ElapsedTime(TimeSpan timeSpan)
+		{
+			if (!ShowElapsedTime)
+				return;
+
+			Say(string.Format("-> {0}s", timeSpan.TotalSeconds));
 			_writer.Write(Environment.NewLine);
 		}
 
-		public void SaySubItem(string message)
+		public void Error(string message)
 		{
-			_writer.Write("-- -> ");
+			_writer.Write("-- ERROR: ");
 			_writer.Write(message);
-			_writer.Write(Environment.NewLine);
-		}
-
-		public void SaySql(string sql)
-		{
-			_writer.Write(sql);
 			_writer.Write(Environment.NewLine);
 		}
 
@@ -69,5 +87,11 @@ namespace FluentMigrator.Runner.Announcers
 		}
 
 		#endregion
+
+		private void Info(string message)
+		{
+			_writer.Write(message);
+			_writer.Write(Environment.NewLine);
+		}
 	}
 }

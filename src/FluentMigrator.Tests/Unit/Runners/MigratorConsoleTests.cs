@@ -17,6 +17,8 @@
 #endregion
 
 using System;
+using System.IO;
+using System.Text;
 using FluentMigrator.Console;
 using FluentMigrator.Runner.Processors.Sqlite;
 using NUnit.Framework;
@@ -34,28 +36,28 @@ namespace FluentMigrator.Tests.Unit.Runners
 		[Test]
 		public void MustInitializeConsoleWithDatabaseArgument()
 		{
-			string[] args = { "/connection", connection, "/log" };
-			new MigratorConsole(args);
+			new MigratorConsole("/connection", connection, "/log");
 			Assert.That(Environment.ExitCode == 1);
 		}
 
 		[Test]
 		public void MustInitializeConsoleWithConnectionArgument()
 		{
-			string[] args = { "/db", database, "/log" };
-			new MigratorConsole(args);
+			new MigratorConsole("/db", database, "/log");
 			Assert.That(Environment.ExitCode == 1);
 		}
 
 		[Test]
 		public void CanInitMigratorConsoleWithValidArguments()
 		{
-			string[] args = { "/db", database, "/connection", connection, "/log", "/target", target, 
-								"/namespace", "FluentMigrator.Tests.Integration.Migrations", 
-								"/task", "migrate:up",
-								"/version", "1"};
-
-			MigratorConsole console = new MigratorConsole(args);
+			var console = new MigratorConsole(
+				"/db", database,
+				"/connection", connection,
+				"/log",
+				"/target", target,
+				"/namespace", "FluentMigrator.Tests.Integration.Migrations",
+				"/task", "migrate:up",
+				"/version", "1");
 
 			console.Processor.ShouldBeOfType<SqliteProcessor>();
 			console.Connection.ShouldBe(connection);
@@ -65,5 +67,54 @@ namespace FluentMigrator.Tests.Unit.Runners
 			console.Version.ShouldBe(1);
 		}
 
+		[Test]
+		public void AnnouncerHasOutput()
+		{
+			var sb = new StringBuilder();
+			var stringWriter = new StringWriter(sb);
+			new MigratorConsole(
+				stringWriter,
+				"/db", database,
+				"/connection", connection,
+				"/log",
+				"/target", target,
+				"/namespace", "FluentMigrator.Tests.Integration.Migrations",
+				"/task", "migrate:up",
+				"/version", "1");
+
+			var output = sb.ToString();
+			Assert.AreNotEqual(0, output.Length);
+		}
+
+		[Test]
+		public void AnnouncerHasMoreOutputWhenVerbose()
+		{
+			var sbNonVerbose = new StringBuilder();
+			var stringWriterNonVerbose = new StringWriter(sbNonVerbose);
+			new MigratorConsole(
+				stringWriterNonVerbose,
+				"/db", database,
+				"/connection", connection,
+				"/log",
+				"/target", target,
+				"/namespace", "FluentMigrator.Tests.Integration.Migrations",
+				"/task", "migrate:up",
+				"/version", "1");
+
+			var sbVerbose = new StringBuilder();
+			var stringWriterVerbose = new StringWriter(sbVerbose);
+			new MigratorConsole(
+				stringWriterVerbose,
+				"/db", database,
+				"/connection", connection,
+				"/log",
+				"/verbose",
+				"/target", target,
+				"/namespace", "FluentMigrator.Tests.Integration.Migrations",
+				"/task", "migrate:up",
+				"/version", "1");
+
+			Assert.Greater(sbVerbose.ToString().Length, sbNonVerbose.ToString().Length);
+		}
 	}
 }

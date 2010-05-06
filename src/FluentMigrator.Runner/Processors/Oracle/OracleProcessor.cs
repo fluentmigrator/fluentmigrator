@@ -77,6 +77,8 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
 		protected override void Process(string sql)
 		{
+			Announcer.Sql(sql);
+
 			if (Connection.State != ConnectionState.Open)
 				Connection.Open();
 

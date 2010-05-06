@@ -24,9 +24,10 @@ namespace FluentMigrator.Runner
 {
 	public interface IAnnouncer : IDisposable
 	{
-		void Announce(string message);
+		void Heading(string message);
 		void Say(string message);
-		void SaySubItem(string message);
-		void SaySql(string sql);
+		void Sql(string sql);
+		void ElapsedTime(TimeSpan timeSpan);
+		void Error(string message);
 	}
 }

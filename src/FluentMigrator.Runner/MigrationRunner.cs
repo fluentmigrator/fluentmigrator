@@ -45,29 +45,25 @@ namespace FluentMigrator.Runner
 		public void Up(IMigration migration)
 		{
 			var name = migration.GetType().Name;
-			_announcer.Announce(name + ": migrating");
+			_announcer.Heading(name + ": migrating");
 
 			CaughtExceptions = new List<Exception>();
 
 			var context = new MigrationContext(Conventions, Processor);
-
 			migration.GetUpExpressions(context);
 
 			_stopWatch.Start();
-
 			ExecuteExpressions(context.Expressions);
-
 			_stopWatch.Stop();
 
-			var elapsed = _stopWatch.ElapsedTime().TotalSeconds;
-
-			_announcer.Announce(name + ": migrated (" + elapsed + "s" + ")");
+			_announcer.Say(name + ": migrated");
+			_announcer.ElapsedTime(_stopWatch.ElapsedTime());
 		}
 
 		public void Down(IMigration migration)
 		{
 			var name = migration.GetType().Name;
-			_announcer.Announce(name + ": reverting");
+			_announcer.Heading(name + ": reverting");
 
 			CaughtExceptions = new List<Exception>();
 
@@ -75,14 +71,11 @@ namespace FluentMigrator.Runner
 			migration.GetDownExpressions(context);
 
 			_stopWatch.Start();
-
 			ExecuteExpressions(context.Expressions);
-
 			_stopWatch.Stop();
 
-			var elapsed = _stopWatch.ElapsedTime().TotalSeconds;
-
-			_announcer.Announce(name + ": reverted (" + elapsed + "s" + ")");
+			_announcer.Say(name + ": reverted");
+			_announcer.ElapsedTime(_stopWatch.ElapsedTime());
 		}
 
 		/// <summary>
@@ -96,11 +89,11 @@ namespace FluentMigrator.Runner
 				try
 				{
 					expression.ApplyConventions(Conventions);
-					time(expression.ToString(), () => expression.ExecuteWith(Processor));
+					Time(expression.ToString(), () => expression.ExecuteWith(Processor));
 				}
 				catch (Exception er)
 				{
-					_announcer.Say(er.Message);
+					_announcer.Error(er.Message);
 
 					//catch the error and move onto the next expression
 					if (SilentlyFail)
@@ -113,19 +106,15 @@ namespace FluentMigrator.Runner
 			}
 		}
 
-		private void time(string message, Action action)
+		private void Time(string message, Action action)
 		{
 			_announcer.Say(message);
 
 			_stopWatch.Start();
-
 			action();
-
 			_stopWatch.Stop();
 
-			var elapsed = _stopWatch.ElapsedTime().TotalSeconds;
-
-			_announcer.SaySubItem(elapsed + "s");
+			_announcer.ElapsedTime(_stopWatch.ElapsedTime());
 		}
 	}
 }

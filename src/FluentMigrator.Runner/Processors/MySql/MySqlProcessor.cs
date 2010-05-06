@@ -104,7 +104,10 @@ namespace FluentMigrator.Runner.Processors.MySql
 
 		protected override void Process(string sql)
 		{
-			if (Connection.State != ConnectionState.Open) Connection.Open();
+			Announcer.Sql(sql);
+
+			if (Connection.State != ConnectionState.Open)
+				Connection.Open();
 
 			using (var command = new MySqlCommand(sql, Connection))
 				command.ExecuteNonQuery();

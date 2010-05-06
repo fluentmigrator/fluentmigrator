@@ -48,7 +48,7 @@ namespace FluentMigrator.Tests.Unit
 		[Test]
 		public void CanAnnounceAndPadWithEquals()
 		{
-			_announcer.Announce("Test");
+			_announcer.Heading("Test");
 			Output.ShouldBe("-- Test ======================================================================" + Environment.NewLine);
 		}
 
@@ -60,16 +60,16 @@ namespace FluentMigrator.Tests.Unit
 		}
 
 		[Test]
-		public void CanSaySubItem()
+		public void CanSayTimeSpan()
 		{
-			_announcer.SaySubItem("0.0512s");
-			Output.ShouldBe("-- -> 0.0512s" + Environment.NewLine);
+			_announcer.ElapsedTime(new TimeSpan(0, 0, 5));
+			Output.ShouldBe("-- -> 5s" + Environment.NewLine);
 		}
 
 		[Test]
 		public void CanSaySql()
 		{
-			_announcer.SaySql("DELETE Blah");
+			_announcer.Sql("DELETE Blah");
 			Output.ShouldBe("DELETE Blah" + Environment.NewLine);
 		}
 	}

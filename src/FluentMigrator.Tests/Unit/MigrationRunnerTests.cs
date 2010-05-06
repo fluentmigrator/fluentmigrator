@@ -20,8 +20,8 @@ using System;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Tests.Integration.Migrations;
-using NUnit.Framework;
 using Moq;
+using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit
 {
@@ -45,7 +45,7 @@ namespace FluentMigrator.Tests.Unit
 		[Test]
 		public void CanAnnounceUp()
 		{
-			_announcer.Setup(x => x.Announce(It.IsRegex(containsAll("Test", "migrating"))));
+			_announcer.Setup(x => x.Heading(It.IsRegex(containsAll("Test", "migrating"))));
 			_runner.Up(new TestMigration());
 			_announcer.VerifyAll();
 		}
@@ -53,7 +53,7 @@ namespace FluentMigrator.Tests.Unit
 		[Test]
 		public void CanAnnounceUpFinish()
 		{
-			_announcer.Setup(x => x.Announce(It.IsRegex(containsAll("Test", "migrated"))));
+			_announcer.Setup(x => x.Heading(It.IsRegex(containsAll("Test", "migrated"))));
 			_runner.Up(new TestMigration());
 			_announcer.VerifyAll();
 		}
@@ -61,7 +61,7 @@ namespace FluentMigrator.Tests.Unit
 		[Test]
 		public void CanAnnounceDown()
 		{
-			_announcer.Setup(x => x.Announce(It.IsRegex(containsAll("Test", "reverting"))));
+			_announcer.Setup(x => x.Heading(It.IsRegex(containsAll("Test", "reverting"))));
 			_runner.Down(new TestMigration());
 			_announcer.VerifyAll();
 		}
@@ -69,7 +69,7 @@ namespace FluentMigrator.Tests.Unit
 		[Test]
 		public void CanAnnounceDownFinish()
 		{
-			_announcer.Setup(x => x.Announce(It.IsRegex(containsAll("Test", "reverted"))));
+			_announcer.Setup(x => x.Heading(It.IsRegex(containsAll("Test", "reverted"))));
 			_runner.Down(new TestMigration());
 			_announcer.VerifyAll();
 		}
@@ -77,7 +77,7 @@ namespace FluentMigrator.Tests.Unit
 		[Test]
 		public void CanAnnounceUpElapsedTime()
 		{
-			_announcer.Setup(x => x.Announce(It.IsRegex(containsAll("1.003s"))));
+			_announcer.Setup(x => x.Heading(It.IsRegex(containsAll("1.003s"))));
 
 			_stopWatch.Setup(x => x.ElapsedTime()).Returns(new TimeSpan(0, 0, 0, 1, 3));
 
@@ -89,7 +89,7 @@ namespace FluentMigrator.Tests.Unit
 		[Test]
 		public void CanAnnounceDownElapsedTime()
 		{
-			_announcer.Setup(x => x.Announce(It.IsRegex(containsAll("1.003s"))));
+			_announcer.Setup(x => x.Heading(It.IsRegex(containsAll("1.003s"))));
 
 			_stopWatch.Setup(x => x.ElapsedTime()).Returns(new TimeSpan(0, 0, 0, 1, 3));
 
@@ -131,9 +131,10 @@ namespace FluentMigrator.Tests.Unit
 		[Test]
 		public void CanTimeExpression()
 		{
-			_announcer.Setup(x => x.SaySubItem(It.IsRegex(containsAll("1.003s"))));
+			var ts = new TimeSpan(0, 0, 0, 1, 3);
+			_announcer.Setup(x => x.ElapsedTime(It.Is<TimeSpan>(y => y == ts)));
 
-			_stopWatch.Setup(x => x.ElapsedTime()).Returns(new TimeSpan(0, 0, 0, 1, 3));
+			_stopWatch.Setup(x => x.ElapsedTime()).Returns(ts);
 
 			_runner.Up(new TestMigration());
 

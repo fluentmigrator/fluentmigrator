@@ -80,7 +80,10 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
 		protected override void Process(string sql)
 		{
-			if (Connection.State != ConnectionState.Open) Connection.Open();
+			Announcer.Sql(sql);
+
+			if (Connection.State != ConnectionState.Open)
+				Connection.Open();
 
 			using (var command = new SQLiteCommand(sql, Connection))
 			{
