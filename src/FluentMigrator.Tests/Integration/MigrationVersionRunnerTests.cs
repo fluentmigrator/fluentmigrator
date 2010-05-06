@@ -20,6 +20,7 @@ using System.Data.SqlClient;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Integration.Migrations;
 using FluentMigrator.Tests.Integration.Migrations.Invalid;
@@ -162,7 +163,7 @@ namespace FluentMigrator.Tests.Integration
 		{
 			var connection = new SqlConnection(sqlServerConnectionString);
 			connection.Open();
-			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out));
+			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 			var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(InvalidMigration).Namespace, new TextWriterAnnouncer(System.Console.Out));
 
 			try

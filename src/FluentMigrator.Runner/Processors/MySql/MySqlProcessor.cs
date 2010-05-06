@@ -26,8 +26,8 @@ namespace FluentMigrator.Runner.Processors.MySql
 	{
 		public MySqlConnection Connection { get; set; }
 
-		public MySqlProcessor(MySqlConnection connection, IMigrationGenerator generator, IAnnouncer announcer)
-			: base(generator, announcer)
+		public MySqlProcessor(MySqlConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+			: base(generator, announcer, options)
 		{
 			Connection = connection;
 		}
@@ -105,6 +105,9 @@ namespace FluentMigrator.Runner.Processors.MySql
 		protected override void Process(string sql)
 		{
 			Announcer.Sql(sql);
+
+			if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
+				return;
 
 			if (Connection.State != ConnectionState.Open)
 				Connection.Open();

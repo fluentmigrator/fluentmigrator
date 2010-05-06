@@ -21,6 +21,7 @@ using System.Data.SqlClient;
 using System.Data.SQLite;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.Sqlite;
 using FluentMigrator.Runner.Processors.SqlServer;
@@ -45,21 +46,21 @@ namespace FluentMigrator.Tests.Integration
 		{
 			var connection = new SqlConnection(sqlServerConnectionString);
 			connection.Open();
-			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out));
+			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 			test(processor);
 		}
 
 		public void ExecuteWithSqlite(Action<IMigrationProcessor> test)
 		{
 			var connection = new SQLiteConnection(sqliteConnectionString);
-			var processor = new SqliteProcessor(connection, new SqliteGenerator(), new TextWriterAnnouncer(System.Console.Out));
+			var processor = new SqliteProcessor(connection, new SqliteGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 			test(processor);
 		}
 
 		private void ExecuteWithMySql(Action<IMigrationProcessor> test)
 		{
 			var connection = new MySqlConnection(mySqlConnectionString);
-			var processor = new MySqlProcessor(connection, new MySqlGenerator(), new TextWriterAnnouncer(System.Console.Out));
+			var processor = new MySqlProcessor(connection, new MySqlGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 			test(processor);
 		}
 	}

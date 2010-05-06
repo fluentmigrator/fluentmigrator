@@ -24,7 +24,6 @@ using System.Reflection;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
-using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.VersionTableInfo;
 
@@ -37,6 +36,7 @@ namespace FluentMigrator.Runner
 		private IMigrationLoader _migrationLoader;
 		private Assembly _migrationAssembly;
 		private string _namespace;
+		private readonly IAnnouncer _announcer;
 		private VersionInfo _versionInfo;
 		private MigrationRunner _migrationRunner;
 		private IMigration _versionMigration;
@@ -59,6 +59,7 @@ namespace FluentMigrator.Runner
 			_migrationAssembly = assembly;
 			_migrationLoader = loader;
 			_namespace = @namespace;
+			_announcer = announcer;
 			_migrationRunner = new MigrationRunner(conventions, processor, announcer, new StopWatch());
 			_versionTableMetaData = loader.GetVersionTableMetaData(assembly);
 			_versionMigration = new VersionMigration(_versionTableMetaData);
@@ -89,8 +90,10 @@ namespace FluentMigrator.Runner
 		{
 			if (!_migrationProcessor.TableExists(_versionTableMetaData.TableName))
 			{
-				var runner = new MigrationRunner(_migrationConventions, _migrationProcessor, new TextWriterAnnouncer(Console.Out), new StopWatch());
+				var runner = new MigrationRunner(_migrationConventions, _migrationProcessor, _announcer, new StopWatch());
 				runner.Up(_versionMigration);
+				_versionInfo = new VersionInfo();
+				return;
 			}
 
 			var dataSet = _migrationProcessor.ReadTableData(_versionTableMetaData.TableName);

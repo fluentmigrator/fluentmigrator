@@ -63,6 +63,7 @@ namespace FluentMigrator.MSBuild
 										Connection = Connection,
 										Target = Target,
 										LoggingEnabled = LoggingEnabled,
+										PreviewOnly = false,
 										Namespace = Namespace,
 										Task = Task,
 										Version = Version,

@@ -44,6 +44,9 @@ namespace FluentMigrator.Runner
 
 		public void Up(IMigration migration)
 		{
+			if (Processor.Options.PreviewOnly)
+				_announcer.Heading("PREVIEW ONLY MODE");
+
 			var name = migration.GetType().Name;
 			_announcer.Heading(name + ": migrating");
 
@@ -62,6 +65,9 @@ namespace FluentMigrator.Runner
 
 		public void Down(IMigration migration)
 		{
+			if (Processor.Options.PreviewOnly)
+				_announcer.Heading("PREVIEW ONLY MODE");
+
 			var name = migration.GetType().Name;
 			_announcer.Heading(name + ": reverting");
 

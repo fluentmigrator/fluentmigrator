@@ -24,15 +24,15 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 {
 	public class SqliteProcessorFactory : IMigrationProcessorFactory
 	{
-		public IMigrationProcessor Create(string connectionString, IAnnouncer announcer)
+		public IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
 		{
 			var connection = new SQLiteConnection(connectionString);
-			return new SqliteProcessor(connection, new SqliteGenerator(), announcer);
+			return new SqliteProcessor(connection, new SqliteGenerator(), announcer, options);
 		}
 
-		public IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer)
+		public IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
 		{
-			return new SqliteProcessor((SQLiteConnection)connection, new SqliteGenerator(), announcer);
+			return new SqliteProcessor((SQLiteConnection)connection, new SqliteGenerator(), announcer, options);
 		}
 	}
 }

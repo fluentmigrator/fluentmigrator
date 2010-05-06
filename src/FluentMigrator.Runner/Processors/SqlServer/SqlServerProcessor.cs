@@ -28,8 +28,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 		public virtual SqlConnection Connection { get; set; }
 		public SqlTransaction Transaction { get; private set; }
 
-		public SqlServerProcessor(SqlConnection connection, IMigrationGenerator generator, IAnnouncer announcer)
-			: base(generator, announcer)
+		public SqlServerProcessor(SqlConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+			: base(generator, announcer, options)
 		{
 			Connection = connection;
 			Transaction = Connection.BeginTransaction();
@@ -100,6 +100,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 		protected override void Process(string sql)
 		{
 			Announcer.Sql(sql);
+
+			if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
+				return;
 
 			if (Connection.State != ConnectionState.Open)
 				Connection.Open();

@@ -27,8 +27,8 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 	{
 		public SQLiteConnection Connection { get; set; }
 
-		public SqliteProcessor(SQLiteConnection connection, IMigrationGenerator generator, IAnnouncer announcer)
-			: base(generator, announcer)
+		public SqliteProcessor(SQLiteConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+			: base(generator, announcer, options)
 		{
 			Connection = connection;
 		}
@@ -81,6 +81,9 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 		protected override void Process(string sql)
 		{
 			Announcer.Sql(sql);
+
+			if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
+				return;
 
 			if (Connection.State != ConnectionState.Open)
 				Connection.Open();

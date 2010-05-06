@@ -9,8 +9,8 @@ namespace FluentMigrator.Runner.Processors.Oracle
 		public virtual OracleConnection Connection { get; set; }
 		public OracleTransaction Transaction { get; private set; }
 
-		public OracleProcessor(OracleConnection connection, IMigrationGenerator generator, IAnnouncer announcer)
-			: base(generator, announcer)
+		public OracleProcessor(OracleConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+			: base(generator, announcer, options)
 		{
 			Connection = connection;
 
@@ -78,6 +78,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
 		protected override void Process(string sql)
 		{
 			Announcer.Sql(sql);
+
+			if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
+				return;
 
 			if (Connection.State != ConnectionState.Open)
 				Connection.Open();

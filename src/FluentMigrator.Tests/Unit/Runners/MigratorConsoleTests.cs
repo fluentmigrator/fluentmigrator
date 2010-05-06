@@ -87,6 +87,27 @@ namespace FluentMigrator.Tests.Unit.Runners
 		}
 
 		[Test]
+		public void AnnouncerHasOutputEvenIfMarkedAsPreviewOnly()
+		{
+			var sb = new StringBuilder();
+			var stringWriter = new StringWriter(sb);
+			new MigratorConsole(
+				stringWriter,
+				"/db", database,
+				"/connection", connection,
+				"/preview",
+				"/verbose",
+				"/target", target,
+				"/namespace", "FluentMigrator.Tests.Integration.Migrations",
+				"/task", "migrate:up",
+				"/version", "1");
+
+			var output = sb.ToString();
+			Assert.AreNotEqual(0, output.Length);
+			Assert.That(output.Contains("PREVIEW ONLY MODE"));
+		}
+
+		[Test]
 		public void AnnouncerHasMoreOutputWhenVerbose()
 		{
 			var sbNonVerbose = new StringBuilder();

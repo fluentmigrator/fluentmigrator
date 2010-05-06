@@ -24,15 +24,15 @@ namespace FluentMigrator.Runner.Processors.MySql
 {
 	public class MySqlProcessorFactory : IMigrationProcessorFactory
 	{
-		public IMigrationProcessor Create(string connectionString, IAnnouncer announcer)
+		public IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
 		{
 			var connection = new MySqlConnection(connectionString);
-			return new MySqlProcessor(connection, new MySqlGenerator(), announcer);
+			return new MySqlProcessor(connection, new MySqlGenerator(), announcer, options);
 		}
 
-		public IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer)
+		public IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
 		{
-			return new MySqlProcessor((MySqlConnection)connection, new MySqlGenerator(), announcer);
+			return new MySqlProcessor((MySqlConnection)connection, new MySqlGenerator(), announcer, options);
 		}
 	}
 }

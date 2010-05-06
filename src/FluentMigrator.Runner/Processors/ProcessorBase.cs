@@ -25,11 +25,13 @@ namespace FluentMigrator.Runner.Processors
 	{
 		protected readonly IMigrationGenerator Generator;
 		protected readonly IAnnouncer Announcer;
+		public IMigrationProcessorOptions Options { get; private set; }
 
-		protected ProcessorBase(IMigrationGenerator generator, IAnnouncer announcer)
+		protected ProcessorBase(IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
 		{
 			Generator = generator;
 			Announcer = announcer;
+			Options = options;
 		}
 
 		public virtual void Process(CreateTableExpression expression)

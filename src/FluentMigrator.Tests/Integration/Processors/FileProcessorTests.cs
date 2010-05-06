@@ -47,7 +47,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 			_columnName = "sample_column_id";
 
 			_generator = new SqliteGenerator();
-			_fileDumpProcessor = new FileProcessor(_dumpFilename, _generator, new TextWriterAnnouncer(System.Console.Out));
+			_fileDumpProcessor = new FileProcessor(_dumpFilename, _generator, new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 		}
 
 		[Test]
@@ -101,8 +101,8 @@ namespace FluentMigrator.Tests.Integration.Processors
 
 	public class FileProcessor : ProcessorBase
 	{
-		public FileProcessor(string dumpFilename, IMigrationGenerator generator, IAnnouncer announcer)
-			: base(generator, announcer)
+		public FileProcessor(string dumpFilename, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+			: base(generator, announcer, options)
 		{
 			DumpFilename = string.Format("{0}.{1}.sql", dumpFilename, FormattedDateTime);
 			File.Delete(DumpFilename);

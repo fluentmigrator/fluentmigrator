@@ -150,6 +150,7 @@
     <Compile Include="Processors\Oracle\OracleProcessor.cs" />
     <Compile Include="Processors\Oracle\OracleProcessorFactory.cs" />
     <Compile Include="Processors\ProcessorFactory.cs" />
+    <Compile Include="Processors\ProcessorOptions.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2008ProcessorFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2005ProcessorFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2000ProcessorFactory.cs" />

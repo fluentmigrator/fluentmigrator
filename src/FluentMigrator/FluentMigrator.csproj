@@ -142,6 +142,7 @@
     <Compile Include="Expressions\ExecuteSqlStatementExpression.cs" />
     <Compile Include="Expressions\MigrationExpressionBase.cs" />
     <Compile Include="IMigrationConventions.cs" />
+    <Compile Include="IMigrationProcessorOptions.cs" />
     <Compile Include="Infrastructure\Extensions\ExtensionsForIEnumerable.cs" />
     <Compile Include="IQuerySchema.cs" />
     <Compile Include="VersionTableInfo\DefaultVersionTableMetaData.cs" />

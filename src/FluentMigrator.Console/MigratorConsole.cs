@@ -32,6 +32,7 @@ namespace FluentMigrator.Console
 		public string Connection;
 		public bool Log;
 		public bool Verbose;
+		public bool PreviewOnly;
 		public string Namespace;
 		public string Task;
 		public long Version;
@@ -80,6 +81,9 @@ namespace FluentMigrator.Console
 				if (args[i].Contains("/verbose"))
 					Verbose = true;
 
+				if (args[i].Contains("/preview"))
+					PreviewOnly = true;
+
 				if (args[i].Contains("/namespace"))
 					Namespace = args[i + 1];
 
@@ -123,6 +127,7 @@ namespace FluentMigrator.Console
 					Connection = Connection,
 					Target = TargetAssembly,
 					LoggingEnabled = Log,
+					PreviewOnly = PreviewOnly,
 					Namespace = Namespace,
 					Task = Task,
 					Version = Version,

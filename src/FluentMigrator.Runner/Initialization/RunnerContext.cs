@@ -1,4 +1,5 @@
 #region License
+
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -14,6 +15,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
 #endregion
 
 using FluentMigrator.Runner.Processors;
@@ -22,23 +24,26 @@ namespace FluentMigrator.Runner.Initialization
 {
 	public class RunnerContext : IRunnerContext
 	{
+		private IMigrationProcessor _processor;
+
 		public RunnerContext(IAnnouncer announcer)
 		{
 			Announcer = announcer;
 		}
 
+		#region IRunnerContext Members
+
 		public string Database { get; set; }
 		public string Connection { get; set; }
 		public string Target { get; set; }
 		public bool LoggingEnabled { get; set; }
+		public bool PreviewOnly { get; set; }
 		public string Namespace { get; set; }
 		public string Task { get; set; }
 		public long Version { get; set; }
 		public int Steps { get; set; }
 		public string WorkingDirectory { get; set; }
 		public IAnnouncer Announcer { get; private set; }
-
-		private IMigrationProcessor _processor;
 
 		public IMigrationProcessor Processor
 		{
@@ -47,11 +52,16 @@ namespace FluentMigrator.Runner.Initialization
 				if (_processor != null)
 					return _processor;
 
-				IMigrationProcessorFactory processorFactory = ProcessorFactory.GetFactory(Database);
-				_processor = processorFactory.Create(Connection, Announcer);
+				var processorFactory = ProcessorFactory.GetFactory(Database);
+				_processor = processorFactory.Create(Connection, Announcer, new ProcessorOptions
+																				{
+																					PreviewOnly = PreviewOnly
+																				});
 
 				return _processor;
 			}
 		}
+
+		#endregion
 	}
 }
