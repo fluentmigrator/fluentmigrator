@@ -19,6 +19,7 @@
 using System;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Tests.Integration.Migrations;
 using Moq;
 using NUnit.Framework;
@@ -36,8 +37,14 @@ namespace FluentMigrator.Tests.Unit
 		[SetUp]
 		public void SetUp()
 		{
-			_announcer = new Mock<IAnnouncer>();
+			var options = new ProcessorOptions
+							{
+								PreviewOnly = true
+							};
 			_processor = new Mock<IMigrationProcessor>();
+			_processor.SetupGet(x => x.Options).Returns(options);
+
+			_announcer = new Mock<IAnnouncer>();
 			_stopWatch = new Mock<IStopWatch>();
 			_runner = new MigrationRunner(new MigrationConventions(), _processor.Object, _announcer.Object, _stopWatch.Object);
 		}
