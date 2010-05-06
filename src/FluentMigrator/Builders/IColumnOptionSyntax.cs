@@ -16,7 +16,6 @@
 //
 #endregion
 
-using System;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders
@@ -32,5 +31,6 @@ namespace FluentMigrator.Builders
 		TNext Nullable();
 		TNext NotNullable();
 		TNext Unique();
+		TNext References(string foreignKeyName, string foreignTableName, params string[] foreignColumnNames);
 	}
 }

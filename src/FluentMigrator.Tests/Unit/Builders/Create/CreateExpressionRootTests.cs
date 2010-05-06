@@ -16,7 +16,6 @@
 //
 #endregion
 
-using System;
 using System.Collections.Generic;
 using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.Create.Column;

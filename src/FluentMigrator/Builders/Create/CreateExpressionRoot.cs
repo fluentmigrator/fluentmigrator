@@ -38,14 +38,14 @@ namespace FluentMigrator.Builders.Create
 		{
 			var expression = new CreateTableExpression { TableName = tableName };
 			_context.Expressions.Add(expression);
-			return new CreateTableExpressionBuilder(expression);
+			return new CreateTableExpressionBuilder(expression, _context);
 		}
 
 		public ICreateColumnOnTableSyntax Column(string columnName)
 		{
 			var expression = new CreateColumnExpression { Column = { Name = columnName } };
 			_context.Expressions.Add(expression);
-			return new CreateColumnExpressionBuilder(expression);
+			return new CreateColumnExpressionBuilder(expression, _context);
 		}
 
 		public ICreateForeignKeyFromTableSyntax ForeignKey()

@@ -16,9 +16,9 @@
 //
 #endregion
 
-using System;
 using System.Data;
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Create.Table
@@ -27,10 +27,12 @@ namespace FluentMigrator.Builders.Create.Table
 		ICreateTableColumnAsTypeSyntax, ICreateTableColumnOptionOrWithColumnSyntax
 	{
 		public ColumnDefinition CurrentColumn { get; set; }
+		private readonly IMigrationContext _context;
 
-		public CreateTableExpressionBuilder(CreateTableExpression expression)
+		public CreateTableExpressionBuilder(CreateTableExpression expression, IMigrationContext context)
 			: base(expression)
 		{
+			_context = context;
 		}
 
 		public ICreateTableColumnAsTypeSyntax WithColumn(string name)
@@ -190,7 +192,7 @@ namespace FluentMigrator.Builders.Create.Table
 		public ICreateTableColumnOptionOrWithColumnSyntax AsCustom(string customType)
 		{
 			CurrentColumn.Type = null;
-		    CurrentColumn.CustomType = customType;
+			CurrentColumn.CustomType = customType;
 			return this;
 		}
 
@@ -239,6 +241,26 @@ namespace FluentMigrator.Builders.Create.Table
 		public ICreateTableColumnOptionOrWithColumnSyntax Unique()
 		{
 			CurrentColumn.IsUnique = true;
+			return this;
+		}
+
+		public ICreateTableColumnOptionOrWithColumnSyntax References(string foreignKeyName, string foreignTableName, params string[] foreignColumnNames)
+		{
+			var fk = new CreateForeignKeyExpression
+						{
+							ForeignKey = new ForeignKeyDefinition
+											{
+												Name = foreignKeyName,
+												PrimaryTable = Expression.TableName,
+												ForeignTable = foreignTableName
+											}
+						};
+
+			fk.ForeignKey.PrimaryColumns.Add(CurrentColumn.Name);
+			foreach (var foreignColumnName in foreignColumnNames)
+				fk.ForeignKey.ForeignColumns.Add(foreignColumnName);
+
+			_context.Expressions.Add(fk);
 			return this;
 		}
 	}
