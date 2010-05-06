@@ -39,7 +39,7 @@ namespace FluentMigrator.Runner
 
 		public void Announce(string message)
 		{
-			_writer.Write("==  " + message + " ");
+			_writer.Write("-- " + message + " ");
 			for (int i = 0; i < 75 - (message.Length + 1); i++)
 			{
 				_writer.Write("=");
@@ -56,7 +56,7 @@ namespace FluentMigrator.Runner
 
 		public void SaySubItem(string message)
 		{
-			_writer.Write("   -> ");
+			_writer.Write("-- -> ");
 			_writer.Write(message);
 			_writer.Write(Environment.NewLine);
 		}

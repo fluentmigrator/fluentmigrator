@@ -49,7 +49,7 @@ namespace FluentMigrator.Tests.Unit
 		public void CanAnnounceAndPadWithEquals()
 		{
 			_announcer.Announce("Test");
-			Output.ShouldBe("==  Test ======================================================================" + Environment.NewLine);
+			Output.ShouldBe("-- Test ======================================================================" + Environment.NewLine);
 		}
 
 		[Test]
@@ -63,7 +63,7 @@ namespace FluentMigrator.Tests.Unit
 		public void CanSaySubItem()
 		{
 			_announcer.SaySubItem("0.0512s");
-			Output.ShouldBe("   -> 0.0512s" + Environment.NewLine);
+			Output.ShouldBe("-- -> 0.0512s" + Environment.NewLine);
 		}
 	}
 }
