@@ -16,6 +16,7 @@
 //
 #endregion
 
+using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
 using NAnt.Core;
 using NAnt.Core.Attributes;
@@ -54,7 +55,7 @@ namespace FluentMigrator.NAnt
 
 		protected override void ExecuteTask()
 		{
-			var runnerContext = new RunnerContext()
+			var runnerContext = new RunnerContext(new Announcer(System.Console.Out))
 									{
 										Database = Database,
 										Connection = Connection,

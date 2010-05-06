@@ -18,7 +18,7 @@
 
 using System;
 using System.IO;
-using FluentMigrator.Runner;
+using FluentMigrator.Runner.Announcers;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -64,6 +64,13 @@ namespace FluentMigrator.Tests.Unit
 		{
 			_announcer.SaySubItem("0.0512s");
 			Output.ShouldBe("-- -> 0.0512s" + Environment.NewLine);
+		}
+
+		[Test]
+		public void CanSaySql()
+		{
+			_announcer.SaySql("DELETE Blah");
+			Output.ShouldBe("DELETE Blah" + Environment.NewLine);
 		}
 	}
 }

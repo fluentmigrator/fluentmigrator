@@ -16,7 +16,6 @@
 //
 #endregion
 
-using System;
 using System.Data;
 using System.Data.SQLite;
 using FluentMigrator.Runner.Generators;
@@ -25,15 +24,15 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 {
 	public class SqliteProcessorFactory : IMigrationProcessorFactory
 	{
-		public IMigrationProcessor Create(string connectionString)
+		public IMigrationProcessor Create(string connectionString, IAnnouncer announcer)
 		{
 			var connection = new SQLiteConnection(connectionString);
-			return new SqliteProcessor(connection, new SqliteGenerator());
+			return new SqliteProcessor(connection, new SqliteGenerator(), announcer);
 		}
 
-		public IMigrationProcessor Create( IDbConnection connection )
+		public IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer)
 		{
-			return new SqliteProcessor((SQLiteConnection)connection, new SqliteGenerator());
+			return new SqliteProcessor((SQLiteConnection)connection, new SqliteGenerator(), announcer);
 		}
 	}
 }

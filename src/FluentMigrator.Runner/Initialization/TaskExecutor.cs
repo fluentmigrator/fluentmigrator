@@ -17,10 +17,7 @@
 #endregion
 
 using System;
-using System.IO;
-using System.Reflection;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
-using FluentMigrator.Runner.Processors;
 
 namespace FluentMigrator.Runner.Initialization
 {
@@ -43,9 +40,14 @@ namespace FluentMigrator.Runner.Initialization
 			if (!string.IsNullOrEmpty(RunnerContext.WorkingDirectory))
 				migrationConventions.GetWorkingDirectory = () => RunnerContext.WorkingDirectory;
 
-			Assembly assembly = AssemblyLoaderFactory.GetAssemblyLoader(RunnerContext.Target).Load();
+			var assembly = AssemblyLoaderFactory.GetAssemblyLoader(RunnerContext.Target).Load();
 
-			Runner = new MigrationVersionRunner(migrationConventions, RunnerContext.Processor, new MigrationLoader(migrationConventions), assembly, RunnerContext.Namespace);
+			Runner = new MigrationVersionRunner(migrationConventions,
+												RunnerContext.Processor,
+												new MigrationLoader(migrationConventions),
+												assembly,
+												RunnerContext.Namespace,
+												RunnerContext.Announcer);
 		}
 
 		public void Execute()

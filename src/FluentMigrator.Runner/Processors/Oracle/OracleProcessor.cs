@@ -9,9 +9,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
 		public virtual OracleConnection Connection { get; set; }
 		public OracleTransaction Transaction { get; private set; }
 
-		public OracleProcessor(OracleConnection connection, IMigrationGenerator generator)
+		public OracleProcessor(OracleConnection connection, IMigrationGenerator generator, IAnnouncer announcer)
+			: base(generator, announcer)
 		{
-			this.generator = generator;
 			Connection = connection;
 
 			//oracle does not support ddl transactions

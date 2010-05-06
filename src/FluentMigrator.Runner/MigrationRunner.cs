@@ -32,11 +32,6 @@ namespace FluentMigrator.Runner
 		public bool SilentlyFail { get; set; }
 		private IStopWatch _stopWatch;
 
-		public MigrationRunner(IMigrationConventions conventions, IMigrationProcessor processor)
-			: this(conventions, processor, new Announcer(Console.Out), new StopWatch())
-		{
-		}
-
 		public MigrationRunner(IMigrationConventions conventions, IMigrationProcessor processor, IAnnouncer announcer, IStopWatch stopWatch)
 		{
 			_announcer = announcer;
@@ -51,10 +46,10 @@ namespace FluentMigrator.Runner
 		{
 			var name = migration.GetType().Name;
 			_announcer.Announce(name + ": migrating");
-			
+
 			CaughtExceptions = new List<Exception>();
 
-			var context = new MigrationContext(Conventions,Processor);
+			var context = new MigrationContext(Conventions, Processor);
 
 			migration.GetUpExpressions(context);
 
@@ -63,7 +58,7 @@ namespace FluentMigrator.Runner
 			ExecuteExpressions(context.Expressions);
 
 			_stopWatch.Stop();
-			
+
 			var elapsed = _stopWatch.ElapsedTime().TotalSeconds;
 
 			_announcer.Announce(name + ": migrated (" + elapsed + "s" + ")");
@@ -73,10 +68,10 @@ namespace FluentMigrator.Runner
 		{
 			var name = migration.GetType().Name;
 			_announcer.Announce(name + ": reverting");
-			
+
 			CaughtExceptions = new List<Exception>();
 
-			var context = new MigrationContext(Conventions,Processor);
+			var context = new MigrationContext(Conventions, Processor);
 			migration.GetDownExpressions(context);
 
 			_stopWatch.Start();
@@ -100,7 +95,7 @@ namespace FluentMigrator.Runner
 			{
 				try
 				{
-					expression.ApplyConventions( Conventions );
+					expression.ApplyConventions(Conventions);
 					time(expression.ToString(), () => expression.ExecuteWith(Processor));
 				}
 				catch (Exception er)

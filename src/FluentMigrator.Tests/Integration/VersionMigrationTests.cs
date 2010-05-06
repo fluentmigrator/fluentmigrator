@@ -16,10 +16,8 @@
 //
 #endregion
 
-using System.Data.SqlClient;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Generators;
-using FluentMigrator.Runner.Processors.SqlServer;
+using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.VersionTableInfo;
 using NUnit.Framework;
@@ -35,7 +33,7 @@ namespace FluentMigrator.Tests.Integration
 		{
 			ExecuteWithSupportedProcessors(processor =>
 				{
-					var runner = new MigrationRunner(new MigrationConventions(), processor);
+					var runner = new MigrationRunner(new MigrationConventions(), processor, new Announcer(System.Console.Out), new StopWatch());
 
 					IVersionTableMetaData tableMetaData = new DefaultVersionTableMetaData();
 
@@ -49,7 +47,7 @@ namespace FluentMigrator.Tests.Integration
 					runner.Down(new VersionMigration(tableMetaData));
 					processor.TableExists(tableMetaData.TableName).ShouldBeFalse();
 				});
-			
+
 		}
 	}
 }

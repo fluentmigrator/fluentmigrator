@@ -128,7 +128,8 @@
     <Compile Include="..\..\SolutionInfo.cs">
       <Link>SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="Announcer.cs" />
+    <Compile Include="Announcers\Announcer.cs" />
+    <Compile Include="IAnnouncer.cs" />
     <Compile Include="Generators\MySqlGenerator.cs" />
     <Compile Include="Generators\GeneratorBase.cs" />
     <Compile Include="Generators\OracleGenerator.cs" />

@@ -27,9 +27,9 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 	{
 		public SQLiteConnection Connection { get; set; }
 
-		public SqliteProcessor(SQLiteConnection connection, IMigrationGenerator generator)
+		public SqliteProcessor(SQLiteConnection connection, IMigrationGenerator generator, IAnnouncer announcer)
+			: base(generator, announcer)
 		{
-			this.generator = generator;
 			Connection = connection;
 		}
 

@@ -1,4 +1,5 @@
 #region License
+
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -14,24 +15,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
 #endregion
 
 using System;
 
-namespace FluentMigrator.Console
+namespace FluentMigrator.Runner
 {
-	class Program
+	public interface IAnnouncer : IDisposable
 	{
-		static void Main(string[] args)
-		{
-			try
-			{
-				new MigratorConsole(args);
-			}
-			catch (ArgumentException ex)
-			{
-				System.Console.WriteLine(ex.Message);
-			}
-		}
+		void Announce(string message);
+		void Say(string message);
+		void SaySubItem(string message);
+		void SaySql(string sql);
 	}
 }

@@ -25,16 +25,16 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 {
 	public class SqlServer2005ProcessorFactory : IMigrationProcessorFactory
 	{
-		public IMigrationProcessor Create(string connectionString)
+		public IMigrationProcessor Create(string connectionString, IAnnouncer announcer)
 		{
 			var connection = new SqlConnection(connectionString);
 			connection.Open();
-			return new SqlServerProcessor(connection, new SqlServer2005Generator());
+			return new SqlServerProcessor(connection, new SqlServer2005Generator(), announcer);
 		}
 
-		public IMigrationProcessor Create(IDbConnection connection)
+		public IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer)
 		{
-			return new SqlServerProcessor((SqlConnection)connection, new SqlServer2005Generator());
+			return new SqlServerProcessor((SqlConnection)connection, new SqlServer2005Generator(), announcer);
 		}
 	}
 }

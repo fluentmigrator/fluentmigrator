@@ -19,13 +19,13 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlClient;
+using System.Linq;
 using System.Reflection;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Versioning;
-using System.Linq;
 using FluentMigrator.VersionTableInfo;
 
 namespace FluentMigrator.Runner
@@ -42,24 +42,24 @@ namespace FluentMigrator.Runner
 		private IMigration _versionMigration;
 		private IVersionTableMetaData _versionTableMetaData;
 
-		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader)
-			: this(conventions, processor, loader, Assembly.GetCallingAssembly(), null)
+		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader, IAnnouncer announcer)
+			: this(conventions, processor, loader, Assembly.GetCallingAssembly(), null, announcer)
 		{
 		}
 
-		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader, Type getAssemblyByType)
-			: this(conventions, processor, loader, getAssemblyByType.Assembly, null)
+		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader, Type getAssemblyByType, IAnnouncer announcer)
+			: this(conventions, processor, loader, getAssemblyByType.Assembly, null, announcer)
 		{
 		}
 
-		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader, Assembly assembly, string @namespace)
+		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader, Assembly assembly, string @namespace, IAnnouncer announcer)
 		{
 			_migrationConventions = conventions;
 			_migrationProcessor = processor;
 			_migrationAssembly = assembly;
 			_migrationLoader = loader;
 			_namespace = @namespace;
-			_migrationRunner = new MigrationRunner(conventions, processor);
+			_migrationRunner = new MigrationRunner(conventions, processor, announcer, new StopWatch());
 			_versionTableMetaData = loader.GetVersionTableMetaData(assembly);
 			_versionMigration = new VersionMigration(_versionTableMetaData);
 		}
@@ -89,7 +89,7 @@ namespace FluentMigrator.Runner
 		{
 			if (!_migrationProcessor.TableExists(_versionTableMetaData.TableName))
 			{
-				var runner = new MigrationRunner(_migrationConventions, _migrationProcessor);
+				var runner = new MigrationRunner(_migrationConventions, _migrationProcessor, new Announcer(Console.Out), new StopWatch());
 				runner.Up(_versionMigration);
 			}
 
@@ -218,7 +218,7 @@ namespace FluentMigrator.Runner
 				_migrationProcessor.CommitTransaction();
 				_versionInfo = null;
 			}
-			catch(Exception)
+			catch (Exception)
 			{
 				_migrationProcessor.RollbackTransaction();
 				throw;
@@ -233,7 +233,7 @@ namespace FluentMigrator.Runner
 
 		public void RemoveVersionTable()
 		{
-			var expression = new DeleteTableExpression { TableName = this._versionTableMetaData.TableName};
+			var expression = new DeleteTableExpression { TableName = this._versionTableMetaData.TableName };
 			expression.ExecuteWith(_migrationProcessor);
 		}
 	}

@@ -22,6 +22,11 @@ namespace FluentMigrator.Runner.Initialization
 {
 	public class RunnerContext : IRunnerContext
 	{
+		public RunnerContext(IAnnouncer announcer)
+		{
+			Announcer = announcer;
+		}
+
 		public string Database { get; set; }
 		public string Connection { get; set; }
 		public string Target { get; set; }
@@ -31,6 +36,7 @@ namespace FluentMigrator.Runner.Initialization
 		public long Version { get; set; }
 		public int Steps { get; set; }
 		public string WorkingDirectory { get; set; }
+		public IAnnouncer Announcer { get; private set; }
 
 		private IMigrationProcessor _processor;
 
@@ -42,7 +48,7 @@ namespace FluentMigrator.Runner.Initialization
 					return _processor;
 
 				IMigrationProcessorFactory processorFactory = ProcessorFactory.GetFactory(Database);
-				_processor = processorFactory.Create(Connection);
+				_processor = processorFactory.Create(Connection, Announcer);
 
 				return _processor;
 			}

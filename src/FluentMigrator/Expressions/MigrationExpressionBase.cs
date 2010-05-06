@@ -31,7 +31,7 @@ namespace FluentMigrator.Expressions
 			throw new NotSupportedException(String.Format("The {0} cannot be automatically reversed", GetType().Name));
 		}
 
-		public virtual void ApplyConventions( IMigrationConventions conventions )
+		public virtual void ApplyConventions(IMigrationConventions conventions)
 		{
 			// By default do nothing, if an expression convention supports this, they should override
 		}

@@ -22,7 +22,7 @@ namespace FluentMigrator.Runner.Processors
 {
 	public interface IMigrationProcessorFactory
 	{
-		IMigrationProcessor Create(string connectionString);
-		IMigrationProcessor Create(IDbConnection connection);
+		IMigrationProcessor Create(string connectionString, IAnnouncer announcer);
+		IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer);
 	}
 }

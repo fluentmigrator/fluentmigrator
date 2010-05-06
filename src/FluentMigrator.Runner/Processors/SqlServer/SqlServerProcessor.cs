@@ -28,9 +28,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 		public virtual SqlConnection Connection { get; set; }
 		public SqlTransaction Transaction { get; private set; }
 
-		public SqlServerProcessor(SqlConnection connection, IMigrationGenerator generator)
+		public SqlServerProcessor(SqlConnection connection, IMigrationGenerator generator, IAnnouncer announcer)
+			: base(generator, announcer)
 		{
-			this.generator = generator;
 			Connection = connection;
 			Transaction = Connection.BeginTransaction();
 		}
@@ -49,7 +49,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 		{
 			return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_CATALOG = DB_NAME() AND TABLE_NAME = '{0}' AND CONSTRAINT_NAME = '{1}'", tableName, constraintName);
 		}
-		
+
 		public override void Execute(string template, params object[] args)
 		{
 			Process(String.Format(template, args));

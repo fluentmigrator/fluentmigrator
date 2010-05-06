@@ -6,16 +6,16 @@ namespace FluentMigrator.Runner.Processors.Oracle
 {
 	public class OracleProcessorFactory : IMigrationProcessorFactory
 	{
-		public IMigrationProcessor Create(string connectionString)
+		public IMigrationProcessor Create(string connectionString, IAnnouncer announcer)
 		{
 			var connection = new OracleConnection(connectionString);
 			connection.Open();
-			return new OracleProcessor(connection, new OracleGenerator());
+			return new OracleProcessor(connection, new OracleGenerator(), announcer);
 		}
 
-		public IMigrationProcessor Create(IDbConnection connection)
+		public IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer)
 		{
-			return new OracleProcessor((OracleConnection)connection, new OracleGenerator());
+			return new OracleProcessor((OracleConnection)connection, new OracleGenerator(), announcer);
 		}
 	}
 }

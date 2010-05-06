@@ -17,9 +17,7 @@
 #endregion
 
 using System;
-using System.IO;
-using System.Reflection;
-using FluentMigrator.Runner;
+using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 
@@ -43,7 +41,6 @@ namespace FluentMigrator.Console
 			try
 			{
 				ParseArguments(args);
-				CreateProcessor();
 				ExecuteMigrations();
 			}
 			catch (Exception ex)
@@ -100,28 +97,26 @@ namespace FluentMigrator.Console
 				Task = "migrate";
 		}
 
-		private void CreateProcessor()
-		{
-			IMigrationProcessorFactory processorFactory = ProcessorFactory.GetFactory(ProcessorType);
-			Processor = processorFactory.Create(Connection);
-		}
-
 		private void ExecuteMigrations()
 		{
-			var migrationContext = new RunnerContext
+			using (var announcer = new Announcer(System.Console.Out))
 			{
-				Database = ProcessorType,
-				Connection = Connection,
-				Target = TargetAssembly,
-				LoggingEnabled = Log,
-				Namespace = Namespace,
-				Task = Task,
-				Version = Version,
-				Steps = Steps,
-				WorkingDirectory = WorkingDirectory
-			};
+				var migrationContext = new RunnerContext(announcer)
+				{
+					Database = ProcessorType,
+					Connection = Connection,
+					Target = TargetAssembly,
+					LoggingEnabled = Log,
+					Namespace = Namespace,
+					Task = Task,
+					Version = Version,
+					Steps = Steps,
+					WorkingDirectory = WorkingDirectory
+				};
+				Processor = migrationContext.Processor;
 
-			new TaskExecutor(migrationContext).Execute();
+				new TaskExecutor(migrationContext).Execute();
+			}
 		}
 	}
 }

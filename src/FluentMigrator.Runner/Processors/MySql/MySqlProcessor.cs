@@ -26,9 +26,9 @@ namespace FluentMigrator.Runner.Processors.MySql
 	{
 		public MySqlConnection Connection { get; set; }
 
-		public MySqlProcessor(MySqlConnection connection, IMigrationGenerator generator)
+		public MySqlProcessor(MySqlConnection connection, IMigrationGenerator generator, IAnnouncer announcer)
+			: base(generator, announcer)
 		{
-			this.generator = generator;
 			Connection = connection;
 		}
 

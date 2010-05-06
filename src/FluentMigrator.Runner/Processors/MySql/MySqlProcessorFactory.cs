@@ -16,11 +16,7 @@
 //
 #endregion
 
-using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
 using FluentMigrator.Runner.Generators;
 using MySql.Data.MySqlClient;
 
@@ -28,15 +24,15 @@ namespace FluentMigrator.Runner.Processors.MySql
 {
 	public class MySqlProcessorFactory : IMigrationProcessorFactory
 	{
-		public IMigrationProcessor Create(string connectionString)
+		public IMigrationProcessor Create(string connectionString, IAnnouncer announcer)
 		{
 			var connection = new MySqlConnection(connectionString);
-			return new MySqlProcessor(connection, new MySqlGenerator());
+			return new MySqlProcessor(connection, new MySqlGenerator(), announcer);
 		}
 
-		public IMigrationProcessor Create( IDbConnection connection )
+		public IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer)
 		{
-			return new MySqlProcessor((MySqlConnection)connection, new MySqlGenerator());
+			return new MySqlProcessor((MySqlConnection)connection, new MySqlGenerator(), announcer);
 		}
 	}
 }

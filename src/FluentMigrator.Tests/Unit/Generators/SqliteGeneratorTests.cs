@@ -110,7 +110,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		//public void CanRenameColumn()
 		//{
 		//	RenameColumnExpression expression = GetRenameColumnExpression();
-		//	string sql = generator.Generate(expression);
+		//	string sql = Generator.Generate(expression);
 		//	sql.ShouldBe(string.Format("UPDATE {0} SET {1}={2}", table, oldColumn, newColumn));
 		//}
 
