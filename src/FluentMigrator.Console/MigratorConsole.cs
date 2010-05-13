@@ -22,6 +22,7 @@ using System.Reflection;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
+using Mono.Options;
 
 namespace FluentMigrator.Console
 {
@@ -37,68 +38,73 @@ namespace FluentMigrator.Console
 		public int Steps;
 		private string TargetAssembly;
 		private string WorkingDirectory;
+        private bool ShowHelp = false;
 
-		public MigratorConsole(string[] args)
-		{
-			try
-			{
-				ParseArguments(args);
-				CreateProcessor();
-				ExecuteMigrations();
-			}
-			catch (Exception ex)
-			{
-				System.Console.WriteLine("!! An error has occurred.  The error is:");
-				System.Console.WriteLine(ex);
-				//set Exit code to failure
-				System.Environment.ExitCode = 1;
-			}
-		}
 
-		private void ParseArguments(string[] args)
-		{
-			for (int i = 0; i < args.Length; i++)
-			{
-				if (args[i].Contains("/db"))
-					ProcessorType = args[i + 1];
+        static void DisplayHelp(OptionSet p)
+        {
+            System.Console.WriteLine("Usage: FluentMigrator.Console [OPTIONS]");
+            System.Console.WriteLine("Options:");
+            p.WriteOptionDescriptions(System.Console.Out);
+        }
 
-				if (args[i].Contains("/connection"))
-					Connection = args[i + 1];
+        public MigratorConsole(string[] args)
+        {
+            try
+            {
+                var optionSet = new OptionSet()
+                                    {
+                                        {"db=",string.Format("Database Type is required \"/db=[db type]\". Where [db type] is one of {0}.", ProcessorFactory.ListAvailableProcessorTypes()) ,v => { ProcessorType = v; }},
+                                        {"connection=","Connection String is required \"/connection\"=[connection string]", v => { Connection = v; }},
+                                        {"target=", "Target Assembly is required \"/target=[assembly path]\" [path]" ,v => { TargetAssembly = v; }},
+                                        {"log", v => { Log = v != null; }},
+                                        {"namespace=", v => { Namespace = v; }},
+                                        {"task=", v => { Task = v; }},
+                                        {"version=", v => { Version = long.Parse(v); }},
+                                        {"steps=", v => { Steps = int.Parse(v); }},
+                                        {"workingdirectory=", v => { WorkingDirectory = v; }},
+                                        {"help", v => { ShowHelp = v != null; }}
+                                    };
 
-				if (args[i].Contains("/target"))
-					TargetAssembly = args[i + 1];
+                try
+                {
+                    optionSet.Parse(args);
+                }
+                catch (OptionException e)
+                {
+                    System.Console.WriteLine("FluentMigrator.Console: ");
+                    System.Console.WriteLine(e.Message);
+                    System.Console.WriteLine("Try 'FluentMigrator.Console --help' for more information.");
+                    return;
+                }
 
-				if (args[i].Contains("/log"))
-					Log = true;
+                if (string.IsNullOrEmpty(Task))
+                    Task = "migrate";
 
-				if (args[i].Contains("/namespace"))
-					Namespace = args[i + 1];
+                if (string.IsNullOrEmpty(ProcessorType) || 
+                    string.IsNullOrEmpty(Connection) || 
+                    string.IsNullOrEmpty(TargetAssembly))
+                {
+                    ShowHelp = true;
+                }
+                
+                if (ShowHelp)
+                {
+                    DisplayHelp(optionSet);
+                    return;
+                }
 
-				if (args[i].Contains("/task"))
-					Task = args[i + 1];
-
-				if (args[i].Contains("/version"))
-					Version = long.Parse(args[i + 1]);
-
-				if (args[i].Contains("/steps"))
-					Steps = int.Parse(args[i + 1]);
-
-				if (args[i].Contains("/workingdirectory"))
-					WorkingDirectory = args[i + 1];
-			}
-
-			if (string.IsNullOrEmpty(ProcessorType))
-				throw new ArgumentException(string.Format("Database Type is required \"/db [db type]\". Where [db type] is one of {0}.", ProcessorFactory.ListAvailableProcessorTypes()));
-
-			if (string.IsNullOrEmpty(Connection))
-				throw new ArgumentException("Connection String is required \"/connection\" [connection string]");
-
-			if (string.IsNullOrEmpty(TargetAssembly))
-				throw new ArgumentException("Target Assembly is required \"/target [assembly path]\" [path]");
-
-			if (string.IsNullOrEmpty(Task))
-				Task = "migrate";
-		}
+                CreateProcessor();
+                ExecuteMigrations();
+            }
+            catch (Exception ex)
+            {
+                System.Console.WriteLine("!! An error has occurred.  The error is:");
+                System.Console.WriteLine(ex);
+                //set Exit code to failure
+                System.Environment.ExitCode = 1;
+            }
+        }
 
 		private void CreateProcessor()
 		{
