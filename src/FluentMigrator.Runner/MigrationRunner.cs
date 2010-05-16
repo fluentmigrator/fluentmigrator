@@ -45,9 +45,6 @@ namespace FluentMigrator.Runner
 
 		public void Up(IMigration migration)
 		{
-			if (Processor.Options.PreviewOnly)
-				_announcer.Heading("PREVIEW ONLY MODE");
-
 			var name = migration.GetType().Name;
 			_announcer.Heading(name + ": migrating");
 
@@ -66,9 +63,6 @@ namespace FluentMigrator.Runner
 
 		public void Down(IMigration migration)
 		{
-			if (Processor.Options.PreviewOnly)
-				_announcer.Heading("PREVIEW ONLY MODE");
-
 			var name = migration.GetType().Name;
 			_announcer.Heading(name + ": reverting");
 
@@ -91,21 +85,22 @@ namespace FluentMigrator.Runner
 		/// <param name="expressions"></param>
 		protected void ExecuteExpressions(ICollection<IMigrationExpression> expressions)
 		{
-		    long insertTicks = 0;
-            int insertCount = 0;
+			long insertTicks = 0;
+			int insertCount = 0;
 			foreach (IMigrationExpression expression in expressions)
 			{
 				try
 				{
 					expression.ApplyConventions(Conventions);
-                    if (expression is InsertDataExpression) {
-                        insertTicks += time(() => expression.ExecuteWith(Processor));
-                        insertCount++;
-                    }
-                    else {
-                        Time(expression.ToString(), () => expression.ExecuteWith(Processor));
-                    }
-					
+					if (expression is InsertDataExpression)
+					{
+						insertTicks += Time(() => expression.ExecuteWith(Processor));
+						insertCount++;
+					}
+					else
+					{
+						AnnounceTime(expression.ToString(), () => expression.ExecuteWith(Processor));
+					}
 				}
 				catch (Exception er)
 				{
@@ -121,15 +116,16 @@ namespace FluentMigrator.Runner
 				}
 			}
 
-            if(insertCount > 0) {
-                var avg = new TimeSpan(insertTicks/insertCount);
-                var msg = string.Format("{0} Insert operations completed in {1} taking an average of {2}", insertCount, new TimeSpan(insertTicks), avg);
-                _announcer.Say(msg); 
-            }
-            
+			if (insertCount > 0)
+			{
+				var avg = new TimeSpan(insertTicks / insertCount);
+				var msg = string.Format("-> {0} Insert operations completed in {1} taking an average of {2}", insertCount, new TimeSpan(insertTicks), avg);
+				_announcer.Say(msg);
+			}
+
 		}
 
-		private void Time(string message, Action action)
+		private void AnnounceTime(string message, Action action)
 		{
 			_announcer.Say(message);
 
@@ -140,14 +136,15 @@ namespace FluentMigrator.Runner
 			_announcer.ElapsedTime(_stopWatch.ElapsedTime());
 		}
 
-        private long time(Action action) {
-            _stopWatch.Start();
+		private long Time(Action action)
+		{
+			_stopWatch.Start();
 
-            action();
+			action();
 
-            _stopWatch.Stop();
+			_stopWatch.Stop();
 
-            return _stopWatch.ElapsedTime().Ticks;
-        }
+			return _stopWatch.ElapsedTime().Ticks;
+		}
 	}
 }

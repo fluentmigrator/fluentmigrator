@@ -169,8 +169,15 @@ namespace FluentMigrator.Runner
 			}
 		}
 
+		private bool _alreadyOutputPreviewOnlyModeWarning;
 		public void MigrateUp(long version)
 		{
+			if (!_alreadyOutputPreviewOnlyModeWarning && _migrationProcessor.Options.PreviewOnly)
+			{
+				_announcer.Heading("PREVIEW-ONLY MODE");
+				_alreadyOutputPreviewOnlyModeWarning = true;
+			}
+
 			ApplyMigrationUp(version);
 			_versionInfo = null;
 		}
