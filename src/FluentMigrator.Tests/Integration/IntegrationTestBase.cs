@@ -31,35 +31,40 @@ namespace FluentMigrator.Tests.Integration
 {
 	public class IntegrationTestBase
 	{
-		protected string sqlServerConnectionString = @"server=(local)\SQLEXPRESS;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator";
-		protected string sqliteConnectionString = @"Data Source=:memory:;Version=3;New=True;";
-		protected string mySqlConnectionString = @"Database=FluentMigrator;Data Source=localhost;User Id=test;Password=test;";
-
 		public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test)
 		{
-			ExecuteWithSqlServer(test);
-			ExecuteWithSqlite(test);
-			ExecuteWithMySql(test);
+			ExecuteWithSqlServer(test, IntegrationTestOptions.SqlServer);
+			ExecuteWithSqlite(test, IntegrationTestOptions.SqlLite);
+			ExecuteWithMySql(test, IntegrationTestOptions.MySql);
 		}
 
-		public void ExecuteWithSqlServer(Action<IMigrationProcessor> test)
+		private static void ExecuteWithSqlServer(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
 		{
-			var connection = new SqlConnection(sqlServerConnectionString);
+			if (!serverOptions.IsEnabled)
+				return;
+
+			var connection = new SqlConnection(serverOptions.ConnectionString);
 			connection.Open();
 			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 			test(processor);
 		}
 
-		public void ExecuteWithSqlite(Action<IMigrationProcessor> test)
+		private static void ExecuteWithSqlite(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
 		{
-			var connection = new SQLiteConnection(sqliteConnectionString);
+			if (!serverOptions.IsEnabled)
+				return;
+
+			var connection = new SQLiteConnection(serverOptions.ConnectionString);
 			var processor = new SqliteProcessor(connection, new SqliteGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 			test(processor);
 		}
 
-		private void ExecuteWithMySql(Action<IMigrationProcessor> test)
+		private static void ExecuteWithMySql(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
 		{
-			var connection = new MySqlConnection(mySqlConnectionString);
+			if (!serverOptions.IsEnabled)
+				return;
+
+			var connection = new MySqlConnection(serverOptions.ConnectionString);
 			var processor = new MySqlProcessor(connection, new MySqlGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 			test(processor);
 		}

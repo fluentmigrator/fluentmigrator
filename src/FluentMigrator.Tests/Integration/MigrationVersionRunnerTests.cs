@@ -161,7 +161,7 @@ namespace FluentMigrator.Tests.Integration
 		[Test]
 		public void SqlServerMigrationsAreTransactional()
 		{
-			var connection = new SqlConnection(sqlServerConnectionString);
+			var connection = new SqlConnection(IntegrationTestOptions.SqlServer.ConnectionString);
 			connection.Open();
 			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 			var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(InvalidMigration).Namespace, new TextWriterAnnouncer(System.Console.Out));

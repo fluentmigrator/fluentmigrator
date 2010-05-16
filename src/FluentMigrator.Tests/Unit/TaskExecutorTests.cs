@@ -26,7 +26,7 @@ using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration
 {
-	[TestFixture,Ignore("Needs to be refactored from changes to TaskExecutor")]
+	[TestFixture, Ignore("Needs to be refactored from changes to TaskExecutor")]
 	public class TaskExecutorTests : IntegrationTestBase
 	{
 		private Mock<IMigrationVersionRunner> _migrationVersionRunner;
@@ -48,7 +48,7 @@ namespace FluentMigrator.Tests.Integration
 
 			var runnerContext = new Mock<IRunnerContext>();
 			runnerContext.SetupGet(x => x.Database).Returns("sqlserver");
-			runnerContext.SetupGet(x => x.Connection).Returns(sqlServerConnectionString);
+			runnerContext.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer.ConnectionString);
 			runnerContext.SetupGet(x => x.Task).Returns(task);
 			runnerContext.SetupGet(x => x.Version).Returns(version);
 			runnerContext.SetupGet(x => x.Steps).Returns(steps);
@@ -97,7 +97,7 @@ namespace FluentMigrator.Tests.Integration
 		[Test]
 		public void ShouldCallMigrateDownIfSpecified()
 		{
-			verify(x => x.MigrateDown(It.Is<long>(c => c == 20)), "migrate:down", 20, 0);			
+			verify(x => x.MigrateDown(It.Is<long>(c => c == 20)), "migrate:down", 20, 0);
 		}
 	}
 }
