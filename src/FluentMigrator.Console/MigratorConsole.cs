@@ -90,7 +90,9 @@ namespace FluentMigrator.Console
 					string.IsNullOrEmpty(Connection) ||
 					string.IsNullOrEmpty(TargetAssembly))
 				{
-					ShowHelp = true;
+					Environment.ExitCode = 1;
+					DisplayHelp(optionSet);
+					return;
 				}
 
 				if (ShowHelp)

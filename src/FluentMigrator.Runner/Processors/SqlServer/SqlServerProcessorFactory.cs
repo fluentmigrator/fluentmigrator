@@ -1,6 +1,4 @@
-﻿// Copyright (c) 2010, Nathan Brown
-// Copyright (c) 2010, Nathan Brown
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
 using FluentMigrator.Runner.Generators;
 
@@ -12,17 +10,17 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 		{
 			var connection = new SqlConnection(connectionString);
 			connection.Open();
-			return new SqlServerProcessor(connection, new SqlServer2000Generator(), announcer, options);
+			return new SqlServerProcessor(connection, new SqlServer2008Generator(), announcer, options);
 		}
 
 		public override IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
 		{
-			return new SqlServerProcessor((SqlConnection)connection, new SqlServer2000Generator(), announcer, options);
+			return new SqlServerProcessor((SqlConnection)connection, new SqlServer2008Generator(), announcer, options);
 		}
 
-        public override bool IsForProvider(string provider)
-        {
-	        return provider.ToLower().Contains("sqlclient");
-	    }
+		public override bool IsForProvider(string provider)
+		{
+			return provider.ToLower().Contains("sqlclient");
+		}
 	}
 }

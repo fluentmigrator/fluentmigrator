@@ -34,10 +34,24 @@ namespace FluentMigrator.Tests.Unit.Runners
 		}
 
 		[Test]
-		public void CanRetrieveSqlServerFactoryWithArgumentString()
+		public void CanRetrieveSqlServer2000FactoryWithArgumentString()
 		{
-			IMigrationProcessorFactory factory = ProcessorFactory.GetFactory("SqlServer");
-			Assert.IsTrue(factory.GetType() == typeof(SqlServerProcessorFactory));
+			IMigrationProcessorFactory factory = ProcessorFactory.GetFactory("SqlServer2000");
+			Assert.IsTrue(factory.GetType() == typeof(SqlServer2000ProcessorFactory));
+		}
+
+		[Test]
+		public void CanRetrieveSqlServer2005FactoryWithArgumentString()
+		{
+			IMigrationProcessorFactory factory = ProcessorFactory.GetFactory("SqlServer2005");
+			Assert.IsTrue(factory.GetType() == typeof(SqlServer2005ProcessorFactory));
+		}
+
+		[Test]
+		public void CanRetrieveSqlServer2008FactoryWithArgumentString()
+		{
+			IMigrationProcessorFactory factory = ProcessorFactory.GetFactory("SqlServer2008");
+			Assert.IsTrue(factory.GetType() == typeof(SqlServer2008ProcessorFactory));
 		}
 	}
 }
