@@ -108,6 +108,7 @@
       <HintPath>..\..\lib\Oracle.DataAccess.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -145,6 +146,7 @@
     <Compile Include="Initialization\RunnerContext.cs" />
     <Compile Include="Initialization\TaskExecutor.cs" />
     <Compile Include="MigrationVersionRunner.cs" />
+    <Compile Include="Processors\MigrationProcessorFactory.cs" />
     <Compile Include="Processors\MySql\MySqlProcessor.cs" />
     <Compile Include="Processors\MySql\MySqlProcessorFactory.cs" />
     <Compile Include="Processors\Oracle\OracleProcessor.cs" />

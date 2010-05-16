@@ -217,7 +217,7 @@ namespace FluentMigrator.Runner.Generators
 			string result = "";
 			foreach (string column in columns)
 			{
-				result += column + ",";
+				result += "[" + column + "],";
 			}
 			return result.TrimEnd(',');
 		}

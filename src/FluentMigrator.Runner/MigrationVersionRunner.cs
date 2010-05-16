@@ -230,8 +230,17 @@ namespace FluentMigrator.Runner
 
 		private void ApplyMigrationDown(long version)
 		{
-			_migrationRunner.Down(Migrations[version]);
-			_migrationProcessor.Execute("DELETE FROM {0} WHERE {1}='{2}'", this._versionTableMetaData.TableName, this._versionTableMetaData.ColumnName, version.ToString());
+		    try {
+		        _migrationRunner.Down(Migrations[version]);
+		        _migrationProcessor.Execute("DELETE FROM {0} WHERE {1}='{2}'", this._versionTableMetaData.TableName, this._versionTableMetaData.ColumnName, version.ToString());
+		    }
+            catch(KeyNotFoundException ex) {
+                string msg = string.Format("VersionInfo references version {0} but no Migrator was found attributed with that version.", version);
+                throw new Exception(msg, ex);
+            }
+		    catch (Exception ex) {
+		        throw new Exception("Error rolling back version " + version, ex);
+		    }
 		}
 
 		public void RemoveVersionTable()
