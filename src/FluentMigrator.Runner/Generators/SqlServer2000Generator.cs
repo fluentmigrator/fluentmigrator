@@ -98,7 +98,7 @@ namespace FluentMigrator.Runner.Generators
 		public override string Generate(DeleteColumnExpression expression)
 		{
 			// before we drop a column, we have to drop any default value constraints in SQL Server
-			string sql = @"
+			const string sql = @"
 			DECLARE @default sysname, @sql nvarchar(max);
 
 			-- get name of default constraint
@@ -126,10 +126,10 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(CreateForeignKeyExpression expression)
 		{
-			string primaryColumns = GetColumnList(expression.ForeignKey.PrimaryColumns);
-			string foreignColumns = GetColumnList(expression.ForeignKey.ForeignColumns);
+			var primaryColumns = GetColumnList(expression.ForeignKey.PrimaryColumns);
+			var foreignColumns = GetColumnList(expression.ForeignKey.ForeignColumns);
 
-			string sql = "ALTER TABLE [{0}] ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES [{3}] ({4})";
+			const string sql = "ALTER TABLE [{0}] ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES [{3}] ({4})";
 
 			return String.Format(sql,
 						  expression.ForeignKey.ForeignTable,
@@ -142,7 +142,7 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(DeleteForeignKeyExpression expression)
 		{
-			string sql = "ALTER TABLE [{0}] DROP CONSTRAINT {1}";
+			const string sql = "ALTER TABLE [{0}] DROP CONSTRAINT {1}";
 			return String.Format(sql, expression.ForeignKey.PrimaryTable, expression.ForeignKey.Name);
 		}
 
@@ -159,8 +159,8 @@ namespace FluentMigrator.Runner.Generators
 
 			result.Append(" INDEX {0} ON {1} (");
 
-			bool first = true;
-			foreach (IndexColumnDefinition column in expression.Index.Columns)
+			var first = true;
+			foreach (var column in expression.Index.Columns)
 			{
 				if (first)
 					first = false;
@@ -200,18 +200,18 @@ namespace FluentMigrator.Runner.Generators
 		public override string Generate(InsertDataExpression expression)
 		{
 			var result = new StringBuilder();
-			foreach (InsertionData row in expression.Rows)
+			foreach (var row in expression.Rows)
 			{
-				List<string> columnNames = new List<string>();
-				List<object> columnData = new List<object>();
+				var columnNames = new List<string>();
+				var columnData = new List<object>();
 				foreach (KeyValuePair<string, object> item in row)
 				{
 					columnNames.Add(item.Key);
 					columnData.Add(item.Value);
 				}
 
-				string columns = GetColumnList(columnNames);
-				string data = GetDataList(columnData);
+				var columns = GetColumnList(columnNames);
+				var data = GetDataList(columnData);
 				result.Append(FormatExpression("INSERT INTO [{0}] ({1}) VALUES ({2});", expression.TableName, columns, data));
 			}
 			return result.ToString();
@@ -224,8 +224,8 @@ namespace FluentMigrator.Runner.Generators
 
 		private string GetColumnList(IEnumerable<string> columns)
 		{
-			string result = "";
-			foreach (string column in columns)
+			var result = "";
+			foreach (var column in columns)
 			{
 				result += "[" + column + "],";
 			}
@@ -234,8 +234,8 @@ namespace FluentMigrator.Runner.Generators
 
 		private string GetDataList(List<object> data)
 		{
-			string result = "";
-			foreach (object column in data)
+			var result = "";
+			foreach (var column in data)
 			{
 				result += GetConstantValue(column) + ",";
 			}

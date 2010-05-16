@@ -27,7 +27,7 @@ namespace FluentMigrator.Builders.Create
 	public interface ICreateExpressionRoot : IFluentSyntax
 	{
 		void Schema(string schemaName);
-		ICreateTableWithColumnSyntax Table(string tableName);
+		ICreateTableWithColumnOrSchemaSyntax Table(string tableName);
 		ICreateColumnOnTableSyntax Column(string columnName);
 		ICreateForeignKeyFromTableSyntax ForeignKey();
 		ICreateForeignKeyFromTableSyntax ForeignKey(string foreignKeyName);

@@ -116,10 +116,13 @@
     </Compile>
     <Compile Include="Builders\Create\Index\ICreateIndexColumnOptionsSyntax.cs" />
     <Compile Include="Builders\Create\Index\ICreateIndexOptionsSyntax.cs" />
+    <Compile Include="Builders\Create\Table\ICreateTableWithColumnOrSchemaSyntax.cs" />
     <Compile Include="Builders\Delete\ForeignKey\IDeleteForeignKeyOnTableSyntax.cs" />
     <Compile Include="Builders\Delete\Index\DeleteIndexExpressionBuilder.cs" />
     <Compile Include="Builders\Delete\Index\IDeleteIndexForTableSyntax.cs" />
     <Compile Include="Builders\Delete\Index\IDeleteIndexOnColumnSyntax.cs" />
+    <Compile Include="Builders\Delete\Table\DeleteTableExpressionBuilder.cs" />
+    <Compile Include="Builders\Delete\Table\IDeleteTableFromSchemaSyntax.cs" />
     <Compile Include="Builders\Execute\ExecuteExpressionRoot.cs" />
     <Compile Include="Builders\Execute\IExecuteExpressionRoot.cs" />
     <Compile Include="Builders\Insert\IInsertDataSyntax.cs" />

@@ -40,7 +40,7 @@ namespace FluentMigrator.Builders.Create
 			_context.Expressions.Add(expression);
 		}
 
-		public ICreateTableWithColumnSyntax Table(string tableName)
+		public ICreateTableWithColumnOrSchemaSyntax Table(string tableName)
 		{
 			var expression = new CreateTableExpression { TableName = tableName };
 			_context.Expressions.Add(expression);

@@ -18,6 +18,7 @@
 
 using FluentMigrator.Builders.Delete.Column;
 using FluentMigrator.Builders.Delete.ForeignKey;
+using FluentMigrator.Builders.Delete.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 
@@ -38,10 +39,11 @@ namespace FluentMigrator.Builders.Delete
 			_context.Expressions.Add(expression);
 		}
 
-		public void Table(string tableName)
+		public IDeleteTableFromSchemaSyntax Table(string tableName)
 		{
 			var expression = new DeleteTableExpression { TableName = tableName };
 			_context.Expressions.Add(expression);
+			return new DeleteTableExpressionBuilder(expression);
 		}
 
 		public IDeleteColumnFromTableSyntax Column(string columnName)

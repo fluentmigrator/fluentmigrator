@@ -16,7 +16,6 @@
 //
 #endregion
 
-using System;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Create.Table

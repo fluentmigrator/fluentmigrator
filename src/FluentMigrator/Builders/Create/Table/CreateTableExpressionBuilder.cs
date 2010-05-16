@@ -24,7 +24,7 @@ using FluentMigrator.Model;
 namespace FluentMigrator.Builders.Create.Table
 {
 	public class CreateTableExpressionBuilder : ExpressionBuilderBase<CreateTableExpression>,
-		ICreateTableColumnAsTypeSyntax, ICreateTableColumnOptionOrWithColumnSyntax
+		ICreateTableWithColumnOrSchemaSyntax, ICreateTableColumnAsTypeSyntax, ICreateTableColumnOptionOrWithColumnSyntax
 	{
 		public ColumnDefinition CurrentColumn { get; set; }
 		private readonly IMigrationContext _context;
@@ -33,6 +33,12 @@ namespace FluentMigrator.Builders.Create.Table
 			: base(expression)
 		{
 			_context = context;
+		}
+
+		public ICreateTableWithColumnSyntax InSchema(string schemaName)
+		{
+			Expression.SchemaName = schemaName;
+			return this;
 		}
 
 		public ICreateTableColumnAsTypeSyntax WithColumn(string name)

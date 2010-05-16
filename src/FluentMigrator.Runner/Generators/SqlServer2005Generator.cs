@@ -17,6 +17,7 @@
 #endregion
 
 using System.Data;
+using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Generators
 {
@@ -31,14 +32,24 @@ namespace FluentMigrator.Runner.Generators
 			SetTypeMap(DbType.Binary, "VARBINARY(MAX)", ImageCapacity);
 		}
 
-		public override string Generate(Expressions.CreateSchemaExpression expression)
+		public override string Generate(CreateSchemaExpression expression)
 		{
 			return FormatExpression("CREATE SCHEMA [{0}]", expression.SchemaName);
 		}
 
-		public override string Generate(Expressions.DeleteSchemaExpression expression)
+		public override string Generate(DeleteSchemaExpression expression)
 		{
 			return FormatExpression("DROP SCHEMA [{0}]", expression.SchemaName);
+		}
+
+		public override string Generate(CreateTableExpression expression)
+		{
+			return FormatExpression("CREATE TABLE [{0}].[{1}] ({2})", expression.SchemaName ?? "dbo", expression.TableName, GetColumnDDL(expression));
+		}
+
+		public override string Generate(DeleteTableExpression expression)
+		{
+			return FormatExpression("DROP TABLE [{0}].[{1}]", expression.SchemaName ?? "dbo", expression.TableName);
 		}
 	}
 }
