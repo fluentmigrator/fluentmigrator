@@ -1,4 +1,5 @@
 ﻿// Copyright (c) 2010, Nathan Brown
+// Copyright (c) 2010, Nathan Brown
 using System.Data;
 using System.Data.SqlClient;
 using FluentMigrator.Runner.Generators;

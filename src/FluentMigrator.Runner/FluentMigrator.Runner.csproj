@@ -135,6 +135,7 @@
     <Compile Include="Generators\MySqlGenerator.cs" />
     <Compile Include="Generators\GeneratorBase.cs" />
     <Compile Include="Generators\OracleGenerator.cs" />
+    <Compile Include="Generators\SqlServer2000Generator.cs" />
     <Compile Include="Generators\SqlServer2005Generator.cs" />
     <Compile Include="Generators\SqlServer2008Generator.cs" />
     <Compile Include="IMigrationVersionRunner.cs" />

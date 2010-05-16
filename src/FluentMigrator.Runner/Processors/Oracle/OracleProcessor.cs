@@ -14,6 +14,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 		{
 			Connection = connection;
 
+
 			//oracle does not support ddl transactions
 			//this.Transaction = this.Connection.BeginTransaction();
 		}
