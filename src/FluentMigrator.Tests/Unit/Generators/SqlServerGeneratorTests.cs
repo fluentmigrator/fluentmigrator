@@ -203,7 +203,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.ForeignKey.ForeignColumns = new[] { "Column3", "Column4" };
 
 			string sql = generator.Generate(expression);
-			sql.ShouldBe("ALTER TABLE [TestForeignTable] ADD CONSTRAINT FK_Test FOREIGN KEY (Column3,Column4) REFERENCES [TestPrimaryTable] (Column1,Column2)");
+			sql.ShouldBe("ALTER TABLE [TestForeignTable] ADD CONSTRAINT FK_Test FOREIGN KEY ([Column3],[Column4]) REFERENCES [TestPrimaryTable] ([Column1],[Column2])");
 		}
 
 		[Test]
@@ -231,8 +231,8 @@ namespace FluentMigrator.Tests.Unit.Generators
 
 			string sql = generator.Generate(expression);
 
-			string expected = "INSERT INTO [TestTable] (Id,Name,Website) VALUES (1,'Justin','codethinked.com');";
-			expected += "INSERT INTO [TestTable] (Id,Name,Website) VALUES (2,'Nate','kohari.org');";
+			string expected = "INSERT INTO [TestTable] ([Id],[Name],[Website]) VALUES (1,'Justin','codethinked.com');";
+			expected += "INSERT INTO [TestTable] ([Id],[Name],[Website]) VALUES (2,'Nate','kohari.org');";
 
 			sql.ShouldBe(expected);
 		}
@@ -246,7 +246,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 
 			string sql = generator.Generate(expression);
 
-			string expected = String.Format("INSERT INTO [TestTable] (guid) VALUES ('{0}');", gid.ToString());
+			string expected = String.Format("INSERT INTO [TestTable] ([guid]) VALUES ('{0}');", gid.ToString());
 
 			sql.ShouldBe(expected);
 		}
