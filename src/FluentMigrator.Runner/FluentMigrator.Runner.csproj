@@ -164,7 +164,6 @@
     <Compile Include="MigrationRunner.cs" />
     <Compile Include="Generators\SqliteGenerator.cs" />
     <Compile Include="Processors\Sqlite\SqliteProcessorFactory.cs" />
-    <Compile Include="Generators\SqlServer2000Generator.cs" />
     <Compile Include="Processors\ProcessorBase.cs" />
     <Compile Include="Processors\Sqlite\SqliteProcessor.cs" />
     <Compile Include="Processors\SqlServer\SqlServerProcessor.cs" />

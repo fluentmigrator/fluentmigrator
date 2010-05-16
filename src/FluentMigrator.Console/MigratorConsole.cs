@@ -40,22 +40,22 @@ namespace FluentMigrator.Console
 		public int Steps;
 		private string TargetAssembly;
 		private string WorkingDirectory;
-        private bool ShowHelp = false;
+		private bool ShowHelp = false;
 
 
-        static void DisplayHelp(OptionSet p)
-        {
-            System.Console.WriteLine("Usage: FluentMigrator.Console [OPTIONS]");
-            System.Console.WriteLine("Options:");
-            p.WriteOptionDescriptions(System.Console.Out);
-        }
+		static void DisplayHelp(OptionSet p)
+		{
+			System.Console.WriteLine("Usage: FluentMigrator.Console [OPTIONS]");
+			System.Console.WriteLine("Options:");
+			p.WriteOptionDescriptions(System.Console.Out);
+		}
 
-	public MigratorConsole(TextWriter announcerOutput, params string[] args)
-        {
+		public MigratorConsole(TextWriter announcerOutput, params string[] args)
+		{
 			_announcerOutput = announcerOutput;
-            try
-            {
-                var optionSet = new OptionSet()
+			try
+			{
+				var optionSet = new OptionSet()
                                     {
                                         {"db=",string.Format("Database Type is required \"/db=[db type]\". Where [db type] is one of {0}.", ProcessorFactory.ListAvailableProcessorTypes()) ,v => { ProcessorType = v; }},
                                         {"connection=","Connection String is required \"/connection\"=[connection string]", v => { Connection = v; }},
@@ -71,45 +71,44 @@ namespace FluentMigrator.Console
                                         {"help", v => { ShowHelp = v != null; }}
                                     };
 
-                try
-                {
-                    optionSet.Parse(args);
-                }
-                catch (OptionException e)
-                {
-                    System.Console.WriteLine("FluentMigrator.Console: ");
-                    System.Console.WriteLine(e.Message);
-                    System.Console.WriteLine("Try 'FluentMigrator.Console --help' for more information.");
-                    return;
-                }
+				try
+				{
+					optionSet.Parse(args);
+				}
+				catch (OptionException e)
+				{
+					System.Console.WriteLine("FluentMigrator.Console: ");
+					System.Console.WriteLine(e.Message);
+					System.Console.WriteLine("Try 'FluentMigrator.Console --help' for more information.");
+					return;
+				}
 
-                if (string.IsNullOrEmpty(Task))
-                    Task = "migrate";
+				if (string.IsNullOrEmpty(Task))
+					Task = "migrate";
 
-                if (string.IsNullOrEmpty(ProcessorType) || 
-                    string.IsNullOrEmpty(Connection) || 
-                    string.IsNullOrEmpty(TargetAssembly))
-                {
-                    ShowHelp = true;
-                }
-                
-                if (ShowHelp)
-                {
-                    DisplayHelp(optionSet);
-                    return;
-                }
+				if (string.IsNullOrEmpty(ProcessorType) ||
+					string.IsNullOrEmpty(Connection) ||
+					string.IsNullOrEmpty(TargetAssembly))
+				{
+					ShowHelp = true;
+				}
 
-                CreateProcessor();
-                ExecuteMigrations();
-            }
-            catch (Exception ex)
-            {
-                System.Console.WriteLine("!! An error has occurred.  The error is:");
-                System.Console.WriteLine(ex);
-                //set Exit code to failure
-                System.Environment.ExitCode = 1;
-            }
-        }
+				if (ShowHelp)
+				{
+					DisplayHelp(optionSet);
+					return;
+				}
+
+				ExecuteMigrations();
+			}
+			catch (Exception ex)
+			{
+				System.Console.WriteLine("!! An error has occurred.  The error is:");
+				System.Console.WriteLine(ex);
+				//set Exit code to failure
+				Environment.ExitCode = 1;
+			}
+		}
 
 		public MigratorConsole(params string[] args)
 			: this(System.Console.Out, args)
