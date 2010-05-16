@@ -16,7 +16,6 @@
 //
 #endregion
 
-using System;
 using FluentMigrator.Builders.Rename.Column;
 using FluentMigrator.Builders.Rename.Table;
 using FluentMigrator.Expressions;
@@ -33,7 +32,7 @@ namespace FluentMigrator.Builders.Rename
 			_context = context;
 		}
 
-		public IRenameTableToSyntax Table(string oldName)
+		public IRenameTableToOrInSchemaSyntax Table(string oldName)
 		{
 			var expression = new RenameTableExpression { OldName = oldName };
 			_context.Expressions.Add(expression);

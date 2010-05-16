@@ -3,7 +3,7 @@
 namespace FluentMigrator.Builders.Delete.Table
 {
 	public class DeleteTableExpressionBuilder : ExpressionBuilderBase<DeleteTableExpression>,
-												IDeleteTableFromSchemaSyntax
+												IInSchemaSyntax
 	{
 		public DeleteTableExpressionBuilder(DeleteTableExpression expression)
 			: base(expression)

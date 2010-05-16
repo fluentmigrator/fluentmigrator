@@ -32,5 +32,6 @@ namespace FluentMigrator.Builders
 		TNext NotNullable();
 		TNext Unique();
 		TNext References(string foreignKeyName, string foreignTableName, params string[] foreignColumnNames);
+		TNext References(string foreignKeyName, string foreignTableSchema, string foreignTableName, params string[] foreignColumnNames);
 	}
 }

@@ -42,14 +42,13 @@ namespace FluentMigrator.Runner.Generators
 			return FormatExpression("DROP SCHEMA [{0}]", expression.SchemaName);
 		}
 
-		public override string Generate(CreateTableExpression expression)
+		protected override string FormatSchema(string schemaName, bool escapeSchemaName)
 		{
-			return FormatExpression("CREATE TABLE [{0}].[{1}] ({2})", expression.SchemaName ?? "dbo", expression.TableName, GetColumnDDL(expression));
-		}
-
-		public override string Generate(DeleteTableExpression expression)
-		{
-			return FormatExpression("DROP TABLE [{0}].[{1}]", expression.SchemaName ?? "dbo", expression.TableName);
+			return string.Format(
+				escapeSchemaName
+					? "[{0}]."
+					: "{0}.",
+				schemaName ?? "dbo");
 		}
 	}
 }

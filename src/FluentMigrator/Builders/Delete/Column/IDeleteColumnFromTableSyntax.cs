@@ -16,13 +16,12 @@
 //
 #endregion
 
-using System;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Delete.Column
 {
 	public interface IDeleteColumnFromTableSyntax : IFluentSyntax
 	{
-		void FromTable(string tableName);
+		IInSchemaSyntax FromTable(string tableName);
 	}
 }

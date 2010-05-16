@@ -16,12 +16,10 @@
 //
 #endregion
 
-using FluentMigrator.Infrastructure;
-
-namespace FluentMigrator.Builders.Create.ForeignKey
+namespace FluentMigrator.Builders.Create.Index
 {
-	public interface ICreateForeignKeyToTableSyntax : IFluentSyntax
+	public interface ICreateIndexOnColumnOrInSchemaSyntax : ICreateIndexOnColumnSyntax
 	{
-		ICreateForeignKeyPrimaryColumnOrInSchemaSyntax ToTable(string table);
+		ICreateIndexOnColumnSyntax InSchema(string schemaName);
 	}
 }

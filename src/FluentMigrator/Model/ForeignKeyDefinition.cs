@@ -26,7 +26,9 @@ namespace FluentMigrator.Model
 	{
 		public virtual string Name { get; set; }
 		public virtual string ForeignTable { get; set; }
+		public virtual string ForeignTableSchema { get; set; }
 		public virtual string PrimaryTable { get; set; }
+		public virtual string PrimaryTableSchema { get; set; }
 		public virtual ICollection<string> ForeignColumns { get; set; }
 		public virtual ICollection<string> PrimaryColumns { get; set; }
 
@@ -68,7 +70,9 @@ namespace FluentMigrator.Model
 			return new ForeignKeyDefinition
 			{
 				Name = Name,
+				ForeignTableSchema = ForeignTableSchema,
 				ForeignTable = ForeignTable,
+				PrimaryTableSchema = PrimaryTableSchema,
 				PrimaryTable = PrimaryTable,
 				ForeignColumns = new List<string>(ForeignColumns),
 				PrimaryColumns = new List<string>(PrimaryColumns)

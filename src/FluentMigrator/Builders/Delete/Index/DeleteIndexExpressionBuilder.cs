@@ -16,14 +16,14 @@
 //
 #endregion
 
-using System;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Delete.Index
 {
 	public class DeleteIndexExpressionBuilder : ExpressionBuilderBase<DeleteIndexExpression>,
-		IDeleteIndexForTableSyntax, IDeleteIndexOnColumnSyntax
+		IDeleteIndexForTableSyntax,
+		IDeleteIndexOnColumnOrInSchemaSyntax
 	{
 		public IndexColumnDefinition CurrentColumn { get; set; }
 
@@ -32,9 +32,15 @@ namespace FluentMigrator.Builders.Delete.Index
 		{
 		}
 
-		public IDeleteIndexOnColumnSyntax OnTable(string tableName)
+		public IDeleteIndexOnColumnOrInSchemaSyntax OnTable(string tableName)
 		{
 			Expression.Index.TableName = tableName;
+			return this;
+		}
+
+		public IDeleteIndexOnColumnSyntax InSchema(string schemaName)
+		{
+			Expression.Index.SchemaName = schemaName;
 			return this;
 		}
 

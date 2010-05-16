@@ -16,22 +16,27 @@
 //
 #endregion
 
-using System;
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Builders.Delete.Column
 {
 	public class DeleteColumnExpressionBuilder : ExpressionBuilderBase<DeleteColumnExpression>,
-		IDeleteColumnFromTableSyntax
+		IDeleteColumnFromTableSyntax, IInSchemaSyntax
 	{
 		public DeleteColumnExpressionBuilder(DeleteColumnExpression expression)
 			: base(expression)
 		{
 		}
 
-		public void FromTable(string tableName)
+		public IInSchemaSyntax FromTable(string tableName)
 		{
 			Expression.TableName = tableName;
+			return this;
+		}
+
+		public void InSchema(string schemaName)
+		{
+			Expression.SchemaName = schemaName;
 		}
 	}
 }

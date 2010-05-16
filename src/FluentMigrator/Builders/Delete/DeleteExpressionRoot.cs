@@ -39,7 +39,7 @@ namespace FluentMigrator.Builders.Delete
 			_context.Expressions.Add(expression);
 		}
 
-		public IDeleteTableFromSchemaSyntax Table(string tableName)
+		public IInSchemaSyntax Table(string tableName)
 		{
 			var expression = new DeleteTableExpression { TableName = tableName };
 			_context.Expressions.Add(expression);

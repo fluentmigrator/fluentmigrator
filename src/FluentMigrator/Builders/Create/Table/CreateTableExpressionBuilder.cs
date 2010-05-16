@@ -24,7 +24,9 @@ using FluentMigrator.Model;
 namespace FluentMigrator.Builders.Create.Table
 {
 	public class CreateTableExpressionBuilder : ExpressionBuilderBase<CreateTableExpression>,
-		ICreateTableWithColumnOrSchemaSyntax, ICreateTableColumnAsTypeSyntax, ICreateTableColumnOptionOrWithColumnSyntax
+		ICreateTableWithColumnOrSchemaSyntax,
+		ICreateTableColumnAsTypeSyntax,
+		ICreateTableColumnOptionOrWithColumnSyntax
 	{
 		public ColumnDefinition CurrentColumn { get; set; }
 		private readonly IMigrationContext _context;
@@ -252,13 +254,20 @@ namespace FluentMigrator.Builders.Create.Table
 
 		public ICreateTableColumnOptionOrWithColumnSyntax References(string foreignKeyName, string foreignTableName, params string[] foreignColumnNames)
 		{
+			return References(foreignKeyName, null, foreignTableName, foreignColumnNames);
+		}
+
+		public ICreateTableColumnOptionOrWithColumnSyntax References(string foreignKeyName, string foreignTableSchema, string foreignTableName, params string[] foreignColumnNames)
+		{
 			var fk = new CreateForeignKeyExpression
 						{
 							ForeignKey = new ForeignKeyDefinition
 											{
 												Name = foreignKeyName,
 												PrimaryTable = Expression.TableName,
-												ForeignTable = foreignTableName
+												PrimaryTableSchema = Expression.SchemaName,
+												ForeignTable = foreignTableName,
+												ForeignTableSchema = foreignTableSchema
 											}
 						};
 

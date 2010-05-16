@@ -1,4 +1,5 @@
 #region License
+
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -14,14 +15,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
 #endregion
 
-using FluentMigrator.Infrastructure;
-
-namespace FluentMigrator.Builders.Create.ForeignKey
+namespace FluentMigrator.Builders.Delete.Index
 {
-	public interface ICreateForeignKeyToTableSyntax : IFluentSyntax
+	public interface IDeleteIndexOnColumnOrInSchemaSyntax : IDeleteIndexOnColumnSyntax
 	{
-		ICreateForeignKeyPrimaryColumnOrInSchemaSyntax ToTable(string table);
+		IDeleteIndexOnColumnSyntax InSchema(string schemaName);
 	}
 }

@@ -21,7 +21,8 @@ using FluentMigrator.Expressions;
 namespace FluentMigrator.Builders.Rename.Column
 {
 	public class RenameColumnExpressionBuilder : ExpressionBuilderBase<RenameColumnExpression>,
-		IRenameColumnToSyntax, IRenameColumnTableSyntax
+		IRenameColumnToOrInSchemaSyntax,
+		IRenameColumnTableSyntax
 	{
 		public RenameColumnExpressionBuilder(RenameColumnExpression expression)
 			: base(expression)
@@ -33,9 +34,15 @@ namespace FluentMigrator.Builders.Rename.Column
 			Expression.NewName = name;
 		}
 
-		public IRenameColumnToSyntax OnTable(string tableName)
+		public IRenameColumnToOrInSchemaSyntax OnTable(string tableName)
 		{
 			Expression.TableName = tableName;
+			return this;
+		}
+
+		public IRenameColumnToSyntax InSchema(string schemaName)
+		{
+			Expression.SchemaName = schemaName;
 			return this;
 		}
 	}

@@ -20,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
-using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 
@@ -80,19 +79,53 @@ namespace FluentMigrator.Runner.Generators
 			throw new NotImplementedException();
 		}
 
-		public override string Generate(CreateTableExpression expression)
+		public override string Generate(RenameTableExpression expression)
 		{
-			return FormatExpression("CREATE TABLE [{0}] ({1})", expression.TableName, GetColumnDDL(expression));
+			return FormatExpression("sp_rename {0}[{1}], [{2}]", FormatSchema(expression.SchemaName), expression.OldName, expression.NewName);
 		}
 
-		public override string Generate(CreateColumnExpression expression)
+		public override string Generate(RenameColumnExpression expression)
 		{
-			return FormatExpression("ALTER TABLE [{0}] ADD {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
+			return FormatExpression("sp_rename '{0}[{1}].[{2}]', [{3}]", FormatSchema(expression.SchemaName, false), expression.TableName, expression.OldName, expression.NewName);
+		}
+
+		public override string Generate(CreateTableExpression expression)
+		{
+			return FormatExpression("CREATE TABLE {0}[{1}] ({2})", FormatSchema(expression.SchemaName), expression.TableName, GetColumnDDL(expression));
 		}
 
 		public override string Generate(DeleteTableExpression expression)
 		{
-			return FormatExpression("DROP TABLE [{0}]", expression.TableName);
+			return FormatExpression("DROP TABLE {0}[{1}]", FormatSchema(expression.SchemaName), expression.TableName);
+		}
+
+		public override string Generate(CreateForeignKeyExpression expression)
+		{
+			var primaryColumns = GetColumnList(expression.ForeignKey.PrimaryColumns);
+			var foreignColumns = GetColumnList(expression.ForeignKey.ForeignColumns);
+
+			const string sql = "ALTER TABLE {0}[{1}] ADD CONSTRAINT {2} FOREIGN KEY ({3}) REFERENCES [{4}].[{5}] ({6})";
+
+			return string.Format(sql,
+								 FormatSchema(expression.ForeignKey.ForeignTableSchema),
+								 expression.ForeignKey.ForeignTable,
+								 expression.ForeignKey.Name,
+								 foreignColumns,
+								 FormatSchema(expression.ForeignKey.PrimaryTableSchema),
+								 expression.ForeignKey.PrimaryTable,
+								 primaryColumns
+				);
+		}
+
+		public override string Generate(DeleteForeignKeyExpression expression)
+		{
+			const string sql = "ALTER TABLE {0}[{1}] DROP CONSTRAINT {2}";
+			return string.Format(sql, FormatSchema(expression.ForeignKey.PrimaryTableSchema), expression.ForeignKey.PrimaryTable, expression.ForeignKey.Name);
+		}
+
+		public override string Generate(CreateColumnExpression expression)
+		{
+			return FormatExpression("ALTER TABLE {0}[{1}] ADD {2}", FormatSchema(expression.SchemaName), expression.TableName, GenerateDDLForColumn(expression.Column));
 		}
 
 		public override string Generate(DeleteColumnExpression expression)
@@ -104,46 +137,23 @@ namespace FluentMigrator.Runner.Generators
 			-- get name of default constraint
 			SELECT @default = name
 			FROM sys.default_constraints 
-			WHERE parent_object_id = object_id('{0}')
+			WHERE parent_object_id = object_id('{1}{2}')
 			AND type = 'D'
 			AND parent_column_id = (
 				SELECT column_id 
 				FROM sys.columns 
-				WHERE object_id = object_id('{0}')
-				AND name = '{1}'
+				WHERE object_id = object_id('{1}{2}')
+				AND name = '{3}'
 			);
 
 			-- create alter table command as string and run it
-			SET @sql = N'ALTER TABLE [{0}] DROP CONSTRAINT ' + @default;
+			SET @sql = N'ALTER TABLE {0}[{2}] DROP CONSTRAINT ' + @default;
 			EXEC sp_executesql @sql;
 
 			-- now we can finally drop column
-			ALTER TABLE [{0}] DROP COLUMN [{1}];";
+			ALTER TABLE {0}[{2}] DROP COLUMN [{3}];";
 
-			return FormatExpression(sql, expression.TableName, expression.ColumnName);
-
-		}
-
-		public override string Generate(CreateForeignKeyExpression expression)
-		{
-			var primaryColumns = GetColumnList(expression.ForeignKey.PrimaryColumns);
-			var foreignColumns = GetColumnList(expression.ForeignKey.ForeignColumns);
-
-			const string sql = "ALTER TABLE [{0}] ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES [{3}] ({4})";
-
-			return String.Format(sql,
-						  expression.ForeignKey.ForeignTable,
-						  expression.ForeignKey.Name,
-						  foreignColumns,
-						  expression.ForeignKey.PrimaryTable,
-						  primaryColumns
-						  );
-		}
-
-		public override string Generate(DeleteForeignKeyExpression expression)
-		{
-			const string sql = "ALTER TABLE [{0}] DROP CONSTRAINT {1}";
-			return String.Format(sql, expression.ForeignKey.PrimaryTable, expression.ForeignKey.Name);
+			return FormatExpression(sql, FormatSchema(expression.SchemaName), FormatSchema(expression.SchemaName, false), expression.TableName, expression.ColumnName);
 		}
 
 		public override string Generate(CreateIndexExpression expression)
@@ -152,12 +162,9 @@ namespace FluentMigrator.Runner.Generators
 			if (expression.Index.IsUnique)
 				result.Append(" UNIQUE");
 
-			if (expression.Index.IsClustered)
-				result.Append(" CLUSTERED");
-			else
-				result.Append(" NONCLUSTERED");
+			result.Append(expression.Index.IsClustered ? " CLUSTERED" : " NONCLUSTERED");
 
-			result.Append(" INDEX {0} ON {1} (");
+			result.Append(" INDEX {0} ON {1}[{2}] (");
 
 			var first = true;
 			foreach (var column in expression.Index.Columns)
@@ -168,33 +175,16 @@ namespace FluentMigrator.Runner.Generators
 					result.Append(",");
 
 				result.Append(column.Name);
-				if (column.Direction == Direction.Ascending)
-				{
-					result.Append(" ASC");
-				}
-				else
-				{
-					result.Append(" DESC");
-				}
+				result.Append(column.Direction == Direction.Ascending ? " ASC" : " DESC");
 			}
 			result.Append(")");
 
-			return FormatExpression(result.ToString(), expression.Index.Name, expression.Index.TableName);
+			return FormatExpression(result.ToString(), expression.Index.Name, FormatSchema(expression.Index.SchemaName), expression.Index.TableName);
 		}
 
 		public override string Generate(DeleteIndexExpression expression)
 		{
-			throw new NotImplementedException();
-		}
-
-		public override string Generate(RenameTableExpression expression)
-		{
-			return FormatExpression("sp_rename [{0}], [{1}]", expression.OldName, expression.NewName);
-		}
-
-		public override string Generate(RenameColumnExpression expression)
-		{
-			return FormatExpression("sp_rename '[{0}].[{1}]', [{2}]", expression.TableName, expression.OldName, expression.NewName);
+			return FormatExpression("DROP INDEX {0}[{1}] ON [{2}]", FormatSchema(expression.Index.SchemaName), expression.Index.Name, expression.Index.TableName);
 		}
 
 		public override string Generate(InsertDataExpression expression)
@@ -204,7 +194,7 @@ namespace FluentMigrator.Runner.Generators
 			{
 				var columnNames = new List<string>();
 				var columnData = new List<object>();
-				foreach (KeyValuePair<string, object> item in row)
+				foreach (var item in row)
 				{
 					columnNames.Add(item.Key);
 					columnData.Add(item.Value);
@@ -212,17 +202,28 @@ namespace FluentMigrator.Runner.Generators
 
 				var columns = GetColumnList(columnNames);
 				var data = GetDataList(columnData);
-				result.Append(FormatExpression("INSERT INTO [{0}] ({1}) VALUES ({2});", expression.TableName, columns, data));
+				result.Append(FormatExpression("INSERT INTO {0}[{1}] ({2}) VALUES ({3});", FormatSchema(expression.SchemaName), expression.TableName, columns, data));
 			}
 			return result.ToString();
 		}
 
-		public string FormatExpression(string template, params object[] args)
+		protected string FormatSchema(string schemaName)
 		{
-			return String.Format(template, args);
+			return FormatSchema(schemaName, true);
 		}
 
-		private string GetColumnList(IEnumerable<string> columns)
+		protected virtual string FormatSchema(string schemaName, bool escapeSchemaName)
+		{
+			// schemas were not supported until SQL Server 2005
+			return string.Empty;
+		}
+
+		protected new string FormatExpression(string template, params object[] args)
+		{
+			return string.Format(template, args);
+		}
+
+		protected string GetColumnList(IEnumerable<string> columns)
 		{
 			var result = "";
 			foreach (var column in columns)
@@ -232,7 +233,7 @@ namespace FluentMigrator.Runner.Generators
 			return result.TrimEnd(',');
 		}
 
-		private string GetDataList(List<object> data)
+		protected string GetDataList(List<object> data)
 		{
 			var result = "";
 			foreach (var column in data)

@@ -24,6 +24,7 @@ namespace FluentMigrator.Expressions
 {
 	public class RenameColumnExpression : MigrationExpressionBase
 	{
+		public virtual string SchemaName { get; set; }
 		public virtual string TableName { get; set; }
 		public virtual string OldName { get; set; }
 		public virtual string NewName { get; set; }
@@ -44,7 +45,7 @@ namespace FluentMigrator.Expressions
 
 		public override IMigrationExpression Reverse()
 		{
-			return new RenameColumnExpression { TableName = TableName, OldName = NewName, NewName = OldName };
+			return new RenameColumnExpression { SchemaName = SchemaName, TableName = TableName, OldName = NewName, NewName = OldName };
 		}
 
 		public override string ToString()

@@ -16,10 +16,9 @@
 //
 #endregion
 
-using System;
 using System.Collections.Generic;
-using FluentMigrator.Model;
 using System.Linq;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
@@ -32,10 +31,10 @@ namespace FluentMigrator.Expressions
 			Index = new IndexDefinition();
 		}
 
-      public override void ApplyConventions(IMigrationConventions conventions)
-      {
-         Index.ApplyConventions(conventions);
-      }
+		public override void ApplyConventions(IMigrationConventions conventions)
+		{
+			Index.ApplyConventions(conventions);
+		}
 
 		public override void CollectValidationErrors(ICollection<string> errors)
 		{

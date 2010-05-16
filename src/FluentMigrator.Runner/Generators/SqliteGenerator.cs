@@ -159,7 +159,7 @@ namespace FluentMigrator.Runner.Generators
 		public override string Generate(InsertDataExpression expression)
 		{
 			var result = new StringBuilder();
-			foreach (InsertionData row in expression.Rows)
+			foreach (InsertionDataDefinition row in expression.Rows)
 			{
 				List<string> columnNames = new List<string>();
 				List<object> columnData = new List<object>();

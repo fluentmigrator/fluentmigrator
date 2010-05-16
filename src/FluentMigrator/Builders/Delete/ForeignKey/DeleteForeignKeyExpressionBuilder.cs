@@ -21,16 +21,27 @@ using FluentMigrator.Expressions;
 namespace FluentMigrator.Builders.Delete.ForeignKey
 {
 	public class DeleteForeignKeyExpressionBuilder : ExpressionBuilderBase<DeleteForeignKeyExpression>,
-		IDeleteForeignKeyFromTableSyntax, IDeleteForeignKeyForeignColumnSyntax, IDeleteForeignKeyToTableSyntax, IDeleteForeignKeyPrimaryColumnSyntax, IDeleteForeignKeyOnTableSyntax
+		IDeleteForeignKeyFromTableSyntax,
+		IDeleteForeignKeyForeignColumnOrInSchemaSyntax,
+		IDeleteForeignKeyToTableSyntax,
+		IDeleteForeignKeyPrimaryColumnSyntax,
+		IDeleteForeignKeyOnTableSyntax,
+		IInSchemaSyntax
 	{
 		public DeleteForeignKeyExpressionBuilder(DeleteForeignKeyExpression expression)
 			: base(expression)
 		{
 		}
 
-		public IDeleteForeignKeyForeignColumnSyntax FromTable(string table)
+		public IDeleteForeignKeyForeignColumnOrInSchemaSyntax FromTable(string foreignTableName)
 		{
-			Expression.ForeignKey.ForeignTable = table;
+			Expression.ForeignKey.ForeignTable = foreignTableName;
+			return this;
+		}
+
+		public IDeleteForeignKeyForeignColumnSyntax InSchema(string foreignSchemaName)
+		{
+			Expression.ForeignKey.ForeignTableSchema = foreignSchemaName;
 			return this;
 		}
 
@@ -42,16 +53,16 @@ namespace FluentMigrator.Builders.Delete.ForeignKey
 
 		public IDeleteForeignKeyToTableSyntax ForeignColumns(params string[] columns)
 		{
-			foreach (string column in columns)
+			foreach (var column in columns)
 				Expression.ForeignKey.ForeignColumns.Add(column);
 
 			return this;
 		}
 
-		public void ToTable(string table)
+		public IInSchemaSyntax ToTable(string table)
 		{
 			Expression.ForeignKey.PrimaryTable = table;
-			//return this;
+			return this;
 		}
 
 		public void PrimaryColumn(string column)
@@ -61,13 +72,19 @@ namespace FluentMigrator.Builders.Delete.ForeignKey
 
 		public void PrimaryColumns(params string[] columns)
 		{
-			foreach (string column in columns)
+			foreach (var column in columns)
 				Expression.ForeignKey.PrimaryColumns.Add(column);
 		}
 
-		public void OnTable(string table)
+		IInSchemaSyntax IDeleteForeignKeyOnTableSyntax.OnTable(string primaryTableName)
 		{
-			Expression.ForeignKey.PrimaryTable = table;
+			Expression.ForeignKey.PrimaryTable = primaryTableName;
+			return this;
+		}
+
+		void IInSchemaSyntax.InSchema(string schemaName)
+		{
+			Expression.ForeignKey.PrimaryTableSchema = schemaName;
 		}
 	}
 }

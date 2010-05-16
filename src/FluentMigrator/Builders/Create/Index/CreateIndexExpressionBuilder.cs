@@ -22,16 +22,19 @@ using FluentMigrator.Model;
 namespace FluentMigrator.Builders.Create.Index
 {
 	public class CreateIndexExpressionBuilder : ExpressionBuilderBase<CreateIndexExpression>,
-		ICreateIndexForTableSyntax, ICreateIndexOnColumnSyntax, ICreateIndexColumnOptionsSyntax, ICreateIndexOptionsSyntax
+		ICreateIndexForTableSyntax,
+		ICreateIndexOnColumnOrInSchemaSyntax,
+		ICreateIndexColumnOptionsSyntax,
+		ICreateIndexOptionsSyntax
 	{
 		public IndexColumnDefinition CurrentColumn { get; set; }
-		
+
 		public CreateIndexExpressionBuilder(CreateIndexExpression expression)
 			: base(expression)
 		{
 		}
 
-		public ICreateIndexOnColumnSyntax OnTable(string tableName)
+		public ICreateIndexOnColumnOrInSchemaSyntax OnTable(string tableName)
 		{
 			Expression.Index.TableName = tableName;
 			return this;
@@ -46,6 +49,12 @@ namespace FluentMigrator.Builders.Create.Index
 
 		public ICreateIndexOptionsSyntax WithOptions()
 		{
+			return this;
+		}
+
+		public ICreateIndexOnColumnSyntax InSchema(string schemaName)
+		{
+			Expression.Index.SchemaName = schemaName;
 			return this;
 		}
 

@@ -21,9 +21,9 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Reflection;
-using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.VersionTableInfo;
 
@@ -199,9 +199,9 @@ namespace FluentMigrator.Runner
 			dataExpression.ExecuteWith(_migrationProcessor);
 		}
 
-		protected virtual InsertionData CreateVersionInfoInsertionData(long version)
+		protected virtual InsertionDataDefinition CreateVersionInfoInsertionData(long version)
 		{
-			return new InsertionData { new KeyValuePair<string, object>(this._versionTableMetaData.ColumnName, version) };
+			return new InsertionDataDefinition { new KeyValuePair<string, object>(this._versionTableMetaData.ColumnName, version) };
 		}
 
 		public void Rollback(int steps)

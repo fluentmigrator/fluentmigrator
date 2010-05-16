@@ -24,6 +24,7 @@ namespace FluentMigrator.Expressions
 {
 	public class DeleteColumnExpression : MigrationExpressionBase
 	{
+		public virtual string SchemaName { get; set; }
 		public virtual string TableName { get; set; }
 		public virtual string ColumnName { get; set; }
 

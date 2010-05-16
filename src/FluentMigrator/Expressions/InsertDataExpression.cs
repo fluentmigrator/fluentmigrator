@@ -16,24 +16,24 @@
 //
 #endregion
 
-using System;
 using System.Collections.Generic;
-using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 
-namespace FluentMigrator.Builders.Insert
+namespace FluentMigrator.Expressions
 {
 	public class InsertDataExpression : IMigrationExpression
 	{
-		private List<InsertionData> rows = new List<InsertionData>();
+		private readonly List<InsertionDataDefinition> _rows = new List<InsertionDataDefinition>();
+		public string SchemaName { get; set; }
 		public string TableName { get; set; }
 
-		public List<InsertionData> Rows
+		public List<InsertionDataDefinition> Rows
 		{
-			get { return rows; }
+			get { return _rows; }
 		}
 
 		public void CollectValidationErrors(ICollection<string> errors)
-		{			
+		{
 		}
 
 		public void ExecuteWith(IMigrationProcessor processor)
@@ -46,8 +46,8 @@ namespace FluentMigrator.Builders.Insert
 			return null;
 		}
 
-	   public void ApplyConventions( IMigrationConventions conventions )
-	   {
-	   }
+		public void ApplyConventions(IMigrationConventions conventions)
+		{
+		}
 	}
 }

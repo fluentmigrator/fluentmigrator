@@ -18,7 +18,6 @@
 
 using FluentMigrator.Builders.Delete.Column;
 using FluentMigrator.Builders.Delete.ForeignKey;
-using FluentMigrator.Builders.Delete.Table;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Delete
@@ -26,7 +25,7 @@ namespace FluentMigrator.Builders.Delete
 	public interface IDeleteExpressionRoot : IFluentSyntax
 	{
 		void Schema(string schemaName);
-		IDeleteTableFromSchemaSyntax Table(string tableName);
+		IInSchemaSyntax Table(string tableName);
 		IDeleteColumnFromTableSyntax Column(string columnName);
 		IDeleteForeignKeyFromTableSyntax ForeignKey();
 		IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName);
