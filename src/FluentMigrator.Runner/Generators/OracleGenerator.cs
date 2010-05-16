@@ -4,7 +4,6 @@ using System.Data;
 using System.Text;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
-using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Generators
@@ -62,20 +61,24 @@ namespace FluentMigrator.Runner.Generators
 			sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
 
 			//Oracle requires Default before Not null
-			if (column.DefaultValue != null) {
+			if (column.DefaultValue != null)
+			{
 				sb.Append(" DEFAULT ");
 				sb.Append(GetConstantValue(column.DefaultValue));
 			}
 
-			if (!column.IsNullable) {
+			if (!column.IsNullable)
+			{
 				sb.Append(" NOT NULL");
 			}
 
-			if (column.IsIdentity) {
+			if (column.IsIdentity)
+			{
 				//todo: would like to throw a warning here
 			}
 
-			if (column.IsPrimaryKey) {
+			if (column.IsPrimaryKey)
+			{
 				sb.Append(" PRIMARY KEY");
 			}
 
@@ -94,6 +97,16 @@ namespace FluentMigrator.Runner.Generators
 		protected override string GetPrimaryKeyConstraintName(IList<ColumnDefinition> primaryKeyColumns, string tableName)
 		{
 			return string.Empty;
+		}
+
+		public override string Generate(CreateSchemaExpression expression)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override string Generate(DeleteSchemaExpression expression)
+		{
+			throw new NotImplementedException();
 		}
 
 		public override string Generate(CreateTableExpression expression)

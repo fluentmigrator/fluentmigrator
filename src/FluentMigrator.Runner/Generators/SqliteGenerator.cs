@@ -20,8 +20,8 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using FluentMigrator.Builders.Insert;
 using System.Text;
+using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 
@@ -118,6 +118,16 @@ namespace FluentMigrator.Runner.Generators
 			sb.Replace(" IDENTITY PRIMARY KEY", " PRIMARY KEY AUTOINCREMENT");
 
 			return sb.ToString();
+		}
+
+		public override string Generate(CreateSchemaExpression expression)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override string Generate(DeleteSchemaExpression expression)
+		{
+			throw new NotImplementedException();
 		}
 
 		public override string Generate(CreateTableExpression expression)

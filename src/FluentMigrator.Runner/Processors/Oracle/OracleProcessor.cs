@@ -19,6 +19,11 @@ namespace FluentMigrator.Runner.Processors.Oracle
 			//this.Transaction = this.Connection.BeginTransaction();
 		}
 
+		public override bool SchemaExists(string schemaName)
+		{
+			throw new NotImplementedException();
+		}
+
 		public override bool TableExists(string tableName)
 		{
 			return Exists("SELECT TABLE_NAME FROM USER_TABLES WHERE LOWER(TABLE_NAME)='{0}'", tableName.ToLower());

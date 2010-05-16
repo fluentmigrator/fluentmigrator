@@ -84,6 +84,8 @@ namespace FluentMigrator.Runner.Generators
 				_templates.Add(type, new SortedList<int, string>());
 		}
 
+		public abstract string Generate(CreateSchemaExpression expression);
+		public abstract string Generate(DeleteSchemaExpression expression);
 		public abstract string Generate(CreateTableExpression expression);
 		public abstract string Generate(CreateColumnExpression expression);
 		public abstract string Generate(DeleteTableExpression expression);
@@ -94,12 +96,12 @@ namespace FluentMigrator.Runner.Generators
 		public abstract string Generate(DeleteIndexExpression expression);
 		public abstract string Generate(RenameTableExpression expression);
 		public abstract string Generate(RenameColumnExpression expression);
-		public abstract string Generate(InsertDataExpression expression);		
+		public abstract string Generate(InsertDataExpression expression);
 
 		public virtual string GenerateDDLForColumn(ColumnDefinition column)
 		{
 			var sb = new StringBuilder();
-			
+
 			sb.Append(column.Name);
 			sb.Append(" ");
 
@@ -188,7 +190,7 @@ namespace FluentMigrator.Runner.Generators
 					keyColumns += column.Name + ",";
 				}
 				keyColumns = keyColumns.TrimEnd(',');
-				result += String.Format(", {0} PRIMARY KEY ({1})", GetPrimaryKeyConstraintName(primaryKeyColumns,tableName), keyColumns);
+				result += String.Format(", {0} PRIMARY KEY ({1})", GetPrimaryKeyConstraintName(primaryKeyColumns, tableName), keyColumns);
 			}
 			return result;
 		}
@@ -197,7 +199,7 @@ namespace FluentMigrator.Runner.Generators
 		/// Gets the name of the primary key constraint. Some Generators may need to override if the constraint name is limited
 		/// </summary>
 		/// <returns></returns>
-		protected virtual string GetPrimaryKeyConstraintName(IList<ColumnDefinition> primaryKeyColumns, string tableName )
+		protected virtual string GetPrimaryKeyConstraintName(IList<ColumnDefinition> primaryKeyColumns, string tableName)
 		{
 			string keyName = string.Empty;
 			foreach (ColumnDefinition column in primaryKeyColumns)
@@ -206,7 +208,7 @@ namespace FluentMigrator.Runner.Generators
 			}
 
 			keyName += "PK";
-			return string.Format("CONSTRAINT {0}",keyName);
+			return string.Format("CONSTRAINT {0}", keyName);
 		}
 
 		public string FormatExpression(string template, params object[] args)
@@ -217,7 +219,8 @@ namespace FluentMigrator.Runner.Generators
 		protected virtual string GetConstantValue(object value)
 		{
 
-			if(value == null) {
+			if (value == null)
+			{
 				return "null";
 			}
 
@@ -226,17 +229,20 @@ namespace FluentMigrator.Runner.Generators
 			{
 				return "'" + stringValue.Replace("'", "''") + "'";
 			}
-			if(value is char) {
+			if (value is char)
+			{
 				return "'" + value + "'";
 			}
-			if(value is bool) {
+			if (value is bool)
+			{
 				return ((bool)value) ? 1.ToString() : 0.ToString();
 			}
-			if(value is Guid)
+			if (value is Guid)
 			{
 				return "'" + ((Guid)value).ToString().Replace("'", "''") + "'";
 			}
-			if(value is DateTime) {
+			if (value is DateTime)
+			{
 				return "'" + value.ToString().Replace("'", "''") + "'";
 			}
 			return value.ToString();

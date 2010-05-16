@@ -134,6 +134,11 @@ namespace FluentMigrator.Tests.Integration.Processors
 			throw new NotImplementedException();
 		}
 
+		public override bool SchemaExists(string tableName)
+		{
+			throw new NotImplementedException();
+		}
+
 		public override bool TableExists(string tableName)
 		{
 			throw new NotImplementedException();

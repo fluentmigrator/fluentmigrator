@@ -36,6 +36,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 			Transaction = Connection.BeginTransaction();
 		}
 
+		public override bool SchemaExists(string schemaName)
+		{
+			return Exists("SELECT * FROM SYS.SCHEMAS WHERE NAME = '{0}'", schemaName);
+		}
+
 		public override bool TableExists(string tableName)
 		{
 			return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{0}'", tableName);
@@ -108,19 +113,23 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 			if (Connection.State != ConnectionState.Open)
 				Connection.Open();
 
-			using (var command = new SqlCommand(sql, Connection, Transaction)) {
-				try {
+			using (var command = new SqlCommand(sql, Connection, Transaction))
+			{
+				try
+				{
 					command.ExecuteNonQuery();
 				}
-				catch(Exception ex) {
-					using (StringWriter message = new StringWriter()) {
+				catch (Exception ex)
+				{
+					using (StringWriter message = new StringWriter())
+					{
 						message.WriteLine("An error occured executing the following sql:");
 						message.WriteLine(sql);
 						message.WriteLine("The error was {0}", ex.Message);
 
 						throw new Exception(message.ToString(), ex);
 					}
-				}	
+				}
 			}
 		}
 	}

@@ -16,6 +16,7 @@
 //
 #endregion
 
+using FluentMigrator.Builders.Schema.Schema;
 using FluentMigrator.Builders.Schema.Table;
 using FluentMigrator.Infrastructure;
 
@@ -24,5 +25,6 @@ namespace FluentMigrator.Builders.Schema
 	public interface ISchemaExpressionRoot : IFluentSyntax
 	{
 		ISchemaTableSyntax Table(string tableName);
+		ISchemaSchemaSyntax Schema(string schemaName);
 	}
 }

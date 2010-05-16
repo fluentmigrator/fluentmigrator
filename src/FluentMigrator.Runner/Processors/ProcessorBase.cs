@@ -34,6 +34,16 @@ namespace FluentMigrator.Runner.Processors
 			Options = options;
 		}
 
+		public virtual void Process(CreateSchemaExpression expression)
+		{
+			Process(Generator.Generate(expression));
+		}
+
+		public virtual void Process(DeleteSchemaExpression expression)
+		{
+			Process(Generator.Generate(expression));
+		}
+
 		public virtual void Process(CreateTableExpression expression)
 		{
 			Process(Generator.Generate(expression));
@@ -103,6 +113,7 @@ namespace FluentMigrator.Runner.Processors
 		public abstract System.Data.DataSet Read(string template, params object[] args);
 		public abstract bool Exists(string template, params object[] args);
 		public abstract void Execute(string template, params object[] args);
+		public abstract bool SchemaExists(string tableName);
 		public abstract bool TableExists(string tableName);
 		public abstract bool ColumnExists(string tableName, string columnName);
 		public abstract bool ConstraintExists(string tableName, string constraintName);

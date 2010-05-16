@@ -16,18 +16,30 @@
 //
 #endregion
 
-using FluentMigrator.Builders.Delete.Column;
-using FluentMigrator.Builders.Delete.ForeignKey;
+using System;
+using System.Collections.Generic;
 using FluentMigrator.Infrastructure;
 
-namespace FluentMigrator.Builders.Delete
+namespace FluentMigrator.Expressions
 {
-	public interface IDeleteExpressionRoot : IFluentSyntax
+	public class DeleteSchemaExpression : MigrationExpressionBase
 	{
-		void Schema(string schemaName);
-		void Table(string tableName);
-		IDeleteColumnFromTableSyntax Column(string columnName);
-		IDeleteForeignKeyFromTableSyntax ForeignKey();
-		IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName);
+		public virtual string SchemaName { get; set; }
+
+		public override void CollectValidationErrors(ICollection<string> errors)
+		{
+			if (String.IsNullOrEmpty(SchemaName))
+				errors.Add(ErrorMessages.SchemaNameCannotBeNullOrEmpty);
+		}
+
+		public override void ExecuteWith(IMigrationProcessor processor)
+		{
+			processor.Process(this);
+		}
+
+		public override string ToString()
+		{
+			return base.ToString() + SchemaName;
+		}
 	}
 }

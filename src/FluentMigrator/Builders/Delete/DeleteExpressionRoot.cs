@@ -32,6 +32,12 @@ namespace FluentMigrator.Builders.Delete
 			_context = context;
 		}
 
+		public void Schema(string schemaName)
+		{
+			var expression = new DeleteSchemaExpression { SchemaName = schemaName };
+			_context.Expressions.Add(expression);
+		}
+
 		public void Table(string tableName)
 		{
 			var expression = new DeleteTableExpression { TableName = tableName };

@@ -33,6 +33,11 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 			Connection = connection;
 		}
 
+		public override bool SchemaExists(string schemaName)
+		{
+			throw new NotImplementedException();
+		}
+
 		public override bool TableExists(string tableName)
 		{
 			return Exists("select count(*) from sqlite_master where name='{0}'", tableName);

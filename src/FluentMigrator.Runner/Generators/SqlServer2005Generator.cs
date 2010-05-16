@@ -20,7 +20,6 @@ using System.Data;
 
 namespace FluentMigrator.Runner.Generators
 {
-
 	public class SqlServer2005Generator : SqlServer2000Generator
 	{
 		protected override void SetupTypeMaps()
@@ -30,6 +29,16 @@ namespace FluentMigrator.Runner.Generators
 			SetTypeMap(DbType.String, "NVARCHAR(MAX)", UnicodeTextCapacity);
 			SetTypeMap(DbType.AnsiString, "VARCHAR(MAX)", AnsiTextCapacity);
 			SetTypeMap(DbType.Binary, "VARBINARY(MAX)", ImageCapacity);
+		}
+
+		public override string Generate(Expressions.CreateSchemaExpression expression)
+		{
+			return FormatExpression("CREATE SCHEMA [{0}]", expression.SchemaName);
+		}
+
+		public override string Generate(Expressions.DeleteSchemaExpression expression)
+		{
+			return FormatExpression("DROP SCHEMA [{0}]", expression.SchemaName);
 		}
 	}
 }

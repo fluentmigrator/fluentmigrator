@@ -33,6 +33,8 @@ namespace FluentMigrator
 		void CommitTransaction();
 		void RollbackTransaction();
 
+		void Process(CreateSchemaExpression expression);
+		void Process(DeleteSchemaExpression expression);
 		void Process(CreateTableExpression expression);
 		void Process(CreateColumnExpression expression);
 		void Process(DeleteTableExpression expression);

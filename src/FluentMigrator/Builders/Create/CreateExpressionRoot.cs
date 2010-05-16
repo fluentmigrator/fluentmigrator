@@ -34,6 +34,12 @@ namespace FluentMigrator.Builders.Create
 			_context = context;
 		}
 
+		public void Schema(string schemaName)
+		{
+			var expression = new CreateSchemaExpression { SchemaName = schemaName };
+			_context.Expressions.Add(expression);
+		}
+
 		public ICreateTableWithColumnSyntax Table(string tableName)
 		{
 			var expression = new CreateTableExpression { TableName = tableName };

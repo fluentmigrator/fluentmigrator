@@ -135,9 +135,13 @@
     <Compile Include="Builders\Schema\Column\ISchemaColumnSyntax.cs" />
     <Compile Include="Builders\Schema\Column\SchemaColumnQuery.cs" />
     <Compile Include="Builders\Schema\ISchemaExpressionRoot.cs" />
+    <Compile Include="Builders\Schema\Schema\ISchemaSchemaSyntax.cs" />
+    <Compile Include="Builders\Schema\Schema\SchemaSchemaQuery.cs" />
     <Compile Include="Builders\Schema\Table\ISchemaTableSyntax.cs" />
     <Compile Include="Builders\Schema\SchemaExpressionRoot.cs" />
     <Compile Include="Builders\Schema\Table\SchemaTableQuery.cs" />
+    <Compile Include="Expressions\DeleteSchemaExpression.cs" />
+    <Compile Include="Expressions\CreateSchemaExpression.cs" />
     <Compile Include="Expressions\ExecuteSqlScriptExpression.cs" />
     <Compile Include="Expressions\ExecuteSqlStatementExpression.cs" />
     <Compile Include="Expressions\MigrationExpressionBase.cs" />
@@ -233,6 +237,7 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

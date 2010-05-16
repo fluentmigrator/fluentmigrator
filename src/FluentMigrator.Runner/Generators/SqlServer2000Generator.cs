@@ -70,6 +70,16 @@ namespace FluentMigrator.Runner.Generators
 			SetTypeMap(DbType.Xml, "XML", XmlCapacity);
 		}
 
+		public override string Generate(CreateSchemaExpression expression)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override string Generate(DeleteSchemaExpression expression)
+		{
+			throw new NotImplementedException();
+		}
+
 		public override string Generate(CreateTableExpression expression)
 		{
 			return FormatExpression("CREATE TABLE [{0}] ({1})", expression.TableName, GetColumnDDL(expression));

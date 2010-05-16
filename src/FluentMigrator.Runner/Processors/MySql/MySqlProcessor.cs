@@ -32,6 +32,11 @@ namespace FluentMigrator.Runner.Processors.MySql
 			Connection = connection;
 		}
 
+		public override bool SchemaExists(string schemaName)
+		{
+			throw new NotImplementedException();
+		}
+
 		public override bool TableExists(string tableName)
 		{
 			return Exists("select count(*) from information_schema.tables where table_name='{0}'", tableName);
