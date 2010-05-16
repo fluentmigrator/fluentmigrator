@@ -38,14 +38,33 @@ namespace FluentMigrator.Console
 		public string Task;
 		public long Version;
 		public int Steps;
-		private string TargetAssembly;
-		private string WorkingDirectory;
-		private bool ShowHelp = false;
-
+		public string TargetAssembly;
+		public string WorkingDirectory;
+		public bool ShowHelp;
 
 		static void DisplayHelp(OptionSet p)
 		{
-			System.Console.WriteLine("Usage: FluentMigrator.Console [OPTIONS]");
+			const string hr = "-------------------------------------------------------------------------------";
+			System.Console.WriteLine(hr);
+			System.Console.WriteLine("=============================== FluentMigrator ================================");
+			System.Console.WriteLine(hr);
+			System.Console.WriteLine("Source Code:");
+			System.Console.WriteLine("  http://github.com/schambers/fluentmigrator/network");
+			System.Console.WriteLine("Ask For Help:");
+			System.Console.WriteLine("  http://groups.google.com/group/fluentmigrator-google-group");
+			System.Console.WriteLine(hr);
+			System.Console.WriteLine("Usage:");
+			System.Console.WriteLine("  migrate [OPTIONS]");
+			System.Console.WriteLine("Example:");
+			System.Console.WriteLine("  migrate -a bin\\debug\\MyMigrations.dll -db SqlServer2008 -conn \"SEE_BELOW\"");
+			System.Console.WriteLine(hr);
+			System.Console.WriteLine("Example Connection Strings:");
+			System.Console.WriteLine("  MySql: Data Source=172.0.0.1;Database=Foo;User Id=USERNAME;Password=BLAH");
+			System.Console.WriteLine("  Oracle: Server=172.0.0.1;Database=Foo;Uid=USERNAME;Pwd=BLAH");
+			System.Console.WriteLine("  SqlLite: Data Source=:memory:;Version=3;New=True");
+			System.Console.WriteLine("  SqlServer: server=127.0.0.1;database=Foo;user id=USERNAME;password=BLAH");
+			System.Console.WriteLine("             server=.\\SQLExpress;database=Foo;trusted_connection=true");
+			System.Console.WriteLine(hr);
 			System.Console.WriteLine("Options:");
 			p.WriteOptionDescriptions(System.Console.Out);
 		}
@@ -55,21 +74,71 @@ namespace FluentMigrator.Console
 			_announcerOutput = announcerOutput;
 			try
 			{
-				var optionSet = new OptionSet()
-                                    {
-                                        {"db=",string.Format("Database Type is required \"/db=[db type]\". Where [db type] is one of {0}.", ProcessorFactory.ListAvailableProcessorTypes()) ,v => { ProcessorType = v; }},
-                                        {"connection=","Connection String is required \"/connection\"=[connection string]", v => { Connection = v; }},
-                                        {"target=", "Target Assembly is required \"/target=[assembly path]\" [path]" ,v => { TargetAssembly = v; }},
-                                        {"log", v => { Log = v != null; }},
-                                        {"namespace=", v => { Namespace = v; }},
-                                        {"task=", v => { Task = v; }},
-                                        {"version=", v => { Version = long.Parse(v); }},
-                                        {"verbose", v => { Verbose = v != null; }},
-                                        {"preview", v => { PreviewOnly = v != null; }},
-                                        {"steps=", v => { Steps = int.Parse(v); }},
-                                        {"workingdirectory=", v => { WorkingDirectory = v; }},
-                                        {"help", v => { ShowHelp = v != null; }}
-                                    };
+				var optionSet = new OptionSet
+				                	{
+				                		{
+				                			"assembly=|a=|target=",
+				                			"REQUIRED. The assembly containing the migrations you want to execute.",
+				                			v => { TargetAssembly = v; }
+				                			},
+				                		{
+				                			"provider=|dbType=|db=",
+				                			string.Format("REQUIRED. The kind of database you are migrating against. Available choices are: {0}.",
+				                			              ProcessorFactory.ListAvailableProcessorTypes()),
+				                			v => { ProcessorType = v; }
+				                			},
+				                		{
+				                			"connectionString=|connection=|conn=|c=",
+				                			"REQUIRED. The connection string to the server and database you want to execute your migrations against.",
+				                			v => { Connection = v; }
+				                			},
+										//TODO: implement
+										//{
+										//    "log",
+										//    "NOT_YET_IMPLEMENTED",
+										//    v => { Log = v != null; }
+										//    },
+				                		{
+				                			"namespace=|ns=",
+											"The namespace contains the migrations you want to run. Default is all migrations found within the Target Assembly will be run.",
+				                			v => { Namespace = v; }
+				                			},
+				                		{
+				                			"preview|p",
+											"Only output the SQL generated by the migration - do not execute it. Default is false.",
+				                			v => { PreviewOnly = v != null; }
+				                			},
+				                		{
+				                			"steps=",
+											"The number of versions to rollback if the task is 'rollback'. Default is 1.",
+				                			v => { Steps = int.Parse(v); }
+				                			},
+				                		{
+				                			"task=|t=",
+											"The task you want FluentMigrator to perform. Available choices are: migrate:up, migrate (same as migrate:up), migrate:down, rollback, rollback:toversion, rollback:all. Default is 'migrate'.",
+				                			v => { Task = v; }
+				                			},
+				                		{
+				                			"version=",
+											"The specific version to migrate. Default is 0, which will run all migrations.",
+				                			v => { Version = long.Parse(v); }
+				                			},
+				                		{
+				                			"verbose",
+											"Show the SQL statements generated and execution time in the console. Default is false.",
+				                			v => { Verbose = v != null; }
+				                			},
+				                		{
+				                			"workingdirectory=|wd=",
+											"The directory to load SQL scripts specified by migrations from.", //TODO: explain defaults
+				                			v => { WorkingDirectory = v; }
+				                			},
+										{
+				                			"help|h|?",
+											"Displays this help menu.",
+				                			v => { ShowHelp = v != null; }
+				                			}
+				                	};
 
 				try
 				{
@@ -77,9 +146,9 @@ namespace FluentMigrator.Console
 				}
 				catch (OptionException e)
 				{
-					System.Console.WriteLine("FluentMigrator.Console: ");
+					System.Console.WriteLine("FluentMigrator.Console:");
 					System.Console.WriteLine(e.Message);
-					System.Console.WriteLine("Try 'FluentMigrator.Console --help' for more information.");
+					System.Console.WriteLine("Try 'migrate --help' for more information.");
 					return;
 				}
 
@@ -90,8 +159,8 @@ namespace FluentMigrator.Console
 					string.IsNullOrEmpty(Connection) ||
 					string.IsNullOrEmpty(TargetAssembly))
 				{
-					Environment.ExitCode = 1;
 					DisplayHelp(optionSet);
+					Environment.ExitCode = 1; //set Exit code to failure
 					return;
 				}
 
@@ -107,8 +176,7 @@ namespace FluentMigrator.Console
 			{
 				System.Console.WriteLine("!! An error has occurred.  The error is:");
 				System.Console.WriteLine(ex);
-				//set Exit code to failure
-				Environment.ExitCode = 1;
+				Environment.ExitCode = 1; //set Exit code to failure
 			}
 		}
 

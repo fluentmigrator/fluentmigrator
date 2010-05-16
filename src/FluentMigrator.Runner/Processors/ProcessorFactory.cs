@@ -28,7 +28,7 @@ namespace FluentMigrator.Runner.Processors
 				.Where(t => typeof(IMigrationProcessorFactory).IsAssignableFrom(t) && !t.IsAbstract && !t.IsInterface);
 
 			string processorList = string.Empty;
-			foreach (Type processorType in processorTypes)
+			foreach (Type processorType in processorTypes.OrderBy(x => x.Name))
 			{
 				string name = processorType.Name;
 
