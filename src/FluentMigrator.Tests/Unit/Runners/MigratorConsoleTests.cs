@@ -78,9 +78,9 @@ namespace FluentMigrator.Tests.Unit.Runners
 				"/connection", connection,
 				"/log",
 				"/target", target,
-				"/namespace", "FluentMigrator.Tests.Integration.Migrations",
+				"/namespace", "FluentMigrator.Tests.Unit.Runners.Migrations",
 				"/task", "migrate:up",
-				"/version", "1");
+				"/version", "0");
 
 			var output = sb.ToString();
 			Assert.AreNotEqual(0, output.Length);
@@ -98,9 +98,8 @@ namespace FluentMigrator.Tests.Unit.Runners
 				"/preview",
 				"/verbose",
 				"/target", target,
-				"/namespace", "FluentMigrator.Tests.Integration.Migrations",
-				"/task", "migrate:up",
-				"/version", "1");
+				"/namespace", "FluentMigrator.Tests.Unit.Runners.Migrations",
+				"/task", "migrate:up");
 
 			var output = sb.ToString();
 			Assert.AreNotEqual(0, output.Length);

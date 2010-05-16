@@ -81,13 +81,28 @@ namespace FluentMigrator.Runner
 			get
 			{
 				if (_versionInfo == null)
-					loadVersionInfo();
+					LoadVersionInfo();
 				return _versionInfo;
 			}
 		}
 
-		private void loadVersionInfo()
+		private bool _alreadyCreatedVersionTable;
+		private void LoadVersionInfo()
 		{
+			if (_migrationProcessor.Options.PreviewOnly)
+			{
+				if (!_alreadyCreatedVersionTable)
+				{
+					new MigrationRunner(_migrationConventions, _migrationProcessor, _announcer, new StopWatch())
+						.Up(_versionMigration);
+					_versionInfo = new VersionInfo();
+					_alreadyCreatedVersionTable = true;
+				}
+				else
+					_versionInfo = new VersionInfo();
+				return;
+			}
+
 			if (!_migrationProcessor.TableExists(_versionTableMetaData.TableName))
 			{
 				var runner = new MigrationRunner(_migrationConventions, _migrationProcessor, _announcer, new StopWatch());
@@ -111,12 +126,12 @@ namespace FluentMigrator.Runner
 			get
 			{
 				if (_migrations == null)
-					loadMigrations();
+					LoadMigrations();
 				return _migrations;
 			}
 		}
 
-		private void loadMigrations()
+		private void LoadMigrations()
 		{
 			_migrations = new SortedList<long, IMigration>();
 
@@ -165,19 +180,19 @@ namespace FluentMigrator.Runner
 			if (!VersionInfo.HasAppliedMigration(version))
 			{
 				_migrationRunner.Up(Migrations[version]);
-				updateVersionInfoWithAppliedMigration(version);
+				UpdateVersionInfoWithAppliedMigration(version);
 			}
 		}
 
-		private void updateVersionInfoWithAppliedMigration(long version)
+		private void UpdateVersionInfoWithAppliedMigration(long version)
 		{
 			var dataExpression = new InsertDataExpression();
-			dataExpression.Rows.Add(createVersionInfoInsertionData(version));
+			dataExpression.Rows.Add(CreateVersionInfoInsertionData(version));
 			dataExpression.TableName = _versionTableMetaData.TableName;
 			dataExpression.ExecuteWith(_migrationProcessor);
 		}
 
-		protected virtual InsertionData createVersionInfoInsertionData(long version)
+		protected virtual InsertionData CreateVersionInfoInsertionData(long version)
 		{
 			return new InsertionData { new KeyValuePair<string, object>(this._versionTableMetaData.ColumnName, version) };
 		}
@@ -230,17 +245,20 @@ namespace FluentMigrator.Runner
 
 		private void ApplyMigrationDown(long version)
 		{
-		    try {
-		        _migrationRunner.Down(Migrations[version]);
-		        _migrationProcessor.Execute("DELETE FROM {0} WHERE {1}='{2}'", this._versionTableMetaData.TableName, this._versionTableMetaData.ColumnName, version.ToString());
-		    }
-            catch(KeyNotFoundException ex) {
-                string msg = string.Format("VersionInfo references version {0} but no Migrator was found attributed with that version.", version);
-                throw new Exception(msg, ex);
-            }
-		    catch (Exception ex) {
-		        throw new Exception("Error rolling back version " + version, ex);
-		    }
+			try
+			{
+				_migrationRunner.Down(Migrations[version]);
+				_migrationProcessor.Execute("DELETE FROM {0} WHERE {1}='{2}'", this._versionTableMetaData.TableName, this._versionTableMetaData.ColumnName, version.ToString());
+			}
+			catch (KeyNotFoundException ex)
+			{
+				string msg = string.Format("VersionInfo references version {0} but no Migrator was found attributed with that version.", version);
+				throw new Exception(msg, ex);
+			}
+			catch (Exception ex)
+			{
+				throw new Exception("Error rolling back version " + version, ex);
+			}
 		}
 
 		public void RemoveVersionTable()

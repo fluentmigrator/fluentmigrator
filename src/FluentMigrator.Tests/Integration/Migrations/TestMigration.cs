@@ -1,4 +1,5 @@
 #region License
+
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -14,6 +15,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
 #endregion
 
 namespace FluentMigrator.Tests.Integration.Migrations
@@ -36,9 +38,9 @@ namespace FluentMigrator.Tests.Integration.Migrations
 			Create.Column("Foo").OnTable("Users").AsInt16().Indexed().WithDefaultValue(1);
 
 			//commenting out the FK so it passes the sqlite tests
-         Create.ForeignKey()
-            .FromTable( "Users" ).ForeignColumn( "GroupId" )
-            .ToTable( "Groups" ).PrimaryColumn( "GroupId" );
+			Create.ForeignKey()
+				.FromTable("Users").ForeignColumn("GroupId")
+				.ToTable("Groups").PrimaryColumn("GroupId");
 			//Create.ForeignKey("FK_Foo").FromTable("Users").ForeignColumn("GroupId").ToTable("Groups").PrimaryColumn("GroupId");
 
 			Create.Table("Foo")
