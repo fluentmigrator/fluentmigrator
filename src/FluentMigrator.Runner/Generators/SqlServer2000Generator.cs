@@ -104,7 +104,7 @@ namespace FluentMigrator.Runner.Generators
 			var primaryColumns = GetColumnList(expression.ForeignKey.PrimaryColumns);
 			var foreignColumns = GetColumnList(expression.ForeignKey.ForeignColumns);
 
-			const string sql = "ALTER TABLE {0}[{1}] ADD CONSTRAINT {2} FOREIGN KEY ({3}) REFERENCES [{4}].[{5}] ({6})";
+			const string sql = "ALTER TABLE {0}[{1}] ADD CONSTRAINT {2} FOREIGN KEY ({3}) REFERENCES {4}[{5}] ({6})";
 
 			return string.Format(sql,
 								 FormatSchema(expression.ForeignKey.ForeignTableSchema),

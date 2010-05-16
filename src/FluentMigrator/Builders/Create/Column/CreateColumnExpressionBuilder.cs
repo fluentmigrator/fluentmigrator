@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System.Collections.Generic;
 using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -255,12 +256,12 @@ namespace FluentMigrator.Builders.Create.Column
 			return this;
 		}
 
-		public ICreateColumnOptionSyntax References(string foreignKeyName, string foreignTableName, params string[] foreignColumnNames)
+		public ICreateColumnOptionSyntax References(string foreignKeyName, string foreignTableName, IEnumerable<string> foreignColumnNames)
 		{
 			return References(foreignKeyName, null, foreignTableName, foreignColumnNames);
 		}
 
-		public ICreateColumnOptionSyntax References(string foreignKeyName, string foreignTableSchema, string foreignTableName, params string[] foreignColumnNames)
+		public ICreateColumnOptionSyntax References(string foreignKeyName, string foreignTableSchema, string foreignTableName, IEnumerable<string> foreignColumnNames)
 		{
 			var fk = new CreateForeignKeyExpression
 			{

@@ -334,7 +334,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
 			var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
 
-			builder.References("fk_foo", "FooTable", "BarColumn");
+			builder.References("fk_foo", "FooTable", new[] { "BarColumn" });
 
 			collectionMock.VerifyAll();
 			contextMock.VerifyAll();

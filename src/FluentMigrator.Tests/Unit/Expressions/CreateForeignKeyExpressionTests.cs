@@ -17,7 +17,6 @@
 #endregion
 
 using System.Collections.ObjectModel;
-using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using NUnit.Framework;
@@ -31,18 +30,18 @@ namespace FluentMigrator.Tests.Unit.Expressions
 		[Test]
 		public void ToStringIsDescriptive()
 		{
-			new CreateForeignKeyExpression
-				{
-					ForeignKey = new ForeignKeyDefinition
-					{
-						ForeignColumns = new Collection<string> { "User_id" },
-						ForeignTable = "UserRoles",
-						PrimaryColumns = new Collection<string> { "Id" },
-						PrimaryTable = "User",
-						Name = "FK"
-					}
-			}.ToString().ShouldBe("CreateForeignKey FK UserRoles (User_id) User (Id)");
-			
+			var sql = new CreateForeignKeyExpression
+						{
+							ForeignKey = new ForeignKeyDefinition
+											{
+												ForeignColumns = new Collection<string> { "User_id" },
+												ForeignTable = "UserRoles",
+												PrimaryColumns = new Collection<string> { "Id" },
+												PrimaryTable = "User",
+												Name = "FK"
+											}
+						}.ToString();
+			sql.ShouldBe("CreateForeignKey FK UserRoles(User_id) User(Id)");
 		}
 	}
 }

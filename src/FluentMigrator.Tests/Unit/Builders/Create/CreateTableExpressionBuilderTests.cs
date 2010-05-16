@@ -314,7 +314,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 								CurrentColumn = columnMock.Object
 							};
 
-			builder.References("fk_foo", "FooTable", "BarColumn");
+			builder.References("fk_foo", "FooTable", new[] { "BarColumn" });
 
 			collectionMock.VerifyAll();
 			contextMock.VerifyAll();

@@ -103,7 +103,7 @@ namespace FluentMigrator.Tests.Unit.Runners
 
 			var output = sb.ToString();
 			Assert.AreNotEqual(0, output.Length);
-			Assert.That(output.Contains("PREVIEW ONLY MODE"));
+			Assert.That(output.Contains("PREVIEW-ONLY MODE"));
 		}
 
 		[Test]
