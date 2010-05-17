@@ -35,9 +35,6 @@ namespace FluentMigrator.NAnt
 		[TaskAttribute("target")]
 		public string Target { get; set; }
 
-		[TaskAttribute("log")]
-		public bool LoggingEnabled { get; set; }
-
 		[TaskAttribute("namespace")]
 		public string Namespace { get; set; }
 
@@ -65,7 +62,6 @@ namespace FluentMigrator.NAnt
 										Database = Database,
 										Connection = Connection,
 										Target = Target,
-										LoggingEnabled = LoggingEnabled,
 										PreviewOnly = false,
 										Namespace = Namespace,
 										Task = Task,

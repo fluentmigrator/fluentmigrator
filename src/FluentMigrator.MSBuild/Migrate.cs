@@ -35,8 +35,6 @@ namespace FluentMigrator.MSBuild
 		[Required]
 		public string Target { get; set; }
 
-		public bool LoggingEnabled { get; set; }
-
 		public bool Verbose { get; set; }
 
 		public string Namespace { get; set; }
@@ -62,7 +60,6 @@ namespace FluentMigrator.MSBuild
 										Database = Database,
 										Connection = Connection,
 										Target = Target,
-										LoggingEnabled = LoggingEnabled,
 										PreviewOnly = false,
 										Namespace = Namespace,
 										Task = Task,

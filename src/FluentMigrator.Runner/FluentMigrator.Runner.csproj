@@ -130,6 +130,8 @@
       <Link>SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="Announcers\BaseAnnouncer.cs" />
+    <Compile Include="Announcers\CompositeAnnouncer.cs" />
+    <Compile Include="Announcers\NullAnnouncer.cs" />
     <Compile Include="Announcers\TextWriterAnnouncer.cs" />
     <Compile Include="IAnnouncer.cs" />
     <Compile Include="Generators\MySqlGenerator.cs" />

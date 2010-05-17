@@ -27,7 +27,6 @@ namespace FluentMigrator.Runner.Initialization
 		public string Database { get; set; }
 		public string Connection { get; set; }
 		public string Target { get; set; }
-		public bool LoggingEnabled { get; set; }
 		public bool PreviewOnly { get; set; }
 		public string Namespace { get; set; }
 		public string Task { get; set; }
