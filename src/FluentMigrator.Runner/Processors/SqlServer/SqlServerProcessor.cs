@@ -20,6 +20,7 @@
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
@@ -28,11 +29,16 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 		public virtual SqlConnection Connection { get; set; }
 		public SqlTransaction Transaction { get; private set; }
 
-		public SqlServerProcessor(SqlConnection connection, IMigrationGenerator generator)
+		public SqlServerProcessor(SqlConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+			: base(generator, announcer, options)
 		{
-			this.generator = generator;
 			Connection = connection;
 			Transaction = Connection.BeginTransaction();
+		}
+
+		public override bool SchemaExists(string schemaName)
+		{
+			return Exists("SELECT * FROM SYS.SCHEMAS WHERE NAME = '{0}'", schemaName);
 		}
 
 		public override bool TableExists(string tableName)
@@ -49,7 +55,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 		{
 			return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_CATALOG = DB_NAME() AND TABLE_NAME = '{0}' AND CONSTRAINT_NAME = '{1}'", tableName, constraintName);
 		}
-		
+
 		public override void Execute(string template, params object[] args)
 		{
 			Process(String.Format(template, args));
@@ -87,21 +93,44 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
 		public override void CommitTransaction()
 		{
+			Announcer.Say("Commiting transaction");
 			Transaction.Commit();
 		}
 
 		public override void RollbackTransaction()
 		{
+			Announcer.Say("Rolling back transaction");
 			Transaction.Rollback();
 		}
 
 		protected override void Process(string sql)
 		{
+			Announcer.Sql(sql);
+
+			if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
+				return;
+
 			if (Connection.State != ConnectionState.Open)
 				Connection.Open();
 
 			using (var command = new SqlCommand(sql, Connection, Transaction))
-				command.ExecuteNonQuery();
+			{
+				try
+				{
+					command.ExecuteNonQuery();
+				}
+				catch (Exception ex)
+				{
+					using (StringWriter message = new StringWriter())
+					{
+						message.WriteLine("An error occured executing the following sql:");
+						message.WriteLine(sql);
+						message.WriteLine("The error was {0}", ex.Message);
+
+						throw new Exception(message.ToString(), ex);
+					}
+				}
+			}
 		}
 	}
 }

@@ -18,7 +18,7 @@
 
 using System;
 using System.IO;
-using FluentMigrator.Runner;
+using FluentMigrator.Runner.Announcers;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -27,14 +27,18 @@ namespace FluentMigrator.Tests.Unit
 	[TestFixture]
 	public class AnnouncerTests
 	{
-		private Announcer _announcer;
+		private TextWriterAnnouncer _announcer;
 		private StringWriter _stringWriter;
 
 		[SetUp]
 		public void SetUp()
 		{
 			_stringWriter = new StringWriter();
-			_announcer = new Announcer(_stringWriter);
+			_announcer = new TextWriterAnnouncer(_stringWriter)
+							{
+								ShowElapsedTime = true,
+								ShowSql = true
+							};
 		}
 
 		public string Output
@@ -48,8 +52,8 @@ namespace FluentMigrator.Tests.Unit
 		[Test]
 		public void CanAnnounceAndPadWithEquals()
 		{
-			_announcer.Announce("Test");
-			Output.ShouldBe("==  Test ======================================================================" + Environment.NewLine);
+			_announcer.Heading("Test");
+			Output.ShouldBe("-- Test ======================================================================" + Environment.NewLine + Environment.NewLine);
 		}
 
 		[Test]
@@ -60,10 +64,17 @@ namespace FluentMigrator.Tests.Unit
 		}
 
 		[Test]
-		public void CanSaySubItem()
+		public void CanSayTimeSpan()
 		{
-			_announcer.SaySubItem("0.0512s");
-			Output.ShouldBe("   -> 0.0512s" + Environment.NewLine);
+			_announcer.ElapsedTime(new TimeSpan(0, 0, 5));
+			Output.ShouldBe("-- -> 5s" + Environment.NewLine + Environment.NewLine);
+		}
+
+		[Test]
+		public void CanSaySql()
+		{
+			_announcer.Sql("DELETE Blah");
+			Output.ShouldBe("DELETE Blah" + Environment.NewLine);
 		}
 	}
 }

@@ -20,6 +20,7 @@
 using System;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Announcers;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
@@ -36,7 +37,7 @@ namespace FluentMigrator.Tests.Integration
 				{
 					var conventions = new MigrationConventions();
 
-					var runner = new MigrationRunner(conventions, processor);
+					var runner = new MigrationRunner(conventions, processor, new TextWriterAnnouncer(System.Console.Out), new StopWatch());
 
 					runner.Up(new TestCreateAndDropTableMigration());
 					processor.TableExists("TestTable").ShouldBeTrue();
@@ -55,7 +56,7 @@ namespace FluentMigrator.Tests.Integration
 
 			var conventions = new MigrationConventions();
 
-			var runner = new MigrationRunner(conventions, processor.Object) { SilentlyFail = true };
+			var runner = new MigrationRunner(conventions, processor.Object, new TextWriterAnnouncer(System.Console.Out), new StopWatch()) { SilentlyFail = true };
 
 			runner.Up(new TestForeignKeySilentFailure());
 			runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
@@ -71,7 +72,7 @@ namespace FluentMigrator.Tests.Integration
 				processor =>
 				{
 					var conventions = new MigrationConventions();
-					var runner = new MigrationRunner(conventions, processor);
+					var runner = new MigrationRunner(conventions, processor, new TextWriterAnnouncer(System.Console.Out), new StopWatch());
 
 					runner.Up(new TestForeignKeyNamingConvention());
 					processor.TableExists("Users").ShouldBeTrue();
@@ -89,7 +90,7 @@ namespace FluentMigrator.Tests.Integration
 				processor =>
 				{
 					var conventions = new MigrationConventions();
-					var runner = new MigrationRunner(conventions, processor);
+					var runner = new MigrationRunner(conventions, processor, new TextWriterAnnouncer(System.Console.Out), new StopWatch());
 
 					runner.Up(new TestIndexNamingConvention());
 					processor.TableExists("Users").ShouldBeTrue();

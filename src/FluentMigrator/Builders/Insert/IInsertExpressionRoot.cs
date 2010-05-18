@@ -20,8 +20,8 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Insert
 {
-	public interface IInsertExpressionRoot: IFluentSyntax
+	public interface IInsertExpressionRoot : IFluentSyntax
 	{
-		IInsertDataSyntax IntoTable(string tableName);
+		IInsertDataOrInSchemaSyntax IntoTable(string tableName);
 	}
 }

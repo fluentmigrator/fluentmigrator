@@ -16,22 +16,34 @@
 //
 #endregion
 
-using System;
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Builders.Rename.Table
 {
 	public class RenameTableExpressionBuilder : ExpressionBuilderBase<RenameTableExpression>,
-		IRenameTableToSyntax
+		IRenameTableToOrInSchemaSyntax,
+		IInSchemaSyntax
 	{
 		public RenameTableExpressionBuilder(RenameTableExpression expression)
 			: base(expression)
 		{
 		}
 
-		public void To(string name)
+		public IInSchemaSyntax To(string name)
 		{
 			Expression.NewName = name;
+			return this;
+		}
+
+		IRenameTableToSyntax IRenameTableToOrInSchemaSyntax.InSchema(string schemaName)
+		{
+			Expression.SchemaName = schemaName;
+			return this;
+		}
+
+		public void InSchema(string schemaName)
+		{
+			Expression.SchemaName = schemaName;
 		}
 	}
 }

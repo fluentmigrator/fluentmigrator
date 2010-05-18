@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1;
 using Moq;
 using NUnit.Framework;
@@ -43,7 +44,7 @@ namespace FluentMigrator.Tests.Unit
 			_processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
 			_loaderMock = new Mock<IMigrationLoader>(MockBehavior.Loose);
 
-			_vrunner = new MigrationVersionRunner(_conventionMock.Object, _processorMock.Object, _loaderMock.Object);
+			_vrunner = new MigrationVersionRunner(_conventionMock.Object, _processorMock.Object, _loaderMock.Object, new TextWriterAnnouncer(System.Console.Out));
 		}
 
 		[Test]
@@ -80,29 +81,29 @@ namespace FluentMigrator.Tests.Unit
 			_vrunner.MigrateUp();
 		}
 
-	    [Test]
-        public void HandlesMigrationThatDoesNotInheritFromMigrationBaseClass()
-	    {
-            _loaderMock.Setup(x => x.FindMigrationsIn(It.IsAny<Assembly>(), null)).Returns(new List<MigrationMetadata>
+		[Test]
+		public void HandlesMigrationThatDoesNotInheritFromMigrationBaseClass()
+		{
+			_loaderMock.Setup(x => x.FindMigrationsIn(It.IsAny<Assembly>(), null)).Returns(new List<MigrationMetadata>
 			                                                                         	{
 			                                                                         		new MigrationMetadata {Version = 1, Type = typeof(MigrationThatDoesNotInheritFromMigrationBaseClass)},
 			                                                                         	});
 
-            _vrunner.Migrations[1].ShouldNotBeNull();
-            _vrunner.Migrations[1].ShouldBeOfType<MigrationThatDoesNotInheritFromMigrationBaseClass>();
-	    }
+			_vrunner.Migrations[1].ShouldNotBeNull();
+			_vrunner.Migrations[1].ShouldBeOfType<MigrationThatDoesNotInheritFromMigrationBaseClass>();
+		}
 
-        private class MigrationThatDoesNotInheritFromMigrationBaseClass : IMigration
-        {
-            public void GetUpExpressions(IMigrationContext context)
-            {
-                throw new NotImplementedException();
-            }
+		private class MigrationThatDoesNotInheritFromMigrationBaseClass : IMigration
+		{
+			public void GetUpExpressions(IMigrationContext context)
+			{
+				throw new NotImplementedException();
+			}
 
-            public void GetDownExpressions(IMigrationContext context)
-            {
-                throw new NotImplementedException();
-            }
-        }
+			public void GetDownExpressions(IMigrationContext context)
+			{
+				throw new NotImplementedException();
+			}
+		}
 	}
 }

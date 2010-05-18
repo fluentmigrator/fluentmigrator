@@ -20,8 +20,8 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using FluentMigrator.Builders.Insert;
 using System.Text;
+using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 
@@ -120,6 +120,16 @@ namespace FluentMigrator.Runner.Generators
 			return sb.ToString();
 		}
 
+		public override string Generate(CreateSchemaExpression expression)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override string Generate(DeleteSchemaExpression expression)
+		{
+			throw new NotImplementedException();
+		}
+
 		public override string Generate(CreateTableExpression expression)
 		{
 			return string.Format("CREATE TABLE {0} ({1})", expression.TableName, GetColumnDDL(expression));
@@ -149,7 +159,7 @@ namespace FluentMigrator.Runner.Generators
 		public override string Generate(InsertDataExpression expression)
 		{
 			var result = new StringBuilder();
-			foreach (InsertionData row in expression.Rows)
+			foreach (InsertionDataDefinition row in expression.Rows)
 			{
 				List<string> columnNames = new List<string>();
 				List<object> columnData = new List<object>();

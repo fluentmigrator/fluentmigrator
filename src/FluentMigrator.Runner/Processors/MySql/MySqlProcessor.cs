@@ -26,10 +26,15 @@ namespace FluentMigrator.Runner.Processors.MySql
 	{
 		public MySqlConnection Connection { get; set; }
 
-		public MySqlProcessor(MySqlConnection connection, IMigrationGenerator generator)
+		public MySqlProcessor(MySqlConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+			: base(generator, announcer, options)
 		{
-			this.generator = generator;
 			Connection = connection;
+		}
+
+		public override bool SchemaExists(string schemaName)
+		{
+			throw new NotImplementedException();
 		}
 
 		public override bool TableExists(string tableName)
@@ -104,7 +109,13 @@ namespace FluentMigrator.Runner.Processors.MySql
 
 		protected override void Process(string sql)
 		{
-			if (Connection.State != ConnectionState.Open) Connection.Open();
+			Announcer.Sql(sql);
+
+			if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
+				return;
+
+			if (Connection.State != ConnectionState.Open)
+				Connection.Open();
 
 			using (var command = new MySqlCommand(sql, Connection))
 				command.ExecuteNonQuery();

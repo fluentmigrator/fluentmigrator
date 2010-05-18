@@ -16,17 +16,18 @@
 //
 #endregion
 
-using System;
-using System.Data;
-using FluentMigrator.Model;
-
-namespace FluentMigrator.Runner.Dialects
+namespace FluentMigrator.Tests.Unit.Runners.Migrations
 {
-	public interface IDialect
+	[Migration(2)]
+	public class UserEmail : Migration
 	{
-		void SetTypeMap(DbType type, string template);
-		void SetTypeMap(DbType type, string template, int maxSize);
-		string GetTypeMap(DbType type, int size, int precision);
-		string GenerateDDLForColumn(ColumnDefinition column);
+		public override void Up()
+		{
+			Create.Column("Email").OnTable("User").AsString().Nullable();
+		}
+
+		public override void Down()
+		{
+		}
 	}
 }

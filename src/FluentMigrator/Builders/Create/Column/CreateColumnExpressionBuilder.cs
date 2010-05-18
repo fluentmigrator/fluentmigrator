@@ -16,23 +16,36 @@
 //
 #endregion
 
-using System;
+using System.Collections.Generic;
 using System.Data;
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Create.Column
 {
 	public class CreateColumnExpressionBuilder : ExpressionBuilderBase<CreateColumnExpression>,
-		ICreateColumnOnTableSyntax, ICreateColumnAsTypeSyntax, ICreateColumnOptionSyntax
+		ICreateColumnOnTableSyntax,
+		ICreateColumnOptionSyntax,
+		ICreateColumnAsTypeOrInSchemaSyntax
 	{
-		public CreateColumnExpressionBuilder(CreateColumnExpression expression)
+		private readonly IMigrationContext _context;
+
+		public CreateColumnExpressionBuilder(CreateColumnExpression expression, IMigrationContext context)
 			: base(expression)
 		{
+			_context = context;
 		}
 
-		public ICreateColumnAsTypeSyntax OnTable(string name)
+		public ICreateColumnAsTypeOrInSchemaSyntax OnTable(string name)
 		{
 			Expression.TableName = name;
+			return this;
+		}
+
+		public ICreateColumnAsTypeSyntax InSchema(string schemaName)
+		{
+			Expression.SchemaName = schemaName;
 			return this;
 		}
 
@@ -188,12 +201,12 @@ namespace FluentMigrator.Builders.Create.Column
 			return this;
 		}
 
-        public ICreateColumnOptionSyntax AsCustom(string customType)
-        {
-            Expression.Column.Type = null;
-            Expression.Column.CustomType = customType;
-            return this;
-        }
+		public ICreateColumnOptionSyntax AsCustom(string customType)
+		{
+			Expression.Column.Type = null;
+			Expression.Column.CustomType = customType;
+			return this;
+		}
 
 		public ICreateColumnOptionSyntax WithDefaultValue(object value)
 		{
@@ -240,6 +253,33 @@ namespace FluentMigrator.Builders.Create.Column
 		public ICreateColumnOptionSyntax Unique()
 		{
 			Expression.Column.IsUnique = true;
+			return this;
+		}
+
+		public ICreateColumnOptionSyntax References(string foreignKeyName, string foreignTableName, IEnumerable<string> foreignColumnNames)
+		{
+			return References(foreignKeyName, null, foreignTableName, foreignColumnNames);
+		}
+
+		public ICreateColumnOptionSyntax References(string foreignKeyName, string foreignTableSchema, string foreignTableName, IEnumerable<string> foreignColumnNames)
+		{
+			var fk = new CreateForeignKeyExpression
+			{
+				ForeignKey = new ForeignKeyDefinition
+				{
+					Name = foreignKeyName,
+					PrimaryTable = Expression.TableName,
+					PrimaryTableSchema = Expression.SchemaName,
+					ForeignTable = foreignTableName,
+					ForeignTableSchema = foreignTableSchema
+				}
+			};
+
+			fk.ForeignKey.PrimaryColumns.Add(Expression.Column.Name);
+			foreach (var foreignColumnName in foreignColumnNames)
+				fk.ForeignKey.ForeignColumns.Add(foreignColumnName);
+
+			_context.Expressions.Add(fk);
 			return this;
 		}
 	}

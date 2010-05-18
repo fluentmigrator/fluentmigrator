@@ -27,10 +27,15 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 	{
 		public SQLiteConnection Connection { get; set; }
 
-		public SqliteProcessor(SQLiteConnection connection, IMigrationGenerator generator)
+		public SqliteProcessor(SQLiteConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+			: base(generator, announcer, options)
 		{
-			this.generator = generator;
 			Connection = connection;
+		}
+
+		public override bool SchemaExists(string schemaName)
+		{
+			throw new NotImplementedException();
 		}
 
 		public override bool TableExists(string tableName)
@@ -80,7 +85,13 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
 		protected override void Process(string sql)
 		{
-			if (Connection.State != ConnectionState.Open) Connection.Open();
+			Announcer.Sql(sql);
+
+			if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
+				return;
+
+			if (Connection.State != ConnectionState.Open)
+				Connection.Open();
 
 			using (var command = new SQLiteCommand(sql, Connection))
 			{

@@ -18,7 +18,9 @@
 
 using System.Data.SqlClient;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Integration.Migrations;
 using FluentMigrator.Tests.Integration.Migrations.Invalid;
@@ -43,7 +45,7 @@ namespace FluentMigrator.Tests.Integration
 		{
 			ExecuteWithSupportedProcessors(processor =>
 				{
-					var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(TestMigration).Namespace);
+					var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(TestMigration).Namespace, new TextWriterAnnouncer(System.Console.Out));
 
 					runner.Migrations.ShouldNotBeNull();
 				});
@@ -54,7 +56,7 @@ namespace FluentMigrator.Tests.Integration
 		{
 			ExecuteWithSupportedProcessors(processor =>
 				{
-					var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(TestMigration).Namespace);
+					var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(TestMigration).Namespace, new TextWriterAnnouncer(System.Console.Out));
 
 					runner.VersionInfo.ShouldNotBeNull();
 				});
@@ -65,7 +67,7 @@ namespace FluentMigrator.Tests.Integration
 		{
 			ExecuteWithSupportedProcessors(processor =>
 				{
-					var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(TestMigration).Namespace);
+					var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(TestMigration).Namespace, new TextWriterAnnouncer(System.Console.Out));
 
 					runner.MigrateUp();
 					runner.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
@@ -83,7 +85,7 @@ namespace FluentMigrator.Tests.Integration
 
 		private void runMigrationsInNamespace(IMigrationProcessor processor, string @namespace)
 		{
-			var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, @namespace);
+			var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, @namespace, new TextWriterAnnouncer(System.Console.Out));
 
 			runner.MigrateUp();
 		}
@@ -100,7 +102,7 @@ namespace FluentMigrator.Tests.Integration
 					processor.TableExists("UserRoles").ShouldBeTrue();
 					processor.TableExists("User").ShouldBeTrue();
 
-					var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3");
+					var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3", new TextWriterAnnouncer(System.Console.Out));
 
 					runner.VersionInfo.HasAppliedMigration(200909060953).ShouldBeTrue();
 					runner.VersionInfo.HasAppliedMigration(200909060935).ShouldBeTrue();
@@ -122,7 +124,7 @@ namespace FluentMigrator.Tests.Integration
 		{
 			ExecuteWithSupportedProcessors(processor =>
 				{
-					var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, "FluentMigrator.Tests.Integration.Migrations");
+					var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, "FluentMigrator.Tests.Integration.Migrations", new TextWriterAnnouncer(System.Console.Out));
 
 					runner.MigrateUp(1);
 
@@ -142,7 +144,7 @@ namespace FluentMigrator.Tests.Integration
 		{
 			ExecuteWithSupportedProcessors(processor =>
 			{
-				var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, "FluentMigrator.Tests.Integration.Migrations");
+				var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, "FluentMigrator.Tests.Integration.Migrations", new TextWriterAnnouncer(System.Console.Out));
 
 				runner.MigrateUp(1);
 
@@ -159,10 +161,10 @@ namespace FluentMigrator.Tests.Integration
 		[Test]
 		public void SqlServerMigrationsAreTransactional()
 		{
-			var connection = new SqlConnection(sqlServerConnectionString);
+			var connection = new SqlConnection(IntegrationTestOptions.SqlServer.ConnectionString);
 			connection.Open();
-			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator());
-			var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(InvalidMigration).Namespace);
+			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+			var runner = new MigrationVersionRunner(_conventions, processor, new MigrationLoader(_conventions), typeof(MigrationVersionRunnerTests).Assembly, typeof(InvalidMigration).Namespace, new TextWriterAnnouncer(System.Console.Out));
 
 			try
 			{

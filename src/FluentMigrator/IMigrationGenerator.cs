@@ -28,6 +28,8 @@ namespace FluentMigrator
 		void SetTypeMap(DbType type, string template, int maxSize);
 		string GetTypeMap(DbType type, int size, int precision);
 
+		string Generate(CreateSchemaExpression expression);
+		string Generate(DeleteSchemaExpression expression);
 		string Generate(CreateTableExpression expression);
 		string Generate(CreateColumnExpression expression);
 		string Generate(DeleteTableExpression expression);

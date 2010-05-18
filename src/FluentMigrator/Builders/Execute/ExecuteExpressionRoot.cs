@@ -32,13 +32,13 @@ namespace FluentMigrator.Builders.Execute
 
 		public void Sql(string sqlStatement)
 		{
-			var expression = new ExecuteSqlStatementExpression {SqlStatement = sqlStatement};
+			var expression = new ExecuteSqlStatementExpression { SqlStatement = sqlStatement };
 			_context.Expressions.Add(expression);
 		}
 
-		public void Script(string sqlScript)
+		public void Script(string pathToSqlScript)
 		{
-			var expression = new ExecuteSqlScriptExpression {SqlScript = sqlScript};
+			var expression = new ExecuteSqlScriptExpression { SqlScript = pathToSqlScript };
 			_context.Expressions.Add(expression);
 		}
 	}

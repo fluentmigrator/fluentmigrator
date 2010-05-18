@@ -16,7 +16,7 @@
 //
 #endregion
 
-using System;
+using FluentMigrator.Builders.Schema.Schema;
 using FluentMigrator.Builders.Schema.Table;
 using FluentMigrator.Infrastructure;
 
@@ -34,6 +34,11 @@ namespace FluentMigrator.Builders.Schema
 		public ISchemaTableSyntax Table(string tableName)
 		{
 			return new SchemaTableQuery(_context, tableName);
+		}
+
+		public ISchemaSchemaSyntax Schema(string schemaName)
+		{
+			return new SchemaSchemaQuery(_context, schemaName);
 		}
 	}
 }

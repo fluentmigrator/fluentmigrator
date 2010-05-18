@@ -72,6 +72,16 @@ namespace FluentMigrator.Runner.Generators
 			SetTypeMap(DbType.Time, "DATETIME");
 		}
 
+		public override string Generate(CreateSchemaExpression expression)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override string Generate(DeleteSchemaExpression expression)
+		{
+			throw new NotImplementedException();
+		}
+
 		public override string Generate(CreateTableExpression expression)
 		{
 			return FormatExpression("CREATE TABLE {0} ({1}) ENGINE = INNODB", expression.TableName, GetColumnDDL(expression));
@@ -165,7 +175,7 @@ namespace FluentMigrator.Runner.Generators
 		public override string Generate(InsertDataExpression expression)
 		{
 			var result = new StringBuilder();
-			foreach (InsertionData row in expression.Rows)
+			foreach (InsertionDataDefinition row in expression.Rows)
 			{
 				List<string> columnNames = new List<string>();
 				List<object> columnData = new List<object>();
@@ -189,14 +199,14 @@ namespace FluentMigrator.Runner.Generators
 			sb.Append(column.Name);
 			sb.Append(" ");
 
-            if (column.Type.HasValue)
-            {
-                sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
-            }
-            else
-            {
-                sb.Append(column.CustomType);
-            }
+			if (column.Type.HasValue)
+			{
+				sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
+			}
+			else
+			{
+				sb.Append(column.CustomType);
+			}
 
 			if (!column.IsNullable)
 			{

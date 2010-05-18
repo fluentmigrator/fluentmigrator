@@ -16,6 +16,7 @@
 //
 #endregion
 
+using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
 using NAnt.Core;
 using NAnt.Core.Attributes;
@@ -34,9 +35,6 @@ namespace FluentMigrator.NAnt
 		[TaskAttribute("target")]
 		public string Target { get; set; }
 
-		[TaskAttribute("log")]
-		public bool LoggingEnabled { get; set; }
-
 		[TaskAttribute("namespace")]
 		public string Namespace { get; set; }
 
@@ -54,12 +52,17 @@ namespace FluentMigrator.NAnt
 
 		protected override void ExecuteTask()
 		{
-			var runnerContext = new RunnerContext()
+			var announcer = new TextWriterAnnouncer(System.Console.Out)
+			{
+				ShowElapsedTime = Verbose,
+				ShowSql = Verbose
+			};
+			var runnerContext = new RunnerContext(announcer)
 									{
 										Database = Database,
 										Connection = Connection,
 										Target = Target,
-										LoggingEnabled = LoggingEnabled,
+										PreviewOnly = false,
 										Namespace = Namespace,
 										Task = Task,
 										Version = Version,

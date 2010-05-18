@@ -16,10 +16,9 @@
 //
 #endregion
 
-using System;
 using System.Collections.Generic;
-using FluentMigrator.Model;
 using System.Linq;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
@@ -34,7 +33,7 @@ namespace FluentMigrator.Expressions
 
 		public override void ApplyConventions(IMigrationConventions conventions)
 		{
-			ForeignKey.ApplyConventions( conventions );
+			ForeignKey.ApplyConventions(conventions);
 		}
 
 		public override void CollectValidationErrors(ICollection<string> errors)
@@ -54,9 +53,13 @@ namespace FluentMigrator.Expressions
 
 		public override string ToString()
 		{
-			return base.ToString() + ForeignKey.Name + " " 
-				+ ForeignKey.ForeignTable + " (" + string.Join(", ", ForeignKey.ForeignColumns.ToArray()) + ") "
-				+ ForeignKey.PrimaryTable + " (" + string.Join(", ", ForeignKey.PrimaryColumns.ToArray()) + ")";
+			return base.ToString() +
+				   string.Format("{0} {1}({2}) {3}({4})",
+								 ForeignKey.Name,
+								 ForeignKey.ForeignTable,
+								 string.Join(", ", ForeignKey.ForeignColumns.ToArray()),
+								 ForeignKey.PrimaryTable,
+								 string.Join(", ", ForeignKey.PrimaryColumns.ToArray()));
 		}
 	}
 }

@@ -20,7 +20,9 @@ using System.Data;
 using System.Data.SQLite;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Sqlite;
 using Moq;
 using NUnit.Framework;
@@ -47,7 +49,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 			command = connection.CreateCommand();
 
 			// SUT
-			processor = new SqliteProcessor(connection, new SqliteGenerator());
+			processor = new SqliteProcessor(connection, new SqliteGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 
 			column = new Mock<ColumnDefinition>();
 			tableName = "NewTable";
@@ -86,8 +88,8 @@ namespace FluentMigrator.Tests.Integration.Processors
 
 			using (command)
 			{
-				processor.Process( expression );
-				command.CommandText = string.Format( "SELECT name FROM sqlite_master WHERE type='table' and name='{0}'", tableName );
+				processor.Process(expression);
+				command.CommandText = string.Format("SELECT name FROM sqlite_master WHERE type='table' and name='{0}'", tableName);
 				command.ExecuteReader().Read().ShouldBeTrue();
 			}
 		}

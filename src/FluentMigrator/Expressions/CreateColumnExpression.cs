@@ -25,6 +25,7 @@ namespace FluentMigrator.Expressions
 {
 	public class CreateColumnExpression : MigrationExpressionBase
 	{
+		public virtual string SchemaName { get; set; }
 		public virtual string TableName { get; set; }
 		public virtual ColumnDefinition Column { get; set; }
 
@@ -48,7 +49,12 @@ namespace FluentMigrator.Expressions
 
 		public override IMigrationExpression Reverse()
 		{
-			return new DeleteColumnExpression { TableName = TableName, ColumnName = Column.Name };
+			return new DeleteColumnExpression
+					{
+						SchemaName = SchemaName,
+						TableName = TableName,
+						ColumnName = Column.Name
+					};
 		}
 
 		public override string ToString()

@@ -34,18 +34,24 @@ namespace FluentMigrator.Builders.Create
 			_context = context;
 		}
 
-		public ICreateTableWithColumnSyntax Table(string tableName)
+		public void Schema(string schemaName)
+		{
+			var expression = new CreateSchemaExpression { SchemaName = schemaName };
+			_context.Expressions.Add(expression);
+		}
+
+		public ICreateTableWithColumnOrSchemaSyntax Table(string tableName)
 		{
 			var expression = new CreateTableExpression { TableName = tableName };
 			_context.Expressions.Add(expression);
-			return new CreateTableExpressionBuilder(expression);
+			return new CreateTableExpressionBuilder(expression, _context);
 		}
 
 		public ICreateColumnOnTableSyntax Column(string columnName)
 		{
 			var expression = new CreateColumnExpression { Column = { Name = columnName } };
 			_context.Expressions.Add(expression);
-			return new CreateColumnExpressionBuilder(expression);
+			return new CreateColumnExpressionBuilder(expression, _context);
 		}
 
 		public ICreateForeignKeyFromTableSyntax ForeignKey()

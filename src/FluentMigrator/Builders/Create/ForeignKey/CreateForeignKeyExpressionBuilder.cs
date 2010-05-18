@@ -16,20 +16,22 @@
 //
 #endregion
 
-using System;
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Builders.Create.ForeignKey
 {
 	public class CreateForeignKeyExpressionBuilder : ExpressionBuilderBase<CreateForeignKeyExpression>,
-		ICreateForeignKeyFromTableSyntax, ICreateForeignKeyForeignColumnSyntax, ICreateForeignKeyToTableSyntax, ICreateForeignKeyPrimaryColumnSyntax
+		ICreateForeignKeyFromTableSyntax,
+		ICreateForeignKeyForeignColumnOrInSchemaSyntax,
+		ICreateForeignKeyToTableSyntax,
+		ICreateForeignKeyPrimaryColumnOrInSchemaSyntax
 	{
 		public CreateForeignKeyExpressionBuilder(CreateForeignKeyExpression expression)
 			: base(expression)
 		{
 		}
 
-		public ICreateForeignKeyForeignColumnSyntax FromTable(string table)
+		public ICreateForeignKeyForeignColumnOrInSchemaSyntax FromTable(string table)
 		{
 			Expression.ForeignKey.ForeignTable = table;
 			return this;
@@ -43,13 +45,18 @@ namespace FluentMigrator.Builders.Create.ForeignKey
 
 		public ICreateForeignKeyToTableSyntax ForeignColumns(params string[] columns)
 		{
-			foreach (string column in columns)
+			foreach (var column in columns)
 				Expression.ForeignKey.ForeignColumns.Add(column);
-
 			return this;
 		}
 
-		public ICreateForeignKeyPrimaryColumnSyntax ToTable(string table)
+		ICreateForeignKeyForeignColumnSyntax ICreateForeignKeyForeignColumnOrInSchemaSyntax.InSchema(string schemaName)
+		{
+			Expression.ForeignKey.ForeignTableSchema = schemaName;
+			return this;
+		}
+
+		public ICreateForeignKeyPrimaryColumnOrInSchemaSyntax ToTable(string table)
 		{
 			Expression.ForeignKey.PrimaryTable = table;
 			return this;
@@ -62,8 +69,14 @@ namespace FluentMigrator.Builders.Create.ForeignKey
 
 		public void PrimaryColumns(params string[] columns)
 		{
-			foreach (string column in columns)
+			foreach (var column in columns)
 				Expression.ForeignKey.PrimaryColumns.Add(column);
+		}
+
+		ICreateForeignKeyPrimaryColumnSyntax ICreateForeignKeyPrimaryColumnOrInSchemaSyntax.InSchema(string schemaName)
+		{
+			Expression.ForeignKey.PrimaryTableSchema = schemaName;
+			return this;
 		}
 	}
 }

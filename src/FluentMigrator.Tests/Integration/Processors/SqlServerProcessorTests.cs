@@ -17,7 +17,9 @@
 #endregion
 
 using System.Data.SqlClient;
+using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
@@ -36,7 +38,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 			Connection = new SqlConnection(@"server=(local)\sqlexpress;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator");
 			Connection.Open();
 
-			Processor = new SqlServerProcessor(Connection, new SqlServer2000Generator());
+			Processor = new SqlServerProcessor(Connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 		}
 
 		[Test]

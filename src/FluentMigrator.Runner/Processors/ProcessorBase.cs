@@ -23,61 +23,80 @@ namespace FluentMigrator.Runner.Processors
 {
 	public abstract class ProcessorBase : IMigrationProcessor
 	{
-		protected IMigrationGenerator generator;
+		protected readonly IMigrationGenerator Generator;
+		protected readonly IAnnouncer Announcer;
+		public IMigrationProcessorOptions Options { get; private set; }
+
+		protected ProcessorBase(IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+		{
+			Generator = generator;
+			Announcer = announcer;
+			Options = options;
+		}
+
+		public virtual void Process(CreateSchemaExpression expression)
+		{
+			Process(Generator.Generate(expression));
+		}
+
+		public virtual void Process(DeleteSchemaExpression expression)
+		{
+			Process(Generator.Generate(expression));
+		}
 
 		public virtual void Process(CreateTableExpression expression)
 		{
-			Process(generator.Generate(expression));
+			Process(Generator.Generate(expression));
 		}
 
 		public virtual void Process(CreateColumnExpression expression)
 		{
-			Process(generator.Generate(expression));
+			Process(Generator.Generate(expression));
 		}
 
 		public virtual void Process(DeleteTableExpression expression)
 		{
-			Process(generator.Generate(expression));
+			Process(Generator.Generate(expression));
 		}
 
 		public virtual void Process(DeleteColumnExpression expression)
 		{
-			Process(generator.Generate(expression));
+			Process(Generator.Generate(expression));
 		}
 
 		public virtual void Process(CreateForeignKeyExpression expression)
 		{
-			Process(generator.Generate(expression));
+			Process(Generator.Generate(expression));
 		}
 
 		public virtual void Process(DeleteForeignKeyExpression expression)
 		{
-			Process(generator.Generate(expression));
+			Process(Generator.Generate(expression));
 		}
 
 		public virtual void Process(CreateIndexExpression expression)
 		{
-			Process(generator.Generate(expression));
+			Process(Generator.Generate(expression));
 		}
 
 		public virtual void Process(DeleteIndexExpression expression)
 		{
-			Process(generator.Generate(expression));
+			Process(Generator.Generate(expression));
 		}
 
 		public virtual void Process(RenameTableExpression expression)
 		{
-			Process(generator.Generate(expression));
+			Process(Generator.Generate(expression));
 		}
 
 		public virtual void Process(RenameColumnExpression expression)
 		{
-			Process(generator.Generate(expression));
+			Process(Generator.Generate(expression));
 		}
 
 		public void Process(InsertDataExpression expression)
 		{
-			Process(generator.Generate(expression));
+			Process(Generator.Generate(expression));
 		}
 
 		protected abstract void Process(string sql);
@@ -94,6 +113,7 @@ namespace FluentMigrator.Runner.Processors
 		public abstract System.Data.DataSet Read(string template, params object[] args);
 		public abstract bool Exists(string template, params object[] args);
 		public abstract void Execute(string template, params object[] args);
+		public abstract bool SchemaExists(string tableName);
 		public abstract bool TableExists(string tableName);
 		public abstract bool ColumnExists(string tableName, string columnName);
 		public abstract bool ConstraintExists(string tableName, string constraintName);

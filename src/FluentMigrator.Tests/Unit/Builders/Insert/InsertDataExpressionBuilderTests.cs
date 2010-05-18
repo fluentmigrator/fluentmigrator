@@ -17,6 +17,7 @@
 #endregion
 
 using FluentMigrator.Builders.Insert;
+using FluentMigrator.Expressions;
 using NUnit.Framework;
 using NUnit.Should;
 

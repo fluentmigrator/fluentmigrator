@@ -18,33 +18,39 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Insert
 {
-	public class InsertDataExpressionBuilder : IInsertDataSyntax
+	public class InsertDataExpressionBuilder : IInsertDataOrInSchemaSyntax
 	{
-		private readonly InsertDataExpression expression;
+		private readonly InsertDataExpression _expression;
 
 		public InsertDataExpressionBuilder(InsertDataExpression expression)
 		{
-			this.expression = expression;
+			_expression = expression;
 		}
 
 		public IInsertDataSyntax Row(object dataAsAnonymousType)
 		{
-			expression.Rows.Add(GetData(dataAsAnonymousType));
+			_expression.Rows.Add(GetData(dataAsAnonymousType));
 			return this;
 		}
 
-		private InsertionData GetData(object dataAsAnonymousType)
+		public IInsertDataSyntax InSchema(string schemaName)
 		{
-			var data = new InsertionData();
-			PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(dataAsAnonymousType);
-			
+			_expression.SchemaName = schemaName;
+			return this;
+		}
+
+		private static InsertionDataDefinition GetData(object dataAsAnonymousType)
+		{
+			var data = new InsertionDataDefinition();
+			var properties = TypeDescriptor.GetProperties(dataAsAnonymousType);
+
 			foreach (PropertyDescriptor property in properties)
-			{				
 				data.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(dataAsAnonymousType)));
-			}
 			return data;
 		}
 	}

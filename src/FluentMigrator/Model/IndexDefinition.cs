@@ -27,6 +27,7 @@ namespace FluentMigrator.Model
 	public class IndexDefinition : ICloneable, ICanBeConventional, ICanBeValidated
 	{
 		public virtual string Name { get; set; }
+		public virtual string SchemaName { get; set; }
 		public virtual string TableName { get; set; }
 		public virtual bool IsUnique { get; set; }
 		public bool IsClustered { get; set; }
@@ -63,6 +64,7 @@ namespace FluentMigrator.Model
 			return new IndexDefinition
 			{
 				Name = Name,
+				SchemaName = SchemaName,
 				TableName = TableName,
 				IsUnique = IsUnique,
 				IsClustered = IsClustered,

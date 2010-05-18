@@ -10,3 +10,4 @@ dist
 TestResult.xml
 src/FluentMigrator.Example/tools/FluentMigrator
 db.sqlite
+*.orig

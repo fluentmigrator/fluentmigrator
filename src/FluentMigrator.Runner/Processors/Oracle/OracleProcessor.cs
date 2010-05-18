@@ -9,13 +9,19 @@ namespace FluentMigrator.Runner.Processors.Oracle
 		public virtual OracleConnection Connection { get; set; }
 		public OracleTransaction Transaction { get; private set; }
 
-		public OracleProcessor(OracleConnection connection, IMigrationGenerator generator)
+		public OracleProcessor(OracleConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+			: base(generator, announcer, options)
 		{
-			this.generator = generator;
 			Connection = connection;
+
 
 			//oracle does not support ddl transactions
 			//this.Transaction = this.Connection.BeginTransaction();
+		}
+
+		public override bool SchemaExists(string schemaName)
+		{
+			throw new NotImplementedException();
 		}
 
 		public override bool TableExists(string tableName)
@@ -77,6 +83,11 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
 		protected override void Process(string sql)
 		{
+			Announcer.Sql(sql);
+
+			if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
+				return;
+
 			if (Connection.State != ConnectionState.Open)
 				Connection.Open();
 

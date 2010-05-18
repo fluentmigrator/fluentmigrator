@@ -23,12 +23,13 @@ namespace FluentMigrator.Runner.Initialization
 		string Database { get; set; }
 		string Connection { get; set; }
 		string Target { get; set; }
-		bool LoggingEnabled { get; set; }
+		bool PreviewOnly { get; set; }
 		string Namespace { get; set; }
 		string Task { get; set; }
 		long Version { get; set; }
 		int Steps { get; set; }
 		string WorkingDirectory { get; set; }
+		IAnnouncer Announcer { get; }
 		IMigrationProcessor Processor { get; }
 	}
 }

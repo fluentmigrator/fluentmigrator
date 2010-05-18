@@ -24,6 +24,7 @@ namespace FluentMigrator.Expressions
 {
 	public class DeleteTableExpression : MigrationExpressionBase
 	{
+		public virtual string SchemaName { get; set; }
 		public virtual string TableName { get; set; }
 
 		public override void CollectValidationErrors(ICollection<string> errors)

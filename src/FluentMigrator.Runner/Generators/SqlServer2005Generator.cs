@@ -17,10 +17,10 @@
 #endregion
 
 using System.Data;
+using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Generators
 {
-
 	public class SqlServer2005Generator : SqlServer2000Generator
 	{
 		protected override void SetupTypeMaps()
@@ -30,6 +30,25 @@ namespace FluentMigrator.Runner.Generators
 			SetTypeMap(DbType.String, "NVARCHAR(MAX)", UnicodeTextCapacity);
 			SetTypeMap(DbType.AnsiString, "VARCHAR(MAX)", AnsiTextCapacity);
 			SetTypeMap(DbType.Binary, "VARBINARY(MAX)", ImageCapacity);
+		}
+
+		public override string Generate(CreateSchemaExpression expression)
+		{
+			return FormatExpression("CREATE SCHEMA [{0}]", expression.SchemaName);
+		}
+
+		public override string Generate(DeleteSchemaExpression expression)
+		{
+			return FormatExpression("DROP SCHEMA [{0}]", expression.SchemaName);
+		}
+
+		protected override string FormatSchema(string schemaName, bool escapeSchemaName)
+		{
+			return string.Format(
+				escapeSchemaName
+					? "[{0}]."
+					: "{0}.",
+				schemaName ?? "dbo");
 		}
 	}
 }

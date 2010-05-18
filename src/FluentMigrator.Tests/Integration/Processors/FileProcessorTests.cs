@@ -21,6 +21,8 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner;
+using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors;
 using NUnit.Framework;
@@ -45,7 +47,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 			_columnName = "sample_column_id";
 
 			_generator = new SqliteGenerator();
-			_fileDumpProcessor = new FileProcessor(_dumpFilename, _generator);
+			_fileDumpProcessor = new FileProcessor(_dumpFilename, _generator, new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 		}
 
 		[Test]
@@ -99,9 +101,9 @@ namespace FluentMigrator.Tests.Integration.Processors
 
 	public class FileProcessor : ProcessorBase
 	{
-		public FileProcessor(string dumpFilename, IMigrationGenerator generator)
+		public FileProcessor(string dumpFilename, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+			: base(generator, announcer, options)
 		{
-			this.generator = generator;
 			DumpFilename = string.Format("{0}.{1}.sql", dumpFilename, FormattedDateTime);
 			File.Delete(DumpFilename);
 		}
@@ -128,6 +130,11 @@ namespace FluentMigrator.Tests.Integration.Processors
 		}
 
 		public override DataSet Read(string template, params object[] args)
+		{
+			throw new NotImplementedException();
+		}
+
+		public override bool SchemaExists(string tableName)
 		{
 			throw new NotImplementedException();
 		}

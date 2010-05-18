@@ -24,6 +24,8 @@ namespace FluentMigrator
 {
 	public interface IMigrationProcessor : IQuerySchema
 	{
+		IMigrationProcessorOptions Options { get; }
+
 		void Execute(string template, params object[] args);
 		DataSet ReadTableData(string tableName);
 		DataSet Read(string template, params object[] args);
@@ -31,6 +33,8 @@ namespace FluentMigrator
 		void CommitTransaction();
 		void RollbackTransaction();
 
+		void Process(CreateSchemaExpression expression);
+		void Process(DeleteSchemaExpression expression);
 		void Process(CreateTableExpression expression);
 		void Process(CreateColumnExpression expression);
 		void Process(DeleteTableExpression expression);

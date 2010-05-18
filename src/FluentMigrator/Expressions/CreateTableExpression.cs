@@ -24,6 +24,7 @@ namespace FluentMigrator.Expressions
 {
 	public class CreateTableExpression : MigrationExpressionBase
 	{
+		public virtual string SchemaName { get; set; }
 		public virtual string TableName { get; set; }
 		public virtual IList<ColumnDefinition> Columns { get; set; }
 
@@ -34,10 +35,10 @@ namespace FluentMigrator.Expressions
 
 		public override void CollectValidationErrors(ICollection<string> errors)
 		{
-			if (String.IsNullOrEmpty(TableName))
+			if (string.IsNullOrEmpty(TableName))
 				errors.Add(String.Format("The {0} does not have a valid table name", GetType().Name));
 
-			foreach (ColumnDefinition column in Columns)
+			foreach (var column in Columns)
 				column.CollectValidationErrors(errors);
 		}
 
@@ -48,7 +49,11 @@ namespace FluentMigrator.Expressions
 
 		public override IMigrationExpression Reverse()
 		{
-			return new DeleteTableExpression { TableName = TableName };
+			return new DeleteTableExpression
+					{
+						TableName = TableName,
+						SchemaName = SchemaName
+					};
 		}
 
 		public override string ToString()

@@ -22,6 +22,6 @@ namespace FluentMigrator.Builders.Rename
 {
 	public interface IRenameColumnTableSyntax
 	{
-		IRenameColumnToSyntax OnTable(string tableName);
+		IRenameColumnToOrInSchemaSyntax OnTable(string tableName);
 	}
 }

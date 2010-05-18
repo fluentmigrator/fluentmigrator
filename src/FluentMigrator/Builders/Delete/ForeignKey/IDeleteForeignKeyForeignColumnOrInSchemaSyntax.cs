@@ -16,12 +16,10 @@
 //
 #endregion
 
-using System.Collections.Generic;
-
-namespace FluentMigrator.Builders.Insert
+namespace FluentMigrator.Builders.Delete.ForeignKey
 {
-	public class InsertionData: List<KeyValuePair<string,object>>
+	public interface IDeleteForeignKeyForeignColumnOrInSchemaSyntax : IDeleteForeignKeyForeignColumnSyntax
 	{
-		
+		IDeleteForeignKeyForeignColumnSyntax InSchema(string foreignSchemaName);
 	}
 }

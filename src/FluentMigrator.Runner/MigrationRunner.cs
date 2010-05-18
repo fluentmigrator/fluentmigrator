@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 
@@ -32,11 +33,6 @@ namespace FluentMigrator.Runner
 		public bool SilentlyFail { get; set; }
 		private IStopWatch _stopWatch;
 
-		public MigrationRunner(IMigrationConventions conventions, IMigrationProcessor processor)
-			: this(conventions, processor, new Announcer(Console.Out), new StopWatch())
-		{
-		}
-
 		public MigrationRunner(IMigrationConventions conventions, IMigrationProcessor processor, IAnnouncer announcer, IStopWatch stopWatch)
 		{
 			_announcer = announcer;
@@ -50,44 +46,37 @@ namespace FluentMigrator.Runner
 		public void Up(IMigration migration)
 		{
 			var name = migration.GetType().Name;
-			_announcer.Announce(name + ": migrating");
-			
+			_announcer.Heading(name + ": migrating");
+
 			CaughtExceptions = new List<Exception>();
 
-			var context = new MigrationContext(Conventions,Processor);
-
+			var context = new MigrationContext(Conventions, Processor);
 			migration.GetUpExpressions(context);
 
 			_stopWatch.Start();
-
 			ExecuteExpressions(context.Expressions);
-
 			_stopWatch.Stop();
-			
-			var elapsed = _stopWatch.ElapsedTime().TotalSeconds;
 
-			_announcer.Announce(name + ": migrated (" + elapsed + "s" + ")");
+			_announcer.Say(name + ": migrated");
+			_announcer.ElapsedTime(_stopWatch.ElapsedTime());
 		}
 
 		public void Down(IMigration migration)
 		{
 			var name = migration.GetType().Name;
-			_announcer.Announce(name + ": reverting");
-			
+			_announcer.Heading(name + ": reverting");
+
 			CaughtExceptions = new List<Exception>();
 
-			var context = new MigrationContext(Conventions,Processor);
+			var context = new MigrationContext(Conventions, Processor);
 			migration.GetDownExpressions(context);
 
 			_stopWatch.Start();
-
 			ExecuteExpressions(context.Expressions);
-
 			_stopWatch.Stop();
 
-			var elapsed = _stopWatch.ElapsedTime().TotalSeconds;
-
-			_announcer.Announce(name + ": reverted (" + elapsed + "s" + ")");
+			_announcer.Say(name + ": reverted");
+			_announcer.ElapsedTime(_stopWatch.ElapsedTime());
 		}
 
 		/// <summary>
@@ -96,16 +85,26 @@ namespace FluentMigrator.Runner
 		/// <param name="expressions"></param>
 		protected void ExecuteExpressions(ICollection<IMigrationExpression> expressions)
 		{
+			long insertTicks = 0;
+			int insertCount = 0;
 			foreach (IMigrationExpression expression in expressions)
 			{
 				try
 				{
-					expression.ApplyConventions( Conventions );
-					time(expression.ToString(), () => expression.ExecuteWith(Processor));
+					expression.ApplyConventions(Conventions);
+					if (expression is InsertDataExpression)
+					{
+						insertTicks += Time(() => expression.ExecuteWith(Processor));
+						insertCount++;
+					}
+					else
+					{
+						AnnounceTime(expression.ToString(), () => expression.ExecuteWith(Processor));
+					}
 				}
 				catch (Exception er)
 				{
-					_announcer.Say(er.Message);
+					_announcer.Error(er.Message);
 
 					//catch the error and move onto the next expression
 					if (SilentlyFail)
@@ -116,21 +115,36 @@ namespace FluentMigrator.Runner
 					throw;
 				}
 			}
+
+			if (insertCount > 0)
+			{
+				var avg = new TimeSpan(insertTicks / insertCount);
+				var msg = string.Format("-> {0} Insert operations completed in {1} taking an average of {2}", insertCount, new TimeSpan(insertTicks), avg);
+				_announcer.Say(msg);
+			}
+
 		}
 
-		private void time(string message, Action action)
+		private void AnnounceTime(string message, Action action)
 		{
 			_announcer.Say(message);
 
+			_stopWatch.Start();
+			action();
+			_stopWatch.Stop();
+
+			_announcer.ElapsedTime(_stopWatch.ElapsedTime());
+		}
+
+		private long Time(Action action)
+		{
 			_stopWatch.Start();
 
 			action();
 
 			_stopWatch.Stop();
 
-			var elapsed = _stopWatch.ElapsedTime().TotalSeconds;
-
-			_announcer.SaySubItem(elapsed + "s");
+			return _stopWatch.ElapsedTime().Ticks;
 		}
 	}
 }

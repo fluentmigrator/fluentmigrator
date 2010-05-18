@@ -24,14 +24,14 @@ namespace FluentMigrator.Console
 	{
 		static void Main(string[] args)
 		{
-         try
-         {
-            new MigratorConsole(args);
-         }
-         catch (ArgumentException ex)
-         {
-            System.Console.WriteLine(ex.Message);
-         }
+			try
+			{
+				new MigratorConsole(args);
+			}
+			catch (ArgumentException ex)
+			{
+				System.Console.WriteLine(ex.Message);
+			}
 		}
 	}
 }

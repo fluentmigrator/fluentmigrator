@@ -144,7 +144,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.ForeignKey.Name = "FK_Test";
 			expression.ForeignKey.PrimaryTable = "TestPrimaryTable";
 			expression.ForeignKey.ForeignTable = "TestForeignTable";
-			expression.ForeignKey.PrimaryColumns = new[] {"Column1", "Column2"};
+			expression.ForeignKey.PrimaryColumns = new[] { "Column1", "Column2" };
 			expression.ForeignKey.ForeignColumns = new[] { "Column3", "Column4" };
 
 			string sql = generator.Generate(expression);
@@ -167,10 +167,10 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			var expression = new InsertDataExpression();
 			expression.TableName = "TestTable";
-			expression.Rows.Add(new InsertionData { new KeyValuePair<string, object>("Id", 1), 
+			expression.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("Id", 1), 
 													new KeyValuePair<string, object>("Name", "Justin"),
 													new KeyValuePair<string, object>("Website", "codethinked.com") });
-			expression.Rows.Add(new InsertionData { new KeyValuePair<string, object>("Id", 2), 
+			expression.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("Id", 2), 
 													new KeyValuePair<string, object>("Name", "Nate"),
 													new KeyValuePair<string, object>("Website", "kohari.org") });
 
@@ -189,14 +189,14 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			var gid = Guid.NewGuid();
 			var expression = new InsertDataExpression() { TableName = "TestTable" };
-			expression.Rows.Add(new InsertionData { new KeyValuePair<string, object>("guid", gid) });
+			expression.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("guid", gid) });
 
 			string sql = generator.Generate(expression);
 
-			string expected = String.Format( "INSERT ALL INTO TestTable (guid) VALUES ('{0}') SELECT 1 FROM DUAL", gid.ToString());
+			string expected = String.Format("INSERT ALL INTO TestTable (guid) VALUES ('{0}') SELECT 1 FROM DUAL", gid.ToString());
 
 			sql.ShouldBe(expected);
-		}		
+		}
 
 		private DeleteTableExpression GetDeleteTableExpression(string tableName)
 		{
