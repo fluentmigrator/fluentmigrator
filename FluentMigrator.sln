@@ -1,28 +1,28 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Runners", "Runners", "{CB10ADAF-FB42-457B-ADFE-7CF866C5DA6E}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{C17FACD1-2740-44B5-8E6E-B7FF0D54CA40}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D264186F-3ED6-482D-8E1A-F41C2F83C711}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{64A04012-A9E7-4DE9-8927-DD1DD5E2523A}"
-	ProjectSection(SolutionItems) = preProject
-		SolutionInfo.cs = SolutionInfo.cs
-	EndProjectSection
-EndProject
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Runner", "src\FluentMigrator.Runner\FluentMigrator.Runner.csproj", "{CB468AD6-60C2-42E9-B3B0-01968EF94C65}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Tests", "src\FluentMigrator.Tests\FluentMigrator.Tests.csproj", "{5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator", "src\FluentMigrator\FluentMigrator.csproj", "{FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Runners", "Runners", "{CB10ADAF-FB42-457B-ADFE-7CF866C5DA6E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{C17FACD1-2740-44B5-8E6E-B7FF0D54CA40}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{D264186F-3ED6-482D-8E1A-F41C2F83C711}"
+EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Console", "src\FluentMigrator.Console\FluentMigrator.Console.csproj", "{664C7334-B44B-4D62-A0F8-063805D630AA}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.NAnt", "src\FluentMigrator.NAnt\FluentMigrator.NAnt.csproj", "{C2B629E5-9394-48DA-A9E8-4999B398F37E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.MSBuild", "src\FluentMigrator.MSBuild\FluentMigrator.MSBuild.csproj", "{97849F97-BD7D-453B-B0CF-6CD922BB1596}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{64A04012-A9E7-4DE9-8927-DD1DD5E2523A}"
+	ProjectSection(SolutionItems) = preProject
+		SolutionInfo.cs = SolutionInfo.cs
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -109,7 +109,7 @@ Global
 		{664C7334-B44B-4D62-A0F8-063805D630AA} = {CB10ADAF-FB42-457B-ADFE-7CF866C5DA6E}
 		{C2B629E5-9394-48DA-A9E8-4999B398F37E} = {CB10ADAF-FB42-457B-ADFE-7CF866C5DA6E}
 		{97849F97-BD7D-453B-B0CF-6CD922BB1596} = {CB10ADAF-FB42-457B-ADFE-7CF866C5DA6E}
-		{FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8} = {C17FACD1-2740-44B5-8E6E-B7FF0D54CA40}
 		{5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C} = {D264186F-3ED6-482D-8E1A-F41C2F83C711}
+		{FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8} = {C17FACD1-2740-44B5-8E6E-B7FF0D54CA40}
 	EndGlobalSection
 EndGlobal
