@@ -221,10 +221,12 @@ namespace FluentMigrator.Runner.Generators
 			{
 				return "'" + stringValue.Replace("'", "''") + "'";
 			}
-			else if (value is Guid)
+
+			if (value is Guid)
 			{
 				return "'" + ((Guid)value).ToString().Replace("'", "''") + "'";
 			}
+
 			return value.ToString();
 		}
 	}
