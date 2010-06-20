@@ -1,9 +1,21 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<project name="migrator" default="build" xmlns="http://nant.sf.net/release/0.85/nant.xsd">
+<project name="fluentmigrator" default="all">
 
     <!-- Paths to various parts of the build -->
+	<property name="path.base" value="${project::get-base-directory()}"/>
+	<property name="product.name" value="fluentmigrator" />
     <property name="dir.bin" value="build" />
+	<property name="path.dist" value="dist" />
+	<property name="build.platform" value="net-3.5" />
+	<property name="build.config" value="release" />
+	<property name="build.version" value="0.9" />
+	
+	<target name="all" depends="build package-bin package-source" />
 
+	<target name="clean" description="Deletes the output folders for a clean build">
+        <delete dir="${dir.bin}"/>
+    </target>
+	
     <target name="build" description="Builds the app" depends="clean">
 		<msbuild project="FluentMigrator.sln">
 			<property name="Configuration" value="AutomatedRelease" />
@@ -11,8 +23,29 @@
 		</msbuild>
     </target>
 
-    <target name="clean" description="Deletes the output folders for a clean build">
-        <delete dir="${dir.bin}"/>
-    </target>
+	<target name="package-bin">
+		<mkdir dir="${path.dist}" if="${not(directory::exists(path.dist))}"/>
+		<zip zipfile="${path.dist}\${product.name}-${build.version}-${build.config}-${build.platform}.zip" ziplevel="9">
+			<fileset basedir="${dir.bin}">
+				<include name="**/*.*"/>
+			</fileset>
+		</zip>
+	</target>
+
+	<target name="package-source">
+		<mkdir dir="${path.dist}" if="${not(directory::exists(path.dist))}"/>
+		<zip zipfile="${path.dist}\${product.name}-${build.version}-source.zip" ziplevel="9">
+			<fileset basedir="${path.base}">
+				<include name="lib/*.*"/>
+				<include name="**/*.cs"/>
+				<include name="**/*.csproj"/>
+				<include name="**/*.sln"/>
+				<include name="**/*.txt"/>
+				<include name="**/*.build"/>
+				<include name="**/*.include"/>
+				<include name="**/*.snk"/>
+			</fileset>
+		</zip>
+	</target>
 
 </project>
