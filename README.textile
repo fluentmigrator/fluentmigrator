@@ -76,6 +76,28 @@ public class TestCreateAndDropTableMigration: Migration
 	}
 }</code></pre>
 
+h2. Example Profile
+
+Profiles are used to selectively apply migrations depending on a command line option, or build script attribute. For instance, you may want to run Migrations 1,2 and 3 only in your Dev environment, and run Migration 4 in Production. Profiles will always be run if you pass them in the command line.
+
+<pre><code>
+[Profile("Development")]
+public class CreateDevSeedData : Migration
+{
+	public override void Up()
+	{
+		Insert.IntoTable( "User" ).Row( new
+         {
+			Username = "devuser1",
+			DisplayName = "Dev User"
+         } );
+	}
+
+	public override void Down()
+	{
+	}
+}</code></pre>
+
 h2. Example usage of console runner
 
 <pre><code>tools\fluentmigrator\FluentMigrator.Console.exe /connection "Data Source=db\db.sqlite;Version=3;" /db sqlite /target build\Migrations.dll</code></pre>
