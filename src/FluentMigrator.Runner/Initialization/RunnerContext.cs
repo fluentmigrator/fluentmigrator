@@ -33,6 +33,7 @@ namespace FluentMigrator.Runner.Initialization
 		public long Version { get; set; }
 		public int Steps { get; set; }
 		public string WorkingDirectory { get; set; }
+		public string Profile { get; set; }
 		public IAnnouncer Announcer { get; private set; }
 
 		public IMigrationProcessor Processor

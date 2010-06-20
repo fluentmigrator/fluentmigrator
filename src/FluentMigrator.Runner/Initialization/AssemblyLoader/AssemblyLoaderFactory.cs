@@ -26,10 +26,8 @@ namespace FluentMigrator.Runner.Initialization.AssemblyLoader
 			{
 				return new AssemblyLoaderFromFile(name);
 			}
-			else
-			{
-				return new AssemblyLoaderFromName(name);
-			}
+
+			return new AssemblyLoaderFromName(name);
 		}
 	}
 }

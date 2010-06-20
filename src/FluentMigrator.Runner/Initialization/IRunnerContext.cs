@@ -29,6 +29,7 @@ namespace FluentMigrator.Runner.Initialization
 		long Version { get; set; }
 		int Steps { get; set; }
 		string WorkingDirectory { get; set; }
+		string Profile { get; set; }
 		IAnnouncer Announcer { get; }
 		IMigrationProcessor Processor { get; }
 	}

@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using FluentMigrator.Infrastructure;
 using System.Linq;
+using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.VersionTableInfo;
 
 namespace FluentMigrator.Runner
@@ -43,6 +44,18 @@ namespace FluentMigrator.Runner
 
 			foreach (Type type in matchedTypes)
 				yield return Conventions.GetMetadataForMigration(type);
+		}
+
+		public IEnumerable<IMigration> FindProfilesIn(Assembly assembly, string profile)
+		{
+			IEnumerable<Type> matchedTypes = assembly.GetExportedTypes().Where(t => Conventions.TypeIsProfile(t));
+
+			foreach (Type type in matchedTypes)
+			{
+				string profileName = type.GetOneAttribute<ProfileAttribute>().ProfileName;
+				if (profileName.ToLower() == profile.ToLower())
+					yield return type.Assembly.CreateInstance(type.FullName) as IMigration;
+			}
 		}
 
 		public IVersionTableMetaData GetVersionTableMetaData(Assembly assembly)

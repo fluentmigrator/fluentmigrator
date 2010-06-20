@@ -50,6 +50,9 @@ namespace FluentMigrator.NAnt
 		[TaskAttribute("workingdirectory")]
 		public string WorkingDirectory { get; set; }
 
+		[TaskAttribute("profile")]
+		public string Profile { get; set; }
+
 		protected override void ExecuteTask()
 		{
 			var announcer = new TextWriterAnnouncer(System.Console.Out)
@@ -67,7 +70,8 @@ namespace FluentMigrator.NAnt
 										Task = Task,
 										Version = Version,
 										Steps = Steps,
-										WorkingDirectory = WorkingDirectory
+										WorkingDirectory = WorkingDirectory,
+										Profile = Profile
 									};
 
 			new TaskExecutor(runnerContext).Execute();

@@ -81,10 +81,10 @@ namespace FluentMigrator
 			get { return new InsertExpressionRoot(_context); }
 		}
 
-	    public IExecuteExpressionRoot Execute
-	    {
-	        get { return new ExecuteExpressionRoot(_context);}
-	    }
+		public IExecuteExpressionRoot Execute
+		{
+			get { return new ExecuteExpressionRoot(_context);}
+		}
 
 		public ISchemaExpressionRoot Schema
 		{

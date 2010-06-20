@@ -161,6 +161,7 @@
     <Compile Include="IMigrationProcessorOptions.cs" />
     <Compile Include="Infrastructure\Extensions\ExtensionsForIEnumerable.cs" />
     <Compile Include="IQuerySchema.cs" />
+    <Compile Include="ProfileAttribute.cs" />
     <Compile Include="VersionTableInfo\DefaultVersionTableMetaData.cs" />
     <Compile Include="VersionTableInfo\IVersionTableMetaData.cs" />
     <Compile Include="MigrationTraitAttribute.cs" />

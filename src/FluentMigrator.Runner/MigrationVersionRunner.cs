@@ -23,6 +23,7 @@ using System.Linq;
 using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.VersionTableInfo;
@@ -41,23 +42,29 @@ namespace FluentMigrator.Runner
 		private MigrationRunner _migrationRunner;
 		private IMigration _versionMigration;
 		private IVersionTableMetaData _versionTableMetaData;
+		private SortedList<long, IMigration> _migrations;
+		private IEnumerable<IMigration> _profiles;
+		private string _profile;
+		private bool _alreadyOutputPreviewOnlyModeWarning;
+		private bool _alreadyCreatedVersionTable;
 
 		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader, IAnnouncer announcer)
-			: this(conventions, processor, loader, Assembly.GetCallingAssembly(), null, announcer)
+			: this(conventions, processor, loader, Assembly.GetCallingAssembly(), null, announcer, string.Empty)
 		{
 		}
 
 		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader, Type getAssemblyByType, IAnnouncer announcer)
-			: this(conventions, processor, loader, getAssemblyByType.Assembly, null, announcer)
+			: this(conventions, processor, loader, getAssemblyByType.Assembly, null, announcer, string.Empty)
 		{
 		}
 
-		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader, Assembly assembly, string @namespace, IAnnouncer announcer)
+		public MigrationVersionRunner(IMigrationConventions conventions, IMigrationProcessor processor, IMigrationLoader loader, Assembly assembly, string @namespace, IAnnouncer announcer, string profile)
 		{
 			_migrationConventions = conventions;
 			_migrationProcessor = processor;
 			_migrationAssembly = assembly;
 			_migrationLoader = loader;
+			_profile = profile;
 			_namespace = @namespace;
 			_announcer = announcer;
 			_migrationRunner = new MigrationRunner(conventions, processor, announcer, new StopWatch());
@@ -86,7 +93,6 @@ namespace FluentMigrator.Runner
 			}
 		}
 
-		private bool _alreadyCreatedVersionTable;
 		private void LoadVersionInfo()
 		{
 			if (_migrationProcessor.Options.PreviewOnly)
@@ -120,7 +126,6 @@ namespace FluentMigrator.Runner
 			}
 		}
 
-		private SortedList<long, IMigration> _migrations;
 		public SortedList<long, IMigration> Migrations
 		{
 			get
@@ -128,6 +133,17 @@ namespace FluentMigrator.Runner
 				if (_migrations == null)
 					LoadMigrations();
 				return _migrations;
+			}
+		}
+
+		private IEnumerable<IMigration> Profiles
+		{
+			get
+			{
+				if (_profiles == null)
+					LoadProfiles();
+
+				return _profiles;
 			}
 		}
 
@@ -150,6 +166,12 @@ namespace FluentMigrator.Runner
 			}
 		}
 
+		private void LoadProfiles()
+		{
+			_profiles = new List<IMigration>();
+			_profiles = _migrationLoader.FindProfilesIn(_migrationAssembly, _profile);
+		}
+
 		public void MigrateUp()
 		{
 			try
@@ -158,6 +180,8 @@ namespace FluentMigrator.Runner
 				{
 					MigrateUp(version);
 				}
+
+				ApplyProfiles();
 
 				_migrationProcessor.CommitTransaction();
 				_versionInfo = null;
@@ -169,7 +193,6 @@ namespace FluentMigrator.Runner
 			}
 		}
 
-		private bool _alreadyOutputPreviewOnlyModeWarning;
 		public void MigrateUp(long version)
 		{
 			if (!_alreadyOutputPreviewOnlyModeWarning && _migrationProcessor.Options.PreviewOnly)
@@ -188,6 +211,50 @@ namespace FluentMigrator.Runner
 			{
 				_migrationRunner.Up(Migrations[version]);
 				UpdateVersionInfoWithAppliedMigration(version);
+			}
+		}
+
+		public void MigrateDown(long version)
+		{
+			try
+			{
+				ApplyMigrationDown(version);
+				ApplyProfiles();
+
+				_migrationProcessor.CommitTransaction();
+				_versionInfo = null;
+			}
+			catch (Exception)
+			{
+				_migrationProcessor.RollbackTransaction();
+				throw;
+			}
+		}
+
+		private void ApplyProfiles()
+		{
+			// Run Profile if applicable
+			foreach (var profile in Profiles)
+			{
+				_migrationRunner.Up(profile);
+			}
+		}
+
+		private void ApplyMigrationDown(long version)
+		{
+			try
+			{
+				_migrationRunner.Down(Migrations[version]);
+				_migrationProcessor.Execute("DELETE FROM {0} WHERE {1}='{2}'", this._versionTableMetaData.TableName, this._versionTableMetaData.ColumnName, version.ToString());
+			}
+			catch (KeyNotFoundException ex)
+			{
+				string msg = string.Format("VersionInfo references version {0} but no Migrator was found attributed with that version.", version);
+				throw new Exception(msg, ex);
+			}
+			catch (Exception ex)
+			{
+				throw new Exception("Error rolling back version " + version, ex);
 			}
 		}
 
@@ -232,40 +299,6 @@ namespace FluentMigrator.Runner
 
 			_migrationProcessor.CommitTransaction();
 			_versionInfo = null;
-		}
-
-		public void MigrateDown(long version)
-		{
-			try
-			{
-				ApplyMigrationDown(version);
-
-				_migrationProcessor.CommitTransaction();
-				_versionInfo = null;
-			}
-			catch (Exception)
-			{
-				_migrationProcessor.RollbackTransaction();
-				throw;
-			}
-		}
-
-		private void ApplyMigrationDown(long version)
-		{
-			try
-			{
-				_migrationRunner.Down(Migrations[version]);
-				_migrationProcessor.Execute("DELETE FROM {0} WHERE {1}='{2}'", this._versionTableMetaData.TableName, this._versionTableMetaData.ColumnName, version.ToString());
-			}
-			catch (KeyNotFoundException ex)
-			{
-				string msg = string.Format("VersionInfo references version {0} but no Migrator was found attributed with that version.", version);
-				throw new Exception(msg, ex);
-			}
-			catch (Exception ex)
-			{
-				throw new Exception("Error rolling back version " + version, ex);
-			}
 		}
 
 		public void RemoveVersionTable()

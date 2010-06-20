@@ -27,5 +27,6 @@ namespace FluentMigrator.Runner
 	{
 		IEnumerable<MigrationMetadata> FindMigrationsIn(Assembly assembly, string @namespace);
 		IVersionTableMetaData GetVersionTableMetaData (Assembly assembly);
+		IEnumerable<IMigration> FindProfilesIn( Assembly assembly, string profile );
 	}
 }

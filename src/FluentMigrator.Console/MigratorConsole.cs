@@ -41,6 +41,7 @@ namespace FluentMigrator.Console
 		public int Steps;
 		public string TargetAssembly;
 		public string WorkingDirectory;
+		public string Profile;
 		public bool ShowHelp;
 
 		static void DisplayHelp(OptionSet p)
@@ -57,7 +58,7 @@ namespace FluentMigrator.Console
 			System.Console.WriteLine("Usage:");
 			System.Console.WriteLine("  migrate [OPTIONS]");
 			System.Console.WriteLine("Example:");
-			System.Console.WriteLine("  migrate -a bin\\debug\\MyMigrations.dll -db SqlServer2008 -conn \"SEE_BELOW\"");
+			System.Console.WriteLine("  migrate -a bin\\debug\\MyMigrations.dll -db SqlServer2008 -conn \"SEE_BELOW\" -profile \"Debug\"");
 			System.Console.WriteLine(hr);
 			System.Console.WriteLine("Example Connection Strings:");
 			System.Console.WriteLine("  MySql: Data Source=172.0.0.1;Database=Foo;User Id=USERNAME;Password=BLAH");
@@ -137,6 +138,11 @@ namespace FluentMigrator.Console
 				                			"workingdirectory=|wd=",
 											"The directory to load SQL scripts specified by migrations from.", //TODO: explain defaults
 				                			v => { WorkingDirectory = v; }
+				                			},
+				                		{
+				                			"profile=",
+											"The profile to run after executing migrations.", //TODO: explain defaults
+				                			v => { Profile = v; }
 				                			},
 										{
 				                			"help|h|?",
@@ -233,7 +239,8 @@ namespace FluentMigrator.Console
 				Task = Task,
 				Version = Version,
 				Steps = Steps,
-				WorkingDirectory = WorkingDirectory
+				WorkingDirectory = WorkingDirectory,
+				Profile = Profile
 			};
 			Processor = migrationContext.Processor;
 

@@ -77,6 +77,11 @@ namespace FluentMigrator.Infrastructure
 			return typeof(IMigration).IsAssignableFrom(type) && type.HasAttribute<MigrationAttribute>();
 		}
 
+		public static bool TypeIsProfile(Type type)
+		{
+			return typeof(IMigration).IsAssignableFrom(type) && type.HasAttribute<ProfileAttribute>();
+		}
+
 		public static bool TypeIsVersionTableMetaData(Type type)
 		{
 			return typeof(IVersionTableMetaData).IsAssignableFrom(type) && type.HasAttribute<VersionTableMetaDataAttribute>();

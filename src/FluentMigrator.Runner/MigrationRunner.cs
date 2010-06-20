@@ -18,13 +18,12 @@
 
 using System;
 using System.Collections.Generic;
-using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Runner
 {
-	public class MigrationRunner
+   public class MigrationRunner
 	{
 		private IAnnouncer _announcer;
 		public IMigrationConventions Conventions { get; private set; }

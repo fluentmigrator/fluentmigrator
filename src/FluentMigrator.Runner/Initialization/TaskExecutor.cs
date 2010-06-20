@@ -47,7 +47,8 @@ namespace FluentMigrator.Runner.Initialization
 												new MigrationLoader(migrationConventions),
 												assembly,
 												RunnerContext.Namespace,
-												RunnerContext.Announcer);
+												RunnerContext.Announcer,
+												RunnerContext.Profile);
 		}
 
 		public void Execute()

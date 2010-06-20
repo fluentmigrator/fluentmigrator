@@ -28,7 +28,7 @@ namespace FluentMigrator.Infrastructure
 		public virtual ICollection<IMigrationExpression> Expressions { get; set; }
 		public virtual IQuerySchema QuerySchema { get; set; }
 
-		public MigrationContext(IMigrationConventions conventions,IQuerySchema querySchema)
+		public MigrationContext(IMigrationConventions conventions, IQuerySchema querySchema)
 		{
 			Conventions = conventions;
 			Expressions = new List<IMigrationExpression>();
