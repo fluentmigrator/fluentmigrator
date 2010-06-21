@@ -5,18 +5,31 @@
 	<property name="path.base" value="${project::get-base-directory()}"/>
 	<property name="product.name" value="fluentmigrator" />
     <property name="dir.bin" value="build" />
+	<property name="dir.sample" value="${path.base}\src\FluentMigrator.Example" />
 	<property name="path.dist" value="dist" />
 	<property name="build.platform" value="net-3.5" />
 	<property name="build.config" value="release" />
-	<property name="build.version" value="0.9" />
+	<property name="major.version" value="0.9" />
+	<property name="complete.version" value="${major.version}.0.${build.number}" />
 	
-	<target name="all" depends="build package-bin package-source" />
+	<target name="all" depends="generate-version build package-bin package-source package-sample" />
 
 	<target name="clean" description="Deletes the output folders for a clean build">
         <delete dir="${dir.bin}"/>
     </target>
 	
-    <target name="build" description="Builds the app" depends="clean">
+	<target name="generate-version" description="Generates the AssemblyInfo.cs" depends="clean">
+		<asminfo output="${path.base}\src\SolutionInfo.cs" language="CSharp">
+			<attributes>
+				<attribute type="System.Reflection.AssemblyProductAttribute" value="FluentMigrator" />
+				<attribute type="System.Reflection.AssemblyVersionAttribute" value="${complete.version}"/>
+				<attribute type="System.Reflection.AssemblyCopyrightAttribute" value="Copyright - Sean Chambers 2008-2010" />
+				<attribute type="System.Reflection.AssemblyConfigurationAttribute" value="${build.config}" />
+			</attributes>
+		</asminfo>
+	</target>
+	
+    <target name="build" description="Builds the app" depends="generate-version">
 		<msbuild project="FluentMigrator.sln">
 			<property name="Configuration" value="AutomatedRelease" />
 			<property name="OutDir" value="..\..\${dir.bin}\\" />
@@ -25,7 +38,7 @@
 
 	<target name="package-bin">
 		<mkdir dir="${path.dist}" if="${not(directory::exists(path.dist))}"/>
-		<zip zipfile="${path.dist}\${product.name}-${build.version}-${build.config}-${build.platform}.zip" ziplevel="9">
+		<zip zipfile="${path.dist}\${product.name}-${major.version}-${build.config}-${build.platform}.zip" ziplevel="9">
 			<fileset basedir="${dir.bin}">
 				<include name="**/*.*"/>
 			</fileset>
@@ -34,7 +47,7 @@
 
 	<target name="package-source">
 		<mkdir dir="${path.dist}" if="${not(directory::exists(path.dist))}"/>
-		<zip zipfile="${path.dist}\${product.name}-${build.version}-source.zip" ziplevel="9">
+		<zip zipfile="${path.dist}\${product.name}-${major.version}-source.zip" ziplevel="9">
 			<fileset basedir="${path.base}">
 				<include name="lib/*.*"/>
 				<include name="**/*.cs"/>
@@ -44,6 +57,15 @@
 				<include name="**/*.build"/>
 				<include name="**/*.include"/>
 				<include name="**/*.snk"/>
+			</fileset>
+		</zip>
+	</target>
+	
+	<target name="package-sample">
+		<mkdir dir="${path.dist}" if="${not(directory::exists(path.dist))}"/>
+		<zip zipfile="${path.dist}\${product.name}-${major.version}-sample.zip" ziplevel="9">
+			<fileset basedir="${dir.sample}">
+				<include name="**/*.*"/>
 			</fileset>
 		</zip>
 	</target>
