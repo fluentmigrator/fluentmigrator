@@ -54,6 +54,14 @@ namespace FluentMigrator.Tests.Unit
 		}
 
 		[Test]
+		public void BlankProfileDoesntLoadProfiles()
+		{
+			_vrunner.MigrateUp();
+
+			_loaderMock.Verify(x => x.FindProfilesIn(It.IsAny<Assembly>(), It.IsAny<string>()), Times.Never());
+		}
+
+		[Test]
 		public void HandlesNullMigrationList()
 		{
 			//set migrations to return empty list

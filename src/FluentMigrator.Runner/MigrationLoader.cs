@@ -48,13 +48,12 @@ namespace FluentMigrator.Runner
 
 		public IEnumerable<IMigration> FindProfilesIn(Assembly assembly, string profile)
 		{
-			IEnumerable<Type> matchedTypes = assembly.GetExportedTypes().Where(t => Conventions.TypeIsProfile(t));
+			IEnumerable<Type> matchedTypes = assembly.GetExportedTypes()
+				.Where(t => Conventions.TypeIsProfile(t) && t.GetOneAttribute<ProfileAttribute>().ProfileName.ToLower() == profile.ToLower());
 
 			foreach (Type type in matchedTypes)
 			{
-				string profileName = type.GetOneAttribute<ProfileAttribute>().ProfileName;
-				if (profileName.ToLower() == profile.ToLower())
-					yield return type.Assembly.CreateInstance(type.FullName) as IMigration;
+				yield return type.Assembly.CreateInstance(type.FullName) as IMigration;
 			}
 		}
 

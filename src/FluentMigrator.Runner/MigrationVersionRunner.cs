@@ -169,7 +169,9 @@ namespace FluentMigrator.Runner
 		private void LoadProfiles()
 		{
 			_profiles = new List<IMigration>();
-			_profiles = _migrationLoader.FindProfilesIn(_migrationAssembly, _profile);
+
+			if (!string.IsNullOrEmpty(_profile))
+				_profiles = _migrationLoader.FindProfilesIn(_migrationAssembly, _profile);
 		}
 
 		public void MigrateUp()
