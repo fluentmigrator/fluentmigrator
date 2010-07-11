@@ -7,7 +7,3 @@ h2. Project Info
 * *Documentation*: "http://wiki.github.com/schambers/fluentmigrator/":http://wiki.github.com/schambers/fluentmigrator/
 * *Discussions*: "fluentmigrator-google-group@googlegroups.com":http://groups.google.com/group/fluentmigrator-google-group
 * *Bug/Feature Tracking*: "http://github.com/schambers/fluentmigrator/issues":http://github.com/schambers/fluentmigrator/issues
-
-h2. Documentation
-
-To find a walkthrough and documentation on the project please see the "wiki page":http://wiki.github.com/schambers/fluentmigrator/
