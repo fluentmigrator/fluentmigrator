@@ -31,9 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FluentMigrator, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="FluentMigrator, Version=0.9.0.42, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\FluentMigrator\bin\Debug\FluentMigrator.dll</HintPath>
+      <HintPath>..\lib\FluentMigrator.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
