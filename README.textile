@@ -4,7 +4,7 @@ Fluent Migrator is a migration framework for .net much like Ruby Migrations.
 
 h2. Project Info
 
-* *Project Home*: [http://www.github.com/schambers/fluentmigrator/]
+* *Documentation*: "http://wiki.github.com/schambers/fluentmigrator/":http://wiki.github.com/schambers/fluentmigrator/
 * *Discussions*: "fluentmigrator-google-group@googlegroups.com":http://groups.google.com/group/fluentmigrator-google-group
 * *Bug/Feature Tracking*: "http://github.com/schambers/fluentmigrator/issues":http://github.com/schambers/fluentmigrator/issues
 
