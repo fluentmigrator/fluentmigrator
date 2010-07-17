@@ -40,6 +40,7 @@ namespace FluentMigrator.Runner.Processors
 			return processorList;
 		}
 
+		private static object factoriesLock = new object();
 		private static List<IMigrationProcessorFactory> factories;
 		public static IEnumerable<IMigrationProcessorFactory> Factories
 		{
@@ -47,15 +48,21 @@ namespace FluentMigrator.Runner.Processors
 			{
 				if (factories == null)
 				{
-					Assembly assembly = typeof(IMigrationProcessorFactory).Assembly;
-					var types = assembly.GetExportedTypes().Where(t => typeof(IMigrationProcessorFactory).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract).ToList();
-					factories = new List<IMigrationProcessorFactory>(types.Count);
-					foreach (var type in types)
+					lock (factoriesLock)
 					{
-						var instance = Activator.CreateInstance(type) as IMigrationProcessorFactory;
-						if (instance != null)
+						if (factories == null)
 						{
-							factories.Add(instance);
+							Assembly assembly = typeof(IMigrationProcessorFactory).Assembly;
+							var types = assembly.GetExportedTypes().Where(t => typeof(IMigrationProcessorFactory).IsAssignableFrom(t) && !t.IsInterface && !t.IsAbstract).ToList();
+							factories = new List<IMigrationProcessorFactory>(types.Count);
+							foreach (var type in types)
+							{
+								var instance = Activator.CreateInstance(type) as IMigrationProcessorFactory;
+								if (instance != null)
+								{
+									factories.Add(instance);
+								}
+							}
 						}
 					}
 				}

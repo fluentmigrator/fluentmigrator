@@ -95,12 +95,20 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 		{
 			Announcer.Say("Commiting transaction");
 			Transaction.Commit();
+			if (Connection.State != ConnectionState.Closed)
+			{
+				Connection.Close();
+			}
 		}
 
 		public override void RollbackTransaction()
 		{
 			Announcer.Say("Rolling back transaction");
 			Transaction.Rollback();
+			if (Connection.State != ConnectionState.Closed)
+			{
+				Connection.Close();
+			}
 		}
 
 		protected override void Process(string sql)
