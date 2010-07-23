@@ -111,7 +111,7 @@ namespace FluentMigrator.Runner.Generators
 
         public override string Generate(AlterColumnExpression expression)
         {
-            throw new NotImplementedException();
+            return FormatExpression("ALTER TABLE {0} MODIFY {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
         }
 
 		public override string Generate(CreateTableExpression expression)
