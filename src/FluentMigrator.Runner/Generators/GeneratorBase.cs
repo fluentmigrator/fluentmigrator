@@ -87,6 +87,7 @@ namespace FluentMigrator.Runner.Generators
 		public abstract string Generate(CreateSchemaExpression expression);
 		public abstract string Generate(DeleteSchemaExpression expression);
 		public abstract string Generate(CreateTableExpression expression);
+        public abstract string Generate(AlterColumnExpression expression);
 		public abstract string Generate(CreateColumnExpression expression);
 		public abstract string Generate(DeleteTableExpression expression);
 		public abstract string Generate(DeleteColumnExpression expression);

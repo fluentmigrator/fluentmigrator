@@ -109,6 +109,11 @@ namespace FluentMigrator.Runner.Generators
 			throw new NotImplementedException();
 		}
 
+        public override string Generate(AlterColumnExpression expression)
+        {
+            throw new NotImplementedException();
+        }
+
 		public override string Generate(CreateTableExpression expression)
 		{
 			return FormatExpression("CREATE TABLE {0} ({1})", expression.TableName, GetColumnDDL(expression));

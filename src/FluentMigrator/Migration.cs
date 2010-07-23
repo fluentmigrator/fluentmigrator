@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using FluentMigrator.Builders.Alter;
 using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.Delete;
 using FluentMigrator.Builders.Insert;
@@ -60,6 +61,11 @@ namespace FluentMigrator
 				_context = null;
 			}
 		}
+
+	    public IAlterExpressionRoot Alter
+	    {
+	        get { return new AlterExpressionRoot(_context);}
+	    }
 
 		public ICreateExpressionRoot Create
 		{
