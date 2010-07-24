@@ -223,11 +223,6 @@ namespace FluentMigrator.Runner.Generators
 			return "INSERT ALL" + result.ToString() + " SELECT 1 FROM DUAL";
 		}
 
-		public string FormatExpression(string template, params object[] args)
-		{
-			return String.Format(template, args);
-		}
-
 		private string GetColumnList(IEnumerable<string> columns)
 		{
 			string result = "";

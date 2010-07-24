@@ -211,7 +211,7 @@ namespace FluentMigrator.Runner.Generators
 			return string.Format("CONSTRAINT {0}", keyName);
 		}
 
-		public string FormatExpression(string template, params object[] args)
+		public virtual string FormatExpression(string template, params object[] args)
 		{
 			return String.Format(template, args);
 		}

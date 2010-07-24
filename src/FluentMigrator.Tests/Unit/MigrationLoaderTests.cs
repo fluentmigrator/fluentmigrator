@@ -90,7 +90,7 @@ namespace FluentMigrator.Tests.Unit
 		private Assembly GetAssemblyWithCustomVersionTableMetaData()
 		{
 			CodeDomProvider provider = new Microsoft.CSharp.CSharpCodeProvider();
-			ICodeCompiler compiler = provider.CreateCompiler();
+
 			CompilerParameters parms = new CompilerParameters();
 
 			// Configure parameters
@@ -100,7 +100,7 @@ namespace FluentMigrator.Tests.Unit
 			parms.ReferencedAssemblies.Add("System.dll");
 			parms.ReferencedAssemblies.Add("FluentMigrator.dll");
 
-			CompilerResults results = compiler.CompileAssemblyFromFile(parms, "..\\..\\Unit\\TestVersionTableMetaData.cs");
+			CompilerResults results = provider.CompileAssemblyFromFile(parms, "..\\..\\Unit\\TestVersionTableMetaData.cs");
 			Assert.AreEqual(0, results.Errors.Count);
 			return results.CompiledAssembly;
 		}

@@ -232,11 +232,6 @@ namespace FluentMigrator.Runner.Generators
 			return sb.ToString();
 		}
 
-		public string FormatExpression(string template, params object[] args)
-		{
-			return String.Format(template, args);
-		}
-
 		private string GetColumnList(IEnumerable<string> columns)
 		{
 			string result = "";
