@@ -197,6 +197,11 @@ namespace FluentMigrator.Runner.Generators
 			return result.ToString();
 		}
 
+        public override string Generate(AlterDefaultConstraintExpression expression)
+        {
+            throw new NotImplementedException();
+        }
+
 		public override string GenerateDDLForColumn(ColumnDefinition column)
 		{
 			var sb = new StringBuilder();

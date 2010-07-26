@@ -210,7 +210,17 @@ namespace FluentMigrator.Builders.Alter.Column
 
         public IAlterColumnOptionSyntax WithDefaultValue(object value)
         {
-            Expression.Column.DefaultValue = value;
+            // we need to do a drop constraint and then add constraint to change the defualt value
+            var dc = new AlterDefaultConstraintExpression
+                         {
+                             TableName = Expression.TableName,
+                             SchemaName = Expression.SchemaName,
+                             ColumnName = Expression.Column.Name,
+                             DefaultValue = value
+                         };
+
+            _context.Expressions.Add(dc);
+
             return this;
         }
 
@@ -235,6 +245,13 @@ namespace FluentMigrator.Builders.Alter.Column
         public IAlterColumnOptionSyntax PrimaryKey()
         {
             Expression.Column.IsPrimaryKey = true;
+            return this;
+        }
+
+        public IAlterColumnOptionSyntax PrimaryKey(string primaryKeyName)
+        {
+            Expression.Column.IsPrimaryKey = true;
+            Expression.Column.PrimaryKeyName = primaryKeyName;
             return this;
         }
 

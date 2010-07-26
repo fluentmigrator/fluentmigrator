@@ -47,5 +47,6 @@ namespace FluentMigrator
 		void Process(RenameTableExpression expression);
 		void Process(RenameColumnExpression expression);
 		void Process(InsertDataExpression expression);
+	    void Process(AlterDefaultConstraintExpression expression);
 	}
 }

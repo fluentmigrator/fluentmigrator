@@ -181,6 +181,11 @@ namespace FluentMigrator.Runner.Generators
 			return result.ToString();
 		}
 
+        public override string Generate(AlterDefaultConstraintExpression expression)
+        {
+            throw new NotImplementedException();
+        }
+
 		private string GetColumnList(IEnumerable<string> columns)
 		{
 			string result = "";

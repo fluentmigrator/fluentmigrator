@@ -228,6 +228,11 @@ namespace FluentMigrator.Runner.Generators
 			return "INSERT ALL" + result.ToString() + " SELECT 1 FROM DUAL";
 		}
 
+        public override string Generate(AlterDefaultConstraintExpression expression)
+        {
+            throw new NotImplementedException();
+        }
+
 		public string FormatExpression(string template, params object[] args)
 		{
 			return String.Format(template, args);
