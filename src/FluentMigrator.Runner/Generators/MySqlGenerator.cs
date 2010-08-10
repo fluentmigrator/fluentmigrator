@@ -84,23 +84,23 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(CreateTableExpression expression)
 		{
-			return FormatExpression("CREATE TABLE {0} ({1}) ENGINE = INNODB", expression.TableName, GetColumnDDL(expression));
+			return FormatExpression("CREATE TABLE `{0}` ({1}) ENGINE = INNODB", expression.TableName, GetColumnDDL(expression));
 		}
 
 		public override string Generate(CreateColumnExpression expression)
 		{
 
-			return FormatExpression("ALTER TABLE {0} ADD {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
+			return FormatExpression("ALTER TABLE `{0}` ADD {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
 		}
 
 		public override string Generate(DeleteTableExpression expression)
 		{
-			return FormatExpression("DROP TABLE {0}", expression.TableName);
+			return FormatExpression("DROP TABLE `{0}`", expression.TableName);
 		}
 
 		public override string Generate(DeleteColumnExpression expression)
 		{
-			return FormatExpression("ALTER TABLE {0} DROP COLUMN {1}", expression.TableName, expression.ColumnName);
+			return FormatExpression("ALTER TABLE `{0}` DROP COLUMN {1}", expression.TableName, expression.ColumnName);
 		}
 
 		public override string Generate(CreateForeignKeyExpression expression)
@@ -108,7 +108,7 @@ namespace FluentMigrator.Runner.Generators
 			string primaryColumns = GetColumnList(expression.ForeignKey.PrimaryColumns);
 			string foreignColumns = GetColumnList(expression.ForeignKey.ForeignColumns);
 
-			string sql = "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4})";
+			string sql = "ALTER TABLE `{0}` ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4})";
 
 			return String.Format(sql,
 						  expression.ForeignKey.ForeignTable,
@@ -121,7 +121,7 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(DeleteForeignKeyExpression expression)
 		{
-			string sql = "ALTER TABLE {0} DROP FOREIGN KEY `{1}`";
+			string sql = "ALTER TABLE `{0}` DROP FOREIGN KEY `{1}`";
 			return String.Format(sql, expression.ForeignKey.PrimaryTable, expression.ForeignKey.Name);
 		}
 
@@ -163,13 +163,13 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(RenameTableExpression expression)
 		{
-			return FormatExpression("RENAME TABLE {0} TO {1}", expression.OldName, expression.NewName);
+			return FormatExpression("RENAME TABLE `{0}` TO `{1}`", expression.OldName, expression.NewName);
 		}
 
 		public override string Generate(RenameColumnExpression expression)
 		{
 			// may need to add definition to end. blerg
-			return FormatExpression("ALTER TABLE {0} CHANGE COLUMN {1} {2}", expression.TableName, expression.OldName, expression.NewName);
+			return FormatExpression("ALTER TABLE `{0}` CHANGE COLUMN {1} {2}", expression.TableName, expression.OldName, expression.NewName);
 		}
 
 		public override string Generate(InsertDataExpression expression)
@@ -187,7 +187,7 @@ namespace FluentMigrator.Runner.Generators
 
 				string columns = GetColumnList(columnNames);
 				string data = GetDataList(columnData);
-				result.Append(FormatExpression("INSERT INTO {0} ({1}) VALUES ({2});", expression.TableName, columns, data));
+				result.Append(FormatExpression("INSERT INTO `{0}` ({1}) VALUES ({2});", expression.TableName, columns, data));
 			}
 			return result.ToString();
 		}
