@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using FluentMigrator.Builders.Execute;
 using Oracle.DataAccess.Client;
 
 namespace FluentMigrator.Runner.Processors.Oracle
@@ -79,6 +80,11 @@ namespace FluentMigrator.Runner.Processors.Oracle
 				adapter.Fill(ds);
 				return ds;
 			}
+		}
+
+		public override void Process(PerformDBOperationExpression expression)
+		{
+			throw new NotImplementedException();
 		}
 
 		protected override void Process(string sql)

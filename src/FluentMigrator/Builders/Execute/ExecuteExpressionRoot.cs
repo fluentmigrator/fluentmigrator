@@ -16,6 +16,9 @@
 //
 #endregion
 
+using System;
+using System.Collections.Generic;
+using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 
@@ -41,5 +44,27 @@ namespace FluentMigrator.Builders.Execute
 			var expression = new ExecuteSqlScriptExpression { SqlScript = pathToSqlScript };
 			_context.Expressions.Add(expression);
 		}
+
+		public void WithConnection(Action<IDbConnection, IDbTransaction> operation)
+		{
+			var expression = new PerformDBOperationExpression { Operation = operation };
+			_context.Expressions.Add(expression);
+		}
+	}
+
+	public class PerformDBOperationExpression : MigrationExpressionBase
+	{
+		public override void ExecuteWith(IMigrationProcessor processor)
+		{
+			processor.Process(this);
+		}
+
+		public override void CollectValidationErrors(ICollection<string> errors)
+		{
+			if (Operation == null)
+				errors.Add(ErrorMessages.OperationCannotBeNull);
+		}
+
+		public Action<IDbConnection, IDbTransaction> Operation { get; set; }
 	}
 }
