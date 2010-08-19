@@ -125,6 +125,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 			{
 				try
 				{
+				   command.CommandTimeout = Options.Timeout;
 					command.ExecuteNonQuery();
 				}
 				catch (Exception ex)

@@ -42,6 +42,7 @@ namespace FluentMigrator.Console
 		public string TargetAssembly;
 		public string WorkingDirectory;
 		public string Profile;
+	   public int Timeout;
 		public bool ShowHelp;
 
 		static void DisplayHelp(OptionSet p)
@@ -144,6 +145,11 @@ namespace FluentMigrator.Console
 											"The profile to run after executing migrations.", //TODO: explain defaults
 				                			v => { Profile = v; }
 				                			},
+				                		{
+				                			"timeout=",
+											"Overrides the default SqlCommand timeout of 30 seconds.",
+				                			v => { Timeout = int.Parse(v); }
+				                			},
 										{
 				                			"help|h|?",
 											"Displays this help menu.",
@@ -240,7 +246,8 @@ namespace FluentMigrator.Console
 				Version = Version,
 				Steps = Steps,
 				WorkingDirectory = WorkingDirectory,
-				Profile = Profile
+				Profile = Profile,
+            Timeout = Timeout
 			};
 			Processor = migrationContext.Processor;
 

@@ -2,10 +2,7 @@
 {
 	public class ProcessorOptions : IMigrationProcessorOptions
 	{
-		#region IMigrationProcessorOptions Members
-
 		public bool PreviewOnly { get; set; }
-
-		#endregion
+      public int Timeout { get; set; }
 	}
 }
