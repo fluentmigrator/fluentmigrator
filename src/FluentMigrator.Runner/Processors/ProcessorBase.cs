@@ -16,6 +16,7 @@
 //
 #endregion
 
+using FluentMigrator.Builders.Execute;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 
@@ -108,6 +109,8 @@ namespace FluentMigrator.Runner.Processors
         {
             Process(Generator.Generate(expression));
         }
+
+		public abstract void Process(PerformDBOperationExpression expression);
 
 		protected abstract void Process(string sql);
 

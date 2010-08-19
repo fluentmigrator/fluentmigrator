@@ -21,6 +21,7 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
+using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
@@ -140,6 +141,14 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 					}
 				}
 			}
+		}
+
+		public override void Process(PerformDBOperationExpression expression)
+		{
+			if (Connection.State != ConnectionState.Open) Connection.Open();
+
+			if (expression.Operation != null)
+				expression.Operation(Connection, Transaction);
 		}
 	}
 }

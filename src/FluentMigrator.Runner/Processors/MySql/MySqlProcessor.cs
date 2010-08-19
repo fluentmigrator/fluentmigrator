@@ -18,6 +18,7 @@
 
 using System;
 using System.Data;
+using FluentMigrator.Builders.Execute;
 using MySql.Data.MySqlClient;
 
 namespace FluentMigrator.Runner.Processors.MySql
@@ -119,6 +120,14 @@ namespace FluentMigrator.Runner.Processors.MySql
 
 			using (var command = new MySqlCommand(sql, Connection))
 				command.ExecuteNonQuery();
+		}
+
+		public override void Process(PerformDBOperationExpression expression)
+		{
+			if (Connection.State != ConnectionState.Open) Connection.Open();
+
+			if (expression.Operation != null)
+				expression.Operation(Connection, null);
 		}
 	}
 }
