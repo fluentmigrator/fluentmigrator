@@ -18,8 +18,6 @@
 
 using System.Collections.Generic;
 using System.Reflection;
-using FluentMigrator.Expressions;
-using FluentMigrator.Model;
 using FluentMigrator.Runner.Versioning;
 
 namespace FluentMigrator.Runner
@@ -32,7 +30,40 @@ namespace FluentMigrator.Runner
 
 	public interface IProfileLoader
 	{
-		
+		void ApplyProfiles();
+	}
+
+	public class ProfileLoader : IProfileLoader
+	{
+		public ProfileLoader(MigrationRunner runner)
+		{
+			Runner = runner;
+					
+		}
+
+		private IEnumerable<IMigration> _profiles;
+
+		public MigrationRunner Runner { get; set; }
+
+		private IEnumerable<IMigration> Profiles
+		{
+			get
+			{
+				if ( _profiles == null )
+					LoadProfiles();
+
+				return _profiles;
+			}
+		}
+
+		public void ApplyProfiles()
+		{
+			// Run Profile if applicable
+			foreach ( var profile in Profiles )
+			{
+				_migrationRunner.Up( profile );
+			}
+		}
 	}
 
 	public interface IMigrationVersionRunner

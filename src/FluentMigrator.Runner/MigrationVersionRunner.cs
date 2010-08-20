@@ -89,17 +89,6 @@ namespace FluentMigrator.Runner
 			}
 		}
 
-		private IEnumerable<IMigration> Profiles
-		{
-			get
-			{
-				if (_profiles == null)
-					LoadProfiles();
-
-				return _profiles;
-			}
-		}
-
 		private void LoadMigrations()
 		{
 			_migrations = new SortedList<long, IMigration>();
@@ -188,14 +177,7 @@ namespace FluentMigrator.Runner
 			}
 		}
 
-		private void ApplyProfiles()
-		{
-			// Run Profile if applicable
-			foreach (var profile in Profiles)
-			{
-				_migrationRunner.Up(profile);
-			}
-		}
+
 
 		private void ApplyMigrationDown(long version)
 		{
