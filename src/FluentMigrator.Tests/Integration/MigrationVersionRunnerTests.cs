@@ -73,13 +73,6 @@ namespace FluentMigrator.Tests.Integration
 					runner.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
 					runner.VersionInfo.HasAppliedMigration(2).ShouldBeTrue();
 					runner.VersionInfo.Latest().ShouldBe(2);
-
-					runner.Rollback(2);
-					runner.VersionInfo.HasAppliedMigration(1).ShouldBeFalse();
-					runner.VersionInfo.HasAppliedMigration(2).ShouldBeFalse();
-					runner.VersionInfo.Latest().ShouldBe(0);
-
-					runner.RemoveVersionTable();
 				});
 		}
 

@@ -203,26 +203,26 @@ namespace FluentMigrator.Runner.Generators
 		protected virtual string GetPrimaryKeyConstraintName(IList<ColumnDefinition> primaryKeyColumns, string tableName)
 		{
 			string keyName = string.Empty;
-		    string assignedName = string.Empty;
+			string assignedName = string.Empty;
 			foreach (ColumnDefinition column in primaryKeyColumns)
 			{
 				keyName += column.Name + "_";
 
-                if (!string.IsNullOrEmpty(column.PrimaryKeyName))
-                {
-                    assignedName = column.PrimaryKeyName;
-                    break; // no need to keep going
-                }
+				if (!string.IsNullOrEmpty(column.PrimaryKeyName))
+				{
+					assignedName = column.PrimaryKeyName;
+					break; // no need to keep going
+				}
 			}
 
 			keyName += "PK";
 
-            if (!string.IsNullOrEmpty(assignedName))
-            {
-                keyName = assignedName;
-            }
+			if (!string.IsNullOrEmpty(assignedName))
+			{
+				keyName = assignedName;
+			}
 
-		    return string.Format("CONSTRAINT {0}", keyName);
+			return string.Format("CONSTRAINT {0}", keyName);
 		}
 
 		public string FormatExpression(string template, params object[] args)
@@ -230,10 +230,10 @@ namespace FluentMigrator.Runner.Generators
 			return String.Format(template, args);
 		}
 
-        public string FormatSqlEscape(string sql)
-        {
-            return sql.Replace("'", "''");
-        }
+		public string FormatSqlEscape(string sql)
+		{
+			return sql.Replace("'", "''");
+		}
 
 		protected virtual string GetConstantValue(object value)
 		{

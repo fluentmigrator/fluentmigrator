@@ -50,10 +50,10 @@ namespace FluentMigrator.Runner.Processors
 			Process(Generator.Generate(expression));
 		}
 
-        public virtual void Process(AlterColumnExpression expression)
-        {
-            Process(Generator.Generate(expression));
-        }
+		public virtual void Process(AlterColumnExpression expression)
+		{
+			Process(Generator.Generate(expression));
+		}
 
 		public virtual void Process(CreateColumnExpression expression)
 		{
@@ -105,10 +105,10 @@ namespace FluentMigrator.Runner.Processors
 			Process(Generator.Generate(expression));
 		}
 
-        public void Process(AlterDefaultConstraintExpression expression)
-        {
-            Process(Generator.Generate(expression));
-        }
+		public void Process(AlterDefaultConstraintExpression expression)
+		{
+			Process(Generator.Generate(expression));
+		}
 
 		public abstract void Process(PerformDBOperationExpression expression);
 

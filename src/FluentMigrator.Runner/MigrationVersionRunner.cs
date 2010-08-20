@@ -70,6 +70,8 @@ namespace FluentMigrator.Runner
 			_migrationRunner = new MigrationRunner(conventions, processor, announcer, new StopWatch());
 			_versionTableMetaData = loader.GetVersionTableMetaData(assembly);
 			_versionMigration = new VersionMigration(_versionTableMetaData);
+
+			LoadVersionInfo();
 		}
 
 		public Assembly MigrationAssembly
@@ -88,7 +90,8 @@ namespace FluentMigrator.Runner
 			get
 			{
 				if (_versionInfo == null)
-					LoadVersionInfo();
+					throw new ArgumentException("VersionInfo was never loaded");
+
 				return _versionInfo;
 			}
 		}
@@ -106,6 +109,7 @@ namespace FluentMigrator.Runner
 				}
 				else
 					_versionInfo = new VersionInfo();
+
 				return;
 			}
 
@@ -186,7 +190,8 @@ namespace FluentMigrator.Runner
 				ApplyProfiles();
 
 				_migrationProcessor.CommitTransaction();
-				_versionInfo = null;
+
+				LoadVersionInfo();
 			}
 			catch (Exception)
 			{
@@ -204,7 +209,8 @@ namespace FluentMigrator.Runner
 			}
 
 			ApplyMigrationUp(version);
-			_versionInfo = null;
+
+			LoadVersionInfo();
 		}
 
 		private void ApplyMigrationUp(long version)
@@ -221,10 +227,10 @@ namespace FluentMigrator.Runner
 			try
 			{
 				ApplyMigrationDown(version);
-				ApplyProfiles();
 
 				_migrationProcessor.CommitTransaction();
-				_versionInfo = null;
+
+				LoadVersionInfo();
 			}
 			catch (Exception)
 			{
@@ -282,7 +288,7 @@ namespace FluentMigrator.Runner
 
 			_migrationProcessor.CommitTransaction();
 
-			_versionInfo = null;
+			LoadVersionInfo();
 		}
 
 		public void RollbackToVersion(long version)
@@ -300,7 +306,8 @@ namespace FluentMigrator.Runner
 				RemoveVersionTable();
 
 			_migrationProcessor.CommitTransaction();
-			_versionInfo = null;
+
+			LoadVersionInfo();
 		}
 
 		public void RemoveVersionTable()

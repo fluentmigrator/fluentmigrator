@@ -29,6 +29,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 		{
 			var connection = new SqlConnection(connectionString);
 			connection.Open();
+			connection.BeginTransaction();
 			return new SqlServerProcessor(connection, new SqlServer2000Generator(), announcer, options);
 		}
 

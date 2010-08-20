@@ -40,6 +40,9 @@ namespace FluentMigrator.Tests.Integration
 					var runner = new MigrationRunner(conventions, processor, new TextWriterAnnouncer(System.Console.Out), new StopWatch());
 
 					runner.Up(new TestCreateAndDropTableMigration());
+					// This is a hack until MigrationVersionRunner and MigrationRunner are refactored and merged together
+					processor.CommitTransaction();
+
 					processor.TableExists("TestTable").ShouldBeTrue();
 
 					runner.Down(new TestCreateAndDropTableMigration());
@@ -59,6 +62,7 @@ namespace FluentMigrator.Tests.Integration
 			var runner = new MigrationRunner(conventions, processor.Object, new TextWriterAnnouncer(System.Console.Out), new StopWatch()) { SilentlyFail = true };
 
 			runner.Up(new TestForeignKeySilentFailure());
+	
 			runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
 
 			runner.Down(new TestForeignKeySilentFailure());
@@ -75,11 +79,12 @@ namespace FluentMigrator.Tests.Integration
 					var runner = new MigrationRunner(conventions, processor, new TextWriterAnnouncer(System.Console.Out), new StopWatch());
 
 					runner.Up(new TestForeignKeyNamingConvention());
-					processor.TableExists("Users").ShouldBeTrue();
-					processor.ConstraintExists("Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeTrue();
 
-					runner.Down(new TestForeignKeyNamingConvention());
-					processor.TableExists("Users").ShouldBeFalse();
+					// This is a hack until MigrationVersionRunner and MigrationRunner are refactored and merged together
+					processor.CommitTransaction();
+
+					processor.ConstraintExists( "Users", "FK_Users_GroupId_Groups_GroupId" ).ShouldBeTrue();
+					runner.Down( new TestForeignKeyNamingConvention() );
 				});
 		}
 
@@ -106,14 +111,14 @@ namespace FluentMigrator.Tests.Integration
 		public override void Up()
 		{
 			Create.Table("Users")
-			   .WithColumn("UserId").AsInt32().Identity().PrimaryKey()
-			   .WithColumn("GroupId").AsInt32().NotNullable()
-			   .WithColumn("UserName").AsString(32).NotNullable()
-			   .WithColumn("Password").AsString(32).NotNullable();
+				.WithColumn("UserId").AsInt32().Identity().PrimaryKey()
+				.WithColumn("GroupId").AsInt32().NotNullable()
+				.WithColumn("UserName").AsString(32).NotNullable()
+				.WithColumn("Password").AsString(32).NotNullable();
 
 			Create.Table("Groups")
-			   .WithColumn("GroupId").AsInt32().Identity().PrimaryKey()
-			   .WithColumn("Name").AsString(32).NotNullable();
+				.WithColumn("GroupId").AsInt32().Identity().PrimaryKey()
+				.WithColumn("Name").AsString(32).NotNullable();
 
 			Create.ForeignKey().FromTable("Users").ForeignColumn("GroupId").ToTable("Groups").PrimaryColumn("GroupId");
 		}

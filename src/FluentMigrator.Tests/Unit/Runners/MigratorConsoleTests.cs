@@ -118,8 +118,8 @@ namespace FluentMigrator.Tests.Unit.Runners
 				"/task", "migrate:up");
 
 			var output = sb.ToString();
+			Assert.That( output.Contains( "PREVIEW-ONLY MODE" ) );
 			Assert.AreNotEqual(0, output.Length);
-			Assert.That(output.Contains("PREVIEW-ONLY MODE"));
 		}
 
 		[Test]
