@@ -87,6 +87,7 @@ namespace FluentMigrator.Runner.Generators
 		public abstract string Generate(CreateSchemaExpression expression);
 		public abstract string Generate(DeleteSchemaExpression expression);
 		public abstract string Generate(CreateTableExpression expression);
+        public abstract string Generate(AlterColumnExpression expression);
 		public abstract string Generate(CreateColumnExpression expression);
 		public abstract string Generate(DeleteTableExpression expression);
 		public abstract string Generate(DeleteColumnExpression expression);
@@ -97,6 +98,7 @@ namespace FluentMigrator.Runner.Generators
 		public abstract string Generate(RenameTableExpression expression);
 		public abstract string Generate(RenameColumnExpression expression);
 		public abstract string Generate(InsertDataExpression expression);
+        public abstract string Generate(AlterDefaultConstraintExpression expression);
 
 		public virtual string GenerateDDLForColumn(ColumnDefinition column)
 		{
@@ -202,19 +204,37 @@ namespace FluentMigrator.Runner.Generators
 		protected virtual string GetPrimaryKeyConstraintName(IList<ColumnDefinition> primaryKeyColumns, string tableName)
 		{
 			string keyName = string.Empty;
+		    string assignedName = string.Empty;
 			foreach (ColumnDefinition column in primaryKeyColumns)
 			{
 				keyName += column.Name + "_";
+
+                if (!string.IsNullOrEmpty(column.PrimaryKeyName))
+                {
+                    assignedName = column.PrimaryKeyName;
+                    break; // no need to keep going
+                }
 			}
 
 			keyName += "PK";
-			return string.Format("CONSTRAINT {0}", keyName);
+
+            if (!string.IsNullOrEmpty(assignedName))
+            {
+                keyName = assignedName;
+            }
+
+		    return string.Format("CONSTRAINT {0}", keyName);
 		}
 
 		public string FormatExpression(string template, params object[] args)
 		{
 			return String.Format(template, args);
 		}
+
+        public string FormatSqlEscape(string sql)
+        {
+            return sql.Replace("'", "''");
+        }
 
 		protected virtual string GetConstantValue(object value)
 		{

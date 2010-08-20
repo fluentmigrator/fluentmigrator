@@ -53,6 +53,9 @@ namespace FluentMigrator.NAnt
 		[TaskAttribute("profile")]
 		public string Profile { get; set; }
 
+      [TaskAttribute( "timeout" )]
+      public int Timeout { get; set; }
+
 		protected override void ExecuteTask()
 		{
 			var announcer = new TextWriterAnnouncer(System.Console.Out)
@@ -71,7 +74,8 @@ namespace FluentMigrator.NAnt
 										Version = Version,
 										Steps = Steps,
 										WorkingDirectory = WorkingDirectory,
-										Profile = Profile
+										Profile = Profile,
+                              Timeout = Timeout
 									};
 
 			new TaskExecutor(runnerContext).Execute();

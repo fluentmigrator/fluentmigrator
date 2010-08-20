@@ -109,6 +109,11 @@ namespace FluentMigrator.Runner.Generators
 			throw new NotImplementedException();
 		}
 
+        public override string Generate(AlterColumnExpression expression)
+        {
+            return FormatExpression("ALTER TABLE {0} MODIFY {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
+        }
+
 		public override string Generate(CreateTableExpression expression)
 		{
 			return FormatExpression("CREATE TABLE {0} ({1})", expression.TableName, GetColumnDDL(expression));
@@ -222,6 +227,11 @@ namespace FluentMigrator.Runner.Generators
 			}
 			return "INSERT ALL" + result.ToString() + " SELECT 1 FROM DUAL";
 		}
+
+        public override string Generate(AlterDefaultConstraintExpression expression)
+        {
+            throw new NotImplementedException();
+        }
 
 		public string FormatExpression(string template, params object[] args)
 		{

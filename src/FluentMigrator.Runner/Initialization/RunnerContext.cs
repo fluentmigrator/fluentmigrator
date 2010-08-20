@@ -34,6 +34,7 @@ namespace FluentMigrator.Runner.Initialization
 		public int Steps { get; set; }
 		public string WorkingDirectory { get; set; }
 		public string Profile { get; set; }
+      public int Timeout { get; set; }
 		public IAnnouncer Announcer { get; private set; }
 
 		public IMigrationProcessor Processor
@@ -93,17 +94,23 @@ namespace FluentMigrator.Runner.Initialization
 					Console.WriteLine("Using Connection {0} from Configuration file {1}", Connection, ConfigFile);
 				}
 
+            if (Timeout == 0)
+            {
+               Timeout = 30; // Set default timeout for command
+            }
+
 				var processorFactory = ProcessorFactory.GetFactory(Database);
 				_processor = processorFactory.Create(ConnectionString, Announcer, new ProcessorOptions
 																					{
-																						PreviewOnly = PreviewOnly
+																						PreviewOnly = PreviewOnly,
+                                                                  Timeout = Timeout
 																					});
 
 				return _processor;
 			}
 		}
 
-		#endregion
+	   #endregion
 
 		private void ReadConnectionString(ConnectionStringSettings connection, string configurationFile)
 		{

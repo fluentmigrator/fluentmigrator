@@ -89,6 +89,11 @@ namespace FluentMigrator.Runner.Generators
 			return FormatExpression("sp_rename '{0}[{1}].[{2}]', [{3}]", FormatSchema(expression.SchemaName, false), expression.TableName, expression.OldName, expression.NewName);
 		}
 
+        public override string Generate(AlterColumnExpression expression)
+        {
+            return FormatExpression("ALTER TABLE {0}[{1}] ALTER COLUMN {2}", FormatSchema(expression.SchemaName), expression.TableName, GenerateDDLForColumn(expression.Column));
+        }
+
 		public override string Generate(CreateTableExpression expression)
 		{
 			return FormatExpression("CREATE TABLE {0}[{1}] ({2})", FormatSchema(expression.SchemaName), expression.TableName, GetColumnDDL(expression));
@@ -206,6 +211,35 @@ namespace FluentMigrator.Runner.Generators
 			}
 			return result.ToString();
 		}
+
+        public override string Generate(AlterDefaultConstraintExpression expression)
+        {
+            const string sql =
+                @"
+			DECLARE @default sysname, @sql nvarchar(max);
+
+			-- get name of default constraint
+			SELECT @default = name
+			FROM sys.default_constraints 
+			WHERE parent_object_id = object_id('{1}{2}')
+			AND type = 'D'
+			AND parent_column_id = (
+				SELECT column_id 
+				FROM sys.columns 
+				WHERE object_id = object_id('{1}{2}')
+				AND name = '{3}'
+			);
+
+			-- create alter table command to drop contraint as string and run it
+			SET @sql = N'ALTER TABLE {0}[{2}] DROP CONSTRAINT ' + @default;
+			EXEC sp_executesql @sql;
+
+			-- create alter table command to create new default constraint as string and run it
+			SET @sql = N'ALTER TABLE {0}[{2}] WITH NOCHECK ADD CONSTRAINT [' + @default + '] DEFAULT({4}) FOR {3}';
+			EXEC sp_executesql @sql;";
+
+            return FormatExpression(sql, FormatSchema(expression.SchemaName), FormatSchema(expression.SchemaName, false), expression.TableName, expression.ColumnName, FormatSqlEscape(GetConstantValue(expression.DefaultValue)));
+        }
 
 		protected string FormatSchema(string schemaName)
 		{

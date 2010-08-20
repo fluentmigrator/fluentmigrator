@@ -31,6 +31,7 @@ namespace FluentMigrator
 		string Generate(CreateSchemaExpression expression);
 		string Generate(DeleteSchemaExpression expression);
 		string Generate(CreateTableExpression expression);
+	    string Generate(AlterColumnExpression expression);
 		string Generate(CreateColumnExpression expression);
 		string Generate(DeleteTableExpression expression);
 		string Generate(DeleteColumnExpression expression);
@@ -41,5 +42,6 @@ namespace FluentMigrator
 		string Generate(RenameTableExpression expression);
 		string Generate(RenameColumnExpression expression);
 		string Generate(InsertDataExpression expression);
+	    string Generate(AlterDefaultConstraintExpression expression);
 	}
 }

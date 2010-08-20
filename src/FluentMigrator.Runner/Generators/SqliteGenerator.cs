@@ -130,6 +130,11 @@ namespace FluentMigrator.Runner.Generators
 			throw new NotImplementedException();
 		}
 
+        public override string Generate(AlterColumnExpression expression)
+        {
+            throw new NotImplementedException();
+        }
+
 		public override string Generate(CreateTableExpression expression)
 		{
 			return string.Format("CREATE TABLE {0} ({1})", expression.TableName, GetColumnDDL(expression));
@@ -175,6 +180,11 @@ namespace FluentMigrator.Runner.Generators
 			}
 			return result.ToString();
 		}
+
+        public override string Generate(AlterDefaultConstraintExpression expression)
+        {
+            throw new NotImplementedException();
+        }
 
 		private string GetColumnList(IEnumerable<string> columns)
 		{

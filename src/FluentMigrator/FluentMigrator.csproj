@@ -114,6 +114,12 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="Builders\Alter\AlterExpressionRoot.cs" />
+    <Compile Include="Builders\Alter\Column\AlterColumnExpressionBuilder.cs" />
+    <Compile Include="Builders\Alter\Column\IAlterColumnAsTypeSyntax.cs" />
+    <Compile Include="Builders\Alter\Column\IAlterColumnOnTableSyntax.cs" />
+    <Compile Include="Builders\Alter\Column\IAlterColumnOptionSyntax.cs" />
+    <Compile Include="Builders\Alter\IAlterExpressionRoot.cs" />
     <Compile Include="Builders\Create\Column\ICreateColumnAsTypeOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Create\ForeignKey\ICreateForeignKeyPrimaryColumnOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Create\ForeignKey\ICreateForeignKeyForeignColumnOrInSchemaSyntax.cs" />
@@ -136,6 +142,8 @@
     <Compile Include="Builders\Insert\IInsertExpressionRoot.cs" />
     <Compile Include="Builders\Rename\Column\IRenameColumnToOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Rename\Table\IRenameTableToOrInSchemaSyntax.cs" />
+    <Compile Include="Expressions\AlterColumnExpression.cs" />
+    <Compile Include="Expressions\AlterDefaultConstraintExpression.cs" />
     <Compile Include="Expressions\InsertDataExpression.cs" />
     <Compile Include="Builders\Insert\InsertDataExpressionBuilder.cs" />
     <Compile Include="Builders\Insert\InsertExpressionRoot.cs" />

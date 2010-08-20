@@ -53,7 +53,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
 		public override bool ConstraintExists(string tableName, string constraintName)
 		{
-			string sql = @"select column_name from information_schema.table_constraints
+            string sql = @"select constraint_name from information_schema.table_constraints
 							where table_name='{0}'
 							and constraint_name='{1}'";
 			return Exists(sql, tableName, constraintName);

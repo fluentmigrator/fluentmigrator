@@ -87,6 +87,11 @@ namespace FluentMigrator.Runner.Generators
 			return FormatExpression("CREATE TABLE `{0}` ({1}) ENGINE = INNODB", expression.TableName, GetColumnDDL(expression));
 		}
 
+        public override string Generate(AlterColumnExpression expression)
+        {
+            return FormatExpression("ALTER TABLE {0} MODIFY {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
+        }
+
 		public override string Generate(CreateColumnExpression expression)
 		{
 
@@ -191,6 +196,11 @@ namespace FluentMigrator.Runner.Generators
 			}
 			return result.ToString();
 		}
+
+        public override string Generate(AlterDefaultConstraintExpression expression)
+        {
+            throw new NotImplementedException();
+        }
 
 		public override string GenerateDDLForColumn(ColumnDefinition column)
 		{

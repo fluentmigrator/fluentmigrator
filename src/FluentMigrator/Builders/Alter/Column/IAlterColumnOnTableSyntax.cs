@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -16,24 +16,12 @@
 //
 #endregion
 
-using System.Collections.Generic;
 using FluentMigrator.Infrastructure;
 
-namespace FluentMigrator.Builders
+namespace FluentMigrator.Builders.Alter.Column
 {
-	public interface IColumnOptionSyntax<TNext> : IFluentSyntax
-		where TNext : IFluentSyntax
-	{
-		TNext WithDefaultValue(object value);
-		TNext ForeignKey();
-		TNext Identity();
-		TNext Indexed();
-		TNext PrimaryKey();
-	    TNext PrimaryKey(string primaryKeyName);
-		TNext Nullable();
-		TNext NotNullable();
-		TNext Unique();
-		TNext References(string foreignKeyName, string foreignTableName, IEnumerable<string> foreignColumnNames);
-		TNext References(string foreignKeyName, string foreignTableSchema, string foreignTableName, IEnumerable<string> foreignColumnNames);
-	}
+    public interface IAlterColumnOnTableSyntax : IFluentSyntax
+    {
+        IAlterColumnAsTypeSyntax OnTable(string name);
+    }
 }
