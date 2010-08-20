@@ -16,20 +16,32 @@
 //
 #endregion
 
+using System.Collections.Generic;
 using System.Reflection;
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Versioning;
 
 namespace FluentMigrator.Runner
 {
+	public interface IVersionLoader
+	{
+		VersionInfo VersionInfo { get; }
+		void RemoveVersionTable();
+	}
+
+	public interface IProfileLoader
+	{
+		
+	}
+
 	public interface IMigrationVersionRunner
 	{
 		Assembly MigrationAssembly { get; }
-		VersionInfo VersionInfo { get; }
 		void MigrateUp();
 		void MigrateUp(long version);
 		void Rollback(int steps);
 		void RollbackToVersion( long version );
 		void MigrateDown(long version);
-		void RemoveVersionTable();
 	}
 }
