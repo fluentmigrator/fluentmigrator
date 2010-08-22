@@ -18,107 +18,176 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data;
+using System.Linq;
+using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
-using FluentMigrator.Model;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Versioning;
 
 namespace FluentMigrator.Runner
 {
-	public class VersionLoader : IVersionLoader
+	public class MigrationRunner : IMigrationRunner
 	{
-		private void UpdateVersionInfo( long version )
-		{
-			var dataExpression = new InsertDataExpression();
-			dataExpression.Rows.Add( CreateVersionInfoInsertionData( version ) );
-			dataExpression.TableName = _versionTableMetaData.TableName;
-			dataExpression.ExecuteWith( _migrationProcessor );
-		}
-
-		protected virtual InsertionDataDefinition CreateVersionInfoInsertionData( long version )
-		{
-			return new InsertionDataDefinition { new KeyValuePair<string, object>( this._versionTableMetaData.ColumnName, version ) };
-		}
-
-
-		public IMigration VersionMigration
-		{
-			get { return _versionMigration; }
-			set { _versionMigration = value; }
-		}
-
-		public VersionInfo VersionInfo
-		{
-			get
-			{
-				if ( _versionInfo == null )
-					throw new ArgumentException( "VersionInfo was never loaded" );
-
-				return _versionInfo;
-			}
-		}
-
-		private void LoadVersionInfo()
-		{
-			if ( _migrationProcessor.Options.PreviewOnly )
-			{
-				if ( !_alreadyCreatedVersionTable )
-				{
-					new MigrationRunner( _migrationConventions, _migrationProcessor, _announcer, new StopWatch() )
-						.Up( _versionMigration );
-					_versionInfo = new VersionInfo();
-					_alreadyCreatedVersionTable = true;
-				}
-				else
-					_versionInfo = new VersionInfo();
-
-				return;
-			}
-
-			if ( !_migrationProcessor.TableExists( _versionTableMetaData.TableName ) )
-			{
-				var runner = new MigrationRunner( _migrationConventions, _migrationProcessor, _announcer, new StopWatch() );
-				runner.Up( _versionMigration );
-				_versionInfo = new VersionInfo();
-				return;
-			}
-
-			var dataSet = _migrationProcessor.ReadTableData( _versionTableMetaData.TableName );
-			_versionInfo = new VersionInfo();
-
-			foreach ( DataRow row in dataSet.Tables[ 0 ].Rows )
-			{
-				_versionInfo.AddAppliedMigration( long.Parse( row[ 0 ].ToString() ) );
-			}
-		}
-
-		public void RemoveVersionTable()
-		{
-			var expression = new DeleteTableExpression { TableName = this._versionTableMetaData.TableName };
-			expression.ExecuteWith( _migrationProcessor );
-		}
-	}
-
-
-
-	public class MigrationRunner
-	{
+		private Assembly _migrationAssembly;
 		private IAnnouncer _announcer;
+		private IStopWatch _stopWatch;
+		private SortedList<long, IMigration> _migrations;
+
+		private IMigrationLoader MigrationLoader { get; set; }
+		private ProfileLoader ProfileLoader { get; set; }
 		public IMigrationConventions Conventions { get; private set; }
 		public IMigrationProcessor Processor { get; private set; }
 		public IList<Exception> CaughtExceptions { get; private set; }
 		public bool SilentlyFail { get; set; }
-		private IStopWatch _stopWatch;
 
-		public MigrationRunner(IMigrationConventions conventions, IMigrationProcessor processor, IAnnouncer announcer, IStopWatch stopWatch)
+		public MigrationRunner(Assembly assembly, IRunnerContext runnerContext)
 		{
-			_announcer = announcer;
+			_migrationAssembly = assembly;
+			_announcer = runnerContext.Announcer;
+			Processor = runnerContext.Processor;
+			_stopWatch = new StopWatch();
+
 			SilentlyFail = false;
 			CaughtExceptions = null;
-			Conventions = conventions;
-			Processor = processor;
-			_stopWatch = stopWatch;
+
+			Conventions = new MigrationConventions();
+			if (!string.IsNullOrEmpty(runnerContext.WorkingDirectory))
+				Conventions.GetWorkingDirectory = () => runnerContext.WorkingDirectory;
+
+			VersionLoader = new VersionLoader();
+			MigrationLoader = new MigrationLoader(Conventions);
+			ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
+		}
+
+		protected VersionLoader VersionLoader { get; set; }
+
+		public SortedList<long, IMigration> Migrations
+		{
+			get
+			{
+				return _migrations;
+			}
+		}
+
+		public void ApplyProfiles()
+		{
+			ProfileLoader.ApplyProfiles();
+		}
+
+		public void MigrateUp()
+		{
+			try
+			{
+				foreach (var version in Migrations.Keys)
+				{
+					MigrateUp(version);
+				}
+
+				ApplyProfiles();
+
+				Processor.CommitTransaction();
+
+				LoadVersionInfo();
+			}
+			catch (Exception)
+			{
+				Processor.RollbackTransaction();
+				throw;
+			}
+		}
+
+		public void MigrateUp(long version)
+		{
+			if (!_alreadyOutputPreviewOnlyModeWarning && Processor.Options.PreviewOnly)
+			{
+				_announcer.Heading("PREVIEW-ONLY MODE");
+				_alreadyOutputPreviewOnlyModeWarning = true;
+			}
+
+			ApplyMigrationUp(version);
+
+			LoadVersionInfo();
+		}
+
+		private void ApplyMigrationUp(long version)
+		{
+			if (!VersionInfo.HasAppliedMigration(version))
+			{
+				Up(Migrations[version]);
+				VersionLoader.UpdateVersionInfo(version);
+			}
+		}
+
+		public void MigrateDown(long version)
+		{
+			try
+			{
+				ApplyMigrationDown(version);
+
+				Processor.CommitTransaction();
+
+				LoadVersionInfo();
+			}
+			catch (Exception)
+			{
+				Processor.RollbackTransaction();
+				throw;
+			}
+		}
+
+		private void ApplyMigrationDown(long version)
+		{
+			try
+			{
+				Down(Migrations[version]);
+				Processor.Execute("DELETE FROM {0} WHERE {1}='{2}'", this._versionTableMetaData.TableName, this._versionTableMetaData.ColumnName, version.ToString());
+			}
+			catch (KeyNotFoundException ex)
+			{
+				string msg = string.Format("VersionInfo references version {0} but no Migrator was found attributed with that version.", version);
+				throw new Exception(msg, ex);
+			}
+			catch (Exception ex)
+			{
+				throw new Exception("Error rolling back version " + version, ex);
+			}
+		}
+
+		public void Rollback(int steps)
+		{
+			foreach (var migrationNumber in VersionInfo.AppliedMigrations().Take(steps))
+			{
+				ApplyMigrationDown(migrationNumber);
+			}
+
+			Processor.CommitTransaction();
+
+			LoadVersionInfo();
+		}
+
+		public void RollbackToVersion(long version)
+		{
+			// Get the migrations between current and the to version
+			foreach (var migrationNumber in VersionInfo.AppliedMigrations())
+			{
+				if (version < migrationNumber || version == 0)
+				{
+					ApplyMigrationDown(migrationNumber);
+				}
+			}
+
+			if (version == 0)
+				RemoveVersionTable();
+
+			Processor.CommitTransaction();
+
+			LoadVersionInfo();
+		}
+
+		public Assembly MigrationAssembly
+		{
+			get { return _migrationAssembly; }
 		}
 
 		public void Up(IMigration migration)
@@ -200,7 +269,6 @@ namespace FluentMigrator.Runner
 				var msg = string.Format("-> {0} Insert operations completed in {1} taking an average of {2}", insertCount, new TimeSpan(insertTicks), avg);
 				_announcer.Say(msg);
 			}
-
 		}
 
 		private void AnnounceTime(string message, Action action)

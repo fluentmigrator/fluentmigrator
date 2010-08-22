@@ -46,16 +46,7 @@ namespace FluentMigrator.Runner
 				yield return Conventions.GetMetadataForMigration(type);
 		}
 
-		public IEnumerable<IMigration> FindProfilesIn(Assembly assembly, string profile)
-		{
-			IEnumerable<Type> matchedTypes = assembly.GetExportedTypes()
-				.Where(t => Conventions.TypeIsProfile(t) && t.GetOneAttribute<ProfileAttribute>().ProfileName.ToLower() == profile.ToLower());
 
-			foreach (Type type in matchedTypes)
-			{
-				yield return type.Assembly.CreateInstance(type.FullName) as IMigration;
-			}
-		}
 
 		public IVersionTableMetaData GetVersionTableMetaData(Assembly assembly)
 		{
@@ -67,6 +58,25 @@ namespace FluentMigrator.Runner
 			}
 
 			return (IVersionTableMetaData)Activator.CreateInstance(matchedType);
+		}
+
+		private IEnumerable<IMigration> LoadMigrations()
+		{
+			_migrations = new SortedList<long, IMigration>();
+
+			IEnumerable<MigrationMetadata> migrationList = _migrationLoader.FindMigrationsIn(_migrationAssembly, _namespace);
+
+			if (migrationList == null)
+				return;
+
+			foreach (var migrationMetadata in migrationList)
+			{
+				if (_migrations.ContainsKey(migrationMetadata.Version))
+					throw new Exception(String.Format("Duplicate migration version {0}.", migrationMetadata.Version));
+
+				var migration = migrationMetadata.Type.Assembly.CreateInstance(migrationMetadata.Type.FullName);
+				_migrations.Add(migrationMetadata.Version, migration as IMigration);
+			}
 		}
 	}
 }

@@ -23,7 +23,7 @@ namespace FluentMigrator.Runner.Initialization
 {
 	public class TaskExecutor
 	{
-		private IMigrationVersionRunner Runner { get; set; }
+		private IMigrationRunner Runner { get; set; }
 		private IRunnerContext RunnerContext { get; set; }
 
 		public TaskExecutor(IRunnerContext runnerContext)
@@ -36,19 +36,17 @@ namespace FluentMigrator.Runner.Initialization
 
 		private void Initialize()
 		{
-			var migrationConventions = new MigrationConventions();
-			if (!string.IsNullOrEmpty(RunnerContext.WorkingDirectory))
-				migrationConventions.GetWorkingDirectory = () => RunnerContext.WorkingDirectory;
-
 			var assembly = AssemblyLoaderFactory.GetAssemblyLoader(RunnerContext.Target).Load();
 
-			Runner = new MigrationVersionRunner(migrationConventions,
-												RunnerContext.Processor,
-												new MigrationLoader(migrationConventions),
-												assembly,
-												RunnerContext.Namespace,
-												RunnerContext.Announcer,
-												RunnerContext.Profile);
+			Runner = new MigrationRunner(assembly, RunnerContext);
+
+//			Runner = new MigrationVersionRunner(migrationConventions,
+//												RunnerContext.Processor,
+//												new MigrationLoader(migrationConventions),
+//												assembly,
+//												RunnerContext.Namespace,
+//												RunnerContext.Announcer,
+//												RunnerContext.Profile);
 		}
 
 		public void Execute()
