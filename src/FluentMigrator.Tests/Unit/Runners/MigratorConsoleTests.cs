@@ -102,6 +102,11 @@ namespace FluentMigrator.Tests.Unit.Runners
 			Assert.AreNotEqual(0, output.Length);
 		}
 
+		[Test, Ignore("implement this test")]
+		public void OrderOfConsoleArgumentsShouldNotMatter()
+		{
+		}
+
 		[Test]
 		public void ConsoleAnnouncerHasOutputEvenIfMarkedAsPreviewOnly()
 		{
@@ -111,11 +116,13 @@ namespace FluentMigrator.Tests.Unit.Runners
 				stringWriter,
 				"/db", database,
 				"/connection", connection,
-				"/preview",
-				"/verbose",
 				"/target", target,
 				"/namespace", "FluentMigrator.Tests.Unit.Runners.Migrations",
-				"/task", "migrate:up");
+				"/verbose",
+				
+				
+				"/task", "migrate:up",
+				"/preview");
 
 			var output = sb.ToString();
 			Assert.That( output.Contains( "PREVIEW-ONLY MODE" ) );

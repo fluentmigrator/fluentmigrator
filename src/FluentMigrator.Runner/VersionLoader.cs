@@ -24,7 +24,11 @@ namespace FluentMigrator.Runner
 			Conventions = conventions;
 			VersionTableMetaData = GetVersionTableMetaData();
 			VersionMigration = new VersionMigration(VersionTableMetaData);
+
+			LoadVersionInfo();
 		}
+
+		private VersionInfo _versionInfo;
 
 		public IMigrationRunner Runner { get; set; }
 		private IRunnerContext RunnerContext { get; set; }
@@ -60,21 +64,9 @@ namespace FluentMigrator.Runner
 			return new InsertionDataDefinition { new KeyValuePair<string, object>( this.VersionTableMetaData.ColumnName, version ) };
 		}
 
-		private VersionInfo _versionInfo;
-
 		public VersionInfo VersionInfo
 		{
-			get
-			{
-				if ( _versionInfo == null )
-					throw new ArgumentException( "VersionInfo was never loaded" );
-
-				return _versionInfo;
-			}
-			set
-			{
-				_versionInfo = VersionInfo;
-			}
+			get; set;
 		}
 
 		public bool AlreadyCreatedVersionTable
