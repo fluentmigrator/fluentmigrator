@@ -8,21 +8,19 @@ namespace FluentMigrator.Runner.Initialization
 {
 	public class RunnerContext : IRunnerContext
 	{
-		private string ConfigFile;
-		private string ConnectionString;
-		private IMigrationProcessor _processor;
-
 		public RunnerContext(IAnnouncer announcer)
 		{
 			Announcer = announcer;
 		}
 
+		private string ConfigFile;
+		private string ConnectionString;
+		private IMigrationProcessor _processor;
+
 		private bool NotUsingConfig
 		{
 			get { return string.IsNullOrEmpty(ConfigFile); }
 		}
-
-		#region IRunnerContext Members
 
 		public string Database { get; set; }
 		public string Connection { get; set; }
@@ -34,8 +32,12 @@ namespace FluentMigrator.Runner.Initialization
 		public int Steps { get; set; }
 		public string WorkingDirectory { get; set; }
 		public string Profile { get; set; }
-      public int Timeout { get; set; }
-		public IAnnouncer Announcer { get; private set; }
+		public int Timeout { get; set; }
+
+		public IAnnouncer Announcer
+		{
+			get; set;
+		}
 
 		public IMigrationProcessor Processor
 		{
@@ -94,23 +96,21 @@ namespace FluentMigrator.Runner.Initialization
 					Console.WriteLine("Using Connection {0} from Configuration file {1}", Connection, ConfigFile);
 				}
 
-            if (Timeout == 0)
-            {
-               Timeout = 30; // Set default timeout for command
-            }
+				if (Timeout == 0)
+				{
+				   Timeout = 30; // Set default timeout for command
+				}
 
 				var processorFactory = ProcessorFactory.GetFactory(Database);
 				_processor = processorFactory.Create(ConnectionString, Announcer, new ProcessorOptions
 																					{
 																						PreviewOnly = PreviewOnly,
-                                                                  Timeout = Timeout
+																						Timeout = Timeout
 																					});
 
 				return _processor;
 			}
 		}
-
-	   #endregion
 
 		private void ReadConnectionString(ConnectionStringSettings connection, string configurationFile)
 		{

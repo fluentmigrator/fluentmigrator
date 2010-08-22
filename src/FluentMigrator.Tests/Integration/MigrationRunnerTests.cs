@@ -18,9 +18,11 @@
 #endregion
 
 using System;
+using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Initialization;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
@@ -35,9 +37,7 @@ namespace FluentMigrator.Tests.Integration
 		{
 			ExecuteWithSupportedProcessors(processor =>
 				{
-					var conventions = new MigrationConventions();
-
-					var runner = new MigrationRunner(conventions, processor, new TextWriterAnnouncer(System.Console.Out), new StopWatch());
+					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), new RunnerContext(new TextWriterAnnouncer(System.Console.Out)), processor);
 
 					runner.Up(new TestCreateAndDropTableMigration());
 					// This is a hack until MigrationVersionRunner and MigrationRunner are refactored and merged together
@@ -57,9 +57,8 @@ namespace FluentMigrator.Tests.Integration
 			processor.Setup(x => x.Process(It.IsAny<CreateForeignKeyExpression>())).Throws(new Exception("Error"));
 			processor.Setup(x => x.Process(It.IsAny<DeleteForeignKeyExpression>())).Throws(new Exception("Error"));
 
-			var conventions = new MigrationConventions();
-
-			var runner = new MigrationRunner(conventions, processor.Object, new TextWriterAnnouncer(System.Console.Out), new StopWatch()) { SilentlyFail = true };
+			var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out));
+			var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor.Object) { SilentlyFail = true };
 
 			runner.Up(new TestForeignKeySilentFailure());
 	
@@ -75,8 +74,8 @@ namespace FluentMigrator.Tests.Integration
 			ExecuteWithSupportedProcessors(
 				processor =>
 				{
-					var conventions = new MigrationConventions();
-					var runner = new MigrationRunner(conventions, processor, new TextWriterAnnouncer(System.Console.Out), new StopWatch());
+					var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out));
+					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
 
 					runner.Up(new TestForeignKeyNamingConvention());
 
@@ -94,8 +93,8 @@ namespace FluentMigrator.Tests.Integration
 			ExecuteWithSupportedProcessors(
 				processor =>
 				{
-					var conventions = new MigrationConventions();
-					var runner = new MigrationRunner(conventions, processor, new TextWriterAnnouncer(System.Console.Out), new StopWatch());
+					var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out));
+					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
 
 					runner.Up(new TestIndexNamingConvention());
 					processor.TableExists("Users").ShouldBeTrue();

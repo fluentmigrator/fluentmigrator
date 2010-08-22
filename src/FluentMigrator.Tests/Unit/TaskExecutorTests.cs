@@ -29,17 +29,17 @@ namespace FluentMigrator.Tests.Integration
 	[TestFixture, Ignore("Needs to be refactored from changes to TaskExecutor")]
 	public class TaskExecutorTests : IntegrationTestBase
 	{
-		private Mock<IMigrationVersionRunner> _migrationVersionRunner;
+		private Mock<IMigrationRunner> _migrationRunner;
 
 		[SetUp]
 		public void SetUp()
 		{
-			_migrationVersionRunner = new Mock<IMigrationVersionRunner>();
+			_migrationRunner = new Mock<IMigrationRunner>();
 		}
 
-		private void verify(Expression<Action<IMigrationVersionRunner>> func, string task, long version, int steps)
+		private void verify(Expression<Action<IMigrationRunner>> func, string task, long version, int steps)
 		{
-			_migrationVersionRunner.Setup(func).Verifiable();
+			_migrationRunner.Setup(func).Verifiable();
 
 			var processor = new Mock<IMigrationProcessor>();
 			var profile = "Debug";
@@ -60,7 +60,7 @@ namespace FluentMigrator.Tests.Integration
 
 			new TaskExecutor(runnerContext.Object).Execute();
 
-			_migrationVersionRunner.VerifyAll();
+			_migrationRunner.VerifyAll();
 		}
 
 		[Test]

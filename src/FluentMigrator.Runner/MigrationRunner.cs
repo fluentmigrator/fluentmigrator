@@ -23,7 +23,6 @@ using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Versioning;
 
 namespace FluentMigrator.Runner
 {
@@ -32,20 +31,20 @@ namespace FluentMigrator.Runner
 		private Assembly _migrationAssembly;
 		private IAnnouncer _announcer;
 		private IStopWatch _stopWatch;
-		private SortedList<long, IMigration> _migrations;
+		private bool _alreadyOutputPreviewOnlyModeWarning;
 
-		private IMigrationLoader MigrationLoader { get; set; }
-		private ProfileLoader ProfileLoader { get; set; }
+		public IMigrationLoader MigrationLoader { get; set; }
+		public IProfileLoader ProfileLoader { get; set; }
 		public IMigrationConventions Conventions { get; private set; }
 		public IMigrationProcessor Processor { get; private set; }
 		public IList<Exception> CaughtExceptions { get; private set; }
 		public bool SilentlyFail { get; set; }
 
-		public MigrationRunner(Assembly assembly, IRunnerContext runnerContext)
+		public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
 		{
 			_migrationAssembly = assembly;
 			_announcer = runnerContext.Announcer;
-			Processor = runnerContext.Processor;
+			Processor = processor;
 			_stopWatch = new StopWatch();
 
 			SilentlyFail = false;
@@ -55,20 +54,12 @@ namespace FluentMigrator.Runner
 			if (!string.IsNullOrEmpty(runnerContext.WorkingDirectory))
 				Conventions.GetWorkingDirectory = () => runnerContext.WorkingDirectory;
 
-			VersionLoader = new VersionLoader();
-			MigrationLoader = new MigrationLoader(Conventions);
+			VersionLoader = new VersionLoader(this, runnerContext, _migrationAssembly, Conventions);
+			MigrationLoader = new MigrationLoader(Conventions, _migrationAssembly, runnerContext.Namespace);
 			ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
 		}
 
-		protected VersionLoader VersionLoader { get; set; }
-
-		public SortedList<long, IMigration> Migrations
-		{
-			get
-			{
-				return _migrations;
-			}
-		}
+		public VersionLoader VersionLoader { get; set; }
 
 		public void ApplyProfiles()
 		{
@@ -79,7 +70,7 @@ namespace FluentMigrator.Runner
 		{
 			try
 			{
-				foreach (var version in Migrations.Keys)
+				foreach (var version in MigrationLoader.Migrations.Keys)
 				{
 					MigrateUp(version);
 				}
@@ -88,7 +79,7 @@ namespace FluentMigrator.Runner
 
 				Processor.CommitTransaction();
 
-				LoadVersionInfo();
+				VersionLoader.LoadVersionInfo();
 			}
 			catch (Exception)
 			{
@@ -107,14 +98,14 @@ namespace FluentMigrator.Runner
 
 			ApplyMigrationUp(version);
 
-			LoadVersionInfo();
+			VersionLoader.LoadVersionInfo();
 		}
 
 		private void ApplyMigrationUp(long version)
 		{
-			if (!VersionInfo.HasAppliedMigration(version))
+			if (!VersionLoader.VersionInfo.HasAppliedMigration(version))
 			{
-				Up(Migrations[version]);
+				Up(MigrationLoader.Migrations[version]);
 				VersionLoader.UpdateVersionInfo(version);
 			}
 		}
@@ -127,7 +118,7 @@ namespace FluentMigrator.Runner
 
 				Processor.CommitTransaction();
 
-				LoadVersionInfo();
+				VersionLoader.LoadVersionInfo();
 			}
 			catch (Exception)
 			{
@@ -140,8 +131,8 @@ namespace FluentMigrator.Runner
 		{
 			try
 			{
-				Down(Migrations[version]);
-				Processor.Execute("DELETE FROM {0} WHERE {1}='{2}'", this._versionTableMetaData.TableName, this._versionTableMetaData.ColumnName, version.ToString());
+				Down(MigrationLoader.Migrations[version]);
+				VersionLoader.DeleteVersion(version);
 			}
 			catch (KeyNotFoundException ex)
 			{
@@ -156,20 +147,20 @@ namespace FluentMigrator.Runner
 
 		public void Rollback(int steps)
 		{
-			foreach (var migrationNumber in VersionInfo.AppliedMigrations().Take(steps))
+			foreach (var migrationNumber in VersionLoader.VersionInfo.AppliedMigrations().Take(steps))
 			{
 				ApplyMigrationDown(migrationNumber);
 			}
 
 			Processor.CommitTransaction();
 
-			LoadVersionInfo();
+			VersionLoader.LoadVersionInfo();
 		}
 
 		public void RollbackToVersion(long version)
 		{
 			// Get the migrations between current and the to version
-			foreach (var migrationNumber in VersionInfo.AppliedMigrations())
+			foreach (var migrationNumber in VersionLoader.VersionInfo.AppliedMigrations())
 			{
 				if (version < migrationNumber || version == 0)
 				{
@@ -178,11 +169,11 @@ namespace FluentMigrator.Runner
 			}
 
 			if (version == 0)
-				RemoveVersionTable();
+				VersionLoader.RemoveVersionTable();
 
 			Processor.CommitTransaction();
 
-			LoadVersionInfo();
+			VersionLoader.LoadVersionInfo();
 		}
 
 		public Assembly MigrationAssembly

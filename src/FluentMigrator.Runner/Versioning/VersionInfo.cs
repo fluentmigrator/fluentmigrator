@@ -23,7 +23,6 @@ namespace FluentMigrator.Runner.Versioning
 {
 	public class VersionInfo
 	{
-
 		private IList<long> _versionsApplied = new List<long>();
 
 		public long Latest()
