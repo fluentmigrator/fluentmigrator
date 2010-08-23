@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Integration
 		{
 			ExecuteWithSupportedProcessors(processor =>
 				{
-					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), new RunnerContext(new TextWriterAnnouncer(System.Console.Out)), processor);
+					var runner = new MigrationRunner( Assembly.GetExecutingAssembly(), new RunnerContext( new TextWriterAnnouncer( System.Console.Out ) ));
 
 					IVersionTableMetaData tableMetaData = new DefaultVersionTableMetaData();
 

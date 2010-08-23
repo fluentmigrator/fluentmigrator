@@ -18,11 +18,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors;
 
 namespace FluentMigrator.Runner
 {
@@ -32,20 +35,22 @@ namespace FluentMigrator.Runner
 		private IAnnouncer _announcer;
 		private IStopWatch _stopWatch;
 		private bool _alreadyOutputPreviewOnlyModeWarning;
+		public bool SilentlyFail { get; set; }
 
+		public IMigrationProcessor Processor { get; set; }
 		public IMigrationLoader MigrationLoader { get; set; }
 		public IProfileLoader ProfileLoader { get; set; }
 		public IMigrationConventions Conventions { get; private set; }
-		public IMigrationProcessor Processor { get; private set; }
 		public IList<Exception> CaughtExceptions { get; private set; }
-		public bool SilentlyFail { get; set; }
 
-		public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
+		public MigrationRunner(Assembly assembly, IRunnerContext runnerContext)
 		{
 			_migrationAssembly = assembly;
 			_announcer = runnerContext.Announcer;
-			Processor = processor;
+			
 			_stopWatch = runnerContext.StopWatch;
+
+			InitializeProcessor(runnerContext);
 
 			SilentlyFail = false;
 			CaughtExceptions = null;
@@ -54,9 +59,101 @@ namespace FluentMigrator.Runner
 			if (!string.IsNullOrEmpty(runnerContext.WorkingDirectory))
 				Conventions.GetWorkingDirectory = () => runnerContext.WorkingDirectory;
 
+			Processor.BeginTransaction();
+
 			VersionLoader = new VersionLoader(this, runnerContext, _migrationAssembly, Conventions);
 			MigrationLoader = new MigrationLoader(Conventions, _migrationAssembly, runnerContext.Namespace);
 			ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
+		}
+
+		private string ConfigFile { get; set; }
+		private string ConnectionString;
+		private void InitializeProcessor(IRunnerContext runnerContext)
+		{
+			var configFile = Path.Combine( Environment.CurrentDirectory, runnerContext.Target );
+			if ( File.Exists( configFile + ".config" ) )
+			{
+				var config = ConfigurationManager.OpenExeConfiguration( configFile );
+				var connections = config.ConnectionStrings.ConnectionStrings;
+
+				if ( connections.Count > 1 )
+				{
+					if ( string.IsNullOrEmpty( runnerContext.Connection ) )
+					{
+						ReadConnectionString(runnerContext, connections[ Environment.MachineName ], config.FilePath );
+					}
+					else
+					{
+						ReadConnectionString(runnerContext, connections[ runnerContext.Connection ], config.FilePath );
+					}
+				}
+				else if ( connections.Count == 1 )
+				{
+					ReadConnectionString( runnerContext, connections[ 0 ], config.FilePath );
+				}
+			}
+
+			if ( NotUsingConfig && !string.IsNullOrEmpty( runnerContext.Connection ) )
+			{
+				ConnectionString = runnerContext.Connection;
+			}
+
+			if ( string.IsNullOrEmpty( ConnectionString ) )
+			{
+				throw new ArgumentException( "Connection String or Name is required \"/connection\"" );
+			}
+
+			if ( string.IsNullOrEmpty( runnerContext.Database ) )
+			{
+				throw new ArgumentException(
+					"Database Type is required \"/db [db type]\". Available db types is [sqlserver], [sqlite]" );
+			}
+
+			if ( NotUsingConfig )
+			{
+				Console.WriteLine( "Using Database {0} and Connection String {1}", runnerContext.Database, ConnectionString );
+			}
+			else
+			{
+				Console.WriteLine( "Using Connection {0} from Configuration file {1}", runnerContext.Connection, ConfigFile );
+			}
+
+			if ( runnerContext.Timeout == 0 )
+			{
+				runnerContext.Timeout = 30;
+			}
+
+			var processorFactory = ProcessorFactory.GetFactory( runnerContext.Database );
+			Processor = processorFactory.Create( ConnectionString, _announcer, new ProcessorOptions
+			{
+				PreviewOnly = runnerContext.PreviewOnly,
+				Timeout = runnerContext.Timeout
+			});
+		}
+
+		private bool NotUsingConfig
+		{
+			get { return string.IsNullOrEmpty( ConfigFile ); }
+		}
+
+
+		private void ReadConnectionString( IRunnerContext runnerContext, ConnectionStringSettings connection, string configurationFile )
+		{
+			if ( connection != null )
+			{
+				var factory = ProcessorFactory.Factories.Where( f => f.IsForProvider( connection.ProviderName ) ).FirstOrDefault();
+				if ( factory != null )
+				{
+					runnerContext.Database = factory.Name;
+					runnerContext.Connection = connection.Name;
+					ConnectionString = connection.ConnectionString;
+					ConfigFile = configurationFile;
+				}
+			}
+			else
+			{
+				Console.WriteLine( "connection is null!" );
+			}
 		}
 
 		public VersionLoader VersionLoader { get; set; }
@@ -78,7 +175,6 @@ namespace FluentMigrator.Runner
 				ApplyProfiles();
 
 				Processor.CommitTransaction();
-
 				VersionLoader.LoadVersionInfo();
 			}
 			catch (Exception ex)
@@ -97,17 +193,7 @@ namespace FluentMigrator.Runner
 			}
 
 			ApplyMigrationUp(version);
-
 			VersionLoader.LoadVersionInfo();
-		}
-
-		private void ApplyMigrationUp(long version)
-		{
-			if (!VersionLoader.VersionInfo.HasAppliedMigration(version))
-			{
-				Up(MigrationLoader.Migrations[version]);
-				VersionLoader.UpdateVersionInfo(version);
-			}
 		}
 
 		public void MigrateDown(long version)
@@ -124,6 +210,15 @@ namespace FluentMigrator.Runner
 			{
 				Processor.RollbackTransaction();
 				throw;
+			}
+		}
+
+		private void ApplyMigrationUp(long version)
+		{
+			if (!VersionLoader.VersionInfo.HasAppliedMigration(version))
+			{
+				Up(MigrationLoader.Migrations[version]);
+				VersionLoader.UpdateVersionInfo(version);
 			}
 		}
 
@@ -153,7 +248,6 @@ namespace FluentMigrator.Runner
 			}
 
 			Processor.CommitTransaction();
-
 			VersionLoader.LoadVersionInfo();
 		}
 

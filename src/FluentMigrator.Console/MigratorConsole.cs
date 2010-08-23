@@ -251,7 +251,6 @@ namespace FluentMigrator.Console
 				Timeout = Timeout,
 				StopWatch = new StopWatch()
 			};
-			Processor = migrationContext.Processor;
 
 			new TaskExecutor( migrationContext ).Execute();
 		}

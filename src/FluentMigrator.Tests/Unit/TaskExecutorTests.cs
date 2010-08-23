@@ -54,7 +54,6 @@ namespace FluentMigrator.Tests.Integration
 			runnerContext.SetupGet(x => x.Version).Returns(version);
 			runnerContext.SetupGet(x => x.Steps).Returns(steps);
 			runnerContext.SetupGet(x => x.Target).Returns(GetType().Assembly.Location);
-			runnerContext.SetupGet(x => x.Processor).Returns(processor.Object);
 			runnerContext.SetupGet(x => x.Profile).Returns( profile );
 			runnerContext.SetupGet(x => x.Namespace).Returns("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3");
 

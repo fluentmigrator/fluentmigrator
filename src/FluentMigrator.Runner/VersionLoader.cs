@@ -16,9 +16,7 @@ namespace FluentMigrator.Runner
 		public VersionLoader(IMigrationRunner runner, IRunnerContext runnerContext, Assembly assembly, IMigrationConventions conventions)
 		{
 			Runner = runner;
-			RunnerContext = runnerContext;
-			Processor = runnerContext.Processor;
-			Announcer = runnerContext.Announcer;
+			Processor = runner.Processor;
 			Assembly = assembly;
 
 			Conventions = conventions;
@@ -31,13 +29,11 @@ namespace FluentMigrator.Runner
 		private VersionInfo _versionInfo;
 
 		public IMigrationRunner Runner { get; set; }
-		private IRunnerContext RunnerContext { get; set; }
 		protected Assembly Assembly { get; set; }
 		public IVersionTableMetaData VersionTableMetaData { get; set; }
 		private IMigrationConventions Conventions { get; set; }
 		private IMigrationProcessor Processor { get; set; }
 		private IMigration VersionMigration { get; set; }
-		private IAnnouncer Announcer { get; set; }
 
 		public void UpdateVersionInfo( long version )
 		{
@@ -61,7 +57,7 @@ namespace FluentMigrator.Runner
 
 		protected virtual InsertionDataDefinition CreateVersionInfoInsertionData( long version )
 		{
-			return new InsertionDataDefinition { new KeyValuePair<string, object>( this.VersionTableMetaData.ColumnName, version ) };
+			return new InsertionDataDefinition { new KeyValuePair<string, object>( VersionTableMetaData.ColumnName, version ) };
 		}
 
 		public VersionInfo VersionInfo

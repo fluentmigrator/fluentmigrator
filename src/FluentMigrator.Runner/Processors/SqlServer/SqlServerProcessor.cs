@@ -34,7 +34,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 			: base(generator, announcer, options)
 		{
 			Connection = connection;
-			Transaction = Connection.BeginTransaction();
 		}
 
 		public override bool SchemaExists(string schemaName)
@@ -92,9 +91,15 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 			}
 		}
 
+		public override void BeginTransaction()
+		{
+			Announcer.Say( "Beginning Transaction" );
+			Transaction = Connection.BeginTransaction();
+		}
+
 		public override void CommitTransaction()
 		{
-			Announcer.Say("Commiting transaction");
+			Announcer.Say("Commiting Transaction");
 			Transaction.Commit();
 			if (Connection.State != ConnectionState.Closed)
 			{

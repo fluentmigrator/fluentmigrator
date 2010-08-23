@@ -140,7 +140,7 @@
     <Compile Include="Generators\SqlServer2000Generator.cs" />
     <Compile Include="Generators\SqlServer2005Generator.cs" />
     <Compile Include="Generators\SqlServer2008Generator.cs" />
-    <Compile Include="IMigrationVersionRunner.cs" />
+    <Compile Include="IMigrationRunner.cs" />
     <Compile Include="Initialization\AssemblyLoader\AssemblyLoaderFactory.cs" />
     <Compile Include="Initialization\AssemblyLoader\AssemblyLoaderFromFile.cs" />
     <Compile Include="Initialization\AssemblyLoader\AssemblyLoaderFromName.cs" />

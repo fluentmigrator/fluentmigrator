@@ -62,11 +62,13 @@ namespace FluentMigrator.Tests.Unit
 			_processorMock.SetupGet(x => x.Options).Returns(options);
 
 			_runnerContextMock.SetupGet(x => x.Namespace).Returns("FluentMigrator.Tests.Integration.Migrations");
-			_runnerContextMock.SetupGet(x => x.Processor).Returns(_processorMock.Object);
 			_runnerContextMock.SetupGet(x => x.Announcer).Returns(_announcer.Object);
 			_runnerContextMock.SetupGet(x => x.StopWatch).Returns(_stopWatch.Object);
+			_runnerContextMock.SetupGet(x => x.Target).Returns(Assembly.GetExecutingAssembly().ToString());
+			_runnerContextMock.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer.ConnectionString);
+			_runnerContextMock.SetupGet(x => x.Database).Returns("sqlserver");
 
-			_runner = new MigrationRunner(Assembly.GetAssembly(typeof (MigrationRunnerTests)), _runnerContextMock.Object, _processorMock.Object);
+			_runner = new MigrationRunner( Assembly.GetAssembly( typeof( MigrationRunnerTests ) ), _runnerContextMock.Object ) { Processor = _processorMock.Object };
 			_runner.MigrationLoader = _migrationLoaderMock.Object;
 			_runner.ProfileLoader = _profileLoaderMock.Object;
 		}

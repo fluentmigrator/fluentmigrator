@@ -37,8 +37,15 @@ namespace FluentMigrator.Tests.Integration
 		{
 			ExecuteWithSupportedProcessors(processor =>
 				{
-					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), new RunnerContext(new TextWriterAnnouncer(System.Console.Out)), processor);
+					var runnerContext = new RunnerContext( new TextWriterAnnouncer( System.Console.Out ) )
+										{
+											Database = "sqlserver",
+											Target = GetType().Assembly.Location,
+											Connection = IntegrationTestOptions.SqlServer.ConnectionString,
+										};
+					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext); //processor
 
+					processor.BeginTransaction();
 					runner.Up(new TestCreateAndDropTableMigration());
 					// This is a hack until MigrationVersionRunner and MigrationRunner are refactored and merged together
 					processor.CommitTransaction();
@@ -58,7 +65,7 @@ namespace FluentMigrator.Tests.Integration
 			processor.Setup(x => x.Process(It.IsAny<DeleteForeignKeyExpression>())).Throws(new Exception("Error"));
 
 			var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out));
-			var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor.Object) { SilentlyFail = true };
+			var runner = new MigrationRunner( Assembly.GetExecutingAssembly(), runnerContext ) { Processor = processor.Object, SilentlyFail = true };
 
 			runner.Up(new TestForeignKeySilentFailure());
 	
@@ -75,7 +82,7 @@ namespace FluentMigrator.Tests.Integration
 				processor =>
 				{
 					var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out));
-					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
+					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext){ Processor = processor };
 
 					runner.Up(new TestForeignKeyNamingConvention());
 
@@ -94,7 +101,7 @@ namespace FluentMigrator.Tests.Integration
 				processor =>
 				{
 					var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out));
-					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
+					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext){ Processor = processor };
 
 					runner.Up(new TestIndexNamingConvention());
 					processor.TableExists("Users").ShouldBeTrue();

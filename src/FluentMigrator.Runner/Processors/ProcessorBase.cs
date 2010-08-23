@@ -114,6 +114,10 @@ namespace FluentMigrator.Runner.Processors
 
 		protected abstract void Process(string sql);
 
+		public virtual void BeginTransaction()
+		{
+		}
+
 		public virtual void CommitTransaction()
 		{
 		}
