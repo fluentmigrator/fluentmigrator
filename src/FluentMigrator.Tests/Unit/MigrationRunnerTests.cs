@@ -36,7 +36,6 @@ namespace FluentMigrator.Tests.Unit
 	{
 		private MigrationRunner _runner;
 		private Mock<IAnnouncer> _announcer;
-		private Mock<IMigrationProcessor> _processor;
 		private Mock<IStopWatch> _stopWatch;
 
 		private Mock<IMigrationConventions> _conventionMock;
@@ -53,17 +52,21 @@ namespace FluentMigrator.Tests.Unit
 			_processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
 			_migrationLoaderMock = new Mock<IMigrationLoader>(MockBehavior.Loose);
 			_profileLoaderMock = new Mock<IProfileLoader>(MockBehavior.Loose);
+			_announcer = new Mock<IAnnouncer>();
+			_stopWatch = new Mock<IStopWatch>();
 
 			var options = new ProcessorOptions
 							{
 								PreviewOnly = true
 							};
-			_processor = new Mock<IMigrationProcessor>();
-			_processor.SetupGet(x => x.Options).Returns(options);
+			_processorMock.SetupGet(x => x.Options).Returns(options);
 
-			_announcer = new Mock<IAnnouncer>();
-			_stopWatch = new Mock<IStopWatch>();
-			_runner = new MigrationRunner(Assembly.GetAssembly(typeof (MigrationRunnerTests)), _runnerContextMock.Object, _processor.Object);
+			_runnerContextMock.SetupGet(x => x.Namespace).Returns("FluentMigrator.Tests.Integration.Migrations");
+			_runnerContextMock.SetupGet(x => x.Processor).Returns(_processorMock.Object);
+			_runnerContextMock.SetupGet(x => x.Announcer).Returns(_announcer.Object);
+			_runnerContextMock.SetupGet(x => x.StopWatch).Returns(_stopWatch.Object);
+
+			_runner = new MigrationRunner(Assembly.GetAssembly(typeof (MigrationRunnerTests)), _runnerContextMock.Object, _processorMock.Object);
 			_runner.MigrationLoader = _migrationLoaderMock.Object;
 			_runner.ProfileLoader = _profileLoaderMock.Object;
 		}
@@ -129,7 +132,7 @@ namespace FluentMigrator.Tests.Unit
 		[Test]
 		public void CanReportExceptions()
 		{
-			_processor.Setup(x => x.Process(It.IsAny<CreateTableExpression>())).Throws(new Exception("Oops"));
+			_processorMock.Setup(x => x.Process(It.IsAny<CreateTableExpression>())).Throws(new Exception("Oops"));
 
 			_announcer.Setup(x => x.Error(It.IsRegex(containsAll("Oops"))));
 
@@ -178,14 +181,6 @@ namespace FluentMigrator.Tests.Unit
 		public void LoadsCorrectCallingAssembly()
 		{
 			_runner.MigrationAssembly.ShouldBe(Assembly.GetAssembly(typeof(MigrationRunnerTests)));
-		}
-
-		[Test]
-		public void BlankProfileDoesntLoadProfiles()
-		{
-			_runner.MigrateUp();
-
-			_profileLoaderMock.Verify(x => x.FindProfilesIn(It.IsAny<Assembly>(), It.IsAny<string>()), Times.Never());
 		}
 
 		[Test,Ignore("Move to MigrationLoader tests")]

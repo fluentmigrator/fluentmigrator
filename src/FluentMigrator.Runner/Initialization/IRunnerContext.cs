@@ -31,6 +31,7 @@ namespace FluentMigrator.Runner.Initialization
 		string WorkingDirectory { get; set; }
 		string Profile { get; set; }
 		IAnnouncer Announcer { get; }
+		IStopWatch StopWatch { get; }
 		IMigrationProcessor Processor { get; }
 	}
 }

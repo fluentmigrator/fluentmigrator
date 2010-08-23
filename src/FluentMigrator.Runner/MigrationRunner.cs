@@ -45,7 +45,7 @@ namespace FluentMigrator.Runner
 			_migrationAssembly = assembly;
 			_announcer = runnerContext.Announcer;
 			Processor = processor;
-			_stopWatch = new StopWatch();
+			_stopWatch = runnerContext.StopWatch;
 
 			SilentlyFail = false;
 			CaughtExceptions = null;
@@ -81,7 +81,7 @@ namespace FluentMigrator.Runner
 
 				VersionLoader.LoadVersionInfo();
 			}
-			catch (Exception)
+			catch (Exception ex)
 			{
 				Processor.RollbackTransaction();
 				throw;

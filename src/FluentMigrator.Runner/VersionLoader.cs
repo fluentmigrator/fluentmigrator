@@ -66,7 +66,17 @@ namespace FluentMigrator.Runner
 
 		public VersionInfo VersionInfo
 		{
-			get; set;
+			get
+			{
+				return _versionInfo;
+			}
+			set
+			{
+				if (value == null)
+					throw new ArgumentException("Cannot set VersionInfo to null");
+
+				_versionInfo = value;
+			}
 		}
 
 		public bool AlreadyCreatedVersionTable

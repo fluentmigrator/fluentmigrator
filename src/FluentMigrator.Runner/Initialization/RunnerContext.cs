@@ -39,6 +39,11 @@ namespace FluentMigrator.Runner.Initialization
 			get; set;
 		}
 
+		public IStopWatch StopWatch
+		{
+			get; set;
+		}
+
 		public IMigrationProcessor Processor
 		{
 			get

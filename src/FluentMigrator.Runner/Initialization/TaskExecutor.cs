@@ -39,14 +39,6 @@ namespace FluentMigrator.Runner.Initialization
 			var assembly = AssemblyLoaderFactory.GetAssemblyLoader(RunnerContext.Target).Load();
 
 			Runner = new MigrationRunner(assembly, RunnerContext, RunnerContext.Processor);
-
-//			Runner = new MigrationVersionRunner(migrationConventions,
-//												RunnerContext.Processor,
-//												new MigrationLoader(migrationConventions),
-//												assembly,
-//												RunnerContext.Namespace,
-//												RunnerContext.Announcer,
-//												RunnerContext.Profile);
 		}
 
 		public void Execute()

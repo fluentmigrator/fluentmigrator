@@ -248,7 +248,8 @@ namespace FluentMigrator.Console
 				Steps = Steps,
 				WorkingDirectory = WorkingDirectory,
 				Profile = Profile,
-				Timeout = Timeout
+				Timeout = Timeout,
+				StopWatch = new StopWatch()
 			};
 			Processor = migrationContext.Processor;
 

@@ -149,7 +149,7 @@ namespace FluentMigrator.Tests.Unit.Runners
 				stringWriterVerbose,
 				"/db", database,
 				"/connection", connection,
-				"/verbose",
+				"/verbose", "1",
 				"/target", target,
 				"/namespace", "FluentMigrator.Tests.Integration.Migrations",
 				"/task", "migrate:up",

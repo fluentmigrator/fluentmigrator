@@ -194,6 +194,7 @@
     <Compile Include="Integration\Migrations\TestMigration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Unit\MigrationRunnerTests.cs" />
+    <Compile Include="Unit\ProfileLoaderTests.cs" />
     <Compile Include="Unit\Runners\Migrations\1_User.cs" />
     <Compile Include="Unit\Runners\Migrations\2_UserEmail.cs" />
     <Compile Include="Unit\Runners\Migrations\3_UserRoles.cs" />

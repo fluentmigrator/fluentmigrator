@@ -38,7 +38,7 @@ namespace FluentMigrator.Tests.Unit
 		{
 			var conventions = new MigrationConventions();
 			var asm = Assembly.GetExecutingAssembly();
-			var loader = new MigrationLoader(conventions, asm, string.Empty);
+			var loader = new MigrationLoader( conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1");
 			
 			SortedList<long, IMigration> migrationList = loader.Migrations;
 

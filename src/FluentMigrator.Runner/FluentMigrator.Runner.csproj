@@ -150,7 +150,6 @@
     <Compile Include="Initialization\TaskExecutor.cs" />
     <Compile Include="IProfileLoader.cs" />
     <Compile Include="IVersionLoader.cs" />
-    <Compile Include="MigrationVersionRunner.cs" />
     <Compile Include="Processors\MigrationProcessorFactory.cs" />
     <Compile Include="Processors\MySql\MySqlProcessor.cs" />
     <Compile Include="Processors\MySql\MySqlProcessorFactory.cs" />
