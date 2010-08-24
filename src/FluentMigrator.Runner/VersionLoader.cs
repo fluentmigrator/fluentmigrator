@@ -13,7 +13,7 @@ namespace FluentMigrator.Runner
 {
 	public class VersionLoader : IVersionLoader
 	{
-		public VersionLoader(IMigrationRunner runner, IRunnerContext runnerContext, Assembly assembly, IMigrationConventions conventions)
+		public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions)
 		{
 			Runner = runner;
 			Processor = runner.Processor;

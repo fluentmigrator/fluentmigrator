@@ -34,14 +34,6 @@ namespace FluentMigrator.Tests.Integration
 	[TestFixture]
 	public class MigrationVersionRunnerTests : IntegrationTestBase
 	{
-		private MigrationConventions _conventions;
-
-		[SetUp]
-		public void SetUp()
-		{
-			_conventions = new MigrationConventions();
-		}
-
 		[Test]
 		public void CanLoadMigrations()
 		{
@@ -52,7 +44,9 @@ namespace FluentMigrator.Tests.Integration
 											Namespace = typeof(TestMigration).Namespace,
 										};
 
-					var runner = new MigrationRunner(typeof(MigrationVersionRunnerTests).Assembly, runnerContext){Processor = processor};
+					var runner = new MigrationRunner(typeof(MigrationVersionRunnerTests).Assembly, runnerContext, processor);
+
+					runner.Processor.CommitTransaction();
 
 					runner.MigrationLoader.Migrations.ShouldNotBeNull();
 				});
@@ -68,8 +62,9 @@ namespace FluentMigrator.Tests.Integration
 						Namespace = typeof(TestMigration).Namespace,
 					};
 
-					var runner = new MigrationRunner(typeof(TestMigration).Assembly, runnerContext){Processor = processor};
+					var runner = new MigrationRunner(typeof(TestMigration).Assembly, runnerContext, processor);
 
+					runner.Processor.CommitTransaction();
 					runner.VersionLoader.VersionInfo.ShouldNotBeNull();
 				});
 		}
@@ -80,22 +75,32 @@ namespace FluentMigrator.Tests.Integration
 			ExecuteWithSupportedProcessors(processor =>
 				{
 					Assembly asm = typeof (MigrationVersionRunnerTests).Assembly;
-					var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out));
-					var runner = new MigrationRunner( asm, runnerContext ) { Processor = processor };
+					var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+					                    	{
+												Namespace = "FluentMigrator.Tests.Integration.Migrations"
+					                    	};
+					var runner = new MigrationRunner(asm, runnerContext, processor);
 
 					runner.MigrateUp();
+
 					runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
 					runner.VersionLoader.VersionInfo.HasAppliedMigration(2).ShouldBeTrue();
 					runner.VersionLoader.VersionInfo.Latest().ShouldBe(2);
+
+					runner.Processor.BeginTransaction();
+					runner.Rollback( 3 );
 				});
 		}
 
 		private void runMigrationsInNamespace(IMigrationProcessor processor, string @namespace)
 		{
 			Assembly asm = typeof (MigrationVersionRunnerTests).Assembly;
-			var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out));
+			var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+									{
+										Namespace = "FluentMigrator.Tests.Integration.Migrations"
+									};
 			runnerContext.Namespace = @namespace;
-			var runner = new MigrationRunner( asm, runnerContext ) { Processor = processor };
+			var runner = new MigrationRunner( asm, runnerContext, processor );
 
 			runner.MigrateUp();
 		}
@@ -113,9 +118,11 @@ namespace FluentMigrator.Tests.Integration
 					processor.TableExists("User").ShouldBeTrue();
 
 					Assembly asm = typeof (MigrationVersionRunnerTests).Assembly;
-					var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out));
-					runnerContext.Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3";
-					var runner = new MigrationRunner(asm, runnerContext ){ Processor = processor};
+					var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+											{
+												Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3"
+											};
+					var runner = new MigrationRunner(asm, runnerContext, processor);
 
 					runner.VersionLoader.VersionInfo.HasAppliedMigration(200909060953).ShouldBeTrue();
 					runner.VersionLoader.VersionInfo.HasAppliedMigration(200909060935).ShouldBeTrue();
@@ -137,11 +144,10 @@ namespace FluentMigrator.Tests.Integration
 		{
 			ExecuteWithSupportedProcessors(processor =>
 				{
-
 					Assembly asm = typeof(MigrationVersionRunnerTests).Assembly;
 					var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out));
 					runnerContext.Namespace = "FluentMigrator.Tests.Integration.Migrations";
-					var runner = new MigrationRunner(asm, runnerContext){ Processor = processor};
+					var runner = new MigrationRunner(asm, runnerContext, processor);
 
 					runner.MigrateUp(1);
 
@@ -163,8 +169,8 @@ namespace FluentMigrator.Tests.Integration
 			{
 				Assembly asm = typeof(MigrationVersionRunnerTests).Assembly;
 				var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out));
-				runnerContext.Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3";
-				var runner = new MigrationRunner(asm, runnerContext){Processor = processor};
+				runnerContext.Namespace = "FluentMigrator.Tests.Integration.Migrations";
+				var runner = new MigrationRunner(asm, runnerContext, processor);
 
 				runner.MigrateUp(1);
 
@@ -188,11 +194,12 @@ namespace FluentMigrator.Tests.Integration
 			Assembly asm = typeof(MigrationVersionRunnerTests).Assembly;
 			var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out));
 			runnerContext.Namespace = typeof(InvalidMigration).Namespace;
-			var runner = new MigrationRunner(asm, runnerContext){Processor = processor};
+			var runner = new MigrationRunner(asm, runnerContext, processor);
 
 			try
 			{
 				runner.MigrateUp();
+				processor.RollbackTransaction();
 			}
 			catch
 			{

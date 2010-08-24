@@ -30,7 +30,6 @@ namespace FluentMigrator.Console
 	{
 		private readonly TextWriter _announcerOutput;
 		public string ProcessorType;
-		public IMigrationProcessor Processor;
 		public string Connection;
 		public bool Verbose;
 		public bool PreviewOnly;
@@ -236,7 +235,7 @@ namespace FluentMigrator.Console
 
 		private void ExecuteMigrations( IAnnouncer announcer )
 		{
-			var migrationContext = new RunnerContext( announcer )
+			var runnerContext = new RunnerContext( announcer )
 			{
 				Database = ProcessorType,
 				Connection = Connection,
@@ -249,10 +248,9 @@ namespace FluentMigrator.Console
 				WorkingDirectory = WorkingDirectory,
 				Profile = Profile,
 				Timeout = Timeout,
-				StopWatch = new StopWatch()
 			};
 
-			new TaskExecutor( migrationContext ).Execute();
+			new TaskExecutor( runnerContext ).Execute();
 		}
 	}
 }

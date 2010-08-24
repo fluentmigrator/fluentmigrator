@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Integration
 		{
 			ExecuteWithSupportedProcessors(processor =>
 				{
-					var runner = new MigrationRunner( Assembly.GetExecutingAssembly(), new RunnerContext( new TextWriterAnnouncer( System.Console.Out ) ));
+					var runner = new MigrationRunner( Assembly.GetExecutingAssembly(), new RunnerContext( new TextWriterAnnouncer( System.Console.Out ) ) { Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3" }, processor );
 
 					IVersionTableMetaData tableMetaData = new DefaultVersionTableMetaData();
 
@@ -48,6 +48,8 @@ namespace FluentMigrator.Tests.Integration
 
 					runner.Down(new VersionMigration(tableMetaData));
 					processor.TableExists(tableMetaData.TableName).ShouldBeFalse();
+
+					runner.Processor.CommitTransaction();
 				});
 
 		}

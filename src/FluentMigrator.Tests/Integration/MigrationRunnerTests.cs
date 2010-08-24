@@ -32,25 +32,33 @@ namespace FluentMigrator.Tests.Integration
 	[TestFixture]
 	public class MigrationRunnerTests : IntegrationTestBase
 	{
+		private IRunnerContext _runnerContext;
+
+		[SetUp]
+		public void SetUp()
+		{
+			_runnerContext = new RunnerContext( new TextWriterAnnouncer( System.Console.Out ) )
+										{
+											Database = "sqlserver",
+											Target = GetType().Assembly.Location,
+											Connection = IntegrationTestOptions.SqlServer.ConnectionString,
+											Namespace = "FluentMigrator.Tests.Integration.Migrations"
+										};
+		}
+
 		[Test]
 		public void CanRunMigration()
 		{
 			ExecuteWithSupportedProcessors(processor =>
 				{
-					var runnerContext = new RunnerContext( new TextWriterAnnouncer( System.Console.Out ) )
-										{
-											Database = "sqlserver",
-											Target = GetType().Assembly.Location,
-											Connection = IntegrationTestOptions.SqlServer.ConnectionString,
-										};
-					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext); //processor
+					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
-					processor.BeginTransaction();
 					runner.Up(new TestCreateAndDropTableMigration());
-					// This is a hack until MigrationVersionRunner and MigrationRunner are refactored and merged together
-					processor.CommitTransaction();
 
 					processor.TableExists("TestTable").ShouldBeTrue();
+
+					// This is a hack until MigrationVersionRunner and MigrationRunner are refactored and merged together
+					processor.CommitTransaction();
 
 					runner.Down(new TestCreateAndDropTableMigration());
 					processor.TableExists("TestTable").ShouldBeFalse();
@@ -60,12 +68,15 @@ namespace FluentMigrator.Tests.Integration
 		[Test]
 		public void CanSilentlyFail()
 		{
+			var processorOptions = new Mock<IMigrationProcessorOptions>();
+			processorOptions.SetupGet(x => x.PreviewOnly).Returns(false);
+
 			var processor = new Mock<IMigrationProcessor>();
 			processor.Setup(x => x.Process(It.IsAny<CreateForeignKeyExpression>())).Throws(new Exception("Error"));
 			processor.Setup(x => x.Process(It.IsAny<DeleteForeignKeyExpression>())).Throws(new Exception("Error"));
+			processor.Setup(x => x.Options).Returns(processorOptions.Object);
 
-			var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out));
-			var runner = new MigrationRunner( Assembly.GetExecutingAssembly(), runnerContext ) { Processor = processor.Object, SilentlyFail = true };
+			var runner = new MigrationRunner( Assembly.GetExecutingAssembly(), _runnerContext, processor.Object ) { SilentlyFail = true };
 
 			runner.Up(new TestForeignKeySilentFailure());
 	
@@ -81,8 +92,7 @@ namespace FluentMigrator.Tests.Integration
 			ExecuteWithSupportedProcessors(
 				processor =>
 				{
-					var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out));
-					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext){ Processor = processor };
+					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
 					runner.Up(new TestForeignKeyNamingConvention());
 
@@ -100,14 +110,15 @@ namespace FluentMigrator.Tests.Integration
 			ExecuteWithSupportedProcessors(
 				processor =>
 				{
-					var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out));
-					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext){ Processor = processor };
+					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
 					runner.Up(new TestIndexNamingConvention());
 					processor.TableExists("Users").ShouldBeTrue();
 
 					runner.Down(new TestIndexNamingConvention());
 					processor.TableExists("Users").ShouldBeFalse();
+
+					processor.CommitTransaction();
 				});
 		}
 	}
@@ -141,10 +152,10 @@ namespace FluentMigrator.Tests.Integration
 		public override void Up()
 		{
 			Create.Table("Users")
-			   .WithColumn("UserId").AsInt32().Identity().PrimaryKey()
-			   .WithColumn("GroupId").AsInt32().NotNullable()
-			   .WithColumn("UserName").AsString(32).NotNullable()
-			   .WithColumn("Password").AsString(32).NotNullable();
+				.WithColumn("UserId").AsInt32().Identity().PrimaryKey()
+				.WithColumn("GroupId").AsInt32().NotNullable()
+				.WithColumn("UserName").AsString(32).NotNullable()
+				.WithColumn("Password").AsString(32).NotNullable();
 
 			Create.Index().OnTable("Users").OnColumn("GroupId").Ascending();
 		}

@@ -58,7 +58,6 @@ namespace FluentMigrator.Tests.Unit.Runners
 				"/task", "migrate:up",
 				"/version", "1");
 
-			console.Processor.ShouldBeOfType<SqliteProcessor>();
 			console.Connection.ShouldBe(connection);
 			console.Namespace.ShouldBe("FluentMigrator.Tests.Integration.Migrations");
 			console.Task.ShouldBe("migrate:up");

@@ -33,12 +33,20 @@ namespace FluentMigrator.Tests.Integration.Processors
 		public SqlConnection Connection { get; set; }
 		public SqlServerProcessor Processor { get; set; }
 
-		public SqlServerProcessorTests()
+		[SetUp]
+		public void SetUp()
 		{
 			Connection = new SqlConnection(IntegrationTestOptions.SqlServer.ConnectionString);
 			Connection.Open();
 
 			Processor = new SqlServerProcessor(Connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+			Processor.BeginTransaction();
+		}
+
+		[TearDown]
+		public void TearDown()
+		{
+			Processor.CommitTransaction();
 		}
 
 		[Test]
