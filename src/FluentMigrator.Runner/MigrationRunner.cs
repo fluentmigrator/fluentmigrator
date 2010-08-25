@@ -57,8 +57,6 @@ namespace FluentMigrator.Runner
 			if (!string.IsNullOrEmpty(runnerContext.WorkingDirectory))
 				Conventions.GetWorkingDirectory = () => runnerContext.WorkingDirectory;
 
-			Processor.BeginTransaction();
-
 			VersionLoader = new VersionLoader(this, _migrationAssembly, Conventions);
 			MigrationLoader = new MigrationLoader(Conventions, _migrationAssembly, runnerContext.Namespace);
 			ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);

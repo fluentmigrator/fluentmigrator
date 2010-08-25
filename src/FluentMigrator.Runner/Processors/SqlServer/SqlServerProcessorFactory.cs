@@ -9,8 +9,12 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 		public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
 		{
 			var connection = new SqlConnection(connectionString);
+
+			var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), announcer, options);
 			connection.Open();
-			return new SqlServerProcessor(connection, new SqlServer2008Generator(), announcer, options);
+			processor.BeginTransaction();
+
+			return processor;
 		}
 
 		public override IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
