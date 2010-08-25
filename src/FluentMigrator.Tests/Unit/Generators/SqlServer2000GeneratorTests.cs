@@ -30,11 +30,12 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Unit.Generators
 {
 	[TestFixture]
-	public class SqlServerGeneratorTests
+	public class SqlServer2000GeneratorTests
 	{
-		private readonly SqlServer2000Generator generator;
+		private SqlServer2000Generator generator;
 
-		public SqlServerGeneratorTests()
+		[SetUp]
+		public void SetUp()
 		{
 			generator = new SqlServer2000Generator();
 		}

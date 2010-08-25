@@ -17,6 +17,7 @@
 #endregion
 
 using System.Data;
+using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Generators
 {
@@ -30,6 +31,11 @@ namespace FluentMigrator.Runner.Generators
 			SetTypeMap(DbType.DateTimeOffset, "DATETIMEOFFSET");
 			SetTypeMap(DbType.Date, "DATE");
 			SetTypeMap(DbType.Time, "TIME");
+		}
+
+		public override string Generate(RenameTableExpression expression)
+		{
+			return FormatExpression("sp_rename '{0}[{1}]', '[{2}]'", FormatSchema( expression.SchemaName ), expression.OldName, expression.NewName);
 		}
 	}
 }

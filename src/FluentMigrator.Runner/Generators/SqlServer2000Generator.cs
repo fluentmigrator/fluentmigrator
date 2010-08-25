@@ -88,10 +88,10 @@ namespace FluentMigrator.Runner.Generators
 			return FormatExpression("sp_rename '{0}[{1}].[{2}]', [{3}]", FormatSchema(expression.SchemaName, false), expression.TableName, expression.OldName, expression.NewName);
 		}
 
-        public override string Generate(AlterColumnExpression expression)
-        {
-            return FormatExpression("ALTER TABLE {0}[{1}] ALTER COLUMN {2}", FormatSchema(expression.SchemaName), expression.TableName, GenerateDDLForColumn(expression.Column));
-        }
+		public override string Generate(AlterColumnExpression expression)
+		{
+			return FormatExpression("ALTER TABLE {0}[{1}] ALTER COLUMN {2}", FormatSchema(expression.SchemaName), expression.TableName, GenerateDDLForColumn(expression.Column));
+		}
 
 		public override string Generate(CreateTableExpression expression)
 		{
