@@ -33,7 +33,6 @@ namespace FluentMigrator.Runner.Generators
 		public const int UnicodeTextCapacity = 1073741823;
 		public const int ImageCapacity = 2147483647;
 		public const int DecimalCapacity = 19;
-		public const int XmlCapacity = 1073741823;
 
 		protected override void SetupTypeMaps()
 		{
@@ -66,7 +65,7 @@ namespace FluentMigrator.Runner.Generators
 			SetTypeMap(DbType.String, "NVARCHAR(MAX)", int.MaxValue);
 			SetTypeMap(DbType.String, "NTEXT", UnicodeTextCapacity);
 			SetTypeMap(DbType.Time, "DATETIME");
-			SetTypeMap(DbType.Xml, "XML", XmlCapacity);
+			SetTypeMap(DbType.Xml, "XML");
 		}
 
 		public override string Generate(CreateSchemaExpression expression)

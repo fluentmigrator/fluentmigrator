@@ -279,5 +279,19 @@ namespace FluentMigrator.Tests.Unit.Generators
 			var sql = generator.Generate(expression);
 			sql.ShouldBe("sp_rename [Table1], [Table2]");
 		}
+
+		[Test]
+		public void CanCreateXmlColumn()
+		{
+			var expression = new CreateColumnExpression();
+			expression.TableName = "Table1";
+
+			expression.Column = new ColumnDefinition();
+			expression.Column.Name = "MyXmlColumn";
+			expression.Column.Type = DbType.Xml;
+
+			var sql = generator.Generate(expression);
+			sql.ShouldNotBeNull();
+		}
 	}
 }
