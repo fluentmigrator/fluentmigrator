@@ -30,11 +30,12 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Unit.Generators
 {
 	[TestFixture]
-	public class SqlServerGeneratorTests
+	public class SqlServer2000GeneratorTests
 	{
-		private readonly SqlServer2000Generator generator;
+		private SqlServer2000Generator generator;
 
-		public SqlServerGeneratorTests()
+		[SetUp]
+		public void SetUp()
 		{
 			generator = new SqlServer2000Generator();
 		}
@@ -278,6 +279,20 @@ namespace FluentMigrator.Tests.Unit.Generators
 
 			var sql = generator.Generate(expression);
 			sql.ShouldBe("sp_rename [Table1], [Table2]");
+		}
+
+		[Test]
+		public void CanCreateXmlColumn()
+		{
+			var expression = new CreateColumnExpression();
+			expression.TableName = "Table1";
+
+			expression.Column = new ColumnDefinition();
+			expression.Column.Name = "MyXmlColumn";
+			expression.Column.Type = DbType.Xml;
+
+			var sql = generator.Generate(expression);
+			sql.ShouldNotBeNull();
 		}
 	}
 }

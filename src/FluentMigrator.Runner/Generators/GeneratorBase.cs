@@ -20,7 +20,6 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
-using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 
@@ -87,7 +86,7 @@ namespace FluentMigrator.Runner.Generators
 		public abstract string Generate(CreateSchemaExpression expression);
 		public abstract string Generate(DeleteSchemaExpression expression);
 		public abstract string Generate(CreateTableExpression expression);
-        public abstract string Generate(AlterColumnExpression expression);
+		public abstract string Generate(AlterColumnExpression expression);
 		public abstract string Generate(CreateColumnExpression expression);
 		public abstract string Generate(DeleteTableExpression expression);
 		public abstract string Generate(DeleteColumnExpression expression);
@@ -98,7 +97,7 @@ namespace FluentMigrator.Runner.Generators
 		public abstract string Generate(RenameTableExpression expression);
 		public abstract string Generate(RenameColumnExpression expression);
 		public abstract string Generate(InsertDataExpression expression);
-        public abstract string Generate(AlterDefaultConstraintExpression expression);
+		public abstract string Generate(AlterDefaultConstraintExpression expression);
 
 		public virtual string GenerateDDLForColumn(ColumnDefinition column)
 		{

@@ -33,7 +33,6 @@ namespace FluentMigrator.Runner.Generators
 		public const int UnicodeTextCapacity = 1073741823;
 		public const int ImageCapacity = 2147483647;
 		public const int DecimalCapacity = 19;
-		public const int XmlCapacity = 1073741823;
 
 		protected override void SetupTypeMaps()
 		{
@@ -66,7 +65,7 @@ namespace FluentMigrator.Runner.Generators
 			SetTypeMap(DbType.String, "NVARCHAR(MAX)", int.MaxValue);
 			SetTypeMap(DbType.String, "NTEXT", UnicodeTextCapacity);
 			SetTypeMap(DbType.Time, "DATETIME");
-			SetTypeMap(DbType.Xml, "XML", XmlCapacity);
+			SetTypeMap(DbType.Xml, "XML");
 		}
 
 		public override string Generate(CreateSchemaExpression expression)
@@ -89,10 +88,10 @@ namespace FluentMigrator.Runner.Generators
 			return FormatExpression("sp_rename '{0}[{1}].[{2}]', [{3}]", FormatSchema(expression.SchemaName, false), expression.TableName, expression.OldName, expression.NewName);
 		}
 
-        public override string Generate(AlterColumnExpression expression)
-        {
-            return FormatExpression("ALTER TABLE {0}[{1}] ALTER COLUMN {2}", FormatSchema(expression.SchemaName), expression.TableName, GenerateDDLForColumn(expression.Column));
-        }
+		public override string Generate(AlterColumnExpression expression)
+		{
+			return FormatExpression("ALTER TABLE {0}[{1}] ALTER COLUMN {2}", FormatSchema(expression.SchemaName), expression.TableName, GenerateDDLForColumn(expression.Column));
+		}
 
 		public override string Generate(CreateTableExpression expression)
 		{

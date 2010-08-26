@@ -174,10 +174,11 @@
     <Compile Include="Unit\Expressions\ExecuteSqlStatementExpressionTests.cs" />
     <Compile Include="Unit\Generators\OracleGeneratorTests.cs" />
     <Compile Include="Unit\Expressions\PerformDBOperationExpressionTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2008GeneratorTests.cs" />
     <Compile Include="Unit\MigrationLoaderTests.cs" />
     <Compile Include="Unit\MigrationMetadataTests.cs" />
     <Compile Include="Unit\Generators\SqliteGeneratorTests.cs" />
-    <Compile Include="Unit\Generators\SqlServerGeneratorTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2000GeneratorTests.cs" />
     <Compile Include="Helpers\SqlServerTestTable.cs" />
     <Compile Include="Unit\Definitions\IndexColumnDefinitionTests.cs" />
     <Compile Include="Unit\Definitions\ForeignKeyDefinitionTests.cs" />
