@@ -29,6 +29,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 	{
 		public virtual SqlConnection Connection { get; set; }
 		public SqlTransaction Transaction { get; private set; }
+		public bool WasCommitted { get; private set; }
 
 		public SqlServerProcessor(SqlConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
 			: base(generator, announcer, options)
@@ -103,6 +104,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 		{
 			Announcer.Say("Commiting Transaction");
 			Transaction.Commit();
+			WasCommitted = true;
 			if (Connection.State != ConnectionState.Closed)
 			{
 				Connection.Close();
@@ -113,6 +115,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 		{
 			Announcer.Say("Rolling back transaction");
 			Transaction.Rollback();
+			WasCommitted = true;
 			if (Connection.State != ConnectionState.Closed)
 			{
 				Connection.Close();

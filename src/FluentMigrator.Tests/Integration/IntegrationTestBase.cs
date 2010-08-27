@@ -46,6 +46,11 @@ namespace FluentMigrator.Tests.Integration
 			var connection = new SqlConnection(serverOptions.ConnectionString);
 			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 			test(processor);
+
+			if (!processor.WasCommitted)
+			{
+				processor.RollbackTransaction();
+			}
 		}
 
 		protected static void ExecuteWithSqlite(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)

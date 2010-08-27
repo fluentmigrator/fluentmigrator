@@ -18,11 +18,17 @@
 #endregion
 
 using System;
+using System.Data.SqlClient;
 using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.SqlServer;
+using FluentMigrator.Tests.Integration.Migrations;
+using FluentMigrator.Tests.Integration.Migrations.Invalid;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
@@ -58,7 +64,7 @@ namespace FluentMigrator.Tests.Integration
 					processor.TableExists("TestTable").ShouldBeTrue();
 
 					// This is a hack until MigrationVersionRunner and MigrationRunner are refactored and merged together
-					processor.CommitTransaction();
+					//processor.CommitTransaction();
 
 					runner.Down(new TestCreateAndDropTableMigration());
 					processor.TableExists("TestTable").ShouldBeFalse();
@@ -97,7 +103,7 @@ namespace FluentMigrator.Tests.Integration
 					runner.Up(new TestForeignKeyNamingConvention());
 
 					// This is a hack until MigrationVersionRunner and MigrationRunner are refactored and merged together
-					processor.CommitTransaction();
+					//processor.CommitTransaction();
 
 					processor.ConstraintExists( "Users", "FK_Users_GroupId_Groups_GroupId" ).ShouldBeTrue();
 					runner.Down( new TestForeignKeyNamingConvention() );
@@ -118,8 +124,102 @@ namespace FluentMigrator.Tests.Integration
 					runner.Down(new TestIndexNamingConvention());
 					processor.TableExists("Users").ShouldBeFalse();
 
-					processor.CommitTransaction();
+					//processor.CommitTransaction();
 				});
+		}
+
+		[Test]
+		public void CanLoadMigrations()
+		{
+			ExecuteWithSupportedProcessors( processor =>
+			{
+				var runnerContext = new RunnerContext( new TextWriterAnnouncer( System.Console.Out ) )
+				{
+					Namespace = typeof( TestMigration ).Namespace,
+				};
+
+				var runner = new MigrationRunner( typeof( MigrationRunnerTests ).Assembly, runnerContext, processor );
+
+				//runner.Processor.CommitTransaction();
+
+				runner.MigrationLoader.Migrations.ShouldNotBeNull();
+			} );
+		}
+
+		[Test]
+		public void CanLoadVersion()
+		{
+			ExecuteWithSupportedProcessors( processor =>
+			{
+				var runnerContext = new RunnerContext( new TextWriterAnnouncer( System.Console.Out ) )
+				{
+					Namespace = typeof( TestMigration ).Namespace,
+				};
+
+				var runner = new MigrationRunner( typeof( TestMigration ).Assembly, runnerContext, processor );
+
+				//runner.Processor.CommitTransaction();
+				runner.VersionLoader.VersionInfo.ShouldNotBeNull();
+			} );
+		}
+
+		[Test]
+		public void CanRunMigrations()
+		{
+			ExecuteWithSupportedProcessors( processor =>
+			{
+				Assembly asm = typeof( MigrationRunnerTests ).Assembly;
+				var runnerContext = new RunnerContext( new TextWriterAnnouncer( System.Console.Out ) )
+				{
+					Namespace = "FluentMigrator.Tests.Integration.Migrations"
+				};
+				var runner = new MigrationRunner( asm, runnerContext, processor );
+
+				runner.MigrateUp();
+
+				runner.VersionLoader.VersionInfo.HasAppliedMigration( 1 ).ShouldBeTrue();
+				runner.VersionLoader.VersionInfo.HasAppliedMigration( 2 ).ShouldBeTrue();
+				runner.VersionLoader.VersionInfo.Latest().ShouldBe( 2 );
+			});
+		}
+
+		[Test]
+		public void CanMigrateASpecificVersion()
+		{
+			ExecuteWithSupportedProcessors( processor =>
+			{
+				Assembly asm = typeof( MigrationRunnerTests ).Assembly;
+				var runnerContext = new RunnerContext( new TextWriterAnnouncer( System.Console.Out ) );
+				runnerContext.Namespace = "FluentMigrator.Tests.Integration.Migrations";
+				var runner = new MigrationRunner( asm, runnerContext, processor );
+
+				runner.MigrateUp( 1 );
+
+				runner.VersionLoader.VersionInfo.HasAppliedMigration( 1 ).ShouldBeTrue();
+				processor.TableExists( "Users" ).ShouldBeTrue();
+			});
+		}
+
+		[Test]
+		public void CanMigrateASpecificVersionDown()
+		{
+			ExecuteWithSupportedProcessors( processor =>
+			{
+				Assembly asm = typeof( MigrationRunnerTests ).Assembly;
+				var runnerContext = new RunnerContext( new TextWriterAnnouncer( System.Console.Out ) );
+				runnerContext.Namespace = "FluentMigrator.Tests.Integration.Migrations";
+				var runner = new MigrationRunner( asm, runnerContext, processor );
+
+				runner.MigrateUp( 1 );
+
+				runner.VersionLoader.VersionInfo.HasAppliedMigration( 1 ).ShouldBeTrue();
+				processor.TableExists( "Users" ).ShouldBeTrue();
+
+				runner.MigrateDown( 1 );
+
+				runner.VersionLoader.VersionInfo.HasAppliedMigration( 1 ).ShouldBeFalse();
+				processor.TableExists( "Users" ).ShouldBeFalse();
+			} );
 		}
 	}
 

@@ -48,8 +48,6 @@ namespace FluentMigrator.Tests.Integration
 
 					runner.Down(new VersionMigration(tableMetaData));
 					processor.TableExists(tableMetaData.TableName).ShouldBeFalse();
-
-					runner.Processor.CommitTransaction();
 				});
 
 		}
