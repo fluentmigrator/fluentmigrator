@@ -25,7 +25,6 @@ using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Processors;
 
 namespace FluentMigrator.Runner
 {
@@ -83,7 +82,7 @@ namespace FluentMigrator.Runner
 				Processor.CommitTransaction();
 				VersionLoader.LoadVersionInfo();
 			}
-			catch (Exception ex)
+			catch (Exception)
 			{
 				Processor.RollbackTransaction();
 				throw;

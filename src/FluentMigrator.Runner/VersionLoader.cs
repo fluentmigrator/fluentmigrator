@@ -5,7 +5,6 @@ using System.Linq;
 using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
-using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.VersionTableInfo;
 
@@ -27,7 +26,6 @@ namespace FluentMigrator.Runner
 		}
 
 		private VersionInfo _versionInfo;
-
 		public IMigrationRunner Runner { get; set; }
 		protected Assembly Assembly { get; set; }
 		public IVersionTableMetaData VersionTableMetaData { get; set; }

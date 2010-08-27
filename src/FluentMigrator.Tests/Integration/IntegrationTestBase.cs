@@ -44,7 +44,6 @@ namespace FluentMigrator.Tests.Integration
 				return;
 
 			var connection = new SqlConnection(serverOptions.ConnectionString);
-			connection.Open();
 			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 			test(processor);
 		}

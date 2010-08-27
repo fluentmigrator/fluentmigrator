@@ -34,6 +34,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 			: base(generator, announcer, options)
 		{
 			Connection = connection;
+			connection.Open();
+			Transaction = connection.BeginTransaction();
 		}
 
 		public override bool SchemaExists(string schemaName)

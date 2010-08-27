@@ -76,9 +76,9 @@ namespace FluentMigrator.Tests.Integration
 				{
 					Assembly asm = typeof (MigrationVersionRunnerTests).Assembly;
 					var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
-					                    	{
+											{
 												Namespace = "FluentMigrator.Tests.Integration.Migrations"
-					                    	};
+											};
 					var runner = new MigrationRunner(asm, runnerContext, processor);
 
 					runner.MigrateUp();
@@ -103,40 +103,6 @@ namespace FluentMigrator.Tests.Integration
 			var runner = new MigrationRunner( asm, runnerContext, processor );
 
 			runner.MigrateUp();
-		}
-
-		[Test]
-		public void CanMigrateInterleavedMigrations()
-		{
-			ExecuteWithSupportedProcessors(processor =>
-				{
-					runMigrationsInNamespace(processor, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1");
-					runMigrationsInNamespace(processor, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass2");
-					runMigrationsInNamespace(processor, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3");
-
-					processor.TableExists("UserRoles").ShouldBeTrue();
-					processor.TableExists("User").ShouldBeTrue();
-
-					Assembly asm = typeof (MigrationVersionRunnerTests).Assembly;
-					var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
-											{
-												Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3"
-											};
-					var runner = new MigrationRunner(asm, runnerContext, processor);
-
-					runner.VersionLoader.VersionInfo.HasAppliedMigration(200909060953).ShouldBeTrue();
-					runner.VersionLoader.VersionInfo.HasAppliedMigration(200909060935).ShouldBeTrue();
-					runner.VersionLoader.VersionInfo.HasAppliedMigration(200909060930).ShouldBeTrue();
-
-					runner.VersionLoader.VersionInfo.Latest().ShouldBe(200909060953);
-
-					runner.Rollback(3);
-
-					processor.TableExists("UserRoles").ShouldBeFalse();
-					processor.TableExists("User").ShouldBeFalse();
-
-					runner.VersionLoader.RemoveVersionTable();
-				});
 		}
 
 		[Test]
@@ -188,7 +154,6 @@ namespace FluentMigrator.Tests.Integration
 		public void SqlServerMigrationsAreTransactional()
 		{
 			var connection = new SqlConnection(IntegrationTestOptions.SqlServer.ConnectionString);
-			connection.Open();
 			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 
 			Assembly asm = typeof(MigrationVersionRunnerTests).Assembly;
