@@ -145,7 +145,6 @@
     <Compile Include="Integration\Migrations\Interleaved\Pass3\2_UserEmail.cs" />
     <Compile Include="Integration\Migrations\Invalid\InvalidMigration.cs" />
     <Compile Include="Integration\Migrations\Invalid\InvalidMigration2.cs" />
-    <Compile Include="Integration\MigrationVersionRunnerTests.cs" />
     <Compile Include="Integration\Processors\FileProcessorTests.cs" />
     <Compile Include="Integration\VersionMigrationTests.cs" />
     <Compile Include="Unit\AnnouncerTests.cs" />
@@ -174,11 +173,11 @@
     <Compile Include="Unit\Expressions\ExecuteSqlStatementExpressionTests.cs" />
     <Compile Include="Unit\Generators\OracleGeneratorTests.cs" />
     <Compile Include="Unit\Expressions\PerformDBOperationExpressionTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2000GeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2008GeneratorTests.cs" />
     <Compile Include="Unit\MigrationLoaderTests.cs" />
     <Compile Include="Unit\MigrationMetadataTests.cs" />
     <Compile Include="Unit\Generators\SqliteGeneratorTests.cs" />
-    <Compile Include="Unit\Generators\SqlServer2000GeneratorTests.cs" />
     <Compile Include="Helpers\SqlServerTestTable.cs" />
     <Compile Include="Unit\Definitions\IndexColumnDefinitionTests.cs" />
     <Compile Include="Unit\Definitions\ForeignKeyDefinitionTests.cs" />
@@ -195,7 +194,7 @@
     <Compile Include="Integration\Migrations\TestMigration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Unit\MigrationRunnerTests.cs" />
-    <Compile Include="Unit\MigrationVersionRunnerUnitTests.cs" />
+    <Compile Include="Unit\ProfileLoaderTests.cs" />
     <Compile Include="Unit\Runners\Migrations\1_User.cs" />
     <Compile Include="Unit\Runners\Migrations\2_UserEmail.cs" />
     <Compile Include="Unit\Runners\Migrations\3_UserRoles.cs" />

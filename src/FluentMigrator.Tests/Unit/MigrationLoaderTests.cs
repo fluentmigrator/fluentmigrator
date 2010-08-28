@@ -37,9 +37,10 @@ namespace FluentMigrator.Tests.Unit
 		public void CanFindMigrationsInAssembly()
 		{
 			var conventions = new MigrationConventions();
-			var loader = new MigrationLoader(conventions);
 			var asm = Assembly.GetExecutingAssembly();
-			IEnumerable<MigrationMetadata> migrationList = loader.FindMigrationsIn(asm, string.Empty);
+			var loader = new MigrationLoader( conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1");
+			
+			SortedList<long, IMigration> migrationList = loader.Migrations;
 
 			//if this works, there will be at least one migration class because i've included on in this code file
 			var en = migrationList.GetEnumerator();
@@ -54,32 +55,37 @@ namespace FluentMigrator.Tests.Unit
 		public void CanFindMigrationsInNamespace()
 		{
 			var conventions = new MigrationConventions();
-			var loader = new MigrationLoader(conventions);
 			var asm = Assembly.GetExecutingAssembly();
-			var migrationList = loader.FindMigrationsIn(asm, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1");
+			var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1");
+
+			var migrationList = loader.FindMigrations();
 			migrationList.Select(x => x.Type).ShouldNotContain(typeof(VersionedMigration));
 			migrationList.Count().ShouldBeGreaterThan(0);
 		}
 
 		[Test]
+		[Ignore("Move to VersionLoaderTests")]
 		public void CanLoadDefaultVersionTableMetaData()
 		{
-			var conventions = new MigrationConventions();
-			var loader = new MigrationLoader(conventions);
-			var asm = Assembly.GetExecutingAssembly();
-			IVersionTableMetaData versionTableMetaData = loader.GetVersionTableMetaData(asm);
-			versionTableMetaData.ShouldBeOfType<TestVersionTableMetaData>();
+//			var conventions = new MigrationConventions();
+//			var asm = Assembly.GetExecutingAssembly();
+//			var loader = new MigrationLoader(conventions, asm, string.Empty);
+//			
+//			IVersionTableMetaData versionTableMetaData = loader.GetVersionTableMetaData(asm);
+//			versionTableMetaData.ShouldBeOfType<TestVersionTableMetaData>();
 		}
 
 		[Test]
+		[Ignore("Move to VersionLoaderTests")]
 		public void CanLoadCustomVersionTableMetaData()
 		{
-			var conventions = new MigrationConventions();
-			var loader = new MigrationLoader(conventions);
-			var asm = GetAssemblyWithCustomVersionTableMetaData();
-			IVersionTableMetaData versionTableMetaData = loader.GetVersionTableMetaData(asm);
-			Assert.AreEqual(TestVersionTableMetaData.TABLENAME,versionTableMetaData.TableName);
-			Assert.AreEqual(TestVersionTableMetaData.COLUMNNAME, versionTableMetaData.ColumnName);
+//			var conventions = new MigrationConventions();
+//			var asm = GetAssemblyWithCustomVersionTableMetaData();
+//			var loader = new MigrationLoader(conventions, asm, string.Empty);
+//			
+//			IVersionTableMetaData versionTableMetaData = loader.GetVersionTableMetaData(asm);
+//			Assert.AreEqual(TestVersionTableMetaData.TABLENAME,versionTableMetaData.TableName);
+//			Assert.AreEqual(TestVersionTableMetaData.COLUMNNAME, versionTableMetaData.ColumnName);
 		}
 
 

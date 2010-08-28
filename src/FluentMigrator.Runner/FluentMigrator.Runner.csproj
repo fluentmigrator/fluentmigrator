@@ -140,7 +140,7 @@
     <Compile Include="Generators\SqlServer2000Generator.cs" />
     <Compile Include="Generators\SqlServer2005Generator.cs" />
     <Compile Include="Generators\SqlServer2008Generator.cs" />
-    <Compile Include="IMigrationVersionRunner.cs" />
+    <Compile Include="IMigrationRunner.cs" />
     <Compile Include="Initialization\AssemblyLoader\AssemblyLoaderFactory.cs" />
     <Compile Include="Initialization\AssemblyLoader\AssemblyLoaderFromFile.cs" />
     <Compile Include="Initialization\AssemblyLoader\AssemblyLoaderFromName.cs" />
@@ -148,7 +148,8 @@
     <Compile Include="Initialization\IRunnerContext.cs" />
     <Compile Include="Initialization\RunnerContext.cs" />
     <Compile Include="Initialization\TaskExecutor.cs" />
-    <Compile Include="MigrationVersionRunner.cs" />
+    <Compile Include="IProfileLoader.cs" />
+    <Compile Include="IVersionLoader.cs" />
     <Compile Include="Processors\MigrationProcessorFactory.cs" />
     <Compile Include="Processors\MySql\MySqlProcessor.cs" />
     <Compile Include="Processors\MySql\MySqlProcessorFactory.cs" />
@@ -169,10 +170,12 @@
     <Compile Include="Processors\ProcessorBase.cs" />
     <Compile Include="Processors\Sqlite\SqliteProcessor.cs" />
     <Compile Include="Processors\SqlServer\SqlServerProcessor.cs" />
+    <Compile Include="ProfileLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StopWatch.cs" />
     <Compile Include="Versioning\VersionInfo.cs" />
     <Compile Include="Versioning\VersionMigration.cs" />
+    <Compile Include="VersionLoader.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj">

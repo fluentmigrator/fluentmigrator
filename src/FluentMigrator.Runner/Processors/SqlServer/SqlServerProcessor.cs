@@ -29,12 +29,14 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 	{
 		public virtual SqlConnection Connection { get; set; }
 		public SqlTransaction Transaction { get; private set; }
+		public bool WasCommitted { get; private set; }
 
 		public SqlServerProcessor(SqlConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
 			: base(generator, announcer, options)
 		{
 			Connection = connection;
-			Transaction = Connection.BeginTransaction();
+			connection.Open();
+			Transaction = connection.BeginTransaction();
 		}
 
 		public override bool SchemaExists(string schemaName)
@@ -92,10 +94,17 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 			}
 		}
 
+		public override void BeginTransaction()
+		{
+			Announcer.Say( "Beginning Transaction" );
+			Transaction = Connection.BeginTransaction();
+		}
+
 		public override void CommitTransaction()
 		{
-			Announcer.Say("Commiting transaction");
+			Announcer.Say("Commiting Transaction");
 			Transaction.Commit();
+			WasCommitted = true;
 			if (Connection.State != ConnectionState.Closed)
 			{
 				Connection.Close();
@@ -106,6 +115,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 		{
 			Announcer.Say("Rolling back transaction");
 			Transaction.Rollback();
+			WasCommitted = true;
 			if (Connection.State != ConnectionState.Closed)
 			{
 				Connection.Close();
@@ -126,7 +136,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 			{
 				try
 				{
-				   command.CommandTimeout = Options.Timeout;
+					command.CommandTimeout = Options.Timeout;
 					command.ExecuteNonQuery();
 				}
 				catch (Exception ex)

@@ -17,12 +17,17 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Reflection;
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Tests.Integration.Migrations;
 using Moq;
 using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit
 {
@@ -31,22 +36,41 @@ namespace FluentMigrator.Tests.Unit
 	{
 		private MigrationRunner _runner;
 		private Mock<IAnnouncer> _announcer;
-		private Mock<IMigrationProcessor> _processor;
 		private Mock<IStopWatch> _stopWatch;
+
+		private Mock<IMigrationConventions> _conventionMock;
+		private Mock<IMigrationProcessor> _processorMock;
+		private Mock<IMigrationLoader> _migrationLoaderMock;
+		private Mock<IProfileLoader> _profileLoaderMock;
+		private Mock<IRunnerContext> _runnerContextMock;
 
 		[SetUp]
 		public void SetUp()
 		{
+			_runnerContextMock = new Mock<IRunnerContext>(MockBehavior.Loose);
+			_conventionMock = new Mock<IMigrationConventions>(MockBehavior.Loose);
+			_processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
+			_migrationLoaderMock = new Mock<IMigrationLoader>(MockBehavior.Loose);
+			_profileLoaderMock = new Mock<IProfileLoader>(MockBehavior.Loose);
+			_announcer = new Mock<IAnnouncer>();
+			_stopWatch = new Mock<IStopWatch>();
+
 			var options = new ProcessorOptions
 							{
 								PreviewOnly = true
 							};
-			_processor = new Mock<IMigrationProcessor>();
-			_processor.SetupGet(x => x.Options).Returns(options);
+			_processorMock.SetupGet(x => x.Options).Returns(options);
 
-			_announcer = new Mock<IAnnouncer>();
-			_stopWatch = new Mock<IStopWatch>();
-			_runner = new MigrationRunner(new MigrationConventions(), _processor.Object, _announcer.Object, _stopWatch.Object);
+			_runnerContextMock.SetupGet(x => x.Namespace).Returns("FluentMigrator.Tests.Integration.Migrations");
+			_runnerContextMock.SetupGet(x => x.Announcer).Returns(_announcer.Object);
+			_runnerContextMock.SetupGet(x => x.StopWatch).Returns(_stopWatch.Object);
+			_runnerContextMock.SetupGet(x => x.Target).Returns(Assembly.GetExecutingAssembly().ToString());
+			_runnerContextMock.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer.ConnectionString);
+			_runnerContextMock.SetupGet(x => x.Database).Returns("sqlserver");
+
+			_runner = new MigrationRunner(Assembly.GetAssembly( typeof( MigrationRunnerTests ) ), _runnerContextMock.Object, _processorMock.Object);
+			_runner.MigrationLoader = _migrationLoaderMock.Object;
+			_runner.ProfileLoader = _profileLoaderMock.Object;
 		}
 
 		[Test]
@@ -110,7 +134,7 @@ namespace FluentMigrator.Tests.Unit
 		[Test]
 		public void CanReportExceptions()
 		{
-			_processor.Setup(x => x.Process(It.IsAny<CreateTableExpression>())).Throws(new Exception("Oops"));
+			_processorMock.Setup(x => x.Process(It.IsAny<CreateTableExpression>())).Throws(new Exception("Oops"));
 
 			_announcer.Setup(x => x.Error(It.IsRegex(containsAll("Oops"))));
 
@@ -153,6 +177,66 @@ namespace FluentMigrator.Tests.Unit
 		private string containsAll(params string[] words)
 		{
 			return ".*?" + string.Join(".*?", words) + ".*?";
+		}
+
+		[Test]
+		public void LoadsCorrectCallingAssembly()
+		{
+			_runner.MigrationAssembly.ShouldBe(Assembly.GetAssembly(typeof(MigrationRunnerTests)));
+		}
+
+		[Test,Ignore("Move to MigrationLoader tests")]
+		public void HandlesNullMigrationList()
+		{
+			//set migrations to return empty list
+//			var asm = Assembly.GetAssembly(typeof(MigrationVersionRunnerUnitTests));
+//			_migrationLoaderMock.Setup(x => x.FindMigrations(asm, null)).Returns<IEnumerable<Migration>>(null);
+//
+//			_runner.Migrations.Count.ShouldBe(0);
+//
+//			_vrunner.MigrateUp();
+//
+//			_migrationLoaderMock.VerifyAll();
+		}
+
+		[Test, ExpectedException(typeof(Exception))]
+		[Ignore("Move to migrationloader tests")]
+		public void ShouldThrowExceptionIfDuplicateVersionNumbersAreLoaded()
+		{
+//			_migrationLoaderMock.Setup(x => x.FindMigrationsIn(It.IsAny<Assembly>(), null)).Returns(new List<MigrationMetadata>
+//			                                                                         	{
+//			                                                                         		new MigrationMetadata {Version = 1, Type = typeof(UserToRole)},
+//			                                                                         		new MigrationMetadata {Version = 2, Type = typeof(FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass2.UserToRole)},
+//			                                                                         		new MigrationMetadata {Version = 2, Type = typeof(FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass2.UserToRole)}
+//			                                                                         	});
+//
+//			_vrunner.MigrateUp();
+		}
+
+		[Test]
+		[Ignore("Move to migrationloader tests")]
+		public void HandlesMigrationThatDoesNotInheritFromMigrationBaseClass()
+		{
+//			_migrationLoaderMock.Setup(x => x.FindMigrationsIn(It.IsAny<Assembly>(), null)).Returns(new List<MigrationMetadata>
+//			                                                                         	{
+//			                                                                         		new MigrationMetadata {Version = 1, Type = typeof(MigrationThatDoesNotInheritFromMigrationBaseClass)},
+//			                                                                         	});
+//
+//			_vrunner.Migrations[1].ShouldNotBeNull();
+//			_vrunner.Migrations[1].ShouldBeOfType<MigrationThatDoesNotInheritFromMigrationBaseClass>();
+		}
+
+		private class MigrationThatDoesNotInheritFromMigrationBaseClass : IMigration
+		{
+			public void GetUpExpressions(IMigrationContext context)
+			{
+				throw new NotImplementedException();
+			}
+
+			public void GetDownExpressions(IMigrationContext context)
+			{
+				throw new NotImplementedException();
+			}
 		}
 	}
 }

@@ -17,14 +17,25 @@
 #endregion
 
 using System;
+using System.Configuration;
+using System.IO;
+using System.Linq;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
+using FluentMigrator.Runner.Processors;
 
 namespace FluentMigrator.Runner.Initialization
 {
 	public class TaskExecutor
 	{
-		private IMigrationVersionRunner Runner { get; set; }
+		private IMigrationRunner Runner { get; set; }
 		private IRunnerContext RunnerContext { get; set; }
+		private string ConfigFile;
+		private string ConnectionString;
+
+		private bool NotUsingConfig
+		{
+			get { return string.IsNullOrEmpty( ConfigFile ); }
+		}
 
 		public TaskExecutor(IRunnerContext runnerContext)
 		{
@@ -36,19 +47,11 @@ namespace FluentMigrator.Runner.Initialization
 
 		private void Initialize()
 		{
-			var migrationConventions = new MigrationConventions();
-			if (!string.IsNullOrEmpty(RunnerContext.WorkingDirectory))
-				migrationConventions.GetWorkingDirectory = () => RunnerContext.WorkingDirectory;
-
 			var assembly = AssemblyLoaderFactory.GetAssemblyLoader(RunnerContext.Target).Load();
 
-			Runner = new MigrationVersionRunner(migrationConventions,
-												RunnerContext.Processor,
-												new MigrationLoader(migrationConventions),
-												assembly,
-												RunnerContext.Namespace,
-												RunnerContext.Announcer,
-												RunnerContext.Profile);
+			var processor = InitializeProcessor();
+
+			Runner = new MigrationRunner(assembly, RunnerContext, processor);
 		}
 
 		public void Execute()
@@ -80,6 +83,90 @@ namespace FluentMigrator.Runner.Initialization
 				case "migrate:down":
 					Runner.MigrateDown(RunnerContext.Version);
 					break;
+			}
+		}
+
+		public IMigrationProcessor InitializeProcessor()
+		{
+			var configFile = Path.Combine( Environment.CurrentDirectory, RunnerContext.Target );
+			if ( File.Exists( configFile + ".config" ) )
+			{
+				var config = ConfigurationManager.OpenExeConfiguration( configFile );
+				var connections = config.ConnectionStrings.ConnectionStrings;
+
+				if ( connections.Count > 1 )
+				{
+					if ( string.IsNullOrEmpty( RunnerContext.Connection ) )
+					{
+						ReadConnectionString( connections[ Environment.MachineName ], config.FilePath );
+					}
+					else
+					{
+						ReadConnectionString( connections[ RunnerContext.Connection ], config.FilePath );
+					}
+				}
+				else if ( connections.Count == 1 )
+				{
+					ReadConnectionString( connections[ 0 ], config.FilePath );
+				}
+			}
+
+			if ( NotUsingConfig && !string.IsNullOrEmpty( RunnerContext.Connection ) )
+			{
+				ConnectionString = RunnerContext.Connection;
+			}
+
+			if ( string.IsNullOrEmpty( ConnectionString ) )
+			{
+				throw new ArgumentException( "Connection String or Name is required \"/connection\"" );
+			}
+
+			if ( string.IsNullOrEmpty( RunnerContext.Database ) )
+			{
+				throw new ArgumentException(
+					"Database Type is required \"/db [db type]\". Available db types is [sqlserver], [sqlite]" );
+			}
+
+			if ( NotUsingConfig )
+			{
+				Console.WriteLine( "Using Database {0} and Connection String {1}", RunnerContext.Database, ConnectionString );
+			}
+			else
+			{
+				Console.WriteLine( "Using Connection {0} from Configuration file {1}", RunnerContext.Connection, ConfigFile );
+			}
+
+			if ( RunnerContext.Timeout == 0 )
+			{
+				RunnerContext.Timeout = 30; // Set default timeout for command
+			}
+
+			var processorFactory = ProcessorFactory.GetFactory( RunnerContext.Database );
+			var processor = processorFactory.Create( ConnectionString, RunnerContext.Announcer, new ProcessorOptions
+			{
+				PreviewOnly = RunnerContext.PreviewOnly,
+				Timeout = RunnerContext.Timeout
+			} );
+
+			return processor;
+		}
+
+		private void ReadConnectionString( ConnectionStringSettings connection, string configurationFile )
+		{
+			if ( connection != null )
+			{
+				var factory = ProcessorFactory.Factories.Where( f => f.IsForProvider( connection.ProviderName ) ).FirstOrDefault();
+				if ( factory != null )
+				{
+					RunnerContext.Database = factory.Name;
+					RunnerContext.Connection = connection.Name;
+					ConnectionString = connection.ConnectionString;
+					ConfigFile = configurationFile;
+				}
+			}
+			else
+			{
+				Console.WriteLine( "connection is null!" );
 			}
 		}
 	}

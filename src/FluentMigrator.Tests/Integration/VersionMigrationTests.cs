@@ -16,8 +16,10 @@
 //
 #endregion
 
+using System.Reflection;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.VersionTableInfo;
 using NUnit.Framework;
@@ -33,7 +35,7 @@ namespace FluentMigrator.Tests.Integration
 		{
 			ExecuteWithSupportedProcessors(processor =>
 				{
-					var runner = new MigrationRunner(new MigrationConventions(), processor, new TextWriterAnnouncer(System.Console.Out), new StopWatch());
+					var runner = new MigrationRunner( Assembly.GetExecutingAssembly(), new RunnerContext( new TextWriterAnnouncer( System.Console.Out ) ) { Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3" }, processor );
 
 					IVersionTableMetaData tableMetaData = new DefaultVersionTableMetaData();
 

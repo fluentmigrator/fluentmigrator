@@ -31,12 +31,14 @@ namespace FluentMigrator
 		DataSet ReadTableData(string tableName);
 		DataSet Read(string template, params object[] args);
 		bool Exists(string template, params object[] args);
+
+		void BeginTransaction();
 		void CommitTransaction();
 		void RollbackTransaction();
 
 		void Process(CreateSchemaExpression expression);
 		void Process(DeleteSchemaExpression expression);
-	    void Process(AlterColumnExpression expression);
+		void Process(AlterColumnExpression expression);
 		void Process(CreateTableExpression expression);
 		void Process(CreateColumnExpression expression);
 		void Process(DeleteTableExpression expression);
@@ -48,7 +50,7 @@ namespace FluentMigrator
 		void Process(RenameTableExpression expression);
 		void Process(RenameColumnExpression expression);
 		void Process(InsertDataExpression expression);
-	   void Process(AlterDefaultConstraintExpression expression);
+		void Process(AlterDefaultConstraintExpression expression);
 		void Process(PerformDBOperationExpression expression);
 	}
 }

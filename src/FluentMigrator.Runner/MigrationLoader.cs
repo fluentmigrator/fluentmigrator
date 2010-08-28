@@ -21,52 +21,53 @@ using System.Collections.Generic;
 using System.Reflection;
 using FluentMigrator.Infrastructure;
 using System.Linq;
-using FluentMigrator.Infrastructure.Extensions;
-using FluentMigrator.VersionTableInfo;
 
 namespace FluentMigrator.Runner
 {
 	public class MigrationLoader : IMigrationLoader
 	{
 		public IMigrationConventions Conventions { get; private set; }
+		public Assembly Assembly { get; set; }
+		public string Namespace { get; set; }
+		public SortedList<long, IMigration> Migrations { get; private set; }
 
-		public MigrationLoader(IMigrationConventions conventions)
+		public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace)
 		{
 			Conventions = conventions;
+			Assembly = assembly;
+			Namespace = @namespace;
+
+			Initialize();
 		}
 
-		public IEnumerable<MigrationMetadata> FindMigrationsIn(Assembly assembly, string @namespace)
+		private void Initialize()
 		{
-			IEnumerable<Type> matchedTypes = assembly.GetExportedTypes().Where(t => Conventions.TypeIsMigration(t));
+			Migrations = new SortedList<long, IMigration>();
 
-			if (!string.IsNullOrEmpty(@namespace))
-				matchedTypes = assembly.GetExportedTypes().Where(t => t.Namespace == @namespace && Conventions.TypeIsMigration(t));
+			IEnumerable<MigrationMetadata> migrationList = FindMigrations();
+
+			if (migrationList == null)
+				return;
+
+			foreach (var migrationMetadata in migrationList)
+			{
+				if (Migrations.ContainsKey(migrationMetadata.Version))
+					throw new Exception(String.Format("Duplicate migration version {0}.", migrationMetadata.Version));
+
+				var migration = migrationMetadata.Type.Assembly.CreateInstance(migrationMetadata.Type.FullName);
+				Migrations.Add(migrationMetadata.Version, migration as IMigration);
+			}
+		}
+
+		public IEnumerable<MigrationMetadata> FindMigrations()
+		{
+			IEnumerable<Type> matchedTypes = Assembly.GetExportedTypes().Where(t => Conventions.TypeIsMigration(t));
+
+			if (!string.IsNullOrEmpty(Namespace))
+				matchedTypes = Assembly.GetExportedTypes().Where(t => t.Namespace == Namespace && Conventions.TypeIsMigration(t));
 
 			foreach (Type type in matchedTypes)
 				yield return Conventions.GetMetadataForMigration(type);
-		}
-
-		public IEnumerable<IMigration> FindProfilesIn(Assembly assembly, string profile)
-		{
-			IEnumerable<Type> matchedTypes = assembly.GetExportedTypes()
-				.Where(t => Conventions.TypeIsProfile(t) && t.GetOneAttribute<ProfileAttribute>().ProfileName.ToLower() == profile.ToLower());
-
-			foreach (Type type in matchedTypes)
-			{
-				yield return type.Assembly.CreateInstance(type.FullName) as IMigration;
-			}
-		}
-
-		public IVersionTableMetaData GetVersionTableMetaData(Assembly assembly)
-		{
-			Type matchedType = assembly.GetExportedTypes().Where(t => Conventions.TypeIsVersionTableMetaData(t)).FirstOrDefault();
-
-			if (matchedType == null)
-			{
-				return new DefaultVersionTableMetaData();
-			}
-
-			return (IVersionTableMetaData)Activator.CreateInstance(matchedType);
 		}
 	}
 }

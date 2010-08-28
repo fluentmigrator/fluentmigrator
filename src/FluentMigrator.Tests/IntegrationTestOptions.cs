@@ -5,7 +5,7 @@
 		public static DatabaseServerOptions SqlServer = new DatabaseServerOptions
 															{
 																ConnectionString =
-																	@"server=(local)\SQLEXPRESS;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator",
+																	@"server=(local);uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator",
 																IsEnabled = true
 															};
 
@@ -13,7 +13,7 @@
 															{
 																ConnectionString =
 																	@"Data Source=:memory:;Version=3;New=True;",
-																IsEnabled = true
+																IsEnabled = false
 															};
 
 		public static DatabaseServerOptions MySql = new DatabaseServerOptions
@@ -23,14 +23,10 @@
 															IsEnabled = false
 														};
 
-		#region Nested type: DatabaseServerOptions
-
 		public class DatabaseServerOptions
 		{
 			public string ConnectionString;
 			public bool IsEnabled = true;
 		}
-
-		#endregion
 	}
 }

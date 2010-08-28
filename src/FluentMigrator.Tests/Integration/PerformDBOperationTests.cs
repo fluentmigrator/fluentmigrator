@@ -1,6 +1,6 @@
 using NUnit.Framework;
 using FluentMigrator.Builders.Execute;
-using System.Data.SqlClient;
+
 namespace FluentMigrator.Tests.Integration
 {
 	[TestFixture]
@@ -22,16 +22,17 @@ namespace FluentMigrator.Tests.Integration
 
 					command.ExecuteNonQuery();
 
-
 					var command2 = connection.CreateCommand();
 					command2.Transaction = transaction;
 					command2.CommandText = "DROP TABLE dbo.TestTable";
 
 					command2.ExecuteNonQuery();
+
+
 				}
 			};
 
-			ExecuteWithSqlServer(processor => processor.Process(expression), IntegrationTestOptions.SqlServer);	
+			ExecuteWithSqlServer(processor => processor.Process(expression), IntegrationTestOptions.SqlServer);
 		}
 	}
 }
