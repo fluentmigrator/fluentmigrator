@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using FluentMigrator.Builders.Alter;
 using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.Delete;
@@ -62,7 +63,7 @@ namespace FluentMigrator
 				if(context.Conventions.GetAutoReverse())
 				{
 					Up();
-					ICollection<IMigrationExpression> upExpressions = _context.Expressions;
+					ICollection<IMigrationExpression> upExpressions = _context.Expressions.Reverse().ToList();
 					_context.Expressions = new List<IMigrationExpression>();
 					foreach (IMigrationExpression expression in upExpressions)
 					{
