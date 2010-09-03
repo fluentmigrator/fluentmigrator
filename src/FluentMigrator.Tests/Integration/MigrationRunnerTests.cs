@@ -221,6 +221,29 @@ namespace FluentMigrator.Tests.Integration
 				processor.TableExists( "Users" ).ShouldBeFalse();
 			} );
 		}
+
+		[Test]
+		public void CanAutoReverseAVersionDown()
+		{
+			ExecuteWithSupportedProcessors(processor =>
+			{
+				Assembly asm = typeof(MigrationRunnerTests).Assembly;
+				var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out));
+				runnerContext.Namespace = "FluentMigrator.Tests.Integration.Migrations";
+				runnerContext.AutoReverse = true;
+				var runner = new MigrationRunner(asm, runnerContext, processor);
+
+				runner.MigrateUp(1);
+
+				runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
+				processor.TableExists("Users").ShouldBeTrue();
+
+				runner.MigrateDown(1);
+
+				runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeFalse();
+				processor.TableExists("Users").ShouldBeFalse();
+			});
+		}
 	}
 
 	internal class TestForeignKeyNamingConvention : Migration

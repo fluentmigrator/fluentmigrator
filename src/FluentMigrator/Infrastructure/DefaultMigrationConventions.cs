@@ -102,5 +102,10 @@ namespace FluentMigrator.Infrastructure
 		{
 			return Environment.CurrentDirectory;
 		}
+
+		public static bool GetAutoReverse()
+		{
+			return false;
+		}
 	}
 }

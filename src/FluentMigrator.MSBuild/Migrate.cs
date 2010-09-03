@@ -47,6 +47,8 @@ namespace FluentMigrator.MSBuild
 
 		public string WorkingDirectory { get; set; }
 
+		public bool AutoReverse { get; set; }
+
 		public override bool Execute()
 		{
 			Log.LogCommandLine(MessageImportance.Low, "Creating Context");
@@ -65,7 +67,8 @@ namespace FluentMigrator.MSBuild
 										Task = Task,
 										Version = Version,
 										Steps = Steps,
-										WorkingDirectory = WorkingDirectory
+										WorkingDirectory = WorkingDirectory,
+										AutoReverse = AutoReverse
 									};
 
 			Log.LogCommandLine(MessageImportance.Low, "Executing Migration Runner");

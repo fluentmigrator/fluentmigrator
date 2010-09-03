@@ -53,12 +53,25 @@ namespace FluentMigrator.Runner
 			CaughtExceptions = null;
 
 			Conventions = new MigrationConventions();
-			if (!string.IsNullOrEmpty(runnerContext.WorkingDirectory))
-				Conventions.GetWorkingDirectory = () => runnerContext.WorkingDirectory;
+
+			ProcessWorkingDirectory(runnerContext);
+
+			ProcessAutoReverse(runnerContext);
 
 			VersionLoader = new VersionLoader(this, _migrationAssembly, Conventions);
 			MigrationLoader = new MigrationLoader(Conventions, _migrationAssembly, runnerContext.Namespace);
 			ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
+		}
+
+		private void ProcessWorkingDirectory(IRunnerContext runnerContext)
+		{
+			if (!string.IsNullOrEmpty(runnerContext.WorkingDirectory))
+				Conventions.GetWorkingDirectory = () => runnerContext.WorkingDirectory;
+		}
+
+		private void ProcessAutoReverse(IRunnerContext runnerContext)
+		{
+			Conventions.GetAutoReverse = () => System.Convert.ToBoolean(runnerContext.AutoReverse);
 		}
 
 		public VersionLoader VersionLoader { get; set; }

@@ -162,6 +162,20 @@ namespace FluentMigrator.Tests.Unit
 		}
 
 		[Test]
+		public void CanAutoReverse()
+		{
+			_announcer.Setup(x => x.Say(It.IsRegex(containsAll("CreateTable"))));
+
+			_stopWatch.Setup(x => x.ElapsedTime()).Returns(new TimeSpan(0, 0, 0, 1, 3));
+
+			_runner.Conventions.GetAutoReverse = () => true;
+			TestAutoReverseMigration test = new TestAutoReverseMigration();
+			IMigrationContext testContext = new MigrationContext(_runner.Conventions, _runner.Processor);
+			test.GetDownExpressions(testContext);
+			testContext.Expressions.Count.ShouldBeGreaterThan(0);
+		}
+
+		[Test]
 		public void CanTimeExpression()
 		{
 			var ts = new TimeSpan(0, 0, 0, 1, 3);

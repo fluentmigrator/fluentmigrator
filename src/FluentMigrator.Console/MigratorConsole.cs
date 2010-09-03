@@ -43,6 +43,7 @@ namespace FluentMigrator.Console
 		public string Profile;
 		public int Timeout;
 		public bool ShowHelp;
+		public bool AutoReverse;
 
 		static void DisplayHelp( OptionSet p )
 		{
@@ -138,6 +139,11 @@ namespace FluentMigrator.Console
 						"workingdirectory=|wd=",
 						"The directory to load SQL scripts specified by migrations from.",
 						v => { WorkingDirectory = v; }
+					},
+					{
+						"autoreverse=|ar=",
+						"Generate down expressions from up.",
+						v => { AutoReverse =bool.Parse(v); }
 					},
 					{
 						"profile=",
@@ -246,6 +252,7 @@ namespace FluentMigrator.Console
 				Version = Version,
 				Steps = Steps,
 				WorkingDirectory = WorkingDirectory,
+				AutoReverse = AutoReverse,
 				Profile = Profile,
 				Timeout = Timeout,
 			};

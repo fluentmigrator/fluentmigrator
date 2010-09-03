@@ -50,6 +50,9 @@ namespace FluentMigrator.NAnt
 		[TaskAttribute("workingdirectory")]
 		public string WorkingDirectory { get; set; }
 
+		[TaskAttribute("autoreverse")]
+		public bool AutoReverse { get; set; }
+
 		[TaskAttribute("profile")]
 		public string Profile { get; set; }
 
@@ -74,8 +77,9 @@ namespace FluentMigrator.NAnt
 										Version = Version,
 										Steps = Steps,
 										WorkingDirectory = WorkingDirectory,
+										AutoReverse = AutoReverse,
 										Profile = Profile,
-                              Timeout = Timeout
+										Timeout = Timeout
 									};
 
 			new TaskExecutor(runnerContext).Execute();

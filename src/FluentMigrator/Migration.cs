@@ -17,12 +17,14 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using FluentMigrator.Builders.Alter;
 using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.Delete;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Builders.Rename;
 using FluentMigrator.Builders.Schema;
+using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Builders.Execute;
 
@@ -57,7 +59,20 @@ namespace FluentMigrator
 			lock (_mutex)
 			{
 				_context = context;
-				Down();
+				if(context.Conventions.GetAutoReverse())
+				{
+					Up();
+					ICollection<IMigrationExpression> upExpressions = _context.Expressions;
+					_context.Expressions = new List<IMigrationExpression>();
+					foreach (IMigrationExpression expression in upExpressions)
+					{
+						_context.Expressions.Add(expression.Reverse());
+					}
+					
+				} 
+				else
+					Down();
+
 				_context = null;
 			}
 		}

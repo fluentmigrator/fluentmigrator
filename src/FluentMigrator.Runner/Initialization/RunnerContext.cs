@@ -32,6 +32,7 @@ namespace FluentMigrator.Runner.Initialization
 		public long Version { get; set; }
 		public int Steps { get; set; }
 		public string WorkingDirectory { get; set; }
+		public bool AutoReverse { get; set; }
 		public string Profile { get; set; }
 		public int Timeout { get; set; }
 

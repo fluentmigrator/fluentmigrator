@@ -33,6 +33,7 @@ namespace FluentMigrator.Runner.Initialization
 		IAnnouncer Announcer { get; }
 		IStopWatch StopWatch { get; }
 		int Timeout { get; set; }
+		bool AutoReverse { get; set; }
 		//IMigrationProcessor Processor { get; }
 	}
 }
