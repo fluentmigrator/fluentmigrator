@@ -233,11 +233,6 @@ namespace FluentMigrator.Runner.Generators
             throw new NotImplementedException();
         }
 
-		public string FormatExpression(string template, params object[] args)
-		{
-			return String.Format(template, args);
-		}
-
 		private string GetColumnList(IEnumerable<string> columns)
 		{
 			string result = "";
