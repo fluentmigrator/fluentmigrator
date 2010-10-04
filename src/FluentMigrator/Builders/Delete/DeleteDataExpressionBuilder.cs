@@ -44,6 +44,11 @@ namespace FluentMigrator.Builders.Delete
             return this;
         }
 
+        public void AllRows()
+        {
+            _expression.IsAllRows = true;
+        }
+
         private static DeletionDataDefinition GetData(object dataAsAnonymousType)
         {
             var data = new DeletionDataDefinition();

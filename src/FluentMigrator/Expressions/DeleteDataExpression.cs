@@ -26,6 +26,7 @@ namespace FluentMigrator.Expressions
         private readonly List<DeletionDataDefinition> _rows = new List<DeletionDataDefinition>();
         public string SchemaName { get; set; }
         public string TableName { get; set; }
+        public bool IsAllRows { get; set; }
 
         public List<DeletionDataDefinition> Rows
         {
