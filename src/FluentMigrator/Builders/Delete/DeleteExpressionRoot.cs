@@ -66,5 +66,12 @@ namespace FluentMigrator.Builders.Delete
 			_context.Expressions.Add(expression);
 			return new DeleteForeignKeyExpressionBuilder(expression);
 		}
-	}
+
+        public IDeleteDataOrInSchemaSyntax FromTable(string tableName)
+        {
+            var expression = new DeleteDataExpression { TableName = tableName };
+            _context.Expressions.Add(expression);
+            return new DeleteDataExpressionBuilder(expression);
+        }
+    }
 }

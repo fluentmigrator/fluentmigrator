@@ -98,6 +98,7 @@ namespace FluentMigrator.Runner.Generators
 		public abstract string Generate(RenameColumnExpression expression);
 		public abstract string Generate(InsertDataExpression expression);
 		public abstract string Generate(AlterDefaultConstraintExpression expression);
+	    public abstract string Generate(DeleteDataExpression expression);
 
 		public virtual string GenerateDDLForColumn(ColumnDefinition column)
 		{
@@ -225,7 +226,7 @@ namespace FluentMigrator.Runner.Generators
 			return string.Format("CONSTRAINT {0}", keyName);
 		}
 
-		public string FormatExpression(string template, params object[] args)
+		public virtual string FormatExpression(string template, params object[] args)
 		{
 			return String.Format(template, args);
 		}
@@ -269,5 +270,5 @@ namespace FluentMigrator.Runner.Generators
 
 			return value.ToString();
 		}
-	}
+    }
 }
