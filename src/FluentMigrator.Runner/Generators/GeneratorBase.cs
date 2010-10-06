@@ -146,10 +146,13 @@ namespace FluentMigrator.Runner.Generators
 			string result = "";
 			int total = columns.Count - 1;
 
-			//if more than one column is a primary key, then it needs to be added separately
+			//if more than one column is a primary key or the primary key is given a name, then it needs to be added separately
 			IList<ColumnDefinition> primaryKeyColumns = GetPrimaryKeyColumns(columns);
-			if (primaryKeyColumns.Count > 1)
+			bool addPrimaryKeySeparately = false;
+			if (primaryKeyColumns.Count > 1
+				|| (primaryKeyColumns.Count == 1 && primaryKeyColumns[0].PrimaryKeyName != null))
 			{
+				addPrimaryKeySeparately = true;
 				foreach (ColumnDefinition column in primaryKeyColumns)
 				{
 					column.IsPrimaryKey = false;
@@ -164,7 +167,8 @@ namespace FluentMigrator.Runner.Generators
 					result += ", ";
 			}
 
-			result = AddPrimaryKeyConstraint(expression.TableName, primaryKeyColumns, result);
+			if (addPrimaryKeySeparately)
+				result = AddPrimaryKeyConstraint(expression.TableName, primaryKeyColumns, result);
 
 			return result;
 		}
@@ -184,16 +188,14 @@ namespace FluentMigrator.Runner.Generators
 
 		private string AddPrimaryKeyConstraint(string tableName, IList<ColumnDefinition> primaryKeyColumns, string result)
 		{
-			if (primaryKeyColumns.Count > 1)
+			string keyColumns = "";
+			foreach (ColumnDefinition column in primaryKeyColumns)
 			{
-				string keyColumns = "";
-				foreach (ColumnDefinition column in primaryKeyColumns)
-				{
-					keyColumns += column.Name + ",";
-				}
-				keyColumns = keyColumns.TrimEnd(',');
-				result += String.Format(", {0} PRIMARY KEY ({1})", GetPrimaryKeyConstraintName(primaryKeyColumns, tableName), keyColumns);
+				keyColumns += column.Name + ",";
 			}
+			keyColumns = keyColumns.TrimEnd(',');
+			result += String.Format(", {0} PRIMARY KEY ({1})", GetPrimaryKeyConstraintName(primaryKeyColumns, tableName), keyColumns);
+
 			return result;
 		}
 
