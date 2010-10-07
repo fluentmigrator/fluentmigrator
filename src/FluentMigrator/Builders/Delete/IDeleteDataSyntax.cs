@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -16,19 +16,11 @@
 //
 #endregion
 
-using FluentMigrator.Builders.Delete.Column;
-using FluentMigrator.Builders.Delete.ForeignKey;
-using FluentMigrator.Infrastructure;
-
 namespace FluentMigrator.Builders.Delete
 {
-	public interface IDeleteExpressionRoot : IFluentSyntax
-	{
-		void Schema(string schemaName);
-		IInSchemaSyntax Table(string tableName);
-		IDeleteColumnFromTableSyntax Column(string columnName);
-		IDeleteForeignKeyFromTableSyntax ForeignKey();
-		IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName);
-	    IDeleteDataOrInSchemaSyntax FromTable(string tableName);
-	}
+    public interface IDeleteDataSyntax
+    {
+        IDeleteDataSyntax Row(object dataAsAnonymousType);
+        void AllRows();
+    }
 }

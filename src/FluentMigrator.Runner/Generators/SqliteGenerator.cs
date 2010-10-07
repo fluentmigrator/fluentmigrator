@@ -158,7 +158,7 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(RenameColumnExpression expression)
 		{
-			throw new System.NotImplementedException();
+			throw new NotImplementedException();
 		}
 
 		public override string Generate(InsertDataExpression expression)
@@ -180,6 +180,39 @@ namespace FluentMigrator.Runner.Generators
 			}
 			return result.ToString();
 		}
+
+        public override string Generate(DeleteDataExpression expression)
+        {
+            var result = new StringBuilder();
+
+            if (expression.IsAllRows)
+            {
+                result.Append(FormatExpression("DELETE FROM {0};", expression.TableName));
+            }
+            else
+            {
+                foreach (var row in expression.Rows)
+                {
+                    var where = String.Empty;
+                    var i = 0;
+
+                    foreach (var item in row)
+                    {
+                        if (i != 0)
+                        {
+                            where += " AND ";
+                        }
+
+                        where += String.Format("[{0}] = {1}", item.Key, GetConstantValue(item.Value));
+                        i++;
+                    }
+
+                    result.Append(FormatExpression("DELETE FROM {0} WHERE {1};", expression.TableName, where));
+                }
+            }
+
+            return result.ToString();
+        }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
         {

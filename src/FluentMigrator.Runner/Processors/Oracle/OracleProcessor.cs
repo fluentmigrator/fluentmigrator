@@ -1,16 +1,17 @@
 using System;
 using System.Data;
+using System.Data.Common;
 using FluentMigrator.Builders.Execute;
-using Oracle.DataAccess.Client;
+
 
 namespace FluentMigrator.Runner.Processors.Oracle
 {
 	public class OracleProcessor : ProcessorBase
 	{
-		public virtual OracleConnection Connection { get; set; }
-		public OracleTransaction Transaction { get; private set; }
+		public virtual IDbConnection Connection { get; set; }
+		
 
-		public OracleProcessor(OracleConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+		public OracleProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
 			: base(generator, announcer, options)
 		{
 			Connection = connection;
@@ -46,7 +47,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 			if (Connection.State != ConnectionState.Open)
 				Connection.Open();
 
-			using (var command = new OracleCommand(String.Format(template, args), Connection))
+			using (var command = OracleFactory.GetCommand(Connection,String.Format(template, args)))
 			{
 				command.ExecuteNonQuery();
 			}
@@ -57,7 +58,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 			if (Connection.State != ConnectionState.Open)
 				Connection.Open();
 
-			using (var command = new OracleCommand(String.Format(template, args), Connection))
+			using (var command = OracleFactory.GetCommand(Connection,String.Format(template, args)))
 			using (var reader = command.ExecuteReader())
 			{
 				return reader.Read();
@@ -74,8 +75,8 @@ namespace FluentMigrator.Runner.Processors.Oracle
 			if (Connection.State != ConnectionState.Open) Connection.Open();
 
 			DataSet ds = new DataSet();
-			using (var command = new OracleCommand(String.Format(template, args), Connection))
-			using (OracleDataAdapter adapter = new OracleDataAdapter(command))
+			using (var command = OracleFactory.GetCommand(Connection,String.Format(template, args)))
+			using (DbDataAdapter adapter = OracleFactory.GetDataAdapter(command))
 			{
 				adapter.Fill(ds);
 				return ds;
@@ -97,7 +98,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 			if (Connection.State != ConnectionState.Open)
 				Connection.Open();
 
-			using (var command = new OracleCommand(sql, Connection))
+			using (var command = OracleFactory.GetCommand(Connection,sql))
 				command.ExecuteNonQuery();
 		}
 	}
