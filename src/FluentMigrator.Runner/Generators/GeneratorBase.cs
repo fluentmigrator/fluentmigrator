@@ -27,60 +27,16 @@ namespace FluentMigrator.Runner.Generators
 {
 	public abstract class GeneratorBase : IMigrationGenerator
 	{
-		protected const string SizePlaceholder = "$size";
-		protected const string PrecisionPlaceholder = "$precision";
+		private readonly ITypeMap _typeMap;
 
-		private readonly Dictionary<DbType, SortedList<int, string>> _templates = new Dictionary<DbType, SortedList<int, string>>();
-
-		public GeneratorBase()
+		public GeneratorBase(ITypeMap typeMap)
 		{
-			SetupTypeMaps();
+			_typeMap = typeMap;
 		}
-
-		protected abstract void SetupTypeMaps();
-
-		protected void SetTypeMap(DbType type, string template)
+		
+		protected string GetTypeMap(DbType type, int size, int precision)
 		{
-			EnsureHasList(type);
-			_templates[type][0] = template;
-		}
-
-		protected void SetTypeMap(DbType type, string template, int maxSize)
-		{
-			EnsureHasList(type);
-			_templates[type][maxSize] = template;
-		}
-
-		protected virtual string GetTypeMap(DbType type, int size, int precision)
-		{
-			if (!_templates.ContainsKey(type))
-				throw new NotSupportedException(String.Format("Unsupported DbType '{0}'", type));
-
-			if (size == 0)
-				return ReplacePlaceholders(_templates[type][0], size, precision);
-
-			foreach (KeyValuePair<int, string> entry in _templates[type])
-			{
-				int capacity = entry.Key;
-				string template = entry.Value;
-
-				if (size <= capacity)
-					return ReplacePlaceholders(template, size, precision);
-			}
-
-			throw new NotSupportedException(String.Format("Unsupported DbType '{0}'", type));
-		}
-
-		private string ReplacePlaceholders(string value, int size, int precision)
-		{
-			return value.Replace(SizePlaceholder, size.ToString())
-				.Replace(PrecisionPlaceholder, precision.ToString());
-		}
-
-		private void EnsureHasList(DbType type)
-		{
-			if (!_templates.ContainsKey(type))
-				_templates.Add(type, new SortedList<int, string>());
+			return _typeMap.GetTypeMap(type, size, precision);
 		}
 
 		public abstract string Generate(CreateSchemaExpression expression);
