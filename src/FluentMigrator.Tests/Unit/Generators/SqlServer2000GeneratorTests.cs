@@ -29,7 +29,6 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {
-	[TestFixture]
 	public class SqlServer2000GeneratorTests
 	{
 		protected SqlServer2000Generator generator;
@@ -39,7 +38,11 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			generator = new SqlServer2000Generator();
 		}
+	}
 
+	[TestFixture]
+	public class SqlServer2000GeneratorOtherTests : SqlServer2000GeneratorTests
+	{
 		private DeleteTableExpression GetDeleteTableExpression(string tableName)
 		{
 			return new DeleteTableExpression { TableName = tableName };
