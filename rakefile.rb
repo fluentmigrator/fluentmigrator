@@ -29,15 +29,12 @@ def copy_files(from, to, filename, extensions)
 end
 
 task :package => :release do
-  build_directory_msbuild = './src/FluentMigrator.MSBuild/bin/Release/'
-  build_directory_nant = './src/FluentMigrator.NAnt/bin/Release/'
-
   output_directory = './packages/FluentMigrator/lib/35/'
   FileUtils.mkdir_p output_directory
 
   copy_files './src/FluentMigrator/bin/Release/', output_directory, 'FluentMigrator', ['dll', 'pdb', 'xml']
   copy_files './src/FluentMigrator.Runner/bin/Release/', output_directory, 'FluentMigrator.Runner', ['dll']
-  copy_files './build/', output_directory, 'Migrate', ['exe', 'exe.config']
-  copy_files './build/', output_directory, 'FluentMigrator.NAnt', ['dll']
+  copy_files './src/FluentMigrator.Console/bin/x86/Release/', output_directory, 'Migrate', ['exe', 'exe.config']
+  copy_files './src/FluentMigrator.NAnt/bin/Release/', output_directory, 'FluentMigrator.NAnt', ['dll']
   copy_files './src/FluentMigrator.MSBuild/bin/Release/', output_directory, 'FluentMigrator.MSBuild', ['dll']
 end
