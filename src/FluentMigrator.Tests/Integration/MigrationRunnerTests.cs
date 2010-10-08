@@ -92,6 +92,7 @@ namespace FluentMigrator.Tests.Integration
 			runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
 		}
 
+		//BUG: the Users table is not getting properly dropped. this test will fail on the second execution
 		[Test]
 		public void CanApplyForeignKeyConvention()
 		{
@@ -110,6 +111,7 @@ namespace FluentMigrator.Tests.Integration
 				});
 		}
 
+		//BUG: the Users table is not getting properly dropped. this test will fail on the second execution
 		[Test]
 		public void CanApplyIndexConvention()
 		{
