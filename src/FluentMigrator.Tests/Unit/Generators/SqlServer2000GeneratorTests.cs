@@ -252,10 +252,11 @@ namespace FluentMigrator.Tests.Unit.Generators
 	[TestFixture]
 	public class SqlServer200GeneratorCreateTableTests : SqlServer2000GeneratorTests
 	{
+		private string tableName = "NewTable";
+
 		[Test]
 		public void CanCreateTable()
 		{
-			var tableName = "NewTable";
 			var expression = GetCreateTableExpression(tableName);
 			var sql = generator.Generate(expression);
 			sql.ShouldBe("CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL, ColumnName2 INT NOT NULL)");
@@ -264,7 +265,6 @@ namespace FluentMigrator.Tests.Unit.Generators
 		[Test]
 		public void CanCreateTableWithCustomColumnType()
 		{
-			var tableName = "NewTable";
 			var expression = GetCreateTableExpression(tableName);
 			expression.Columns[0].IsPrimaryKey = true;
 			expression.Columns[1].Type = null;
@@ -277,13 +277,44 @@ namespace FluentMigrator.Tests.Unit.Generators
 		[Test]
 		public void CanCreateTableWithPrimaryKey()
 		{
-			var tableName = "NewTable";
 			var expression = GetCreateTableExpression(tableName);
 			expression.Columns[0].IsPrimaryKey = true;
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(
 				"CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL PRIMARY KEY CLUSTERED, ColumnName2 INT NOT NULL)");
 		}
+
+		[Test]
+		public void CanCreateTableWithIdentity()
+		{
+			var expression = GetCreateTableExpression(tableName);
+			expression.Columns[0].IsIdentity = true;
+			var sql = generator.Generate(expression);
+			sql.ShouldBe(
+				"CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL IDENTITY(1,1), ColumnName2 INT NOT NULL)");
+		}
+
+		[Test]
+		public void CanCreateTableWithNullField()
+		{
+			var expression = GetCreateTableExpression(tableName);
+			expression.Columns[0].IsNullable = true;
+			var sql = generator.Generate(expression);
+			sql.ShouldBe(
+				"CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255), ColumnName2 INT NOT NULL)");
+		}
+
+		[Test]
+		public void CanCreateTableWithDefaultValue()
+		{
+			var expression = GetCreateTableExpression(tableName);
+			expression.Columns[0].DefaultValue = "Default";
+			expression.Columns[1].DefaultValue = 0;
+			var sql = generator.Generate(expression);
+			sql.ShouldBe(
+				"CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL DEFAULT 'Default', ColumnName2 INT NOT NULL DEFAULT 0)");
+		}
+
 
 		protected CreateTableExpression GetCreateTableExpression(string tableName)
 		{
