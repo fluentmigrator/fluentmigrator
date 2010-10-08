@@ -250,7 +250,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 	}
 
 	[TestFixture]
-	public class SqlServer200GeneratorCreateTableTests : SqlServer2000GeneratorTests
+	public class SqlServer2000GeneratorCreateTableTests : SqlServer2000GeneratorTests
 	{
 		private string tableName = "NewTable";
 
