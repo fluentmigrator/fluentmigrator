@@ -239,7 +239,7 @@ namespace FluentMigrator.Runner.Generators
             throw new NotImplementedException();
         }
 
-		public override string GenerateDDLForColumn(ColumnDefinition column)
+		protected override string GenerateDDLForColumn(ColumnDefinition column)
 		{
 			var sb = new StringBuilder();
 

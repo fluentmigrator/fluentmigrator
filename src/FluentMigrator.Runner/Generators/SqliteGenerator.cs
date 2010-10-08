@@ -65,12 +65,12 @@ namespace FluentMigrator.Runner.Generators
 			SetTypeMap(DbType.Guid, "UNIQUEIDENTIFIER");
 		}
 
-		public override string GetTypeMap(DbType type, int size, int precision)
+		protected override string GetTypeMap(DbType type, int size, int precision)
 		{
 			return base.GetTypeMap(type, 0, 0);
 		}
 
-		public override string GenerateDDLForColumn(ColumnDefinition column)
+		protected override string GenerateDDLForColumn(ColumnDefinition column)
 		{
 			var sb = new StringBuilder();
 

@@ -39,19 +39,19 @@ namespace FluentMigrator.Runner.Generators
 
 		protected abstract void SetupTypeMaps();
 
-		public void SetTypeMap(DbType type, string template)
+		protected void SetTypeMap(DbType type, string template)
 		{
 			EnsureHasList(type);
 			_templates[type][0] = template;
 		}
 
-		public void SetTypeMap(DbType type, string template, int maxSize)
+		protected void SetTypeMap(DbType type, string template, int maxSize)
 		{
 			EnsureHasList(type);
 			_templates[type][maxSize] = template;
 		}
 
-		public virtual string GetTypeMap(DbType type, int size, int precision)
+		protected virtual string GetTypeMap(DbType type, int size, int precision)
 		{
 			if (!_templates.ContainsKey(type))
 				throw new NotSupportedException(String.Format("Unsupported DbType '{0}'", type));
@@ -71,7 +71,7 @@ namespace FluentMigrator.Runner.Generators
 			throw new NotSupportedException(String.Format("Unsupported DbType '{0}'", type));
 		}
 
-		protected string ReplacePlaceholders(string value, int size, int precision)
+		private string ReplacePlaceholders(string value, int size, int precision)
 		{
 			return value.Replace(SizePlaceholder, size.ToString())
 				.Replace(PrecisionPlaceholder, precision.ToString());
@@ -100,7 +100,7 @@ namespace FluentMigrator.Runner.Generators
 		public abstract string Generate(AlterDefaultConstraintExpression expression);
 	    public abstract string Generate(DeleteDataExpression expression);
 
-		public virtual string GenerateDDLForColumn(ColumnDefinition column)
+		protected virtual string GenerateDDLForColumn(ColumnDefinition column)
 		{
 			var sb = new StringBuilder();
 
@@ -228,17 +228,17 @@ namespace FluentMigrator.Runner.Generators
 			return string.Format("CONSTRAINT {0}", keyName);
 		}
 
-		public virtual string FormatExpression(string template, params object[] args)
+		protected string FormatExpression(string template, params object[] args)
 		{
 			return String.Format(template, args);
 		}
 
-		public string FormatSqlEscape(string sql)
+		protected string FormatSqlEscape(string sql)
 		{
 			return sql.Replace("'", "''");
 		}
 
-		protected virtual string GetConstantValue(object value)
+		protected string GetConstantValue(object value)
 		{
 
 			if (value == null)

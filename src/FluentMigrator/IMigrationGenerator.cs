@@ -24,10 +24,6 @@ namespace FluentMigrator
 {
 	public interface IMigrationGenerator
 	{
-		void SetTypeMap(DbType type, string template);
-		void SetTypeMap(DbType type, string template, int maxSize);
-		string GetTypeMap(DbType type, int size, int precision);
-
 		string Generate(CreateSchemaExpression expression);
 		string Generate(DeleteSchemaExpression expression);
 		string Generate(CreateTableExpression expression);
