@@ -273,5 +273,10 @@ namespace FluentMigrator.Runner.Generators
 			}
 			return result.TrimEnd(',');
 		}
+
+		protected string FormatSqlEscape(string sql)
+		{
+			return sql.Replace("'", "''");
+		}
 	}
 }

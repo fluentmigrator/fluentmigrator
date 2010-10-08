@@ -189,11 +189,6 @@ namespace FluentMigrator.Runner.Generators
 			return String.Format(template, args);
 		}
 
-		protected string FormatSqlEscape(string sql)
-		{
-			return sql.Replace("'", "''");
-		}
-
 		protected string GetConstantValue(object value)
 		{
 
