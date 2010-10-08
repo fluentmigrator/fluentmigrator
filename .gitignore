@@ -13,4 +13,4 @@ db.sqlite
 *.orig
 *.pidb
 *.userprefs
-packages/FluentMigrator/lib/35/
+packages/FluentMigrator/
