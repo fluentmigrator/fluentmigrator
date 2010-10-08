@@ -1,50 +1,43 @@
-require 'rubygems'
+require 'albacore'
+require 'fileutils'
 
-task :default => [:clean, :compile, :test, :run_corflags]
+task :default => [:build]
 
-desc 'removes build files'
-task :clean do
-  FileUtils.rm_rf("build")
+msbuild :build do |msb|
+  msb.path_to_command =  File.join(ENV['windir'], 'Microsoft.NET', 'Framework',  'v4.0.30319', 'MSBuild.exe')
+  msb.properties :configuration => :Debug
+  msb.targets :Clean, :Rebuild
+  msb.solution = "FluentMigrator (2010).sln"
 end
 
-desc 'compile'
-task :compile => :clean do
-  msbuild_path = File.join(ENV['windir'].dup, 'Microsoft.NET', 'Framework', 'v3.5', 'msbuild.exe')
-  sh "#{msbuild_path} FluentMigrator.sln /maxcpucount /v:m /property:BuildInParallel=false /property:Configuration=debug /property:Architecture=x86 /t:Rebuild"
-  
-  exampleToolsDir = 'src/FluentMigrator.Example/tools/FluentMigrator'
-  FileUtils.mkdir_p 'build'
-  FileUtils.mkdir_p exampleToolsDir
-  
-  Dir.glob(File.join('src/FluentMigrator.Console/bin/Debug', "*.{dll,pdb,xml,exe}")) do |file|
-	copy(file, 'build')
-	copy(file, exampleToolsDir)
-  end
+nunit :test => :build do |nunit|
+  nunit.path_to_command = "tools/NUnit/nunit-console.exe"
+  nunit.assemblies "src/FluentMigrator.Tests/bin/Debug/FluentMigrator.Tests.dll"
 end
 
-desc 'set the migrator console exe to run in x86'
-task :run_corflags do
-  sh '"C:\Program Files\Microsoft SDKs\Windows\v6.0A\Bin\CorFlags.exe" build\FluentMigrator.Console.exe /32BIT+'
-  sh '"C:\Program Files\Microsoft SDKs\Windows\v6.0A\Bin\CorFlags.exe" src\FluentMigrator.Example\tools\FluentMigrator\FluentMigrator.Console.exe /32BIT+'
+msbuild :release do |msb|
+  msb.path_to_command =  File.join(ENV['windir'], 'Microsoft.NET', 'Framework',  'v4.0.30319', 'MSBuild.exe')
+  msb.properties :configuration => :Release
+  msb.targets :Clean, :Rebuild
+  msb.solution = "FluentMigrator (2010).sln"
 end
 
-desc 'runs tests'
-task :test do
-  sh 'tools\nunit\nunit-console.exe src\FluentMigrator.Tests\bin\Debug\FluentMigrator.Tests.dll'
+def copy_files(from, to, filename, extensions)
+	extensions.each do |ext|
+		FileUtils.cp "#{from}#{filename}.#{ext}", "#{to}#{filename}.#{ext}"
+	end
 end
 
-desc 'opens the sln file'
-task :sln do
+task :package => :release do
+  build_directory_msbuild = './src/FluentMigrator.MSBuild/bin/Release/'
+  build_directory_nant = './src/FluentMigrator.NAnt/bin/Release/'
 
-  if ENV['PROCESSOR_ARCHITECTURE'] == 'x86' then
-    program_files_32 = ENV['ProgramFiles']
-  else
-    program_files_32 = ENV['ProgramFiles(x86)']
-  end
-  
-  Thread.new do
-    devenv = "#{program_files_32}\\Microsoft Visual Studio 9.0\\Common7\\IDE\\devenv.exe"
-    path = File.join(Dir.pwd, 'FluentMigrator.sln')
-    sh "\"#{devenv}\" #{path}"
-  end
+  output_directory = './packages/FluentMigrator/lib/35/'
+  FileUtils.mkdir_p output_directory
+
+  copy_files './src/FluentMigrator/bin/Release/', output_directory, 'FluentMigrator', ['dll', 'pdb', 'xml']
+  copy_files './src/FluentMigrator.Runner/bin/Release/', output_directory, 'FluentMigrator.Runner', ['dll']
+  copy_files './build/', output_directory, 'Migrate', ['exe', 'exe.config']
+  copy_files './build/', output_directory, 'FluentMigrator.NAnt', ['dll']
+  copy_files './src/FluentMigrator.MSBuild/bin/Release/', output_directory, 'FluentMigrator.MSBuild', ['dll']
 end
