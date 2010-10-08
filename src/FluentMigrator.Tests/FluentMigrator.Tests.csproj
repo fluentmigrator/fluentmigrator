@@ -172,6 +172,7 @@
     <Compile Include="Unit\Expressions\CreateTableExpressionTests.cs" />
     <Compile Include="Unit\Expressions\ExecuteSqlScriptExpressionTests.cs" />
     <Compile Include="Unit\Expressions\ExecuteSqlStatementExpressionTests.cs" />
+    <Compile Include="Unit\Generators\MySqlGeneratorTests.cs" />
     <Compile Include="Unit\Generators\OracleGeneratorTests.cs" />
     <Compile Include="Unit\Expressions\PerformDBOperationExpressionTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2000GeneratorTests.cs" />
