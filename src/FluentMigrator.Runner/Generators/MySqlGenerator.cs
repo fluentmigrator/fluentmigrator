@@ -28,48 +28,8 @@ namespace FluentMigrator.Runner.Generators
 {
 	public class MySqlGenerator : GeneratorBase
 	{
-		public const int AnsiTinyStringCapacity = 127;
-		public const int StringCapacity = 255;
-		public const int TextCapacity = 65535;
-		public const int MediumTextCapacity = 16777215;
-		public const int DecimalCapacity = 19;
-
-		protected override void SetupTypeMaps()
+		public MySqlGenerator() : base(new MySqlTypeMap(), new ConstantFormatterWithQuotedBackslashes())
 		{
-			SetTypeMap(DbType.AnsiStringFixedLength, "CHAR(255)");
-			SetTypeMap(DbType.AnsiStringFixedLength, "CHAR($size)", StringCapacity);
-			SetTypeMap(DbType.AnsiStringFixedLength, "TEXT", TextCapacity);
-			SetTypeMap(DbType.AnsiStringFixedLength, "MEDIUMTEXT", MediumTextCapacity);
-			SetTypeMap(DbType.AnsiString, "VARCHAR(255)");
-			SetTypeMap(DbType.AnsiString, "VARCHAR($size)", StringCapacity);
-			SetTypeMap(DbType.AnsiString, "TEXT", TextCapacity);
-			SetTypeMap(DbType.AnsiString, "MEDIUMTEXT", MediumTextCapacity);
-			SetTypeMap(DbType.Binary, "LONGBLOB");
-			SetTypeMap(DbType.Binary, "TINYBLOB", AnsiTinyStringCapacity);
-			SetTypeMap(DbType.Binary, "BLOB", TextCapacity);
-			SetTypeMap(DbType.Binary, "MEDIUMBLOB", MediumTextCapacity);
-			SetTypeMap(DbType.Boolean, "TINYINT(1)");
-			SetTypeMap(DbType.Byte, "TINYINT UNSIGNED");
-			SetTypeMap(DbType.Currency, "MONEY");
-			SetTypeMap(DbType.Date, "DATE");
-			SetTypeMap(DbType.DateTime, "DATETIME");
-			SetTypeMap(DbType.Decimal, "DECIMAL(19,5)");
-			SetTypeMap(DbType.Decimal, "DECIMAL($size,$precision)", DecimalCapacity);
-			SetTypeMap(DbType.Double, "DOUBLE");
-			SetTypeMap(DbType.Guid, "VARCHAR(40)");
-			SetTypeMap(DbType.Int16, "SMALLINT");
-			SetTypeMap(DbType.Int32, "INTEGER");
-			SetTypeMap(DbType.Int64, "BIGINT");
-			SetTypeMap(DbType.Single, "FLOAT");
-			SetTypeMap(DbType.StringFixedLength, "CHAR(255)");
-			SetTypeMap(DbType.StringFixedLength, "CHAR($size)", StringCapacity);
-			SetTypeMap(DbType.StringFixedLength, "TEXT", TextCapacity);
-			SetTypeMap(DbType.StringFixedLength, "MEDIUMTEXT", MediumTextCapacity);
-			SetTypeMap(DbType.String, "VARCHAR(255)");
-			SetTypeMap(DbType.String, "VARCHAR($size)", StringCapacity);
-			SetTypeMap(DbType.String, "TEXT", TextCapacity);
-			SetTypeMap(DbType.String, "MEDIUMTEXT", MediumTextCapacity);
-			SetTypeMap(DbType.Time, "DATETIME");
 		}
 
 		public override string Generate(CreateSchemaExpression expression)
@@ -84,28 +44,28 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(CreateTableExpression expression)
 		{
-			return FormatExpression("CREATE TABLE `{0}` ({1}) ENGINE = INNODB", expression.TableName, GetColumnDDL(expression));
+			return String.Format("CREATE TABLE `{0}` ({1}) ENGINE = INNODB", expression.TableName, GetColumnDDL(expression));
 		}
 
         public override string Generate(AlterColumnExpression expression)
         {
-            return FormatExpression("ALTER TABLE {0} MODIFY {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
+            return String.Format("ALTER TABLE {0} MODIFY {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
         }
 
 		public override string Generate(CreateColumnExpression expression)
 		{
 
-			return FormatExpression("ALTER TABLE `{0}` ADD {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
+			return String.Format("ALTER TABLE `{0}` ADD {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
 		}
 
 		public override string Generate(DeleteTableExpression expression)
 		{
-			return FormatExpression("DROP TABLE `{0}`", expression.TableName);
+			return String.Format("DROP TABLE `{0}`", expression.TableName);
 		}
 
 		public override string Generate(DeleteColumnExpression expression)
 		{
-			return FormatExpression("ALTER TABLE `{0}` DROP COLUMN {1}", expression.TableName, expression.ColumnName);
+			return String.Format("ALTER TABLE `{0}` DROP COLUMN {1}", expression.TableName, expression.ColumnName);
 		}
 
 		public override string Generate(CreateForeignKeyExpression expression)
@@ -158,23 +118,27 @@ namespace FluentMigrator.Runner.Generators
 			}
 			result.Append(")");
 
-			return FormatExpression(result.ToString(), expression.Index.Name, expression.Index.TableName);
+			return String.Format(result.ToString(), expression.Index.Name, expression.Index.TableName);
 		}
 
 		public override string Generate(DeleteIndexExpression expression)
 		{
-			return FormatExpression("DROP INDEX {0}", expression.Index.Name, expression.Index.TableName);
+			return String.Format("DROP INDEX {0}", expression.Index.Name, expression.Index.TableName);
 		}
 
 		public override string Generate(RenameTableExpression expression)
 		{
-			return FormatExpression("RENAME TABLE `{0}` TO `{1}`", expression.OldName, expression.NewName);
+			return String.Format("RENAME TABLE `{0}` TO `{1}`", expression.OldName, expression.NewName);
 		}
 
 		public override string Generate(RenameColumnExpression expression)
 		{
 			// may need to add definition to end. blerg
-			return FormatExpression("ALTER TABLE `{0}` CHANGE COLUMN {1} {2}", expression.TableName, expression.OldName, expression.NewName);
+			//return String.Format("ALTER TABLE `{0}` CHANGE COLUMN {1} {2}", expression.TableName, expression.OldName, expression.NewName);
+			
+			// NOTE: The above does not work, as the CHANGE COLUMN syntax in Mysql requires the column definition to be re-specified,
+			// even if it has not changed; so marking this as not working for now
+			throw new NotImplementedException();
 		}
 
 		public override string Generate(InsertDataExpression expression)
@@ -192,7 +156,7 @@ namespace FluentMigrator.Runner.Generators
 
 				string columns = GetColumnList(columnNames);
 				string data = GetDataList(columnData);
-				result.Append(FormatExpression("INSERT INTO `{0}` ({1}) VALUES ({2});", expression.TableName, columns, data));
+				result.Append(String.Format("INSERT INTO `{0}` ({1}) VALUES ({2});", expression.TableName, columns, data));
 			}
 			return result.ToString();
 		}
@@ -203,7 +167,7 @@ namespace FluentMigrator.Runner.Generators
 
             if (expression.IsAllRows)
             {
-                result.Append(FormatExpression("DELETE FROM {0};", expression.TableName));
+                result.Append(String.Format("DELETE FROM {0};", expression.TableName));
             }
             else
             {
@@ -219,11 +183,11 @@ namespace FluentMigrator.Runner.Generators
                             where += " AND ";
                         }
 
-                        where += String.Format("[{0}] = {1}", item.Key, GetConstantValue(item.Value));
+                        where += String.Format("[{0}] = {1}", item.Key, Constant.Format(item.Value));
                         i++;
                     }
 
-                    result.Append(FormatExpression("DELETE FROM {0} WHERE {1};", expression.TableName, where));
+                    result.Append(String.Format("DELETE FROM {0} WHERE {1};", expression.TableName, where));
                 }
             }
 
@@ -235,7 +199,7 @@ namespace FluentMigrator.Runner.Generators
             throw new NotImplementedException();
         }
 
-		public override string GenerateDDLForColumn(ColumnDefinition column)
+		protected override string GenerateDDLForColumn(ColumnDefinition column)
 		{
 			var sb = new StringBuilder();
 
@@ -259,7 +223,7 @@ namespace FluentMigrator.Runner.Generators
 			if (column.DefaultValue != null)
 			{
 				sb.Append(" DEFAULT ");
-				sb.Append(GetConstantValue(column.DefaultValue));
+				sb.Append(Constant.Format(column.DefaultValue));
 			}
 
 			if (column.IsIdentity)
@@ -290,7 +254,7 @@ namespace FluentMigrator.Runner.Generators
 			string result = "";
 			foreach (object column in data)
 			{
-				result += GetConstantValue(column) + ",";
+				result += Constant.Format(column) + ",";
 			}
 			return result.TrimEnd(',');
 		}

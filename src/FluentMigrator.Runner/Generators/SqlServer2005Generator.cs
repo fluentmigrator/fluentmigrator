@@ -16,30 +16,28 @@
 //
 #endregion
 
-using System.Data;
+using System;
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Generators
 {
 	public class SqlServer2005Generator : SqlServer2000Generator
 	{
-		protected override void SetupTypeMaps()
-		{
-			base.SetupTypeMaps();
+		public SqlServer2005Generator() : base(new SqlServer2005TypeMap())		{
+		}
 
-			SetTypeMap(DbType.String, "NVARCHAR(MAX)", UnicodeTextCapacity);
-			SetTypeMap(DbType.AnsiString, "VARCHAR(MAX)", AnsiTextCapacity);
-			SetTypeMap(DbType.Binary, "VARBINARY(MAX)", ImageCapacity);
+		protected SqlServer2005Generator(ITypeMap typeMap) : base(typeMap)
+		{
 		}
 
 		public override string Generate(CreateSchemaExpression expression)
 		{
-			return FormatExpression("CREATE SCHEMA [{0}]", expression.SchemaName);
+			return String.Format("CREATE SCHEMA [{0}]", expression.SchemaName);
 		}
 
 		public override string Generate(DeleteSchemaExpression expression)
 		{
-			return FormatExpression("DROP SCHEMA [{0}]", expression.SchemaName);
+			return String.Format("DROP SCHEMA [{0}]", expression.SchemaName);
 		}
 
 		protected override string FormatSchema(string schemaName, bool escapeSchemaName)

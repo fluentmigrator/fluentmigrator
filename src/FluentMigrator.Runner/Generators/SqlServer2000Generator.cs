@@ -27,45 +27,10 @@ namespace FluentMigrator.Runner.Generators
 {
 	public class SqlServer2000Generator : GeneratorBase
 	{
-		public const int AnsiStringCapacity = 8000;
-		public const int AnsiTextCapacity = 2147483647;
-		public const int UnicodeStringCapacity = 4000;
-		public const int UnicodeTextCapacity = 1073741823;
-		public const int ImageCapacity = 2147483647;
-		public const int DecimalCapacity = 19;
+		public SqlServer2000Generator() : base(new SqlServer2000TypeMap(), new ConstantFormatter())		{
+		}
 
-		protected override void SetupTypeMaps()
-		{
-			SetTypeMap(DbType.AnsiStringFixedLength, "CHAR(255)");
-			SetTypeMap(DbType.AnsiStringFixedLength, "CHAR($size)", AnsiStringCapacity);
-			SetTypeMap(DbType.AnsiString, "VARCHAR(255)");
-			SetTypeMap(DbType.AnsiString, "VARCHAR($size)", AnsiStringCapacity);
-			SetTypeMap(DbType.AnsiString, "TEXT", AnsiTextCapacity);
-			SetTypeMap(DbType.Binary, "VARBINARY(8000)");
-			SetTypeMap(DbType.Binary, "VARBINARY($size)", AnsiStringCapacity);
-			SetTypeMap(DbType.Binary, "VARBINARY(MAX)", int.MaxValue);
-			SetTypeMap(DbType.Binary, "IMAGE", ImageCapacity);
-			SetTypeMap(DbType.Boolean, "BIT");
-			SetTypeMap(DbType.Byte, "TINYINT");
-			SetTypeMap(DbType.Currency, "MONEY");
-			SetTypeMap(DbType.Date, "DATETIME");
-			SetTypeMap(DbType.DateTime, "DATETIME");
-			SetTypeMap(DbType.Decimal, "DECIMAL(19,5)");
-			SetTypeMap(DbType.Decimal, "DECIMAL($size,$precision)", DecimalCapacity);
-			SetTypeMap(DbType.Double, "DOUBLE PRECISION");
-			SetTypeMap(DbType.Guid, "UNIQUEIDENTIFIER");
-			SetTypeMap(DbType.Int16, "SMALLINT");
-			SetTypeMap(DbType.Int32, "INT");
-			SetTypeMap(DbType.Int64, "BIGINT");
-			SetTypeMap(DbType.Single, "REAL");
-			SetTypeMap(DbType.StringFixedLength, "NCHAR(255)");
-			SetTypeMap(DbType.StringFixedLength, "NCHAR($size)", UnicodeStringCapacity);
-			SetTypeMap(DbType.String, "NVARCHAR(255)");
-			SetTypeMap(DbType.String, "NVARCHAR($size)", UnicodeStringCapacity);
-			SetTypeMap(DbType.String, "NVARCHAR(MAX)", int.MaxValue);
-			SetTypeMap(DbType.String, "NTEXT", UnicodeTextCapacity);
-			SetTypeMap(DbType.Time, "DATETIME");
-			SetTypeMap(DbType.Xml, "XML");
+		protected SqlServer2000Generator(ITypeMap typeMap) : base(typeMap, new ConstantFormatter())		{
 		}
 
 		public override string Generate(CreateSchemaExpression expression)
@@ -80,27 +45,27 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(RenameTableExpression expression)
 		{
-			return FormatExpression("sp_rename {0}[{1}], [{2}]", FormatSchema(expression.SchemaName), expression.OldName, expression.NewName);
+			return String.Format("sp_rename {0}[{1}], [{2}]", FormatSchema(expression.SchemaName), expression.OldName, expression.NewName);
 		}
 
 		public override string Generate(RenameColumnExpression expression)
 		{
-			return FormatExpression("sp_rename '{0}[{1}].[{2}]', [{3}]", FormatSchema(expression.SchemaName, false), expression.TableName, expression.OldName, expression.NewName);
+			return String.Format("sp_rename '{0}[{1}].[{2}]', [{3}]", FormatSchema(expression.SchemaName, false), expression.TableName, expression.OldName, expression.NewName);
 		}
 
 		public override string Generate(AlterColumnExpression expression)
 		{
-			return FormatExpression("ALTER TABLE {0}[{1}] ALTER COLUMN {2}", FormatSchema(expression.SchemaName), expression.TableName, GenerateDDLForColumn(expression.Column));
+			return String.Format("ALTER TABLE {0}[{1}] ALTER COLUMN {2}", FormatSchema(expression.SchemaName), expression.TableName, GenerateDDLForColumn(expression.Column));
 		}
 
 		public override string Generate(CreateTableExpression expression)
 		{
-			return FormatExpression("CREATE TABLE {0}[{1}] ({2})", FormatSchema(expression.SchemaName), expression.TableName, GetColumnDDL(expression));
+			return String.Format("CREATE TABLE {0}[{1}] ({2})", FormatSchema(expression.SchemaName), expression.TableName, GetColumnDDL(expression));
 		}
 
 		public override string Generate(DeleteTableExpression expression)
 		{
-			return FormatExpression("DROP TABLE {0}[{1}]", FormatSchema(expression.SchemaName), expression.TableName);
+			return String.Format("DROP TABLE {0}[{1}]", FormatSchema(expression.SchemaName), expression.TableName);
 		}
 
 		public override string Generate(CreateForeignKeyExpression expression)
@@ -129,7 +94,7 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(CreateColumnExpression expression)
 		{
-			return FormatExpression("ALTER TABLE {0}[{1}] ADD {2}", FormatSchema(expression.SchemaName), expression.TableName, GenerateDDLForColumn(expression.Column));
+			return String.Format("ALTER TABLE {0}[{1}] ADD {2}", FormatSchema(expression.SchemaName), expression.TableName, GenerateDDLForColumn(expression.Column));
 		}
 
 		public override string Generate(DeleteColumnExpression expression)
@@ -157,7 +122,7 @@ namespace FluentMigrator.Runner.Generators
 			-- now we can finally drop column
 			ALTER TABLE {0}[{2}] DROP COLUMN [{3}];";
 
-			return FormatExpression(sql, FormatSchema(expression.SchemaName), FormatSchema(expression.SchemaName, false), expression.TableName, expression.ColumnName);
+			return String.Format(sql, FormatSchema(expression.SchemaName), FormatSchema(expression.SchemaName, false), expression.TableName, expression.ColumnName);
 		}
 
 		public override string Generate(CreateIndexExpression expression)
@@ -183,12 +148,12 @@ namespace FluentMigrator.Runner.Generators
 			}
 			result.Append(")");
 
-			return FormatExpression(result.ToString(), expression.Index.Name, FormatSchema(expression.Index.SchemaName), expression.Index.TableName);
+			return String.Format(result.ToString(), expression.Index.Name, FormatSchema(expression.Index.SchemaName), expression.Index.TableName);
 		}
 
 		public override string Generate(DeleteIndexExpression expression)
 		{
-			return FormatExpression("DROP INDEX {0}[{1}] ON [{2}]", FormatSchema(expression.Index.SchemaName), expression.Index.Name, expression.Index.TableName);
+			return String.Format("DROP INDEX {0}[{1}] ON [{2}]", FormatSchema(expression.Index.SchemaName), expression.Index.Name, expression.Index.TableName);
 		}
 
 		public override string Generate(InsertDataExpression expression)
@@ -206,7 +171,7 @@ namespace FluentMigrator.Runner.Generators
 
 				var columns = GetColumnList(columnNames);
 				var data = GetDataList(columnData);
-				result.Append(FormatExpression("INSERT INTO {0}[{1}] ({2}) VALUES ({3});", FormatSchema(expression.SchemaName), expression.TableName, columns, data));
+				result.Append(String.Format("INSERT INTO {0}[{1}] ({2}) VALUES ({3});", FormatSchema(expression.SchemaName), expression.TableName, columns, data));
 			}
 			return result.ToString();
 		}
@@ -217,7 +182,7 @@ namespace FluentMigrator.Runner.Generators
 
             if (expression.IsAllRows)
             {
-                result.Append(FormatExpression("DELETE FROM {0}[{1}];", FormatSchema(expression.SchemaName), expression.TableName));
+                result.Append(String.Format("DELETE FROM {0}[{1}];", FormatSchema(expression.SchemaName), expression.TableName));
             }
             else
             {
@@ -233,11 +198,11 @@ namespace FluentMigrator.Runner.Generators
                             where += " AND ";
                         }
 
-                        where += String.Format("[{0}] = {1}", item.Key, GetConstantValue(item.Value));
+                        where += String.Format("[{0}] = {1}", item.Key, Constant.Format(item.Value));
                         i++;
                     }
 
-                    result.Append(FormatExpression("DELETE FROM {0}[{1}] WHERE {2};", FormatSchema(expression.SchemaName), expression.TableName, where));
+                    result.Append(String.Format("DELETE FROM {0}[{1}] WHERE {2};", FormatSchema(expression.SchemaName), expression.TableName, where));
                 }
             }
             
@@ -270,7 +235,7 @@ namespace FluentMigrator.Runner.Generators
 			SET @sql = N'ALTER TABLE {0}[{2}] WITH NOCHECK ADD CONSTRAINT [' + @default + '] DEFAULT({4}) FOR {3}';
 			EXEC sp_executesql @sql;";
 
-			return FormatExpression(sql, FormatSchema(expression.SchemaName), FormatSchema(expression.SchemaName, false), expression.TableName, expression.ColumnName, FormatSqlEscape(GetConstantValue(expression.DefaultValue)));
+			return String.Format(sql, FormatSchema(expression.SchemaName), FormatSchema(expression.SchemaName, false), expression.TableName, expression.ColumnName, FormatSqlEscape(Constant.Format(expression.DefaultValue)));
 		}
 
 		protected string FormatSchema(string schemaName)
@@ -282,11 +247,6 @@ namespace FluentMigrator.Runner.Generators
 		{
 			// schemas were not supported until SQL Server 2005
 			return string.Empty;
-		}
-
-		protected new string FormatExpression(string template, params object[] args)
-		{
-			return string.Format(template, args);
 		}
 
 		protected string GetColumnList(IEnumerable<string> columns)
@@ -304,9 +264,14 @@ namespace FluentMigrator.Runner.Generators
 			var result = "";
 			foreach (var column in data)
 			{
-				result += GetConstantValue(column) + ",";
+				result += Constant.Format(column) + ",";
 			}
 			return result.TrimEnd(',');
+		}
+
+		protected string FormatSqlEscape(string sql)
+		{
+			return sql.Replace("'", "''");
 		}
 	}
 }

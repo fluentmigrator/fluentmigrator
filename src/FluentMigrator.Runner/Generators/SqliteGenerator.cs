@@ -29,48 +29,10 @@ namespace FluentMigrator.Runner.Generators
 {
 	public class SqliteGenerator : GeneratorBase
 	{
-		public const int AnsiStringCapacity = 8000;
-		public const int AnsiTextCapacity = 2147483647;
-		public const int UnicodeStringCapacity = 4000;
-		public const int UnicodeTextCapacity = 1073741823;
-		public const int ImageCapacity = 2147483647;
-		public const int DecimalCapacity = 19;
-		public const int XmlCapacity = 1073741823;
-
-		protected override void SetupTypeMaps()
-		{
-			SetTypeMap(DbType.Binary, "BLOB");
-			SetTypeMap(DbType.Byte, "INTEGER");
-			SetTypeMap(DbType.Int16, "INTEGER");
-			SetTypeMap(DbType.Int32, "INTEGER");
-			SetTypeMap(DbType.Int64, "INTEGER");
-			SetTypeMap(DbType.SByte, "INTEGER");
-			SetTypeMap(DbType.UInt16, "INTEGER");
-			SetTypeMap(DbType.UInt32, "INTEGER");
-			SetTypeMap(DbType.UInt64, "INTEGER");
-			SetTypeMap(DbType.Currency, "NUMERIC");
-			SetTypeMap(DbType.Decimal, "NUMERIC");
-			SetTypeMap(DbType.Double, "NUMERIC");
-			SetTypeMap(DbType.Single, "NUMERIC");
-			SetTypeMap(DbType.VarNumeric, "NUMERIC");
-			SetTypeMap(DbType.AnsiString, "TEXT");
-			SetTypeMap(DbType.String, "TEXT");
-			SetTypeMap(DbType.AnsiStringFixedLength, "TEXT");
-			SetTypeMap(DbType.StringFixedLength, "TEXT");
-
-			SetTypeMap(DbType.Date, "DATETIME");
-			SetTypeMap(DbType.DateTime, "DATETIME");
-			SetTypeMap(DbType.Time, "DATETIME");
-			SetTypeMap(DbType.Boolean, "INTEGER");
-			SetTypeMap(DbType.Guid, "UNIQUEIDENTIFIER");
+		public SqliteGenerator() : base(new SqliteTypeMap(), new ConstantFormatter())		{
 		}
 
-		public override string GetTypeMap(DbType type, int size, int precision)
-		{
-			return base.GetTypeMap(type, 0, 0);
-		}
-
-		public override string GenerateDDLForColumn(ColumnDefinition column)
+		protected override string GenerateDDLForColumn(ColumnDefinition column)
 		{
 			var sb = new StringBuilder();
 
@@ -101,7 +63,7 @@ namespace FluentMigrator.Runner.Generators
 			if (column.DefaultValue != null)
 			{
 				sb.Append(" DEFAULT ");
-				sb.Append(GetConstantValue(column.DefaultValue));
+				sb.Append(Constant.Format(column.DefaultValue));
 			}
 
 			if (column.IsIdentity)
@@ -153,7 +115,7 @@ namespace FluentMigrator.Runner.Generators
 		public override string Generate(CreateColumnExpression expression)
 		{
 			//return string.Format("ALTER TABLE {0} ADD COLUMN {1}", expression.TableName, expression.Column.Name);
-			return FormatExpression("ALTER TABLE [{0}] ADD COLUMN {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
+			return String.Format("ALTER TABLE [{0}] ADD COLUMN {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
 		}
 
 		public override string Generate(RenameColumnExpression expression)
@@ -176,7 +138,7 @@ namespace FluentMigrator.Runner.Generators
 
 				string columns = GetColumnList(columnNames);
 				string data = GetDataList(columnData);
-				result.Append(FormatExpression("INSERT INTO [{0}] ({1}) VALUES ({2});", expression.TableName, columns, data));
+				result.Append(String.Format("INSERT INTO [{0}] ({1}) VALUES ({2});", expression.TableName, columns, data));
 			}
 			return result.ToString();
 		}
@@ -187,7 +149,7 @@ namespace FluentMigrator.Runner.Generators
 
             if (expression.IsAllRows)
             {
-                result.Append(FormatExpression("DELETE FROM {0};", expression.TableName));
+                result.Append(String.Format("DELETE FROM {0};", expression.TableName));
             }
             else
             {
@@ -203,11 +165,11 @@ namespace FluentMigrator.Runner.Generators
                             where += " AND ";
                         }
 
-                        where += String.Format("[{0}] = {1}", item.Key, GetConstantValue(item.Value));
+                        where += String.Format("[{0}] = {1}", item.Key, Constant.Format(item.Value));
                         i++;
                     }
 
-                    result.Append(FormatExpression("DELETE FROM {0} WHERE {1};", expression.TableName, where));
+                    result.Append(String.Format("DELETE FROM {0} WHERE {1};", expression.TableName, where));
                 }
             }
 
@@ -234,7 +196,7 @@ namespace FluentMigrator.Runner.Generators
 			string result = "";
 			foreach (object column in data)
 			{
-				result += GetConstantValue(column) + ",";
+				result += Constant.Format(column) + ",";
 			}
 			return result.TrimEnd(',');
 		}
@@ -275,7 +237,7 @@ namespace FluentMigrator.Runner.Generators
 			}
 			result.Append(")");
 
-			return FormatExpression(result.ToString(), expression.Index.Name, expression.Index.TableName);
+			return String.Format(result.ToString(), expression.Index.Name, expression.Index.TableName);
 		}
 
 		public override string Generate(DeleteIndexExpression expression)

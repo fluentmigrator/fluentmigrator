@@ -1,3 +1,4 @@
+﻿using System;
 using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
@@ -8,36 +9,25 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Unit.Generators
 {
 	[TestFixture]
-	public class SqlServer2008GeneratorTests
+	public class SqlServer2005GeneratorTests
 	{
-		private SqlServer2008Generator generator;
+		private SqlServer2005Generator generator;
 
 		[SetUp]
 		public void SetUp()
 		{
-			generator = new SqlServer2008Generator();
+			generator = new SqlServer2005Generator();
 		}
 
 		[Test]
-		public void CanRenameTable()
-		{
-			var expression = new RenameTableExpression();
-			expression.SchemaName = "dbo";
-			expression.OldName = "Table1";
-			expression.NewName = "Table2";
-
-			var sql = generator.Generate( expression );
-			sql.ShouldBe( "sp_rename '[dbo].[Table1]', '[Table2]'" );
-		}
-
-		[Test]
-		public void CanCreateTableWithDateTimeOffsetColumn()
+		public void CanCreateTableWithNvarcharMax()
 		{
 			var expression = GetCreateTableExpression(tableName);
-			expression.Columns[0].Type = DbType.DateTimeOffset;
+			expression.Columns[0].Type = DbType.String;
+			expression.Columns[0].Size = Int32.MaxValue;
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(
-				"CREATE TABLE [dbo].[NewTable] (ColumnName1 DATETIMEOFFSET NOT NULL)");
+				"CREATE TABLE [dbo].[NewTable] (ColumnName1 NVARCHAR(MAX) NOT NULL)");
 		}
 
 
