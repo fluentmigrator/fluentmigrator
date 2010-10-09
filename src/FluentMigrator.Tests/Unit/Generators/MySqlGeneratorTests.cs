@@ -156,20 +156,20 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.Rows.Add(new InsertionDataDefinition
 			                    	{
 			                    		new KeyValuePair<string, object>("Id", 1),
-			                    		new KeyValuePair<string, object>("Name", "Justin"),
+			                    		new KeyValuePair<string, object>("Name", @"Just'in"),
 			                    		new KeyValuePair<string, object>("Website", "codethinked.com")
 			                    	});
 			expression.Rows.Add(new InsertionDataDefinition
 			                    	{
 			                    		new KeyValuePair<string, object>("Id", 2),
-			                    		new KeyValuePair<string, object>("Name", "Nate"),
+			                    		new KeyValuePair<string, object>("Name", @"Na\te"),
 			                    		new KeyValuePair<string, object>("Website", "kohari.org")
 			                    	});
 
 			var sql = generator.Generate(expression);
 
-			var expected = "INSERT INTO `TestTable` (Id,Name,Website) VALUES (1,'Justin','codethinked.com');";
-			expected += "INSERT INTO `TestTable` (Id,Name,Website) VALUES (2,'Nate','kohari.org');";
+			var expected = @"INSERT INTO `TestTable` (Id,Name,Website) VALUES (1,'Just''in','codethinked.com');";
+			expected += @"INSERT INTO `TestTable` (Id,Name,Website) VALUES (2,'Na\\te','kohari.org');";
 
 			sql.ShouldBe(expected);
 		}
