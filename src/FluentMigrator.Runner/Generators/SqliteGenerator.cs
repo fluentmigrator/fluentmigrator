@@ -29,7 +29,7 @@ namespace FluentMigrator.Runner.Generators
 {
 	public class SqliteGenerator : GeneratorBase
 	{
-		public SqliteGenerator() : base(new SqliteTypeMap())		{
+		public SqliteGenerator() : base(new SqliteTypeMap(), new ConstantFormatter())		{
 		}
 
 		protected override string GenerateDDLForColumn(ColumnDefinition column)

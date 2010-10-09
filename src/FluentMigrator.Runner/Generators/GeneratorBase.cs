@@ -28,13 +28,14 @@ namespace FluentMigrator.Runner.Generators
 	public abstract class GeneratorBase : IMigrationGenerator
 	{
 		private readonly ITypeMap _typeMap;
-		private IConstantFormatter _constant = new ConstantFormatter();
+		private readonly IConstantFormatter _constantFormatter;
 
-		public GeneratorBase(ITypeMap typeMap)
+		public GeneratorBase(ITypeMap typeMap, IConstantFormatter constantFormatter)
 		{
 			_typeMap = typeMap;
+			_constantFormatter = constantFormatter;
 		}
-		
+
 		protected string GetTypeMap(DbType type, int size, int precision)
 		{
 			return _typeMap.GetTypeMap(type, size, precision);
@@ -187,7 +188,7 @@ namespace FluentMigrator.Runner.Generators
 
 		protected IConstantFormatter Constant
 		{
-			get { return _constant; }
+			get { return _constantFormatter; }
 		}
 	}
 }

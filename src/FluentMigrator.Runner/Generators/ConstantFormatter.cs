@@ -4,7 +4,7 @@ namespace FluentMigrator.Runner.Generators
 {
 	public class ConstantFormatter : IConstantFormatter
 	{
-		public string Format(object value)
+		public virtual string Format(object value)
 		{
 			if (value == null)
 			{
@@ -34,6 +34,14 @@ namespace FluentMigrator.Runner.Generators
 			}
 
 			return value.ToString();
+		}
+	}
+
+	public class ConstantFormatterWithQuotedBackslashes : ConstantFormatter
+	{
+		public override string Format(object value)
+		{
+			return base.Format(value).Replace(@"\", @"\\");
 		}
 	}
 }

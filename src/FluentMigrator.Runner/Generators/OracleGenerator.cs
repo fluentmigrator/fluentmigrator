@@ -10,7 +10,7 @@ namespace FluentMigrator.Runner.Generators
 {
 	public class OracleGenerator : GeneratorBase
 	{
-		public OracleGenerator() : base(new OracleTypeMap())
+		public OracleGenerator() : base(new OracleTypeMap(), new ConstantFormatter())
 		{
 		}
 

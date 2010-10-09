@@ -28,7 +28,7 @@ namespace FluentMigrator.Runner.Generators
 {
 	public class MySqlGenerator : GeneratorBase
 	{
-		public MySqlGenerator() : base(new MySqlTypeMap())
+		public MySqlGenerator() : base(new MySqlTypeMap(), new ConstantFormatterWithQuotedBackslashes())
 		{
 		}
 
