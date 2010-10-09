@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Generators
@@ -31,12 +32,12 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(CreateSchemaExpression expression)
 		{
-			return FormatExpression("CREATE SCHEMA [{0}]", expression.SchemaName);
+			return String.Format("CREATE SCHEMA [{0}]", expression.SchemaName);
 		}
 
 		public override string Generate(DeleteSchemaExpression expression)
 		{
-			return FormatExpression("DROP SCHEMA [{0}]", expression.SchemaName);
+			return String.Format("DROP SCHEMA [{0}]", expression.SchemaName);
 		}
 
 		protected override string FormatSchema(string schemaName, bool escapeSchemaName)

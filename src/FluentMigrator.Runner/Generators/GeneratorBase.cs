@@ -184,14 +184,8 @@ namespace FluentMigrator.Runner.Generators
 			return string.Format("CONSTRAINT {0}", keyName);
 		}
 
-		protected string FormatExpression(string template, params object[] args)
+		protected static string GetConstantValue(object value)
 		{
-			return String.Format(template, args);
-		}
-
-		protected string GetConstantValue(object value)
-		{
-
 			if (value == null)
 			{
 				return "null";

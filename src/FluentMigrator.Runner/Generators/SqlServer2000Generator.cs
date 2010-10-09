@@ -45,27 +45,27 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(RenameTableExpression expression)
 		{
-			return FormatExpression("sp_rename {0}[{1}], [{2}]", FormatSchema(expression.SchemaName), expression.OldName, expression.NewName);
+			return String.Format("sp_rename {0}[{1}], [{2}]", FormatSchema(expression.SchemaName), expression.OldName, expression.NewName);
 		}
 
 		public override string Generate(RenameColumnExpression expression)
 		{
-			return FormatExpression("sp_rename '{0}[{1}].[{2}]', [{3}]", FormatSchema(expression.SchemaName, false), expression.TableName, expression.OldName, expression.NewName);
+			return String.Format("sp_rename '{0}[{1}].[{2}]', [{3}]", FormatSchema(expression.SchemaName, false), expression.TableName, expression.OldName, expression.NewName);
 		}
 
 		public override string Generate(AlterColumnExpression expression)
 		{
-			return FormatExpression("ALTER TABLE {0}[{1}] ALTER COLUMN {2}", FormatSchema(expression.SchemaName), expression.TableName, GenerateDDLForColumn(expression.Column));
+			return String.Format("ALTER TABLE {0}[{1}] ALTER COLUMN {2}", FormatSchema(expression.SchemaName), expression.TableName, GenerateDDLForColumn(expression.Column));
 		}
 
 		public override string Generate(CreateTableExpression expression)
 		{
-			return FormatExpression("CREATE TABLE {0}[{1}] ({2})", FormatSchema(expression.SchemaName), expression.TableName, GetColumnDDL(expression));
+			return String.Format("CREATE TABLE {0}[{1}] ({2})", FormatSchema(expression.SchemaName), expression.TableName, GetColumnDDL(expression));
 		}
 
 		public override string Generate(DeleteTableExpression expression)
 		{
-			return FormatExpression("DROP TABLE {0}[{1}]", FormatSchema(expression.SchemaName), expression.TableName);
+			return String.Format("DROP TABLE {0}[{1}]", FormatSchema(expression.SchemaName), expression.TableName);
 		}
 
 		public override string Generate(CreateForeignKeyExpression expression)
@@ -94,7 +94,7 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(CreateColumnExpression expression)
 		{
-			return FormatExpression("ALTER TABLE {0}[{1}] ADD {2}", FormatSchema(expression.SchemaName), expression.TableName, GenerateDDLForColumn(expression.Column));
+			return String.Format("ALTER TABLE {0}[{1}] ADD {2}", FormatSchema(expression.SchemaName), expression.TableName, GenerateDDLForColumn(expression.Column));
 		}
 
 		public override string Generate(DeleteColumnExpression expression)
@@ -122,7 +122,7 @@ namespace FluentMigrator.Runner.Generators
 			-- now we can finally drop column
 			ALTER TABLE {0}[{2}] DROP COLUMN [{3}];";
 
-			return FormatExpression(sql, FormatSchema(expression.SchemaName), FormatSchema(expression.SchemaName, false), expression.TableName, expression.ColumnName);
+			return String.Format(sql, FormatSchema(expression.SchemaName), FormatSchema(expression.SchemaName, false), expression.TableName, expression.ColumnName);
 		}
 
 		public override string Generate(CreateIndexExpression expression)
@@ -148,12 +148,12 @@ namespace FluentMigrator.Runner.Generators
 			}
 			result.Append(")");
 
-			return FormatExpression(result.ToString(), expression.Index.Name, FormatSchema(expression.Index.SchemaName), expression.Index.TableName);
+			return String.Format(result.ToString(), expression.Index.Name, FormatSchema(expression.Index.SchemaName), expression.Index.TableName);
 		}
 
 		public override string Generate(DeleteIndexExpression expression)
 		{
-			return FormatExpression("DROP INDEX {0}[{1}] ON [{2}]", FormatSchema(expression.Index.SchemaName), expression.Index.Name, expression.Index.TableName);
+			return String.Format("DROP INDEX {0}[{1}] ON [{2}]", FormatSchema(expression.Index.SchemaName), expression.Index.Name, expression.Index.TableName);
 		}
 
 		public override string Generate(InsertDataExpression expression)
@@ -171,7 +171,7 @@ namespace FluentMigrator.Runner.Generators
 
 				var columns = GetColumnList(columnNames);
 				var data = GetDataList(columnData);
-				result.Append(FormatExpression("INSERT INTO {0}[{1}] ({2}) VALUES ({3});", FormatSchema(expression.SchemaName), expression.TableName, columns, data));
+				result.Append(String.Format("INSERT INTO {0}[{1}] ({2}) VALUES ({3});", FormatSchema(expression.SchemaName), expression.TableName, columns, data));
 			}
 			return result.ToString();
 		}
@@ -182,7 +182,7 @@ namespace FluentMigrator.Runner.Generators
 
             if (expression.IsAllRows)
             {
-                result.Append(FormatExpression("DELETE FROM {0}[{1}];", FormatSchema(expression.SchemaName), expression.TableName));
+                result.Append(String.Format("DELETE FROM {0}[{1}];", FormatSchema(expression.SchemaName), expression.TableName));
             }
             else
             {
@@ -202,7 +202,7 @@ namespace FluentMigrator.Runner.Generators
                         i++;
                     }
 
-                    result.Append(FormatExpression("DELETE FROM {0}[{1}] WHERE {2};", FormatSchema(expression.SchemaName), expression.TableName, where));
+                    result.Append(String.Format("DELETE FROM {0}[{1}] WHERE {2};", FormatSchema(expression.SchemaName), expression.TableName, where));
                 }
             }
             
@@ -235,7 +235,7 @@ namespace FluentMigrator.Runner.Generators
 			SET @sql = N'ALTER TABLE {0}[{2}] WITH NOCHECK ADD CONSTRAINT [' + @default + '] DEFAULT({4}) FOR {3}';
 			EXEC sp_executesql @sql;";
 
-			return FormatExpression(sql, FormatSchema(expression.SchemaName), FormatSchema(expression.SchemaName, false), expression.TableName, expression.ColumnName, FormatSqlEscape(GetConstantValue(expression.DefaultValue)));
+			return String.Format(sql, FormatSchema(expression.SchemaName), FormatSchema(expression.SchemaName, false), expression.TableName, expression.ColumnName, FormatSqlEscape(GetConstantValue(expression.DefaultValue)));
 		}
 
 		protected string FormatSchema(string schemaName)
@@ -247,11 +247,6 @@ namespace FluentMigrator.Runner.Generators
 		{
 			// schemas were not supported until SQL Server 2005
 			return string.Empty;
-		}
-
-		protected new string FormatExpression(string template, params object[] args)
-		{
-			return string.Format(template, args);
 		}
 
 		protected string GetColumnList(IEnumerable<string> columns)

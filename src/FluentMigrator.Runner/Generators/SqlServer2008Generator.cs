@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Generators
@@ -27,7 +28,7 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(RenameTableExpression expression)
 		{
-			return FormatExpression("sp_rename '{0}[{1}]', '[{2}]'", FormatSchema( expression.SchemaName ), expression.OldName, expression.NewName);
+			return String.Format("sp_rename '{0}[{1}]', '[{2}]'", FormatSchema( expression.SchemaName ), expression.OldName, expression.NewName);
 		}
 	}
 }

@@ -73,28 +73,28 @@ namespace FluentMigrator.Runner.Generators
 
         public override string Generate(AlterColumnExpression expression)
         {
-            return FormatExpression("ALTER TABLE {0} MODIFY {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
+            return String.Format("ALTER TABLE {0} MODIFY {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
         }
 
 		public override string Generate(CreateTableExpression expression)
 		{
-			return FormatExpression("CREATE TABLE {0} ({1})", expression.TableName, GetColumnDDL(expression));
+			return String.Format("CREATE TABLE {0} ({1})", expression.TableName, GetColumnDDL(expression));
 		}
 
 		public override string Generate(CreateColumnExpression expression)
 		{
-			return FormatExpression("ALTER TABLE {0} ADD {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
+			return String.Format("ALTER TABLE {0} ADD {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
 		}
 
 		public override string Generate(DeleteTableExpression expression)
 		{
-			return FormatExpression("DROP TABLE {0}", expression.TableName);
+			return String.Format("DROP TABLE {0}", expression.TableName);
 		}
 
 		public override string Generate(DeleteColumnExpression expression)
 		{
 
-			return FormatExpression("ALTER TABLE {0} DROP COLUMN {1}", expression.TableName, expression.ColumnName);
+			return String.Format("ALTER TABLE {0} DROP COLUMN {1}", expression.TableName, expression.ColumnName);
 		}
 
 		public override string Generate(CreateForeignKeyExpression expression)
@@ -152,7 +152,7 @@ namespace FluentMigrator.Runner.Generators
 			}
 			result.Append(")");
 
-			return FormatExpression(result.ToString(), expression.Index.Name, expression.Index.TableName);
+			return String.Format(result.ToString(), expression.Index.Name, expression.Index.TableName);
 		}
 
 		public override string Generate(DeleteIndexExpression expression)
@@ -162,12 +162,12 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(RenameTableExpression expression)
 		{
-			return FormatExpression("ALTER TABLE {0} RENAME TO {1}", expression.OldName, expression.NewName);
+			return String.Format("ALTER TABLE {0} RENAME TO {1}", expression.OldName, expression.NewName);
 		}
 
 		public override string Generate(RenameColumnExpression expression)
 		{
-			return FormatExpression("ALTER TABLE {0} RENAME COLUMN {1} TO {2}", expression.TableName, expression.OldName, expression.NewName);
+			return String.Format("ALTER TABLE {0} RENAME COLUMN {1} TO {2}", expression.TableName, expression.OldName, expression.NewName);
 		}
 
 		public override string Generate(InsertDataExpression expression)
@@ -185,7 +185,7 @@ namespace FluentMigrator.Runner.Generators
 
 				string columns = GetColumnList(columnNames);
 				string data = GetDataList(columnData);
-				result.Append(FormatExpression(" INTO {0} ({1}) VALUES ({2})", expression.TableName, columns, data));
+				result.Append(String.Format(" INTO {0} ({1}) VALUES ({2})", expression.TableName, columns, data));
 			}
 			return "INSERT ALL" + result.ToString() + " SELECT 1 FROM DUAL";
 		}
@@ -209,7 +209,7 @@ namespace FluentMigrator.Runner.Generators
                     i++;
                 }
 
-                result.Append(FormatExpression("DELETE FROM {0} WHERE {1};", expression.TableName, where));
+                result.Append(String.Format("DELETE FROM {0} WHERE {1};", expression.TableName, where));
             }
             return result.ToString();
         }

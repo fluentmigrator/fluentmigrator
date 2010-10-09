@@ -115,7 +115,7 @@ namespace FluentMigrator.Runner.Generators
 		public override string Generate(CreateColumnExpression expression)
 		{
 			//return string.Format("ALTER TABLE {0} ADD COLUMN {1}", expression.TableName, expression.Column.Name);
-			return FormatExpression("ALTER TABLE [{0}] ADD COLUMN {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
+			return String.Format("ALTER TABLE [{0}] ADD COLUMN {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
 		}
 
 		public override string Generate(RenameColumnExpression expression)
@@ -138,7 +138,7 @@ namespace FluentMigrator.Runner.Generators
 
 				string columns = GetColumnList(columnNames);
 				string data = GetDataList(columnData);
-				result.Append(FormatExpression("INSERT INTO [{0}] ({1}) VALUES ({2});", expression.TableName, columns, data));
+				result.Append(String.Format("INSERT INTO [{0}] ({1}) VALUES ({2});", expression.TableName, columns, data));
 			}
 			return result.ToString();
 		}
@@ -149,7 +149,7 @@ namespace FluentMigrator.Runner.Generators
 
             if (expression.IsAllRows)
             {
-                result.Append(FormatExpression("DELETE FROM {0};", expression.TableName));
+                result.Append(String.Format("DELETE FROM {0};", expression.TableName));
             }
             else
             {
@@ -169,7 +169,7 @@ namespace FluentMigrator.Runner.Generators
                         i++;
                     }
 
-                    result.Append(FormatExpression("DELETE FROM {0} WHERE {1};", expression.TableName, where));
+                    result.Append(String.Format("DELETE FROM {0} WHERE {1};", expression.TableName, where));
                 }
             }
 
@@ -237,7 +237,7 @@ namespace FluentMigrator.Runner.Generators
 			}
 			result.Append(")");
 
-			return FormatExpression(result.ToString(), expression.Index.Name, expression.Index.TableName);
+			return String.Format(result.ToString(), expression.Index.Name, expression.Index.TableName);
 		}
 
 		public override string Generate(DeleteIndexExpression expression)
