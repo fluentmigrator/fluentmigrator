@@ -9,7 +9,7 @@
 	<property name="path.dist" value="dist" />
 	<property name="build.platform" value="net-3.5" />
 	<property name="build.config" value="release" />
-	<property name="major.version" value="0.9" />
+	<property name="major.version" value="1.0" />
 	<property name="complete.version" value="${major.version}.0.${build.number}" />
 	
 	<target name="all" depends="generate-version build package-bin package-source package-sample" />
