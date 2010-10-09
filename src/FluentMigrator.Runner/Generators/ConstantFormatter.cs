@@ -2,7 +2,7 @@
 
 namespace FluentMigrator.Runner.Generators
 {
-	class ConstantFormatter : IConstantFormatter
+	public class ConstantFormatter : IConstantFormatter
 	{
 		public string Format(object value)
 		{
@@ -17,11 +17,9 @@ namespace FluentMigrator.Runner.Generators
 				return "'" + stringValue.Replace("'", "''") + "'";
 			}
 			if (value is char)
-
-				if (value is Guid)
-				{
-					return "'" + value + "'";
-				}
+			{
+				return "'" + value + "'";
+			}
 			if (value is bool)
 			{
 				return ((bool)value) ? 1.ToString() : 0.ToString();
@@ -32,7 +30,7 @@ namespace FluentMigrator.Runner.Generators
 			}
 			if (value is DateTime)
 			{
-				return "'" + value.ToString().Replace("'", "''") + "'";
+				return "'" + ((DateTime)value).ToString("yyyy-MM-ddTHH:mm:ss")+ "'";
 			}
 
 			return value.ToString();
