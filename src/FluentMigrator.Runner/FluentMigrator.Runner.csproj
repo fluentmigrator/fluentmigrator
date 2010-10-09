@@ -129,6 +129,8 @@
     <Compile Include="Announcers\CompositeAnnouncer.cs" />
     <Compile Include="Announcers\NullAnnouncer.cs" />
     <Compile Include="Announcers\TextWriterAnnouncer.cs" />
+    <Compile Include="Generators\ConstantFormatter.cs" />
+    <Compile Include="Generators\IConstantFormatter.cs" />
     <Compile Include="Generators\ITypeMap.cs" />
     <Compile Include="Generators\MySqlTypeMap.cs" />
     <Compile Include="Generators\OracleTypeMap.cs" />

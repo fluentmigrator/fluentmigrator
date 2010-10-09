@@ -26,7 +26,7 @@ namespace FluentMigrator.Runner.Generators
 			if (column.DefaultValue != null)
 			{
 				sb.Append(" DEFAULT ");
-				sb.Append(GetConstantValue(column.DefaultValue));
+				sb.Append(Constant.Format(column.DefaultValue));
 			}
 
 			if (!column.IsNullable)
@@ -205,7 +205,7 @@ namespace FluentMigrator.Runner.Generators
                         where += " AND ";
                     }
 
-                    where += String.Format("[{0}] = {1}", item.Key, GetConstantValue(item.Value));
+                    where += String.Format("[{0}] = {1}", item.Key, Constant.Format(item.Value));
                     i++;
                 }
 
@@ -234,7 +234,7 @@ namespace FluentMigrator.Runner.Generators
 			string result = "";
 			foreach (object column in data)
 			{
-				result += GetConstantValue(column) + ",";
+				result += Constant.Format(column) + ",";
 			}
 			return result.TrimEnd(',');
 		}

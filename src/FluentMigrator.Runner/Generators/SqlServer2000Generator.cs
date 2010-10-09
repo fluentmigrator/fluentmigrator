@@ -198,7 +198,7 @@ namespace FluentMigrator.Runner.Generators
                             where += " AND ";
                         }
 
-                        where += String.Format("[{0}] = {1}", item.Key, GetConstantValue(item.Value));
+                        where += String.Format("[{0}] = {1}", item.Key, Constant.Format(item.Value));
                         i++;
                     }
 
@@ -235,7 +235,7 @@ namespace FluentMigrator.Runner.Generators
 			SET @sql = N'ALTER TABLE {0}[{2}] WITH NOCHECK ADD CONSTRAINT [' + @default + '] DEFAULT({4}) FOR {3}';
 			EXEC sp_executesql @sql;";
 
-			return String.Format(sql, FormatSchema(expression.SchemaName), FormatSchema(expression.SchemaName, false), expression.TableName, expression.ColumnName, FormatSqlEscape(GetConstantValue(expression.DefaultValue)));
+			return String.Format(sql, FormatSchema(expression.SchemaName), FormatSchema(expression.SchemaName, false), expression.TableName, expression.ColumnName, FormatSqlEscape(Constant.Format(expression.DefaultValue)));
 		}
 
 		protected string FormatSchema(string schemaName)
@@ -264,7 +264,7 @@ namespace FluentMigrator.Runner.Generators
 			var result = "";
 			foreach (var column in data)
 			{
-				result += GetConstantValue(column) + ",";
+				result += Constant.Format(column) + ",";
 			}
 			return result.TrimEnd(',');
 		}

@@ -28,6 +28,7 @@ namespace FluentMigrator.Runner.Generators
 	public abstract class GeneratorBase : IMigrationGenerator
 	{
 		private readonly ITypeMap _typeMap;
+		private IConstantFormatter _constant = new ConstantFormatter();
 
 		public GeneratorBase(ITypeMap typeMap)
 		{
@@ -80,7 +81,7 @@ namespace FluentMigrator.Runner.Generators
 			if (column.DefaultValue != null)
 			{
 				sb.Append(" DEFAULT ");
-				sb.Append(GetConstantValue(column.DefaultValue));
+				sb.Append(Constant.Format(column.DefaultValue));
 			}
 
 			if (column.IsIdentity)
@@ -184,38 +185,9 @@ namespace FluentMigrator.Runner.Generators
 			return string.Format("CONSTRAINT {0}", keyName);
 		}
 
-		protected static string GetConstantValue(object value)
+		protected IConstantFormatter Constant
 		{
-			if (value == null)
-			{
-				return "null";
-			}
-
-			string stringValue = value as string;
-			if (stringValue != null)
-			{
-				return "'" + stringValue.Replace("'", "''") + "'";
-			}
-			if (value is char)
-
-			if (value is Guid)
-			{
-				return "'" + value + "'";
-			}
-			if (value is bool)
-			{
-				return ((bool)value) ? 1.ToString() : 0.ToString();
-			}
-			if (value is Guid)
-			{
-				return "'" + ((Guid)value).ToString().Replace("'", "''") + "'";
-			}
-			if (value is DateTime)
-			{
-				return "'" + value.ToString().Replace("'", "''") + "'";
-			}
-
-			return value.ToString();
+			get { return _constant; }
 		}
-    }
+	}
 }
