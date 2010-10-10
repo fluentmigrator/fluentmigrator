@@ -27,10 +27,10 @@ namespace FluentMigrator.Runner.Generators
 {
 	public class SqlServer2000Generator : GeneratorBase
 	{
-		public SqlServer2000Generator() : base(new SqlServer2000TypeMap(), new ConstantFormatter())		{
+		public SqlServer2000Generator() : base(new SqlServer2000TypeMap(), new ConstantFormatter())		{
 		}
 
-		protected SqlServer2000Generator(ITypeMap typeMap) : base(typeMap, new ConstantFormatter())		{
+		protected SqlServer2000Generator(ITypeMap typeMap) : base(typeMap, new ConstantFormatter())		{
 		}
 
 		public override string Generate(CreateSchemaExpression expression)

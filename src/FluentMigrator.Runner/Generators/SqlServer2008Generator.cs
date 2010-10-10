@@ -23,7 +23,7 @@ namespace FluentMigrator.Runner.Generators
 {
 	public class SqlServer2008Generator : SqlServer2005Generator
 	{
-		public SqlServer2008Generator() : base(new SqlServer2008TypeMap())		{
+		public SqlServer2008Generator() : base(new SqlServer2008TypeMap())		{
 		}
 
 		public override string Generate(RenameTableExpression expression)
