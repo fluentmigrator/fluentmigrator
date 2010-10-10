@@ -20,7 +20,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		public void NullIsFormattedAsLiteral()
 		{
 			formatter.Format(null)
-				.ShouldBe("null");
+				.ShouldBe("NULL");
 		}
 
 		[Test]
