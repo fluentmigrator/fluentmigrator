@@ -141,6 +141,7 @@
     <Compile Include="Builders\Delete\Table\DeleteTableExpressionBuilder.cs" />
     <Compile Include="Builders\Execute\ExecuteExpressionRoot.cs" />
     <Compile Include="Builders\Execute\IExecuteExpressionRoot.cs" />
+    <Compile Include="Builders\ExpressionBuilderWithColumnTypesBase.cs" />
     <Compile Include="Builders\IInSchemaSyntax.cs" />
     <Compile Include="Builders\Insert\IInsertDataOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Insert\IInsertDataSyntax.cs" />
