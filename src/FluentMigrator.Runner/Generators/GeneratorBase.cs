@@ -79,7 +79,7 @@ namespace FluentMigrator.Runner.Generators
 				sb.Append(" NOT NULL");
 			}
 
-			if (column.DefaultValue != null)
+			if (!(column.DefaultValue is ColumnDefinition.UndefinedDefaultValue))
 			{
 				sb.Append(" DEFAULT ");
 				sb.Append(Constant.Format(column.DefaultValue));

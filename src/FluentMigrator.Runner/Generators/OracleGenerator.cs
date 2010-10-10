@@ -23,7 +23,7 @@ namespace FluentMigrator.Runner.Generators
 			sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
 
 			//Oracle requires Default before Not null
-			if (column.DefaultValue != null)
+			if (!(column.DefaultValue is ColumnDefinition.UndefinedDefaultValue))
 			{
 				sb.Append(" DEFAULT ");
 				sb.Append(Constant.Format(column.DefaultValue));

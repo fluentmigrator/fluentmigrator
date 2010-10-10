@@ -318,6 +318,17 @@ namespace FluentMigrator.Tests.Unit.Generators
 				"CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL DEFAULT 'Default', ColumnName2 INT NOT NULL DEFAULT 0)");
 		}
 
+		[Test]
+		public void CanCreateTableWithDefaultValueExplicitlySetToNull()
+		{
+			var expression = GetCreateTableExpression(tableName);
+			expression.Columns[0].DefaultValue = null;
+			var sql = generator.Generate(expression);
+			sql.ShouldBe(
+				"CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL DEFAULT NULL, ColumnName2 INT NOT NULL)");
+			
+		}
+
 
 		protected CreateTableExpression GetCreateTableExpression(string tableName)
 		{
