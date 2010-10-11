@@ -14,19 +14,7 @@ namespace FluentMigrator.Runner.Generators
 		{
 		}
 
-		/// <summary>
-		/// Returns empty string as the constraint for Primary Key. 
-		/// Oracle will generate a coinstraint name if none is specified ie. SYS_C008004
-		/// Oracle is limited to 30 chars and the constraints must be unique for the enire schema
-		/// so there is no way to get an intelligent name using table and column names
-		/// </summary>
-		/// <param name="primaryKeyColumns"></param>
-		/// <param name="tableName"></param>
-		/// <returns></returns>
-		protected override string GetPrimaryKeyConstraintName(IList<ColumnDefinition> primaryKeyColumns, string tableName)
-		{
-			return string.Empty;
-		}
+
 
 		public override string Generate(CreateSchemaExpression expression)
 		{

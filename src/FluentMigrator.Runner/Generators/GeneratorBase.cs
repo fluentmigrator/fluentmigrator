@@ -60,95 +60,12 @@ namespace FluentMigrator.Runner.Generators
 
 		protected string GetColumnDDL(CreateTableExpression expression)
 		{
-			IList<ColumnDefinition> columns = expression.Columns;
-			string result = "";
-			int total = columns.Count - 1;
-
-			//if more than one column is a primary key or the primary key is given a name, then it needs to be added separately
-			IList<ColumnDefinition> primaryKeyColumns = GetPrimaryKeyColumns(columns);
-			bool addPrimaryKeySeparately = false;
-			if (primaryKeyColumns.Count > 1
-				|| (primaryKeyColumns.Count == 1 && primaryKeyColumns[0].PrimaryKeyName != null))
-			{
-				addPrimaryKeySeparately = true;
-				foreach (ColumnDefinition column in primaryKeyColumns)
-				{
-					column.IsPrimaryKey = false;
-				}
-			}
-
-			for (int i = 0; i < columns.Count; i++)
-			{
-				result += Column.Generate(columns[i]);
-
-				if (i != total)
-					result += ", ";
-			}
-
-			if (addPrimaryKeySeparately)
-				result = AddPrimaryKeyConstraint(expression.TableName, primaryKeyColumns, result);
-
-			return result;
+			return Column.Generate(expression);
 		}
 
 		protected IColumn Column
 		{
 			get { return _column; }
-		}
-
-		private IList<ColumnDefinition> GetPrimaryKeyColumns(IList<ColumnDefinition> columns)
-		{
-			IList<ColumnDefinition> primaryKeyColumns = new List<ColumnDefinition>();
-			foreach (ColumnDefinition column in columns)
-			{
-				if (column.IsPrimaryKey)
-				{
-					primaryKeyColumns.Add(column);
-				}
-			}
-			return primaryKeyColumns;
-		}
-
-		private string AddPrimaryKeyConstraint(string tableName, IList<ColumnDefinition> primaryKeyColumns, string result)
-		{
-			string keyColumns = "";
-			foreach (ColumnDefinition column in primaryKeyColumns)
-			{
-				keyColumns += column.Name + ",";
-			}
-			keyColumns = keyColumns.TrimEnd(',');
-			result += String.Format(", {0} PRIMARY KEY ({1})", GetPrimaryKeyConstraintName(primaryKeyColumns, tableName), keyColumns);
-
-			return result;
-		}
-
-		/// <summary>
-		/// Gets the name of the primary key constraint. Some Generators may need to override if the constraint name is limited
-		/// </summary>
-		/// <returns></returns>
-		protected virtual string GetPrimaryKeyConstraintName(IList<ColumnDefinition> primaryKeyColumns, string tableName)
-		{
-			string keyName = string.Empty;
-			string assignedName = string.Empty;
-			foreach (ColumnDefinition column in primaryKeyColumns)
-			{
-				keyName += column.Name + "_";
-
-				if (!string.IsNullOrEmpty(column.PrimaryKeyName))
-				{
-					assignedName = column.PrimaryKeyName;
-					break; // no need to keep going
-				}
-			}
-
-			keyName += "PK";
-
-			if (!string.IsNullOrEmpty(assignedName))
-			{
-				keyName = assignedName;
-			}
-
-			return string.Format("CONSTRAINT {0}", keyName);
 		}
 
 		protected IConstantFormatter Constant
