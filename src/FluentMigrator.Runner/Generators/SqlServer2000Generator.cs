@@ -89,7 +89,7 @@ namespace FluentMigrator.Runner.Generators
 		public override string Generate(DeleteForeignKeyExpression expression)
 		{
 			const string sql = "ALTER TABLE {0}[{1}] DROP CONSTRAINT {2}";
-			return string.Format(sql, FormatSchema(expression.ForeignKey.PrimaryTableSchema), expression.ForeignKey.PrimaryTable, expression.ForeignKey.Name);
+			return string.Format(sql, FormatSchema(expression.ForeignKey.ForeignTableSchema), expression.ForeignKey.ForeignTable, expression.ForeignKey.Name);
 		}
 
 		public override string Generate(CreateColumnExpression expression)
