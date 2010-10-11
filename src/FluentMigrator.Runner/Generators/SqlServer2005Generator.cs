@@ -23,10 +23,10 @@ namespace FluentMigrator.Runner.Generators
 {
 	public class SqlServer2005Generator : SqlServer2000Generator
 	{
-		public SqlServer2005Generator() : base(new SqlServer2005TypeMap())		{
+		public SqlServer2005Generator() : base(new SqlServerColumn(new SqlServer2005TypeMap()))		{
 		}
 
-		protected SqlServer2005Generator(ITypeMap typeMap) : base(typeMap)
+		protected SqlServer2005Generator(IColumn column) : base(column)
 		{
 		}
 

@@ -28,7 +28,7 @@ namespace FluentMigrator.Runner.Generators
 {
 	public class MySqlGenerator : GeneratorBase
 	{
-		public MySqlGenerator() : base(new MySqlTypeMap(), new ConstantFormatterWithQuotedBackslashes())
+		public MySqlGenerator() : base(new MySqlColumn(), new ConstantFormatterWithQuotedBackslashes())
 		{
 		}
 
@@ -198,46 +198,6 @@ namespace FluentMigrator.Runner.Generators
         {
             throw new NotImplementedException();
         }
-
-		protected override string GenerateDDLForColumn(ColumnDefinition column)
-		{
-			var sb = new StringBuilder();
-
-			sb.Append(column.Name);
-			sb.Append(" ");
-
-			if (column.Type.HasValue)
-			{
-				sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
-			}
-			else
-			{
-				sb.Append(column.CustomType);
-			}
-
-			if (!column.IsNullable)
-			{
-				sb.Append(" NOT NULL");
-			}
-
-			if (!(column.DefaultValue is ColumnDefinition.UndefinedDefaultValue))
-			{
-				sb.Append(" DEFAULT ");
-				sb.Append(Constant.Format(column.DefaultValue));
-			}
-
-			if (column.IsIdentity)
-			{
-				sb.Append(" AUTO_INCREMENT");
-			}
-
-			if (column.IsPrimaryKey)
-			{
-				sb.Append(string.Format(", PRIMARY KEY (`{0}`)", column.Name));
-			}
-
-			return sb.ToString();
-		}
 
 		private string GetColumnList(IEnumerable<string> columns)
 		{

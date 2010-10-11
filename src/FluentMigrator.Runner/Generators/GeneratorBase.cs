@@ -27,18 +27,13 @@ namespace FluentMigrator.Runner.Generators
 {
 	public abstract class GeneratorBase : IMigrationGenerator
 	{
-		private readonly ITypeMap _typeMap;
+		private readonly IColumn _column;
 		private readonly IConstantFormatter _constantFormatter;
 
-		public GeneratorBase(ITypeMap typeMap, IConstantFormatter constantFormatter)
+		public GeneratorBase(IColumn column, IConstantFormatter constantFormatter)
 		{
-			_typeMap = typeMap;
+			_column = column;
 			_constantFormatter = constantFormatter;
-		}
-
-		protected string GetTypeMap(DbType type, int size, int precision)
-		{
-			return _typeMap.GetTypeMap(type, size, precision);
 		}
 
 		public abstract string Generate(CreateSchemaExpression expression);
@@ -58,44 +53,9 @@ namespace FluentMigrator.Runner.Generators
 		public abstract string Generate(AlterDefaultConstraintExpression expression);
 	    public abstract string Generate(DeleteDataExpression expression);
 
-		protected virtual string GenerateDDLForColumn(ColumnDefinition column)
+		protected string GenerateDDLForColumn(ColumnDefinition column)
 		{
-			var sb = new StringBuilder();
-
-			sb.Append(column.Name);
-			sb.Append(" ");
-
-			if (column.Type.HasValue)
-			{
-				sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
-			}
-			else
-			{
-				sb.Append(column.CustomType);
-			}
-
-			if (!column.IsNullable)
-			{
-				sb.Append(" NOT NULL");
-			}
-
-			if (!(column.DefaultValue is ColumnDefinition.UndefinedDefaultValue))
-			{
-				sb.Append(" DEFAULT ");
-				sb.Append(Constant.Format(column.DefaultValue));
-			}
-
-			if (column.IsIdentity)
-			{
-				sb.Append(" IDENTITY(1,1)");
-			}
-
-			if (column.IsPrimaryKey)
-			{
-				sb.Append(" PRIMARY KEY CLUSTERED");
-			}
-
-			return sb.ToString();
+			return Column.Generate(column);
 		}
 
 		protected string GetColumnDDL(CreateTableExpression expression)
@@ -119,7 +79,7 @@ namespace FluentMigrator.Runner.Generators
 
 			for (int i = 0; i < columns.Count; i++)
 			{
-				result += GenerateDDLForColumn(columns[i]);
+				result += Column.Generate(columns[i]);
 
 				if (i != total)
 					result += ", ";
@@ -129,6 +89,11 @@ namespace FluentMigrator.Runner.Generators
 				result = AddPrimaryKeyConstraint(expression.TableName, primaryKeyColumns, result);
 
 			return result;
+		}
+
+		protected IColumn Column
+		{
+			get { return _column; }
 		}
 
 		private IList<ColumnDefinition> GetPrimaryKeyColumns(IList<ColumnDefinition> columns)

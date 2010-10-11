@@ -10,41 +10,8 @@ namespace FluentMigrator.Runner.Generators
 {
 	public class OracleGenerator : GeneratorBase
 	{
-		public OracleGenerator() : base(new OracleTypeMap(), new ConstantFormatter())
+		public OracleGenerator() : base(new OracleColumn(), new ConstantFormatter())
 		{
-		}
-
-		protected override string GenerateDDLForColumn(ColumnDefinition column)
-		{
-			var sb = new StringBuilder();
-
-			sb.Append(column.Name);
-			sb.Append(" ");
-			sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
-
-			//Oracle requires Default before Not null
-			if (!(column.DefaultValue is ColumnDefinition.UndefinedDefaultValue))
-			{
-				sb.Append(" DEFAULT ");
-				sb.Append(Constant.Format(column.DefaultValue));
-			}
-
-			if (!column.IsNullable)
-			{
-				sb.Append(" NOT NULL");
-			}
-
-			if (column.IsIdentity)
-			{
-				//todo: would like to throw a warning here
-			}
-
-			if (column.IsPrimaryKey)
-			{
-				sb.Append(" PRIMARY KEY");
-			}
-
-			return sb.ToString();
 		}
 
 		/// <summary>
