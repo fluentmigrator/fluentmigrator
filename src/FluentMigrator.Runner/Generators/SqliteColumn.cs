@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Text;
 using FluentMigrator.Model;
 
@@ -10,54 +11,30 @@ namespace FluentMigrator.Runner.Generators
 		{
 		}
 
-		public override string Generate(ColumnDefinition column)
+		protected override string FormatIdentity(ColumnDefinition column)
 		{
-			var sb = new StringBuilder();
-
-			sb.Append(column.Name);
-			sb.Append(" ");
-
 			if (!column.IsIdentity)
-			{
-				if (column.Type.HasValue)
-				{
-					sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
-				}
-				else
-				{
-					sb.Append(column.CustomType);
-				}
-			}
-			else
-			{
-				sb.Append(GetTypeMap(DbType.Int32, column.Size, column.Precision));
-			}
-
-			if (!column.IsNullable)
-			{
-				sb.Append(" NOT NULL");
-			}
-
-			if (!(column.DefaultValue is ColumnDefinition.UndefinedDefaultValue))
-			{
-				sb.Append(" DEFAULT ");
-				sb.Append(Constant.Format(column.DefaultValue));
-			}
-
-			if (column.IsIdentity)
-			{
-				sb.Append(" IDENTITY");
-			}
-
-			if (column.IsPrimaryKey)
-			{
-				sb.Append(" PRIMARY KEY");
-			}
+				return string.Empty;
 
 			//Assume that if its IDENTITY and PRIMARY KEY, the it should be an AUTOINCREMENT column
-			sb.Replace(" IDENTITY PRIMARY KEY", " PRIMARY KEY AUTOINCREMENT");
+			return !column.IsPrimaryKey ? "IDENTITY" : string.Empty;
+		}
 
-			return sb.ToString();
+		protected override string FormatPrimaryKey(ColumnDefinition column)
+		{
+			if (!column.IsPrimaryKey)
+				return string.Empty;
+
+			//Assume that if its IDENTITY and PRIMARY KEY, the it should be an AUTOINCREMENT column
+			return !column.IsIdentity ? "PRIMARY KEY" : "PRIMARY KEY AUTOINCREMENT";
+		}
+
+		protected override string FormatType(ColumnDefinition column)
+		{
+			if (column.IsIdentity)
+				return GetTypeMap(DbType.Int32, column.Size, column.Precision);
+
+            return base.FormatType(column);
 		}
 	}
 }

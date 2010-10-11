@@ -1,46 +1,35 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Generators
 {
-	class OracleColumn : ColumnBase
+	internal class OracleColumn : ColumnBase
 	{
 		public OracleColumn() : base(new OracleTypeMap(), new ConstantFormatter())
 		{
+			int a = ClauseOrder.IndexOf(FormatDefaultValue);
+			int b = ClauseOrder.IndexOf(FormatNullable);
+
+			// Oracle requires DefaultValue before nullable
+			if (a > b) {
+				ClauseOrder[b] = FormatDefaultValue;
+				ClauseOrder[a] = FormatNullable;
+			}
 		}
 
-		public override string Generate(ColumnDefinition column)
+		protected override string FormatIdentity(ColumnDefinition column)
 		{
-			var sb = new StringBuilder();
-
-			sb.Append(column.Name);
-			sb.Append(" ");
-			sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
-
-			//Oracle requires Default before Not null
-			if (!(column.DefaultValue is ColumnDefinition.UndefinedDefaultValue))
-			{
-				sb.Append(" DEFAULT ");
-				sb.Append(Constant.Format(column.DefaultValue));
-			}
-
-			if (!column.IsNullable)
-			{
-				sb.Append(" NOT NULL");
-			}
-
-			if (column.IsIdentity)
-			{
+			if (column.IsIdentity) {
 				//todo: would like to throw a warning here
 			}
+			return string.Empty;
+		}
 
-			if (column.IsPrimaryKey)
-			{
-				sb.Append(" PRIMARY KEY");
-			}
-
-			return sb.ToString();
+		protected override string FormatPrimaryKey(ColumnDefinition column)
+		{
+			return column.IsPrimaryKey ? "PRIMARY KEY" : string.Empty;
 		}
 
 		/// <summary>

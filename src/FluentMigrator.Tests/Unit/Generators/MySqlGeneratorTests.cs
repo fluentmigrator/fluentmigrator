@@ -235,7 +235,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.Columns[1].CustomType = "[timestamp]";
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(
-				"CREATE TABLE `NewTable` (ColumnName1 VARCHAR(255) NOT NULL, PRIMARY KEY (`ColumnName1`), ColumnName2 [timestamp] NOT NULL) ENGINE = INNODB");
+				"CREATE TABLE `NewTable` (ColumnName1 VARCHAR(255) NOT NULL , PRIMARY KEY (`ColumnName1`), ColumnName2 [timestamp] NOT NULL) ENGINE = INNODB");
 		}
 
 		[Test]
@@ -245,7 +245,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.Columns[0].IsPrimaryKey = true;
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(
-				"CREATE TABLE `NewTable` (ColumnName1 VARCHAR(255) NOT NULL, PRIMARY KEY (`ColumnName1`), ColumnName2 INTEGER NOT NULL) ENGINE = INNODB");
+				"CREATE TABLE `NewTable` (ColumnName1 VARCHAR(255) NOT NULL , PRIMARY KEY (`ColumnName1`), ColumnName2 INTEGER NOT NULL) ENGINE = INNODB");
 		}
 
 		[Test]

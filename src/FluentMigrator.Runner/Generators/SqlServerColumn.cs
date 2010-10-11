@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Generators
@@ -9,44 +10,14 @@ namespace FluentMigrator.Runner.Generators
 		{
 		}
 
-		public override string Generate(ColumnDefinition column)
+		protected override string FormatIdentity(ColumnDefinition column)
 		{
-			var sb = new StringBuilder();
+			return column.IsIdentity ? "IDENTITY(1,1)" : string.Empty;
+		}
 
-			sb.Append(column.Name);
-			sb.Append(" ");
-
-			if (column.Type.HasValue)
-			{
-				sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
-			}
-			else
-			{
-				sb.Append(column.CustomType);
-			}
-
-			if (!column.IsNullable)
-			{
-				sb.Append(" NOT NULL");
-			}
-
-			if (!(column.DefaultValue is ColumnDefinition.UndefinedDefaultValue))
-			{
-				sb.Append(" DEFAULT ");
-				sb.Append(Constant.Format(column.DefaultValue));
-			}
-
-			if (column.IsIdentity)
-			{
-				sb.Append(" IDENTITY(1,1)");
-			}
-
-			if (column.IsPrimaryKey)
-			{
-				sb.Append(" PRIMARY KEY CLUSTERED");
-			}
-
-			return sb.ToString();
+		protected override string FormatPrimaryKey(ColumnDefinition column)
+		{
+			return column.IsPrimaryKey ? "PRIMARY KEY CLUSTERED" : string.Empty;
 		}
 	}
 }
