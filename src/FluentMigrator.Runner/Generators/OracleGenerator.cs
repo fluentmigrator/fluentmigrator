@@ -28,17 +28,17 @@ namespace FluentMigrator.Runner.Generators
 
         public override string Generate(AlterColumnExpression expression)
         {
-            return String.Format("ALTER TABLE {0} MODIFY {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
+            return String.Format("ALTER TABLE {0} MODIFY {1}", expression.TableName, Column.Generate(expression.Column));
         }
 
 		public override string Generate(CreateTableExpression expression)
 		{
-			return String.Format("CREATE TABLE {0} ({1})", expression.TableName, GetColumnDDL(expression));
+			return String.Format("CREATE TABLE {0} ({1})", expression.TableName, Column.Generate(expression));
 		}
 
 		public override string Generate(CreateColumnExpression expression)
 		{
-			return String.Format("ALTER TABLE {0} ADD {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
+			return String.Format("ALTER TABLE {0} ADD {1}", expression.TableName, Column.Generate(expression.Column));
 		}
 
 		public override string Generate(DeleteTableExpression expression)

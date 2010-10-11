@@ -51,7 +51,7 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(CreateTableExpression expression)
 		{
-			return string.Format("CREATE TABLE {0} ({1})", expression.TableName, GetColumnDDL(expression));
+			return string.Format("CREATE TABLE {0} ({1})", expression.TableName, Column.Generate(expression));
 		}
 
 		public override string Generate(RenameTableExpression expression)
@@ -67,7 +67,7 @@ namespace FluentMigrator.Runner.Generators
 		public override string Generate(CreateColumnExpression expression)
 		{
 			//return string.Format("ALTER TABLE {0} ADD COLUMN {1}", expression.TableName, expression.Column.Name);
-			return String.Format("ALTER TABLE [{0}] ADD COLUMN {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
+			return String.Format("ALTER TABLE [{0}] ADD COLUMN {1}", expression.TableName, Column.Generate(expression.Column));
 		}
 
 		public override string Generate(RenameColumnExpression expression)

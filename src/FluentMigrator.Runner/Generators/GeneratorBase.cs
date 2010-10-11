@@ -53,16 +53,6 @@ namespace FluentMigrator.Runner.Generators
 		public abstract string Generate(AlterDefaultConstraintExpression expression);
 	    public abstract string Generate(DeleteDataExpression expression);
 
-		protected string GenerateDDLForColumn(ColumnDefinition column)
-		{
-			return Column.Generate(column);
-		}
-
-		protected string GetColumnDDL(CreateTableExpression expression)
-		{
-			return Column.Generate(expression);
-		}
-
 		protected IColumn Column
 		{
 			get { return _column; }
