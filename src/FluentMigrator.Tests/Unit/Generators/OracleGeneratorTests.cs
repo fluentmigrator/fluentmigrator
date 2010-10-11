@@ -40,6 +40,17 @@ namespace FluentMigrator.Tests.Unit.Generators
 		}
 
 		[Test]
+		public void CanCreateTableWithDefaultValue()
+		{
+			string tableName = "NewTable";
+			CreateTableExpression expression = GetCreateTableExpression(tableName);
+			expression.Columns[0].DefaultValue = "abc";
+			string sql = generator.Generate(expression);
+			// Oracle requires the DEFAULT clause to appear before the NOT NULL clause
+			sql.ShouldBe("CREATE TABLE NewTable (ColumnName1 NVARCHAR2(255) DEFAULT 'abc' NOT NULL, ColumnName2 NUMBER(10,0) NOT NULL)");
+		}
+
+		[Test]
 		public void CanDropTable()
 		{
 			string tableName = "NewTable";
