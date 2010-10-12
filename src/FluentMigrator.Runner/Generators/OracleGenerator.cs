@@ -10,56 +10,11 @@ namespace FluentMigrator.Runner.Generators
 {
 	public class OracleGenerator : GeneratorBase
 	{
-		public OracleGenerator() : base(new OracleTypeMap(), new ConstantFormatter())
+		public OracleGenerator() : base(new OracleColumn(), new ConstantFormatter())
 		{
 		}
 
-		protected override string GenerateDDLForColumn(ColumnDefinition column)
-		{
-			var sb = new StringBuilder();
 
-			sb.Append(column.Name);
-			sb.Append(" ");
-			sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
-
-			//Oracle requires Default before Not null
-			if (column.DefaultValue != null)
-			{
-				sb.Append(" DEFAULT ");
-				sb.Append(Constant.Format(column.DefaultValue));
-			}
-
-			if (!column.IsNullable)
-			{
-				sb.Append(" NOT NULL");
-			}
-
-			if (column.IsIdentity)
-			{
-				//todo: would like to throw a warning here
-			}
-
-			if (column.IsPrimaryKey)
-			{
-				sb.Append(" PRIMARY KEY");
-			}
-
-			return sb.ToString();
-		}
-
-		/// <summary>
-		/// Returns empty string as the constraint for Primary Key. 
-		/// Oracle will generate a coinstraint name if none is specified ie. SYS_C008004
-		/// Oracle is limited to 30 chars and the constraints must be unique for the enire schema
-		/// so there is no way to get an intelligent name using table and column names
-		/// </summary>
-		/// <param name="primaryKeyColumns"></param>
-		/// <param name="tableName"></param>
-		/// <returns></returns>
-		protected override string GetPrimaryKeyConstraintName(IList<ColumnDefinition> primaryKeyColumns, string tableName)
-		{
-			return string.Empty;
-		}
 
 		public override string Generate(CreateSchemaExpression expression)
 		{
@@ -73,17 +28,17 @@ namespace FluentMigrator.Runner.Generators
 
         public override string Generate(AlterColumnExpression expression)
         {
-            return String.Format("ALTER TABLE {0} MODIFY {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
+            return String.Format("ALTER TABLE {0} MODIFY {1}", expression.TableName, Column.Generate(expression.Column));
         }
 
 		public override string Generate(CreateTableExpression expression)
 		{
-			return String.Format("CREATE TABLE {0} ({1})", expression.TableName, GetColumnDDL(expression));
+			return String.Format("CREATE TABLE {0} ({1})", expression.TableName, Column.Generate(expression));
 		}
 
 		public override string Generate(CreateColumnExpression expression)
 		{
-			return String.Format("ALTER TABLE {0} ADD {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
+			return String.Format("ALTER TABLE {0} ADD {1}", expression.TableName, Column.Generate(expression.Column));
 		}
 
 		public override string Generate(DeleteTableExpression expression)

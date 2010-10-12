@@ -25,6 +25,11 @@ namespace FluentMigrator.Model
 {
 	public class ColumnDefinition : ICloneable, ICanBeValidated
 	{
+		public ColumnDefinition()
+		{
+			DefaultValue = new UndefinedDefaultValue();
+		}
+
 		public virtual string Name { get; set; }
 		public virtual DbType? Type { get; set; }
 		public virtual int Size { get; set; }
@@ -51,6 +56,10 @@ namespace FluentMigrator.Model
 		public object Clone()
 		{
 			return MemberwiseClone();
+		}
+
+		public class UndefinedDefaultValue
+		{
 		}
 	}
 }

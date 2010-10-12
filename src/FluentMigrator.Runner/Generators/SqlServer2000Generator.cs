@@ -27,10 +27,10 @@ namespace FluentMigrator.Runner.Generators
 {
 	public class SqlServer2000Generator : GeneratorBase
 	{
-		public SqlServer2000Generator() : base(new SqlServer2000TypeMap(), new ConstantFormatter())		{
+		public SqlServer2000Generator() : base(new SqlServerColumn(new SqlServer2000TypeMap()), new ConstantFormatter())		{
 		}
 
-		protected SqlServer2000Generator(ITypeMap typeMap) : base(typeMap, new ConstantFormatter())		{
+		protected SqlServer2000Generator(IColumn column) : base(column, new ConstantFormatter())		{
 		}
 
 		public override string Generate(CreateSchemaExpression expression)
@@ -55,12 +55,12 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(AlterColumnExpression expression)
 		{
-			return String.Format("ALTER TABLE {0}[{1}] ALTER COLUMN {2}", FormatSchema(expression.SchemaName), expression.TableName, GenerateDDLForColumn(expression.Column));
+			return String.Format("ALTER TABLE {0}[{1}] ALTER COLUMN {2}", FormatSchema(expression.SchemaName), expression.TableName, Column.Generate(expression.Column));
 		}
 
 		public override string Generate(CreateTableExpression expression)
 		{
-			return String.Format("CREATE TABLE {0}[{1}] ({2})", FormatSchema(expression.SchemaName), expression.TableName, GetColumnDDL(expression));
+			return String.Format("CREATE TABLE {0}[{1}] ({2})", FormatSchema(expression.SchemaName), expression.TableName, Column.Generate(expression));
 		}
 
 		public override string Generate(DeleteTableExpression expression)
@@ -94,7 +94,7 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(CreateColumnExpression expression)
 		{
-			return String.Format("ALTER TABLE {0}[{1}] ADD {2}", FormatSchema(expression.SchemaName), expression.TableName, GenerateDDLForColumn(expression.Column));
+			return String.Format("ALTER TABLE {0}[{1}] ADD {2}", FormatSchema(expression.SchemaName), expression.TableName, Column.Generate(expression.Column));
 		}
 
 		public override string Generate(DeleteColumnExpression expression)

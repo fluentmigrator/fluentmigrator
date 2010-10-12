@@ -8,7 +8,7 @@ namespace FluentMigrator.Runner.Generators
 		{
 			if (value == null)
 			{
-				return "null";
+				return "NULL";
 			}
 
 			string stringValue = value as string;
