@@ -173,10 +173,15 @@
     <Compile Include="Unit\Expressions\ExecuteSqlScriptExpressionTests.cs" />
     <Compile Include="Unit\Expressions\ExecuteSqlStatementExpressionTests.cs" />
     <Compile Include="Unit\Generators\ConstantFormatterTests.cs" />
+    <Compile Include="Unit\Generators\CreateTable\GeneratorCreateTableTestsBase.cs" />
+    <Compile Include="Unit\Generators\GeneratorTestsBase.cs" />
+    <Compile Include="Unit\Generators\CreateTable\IExpectedCreateTableTestResults.cs" />
+    <Compile Include="Unit\Generators\IExpectedTestResults.cs" />
     <Compile Include="Unit\Generators\MySqlGeneratorTests.cs" />
     <Compile Include="Unit\Generators\OracleGeneratorTests.cs" />
     <Compile Include="Unit\Expressions\PerformDBOperationExpressionTests.cs" />
-    <Compile Include="Unit\Generators\SqlServer2000GeneratorTests.cs" />
+    <Compile Include="Unit\Generators\CreateTable\SqlServer2000ExpectedCreateTableTestResults.cs" />
+    <Compile Include="Unit\Generators\SqlServer2000ExpectedTestResults.cs" />
     <Compile Include="Unit\Generators\SqlServer2005GeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2008GeneratorTests.cs" />
     <Compile Include="Unit\MigrationLoaderTests.cs" />
