@@ -18,8 +18,8 @@
 
 namespace FluentMigrator.Builders.Delete
 {
-    public interface IDeleteDataOrInSchemaSyntax : IDeleteDataSyntax
-    {
-        IDeleteDataSyntax InSchema(string schemaName);
-    }
+	public interface IDeleteDataOrInSchemaSyntax : IDeleteDataSyntax
+	{
+		IDeleteDataSyntax InSchema(string schemaName);
+	}
 }

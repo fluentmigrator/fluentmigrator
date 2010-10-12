@@ -38,16 +38,16 @@ namespace FluentMigrator.Tests.Unit.Expressions
 				Index = new IndexDefinition
 				{
 					Columns = new Collection<IndexColumnDefinition>
-			                                   		          	{
-			                                   		          		new IndexColumnDefinition
-			                                   		          			{
+																		{
+																			new IndexColumnDefinition
+																				{
 																			Name = "Name"
-			                                   		          			},
+																				},
 																	new IndexColumnDefinition
 																		{
 																			Name = "Slug"
 																		}
-			                                   		          	},
+																		},
 					TableName = "Table",
 					Name = "NameIndex"
 				}

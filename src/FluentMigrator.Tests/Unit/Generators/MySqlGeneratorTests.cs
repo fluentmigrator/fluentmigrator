@@ -154,17 +154,17 @@ namespace FluentMigrator.Tests.Unit.Generators
 			var expression = new InsertDataExpression();
 			expression.TableName = "TestTable";
 			expression.Rows.Add(new InsertionDataDefinition
-			                    	{
-			                    		new KeyValuePair<string, object>("Id", 1),
-			                    		new KeyValuePair<string, object>("Name", @"Just'in"),
-			                    		new KeyValuePair<string, object>("Website", "codethinked.com")
-			                    	});
+									{
+										new KeyValuePair<string, object>("Id", 1),
+										new KeyValuePair<string, object>("Name", @"Just'in"),
+										new KeyValuePair<string, object>("Website", "codethinked.com")
+									});
 			expression.Rows.Add(new InsertionDataDefinition
-			                    	{
-			                    		new KeyValuePair<string, object>("Id", 2),
-			                    		new KeyValuePair<string, object>("Name", @"Na\te"),
-			                    		new KeyValuePair<string, object>("Website", "kohari.org")
-			                    	});
+									{
+										new KeyValuePair<string, object>("Id", 2),
+										new KeyValuePair<string, object>("Name", @"Na\te"),
+										new KeyValuePair<string, object>("Website", "kohari.org")
+									});
 
 			var sql = generator.Generate(expression);
 

@@ -67,11 +67,11 @@ namespace FluentMigrator.Builders.Delete
 			return new DeleteForeignKeyExpressionBuilder(expression);
 		}
 
-        public IDeleteDataOrInSchemaSyntax FromTable(string tableName)
-        {
-            var expression = new DeleteDataExpression { TableName = tableName };
-            _context.Expressions.Add(expression);
-            return new DeleteDataExpressionBuilder(expression);
-        }
-    }
+		public IDeleteDataOrInSchemaSyntax FromTable(string tableName)
+		{
+			var expression = new DeleteDataExpression { TableName = tableName };
+			_context.Expressions.Add(expression);
+			return new DeleteDataExpressionBuilder(expression);
+		}
+	}
 }

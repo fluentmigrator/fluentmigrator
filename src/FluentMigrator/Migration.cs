@@ -62,10 +62,10 @@ namespace FluentMigrator
 			}
 		}
 
-	    public IAlterExpressionRoot Alter
-	    {
-	        get { return new AlterExpressionRoot(_context);}
-	    }
+		public IAlterExpressionRoot Alter
+		{
+			get { return new AlterExpressionRoot(_context);}
+		}
 
 		public ICreateExpressionRoot Create
 		{

@@ -47,6 +47,6 @@ namespace FluentMigrator.Builders
 		TNext AsTime();
 		TNext AsXml();
 		TNext AsXml(int size);
-        TNext AsCustom(string customType);
+		TNext AsCustom(string customType);
 	}
 }

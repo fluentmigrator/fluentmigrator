@@ -7,8 +7,8 @@ namespace FluentMigrator.Runner.Processors
 		IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options);
 		IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options);
 
-	    bool IsForProvider(string provider);
+		bool IsForProvider(string provider);
 
-        string Name { get; }
+		string Name { get; }
 	}
 }

@@ -105,10 +105,10 @@ namespace FluentMigrator.Runner.Processors
 			Process(Generator.Generate(expression));
 		}
 
-        public void Process(DeleteDataExpression expression)
-        {
-            Process(Generator.Generate(expression));
-        }
+		public void Process(DeleteDataExpression expression)
+		{
+			Process(Generator.Generate(expression));
+		}
 
 		public void Process(AlterDefaultConstraintExpression expression)
 		{
