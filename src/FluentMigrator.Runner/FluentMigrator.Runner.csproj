@@ -103,10 +103,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\MySql.Data.dll</HintPath>
     </Reference>
-    <Reference Include="Oracle.DataAccess, Version=2.112.1.1, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Oracle.DataAccess.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core">
@@ -133,6 +129,22 @@
     <Compile Include="Announcers\CompositeAnnouncer.cs" />
     <Compile Include="Announcers\NullAnnouncer.cs" />
     <Compile Include="Announcers\TextWriterAnnouncer.cs" />
+    <Compile Include="Generators\ColumnBase.cs" />
+    <Compile Include="Generators\ConstantFormatter.cs" />
+    <Compile Include="Generators\IColumn.cs" />
+    <Compile Include="Generators\IConstantFormatter.cs" />
+    <Compile Include="Generators\ITypeMap.cs" />
+    <Compile Include="Generators\MySqlColumn.cs" />
+    <Compile Include="Generators\MySqlTypeMap.cs" />
+    <Compile Include="Generators\OracleColumn.cs" />
+    <Compile Include="Generators\OracleTypeMap.cs" />
+    <Compile Include="Generators\SqliteColumn.cs" />
+    <Compile Include="Generators\SqliteTypeMap.cs" />
+    <Compile Include="Generators\SqlServer2000TypeMap.cs" />
+    <Compile Include="Generators\SqlServer2005TypeMap.cs" />
+    <Compile Include="Generators\SqlServer2008TypeMap.cs" />
+    <Compile Include="Generators\SqlServerColumn.cs" />
+    <Compile Include="Generators\TypeMapBase.cs" />
     <Compile Include="IAnnouncer.cs" />
     <Compile Include="Generators\MySqlGenerator.cs" />
     <Compile Include="Generators\GeneratorBase.cs" />
@@ -153,6 +165,7 @@
     <Compile Include="Processors\MigrationProcessorFactory.cs" />
     <Compile Include="Processors\MySql\MySqlProcessor.cs" />
     <Compile Include="Processors\MySql\MySqlProcessorFactory.cs" />
+    <Compile Include="Processors\Oracle\OracleFactory.cs" />
     <Compile Include="Processors\Oracle\OracleProcessor.cs" />
     <Compile Include="Processors\Oracle\OracleProcessorFactory.cs" />
     <Compile Include="Processors\ProcessorFactory.cs" />

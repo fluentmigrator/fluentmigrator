@@ -16,26 +16,19 @@
 //
 #endregion
 
-using System.Data;
+using System;
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Generators
 {
 	public class SqlServer2008Generator : SqlServer2005Generator
 	{
-		protected override void SetupTypeMaps()
-		{
-			base.SetupTypeMaps();
-
-			SetTypeMap(DbType.DateTime2, "DATETIME2");
-			SetTypeMap(DbType.DateTimeOffset, "DATETIMEOFFSET");
-			SetTypeMap(DbType.Date, "DATE");
-			SetTypeMap(DbType.Time, "TIME");
+		public SqlServer2008Generator() : base(new SqlServerColumn(new SqlServer2008TypeMap()))		{
 		}
 
 		public override string Generate(RenameTableExpression expression)
 		{
-			return FormatExpression("sp_rename '{0}[{1}]', '[{2}]'", FormatSchema( expression.SchemaName ), expression.OldName, expression.NewName);
+			return String.Format("sp_rename '{0}[{1}]', '[{2}]'", FormatSchema( expression.SchemaName ), expression.OldName, expression.NewName);
 		}
 	}
 }

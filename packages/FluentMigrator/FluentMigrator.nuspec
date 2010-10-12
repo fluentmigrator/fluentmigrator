@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package>
+  <metadata>
+    <id>FluentMigrator</id>
+    <version>0.9.0.0</version>
+    <authors>
+      <author>Shawn Chambers</author>
+    </authors>
+    <description><![CDATA[Fluent Migrations framework for .net]]></description>
+    <language>en-US</language>
+    <homepage>http://github.com/schambers/fluentmigrator</homepage>
+  </metadata>
+</package>

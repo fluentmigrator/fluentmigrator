@@ -146,6 +146,7 @@
     <Compile Include="Integration\Migrations\Invalid\InvalidMigration.cs" />
     <Compile Include="Integration\Migrations\Invalid\InvalidMigration2.cs" />
     <Compile Include="Integration\Processors\FileProcessorTests.cs" />
+    <Compile Include="Integration\Processors\OracleProcessorTests.cs" />
     <Compile Include="Integration\VersionMigrationTests.cs" />
     <Compile Include="Unit\AnnouncerTests.cs" />
     <Compile Include="Unit\AssemblyLoader\AssemblyLoaderTests.cs" />
@@ -171,9 +172,12 @@
     <Compile Include="Unit\Expressions\CreateTableExpressionTests.cs" />
     <Compile Include="Unit\Expressions\ExecuteSqlScriptExpressionTests.cs" />
     <Compile Include="Unit\Expressions\ExecuteSqlStatementExpressionTests.cs" />
+    <Compile Include="Unit\Generators\ConstantFormatterTests.cs" />
+    <Compile Include="Unit\Generators\MySqlGeneratorTests.cs" />
     <Compile Include="Unit\Generators\OracleGeneratorTests.cs" />
     <Compile Include="Unit\Expressions\PerformDBOperationExpressionTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2000GeneratorTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2005GeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2008GeneratorTests.cs" />
     <Compile Include="Unit\MigrationLoaderTests.cs" />
     <Compile Include="Unit\MigrationMetadataTests.cs" />

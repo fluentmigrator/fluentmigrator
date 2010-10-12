@@ -24,7 +24,7 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Alter.Column
 {
-	public class AlterColumnExpressionBuilder : ExpressionBuilderBase<AlterColumnExpression>,
+	public class AlterColumnExpressionBuilder : ExpressionBuilderWithColumnTypesBase<AlterColumnExpression, IAlterColumnOptionSyntax>,
 		IAlterColumnOnTableSyntax,
 		IAlterColumnOptionSyntax,
 		IAlterColumnAsTypeSyntax
@@ -46,165 +46,6 @@ namespace FluentMigrator.Builders.Alter.Column
 		public IAlterColumnOptionSyntax InSchema( string schemaName )
 		{
 			Expression.SchemaName = schemaName;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsAnsiString()
-		{
-			Expression.Column.Type = DbType.AnsiString;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsAnsiString( int size )
-		{
-			Expression.Column.Type = DbType.AnsiString;
-			Expression.Column.Size = size;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsBinary()
-		{
-			Expression.Column.Type = DbType.Binary;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsBinary( int size )
-		{
-			Expression.Column.Type = DbType.Binary;
-			Expression.Column.Size = size;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsBoolean()
-		{
-			Expression.Column.Type = DbType.Boolean;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsByte()
-		{
-			Expression.Column.Type = DbType.Byte;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsCurrency()
-		{
-			Expression.Column.Type = DbType.Currency;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsDate()
-		{
-			Expression.Column.Type = DbType.Date;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsDateTime()
-		{
-			Expression.Column.Type = DbType.DateTime;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsDecimal()
-		{
-			Expression.Column.Type = DbType.Decimal;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsDecimal( int size, int precision )
-		{
-			Expression.Column.Type = DbType.Decimal;
-			Expression.Column.Size = size;
-			Expression.Column.Precision = precision;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsDouble()
-		{
-			Expression.Column.Type = DbType.Double;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsFixedLengthString( int size )
-		{
-			Expression.Column.Type = DbType.StringFixedLength;
-			Expression.Column.Size = size;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsFixedLengthAnsiString( int size )
-		{
-			Expression.Column.Type = DbType.AnsiStringFixedLength;
-			Expression.Column.Size = size;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsFloat()
-		{
-			Expression.Column.Type = DbType.Single;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsGuid()
-		{
-			Expression.Column.Type = DbType.Guid;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsInt16()
-		{
-			Expression.Column.Type = DbType.Int16;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsInt32()
-		{
-			Expression.Column.Type = DbType.Int32;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsInt64()
-		{
-			Expression.Column.Type = DbType.Int64;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsString()
-		{
-			Expression.Column.Type = DbType.String;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsString( int size )
-		{
-			Expression.Column.Type = DbType.String;
-			Expression.Column.Size = size;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsTime()
-		{
-			Expression.Column.Type = DbType.Time;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsXml()
-		{
-			Expression.Column.Type = DbType.Xml;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsXml( int size )
-		{
-			Expression.Column.Type = DbType.Xml;
-			Expression.Column.Size = size;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax AsCustom( string customType )
-		{
-			Expression.Column.Type = null;
-			Expression.Column.CustomType = customType;
 			return this;
 		}
 
@@ -298,6 +139,10 @@ namespace FluentMigrator.Builders.Alter.Column
 
 			_context.Expressions.Add( fk );
 			return this;
+		}
+		protected override ColumnDefinition GetColumnForType()
+		{
+			return Expression.Column;
 		}
 	}
 }
