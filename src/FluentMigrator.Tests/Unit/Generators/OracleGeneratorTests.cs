@@ -156,7 +156,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			var expression = new DeleteForeignKeyExpression();
 			expression.ForeignKey.Name = "FK_Test";
-			expression.ForeignKey.PrimaryTable = "TestPrimaryTable";
+			expression.ForeignKey.ForeignTable = "TestPrimaryTable";
 
 			string sql = generator.Generate(expression);
 			sql.ShouldBe("ALTER TABLE TestPrimaryTable DROP CONSTRAINT FK_Test");

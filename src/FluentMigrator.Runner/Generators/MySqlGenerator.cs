@@ -87,7 +87,7 @@ namespace FluentMigrator.Runner.Generators
 		public override string Generate(DeleteForeignKeyExpression expression)
 		{
 			string sql = "ALTER TABLE `{0}` DROP FOREIGN KEY `{1}`";
-			return String.Format(sql, expression.ForeignKey.PrimaryTable, expression.ForeignKey.Name);
+			return String.Format(sql, expression.ForeignKey.ForeignTable, expression.ForeignKey.Name);
 		}
 
 		public override string Generate(CreateIndexExpression expression)
