@@ -315,7 +315,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.Columns[1].DefaultValue = 0;
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(
-				"CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL DEFAULT 'Default', ColumnName2 INT NOT NULL DEFAULT 0)");
+				"CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL CONSTRAINT DF_NewTable_ColumnName1 DEFAULT 'Default', ColumnName2 INT NOT NULL CONSTRAINT DF_NewTable_ColumnName2 DEFAULT 0)");
 		}
 
 		[Test]
@@ -325,7 +325,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.Columns[0].DefaultValue = null;
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(
-				"CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL DEFAULT NULL, ColumnName2 INT NOT NULL)");
+				"CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL CONSTRAINT DF_NewTable_ColumnName1 DEFAULT NULL, ColumnName2 INT NOT NULL)");
 			
 		}
 
@@ -335,8 +335,8 @@ namespace FluentMigrator.Tests.Unit.Generators
 			var columnName1 = "ColumnName1";
 			var columnName2 = "ColumnName2";
 
-			var column1 = new ColumnDefinition { Name = columnName1, Type = DbType.String };
-			var column2 = new ColumnDefinition { Name = columnName2, Type = DbType.Int32 };
+			var column1 = new ColumnDefinition { Name = columnName1, TableName = tableName, Type = DbType.String };
+			var column2 = new ColumnDefinition { Name = columnName2, TableName = tableName, Type = DbType.Int32 };
 
 			var expression = new CreateTableExpression { TableName = tableName };
 			expression.Columns.Add(column1);

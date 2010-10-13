@@ -43,6 +43,7 @@ namespace FluentMigrator.Model
 		public virtual string PrimaryKeyName { get; set; }
 		public virtual bool IsNullable { get; set; }
 		public virtual bool IsUnique { get; set; }
+		public virtual string TableName { get; set; }
 
 		public virtual void CollectValidationErrors(ICollection<string> errors)
 		{
