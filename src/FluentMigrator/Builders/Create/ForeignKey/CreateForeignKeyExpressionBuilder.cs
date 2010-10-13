@@ -16,15 +16,17 @@
 //
 #endregion
 
+using System.Data;
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Builders.Create.ForeignKey
 {
-	public class CreateForeignKeyExpressionBuilder : ExpressionBuilderBase<CreateForeignKeyExpression>,
+	public class CreateForeignKeyExpressionBuilder: ExpressionBuilderBase<CreateForeignKeyExpression>,
 		ICreateForeignKeyFromTableSyntax,
 		ICreateForeignKeyForeignColumnOrInSchemaSyntax,
 		ICreateForeignKeyToTableSyntax,
-		ICreateForeignKeyPrimaryColumnOrInSchemaSyntax
+		ICreateForeignKeyPrimaryColumnOrInSchemaSyntax,
+		ICreateForiegnKeyCascadeSyntax
 	{
 		public CreateForeignKeyExpressionBuilder(CreateForeignKeyExpression expression)
 			: base(expression)
@@ -45,7 +47,7 @@ namespace FluentMigrator.Builders.Create.ForeignKey
 
 		public ICreateForeignKeyToTableSyntax ForeignColumns(params string[] columns)
 		{
-			foreach (var column in columns)
+			foreach(var column in columns)
 				Expression.ForeignKey.ForeignColumns.Add(column);
 			return this;
 		}
@@ -62,15 +64,35 @@ namespace FluentMigrator.Builders.Create.ForeignKey
 			return this;
 		}
 
-		public void PrimaryColumn(string column)
+		public ICreateForiegnKeyCascadeSyntax PrimaryColumn(string column)
 		{
 			Expression.ForeignKey.PrimaryColumns.Add(column);
+			return this;
 		}
 
-		public void PrimaryColumns(params string[] columns)
+		public ICreateForiegnKeyCascadeSyntax PrimaryColumns(params string[] columns)
 		{
-			foreach (var column in columns)
+			foreach(var column in columns)
 				Expression.ForeignKey.PrimaryColumns.Add(column);
+			return this;
+		}
+
+		public ICreateForiegnKeyCascadeSyntax OnDelete(Rule rule)
+		{
+			Expression.ForeignKey.OnDelete = rule;
+			return this;
+		}
+
+		public ICreateForiegnKeyCascadeSyntax OnUpdate(Rule rule)
+		{
+			Expression.ForeignKey.OnUpdate = rule;
+			return this;
+		}
+
+		public void OnDeleteOrUpdate(System.Data.Rule rule)
+		{
+			Expression.ForeignKey.OnDelete = rule;
+			Expression.ForeignKey.OnUpdate = rule;
 		}
 
 		ICreateForeignKeyPrimaryColumnSyntax ICreateForeignKeyPrimaryColumnOrInSchemaSyntax.InSchema(string schemaName)

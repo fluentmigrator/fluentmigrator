@@ -125,6 +125,7 @@
     <Compile Include="Builders\Create\Column\ICreateColumnAsTypeOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Create\ForeignKey\ICreateForeignKeyPrimaryColumnOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Create\ForeignKey\ICreateForeignKeyForeignColumnOrInSchemaSyntax.cs" />
+    <Compile Include="Builders\Create\ForeignKey\ICreateForiegnKeyCascadeSyntax.cs" />
     <Compile Include="Builders\Create\Index\ICreateIndexOnColumnOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Create\Index\ICreateIndexColumnOptionsSyntax.cs" />
     <Compile Include="Builders\Create\Index\ICreateIndexOptionsSyntax.cs" />
