@@ -9,5 +9,6 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 		string CreateTableWithNullField();
 		string CreateTableWithDefaultValue();
 		string CreateTableWithDefaultValueExplicitlySetToNull();
+		string CreateTableWithMultipleColumns();
 	}
 }

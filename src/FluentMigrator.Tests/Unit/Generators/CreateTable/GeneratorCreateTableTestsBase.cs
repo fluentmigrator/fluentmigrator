@@ -26,18 +26,26 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 		[Test]
 		public void CanCreateTable()
 		{
-			var expression = GetCreateTableExpression(tableName);
+			var expression = GetCreateTableExpression(tableName, 1);
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(expected.CreateTable());
 		}
 
 		[Test]
+		public void CanCreateTableWithMultipleColumns()
+		{
+			var expression = GetCreateTableExpression(tableName, 3);
+			var sql = generator.Generate(expression);
+			sql.ShouldBe(expected.CreateTableWithMultipleColumns());
+		}
+
+		[Test]
 		public void CanCreateTableWithCustomColumnType()
 		{
-			var expression = GetCreateTableExpression(tableName);
-			expression.Columns[0].IsPrimaryKey = true;
-			expression.Columns[1].Type = null;
-			expression.Columns[1].CustomType = "[timestamp]";
+			var expression = GetCreateTableExpression(tableName, 1);
+			//FIXME: It feels like a bug that CustomType is currently ignored when Type is already set - should throw ?
+			expression.Columns[0].Type = null;
+			expression.Columns[0].CustomType = "[timestamp]";
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(expected.CreateTableWithCustomColumnType());
 		}
@@ -45,7 +53,7 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 		[Test]
 		public void CanCreateTableWithPrimaryKey()
 		{
-			var expression = GetCreateTableExpression(tableName);
+			var expression = GetCreateTableExpression(tableName, 1);
 			expression.Columns[0].IsPrimaryKey = true;
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(expected.CreateTableWithPrimaryKey());
@@ -54,7 +62,7 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 		[Test]
 		public void CanCreateTableWithIdentity()
 		{
-			var expression = GetCreateTableExpression(tableName);
+			var expression = GetCreateTableExpression(tableName, 1);
 			expression.Columns[0].IsIdentity = true;
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(expected.CreateTableWithIdentity());
@@ -63,7 +71,7 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 		[Test]
 		public void CanCreateTableWithNullField()
 		{
-			var expression = GetCreateTableExpression(tableName);
+			var expression = GetCreateTableExpression(tableName, 1);
 			expression.Columns[0].IsNullable = true;
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(expected.CreateTableWithNullField());
@@ -72,7 +80,7 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 		[Test]
 		public void CanCreateTableWithDefaultValue()
 		{
-			var expression = GetCreateTableExpression(tableName);
+			var expression = GetCreateTableExpression(tableName, 2);
 			expression.Columns[0].DefaultValue = "Default";
 			expression.Columns[1].DefaultValue = 0;
 			var sql = generator.Generate(expression);
@@ -82,25 +90,24 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 		[Test]
 		public void CanCreateTableWithDefaultValueExplicitlySetToNull()
 		{
-			var expression = GetCreateTableExpression(tableName);
+			var expression = GetCreateTableExpression(tableName, 1);
 			expression.Columns[0].DefaultValue = null;
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(expected.CreateTableWithDefaultValueExplicitlySetToNull());
 
 		}
 
-
-		protected CreateTableExpression GetCreateTableExpression(string tableName)
+		protected CreateTableExpression GetCreateTableExpression(string tableName, int numberColumns)
 		{
-			var columnName1 = "ColumnName1";
-			var columnName2 = "ColumnName2";
-
-			var column1 = new ColumnDefinition { Name = columnName1, Type = DbType.String };
-			var column2 = new ColumnDefinition { Name = columnName2, Type = DbType.Int32 };
+			var types = new [] {DbType.String, DbType.Int32};
 
 			var expression = new CreateTableExpression { TableName = tableName };
-			expression.Columns.Add(column1);
-			expression.Columns.Add(column2);
+
+			for (int idx = 1; idx <= numberColumns; idx++)
+			{
+				var column = new ColumnDefinition { Name = "ColumnName" + idx, Type = types [(idx-1) % types.Length]};
+				expression.Columns.Add(column);
+			}
 			return expression;
 		}
 	}
