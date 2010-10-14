@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		}
 
 		[Test]
-		public void CanAddColumn()
+		public virtual void CanAddColumn()
 		{
 			var tableName = "NewTable";
 
@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		}
 
 		[Test]
-		public void CanAddDecimalColumn()
+		public virtual void CanAddDecimalColumn()
 		{
 			var tableName = "NewTable";
 
@@ -61,7 +61,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		}
 
 		[Test]
-		public void CanCreateForeignKey()
+		public virtual void CanCreateForeignKey()
 		{
 			var expression = new CreateForeignKeyExpression();
 			expression.ForeignKey.Name = "FK_Test";
@@ -75,7 +75,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		}
 
 		[Test]
-		public void CanCreateIndex()
+		public virtual void CanCreateIndex()
 		{
 			var expression = new CreateIndexExpression();
 			expression.Index.Name = "IX_TEST";
@@ -90,7 +90,21 @@ namespace FluentMigrator.Tests.Unit.Generators
 		}
 
 		[Test]
-		public void CanDropForeignKey()
+		public virtual void CanDropColumn()
+		{
+			var tableName = "NewTable";
+			var columnName = "NewColumn";
+
+			var expression = new DeleteColumnExpression();
+			expression.TableName = tableName;
+			expression.ColumnName = columnName;
+
+			var sql = generator.Generate(expression);
+			sql.ShouldBe(expected.DropColumn());
+		}
+
+		[Test]
+		public virtual void CanDropForeignKey()
 		{
 			var expression = new DeleteForeignKeyExpression();
 			expression.ForeignKey.Name = "FK_Test";
@@ -101,7 +115,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		}
 
 		[Test]
-		public void CanDropTable()
+		public virtual void CanDropTable()
 		{
 			var tableName = "NewTable";
 			var expression = new DeleteTableExpression { TableName = tableName };
@@ -110,7 +124,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		}
 
 		[Test]
-		public void CanInsertData()
+		public virtual void CanInsertData()
 		{
 			var expression = new InsertDataExpression();
 			expression.TableName = "TestTable";
@@ -133,7 +147,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		}
 
 		[Test]
-		public void CanInsertGuidData()
+		public virtual void CanInsertGuidData()
 		{
 			var gid = new Guid("12345678-1234-1234-1234-123456789012");
 			var expression = new InsertDataExpression { TableName = "TestTable" };
@@ -145,7 +159,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		}
 
 		[Test]
-		public void CanRenameColumn()
+		public virtual void CanRenameColumn()
 		{
 			var expression = new RenameColumnExpression();
 			expression.TableName = "Table1";
@@ -157,7 +171,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		}
 
 		[Test]
-		public void CanRenameTable()
+		public virtual void CanRenameTable()
 		{
 			var expression = new RenameTableExpression();
 			expression.OldName = "Table1";

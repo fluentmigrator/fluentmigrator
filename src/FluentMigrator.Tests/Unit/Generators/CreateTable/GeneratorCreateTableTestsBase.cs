@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 		private string tableName = "NewTable";
 
 		[Test]
-		public void CanCreateTable()
+		public virtual void CanCreateTable()
 		{
 			var expression = GetCreateTableExpression(tableName, 1);
 			var sql = generator.Generate(expression);
@@ -32,7 +32,7 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 		}
 
 		[Test]
-		public void CanCreateTableWithMultipleColumns()
+		public virtual void CanCreateTableWithMultipleColumns()
 		{
 			var expression = GetCreateTableExpression(tableName, 3);
 			var sql = generator.Generate(expression);
@@ -40,7 +40,7 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 		}
 
 		[Test]
-		public void CanCreateTableWithCustomColumnType()
+		public virtual void CanCreateTableWithCustomColumnType()
 		{
 			var expression = GetCreateTableExpression(tableName, 1);
 			//FIXME: It feels like a bug that CustomType is currently ignored when Type is already set - should throw ?
@@ -51,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 		}
 
 		[Test]
-		public void CanCreateTableWithPrimaryKey()
+		public virtual void CanCreateTableWithPrimaryKey()
 		{
 			var expression = GetCreateTableExpression(tableName, 1);
 			expression.Columns[0].IsPrimaryKey = true;
@@ -60,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 		}
 
 		[Test]
-		public void CanCreateTableWithIdentity()
+		public virtual void CanCreateTableWithIdentity()
 		{
 			var expression = GetCreateTableExpression(tableName, 1);
 			expression.Columns[0].IsIdentity = true;
@@ -69,7 +69,7 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 		}
 
 		[Test]
-		public void CanCreateTableWithNullField()
+		public virtual void CanCreateTableWithNullField()
 		{
 			var expression = GetCreateTableExpression(tableName, 1);
 			expression.Columns[0].IsNullable = true;
@@ -78,7 +78,7 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 		}
 
 		[Test]
-		public void CanCreateTableWithDefaultValue()
+		public virtual void CanCreateTableWithDefaultValue()
 		{
 			var expression = GetCreateTableExpression(tableName, 2);
 			expression.Columns[0].DefaultValue = "Default";
@@ -88,10 +88,11 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 		}
 
 		[Test]
-		public void CanCreateTableWithDefaultValueExplicitlySetToNull()
+		public virtual void CanCreateTableWithDefaultValueExplicitlySetToNull()
 		{
 			var expression = GetCreateTableExpression(tableName, 1);
 			expression.Columns[0].DefaultValue = null;
+			expression.Columns[0].IsNullable = true;
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(expected.CreateTableWithDefaultValueExplicitlySetToNull());
 

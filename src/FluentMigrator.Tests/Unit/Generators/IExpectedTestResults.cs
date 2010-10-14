@@ -12,5 +12,6 @@ namespace FluentMigrator.Tests.Unit.Generators
 		string InsertGuidData();
 		string RenameColumn();
 		string RenameTable();
+		string DropColumn();
 	}
 }
