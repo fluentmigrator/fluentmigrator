@@ -1,6 +1,7 @@
 namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 {
-	public interface IExpectedCreateTableTestResults	{
+	public interface IExpectedCreateTableTestResults
+	{
 		string CreateTable();
 		string CreateTableWithCustomColumnType();
 		string CreateTableWithPrimaryKey();

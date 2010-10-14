@@ -99,7 +99,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		public string InsertData()
 		{
 			return "INSERT INTO [TestTable] ([Id],[Name],[Website]) VALUES (1,'Just''in','codethinked.com');" + 
-			       @"INSERT INTO [TestTable] ([Id],[Name],[Website]) VALUES (2,'Na\te','kohari.org');";
+					@"INSERT INTO [TestTable] ([Id],[Name],[Website]) VALUES (2,'Na\te','kohari.org');";
 		}
 
 		public string InsertGuidData()
