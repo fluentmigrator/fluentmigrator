@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 
 		public string CreateTableWithDefaultValueExplicitlySetToNull()
 		{
-			return "CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL DEFAULT NULL)";
+			return "CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) DEFAULT NULL)";
 		}
 	}
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
@@ -9,43 +10,10 @@ namespace FluentMigrator.Tests.Unit.Generators
 {
 	public class SqlServer2000GeneratorTests : GeneratorTestsBase<SqlServer2000Generator, SqlServer2000ExpectedTestResults>
 	{
-		[Test]
 		[Ignore("need better way to test this")]
-		public void CanDropColumn()
+		public override void CanDropColumn()
 		{
-			var tableName = "NewTable";
-			var columnName = "NewColumn";
-
-			var expression = new DeleteColumnExpression();
-			expression.TableName = tableName;
-			expression.ColumnName = columnName;
-
-			var sql = generator.Generate(expression);
-
-			var expectedSql =
-				@"
-			DECLARE @default sysname, @sql nvarchar(max);
-
-			-- get name of default constraint
-			SELECT @default = name 
-			FROM sys.default_constraints 
-			WHERE parent_object_id = object_id('NewTable')
-			AND type = 'D'
-			AND parent_column_id = (
-				SELECT column_id 
-				FROM sys.columns 
-				WHERE object_id = object_id('NewTable')
-				AND name = 'NewColumn'
-			);
-
-			-- create alter table command as string and run it
-			SET @sql = N'ALTER TABLE [NewTable] DROP CONSTRAINT ' + @default;
-			EXEC sp_executesql @sql;
-
-			-- now we can finally drop column
-			ALTER TABLE [NewTable] DROP COLUMN [NewColumn];";
-
-			sql.ShouldBe(expectedSql);
+			base.CanDropColumn();
 		}
 
 		[Test]
@@ -115,6 +83,11 @@ namespace FluentMigrator.Tests.Unit.Generators
 		public string RenameTable()
 		{
 			return "sp_rename [Table1], [Table2]";
+		}
+
+		public string DropColumn()
+		{
+			throw new NotImplementedException();
 		}
 	}
 }
