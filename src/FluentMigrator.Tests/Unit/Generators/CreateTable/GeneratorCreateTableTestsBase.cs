@@ -60,6 +60,16 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 		}
 
 		[Test]
+		public virtual void CanCreateTableWithMultipartPrimaryKey()
+		{
+			var expression = GetCreateTableExpression(tableName, 2);
+			expression.Columns[0].IsPrimaryKey = true;
+			expression.Columns[1].IsPrimaryKey = true;
+			var sql = generator.Generate(expression);
+			sql.ShouldBe(expected.CreateTableWithMultipartPrimaryKey());
+		}
+
+		[Test]
 		public virtual void CanCreateTableWithIdentity()
 		{
 			var expression = GetCreateTableExpression(tableName, 1);

@@ -55,5 +55,10 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 		{
 			return "CREATE TABLE `NewTable` (ColumnName1 VARCHAR(255) NOT NULL, ColumnName2 INTEGER NOT NULL, ColumnName3 VARCHAR(255) NOT NULL) ENGINE = INNODB";
 		}
+
+		public string CreateTableWithMultipartPrimaryKey()
+		{
+			return "CREATE TABLE `NewTable` (ColumnName1 VARCHAR(255) NOT NULL, ColumnName2 INTEGER NOT NULL, CONSTRAINT ColumnName1_ColumnName2_PK PRIMARY KEY (ColumnName1,ColumnName2)) ENGINE = INNODB";
+		}
 	}
 }

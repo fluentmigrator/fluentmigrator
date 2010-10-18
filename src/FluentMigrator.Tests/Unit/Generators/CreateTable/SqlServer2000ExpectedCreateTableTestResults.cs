@@ -20,6 +20,11 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 			return "CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL, ColumnName2 INT NOT NULL, ColumnName3 NVARCHAR(255) NOT NULL)";
 		}
 
+		public string CreateTableWithMultipartPrimaryKey()
+		{
+			return "CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL, ColumnName2 INT NOT NULL, CONSTRAINT ColumnName1_ColumnName2_PK PRIMARY KEY (ColumnName1,ColumnName2))";
+		}
+
 
 		public string CreateTableWithCustomColumnType()
 		{
