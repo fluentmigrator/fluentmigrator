@@ -3,11 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using FluentMigrator.Runner.Generators;
+using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {
 	public class OracleGeneratorTests : GeneratorTestsBase<OracleGenerator,OracleExpectedTestResults>
 	{
+		[ExpectedException(typeof(NotImplementedException))]
+		public override void CanAddIdentityColumn()
+		{
+			throw new NotImplementedException();
+		}
 	}
 
 	public class OracleExpectedTestResults : IExpectedTestResults
@@ -67,6 +73,11 @@ namespace FluentMigrator.Tests.Unit.Generators
 		public string DropColumn()
 		{
 			return "ALTER TABLE NewTable DROP COLUMN NewColumn";
+		}
+
+		public string AddIdentityColumn()
+		{
+			throw new NotImplementedException();
 		}
 	}
 }

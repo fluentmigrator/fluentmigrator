@@ -89,5 +89,10 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			throw new NotImplementedException();
 		}
+
+		public string AddIdentityColumn()
+		{
+			return "ALTER TABLE [NewTable] ADD NewColumn NVARCHAR(255) NOT NULL IDENTITY(1,1)";
+		}
 	}
 }

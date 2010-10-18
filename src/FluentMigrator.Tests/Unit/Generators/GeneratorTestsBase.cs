@@ -61,6 +61,24 @@ namespace FluentMigrator.Tests.Unit.Generators
 		}
 
 		[Test]
+		public virtual void CanAddIdentityColumn()
+		{
+			var tableName = "NewTable";
+
+			var columnDefinition = new ColumnDefinition();
+			columnDefinition.Name = "NewColumn";
+			columnDefinition.Type = DbType.String;
+			columnDefinition.IsIdentity = true;
+
+			var expression = new CreateColumnExpression();
+			expression.Column = columnDefinition;
+			expression.TableName = tableName;
+
+			var sql = generator.Generate(expression);
+			sql.ShouldBe(expected.AddIdentityColumn());
+		}
+
+		[Test]
 		public virtual void CanCreateForeignKey()
 		{
 			var expression = new CreateForeignKeyExpression();
