@@ -20,7 +20,7 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 		public string CreateTableWithCustomColumnType()
 		{
 			return
-				"CREATE TABLE `NewTable` (ColumnName1 [timestamp] NOT NULL) ENGINE = INNODB";
+				"CREATE TABLE `NewTable` (ColumnName1 timestamp NOT NULL) ENGINE = INNODB";
 		}
 
 		public string CreateTableWithPrimaryKey()

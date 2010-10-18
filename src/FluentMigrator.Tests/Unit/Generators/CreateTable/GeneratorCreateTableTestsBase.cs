@@ -45,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 			var expression = GetCreateTableExpression(tableName, 1);
 			//FIXME: It feels like a bug that CustomType is currently ignored when Type is already set - should throw ?
 			expression.Columns[0].Type = null;
-			expression.Columns[0].CustomType = "[timestamp]";
+			expression.Columns[0].CustomType = "timestamp";
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(expected.CreateTableWithCustomColumnType());
 		}

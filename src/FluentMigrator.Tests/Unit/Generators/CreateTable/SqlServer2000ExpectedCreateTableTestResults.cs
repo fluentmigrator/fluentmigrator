@@ -29,7 +29,7 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 		public string CreateTableWithCustomColumnType()
 		{
 			return
-				"CREATE TABLE [NewTable] (ColumnName1 [timestamp] NOT NULL)";
+				"CREATE TABLE [NewTable] (ColumnName1 timestamp NOT NULL)";
 		}
 
 		public string CreateTableWithPrimaryKey()
