@@ -9,11 +9,6 @@ namespace FluentMigrator.Tests.Unit.Generators
 {
 	public class OracleGeneratorTests : GeneratorTestsBase<OracleGenerator,OracleExpectedTestResults>
 	{
-		[ExpectedException(typeof(NotImplementedException))]
-		public override void CanAddIdentityColumn()
-		{
-			throw new NotImplementedException();
-		}
 	}
 
 	public class OracleExpectedTestResults : IExpectedTestResults
@@ -51,8 +46,8 @@ namespace FluentMigrator.Tests.Unit.Generators
 		public string InsertData()
 		{
 			return @"INSERT ALL INTO TestTable (Id,Name,Website) VALUES (1,'Just''in','codethinked.com')" +
-			       @" INTO TestTable (Id,Name,Website) VALUES (2,'Na\te','kohari.org')" +
-			       @" SELECT 1 FROM DUAL";
+					@" INTO TestTable (Id,Name,Website) VALUES (2,'Na\te','kohari.org')" +
+					@" SELECT 1 FROM DUAL";
 		}
 
 		public string InsertGuidData()
@@ -73,11 +68,6 @@ namespace FluentMigrator.Tests.Unit.Generators
 		public string DropColumn()
 		{
 			return "ALTER TABLE NewTable DROP COLUMN NewColumn";
-		}
-
-		public string AddIdentityColumn()
-		{
-			throw new NotImplementedException();
 		}
 	}
 }

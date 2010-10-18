@@ -71,10 +71,5 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			return "ALTER TABLE `NewTable` DROP COLUMN NewColumn";
 		}
-
-		public string AddIdentityColumn()
-		{
-			return "ALTER TABLE `NewTable` ADD NewColumn VARCHAR(255) NOT NULL AUTO_INCREMENT";
-		}
 	}
 }
