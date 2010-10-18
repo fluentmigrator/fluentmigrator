@@ -175,7 +175,7 @@
     <Compile Include="Unit\Generators\ConstantFormatterTests.cs" />
     <Compile Include="Unit\Generators\CreateTable\GeneratorCreateTableTestsBase.cs" />
     <Compile Include="Unit\Generators\CreateTable\MySqlExpectedCreateTableTestResults.cs" />
-    <Compile Include="Unit\Generators\CreateTable\OracleExpectedCreateTableResults.cs" />
+    <Compile Include="Unit\Generators\CreateTable\OracleExpectedCreateTableTestResults.cs" />
     <Compile Include="Unit\Generators\GeneratorTestsBase.cs" />
     <Compile Include="Unit\Generators\CreateTable\IExpectedCreateTableTestResults.cs" />
     <Compile Include="Unit\Generators\IExpectedTestResults.cs" />

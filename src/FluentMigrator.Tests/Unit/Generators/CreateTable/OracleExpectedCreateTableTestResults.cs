@@ -5,7 +5,7 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 {
-	public class OracleCreateTableGeneratorTests : GeneratorCreateTableTestsBase<OracleGenerator,OracleExpectedCreateTableResults>
+	public class OracleCreateTableGeneratorTests : GeneratorCreateTableTestsBase<OracleGenerator,OracleExpectedCreateTableTestResults>
 	{
 		[ExpectedException(typeof(NotImplementedException))]
 		public override void CanCreateTableWithIdentity()
@@ -14,7 +14,7 @@ namespace FluentMigrator.Tests.Unit.Generators.CreateTable
 		}
 	}
 
-	public class OracleExpectedCreateTableResults : IExpectedCreateTableTestResults
+	public class OracleExpectedCreateTableTestResults : IExpectedCreateTableTestResults
 	{
 		public string CreateTable()
 		{
