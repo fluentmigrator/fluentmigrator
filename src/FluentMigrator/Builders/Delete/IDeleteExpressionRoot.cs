@@ -29,6 +29,6 @@ namespace FluentMigrator.Builders.Delete
 		IDeleteColumnFromTableSyntax Column(string columnName);
 		IDeleteForeignKeyFromTableSyntax ForeignKey();
 		IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName);
-	    IDeleteDataOrInSchemaSyntax FromTable(string tableName);
+		IDeleteDataOrInSchemaSyntax FromTable(string tableName);
 	}
 }

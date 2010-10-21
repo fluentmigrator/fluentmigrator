@@ -53,8 +53,8 @@ namespace FluentMigrator.NAnt
 		[TaskAttribute("profile")]
 		public string Profile { get; set; }
 
-      [TaskAttribute( "timeout" )]
-      public int Timeout { get; set; }
+		[TaskAttribute( "timeout" )]
+		public int Timeout { get; set; }
 
 		protected override void ExecuteTask()
 		{
@@ -75,7 +75,7 @@ namespace FluentMigrator.NAnt
 										Steps = Steps,
 										WorkingDirectory = WorkingDirectory,
 										Profile = Profile,
-                              Timeout = Timeout
+								Timeout = Timeout
 									};
 
 			new TaskExecutor(runnerContext).Execute();

@@ -76,15 +76,15 @@ namespace FluentMigrator.Runner.Generators
 			const string sql = "ALTER TABLE {0}[{1}] ADD CONSTRAINT {2} FOREIGN KEY ({3}) REFERENCES {4}[{5}] ({6}){7}{8}";
 
 			return string.Format(sql,
-								 FormatSchema(expression.ForeignKey.ForeignTableSchema),
-								 expression.ForeignKey.ForeignTable,
-								 expression.ForeignKey.Name,
-								 foreignColumns,
-								 FormatSchema(expression.ForeignKey.PrimaryTableSchema),
-								 expression.ForeignKey.PrimaryTable,
-								 primaryColumns,
-								 FormateCascade("DELETE", expression.ForeignKey.OnDelete),
-								 FormateCascade("UPDATE", expression.ForeignKey.OnDelete)
+								FormatSchema(expression.ForeignKey.ForeignTableSchema),
+								expression.ForeignKey.ForeignTable,
+								expression.ForeignKey.Name,
+								foreignColumns,
+								FormatSchema(expression.ForeignKey.PrimaryTableSchema),
+								expression.ForeignKey.PrimaryTable,
+								primaryColumns,
+								FormateCascade("DELETE", expression.ForeignKey.OnDelete),
+								FormateCascade("UPDATE", expression.ForeignKey.OnDelete)
 				);
 		}
 
@@ -178,38 +178,38 @@ namespace FluentMigrator.Runner.Generators
 			return result.ToString();
 		}
 
-        public override string Generate(DeleteDataExpression expression)
-        {
-            var result = new StringBuilder();
+		public override string Generate(DeleteDataExpression expression)
+		{
+			var result = new StringBuilder();
 
-            if (expression.IsAllRows)
-            {
-                result.Append(String.Format("DELETE FROM {0}[{1}];", FormatSchema(expression.SchemaName), expression.TableName));
-            }
-            else
-            {
-                foreach (var row in expression.Rows)
-                {
-                    var where = String.Empty;
-                    var i = 0;
+			if (expression.IsAllRows)
+			{
+				result.Append(String.Format("DELETE FROM {0}[{1}];", FormatSchema(expression.SchemaName), expression.TableName));
+			}
+			else
+			{
+				foreach (var row in expression.Rows)
+				{
+					var where = String.Empty;
+					var i = 0;
 
-                    foreach (var item in row)
-                    {
-                        if (i != 0)
-                        {
-                            where += " AND ";
-                        }
+					foreach (var item in row)
+					{
+						if (i != 0)
+						{
+							where += " AND ";
+						}
 
-                        where += String.Format("[{0}] = {1}", item.Key, Constant.Format(item.Value));
-                        i++;
-                    }
+						where += String.Format("[{0}] = {1}", item.Key, Constant.Format(item.Value));
+						i++;
+					}
 
-                    result.Append(String.Format("DELETE FROM {0}[{1}] WHERE {2};", FormatSchema(expression.SchemaName), expression.TableName, where));
-                }
-            }
-            
-            return result.ToString();
-        }
+					result.Append(String.Format("DELETE FROM {0}[{1}] WHERE {2};", FormatSchema(expression.SchemaName), expression.TableName, where));
+				}
+			}
+			
+			return result.ToString();
+		}
 
 		public override string Generate(AlterDefaultConstraintExpression expression)
 		{

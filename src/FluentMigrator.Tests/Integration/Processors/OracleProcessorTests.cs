@@ -23,7 +23,8 @@ namespace FluentMigrator.Tests.Integration.Processors
 			string sql = "Select * from Users";
 			DataSet ds = new DataSet();
 			using (var command = OracleFactory.GetCommand(connection,sql ))
-			using (DbDataAdapter adapter = OracleFactory.GetDataAdapter(command)) {
+			using (DbDataAdapter adapter = OracleFactory.GetDataAdapter(command))
+			{
 				adapter.Fill(ds);
 			}
 

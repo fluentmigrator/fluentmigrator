@@ -21,48 +21,48 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-    public class DeleteDataExpression : IMigrationExpression
-    {
-        private readonly List<DeletionDataDefinition> _rows = new List<DeletionDataDefinition>();
-        public string SchemaName { get; set; }
-        public string TableName { get; set; }
-        public bool IsAllRows { get; set; }
+	public class DeleteDataExpression : IMigrationExpression
+	{
+		private readonly List<DeletionDataDefinition> _rows = new List<DeletionDataDefinition>();
+		public string SchemaName { get; set; }
+		public string TableName { get; set; }
+		public bool IsAllRows { get; set; }
 
-        public List<DeletionDataDefinition> Rows
-        {
-            get { return _rows; }
-        }
+		public List<DeletionDataDefinition> Rows
+		{
+			get { return _rows; }
+		}
 
-        public void CollectValidationErrors(ICollection<string> errors)
-        {
-        }
+		public void CollectValidationErrors(ICollection<string> errors)
+		{
+		}
 
-        public void ExecuteWith(IMigrationProcessor processor)
-        {
-            processor.Process(this);
-        }
+		public void ExecuteWith(IMigrationProcessor processor)
+		{
+			processor.Process(this);
+		}
 
-        public IMigrationExpression Reverse()
-        {
-            var expression = new InsertDataExpression
-            {
-                SchemaName = SchemaName,
-                TableName = TableName
-            };
+		public IMigrationExpression Reverse()
+		{
+			var expression = new InsertDataExpression
+			{
+				SchemaName = SchemaName,
+				TableName = TableName
+			};
 
-            foreach (var row in Rows)
-            {
-                var dataDefinition = new InsertionDataDefinition();
-                dataDefinition.AddRange(row);
+			foreach (var row in Rows)
+			{
+				var dataDefinition = new InsertionDataDefinition();
+				dataDefinition.AddRange(row);
 
-                expression.Rows.Add(dataDefinition);
-            }
+				expression.Rows.Add(dataDefinition);
+			}
 
-            return expression;
-        }
+			return expression;
+		}
 
-        public void ApplyConventions(IMigrationConventions conventions)
-        {
-        }
-    }
+		public void ApplyConventions(IMigrationConventions conventions)
+		{
+		}
+	}
 }

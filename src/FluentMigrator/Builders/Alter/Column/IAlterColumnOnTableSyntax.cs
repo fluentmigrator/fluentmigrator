@@ -20,8 +20,8 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Alter.Column
 {
-    public interface IAlterColumnOnTableSyntax : IFluentSyntax
-    {
-        IAlterColumnAsTypeSyntax OnTable(string name);
-    }
+	public interface IAlterColumnOnTableSyntax : IFluentSyntax
+	{
+		IAlterColumnAsTypeSyntax OnTable(string name);
+	}
 }

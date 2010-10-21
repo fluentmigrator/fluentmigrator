@@ -34,7 +34,7 @@ namespace FluentMigrator.Runner.Generators
 			if (column.IsIdentity)
 				return GetTypeMap(DbType.Int32, column.Size, column.Precision);
 
-            return base.FormatType(column);
+			return base.FormatType(column);
 		}
 	}
 }

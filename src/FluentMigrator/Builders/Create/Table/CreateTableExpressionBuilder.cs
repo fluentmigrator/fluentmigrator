@@ -82,12 +82,12 @@ namespace FluentMigrator.Builders.Create.Table
 			return this;
 		}
 
-        public ICreateTableColumnOptionOrWithColumnSyntax PrimaryKey(string primaryKeyName)
-        {
-            CurrentColumn.IsPrimaryKey = true;
-            CurrentColumn.PrimaryKeyName = primaryKeyName;
-            return this;
-        }
+		public ICreateTableColumnOptionOrWithColumnSyntax PrimaryKey(string primaryKeyName)
+		{
+			CurrentColumn.IsPrimaryKey = true;
+			CurrentColumn.PrimaryKeyName = primaryKeyName;
+			return this;
+		}
 
 		public ICreateTableColumnOptionOrWithColumnSyntax Nullable()
 		{
