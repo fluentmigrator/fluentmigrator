@@ -223,6 +223,26 @@ namespace FluentMigrator.Tests.Integration
 				processor.TableExists( "Users" ).ShouldBeFalse();
 			} );
 		}
+
+		[Test]
+		public void CanRollbackAll()
+		{
+			ExecuteWithSupportedProcessors(processor =>
+			{
+				Assembly asm = typeof(MigrationRunnerTests).Assembly;
+				var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out));
+				runnerContext.Namespace = "FluentMigrator.Tests.Integration.Migrations";
+				var runner = new MigrationRunner(asm, runnerContext, processor);
+
+				runner.MigrateUp(2);
+
+				processor.TableExists(runner.VersionLoader.VersionTableMetaData.TableName).ShouldBeTrue();
+
+				runner.RollbackToVersion(0);
+
+				processor.TableExists(runner.VersionLoader.VersionTableMetaData.TableName).ShouldBeFalse();
+			});
+		}
 	}
 
 	internal class TestForeignKeyNamingConvention : Migration
