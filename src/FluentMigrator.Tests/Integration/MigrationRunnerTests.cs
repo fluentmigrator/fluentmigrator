@@ -18,17 +18,12 @@
 #endregion
 
 using System;
-using System.Data.SqlClient;
 using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Processors;
-using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Integration.Migrations;
-using FluentMigrator.Tests.Integration.Migrations.Invalid;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
@@ -170,12 +165,7 @@ namespace FluentMigrator.Tests.Integration
 		{
 			ExecuteWithSupportedProcessors( processor =>
 			{
-				Assembly asm = typeof( MigrationRunnerTests ).Assembly;
-				var runnerContext = new RunnerContext( new TextWriterAnnouncer( System.Console.Out ) )
-				{
-					Namespace = "FluentMigrator.Tests.Integration.Migrations"
-				};
-				var runner = new MigrationRunner( asm, runnerContext, processor );
+				MigrationRunner runner = SetupMigrationRunner(processor);
 
 				runner.MigrateUp();
 
@@ -190,10 +180,7 @@ namespace FluentMigrator.Tests.Integration
 		{
 			ExecuteWithSupportedProcessors( processor =>
 			{
-				Assembly asm = typeof( MigrationRunnerTests ).Assembly;
-				var runnerContext = new RunnerContext( new TextWriterAnnouncer( System.Console.Out ) );
-				runnerContext.Namespace = "FluentMigrator.Tests.Integration.Migrations";
-				var runner = new MigrationRunner( asm, runnerContext, processor );
+				MigrationRunner runner = SetupMigrationRunner(processor);
 
 				runner.MigrateUp( 1 );
 
@@ -207,10 +194,7 @@ namespace FluentMigrator.Tests.Integration
 		{
 			ExecuteWithSupportedProcessors( processor =>
 			{
-				Assembly asm = typeof( MigrationRunnerTests ).Assembly;
-				var runnerContext = new RunnerContext( new TextWriterAnnouncer( System.Console.Out ) );
-				runnerContext.Namespace = "FluentMigrator.Tests.Integration.Migrations";
-				var runner = new MigrationRunner( asm, runnerContext, processor );
+				MigrationRunner runner = SetupMigrationRunner(processor);
 
 				runner.MigrateUp( 1 );
 
@@ -225,14 +209,11 @@ namespace FluentMigrator.Tests.Integration
 		}
 
 		[Test]
-		public void CanRollbackAll()
+		public void RollbackAllShouldRemoveVersionInfoTable()
 		{
 			ExecuteWithSupportedProcessors(processor =>
 			{
-				Assembly asm = typeof(MigrationRunnerTests).Assembly;
-				var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out));
-				runnerContext.Namespace = "FluentMigrator.Tests.Integration.Migrations";
-				var runner = new MigrationRunner(asm, runnerContext, processor);
+				MigrationRunner runner = SetupMigrationRunner(processor);
 
 				runner.MigrateUp(2);
 
@@ -242,6 +223,17 @@ namespace FluentMigrator.Tests.Integration
 
 				processor.TableExists(runner.VersionLoader.VersionTableMetaData.TableName).ShouldBeFalse();
 			});
+		}
+
+		private static MigrationRunner SetupMigrationRunner(IMigrationProcessor processor)
+		{
+			Assembly asm = typeof(MigrationRunnerTests).Assembly;
+			var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+			{
+				Namespace = "FluentMigrator.Tests.Integration.Migrations"
+			};
+
+			return new MigrationRunner(asm, runnerContext, processor);
 		}
 	}
 
