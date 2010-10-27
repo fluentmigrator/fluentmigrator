@@ -76,9 +76,9 @@ namespace FluentMigrator.Builders.Delete.ForeignKey
 				Expression.ForeignKey.PrimaryColumns.Add(column);
 		}
 
-		IInSchemaSyntax IDeleteForeignKeyOnTableSyntax.OnTable(string primaryTableName)
+		IInSchemaSyntax IDeleteForeignKeyOnTableSyntax.OnTable(string foreignTableName)
 		{
-			Expression.ForeignKey.PrimaryTable = primaryTableName;
+            Expression.ForeignKey.ForeignTable = foreignTableName;
 			return this;
 		}
 

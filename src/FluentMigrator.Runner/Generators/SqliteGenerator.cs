@@ -117,7 +117,7 @@ namespace FluentMigrator.Runner.Generators
 							where += " AND ";
 						}
 
-						where += String.Format("[{0}] = {1}", item.Key, Constant.Format(item.Value));
+                        where += String.Format("[{0}] {1} {2}", item.Key, item.Value == null ? "IS" : "=", Constant.Format(item.Value));
 						i++;
 					}
 
