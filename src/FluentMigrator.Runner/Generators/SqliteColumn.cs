@@ -30,7 +30,15 @@ namespace FluentMigrator.Runner.Generators
 
         protected override string FormatSystemMethods(SystemMethods systemMethod)
         {
-            throw new NotImplementedException();
+            switch (systemMethod)
+            {
+                case SystemMethods.NewGuid:
+                    throw new NotImplementedException();
+                case SystemMethods.CurrentDateTime:
+                    return "CURRENT_TIMESTAMP";
+            }
+
+            return null;
         }
 
 		protected override string FormatType(ColumnDefinition column)
