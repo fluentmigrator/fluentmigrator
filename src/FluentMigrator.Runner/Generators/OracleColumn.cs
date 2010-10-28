@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Generators
@@ -35,7 +34,13 @@ namespace FluentMigrator.Runner.Generators
 
         protected override string FormatSystemMethods(SystemMethods systemMethod)
         {
-            throw new NotImplementedException();
+            switch (systemMethod)
+            {
+                case SystemMethods.NewGuid:
+                    return "sys_guid()";
+            }
+
+            return null;
         }
 
 		/// <summary>

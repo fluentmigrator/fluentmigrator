@@ -1,5 +1,4 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Generators
@@ -32,8 +31,6 @@ namespace FluentMigrator.Runner.Generators
         {
             switch (systemMethod)
             {
-                case SystemMethods.NewGuid:
-                    throw new NotImplementedException();
                 case SystemMethods.CurrentDateTime:
                     return "CURRENT_TIMESTAMP";
             }
