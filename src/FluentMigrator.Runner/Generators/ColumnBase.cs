@@ -64,11 +64,23 @@ namespace FluentMigrator.Runner.Generators
 		{
 			if (column.DefaultValue is ColumnDefinition.UndefinedDefaultValue)
 				return string.Empty;
+
+            // see if this is for a system method
+            if (column.DefaultValue is SystemMethods)
+            {
+                string method = FormatSystemMethods((SystemMethods)column.DefaultValue);
+                if (string.IsNullOrEmpty(method))
+                    return string.Empty;
+                
+                return "DEFAULT " + method;
+            }
+
 			return "DEFAULT " + Constant.Format(column.DefaultValue);
 		}
 
 		protected abstract string FormatIdentity(ColumnDefinition column);
 		protected abstract string FormatPrimaryKey(ColumnDefinition column);
+	    protected abstract string FormatSystemMethods(SystemMethods systemMethod);
 
 		public string Generate(CreateTableExpression expression)
 		{

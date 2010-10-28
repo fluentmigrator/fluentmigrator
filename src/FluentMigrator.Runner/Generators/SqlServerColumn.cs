@@ -1,6 +1,4 @@
-﻿using System;
-using System.Text;
-using FluentMigrator.Model;
+﻿using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Generators
 {
@@ -19,5 +17,18 @@ namespace FluentMigrator.Runner.Generators
 		{
 			return column.IsPrimaryKey ? "PRIMARY KEY CLUSTERED" : string.Empty;
 		}
+
+        protected override string FormatSystemMethods(SystemMethods systemMethod)
+        {
+            switch (systemMethod)
+            {
+                case SystemMethods.NewGuid:
+                    return "NEWID()";
+                case SystemMethods.CurrentDateTime:
+                    return "GETDATE()";
+            }
+
+            return null;
+        }
 	}
 }

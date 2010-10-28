@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Text;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Generators
@@ -33,6 +32,11 @@ namespace FluentMigrator.Runner.Generators
 		{
 			return column.IsPrimaryKey ? "PRIMARY KEY" : string.Empty;
 		}
+
+        protected override string FormatSystemMethods(SystemMethods systemMethod)
+        {
+            throw new NotImplementedException();
+        }
 
 		/// <summary>
 		/// Returns empty string as the constraint for Primary Key. 
