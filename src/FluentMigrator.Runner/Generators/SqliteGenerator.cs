@@ -51,17 +51,17 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(CreateTableExpression expression)
 		{
-			return string.Format("CREATE TABLE {0} ({1})", expression.TableName, Column.Generate(expression));
+			return string.Format("CREATE TABLE [{0}] ({1})", expression.TableName, Column.Generate(expression));
 		}
 
 		public override string Generate(RenameTableExpression expression)
 		{
-			return string.Format("ALTER TABLE {0} RENAME TO {1}", expression.OldName, expression.NewName);
+			return string.Format("ALTER TABLE [{0}] RENAME TO [{1}]", expression.OldName, expression.NewName);
 		}
 
 		public override string Generate(DeleteTableExpression expression)
 		{
-			return string.Format("DROP TABLE {0}", expression.TableName);
+			return string.Format("DROP TABLE [{0}]", expression.TableName);
 		}
 
 		public override string Generate(CreateColumnExpression expression)
@@ -101,7 +101,7 @@ namespace FluentMigrator.Runner.Generators
 
 			if (expression.IsAllRows)
 			{
-				result.Append(String.Format("DELETE FROM {0};", expression.TableName));
+				result.Append(String.Format("DELETE FROM [{0}];", expression.TableName));
 			}
 			else
 			{
@@ -121,7 +121,7 @@ namespace FluentMigrator.Runner.Generators
 						i++;
 					}
 
-					result.Append(String.Format("DELETE FROM {0} WHERE {1};", expression.TableName, where));
+					result.Append(String.Format("DELETE FROM [{0}] WHERE {1};", expression.TableName, where));
 				}
 			}
 
