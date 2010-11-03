@@ -17,7 +17,6 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -38,7 +37,6 @@ namespace FluentMigrator.Tests.Unit
 		private Mock<IAnnouncer> _announcer;
 		private Mock<IStopWatch> _stopWatch;
 
-		private Mock<IMigrationConventions> _conventionMock;
 		private Mock<IMigrationProcessor> _processorMock;
 		private Mock<IMigrationLoader> _migrationLoaderMock;
 		private Mock<IProfileLoader> _profileLoaderMock;
@@ -48,7 +46,6 @@ namespace FluentMigrator.Tests.Unit
 		public void SetUp()
 		{
 			_runnerContextMock = new Mock<IRunnerContext>(MockBehavior.Loose);
-			_conventionMock = new Mock<IMigrationConventions>(MockBehavior.Loose);
 			_processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
 			_migrationLoaderMock = new Mock<IMigrationLoader>(MockBehavior.Loose);
 			_profileLoaderMock = new Mock<IProfileLoader>(MockBehavior.Loose);
@@ -68,9 +65,11 @@ namespace FluentMigrator.Tests.Unit
 			_runnerContextMock.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer.ConnectionString);
 			_runnerContextMock.SetupGet(x => x.Database).Returns("sqlserver");
 
-			_runner = new MigrationRunner(Assembly.GetAssembly( typeof( MigrationRunnerTests ) ), _runnerContextMock.Object, _processorMock.Object);
-			_runner.MigrationLoader = _migrationLoaderMock.Object;
-			_runner.ProfileLoader = _profileLoaderMock.Object;
+			_runner = new MigrationRunner(Assembly.GetAssembly( typeof( MigrationRunnerTests ) ), _runnerContextMock.Object, _processorMock.Object)
+			          	{
+			          		MigrationLoader = _migrationLoaderMock.Object,
+			          		ProfileLoader = _profileLoaderMock.Object
+			          	};
 		}
 
 		[Test]
@@ -183,6 +182,59 @@ namespace FluentMigrator.Tests.Unit
 		public void LoadsCorrectCallingAssembly()
 		{
 			_runner.MigrationAssembly.ShouldBe(Assembly.GetAssembly(typeof(MigrationRunnerTests)));
+		}
+
+		[Test]
+		public void RollbackToVersionZeroShouldDeleteVersionInfoTable()
+		{
+			var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
+
+			_runner.RollbackToVersion(0);
+			
+			_processorMock.Verify(
+				pm => pm.Process(It.Is<DeleteTableExpression>(
+					dte => dte.TableName == versionInfoTableName)
+					)
+				);
+		}
+
+		[Test]
+		public void RollbackToVersionZeroShouldNotCreateVersionInfoTableAfterRemoval()
+		{
+			var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
+
+			_runner.RollbackToVersion(0);
+
+			//Should only be called once in setup
+			_processorMock.Verify(
+				pm => pm.Process(It.Is<CreateTableExpression>(
+					dte => dte.TableName == versionInfoTableName)
+					),
+					Times.Once()
+				);
+		}
+
+		[Test]
+		public void RollbackToVersionShouldLoadVersionInfoIfVersionGreaterThanZero()
+		{
+			var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
+
+			_runner.RollbackToVersion(1);
+
+			_processorMock.Verify(
+				pm => pm.Process(It.Is<DeleteTableExpression>(
+					dte => dte.TableName == versionInfoTableName)
+					),
+					Times.Never()
+				);
+
+			//Once in setup, once after rollback
+			_processorMock.Verify(
+				pm => pm.Process(It.Is<CreateTableExpression>(
+					dte => dte.TableName == versionInfoTableName)
+					),
+					Times.Exactly(2)
+				);
 		}
 
 		[Test,Ignore("Move to MigrationLoader tests")]
