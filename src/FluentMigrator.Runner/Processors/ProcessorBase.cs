@@ -50,6 +50,11 @@ namespace FluentMigrator.Runner.Processors
 			Process(Generator.Generate(expression));
 		}
 
+        public virtual void Process(AlterTableExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
+
 		public virtual void Process(AlterColumnExpression expression)
 		{
 			Process(Generator.Generate(expression));

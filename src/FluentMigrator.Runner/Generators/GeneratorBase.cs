@@ -16,12 +16,7 @@
 //
 #endregion
 
-using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Text;
 using FluentMigrator.Expressions;
-using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Generators
 {
@@ -52,6 +47,13 @@ namespace FluentMigrator.Runner.Generators
 		public abstract string Generate(InsertDataExpression expression);
 		public abstract string Generate(AlterDefaultConstraintExpression expression);
 		public abstract string Generate(DeleteDataExpression expression);
+
+        public string Generate(AlterTableExpression expression)
+        {
+            // returns nothing because the individual AddColumn and AlterColumn calls
+            //  create CreateColumnExpression and AlterColumnExpression respectively
+            return string.Empty;
+        }
 
 		protected IColumn Column
 		{

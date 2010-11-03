@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
-using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 
