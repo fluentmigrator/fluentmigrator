@@ -88,6 +88,19 @@ namespace FluentMigrator.Tests.Unit.Generators
 				.ShouldBe("CustomClass");
 		}
 
+	    [Test]
+	    public void EnumIsFormattedAsString()
+	    {
+	        formatter.Format(Foo.Bar)
+                .ShouldBe("'Bar'");
+	    }
+
+        private enum Foo
+        {
+            Bar,
+            Baz
+        }
+
 		private class CustomClass
 		{
 			public override string ToString()
