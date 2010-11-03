@@ -155,7 +155,7 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(DeleteColumnExpression expression)
 		{
-			return string.Format("ALTER TABLE {0} DROP COLUMN {1}", expression.TableName, expression.ColumnName);
+			return string.Format("ALTER TABLE [{0}] DROP COLUMN {1}", expression.TableName, expression.ColumnName);
 		}
 
 		public override string Generate(CreateForeignKeyExpression expression)
