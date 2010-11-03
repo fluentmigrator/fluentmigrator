@@ -292,12 +292,12 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
 			collectionMock.Setup(x => x.Add(It.Is<CreateForeignKeyExpression>(
 				fk => fk.ForeignKey.Name == "fk_foo" &&
-					  fk.ForeignKey.ForeignTable == "FooTable" &&
-					  fk.ForeignKey.ForeignColumns.Contains("BarColumn") &&
-					  fk.ForeignKey.ForeignColumns.Count == 1 &&
-					  fk.ForeignKey.PrimaryTable == "Bacon" &&
-					  fk.ForeignKey.PrimaryColumns.Contains("BaconId") &&
-					  fk.ForeignKey.PrimaryColumns.Count == 1
+						fk.ForeignKey.ForeignTable == "FooTable" &&
+						fk.ForeignKey.ForeignColumns.Contains("BarColumn") &&
+						fk.ForeignKey.ForeignColumns.Count == 1 &&
+						fk.ForeignKey.PrimaryTable == "Bacon" &&
+						fk.ForeignKey.PrimaryColumns.Contains("BaconId") &&
+						fk.ForeignKey.PrimaryColumns.Count == 1
 												))).AtMostOnce();
 
 			var contextMock = new Mock<IMigrationContext>();

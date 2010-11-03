@@ -47,10 +47,10 @@ namespace FluentMigrator.Runner.Generators
 			return String.Format("CREATE TABLE `{0}` ({1}) ENGINE = INNODB", expression.TableName, Column.Generate(expression));
 		}
 
-        public override string Generate(AlterColumnExpression expression)
-        {
-            return String.Format("ALTER TABLE {0} MODIFY {1}", expression.TableName, Column.Generate(expression.Column));
-        }
+		public override string Generate(AlterColumnExpression expression)
+		{
+			return String.Format("ALTER TABLE {0} MODIFY {1}", expression.TableName, Column.Generate(expression.Column));
+		}
 
 		public override string Generate(CreateColumnExpression expression)
 		{
@@ -76,12 +76,12 @@ namespace FluentMigrator.Runner.Generators
 			string sql = "ALTER TABLE `{0}` ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4})";
 
 			return String.Format(sql,
-						  expression.ForeignKey.ForeignTable,
-						  expression.ForeignKey.Name,
-						  foreignColumns,
-						  expression.ForeignKey.PrimaryTable,
-						  primaryColumns
-						  );
+							expression.ForeignKey.ForeignTable,
+							expression.ForeignKey.Name,
+							foreignColumns,
+							expression.ForeignKey.PrimaryTable,
+							primaryColumns
+							);
 		}
 
 		public override string Generate(DeleteForeignKeyExpression expression)
@@ -161,43 +161,43 @@ namespace FluentMigrator.Runner.Generators
 			return result.ToString();
 		}
 
-        public override string Generate(DeleteDataExpression expression)
-        {
-            var result = new StringBuilder();
+		public override string Generate(DeleteDataExpression expression)
+		{
+			var result = new StringBuilder();
 
-            if (expression.IsAllRows)
-            {
-                result.Append(String.Format("DELETE FROM {0};", expression.TableName));
-            }
-            else
-            {
-                foreach (var row in expression.Rows)
-                {
-                    var where = String.Empty;
-                    var i = 0;
+			if (expression.IsAllRows)
+			{
+				result.Append(String.Format("DELETE FROM {0};", expression.TableName));
+			}
+			else
+			{
+				foreach (var row in expression.Rows)
+				{
+					var where = String.Empty;
+					var i = 0;
 
-                    foreach (var item in row)
-                    {
-                        if (i != 0)
-                        {
-                            where += " AND ";
-                        }
+					foreach (var item in row)
+					{
+						if (i != 0)
+						{
+							where += " AND ";
+						}
 
-                        where += String.Format("[{0}] = {1}", item.Key, Constant.Format(item.Value));
-                        i++;
-                    }
+						where += String.Format("[{0}] = {1}", item.Key, Constant.Format(item.Value));
+						i++;
+					}
 
-                    result.Append(String.Format("DELETE FROM {0} WHERE {1};", expression.TableName, where));
-                }
-            }
+					result.Append(String.Format("DELETE FROM {0} WHERE {1};", expression.TableName, where));
+				}
+			}
 
-            return result.ToString();
-        }
+			return result.ToString();
+		}
 
-        public override string Generate(AlterDefaultConstraintExpression expression)
-        {
-            throw new NotImplementedException();
-        }
+		public override string Generate(AlterDefaultConstraintExpression expression)
+		{
+			throw new NotImplementedException();
+		}
 
 		private string GetColumnList(IEnumerable<string> columns)
 		{

@@ -13,7 +13,8 @@ namespace FluentMigrator.Runner.Generators
 			int b = ClauseOrder.IndexOf(FormatNullable);
 
 			// Oracle requires DefaultValue before nullable
-			if (a > b) {
+			if (a > b)
+			{
 				ClauseOrder[b] = FormatDefaultValue;
 				ClauseOrder[a] = FormatNullable;
 			}
@@ -21,7 +22,8 @@ namespace FluentMigrator.Runner.Generators
 
 		protected override string FormatIdentity(ColumnDefinition column)
 		{
-			if (column.IsIdentity) {
+			if (column.IsIdentity)
+			{
 				//todo: would like to throw a warning here
 			}
 			return string.Empty;

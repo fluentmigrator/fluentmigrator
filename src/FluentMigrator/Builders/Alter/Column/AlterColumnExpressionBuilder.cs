@@ -53,12 +53,12 @@ namespace FluentMigrator.Builders.Alter.Column
 		{
 			// we need to do a drop constraint and then add constraint to change the defualt value
 			var dc = new AlterDefaultConstraintExpression
-						 {
-							 TableName = Expression.TableName,
-							 SchemaName = Expression.SchemaName,
-							 ColumnName = Expression.Column.Name,
-							 DefaultValue = value
-						 };
+						{
+							TableName = Expression.TableName,
+							SchemaName = Expression.SchemaName,
+							ColumnName = Expression.Column.Name,
+							DefaultValue = value
+						};
 
 			_context.Expressions.Add( dc );
 

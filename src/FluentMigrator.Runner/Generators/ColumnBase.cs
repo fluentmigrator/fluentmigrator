@@ -32,7 +32,8 @@ namespace FluentMigrator.Runner.Generators
 		{
 			var clauses = new List<string>();
 
-			foreach (var action in ClauseOrder) {
+			foreach (var action in ClauseOrder)
+			{
 				string clause = action(column);
 				if (!string.IsNullOrEmpty(clause))
 					clauses.Add(clause);

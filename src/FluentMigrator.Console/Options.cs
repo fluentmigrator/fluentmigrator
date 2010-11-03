@@ -320,7 +320,7 @@ namespace Mono.Options
 						"maxValueCount");
 			if (Array.IndexOf (names, "<>") >= 0 && 
 					((names.Length == 1 && this.type != OptionValueType.None) ||
-					 (names.Length > 1 && this.MaxValueCount > 1)))
+					(names.Length > 1 && this.MaxValueCount > 1)))
 				throw new ArgumentException (
 						"The default option handler '<>' cannot require values.",
 						"prototype");

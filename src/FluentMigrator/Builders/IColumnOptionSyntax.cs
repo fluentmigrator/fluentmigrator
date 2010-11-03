@@ -29,7 +29,7 @@ namespace FluentMigrator.Builders
 		TNext Identity();
 		TNext Indexed();
 		TNext PrimaryKey();
-	    TNext PrimaryKey(string primaryKeyName);
+		TNext PrimaryKey(string primaryKeyName);
 		TNext Nullable();
 		TNext NotNullable();
 		TNext Unique();

@@ -5,7 +5,7 @@ using FluentMigrator.Runner.Generators;
 
 namespace FluentMigrator.Runner.Processors.Oracle
 {
-    public class OracleProcessorFactory : MigrationProcessorFactory
+	public class OracleProcessorFactory : MigrationProcessorFactory
 	{
 		public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
 		{

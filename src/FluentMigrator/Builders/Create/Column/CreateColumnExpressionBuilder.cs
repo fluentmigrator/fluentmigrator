@@ -79,12 +79,12 @@ namespace FluentMigrator.Builders.Create.Column
 			return this;
 		}
 
-        public ICreateColumnOptionSyntax PrimaryKey(string primaryKeyName)
-        {
-            Expression.Column.IsPrimaryKey = true;
-            Expression.Column.PrimaryKeyName = primaryKeyName;
-            return this;
-        }
+		public ICreateColumnOptionSyntax PrimaryKey(string primaryKeyName)
+		{
+			Expression.Column.IsPrimaryKey = true;
+			Expression.Column.PrimaryKeyName = primaryKeyName;
+			return this;
+		}
 
 		public ICreateColumnOptionSyntax Nullable()
 		{
