@@ -44,6 +44,7 @@ namespace FluentMigrator.Expressions
 
 		public override void ExecuteWith(IMigrationProcessor processor)
 		{
+			Column.TableName = TableName;
 			processor.Process(this);
 		}
 
