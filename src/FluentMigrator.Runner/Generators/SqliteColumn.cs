@@ -1,6 +1,4 @@
-﻿using System;
-using System.Data;
-using System.Text;
+﻿using System.Data;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Generators
@@ -28,6 +26,17 @@ namespace FluentMigrator.Runner.Generators
 			//Assume that if its IDENTITY and PRIMARY KEY, the it should be an AUTOINCREMENT column
 			return !column.IsIdentity ? "PRIMARY KEY" : "PRIMARY KEY AUTOINCREMENT";
 		}
+
+        protected override string FormatSystemMethods(SystemMethods systemMethod)
+        {
+            switch (systemMethod)
+            {
+                case SystemMethods.CurrentDateTime:
+                    return "CURRENT_TIMESTAMP";
+            }
+
+            return null;
+        }
 
 		protected override string FormatType(ColumnDefinition column)
 		{

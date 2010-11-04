@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Text;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Generators
@@ -19,5 +18,10 @@ namespace FluentMigrator.Runner.Generators
 		{
 			return column.IsPrimaryKey ? string.Format(", PRIMARY KEY (`{0}`)", column.Name) : string.Empty;
 		}
+
+        protected override string FormatSystemMethods(SystemMethods systemMethod)
+        {
+            throw new NotImplementedException();
+        }
 	}
 }
