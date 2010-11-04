@@ -56,14 +56,15 @@ namespace FluentMigrator.Runner.Generators
 			string primaryColumns = GetColumnList(expression.ForeignKey.PrimaryColumns);
 			string foreignColumns = GetColumnList(expression.ForeignKey.ForeignColumns);
 
-			string sql = "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4})";
+			string sql = "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}";
 
 			return String.Format(sql,
 							expression.ForeignKey.ForeignTable,
 							expression.ForeignKey.Name,
 							foreignColumns,
 							expression.ForeignKey.PrimaryTable,
-							primaryColumns
+							primaryColumns,
+                            FormatCascade("DELETE", expression.ForeignKey.OnDelete)
 							);
 		}
 
@@ -192,5 +193,24 @@ namespace FluentMigrator.Runner.Generators
 			}
 			return result.TrimEnd(',');
 		}
+
+        protected string FormatCascade(string onWhat, Rule rule)
+        {
+            string action = "NO ACTION";
+            switch (rule)
+            {
+                case Rule.None:
+                case Rule.SetDefault:
+                    return "";
+                case Rule.Cascade:
+                    action = "CASCADE";
+                    break;
+                case Rule.SetNull:
+                    action = "SET NULL";
+                    break;
+            }
+
+            return string.Format(" ON {0} {1}", onWhat, action);
+        }
 	}
 }

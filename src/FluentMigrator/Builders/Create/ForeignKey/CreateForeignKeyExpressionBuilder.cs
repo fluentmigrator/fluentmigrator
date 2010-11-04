@@ -89,7 +89,7 @@ namespace FluentMigrator.Builders.Create.ForeignKey
 			return this;
 		}
 
-		public void OnDeleteOrUpdate(System.Data.Rule rule)
+		public void OnDeleteOrUpdate(Rule rule)
 		{
 			Expression.ForeignKey.OnDelete = rule;
 			Expression.ForeignKey.OnUpdate = rule;
