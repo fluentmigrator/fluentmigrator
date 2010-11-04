@@ -83,8 +83,8 @@ namespace FluentMigrator.Runner.Generators
 								FormatSchema(expression.ForeignKey.PrimaryTableSchema),
 								expression.ForeignKey.PrimaryTable,
 								primaryColumns,
-								FormateCascade("DELETE", expression.ForeignKey.OnDelete),
-								FormateCascade("UPDATE", expression.ForeignKey.OnDelete)
+								FormatCascade("DELETE", expression.ForeignKey.OnDelete),
+								FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)
 				);
 		}
 
@@ -276,7 +276,7 @@ namespace FluentMigrator.Runner.Generators
 			return sql.Replace("'", "''");
 		}
 
-		protected string FormateCascade(string onWhat, Rule rule)
+		protected string FormatCascade(string onWhat, Rule rule)
 		{
 			string action = "NO ACTION";
 			switch(rule)
