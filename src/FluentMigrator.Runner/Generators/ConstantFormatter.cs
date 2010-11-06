@@ -32,6 +32,11 @@ namespace FluentMigrator.Runner.Generators
 			{
 				return "'" + ((DateTime)value).ToString("yyyy-MM-ddTHH:mm:ss")+ "'";
 			}
+            if(value.GetType().IsEnum)
+            {
+                return "'" + value.ToString() + "'";
+            }
+
 
 			return value.ToString();
 		}
