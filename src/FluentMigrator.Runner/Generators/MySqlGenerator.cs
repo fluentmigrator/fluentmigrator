@@ -162,6 +162,41 @@ namespace FluentMigrator.Runner.Generators
 			return result.ToString();
 		}
 
+        public override string Generate(UpdateDataExpression expression)
+        {
+            var result = new StringBuilder();
+
+            var set = String.Empty;
+            var i = 0;
+            foreach (var item in expression.Set)
+            {
+                if (i != 0)
+                {
+                    set += ", ";
+                }
+
+                set += String.Format("[{0}] = {1}", item.Key, Constant.Format(item.Value));
+                i++;
+            }
+
+            var where = String.Empty;
+            i = 0;
+            foreach (var item in expression.Where)
+            {
+                if (i != 0)
+                {
+                    where += " AND ";
+                }
+
+                where += String.Format("[{0}] {1} {2}", item.Key, item.Value == null ? "IS" : "=", Constant.Format(item.Value));
+                i++;
+            }
+
+            result.Append(String.Format("UPDATE [{0}] SET {1} WHERE {2};", expression.TableName, set, where));
+
+            return result.ToString();
+        }
+
 		public override string Generate(DeleteDataExpression expression)
 		{
 			var result = new StringBuilder();

@@ -154,6 +154,12 @@
     <Compile Include="Builders\Insert\IInsertExpressionRoot.cs" />
     <Compile Include="Builders\Rename\Column\IRenameColumnToOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Rename\Table\IRenameTableToOrInSchemaSyntax.cs" />
+    <Compile Include="Builders\Update\UpdateDataExpressionBuilder.cs" />
+    <Compile Include="Builders\Update\IUpdateSetOrInSchemaSyntax.cs" />
+    <Compile Include="Builders\Update\IUpdateSetSyntax.cs" />
+    <Compile Include="Builders\Update\IUpdateWhereSyntax.cs" />
+    <Compile Include="Builders\Update\UpdateExpressionRoot.cs" />
+    <Compile Include="Builders\Update\IUpdateExpressionRoot.cs" />
     <Compile Include="Expressions\AlterColumnExpression.cs" />
     <Compile Include="Expressions\AlterDefaultConstraintExpression.cs" />
     <Compile Include="Expressions\AlterTableExpression.cs" />
@@ -161,6 +167,7 @@
     <Compile Include="Expressions\InsertDataExpression.cs" />
     <Compile Include="Builders\Insert\InsertDataExpressionBuilder.cs" />
     <Compile Include="Builders\Insert\InsertExpressionRoot.cs" />
+    <Compile Include="Expressions\UpdateDataExpression.cs" />
     <Compile Include="Model\DeletionDataDefinition.cs" />
     <Compile Include="Model\InsertionDataDefinition.cs" />
     <Compile Include="Builders\Rename\Column\IRenameColumnToSyntax.cs" />
