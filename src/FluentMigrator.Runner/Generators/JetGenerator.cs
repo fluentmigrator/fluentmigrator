@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
@@ -63,7 +63,7 @@ namespace FluentMigrator.Runner.Generators
 				expression.ForeignKey.PrimaryTable,
 				primaryColumns,
 				FormatCascade("DELETE", expression.ForeignKey.OnDelete),
-				FormatCascade("DELETE", expression.ForeignKey.OnUpdate)
+				FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)
 				);
 		}
 
