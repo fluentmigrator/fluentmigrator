@@ -43,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.TableName = tableName;
 
 			var sql = generator.Generate(expression);
-			sql.ShouldBe("ALTER TABLE [NewTable] ADD COLUMN NewColumn VARCHAR(5) NOT NULL");
+			sql.ShouldBe("ALTER TABLE [NewTable] ADD COLUMN [NewColumn] VARCHAR(5) NOT NULL");
 		}
 
 		[Test]
@@ -62,7 +62,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.TableName = tableName;
 
 			var sql = generator.Generate(expression);
-			sql.ShouldBe("ALTER TABLE [NewTable] ADD COLUMN NewColumn DECIMAL(19,2) NOT NULL");
+			sql.ShouldBe("ALTER TABLE [NewTable] ADD COLUMN [NewColumn] DECIMAL(19,2) NOT NULL");
 		}
 
 		[Test]
@@ -233,7 +233,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.Column.IsNullable = false;
 
 			var sql = generator.Generate(expression);
-			sql.ShouldBe("ALTER TABLE [Table1] ALTER COLUMN Column1 VARCHAR(20) NOT NULL");
+			sql.ShouldBe("ALTER TABLE [Table1] ALTER COLUMN [Column1] VARCHAR(20) NOT NULL");
 		}
 
 		[Test]
@@ -269,7 +269,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			var expression = GetCreateTableExpression(tableName);
 			var sql = generator.Generate(expression);
-			sql.ShouldBe("CREATE TABLE [NewTable] (ColumnName1 VARCHAR(255) NOT NULL, ColumnName2 INTEGER NOT NULL)");
+			sql.ShouldBe("CREATE TABLE [NewTable] ([ColumnName1] VARCHAR(255) NOT NULL, [ColumnName2] INTEGER NOT NULL)");
 		}
 
 		[Test]
@@ -281,7 +281,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.Columns[1].CustomType = "[timestamp]";
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(
-				"CREATE TABLE [NewTable] (ColumnName1 VARCHAR(255) NOT NULL PRIMARY KEY, ColumnName2 [timestamp] NOT NULL)");
+				"CREATE TABLE [NewTable] ([ColumnName1] VARCHAR(255) NOT NULL PRIMARY KEY, [ColumnName2] [timestamp] NOT NULL)");
 		}
 
 		[Test]
@@ -291,7 +291,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.Columns[0].IsPrimaryKey = true;
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(
-				"CREATE TABLE [NewTable] (ColumnName1 VARCHAR(255) NOT NULL PRIMARY KEY, ColumnName2 INTEGER NOT NULL)");
+				"CREATE TABLE [NewTable] ([ColumnName1] VARCHAR(255) NOT NULL PRIMARY KEY, [ColumnName2] INTEGER NOT NULL)");
 		}
 
 		[Test]
@@ -301,7 +301,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.Columns[0].IsIdentity = true;
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(
-				"CREATE TABLE [NewTable] (ColumnName1 COUNTER NOT NULL, ColumnName2 INTEGER NOT NULL)");
+				"CREATE TABLE [NewTable] ([ColumnName1] COUNTER NOT NULL, [ColumnName2] INTEGER NOT NULL)");
 		}
 
 		[Test]
@@ -311,7 +311,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.Columns[0].IsNullable = true;
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(
-				"CREATE TABLE [NewTable] (ColumnName1 VARCHAR(255), ColumnName2 INTEGER NOT NULL)");
+				"CREATE TABLE [NewTable] ([ColumnName1] VARCHAR(255), [ColumnName2] INTEGER NOT NULL)");
 		}
 
 		[Test]
@@ -322,7 +322,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.Columns[1].DefaultValue = 0;
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(
-				"CREATE TABLE [NewTable] (ColumnName1 VARCHAR(255) NOT NULL DEFAULT 'Default', ColumnName2 INTEGER NOT NULL DEFAULT 0)");
+				"CREATE TABLE [NewTable] ([ColumnName1] VARCHAR(255) NOT NULL DEFAULT 'Default', [ColumnName2] INTEGER NOT NULL DEFAULT 0)");
 		}
 
 		[Test]
@@ -332,7 +332,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.Columns[0].DefaultValue = null;
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(
-				"CREATE TABLE [NewTable] (ColumnName1 VARCHAR(255) NOT NULL DEFAULT NULL, ColumnName2 INTEGER NOT NULL)");
+				"CREATE TABLE [NewTable] ([ColumnName1] VARCHAR(255) NOT NULL DEFAULT NULL, [ColumnName2] INTEGER NOT NULL)");
 		}
 
 

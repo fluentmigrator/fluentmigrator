@@ -30,6 +30,11 @@ namespace FluentMigrator.Runner.Generators
 			return string.Empty;
 		}
 
+		protected override string FormatName(ColumnDefinition column)
+		{
+			return String.Format("[{0}]", column.Name);
+		}
+
 		protected override string FormatPrimaryKey(ColumnDefinition column)
 		{
 			return column.IsPrimaryKey ? "PRIMARY KEY" : string.Empty;
