@@ -98,6 +98,12 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -122,15 +128,9 @@
     <Compile Include="Builders\Alter\Column\IAlterColumnOnTableSyntax.cs" />
     <Compile Include="Builders\Alter\Column\IAlterColumnOptionSyntax.cs" />
     <Compile Include="Builders\Alter\IAlterExpressionRoot.cs" />
-    <Compile Include="Builders\Alter\Table\AlterTableExpressionBuilder.cs" />
-    <Compile Include="Builders\Alter\Table\IAlterTableAddColumnOrAlterColumnOrSchemaSyntax.cs" />
-    <Compile Include="Builders\Alter\Table\IAlterTableAddColumOrAlterColumnSyntax.cs" />
-    <Compile Include="Builders\Alter\Table\IAlterTableColumnAsTypeSyntax.cs" />
-    <Compile Include="Builders\Alter\Table\IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax.cs" />
     <Compile Include="Builders\Create\Column\ICreateColumnAsTypeOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Create\ForeignKey\ICreateForeignKeyPrimaryColumnOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Create\ForeignKey\ICreateForeignKeyForeignColumnOrInSchemaSyntax.cs" />
-    <Compile Include="Builders\Create\ForeignKey\ICreateForiegnKeyCascadeSyntax.cs" />
     <Compile Include="Builders\Create\Index\ICreateIndexOnColumnOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Create\Index\ICreateIndexColumnOptionsSyntax.cs" />
     <Compile Include="Builders\Create\Index\ICreateIndexOptionsSyntax.cs" />
@@ -154,20 +154,12 @@
     <Compile Include="Builders\Insert\IInsertExpressionRoot.cs" />
     <Compile Include="Builders\Rename\Column\IRenameColumnToOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Rename\Table\IRenameTableToOrInSchemaSyntax.cs" />
-    <Compile Include="Builders\Update\UpdateDataExpressionBuilder.cs" />
-    <Compile Include="Builders\Update\IUpdateSetOrInSchemaSyntax.cs" />
-    <Compile Include="Builders\Update\IUpdateSetSyntax.cs" />
-    <Compile Include="Builders\Update\IUpdateWhereSyntax.cs" />
-    <Compile Include="Builders\Update\UpdateExpressionRoot.cs" />
-    <Compile Include="Builders\Update\IUpdateExpressionRoot.cs" />
     <Compile Include="Expressions\AlterColumnExpression.cs" />
     <Compile Include="Expressions\AlterDefaultConstraintExpression.cs" />
-    <Compile Include="Expressions\AlterTableExpression.cs" />
     <Compile Include="Expressions\DeleteDataExpression.cs" />
     <Compile Include="Expressions\InsertDataExpression.cs" />
     <Compile Include="Builders\Insert\InsertDataExpressionBuilder.cs" />
     <Compile Include="Builders\Insert\InsertExpressionRoot.cs" />
-    <Compile Include="Expressions\UpdateDataExpression.cs" />
     <Compile Include="Model\DeletionDataDefinition.cs" />
     <Compile Include="Model\InsertionDataDefinition.cs" />
     <Compile Include="Builders\Rename\Column\IRenameColumnToSyntax.cs" />
@@ -192,7 +184,6 @@
     <Compile Include="Infrastructure\Extensions\ExtensionsForIEnumerable.cs" />
     <Compile Include="IQuerySchema.cs" />
     <Compile Include="ProfileAttribute.cs" />
-    <Compile Include="SystemMethods.cs" />
     <Compile Include="VersionTableInfo\DefaultVersionTableMetaData.cs" />
     <Compile Include="VersionTableInfo\IVersionTableMetaData.cs" />
     <Compile Include="MigrationTraitAttribute.cs" />
@@ -281,7 +272,11 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="..\FluentMigrator.snk">
+      <Link>FluentMigrator.snk</Link>
+    </None>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
