@@ -49,6 +49,11 @@ namespace FluentMigrator.Runner.Generators
 			throw new NotImplementedException();
 		}
 
+    public override string Generate( AlterSchemaExpression expression )
+    {
+      throw new NotImplementedException();
+    }
+
 		public override string Generate(CreateTableExpression expression)
 		{
 			return string.Format("CREATE TABLE [{0}] ({1})", expression.TableName, Column.Generate(expression));
