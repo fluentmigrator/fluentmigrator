@@ -43,7 +43,7 @@ namespace FluentMigrator.Runner.Generators
 			throw new NotImplementedException();
 		}
 
-    public override string Generate( AlterSchemaExpression expression )
+    public override string Generate(AlterSchemaExpression expression)
     {
       throw new NotImplementedException();
     }
