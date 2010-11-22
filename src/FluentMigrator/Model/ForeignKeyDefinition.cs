@@ -78,7 +78,9 @@ namespace FluentMigrator.Model
 				PrimaryTableSchema = PrimaryTableSchema,
 				PrimaryTable = PrimaryTable,
 				ForeignColumns = new List<string>(ForeignColumns),
-				PrimaryColumns = new List<string>(PrimaryColumns)
+				PrimaryColumns = new List<string>(PrimaryColumns),
+                OnDelete = OnDelete,
+                OnUpdate = OnUpdate
 			};
 		}
 	}
