@@ -41,6 +41,11 @@ namespace FluentMigrator.Runner.Generators
 			throw new NotImplementedException();
 		}
 
+    public override string Generate(AlterSchemaExpression expression)
+    {
+      throw new NotImplementedException();
+    }
+
 		public override string Generate(CreateTableExpression expression)
 		{
 			return String.Format("CREATE TABLE `{0}` ({1}) ENGINE = INNODB", expression.TableName, Column.Generate(expression));

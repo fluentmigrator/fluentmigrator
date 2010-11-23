@@ -40,6 +40,11 @@ namespace FluentMigrator.Runner.Generators
 			return String.Format("DROP SCHEMA [{0}]", expression.SchemaName);
 		}
 
+    public override string Generate( AlterSchemaExpression expression )
+    {
+      return String.Format("ALTER SCHEMA [{0}] TRANSFER {1}[{2}]", expression.DestinationSchemaName, FormatSchema(expression.SourceSchemaName), expression.TableName );
+    }
+
 		protected override string FormatSchema(string schemaName, bool escapeSchemaName)
 		{
 			return string.Format(

@@ -163,6 +163,7 @@
     <Compile Include="Expressions\AlterColumnExpression.cs" />
     <Compile Include="Expressions\AlterDefaultConstraintExpression.cs" />
     <Compile Include="Expressions\AlterTableExpression.cs" />
+    <Compile Include="Expressions\AlterSchemaExpression.cs" />
     <Compile Include="Expressions\DeleteDataExpression.cs" />
     <Compile Include="Expressions\InsertDataExpression.cs" />
     <Compile Include="Builders\Insert\InsertDataExpressionBuilder.cs" />

@@ -43,6 +43,11 @@ namespace FluentMigrator.Runner.Generators
 			throw new NotImplementedException();
 		}
 
+    public override string Generate(AlterSchemaExpression expression)
+    {
+      throw new NotImplementedException();
+    }
+
 		public override string Generate(RenameTableExpression expression)
 		{
 			return String.Format("sp_rename {0}[{1}], [{2}]", FormatSchema(expression.SchemaName), expression.OldName, expression.NewName);

@@ -127,6 +127,11 @@ namespace FluentMigrator.Runner.Processors
 
 		public abstract void Process(PerformDBOperationExpression expression);
 
+    public void Process(AlterSchemaExpression expression)
+    {
+      Process(Generator.Generate(expression));
+    }
+
 		protected abstract void Process(string sql);
 
 		public virtual void BeginTransaction()

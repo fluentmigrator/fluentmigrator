@@ -30,6 +30,20 @@ namespace FluentMigrator.Tests.Unit.Generators
 				"CREATE TABLE [dbo].[NewTable] (ColumnName1 NVARCHAR(MAX) NOT NULL)");
 		}
 
+    [Test]
+    public void CanAlterSchema()
+    {
+      var expression = new AlterSchemaExpression
+      {
+        DestinationSchemaName = "DEST",
+        SourceSchemaName = "SOURCE",
+        TableName = "TABLE"
+      };
+
+      var sql = generator.Generate( expression );
+      sql.ShouldBe(
+        "ALTER SCHEMA [DEST] TRANSFER [SOURCE].[TABLE]" );
+    }
 
 		private CreateTableExpression GetCreateTableExpression(string tableName)
 		{

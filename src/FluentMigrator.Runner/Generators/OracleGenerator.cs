@@ -25,6 +25,11 @@ namespace FluentMigrator.Runner.Generators
 			throw new NotImplementedException();
 		}
 
+    public override string Generate( AlterSchemaExpression expression )
+    {
+      throw new NotImplementedException();
+    }
+
 		public override string Generate(AlterColumnExpression expression)
 		{
 			return String.Format("ALTER TABLE {0} MODIFY {1}", expression.TableName, Column.Generate(expression.Column));
