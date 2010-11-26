@@ -32,7 +32,7 @@ namespace FluentMigrator.Tests.Integration
 				}
 			};
 
-			ExecuteWithSqlServer(processor => processor.Process(expression), IntegrationTestOptions.SqlServer);
+			ExecuteWithSqlServer(processor => processor.Process(expression), IntegrationTestOptions.SqlServer, true);
 		}
 	}
 }
