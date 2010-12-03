@@ -28,20 +28,6 @@ namespace FluentMigrator.Runner.Generators
 			get { return _constantFormatter; }
 		}
 
-		public virtual string Generate(ColumnDefinition column)
-		{
-			var clauses = new List<string>();
-
-			foreach (var action in ClauseOrder)
-			{
-				string clause = action(column);
-				if (!string.IsNullOrEmpty(clause))
-					clauses.Add(clause);
-			}
-
-			return string.Join(" ", clauses.ToArray());
-		}
-
 		protected virtual string FormatName(ColumnDefinition column)
 		{
 			return column.Name;
@@ -65,22 +51,36 @@ namespace FluentMigrator.Runner.Generators
 			if (column.DefaultValue is ColumnDefinition.UndefinedDefaultValue)
 				return string.Empty;
 
-            // see if this is for a system method
-            if (column.DefaultValue is SystemMethods)
-            {
-                string method = FormatSystemMethods((SystemMethods)column.DefaultValue);
-                if (string.IsNullOrEmpty(method))
-                    return string.Empty;
-                
-                return "DEFAULT " + method;
-            }
+			// see if this is for a system method
+			if (column.DefaultValue is SystemMethods)
+			{
+				string method = FormatSystemMethods((SystemMethods)column.DefaultValue);
+				if (string.IsNullOrEmpty(method))
+					return string.Empty;
+
+				return "DEFAULT " + method;
+			}
 
 			return "DEFAULT " + Constant.Format(column.DefaultValue);
 		}
 
 		protected abstract string FormatIdentity(ColumnDefinition column);
 		protected abstract string FormatPrimaryKey(ColumnDefinition column);
-	    protected abstract string FormatSystemMethods(SystemMethods systemMethod);
+		protected abstract string FormatSystemMethods(SystemMethods systemMethod);
+
+		public virtual string Generate( ColumnDefinition column )
+		{
+			var clauses = new List<string>();
+
+			foreach ( var action in ClauseOrder )
+			{
+				string clause = action( column );
+				if ( !string.IsNullOrEmpty( clause ) )
+					clauses.Add( clause );
+			}
+
+			return string.Join( " ", clauses.ToArray() );
+		}
 
 		public string Generate(CreateTableExpression expression)
 		{
@@ -91,8 +91,7 @@ namespace FluentMigrator.Runner.Generators
 			//if more than one column is a primary key or the primary key is given a name, then it needs to be added separately
 			IList<ColumnDefinition> primaryKeyColumns = GetPrimaryKeyColumns(columns);
 			bool addPrimaryKeySeparately = false;
-			if (primaryKeyColumns.Count > 1
-				|| (primaryKeyColumns.Count == 1 && primaryKeyColumns[0].PrimaryKeyName != null))
+			if (primaryKeyColumns.Count > 1 || (primaryKeyColumns.Count == 1 && !string.IsNullOrEmpty(primaryKeyColumns[0].PrimaryKeyName)))
 			{
 				addPrimaryKeySeparately = true;
 				foreach (ColumnDefinition column in primaryKeyColumns)
@@ -156,7 +155,7 @@ namespace FluentMigrator.Runner.Generators
 				if (!string.IsNullOrEmpty(column.PrimaryKeyName))
 				{
 					assignedName = column.PrimaryKeyName;
-					break; // no need to keep going
+					break;
 				}
 			}
 

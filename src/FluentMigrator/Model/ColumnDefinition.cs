@@ -23,7 +23,7 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Model
 {
-	public class ColumnDefinition : ICloneable, ICanBeValidated
+	public class ColumnDefinition : ICloneable, ICanBeConventional, ICanBeValidated
 	{
 		public ColumnDefinition()
 		{
@@ -44,6 +44,12 @@ namespace FluentMigrator.Model
 		public virtual bool IsNullable { get; set; }
 		public virtual bool IsUnique { get; set; }
 		public virtual string TableName { get; set; }
+
+		public void ApplyConventions(IMigrationConventions conventions)
+		{
+			if ( String.IsNullOrEmpty( PrimaryKeyName ) )
+				PrimaryKeyName = conventions.GetPrimaryKeyName(TableName);
+		}
 
 		public virtual void CollectValidationErrors(ICollection<string> errors)
 		{
