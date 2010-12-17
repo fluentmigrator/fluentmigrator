@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 
@@ -11,6 +12,7 @@ namespace FluentMigrator.Runner.Generators
 		private readonly ITypeMap _typeMap;
 		private readonly IConstantFormatter _constantFormatter;
 		protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; set; }
+        protected virtual bool CanSeperatePrimaryKeyAndIdentity { get { return true; } }
 
 		public ColumnBase(ITypeMap typeMap, IConstantFormatter constantFormatter)
 		{			_typeMap = typeMap;
@@ -89,15 +91,18 @@ namespace FluentMigrator.Runner.Generators
 			int total = columns.Count - 1;
 
 			//if more than one column is a primary key or the primary key is given a name, then it needs to be added separately
-			IList<ColumnDefinition> primaryKeyColumns = GetPrimaryKeyColumns(columns);
+            IList<ColumnDefinition> primaryKeyColumns = GetPrimaryKeyColumns(columns);
 			bool addPrimaryKeySeparately = false;
 			if (primaryKeyColumns.Count > 1 || (primaryKeyColumns.Count == 1 && !string.IsNullOrEmpty(primaryKeyColumns[0].PrimaryKeyName)))
 			{
-				addPrimaryKeySeparately = true;
-				foreach (ColumnDefinition column in primaryKeyColumns)
-				{
-					column.IsPrimaryKey = false;
-				}
+                if(CanSeperatePrimaryKeyAndIdentity || primaryKeyColumns.All(x => !x.IsIdentity))
+                {
+                    addPrimaryKeySeparately = true;
+                    foreach (ColumnDefinition column in primaryKeyColumns)
+                    {
+                        column.IsPrimaryKey = false;
+                    }
+                }
 			}
 
 			for (int i = 0; i < columns.Count; i++)

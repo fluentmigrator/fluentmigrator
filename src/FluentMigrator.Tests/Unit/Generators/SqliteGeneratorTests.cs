@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Data;
 using FluentMigrator.Builders.Insert;
@@ -55,7 +56,15 @@ namespace FluentMigrator.Tests.Unit.Generators
 			sql.ShouldBe(string.Format("CREATE TABLE [{0}] (NewColumn TEXT NOT NULL)", table));
 		}
 
-		[Test]
+        [Test]
+        public void CanCreateTableWithAutoIncrement()
+        {
+            var expression = GetCreateTableWithPrimaryKeyIdentityExpression();
+            var sql = generator.Generate(expression);
+            sql.ShouldBe(string.Format("CREATE TABLE [{0}] (NewColumn INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT)", table));
+        }
+
+	    [Test]
 		public void CanRenameTable()
 		{
 			RenameTableExpression expression = new RenameTableExpression { OldName = oldTable, NewName = newTable };
@@ -178,6 +187,13 @@ namespace FluentMigrator.Tests.Unit.Generators
 			ColumnDefinition column = new ColumnDefinition { Name = newColumn, IsIdentity = true, IsPrimaryKey = true, Type = DbType.String };
 			return new CreateColumnExpression { TableName = table, Column = column };
 		}
+
+        private CreateTableExpression GetCreateTableWithPrimaryKeyIdentityExpression()
+        {
+            var expression = new CreateTableExpression {TableName = table};
+            expression.Columns.Add(new ColumnDefinition { Name = newColumn, IsIdentity = true, IsPrimaryKey = true, Type = DbType.String });
+            return expression;
+        }
 
 		private CreateTableExpression GetCreateTableExpression()
 		{

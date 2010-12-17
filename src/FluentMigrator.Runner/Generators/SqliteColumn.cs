@@ -5,17 +5,17 @@ namespace FluentMigrator.Runner.Generators
 {
 	class SqliteColumn : ColumnBase
 	{
+        protected override bool CanSeperatePrimaryKeyAndIdentity { get { return false; } }
+
 		public SqliteColumn() : base(new SqliteTypeMap(), new ConstantFormatter())
 		{
 		}
 
 		protected override string FormatIdentity(ColumnDefinition column)
 		{
-			if (!column.IsIdentity)
-				return string.Empty;
-
-			//Assume that if its IDENTITY and PRIMARY KEY, the it should be an AUTOINCREMENT column
-			return !column.IsPrimaryKey ? "IDENTITY" : string.Empty;
+            //SQLite only supports the concept of Identity in combination with a single primary key
+            //see: http://www.sqlite.org/syntaxdiagrams.html#column-constraint syntax details
+		    return string.Empty;
 		}
 
 		protected override string FormatPrimaryKey(ColumnDefinition column)
