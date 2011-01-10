@@ -33,6 +33,12 @@ namespace FluentMigrator.Expressions
 			Columns = new List<ColumnDefinition>();
 		}
 
+		public override void ApplyConventions( IMigrationConventions conventions )
+		{
+			foreach (var column in Columns)
+				column.ApplyConventions(conventions);
+		}
+
 		public override void CollectValidationErrors(ICollection<string> errors)
 		{
 			if (string.IsNullOrEmpty(TableName))

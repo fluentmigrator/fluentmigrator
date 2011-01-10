@@ -28,7 +28,6 @@ using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Integration.Migrations;
-using FluentMigrator.Tests.Integration.Migrations.Invalid;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
@@ -92,6 +91,7 @@ namespace FluentMigrator.Tests.Integration
 			runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
 		}
 
+		//BUG: the Users table is not getting properly dropped. this test will fail on the second execution
 		[Test]
 		public void CanApplyForeignKeyConvention()
 		{
@@ -110,6 +110,7 @@ namespace FluentMigrator.Tests.Integration
 				});
 		}
 
+		//BUG: the Users table is not getting properly dropped. this test will fail on the second execution
 		[Test]
 		public void CanApplyIndexConvention()
 		{
@@ -168,12 +169,7 @@ namespace FluentMigrator.Tests.Integration
 		{
 			ExecuteWithSupportedProcessors( processor =>
 			{
-				Assembly asm = typeof( MigrationRunnerTests ).Assembly;
-				var runnerContext = new RunnerContext( new TextWriterAnnouncer( System.Console.Out ) )
-				{
-					Namespace = "FluentMigrator.Tests.Integration.Migrations"
-				};
-				var runner = new MigrationRunner( asm, runnerContext, processor );
+				MigrationRunner runner = SetupMigrationRunner(processor);
 
 				runner.MigrateUp();
 
@@ -188,10 +184,7 @@ namespace FluentMigrator.Tests.Integration
 		{
 			ExecuteWithSupportedProcessors( processor =>
 			{
-				Assembly asm = typeof( MigrationRunnerTests ).Assembly;
-				var runnerContext = new RunnerContext( new TextWriterAnnouncer( System.Console.Out ) );
-				runnerContext.Namespace = "FluentMigrator.Tests.Integration.Migrations";
-				var runner = new MigrationRunner( asm, runnerContext, processor );
+				MigrationRunner runner = SetupMigrationRunner(processor);
 
 				runner.MigrateUp( 1 );
 
@@ -203,25 +196,116 @@ namespace FluentMigrator.Tests.Integration
 		[Test]
 		public void CanMigrateASpecificVersionDown()
 		{
-			ExecuteWithSupportedProcessors( processor =>
+			try 
 			{
-				Assembly asm = typeof( MigrationRunnerTests ).Assembly;
-				var runnerContext = new RunnerContext( new TextWriterAnnouncer( System.Console.Out ) );
-				runnerContext.Namespace = "FluentMigrator.Tests.Integration.Migrations";
-				var runner = new MigrationRunner( asm, runnerContext, processor );
+				ExecuteWithSupportedProcessors(processor => {
+					MigrationRunner runner = SetupMigrationRunner(processor);
 
-				runner.MigrateUp( 1 );
+					runner.MigrateUp(1);
 
-				runner.VersionLoader.VersionInfo.HasAppliedMigration( 1 ).ShouldBeTrue();
-				processor.TableExists( "Users" ).ShouldBeTrue();
+					runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
+					processor.TableExists("Users").ShouldBeTrue();
+				}, false);
 
-				runner.MigrateDown( 1 );
+				ExecuteWithSupportedProcessors(processor => {
+					MigrationRunner testRunner = SetupMigrationRunner(processor);
+					testRunner.MigrateDown(1);
 
-				runner.VersionLoader.VersionInfo.HasAppliedMigration( 1 ).ShouldBeFalse();
-				processor.TableExists( "Users" ).ShouldBeFalse();
-			} );
+					testRunner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeFalse();
+					processor.TableExists("Users").ShouldBeFalse();
+				}, false);
+
+			}
+			finally 
+			{
+				ExecuteWithSupportedProcessors(processor => {
+					MigrationRunner testRunner = SetupMigrationRunner(processor);
+					testRunner.RollbackToVersion(0);
+				}, false);
+			}
+		}
+
+		[Test]
+		public void RollbackAllShouldRemoveVersionInfoTable()
+		{
+			ExecuteWithSupportedProcessors(processor =>
+			{
+				MigrationRunner runner = SetupMigrationRunner(processor);
+
+				runner.MigrateUp(2);
+
+				processor.TableExists(runner.VersionLoader.VersionTableMetaData.TableName).ShouldBeTrue();
+			});
+
+			ExecuteWithSupportedProcessors(processor => {
+				MigrationRunner runner = SetupMigrationRunner(processor);
+				runner.RollbackToVersion(0);
+
+				processor.TableExists(runner.VersionLoader.VersionTableMetaData.TableName).ShouldBeFalse();
+			});
+		}
+
+		[Test]
+		public void MigrateUpWithSqlServerProcessorShouldCommitItsTransaction()
+		{
+			var connection = new SqlConnection(IntegrationTestOptions.SqlServer.ConnectionString);
+			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+
+			MigrationRunner runner = SetupMigrationRunner(processor);
+			runner.MigrateUp();
+
+			try {
+				processor.WasCommitted.ShouldBeTrue();
+
+			} finally {
+				CleanupTestSqlServerDatabase(connection, processor);
+			}
+		}
+
+		[Test]
+		public void MigrateUpSpecificVersionWithSqlServerProcessorShouldCommitItsTransaction()
+		{
+			var connection = new SqlConnection(IntegrationTestOptions.SqlServer.ConnectionString);
+			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+
+			MigrationRunner runner = SetupMigrationRunner(processor);
+			runner.MigrateUp(1);
+
+			try {
+				processor.WasCommitted.ShouldBeTrue();
+
+			} finally {
+				CleanupTestSqlServerDatabase(connection, processor);
+			}
+		}
+
+
+		private static MigrationRunner SetupMigrationRunner(IMigrationProcessor processor)
+		{
+			Assembly asm = typeof(MigrationRunnerTests).Assembly;
+			var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+			{
+				Namespace = "FluentMigrator.Tests.Integration.Migrations"
+			};
+
+			return new MigrationRunner(asm, runnerContext, processor);
+		}
+
+		private static void CleanupTestSqlServerDatabase(SqlConnection connection, SqlServerProcessor origProcessor)
+		{
+			if (origProcessor.WasCommitted) {
+				connection.Close();
+
+				var cleanupProcessor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+				MigrationRunner cleanupRunner = SetupMigrationRunner(cleanupProcessor);
+				cleanupRunner.RollbackToVersion(0);
+
+			} else {
+				origProcessor.RollbackTransaction();
+			}	
 		}
 	}
+
 
 	internal class TestForeignKeyNamingConvention : Migration
 	{

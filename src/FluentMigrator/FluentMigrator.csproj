@@ -42,6 +42,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Debug\FluentMigrator.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -51,6 +52,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <DocumentationFile>bin\Release\FluentMigrator.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AutomatedRelease|AnyCPU' ">
     <OutputPath>..\..\build\AutomatedRelease\</OutputPath>
@@ -120,9 +122,15 @@
     <Compile Include="Builders\Alter\Column\IAlterColumnOnTableSyntax.cs" />
     <Compile Include="Builders\Alter\Column\IAlterColumnOptionSyntax.cs" />
     <Compile Include="Builders\Alter\IAlterExpressionRoot.cs" />
+    <Compile Include="Builders\Alter\Table\AlterTableExpressionBuilder.cs" />
+    <Compile Include="Builders\Alter\Table\IAlterTableAddColumnOrAlterColumnOrSchemaSyntax.cs" />
+    <Compile Include="Builders\Alter\Table\IAlterTableAddColumOrAlterColumnSyntax.cs" />
+    <Compile Include="Builders\Alter\Table\IAlterTableColumnAsTypeSyntax.cs" />
+    <Compile Include="Builders\Alter\Table\IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax.cs" />
     <Compile Include="Builders\Create\Column\ICreateColumnAsTypeOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Create\ForeignKey\ICreateForeignKeyPrimaryColumnOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Create\ForeignKey\ICreateForeignKeyForeignColumnOrInSchemaSyntax.cs" />
+    <Compile Include="Builders\Create\ForeignKey\ICreateForiegnKeyCascadeSyntax.cs" />
     <Compile Include="Builders\Create\Index\ICreateIndexOnColumnOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Create\Index\ICreateIndexColumnOptionsSyntax.cs" />
     <Compile Include="Builders\Create\Index\ICreateIndexOptionsSyntax.cs" />
@@ -139,18 +147,28 @@
     <Compile Include="Builders\Delete\Table\DeleteTableExpressionBuilder.cs" />
     <Compile Include="Builders\Execute\ExecuteExpressionRoot.cs" />
     <Compile Include="Builders\Execute\IExecuteExpressionRoot.cs" />
+    <Compile Include="Builders\ExpressionBuilderWithColumnTypesBase.cs" />
     <Compile Include="Builders\IInSchemaSyntax.cs" />
     <Compile Include="Builders\Insert\IInsertDataOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Insert\IInsertDataSyntax.cs" />
     <Compile Include="Builders\Insert\IInsertExpressionRoot.cs" />
     <Compile Include="Builders\Rename\Column\IRenameColumnToOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Rename\Table\IRenameTableToOrInSchemaSyntax.cs" />
+    <Compile Include="Builders\Update\UpdateDataExpressionBuilder.cs" />
+    <Compile Include="Builders\Update\IUpdateSetOrInSchemaSyntax.cs" />
+    <Compile Include="Builders\Update\IUpdateSetSyntax.cs" />
+    <Compile Include="Builders\Update\IUpdateWhereSyntax.cs" />
+    <Compile Include="Builders\Update\UpdateExpressionRoot.cs" />
+    <Compile Include="Builders\Update\IUpdateExpressionRoot.cs" />
     <Compile Include="Expressions\AlterColumnExpression.cs" />
     <Compile Include="Expressions\AlterDefaultConstraintExpression.cs" />
+    <Compile Include="Expressions\AlterTableExpression.cs" />
+    <Compile Include="Expressions\AlterSchemaExpression.cs" />
     <Compile Include="Expressions\DeleteDataExpression.cs" />
     <Compile Include="Expressions\InsertDataExpression.cs" />
     <Compile Include="Builders\Insert\InsertDataExpressionBuilder.cs" />
     <Compile Include="Builders\Insert\InsertExpressionRoot.cs" />
+    <Compile Include="Expressions\UpdateDataExpression.cs" />
     <Compile Include="Model\DeletionDataDefinition.cs" />
     <Compile Include="Model\InsertionDataDefinition.cs" />
     <Compile Include="Builders\Rename\Column\IRenameColumnToSyntax.cs" />
@@ -175,6 +193,7 @@
     <Compile Include="Infrastructure\Extensions\ExtensionsForIEnumerable.cs" />
     <Compile Include="IQuerySchema.cs" />
     <Compile Include="ProfileAttribute.cs" />
+    <Compile Include="SystemMethods.cs" />
     <Compile Include="VersionTableInfo\DefaultVersionTableMetaData.cs" />
     <Compile Include="VersionTableInfo\IVersionTableMetaData.cs" />
     <Compile Include="MigrationTraitAttribute.cs" />

@@ -29,96 +29,10 @@ namespace FluentMigrator.Runner.Generators
 {
 	public class SqliteGenerator : GeneratorBase
 	{
-		public const int AnsiStringCapacity = 8000;
-		public const int AnsiTextCapacity = 2147483647;
-		public const int UnicodeStringCapacity = 4000;
-		public const int UnicodeTextCapacity = 1073741823;
-		public const int ImageCapacity = 2147483647;
-		public const int DecimalCapacity = 19;
-		public const int XmlCapacity = 1073741823;
-
-		protected override void SetupTypeMaps()
-		{
-			SetTypeMap(DbType.Binary, "BLOB");
-			SetTypeMap(DbType.Byte, "INTEGER");
-			SetTypeMap(DbType.Int16, "INTEGER");
-			SetTypeMap(DbType.Int32, "INTEGER");
-			SetTypeMap(DbType.Int64, "INTEGER");
-			SetTypeMap(DbType.SByte, "INTEGER");
-			SetTypeMap(DbType.UInt16, "INTEGER");
-			SetTypeMap(DbType.UInt32, "INTEGER");
-			SetTypeMap(DbType.UInt64, "INTEGER");
-			SetTypeMap(DbType.Currency, "NUMERIC");
-			SetTypeMap(DbType.Decimal, "NUMERIC");
-			SetTypeMap(DbType.Double, "NUMERIC");
-			SetTypeMap(DbType.Single, "NUMERIC");
-			SetTypeMap(DbType.VarNumeric, "NUMERIC");
-			SetTypeMap(DbType.AnsiString, "TEXT");
-			SetTypeMap(DbType.String, "TEXT");
-			SetTypeMap(DbType.AnsiStringFixedLength, "TEXT");
-			SetTypeMap(DbType.StringFixedLength, "TEXT");
-
-			SetTypeMap(DbType.Date, "DATETIME");
-			SetTypeMap(DbType.DateTime, "DATETIME");
-			SetTypeMap(DbType.Time, "DATETIME");
-			SetTypeMap(DbType.Boolean, "INTEGER");
-			SetTypeMap(DbType.Guid, "UNIQUEIDENTIFIER");
+		public SqliteGenerator() : base(new SqliteColumn(), new ConstantFormatter())		{
 		}
 
-		public override string GetTypeMap(DbType type, int size, int precision)
-		{
-			return base.GetTypeMap(type, 0, 0);
-		}
 
-		public override string GenerateDDLForColumn(ColumnDefinition column)
-		{
-			var sb = new StringBuilder();
-
-			sb.Append(column.Name);
-			sb.Append(" ");
-
-			if (!column.IsIdentity)
-			{
-				if (column.Type.HasValue)
-				{
-					sb.Append(GetTypeMap(column.Type.Value, column.Size, column.Precision));
-				}
-				else
-				{
-					sb.Append(column.CustomType);
-				}
-			}
-			else
-			{
-				sb.Append(GetTypeMap(DbType.Int32, column.Size, column.Precision));
-			}
-
-			if (!column.IsNullable)
-			{
-				sb.Append(" NOT NULL");
-			}
-
-			if (column.DefaultValue != null)
-			{
-				sb.Append(" DEFAULT ");
-				sb.Append(GetConstantValue(column.DefaultValue));
-			}
-
-			if (column.IsIdentity)
-			{
-				sb.Append(" IDENTITY");
-			}
-
-			if (column.IsPrimaryKey)
-			{
-				sb.Append(" PRIMARY KEY");
-			}
-
-			//Assume that if its IDENTITY and PRIMARY KEY, the it should be an AUTOINCREMENT column
-			sb.Replace(" IDENTITY PRIMARY KEY", " PRIMARY KEY AUTOINCREMENT");
-
-			return sb.ToString();
-		}
 
 		public override string Generate(CreateSchemaExpression expression)
 		{
@@ -130,30 +44,35 @@ namespace FluentMigrator.Runner.Generators
 			throw new NotImplementedException();
 		}
 
-        public override string Generate(AlterColumnExpression expression)
-        {
-            throw new NotImplementedException();
-        }
+		public override string Generate(AlterColumnExpression expression)
+		{
+			throw new NotImplementedException();
+		}
+
+    public override string Generate( AlterSchemaExpression expression )
+    {
+      throw new NotImplementedException();
+    }
 
 		public override string Generate(CreateTableExpression expression)
 		{
-			return string.Format("CREATE TABLE {0} ({1})", expression.TableName, GetColumnDDL(expression));
+			return string.Format("CREATE TABLE [{0}] ({1})", expression.TableName, Column.Generate(expression));
 		}
 
 		public override string Generate(RenameTableExpression expression)
 		{
-			return string.Format("ALTER TABLE {0} RENAME TO {1}", expression.OldName, expression.NewName);
+			return string.Format("ALTER TABLE [{0}] RENAME TO [{1}]", expression.OldName, expression.NewName);
 		}
 
 		public override string Generate(DeleteTableExpression expression)
 		{
-			return string.Format("DROP TABLE {0}", expression.TableName);
+			return string.Format("DROP TABLE [{0}]", expression.TableName);
 		}
 
 		public override string Generate(CreateColumnExpression expression)
 		{
 			//return string.Format("ALTER TABLE {0} ADD COLUMN {1}", expression.TableName, expression.Column.Name);
-			return FormatExpression("ALTER TABLE [{0}] ADD COLUMN {1}", expression.TableName, GenerateDDLForColumn(expression.Column));
+			return String.Format("ALTER TABLE [{0}] ADD COLUMN {1}", expression.TableName, Column.Generate(expression.Column));
 		}
 
 		public override string Generate(RenameColumnExpression expression)
@@ -176,48 +95,83 @@ namespace FluentMigrator.Runner.Generators
 
 				string columns = GetColumnList(columnNames);
 				string data = GetDataList(columnData);
-				result.Append(FormatExpression("INSERT INTO [{0}] ({1}) VALUES ({2});", expression.TableName, columns, data));
+				result.Append(String.Format("INSERT INTO [{0}] ({1}) VALUES ({2});", expression.TableName, columns, data));
 			}
 			return result.ToString();
 		}
 
-        public override string Generate(DeleteDataExpression expression)
+        public override string Generate(UpdateDataExpression expression)
         {
             var result = new StringBuilder();
 
-            if (expression.IsAllRows)
+            var set = String.Empty;
+            var i = 0;
+            foreach (var item in expression.Set)
             {
-                result.Append(FormatExpression("DELETE FROM {0};", expression.TableName));
-            }
-            else
-            {
-                foreach (var row in expression.Rows)
+                if (i != 0)
                 {
-                    var where = String.Empty;
-                    var i = 0;
-
-                    foreach (var item in row)
-                    {
-                        if (i != 0)
-                        {
-                            where += " AND ";
-                        }
-
-                        where += String.Format("[{0}] = {1}", item.Key, GetConstantValue(item.Value));
-                        i++;
-                    }
-
-                    result.Append(FormatExpression("DELETE FROM {0} WHERE {1};", expression.TableName, where));
+                    set += ", ";
                 }
+
+                set += String.Format("[{0}] = {1}", item.Key, Constant.Format(item.Value));
+                i++;
             }
+
+            var where = String.Empty;
+            i = 0;
+            foreach (var item in expression.Where)
+            {
+                if (i != 0)
+                {
+                    where += " AND ";
+                }
+
+                where += String.Format("[{0}] {1} {2}", item.Key, item.Value == null ? "IS" : "=", Constant.Format(item.Value));
+                i++;
+            }
+
+            result.Append(String.Format("UPDATE [{0}] SET {1} WHERE {2};", expression.TableName, set, where));
 
             return result.ToString();
         }
 
-        public override string Generate(AlterDefaultConstraintExpression expression)
-        {
-            throw new NotImplementedException();
-        }
+		public override string Generate(DeleteDataExpression expression)
+		{
+			var result = new StringBuilder();
+
+			if (expression.IsAllRows)
+			{
+				result.Append(String.Format("DELETE FROM [{0}];", expression.TableName));
+			}
+			else
+			{
+				foreach (var row in expression.Rows)
+				{
+					var where = String.Empty;
+					var i = 0;
+
+					foreach (var item in row)
+					{
+						if (i != 0)
+						{
+							where += " AND ";
+						}
+
+                        where += String.Format("[{0}] {1} {2}", item.Key, item.Value == null ? "IS" : "=", Constant.Format(item.Value));
+						i++;
+					}
+
+					result.Append(String.Format("DELETE FROM [{0}] WHERE {1};", expression.TableName, where));
+				}
+			}
+
+			return result.ToString();
+		}
+
+		public override string Generate(AlterDefaultConstraintExpression expression)
+		{
+			throw new NotImplementedException();
+		}
 
 		private string GetColumnList(IEnumerable<string> columns)
 		{
@@ -234,14 +188,14 @@ namespace FluentMigrator.Runner.Generators
 			string result = "";
 			foreach (object column in data)
 			{
-				result += GetConstantValue(column) + ",";
+				result += Constant.Format(column) + ",";
 			}
 			return result.TrimEnd(',');
 		}
 
 		public override string Generate(DeleteColumnExpression expression)
 		{
-			return string.Format("ALTER TABLE {0} DROP COLUMN {1}", expression.TableName, expression.ColumnName);
+			return string.Format("ALTER TABLE [{0}] DROP COLUMN {1}", expression.TableName, expression.ColumnName);
 		}
 
 		public override string Generate(CreateForeignKeyExpression expression)
@@ -275,7 +229,7 @@ namespace FluentMigrator.Runner.Generators
 			}
 			result.Append(")");
 
-			return FormatExpression(result.ToString(), expression.Index.Name, expression.Index.TableName);
+			return String.Format(result.ToString(), expression.Index.Name, expression.Index.TableName);
 		}
 
 		public override string Generate(DeleteIndexExpression expression)

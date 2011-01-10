@@ -33,12 +33,17 @@ namespace FluentMigrator.Tests.Integration
 	{
 		public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test)
 		{
-			ExecuteWithSqlServer(test, IntegrationTestOptions.SqlServer);
+			ExecuteWithSupportedProcessors(test, true);
+		}
+
+		public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback)
+		{
+			ExecuteWithSqlServer(test, IntegrationTestOptions.SqlServer, tryRollback);
 			ExecuteWithSqlite(test, IntegrationTestOptions.SqlLite);
 			ExecuteWithMySql(test, IntegrationTestOptions.MySql);
 		}
 
-		protected static void ExecuteWithSqlServer(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
+		protected static void ExecuteWithSqlServer(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions, Boolean tryRollback)
 		{
 			if (!serverOptions.IsEnabled)
 				return;
@@ -47,9 +52,9 @@ namespace FluentMigrator.Tests.Integration
 			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 			test(processor);
 
-			if (!processor.WasCommitted)
+			if (tryRollback && !processor.WasCommitted)
 			{
-				processor.RollbackTransaction();
+			    processor.RollbackTransaction();
 			}
 		}
 

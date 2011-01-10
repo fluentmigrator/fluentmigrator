@@ -38,6 +38,7 @@ namespace FluentMigrator
 
 		void Process(CreateSchemaExpression expression);
 		void Process(DeleteSchemaExpression expression);
+	    void Process(AlterTableExpression expression);
 		void Process(AlterColumnExpression expression);
 		void Process(CreateTableExpression expression);
 		void Process(CreateColumnExpression expression);
@@ -52,6 +53,8 @@ namespace FluentMigrator
 		void Process(InsertDataExpression expression);
 		void Process(AlterDefaultConstraintExpression expression);
 		void Process(PerformDBOperationExpression expression);
-	    void Process(DeleteDataExpression expression);
+		void Process(DeleteDataExpression expression);
+        void Process(UpdateDataExpression expression);
+        void Process( AlterSchemaExpression expression );
 	}
 }

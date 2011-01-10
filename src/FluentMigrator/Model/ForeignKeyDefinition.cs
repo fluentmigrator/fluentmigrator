@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Model
@@ -29,6 +30,8 @@ namespace FluentMigrator.Model
 		public virtual string ForeignTableSchema { get; set; }
 		public virtual string PrimaryTable { get; set; }
 		public virtual string PrimaryTableSchema { get; set; }
+		public virtual Rule OnDelete { get; set; }
+		public virtual Rule OnUpdate { get; set; }
 		public virtual ICollection<string> ForeignColumns { get; set; }
 		public virtual ICollection<string> PrimaryColumns { get; set; }
 
@@ -75,7 +78,9 @@ namespace FluentMigrator.Model
 				PrimaryTableSchema = PrimaryTableSchema,
 				PrimaryTable = PrimaryTable,
 				ForeignColumns = new List<string>(ForeignColumns),
-				PrimaryColumns = new List<string>(PrimaryColumns)
+				PrimaryColumns = new List<string>(PrimaryColumns),
+                OnDelete = OnDelete,
+                OnUpdate = OnUpdate
 			};
 		}
 	}

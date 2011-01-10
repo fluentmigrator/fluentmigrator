@@ -50,6 +50,11 @@ namespace FluentMigrator.Runner.Processors
 			Process(Generator.Generate(expression));
 		}
 
+        public virtual void Process(AlterTableExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
+
 		public virtual void Process(AlterColumnExpression expression)
 		{
 			Process(Generator.Generate(expression));
@@ -105,17 +110,27 @@ namespace FluentMigrator.Runner.Processors
 			Process(Generator.Generate(expression));
 		}
 
-        public void Process(DeleteDataExpression expression)
-        {
-            Process(Generator.Generate(expression));
-        }
+		public void Process(DeleteDataExpression expression)
+		{
+			Process(Generator.Generate(expression));
+		}
 
 		public void Process(AlterDefaultConstraintExpression expression)
 		{
 			Process(Generator.Generate(expression));
 		}
 
+        public void Process(UpdateDataExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
+
 		public abstract void Process(PerformDBOperationExpression expression);
+
+    public void Process(AlterSchemaExpression expression)
+    {
+      Process(Generator.Generate(expression));
+    }
 
 		protected abstract void Process(string sql);
 

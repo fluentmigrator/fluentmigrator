@@ -74,7 +74,7 @@ namespace FluentMigrator.Runner
 			{
 				foreach (var version in MigrationLoader.Migrations.Keys)
 				{
-					MigrateUp(version);
+					ApplyMigrationUp(version);
 				}
 
 				ApplyProfiles();
@@ -91,14 +91,17 @@ namespace FluentMigrator.Runner
 
 		public void MigrateUp(long version)
 		{
-			if (!_alreadyOutputPreviewOnlyModeWarning && Processor.Options.PreviewOnly)
+			try 
 			{
-				_announcer.Heading("PREVIEW-ONLY MODE");
-				_alreadyOutputPreviewOnlyModeWarning = true;
+				ApplyMigrationUp(version);
+				Processor.CommitTransaction();
+				VersionLoader.LoadVersionInfo();
+			} 
+			catch (Exception) 
+			{
+				Processor.RollbackTransaction();
+				throw;
 			}
-
-			ApplyMigrationUp(version);
-			VersionLoader.LoadVersionInfo();
 		}
 
 		public void MigrateDown(long version)
@@ -119,6 +122,11 @@ namespace FluentMigrator.Runner
 
 		private void ApplyMigrationUp(long version)
 		{
+			if (!_alreadyOutputPreviewOnlyModeWarning && Processor.Options.PreviewOnly) {
+				_announcer.Heading("PREVIEW-ONLY MODE");
+				_alreadyOutputPreviewOnlyModeWarning = true;
+			}
+
 			if (!VersionLoader.VersionInfo.HasAppliedMigration(version))
 			{
 				Up(MigrationLoader.Migrations[version]);
@@ -168,8 +176,14 @@ namespace FluentMigrator.Runner
 
 			if (version == 0)
 				VersionLoader.RemoveVersionTable();
+<<<<<<< HEAD
 
 			VersionLoader.LoadVersionInfo();
+=======
+			else
+				VersionLoader.LoadVersionInfo();
+
+>>>>>>> 210618a0a107843fef9bca9f362a630c3259bd47
 			Processor.CommitTransaction();
 		}
 

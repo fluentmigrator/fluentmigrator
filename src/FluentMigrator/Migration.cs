@@ -25,6 +25,7 @@ using FluentMigrator.Builders.Rename;
 using FluentMigrator.Builders.Schema;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Builders.Execute;
+using FluentMigrator.Builders.Update;
 
 namespace FluentMigrator
 {
@@ -62,10 +63,10 @@ namespace FluentMigrator
 			}
 		}
 
-	    public IAlterExpressionRoot Alter
-	    {
-	        get { return new AlterExpressionRoot(_context);}
-	    }
+		public IAlterExpressionRoot Alter
+		{
+			get { return new AlterExpressionRoot(_context);}
+		}
 
 		public ICreateExpressionRoot Create
 		{
@@ -96,5 +97,10 @@ namespace FluentMigrator
 		{
 			get { return new SchemaExpressionRoot(_context); }
 		}
+
+	    public IUpdateExpressionRoot Update
+	    {
+	        get { return new UpdateExpressionRoot(_context);}
+	    }
 	}
 }

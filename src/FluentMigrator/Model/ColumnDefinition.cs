@@ -23,8 +23,13 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Model
 {
-	public class ColumnDefinition : ICloneable, ICanBeValidated
+	public class ColumnDefinition : ICloneable, ICanBeConventional, ICanBeValidated
 	{
+		public ColumnDefinition()
+		{
+			DefaultValue = new UndefinedDefaultValue();
+		}
+
 		public virtual string Name { get; set; }
 		public virtual DbType? Type { get; set; }
 		public virtual int Size { get; set; }
@@ -38,6 +43,13 @@ namespace FluentMigrator.Model
 		public virtual string PrimaryKeyName { get; set; }
 		public virtual bool IsNullable { get; set; }
 		public virtual bool IsUnique { get; set; }
+		public virtual string TableName { get; set; }
+
+		public void ApplyConventions(IMigrationConventions conventions)
+		{
+			if ( String.IsNullOrEmpty( PrimaryKeyName ) )
+				PrimaryKeyName = conventions.GetPrimaryKeyName(TableName);
+		}
 
 		public virtual void CollectValidationErrors(ICollection<string> errors)
 		{
@@ -51,6 +63,10 @@ namespace FluentMigrator.Model
 		public object Clone()
 		{
 			return MemberwiseClone();
+		}
+
+		public class UndefinedDefaultValue
+		{
 		}
 	}
 }

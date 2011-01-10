@@ -17,13 +17,15 @@
 #endregion
 
 using FluentMigrator.Builders.Alter.Column;
+using FluentMigrator.Builders.Alter.Table;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Alter
 {
-    public interface IAlterExpressionRoot : IFluentSyntax
-    {
-        //void Schema(string schemaName);
-        IAlterColumnOnTableSyntax Column(string columnName);
-    }
+	public interface IAlterExpressionRoot : IFluentSyntax
+	{
+		//void Schema(string schemaName);
+        IAlterTableAddColumnOrAlterColumnOrSchemaSyntax Table(string tableName);
+		IAlterColumnOnTableSyntax Column(string columnName);
+	}
 }

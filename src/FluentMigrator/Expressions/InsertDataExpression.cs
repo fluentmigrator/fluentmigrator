@@ -43,21 +43,21 @@ namespace FluentMigrator.Expressions
 
 		public IMigrationExpression Reverse()
 		{
-		    var expression = new DeleteDataExpression
-		                         {
-		                             SchemaName = SchemaName,
-		                             TableName = TableName
-		                         };
+			var expression = new DeleteDataExpression
+								{
+									SchemaName = SchemaName,
+									TableName = TableName
+								};
 
-            foreach (var row in Rows)
-            {
-                var dataDefinition = new DeletionDataDefinition();
-                dataDefinition.AddRange(row);
+			foreach (var row in Rows)
+			{
+				var dataDefinition = new DeletionDataDefinition();
+				dataDefinition.AddRange(row);
 
-                expression.Rows.Add(dataDefinition);
-            }
+				expression.Rows.Add(dataDefinition);
+			}
 
-		    return expression;
+			return expression;
 		}
 
 		public void ApplyConventions(IMigrationConventions conventions)

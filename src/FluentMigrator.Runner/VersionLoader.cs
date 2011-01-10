@@ -120,7 +120,12 @@ namespace FluentMigrator.Runner
 
 		public void DeleteVersion(long version)
 		{
-			Processor.Execute("DELETE FROM {0} WHERE {1}='{2}'", VersionTableMetaData.TableName, VersionTableMetaData.ColumnName, version.ToString());
+			var expression = new DeleteDataExpression { TableName = VersionTableMetaData.TableName };
+			expression.Rows.Add(new DeletionDataDefinition
+									{
+										new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version)
+									});
+			expression.ExecuteWith( Processor );
 		}
 	}
 }

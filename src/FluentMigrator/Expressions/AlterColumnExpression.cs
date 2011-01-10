@@ -23,15 +23,15 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-    public class AlterColumnExpression : MigrationExpressionBase
-    {
-        public virtual string SchemaName { get; set; }
+	public class AlterColumnExpression : MigrationExpressionBase
+	{
+		public virtual string SchemaName { get; set; }
 		public virtual string TableName { get; set; }
-        public virtual ColumnDefinition Column { get; set; }
+		public virtual ColumnDefinition Column { get; set; }
 
-        public AlterColumnExpression()
+		public AlterColumnExpression()
 		{
-            Column = new ColumnDefinition();
+			Column = new ColumnDefinition();
 		}
 
 		public override void CollectValidationErrors(ICollection<string> errors)
@@ -39,11 +39,12 @@ namespace FluentMigrator.Expressions
 			if (String.IsNullOrEmpty(TableName))
 				errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
 
-            Column.CollectValidationErrors(errors);
+			Column.CollectValidationErrors(errors);
 		}
 
 		public override void ExecuteWith(IMigrationProcessor processor)
 		{
+			Column.TableName = TableName;
 			processor.Process(this);
 		}
 
@@ -51,5 +52,5 @@ namespace FluentMigrator.Expressions
 		{
 			return base.ToString() + TableName + " " + Column.Name + " " + Column.Type ?? Column.CustomType;
 		}
-    }
+	}
 }

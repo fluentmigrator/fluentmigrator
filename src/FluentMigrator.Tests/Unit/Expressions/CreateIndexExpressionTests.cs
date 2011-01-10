@@ -32,18 +32,18 @@ namespace FluentMigrator.Tests.Unit.Expressions
 		public void ToStringIsDescriptive()
 		{
 			new CreateIndexExpression{ Index = new IndexDefinition
-			                                   	{
-			                                   		Columns = new Collection<IndexColumnDefinition>
-			                                   		          	{
-			                                   		          		new IndexColumnDefinition
-			                                   		          			{
+													{
+														Columns = new Collection<IndexColumnDefinition>
+																		{
+																			new IndexColumnDefinition
+																				{
 																			Name = "Name"
-			                                   		          			},
+																				},
 																	new IndexColumnDefinition
 																		{
 																			Name = "Slug"
 																		}
-			                                   		          	},
+																		},
 													TableName = "Table",
 													Name = "NameIndex"
 												}

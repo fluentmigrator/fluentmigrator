@@ -29,34 +29,23 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {
-	[TestFixture]
 	public class SqlServer2000GeneratorTests
 	{
-		private SqlServer2000Generator generator;
+		protected SqlServer2000Generator generator;
 
 		[SetUp]
 		public void SetUp()
 		{
 			generator = new SqlServer2000Generator();
 		}
+	}
 
+	[TestFixture]
+	public class SqlServer2000GeneratorOtherTests : SqlServer2000GeneratorTests
+	{
 		private DeleteTableExpression GetDeleteTableExpression(string tableName)
 		{
 			return new DeleteTableExpression { TableName = tableName };
-		}
-
-		private CreateTableExpression GetCreateTableExpression(string tableName)
-		{
-			var columnName1 = "ColumnName1";
-			var columnName2 = "ColumnName2";
-
-			var column1 = new ColumnDefinition { Name = columnName1, Type = DbType.String };
-			var column2 = new ColumnDefinition { Name = columnName2, Type = DbType.Int32 };
-
-			var expression = new CreateTableExpression { TableName = tableName };
-			expression.Columns.Add(column1);
-			expression.Columns.Add(column2);
-			return expression;
 		}
 
 		[Test]
@@ -127,39 +116,6 @@ namespace FluentMigrator.Tests.Unit.Generators
 		}
 
 		[Test]
-		public void CanCreateTable()
-		{
-			var tableName = "NewTable";
-			var expression = GetCreateTableExpression(tableName);
-			var sql = generator.Generate(expression);
-			sql.ShouldBe("CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL, ColumnName2 INT NOT NULL)");
-		}
-
-		[Test]
-		public void CanCreateTableWithCustomColumnType()
-		{
-			var tableName = "NewTable";
-			var expression = GetCreateTableExpression(tableName);
-			expression.Columns[0].IsPrimaryKey = true;
-			expression.Columns[1].Type = null;
-			expression.Columns[1].CustomType = "[timestamp]";
-			var sql = generator.Generate(expression);
-			sql.ShouldBe(
-				"CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL PRIMARY KEY CLUSTERED, ColumnName2 [timestamp] NOT NULL)");
-		}
-
-		[Test]
-		public void CanCreateTableWithPrimaryKey()
-		{
-			var tableName = "NewTable";
-			var expression = GetCreateTableExpression(tableName);
-			expression.Columns[0].IsPrimaryKey = true;
-			var sql = generator.Generate(expression);
-			sql.ShouldBe(
-				"CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL PRIMARY KEY CLUSTERED, ColumnName2 INT NOT NULL)");
-		}
-
-		[Test]
 		[Ignore("need better way to test this")]
 		public void CanDropColumn()
 		{
@@ -203,7 +159,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			var expression = new DeleteForeignKeyExpression();
 			expression.ForeignKey.Name = "FK_Test";
-			expression.ForeignKey.PrimaryTable = "TestPrimaryTable";
+			expression.ForeignKey.ForeignTable = "TestPrimaryTable";
 
 			var sql = generator.Generate(expression);
 			sql.ShouldBe("ALTER TABLE [TestPrimaryTable] DROP CONSTRAINT FK_Test");
@@ -224,22 +180,22 @@ namespace FluentMigrator.Tests.Unit.Generators
 			var expression = new InsertDataExpression();
 			expression.TableName = "TestTable";
 			expression.Rows.Add(new InsertionDataDefinition
-			                    	{
-			                    		new KeyValuePair<string, object>("Id", 1),
-			                    		new KeyValuePair<string, object>("Name", "Justin"),
-			                    		new KeyValuePair<string, object>("Website", "codethinked.com")
-			                    	});
+									{
+										new KeyValuePair<string, object>("Id", 1),
+										new KeyValuePair<string, object>("Name", "Just'in"),
+										new KeyValuePair<string, object>("Website", "codethinked.com")
+									});
 			expression.Rows.Add(new InsertionDataDefinition
-			                    	{
-			                    		new KeyValuePair<string, object>("Id", 2),
-			                    		new KeyValuePair<string, object>("Name", "Nate"),
-			                    		new KeyValuePair<string, object>("Website", "kohari.org")
-			                    	});
+									{
+										new KeyValuePair<string, object>("Id", 2),
+										new KeyValuePair<string, object>("Name", @"Na\te"),
+										new KeyValuePair<string, object>("Website", "kohari.org")
+									});
 
 			var sql = generator.Generate(expression);
 
-			var expected = "INSERT INTO [TestTable] ([Id],[Name],[Website]) VALUES (1,'Justin','codethinked.com');";
-			expected += "INSERT INTO [TestTable] ([Id],[Name],[Website]) VALUES (2,'Nate','kohari.org');";
+			var expected = "INSERT INTO [TestTable] ([Id],[Name],[Website]) VALUES (1,'Just''in','codethinked.com');";
+			expected += @"INSERT INTO [TestTable] ([Id],[Name],[Website]) VALUES (2,'Na\te','kohari.org');";
 
 			sql.ShouldBe(expected);
 		}
@@ -293,6 +249,99 @@ namespace FluentMigrator.Tests.Unit.Generators
 
 			var sql = generator.Generate(expression);
 			sql.ShouldNotBeNull();
+		}
+	}
+
+	[TestFixture]
+	public class SqlServer2000GeneratorCreateTableTests : SqlServer2000GeneratorTests
+	{
+		private string tableName = "NewTable";
+
+		[Test]
+		public void CanCreateTable()
+		{
+			var expression = GetCreateTableExpression(tableName);
+			var sql = generator.Generate(expression);
+			sql.ShouldBe("CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL, ColumnName2 INT NOT NULL)");
+		}
+
+		[Test]
+		public void CanCreateTableWithCustomColumnType()
+		{
+			var expression = GetCreateTableExpression(tableName);
+			expression.Columns[0].IsPrimaryKey = true;
+			expression.Columns[1].Type = null;
+			expression.Columns[1].CustomType = "[timestamp]";
+			var sql = generator.Generate(expression);
+			sql.ShouldBe(
+				"CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL PRIMARY KEY CLUSTERED, ColumnName2 [timestamp] NOT NULL)");
+		}
+
+		[Test]
+		public void CanCreateTableWithPrimaryKey()
+		{
+			var expression = GetCreateTableExpression(tableName);
+			expression.Columns[0].IsPrimaryKey = true;
+			var sql = generator.Generate(expression);
+			sql.ShouldBe(
+				"CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL PRIMARY KEY CLUSTERED, ColumnName2 INT NOT NULL)");
+		}
+
+		[Test]
+		public void CanCreateTableWithIdentity()
+		{
+			var expression = GetCreateTableExpression(tableName);
+			expression.Columns[0].IsIdentity = true;
+			var sql = generator.Generate(expression);
+			sql.ShouldBe(
+				"CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL IDENTITY(1,1), ColumnName2 INT NOT NULL)");
+		}
+
+		[Test]
+		public void CanCreateTableWithNullField()
+		{
+			var expression = GetCreateTableExpression(tableName);
+			expression.Columns[0].IsNullable = true;
+			var sql = generator.Generate(expression);
+			sql.ShouldBe(
+				"CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255), ColumnName2 INT NOT NULL)");
+		}
+
+		[Test]
+		public void CanCreateTableWithDefaultValue()
+		{
+			var expression = GetCreateTableExpression(tableName);
+			expression.Columns[0].DefaultValue = "Default";
+			expression.Columns[1].DefaultValue = 0;
+			var sql = generator.Generate(expression);
+			sql.ShouldBe(
+				"CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL CONSTRAINT DF_NewTable_ColumnName1 DEFAULT 'Default', ColumnName2 INT NOT NULL CONSTRAINT DF_NewTable_ColumnName2 DEFAULT 0)");
+		}
+
+		[Test]
+		public void CanCreateTableWithDefaultValueExplicitlySetToNull()
+		{
+			var expression = GetCreateTableExpression(tableName);
+			expression.Columns[0].DefaultValue = null;
+			var sql = generator.Generate(expression);
+			sql.ShouldBe(
+				"CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL CONSTRAINT DF_NewTable_ColumnName1 DEFAULT NULL, ColumnName2 INT NOT NULL)");
+			
+		}
+
+
+		protected CreateTableExpression GetCreateTableExpression(string tableName)
+		{
+			var columnName1 = "ColumnName1";
+			var columnName2 = "ColumnName2";
+
+			var column1 = new ColumnDefinition { Name = columnName1, TableName = tableName, Type = DbType.String };
+			var column2 = new ColumnDefinition { Name = columnName2, TableName = tableName, Type = DbType.Int32 };
+
+			var expression = new CreateTableExpression { TableName = tableName };
+			expression.Columns.Add(column1);
+			expression.Columns.Add(column2);
+			return expression;
 		}
 	}
 }

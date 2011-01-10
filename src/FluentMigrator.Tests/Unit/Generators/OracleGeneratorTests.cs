@@ -40,6 +40,29 @@ namespace FluentMigrator.Tests.Unit.Generators
 		}
 
 		[Test]
+		public void CanCreateTableWithDefaultValue()
+		{
+			string tableName = "NewTable";
+			CreateTableExpression expression = GetCreateTableExpression(tableName);
+			expression.Columns[0].DefaultValue = "abc";
+			string sql = generator.Generate(expression);
+			// Oracle requires the DEFAULT clause to appear before the NOT NULL clause
+			sql.ShouldBe("CREATE TABLE NewTable (ColumnName1 NVARCHAR2(255) DEFAULT 'abc' NOT NULL, ColumnName2 NUMBER(10,0) NOT NULL)");
+		}
+
+		[Test]
+		public void CanCreateTableWithMultipartKey()
+		{
+			string tableName = "NewTable";
+			CreateTableExpression expression = GetCreateTableExpression(tableName);
+			expression.Columns[0].IsPrimaryKey = true;
+			expression.Columns[1].IsPrimaryKey = true;
+			string sql = generator.Generate(expression);
+			// See the note in OracleColumn about why the PK should not be named
+			sql.ShouldBe("CREATE TABLE NewTable (ColumnName1 NVARCHAR2(255) NOT NULL, ColumnName2 NUMBER(10,0) NOT NULL,  PRIMARY KEY (ColumnName1,ColumnName2))");
+		}
+
+		[Test]
 		public void CanDropTable()
 		{
 			string tableName = "NewTable";
@@ -156,7 +179,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			var expression = new DeleteForeignKeyExpression();
 			expression.ForeignKey.Name = "FK_Test";
-			expression.ForeignKey.PrimaryTable = "TestPrimaryTable";
+			expression.ForeignKey.ForeignTable = "TestPrimaryTable";
 
 			string sql = generator.Generate(expression);
 			sql.ShouldBe("ALTER TABLE TestPrimaryTable DROP CONSTRAINT FK_Test");

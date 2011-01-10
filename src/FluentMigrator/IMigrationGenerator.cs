@@ -24,14 +24,11 @@ namespace FluentMigrator
 {
 	public interface IMigrationGenerator
 	{
-		void SetTypeMap(DbType type, string template);
-		void SetTypeMap(DbType type, string template, int maxSize);
-		string GetTypeMap(DbType type, int size, int precision);
-
 		string Generate(CreateSchemaExpression expression);
 		string Generate(DeleteSchemaExpression expression);
 		string Generate(CreateTableExpression expression);
-	    string Generate(AlterColumnExpression expression);
+		string Generate(AlterTableExpression expression);
+        string Generate(AlterColumnExpression expression);
 		string Generate(CreateColumnExpression expression);
 		string Generate(DeleteTableExpression expression);
 		string Generate(DeleteColumnExpression expression);
@@ -42,7 +39,9 @@ namespace FluentMigrator
 		string Generate(RenameTableExpression expression);
 		string Generate(RenameColumnExpression expression);
 		string Generate(InsertDataExpression expression);
-	    string Generate(AlterDefaultConstraintExpression expression);
-	    string Generate(DeleteDataExpression expression);
+		string Generate(AlterDefaultConstraintExpression expression);
+		string Generate(DeleteDataExpression expression);
+        string Generate(UpdateDataExpression expression);
+    string Generate(AlterSchemaExpression expression);
 	}
 }

@@ -34,6 +34,11 @@ namespace FluentMigrator.Expressions
 			Column = new ColumnDefinition();
 		}
 
+		public override void ApplyConventions( IMigrationConventions conventions )
+		{
+			Column.ApplyConventions(conventions);
+		}
+
 		public override void CollectValidationErrors(ICollection<string> errors)
 		{
 			if (String.IsNullOrEmpty(TableName))
@@ -44,6 +49,7 @@ namespace FluentMigrator.Expressions
 
 		public override void ExecuteWith(IMigrationProcessor processor)
 		{
+			Column.TableName = TableName;
 			processor.Process(this);
 		}
 

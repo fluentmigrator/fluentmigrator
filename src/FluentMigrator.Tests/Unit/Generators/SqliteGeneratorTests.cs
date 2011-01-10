@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			CreateTableExpression expression = GetCreateTableExpression();
 			string sql = generator.Generate(expression);
-			sql.ShouldBe(string.Format("CREATE TABLE {0} (NewColumn TEXT NOT NULL)", table));
+			sql.ShouldBe(string.Format("CREATE TABLE [{0}] (NewColumn TEXT NOT NULL)", table));
 		}
 
 		[Test]
@@ -60,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			RenameTableExpression expression = new RenameTableExpression { OldName = oldTable, NewName = newTable };
 			string sql = generator.Generate(expression);
-			sql.ShouldBe(string.Format("ALTER TABLE {0} RENAME TO {1}", oldTable, newTable));
+			sql.ShouldBe(string.Format("ALTER TABLE [{0}] RENAME TO [{1}]", oldTable, newTable));
 		}
 
 		[Test]
@@ -68,7 +68,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			DeleteTableExpression expression = new DeleteTableExpression { TableName = table };
 			string sql = generator.Generate(expression);
-			sql.ShouldBe(string.Format("DROP TABLE {0}", table));
+			sql.ShouldBe(string.Format("DROP TABLE [{0}]", table));
 		}
 
 		[Test]
@@ -119,7 +119,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			DeleteColumnExpression expression = new DeleteColumnExpression { TableName = table, ColumnName = column };
 			string sql = generator.Generate(expression);
-			sql.ShouldBe(string.Format("ALTER TABLE {0} DROP COLUMN {1}", table, column));
+			sql.ShouldBe(string.Format("ALTER TABLE [{0}] DROP COLUMN {1}", table, column));
 		}
 
 		// CreateForeignKey -- Not supported in Sqlite
