@@ -176,14 +176,9 @@ namespace FluentMigrator.Runner
 
 			if (version == 0)
 				VersionLoader.RemoveVersionTable();
-<<<<<<< HEAD
-
-			VersionLoader.LoadVersionInfo();
-=======
 			else
 				VersionLoader.LoadVersionInfo();
 
->>>>>>> 210618a0a107843fef9bca9f362a630c3259bd47
 			Processor.CommitTransaction();
 		}
 
