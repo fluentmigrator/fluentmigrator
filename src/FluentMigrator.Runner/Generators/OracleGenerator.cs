@@ -117,8 +117,8 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(DeleteIndexExpression expression)
 		{
-			throw new NotImplementedException();
-		}
+            return String.Format("DROP INDEX {0}", expression.Index.Name, expression.Index.TableName);
+        }
 
 		public override string Generate(RenameTableExpression expression)
 		{

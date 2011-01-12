@@ -112,8 +112,19 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Descending, Name = "Column2" });
 
 			var sql = generator.Generate(expression);
-			sql.ShouldBe("CREATE UNIQUE CLUSTERED INDEX IX_TEST ON [TEST_TABLE] (Column1 ASC,Column2 DESC)");
+			sql.ShouldBe("CREATE UNIQUE CLUSTERED INDEX [IX_TEST] ON [TEST_TABLE] ([Column1] ASC,[Column2] DESC)");
 		}
+
+        [Test]
+        public void CanDropIndex()
+        {
+            var expression = new DeleteIndexExpression();
+            expression.Index.Name = "IX_TEST";
+            expression.Index.TableName = "TEST_TABLE";
+            
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("DROP INDEX [IX_TEST] ON [TEST_TABLE]");
+        }
 
 		[Test]
 		[Ignore("need better way to test this")]
@@ -223,7 +234,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.NewName = "Column2";
 
 			var sql = generator.Generate(expression);
-			sql.ShouldBe("sp_rename '[Table1].[Column1]', [Column2]");
+			sql.ShouldBe("sp_rename '[Table1].[Column1]', 'Column2'");
 		}
 
 		[Test]
@@ -234,7 +245,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.NewName = "Table2";
 
 			var sql = generator.Generate(expression);
-			sql.ShouldBe("sp_rename [Table1], [Table2]");
+			sql.ShouldBe("sp_rename '[Table1]', 'Table2'");
 		}
 
 		[Test]

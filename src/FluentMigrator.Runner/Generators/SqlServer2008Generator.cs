@@ -28,7 +28,7 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(RenameTableExpression expression)
 		{
-			return String.Format("sp_rename '{0}[{1}]', '[{2}]'", FormatSchema( expression.SchemaName ), expression.OldName, expression.NewName);
+			return String.Format("sp_rename '{0}[{1}]', '{2}'", FormatSchema( expression.SchemaName ), expression.OldName, FormatSqlEscape(expression.NewName));
 		}
 	}
 }

@@ -42,6 +42,11 @@ namespace FluentMigrator.Runner.Processors.Oracle
 			return Exists(sql, tableName.ToLower(), constraintName.ToLower());
 		}
 
+        public override bool IndexExists(string tableName, string indexName)
+        {
+            return Exists("SELECT INDEX_NAME FROM ALL_INDEXES WHERE LOWER(TABLE_NAME) = '{0}' AND LOWER(INDEX_NAME) = '{1}'", tableName.ToLower(), indexName.ToLower());
+        }
+
 		public override void Execute(string template, params object[] args)
 		{
 			if (Connection.State != ConnectionState.Open)

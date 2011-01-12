@@ -110,5 +110,16 @@ namespace FluentMigrator.Runner.Processors.Jet
 				return constraints.Rows.Count > 0;
 			}
 		}
+
+        public override bool IndexExists(string tableName, string indexName)
+        {
+            if (Connection.State != ConnectionState.Open) Connection.Open();
+
+            var restrict = new[] { null, null, indexName, null, null, tableName };
+            using (var indexes = Connection.GetOleDbSchemaTable(OleDbSchemaGuid.Indexes, restrict))
+            {
+                return indexes.Rows.Count > 0;
+            }
+        }
 	}
 }

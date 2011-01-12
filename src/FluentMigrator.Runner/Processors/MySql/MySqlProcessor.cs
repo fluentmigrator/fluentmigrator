@@ -59,6 +59,14 @@ namespace FluentMigrator.Runner.Processors.MySql
 			return Exists(sql, tableName, constraintName);
 		}
 
+        public override bool IndexExists(string tableName, string indexName)
+		{
+			string sql = @"select null from information_schema.statistics
+							where table_name='{0}'
+							and index_name='{1}'";
+			return Exists(sql, tableName, indexName);
+		}
+
 		public override void Execute(string template, params object[] args)
 		{
 			if (Connection.State != ConnectionState.Open) Connection.Open();

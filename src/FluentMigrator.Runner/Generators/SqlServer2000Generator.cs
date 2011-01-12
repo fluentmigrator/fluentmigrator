@@ -50,12 +50,12 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(RenameTableExpression expression)
 		{
-			return String.Format("sp_rename {0}[{1}], [{2}]", FormatSchema(expression.SchemaName), expression.OldName, expression.NewName);
+            return String.Format("sp_rename '{0}[{1}]', '{2}'", FormatSchema(expression.SchemaName), FormatSqlEscape(expression.OldName), FormatSqlEscape(expression.NewName));
 		}
 
 		public override string Generate(RenameColumnExpression expression)
 		{
-			return String.Format("sp_rename '{0}[{1}].[{2}]', [{3}]", FormatSchema(expression.SchemaName, false), expression.TableName, expression.OldName, expression.NewName);
+            return String.Format("sp_rename '{0}[{1}].[{2}]', '{3}'", FormatSchema(expression.SchemaName, false), FormatSqlEscape(expression.TableName), FormatSqlEscape(expression.OldName), FormatSqlEscape(expression.NewName));
 		}
 
 		public override string Generate(AlterColumnExpression expression)
@@ -140,7 +140,7 @@ namespace FluentMigrator.Runner.Generators
 
 			result.Append(expression.Index.IsClustered ? " CLUSTERED" : " NONCLUSTERED");
 
-			result.Append(" INDEX {0} ON {1}[{2}] (");
+			result.Append(" INDEX [{0}] ON {1}[{2}] (");
 
 			var first = true;
 			foreach (var column in expression.Index.Columns)
@@ -150,12 +150,12 @@ namespace FluentMigrator.Runner.Generators
 				else
 					result.Append(",");
 
-				result.Append(column.Name);
+                result.Append("[" + column.Name + "]");
 				result.Append(column.Direction == Direction.Ascending ? " ASC" : " DESC");
 			}
 			result.Append(")");
 
-			return String.Format(result.ToString(), expression.Index.Name, FormatSchema(expression.Index.SchemaName), expression.Index.TableName);
+            return String.Format(result.ToString(), expression.Index.Name, FormatSchema(expression.Index.SchemaName), expression.Index.TableName);
 		}
 
 		public override string Generate(DeleteIndexExpression expression)
