@@ -21,6 +21,7 @@ using FluentMigrator.Builders.Delete.ForeignKey;
 using FluentMigrator.Builders.Delete.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Builders.Delete.Index;
 
 namespace FluentMigrator.Builders.Delete
 {
@@ -73,5 +74,20 @@ namespace FluentMigrator.Builders.Delete
 			_context.Expressions.Add(expression);
 			return new DeleteDataExpressionBuilder(expression);
 		}
+
+        public IDeleteIndexForTableSyntax Index(string indexName)
+        {
+            var expression = new DeleteIndexExpression();
+            expression.Index.Name = indexName;
+            _context.Expressions.Add(expression);
+            return new DeleteIndexExpressionBuilder(expression);
+        }
+
+        public IDeleteIndexForTableSyntax Index()
+        {
+            var expression = new DeleteIndexExpression();
+            _context.Expressions.Add(expression);
+            return new DeleteIndexExpressionBuilder(expression);
+        }
 	}
 }

@@ -178,6 +178,7 @@
     <Compile Include="Unit\Generators\MySqlGeneratorTests.cs" />
     <Compile Include="Unit\Generators\OracleGeneratorTests.cs" />
     <Compile Include="Unit\Expressions\PerformDBOperationExpressionTests.cs" />
+    <Compile Include="Unit\Generators\SqliteGeneratorWithConventionsAppliedTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2000GeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2005GeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2008GeneratorTests.cs" />

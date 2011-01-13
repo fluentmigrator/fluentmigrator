@@ -19,6 +19,7 @@
 using System;
 using System.Data.SqlClient;
 using System.Data.SQLite;
+using System.Linq;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors;
@@ -38,9 +39,17 @@ namespace FluentMigrator.Tests.Integration
 
 		public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback)
 		{
-			ExecuteWithSqlServer(test, IntegrationTestOptions.SqlServer, tryRollback);
-			ExecuteWithSqlite(test, IntegrationTestOptions.SqlLite);
-			ExecuteWithMySql(test, IntegrationTestOptions.MySql);
+			ExecuteWithSupportedProcessors(test, tryRollback, new Type[]{});
+		}
+
+		public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback, params Type[] exceptProcessors)
+		{
+			if (exceptProcessors.Count(t => typeof(SqlServerProcessor).IsAssignableFrom(t)) == 0)
+				ExecuteWithSqlServer(test, IntegrationTestOptions.SqlServer, tryRollback);
+			if (exceptProcessors.Count(t => typeof(SqliteProcessor).IsAssignableFrom(t)) == 0)
+				ExecuteWithSqlite(test, IntegrationTestOptions.SqlLite);
+			if (exceptProcessors.Count(t => typeof(MySqlProcessor).IsAssignableFrom(t)) == 0)
+				ExecuteWithMySql(test, IntegrationTestOptions.MySql);
 		}
 
 		protected static void ExecuteWithSqlServer(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions, Boolean tryRollback)

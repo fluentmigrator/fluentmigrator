@@ -27,7 +27,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.NewName = "Table2";
 
 			var sql = generator.Generate( expression );
-			sql.ShouldBe( "sp_rename '[dbo].[Table1]', '[Table2]'" );
+			sql.ShouldBe( "sp_rename '[dbo].[Table1]', 'Table2'" );
 		}
 
 		[Test]

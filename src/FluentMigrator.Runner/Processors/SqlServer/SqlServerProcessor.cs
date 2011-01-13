@@ -41,23 +41,28 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
 		public override bool SchemaExists(string schemaName)
 		{
-			return Exists("SELECT * FROM SYS.SCHEMAS WHERE NAME = '{0}'", schemaName);
+            return Exists("SELECT * FROM SYS.SCHEMAS WHERE NAME = '{0}'", FormatSqlEscape(schemaName));
 		}
 
 		public override bool TableExists(string tableName)
 		{
-			return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{0}'", tableName);
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{0}'", FormatSqlEscape(tableName));
 		}
 
 		public override bool ColumnExists(string tableName, string columnName)
 		{
-			return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'", tableName, columnName);
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'", FormatSqlEscape(tableName), FormatSqlEscape(columnName));
 		}
 
 		public override bool ConstraintExists(string tableName, string constraintName)
 		{
-			return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_CATALOG = DB_NAME() AND TABLE_NAME = '{0}' AND CONSTRAINT_NAME = '{1}'", tableName, constraintName);
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_CATALOG = DB_NAME() AND TABLE_NAME = '{0}' AND CONSTRAINT_NAME = '{1}'", FormatSqlEscape(tableName), FormatSqlEscape(constraintName));
 		}
+
+        public override bool IndexExists(string tableName, string indexName)
+        {
+            return Exists("SELECT NULL FROM sysindexes WHERE name = '{0}'", FormatSqlEscape(indexName));
+        }
 
 		public override void Execute(string template, params object[] args)
 		{
@@ -78,7 +83,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
 		public override DataSet ReadTableData(string tableName)
 		{
-			return Read("SELECT * FROM {0}", tableName);
+			return Read("SELECT * FROM [{0}]", tableName);
 		}
 
 		public override DataSet Read(string template, params object[] args)
@@ -102,7 +107,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
 		public override void CommitTransaction()
 		{
-			Announcer.Say("Commiting Transaction");
+			Announcer.Say("Committing Transaction");
 			Transaction.Commit();
 			WasCommitted = true;
 			if (Connection.State != ConnectionState.Closed)
@@ -160,5 +165,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 			if (expression.Operation != null)
 				expression.Operation(Connection, Transaction);
 		}
+
+        protected string FormatSqlEscape(string sql)
+        {
+            return sql.Replace("'", "''");
+        }
 	}
 }

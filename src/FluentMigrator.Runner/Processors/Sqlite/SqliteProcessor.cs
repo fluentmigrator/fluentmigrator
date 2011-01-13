@@ -20,6 +20,7 @@
 using System;
 using System.Data;
 using System.Data.SQLite;
+
 using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.Sqlite
@@ -41,18 +42,23 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
 		public override bool TableExists(string tableName)
 		{
-			return Exists("select count(*) from sqlite_master where name='{0}'", tableName);
+            return Exists("select count(*) from sqlite_master where name=\"{0}\" and type='table'", tableName);
 		}
 
 		public override bool ColumnExists(string tableName, string columnName)
 		{
-			throw new NotImplementedException();
-		}
+		    return Read("PRAGMA table_info({0})",tableName).Tables[0].Select(string.Format("Name='{0}'",columnName.Replace("'","''"))).Length>0;
+        }
 
 		public override bool ConstraintExists(string tableName, string constraintName)
 		{
 			return false;
 		}
+
+        public override bool IndexExists(string tableName, string indexName)
+        {
+            return Exists("select count(*) from sqlite_master where name='{0}' and tbl_name='{1}' and type='index'", indexName, tableName);
+        }
 
 		public override void Execute(string template, params object[] args)
 		{

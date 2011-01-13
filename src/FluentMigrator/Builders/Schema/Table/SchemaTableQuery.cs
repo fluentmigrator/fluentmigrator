@@ -18,6 +18,7 @@
 
 using FluentMigrator.Builders.Schema.Column;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Builders.Schema.Index;
 
 namespace FluentMigrator.Builders.Schema.Table
 {
@@ -41,5 +42,11 @@ namespace FluentMigrator.Builders.Schema.Table
 		{
 			return new SchemaColumnQuery(_tableName, columnName, _context);
 		}
-	}
+
+        public ISchemaIndexSyntax Index(string indexName)
+        {
+            return new SchemaIndexQuery(_tableName, indexName, _context);
+        }
+
+    }
 }

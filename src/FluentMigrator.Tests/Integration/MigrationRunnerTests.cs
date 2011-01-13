@@ -26,6 +26,7 @@ using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.Sqlite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Integration.Migrations;
 using Moq;
@@ -42,7 +43,7 @@ namespace FluentMigrator.Tests.Integration
 		[SetUp]
 		public void SetUp()
 		{
-			_runnerContext = new RunnerContext( new TextWriterAnnouncer( System.Console.Out ) )
+			_runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
 										{
 											Database = "sqlserver",
 											Target = GetType().Assembly.Location,
@@ -81,17 +82,16 @@ namespace FluentMigrator.Tests.Integration
 			processor.Setup(x => x.Process(It.IsAny<DeleteForeignKeyExpression>())).Throws(new Exception("Error"));
 			processor.Setup(x => x.Options).Returns(processorOptions.Object);
 
-			var runner = new MigrationRunner( Assembly.GetExecutingAssembly(), _runnerContext, processor.Object ) { SilentlyFail = true };
+			var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor.Object) { SilentlyFail = true };
 
 			runner.Up(new TestForeignKeySilentFailure());
-	
+
 			runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
 
 			runner.Down(new TestForeignKeySilentFailure());
 			runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
 		}
 
-		//BUG: the Users table is not getting properly dropped. this test will fail on the second execution
 		[Test]
 		public void CanApplyForeignKeyConvention()
 		{
@@ -102,15 +102,11 @@ namespace FluentMigrator.Tests.Integration
 
 					runner.Up(new TestForeignKeyNamingConvention());
 
-					// This is a hack until MigrationVersionRunner and MigrationRunner are refactored and merged together
-					//processor.CommitTransaction();
-
-					processor.ConstraintExists( "Users", "FK_Users_GroupId_Groups_GroupId" ).ShouldBeTrue();
-					runner.Down( new TestForeignKeyNamingConvention() );
-				});
+					processor.ConstraintExists("Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeTrue();
+					runner.Down(new TestForeignKeyNamingConvention());
+				}, false, typeof(SqliteProcessor));
 		}
 
-		//BUG: the Users table is not getting properly dropped. this test will fail on the second execution
 		[Test]
 		public void CanApplyIndexConvention()
 		{
@@ -120,105 +116,182 @@ namespace FluentMigrator.Tests.Integration
 					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
 					runner.Up(new TestIndexNamingConvention());
+					processor.IndexExists("Users", "IX_Users_GroupId").ShouldBeTrue();
 					processor.TableExists("Users").ShouldBeTrue();
 
 					runner.Down(new TestIndexNamingConvention());
+					processor.IndexExists("Users", "IX_Users_GroupId").ShouldBeFalse();
 					processor.TableExists("Users").ShouldBeFalse();
+				});
+		}
+
+		[Test]
+		public void CanCreateAndDropIndex()
+		{
+			ExecuteWithSupportedProcessors(
+				processor =>
+				{
+					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+					runner.Up(new TestCreateAndDropTableMigration());
+					processor.IndexExists("TestTable", "IX_TestTable_Name").ShouldBeFalse();
+
+					runner.Up(new TestCreateAndDropIndexMigration());
+					processor.IndexExists("TestTable", "IX_TestTable_Name").ShouldBeTrue();
+
+					runner.Down(new TestCreateAndDropIndexMigration());
+					processor.IndexExists("TestTable", "IX_TestTable_Name").ShouldBeFalse();
+
+					runner.Down(new TestCreateAndDropTableMigration());
+					processor.IndexExists("TestTable", "IX_TestTable_Name").ShouldBeFalse();
 
 					//processor.CommitTransaction();
 				});
 		}
 
 		[Test]
+		public void CanRenameTable()
+		{
+			ExecuteWithSupportedProcessors(
+				processor =>
+				{
+					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+					runner.Up(new TestCreateAndDropTableMigration());
+					processor.TableExists("TestTable2").ShouldBeTrue();
+
+					runner.Up(new TestRenameTableMigration());
+					processor.TableExists("TestTable2").ShouldBeFalse();
+					processor.TableExists("TestTable'3").ShouldBeTrue();
+
+					runner.Down(new TestRenameTableMigration());
+					processor.TableExists("TestTable'3").ShouldBeFalse();
+					processor.TableExists("TestTable2").ShouldBeTrue();
+
+					runner.Down(new TestCreateAndDropTableMigration());
+					processor.TableExists("TestTable2").ShouldBeFalse();
+
+					//processor.CommitTransaction();
+				});
+		}
+
+		[Test, Explicit("Sqlite will fail here. Run this explicitly to see other generators process this correctly")]
+		public void CanRenameColumn()
+		{
+			ExecuteWithSupportedProcessors(
+				processor =>
+				{
+					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+					runner.Up(new TestCreateAndDropTableMigration());
+					processor.ColumnExists("TestTable2", "Name").ShouldBeTrue();
+
+					runner.Up(new TestRenameColumnMigration());
+					processor.ColumnExists("TestTable2", "Name").ShouldBeFalse();
+					processor.ColumnExists("TestTable2", "Name'3").ShouldBeTrue();
+
+					runner.Down(new TestRenameColumnMigration());
+					processor.ColumnExists("TestTable2", "Name'3").ShouldBeFalse();
+					processor.ColumnExists("TestTable2", "Name").ShouldBeTrue();
+
+					runner.Down(new TestCreateAndDropTableMigration());
+					processor.ColumnExists("TestTable2", "Name").ShouldBeFalse();
+				});
+		}
+
+		[Test]
 		public void CanLoadMigrations()
 		{
-			ExecuteWithSupportedProcessors( processor =>
+			ExecuteWithSupportedProcessors(processor =>
 			{
-				var runnerContext = new RunnerContext( new TextWriterAnnouncer( System.Console.Out ) )
+				var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
 				{
-					Namespace = typeof( TestMigration ).Namespace,
+					Namespace = typeof(TestMigration).Namespace,
 				};
 
-				var runner = new MigrationRunner( typeof( MigrationRunnerTests ).Assembly, runnerContext, processor );
+				var runner = new MigrationRunner(typeof(MigrationRunnerTests).Assembly, runnerContext, processor);
 
 				//runner.Processor.CommitTransaction();
 
 				runner.MigrationLoader.Migrations.ShouldNotBeNull();
-			} );
+			});
 		}
 
 		[Test]
 		public void CanLoadVersion()
 		{
-			ExecuteWithSupportedProcessors( processor =>
+			ExecuteWithSupportedProcessors(processor =>
 			{
-				var runnerContext = new RunnerContext( new TextWriterAnnouncer( System.Console.Out ) )
+				var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
 				{
-					Namespace = typeof( TestMigration ).Namespace,
+					Namespace = typeof(TestMigration).Namespace,
 				};
 
-				var runner = new MigrationRunner( typeof( TestMigration ).Assembly, runnerContext, processor );
+				var runner = new MigrationRunner(typeof(TestMigration).Assembly, runnerContext, processor);
 
 				//runner.Processor.CommitTransaction();
 				runner.VersionLoader.VersionInfo.ShouldNotBeNull();
-			} );
+			});
 		}
 
 		[Test]
 		public void CanRunMigrations()
 		{
-			ExecuteWithSupportedProcessors( processor =>
+			ExecuteWithSupportedProcessors(processor =>
 			{
 				MigrationRunner runner = SetupMigrationRunner(processor);
 
 				runner.MigrateUp();
 
-				runner.VersionLoader.VersionInfo.HasAppliedMigration( 1 ).ShouldBeTrue();
-				runner.VersionLoader.VersionInfo.HasAppliedMigration( 2 ).ShouldBeTrue();
-				runner.VersionLoader.VersionInfo.Latest().ShouldBe( 2 );
+				runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
+				runner.VersionLoader.VersionInfo.HasAppliedMigration(2).ShouldBeTrue();
+				runner.VersionLoader.VersionInfo.Latest().ShouldBe(2);
 			});
 		}
 
 		[Test]
 		public void CanMigrateASpecificVersion()
 		{
-			ExecuteWithSupportedProcessors( processor =>
+			ExecuteWithSupportedProcessors(processor =>
 			{
 				MigrationRunner runner = SetupMigrationRunner(processor);
 
-				runner.MigrateUp( 1 );
+				runner.MigrateUp(1);
 
-				runner.VersionLoader.VersionInfo.HasAppliedMigration( 1 ).ShouldBeTrue();
-				processor.TableExists( "Users" ).ShouldBeTrue();
+				runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
+				processor.TableExists("Users").ShouldBeTrue();
 			});
 		}
 
 		[Test]
 		public void CanMigrateASpecificVersionDown()
 		{
-			try 
+			try
 			{
-				ExecuteWithSupportedProcessors(processor => {
+				ExecuteWithSupportedProcessors(processor =>
+				{
 					MigrationRunner runner = SetupMigrationRunner(processor);
 
 					runner.MigrateUp(1);
 
 					runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
 					processor.TableExists("Users").ShouldBeTrue();
-				}, false);
+				}, false, typeof(SqliteProcessor));
 
-				ExecuteWithSupportedProcessors(processor => {
+				ExecuteWithSupportedProcessors(processor =>
+				{
 					MigrationRunner testRunner = SetupMigrationRunner(processor);
 					testRunner.MigrateDown(1);
 
 					testRunner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeFalse();
 					processor.TableExists("Users").ShouldBeFalse();
-				}, false);
+				}, false, typeof(SqliteProcessor));
 
 			}
-			finally 
+			finally
 			{
-				ExecuteWithSupportedProcessors(processor => {
+				ExecuteWithSupportedProcessors(processor =>
+				{
 					MigrationRunner testRunner = SetupMigrationRunner(processor);
 					testRunner.RollbackToVersion(0);
 				}, false);
@@ -237,7 +310,8 @@ namespace FluentMigrator.Tests.Integration
 				processor.TableExists(runner.VersionLoader.VersionTableMetaData.TableName).ShouldBeTrue();
 			});
 
-			ExecuteWithSupportedProcessors(processor => {
+			ExecuteWithSupportedProcessors(processor =>
+			{
 				MigrationRunner runner = SetupMigrationRunner(processor);
 				runner.RollbackToVersion(0);
 
@@ -254,10 +328,13 @@ namespace FluentMigrator.Tests.Integration
 			MigrationRunner runner = SetupMigrationRunner(processor);
 			runner.MigrateUp();
 
-			try {
+			try
+			{
 				processor.WasCommitted.ShouldBeTrue();
 
-			} finally {
+			}
+			finally
+			{
 				CleanupTestSqlServerDatabase(connection, processor);
 			}
 		}
@@ -271,10 +348,13 @@ namespace FluentMigrator.Tests.Integration
 			MigrationRunner runner = SetupMigrationRunner(processor);
 			runner.MigrateUp(1);
 
-			try {
+			try
+			{
 				processor.WasCommitted.ShouldBeTrue();
 
-			} finally {
+			}
+			finally
+			{
 				CleanupTestSqlServerDatabase(connection, processor);
 			}
 		}
@@ -293,16 +373,19 @@ namespace FluentMigrator.Tests.Integration
 
 		private static void CleanupTestSqlServerDatabase(SqlConnection connection, SqlServerProcessor origProcessor)
 		{
-			if (origProcessor.WasCommitted) {
+			if (origProcessor.WasCommitted)
+			{
 				connection.Close();
 
 				var cleanupProcessor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 				MigrationRunner cleanupRunner = SetupMigrationRunner(cleanupProcessor);
 				cleanupRunner.RollbackToVersion(0);
 
-			} else {
+			}
+			else
+			{
 				origProcessor.RollbackTransaction();
-			}	
+			}
 		}
 	}
 
@@ -346,6 +429,7 @@ namespace FluentMigrator.Tests.Integration
 
 		public override void Down()
 		{
+			Delete.Index("IX_Users_GroupId").OnTable("Users").OnColumn("GroupId");
 			Delete.Table("Users");
 		}
 	}
@@ -404,6 +488,35 @@ namespace FluentMigrator.Tests.Integration
 		{
 			Delete.Table("TestTable2");
 			Delete.Table("TestTable");
+		}
+	}
+
+	internal class TestRenameTableMigration : AutoReversingMigration
+	{
+		public override void Up()
+		{
+			Rename.Table("TestTable2").To("TestTable'3");
+		}
+	}
+
+	internal class TestRenameColumnMigration : AutoReversingMigration
+	{
+		public override void Up()
+		{
+			Rename.Column("Name").OnTable("TestTable2").To("Name'3");
+		}
+	}
+
+	internal class TestCreateAndDropIndexMigration : Migration
+	{
+		public override void Up()
+		{
+			Create.Index("IX_TestTable_Name").OnTable("TestTable").OnColumn("Name");
+		}
+
+		public override void Down()
+		{
+			Delete.Index("IX_TestTable_Name").OnTable("TestTable");
 		}
 	}
 }
