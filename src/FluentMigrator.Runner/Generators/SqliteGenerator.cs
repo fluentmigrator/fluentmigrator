@@ -29,7 +29,9 @@ namespace FluentMigrator.Runner.Generators
 {
 	public class SqliteGenerator : GeneratorBase
 	{
-		public SqliteGenerator() : base(new SqliteColumn(), new ConstantFormatter())		{
+		public SqliteGenerator()
+			: base(new SqliteColumn(), new ConstantFormatter())
+		{
 		}
 
 
@@ -49,10 +51,10 @@ namespace FluentMigrator.Runner.Generators
 			throw new NotImplementedException();
 		}
 
-    public override string Generate( AlterSchemaExpression expression )
-    {
-      throw new NotImplementedException();
-    }
+		public override string Generate(AlterSchemaExpression expression)
+		{
+			throw new NotImplementedException();
+		}
 
 		public override string Generate(CreateTableExpression expression)
 		{
@@ -100,40 +102,40 @@ namespace FluentMigrator.Runner.Generators
 			return result.ToString();
 		}
 
-        public override string Generate(UpdateDataExpression expression)
-        {
-            var result = new StringBuilder();
+		public override string Generate(UpdateDataExpression expression)
+		{
+			var result = new StringBuilder();
 
-            var set = String.Empty;
-            var i = 0;
-            foreach (var item in expression.Set)
-            {
-                if (i != 0)
-                {
-                    set += ", ";
-                }
+			var set = String.Empty;
+			var i = 0;
+			foreach (var item in expression.Set)
+			{
+				if (i != 0)
+				{
+					set += ", ";
+				}
 
-                set += String.Format("[{0}] = {1}", item.Key, Constant.Format(item.Value));
-                i++;
-            }
+				set += String.Format("[{0}] = {1}", item.Key, Constant.Format(item.Value));
+				i++;
+			}
 
-            var where = String.Empty;
-            i = 0;
-            foreach (var item in expression.Where)
-            {
-                if (i != 0)
-                {
-                    where += " AND ";
-                }
+			var where = String.Empty;
+			i = 0;
+			foreach (var item in expression.Where)
+			{
+				if (i != 0)
+				{
+					where += " AND ";
+				}
 
-                where += String.Format("[{0}] {1} {2}", item.Key, item.Value == null ? "IS" : "=", Constant.Format(item.Value));
-                i++;
-            }
+				where += String.Format("[{0}] {1} {2}", item.Key, item.Value == null ? "IS" : "=", Constant.Format(item.Value));
+				i++;
+			}
 
-            result.Append(String.Format("UPDATE [{0}] SET {1} WHERE {2};", expression.TableName, set, where));
+			result.Append(String.Format("UPDATE [{0}] SET {1} WHERE {2};", expression.TableName, set, where));
 
-            return result.ToString();
-        }
+			return result.ToString();
+		}
 
 		public override string Generate(DeleteDataExpression expression)
 		{
@@ -157,7 +159,7 @@ namespace FluentMigrator.Runner.Generators
 							where += " AND ";
 						}
 
-                        where += String.Format("[{0}] {1} {2}", item.Key, item.Value == null ? "IS" : "=", Constant.Format(item.Value));
+						where += String.Format("[{0}] {1} {2}", item.Key, item.Value == null ? "IS" : "=", Constant.Format(item.Value));
 						i++;
 					}
 
@@ -234,7 +236,7 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(DeleteIndexExpression expression)
 		{
-            return String.Format("DROP INDEX IF EXISTS {0}", expression.Index.Name);
-        }
+			return String.Format("DROP INDEX IF EXISTS {0}", expression.Index.Name);
+		}
 	}
 }

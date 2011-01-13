@@ -56,15 +56,15 @@ namespace FluentMigrator.Tests.Unit.Generators
 			sql.ShouldBe(string.Format("CREATE TABLE [{0}] (NewColumn TEXT NOT NULL)", table));
 		}
 
-        [Test]
-        public void CanCreateTableWithAutoIncrement()
-        {
-            var expression = GetCreateTableWithPrimaryKeyIdentityExpression();
-            var sql = generator.Generate(expression);
-            sql.ShouldBe(string.Format("CREATE TABLE [{0}] (NewColumn INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT)", table));
-        }
+		[Test]
+		public void CanCreateTableWithAutoIncrement()
+		{
+			var expression = GetCreateTableWithPrimaryKeyIdentityExpression();
+			var sql = generator.Generate(expression);
+			sql.ShouldBe(string.Format("CREATE TABLE [{0}] (NewColumn INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT)", table));
+		}
 
-	    [Test]
+		[Test]
 		public void CanRenameTable()
 		{
 			RenameTableExpression expression = new RenameTableExpression { OldName = oldTable, NewName = newTable };
@@ -142,13 +142,13 @@ namespace FluentMigrator.Tests.Unit.Generators
 			sql.ShouldBe(string.Format("CREATE INDEX IF NOT EXISTS {0} ON {1} ({2})", indexName, table, indexColumn));
 		}
 
-        [Test]
-        public void CanDeleteBasicIndex()
-        {
-            DeleteIndexExpression expression = GetDeleteIndexExpression();
-            string sql = generator.Generate(expression);
-            sql.ShouldBe(string.Format("DROP INDEX {0} IF EXISTS", indexName));
-        }
+		[Test]
+		public void CanDeleteBasicIndex()
+		{
+			DeleteIndexExpression expression = GetDeleteIndexExpression();
+			string sql = generator.Generate(expression);
+			sql.ShouldBe(string.Format("DROP INDEX IF EXISTS {0}", indexName));
+		}
 
 		// DeleteIndex
 
@@ -179,11 +179,11 @@ namespace FluentMigrator.Tests.Unit.Generators
 			return new CreateIndexExpression { Index = indexDefinition };
 		}
 
-        private DeleteIndexExpression GetDeleteIndexExpression()
-        {
-            IndexDefinition indexDefinition = new IndexDefinition { Name = indexName};
-            return new DeleteIndexExpression { Index = indexDefinition };
-        }
+		private DeleteIndexExpression GetDeleteIndexExpression()
+		{
+			IndexDefinition indexDefinition = new IndexDefinition { Name = indexName };
+			return new DeleteIndexExpression { Index = indexDefinition };
+		}
 
 		private RenameColumnExpression GetRenameColumnExpression()
 		{
@@ -202,12 +202,12 @@ namespace FluentMigrator.Tests.Unit.Generators
 			return new CreateColumnExpression { TableName = table, Column = column };
 		}
 
-        private CreateTableExpression GetCreateTableWithPrimaryKeyIdentityExpression()
-        {
-            var expression = new CreateTableExpression {TableName = table};
-            expression.Columns.Add(new ColumnDefinition { Name = newColumn, IsIdentity = true, IsPrimaryKey = true, Type = DbType.String });
-            return expression;
-        }
+		private CreateTableExpression GetCreateTableWithPrimaryKeyIdentityExpression()
+		{
+			var expression = new CreateTableExpression { TableName = table };
+			expression.Columns.Add(new ColumnDefinition { Name = newColumn, IsIdentity = true, IsPrimaryKey = true, Type = DbType.String });
+			return expression;
+		}
 
 		private CreateTableExpression GetCreateTableExpression()
 		{
