@@ -160,6 +160,17 @@ namespace FluentMigrator.Tests.Unit.Generators
 			sql.ShouldBe("CREATE UNIQUE INDEX IX_TEST ON TEST_TABLE (Column1 ASC,Column2 DESC)");
 		}
 
+        [Test]
+        public void CanDropIndex()
+        {
+            var expression = new DeleteIndexExpression();
+            expression.Index.Name = "IX_TEST";
+            expression.Index.TableName = "TEST_TABLE";
+         
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("DROP INDEX IX_TEST");
+        }
+
 		[Test]
 		public void CanCreateForeignKey()
 		{

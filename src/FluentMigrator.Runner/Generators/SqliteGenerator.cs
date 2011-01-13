@@ -77,7 +77,7 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(RenameColumnExpression expression)
 		{
-			throw new NotImplementedException();
+			throw new NotImplementedException("Sqlite does not support renaming of columns in a safe way");
 		}
 
 		public override string Generate(InsertDataExpression expression)
@@ -234,7 +234,7 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(DeleteIndexExpression expression)
 		{
-			throw new NotImplementedException();
-		}
+            return String.Format("DROP INDEX IF EXISTS {0}", expression.Index.Name);
+        }
 	}
 }

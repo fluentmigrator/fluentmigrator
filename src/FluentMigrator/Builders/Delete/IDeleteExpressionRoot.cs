@@ -19,6 +19,7 @@
 using FluentMigrator.Builders.Delete.Column;
 using FluentMigrator.Builders.Delete.ForeignKey;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Builders.Delete.Index;
 
 namespace FluentMigrator.Builders.Delete
 {
@@ -30,5 +31,16 @@ namespace FluentMigrator.Builders.Delete
 		IDeleteForeignKeyFromTableSyntax ForeignKey();
 		IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName);
 		IDeleteDataOrInSchemaSyntax FromTable(string tableName);
-	}
+        /// <summary>
+        /// Deletes an index
+        /// </summary>
+        /// <param name="indexName">the name of the index</param>
+        /// <returns></returns>
+        IDeleteIndexForTableSyntax Index(string indexName);
+        /// <summary>
+        /// Deletes an index, based on the naming convention in effect
+        /// </summary>
+        /// <returns></returns>
+        IDeleteIndexForTableSyntax Index();
+    }
 }

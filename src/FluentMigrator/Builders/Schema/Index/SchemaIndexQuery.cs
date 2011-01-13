@@ -16,14 +16,26 @@
 //
 #endregion
 
-namespace FluentMigrator
+using FluentMigrator.Infrastructure;
+
+namespace FluentMigrator.Builders.Schema.Index
 {
-	public interface IQuerySchema
+	public class SchemaIndexQuery : ISchemaIndexSyntax
 	{
-		bool SchemaExists(string schemaName);
-		bool TableExists(string tableName);
-		bool ColumnExists(string tableName, string columnName);
-		bool ConstraintExists(string tableName, string constraintName);
-        bool IndexExists(string tableName, string indexName);
-    }
+		private readonly string _tableName;
+		private readonly string _indexName;
+		private readonly IMigrationContext _context;
+
+        public SchemaIndexQuery(string tableName, string indexName, IMigrationContext context)
+		{
+			_tableName = tableName;
+            _indexName = indexName;
+			_context = context;
+		}
+
+		public bool Exists()
+		{
+			return _context.QuerySchema.IndexExists(_tableName, _indexName);
+		}
+	}
 }

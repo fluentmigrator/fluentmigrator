@@ -142,6 +142,14 @@ namespace FluentMigrator.Tests.Unit.Generators
 			sql.ShouldBe(string.Format("CREATE INDEX IF NOT EXISTS {0} ON {1} ({2})", indexName, table, indexColumn));
 		}
 
+        [Test]
+        public void CanDeleteBasicIndex()
+        {
+            DeleteIndexExpression expression = GetDeleteIndexExpression();
+            string sql = generator.Generate(expression);
+            sql.ShouldBe(string.Format("DROP INDEX {0} IF EXISTS", indexName));
+        }
+
 		// DeleteIndex
 
 		[Test]
@@ -170,6 +178,12 @@ namespace FluentMigrator.Tests.Unit.Generators
 			IndexDefinition indexDefinition = new IndexDefinition { TableName = table, Name = indexName, Columns = new List<IndexColumnDefinition> { indexColumnDefinition } };
 			return new CreateIndexExpression { Index = indexDefinition };
 		}
+
+        private DeleteIndexExpression GetDeleteIndexExpression()
+        {
+            IndexDefinition indexDefinition = new IndexDefinition { Name = indexName};
+            return new DeleteIndexExpression { Index = indexDefinition };
+        }
 
 		private RenameColumnExpression GetRenameColumnExpression()
 		{

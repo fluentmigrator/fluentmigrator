@@ -154,6 +154,8 @@
     <Compile Include="Builders\Insert\IInsertExpressionRoot.cs" />
     <Compile Include="Builders\Rename\Column\IRenameColumnToOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Rename\Table\IRenameTableToOrInSchemaSyntax.cs" />
+    <Compile Include="Builders\Schema\Index\ISchemaIndexSyntax.cs" />
+    <Compile Include="Builders\Schema\Index\SchemaIndexQuery.cs" />
     <Compile Include="Builders\Update\UpdateDataExpressionBuilder.cs" />
     <Compile Include="Builders\Update\IUpdateSetOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Update\IUpdateSetSyntax.cs" />

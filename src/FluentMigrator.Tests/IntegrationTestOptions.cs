@@ -5,15 +5,15 @@
 		public static DatabaseServerOptions SqlServer = new DatabaseServerOptions
 															{
 																ConnectionString =
-                                                                    @"server=.\SQLExpress;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator",
-																IsEnabled = true
+                                                                    @"server=.;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator",
+																IsEnabled = false
 															};
 
 		public static DatabaseServerOptions SqlLite = new DatabaseServerOptions
 															{
 																ConnectionString =
 																	@"Data Source=:memory:;Version=3;New=True;",
-																IsEnabled = false
+																IsEnabled = true
 															};
 
 		public static DatabaseServerOptions MySql = new DatabaseServerOptions
