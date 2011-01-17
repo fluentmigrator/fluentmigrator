@@ -167,6 +167,7 @@
     <Compile Include="Expressions\AlterTableExpression.cs" />
     <Compile Include="Expressions\AlterSchemaExpression.cs" />
     <Compile Include="Expressions\DeleteDataExpression.cs" />
+    <Compile Include="Expressions\ExecuteEmbeddedSqlScriptExpression.cs" />
     <Compile Include="Expressions\InsertDataExpression.cs" />
     <Compile Include="Builders\Insert\InsertDataExpressionBuilder.cs" />
     <Compile Include="Builders\Insert\InsertExpressionRoot.cs" />

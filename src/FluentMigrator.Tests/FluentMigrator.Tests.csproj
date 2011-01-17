@@ -171,6 +171,7 @@
     <Compile Include="Unit\Expressions\CreateForeignKeyExpressionTests.cs" />
     <Compile Include="Unit\Expressions\CreateIndexExpressionTests.cs" />
     <Compile Include="Unit\Expressions\CreateTableExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\ExecuteEmbeddedSqlExpressionTests.cs" />
     <Compile Include="Unit\Expressions\ExecuteSqlScriptExpressionTests.cs" />
     <Compile Include="Unit\Expressions\ExecuteSqlStatementExpressionTests.cs" />
     <Compile Include="Unit\Generators\ConstantFormatterTests.cs" />
@@ -248,6 +249,11 @@
       <ProductName>Windows Installer 3.1</ProductName>
       <Install>true</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Embeddedtestscript.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
