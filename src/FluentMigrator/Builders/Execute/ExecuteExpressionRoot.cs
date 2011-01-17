@@ -50,6 +50,12 @@ namespace FluentMigrator.Builders.Execute
 			var expression = new PerformDBOperationExpression { Operation = operation };
 			_context.Expressions.Add(expression);
 		}
+
+        public void EmbeddedScript(string EmbeddedSqlScriptName)
+        {
+            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = EmbeddedSqlScriptName };
+            _context.Expressions.Add(expression);
+        }
 	}
 
 	public class PerformDBOperationExpression : MigrationExpressionBase
