@@ -12,24 +12,40 @@ namespace FluentMigrator.Expressions
     {
         public string SqlScript { get; set; }
 
+        public Assembly MigrationAssembly { get; set; }
+
         public override void ExecuteWith(IMigrationProcessor processor)
         {
+            
             string sqlText;
-            using (var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream(SqlScript))
+            string embeddedResourceName = GetQualifiedResourcePath(SqlScript);
+
+            if (string.IsNullOrEmpty(embeddedResourceName))
+            {
+                throw new ArgumentNullException(string.Format("Could find resource named {0} in assembly {1}",SqlScript,MigrationAssembly.FullName));
+            }
+
+            using (var stream = MigrationAssembly.GetManifestResourceStream(embeddedResourceName))
             {
                 using (var reader = new StreamReader(stream))
                 {
                     sqlText = reader.ReadToEnd();
                 }
             }
+            
             processor.Execute(sqlText);
+        }
+
+        private string GetQualifiedResourcePath(string resourceName)
+        {
+            var resources = MigrationAssembly.GetManifestResourceNames();
+            var fullManifestPath = resources.Where(x => x.EndsWith(SqlScript));
+            return fullManifestPath.FirstOrDefault();
         }
 
         public override void ApplyConventions(IMigrationConventions conventions)
         {
-            var resources = Assembly.GetExecutingAssembly().GetManifestResourceNames();
-            var fullManifestPath = resources.SkipWhile(x => !x.EndsWith(SqlScript));           
-            SqlScript = fullManifestPath.FirstOrDefault();
+           
         }
 
         public override void CollectValidationErrors(ICollection<string> errors)

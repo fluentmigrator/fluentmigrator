@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using FluentMigrator.Expressions;
+using System.Reflection;
 
 namespace FluentMigrator.Infrastructure
 {
@@ -26,6 +27,7 @@ namespace FluentMigrator.Infrastructure
 	{
 		IMigrationConventions Conventions { get; }
 		ICollection<IMigrationExpression> Expressions { get; set; }
-		IQuerySchema QuerySchema { get; } 
+		IQuerySchema QuerySchema { get; }
+        Assembly MigrationAssembly { get; set; }
 	}
 }
