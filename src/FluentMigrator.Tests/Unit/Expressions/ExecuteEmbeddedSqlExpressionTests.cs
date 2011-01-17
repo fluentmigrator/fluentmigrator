@@ -8,12 +8,14 @@ using FluentMigrator.Tests.Helpers;
 using FluentMigrator.Infrastructure;
 using Moq;
 using NUnit.Should;
+using System.Reflection;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
     [TestFixture]
     public class ExecuteEmbeddedSqlScriptExpressionTests
     {
+       
         private string testSqlScript = "embeddedtestscript.sql";
         private string scriptContents = "TEST SCRIPT";
 
@@ -28,8 +30,19 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ExecutesTheStatement()
         {
-            var expression = new ExecuteSqlScriptExpression { SqlScript = testSqlScript };
+            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = testSqlScript, MigrationAssembly = Assembly.GetExecutingAssembly() };
 
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute(scriptContents)).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+
+        [Test]
+        public void ResourceFinderIsCaseInsensitive()
+        {
+            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = testSqlScript.ToUpper(), MigrationAssembly = Assembly.GetExecutingAssembly() };
             var processor = new Mock<IMigrationProcessor>();
             processor.Setup(x => x.Execute(scriptContents)).Verifiable();
 

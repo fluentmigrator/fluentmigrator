@@ -39,7 +39,7 @@ namespace FluentMigrator.Expressions
         private string GetQualifiedResourcePath(string resourceName)
         {
             var resources = MigrationAssembly.GetManifestResourceNames();
-            var fullManifestPath = resources.Where(x => x.EndsWith(SqlScript));
+            var fullManifestPath = resources.Where(x => x.ToLowerInvariant().EndsWith(SqlScript.ToLowerInvariant()));
             return fullManifestPath.FirstOrDefault();
         }
 
