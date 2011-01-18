@@ -94,16 +94,16 @@ namespace FluentMigrator.Runner
 			}
 		}
 
-        public void MigrateUp(long version)
+        public void MigrateUp(long targetVersion)
         {
-            MigrateUp(version, true);
+            MigrateUp(targetVersion, true);
         }
 
-        public void MigrateUp(long version, bool useAutomaticTransactionManagement)
+        public void MigrateUp(long targetVersion, bool useAutomaticTransactionManagement)
 		{
 			try 
 			{
-                foreach (var neededMigrationVersion in GetMigrationToApply(version))
+                foreach (var neededMigrationVersion in GetUpMigrationsToApply(targetVersion))
 				{
                     ApplyMigrationUp(neededMigrationVersion);
                 }
@@ -117,15 +117,15 @@ namespace FluentMigrator.Runner
 			}
 		}
 
-        private IEnumerable<long> GetMigrationToApply(long version)
+        private IEnumerable<long> GetUpMigrationsToApply(long version)
         {
             return MigrationLoader.Migrations.Keys.Where(x => IsMigrationStepNeededForUpMigration(x, version));
         }
 
 
-        private bool IsMigrationStepNeededForUpMigration(long versionUnderTest, long version)
+        private bool IsMigrationStepNeededForUpMigration(long versionOfMigration, long targetVersion)
         {
-            if (versionUnderTest <= version && !VersionLoader.VersionInfo.HasAppliedMigration(versionUnderTest))
+            if (versionOfMigration <= targetVersion && !VersionLoader.VersionInfo.HasAppliedMigration(versionOfMigration))
             {
                 return true;
             }
@@ -133,16 +133,19 @@ namespace FluentMigrator.Runner
    
         }
 
-        public void MigrateDown(long version)
+        public void MigrateDown(long targetVersion)
         {
-            MigrateDown(version, true);
+            MigrateDown(targetVersion, true);
         }
 
-        public void MigrateDown(long version, bool useAutomaticTransactionManagement)
+        public void MigrateDown(long targetVersion, bool useAutomaticTransactionManagement)
 		{
 			try
 			{
-				ApplyMigrationDown(version);
+                foreach (var neededMigrationVersion in GetDownMigrationsToApply(targetVersion))
+				{
+                    ApplyMigrationDown(neededMigrationVersion);
+                }
 
                 if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
 				VersionLoader.LoadVersionInfo();
@@ -153,6 +156,22 @@ namespace FluentMigrator.Runner
 				throw;
 			}
 		}
+
+        private IEnumerable<long> GetDownMigrationsToApply(long targetVersion)
+        {
+            return MigrationLoader.Migrations.Keys.Where(x => IsMigrationStepNeededForDownMigration(x, targetVersion));
+        }
+
+
+        private bool IsMigrationStepNeededForDownMigration(long versionOfMigration, long targetVersion)
+        {
+            if (versionOfMigration > targetVersion && VersionLoader.VersionInfo.HasAppliedMigration(versionOfMigration))
+            {
+                return true;
+            }
+            return false;
+
+        }
 
 		private void ApplyMigrationUp(long version)
 		{
