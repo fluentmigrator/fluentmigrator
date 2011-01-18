@@ -41,6 +41,9 @@ namespace FluentMigrator.Tests.Integration
 	{
 		private IRunnerContext _runnerContext;
 
+        private readonly bool DoNotUseAutomaticTransactionManagement = false;
+        private readonly bool RollBackTransactionAfterTest = true;
+
 		[SetUp]
 		public void SetUp()
 		{
@@ -69,7 +72,7 @@ namespace FluentMigrator.Tests.Integration
 
 					runner.Down(new TestCreateAndDropTableMigration());
 					processor.TableExists("TestTable").ShouldBeFalse();
-				},true);
+                }, RollBackTransactionAfterTest);
 		}
 
 		[Test]
@@ -105,7 +108,7 @@ namespace FluentMigrator.Tests.Integration
 
 					processor.ConstraintExists("Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeTrue();
 					runner.Down(new TestForeignKeyNamingConvention());
-				}, true);
+				},RollBackTransactionAfterTest);
 		}
 
 		[Test]
@@ -123,7 +126,7 @@ namespace FluentMigrator.Tests.Integration
 					runner.Down(new TestIndexNamingConvention());
 					processor.IndexExists("Users", "IX_Users_GroupId").ShouldBeFalse();
 					processor.TableExists("Users").ShouldBeFalse();
-				},true);
+                }, RollBackTransactionAfterTest);
 		}
 
 		[Test]
@@ -145,7 +148,7 @@ namespace FluentMigrator.Tests.Integration
 
 					runner.Down(new TestCreateAndDropTableMigration());
 					processor.IndexExists("TestTable", "IX_TestTable_Name").ShouldBeFalse();
-				},true);
+                }, RollBackTransactionAfterTest);
 		}
 
 		[Test]
@@ -169,12 +172,14 @@ namespace FluentMigrator.Tests.Integration
 
 					runner.Down(new TestCreateAndDropTableMigration());
 					processor.TableExists("TestTable2").ShouldBeFalse();
-				},true);
+                }, RollBackTransactionAfterTest);
 		}
 
 		[Test, Description("Sqlite will fail here. This test is only run against MS SQL and MySQL")]
 		public void CanRenameColumn()
 		{
+            var useOnlyTheseProcessorTypes = new Type[] {typeof(SqlServerProcessor),typeof(MySqlProcessor)};
+
 			ExecuteWithSupportedProcessors(
 				processor =>
 				{
@@ -193,7 +198,7 @@ namespace FluentMigrator.Tests.Integration
 
 					runner.Down(new TestCreateAndDropTableMigration());
 					processor.ColumnExists("TestTable2", "Name").ShouldBeFalse();
-				},true,new Type[] {typeof(SqlServerProcessor),typeof(MySqlProcessor)});
+                }, RollBackTransactionAfterTest, useOnlyTheseProcessorTypes);
 		}
 
 		[Test]
@@ -209,7 +214,7 @@ namespace FluentMigrator.Tests.Integration
 				var runner = new MigrationRunner(typeof(MigrationRunnerTests).Assembly, runnerContext, processor);
 
 				runner.MigrationLoader.Migrations.ShouldNotBeNull();
-			},true);
+			});
 		}
 
 		[Test]
@@ -224,7 +229,7 @@ namespace FluentMigrator.Tests.Integration
 
 				var runner = new MigrationRunner(typeof(TestMigration).Assembly, runnerContext, processor);
 				runner.VersionLoader.VersionInfo.ShouldNotBeNull();
-			},true);
+			});
 		}
 
 		[Test]
@@ -234,12 +239,12 @@ namespace FluentMigrator.Tests.Integration
 			{
 				MigrationRunner runner = SetupMigrationRunner(processor);
 
-				runner.MigrateUp();
+                runner.MigrateUp(DoNotUseAutomaticTransactionManagement);
 
 				runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
 				runner.VersionLoader.VersionInfo.HasAppliedMigration(2).ShouldBeTrue();
 				runner.VersionLoader.VersionInfo.Latest().ShouldBe(2);
-			},true);
+            }, RollBackTransactionAfterTest);
 		}
 
 		[Test]
@@ -249,14 +254,14 @@ namespace FluentMigrator.Tests.Integration
 			{
 				MigrationRunner runner = SetupMigrationRunner(processor);
 
-				runner.MigrateUp(2);
+                runner.MigrateUp(2, DoNotUseAutomaticTransactionManagement);
 
                 runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
                 processor.TableExists("Users").ShouldBeTrue();
 
                 runner.VersionLoader.VersionInfo.HasAppliedMigration(2).ShouldBeTrue();
                 processor.TableExists("VersionedMigration").ShouldBeTrue();
-			},true);
+            }, RollBackTransactionAfterTest);
 		}
 
 		[Test]
@@ -266,7 +271,7 @@ namespace FluentMigrator.Tests.Integration
 				{
 					MigrationRunner runner = SetupMigrationRunner(processor);
 
-					runner.MigrateUp(2);
+                    runner.MigrateUp(2, DoNotUseAutomaticTransactionManagement);
 
 					runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
 					processor.TableExists("Users").ShouldBeTrue();
@@ -274,15 +279,15 @@ namespace FluentMigrator.Tests.Integration
                     runner.VersionLoader.VersionInfo.HasAppliedMigration(2).ShouldBeTrue();
                     processor.TableExists("VersionedMigration").ShouldBeTrue();
 
-                    runner.MigrateDown(1);
+                    runner.MigrateDown(1,DoNotUseAutomaticTransactionManagement);
 
                     runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
                     processor.TableExists("Users").ShouldBeTrue();
 
                     runner.VersionLoader.VersionInfo.HasAppliedMigration(2).ShouldBeFalse();
                     processor.TableExists("VersionedMigration").ShouldBeFalse();
- 
-				}, true);
+
+                }, RollBackTransactionAfterTest);
 		}
 
 		[Test]
@@ -292,14 +297,15 @@ namespace FluentMigrator.Tests.Integration
 			{
 				MigrationRunner runner = SetupMigrationRunner(processor);
 
-				runner.MigrateUp(1);
+                runner.MigrateUp(1, DoNotUseAutomaticTransactionManagement);
 
 				processor.TableExists(runner.VersionLoader.VersionTableMetaData.TableName).ShouldBeTrue();
 
                 runner.RollbackToVersion(0);
 
                 processor.TableExists(runner.VersionLoader.VersionTableMetaData.TableName).ShouldBeFalse();
-			},true);
+            }, RollBackTransactionAfterTest);
+
 		}
 
 		[Test]

@@ -58,7 +58,7 @@ namespace FluentMigrator.Tests.Integration
 				return;
 
             var announcer = new TextWriterAnnouncer(System.Console.Out);
-            announcer.Say("Testing Migration against MS SQL Server");
+            announcer.Say("\n\n******************Testing Migration against MS SQL Server******************\n\n");
             
             using (var connection = new SqlConnection(serverOptions.ConnectionString))
             {
@@ -78,7 +78,7 @@ namespace FluentMigrator.Tests.Integration
 				return;
 
             var announcer = new TextWriterAnnouncer(System.Console.Out);
-            announcer.Say("Testing Migration against SQLite");
+            announcer.Say("\n\n******************Testing Migration against SQLite******************\n\n");
 
             using (var connection = new SQLiteConnection(serverOptions.ConnectionString))
             {
@@ -93,7 +93,7 @@ namespace FluentMigrator.Tests.Integration
 				return;
 
             var announcer = new TextWriterAnnouncer(System.Console.Out);
-            announcer.Say("Testing Migration against MySQL Server");
+            announcer.Say("\n\n******************Testing Migration against MySQL Server******************\n\n");
 
             using (var connection = new MySqlConnection(serverOptions.ConnectionString))
             {
