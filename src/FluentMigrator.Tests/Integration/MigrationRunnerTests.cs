@@ -256,46 +256,40 @@ namespace FluentMigrator.Tests.Integration
 			{
 				MigrationRunner runner = SetupMigrationRunner(processor);
 
-				runner.MigrateUp(1);
+				runner.MigrateUp(2);
 
-				runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
+                runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
 				processor.TableExists("Users").ShouldBeTrue();
+
+                runner.VersionLoader.VersionInfo.HasAppliedMigration(2).ShouldBeTrue();
+                processor.TableExists("VersionedMigration").ShouldBeTrue();
 			});
 		}
 
 		[Test]
 		public void CanMigrateASpecificVersionDown()
 		{
-			try
-			{
 				ExecuteWithSupportedProcessors(processor =>
 				{
 					MigrationRunner runner = SetupMigrationRunner(processor);
 
-					runner.MigrateUp(1);
+					runner.MigrateUp(2);
 
 					runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
 					processor.TableExists("Users").ShouldBeTrue();
+
+                    runner.VersionLoader.VersionInfo.HasAppliedMigration(2).ShouldBeTrue();
+                    processor.TableExists("VersionedMigration").ShouldBeTrue();
+
+                    runner.MigrateDown(1);
+
+                    runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
+                    processor.TableExists("Users").ShouldBeTrue();
+
+                    runner.VersionLoader.VersionInfo.HasAppliedMigration(2).ShouldBeFalse();
+                    processor.TableExists("VersionedMigration").ShouldBeFalse();
+
 				}, false, typeof(SqliteProcessor));
-
-				ExecuteWithSupportedProcessors(processor =>
-				{
-					MigrationRunner testRunner = SetupMigrationRunner(processor);
-					testRunner.MigrateDown(1);
-
-					testRunner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeFalse();
-					processor.TableExists("Users").ShouldBeFalse();
-				}, false, typeof(SqliteProcessor));
-
-			}
-			finally
-			{
-				ExecuteWithSupportedProcessors(processor =>
-				{
-					MigrationRunner testRunner = SetupMigrationRunner(processor);
-					testRunner.RollbackToVersion(0);
-				}, false);
-			}
 		}
 
 		[Test]
