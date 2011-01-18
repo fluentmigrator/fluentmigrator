@@ -212,14 +212,21 @@ namespace FluentMigrator.Runner
 
         public void Rollback(int steps, bool useAutomaticTransactionManagement)
 		{
-            //TODO: Wrap this in a try catch
-			foreach (var migrationNumber in VersionLoader.VersionInfo.AppliedMigrations().Take(steps))
-			{
-				ApplyMigrationDown(migrationNumber);
-			}
+            try
+            {
+                foreach (var migrationNumber in VersionLoader.VersionInfo.AppliedMigrations().Take(steps))
+                {
+                    ApplyMigrationDown(migrationNumber);
+                }
 
-			VersionLoader.LoadVersionInfo();
-            if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
+                VersionLoader.LoadVersionInfo();
+                if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
+            }
+            catch (Exception)
+            {
+                if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
+                throw;
+            }
 		}
 
         public void RollbackToVersion(long version)
@@ -230,23 +237,29 @@ namespace FluentMigrator.Runner
         public void RollbackToVersion(long version, bool useAutomaticTransactionManagement)
 		{
             //TODO: Extract VersionsToApply Strategy
-            //TODO: Wrap this in a try catch
+            try
+            {
+                // Get the migrations between current and the to version
+                foreach (var migrationNumber in VersionLoader.VersionInfo.AppliedMigrations())
+                {
+                    if (version < migrationNumber || version == 0)
+                    {
+                        ApplyMigrationDown(migrationNumber);
+                    }
+                }
 
-			// Get the migrations between current and the to version
-			foreach (var migrationNumber in VersionLoader.VersionInfo.AppliedMigrations())
-			{
-				if (version < migrationNumber || version == 0)
-				{
-					ApplyMigrationDown(migrationNumber);
-				}
-			}
+                if (version == 0)
+                    VersionLoader.RemoveVersionTable();
+                else
+                    VersionLoader.LoadVersionInfo();
 
-			if (version == 0)
-				VersionLoader.RemoveVersionTable();
-			else
-				VersionLoader.LoadVersionInfo();
-
-            if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
+                if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
+            }
+            catch (Exception)
+            {
+                if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
+                throw;
+            }
 		}
 
 		public Assembly MigrationAssembly
