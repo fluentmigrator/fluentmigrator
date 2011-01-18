@@ -39,7 +39,7 @@ namespace FluentMigrator.Tests.Integration
 
 		public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback)
 		{
-			ExecuteWithSupportedProcessors(test, tryRollback, new Type[]{});
+            ExecuteWithSupportedProcessors(test, tryRollback, new Type[] { typeof(SqlServerProcessor), typeof(SqliteProcessor) , typeof(MySqlProcessor)});
 		}
 
 		public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback, params Type[] exceptProcessors)
