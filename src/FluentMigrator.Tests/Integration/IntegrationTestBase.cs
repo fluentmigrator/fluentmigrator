@@ -39,16 +39,16 @@ namespace FluentMigrator.Tests.Integration
 
 		public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback)
 		{
-            ExecuteWithSupportedProcessors(test, tryRollback, new Type[] { typeof(SqlServerProcessor), typeof(SqliteProcessor) , typeof(MySqlProcessor)});
+            ExecuteWithSupportedProcessors(test, tryRollback, new Type[] {});
 		}
 
 		public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback, params Type[] exceptProcessors)
 		{
-			if (exceptProcessors.Count(t => typeof(SqlServerProcessor).IsAssignableFrom(t)) != 0)
+			if (exceptProcessors.Count(t => typeof(SqlServerProcessor).IsAssignableFrom(t)) == 0)
 				ExecuteWithSqlServer(test, IntegrationTestOptions.SqlServer, tryRollback);
-			if (exceptProcessors.Count(t => typeof(SqliteProcessor).IsAssignableFrom(t)) != 0)
+			if (exceptProcessors.Count(t => typeof(SqliteProcessor).IsAssignableFrom(t)) == 0)
 				ExecuteWithSqlite(test, IntegrationTestOptions.SqlLite);
-			if (exceptProcessors.Count(t => typeof(MySqlProcessor).IsAssignableFrom(t)) != 0)
+			if (exceptProcessors.Count(t => typeof(MySqlProcessor).IsAssignableFrom(t)) == 0)
 				ExecuteWithMySql(test, IntegrationTestOptions.MySql);
 		}
 

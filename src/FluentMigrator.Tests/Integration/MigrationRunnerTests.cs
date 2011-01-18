@@ -99,7 +99,7 @@ namespace FluentMigrator.Tests.Integration
         [Test, Description("SQLite does not support ForeignKey constraints. This test is only run against MS SQL and MySQL")]
 		public void CanApplyForeignKeyConvention()
 		{
-            var useOnlyTheseProcessorTypes = new Type[] { typeof(SqlServerProcessor), typeof(MySqlProcessor) };
+            var excludedProcessorTypes = new Type[] { typeof(SqliteProcessor) };
 
 			ExecuteWithSupportedProcessors(
 				processor =>
@@ -110,7 +110,7 @@ namespace FluentMigrator.Tests.Integration
 
 					processor.ConstraintExists("Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeTrue();
 					runner.Down(new TestForeignKeyNamingConvention());
-				},RollBackTransactionAfterTest,useOnlyTheseProcessorTypes);
+                }, RollBackTransactionAfterTest, excludedProcessorTypes);
 		}
 
 		[Test]
@@ -180,7 +180,7 @@ namespace FluentMigrator.Tests.Integration
 		[Test, Description("Sqlite will fail here. This test is only run against MS SQL and MySQL")]
 		public void CanRenameColumn()
 		{
-            var useOnlyTheseProcessorTypes = new Type[] {typeof(SqlServerProcessor),typeof(MySqlProcessor)};
+            var excludedProcessorTypes = new Type[] { typeof(SqliteProcessor) };
 
 			ExecuteWithSupportedProcessors(
 				processor =>
@@ -200,7 +200,7 @@ namespace FluentMigrator.Tests.Integration
 
 					runner.Down(new TestCreateAndDropTableMigration());
 					processor.ColumnExists("TestTable2", "Name").ShouldBeFalse();
-                }, RollBackTransactionAfterTest, useOnlyTheseProcessorTypes);
+                }, RollBackTransactionAfterTest, excludedProcessorTypes);
 		}
 
 		[Test]
