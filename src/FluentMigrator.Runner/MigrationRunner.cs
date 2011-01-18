@@ -68,7 +68,7 @@ namespace FluentMigrator.Runner
 			ProfileLoader.ApplyProfiles();
 		}
 
-        public void MigrationUp()
+        public void MigrateUp()
         {
             MigrateUp(true);
         }
