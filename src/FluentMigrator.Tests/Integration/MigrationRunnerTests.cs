@@ -96,9 +96,11 @@ namespace FluentMigrator.Tests.Integration
 			runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
 		}
 
-		[Test]
+        [Test, Description("SQLite does not support ForeignKey constraints. This test is only run against MS SQL and MySQL")]
 		public void CanApplyForeignKeyConvention()
 		{
+            var useOnlyTheseProcessorTypes = new Type[] { typeof(SqlServerProcessor), typeof(MySqlProcessor) };
+
 			ExecuteWithSupportedProcessors(
 				processor =>
 				{
@@ -108,7 +110,7 @@ namespace FluentMigrator.Tests.Integration
 
 					processor.ConstraintExists("Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeTrue();
 					runner.Down(new TestForeignKeyNamingConvention());
-				},RollBackTransactionAfterTest);
+				},RollBackTransactionAfterTest,useOnlyTheseProcessorTypes);
 		}
 
 		[Test]
