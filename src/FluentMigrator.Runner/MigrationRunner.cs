@@ -68,7 +68,12 @@ namespace FluentMigrator.Runner
 			ProfileLoader.ApplyProfiles();
 		}
 
-		public void MigrateUp()
+        public void MigrationUp()
+        {
+            MigrateUp(true);
+        }
+
+		public void MigrateUp(bool useAutomaticTransactionManagement)
 		{
 			try
 			{
@@ -79,17 +84,22 @@ namespace FluentMigrator.Runner
 
 				ApplyProfiles();
 
-				Processor.CommitTransaction();
+                if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
 				VersionLoader.LoadVersionInfo();
 			}
 			catch (Exception)
 			{
-				Processor.RollbackTransaction();
+				if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
 				throw;
 			}
 		}
 
-		public void MigrateUp(long version)
+        public void MigrateUp(long version)
+        {
+            MigrateUp(version, true);
+        }
+
+        public void MigrateUp(long version, bool useAutomaticTransactionManagement)
 		{
 			try 
 			{
@@ -97,12 +107,12 @@ namespace FluentMigrator.Runner
 				{
                     ApplyMigrationUp(neededMigrationVersion);
                 }
-                Processor.CommitTransaction();
+                if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
                 VersionLoader.LoadVersionInfo();
 			} 
 			catch (Exception) 
 			{
-				Processor.RollbackTransaction();
+                if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
 				throw;
 			}
 		}
@@ -123,18 +133,23 @@ namespace FluentMigrator.Runner
    
         }
 
-		public void MigrateDown(long version)
+        public void MigrateDown(long version)
+        {
+            MigrateDown(version, true);
+        }
+
+        public void MigrateDown(long version, bool useAutomaticTransactionManagement)
 		{
 			try
 			{
 				ApplyMigrationDown(version);
 
-				Processor.CommitTransaction();
+                if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
 				VersionLoader.LoadVersionInfo();
 			}
 			catch (Exception)
 			{
-				Processor.RollbackTransaction();
+                if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
 				throw;
 			}
 		}
@@ -171,19 +186,33 @@ namespace FluentMigrator.Runner
 			}
 		}
 
-		public void Rollback(int steps)
+        public void Rollback(int steps)
+        {
+            Rollback(steps, true);
+        }
+
+        public void Rollback(int steps, bool useAutomaticTransactionManagement)
 		{
+            //TODO: Wrap this in a try catch
 			foreach (var migrationNumber in VersionLoader.VersionInfo.AppliedMigrations().Take(steps))
 			{
 				ApplyMigrationDown(migrationNumber);
 			}
 
 			VersionLoader.LoadVersionInfo();
-			Processor.CommitTransaction();
+            if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
 		}
 
-		public void RollbackToVersion(long version)
+        public void RollbackToVersion(long version)
+        {
+            RollbackToVersion(version, true);
+        }
+
+        public void RollbackToVersion(long version, bool useAutomaticTransactionManagement)
 		{
+            //TODO: Extract VersionsToApply Strategy
+            //TODO: Wrap this in a try catch
+
 			// Get the migrations between current and the to version
 			foreach (var migrationNumber in VersionLoader.VersionInfo.AppliedMigrations())
 			{
@@ -198,7 +227,7 @@ namespace FluentMigrator.Runner
 			else
 				VersionLoader.LoadVersionInfo();
 
-			Processor.CommitTransaction();
+            if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
 		}
 
 		public Assembly MigrationAssembly
