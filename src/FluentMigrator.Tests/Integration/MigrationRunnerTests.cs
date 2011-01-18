@@ -273,8 +273,8 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.MigrateUp(2, DoNotUseAutomaticTransactionManagement);
 
-					runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
-					processor.TableExists("Users").ShouldBeTrue();
+                    runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
+                    processor.TableExists("Users").ShouldBeTrue();
 
                     runner.VersionLoader.VersionInfo.HasAppliedMigration(2).ShouldBeTrue();
                     processor.TableExists("VersionedMigration").ShouldBeTrue();
@@ -286,8 +286,7 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.VersionLoader.VersionInfo.HasAppliedMigration(2).ShouldBeFalse();
                     processor.TableExists("VersionedMigration").ShouldBeFalse();
-
-                }, RollBackTransactionAfterTest);
+               }, RollBackTransactionAfterTest);
 		}
 
 		[Test]
