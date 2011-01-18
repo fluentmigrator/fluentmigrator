@@ -93,9 +93,12 @@ namespace FluentMigrator.Runner
 		{
 			try 
 			{
-				ApplyMigrationUp(version);
-				Processor.CommitTransaction();
-				VersionLoader.LoadVersionInfo();
+                foreach (var neededMigrationVersion in GetMigrationToApply(version))
+				{
+                    ApplyMigrationUp(neededMigrationVersion);
+                }
+                Processor.CommitTransaction();
+                VersionLoader.LoadVersionInfo();
 			} 
 			catch (Exception) 
 			{
@@ -103,6 +106,22 @@ namespace FluentMigrator.Runner
 				throw;
 			}
 		}
+
+        private IEnumerable<long> GetMigrationToApply(long version)
+        {
+            return MigrationLoader.Migrations.Keys.Where(x => IsMigrationStepNeededForUpMigration(x, version));
+        }
+
+
+        private bool IsMigrationStepNeededForUpMigration(long versionUnderTest, long version)
+        {
+            if (versionUnderTest <= version && !VersionLoader.VersionInfo.HasAppliedMigration(versionUnderTest))
+            {
+                return true;
+            }
+            return false;
+   
+        }
 
 		public void MigrateDown(long version)
 		{
