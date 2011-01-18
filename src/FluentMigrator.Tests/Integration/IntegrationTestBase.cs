@@ -73,6 +73,7 @@ namespace FluentMigrator.Tests.Integration
 		{
 			if (!serverOptions.IsEnabled)
 				return;
+
             using (var connection = new SQLiteConnection(serverOptions.ConnectionString))
             {
                 var processor = new SqliteProcessor(connection, new SqliteGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
