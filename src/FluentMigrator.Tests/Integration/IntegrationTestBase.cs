@@ -57,9 +57,12 @@ namespace FluentMigrator.Tests.Integration
 			if (!serverOptions.IsEnabled)
 				return;
 
+            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            announcer.Say("Testing Migration against MS SQL Server");
+            
             using (var connection = new SqlConnection(serverOptions.ConnectionString))
             {
-                var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+                var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), announcer, new ProcessorOptions());
                 test(processor);
 
                 if (tryRollback && !processor.WasCommitted)
@@ -74,9 +77,12 @@ namespace FluentMigrator.Tests.Integration
 			if (!serverOptions.IsEnabled)
 				return;
 
+            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            announcer.Say("Testing Migration against SQLite");
+
             using (var connection = new SQLiteConnection(serverOptions.ConnectionString))
             {
-                var processor = new SqliteProcessor(connection, new SqliteGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+                var processor = new SqliteProcessor(connection, new SqliteGenerator(), announcer, new ProcessorOptions());
                 test(processor);
             }
 		}
@@ -86,9 +92,12 @@ namespace FluentMigrator.Tests.Integration
 			if (!serverOptions.IsEnabled)
 				return;
 
+            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            announcer.Say("Testing Migration against MySQL Server");
+
             using (var connection = new MySqlConnection(serverOptions.ConnectionString))
             {
-                var processor = new MySqlProcessor(connection, new MySqlGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+                var processor = new MySqlProcessor(connection, new MySqlGenerator(), announcer, new ProcessorOptions());
                 test(processor);
             }
 		}
