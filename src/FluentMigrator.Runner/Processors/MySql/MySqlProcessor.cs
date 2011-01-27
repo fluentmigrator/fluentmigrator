@@ -40,13 +40,14 @@ namespace FluentMigrator.Runner.Processors.MySql
 
 		public override bool TableExists(string tableName)
 		{
-			return Exists("select count(*) from information_schema.tables where table_name='{0}'", tableName);
+			return Exists(@"select table_name from information_schema.tables 
+							where table_schema = SCHEMA() and table_name='{0}'", tableName);
 		}
 
 		public override bool ColumnExists(string tableName, string columnName)
 		{
 			string sql = @"select column_name from information_schema.columns
-							where table_name='{0}'
+							where table_schema = SCHEMA() and table_name='{0}'
 							and column_name='{1}'";
 			return Exists(sql, tableName, columnName);
 		}
@@ -54,15 +55,15 @@ namespace FluentMigrator.Runner.Processors.MySql
 		public override bool ConstraintExists(string tableName, string constraintName)
 		{
 			string sql = @"select constraint_name from information_schema.table_constraints
-							where table_name='{0}'
+							where table_schema = SCHEMA() and table_name='{0}'
 							and constraint_name='{1}'";
 			return Exists(sql, tableName, constraintName);
 		}
 
         public override bool IndexExists(string tableName, string indexName)
 		{
-			string sql = @"select null from information_schema.statistics
-							where table_name='{0}'
+			string sql = @"select index_name from information_schema.statistics
+							where table_schema = SCHEMA() and table_name='{0}'
 							and index_name='{1}'";
 			return Exists(sql, tableName, indexName);
 		}
@@ -89,7 +90,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 					if (!reader.Read())
 						return false;
 
-					return int.Parse(reader[0].ToString()) > 0;
+					return true;
 				}
 				catch
 				{
