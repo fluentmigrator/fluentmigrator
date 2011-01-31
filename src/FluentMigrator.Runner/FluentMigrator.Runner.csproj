@@ -116,6 +116,7 @@
     <Reference Include="System.Data.SqlServerCe, Version=4.0.0.1, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\SQLServerCE4\System.Data.SqlServerCe.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -190,6 +191,7 @@
     <Compile Include="Processors\SqlServer\SqlServer2008ProcessorFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2005ProcessorFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2000ProcessorFactory.cs" />
+    <Compile Include="Processors\SqlServer\SqlServerCeProcessorFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServerProcessorFactory.cs" />
     <Compile Include="Processors\IMigrationProcessorFactory.cs" />
     <Compile Include="MigrationLoader.cs" />

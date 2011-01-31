@@ -55,5 +55,16 @@ namespace FluentMigrator.Runner.Generators
             return string.Empty;
         }
 
+        public override string Generate(DeleteColumnExpression expression)
+        {
+            // Limited functionality in CE, for now will just drop the column.. no DECLARE support!
+            const string sql = @"
+			-- now we can finally drop column
+			ALTER TABLE {0}[{2}] DROP COLUMN [{3}];";
+
+            return String.Format(sql, FormatSchema(expression.SchemaName), FormatSchema(expression.SchemaName, false), expression.TableName, expression.ColumnName);
+        }
+
+
     }
 }

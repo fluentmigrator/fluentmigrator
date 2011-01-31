@@ -159,7 +159,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             {
                 try
                 {
-                    command.CommandTimeout = Options.Timeout;
+                    command.CommandTimeout = 0; // SQL Server CE does not support non-zero command timeout values!! :/
                     command.ExecuteNonQuery();
                 }
                 catch (Exception ex)
