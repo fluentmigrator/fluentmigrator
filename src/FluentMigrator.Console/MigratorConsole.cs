@@ -36,6 +36,7 @@ namespace FluentMigrator.Console
 		public string Namespace;
 		public string Task;
 		public bool Output;
+	    public string OutputFilename;
 		public long Version;
 		public int Steps;
 		public string TargetAssembly;
@@ -106,8 +107,13 @@ namespace FluentMigrator.Console
 					},
 					{
 						"output|out|o",
-						"The name of the file to output the generated SQL to. Default is no output.",
+						"Output generated SQL to a file. Default is no output. Use outputFilename to control the filename, otherwise [assemblyname].sql is the default.",
 						v => { Output = true; }
+					},
+					{
+						"outputFilename=|outfile=|of=",
+						"The name of the file to output the generated SQL to. The output option must be included for output to be saved to the file.",
+						v => { OutputFilename = v; }
 					},
 					{
 						"preview|p",
@@ -187,7 +193,12 @@ namespace FluentMigrator.Console
 				}
 
 				if ( Output )
-					ExecuteMigrations( TargetAssembly + ".sql" );
+				{
+				    if (string.IsNullOrEmpty(OutputFilename))
+				        OutputFilename = TargetAssembly + ".sql";
+
+				    ExecuteMigrations(OutputFilename);
+				}
 				else
 					ExecuteMigrations();
 			}

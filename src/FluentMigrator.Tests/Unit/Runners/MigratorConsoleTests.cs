@@ -68,6 +68,8 @@ namespace FluentMigrator.Tests.Unit.Runners
 		public void FileAnnouncerHasOutputToDefaultOutputFile()
 		{
 			var outputFileName = target + ".sql";
+            if (File.Exists(outputFileName)) File.Delete(outputFileName);
+
 			Assert.IsFalse(File.Exists(outputFileName));
 
 			new MigratorConsole(
@@ -82,6 +84,29 @@ namespace FluentMigrator.Tests.Unit.Runners
 			Assert.IsTrue(File.Exists(outputFileName));
 			File.Delete(outputFileName);
 		}
+
+        [Test]
+        public void FileAnnouncerHasOutputToSpecifiedOutputFile()
+        {
+            var outputFileName = "output.sql";
+            if (File.Exists(outputFileName)) File.Delete(outputFileName);
+
+            Assert.IsFalse(File.Exists(outputFileName));
+
+            new MigratorConsole(
+                "/db", database,
+                "/connection", connection,
+                "/target", target,
+                "/output",
+                "/outputFilename", outputFileName,
+                "/namespace", "FluentMigrator.Tests.Unit.Runners.Migrations",
+                "/task", "migrate:up",
+                "/version", "0");
+
+            Assert.IsTrue(File.Exists(outputFileName));
+            File.Delete(outputFileName);
+        }
+
 
 		[Test]
 		public void ConsoleAnnouncerHasOutput()
