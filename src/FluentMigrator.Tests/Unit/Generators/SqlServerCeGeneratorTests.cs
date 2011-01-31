@@ -51,6 +51,15 @@ namespace FluentMigrator.Tests.Unit.Generators
             var sql = generator.Generate(new DeleteSchemaExpression());
         }
 
+        [Test]
+        public void CreatesTheCorrectSyntaxToDropAnIndex()
+        {
+            var expression = new DeleteIndexExpression();
+            expression.Index = new IndexDefinition() {Name = "MyColumn", TableName = "MyTable"};
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("DROP INDEX [MyTable].[MyColumn]");
+        }
+
         private static CreateTableExpression GetCreateTableExpression(string tableName)
         {
             var columnName1 = "ColumnName1";

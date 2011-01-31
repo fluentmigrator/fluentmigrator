@@ -65,6 +65,9 @@ namespace FluentMigrator.Runner.Generators
             return String.Format(sql, FormatSchema(expression.SchemaName), FormatSchema(expression.SchemaName, false), expression.TableName, expression.ColumnName);
         }
 
-
+        public override string Generate(DeleteIndexExpression expression)
+        {
+            return String.Format("DROP INDEX [{0}].[{1}]", expression.Index.TableName, expression.Index.Name);
+        }
     }
 }
