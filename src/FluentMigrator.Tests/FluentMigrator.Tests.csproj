@@ -182,6 +182,7 @@
     <Compile Include="Unit\Generators\SqlServer2000GeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2005GeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2008GeneratorTests.cs" />
+    <Compile Include="Unit\Generators\SqlServerCeGeneratorTests.cs" />
     <Compile Include="Unit\MigrationLoaderTests.cs" />
     <Compile Include="Unit\MigrationMetadataTests.cs" />
     <Compile Include="Unit\Generators\SqliteGeneratorTests.cs" />
