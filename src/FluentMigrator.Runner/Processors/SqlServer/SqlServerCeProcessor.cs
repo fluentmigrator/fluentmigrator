@@ -25,18 +25,18 @@ using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-    public class SqlCeProcessor : ProcessorBase
+    public class SqlServerCeProcessor : ProcessorBase
     {
         public virtual SqlCeConnection Connection { get; set; }
         public SqlCeTransaction Transaction { get; private set; }
         public bool WasCommitted { get; private set; }
 
-        public SqlCeProcessor(SqlCeConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+        public SqlServerCeProcessor(SqlCeConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
             : base(generator, announcer, options)
         {
             Connection = connection;
             connection.Open();
-            //Transaction = connection.BeginTransaction();
+            BeginTransaction();
         }
 
         public override bool SchemaExists(string schemaName)
@@ -102,14 +102,21 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         public override void BeginTransaction()
         {
             Announcer.Say("Beginning Transaction");
-            //Transaction = Connection.BeginTransaction();
+            Transaction = Connection.BeginTransaction();
         }
 
         public override void CommitTransaction()
         {
             Announcer.Say("Committing Transaction");
-            //Transaction.Commit();
+            
+            if (Transaction != null)
+            {
+                Transaction.Commit();
+                Transaction = null;    
+            }
+
             WasCommitted = true;
+
             if (Connection.State != ConnectionState.Closed)
             {
                 Connection.Close();
@@ -118,8 +125,16 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override void RollbackTransaction()
         {
+            if (Transaction == null)
+            {
+                Announcer.Say("No transaction was available to rollback!");
+                return;
+            }
+
             Announcer.Say("Rolling back transaction");
-            //Transaction.Rollback();
+            
+            Transaction.Rollback();
+
             WasCommitted = true;
             if (Connection.State != ConnectionState.Closed)
             {
@@ -136,6 +151,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
+
+            if (Transaction == null)
+                BeginTransaction();
 
             using (var command = new SqlCeCommand(sql, Connection, Transaction))
             {
