@@ -97,7 +97,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(
-				"ALTER TABLE `TestForeignTable` ADD CONSTRAINT FK_Test FOREIGN KEY (Column3,Column4) REFERENCES TestPrimaryTable (Column1,Column2)");
+                "ALTER TABLE `TestForeignTable` ADD CONSTRAINT `FK_Test` FOREIGN KEY (Column3,Column4) REFERENCES TestPrimaryTable (Column1,Column2)");
 		}
 
 		[Test]
