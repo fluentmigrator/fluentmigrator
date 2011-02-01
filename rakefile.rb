@@ -13,7 +13,7 @@ msbuild :build do |msb|
 end
 
 nunit :test => :build do |nunit|
-  nunit.path_to_command = "tools/NUnit/nunit-console.exe"
+  nunit.command = "tools/NUnit/nunit-console.exe"
   nunit.assemblies "src/FluentMigrator.Tests/bin/Debug/FluentMigrator.Tests.dll"
 end
 
