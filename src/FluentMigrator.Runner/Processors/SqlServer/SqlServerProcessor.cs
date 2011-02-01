@@ -20,6 +20,7 @@
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Collections.Generic;
 using System.IO;
 using FluentMigrator.Builders.Execute;
 
@@ -169,6 +170,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         protected string FormatSqlEscape(string sql)
         {
             return sql.Replace("'", "''");
+        }
+
+        public override List<FluentMigrator.Model.TableDefinition> ReadDbSchema() {
+            throw new NotImplementedException();
         }
 	}
 }

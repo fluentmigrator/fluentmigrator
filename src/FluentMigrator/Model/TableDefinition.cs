@@ -20,10 +20,12 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Infrastructure.Extensions;
 
 namespace FluentMigrator.Model {
-    class TableDefinition : ICloneable, ICanBeConventional, ICanBeValidated
+    public class TableDefinition : ICloneable, ICanBeConventional, ICanBeValidated
     {
         public TableDefinition()
 		{
@@ -34,9 +36,9 @@ namespace FluentMigrator.Model {
 
         public virtual string Name { get; set; }
         public virtual string SchemaName { get; set; }
-        public virtual List<ColumnDefinition> Columns { get; set; }
-        public virtual List<ForeignKeyDefinition> ForiengKeys { get; set; }
-        public virtual List<IndexDefinition> Indexes { get; set; }
+        public virtual ICollection<ColumnDefinition> Columns { get; set; }
+        public virtual ICollection<ForeignKeyDefinition> ForiengKeys { get; set; }
+        public virtual ICollection<IndexDefinition> Indexes { get; set; }
 
         public void ApplyConventions(IMigrationConventions conventions) 
         {
@@ -45,12 +47,28 @@ namespace FluentMigrator.Model {
 
         public void CollectValidationErrors(ICollection<string> errors) 
         {
-            throw new NotImplementedException();
+            if (String.IsNullOrEmpty(Name))
+                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
+
+            foreach (ColumnDefinition column in Columns)
+                column.CollectValidationErrors(errors);
+
+            foreach (IndexDefinition index in Indexes)
+                index.CollectValidationErrors(errors);
+
+            foreach (ForeignKeyDefinition fk in ForiengKeys)
+                fk.CollectValidationErrors(errors);
         }
 
         public object Clone() 
         {
-            throw new NotImplementedException();
+            return new TableDefinition
+            {
+                Name = Name,
+                SchemaName = SchemaName,
+                Columns = Columns.CloneAll().ToList(),
+                Indexes = Indexes.CloneAll().ToList()
+            };
         }
     }
 }

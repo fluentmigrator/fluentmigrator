@@ -18,6 +18,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 
@@ -133,5 +134,9 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 				return ds;
 			}
 		}
+
+        public override List<FluentMigrator.Model.TableDefinition> ReadDbSchema() {
+            throw new NotImplementedException();
+        }
 	}
 }

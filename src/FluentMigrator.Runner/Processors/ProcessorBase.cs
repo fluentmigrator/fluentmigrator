@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System.Collections.Generic;
+using FluentMigrator.Model;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
@@ -155,5 +157,6 @@ namespace FluentMigrator.Runner.Processors
 		public abstract bool ColumnExists(string tableName, string columnName);
 		public abstract bool ConstraintExists(string tableName, string constraintName);
         public abstract bool IndexExists(string tableName, string indexName);
+        public abstract List<TableDefinition> ReadDbSchema();
     }
 }

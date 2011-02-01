@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using FluentMigrator.Builders.Execute;
@@ -120,6 +121,10 @@ namespace FluentMigrator.Runner.Processors.Jet
             {
                 return indexes.Rows.Count > 0;
             }
+        }
+
+        public override List<FluentMigrator.Model.TableDefinition> ReadDbSchema() {
+            throw new NotImplementedException();
         }
 	}
 }

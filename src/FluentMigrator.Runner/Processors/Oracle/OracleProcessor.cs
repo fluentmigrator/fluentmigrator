@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using FluentMigrator.Builders.Execute;
@@ -106,5 +107,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
 			using (var command = OracleFactory.GetCommand(Connection,sql))
 				command.ExecuteNonQuery();
 		}
+
+        public override List<FluentMigrator.Model.TableDefinition> ReadDbSchema() {
+            throw new NotImplementedException();
+        }
 	}
 }

@@ -17,9 +17,11 @@
 #endregion
 
 using System.Data;
+using System.Collections.Generic;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 
 namespace FluentMigrator
 {
@@ -31,6 +33,7 @@ namespace FluentMigrator
 		DataSet ReadTableData(string tableName);
 		DataSet Read(string template, params object[] args);
 		bool Exists(string template, params object[] args);
+        List<TableDefinition> ReadDbSchema();
 
 		void BeginTransaction();
 		void CommitTransaction();
