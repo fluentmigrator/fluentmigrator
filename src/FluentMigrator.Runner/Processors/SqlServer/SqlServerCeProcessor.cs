@@ -18,6 +18,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlServerCe;
 using System.IO;
@@ -187,6 +188,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         protected string FormatSqlEscape(string sql)
         {
             return sql.Replace("'", "''");
+        }
+
+        public override List<FluentMigrator.Model.TableDefinition> ReadDbSchema() {
+            throw new NotImplementedException();
         }
     }
 }

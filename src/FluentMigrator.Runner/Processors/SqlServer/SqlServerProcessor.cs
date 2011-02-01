@@ -149,7 +149,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 				{
 					using (StringWriter message = new StringWriter())
 					{
-						message.WriteLine("An error occurred executing the following sql:");
+						message.WriteLine("An error occured executing the following sql:");
 						message.WriteLine(sql);
 						message.WriteLine("The error was {0}", ex.Message);
 
@@ -178,7 +178,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         protected virtual ICollection<FluentMigrator.Model.TableDefinition> ReadTables() {
             /*
-             * --get columns for a given table; still needs to determined if a columns IsUnique
+             * --get colurake tesmns for a given table; still needs to determined if a columns IsUnique
                 SELECT OBJECT_SCHEMA_NAME(t.[object_id],DB_ID()) AS [Schema], t.name AS [Table], 
                 c.[Name] AS ColumnName,
                 t.object_id AS [TableID],
