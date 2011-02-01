@@ -14,3 +14,6 @@ db.sqlite
 *.pidb
 *.userprefs
 packages/FluentMigrator/
+_UpgradeReport_Files
+UpgradeLog.XML
+*.bak
