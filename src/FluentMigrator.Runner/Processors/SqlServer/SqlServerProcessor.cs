@@ -175,5 +175,74 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         public override List<FluentMigrator.Model.TableDefinition> ReadDbSchema() {
             throw new NotImplementedException();
         }
+
+        protected virtual ICollection<FluentMigrator.Model.TableDefinition> ReadTables() {
+            /*
+             * --get columns for a given table; still needs to determined if a columns IsUnique
+                SELECT OBJECT_SCHEMA_NAME(t.[object_id],DB_ID()) AS [Schema], t.name AS [Table], 
+                c.[Name] AS ColumnName,
+                t.object_id AS [TableID],
+                c.column_id AS [ColumnID],
+                def.definition AS [DefaultValue],
+                c.[system_type_id] AS [TypeID],
+                c.[user_type_id] AS [UserTypeID],
+                c.[max_length] AS [Length],
+                c.[precision] AS [Precision],
+                c.[scale] AS [Scale],
+                c.[is_identity] AS [IsIdentity],
+                c.[is_nullable] AS [IsNullable],
+                CASE WHEN EXISTS(SELECT 1 FROM sys.foreign_key_columns fkc WHERE t.object_id = fkc.parent_object_id AND c.column_id = fkc.parent_column_id) THEN 1 ELSE 0 END AS IsForiegnKey,
+                CASE WHEN EXISTS(select 1 from sys.index_columns ic WHERE t.object_id = ic.object_id AND c.column_id = ic.column_id) THEN 1 ELSE 0 END AS IsIndexed 
+                --,CASE WHEN EXISTS(select 1 from sys.key_constraints kc where [type] = 'UQ' AND c.object_id = kc.parent_object_id) THEN 1 ELSE 0 END AS IsUniqueKey
+                FROM sys.all_columns c
+                JOIN sys.tables t ON c.object_id = t.object_id AND t.type = 'u'
+                LEFT JOIN sys.default_constraints def ON c.default_object_id = def.object_id
+                ORDER BY t.name, c.name
+             */
+            throw new NotImplementedException();
+        }
+
+        protected virtual ICollection<FluentMigrator.Model.ColumnDefinition> ReadIndexes() 
+        {
+            /*
+             * SELECT OBJECT_SCHEMA_NAME(T.[object_id],DB_ID()) AS [Schema],  
+              T.[name] AS [table_name], I.[name] AS [index_name], AC.[name] AS [column_name],  
+              I.[type_desc], I.[is_unique], I.[data_space_id], I.[ignore_dup_key], I.[is_primary_key], 
+              I.[is_unique_constraint], I.[fill_factor],    I.[is_padded], I.[is_disabled], I.[is_hypothetical], 
+              I.[allow_row_locks], I.[allow_page_locks], IC.[is_descending_key], IC.[is_included_column] 
+            FROM sys.[tables] AS T  
+              INNER JOIN sys.[indexes] I ON T.[object_id] = I.[object_id]  
+              INNER JOIN sys.[index_columns] IC ON I.[object_id] = IC.[object_id] 
+              INNER JOIN sys.[all_columns] AC ON T.[object_id] = AC.[object_id] AND IC.[column_id] = AC.[column_id] 
+            WHERE T.[is_ms_shipped] = 0 AND I.[type_desc] <> 'HEAP' 
+            ORDER BY T.[name], I.[index_id], IC.[key_ordinal]
+             */
+            throw new NotImplementedException();
+        }
+
+        protected virtual ICollection<FluentMigrator.Model.ForeignKeyDefinition> ReadForeignKeys() 
+        {
+            /*
+             * SELECT C.CONSTRAINT_NAME AS Constraint_Name,
+	                FK.CONSTRAINT_SCHEMA AS ForeignTableSchema,
+	                FK.TABLE_NAME AS FK_Table,
+	                CU.COLUMN_NAME AS FK_Column,
+	                PK.CONSTRAINT_SCHEMA as PrimaryTableSchema,
+	                PK.TABLE_NAME AS PK_Table,
+	                PT.COLUMN_NAME AS PK_Column
+                FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS C
+                INNER JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS FK ON C.CONSTRAINT_NAME = FK.CONSTRAINT_NAME
+                INNER JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS PK ON C.UNIQUE_CONSTRAINT_NAME = PK.CONSTRAINT_NAME
+                INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE CU ON C.CONSTRAINT_NAME = CU.CONSTRAINT_NAME
+                INNER JOIN (
+                SELECT i1.TABLE_NAME, i2.COLUMN_NAME
+                FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS i1
+                INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE i2 ON i1.CONSTRAINT_NAME = i2.CONSTRAINT_NAME
+                WHERE i1.CONSTRAINT_TYPE = 'PRIMARY KEY'
+                ) PT ON PT.TABLE_NAME = PK.TABLE_NAME
+                ORDER BY Constraint_Name
+             */
+            throw new NotImplementedException();
+        }
 	}
 }
