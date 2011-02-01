@@ -11,7 +11,7 @@ namespace FluentMigrator.Runner.SchemaWriters {
             throw new NotImplementedException();
         }
 
-        public abstract void WriteToFile(ICollection<Model.TableDefinition> tables, string file) {
+        public void WriteToFile(ICollection<Model.TableDefinition> tables, string file) {
             throw new NotImplementedException();
         }
     }
