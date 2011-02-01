@@ -2,7 +2,7 @@
 
 namespace FluentMigrator.Runner.Generators
 {
-	internal class SqlServer2000TypeMap : TypeMapBase
+    internal class SqlServer2000TypeMap : TypeMapBase
 	{
 		public const int AnsiStringCapacity = 8000;
 		public const int AnsiTextCapacity = 2147483647;

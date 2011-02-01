@@ -8,7 +8,7 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {
-	[TestFixture]
+    [TestFixture]
 	public class SqlServer2005GeneratorTests
 	{
 		private SqlServer2005Generator generator;
