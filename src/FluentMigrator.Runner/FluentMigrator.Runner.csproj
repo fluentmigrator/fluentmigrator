@@ -203,7 +203,7 @@
     <Compile Include="Processors\SqlServer\SqlServerProcessor.cs" />
     <Compile Include="ProfileLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SchemaWriters\RawSchemaWriter.cs" />
+    <Compile Include="SchemaWriters\SchemaWriterBase.cs" />
     <Compile Include="StopWatch.cs" />
     <Compile Include="Versioning\VersionInfo.cs" />
     <Compile Include="Versioning\VersionMigration.cs" />
