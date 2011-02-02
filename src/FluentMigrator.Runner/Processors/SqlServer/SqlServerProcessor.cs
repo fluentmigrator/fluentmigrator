@@ -200,12 +200,16 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 c.[is_nullable] AS [IsNullable],
                 CASE WHEN EXISTS(SELECT 1 FROM sys.foreign_key_columns fkc WHERE t.object_id = fkc.parent_object_id AND c.column_id = fkc.parent_column_id) THEN 1 ELSE 0 END AS IsForeignKey,
                 CASE WHEN EXISTS(select 1 from sys.index_columns ic WHERE t.object_id = ic.object_id AND c.column_id = ic.column_id) THEN 1 ELSE 0 END AS IsIndexed 
-                ,0 AS IsPrimaryKey -- THIS NEEDS COMPLETED
-                ,0 AS IsUnique -- THIS NEEDS COMPLETED
-                ,0 AS PrimaryKeyName -- THIS NEEDS COMPLETED
+                ,CASE WHEN kcu.CONSTRAINT_NAME IS NOT NULL THEN 1 ELSE 0 END AS IsPrimaryKey
+                , CASE WHEN EXISTS(select stc.CONSTRAINT_NAME, skcu.TABLE_NAME, skcu.COLUMN_NAME from INFORMATION_SCHEMA.TABLE_CONSTRAINTS stc
+                JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE skcu ON skcu.CONSTRAINT_NAME = stc.CONSTRAINT_NAME WHERE stc.CONSTRAINT_TYPE = 'UNIQUE'
+                AND skcu.TABLE_NAME = t.name AND skcu.COLUMN_NAME = c.name) THEN 1 ELSE 0 END AS IsUnique
+                ,pk.name AS PrimaryKeyName
                 FROM sys.all_columns c
                 JOIN sys.tables t ON c.object_id = t.object_id AND t.type = 'u'
                 LEFT JOIN sys.default_constraints def ON c.default_object_id = def.object_id
+                LEFT JOIN sys.key_constraints pk ON t.object_id = pk.parent_object_id AND pk.type = 'PK'
+                LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu ON t.name = kcu.TABLE_NAME AND c.name = kcu.COLUMN_NAME AND pk.name = kcu.CONSTRAINT_NAME
                 ORDER BY t.name, c.name";
             DataSet ds = Read(query);
             DataTable dt = ds.Tables[0];
