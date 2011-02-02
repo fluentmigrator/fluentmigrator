@@ -60,7 +60,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump {
         }
 
         [Test]
-        public void CanFetchAccurateSchemaInfo() 
+        public void CanReadBasicSchemaInfo() 
         {
             // this is the fun part.. this test should fail until the schema reading code works
             // also assume the target database contains schema described in TestMigration
