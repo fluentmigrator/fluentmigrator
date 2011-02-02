@@ -41,13 +41,31 @@ namespace FluentMigrator.Tests.Integration.SchemaDump {
             List<TableDefinition> defs = new List<TableDefinition>();
             defs.Add(tableDef);
 
+            SchemaTestWriter testWriter = new SchemaTestWriter();
+            var output = GetOutput(testWriter, defs);
+            string expectedMessage = testWriter.GetMessage(1, 1, 1, 1);
+
+            output.ShouldBe(expectedMessage);
+        }
+
+        [Test]
+        public void CanFetchAccurateSchemaInfo() {
+            // this is the fun part.. this test should fail until the schema reading code works
+            // also assume the target database contains schema described in TestMigration
+            List<TableDefinition> defs = new List<TableDefinition>();
+
+            SchemaTestWriter testWriter = new SchemaTestWriter();
+            var output = GetOutput(testWriter, defs);
+            string expectedMessage = testWriter.GetMessage(3, 8, 1, 1);
+
+            output.ShouldBe(expectedMessage);
+        }
+
+        private string GetOutput(SchemaTestWriter testWriter, List<TableDefinition> defs) {
             MemoryStream ms = new MemoryStream();
             StreamWriter sr = new StreamWriter(ms);
             StreamReader reader = new StreamReader(ms);
-
-            SchemaTestWriter testWriter = new SchemaTestWriter();            
             testWriter.WriteToStream(defs, sr);
-
             sr.Flush();
             ms.Seek(0, SeekOrigin.Begin); //goto beginning
             var output = reader.ReadToEnd();
@@ -56,8 +74,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump {
             reader.Close();
             ms.Close();
 
-            string expectedMessage = testWriter.GetMessage(1, 1, 1, 1);
-            output.ShouldBe(expectedMessage);
+            return output;
         }
     }
 }
