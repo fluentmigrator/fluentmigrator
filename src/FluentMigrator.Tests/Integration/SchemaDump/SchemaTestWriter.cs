@@ -16,8 +16,12 @@ namespace FluentMigrator.Tests.Integration.SchemaDump {
                 foreach (ForeignKeyDefinition fkey in table.ForiengKeys) { keyCount++; }
             }
 
-            output.WriteLine(String.Format("tables: {0}; columns: {1}; indexes: {2}; keys: {3}", 
-                tableCount, columnCount, indexCount, keyCount));
+            output.Write(GetMessage(tableCount, columnCount, indexCount, keyCount));
+        }
+
+        public string GetMessage(int tableCount, int columnCount, int indexCount, int keyCount) {
+            return String.Format("tables: {0}; columns: {1}; indexes: {2}; keys: {3}",
+                tableCount, columnCount, indexCount, keyCount);
         }
     }
 }
