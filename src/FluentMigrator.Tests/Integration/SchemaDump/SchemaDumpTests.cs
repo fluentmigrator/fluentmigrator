@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Data.SqlClient;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors;
-using FluentMigrator.Runner.Processors.MySql;
-using FluentMigrator.Runner.Processors.Sqlite;
 using FluentMigrator.Runner.Processors.SqlServer;
-using MySql.Data.MySqlClient;
 using FluentMigrator.Model;
 using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
@@ -18,17 +16,30 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Integration.SchemaDump {
 
     [TestFixture]
-    public class SchemaDumpTests {
+    public class SchemaDumpTests 
+    {
+        public SqlConnection Connection;
+        public SqlServerProcessor Processor;
+
+        public SchemaDumpTests() 
+        {
+            Connection = new SqlConnection(IntegrationTestOptions.SqlServer.ConnectionString);
+            Processor = new SqlServerProcessor(Connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+        }
+
         [SetUp]
-        public void SetUp() {
+        public void SetUp() 
+        {
         }
 
         [TearDown]
-        public void TearDown() {
+        public void TearDown() 
+        {
         }
 
         [Test]
-        public void TestSchemaTestWriter() {
+        public void TestSchemaTestWriter() 
+        {
             TableDefinition tableDef = new TableDefinition
             {
                 SchemaName = "dbo",
@@ -49,19 +60,23 @@ namespace FluentMigrator.Tests.Integration.SchemaDump {
         }
 
         [Test]
-        public void CanFetchAccurateSchemaInfo() {
+        public void CanFetchAccurateSchemaInfo() 
+        {
             // this is the fun part.. this test should fail until the schema reading code works
             // also assume the target database contains schema described in TestMigration
-            List<TableDefinition> defs = new List<TableDefinition>();
+            using (var table = new SqlServerTestTable(Processor, "id int")) {
+                IList<TableDefinition> defs = Processor.ReadDbSchema();
 
-            SchemaTestWriter testWriter = new SchemaTestWriter();
-            var output = GetOutput(testWriter, defs);
-            string expectedMessage = testWriter.GetMessage(3, 8, 1, 1);
+                SchemaTestWriter testWriter = new SchemaTestWriter();
+                var output = GetOutput(testWriter, defs);
+                string expectedMessage = testWriter.GetMessage(1, 1, 0, 0);
 
-            output.ShouldBe(expectedMessage);
+                output.ShouldBe(expectedMessage);
+            }
         }
 
-        private string GetOutput(SchemaTestWriter testWriter, List<TableDefinition> defs) {
+        private string GetOutput(SchemaTestWriter testWriter, IList<TableDefinition> defs) 
+        {
             MemoryStream ms = new MemoryStream();
             StreamWriter sr = new StreamWriter(ms);
             StreamReader reader = new StreamReader(ms);

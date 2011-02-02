@@ -22,6 +22,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Model;
 
@@ -205,7 +206,41 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 LEFT JOIN sys.default_constraints def ON c.default_object_id = def.object_id
                 ORDER BY t.name, c.name";
             DataSet ds = Read(query);
-            throw new NotImplementedException();
+            DataTable dt = ds.Tables[0];
+            IList<TableDefinition> tables = new List<TableDefinition>();
+
+            foreach (DataRow dr in dt.Rows) {
+                List<TableDefinition> matches = (from t in tables
+                            where t.Name == dr["Table"].ToString()
+                            && t.SchemaName == dr["Schema"].ToString()
+                            select t).ToList();
+
+                TableDefinition tableDef = null;
+                if (matches.Count > 0) tableDef = matches[0];
+
+                // create the table if not found
+                if (tableDef == null) {
+                    tableDef = new TableDefinition()
+                    {
+                        Name = dr["Table"].ToString(),
+                        SchemaName = dr["Schema"].ToString()
+                    };
+                    tables.Add(tableDef);
+                }
+                //find the column
+                List<ColumnDefinition> cmatches = (from c in tableDef.Columns
+                                           where c.Name == dr["ColumnName"].ToString()
+                                           select c).ToList();
+                ColumnDefinition colDef = null;
+                if (cmatches.Count > 0) colDef = cmatches[0];
+
+                if (colDef == null) {
+                    //need to create and add the column
+                    tableDef.Columns.Add( new ColumnDefinition() { Name = dr["ColumnName"].ToString() } );
+                }
+            }
+
+            return tables;
         }
 
         protected virtual IList<IndexDefinition> ReadIndexes(string schemaName, string tableName) 
@@ -223,12 +258,39 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             AND T.object_id = OBJECT_ID('[{0}].[{1}]')
             ORDER BY T.[name], I.[index_id], IC.[key_ordinal]";
             DataSet ds = Read(query, schemaName, tableName);
-            throw new NotImplementedException();
+            DataTable dt = ds.Tables[0];
+            IList<IndexDefinition> indexes = new List<IndexDefinition>();
+
+            foreach (DataRow dr in dt.Rows) 
+            {
+                List<IndexDefinition> matches = (from i in indexes
+                                                 where i.Name == dr["index_name"].ToString()
+                                                 && i.SchemaName == dr["Schema"].ToString()
+                                                 select i).ToList();
+
+                IndexDefinition iDef = null;
+                if (matches.Count > 0) iDef = matches[0];
+
+                // create the table if not found
+                if (iDef == null) {
+                    iDef = new IndexDefinition()
+                    {
+                        Name = dr["index_name"].ToString(),
+                        SchemaName = dr["Schema"].ToString()
+                    };
+                    indexes.Add(iDef);
+                }
+
+                //TODO: still need to capture the table/columns
+            }
+
+            return indexes;
         }
 
         protected virtual IList<ForeignKeyDefinition> ReadForeignKeys(string schemaName, string tableName) 
         {
-            string query = @"SELECT C.CONSTRAINT_NAME AS Constraint_Name,
+            string query = @"SELECT C.CONSTRAINT_SCHEMA AS Contraint_Schema, 
+                    C.CONSTRAINT_NAME AS Constraint_Name,
 	                FK.CONSTRAINT_SCHEMA AS ForeignTableSchema,
 	                FK.TABLE_NAME AS FK_Table,
 	                CU.COLUMN_NAME AS FK_Column,
@@ -249,7 +311,30 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 AND PK.CONSTRAINT_SCHEMA = '{0}'
                 ORDER BY Constraint_Name";
             DataSet ds = Read(query, schemaName, tableName);
-            throw new NotImplementedException();
+            DataTable dt = ds.Tables[0];
+            IList<ForeignKeyDefinition> keys = new List<ForeignKeyDefinition>();
+
+            foreach (DataRow dr in dt.Rows) {
+                List<ForeignKeyDefinition> matches = (from i in keys
+                                                      where i.Name == dr["Constraint_Name"].ToString()
+                                                      select i).ToList();
+
+                ForeignKeyDefinition d = null;
+                if (matches.Count > 0) d = matches[0];
+
+                // create the table if not found
+                if (d == null) {
+                    d = new ForeignKeyDefinition()
+                    {
+                        Name = dr["Constraint_Name"].ToString()
+                    };
+                    keys.Add(d);
+                }
+
+                //TODO: still need to capture the tables/columns
+            }
+
+            return keys;
         }
 	}
 }
