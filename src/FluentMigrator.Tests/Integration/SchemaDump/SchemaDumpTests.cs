@@ -4,12 +4,15 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Data.SqlClient;
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Model;
 using FluentMigrator.Tests.Helpers;
+using FluentMigrator.Tests.Integration.Migrations;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -73,6 +76,31 @@ namespace FluentMigrator.Tests.Integration.SchemaDump {
 
                 output.ShouldBe(expectedMessage);
             }
+        }
+
+        [Test]
+        public void VerifyTestMigrationSchema() 
+        {
+            //run TestMigration migration, read, then remove...
+            var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+            {
+                Namespace = typeof(TestMigration).Namespace                
+            };
+
+            var runner = new MigrationRunner(typeof(TestMigration).Assembly, runnerContext, Processor);
+            runner.Up(new TestMigration());
+
+            //read schema here
+            IList<TableDefinition> defs = Processor.ReadDbSchema();
+
+            SchemaTestWriter testWriter = new SchemaTestWriter();
+            var output = GetOutput(testWriter, defs);
+            string expectedMessage = testWriter.GetMessage(4, 9, 2, 1);            
+
+            runner.Down(new TestMigration());
+
+            //test
+            output.ShouldBe(expectedMessage);
         }
 
         private string GetOutput(SchemaTestWriter testWriter, IList<TableDefinition> defs) 
