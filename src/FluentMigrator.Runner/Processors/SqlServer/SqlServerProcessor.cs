@@ -23,6 +23,7 @@ using System.Data.SqlClient;
 using System.Collections.Generic;
 using System.IO;
 using FluentMigrator.Builders.Execute;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
@@ -172,14 +173,19 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             return sql.Replace("'", "''");
         }
 
-        public override List<FluentMigrator.Model.TableDefinition> ReadDbSchema() {
-            throw new NotImplementedException();
+        public override IList<TableDefinition> ReadDbSchema() {
+            IList<TableDefinition> tables = ReadTables();
+            foreach(TableDefinition table in tables)
+            {
+                table.Indexes = ReadIndexes(table.SchemaName, table.Name);
+                table.ForiengKeys = ReadForeignKeys(table.SchemaName, table.Name);
+            }
+
+            return tables as IList<TableDefinition>;
         }
 
-        protected virtual ICollection<FluentMigrator.Model.TableDefinition> ReadTables() {
-            /*
-             * --get colurake tesmns for a given table; still needs to determined if a columns IsUnique
-                SELECT OBJECT_SCHEMA_NAME(t.[object_id],DB_ID()) AS [Schema], t.name AS [Table], 
+        protected virtual IList<FluentMigrator.Model.TableDefinition> ReadTables() {
+            string query = @"SELECT OBJECT_SCHEMA_NAME(t.[object_id],DB_ID()) AS [Schema], t.name AS [Table], 
                 c.[Name] AS ColumnName,
                 t.object_id AS [TableID],
                 c.column_id AS [ColumnID],
@@ -197,15 +203,14 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 FROM sys.all_columns c
                 JOIN sys.tables t ON c.object_id = t.object_id AND t.type = 'u'
                 LEFT JOIN sys.default_constraints def ON c.default_object_id = def.object_id
-                ORDER BY t.name, c.name
-             */
+                ORDER BY t.name, c.name";
+            DataSet ds = Read(query);
             throw new NotImplementedException();
         }
 
-        protected virtual ICollection<FluentMigrator.Model.ColumnDefinition> ReadIndexes() 
+        protected virtual IList<IndexDefinition> ReadIndexes(string schemaName, string tableName) 
         {
-            /*
-             * SELECT OBJECT_SCHEMA_NAME(T.[object_id],DB_ID()) AS [Schema],  
+            string query = @"SELECT OBJECT_SCHEMA_NAME(T.[object_id],DB_ID()) AS [Schema],  
               T.[name] AS [table_name], I.[name] AS [index_name], AC.[name] AS [column_name],  
               I.[type_desc], I.[is_unique], I.[data_space_id], I.[ignore_dup_key], I.[is_primary_key], 
               I.[is_unique_constraint], I.[fill_factor],    I.[is_padded], I.[is_disabled], I.[is_hypothetical], 
@@ -215,15 +220,15 @@ namespace FluentMigrator.Runner.Processors.SqlServer
               INNER JOIN sys.[index_columns] IC ON I.[object_id] = IC.[object_id] 
               INNER JOIN sys.[all_columns] AC ON T.[object_id] = AC.[object_id] AND IC.[column_id] = AC.[column_id] 
             WHERE T.[is_ms_shipped] = 0 AND I.[type_desc] <> 'HEAP' 
-            ORDER BY T.[name], I.[index_id], IC.[key_ordinal]
-             */
+            AND T.object_id = OBJECT_ID('[{0}].[{1}]')
+            ORDER BY T.[name], I.[index_id], IC.[key_ordinal]";
+            DataSet ds = Read(query, schemaName, tableName);
             throw new NotImplementedException();
         }
 
-        protected virtual ICollection<FluentMigrator.Model.ForeignKeyDefinition> ReadForeignKeys() 
+        protected virtual IList<ForeignKeyDefinition> ReadForeignKeys(string schemaName, string tableName) 
         {
-            /*
-             * SELECT C.CONSTRAINT_NAME AS Constraint_Name,
+            string query = @"SELECT C.CONSTRAINT_NAME AS Constraint_Name,
 	                FK.CONSTRAINT_SCHEMA AS ForeignTableSchema,
 	                FK.TABLE_NAME AS FK_Table,
 	                CU.COLUMN_NAME AS FK_Column,
@@ -240,8 +245,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE i2 ON i1.CONSTRAINT_NAME = i2.CONSTRAINT_NAME
                 WHERE i1.CONSTRAINT_TYPE = 'PRIMARY KEY'
                 ) PT ON PT.TABLE_NAME = PK.TABLE_NAME
-                ORDER BY Constraint_Name
-             */
+                WHERE PK.TABLE_NAME = '{1}'
+                AND PK.CONSTRAINT_SCHEMA = '{0}'
+                ORDER BY Constraint_Name";
+            DataSet ds = Read(query, schemaName, tableName);
             throw new NotImplementedException();
         }
 	}

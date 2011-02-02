@@ -36,9 +36,9 @@ namespace FluentMigrator.Model {
 
         public virtual string Name { get; set; }
         public virtual string SchemaName { get; set; }
-        public virtual ICollection<ColumnDefinition> Columns { get; set; }
-        public virtual ICollection<ForeignKeyDefinition> ForiengKeys { get; set; }
-        public virtual ICollection<IndexDefinition> Indexes { get; set; }
+        public virtual IList<ColumnDefinition> Columns { get; set; }
+        public virtual IList<ForeignKeyDefinition> ForiengKeys { get; set; }
+        public virtual IList<IndexDefinition> Indexes { get; set; }
 
         public void ApplyConventions(IMigrationConventions conventions) 
         {

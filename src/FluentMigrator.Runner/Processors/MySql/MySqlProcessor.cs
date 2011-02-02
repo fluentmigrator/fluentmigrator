@@ -140,7 +140,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 				expression.Operation(Connection, null);
 		}
 
-        public override List<FluentMigrator.Model.TableDefinition> ReadDbSchema() {
+        public override IList<FluentMigrator.Model.TableDefinition> ReadDbSchema() {
             throw new NotImplementedException();
         }
 	}

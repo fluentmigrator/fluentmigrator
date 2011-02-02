@@ -190,7 +190,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             return sql.Replace("'", "''");
         }
 
-        public override List<FluentMigrator.Model.TableDefinition> ReadDbSchema() {
+        public override IList<FluentMigrator.Model.TableDefinition> ReadDbSchema() {
             throw new NotImplementedException();
         }
     }

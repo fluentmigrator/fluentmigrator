@@ -123,7 +123,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             }
         }
 
-        public override List<FluentMigrator.Model.TableDefinition> ReadDbSchema() {
+        public override IList<FluentMigrator.Model.TableDefinition> ReadDbSchema() {
             throw new NotImplementedException();
         }
 	}
