@@ -198,9 +198,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 c.[scale] AS [Scale],
                 c.[is_identity] AS [IsIdentity],
                 c.[is_nullable] AS [IsNullable],
-                CASE WHEN EXISTS(SELECT 1 FROM sys.foreign_key_columns fkc WHERE t.object_id = fkc.parent_object_id AND c.column_id = fkc.parent_column_id) THEN 1 ELSE 0 END AS IsForiegnKey,
+                CASE WHEN EXISTS(SELECT 1 FROM sys.foreign_key_columns fkc WHERE t.object_id = fkc.parent_object_id AND c.column_id = fkc.parent_column_id) THEN 1 ELSE 0 END AS IsForeignKey,
                 CASE WHEN EXISTS(select 1 from sys.index_columns ic WHERE t.object_id = ic.object_id AND c.column_id = ic.column_id) THEN 1 ELSE 0 END AS IsIndexed 
-                --,CASE WHEN EXISTS(select 1 from sys.key_constraints kc where [type] = 'UQ' AND c.object_id = kc.parent_object_id) THEN 1 ELSE 0 END AS IsUniqueKey
+                ,0 AS IsPrimaryKey -- THIS NEEDS COMPLETED
+                ,0 AS IsUnique -- THIS NEEDS COMPLETED
+                ,0 AS PrimaryKeyName -- THIS NEEDS COMPLETED
                 FROM sys.all_columns c
                 JOIN sys.tables t ON c.object_id = t.object_id AND t.type = 'u'
                 LEFT JOIN sys.default_constraints def ON c.default_object_id = def.object_id
@@ -236,7 +238,22 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
                 if (colDef == null) {
                     //need to create and add the column
-                    tableDef.Columns.Add( new ColumnDefinition() { Name = dr["ColumnName"].ToString() } );
+                    tableDef.Columns.Add( new ColumnDefinition() { 
+                        Name = dr["ColumnName"].ToString(),
+                        CustomType = "", //TODO: set this property
+                        DefaultValue = dr.IsNull("DefaultValue") ? "" : dr["DefaultValue"].ToString(),
+                        IsForeignKey = dr["IsForeignKey"].ToString() == "1",
+                        IsIdentity = dr["IsIdentity"].ToString() == "1",
+                        IsIndexed = dr["IsIndexed"].ToString() == "1",
+                        IsNullable = dr["IsNullable"].ToString() == "1",
+                        IsPrimaryKey = dr["IsPrimaryKey"].ToString() == "1",
+                        IsUnique = dr["IsUnique"].ToString() == "1",
+                        Precision = int.Parse(dr["Precision"].ToString()),
+                        PrimaryKeyName = dr.IsNull("PrimaryKeyName") ? "" : dr["PrimaryKeyName"].ToString(), 
+                        Size = int.Parse(dr["Length"].ToString()),
+                        TableName = dr["Table"].ToString(),
+                        Type = null //TODO: set this property
+                    });
                 }
             }
 
@@ -276,12 +293,26 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                     iDef = new IndexDefinition()
                     {
                         Name = dr["index_name"].ToString(),
-                        SchemaName = dr["Schema"].ToString()
+                        SchemaName = dr["Schema"].ToString(),
+                        IsClustered = dr["type_desc"].ToString()=="CLUSTERED",
+                        IsUnique = dr["is_unique"].ToString() == "1",
+                        TableName = dr["table_name"].ToString()
                     };
                     indexes.Add(iDef);
                 }
 
-                //TODO: still need to capture the table/columns
+                ICollection<IndexColumnDefinition> ms;
+                // columns
+                ms = (from m in iDef.Columns
+                      where m.Name == dr["column_name"].ToString()
+                      select m).ToList();
+                if (ms.Count == 0) 
+                {
+                    iDef.Columns.Add(new IndexColumnDefinition() {
+                        Name = dr["column_name"].ToString(),
+                        Direction = dr["is_descending_key"].ToString()=="1" ? Direction.Descending : Direction.Ascending
+                    });                    
+                }
             }
 
             return indexes;
@@ -326,12 +357,27 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 if (d == null) {
                     d = new ForeignKeyDefinition()
                     {
-                        Name = dr["Constraint_Name"].ToString()
+                        Name = dr["Constraint_Name"].ToString(),
+                        ForeignTableSchema = dr["ForeignTableSchema"].ToString(),
+                        ForeignTable = dr["FK_Table"].ToString(),
+                        PrimaryTable = dr["PK_Table"].ToString(),
+                        PrimaryTableSchema = dr["PrimaryTableSchema"].ToString()
                     };
                     keys.Add(d);
                 }
 
-                //TODO: still need to capture the tables/columns
+                ICollection<string> ms;
+                // Foreign Columns
+                ms = (from m in d.ForeignColumns
+                           where m == dr["FK_Table"].ToString()
+                           select m).ToList();
+                if (ms.Count == 0) d.ForeignColumns.Add(dr["FK_Table"].ToString());
+
+                // Primary Columns
+                ms = (from m in d.PrimaryColumns
+                           where m == dr["PK_Table"].ToString()
+                           select m).ToList();
+                if (ms.Count == 0) d.PrimaryColumns.Add(dr["PK_Table"].ToString());
             }
 
             return keys;
