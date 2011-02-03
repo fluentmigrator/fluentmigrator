@@ -10,6 +10,7 @@ using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.SchemaWriters;
 using FluentMigrator.Model;
 using FluentMigrator.Tests.Helpers;
 using FluentMigrator.Tests.Integration.Migrations;
@@ -103,7 +104,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump {
             output.ShouldBe(expectedMessage);
         }
 
-        private string GetOutput(SchemaTestWriter testWriter, IList<TableDefinition> defs) 
+        private string GetOutput(SchemaWriterBase testWriter, IList<TableDefinition> defs) 
         {
             MemoryStream ms = new MemoryStream();
             StreamWriter sr = new StreamWriter(ms);
