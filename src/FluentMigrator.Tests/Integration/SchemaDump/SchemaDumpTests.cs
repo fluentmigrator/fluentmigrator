@@ -10,8 +10,9 @@ using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.SchemaWriters;
+using FluentMigrator.SchemaDump.SchemaWriters;
 using FluentMigrator.Model;
+using FluentMigrator.SchemaDump.SchemaDumpers;
 using FluentMigrator.Tests.Helpers;
 using FluentMigrator.Tests.Integration.Migrations;
 using NUnit.Framework;
@@ -24,11 +25,13 @@ namespace FluentMigrator.Tests.Integration.SchemaDump {
     {
         public SqlConnection Connection;
         public SqlServerProcessor Processor;
-
+        public SqlServerSchemaDumper SchemaDumper;
+        
         public SchemaDumpTests() 
         {
             Connection = new SqlConnection(IntegrationTestOptions.SqlServer.ConnectionString);
             Processor = new SqlServerProcessor(Connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+            SchemaDumper = new SqlServerSchemaDumper(Processor, new TextWriterAnnouncer(System.Console.Out));
         }
 
         [SetUp]
@@ -69,7 +72,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump {
             // this is the fun part.. this test should fail until the schema reading code works
             // also assume the target database contains schema described in TestMigration
             using (var table = new SqlServerTestTable(Processor, "id int")) {
-                IList<TableDefinition> defs = Processor.ReadDbSchema();
+                IList<TableDefinition> defs = SchemaDumper.ReadDbSchema();
 
                 SchemaTestWriter testWriter = new SchemaTestWriter();
                 var output = GetOutput(testWriter, defs);
@@ -88,11 +91,11 @@ namespace FluentMigrator.Tests.Integration.SchemaDump {
                 Namespace = typeof(TestMigration).Namespace                
             };
 
-            var runner = new MigrationRunner(typeof(TestMigration).Assembly, runnerContext, Processor);
+            var runner = new MigrationRunner(typeof(TestMigration).Assembly, runnerContext, Processor);            
             runner.Up(new TestMigration());
 
             //read schema here
-            IList<TableDefinition> defs = Processor.ReadDbSchema();
+            IList<TableDefinition> defs = SchemaDumper.ReadDbSchema();
 
             SchemaTestWriter testWriter = new SchemaTestWriter();
             var output = GetOutput(testWriter, defs);

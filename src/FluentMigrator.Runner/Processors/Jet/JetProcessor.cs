@@ -122,9 +122,5 @@ namespace FluentMigrator.Runner.Processors.Jet
                 return indexes.Rows.Count > 0;
             }
         }
-
-        public override IList<FluentMigrator.Model.TableDefinition> ReadDbSchema() {
-            throw new NotImplementedException();
-        }
 	}
 }

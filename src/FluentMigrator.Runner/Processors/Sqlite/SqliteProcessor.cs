@@ -134,9 +134,5 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 				return ds;
 			}
 		}
-
-        public override IList<FluentMigrator.Model.TableDefinition> ReadDbSchema() {
-            throw new NotImplementedException();
-        }
 	}
 }

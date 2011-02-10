@@ -169,9 +169,5 @@ namespace FluentMigrator.Tests.Integration.Processors
 		{
 			throw new NotImplementedException();
 		}
-
-        public override IList<FluentMigrator.Model.TableDefinition> ReadDbSchema() {
-            throw new NotImplementedException();
-        }
 	}
 }

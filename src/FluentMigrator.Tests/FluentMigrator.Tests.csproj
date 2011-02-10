@@ -217,6 +217,10 @@
     <Compile Include="Unit\Versioning\VersionInfoTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\FluentMigrator.SchemaDump\FluentMigrator.SchemaDump.csproj">
+      <Project>{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}</Project>
+      <Name>FluentMigrator.SchemaDump</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FluentMigrator.Console\FluentMigrator.Console.csproj">
       <Project>{664C7334-B44B-4D62-A0F8-063805D630AA}</Project>
       <Name>FluentMigrator.Console</Name>

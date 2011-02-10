@@ -33,7 +33,6 @@ namespace FluentMigrator
 		DataSet ReadTableData(string tableName);
 		DataSet Read(string template, params object[] args);
 		bool Exists(string template, params object[] args);
-        IList<TableDefinition> ReadDbSchema();
 
 		void BeginTransaction();
 		void CommitTransaction();

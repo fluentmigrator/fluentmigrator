@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 using FluentMigrator;
 
-namespace FluentMigrator.Runner.SchemaWriters {
+namespace FluentMigrator.SchemaDump.SchemaWriters {
     public abstract class SchemaWriterBase : ISchemaWriter {
         public abstract void WriteToStream(ICollection<Model.TableDefinition> tables, System.IO.StreamWriter output);
 

@@ -107,9 +107,5 @@ namespace FluentMigrator.Runner.Processors.Oracle
 			using (var command = OracleFactory.GetCommand(Connection,sql))
 				command.ExecuteNonQuery();
 		}
-
-        public override IList<FluentMigrator.Model.TableDefinition> ReadDbSchema() {
-            throw new NotImplementedException();
-        }
 	}
 }

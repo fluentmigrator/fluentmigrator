@@ -139,9 +139,5 @@ namespace FluentMigrator.Runner.Processors.MySql
 			if (expression.Operation != null)
 				expression.Operation(Connection, null);
 		}
-
-        public override IList<FluentMigrator.Model.TableDefinition> ReadDbSchema() {
-            throw new NotImplementedException();
-        }
 	}
 }
