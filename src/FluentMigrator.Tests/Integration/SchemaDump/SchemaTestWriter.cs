@@ -9,13 +9,10 @@ using FluentMigrator.SchemaDump.SchemaWriters;
 namespace FluentMigrator.Tests.Integration.SchemaDump {
     public class SchemaTestWriter : SchemaWriterBase {
         public override void WriteToStream(ICollection<TableDefinition> tables, System.IO.StreamWriter output) {
-            int tableCount = 0, indexCount = 0, keyCount = 0, columnCount = 0;
-            foreach (TableDefinition table in tables) {
-                tableCount++;
-                foreach (ColumnDefinition column in table.Columns) { columnCount++; }
-                foreach (IndexDefinition index in table.Indexes) { indexCount++; }
-                foreach (ForeignKeyDefinition fkey in table.ForiengKeys) { keyCount++; }
-            }
+            int tableCount = tables.Count;
+            int columnCount = tables.Select(t => t.Columns.Count).Sum();
+            int indexCount = tables.Select(t => t.Indexes.Count).Sum();
+            int keyCount = tables.Select(t => t.ForiengKeys.Count).Sum();
 
             output.Write(GetMessage(tableCount, columnCount, indexCount, keyCount));
         }
