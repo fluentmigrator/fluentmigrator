@@ -41,10 +41,10 @@ namespace FluentMigrator.Runner.Generators
 			throw new NotImplementedException();
 		}
 
-    public override string Generate(AlterSchemaExpression expression)
-    {
-      throw new NotImplementedException();
-    }
+		public override string Generate(AlterSchemaExpression expression)
+		{
+		  throw new NotImplementedException();
+		}
 
 		public override string Generate(CreateTableExpression expression)
 		{
@@ -77,7 +77,7 @@ namespace FluentMigrator.Runner.Generators
 			string primaryColumns = GetColumnList(expression.ForeignKey.PrimaryColumns);
 			string foreignColumns = GetColumnList(expression.ForeignKey.ForeignColumns);
 
-			string sql = "ALTER TABLE `{0}` ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}";
+			string sql = "ALTER TABLE `{0}` ADD CONSTRAINT `{1}` FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}";
 
 			return String.Format(sql,
 							expression.ForeignKey.ForeignTable,
@@ -180,7 +180,7 @@ namespace FluentMigrator.Runner.Generators
                     set += ", ";
                 }
 
-                set += String.Format("[{0}] = {1}", item.Key, Constant.Format(item.Value));
+                set += String.Format("`{0}` = {1}", item.Key, Constant.Format(item.Value));
                 i++;
             }
 
@@ -193,11 +193,11 @@ namespace FluentMigrator.Runner.Generators
                     where += " AND ";
                 }
 
-                where += String.Format("[{0}] {1} {2}", item.Key, item.Value == null ? "IS" : "=", Constant.Format(item.Value));
+                where += String.Format("`{0}` {1} {2}", item.Key, item.Value == null ? "IS" : "=", Constant.Format(item.Value));
                 i++;
             }
 
-            result.Append(String.Format("UPDATE [{0}] SET {1} WHERE {2};", expression.TableName, set, where));
+            result.Append(String.Format("UPDATE `{0}` SET `{1}` WHERE {2};", expression.TableName, set, where));
 
             return result.ToString();
         }
@@ -208,7 +208,7 @@ namespace FluentMigrator.Runner.Generators
 
 			if (expression.IsAllRows)
 			{
-				result.Append(String.Format("DELETE FROM {0};", expression.TableName));
+				result.Append(String.Format("DELETE FROM `{0}`;", expression.TableName));
 			}
 			else
 			{
@@ -224,7 +224,7 @@ namespace FluentMigrator.Runner.Generators
 							where += " AND ";
 						}
 
-                        where += String.Format("[{0}] {1} {2}", item.Key, item.Value == null ? "IS" : "=", Constant.Format(item.Value));
+                        where += String.Format("`{0}` {1} {2}", item.Key, item.Value == null ? "IS" : "=", Constant.Format(item.Value));
 						i++;
 					}
 

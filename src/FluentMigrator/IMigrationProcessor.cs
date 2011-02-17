@@ -17,9 +17,11 @@
 #endregion
 
 using System.Data;
+using System.Collections.Generic;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 
 namespace FluentMigrator
 {

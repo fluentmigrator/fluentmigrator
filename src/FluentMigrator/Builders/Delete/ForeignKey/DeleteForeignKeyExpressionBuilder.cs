@@ -59,7 +59,7 @@ namespace FluentMigrator.Builders.Delete.ForeignKey
 			return this;
 		}
 
-		public IInSchemaSyntax ToTable(string table)
+		public IDeleteForeignKeyPrimaryColumnSyntax ToTable(string table)
 		{
 			Expression.ForeignKey.PrimaryTable = table;
 			return this;

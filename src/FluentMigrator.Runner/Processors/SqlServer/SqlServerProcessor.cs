@@ -20,8 +20,11 @@
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using FluentMigrator.Builders.Execute;
+using FluentMigrator.Model;
 
 
 namespace FluentMigrator.Runner.Processors.SqlServer

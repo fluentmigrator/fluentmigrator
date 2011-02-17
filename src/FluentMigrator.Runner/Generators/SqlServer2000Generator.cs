@@ -64,12 +64,12 @@ namespace FluentMigrator.Runner.Generators
 
         public override string Generate(AlterColumnExpression expression)
         {
-            return String.Format("ALTER TABLE [{0}].[{1}] ALTER COLUMN {2}", FormatSchema(expression.SchemaName), expression.TableName, Column.Generate(expression.Column));
+            return String.Format("ALTER TABLE {0}[{1}] ALTER COLUMN {2}", FormatSchema(expression.SchemaName), expression.TableName, Column.Generate(expression.Column));
         }
 
         public override string Generate(CreateTableExpression expression)
         {
-            return String.Format("CREATE TABLE [{0}].[{1}] ({2})", FormatSchema(expression.SchemaName), expression.TableName, Column.Generate(expression));
+            return String.Format("CREATE TABLE {0}[{1}] ({2})", FormatSchema(expression.SchemaName), expression.TableName, Column.Generate(expression));
         }
 
         public override string Generate(DeleteTableExpression expression)

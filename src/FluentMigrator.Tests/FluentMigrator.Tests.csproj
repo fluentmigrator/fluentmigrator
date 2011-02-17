@@ -41,7 +41,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -51,7 +51,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AutomatedRelease|AnyCPU' ">
@@ -59,7 +59,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <Optimize>true</Optimize>
     <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <CodeAnalysisUseTypeNameInSuppression>true</CodeAnalysisUseTypeNameInSuppression>
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
@@ -147,6 +147,8 @@
     <Compile Include="Integration\Migrations\Invalid\InvalidMigration2.cs" />
     <Compile Include="Integration\Processors\FileProcessorTests.cs" />
     <Compile Include="Integration\Processors\OracleProcessorTests.cs" />
+    <Compile Include="Integration\SchemaDump\SchemaDumpTests.cs" />
+    <Compile Include="Integration\SchemaDump\SchemaTestWriter.cs" />
     <Compile Include="Integration\VersionMigrationTests.cs" />
     <Compile Include="Unit\AnnouncerTests.cs" />
     <Compile Include="Unit\AssemblyLoader\AssemblyLoaderTests.cs" />
@@ -183,6 +185,7 @@
     <Compile Include="Unit\Generators\SqlServer2000GeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2005GeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2008GeneratorTests.cs" />
+    <Compile Include="Unit\Generators\SqlServerCeGeneratorTests.cs" />
     <Compile Include="Unit\MigrationLoaderTests.cs" />
     <Compile Include="Unit\MigrationMetadataTests.cs" />
     <Compile Include="Unit\Generators\SqliteGeneratorTests.cs" />
@@ -215,6 +218,10 @@
     <Compile Include="Unit\Versioning\VersionInfoTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\FluentMigrator.SchemaDump\FluentMigrator.SchemaDump.csproj">
+      <Project>{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}</Project>
+      <Name>FluentMigrator.SchemaDump</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FluentMigrator.Console\FluentMigrator.Console.csproj">
       <Project>{664C7334-B44B-4D62-A0F8-063805D630AA}</Project>
       <Name>FluentMigrator.Console</Name>
@@ -256,6 +263,9 @@
     </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy "$(ProjectDir)..\..\lib\sqlite3.dll" "$(ProjectDir)$(OutDir)" /Y</PostBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
