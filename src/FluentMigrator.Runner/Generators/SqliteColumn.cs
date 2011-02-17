@@ -11,6 +11,10 @@ namespace FluentMigrator.Runner.Generators
 		{
 		}
 
+        protected override string FormatName(ColumnDefinition column)
+        {
+            return string.Format("[{0}]",column.Name);
+        }
 		protected override string FormatIdentity(ColumnDefinition column)
 		{
             //SQLite only supports the concept of Identity in combination with a single primary key

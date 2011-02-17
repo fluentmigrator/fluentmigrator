@@ -85,7 +85,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			CreateColumnExpression expression = GetCreateColumnExpression();
 			string sql = generator.Generate(expression);
-			sql.ShouldBe(string.Format("ALTER TABLE [{0}] ADD COLUMN {1} TEXT NOT NULL", table, newColumn));
+			sql.ShouldBe(string.Format("ALTER TABLE [{0}] ADD COLUMN [{1}] TEXT NOT NULL", table, newColumn));
 		}
 
 		[Test]
@@ -104,7 +104,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.TableName = tableName;
 
 			string sql = generator.Generate(expression);
-			sql.ShouldBe("ALTER TABLE [NewTable] ADD COLUMN NewColumn NUMERIC NOT NULL");
+			sql.ShouldBe("ALTER TABLE [NewTable] ADD COLUMN [NewColumn] NUMERIC NOT NULL");
 		}
 
 		[Test]
@@ -112,7 +112,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			CreateColumnExpression expression = GetCreateAutoIncrementColumnExpression();
 			string sql = generator.Generate(expression);
-			sql.ShouldBe(string.Format("ALTER TABLE [{0}] ADD COLUMN {1} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT", table, newColumn));
+			sql.ShouldBe(string.Format("ALTER TABLE [{0}] ADD COLUMN [{1}] INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT", table, newColumn));
 		}
 
 		//[Test]
@@ -128,7 +128,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			DeleteColumnExpression expression = new DeleteColumnExpression { TableName = table, ColumnName = column };
 			string sql = generator.Generate(expression);
-			sql.ShouldBe(string.Format("ALTER TABLE [{0}] DROP COLUMN {1}", table, column));
+            string.Format("ALTER TABLE [{0}] DROP COLUMN [{1}]", table, column).ShouldBe(sql);
 		}
 
 		// CreateForeignKey -- Not supported in Sqlite
@@ -139,7 +139,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			CreateIndexExpression expression = GetCreateIndexExpression();
 			string sql = generator.Generate(expression);
-			sql.ShouldBe(string.Format("CREATE INDEX IF NOT EXISTS {0} ON {1} ({2})", indexName, table, indexColumn));
+			sql.ShouldBe(string.Format("CREATE INDEX IF NOT EXISTS [{0}] ON [{1}] ([{2}])", indexName, table, indexColumn));
 		}
 
 		[Test]
@@ -147,7 +147,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		{
 			DeleteIndexExpression expression = GetDeleteIndexExpression();
 			string sql = generator.Generate(expression);
-			sql.ShouldBe(string.Format("DROP INDEX IF EXISTS {0}", indexName));
+			sql.ShouldBe(string.Format("DROP INDEX IF EXISTS [{0}]", indexName));
 		}
 
 		// DeleteIndex

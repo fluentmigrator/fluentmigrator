@@ -217,7 +217,7 @@ namespace FluentMigrator.Runner.Generators
 			if (expression.Index.IsUnique)
 				result.Append(" UNIQUE");
 
-			result.Append(" INDEX IF NOT EXISTS {0} ON {1} (");
+			result.Append(" INDEX IF NOT EXISTS [{0}[ ON [{1}] (");
 
 			bool first = true;
 			foreach (IndexColumnDefinition column in expression.Index.Columns)
@@ -236,7 +236,7 @@ namespace FluentMigrator.Runner.Generators
 
 		public override string Generate(DeleteIndexExpression expression)
 		{
-			return String.Format("DROP INDEX IF EXISTS {0}", expression.Index.Name);
+			return String.Format("DROP INDEX IF EXISTS [{0}]", expression.Index.Name);
 		}
 	}
 }

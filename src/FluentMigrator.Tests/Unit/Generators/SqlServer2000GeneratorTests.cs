@@ -63,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.TableName = tableName;
 
 			var sql = generator.Generate(expression);
-			sql.ShouldBe("ALTER TABLE [NewTable] ADD NewColumn NVARCHAR(5) NOT NULL");
+			sql.ShouldBe("ALTER TABLE [NewTable] ADD [NewColumn] NVARCHAR(5) NOT NULL");
 		}
 
 		[Test]
@@ -82,7 +82,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.TableName = tableName;
 
 			var sql = generator.Generate(expression);
-			sql.ShouldBe("ALTER TABLE [NewTable] ADD NewColumn DECIMAL(19,2) NOT NULL");
+			sql.ShouldBe("ALTER TABLE [NewTable] ADD [NewColumn] DECIMAL(19,2) NOT NULL");
 		}
 
 		[Test]
@@ -97,7 +97,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(
-				"ALTER TABLE [TestForeignTable] ADD CONSTRAINT FK_Test FOREIGN KEY ([Column3],[Column4]) REFERENCES [TestPrimaryTable] ([Column1],[Column2])");
+				"ALTER TABLE [TestForeignTable] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([Column3],[Column4]) REFERENCES [TestPrimaryTable] ([Column1],[Column2])");
 		}
 
 		[Test]
@@ -229,12 +229,13 @@ namespace FluentMigrator.Tests.Unit.Generators
 		public void CanRenameColumn()
 		{
 			var expression = new RenameColumnExpression();
+            expression.SchemaName = "Schema1";
 			expression.TableName = "Table1";
 			expression.OldName = "Column1";
 			expression.NewName = "Column2";
 
 			var sql = generator.Generate(expression);
-			sql.ShouldBe("sp_rename '[Table1].[Column1]', 'Column2'");
+            sql.ShouldBe("sp_rename '[Schema1].[Table1].[Column1]', 'Column2'");
 		}
 
 		[Test]

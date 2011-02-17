@@ -47,7 +47,7 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
 		public override bool ColumnExists(string tableName, string columnName)
 		{
-		    return Read("PRAGMA table_info({0})",tableName).Tables[0].Select(string.Format("Name='{0}'",columnName.Replace("'","''"))).Length>0;
+		    return Read("PRAGMA table_info([{0}])",tableName).Tables[0].Select(string.Format("Name='{0}'",columnName.Replace("'","''"))).Length>0;
         }
 
 		public override bool ConstraintExists(string tableName, string constraintName)
@@ -87,7 +87,7 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
 		public override DataSet ReadTableData(string tableName)
 		{
-			return Read("select * from {0}", tableName);
+			return Read("select * from [{0}]", tableName);
 		}
 
 		public override void Process(PerformDBOperationExpression expression)
@@ -140,7 +140,7 @@ namespace FluentMigrator.Runner.Processors.Sqlite
         {
             sql += "\nGO";   // make sure last batch is executed.
             string sqlBatch = string.Empty;
-
+            
             using (var command = new SQLiteCommand(sql, Connection))
             {
                 try
