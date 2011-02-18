@@ -1,24 +1,4 @@
-#region License
-
-// 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-
-#endregion
-
-
+﻿
 
 namespace FluentMigrator.Tests.Unit.Generators
 {
@@ -28,24 +8,12 @@ namespace FluentMigrator.Tests.Unit.Generators
     using FluentMigrator.Expressions;
     using FluentMigrator.Model;
     using NUnit.Framework;
-    using FluentMigrator.Runner.Generators.SqlServer;
     using NUnit.Should;
 
-    public class SqlServer2000GeneratorTests : GeneratorTestBase
-	{
-		protected SqlServer2000Generator generator;
-
-		[SetUp]
-		public void SetUp()
-		{
-			generator = new SqlServer2000Generator();
-		}
-	}
-
-	[TestFixture]
-	public class SqlServer2000GeneratorOtherTests : SqlServer2000GeneratorTests
+	public class JetGeneratorOtherTests : JetGeneratorTestBase
 	{
 		
+
 		[Test]
 		public void CanAddColumn()
 		{
@@ -61,7 +29,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.TableName = tableName;
 
 			var sql = generator.Generate(expression);
-			sql.ShouldBe("ALTER TABLE [NewTable] ADD [NewColumn] NVARCHAR(5) NOT NULL");
+			sql.ShouldBe("ALTER TABLE [NewTable] ADD COLUMN [NewColumn] VARCHAR(5) NOT NULL");
 		}
 
 		[Test]
@@ -80,7 +48,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.TableName = tableName;
 
 			var sql = generator.Generate(expression);
-			sql.ShouldBe("ALTER TABLE [NewTable] ADD [NewColumn] DECIMAL(19,2) NOT NULL");
+			sql.ShouldBe("ALTER TABLE [NewTable] ADD COLUMN [NewColumn] DECIMAL(19,2) NOT NULL");
 		}
 
 		[Test]
@@ -95,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(
-				"ALTER TABLE [TestForeignTable] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([Column3],[Column4]) REFERENCES [TestPrimaryTable] ([Column1],[Column2])");
+				"ALTER TABLE [TestForeignTable] ADD CONSTRAINT FK_Test FOREIGN KEY ([Column3],[Column4]) REFERENCES [TestPrimaryTable] ([Column1],[Column2])");
 		}
 
 		[Test]
@@ -105,62 +73,36 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.Index.Name = "IX_TEST";
 			expression.Index.TableName = "TEST_TABLE";
 			expression.Index.IsUnique = true;
-			expression.Index.IsClustered = true;
 			expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Ascending, Name = "Column1" });
 			expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Descending, Name = "Column2" });
 
 			var sql = generator.Generate(expression);
-			sql.ShouldBe("CREATE UNIQUE CLUSTERED INDEX [IX_TEST] ON [TEST_TABLE] ([Column1] ASC,[Column2] DESC)");
+			sql.ShouldBe("CREATE UNIQUE INDEX IX_TEST ON [TEST_TABLE] (Column1 ASC,Column2 DESC)");
 		}
 
-        [Test]
-        public void CanDropIndex()
-        {
-            var expression = new DeleteIndexExpression();
-            expression.Index.Name = "IX_TEST";
-            expression.Index.TableName = "TEST_TABLE";
-            
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("DROP INDEX [IX_TEST] ON [TEST_TABLE]");
-        }
+		[Test]
+		public void CanDeleteIndex()
+		{
+			var expression = new DeleteIndexExpression();
+			expression.Index.Name = "IX_TEST";
+			expression.Index.TableName = "TEST_TABLE";
+
+			var sql = generator.Generate(expression);
+			sql.ShouldBe("DROP INDEX IX_TEST ON [TEST_TABLE]");
+		}
 
 		[Test]
-		[Ignore("need better way to test this")]
 		public void CanDropColumn()
 		{
-			var tableName = "NewTable";
-			var columnName = "NewColumn";
+			string tableName = "NewTable";
+			string columnName = "NewColumn";
 
 			var expression = new DeleteColumnExpression();
 			expression.TableName = tableName;
 			expression.ColumnName = columnName;
 
-			var sql = generator.Generate(expression);
-
-			var expectedSql =
-				@"
-			DECLARE @default sysname, @sql nvarchar(max);
-
-			-- get name of default constraint
-			SELECT @default = name 
-			FROM sys.default_constraints 
-			WHERE parent_object_id = object_id('NewTable')
-			AND type = 'D'
-			AND parent_column_id = (
-				SELECT column_id 
-				FROM sys.columns 
-				WHERE object_id = object_id('NewTable')
-				AND name = 'NewColumn'
-			);
-
-			-- create alter table command as string and run it
-			SET @sql = N'ALTER TABLE [NewTable] DROP CONSTRAINT ' + @default;
-			EXEC sp_executesql @sql;
-
-			-- now we can finally drop column
-			ALTER TABLE [NewTable] DROP COLUMN [NewColumn];";
-
-			sql.ShouldBe(expectedSql);
+			string sql = generator.Generate(expression);
+			sql.ShouldBe("ALTER TABLE [NewTable] DROP COLUMN NewColumn");
 		}
 
 		[Test]
@@ -210,6 +152,22 @@ namespace FluentMigrator.Tests.Unit.Generators
 		}
 
 		[Test]
+		public void CanDeleteData()
+		{
+			var expression = new DeleteDataExpression();
+			expression.TableName = "TestTable";
+			expression.Rows.Add(new DeletionDataDefinition
+									{
+										new KeyValuePair<string, object>("Name", "Just'in"),
+										new KeyValuePair<string, object>("Website", null)
+									});
+
+			var sql = generator.Generate(expression);
+
+			sql.ShouldBe("DELETE FROM [TestTable] WHERE [Name] = 'Just''in' AND [Website] IS NULL;");
+		}
+
+		[Test]
 		public void CanInsertGuidData()
 		{
 			var gid = Guid.NewGuid();
@@ -223,20 +181,19 @@ namespace FluentMigrator.Tests.Unit.Generators
 			sql.ShouldBe(expected);
 		}
 
-		[Test]
+		[Test, Ignore("Is not supported.")]
 		public void CanRenameColumn()
 		{
 			var expression = new RenameColumnExpression();
-            expression.SchemaName = "Schema1";
 			expression.TableName = "Table1";
 			expression.OldName = "Column1";
 			expression.NewName = "Column2";
 
 			var sql = generator.Generate(expression);
-            sql.ShouldBe("sp_rename '[Schema1].[Table1].[Column1]', 'Column2'");
+			sql.ShouldBe("sp_rename '[Table1].[Column1]', [Column2]");
 		}
 
-		[Test]
+		[Test, Ignore("Is not supported.")]
 		public void CanRenameTable()
 		{
 			var expression = new RenameTableExpression();
@@ -244,21 +201,47 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.NewName = "Table2";
 
 			var sql = generator.Generate(expression);
-			sql.ShouldBe("sp_rename '[Table1]', 'Table2'");
+			sql.ShouldBe("sp_rename [Table1], [Table2]");
 		}
 
+		// Xml Columns are not supported
+
 		[Test]
-		public void CanCreateXmlColumn()
+		public void CanAlterColumn()
 		{
-			var expression = new CreateColumnExpression();
+			var expression = new AlterColumnExpression();
 			expression.TableName = "Table1";
 
 			expression.Column = new ColumnDefinition();
-			expression.Column.Name = "MyXmlColumn";
-			expression.Column.Type = DbType.Xml;
+			expression.Column.Name = "Column1";
+			expression.Column.Type = DbType.String;
+			expression.Column.Size = 20;
+			expression.Column.IsNullable = false;
 
 			var sql = generator.Generate(expression);
-			sql.ShouldNotBeNull();
+			sql.ShouldBe("ALTER TABLE [Table1] ALTER COLUMN [Column1] VARCHAR(20) NOT NULL");
+		}
+
+		[Test]
+		public void CanUpdateData()
+		{
+			var expression = new UpdateDataExpression();
+			expression.TableName = "Table1";
+
+			expression.Set = new List<KeyValuePair<string, object>>
+								 {
+									 new KeyValuePair<string, object>("Name", "Just'in"),
+									 new KeyValuePair<string, object>("Age", 25)
+								 };
+
+			expression.Where = new List<KeyValuePair<string, object>>
+								   {
+									   new KeyValuePair<string, object>("Id", 9),
+									   new KeyValuePair<string, object>("Homepage", null)
+								   };
+
+			var sql = generator.Generate(expression);
+			sql.ShouldBe("UPDATE [Table1] SET [Name] = 'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL");
 		}
 	}
 }

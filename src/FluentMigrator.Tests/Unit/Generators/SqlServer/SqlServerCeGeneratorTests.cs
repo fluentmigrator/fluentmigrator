@@ -10,10 +10,9 @@ namespace FluentMigrator.Tests.Unit.Generators
     using FluentMigrator.Runner.Generators.SqlServer;
     using NUnit.Should;
 
-    [TestFixture]
-    public class SqlServerCeGeneratorTests
+    public class SqlServerCeGeneratorTests : GeneratorTestBase
     {
-        private const string tableName = "NewTable";
+       
         SqlServerCeGenerator generator;
 
         [SetUp]
@@ -25,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         [Test]
         public void DoesNotImplementASchema()
         {
-            var expression = GetCreateTableExpression(tableName);
+            var expression = GetCreateTableExpression();
             expression.Columns[0].Type = DbType.String;
             expression.Columns[0].Size = 100;
             var sql = generator.Generate(expression);
@@ -61,17 +60,5 @@ namespace FluentMigrator.Tests.Unit.Generators
             var sql = generator.Generate(expression);
             sql.ShouldBe("DROP INDEX [MyTable].[MyColumn]");
         }
-
-        private static CreateTableExpression GetCreateTableExpression(string tableName)
-        {
-            var columnName1 = "ColumnName1";
-
-            var column1 = new ColumnDefinition { Name = columnName1, Type = DbType.String };
-
-            var expression = new CreateTableExpression { TableName = tableName };
-            expression.Columns.Add(column1);
-            return expression;
-        }
-
     }
 }

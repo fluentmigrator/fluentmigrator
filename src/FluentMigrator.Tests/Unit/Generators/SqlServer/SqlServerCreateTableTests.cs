@@ -1,19 +1,21 @@
 ﻿
-
 namespace FluentMigrator.Tests.Unit.Generators
 {
     using NUnit.Framework;
     using NUnit.Should;
 
-    public class MySqlGeneratorCreateTableTests : MySqlGeneratorTestBase
+
+    [TestFixture]
+    public class SqlServer2000GeneratorCreateTableTests : SqlServer2000GeneratorTests
     {
-      
+        
+
         [Test]
         public void CanCreateTable()
         {
             var expression = GetCreateTableExpression();
             var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE `NewTable` (ColumnName1 VARCHAR(255) NOT NULL, ColumnName2 INTEGER NOT NULL) ENGINE = INNODB");
+            sql.ShouldBe("CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL, ColumnName2 INT NOT NULL)");
         }
 
         [Test]
@@ -25,7 +27,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             expression.Columns[1].CustomType = "[timestamp]";
             var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE `NewTable` (ColumnName1 VARCHAR(255) NOT NULL , PRIMARY KEY (`ColumnName1`), ColumnName2 [timestamp] NOT NULL) ENGINE = INNODB");
+                "CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL PRIMARY KEY CLUSTERED, ColumnName2 [timestamp] NOT NULL)");
         }
 
         [Test]
@@ -35,7 +37,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             expression.Columns[0].IsPrimaryKey = true;
             var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE `NewTable` (ColumnName1 VARCHAR(255) NOT NULL , PRIMARY KEY (`ColumnName1`), ColumnName2 INTEGER NOT NULL) ENGINE = INNODB");
+                "CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL PRIMARY KEY CLUSTERED, ColumnName2 INT NOT NULL)");
         }
 
         [Test]
@@ -45,7 +47,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             expression.Columns[0].IsIdentity = true;
             var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE `NewTable` (ColumnName1 VARCHAR(255) NOT NULL AUTO_INCREMENT, ColumnName2 INTEGER NOT NULL) ENGINE = INNODB");
+                "CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL IDENTITY(1,1), ColumnName2 INT NOT NULL)");
         }
 
         [Test]
@@ -55,7 +57,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             expression.Columns[0].IsNullable = true;
             var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE `NewTable` (ColumnName1 VARCHAR(255), ColumnName2 INTEGER NOT NULL) ENGINE = INNODB");
+                "CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255), ColumnName2 INT NOT NULL)");
         }
 
         [Test]
@@ -66,7 +68,18 @@ namespace FluentMigrator.Tests.Unit.Generators
             expression.Columns[1].DefaultValue = 0;
             var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE `NewTable` (ColumnName1 VARCHAR(255) NOT NULL DEFAULT 'Default', ColumnName2 INTEGER NOT NULL DEFAULT 0) ENGINE = INNODB");
+                "CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL CONSTRAINT DF_NewTable_ColumnName1 DEFAULT 'Default', ColumnName2 INT NOT NULL CONSTRAINT DF_NewTable_ColumnName2 DEFAULT 0)");
+        }
+
+        [Test]
+        public void CanCreateTableWithDefaultValueExplicitlySetToNull()
+        {
+            var expression = GetCreateTableExpression();
+            expression.Columns[0].DefaultValue = null;
+            var sql = generator.Generate(expression);
+            sql.ShouldBe(
+                "CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL CONSTRAINT DF_NewTable_ColumnName1 DEFAULT NULL, ColumnName2 INT NOT NULL)");
+
         }
     }
 }

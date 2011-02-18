@@ -10,24 +10,9 @@ namespace FluentMigrator.Tests.Unit.Generators
     using FluentMigrator.Runner.Generators.SQLite;
     using NUnit.Should;
 
-    [TestFixture]
-    public class SqliteGeneratorWithConventionsAppliedTests
+  
+    public class SqliteGeneratorWithConventionsAppliedTests : SQLiteTestBase
     {
-        SqliteGenerator generator;
-		string table = "Table";
-		private string oldTable = "OldTable";
-		string newTable = "NewTable";
-
-		string column = "Column";
-        string newColumn = "NewColumn";
-
-		string indexName = "indexed-column";
-		string indexColumn = "IndexColumn";
-
-        public SqliteGeneratorWithConventionsAppliedTests()
-		{
-			generator = new SqliteGenerator();
-		}
 
 		[Test]
 		public void CanCreateTable()
@@ -35,7 +20,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			var expression = GetCreateTableExpression();
 		    ApplyDefaultConventions(expression);
 			var sql = generator.Generate(expression);
-			sql.ShouldBe(string.Format("CREATE TABLE [{0}] (NewColumn TEXT NOT NULL)", table));
+			sql.ShouldBe(string.Format("CREATE TABLE [{0}] (NewColumn TEXT NOT NULL)", this.TestTableName1));
 		}
 
         [Test]
@@ -44,7 +29,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             var expression = GetCreateTableWithPrimaryKeyIdentityExpression();
             ApplyDefaultConventions(expression);
             var sql = generator.Generate(expression);
-            sql.ShouldBe(string.Format("CREATE TABLE [{0}] (NewColumn INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT)", table));
+            sql.ShouldBe(string.Format("CREATE TABLE [{0}] (NewColumn INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT)", this.TestTableName1));
         }
 
         [Test]
@@ -58,25 +43,25 @@ namespace FluentMigrator.Tests.Unit.Generators
             ApplyDefaultConventions(expression);
 
             var sql = generator.Generate(expression);
-            sql.ShouldBe(string.Format("CREATE TABLE [{0}] (NewColumn TEXT NOT NULL, OtherColumn TEXT NOT NULL, CONSTRAINT PK_{0} PRIMARY KEY (NewColumn,OtherColumn))", table));
+            sql.ShouldBe(string.Format("CREATE TABLE [{0}] (NewColumn TEXT NOT NULL, OtherColumn TEXT NOT NULL, CONSTRAINT PK_{0} PRIMARY KEY (NewColumn,OtherColumn))", this.TestTableName1));
         }
 
 	    [Test]
 		public void CanRenameTable()
 		{
-			var expression = new RenameTableExpression { OldName = oldTable, NewName = newTable };
+            var expression = new RenameTableExpression { OldName = this.TestTableName1, NewName = this.TestTableName2 };
             ApplyDefaultConventions(expression);
 			var sql = generator.Generate(expression);
-			sql.ShouldBe(string.Format("ALTER TABLE [{0}] RENAME TO [{1}]", oldTable, newTable));
+            sql.ShouldBe(string.Format("ALTER TABLE [{0}] RENAME TO [{1}]", this.TestTableName1, this.TestTableName2));
 		}
 
 		[Test]
 		public void CanDeleteTable()
 		{
-			var expression = new DeleteTableExpression { TableName = table };
+            var expression = new DeleteTableExpression { TableName = this.TestTableName1 };
             ApplyDefaultConventions(expression);
 			var sql = generator.Generate(expression);
-			sql.ShouldBe(string.Format("DROP TABLE [{0}]", table));
+            sql.ShouldBe(string.Format("DROP TABLE [{0}]", this.TestTableName1));
 		}
 
 		[Test]
@@ -85,7 +70,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			var expression = GetCreateColumnExpression();
             ApplyDefaultConventions(expression);
 			var sql = generator.Generate(expression);
-			sql.ShouldBe(string.Format("ALTER TABLE [{0}] ADD COLUMN {1} TEXT NOT NULL", table, newColumn));
+            sql.ShouldBe(string.Format("ALTER TABLE [{0}] ADD COLUMN {1} TEXT NOT NULL", this.TestTableName1, this.TestColumnName1));
 		}
 
 		[Test]
@@ -106,16 +91,16 @@ namespace FluentMigrator.Tests.Unit.Generators
 			var expression = GetCreateAutoIncrementColumnExpression();
             ApplyDefaultConventions(expression);
 			var sql = generator.Generate(expression);
-			sql.ShouldBe(string.Format("ALTER TABLE [{0}] ADD COLUMN {1} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT", table, newColumn));
+            sql.ShouldBe(string.Format("ALTER TABLE [{0}] ADD COLUMN {1} INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT", this.TestTableName1, this.TestColumnName1));
 		}
 
 		[Test]
 		public void CanDeleteColumn()
 		{
-			var expression = new DeleteColumnExpression { TableName = table, ColumnName = column };
+            var expression = new DeleteColumnExpression { TableName = this.TestTableName1, ColumnName = this.TestColumnName1 };
             ApplyDefaultConventions(expression);
 			var sql = generator.Generate(expression);
-			sql.ShouldBe(string.Format("ALTER TABLE [{0}] DROP COLUMN {1}", table, column));
+            sql.ShouldBe(string.Format("ALTER TABLE [{0}] DROP COLUMN {1}", this.TestTableName1, this.TestColumnName1));
 		}
 
 		[Test]
@@ -124,7 +109,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			var expression = GetCreateIndexExpression();
             ApplyDefaultConventions(expression);
 			var sql = generator.Generate(expression);
-			sql.ShouldBe(string.Format("CREATE INDEX IF NOT EXISTS {0} ON {1} ({2})", indexName, table, indexColumn));
+			sql.ShouldBe(string.Format("CREATE INDEX IF NOT EXISTS {0} ON {1} ({2})", this.TestIndexName, this.TestTableName1, this.TestColumnName1));
 		}
 
         [Test]
@@ -152,38 +137,5 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             expression.ApplyConventions(new MigrationConventions());
         }
-        
-        private CreateIndexExpression GetCreateIndexExpression()
-		{
-			IndexColumnDefinition indexColumnDefinition = new IndexColumnDefinition { Name = indexColumn };
-			IndexDefinition indexDefinition = new IndexDefinition { TableName = table, Name = indexName, Columns = new List<IndexColumnDefinition> { indexColumnDefinition } };
-			return new CreateIndexExpression { Index = indexDefinition };
-		}
-
-		private CreateColumnExpression GetCreateColumnExpression()
-		{
-			ColumnDefinition column = new ColumnDefinition { Name = newColumn, Type = DbType.String };
-			return new CreateColumnExpression { TableName = table, Column = column };
-		}
-
-		private CreateColumnExpression GetCreateAutoIncrementColumnExpression()
-		{
-			var column = new ColumnDefinition { Name = newColumn, IsIdentity = true, IsPrimaryKey = true, Type = DbType.String };
-			return new CreateColumnExpression { TableName = table, Column = column };
-		}
-
-        private CreateTableExpression GetCreateTableWithPrimaryKeyIdentityExpression()
-        {
-            var expression = new CreateTableExpression {TableName = table};
-            expression.Columns.Add(new ColumnDefinition { Name = newColumn, IsIdentity = true, IsPrimaryKey = true, Type = DbType.String, TableName = table});
-            return expression;  
-        }
-
-		private CreateTableExpression GetCreateTableExpression()
-		{
-			CreateTableExpression expression = new CreateTableExpression() { TableName = table, };
-			expression.Columns.Add(new ColumnDefinition { Name = newColumn, Type = DbType.String, TableName = table});
-			return expression;
-		}
     }
 }

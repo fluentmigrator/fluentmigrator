@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
@@ -19,7 +19,6 @@
 #endregion
 
 
-
 namespace FluentMigrator.Tests.Unit.Generators
 {
     using System;
@@ -28,24 +27,11 @@ namespace FluentMigrator.Tests.Unit.Generators
     using FluentMigrator.Expressions;
     using FluentMigrator.Model;
     using NUnit.Framework;
-    using FluentMigrator.Runner.Generators.SqlServer;
+    using FluentMigrator.Runner.Generators.MySql;
     using NUnit.Should;
 
-    public class SqlServer2000GeneratorTests : GeneratorTestBase
+	public class MySqlGeneratorOtherTests : MySqlGeneratorTestBase
 	{
-		protected SqlServer2000Generator generator;
-
-		[SetUp]
-		public void SetUp()
-		{
-			generator = new SqlServer2000Generator();
-		}
-	}
-
-	[TestFixture]
-	public class SqlServer2000GeneratorOtherTests : SqlServer2000GeneratorTests
-	{
-		
 		[Test]
 		public void CanAddColumn()
 		{
@@ -61,7 +47,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.TableName = tableName;
 
 			var sql = generator.Generate(expression);
-			sql.ShouldBe("ALTER TABLE [NewTable] ADD [NewColumn] NVARCHAR(5) NOT NULL");
+			sql.ShouldBe("ALTER TABLE `NewTable` ADD NewColumn VARCHAR(5) NOT NULL");
 		}
 
 		[Test]
@@ -80,7 +66,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.TableName = tableName;
 
 			var sql = generator.Generate(expression);
-			sql.ShouldBe("ALTER TABLE [NewTable] ADD [NewColumn] DECIMAL(19,2) NOT NULL");
+			sql.ShouldBe("ALTER TABLE `NewTable` ADD NewColumn DECIMAL(19,2) NOT NULL");
 		}
 
 		[Test]
@@ -95,7 +81,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(
-				"ALTER TABLE [TestForeignTable] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([Column3],[Column4]) REFERENCES [TestPrimaryTable] ([Column1],[Column2])");
+                "ALTER TABLE `TestForeignTable` ADD CONSTRAINT `FK_Test` FOREIGN KEY (Column3,Column4) REFERENCES TestPrimaryTable (Column1,Column2)");
 		}
 
 		[Test]
@@ -105,12 +91,11 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.Index.Name = "IX_TEST";
 			expression.Index.TableName = "TEST_TABLE";
 			expression.Index.IsUnique = true;
-			expression.Index.IsClustered = true;
 			expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Ascending, Name = "Column1" });
 			expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Descending, Name = "Column2" });
 
 			var sql = generator.Generate(expression);
-			sql.ShouldBe("CREATE UNIQUE CLUSTERED INDEX [IX_TEST] ON [TEST_TABLE] ([Column1] ASC,[Column2] DESC)");
+			sql.ShouldBe("CREATE UNIQUE INDEX IX_TEST ON TEST_TABLE (Column1 ASC,Column2 DESC)");
 		}
 
         [Test]
@@ -121,11 +106,10 @@ namespace FluentMigrator.Tests.Unit.Generators
             expression.Index.TableName = "TEST_TABLE";
             
             var sql = generator.Generate(expression);
-            sql.ShouldBe("DROP INDEX [IX_TEST] ON [TEST_TABLE]");
+            sql.ShouldBe("DROP INDEX IX_TEST");
         }
 
 		[Test]
-		[Ignore("need better way to test this")]
 		public void CanDropColumn()
 		{
 			var tableName = "NewTable";
@@ -136,31 +120,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.ColumnName = columnName;
 
 			var sql = generator.Generate(expression);
-
-			var expectedSql =
-				@"
-			DECLARE @default sysname, @sql nvarchar(max);
-
-			-- get name of default constraint
-			SELECT @default = name 
-			FROM sys.default_constraints 
-			WHERE parent_object_id = object_id('NewTable')
-			AND type = 'D'
-			AND parent_column_id = (
-				SELECT column_id 
-				FROM sys.columns 
-				WHERE object_id = object_id('NewTable')
-				AND name = 'NewColumn'
-			);
-
-			-- create alter table command as string and run it
-			SET @sql = N'ALTER TABLE [NewTable] DROP CONSTRAINT ' + @default;
-			EXEC sp_executesql @sql;
-
-			-- now we can finally drop column
-			ALTER TABLE [NewTable] DROP COLUMN [NewColumn];";
-
-			sql.ShouldBe(expectedSql);
+			sql.ShouldBe("ALTER TABLE `NewTable` DROP COLUMN NewColumn");
 		}
 
 		[Test]
@@ -171,7 +131,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.ForeignKey.ForeignTable = "TestPrimaryTable";
 
 			var sql = generator.Generate(expression);
-			sql.ShouldBe("ALTER TABLE [TestPrimaryTable] DROP CONSTRAINT FK_Test");
+			sql.ShouldBe("ALTER TABLE `TestPrimaryTable` DROP FOREIGN KEY `FK_Test`");
 		}
 
 		[Test]
@@ -180,7 +140,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			var tableName = "NewTable";
 			var expression = GetDeleteTableExpression();
 			var sql = generator.Generate(expression);
-			sql.ShouldBe("DROP TABLE [NewTable]");
+			sql.ShouldBe("DROP TABLE `NewTable`");
 		}
 
 		[Test]
@@ -191,7 +151,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.Rows.Add(new InsertionDataDefinition
 									{
 										new KeyValuePair<string, object>("Id", 1),
-										new KeyValuePair<string, object>("Name", "Just'in"),
+										new KeyValuePair<string, object>("Name", @"Just'in"),
 										new KeyValuePair<string, object>("Website", "codethinked.com")
 									});
 			expression.Rows.Add(new InsertionDataDefinition
@@ -203,8 +163,8 @@ namespace FluentMigrator.Tests.Unit.Generators
 
 			var sql = generator.Generate(expression);
 
-			var expected = "INSERT INTO [TestTable] ([Id],[Name],[Website]) VALUES (1,'Just''in','codethinked.com');";
-			expected += @"INSERT INTO [TestTable] ([Id],[Name],[Website]) VALUES (2,'Na\te','kohari.org');";
+			var expected = @"INSERT INTO `TestTable` (Id,Name,Website) VALUES (1,'Just''in','codethinked.com');";
+			expected += @"INSERT INTO `TestTable` (Id,Name,Website) VALUES (2,'Na\\te','kohari.org');";
 
 			sql.ShouldBe(expected);
 		}
@@ -218,22 +178,22 @@ namespace FluentMigrator.Tests.Unit.Generators
 
 			var sql = generator.Generate(expression);
 
-			var expected = String.Format("INSERT INTO [TestTable] ([guid]) VALUES ('{0}');", gid);
+			var expected = String.Format("INSERT INTO `TestTable` (guid) VALUES ('{0}');", gid);
 
 			sql.ShouldBe(expected);
 		}
 
-		[Test]
+		[Test, ExpectedException(typeof(NotImplementedException))]
 		public void CanRenameColumn()
 		{
 			var expression = new RenameColumnExpression();
-            expression.SchemaName = "Schema1";
 			expression.TableName = "Table1";
 			expression.OldName = "Column1";
 			expression.NewName = "Column2";
 
 			var sql = generator.Generate(expression);
-            sql.ShouldBe("sp_rename '[Schema1].[Table1].[Column1]', 'Column2'");
+			// MySql does not appear to have a way to change column without re-specifying the existing column definition
+			sql.ShouldBe("ALTER TABLE `Table1` CHANGE COLUMN `Column1` `Column2` EXISTING_DEFINITION_HERE");
 		}
 
 		[Test]
@@ -244,21 +204,9 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.NewName = "Table2";
 
 			var sql = generator.Generate(expression);
-			sql.ShouldBe("sp_rename '[Table1]', 'Table2'");
-		}
-
-		[Test]
-		public void CanCreateXmlColumn()
-		{
-			var expression = new CreateColumnExpression();
-			expression.TableName = "Table1";
-
-			expression.Column = new ColumnDefinition();
-			expression.Column.Name = "MyXmlColumn";
-			expression.Column.Type = DbType.Xml;
-
-			var sql = generator.Generate(expression);
-			sql.ShouldNotBeNull();
+			sql.ShouldBe("RENAME TABLE `Table1` TO `Table2`");
 		}
 	}
+
+	
 }
