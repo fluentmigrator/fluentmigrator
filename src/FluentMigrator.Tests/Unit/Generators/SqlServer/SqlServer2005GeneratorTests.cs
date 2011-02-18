@@ -11,7 +11,7 @@ namespace FluentMigrator.Tests.Unit.Generators
     using NUnit.Should;
 
 
-	public class SqlServer2005GeneratorTests : GeneratorTestBase
+	public class SqlServer2005GeneratorTests
 	{
 		private SqlServer2005Generator generator;
 
@@ -21,10 +21,12 @@ namespace FluentMigrator.Tests.Unit.Generators
 			generator = new SqlServer2005Generator();
 		}
 
+
+
 		[Test]
 		public void CanCreateTableWithNvarcharMax()
 		{
-			var expression = GetCreateTableExpression();
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
 			expression.Columns[0].Type = DbType.String;
 			expression.Columns[0].Size = Int32.MaxValue;
 			var sql = generator.Generate(expression);

@@ -149,6 +149,7 @@
     <Compile Include="Generators\Jet\JetTypeMap.cs" />
     <Compile Include="Generators\MySql\MySqlColumn.cs" />
     <Compile Include="Generators\MySql\MySqlTypeMap.cs" />
+    <Compile Include="Generators\DatabaseOperationNotSupportedExecption.cs" />
     <Compile Include="Generators\Oracle\OracleColumn.cs" />
     <Compile Include="Generators\Oracle\OracleTypeMap.cs" />
     <Compile Include="Generators\SQLite\SqliteColumn.cs" />

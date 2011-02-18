@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         [Test]
         public void DoesNotImplementASchema()
         {
-            var expression = GetCreateTableExpression();
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.Columns[0].Type = DbType.String;
             expression.Columns[0].Size = 100;
             var sql = generator.Generate(expression);

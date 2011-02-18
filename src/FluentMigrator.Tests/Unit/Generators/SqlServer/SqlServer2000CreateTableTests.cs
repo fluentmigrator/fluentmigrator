@@ -3,19 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using FluentMigrator.Runner.Generators.MySql;
+using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Should;
 
-namespace FluentMigrator.Tests.Unit.Generators.MySql
+namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 {
-    public class MySqlCreateTableTests : BaseTableCreateTests
+    public class SqlServer2000CreateTableTests : BaseTableCreateTests
     {
-        protected MySqlGenerator generator;
+        protected SqlServer2000Generator generator;
 
         [SetUp]
         public void Setup()
         {
-            generator = new MySqlGenerator();
+            generator = new SqlServer2000Generator();
+
+
         }
 
         [Test]
@@ -23,8 +25,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL, `TestColumn2` INTEGER NOT NULL) ENGINE = INNODB");
-  
+            sql.ShouldBe("CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL, ColumnName2 INT NOT NULL)");
         }
 
         [Test]
@@ -34,53 +35,46 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             expression.Columns[0].IsPrimaryKey = true;
             expression.Columns[1].Type = null;
             expression.Columns[1].CustomType = "[timestamp]";
+
             var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL , PRIMARY KEY (`TestColumn1`), `TestColumn2` [timestamp] NOT NULL) ENGINE = INNODB");
-
+                "CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL PRIMARY KEY CLUSTERED, ColumnName2 [timestamp] NOT NULL)");
         }
 
         [Test]
         public override void CanCreateTableWithPrimaryKey()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
-
             var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL , PRIMARY KEY (`TestColumn1`), `TestColumn2` INTEGER NOT NULL) ENGINE = INNODB");
-
+                "CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL PRIMARY KEY CLUSTERED, ColumnName2 INT NOT NULL)");
         }
 
         [Test]
         public override void CanCreateTableWithIdentity()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithGetAutoIncrementExpression();
-
             var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL AUTO_INCREMENT, `TestColumn2` INTEGER NOT NULL) ENGINE = INNODB");
- 
+                "CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL IDENTITY(1,1), ColumnName2 INT NOT NULL)");
         }
 
         [Test]
         public override void CanCreateTableWithNullField()
         {
-            var expression = GeneratorTestHelper.GetCreateTableExpression();
-            expression.Columns[0].IsNullable = true;
-            var sql = generator.Generate(expression);
-            sql.ShouldBe(
-                "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255), `TestColumn2` INTEGER NOT NULL) ENGINE = INNODB");
+            //var expression = G
+            //var sql = generator.Generate(expression);
+            //sql.ShouldBe(
+            //    "CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255), ColumnName2 INT NOT NULL)");
         }
 
         [Test]
         public override void CanCreateTableWithDefaultValue()
         {
-            var expression = GeneratorTestHelper.GetCreateTableExpression();
-            expression.Columns[0].DefaultValue = "Default";
-            expression.Columns[1].DefaultValue = 0;
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
             var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL DEFAULT 'Default', `TestColumn2` INTEGER NOT NULL DEFAULT 0) ENGINE = INNODB");
+                "CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL CONSTRAINT DF_NewTable_ColumnName1 DEFAULT 'Default', ColumnName2 INT NOT NULL CONSTRAINT DF_NewTable_ColumnName2 DEFAULT 0)");
   
         }
 
@@ -94,19 +88,14 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         public override void CanCreateIndex()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
-                   var sql = generator.Generate(expression);
-                   sql.ShouldBe("CREATE UNIQUE INDEX IX_TEST ON `TestTable1` (`TestColumn1` ASC)");
-
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE UNIQUE CLUSTERED INDEX [IX_TEST] ON [TEST_TABLE] ([Column1] ASC,[Column2] DESC)");
         }
 
         [Test]
         public override void CanCreateMultiColumnIndex()
         {
-            var expression = GeneratorTestHelper.GetMultiColumnCreateIndexExpression();
-          
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE UNIQUE INDEX IX_TEST ON `TestTable1` (`TestColumn1` ASC,`TestColumn1` DESC)");
-
+            throw new NotImplementedException();
         }
 
         [Test]

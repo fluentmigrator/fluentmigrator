@@ -11,7 +11,7 @@ namespace FluentMigrator.Tests.Unit.Generators
     using NUnit.Should;
 
   
-    public class SqliteGeneratorWithConventionsAppliedTests : SQLiteTestBase
+    public class SqliteGeneratorWithConventionsAppliedTests 
     {
 
 		[Test]

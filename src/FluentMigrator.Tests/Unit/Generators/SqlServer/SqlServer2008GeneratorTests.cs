@@ -9,7 +9,7 @@ namespace FluentMigrator.Tests.Unit.Generators
     using NUnit.Framework;
     using NUnit.Should;
 
-    public class SqlServer2008GeneratorTests : GeneratorTestBase
+    public class SqlServer2008GeneratorTests
 	{
 		private SqlServer2008Generator generator;
 
@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		[Test]
 		public void CanCreateTableWithDateTimeOffsetColumn()
 		{
-			var expression = GetCreateTableExpression();
+			var expression = GeneratorTestHelper.GetCreateTableExpression();
 			expression.Columns[0].Type = DbType.DateTimeOffset;
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(

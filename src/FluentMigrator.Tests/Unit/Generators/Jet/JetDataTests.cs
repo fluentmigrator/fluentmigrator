@@ -1,0 +1,64 @@
+﻿using System;
+using System.Collections.Generic;
+using FluentMigrator.Runner.Generators.Jet;
+using NUnit.Framework;
+using NUnit.Should;
+
+namespace FluentMigrator.Tests.Unit.Generators.Jet
+{
+    public class JetDataTests : BaseDataTests
+    {
+        protected JetGenerator SUT;
+
+        [SetUp]
+        public void Setup()
+        {
+            SUT = new JetGenerator();
+        }
+
+        [Test]
+        public override void CanInsertData()
+        {
+            var expression = GeneratorTestHelper.GetInsertDataExpression();
+
+            var sql = SUT.Generate(expression);
+
+            var expected = "INSERT INTO [TestTable1] ([Id],[Name],[Website]) VALUES (1,'Just''in','codethinked.com');";
+            expected += @"INSERT INTO [TestTable1] ([Id],[Name],[Website]) VALUES (2,'Na\te','kohari.org');";
+
+            sql.ShouldBe(expected);
+        }
+
+        [Test]
+        public override void CanDeleteData()
+        {
+            var expression = GeneratorTestHelper.GetDeleteDataExpression();
+
+            var sql = SUT.Generate(expression);
+
+            sql.ShouldBe("DELETE FROM [TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL;");
+        }
+
+        [Test]
+        public override void CanInsertGuidData()
+        {
+
+            var expression = GeneratorTestHelper.GetInsertGUIDExpression();
+
+            var sql = SUT.Generate(expression);
+
+            var expected = String.Format("INSERT INTO [TestTable1] ([guid]) VALUES ('{0}');", GeneratorTestHelper.TestGuid.ToString());
+
+            sql.ShouldBe(expected);
+        }
+
+        [Test]
+        public override void CanUpdateData()
+        {
+            var expression = GeneratorTestHelper.GetUpdateDataExpression();
+
+            var sql = SUT.Generate(expression);
+            sql.ShouldBe("UPDATE [TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL");
+        }
+    }
+}
