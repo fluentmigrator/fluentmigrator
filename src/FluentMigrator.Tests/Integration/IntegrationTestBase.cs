@@ -27,6 +27,9 @@ using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.Sqlite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using MySql.Data.MySqlClient;
+using FluentMigrator.Runner.Generators.SQLite;
+using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Runner.Generators.MySql;
 
 namespace FluentMigrator.Tests.Integration
 {

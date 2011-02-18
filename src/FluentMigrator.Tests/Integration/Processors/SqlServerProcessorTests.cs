@@ -24,6 +24,7 @@ using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
 using NUnit.Should;
+using FluentMigrator.Runner.Generators.SqlServer;
 
 namespace FluentMigrator.Tests.Integration.Processors
 {

@@ -2,6 +2,7 @@
 using FluentMigrator.Runner.Generators;
 using NUnit.Framework;
 using NUnit.Should;
+using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {

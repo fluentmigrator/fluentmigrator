@@ -17,6 +17,7 @@ using FluentMigrator.Tests.Helpers;
 using FluentMigrator.Tests.Integration.Migrations;
 using NUnit.Framework;
 using NUnit.Should;
+using FluentMigrator.Runner.Generators.SqlServer;
 
 namespace FluentMigrator.Tests.Integration.SchemaDump {
 

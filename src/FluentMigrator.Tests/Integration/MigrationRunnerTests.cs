@@ -33,6 +33,7 @@ using Moq;
 using NUnit.Framework;
 using NUnit.Should;
 using FluentMigrator.Runner.Processors.MySql;
+using FluentMigrator.Runner.Generators.SqlServer;
 
 namespace FluentMigrator.Tests.Integration
 {
