@@ -19,6 +19,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
         }
 
+        
         [Test]
         public override void CanInsertData()
         {
@@ -26,7 +27,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             string sql = generator.Generate(expression);
 
             string expected = "INSERT INTO 'TestTable1' ('Id', 'Name', 'Website') VALUES (1, 'Just''in', 'codethinked.com');";
-            expected += " INSERT INTO 'TestTable1' ('Id', 'Name', 'Website') VALUES (2, 'Nate', 'kohari.org');";
+            expected += @" INSERT INTO 'TestTable1' ('Id', 'Name', 'Website') VALUES (2, 'Na\te', 'kohari.org')";
 
             sql.ShouldBe(expected);
         }

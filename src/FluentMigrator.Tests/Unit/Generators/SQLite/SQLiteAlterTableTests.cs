@@ -63,13 +63,13 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         [Test]
         public override void CanCreateForeignKey()
         {
-            throw new NotImplementedException();
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(GeneratorTestHelper.GetCreateForeignKeyExpression()));
         }
 
         [Test]
         public override void CanCreateMulitColumnForeignKey()
         {
-            throw new NotImplementedException();
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression()));
         }
 
         [Test]

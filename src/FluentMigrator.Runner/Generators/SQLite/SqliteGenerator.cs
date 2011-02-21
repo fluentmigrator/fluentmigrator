@@ -36,13 +36,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
 		{
 		}
 
-        
-
-       
-
         public override string RenameTable { get { return "ALTER TABLE {0} RENAME TO {1}"; } }
-
-		
 
         public override string Generate(AlterColumnExpression expression)
         {
@@ -61,13 +55,12 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
 		public override string Generate(CreateForeignKeyExpression expression)
 		{
-			// Ignore foreign keys for SQLite
-			return "";
+            throw new DatabaseOperationNotSupportedExecption("Forign keys are not supported in Sqlite");
 		}
 
 		public override string Generate(DeleteForeignKeyExpression expression)
 		{
-			return "";
+            throw new DatabaseOperationNotSupportedExecption("Forign keys are not supported in Sqlite");
 		}
 	}
 }

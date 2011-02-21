@@ -26,8 +26,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetInsertDataExpression();
             string sql = generator.Generate(expression);
 
-            string expected = "INSERT ALL INTO TestTable1 (Id, Name, Website) VALUES (1, 'Justin', 'codethinked.com')";
-            expected += " INTO TestTable1 (Id, Name ,Website) VALUES (2, 'Nate', 'kohari.org')";
+            string expected = "INSERT ALL INTO TestTable1 (Id, Name, Website) VALUES (1, 'Just''in', 'codethinked.com')";
+            expected += @" INTO TestTable1 (Id, Name, Website) VALUES (2, 'Na\te', 'kohari.org')";
             expected += " SELECT 1 FROM DUAL";
 
             sql.ShouldBe(expected);
@@ -36,7 +36,11 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public override void CanDeleteData()
         {
-            throw new NotImplementedException();
+            var expression = GeneratorTestHelper.GetDeleteDataExpression();
+
+            var sql = generator.Generate(expression);
+
+            sql.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL");
         }
 
         [Test]
@@ -56,7 +60,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public override void CanUpdateData()
         {
-            throw new NotImplementedException();
+            var expression = GeneratorTestHelper.GetUpdateDataExpression();
+
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE Id = 9 AND Homepage IS NULL");
         }
     }
 }

@@ -18,12 +18,6 @@ namespace FluentMigrator.Runner.Generators.Oracle
 		{
 		}
 
-       
-
-
-
-		
-
         public override string AddColumn { get  { return "ALTER TABLE {0} ADD {1}"; } }
 
         public override string RenameTable { get { return "ALTER TABLE {0} RENAME TO {1}";  } }
