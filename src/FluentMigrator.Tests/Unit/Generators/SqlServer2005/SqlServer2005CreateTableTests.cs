@@ -7,6 +7,7 @@ using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Should;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Expressions;
+using System.Data;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 {
@@ -337,7 +338,58 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         [Test]
         public void CanCreateSchema()
         {
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
+            var expression = new CreateSchemaExpression
+            {
+                SchemaName = "TestSchema"
+            };
+
+            var sql = generator.Generate(expression);
+            sql.ShouldBe(
+              "CREATE SCHEMA [TestSchema]");
+        }
+
+        [Test]
+        public void CanCreateTableWithNvarcharMaxWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.Columns[0].Type = DbType.String;
+            expression.Columns[0].Size = Int32.MaxValue;
+            var sql = generator.Generate(expression);
+            sql.ShouldBe(
+                "CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(MAX) NOT NULL, [TestColumn2] INT NOT NULL)");
+        }
+
+        [Test]
+        public void CanCreateTableWithNvarcharMaxWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.SchemaName = "TestSchema";
+            expression.Columns[0].Type = DbType.String;
+            expression.Columns[0].Size = Int32.MaxValue;
+            var sql = generator.Generate(expression);
+            sql.ShouldBe(
+                "CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] NVARCHAR(MAX) NOT NULL, [TestColumn2] INT NOT NULL)");
+        }
+
+        [Test]
+        public void CanCreateTableWithDateTimeOffsetColumn()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.Columns[0].Type = DbType.DateTimeOffset;
+            var sql = generator.Generate(expression);
+            sql.ShouldBe(
+                "CREATE TABLE [dbo].[TestTable1] ([TestColumn1] DATETIMEOFFSET NOT NULL)");
+        }
+
+        [Test]
+        public void CanCreateTableWithDateTimeOffsetColumnWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.SchemaName = "TestSchema";
+            expression.Columns[0].Type = DbType.DateTimeOffset;
+            var sql = generator.Generate(expression);
+            sql.ShouldBe(
+                "CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] DATETIMEOFFSET NOT NULL)");
         }
     }
 }

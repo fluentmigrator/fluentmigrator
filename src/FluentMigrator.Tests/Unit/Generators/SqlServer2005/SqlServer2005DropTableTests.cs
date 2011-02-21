@@ -150,7 +150,9 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         [Test]
         public void CanDeleteSchema()
         {
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new DeleteSchemaExpression()));
+            var expression = new DeleteSchemaExpression() { SchemaName = "TestSchema" };
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("DROP SCHEMA [TestSchema]");
         }
     }
 }

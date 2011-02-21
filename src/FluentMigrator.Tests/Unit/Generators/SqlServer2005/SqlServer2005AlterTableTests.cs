@@ -203,7 +203,18 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         [Test]
         public   void CanAlterSchema()
         {
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new AlterSchemaExpression()));
+            var expression = new AlterSchemaExpression
+            {
+                DestinationSchemaName = "DEST",
+                SourceSchemaName = "SOURCE",
+                TableName = "TABLE"
+            };
+
+            var sql = generator.Generate(expression);
+            sql.ShouldBe(
+              "ALTER SCHEMA [DEST] TRANSFER [SOURCE].[TABLE]");
         }
+
+        
     }
 }

@@ -207,7 +207,6 @@
     <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000AlterTableTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000CreateTableTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000Data.cs" />
-    <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005GeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2000\SqlServer2008GeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2000\SqlServerCeGeneratorTests.cs" />
     <Compile Include="Unit\Generators\BaseTableAlterTests.cs" />
