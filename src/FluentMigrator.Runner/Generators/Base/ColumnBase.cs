@@ -14,7 +14,7 @@ namespace FluentMigrator.Runner.Generators.Base
 		private readonly ITypeMap _typeMap;
         private readonly IQuoter _quoter;
 		protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; set; }
-        protected virtual bool ShouldSeperatePrimaryKeyAndIdentity { get { return true; } }
+       
 
 		public ColumnBase(ITypeMap typeMap, IQuoter quoter)
 		{			_typeMap = typeMap;
@@ -110,21 +110,13 @@ namespace FluentMigrator.Runner.Generators.Base
             return String.Join(", ", columns.Select(x => Generate(x)).ToArray()) + primaryKeyString;
 		}
 
-        private bool ShouldPrimaryKeysBeAddedSeparatley(IEnumerable<ColumnDefinition> primaryKeyColumns)
+        public virtual bool ShouldPrimaryKeysBeAddedSeparatley(IEnumerable<ColumnDefinition> primaryKeyColumns)
         {
-            if (ShouldSeperatePrimaryKeyAndIdentity && primaryKeyColumns.Any(x=>x.IsPrimaryKey)) {
-                return true ;
-            }
-
-            if (primaryKeyColumns.Count(x=>x.IsPrimaryKey) > 1 || primaryKeyColumns.Any(x => !string.IsNullOrEmpty(x.PrimaryKeyName)))
-            {
-                return true;
-            }
-
-            return false;
+            //By default always try to add primary keys as a separate constraint if any exist
+            return primaryKeyColumns.Any(x => x.IsPrimaryKey);
         }
 
-        private string AddPrimaryKeyConstraint(string tableName, IEnumerable<ColumnDefinition> primaryKeyColumns)
+        public virtual string AddPrimaryKeyConstraint(string tableName, IEnumerable<ColumnDefinition> primaryKeyColumns)
 		{
 			string keyColumns = String.Join(", ", primaryKeyColumns.Select(x => Quoter.QuoteColumnName(x.Name)).ToArray());
 

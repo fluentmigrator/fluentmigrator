@@ -169,7 +169,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public virtual string GenerateForeignKeyName(CreateForeignKeyExpression expression)
         {
-            return string.Format("FK_{0}_{1}", expression.ForeignKey.PrimaryTable, expression.ForeignKey.ForeignTable);
+            return string.Format("FK_{0}_{1}", expression.ForeignKey.PrimaryTable.Substring(0, 5), expression.ForeignKey.ForeignTable.Substring(0, 5));
         }
 
         public override string Generate(DeleteForeignKeyExpression expression){

@@ -7,10 +7,12 @@ namespace FluentMigrator.Runner.Generators.SQLite
     using FluentMigrator.Model;
     using FluentMigrator.Runner.Generators.Base;
     using FluentMigrator.Runner.Generators.Generic;
+    using System.Collections.Generic;
+    using System.Linq;
 
 	class SqliteColumn : ColumnBase
 	{
-        protected override bool ShouldSeperatePrimaryKeyAndIdentity { get { return false; } }
+       
 
 		public SqliteColumn() : base(new SqliteTypeMap(), new SqliteQuoter())
 		{
@@ -24,12 +26,21 @@ namespace FluentMigrator.Runner.Generators.SQLite
             {
                 throw new ArgumentException("SQLite only supports identity on single integer, primary key coulmns");
             }
-            return column.IsIdentity ? "AUTOINCREMENT" : string.Empty;
+            return string.Empty;
 		}
+
+        public override bool ShouldPrimaryKeysBeAddedSeparatley(IEnumerable<ColumnDefinition> primaryKeyColumns)
+        {
+            //If there are no identity column then we can add as a separate constrint
+            if(!primaryKeyColumns.Any(x=>x.IsIdentity) && primaryKeyColumns.Any(x=>x.IsPrimaryKey)) return true;
+            return false;
+        }
 
         protected override string FormatPrimaryKey(ColumnDefinition column)
         {
-            return column.IsPrimaryKey ? "PRIMARY KEY" : string.Empty;
+            if(!column.IsPrimaryKey) return string.Empty;
+
+            return column.IsIdentity ? "PRIMARY KEY AUTOINCREMENT" : "PRIMARY KEY";
         }
 
         protected override string FormatSystemMethods(SystemMethods systemMethod)
