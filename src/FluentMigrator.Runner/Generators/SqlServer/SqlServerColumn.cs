@@ -27,11 +27,6 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 			return column.IsIdentity ? "IDENTITY(1,1)" : string.Empty;
 		}
 
-        //protected override string FormatPrimaryKey(ColumnDefinition column)
-        //{
-        //    return column.IsPrimaryKey ? "PRIMARY KEY CLUSTERED" : string.Empty;
-        //}
-
         protected override string FormatSystemMethods(SystemMethods systemMethod)
         {
             switch (systemMethod)
