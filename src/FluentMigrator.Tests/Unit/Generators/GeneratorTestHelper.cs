@@ -43,6 +43,22 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static CreateTableExpression GetCreateTableWithNamedPrimaryKeyExpression()
+        {
+            var expression = new CreateTableExpression { TableName = TestTableName1 };
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, IsPrimaryKey = true, PrimaryKeyName="TestKey", Type = DbType.String });
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, Type = DbType.Int32 });
+            return expression;
+        }
+
+        public static CreateTableExpression GetCreateTableWithMultiColumNamedPrimaryKeyExpression()
+        {
+            var expression = new CreateTableExpression { TableName = TestTableName1 };
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, IsPrimaryKey = true, PrimaryKeyName = "TestKey", Type = DbType.String });
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, Type = DbType.Int32 });
+            return expression;
+        }
+
         public static CreateTableExpression GetCreateTableWithAutoIncrementExpression()
         {
             var expression = new CreateTableExpression { TableName = TestTableName1 };

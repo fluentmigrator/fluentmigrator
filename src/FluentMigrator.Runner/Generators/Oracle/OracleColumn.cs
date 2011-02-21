@@ -24,11 +24,11 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
 		protected override string FormatIdentity(ColumnDefinition column)
 		{
-			if (column.IsIdentity)
-			{
-				//todo: would like to throw a warning here
-			}
-			return string.Empty;
+            if (column.IsIdentity)
+            {
+                throw new DatabaseOperationNotSupportedExecption("Oracle does not support identity columns. Please use a SEQUENCE instead");
+            }
+            return string.Empty;
 		}
 
         //protected override string FormatPrimaryKey(ColumnDefinition column)

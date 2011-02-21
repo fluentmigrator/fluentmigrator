@@ -44,6 +44,26 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
+        public override void CanCreateTableNamedPrimaryKey()
+        {
+            //Should work. I think from the docs
+            var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL, 'TestColumn2' INTEGER NOT NULL, CONSTRAINT 'TestKey' PRIMARY KEY ('TestColumn1'))");
+
+        }
+
+        [Test]
+        public override void CanCreateTableNamedMultiColumnPrimaryKey()
+        {
+            //Should work. I think from the docs
+            var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL, 'TestColumn2' INTEGER NOT NULL, CONSTRAINT 'TestKey' PRIMARY KEY ('TestColumn1', 'TestColumn2'))");
+
+        }
+
+        [Test]
         public override void CanCreateTableWithIdentity()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
@@ -115,6 +135,25 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var result = generator.Generate(expression);
             result.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL, 'TestColumn2' INTEGER NOT NULL, PRIMARY KEY ('TestColumn1', 'TestColumn2'))");
    
+        }
+
+        [Test]
+        public override void CanCreateUniqueIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE UNIQUE INDEX 'TestIndex' ON 'TestTable1' ('TestColumn1' ASC)");
+
+        }
+
+        [Test]
+        public override void CanCreateMultiColumnUniqueIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
+
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE UNIQUE INDEX 'TestIndex' ON 'TestTable1' ('TestColumn1' ASC, 'TestColumn2' DESC)");
+
         }
 
         [Test]

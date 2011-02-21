@@ -30,15 +30,35 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public override void CanCreateTableWithCustomColumnType()
         {
-            throw new NotImplementedException();
+            //Do not knows any oracle custom types. Not testing for it.  If someone else knows please add a test
         }
 
         [Test]
         public override void CanCreateTableWithPrimaryKey()
         {
+            //After a quick goolge the below tested statment should work.
+            //CONSTRAINT constraint_name PRIMARY KEY (column1, column2, . column_n)
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
             string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL PRIMARY KEY, TestColumn2 NUMBER(10,0) NOT NULL)");
+            sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL, PRIMARY KEY (TestColumn1))");
+
+        }
+
+        [Test]
+        public override void CanCreateTableNamedPrimaryKey()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL, CONSTRAINT pk_PersonID PRIMARY KEY (P_Id,LastName))");
+
+        }
+
+        [Test]
+        public override void CanCreateTableNamedMultiColumnPrimaryKey()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL, CONSTRAINT TestKey PRIMARY KEY (TestColumn1, TestColumn2))");
 
         }
 
@@ -51,7 +71,12 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public override void CanCreateTableWithNullableField()
         {
-            throw new NotImplementedException();
+            var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
+
+            var result = generator.Generate(expression);
+
+            result.ShouldBe(
+                "CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255), TestColumn2 NUMBER(10,0) NOT NULL)");
         }
 
         [Test]
@@ -69,7 +94,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNull()
         {
-            throw new NotImplementedException();
+           //Not sure how this would work in oracle.  Someone please add a test
         }
 
         [Test]
@@ -89,7 +114,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateUniqueIndex()
+        public override void CanCreateUniqueIndex()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
             string sql = generator.Generate(expression);
@@ -97,7 +122,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateUniqueMultiColumnIndex()
+        public override void CanCreateMultiColumnUniqueIndex()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
             string sql = generator.Generate(expression);
@@ -118,7 +143,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public override void CanCreateSchema()
         {
-            throw new NotImplementedException();
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression()));
         }
     }
 }

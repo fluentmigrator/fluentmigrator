@@ -54,6 +54,24 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         }
 
         [Test]
+        public override void CanCreateTableNamedPrimaryKey()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL, `TestColumn2` INTEGER NOT NULL, CONSTRAINT `TestKey` PRIMARY KEY (`TestColumn1`))");
+
+        }
+
+        [Test]
+        public override void CanCreateTableNamedMultiColumnPrimaryKey()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL, `TestColumn2` INTEGER NOT NULL, CONSTRAINT `TestKey` PRIMARY KEY (`TestColumn1`, `TestColumn2`))");
+
+        }
+
+        [Test]
         public override void CanCreateTableWithIdentity()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
@@ -119,7 +137,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         }
 
         [Test]
-        public void CanCreateUniqueMultiColumnIndex()
+        public override void CanCreateUniqueIndex()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
             var sql = generator.Generate(expression);
@@ -128,7 +146,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         }
 
         [Test]
-        public void CanCreateeUniqueMultiColumnIndex()
+        public override void CanCreateMultiColumnUniqueIndex()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
 
