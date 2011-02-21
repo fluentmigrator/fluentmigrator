@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetInsertDataExpression();
             string sql = generator.Generate(expression);
 
-            string expected = "INSERT INTO 'TestTable1' ('Id', 'Name', 'Website') VALUES (1, 'Jus''tin', 'codethinked.com');";
+            string expected = "INSERT INTO 'TestTable1' ('Id', 'Name', 'Website') VALUES (1, 'Just''in', 'codethinked.com');";
             expected += " INSERT INTO 'TestTable1' ('Id', 'Name', 'Website') VALUES (2, 'Nate', 'kohari.org');";
 
             sql.ShouldBe(expected);

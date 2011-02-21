@@ -86,7 +86,11 @@ namespace FluentMigrator.Runner.Generators.Generic
             return (name.StartsWith(OpenQuote) && name.EndsWith(CloseQuote));
         }
 
-        public bool ShouldQuote(string name)
+        public virtual string QuoteCommand(string command){
+            return command.Replace("\'","\'\'");
+        }
+
+        private bool ShouldQuote(string name)
         {
             return (!string.IsNullOrEmpty(OpenQuote) || !string.IsNullOrEmpty(CloseQuote)) && !string.IsNullOrEmpty(name);
         }
@@ -100,12 +104,19 @@ namespace FluentMigrator.Runner.Generators.Generic
             if (!ShouldQuote(name))
                 return name;
 
-            string quotedName = name.Replace(OpenQuote, OpenQuoteEscapeString);
-            //Check to see if we need to each closing quotes.
+            string quotedName = name;
+            if (!string.IsNullOrEmpty(OpenQuoteEscapeString))
+            {
+                quotedName = name.Replace(OpenQuote, OpenQuoteEscapeString);
+            }
+
             //If closing quote is the same as the opening quote then no need to escape again
             if (OpenQuote != CloseQuote)
             {
-                quotedName = quotedName.Replace(CloseQuote, CloseQuoteEscapeString);
+                if (!string.IsNullOrEmpty(CloseQuoteEscapeString))
+                {
+                    quotedName = quotedName.Replace(CloseQuote, CloseQuoteEscapeString);
+                }
             }
 
             return OpenQuote + quotedName + CloseQuote;

@@ -183,7 +183,6 @@
     <Compile Include="Unit\Generators\GenericGenerator\GenericGeneratorCreateTableTests.cs" />
     <Compile Include="Unit\Generators\GenericGenerator\GenericGeneratorImplementor.cs" />
     <Compile Include="Unit\Generators\GenericGenerator\GenericGeneratorTestBase.cs" />
-    <Compile Include="Unit\Generators\GenericGenerator\Quote_UnquoteTests.cs" />
     <Compile Include="Unit\Generators\Jet\JetAlterTableTests.cs" />
     <Compile Include="Unit\Generators\Jet\JetCreateTableTests.cs" />
     <Compile Include="Unit\Generators\Jet\JetDataTests.cs" />

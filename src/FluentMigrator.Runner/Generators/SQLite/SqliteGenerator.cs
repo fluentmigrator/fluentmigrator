@@ -32,7 +32,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
 	public class SqliteGenerator : GenericGenerator
 	{
 		public SqliteGenerator()
-			: base(new SqliteColumn(), new SQLiteQuoter())
+			: base(new SqliteColumn(), new SqliteQuoter())
 		{
 		}
 

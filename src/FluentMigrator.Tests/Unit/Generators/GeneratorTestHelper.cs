@@ -30,8 +30,8 @@ namespace FluentMigrator.Tests.Unit.Generators
         public static CreateTableExpression GetCreateTableWithDefaultValue()
         {
             CreateTableExpression expression = new CreateTableExpression() { TableName = TestTableName1, };
-            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, Type = DbType.String, DefaultValue = "Default" });
-            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, Type = DbType.Int32, DefaultValue = 0 });
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, Type = DbType.String, DefaultValue = "Default", TableName=TestTableName1 });
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, Type = DbType.Int32, DefaultValue = 0, TableName = TestTableName1 });
             return expression;
         }
 

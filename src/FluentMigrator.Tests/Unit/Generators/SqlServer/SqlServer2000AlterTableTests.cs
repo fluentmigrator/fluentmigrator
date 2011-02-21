@@ -47,7 +47,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
             var sql = generator.Generate(expression);
-            sql.ShouldBe("sp_rename '[TestTable1]', '[TestTable2]'");
+            sql.ShouldBe("sp_rename '[TestTable1]', 'TestTable2'");
         }
 
         [Test]
@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
             var sql = generator.Generate(expression);
-            sql.ShouldBe("sp_rename '[TestTable1].[TestColumn1]', '[TestColumn2]'");
+            sql.ShouldBe("sp_rename '[TestTable1].[TestColumn1]', 'TestColumn2'");
         }
 
         [Test]

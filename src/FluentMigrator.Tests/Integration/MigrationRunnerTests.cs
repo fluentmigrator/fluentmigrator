@@ -281,7 +281,7 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.VersionLoader.VersionInfo.HasAppliedMigration(2).ShouldBeTrue();
                     processor.TableExists("VersionedMigration").ShouldBeTrue();
-
+                   
                     runner.MigrateDown(1,DoNotUseAutomaticTransactionManagement);
 
                     runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();

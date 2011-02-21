@@ -11,5 +11,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string OpenQuote { get { return "["; } }
 
         public override string CloseQuote { get { return "]"; } }
+
+        public override string CloseQuoteEscapeString { get { return "]]"; } }
+
+        public override string OpenQuoteEscapeString { get { return string.Empty; } }
     }
 }

@@ -6,7 +6,7 @@ using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.SQLite
 {
-    public class SQLiteQuoter : GenericQuoter
+    public class SqliteQuoter : GenericQuoter
     {
         public override string OpenQuote { get { return "'"; } }
 

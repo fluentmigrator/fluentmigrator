@@ -13,5 +13,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
         public override string OpenQuote { get { return string.Empty; } }
 
         public override string CloseQuote { get { return string.Empty; } }
+
+        
     }
 }

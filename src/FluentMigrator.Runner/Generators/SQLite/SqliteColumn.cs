@@ -12,7 +12,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
 	{
         protected override bool ShouldSeperatePrimaryKeyAndIdentity { get { return false; } }
 
-		public SqliteColumn() : base(new SqliteTypeMap(), new SQLiteQuoter())
+		public SqliteColumn() : base(new SqliteTypeMap(), new SqliteQuoter())
 		{
 		}
 

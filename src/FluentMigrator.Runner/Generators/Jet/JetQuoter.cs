@@ -12,6 +12,9 @@ namespace FluentMigrator.Runner.Generators.Jet
 
         public override string CloseQuote { get { return "]"; } }
 
+        public override string CloseQuoteEscapeString { get { return "]]"; } }
+
+        public override string OpenQuoteEscapeString { get { return string.Empty; } }
 
 
     }

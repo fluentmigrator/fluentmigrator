@@ -14,5 +14,6 @@
         string QuoteTableName(string tableName);
         string QuoteIndexName(string indexName);
         string QuoteForSchemaName(string schemaName);
+        string QuoteCommand(string command);
 	}
 }
