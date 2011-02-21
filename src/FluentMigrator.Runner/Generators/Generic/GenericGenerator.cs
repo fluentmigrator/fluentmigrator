@@ -140,6 +140,10 @@ namespace FluentMigrator.Runner.Generators.Generic
                 throw new ArgumentException("Number of primary columns and secondary columns must be equal");
             }
 
+            string keyName = string.IsNullOrEmpty(expression.ForeignKey.Name) 
+                ? GenerateForeignKeyName(expression) 
+                : expression.ForeignKey.Name;
+
             List<string> primaryColumns = new List<string>();
             List<string> foreignColumns = new List<string>();
             foreach (var column in expression.ForeignKey.PrimaryColumns)
@@ -154,13 +158,18 @@ namespace FluentMigrator.Runner.Generators.Generic
             return string.Format(
                 CreateConstraint,
                 Quoter.QuoteTableName(expression.ForeignKey.ForeignTable),
-                Quoter.QuoteColumnName(expression.ForeignKey.Name),
+                Quoter.QuoteColumnName(keyName),
                 String.Join(", ",foreignColumns.ToArray()),
                 Quoter.QuoteTableName(expression.ForeignKey.PrimaryTable),
                 String.Join(", ",primaryColumns.ToArray()),
                 FormatCascade("DELETE", expression.ForeignKey.OnDelete),
                 FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)
                 );
+        }
+
+        public virtual string GenerateForeignKeyName(CreateForeignKeyExpression expression)
+        {
+            return string.Format("FK_{0}_{1}", expression.ForeignKey.PrimaryTable, expression.ForeignKey.ForeignTable);
         }
 
         public override string Generate(DeleteForeignKeyExpression expression){

@@ -74,7 +74,7 @@ namespace FluentMigrator.Runner.Generators.Base
 
         protected virtual string FormatPrimaryKey(ColumnDefinition column)
         {
-            //Most Generators allow for adding primary keys separtly
+            //Most Generators allow for adding primary keys as a constrint
             return string.Empty;
         }
 
@@ -141,8 +141,7 @@ namespace FluentMigrator.Runner.Generators.Base
           
            if(string.IsNullOrEmpty(primaryKeyName)){
                return string.Empty;
-              //primaryKeyName = string.Format("PK_{0}_{1}",tableName,String.Join("_", primaryKeyColumns.Select(x => x.Name).ToArray()));
-           }
+            }
 
            return string.Format("CONSTRAINT {0} ", Quoter.QuoteIndexName(primaryKeyName));
 		}
