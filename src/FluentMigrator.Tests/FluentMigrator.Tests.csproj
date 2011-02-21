@@ -176,7 +176,7 @@
     <Compile Include="Unit\Expressions\ExecuteEmbeddedSqlExpressionTests.cs" />
     <Compile Include="Unit\Expressions\ExecuteSqlScriptExpressionTests.cs" />
     <Compile Include="Unit\Expressions\ExecuteSqlStatementExpressionTests.cs" />
-    <Compile Include="Unit\Generators\GenericGenerator\QuoteValueTests.cs" />
+    <Compile Include="Unit\Generators\GenericGenerator\QuoterTests.cs" />
     <Compile Include="Unit\Generators\BaseDataTests.cs" />
     <Compile Include="Unit\Generators\GeneratorBaseTests.cs" />
     <Compile Include="Unit\Generators\GeneratorTestHelper.cs" />
