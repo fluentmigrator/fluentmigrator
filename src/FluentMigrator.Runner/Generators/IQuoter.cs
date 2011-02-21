@@ -13,7 +13,7 @@
         string QuoteColumnName(string columnName);
         string QuoteTableName(string tableName);
         string QuoteIndexName(string indexName);
-        string QuoteForSchemaName(string schemaName);
+        string QuoteSchemaName(string schemaName);
         string QuoteCommand(string command);
 	}
 }

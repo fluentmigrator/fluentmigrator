@@ -13,12 +13,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 
     public class SqlServer2005DropTableTests : GeneratorTestBase
     {
-        protected SqlServer2000Generator generator;
+        protected SqlServer2005Generator generator;
 
         [SetUp]
         public void Setup()
         {
-            generator = new SqlServer2000Generator();
+            generator = new SqlServer2005Generator();
 
 
         }
@@ -80,7 +80,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
 
             var sql = generator.Generate(expression);
-            sql.ShouldBe("DROP INDEX [dbo].[TestTable1].[TestIndex]");
+            sql.ShouldBe("DROP INDEX [TestIndex] ON [dbo].[TestTable1]");
         }
 
         [Test]
@@ -130,9 +130,9 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         public void CanDropTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
-
-            var sql = generator.Generate(expression);
             expression.SchemaName = "TestSchema";
+            var sql = generator.Generate(expression);
+           
             sql.ShouldBe("DROP TABLE [TestSchema].[TestTable1]");
         }
 
@@ -140,9 +140,10 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         public void CanDeleteIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
-            var sql = generator.Generate(expression);
             expression.Index.SchemaName = "TestSchema";
-            sql.ShouldBe("DROP INDEX [TestSchema].[TestTable1].[TestIndex]");
+            var sql = generator.Generate(expression);
+           
+            sql.ShouldBe("DROP INDEX [TestIndex] ON [TestSchema].[TestTable1]");
         }
 
 

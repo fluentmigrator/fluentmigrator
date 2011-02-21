@@ -10,12 +10,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 {
     public class SqlServer2005Data : GeneratorTestBase
     {
-        protected SqlServer2000Generator generator;
+        protected SqlServer2005Generator generator;
 
         [SetUp]
         public void Setup()
         {
-            generator = new SqlServer2000Generator();
+            generator = new SqlServer2005Generator();
 
 
         }

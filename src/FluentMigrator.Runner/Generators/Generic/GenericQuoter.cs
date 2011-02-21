@@ -151,7 +151,7 @@ namespace FluentMigrator.Runner.Generators.Generic
         /// <summary>
         /// Quotes a Schema Name
         /// </summary>
-        public virtual string QuoteForSchemaName(string schemaName)
+        public virtual string QuoteSchemaName(string schemaName)
         {
             return IsQuoted(schemaName) ? schemaName : Quote(schemaName);
         }

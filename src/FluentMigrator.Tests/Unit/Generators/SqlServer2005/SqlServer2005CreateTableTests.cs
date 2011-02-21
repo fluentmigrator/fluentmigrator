@@ -221,7 +221,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
             expression.Index.SchemaName = "TestSchema";
             var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE UNIQUE INDEX [TestSchema].[TestIndex] ON [TestTable1] ([TestColumn1] ASC)");
+            sql.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC)");
         }
 
         [Test]
@@ -330,6 +330,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         public   void CanCreateTableWithMultiColumnPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
+            expression.SchemaName = "TestSchema";
             var result = generator.Generate(expression);
             result.ShouldBe("CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1], [TestColumn2]))");
 
@@ -378,7 +379,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             expression.Columns[0].Type = DbType.DateTimeOffset;
             var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE [dbo].[TestTable1] ([TestColumn1] DATETIMEOFFSET NOT NULL)");
+                "CREATE TABLE [dbo].[TestTable1] ([TestColumn1] DATETIMEOFFSET NOT NULL, [TestColumn2] INT NOT NULL)");
         }
 
         [Test]
@@ -389,7 +390,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             expression.Columns[0].Type = DbType.DateTimeOffset;
             var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] DATETIMEOFFSET NOT NULL)");
+                "CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] DATETIMEOFFSET NOT NULL, [TestColumn2] INT NOT NULL)");
         }
     }
 }

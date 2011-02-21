@@ -41,6 +41,10 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
         }
 
+        public override string RenameTable { get { return "sp_rename '{0}', '{1}'"; } }
+
+        public override string RenameColumn { get { return "sp_rename '{0}.{1}', '{2}'"; } }
+
         public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
 
         public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
@@ -51,29 +55,14 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return column.Index.IsClustered ? "CLUSTERED " : string.Empty;
         }
 
-        public override string Generate(CreateSchemaExpression expression)
-        {
-            throw new DatabaseOperationNotSupportedExecption();
-        }
-
-        public override string Generate(DeleteSchemaExpression expression)
-        {
-            throw new DatabaseOperationNotSupportedExecption();
-        }
-
-        public override string Generate(AlterSchemaExpression expression)
-        {
-            throw new DatabaseOperationNotSupportedExecption();
-        }
-
         public override string Generate(RenameTableExpression expression)
         {
-            return String.Format("sp_rename '{0}', '{1}'", Quoter.QuoteTableName(Quoter.QuoteCommand(expression.OldName)),Quoter.QuoteCommand(expression.NewName));
+            return String.Format(RenameTable, Quoter.QuoteTableName(Quoter.QuoteCommand(expression.OldName)),Quoter.QuoteCommand(expression.NewName));
         }
 
         public override string Generate(RenameColumnExpression expression)
         {
-            return String.Format("sp_rename '{0}.{1}', '{2}'", Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(Quoter.QuoteCommand(expression.OldName)),Quoter.QuoteCommand(expression.NewName));
+            return String.Format(RenameColumn, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(Quoter.QuoteCommand(expression.OldName)),Quoter.QuoteCommand(expression.NewName));
         }
 
         public override string Generate(DeleteColumnExpression expression)

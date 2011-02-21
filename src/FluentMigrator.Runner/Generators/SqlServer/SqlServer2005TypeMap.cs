@@ -13,6 +13,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 			SetTypeMap(DbType.String, "NVARCHAR(MAX)", UnicodeTextCapacity);
 			SetTypeMap(DbType.AnsiString, "VARCHAR(MAX)", AnsiTextCapacity);
 			SetTypeMap(DbType.Binary, "VARBINARY(MAX)", ImageCapacity);
+            SetTypeMap(DbType.DateTimeOffset, "DATETIMEOFFSET");
 		}
 	}
 }

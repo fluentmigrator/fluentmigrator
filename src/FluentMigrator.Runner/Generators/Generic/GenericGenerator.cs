@@ -19,7 +19,6 @@ namespace FluentMigrator.Runner.Generators.Generic
         }
 
         public virtual string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
-        public virtual string AlterTable { get { return "ALTER TABLE "; } }
         public virtual string DropTable { get { return "DROP TABLE {0}"; } }
 
         public virtual string AddColumn { get { return "ALTER TABLE {0} ADD COLUMN {1}"; } }
@@ -29,8 +28,9 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public virtual string RenameTable { get { return "RENAME TABLE {0} TO {1}"; } }
 
-        public virtual string CreateSchema { get { return "create schema"; } }
-        public virtual string DropSchema { get { return "drop schema"; } }
+        public virtual string CreateSchema { get { return "CREATE SCHEMA {0}"; } }
+        public virtual string AlterSchema { get { return "ALTER SCHEMA {0} TRANSFER {1}.{2}"; } }
+        public virtual string DropSchema { get { return "DROP SCHEMA {0}"; } }
 
         public virtual string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3} ({4})"; } }
         public virtual string DropIndex { get { return "DROP INDEX {0}"; } }
@@ -119,7 +119,13 @@ namespace FluentMigrator.Runner.Generators.Generic
                     indexColumns[i] = Quoter.QuoteColumnName(columnDef.Name) + " DESC";
                 }
             }
-            return String.Format(CreateIndex, GetClusterTypeString(expression), GetUniqueString(expression), Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName), String.Join(", ", indexColumns));
+
+            return String.Format(CreateIndex
+                , GetClusterTypeString(expression)
+                , GetUniqueString(expression)
+                , Quoter.QuoteIndexName(expression.Index.Name)
+                , Quoter.QuoteTableName(expression.Index.TableName)
+                , String.Join(", ", indexColumns));
         }
 
         public override string Generate(DeleteIndexExpression expression)
