@@ -26,7 +26,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.MSBuild", "s
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "SchemaDump", "SchemaDump", "{61F1CBE8-A3C1-4153-84E3-4CA3E0E23ACD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.SchemaDump", "FluentMigrator.SchemaDump\FluentMigrator.SchemaDump.csproj", "{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.SchemaDump", "src\FluentMigrator.SchemaDump\FluentMigrator.SchemaDump.csproj", "{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
