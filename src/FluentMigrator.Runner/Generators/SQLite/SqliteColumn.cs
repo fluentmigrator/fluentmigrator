@@ -40,7 +40,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
         {
             if(!column.IsPrimaryKey) return string.Empty;
 
-            return column.IsIdentity ? "PRIMARY KEY AUTOINCREMENT" : "PRIMARY KEY";
+            return column.IsIdentity ? "PRIMARY KEY AUTOINCREMENT" : string.Empty;
         }
 
         protected override string FormatSystemMethods(SystemMethods systemMethod)

@@ -40,7 +40,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
             var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL PRIMARY KEY, 'TestColumn2' INTEGER NOT NULL)");
+            sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL, 'TestColumn2' INTEGER NOT NULL, PRIMARY KEY ('TestColumn1'))");
         }
 
         [Test]
