@@ -11,7 +11,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         public abstract void CanDropTable();
         public abstract void CanDeleteIndex();
 
-
+        public abstract void CanDeleteSchema();
         
         
 

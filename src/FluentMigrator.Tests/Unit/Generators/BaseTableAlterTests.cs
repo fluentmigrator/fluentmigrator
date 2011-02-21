@@ -17,6 +17,8 @@ namespace FluentMigrator.Tests.Unit.Generators
         public abstract void CanCreateForeignKey();
         public abstract void CanCreateMulitColumnForeignKey();
         public abstract void CanCreateAutoIncrementColumn();
+
+        public abstract void CanAlterSchema();
        
 
         

@@ -32,28 +32,21 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 		{
 		}
 
+        public override string DropIndex { get { return "DROP INDEX {0} ON {1}"; } }
+
 		public override string Generate(CreateSchemaExpression expression)
 		{
-			return String.Format("CREATE SCHEMA [{0}]", expression.SchemaName);
+			return String.Format("CREATE SCHEMA {0}", Quoter.QuoteForSchemaName(expression.SchemaName));
 		}
 
 		public override string Generate(DeleteSchemaExpression expression)
 		{
-			return String.Format("DROP SCHEMA [{0}]", expression.SchemaName);
+			return String.Format("DROP SCHEMA {0}", Quoter.QuoteForSchemaName(expression.SchemaName));
 		}
 
-    public override string Generate( AlterSchemaExpression expression )
-    {
-      return String.Format("ALTER SCHEMA [{0}] TRANSFER {1}[{2}]", expression.DestinationSchemaName, FormatSchema(expression.SourceSchemaName), expression.TableName );
-    }
-
-		protected override string FormatSchema(string schemaName, bool escapeSchemaName)
-		{
-			return string.Format(
-				escapeSchemaName
-					? "[{0}]."
-					: "{0}.",
-				schemaName ?? "dbo");
-		}
+        public override string Generate( AlterSchemaExpression expression )
+        {
+            return String.Format("ALTER SCHEMA {0} TRANSFER {1}{2}", Quoter.QuoteForSchemaName(expression.DestinationSchemaName), Quoter.QuoteForSchemaName(expression.SourceSchemaName), Quoter.QuoteTableName(expression.TableName));
+        }
 	}
 }

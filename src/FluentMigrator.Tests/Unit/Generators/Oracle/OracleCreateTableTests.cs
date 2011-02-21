@@ -5,6 +5,7 @@ using System.Text;
 using NUnit.Framework;
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Should;
+using FluentMigrator.Runner.Generators;
 
 namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {
@@ -44,11 +45,11 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public override void CanCreateTableWithIdentity()
         {
-            throw new NotImplementedException();
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(()=>generator.Generate(GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression()));
         }
 
         [Test]
-        public override void CanCreateTableWithNullField()
+        public override void CanCreateTableWithNullableField()
         {
             throw new NotImplementedException();
         }
@@ -76,26 +77,48 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
             string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE UNIQUE INDEX IX_TEST ON TestTable1 (TestColumn1 ASC,TestColumn2 DESC)");
+            sql.ShouldBe("CREATE INDEX TestIndex ON TestTable1 (TestColumn1 ASC)");
         }
 
         [Test]
         public override void CanCreateMultiColumnIndex()
         {
-            var expression = GeneratorTestHelper.GetMultiColumnCreateIndexExpression();
+            var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
             string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE UNIQUE INDEX IX_TEST ON TestTable1 (TestColumn1 ASC,TestColumn2 DESC)");
+            sql.ShouldBe("CREATE INDEX TestIndex ON TestTable1 (TestColumn1 ASC, TestColumn2 DESC)");
         }
 
         [Test]
-        public override void CanCreateTableWithMultipartKey()
+        public void CanCreateUniqueIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE UNIQUE INDEX TestIndex ON TestTable1 (TestColumn1 ASC)");
+        }
+
+        [Test]
+        public void CanCreateUniqueMultiColumnIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE UNIQUE INDEX TestIndex ON TestTable1 (TestColumn1 ASC, TestColumn2 DESC)");
+        }
+
+        [Test]
+        public override void CanCreateTableWithMultiColumnPrimaryKey()
         {
 
-            var expression = GeneratorTestHelper.GetCreateTableWithMultipartKeyExpression();
+            var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
                string sql = generator.Generate(expression);
             // See the note in OracleColumn about why the PK should not be named
-               sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL,  PRIMARY KEY (TestColumn1,TestColumn2))");
+               sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL, PRIMARY KEY (TestColumn1, TestColumn2))");
 
+        }
+
+        [Test]
+        public override void CanCreateSchema()
+        {
+            throw new NotImplementedException();
         }
     }
 }

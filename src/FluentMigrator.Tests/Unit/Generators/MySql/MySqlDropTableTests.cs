@@ -5,6 +5,8 @@ using System.Text;
 using NUnit.Framework;
 using FluentMigrator.Runner.Generators.MySql;
 using NUnit.Should;
+using FluentMigrator.Runner.Generators;
+using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Tests.Unit.Generators.MySql
 {
@@ -48,7 +50,12 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
             var sql = generator.Generate(expression);
-            sql.ShouldBe("DROP INDEX IX_TEST");
+            sql.ShouldBe("DROP INDEX `TestIndex`");
+        }
+
+        public override void CanDeleteSchema()
+        {
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new DeleteSchemaExpression()));
         }
     }
 }

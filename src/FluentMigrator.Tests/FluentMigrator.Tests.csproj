@@ -176,7 +176,7 @@
     <Compile Include="Unit\Expressions\ExecuteEmbeddedSqlExpressionTests.cs" />
     <Compile Include="Unit\Expressions\ExecuteSqlScriptExpressionTests.cs" />
     <Compile Include="Unit\Expressions\ExecuteSqlStatementExpressionTests.cs" />
-    <Compile Include="Unit\Generators\ConstantFormatterTests.cs" />
+    <Compile Include="Unit\Generators\GenericGenerator\QuoteValueTests.cs" />
     <Compile Include="Unit\Generators\BaseDataTests.cs" />
     <Compile Include="Unit\Generators\GeneratorBaseTests.cs" />
     <Compile Include="Unit\Generators\GeneratorTestHelper.cs" />
@@ -207,7 +207,6 @@
     <Compile Include="Unit\Generators\SqlServer\SqlServer2005GeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer\SqlServer2008GeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer\SqlServerCeGeneratorTests.cs" />
-    <Compile Include="Unit\Generators\SqlServer\SqlServerCreateTableTests.cs" />
     <Compile Include="Unit\Generators\BaseTableAlterTests.cs" />
     <Compile Include="Unit\Generators\BaseTableCreateTests.cs" />
     <Compile Include="Unit\Generators\BaseTableDropTests.cs" />

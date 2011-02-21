@@ -61,7 +61,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT FK_Test FOREIGN KEY (TestColumn1) REFERENCES TestPrimaryTable (TestColumn2)");
+            sql.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT FK_Test FOREIGN KEY (TestColumn1) REFERENCES TestTable2 (TestColumn2)");
 	
         }
 
@@ -70,12 +70,17 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT FK_Test FOREIGN KEY (TestColumn1,Column4) REFERENCES TestTable2 (Column2,Column4)");
+            sql.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT FK_Test FOREIGN KEY (TestColumn1, TestColumn3) REFERENCES TestTable2 (TestColumn2, TestColumn4)");
 	
         }
 
         [Test]
         public override void CanCreateAutoIncrementColumn()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void CanAlterSchema()
         {
             throw new NotImplementedException();
         }

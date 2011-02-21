@@ -9,6 +9,7 @@ namespace FluentMigrator.Tests.Unit.Generators
     using NUnit.Framework;
     using FluentMigrator.Runner.Generators.SqlServer;
     using NUnit.Should;
+    using FluentMigrator.Runner.Generators;
 
     public class SqlServerCeGeneratorTests : GeneratorTestBase
     {
@@ -22,43 +23,30 @@ namespace FluentMigrator.Tests.Unit.Generators
         }
 
         [Test]
-        public void DoesNotImplementASchema()
-        {
-            var expression = GeneratorTestHelper.GetCreateTableExpression();
-            expression.Columns[0].Type = DbType.String;
-            expression.Columns[0].Size = 100;
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(100) NOT NULL)");
-        }
-
-        [Test]
-        [ExpectedException(typeof(NotImplementedException))]
         public void CannotCreateASchema()
         {
-            var sql = generator.Generate(new CreateSchemaExpression());
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
         }
 
         [Test]
-        [ExpectedException(typeof(NotImplementedException))]
         public void CannotAlterASchema()
         {
-            var sql = generator.Generate(new AlterSchemaExpression());
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new AlterSchemaExpression()));
         }
 
         [Test]
-        [ExpectedException(typeof(NotImplementedException))]
         public void CannotDeleteASchema()
         {
-            var sql = generator.Generate(new DeleteSchemaExpression());
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new DeleteSchemaExpression()));
         }
 
         [Test]
         public void CreatesTheCorrectSyntaxToDropAnIndex()
         {
-            var expression = new DeleteIndexExpression();
-            expression.Index = new IndexDefinition() {Name = "MyColumn", TableName = "MyTable"};
+            var expression = GeneratorTestHelper.GetDeleteIndexExpression();
             var sql = generator.Generate(expression);
-            sql.ShouldBe("DROP INDEX [MyTable].[MyColumn]");
+
+            sql.ShouldBe("DROP INDEX [TestTable1].[TestIndex]");
         }
     }
 }

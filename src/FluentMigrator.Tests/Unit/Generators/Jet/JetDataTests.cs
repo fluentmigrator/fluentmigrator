@@ -8,12 +8,12 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
 {
     public class JetDataTests : BaseDataTests
     {
-        protected JetGenerator SUT;
+        protected JetGenerator generator;
 
         [SetUp]
         public void Setup()
         {
-            SUT = new JetGenerator();
+            generator = new JetGenerator();
         }
 
         [Test]
@@ -21,10 +21,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
 
-            var sql = SUT.Generate(expression);
+            var sql = generator.Generate(expression);
 
-            var expected = "INSERT INTO [TestTable1] ([Id],[Name],[Website]) VALUES (1,'Just''in','codethinked.com');";
-            expected += @"INSERT INTO [TestTable1] ([Id],[Name],[Website]) VALUES (2,'Na\te','kohari.org');";
+            var expected = "INSERT INTO [TestTable1] ([Id], [Name], [Website]) VALUES (1, 'Just''in', 'codethinked.com');";
+            expected += @" INSERT INTO [TestTable1] ([Id], [Name], [Website]) VALUES (2, 'Na\te', 'kohari.org')";
 
             sql.ShouldBe(expected);
         }
@@ -34,9 +34,9 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
 
-            var sql = SUT.Generate(expression);
+            var sql = generator.Generate(expression);
 
-            sql.ShouldBe("DELETE FROM [TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL;");
+            sql.ShouldBe("DELETE FROM [TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL");
         }
 
         [Test]
@@ -45,9 +45,9 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
 
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
 
-            var sql = SUT.Generate(expression);
+            var sql = generator.Generate(expression);
 
-            var expected = String.Format("INSERT INTO [TestTable1] ([guid]) VALUES ('{0}');", GeneratorTestHelper.TestGuid.ToString());
+            var expected = String.Format("INSERT INTO [TestTable1] ([guid]) VALUES ('{0}')", GeneratorTestHelper.TestGuid.ToString());
 
             sql.ShouldBe(expected);
         }
@@ -57,7 +57,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
 
-            var sql = SUT.Generate(expression);
+            var sql = generator.Generate(expression);
             sql.ShouldBe("UPDATE [TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL");
         }
     }

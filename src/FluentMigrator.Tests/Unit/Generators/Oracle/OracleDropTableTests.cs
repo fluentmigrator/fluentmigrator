@@ -47,7 +47,12 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
             string sql = generator.Generate(expression);
-            sql.ShouldBe("DROP INDEX IX_TEST");
+            sql.ShouldBe("DROP INDEX TestIndex");
+        }
+
+        public override void CanDeleteSchema()
+        {
+            throw new NotImplementedException();
         }
     }
 }

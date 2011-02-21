@@ -5,10 +5,11 @@ namespace FluentMigrator.Runner.Generators.Oracle
     using System.Collections.Generic;
     using FluentMigrator.Model;
     using FluentMigrator.Runner.Generators.Base;
+    using FluentMigrator.Runner.Generators.Generic;
 
 	internal class OracleColumn : ColumnBase
 	{
-		public OracleColumn() : base(new OracleTypeMap(), new ConstantFormatter())
+		public OracleColumn() : base(new OracleTypeMap(), new OracleQuoter())
 		{
 			int a = ClauseOrder.IndexOf(FormatDefaultValue);
 			int b = ClauseOrder.IndexOf(FormatNullable);
@@ -30,10 +31,10 @@ namespace FluentMigrator.Runner.Generators.Oracle
 			return string.Empty;
 		}
 
-		protected override string FormatPrimaryKey(ColumnDefinition column)
-		{
-			return column.IsPrimaryKey ? "PRIMARY KEY" : string.Empty;
-		}
+        //protected override string FormatPrimaryKey(ColumnDefinition column)
+        //{
+        //    return column.IsPrimaryKey ? "PRIMARY KEY" : string.Empty;
+        //}
 
         protected override string FormatSystemMethods(SystemMethods systemMethod)
         {
@@ -55,7 +56,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
 		/// <param name="primaryKeyColumns"></param>
 		/// <param name="tableName"></param>
 		/// <returns></returns>
-		protected override string GetPrimaryKeyConstraintName(IList<ColumnDefinition> primaryKeyColumns, string tableName)
+        protected override string GetPrimaryKeyConstraintName(IEnumerable<ColumnDefinition> primaryKeyColumns, string tableName)
 		{
 			return string.Empty;
 		}

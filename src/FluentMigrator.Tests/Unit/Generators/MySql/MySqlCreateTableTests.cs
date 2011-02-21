@@ -5,6 +5,8 @@ using System.Text;
 using NUnit.Framework;
 using FluentMigrator.Runner.Generators.MySql;
 using NUnit.Should;
+using FluentMigrator.Runner.Generators;
+using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Tests.Unit.Generators.MySql
 {
@@ -36,7 +38,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             expression.Columns[1].CustomType = "[timestamp]";
             var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL , PRIMARY KEY (`TestColumn1`), `TestColumn2` [timestamp] NOT NULL) ENGINE = INNODB");
+                "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL, `TestColumn2` [timestamp] NOT NULL, PRIMARY KEY (`TestColumn1`)) ENGINE = INNODB");
 
         }
 
@@ -47,23 +49,23 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
 
             var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL , PRIMARY KEY (`TestColumn1`), `TestColumn2` INTEGER NOT NULL) ENGINE = INNODB");
+                "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL, `TestColumn2` INTEGER NOT NULL, PRIMARY KEY (`TestColumn1`)) ENGINE = INNODB");
 
         }
 
         [Test]
         public override void CanCreateTableWithIdentity()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithGetAutoIncrementExpression();
+            var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
 
             var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL AUTO_INCREMENT, `TestColumn2` INTEGER NOT NULL) ENGINE = INNODB");
+                "CREATE TABLE `TestTable1` (`TestColumn1` INTEGER NOT NULL AUTO_INCREMENT, `TestColumn2` INTEGER NOT NULL) ENGINE = INNODB");
  
         }
 
         [Test]
-        public override void CanCreateTableWithNullField()
+        public override void CanCreateTableWithNullableField()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.Columns[0].IsNullable = true;
@@ -87,7 +89,14 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         [Test]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNull()
         {
-            throw new NotImplementedException();
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
+            expression.Columns[0].DefaultValue = null;
+
+            var result = generator.Generate(expression);
+
+            result.ShouldBe(
+                "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL DEFAULT NULL, `TestColumn2` INTEGER NOT NULL DEFAULT 0) ENGINE = INNODB");
+ 
         }
 
         [Test]
@@ -95,24 +104,55 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
                    var sql = generator.Generate(expression);
-                   sql.ShouldBe("CREATE UNIQUE INDEX IX_TEST ON `TestTable1` (`TestColumn1` ASC)");
+                   sql.ShouldBe("CREATE INDEX `TestIndex` ON `TestTable1` (`TestColumn1` ASC)");
 
         }
 
         [Test]
         public override void CanCreateMultiColumnIndex()
         {
-            var expression = GeneratorTestHelper.GetMultiColumnCreateIndexExpression();
+            var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
           
             var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE UNIQUE INDEX IX_TEST ON `TestTable1` (`TestColumn1` ASC,`TestColumn1` DESC)");
+            sql.ShouldBe("CREATE INDEX `TestIndex` ON `TestTable1` (`TestColumn1` ASC, `TestColumn2` DESC)");
 
         }
 
         [Test]
-        public override void CanCreateTableWithMultipartKey()
+        public void CanCreateUniqueMultiColumnIndex()
         {
-            throw new NotImplementedException();
+            var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE UNIQUE INDEX `TestIndex` ON `TestTable1` (`TestColumn1` ASC)");
+
+        }
+
+        [Test]
+        public void CanCreateeUniqueMultiColumnIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
+
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE UNIQUE INDEX `TestIndex` ON `TestTable1` (`TestColumn1` ASC, `TestColumn2` DESC)");
+
+        }
+
+        [Test]
+        public override void CanCreateTableWithMultiColumnPrimaryKey()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
+
+            var result = generator.Generate(expression);
+
+            result.ShouldBe(
+                "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL, `TestColumn2` INTEGER NOT NULL, PRIMARY KEY (`TestColumn1`, `TestColumn2`)) ENGINE = INNODB");
+     
+        }
+
+        [Test]
+        public override void CanCreateSchema()
+        {
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
         }
     }
 }

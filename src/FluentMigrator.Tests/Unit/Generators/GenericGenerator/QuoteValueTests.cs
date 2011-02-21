@@ -3,59 +3,60 @@ using FluentMigrator.Runner.Generators;
 using NUnit.Framework;
 using NUnit.Should;
 using FluentMigrator.Runner.Generators.Base;
+using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {
 	[TestFixture]
 	public class ConstantFormatterTests
 	{
-		private ConstantFormatter formatter;
+		private IQuoter formatter;
 
 		[SetUp]
 		public void SetUp()
 		{
-			formatter = new ConstantFormatter();
+			formatter = new GenericQuoter();
 		}
 
 		[Test]
 		public void NullIsFormattedAsLiteral()
 		{
-			formatter.Format(null)
+			formatter.QuoteValue(null)
 				.ShouldBe("NULL");
 		}
 
 		[Test]
 		public void StringIsFormattedWithQuotes()
 		{
-			formatter.Format("value")
+            formatter.QuoteValue("value")
 				.ShouldBe("'value'");
 		}
 
 		[Test]
 		public void StringWithQuoteIsFormattedWithDoubleQuote()
 		{
-			formatter.Format("val'ue")
+            formatter.QuoteValue("val'ue")
 				.ShouldBe("'val''ue'");
 		}
 
 		[Test]
 		public void CharIsFormattedWithQuotes()
 		{
-			formatter.Format('A')
+            formatter.QuoteValue('A')
 				.ShouldBe("'A'");
 		}
 
 		[Test]
 		public void TrueIsFormattedAsOne()
 		{
-			formatter.Format(true)
+            formatter.QuoteValue(true)
 				.ShouldBe("1");
 		}
 
 		[Test]
 		public void FalseIsFormattedAsZero()
 		{
-			formatter.Format(false)
+            formatter.QuoteValue(false)
 				.ShouldBe("0");
 		}
 
@@ -63,7 +64,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		public void GuidIsFormattedWithQuotes()
 		{
 			Guid guid = new Guid("00000000-0000-0000-0000-000000000000");
-			formatter.Format(guid)
+            formatter.QuoteValue(guid)
 				.ShouldBe("'00000000-0000-0000-0000-000000000000'");
 		}
 
@@ -71,28 +72,28 @@ namespace FluentMigrator.Tests.Unit.Generators
 		public void DateTimeIsFormattedIso8601WithQuotes()
 		{
 			DateTime date = new DateTime(2010,1,2,18,4,5,123);
-			formatter.Format(date)
+            formatter.QuoteValue(date)
 				.ShouldBe("'2010-01-02T18:04:05'");
 		}
 
 		[Test]
 		public void Int32IsBare()
 		{
-			formatter.Format(1234)
+            formatter.QuoteValue(1234)
 				.ShouldBe("1234");
 		}
 
 		[Test]
 		public void CustomTypeIsBare()
 		{
-			formatter.Format(new CustomClass())
+            formatter.QuoteValue(new CustomClass())
 				.ShouldBe("CustomClass");
 		}
 
 	    [Test]
 	    public void EnumIsFormattedAsString()
 	    {
-	        formatter.Format(Foo.Bar)
+            formatter.QuoteValue(Foo.Bar)
                 .ShouldBe("'Bar'");
 	    }
 

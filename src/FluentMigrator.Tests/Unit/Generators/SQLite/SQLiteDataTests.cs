@@ -25,8 +25,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetInsertDataExpression();
             string sql = generator.Generate(expression);
 
-            string expected = "INSERT INTO [TestTable] (Id,Name,Website) VALUES (1,'Justin','codethinked.com');";
-            expected += "INSERT INTO [TestTable] (Id,Name,Website) VALUES (2,'Nate','kohari.org');";
+            string expected = "INSERT INTO 'TestTable1' ('Id', 'Name', 'Website') VALUES (1, 'Jus''tin', 'codethinked.com');";
+            expected += " INSERT INTO 'TestTable1' ('Id', 'Name', 'Website') VALUES (2, 'Nate', 'kohari.org');";
 
             sql.ShouldBe(expected);
         }
@@ -34,19 +34,32 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         [Test]
         public override void CanDeleteData()
         {
-            throw new NotImplementedException();
+            var expression = GeneratorTestHelper.GetDeleteDataExpression();
+
+            var sql = generator.Generate(expression);
+
+            sql.ShouldBe("DELETE FROM 'TestTable1' WHERE 'Name' = 'Just''in' AND 'Website' IS NULL");
         }
 
         [Test]
         public override void CanInsertGuidData()
         {
-            throw new NotImplementedException();
+            var expression = GeneratorTestHelper.GetInsertGUIDExpression();
+
+            var sql = generator.Generate(expression);
+
+            var expected = String.Format("INSERT INTO 'TestTable1' ('guid') VALUES ('{0}')", GeneratorTestHelper.TestGuid.ToString());
+
+            sql.ShouldBe(expected);
         }
 
         [Test]
         public override void CanUpdateData()
         {
-            throw new NotImplementedException();
+            var expression = GeneratorTestHelper.GetUpdateDataExpression();
+
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("UPDATE 'TestTable1' SET 'Name' = 'Just''in', 'Age' = 25 WHERE 'Id' = 9 AND 'Homepage' IS NULL");
         }
     }
 }

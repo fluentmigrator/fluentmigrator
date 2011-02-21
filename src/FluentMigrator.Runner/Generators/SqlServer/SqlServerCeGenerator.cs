@@ -32,45 +32,41 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
         }
 
+        //I think that this would be better inheriting form the SqlServer 2000 Generator.  It seems to match it better
+
+
+
         public override string Generate(RenameTableExpression expression)
         {
-            return String.Format("sp_rename '{0}[{1}]', '{2}'", FormatSchema(expression.SchemaName), expression.OldName, FormatSqlEscape(expression.NewName));
+            return String.Format("sp_rename '{1}', '{2}'", Quoter.QuoteTableName(expression.OldName), Quoter.QuoteTableName(expression.NewName));
         }
 
+        //All Schema method throw by default as only Sql server 2005 and up supports them.
         public override string Generate(CreateSchemaExpression expression)
         {
-            throw new NotImplementedException();
+            throw new DatabaseOperationNotSupportedExecption();
         }
 
         public override string Generate(DeleteSchemaExpression expression)
         {
-            throw new NotImplementedException();
+            throw new DatabaseOperationNotSupportedExecption();
         }
 
         public override string Generate(AlterSchemaExpression expression)
         {
-            throw new NotImplementedException();
-        }
-
-        protected override string FormatSchema(string schemaName, bool escapeSchemaName)
-        {
-            // schemas are not supported in CE
-            return string.Empty;
+            throw new DatabaseOperationNotSupportedExecption();
         }
 
         public override string Generate(DeleteColumnExpression expression)
         {
             // Limited functionality in CE, for now will just drop the column.. no DECLARE support!
-            const string sql = @"
-			-- now we can finally drop column
-			ALTER TABLE {0}[{2}] DROP COLUMN [{3}];";
-
-            return String.Format(sql, FormatSchema(expression.SchemaName), FormatSchema(expression.SchemaName, false), expression.TableName, expression.ColumnName);
+            const string sql = @"ALTER TABLE {0} DROP COLUMN {1};";
+            return String.Format(sql, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.ColumnName));
         }
 
         public override string Generate(DeleteIndexExpression expression)
         {
-            return String.Format("DROP INDEX [{0}].[{1}]", expression.Index.TableName, expression.Index.Name);
+            return String.Format("DROP INDEX {0}.{1}", Quoter.QuoteTableName(expression.Index.TableName), Quoter.QuoteIndexName(expression.Index.Name));
         }
     }
 }

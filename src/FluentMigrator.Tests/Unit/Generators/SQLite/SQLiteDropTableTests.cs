@@ -6,6 +6,7 @@ using NUnit.Framework;
 using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.Runner.Generators;
 using NUnit.Should;
+using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Tests.Unit.Generators.SQLite
 {
@@ -24,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [TestTable1] DROP COLUMN [TestColumn1]");
+            sql.ShouldBe("ALTER TABLE 'TestTable1' DROP COLUMN 'TestColumn1'");
 
         }
 
@@ -40,7 +41,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
             string sql = generator.Generate(expression);
-            sql.ShouldBe("DROP TABLE [TestTable1]");
+            sql.ShouldBe("DROP TABLE 'TestTable1'");
         }
 
         [Test]
@@ -48,7 +49,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
             string sql = generator.Generate(expression);
-            sql.ShouldBe("DROP INDEX IF EXISTS [TestIndex]");
+            sql.ShouldBe("DROP INDEX 'TestIndex'");
+        }
+
+        public override void CanDeleteSchema()
+        {
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new DeleteSchemaExpression()));
         }
     }
 }

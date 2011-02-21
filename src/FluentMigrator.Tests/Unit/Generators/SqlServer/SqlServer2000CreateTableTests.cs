@@ -5,6 +5,8 @@ using System.Text;
 using NUnit.Framework;
 using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Should;
+using FluentMigrator.Runner.Generators;
+using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 {
@@ -20,12 +22,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 
         }
 
-        [Test]
+        [Test] 
         public override void CanCreateTable()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL, ColumnName2 INT NOT NULL)");
+            sql.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL)");
         }
 
         [Test]
@@ -38,7 +40,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 
             var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL PRIMARY KEY CLUSTERED, ColumnName2 [timestamp] NOT NULL)");
+                "CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] [timestamp] NOT NULL, PRIMARY KEY ([TestColumn1]))");
         }
 
         [Test]
@@ -47,25 +49,26 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
             var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL PRIMARY KEY CLUSTERED, ColumnName2 INT NOT NULL)");
+                "CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1]))");
         }
 
         [Test]
         public override void CanCreateTableWithIdentity()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithGetAutoIncrementExpression();
+            var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
             var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL IDENTITY(1,1), ColumnName2 INT NOT NULL)");
+                "CREATE TABLE [TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(1,1), [TestColumn2] INT NOT NULL)");
         }
 
         [Test]
-        public override void CanCreateTableWithNullField()
+        public override void CanCreateTableWithNullableField()
         {
-            //var expression = G
-            //var sql = generator.Generate(expression);
-            //sql.ShouldBe(
-            //    "CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255), ColumnName2 INT NOT NULL)");
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.Columns[0].IsNullable = true;
+            var sql = generator.Generate(expression);
+            sql.ShouldBe(
+                "CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255), [TestColumn2] INT NOT NULL)");
         }
 
         [Test]
@@ -74,14 +77,19 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
             var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE [NewTable] (ColumnName1 NVARCHAR(255) NOT NULL CONSTRAINT DF_NewTable_ColumnName1 DEFAULT 'Default', ColumnName2 INT NOT NULL CONSTRAINT DF_NewTable_ColumnName2 DEFAULT 0)");
+                "CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT DF_TestTable1_TestColumn1 DEFAULT 'Default', [TestColumn2] INT NOT NULL CONSTRAINT DF_NewTable_ColumnName2 DEFAULT 0)");
   
         }
 
         [Test]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNull()
         {
-            throw new NotImplementedException();
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.Columns[0].DefaultValue = null;
+            var sql = generator.Generate(expression);
+            sql.ShouldBe(
+                "CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT DF_TestTable1_TestColumn1 DEFAULT NULL, [TestColumn2] INT NOT NULL)");
+
         }
 
         [Test]
@@ -89,19 +97,82 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
             var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE UNIQUE CLUSTERED INDEX [IX_TEST] ON [TEST_TABLE] ([Column1] ASC,[Column2] DESC)");
+            sql.ShouldBe("CREATE INDEX [TestIndex] ON [TestTable1] ([TestColumn1] ASC)");
         }
 
         [Test]
         public override void CanCreateMultiColumnIndex()
         {
-            throw new NotImplementedException();
+            var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE INDEX [TestIndex] ON [TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
         }
 
         [Test]
-        public override void CanCreateTableWithMultipartKey()
+        public  void CanCreateUniqueIndex()
         {
-            throw new NotImplementedException();
+            var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [TestTable1] ([TestColumn1] ASC)");
+        }
+
+        [Test]
+        public void CanCreatUniqueMultiColumnIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
+        }
+
+        [Test]
+        public void CanCreateClusteredIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateIndexExpression();
+            expression.Index.IsClustered = true;
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE CLUSTERED INDEX [TestIndex] ON [TestTable1] ([TestColumn1] ASC)");
+        }
+
+        [Test]
+        public void CanCreateClusteredMultiColumnIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
+            expression.Index.IsClustered = true;
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE CLUSTERED INDEX [TestIndex] ON [TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
+        }
+
+        [Test]
+        public void CanCreateClusteredUniqueIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
+            expression.Index.IsClustered = true;
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE CLUSTERED UNIQUE INDEX [TestIndex] ON [TestTable1] ([TestColumn1] ASC)");
+        }
+
+        [Test]
+        public void CanCreatClusteredUniqueMultiColumnIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
+            expression.Index.IsClustered = true;
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE CLUSTERED UNIQUE INDEX [TestIndex] ON [TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
+        }
+
+        [Test]
+        public override void CanCreateTableWithMultiColumnPrimaryKey()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
+            var result = generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1], [TestColumn2]))");
+   
+        }
+
+        [Test]
+        public override void CanCreateSchema()
+        {
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
         }
     }
 }

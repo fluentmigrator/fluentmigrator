@@ -5,10 +5,12 @@ using System.Text;
 using NUnit.Framework;
 using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Should;
+using FluentMigrator.Runner.Generators;
+using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 {
-    
+
     public class SqlServer2000DropTableTests : BaseTableDropTests
     {
         protected SqlServer2000Generator generator;
@@ -24,6 +26,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         [Test]
         public override void CanDropColumn()
         {
+            //This does not work if it is a primary key
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
             var sql = generator.Generate(expression);
 
@@ -32,23 +35,23 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 			DECLARE @default sysname, @sql nvarchar(max);
 
 			-- get name of default constraint
-			SELECT @default = name 
+			SELECT @default = name
 			FROM sys.default_constraints 
-			WHERE parent_object_id = object_id('NewTable')
+			WHERE parent_object_id = object_id('[TestTable1]')
 			AND type = 'D'
 			AND parent_column_id = (
 				SELECT column_id 
 				FROM sys.columns 
-				WHERE object_id = object_id('NewTable')
-				AND name = 'NewColumn'
+				WHERE object_id = object_id('[TestTable1]')
+				AND name = '[TestColumn1]'
 			);
 
 			-- create alter table command as string and run it
-			SET @sql = N'ALTER TABLE [NewTable] DROP CONSTRAINT ' + @default;
+			SET @sql = N'ALTER TABLE [TestTable1] DROP CONSTRAINT ' + @default;
 			EXEC sp_executesql @sql;
 
 			-- now we can finally drop column
-			ALTER TABLE [NewTable] DROP COLUMN [NewColumn];";
+			ALTER TABLE [TestTable1] DROP COLUMN [TestColumn1];";
 
             sql.ShouldBe(expectedSql);
         }
@@ -58,21 +61,31 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
             var sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [TestPrimaryTable] DROP CONSTRAINT FK_Test");
+            sql.ShouldBe("ALTER TABLE [TestTable1] DROP CONSTRAINT [FK_Test]");
         }
 
         [Test]
         public override void CanDropTable()
         {
-            throw new NotImplementedException();
+            var expression = GeneratorTestHelper.GetDeleteTableExpression();
+
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("DROP TABLE [TestTable1]");
         }
 
         [Test]
         public override void CanDeleteIndex()
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
+
             var sql = generator.Generate(expression);
-            sql.ShouldBe("DROP INDEX [IX_TEST] ON [TEST_TABLE]");
+            sql.ShouldBe("DROP INDEX [TestTable1].[TestIndex]");
+        }
+
+        [Test]
+        public override void CanDeleteSchema()
+        {
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new DeleteSchemaExpression()));
         }
     }
 }

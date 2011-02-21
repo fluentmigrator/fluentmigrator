@@ -6,6 +6,7 @@ using NUnit.Framework;
 using NUnit.Should;
 using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Tests.Unit.Generators.SQLite
 {
@@ -25,7 +26,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [TestTable1] ADD COLUMN [TestColumn1] TEXT NOT NULL");
+            sql.ShouldBe("ALTER TABLE 'TestTable1' ADD COLUMN 'TestColumn1' TEXT NOT NULL");
 	
         }
 
@@ -34,13 +35,13 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [TestTable1] ADD COLUMN [TestColumn1] NUMERIC NOT NULL");
+            sql.ShouldBe("ALTER TABLE 'TestTable1' ADD COLUMN 'TestColumn1' NUMERIC NOT NULL");
         }
 
         [Test]
         public override void CanRenameColumn()
         {
-            throw new NotImplementedException();
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(GeneratorTestHelper.GetRenameColumnExpression()));
         }
 
         [Test]
@@ -48,7 +49,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [TestTable1] RENAME TO [TestTable2]");
+            sql.ShouldBe("ALTER TABLE 'TestTable1' RENAME TO 'TestTable2'");
 	
         }
 
@@ -62,8 +63,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         [Test]
         public override void CanCreateForeignKey()
         {
-            var expresion = GeneratorTestHelper.GetCreateForeignKeyExpression();
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(expresion));
+            throw new NotImplementedException();
         }
 
         [Test]
@@ -75,10 +75,18 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         [Test]
         public override void CanCreateAutoIncrementColumn()
         {
-            var expression = GeneratorTestHelper.GetCreateAutoIncrementColumnExpression();
+            var expression = GeneratorTestHelper.GetAlterTableAutoIncrementColumnExpression();
+            expression.Column.IsPrimaryKey = true;
+
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [TestTable1] ADD COLUMN [TestColumn1] INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT");
+            sql.ShouldBe("ALTER TABLE 'TestTable1' ADD COLUMN 'TestColumn1' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT");
     
+        }
+
+        [Test]
+        public override void CanAlterSchema()
+        {
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new AlterSchemaExpression()));
         }
     }
 }

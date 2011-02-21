@@ -6,15 +6,17 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
     using NUnit.Should;
     using NUnit.Framework;
     using FluentMigrator.Runner.Generators.Jet;
+    using FluentMigrator.Runner.Generators;
+    using FluentMigrator.Expressions;
 
     public class JetCreateTableTests : BaseTableCreateTests
     {
-        protected JetGenerator SUT;
+        protected JetGenerator generator;
 
         [SetUp]
         public void SetUp()
         {
-            SUT = new JetGenerator();
+            generator = new JetGenerator();
         }
 
         [Test]
@@ -22,22 +24,21 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
 
-            var result = SUT.Generate(expression);
+            var result = generator.Generate(expression);
 
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL, [ColumnName2] INTEGER NOT NULL)");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL, [TestColumn2] INTEGER NOT NULL)");
         }
 
         [Test]
         public override void CanCreateTableWithCustomColumnType()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
-            expression.Columns[0].IsPrimaryKey = true;
             expression.Columns[1].Type = null;
             expression.Columns[1].CustomType = "[timestamp]";
 
-            var restul = SUT.Generate(expression);
+            var restul = generator.Generate(expression);
 
-            restul.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL PRIMARY KEY, [ColumnName2] INTEGER NOT NULL)");
+            restul.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL, [TestColumn2] [timestamp] NOT NULL)");
         }
 
         [Test]
@@ -45,30 +46,37 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
 
-            var result = SUT.Generate(expression);
+            var result = generator.Generate(expression);
 
             result.ShouldBe(
-                "CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL PRIMARY KEY, [TestColumn2] INTEGER NOT NULL)");
+                "CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL, [TestColumn2] INTEGER NOT NULL, PRIMARY KEY ([TestColumn1]))");
      
+        }
+
+        [Test]
+        public override void CanCreateTableWithMultiColumnPrimaryKey()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
+            var result = generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL, [TestColumn2] INTEGER NOT NULL, PRIMARY KEY ([TestColumn1], [TestColumn2]))");
         }
 
         [Test]
         public override void CanCreateTableWithIdentity()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithGetAutoIncrementExpression();
-            var result = SUT.Generate(expression);
+            var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
+            var result = generator.Generate(expression);
 
             result.ShouldBe(
                 "CREATE TABLE [TestTable1] ([TestColumn1] COUNTER NOT NULL, [TestColumn2] INTEGER NOT NULL)");
         }
 
         [Test]
-        public override void CanCreateTableWithNullField()
+        public override void CanCreateTableWithNullableField()
         {
-            var expression = GeneratorTestHelper.GetCreateTableExpression();
-            expression.Columns[0].IsNullable = true;
-
-            var result = SUT.Generate(expression);
+            var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
+   
+            var result = generator.Generate(expression);
 
             result.ShouldBe(
                 "CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255), [TestColumn2] INTEGER NOT NULL)");
@@ -77,11 +85,9 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         [Test]
         public override void CanCreateTableWithDefaultValue()
         {
-            var expression = GeneratorTestHelper.GetCreateTableExpression();
-            expression.Columns[0].DefaultValue = "Default";
-            expression.Columns[1].DefaultValue = 0;
-
-            var result = SUT.Generate(expression);
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
+            
+            var result = generator.Generate(expression);
 
             result.ShouldBe(
                 "CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL DEFAULT 'Default', [TestColumn2] INTEGER NOT NULL DEFAULT 0)");
@@ -91,13 +97,13 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         [Test]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNull()
         {
-            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
             expression.Columns[0].DefaultValue = null;
 
-            var result = SUT.Generate(expression);
+            var result = generator.Generate(expression);
 
             result.ShouldBe(
-                "CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL DEFAULT NULL, [TestColumnName2] INTEGER NOT NULL)");
+                "CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL DEFAULT NULL, [TestColumn2] INTEGER NOT NULL DEFAULT 0)");
         }
 
         [Test]
@@ -105,26 +111,47 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
 
-            var sql = SUT.Generate(expression);
+            var sql = generator.Generate(expression);
 
-            sql.ShouldBe("CREATE UNIQUE INDEX IX_TEST ON [TestTable1] ([TestColumn1] ASC)");
+            sql.ShouldBe("CREATE INDEX [TestIndex] ON [TestTable1] ([TestColumn1] ASC)");
         }
 
         [Test]
         public override void CanCreateMultiColumnIndex()
         {
-            var expression = GeneratorTestHelper.GetMultiColumnCreateIndexExpression();
+            var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
 
-            var sql = SUT.Generate(expression);
+            var sql = generator.Generate(expression);
 
-            sql.ShouldBe("CREATE UNIQUE INDEX IX_TEST ON [TestTable1] ([TestColumn1] ASC,[TestColumn2] DESC)");
+            sql.ShouldBe("CREATE INDEX [TestIndex] ON [TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
         }
-
 
         [Test]
-        public override void CanCreateTableWithMultipartKey()
+        public void CanCreateUniqueIndex()
         {
-            throw new NotImplementedException();
+            var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
+
+            var sql = generator.Generate(expression);
+
+            sql.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [TestTable1] ([TestColumn1] ASC)");
         }
+
+        [Test]
+        public void CanCreateUniqueMultiColumnIndex()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
+
+            var sql = generator.Generate(expression);
+
+            sql.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
+        }
+
+        [Test]
+        public override void CanCreateSchema()
+        {
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new AlterSchemaExpression()));
+        }
+
+
     }
 }

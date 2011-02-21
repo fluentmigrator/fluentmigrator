@@ -31,22 +31,59 @@ namespace FluentMigrator.Tests.Unit.Generators
 			expression.Columns[0].Size = Int32.MaxValue;
 			var sql = generator.Generate(expression);
 			sql.ShouldBe(
-				"CREATE TABLE [dbo].[NewTable] (ColumnName1 NVARCHAR(MAX) NOT NULL)");
+                "CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(MAX) NOT NULL, [TestColumn2] INT NOT NULL)");
 		}
 
-    [Test]
-    public void CanAlterSchema()
-    {
-      var expression = new AlterSchemaExpression
-      {
-        DestinationSchemaName = "DEST",
-        SourceSchemaName = "SOURCE",
-        TableName = "TABLE"
-      };
+        [Test]
+        public void CanDeleteIndex()
+        {
+            var expression = GeneratorTestHelper.GetDeleteIndexExpression();
+ 
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("DROP INDEX [TestIndex] ON [TestTable1]");
+        }
 
-      var sql = generator.Generate( expression );
-      sql.ShouldBe(
-        "ALTER SCHEMA [DEST] TRANSFER [SOURCE].[TABLE]" );
-    }
+        [Test]
+        public void CanAlterSchema()
+        {
+          var expression = new AlterSchemaExpression
+          {
+            DestinationSchemaName = "DEST",
+            SourceSchemaName = "SOURCE",
+            TableName = "TABLE"
+          };
+
+          var sql = generator.Generate( expression );
+          sql.ShouldBe(
+            "ALTER SCHEMA [DEST] TRANSFER [SOURCE].[TABLE]" );
+        }
+
+        [Test]
+        public void CanRenameTable()
+        {
+
+            var expression = GeneratorTestHelper.GetRenameTableExpression();
+
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("sp_rename '[dbo].[TestTable1]', '[TestTable2]'");
+        }
+
+        [Test]
+        public void CanCreateTableWithDateTimeOffsetColumn()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.Columns[0].Type = DbType.DateTimeOffset;
+            var sql = generator.Generate(expression);
+            sql.ShouldBe(
+                "CREATE TABLE [dbo].[TestTable1] ([TestColumn1] DATETIMEOFFSET NOT NULL)");
+        }
+
+        [Test]
+        public void CanRenameColumn()
+        {
+            var expression = GeneratorTestHelper.GetRenameColumnExpression();
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("sp_rename '[Schema1].[TestTable1].[TestColumn1]', 'TestColumn2'");
+        }
 	}
 }

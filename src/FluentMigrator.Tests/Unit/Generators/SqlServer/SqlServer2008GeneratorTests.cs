@@ -19,26 +19,6 @@ namespace FluentMigrator.Tests.Unit.Generators
 			generator = new SqlServer2008Generator();
 		}
 
-		[Test]
-		public void CanRenameTable()
-		{
-			var expression = new RenameTableExpression();
-			expression.SchemaName = "dbo";
-			expression.OldName = "Table1";
-			expression.NewName = "Table2";
-
-			var sql = generator.Generate( expression );
-			sql.ShouldBe( "sp_rename '[dbo].[Table1]', 'Table2'" );
-		}
-
-		[Test]
-		public void CanCreateTableWithDateTimeOffsetColumn()
-		{
-			var expression = GeneratorTestHelper.GetCreateTableExpression();
-			expression.Columns[0].Type = DbType.DateTimeOffset;
-			var sql = generator.Generate(expression);
-			sql.ShouldBe(
-				"CREATE TABLE [dbo].[NewTable] (ColumnName1 DATETIMEOFFSET NOT NULL)");
-		}
+		
 	}
 }

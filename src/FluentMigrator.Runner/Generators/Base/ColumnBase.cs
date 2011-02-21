@@ -12,14 +12,14 @@ namespace FluentMigrator.Runner.Generators.Base
 	internal abstract class ColumnBase : IColumn
 	{
 		private readonly ITypeMap _typeMap;
-		private readonly IConstantFormatter _constantFormatter;
+        private readonly IQuoter _quoter;
 		protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; set; }
-        protected virtual bool CanSeperatePrimaryKeyAndIdentity { get { return true; } }
+        protected virtual bool ShouldSeperatePrimaryKeyAndIdentity { get { return true; } }
 
-		public ColumnBase(ITypeMap typeMap, IConstantFormatter constantFormatter)
+		public ColumnBase(ITypeMap typeMap, IQuoter quoter)
 		{			_typeMap = typeMap;
-			_constantFormatter = constantFormatter;
-			ClauseOrder = new List<Func<ColumnDefinition, string>> { FormatName, FormatType, FormatNullable, FormatDefaultValue, FormatIdentity, FormatPrimaryKey };
+			_quoter = quoter;
+			ClauseOrder = new List<Func<ColumnDefinition, string>> { FormatString, FormatType, FormatNullable, FormatDefaultValue, FormatIdentity, FormatPrimaryKey };
 		}
 
 		protected string GetTypeMap(DbType value, int size, int precision)
@@ -27,15 +27,15 @@ namespace FluentMigrator.Runner.Generators.Base
 			return _typeMap.GetTypeMap(value, size, precision);
 		}
 
-		protected IConstantFormatter Constant
+        protected IQuoter Quoter
 		{
-			get { return _constantFormatter; }
+			get { return _quoter; }
 		}
 
-		protected virtual string FormatName(ColumnDefinition column)
-		{
-			return column.Name;
-		}
+        public virtual string FormatString(ColumnDefinition column)
+        {
+            return _quoter.QuoteColumnName(column.Name);
+        }
 
 		protected virtual string FormatType(ColumnDefinition column)
 		{
@@ -65,12 +65,18 @@ namespace FluentMigrator.Runner.Generators.Base
 				return "DEFAULT " + method;
 			}
 
-			return "DEFAULT " + Constant.Format(column.DefaultValue);
+			return "DEFAULT " + Quoter.QuoteValue(column.DefaultValue);
 		}
 
 		protected abstract string FormatIdentity(ColumnDefinition column);
-		protected abstract string FormatPrimaryKey(ColumnDefinition column);
+		
 		protected abstract string FormatSystemMethods(SystemMethods systemMethod);
+
+        protected virtual string FormatPrimaryKey(ColumnDefinition column)
+        {
+            //Most Generators allow for adding primary keys separtly
+            return string.Empty;
+        }
 
 		public virtual string Generate( ColumnDefinition column )
 		{
@@ -86,63 +92,50 @@ namespace FluentMigrator.Runner.Generators.Base
 			return string.Join( " ", clauses.ToArray() );
 		}
 
-		public string Generate(CreateTableExpression expression)
+        public string Generate(IEnumerable<ColumnDefinition> columns, string tableName)
 		{
-
-			IList<ColumnDefinition> columns = expression.Columns;
-			string result = "";
-			int total = columns.Count - 1;
+            string primaryKeyString = string.Empty;
 
 			//if more than one column is a primary key or the primary key is given a name, then it needs to be added separately
-            IList<ColumnDefinition> primaryKeyColumns = GetPrimaryKeyColumns(columns);
-			bool addPrimaryKeySeparately = false;
-			if (primaryKeyColumns.Count > 1 || (primaryKeyColumns.Count == 1 && !string.IsNullOrEmpty(primaryKeyColumns[0].PrimaryKeyName)))
-			{
-                if(CanSeperatePrimaryKeyAndIdentity || primaryKeyColumns.All(x => !x.IsIdentity))
-                {
-                    addPrimaryKeySeparately = true;
-                    foreach (ColumnDefinition column in primaryKeyColumns)
-                    {
-                        column.IsPrimaryKey = false;
-                    }
-                }
-			}
 
-			for (int i = 0; i < columns.Count; i++)
-			{
-				result += Generate(columns[i]);
+            //CAUTION: this must execute before we set the values of primarykey to false; Beware of yield return
+            IEnumerable<ColumnDefinition> primaryKeyColumns = columns.Where(x=>x.IsPrimaryKey);
+          
+            if (ShouldPrimaryKeysBeAddedSeparatley(primaryKeyColumns))
+            {
+                primaryKeyString = AddPrimaryKeySeparatley(primaryKeyColumns);
+                //result = AddPrimaryKeyConstraint(tableName, primaryKeyColumns, result);
+                foreach (ColumnDefinition column in columns) { column.IsPrimaryKey = false; }
+            }
 
-				if (i != total)
-					result += ", ";
-			}
-
-			if (addPrimaryKeySeparately)
-				result = AddPrimaryKeyConstraint(expression.TableName, primaryKeyColumns, result);
-
-			return result;
+            return String.Join(", ", columns.Select(x => Generate(x)).ToArray()) + primaryKeyString;
 		}
 
-		private IList<ColumnDefinition> GetPrimaryKeyColumns(IList<ColumnDefinition> columns)
-		{
-			IList<ColumnDefinition> primaryKeyColumns = new List<ColumnDefinition>();
-			foreach (ColumnDefinition column in columns)
-			{
-				if (column.IsPrimaryKey)
-				{
-					primaryKeyColumns.Add(column);
-				}
-			}
-			return primaryKeyColumns;
-		}
+        protected virtual string AddPrimaryKeySeparatley(IEnumerable<ColumnDefinition> primaryKeyColumns)
+        {
+            string keyColumns = String.Join(", ", primaryKeyColumns.Select(x => Quoter.QuoteColumnName(x.Name)).ToArray());
+            return String.Format(", PRIMARY KEY ({0})", keyColumns);
+        }
 
-		private string AddPrimaryKeyConstraint(string tableName, IList<ColumnDefinition> primaryKeyColumns, string result)
+        private bool ShouldPrimaryKeysBeAddedSeparatley(IEnumerable<ColumnDefinition> primaryKeyColumns)
+        {
+            if (ShouldSeperatePrimaryKeyAndIdentity && primaryKeyColumns.Any(x=>x.IsPrimaryKey) )
+            {
+                return true ;
+            }
+
+            if (primaryKeyColumns.Count() > 1 || (primaryKeyColumns.Count() == 1 && !string.IsNullOrEmpty(primaryKeyColumns.First().PrimaryKeyName)))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        private string AddPrimaryKeyConstraint(string tableName, IEnumerable<ColumnDefinition> primaryKeyColumns, string result)
 		{
-			string keyColumns = "";
-			foreach (ColumnDefinition column in primaryKeyColumns)
-			{
-				keyColumns += column.Name + ",";
-			}
-			keyColumns = keyColumns.TrimEnd(',');
+			string keyColumns = String.Join(", ", primaryKeyColumns.Select(x => Quoter.QuoteColumnName(x.Name)).ToArray());
+
 			result += String.Format(", {0} PRIMARY KEY ({1})", GetPrimaryKeyConstraintName(primaryKeyColumns, tableName), keyColumns);
 
 			return result;
@@ -152,29 +145,15 @@ namespace FluentMigrator.Runner.Generators.Base
 		/// Gets the name of the primary key constraint. Some Generators may need to override if the constraint name is limited
 		/// </summary>
 		/// <returns></returns>
-		protected virtual string GetPrimaryKeyConstraintName(IList<ColumnDefinition> primaryKeyColumns, string tableName)
+        protected virtual string GetPrimaryKeyConstraintName(IEnumerable<ColumnDefinition> primaryKeyColumns, string tableName)
 		{
-			string keyName = string.Empty;
-			string assignedName = string.Empty;
-			foreach (ColumnDefinition column in primaryKeyColumns)
-			{
-				keyName += column.Name + "_";
+           string primaryKeyName = primaryKeyColumns.Select(x => x.PrimaryKeyName).FirstOrDefault();
+          
+           if(string.IsNullOrEmpty(primaryKeyName)){
+               primaryKeyName = string.Format("PK_{0}_{1}",tableName,String.Join("_", primaryKeyColumns.Select(x => x.Name).ToArray()));
+           }
 
-				if (!string.IsNullOrEmpty(column.PrimaryKeyName))
-				{
-					assignedName = column.PrimaryKeyName;
-					break;
-				}
-			}
-
-			keyName += "PK";
-
-			if (!string.IsNullOrEmpty(assignedName))
-			{
-				keyName = assignedName;
-			}
-
-			return string.Format("CONSTRAINT {0}", keyName);
+		    return string.Format("CONSTRAINT {0}", Quoter.QuoteIndexName(primaryKeyName));
 		}
 	}
 }

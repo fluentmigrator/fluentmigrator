@@ -25,12 +25,12 @@ namespace FluentMigrator.Runner.Generators.Base
     public abstract class GeneratorBase : IMigrationGenerator
     {
         private readonly IColumn _column;
-        private readonly IConstantFormatter _constantFormatter;
+        private readonly IQuoter _quoter;
 
-        public GeneratorBase(IColumn column, IConstantFormatter constantFormatter)
+        public GeneratorBase(IColumn column, IQuoter quoter)
         {
             _column = column;
-            _constantFormatter = constantFormatter;
+            _quoter = quoter;
         }
 
         public abstract string Generate(CreateSchemaExpression expression);
@@ -66,9 +66,9 @@ namespace FluentMigrator.Runner.Generators.Base
             get { return _column; }
         }
 
-        protected IConstantFormatter Constant
+        protected IQuoter Quoter
         {
-            get { return _constantFormatter; }
+            get { return _quoter; }
         }
 
 

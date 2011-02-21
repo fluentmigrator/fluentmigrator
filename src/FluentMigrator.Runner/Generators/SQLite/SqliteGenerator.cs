@@ -32,175 +32,168 @@ namespace FluentMigrator.Runner.Generators.SQLite
 	public class SqliteGenerator : GenericGenerator
 	{
 		public SqliteGenerator()
-			: base(new SqliteColumn(), new ConstantFormatter())
+			: base(new SqliteColumn(), new SQLiteQuoter())
 		{
 		}
 
+        
+
+       
+
+        public override string RenameTable { get { return "ALTER TABLE {0} RENAME TO {1}"; } }
+
+		
+
+        public override string Generate(AlterColumnExpression expression)
+        {
+            throw new DatabaseOperationNotSupportedExecption("Sqlite does not support alter column");
+        }
+
+        public override string Generate(RenameColumnExpression expression)
+        {
+            throw new DatabaseOperationNotSupportedExecption("Sqlite does not support renaming of columns");
+        }
 
 
-		public override string Generate(CreateSchemaExpression expression)
-		{
-			throw new NotImplementedException();
-		}
+        //public override string Generate(CreateTableExpression expression)
+        //{
+        //    return string.Format("CREATE TABLE '{0}] ({1})", expression.TableName, Column.Generate(expression));
+        //}
 
-		public override string Generate(DeleteSchemaExpression expression)
-		{
-			throw new NotImplementedException();
-		}
+        //public override string Generate(RenameTableExpression expression)
+        //{
+        //    return string.Format("ALTER TABLE '{0}] RENAME TO '{1}]", expression.OldName, expression.NewName);
+        //}
 
-		public override string Generate(AlterColumnExpression expression)
-		{
-			throw new NotImplementedException();
-		}
+        //public override string Generate(DeleteTableExpression expression)
+        //{
+        //    return string.Format("DROP TABLE '{0}]", expression.TableName);
+        //}
 
-		public override string Generate(AlterSchemaExpression expression)
-		{
-			throw new NotImplementedException();
-		}
+        //public override string Generate(CreateColumnExpression expression)
+        //{
+        //    //return string.Format("ALTER TABLE {0} ADD COLUMN {1}", expression.TableName, expression.Column.Name);
+        //    return String.Format("ALTER TABLE '{0}] ADD COLUMN {1}", expression.TableName, Column.Generate(expression.Column));
+        //}
 
-		public override string Generate(CreateTableExpression expression)
-		{
-			return string.Format("CREATE TABLE [{0}] ({1})", expression.TableName, Column.Generate(expression));
-		}
+		
+        //public override string Generate(InsertDataExpression expression)
+        //{
+        //    var result = new StringBuilder();
+        //    foreach (InsertionDataDefinition row in expression.Rows)
+        //    {
+        //        List<string> columnNames = new List<string>();
+        //        List<object> columnData = new List<object>();
+        //        foreach (KeyValuePair<string, object> item in row)
+        //        {
+        //            columnNames.Add(item.Key);
+        //            columnData.Add(item.Value);
+        //        }
 
-		public override string Generate(RenameTableExpression expression)
-		{
-			return string.Format("ALTER TABLE [{0}] RENAME TO [{1}]", expression.OldName, expression.NewName);
-		}
+        //        string columns = GetColumnList(columnNames);
+        //        string data = GetDataList(columnData);
+        //        result.Append(String.Format("INSERT INTO {0} ({1}) VALUES ({2});", expression.TableName, columns, data));
+        //    }
+        //    return result.ToString();
+        //}
 
-		public override string Generate(DeleteTableExpression expression)
-		{
-			return string.Format("DROP TABLE [{0}]", expression.TableName);
-		}
+        //public override string Generate(UpdateDataExpression expression)
+        //{
+        //    var result = new StringBuilder();
 
-		public override string Generate(CreateColumnExpression expression)
-		{
-			//return string.Format("ALTER TABLE {0} ADD COLUMN {1}", expression.TableName, expression.Column.Name);
-			return String.Format("ALTER TABLE [{0}] ADD COLUMN {1}", expression.TableName, Column.Generate(expression.Column));
-		}
+        //    var set = String.Empty;
+        //    var i = 0;
+        //    foreach (var item in expression.Set)
+        //    {
+        //        if (i != 0)
+        //        {
+        //            set += ", ";
+        //        }
 
-		public override string Generate(RenameColumnExpression expression)
-		{
-			throw new NotImplementedException("Sqlite does not support renaming of columns in a safe way");
-		}
+        //        set += String.Format("'{0}] = {1}", item.Key, Constant.Format(item.Value));
+        //        i++;
+        //    }
 
-		public override string Generate(InsertDataExpression expression)
-		{
-			var result = new StringBuilder();
-			foreach (InsertionDataDefinition row in expression.Rows)
-			{
-				List<string> columnNames = new List<string>();
-				List<object> columnData = new List<object>();
-				foreach (KeyValuePair<string, object> item in row)
-				{
-					columnNames.Add(item.Key);
-					columnData.Add(item.Value);
-				}
+        //    var where = String.Empty;
+        //    i = 0;
+        //    foreach (var item in expression.Where)
+        //    {
+        //        if (i != 0)
+        //        {
+        //            where += " AND ";
+        //        }
 
-				string columns = GetColumnList(columnNames);
-				string data = GetDataList(columnData);
-				result.Append(String.Format("INSERT INTO [{0}] ({1}) VALUES ({2});", expression.TableName, columns, data));
-			}
-			return result.ToString();
-		}
+        //        where += String.Format("'{0}] {1} {2}", item.Key, item.Value == null ? "IS" : "=", Constant.Format(item.Value));
+        //        i++;
+        //    }
 
-		public override string Generate(UpdateDataExpression expression)
-		{
-			var result = new StringBuilder();
+        //    result.Append(String.Format("UPDATE '{0}] SET {1} WHERE {2};", expression.TableName, set, where));
 
-			var set = String.Empty;
-			var i = 0;
-			foreach (var item in expression.Set)
-			{
-				if (i != 0)
-				{
-					set += ", ";
-				}
+        //    return result.ToString();
+        //}
 
-				set += String.Format("[{0}] = {1}", item.Key, Constant.Format(item.Value));
-				i++;
-			}
+        //public override string Generate(DeleteDataExpression expression)
+        //{
+        //    var result = new StringBuilder();
 
-			var where = String.Empty;
-			i = 0;
-			foreach (var item in expression.Where)
-			{
-				if (i != 0)
-				{
-					where += " AND ";
-				}
+        //    if (expression.IsAllRows)
+        //    {
+        //        result.Append(String.Format("DELETE FROM '{0}];", expression.TableName));
+        //    }
+        //    else
+        //    {
+        //        foreach (var row in expression.Rows)
+        //        {
+        //            var where = String.Empty;
+        //            var i = 0;
 
-				where += String.Format("[{0}] {1} {2}", item.Key, item.Value == null ? "IS" : "=", Constant.Format(item.Value));
-				i++;
-			}
+        //            foreach (var item in row)
+        //            {
+        //                if (i != 0)
+        //                {
+        //                    where += " AND ";
+        //                }
 
-			result.Append(String.Format("UPDATE [{0}] SET {1} WHERE {2};", expression.TableName, set, where));
+        //                where += String.Format("'{0}] {1} {2}", item.Key, item.Value == null ? "IS" : "=", Constant.Format(item.Value));
+        //                i++;
+        //            }
 
-			return result.ToString();
-		}
+        //            result.Append(String.Format("DELETE FROM '{0}] WHERE {1};", expression.TableName, where));
+        //        }
+        //    }
 
-		public override string Generate(DeleteDataExpression expression)
-		{
-			var result = new StringBuilder();
-
-			if (expression.IsAllRows)
-			{
-				result.Append(String.Format("DELETE FROM [{0}];", expression.TableName));
-			}
-			else
-			{
-				foreach (var row in expression.Rows)
-				{
-					var where = String.Empty;
-					var i = 0;
-
-					foreach (var item in row)
-					{
-						if (i != 0)
-						{
-							where += " AND ";
-						}
-
-						where += String.Format("[{0}] {1} {2}", item.Key, item.Value == null ? "IS" : "=", Constant.Format(item.Value));
-						i++;
-					}
-
-					result.Append(String.Format("DELETE FROM [{0}] WHERE {1};", expression.TableName, where));
-				}
-			}
-
-			return result.ToString();
-		}
+        //    return result.ToString();
+        //}
 
 		public override string Generate(AlterDefaultConstraintExpression expression)
 		{
-			throw new NotImplementedException();
+            throw new DatabaseOperationNotSupportedExecption();
 		}
 
-		private string GetColumnList(IEnumerable<string> columns)
-		{
-			string result = "";
-			foreach (string column in columns)
-			{
-				result += column + ",";
-			}
-			return result.TrimEnd(',');
-		}
+        //private string GetColumnList(IEnumerable<string> columns)
+        //{
+        //    string result = "";
+        //    foreach (string column in columns)
+        //    {
+        //        result += column + ",";
+        //    }
+        //    return result.TrimEnd(',');
+        //}
 
-		private string GetDataList(List<object> data)
-		{
-			string result = "";
-			foreach (object column in data)
-			{
-				result += Constant.Format(column) + ",";
-			}
-			return result.TrimEnd(',');
-		}
+        //private string GetDataList(List<object> data)
+        //{
+        //    string result = "";
+        //    foreach (object column in data)
+        //    {
+        //        result += Constant.Format(column) + ",";
+        //    }
+        //    return result.TrimEnd(',');
+        //}
 
-		public override string Generate(DeleteColumnExpression expression)
-		{
-			return string.Format("ALTER TABLE [{0}] DROP COLUMN {1}", expression.TableName, expression.ColumnName);
-		}
+        //public override string Generate(DeleteColumnExpression expression)
+        //{
+        //    return string.Format("ALTER TABLE {0} DROP COLUMN {1}", expression.TableName, expression.ColumnName);
+        //}
 
 		public override string Generate(CreateForeignKeyExpression expression)
 		{
@@ -213,32 +206,32 @@ namespace FluentMigrator.Runner.Generators.SQLite
 			return "";
 		}
 
-		public override string Generate(CreateIndexExpression expression)
-		{
-			var result = new StringBuilder("CREATE");
-			if (expression.Index.IsUnique)
-				result.Append(" UNIQUE");
+        //public override string Generate(CreateIndexExpression expression)
+        //{
+        //    var result = new StringBuilder("CREATE");
+        //    if (expression.Index.IsUnique)
+        //        result.Append(" UNIQUE");
 
-			result.Append(" INDEX IF NOT EXISTS [{0}[ ON [{1}] (");
+        //    result.Append(" INDEX IF NOT EXISTS '{0}' ON '{1}] (");
 
-			bool first = true;
-			foreach (IndexColumnDefinition column in expression.Index.Columns)
-			{
-				if (first)
-					first = false;
-				else
-					result.Append(",");
+        //    bool first = true;
+        //    foreach (IndexColumnDefinition column in expression.Index.Columns)
+        //    {
+        //        if (first)
+        //            first = false;
+        //        else
+        //            result.Append(",");
 
-				result.Append(column.Name);
-			}
-			result.Append(")");
+        //        result.Append(column.Name);
+        //    }
+        //    result.Append(")");
 
-			return String.Format(result.ToString(), expression.Index.Name, expression.Index.TableName);
-		}
+        //    return String.Format(result.ToString(), expression.Index.Name, expression.Index.TableName);
+        //}
 
-		public override string Generate(DeleteIndexExpression expression)
-		{
-			return String.Format("DROP INDEX IF EXISTS [{0}]", expression.Index.Name);
-		}
+        //public override string Generate(DeleteIndexExpression expression)
+        //{
+        //    return String.Format("DROP INDEX IF EXISTS '{0}]", expression.Index.Name);
+        //}
 	}
 }

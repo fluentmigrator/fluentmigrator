@@ -15,13 +15,17 @@ namespace FluentMigrator.Tests.Unit.Generators
         public abstract void CanCreateTableWithCustomColumnType();
         public abstract void CanCreateTableWithPrimaryKey();
         public abstract void CanCreateTableWithIdentity();
-        public abstract void CanCreateTableWithNullField();
+        public abstract void CanCreateTableWithNullableField();
         public abstract void CanCreateTableWithDefaultValue();
         public abstract void CanCreateTableWithDefaultValueExplicitlySetToNull();
-        public abstract void CanCreateTableWithMultipartKey();
+        public abstract void CanCreateTableWithMultiColumnPrimaryKey();
 
         public abstract void CanCreateIndex();
         public abstract void CanCreateMultiColumnIndex();
+        //public abstract void CanCreateUniqueIndex();
+        //public abstract void CanCreateMultiColumnUniqueIndex();
+
+        public abstract void CanCreateSchema();
 
         
 

@@ -6,6 +6,7 @@ using NUnit.Framework;
 using FluentMigrator.Runner.Generators.MySql;
 using NUnit.Should;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Tests.Unit.Generators.MySql
 {
@@ -27,7 +28,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         
 
             var sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE `TestTable1` ADD `TestColumn1` VARCHAR(5) NOT NULL");
+            sql.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` VARCHAR(5) NOT NULL");
         }
 
         [Test]
@@ -38,7 +39,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
     
 
             var sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE `NewTable` ADD `TestColumn1` DECIMAL(19,2) NOT NULL");
+            sql.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` DECIMAL(19,2) NOT NULL");
         }
 
         [Test]
@@ -60,7 +61,11 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         [Test]
         public override void CanAlterColumn()
         {
-            throw new NotImplementedException();
+            var expression = GeneratorTestHelper.GetAlterTableExpression();
+
+            var sql = generator.Generate(expression);
+
+            sql.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` VARCHAR(20) NOT NULL");
         }
 
         [Test]
@@ -69,20 +74,33 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
                     var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1,`TestColumn3`) REFERENCES `TestTable2` (`TestColumn2`,`TestColumn4`)");
+                "ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`) REFERENCES `TestTable2` (`TestColumn2`)");
 
         }
 
         [Test]
         public override void CanCreateMulitColumnForeignKey()
         {
-            throw new NotImplementedException();
+            var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
+            var sql = generator.Generate(expression);
+            sql.ShouldBe(
+                "ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`, `TestColumn3`) REFERENCES `TestTable2` (`TestColumn2`, `TestColumn4`)");
+
         }
 
         [Test]
         public override void CanCreateAutoIncrementColumn()
         {
-            throw new NotImplementedException();
+            var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
+
+            var sql = generator.Generate(expression);
+
+            sql.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` INTEGER NOT NULL AUTO_INCREMENT");
+        }
+
+        public override void CanAlterSchema()
+        {
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new AlterSchemaExpression()));
         }
     }
 }

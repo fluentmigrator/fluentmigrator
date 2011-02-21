@@ -26,8 +26,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetInsertDataExpression();
             string sql = generator.Generate(expression);
 
-            string expected = "INSERT ALL INTO TestTable1 (Id,Name,Website) VALUES (1,'Justin','codethinked.com')";
-            expected += " INTO TestTable1 (Id,Name,Website) VALUES (2,'Nate','kohari.org')";
+            string expected = "INSERT ALL INTO TestTable1 (Id, Name, Website) VALUES (1, 'Justin', 'codethinked.com')";
+            expected += " INTO TestTable1 (Id, Name ,Website) VALUES (2, 'Nate', 'kohari.org')";
             expected += " SELECT 1 FROM DUAL";
 
             sql.ShouldBe(expected);

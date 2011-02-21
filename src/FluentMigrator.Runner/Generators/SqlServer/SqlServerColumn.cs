@@ -4,10 +4,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 {
     using FluentMigrator.Model;
     using FluentMigrator.Runner.Generators.Base;
+    using FluentMigrator.Runner.Generators.Generic;
 
 	class SqlServerColumn : ColumnBase
 	{
-		public SqlServerColumn(ITypeMap typeMap) : base(typeMap, new ConstantFormatter())
+		public SqlServerColumn(ITypeMap typeMap) : base(typeMap, new SqlServerQuoter())
 		{
 		}
 
@@ -26,10 +27,10 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 			return column.IsIdentity ? "IDENTITY(1,1)" : string.Empty;
 		}
 
-		protected override string FormatPrimaryKey(ColumnDefinition column)
-		{
-			return column.IsPrimaryKey ? "PRIMARY KEY CLUSTERED" : string.Empty;
-		}
+        //protected override string FormatPrimaryKey(ColumnDefinition column)
+        //{
+        //    return column.IsPrimaryKey ? "PRIMARY KEY CLUSTERED" : string.Empty;
+        //}
 
         protected override string FormatSystemMethods(SystemMethods systemMethod)
         {

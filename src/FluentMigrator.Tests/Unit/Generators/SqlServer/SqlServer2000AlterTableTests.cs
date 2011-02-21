@@ -8,6 +8,7 @@ using NUnit.Should;
 using System.Data;
 using FluentMigrator.Model;
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Generators;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 {
@@ -39,26 +40,33 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             sql.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] DECIMAL(19,2) NOT NULL");
         }
 
-        [Test]
-        public override void CanRenameColumn()
-        {
-            var expression = GeneratorTestHelper.GetRenameColumnExpression();
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("sp_rename '[Schema1].[TestTable1].[TestColumn1]', 'TestColumn2'");
-        }
+        
 
         [Test]
         public override void CanRenameTable()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
             var sql = generator.Generate(expression);
-            sql.ShouldBe("sp_rename '[TestTable1]', 'TestTable2'");
+            sql.ShouldBe("sp_rename '[TestTable1]', '[TestTable2]'");
+        }
+
+        [Test]
+        public override void CanRenameColumn()
+        {
+            var expression = GeneratorTestHelper.GetRenameColumnExpression();
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("sp_rename '[TestTable1].[TestColumn1]', '[TestColumn2]'");
         }
 
         [Test]
         public override void CanAlterColumn()
         {
-            throw new NotImplementedException();
+            //TODO: This will fail if there are any keys attached 
+            var expression = GeneratorTestHelper.GetAlterTableExpression();
+
+            var sql = generator.Generate(expression);
+
+            sql.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL");
         }
 
         [Test]
@@ -67,7 +75,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
             var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "ALTER TABLE [TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [TestTable2] ([TestColumn1])");
+                "ALTER TABLE [TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [TestTable2] ([TestColumn2])");
 
         }
 
@@ -77,7 +85,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
             var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "ALTER TABLE [TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([Column3],[Column4]) REFERENCES [TestPrimaryTable] ([Column1],[Column2])");
+                "ALTER TABLE [TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [TestTable2] ([TestColumn2], [TestColumn4])");
 
         }
 
@@ -98,6 +106,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         public override void CanCreateAutoIncrementColumn()
         {
             throw new NotImplementedException();
+        }
+
+        [Test]
+        public override void CanAlterSchema()
+        {
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new AlterSchemaExpression()));
         }
     }
 }

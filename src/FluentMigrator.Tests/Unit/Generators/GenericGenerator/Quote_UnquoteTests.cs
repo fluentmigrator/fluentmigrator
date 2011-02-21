@@ -11,11 +11,11 @@ namespace FluentMigrator.Tests.Unit.Generators
     [TestFixture]
     public class Quote_UnquoteTests 
     {
-        GenericGenerator SUT = default(GenericGenerator);
+        IQuoter SUT = default(GenericQuoter);
 
         [SetUp]
         public void Setup(){
-            SUT = new GenericGeneratorImplementor();
+            SUT = new GenericQuoter();
         }
 
         [Test]
@@ -45,37 +45,37 @@ namespace FluentMigrator.Tests.Unit.Generators
         [Test]
         public void CanHandleAnUnQuotedColumnName()
         {
-            SUT.QuoteForColumnName("ColumnName").ShouldBe("\"ColumnName\"");
+            SUT.QuoteColumnName("ColumnName").ShouldBe("\"ColumnName\"");
         }
 
         [Test]
         public void CanHandleAnAlreadyQuotedColumnName()
         {
-            SUT.QuoteForColumnName("\"ColumnName\"").ShouldBe("\"ColumnName\"");
+            SUT.QuoteColumnName("\"ColumnName\"").ShouldBe("\"ColumnName\"");
         }
 
         [Test]
         public void CanHandleAnUnQuotedTableName()
         {
-            SUT.QuoteForColumnName("TableName").ShouldBe("\"TableName\"");
+            SUT.QuoteColumnName("TableName").ShouldBe("\"TableName\"");
         }
 
         [Test]
         public void CanHandleAnAlreadyQuotedTableName()
         {
-            SUT.QuoteForColumnName("\"TableName\"").ShouldBe("\"TableName\"");
+            SUT.QuoteColumnName("\"TableName\"").ShouldBe("\"TableName\"");
         }
 
         [Test]
         public void CanHandleAnUnQuotedSchemaName()
         {
-            SUT.QuoteForColumnName("SchemaName").ShouldBe("\"SchemaName\"");
+            SUT.QuoteColumnName("SchemaName").ShouldBe("\"SchemaName\"");
         }
 
         [Test]
         public void CanHandleAnAlreadyQuotedSchemaName()
         {
-            SUT.QuoteForColumnName("\"SchemaName\"").ShouldBe("\"SchemaName\"");
+            SUT.QuoteColumnName("\"SchemaName\"").ShouldBe("\"SchemaName\"");
         }
     }
 }

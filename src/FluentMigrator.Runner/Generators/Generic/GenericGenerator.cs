@@ -7,28 +7,51 @@ namespace FluentMigrator.Runner.Generators.Generic
     using FluentMigrator.Expressions;
     using FluentMigrator.Model;
     using FluentMigrator.Runner.Generators.Base;
+    using System.Linq;
+    using System.Text;
+    using System.Data;
 
     public abstract class GenericGenerator : GeneratorBase
     {
-        public GenericGenerator(IColumn column, IConstantFormatter constantFormatter) : base(column,constantFormatter)
-        {}
+        public GenericGenerator(IColumn column, IQuoter quoter) : base(column,quoter)
+        {
+            
+        }
 
-        public virtual string CreateTable { get { return "create table "; } }
-        public virtual string AlterTable { get { return "alter table "; } }
-        public virtual string DropTable { get { return "drop table"; } }
-        
-        public virtual string AddColumn { get { return "add column"; } }
-        public virtual string DropColumn { get { return "drop column"; } }
-        public virtual string AlterColumn { get { return "alter column"; } }
+        public virtual string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
+        public virtual string AlterTable { get { return "ALTER TABLE "; } }
+        public virtual string DropTable { get { return "DROP TABLE {0}"; } }
+
+        public virtual string AddColumn { get { return "ALTER TABLE {0} ADD COLUMN {1}"; } }
+        public virtual string DropColumn { get { return "ALTER TABLE {0} DROP COLUMN {1}"; } }
+        public virtual string AlterColumn { get { return "ALTER TABLE {0} ALTER COLUMN {1}"; } }
+        public virtual string RenameColumn { get { return "ALTER TABLE {0} RENAME COLUMN {1} TO {2}"; } }
+
+        public virtual string RenameTable { get { return "RENAME TABLE {0} TO {1}"; } }
 
         public virtual string CreateSchema { get { return "create schema"; } }
         public virtual string DropSchema { get { return "drop schema"; } }
 
+        public virtual string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3} ({4})"; } }
+        public virtual string DropIndex { get { return "DROP INDEX {0}"; } }
+
+        public virtual string InsertData { get { return "INSERT INTO {0} ({1}) VALUES ({2})"; } }
+        public virtual string UpdateData { get { return "UPDATE {0} SET {1} WHERE {2}"; } }
+        public virtual string DeleteData { get { return "DELETE FROM {0} WHERE {1}"; } }
+
+        public virtual string CreateConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}"; } }
+        public virtual string DeleteConstraint { get { return "ALTER TABLE {0} DROP CONSTRAINT {1}"; } }
 
 
+        public virtual string GetUniqueString(CreateIndexExpression column)
+        {
+            return column.Index.IsUnique ? "UNIQUE " : string.Empty;
+        }
 
-
-
+        public virtual string GetClusterTypeString(CreateIndexExpression column)
+        {
+            return string.Empty;
+        }
 
         /// <summary>
         /// Outputs a create table string
@@ -38,101 +61,204 @@ namespace FluentMigrator.Runner.Generators.Generic
         public override string Generate(CreateTableExpression expression)
         {
             if (string.IsNullOrEmpty(expression.TableName)) throw new ArgumentNullException("Table name cannot be empty");
-            var tableCreationString =  CreateTable + QuoteForTableName(expression.TableName) + " ({0})";
-            return string.Format(tableCreationString, this.Column.Generate(expression));
+            if (expression.Columns.Count == 0) throw new ArgumentException("You must specifiy at least one column");
+
+            string quotedTableName = Quoter.QuoteTableName(expression.TableName);
+
+            return string.Format(CreateTable, quotedTableName, Column.Generate(expression.Columns, quotedTableName));
         }
 
+        public override string Generate(DeleteTableExpression expression)
+        {
+            return String.Format(DropTable, Quoter.QuoteTableName(expression.TableName));
+        }
+
+        public override string Generate(RenameTableExpression expression)
+        {
+            return String.Format(RenameTable, Quoter.QuoteTableName(expression.OldName), Quoter.QuoteTableName(expression.NewName));
+        }
+
+        public override string Generate(CreateColumnExpression expression)
+        {
+            return String.Format(AddColumn, Quoter.QuoteTableName(expression.TableName), Column.Generate(expression.Column));
+        }
+
+
+        public override string Generate(AlterColumnExpression expression)
+        {
+            return String.Format(AlterColumn, Quoter.QuoteTableName(expression.TableName), Column.Generate(expression.Column));
+        }
+
+        public override string Generate(DeleteColumnExpression expression)
+        {
+            return String.Format(DropColumn, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.ColumnName));
+        }
+
+
+        public override string Generate(RenameColumnExpression expression)
+        {
+            return String.Format(RenameColumn, expression.TableName, expression.OldName, expression.NewName);
+        }
         
-
-
-        /// <summary>
-        /// Returns the opening quote identifier - " is the standard according to the specification
-        /// </summary>
-        public virtual string OpenQuote { get { return "\""; } }
-
-        /// <summary>
-        /// Returns the closing quote identifier - " is the standard according to the specification
-        /// </summary>
-        public virtual string CloseQuote { get { return "\""; } }
-
-        public virtual string OpenQuoteEscapeString { get { return OpenQuote.PadRight(2, OpenQuote.ToCharArray()[0]); } }
-        public virtual string CloseQuoteEscapeString { get { return CloseQuote.PadRight(2, CloseQuote.ToCharArray()[0]); } }
-
-        /// <summary>
-        /// Returns true is the value starts and ends with a close quote
-        /// </summary>
-        public virtual bool IsQuoted(string name)
+        public override string Generate(CreateIndexExpression expression)
         {
-            //This can return true incorrectly in some cases edge cases.
-            //If a string say [myname]] is passed in this is not correctly quote for MSSQL but this function will
-            //return true. 
-            return (name.StartsWith(OpenQuote) && name.EndsWith(CloseQuote));
+            
+            string[] indexColumns = new string[expression.Index.Columns.Count];
+            IndexColumnDefinition columnDef;
+            
+
+            for (int i = 0; i < expression.Index.Columns.Count; i++)
+            {
+                columnDef = expression.Index.Columns.ElementAt(i);
+                if (columnDef.Direction == Direction.Ascending)
+                {
+                    indexColumns[i] = Quoter.QuoteColumnName(columnDef.Name) + " ASC";
+                }
+                else
+                {
+                    indexColumns[i] = Quoter.QuoteColumnName(columnDef.Name) + " DESC";
+                }
+            }
+            return String.Format(CreateIndex, GetClusterTypeString(expression), GetUniqueString(expression), Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName), String.Join(", ", indexColumns));
         }
 
-        /// <summary>
-        /// Returns a quoted string that has been correctly escaped
-        /// </summary>
-        public virtual string Quote(string name)
+        public override string Generate(DeleteIndexExpression expression)
         {
-            string quotedName = name.Replace(OpenQuote, OpenQuoteEscapeString);
-            //Check to see if we need to each closing quotes.
-            //If closing quote is the same as the opening quote then no need to escape again
-            if (OpenQuote != CloseQuote)
+            return String.Format(DropIndex, Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName));
+        }
+
+        public override string Generate(CreateForeignKeyExpression expression)
+        {
+            if (expression.ForeignKey.PrimaryColumns.Count != expression.ForeignKey.ForeignColumns.Count)
             {
-                quotedName = quotedName.Replace(CloseQuote, CloseQuoteEscapeString);
+                throw new ArgumentException("Number of primary columns and secondary columns must be equal");
             }
 
-            return OpenQuote + quotedName + CloseQuote;
-        }
-
-        /// <summary>
-        /// Quotes a column name
-        /// </summary>
-        public virtual string QuoteForColumnName(string columnName)
-        {
-            return IsQuoted(columnName) ? columnName : Quote(columnName);
-        }
-
-        /// <summary>
-        /// Quotes a Table name
-        /// </summary>
-        public virtual string QuoteForTableName(string tableName)
-        {
-            return IsQuoted(tableName) ? tableName : Quote(tableName);
-        }
-
-        /// <summary>
-        /// Quotes a Schema Name
-        /// </summary>
-        public virtual string QuoteForSchemaName(string schemaName)
-        {
-            return IsQuoted(schemaName) ? schemaName : Quote(schemaName);
-        }
-
-        /// <summary>
-        /// Provides and unquoted, unescaped string
-        /// </summary>
-        public virtual string UnQuote(string quoted)
-        {
-            string unquoted;
-
-            if (IsQuoted(quoted))
+            List<string> primaryColumns = new List<string>();
+            List<string> foreignColumns = new List<string>();
+            foreach (var column in expression.ForeignKey.PrimaryColumns)
             {
-                unquoted = quoted.Substring(1, quoted.Length - 2);
-            }
-            else
-            {
-                unquoted = quoted;
+                primaryColumns.Add(Quoter.QuoteColumnName(column));
             }
 
-            unquoted = unquoted.Replace(OpenQuoteEscapeString, OpenQuote);
-
-            if (OpenQuote != CloseQuote)
+            foreach (var column in expression.ForeignKey.ForeignColumns)
             {
-                unquoted = unquoted.Replace(CloseQuoteEscapeString, CloseQuote);
+                foreignColumns.Add(Quoter.QuoteColumnName(column));
+            }
+            return string.Format(
+                CreateConstraint,
+                Quoter.QuoteTableName(expression.ForeignKey.ForeignTable),
+                Quoter.QuoteColumnName(expression.ForeignKey.Name),
+                String.Join(", ",foreignColumns.ToArray()),
+                Quoter.QuoteTableName(expression.ForeignKey.PrimaryTable),
+                String.Join(", ",primaryColumns.ToArray()),
+                FormatCascade("DELETE", expression.ForeignKey.OnDelete),
+                FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)
+                );
+        }
+
+        public override string Generate(DeleteForeignKeyExpression expression){
+            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.ForeignKey.ForeignTable), Quoter.QuoteColumnName(expression.ForeignKey.Name));
+        }
+
+
+        protected string FormatCascade(string onWhat, Rule rule)
+        {
+            string action = "NO ACTION";
+            switch (rule)
+            {
+                case Rule.None:
+                    return "";
+                case Rule.Cascade:
+                    action = "CASCADE";
+                    break;
+                case Rule.SetNull:
+                    action = "SET NULL";
+                    break;
+                case Rule.SetDefault:
+                    action = "SET DEFAULT";
+                    break;
             }
 
-            return unquoted;
+            return string.Format(" ON {0} {1}", onWhat, action);
         }
+
+
+        public override string Generate(InsertDataExpression expression)
+        {
+            List<string> columnNames = new List<string>();
+            List<string> columnValues = new List<string>();
+            List<string> insertStrings = new List<string>();
+
+            foreach (InsertionDataDefinition row in expression.Rows)
+            {
+                columnNames.Clear();
+                columnValues.Clear();
+                foreach (KeyValuePair<string, object> item in row)
+                {
+                    columnNames.Add(Quoter.QuoteColumnName(item.Key));
+                    columnValues.Add(Quoter.QuoteValue(item.Value));
+                }
+
+                string columns = String.Join(", ", columnNames.ToArray());
+                string values = String.Join(", ", columnValues.ToArray());
+                insertStrings.Add(String.Format(InsertData, Quoter.QuoteTableName(expression.TableName), columns, values));
+            }
+            return String.Join("; ",insertStrings.ToArray());
+        }
+
+        public override string Generate(UpdateDataExpression expression)
+        {
+           
+            List<string> updateItems = new List<string>();
+            List<string> whereClauses = new List<string>();
+
+            foreach (var item in expression.Set)
+            {
+                updateItems.Add(string.Format("{0} = {1}", Quoter.QuoteColumnName(item.Key), Quoter.QuoteValue(item.Value)));
+            }
+
+            foreach (var item in expression.Where)
+            {
+                whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value)));
+            }
+
+            return String.Format(UpdateData, Quoter.QuoteTableName(expression.TableName), String.Join(", ", updateItems.ToArray()), String.Join(" AND ", whereClauses.ToArray()));
+        }
+
+        public override string Generate(DeleteDataExpression expression)
+        {
+            List<string> deleteItems = new List<string>();
+            List<string> whereClauses = new List<string>();
+
+            foreach (var row in expression.Rows)
+            {
+                foreach (KeyValuePair<string, object> item in row)
+                {
+                    whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value)));
+                }
+
+                deleteItems.Add(string.Format(DeleteData, Quoter.QuoteTableName(expression.TableName), String.Join(" AND ", whereClauses.ToArray())));
+            }
+            return String.Join("; ", deleteItems.ToArray());
+        }
+
+
+        //All Schema method throw by default as only Sql server 2005 and up supports them.
+        public override string Generate(CreateSchemaExpression expression)
+        {
+            throw new DatabaseOperationNotSupportedExecption();
+        }
+
+        public override string Generate(DeleteSchemaExpression expression)
+        {
+            throw new DatabaseOperationNotSupportedExecption();
+        }
+
+        public override string Generate(AlterSchemaExpression expression)
+        {
+            throw new DatabaseOperationNotSupportedExecption();
+        }
+        
     }
 }

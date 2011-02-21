@@ -22,50 +22,88 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             CreateTableExpression expression = new CreateTableExpression() { TableName = TestTableName1, };
             expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, Type = DbType.String });
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, Type = DbType.Int32 });
+
             return expression;
         }
 
         public static CreateTableExpression GetCreateTableWithDefaultValue()
         {
             CreateTableExpression expression = new CreateTableExpression() { TableName = TestTableName1, };
-            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, Type = DbType.String, DefaultValue = "POO" });
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, Type = DbType.String, DefaultValue = "Default" });
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, Type = DbType.Int32, DefaultValue = 0 });
             return expression;
         }
 
         public static CreateTableExpression GetCreateTableWithPrimaryKeyExpression()
         {
             var expression = new CreateTableExpression { TableName = TestTableName1 };
-            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, IsIdentity = false, IsPrimaryKey = true, Type = DbType.String });
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, IsPrimaryKey = true, Type = DbType.String });
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, Type = DbType.Int32 });
             return expression;
         }
 
-        public static CreateTableExpression GetCreateTableWithGetAutoIncrementExpression()
+        public static CreateTableExpression GetCreateTableWithAutoIncrementExpression()
         {
             var expression = new CreateTableExpression { TableName = TestTableName1 };
-            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, IsIdentity = true, IsPrimaryKey = true, Type = DbType.String });
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, IsIdentity = true, Type = DbType.Int32 });
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, Type = DbType.Int32 });
             return expression;
         }
 
-        public static CreateTableExpression GetCreateTableWithMultipartKeyExpression()
+        public static CreateTableExpression GetCreateTableWithMultiColumnPrimaryKeyExpression()
         {
-            CreateTableExpression expression = GetCreateTableExpression();
-            expression.Columns[0].IsPrimaryKey = true;
-            expression.Columns[1].IsPrimaryKey = true;
+            var expression = new CreateTableExpression { TableName = TestTableName1 };
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, IsPrimaryKey = true, Type = DbType.String });
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, IsPrimaryKey = true, Type = DbType.Int32 });
             return expression;
 
+        }
+
+        public static CreateTableExpression GetCreateTableWithNullableColumn()
+        {
+            var expression = new CreateTableExpression { TableName = TestTableName1 };
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, IsNullable = true, Type = DbType.String });
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, Type = DbType.Int32 });
+            return expression;
         }
 
         public static CreateIndexExpression GetCreateIndexExpression()
         {
-            IndexColumnDefinition indexColumnDefinition = new IndexColumnDefinition { Name = TestIndexName };
-            IndexDefinition indexDefinition = new IndexDefinition { TableName = TestTableName1, Name = TestIndexName, Columns = new List<IndexColumnDefinition> { indexColumnDefinition } };
-            return new CreateIndexExpression { Index = indexDefinition };
+            var expression = new CreateIndexExpression();
+            expression.Index.Name = TestIndexName;
+            expression.Index.TableName = TestTableName1;
+            expression.Index.IsUnique = false;
+            expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Ascending, Name = TestColumnName1 });
+            return expression;
         }
 
-        public static CreateIndexExpression GetMultiColumnCreateIndexExpression()
+        public static CreateIndexExpression GetCreateMultiColumnCreateIndexExpression()
+        {
+
+            var expression = new CreateIndexExpression();
+            expression.Index.Name = TestIndexName;
+            expression.Index.TableName = TestTableName1;
+            expression.Index.IsUnique = false;
+            expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Ascending, Name = TestColumnName1 });
+            expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Descending, Name = TestColumnName2 });
+            return expression;
+        }
+
+        public static CreateIndexExpression GetCreateUniqueIndexExpression()
         {
             var expression = new CreateIndexExpression();
-            expression.Index.Name = "IX_TEST";
+            expression.Index.Name =  TestIndexName;
+            expression.Index.TableName = TestTableName1;
+            expression.Index.IsUnique = true;
+            expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Ascending, Name = TestColumnName1 });
+            return expression;
+        }
+
+        public static CreateIndexExpression GetCreateUniqueMultiColumnIndexExpression()
+        {
+            var expression = new CreateIndexExpression();
+            expression.Index.Name = TestIndexName;
             expression.Index.TableName = TestTableName1;
             expression.Index.IsUnique = true;
             expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Ascending, Name = TestColumnName1 });
@@ -140,7 +178,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         public static CreateColumnExpression GetCreateDecimalColumnExpression()
         {
-            ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, Type = DbType.Decimal, Size = 5, Precision = 19 };
+            ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, Type = DbType.Decimal, Size = 19, Precision = 2 };
             return new CreateColumnExpression { TableName = TestTableName1, Column = column };
         }
 
@@ -150,10 +188,16 @@ namespace FluentMigrator.Tests.Unit.Generators
             return new CreateColumnExpression { TableName = TestTableName1, Column = column };
         }
 
-        public static CreateColumnExpression GetCreateAutoIncrementColumnExpression()
+        public static CreateColumnExpression GetAlterTableAutoIncrementColumnExpression()
         {
-            ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, IsIdentity = true, IsPrimaryKey = true, Type = DbType.String };
+            ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, IsIdentity = true, Type = DbType.Int32 };
             return new CreateColumnExpression { TableName = TestTableName1, Column = column };
+        }
+
+        public static AlterColumnExpression GetAlterColumnAddAutoIncrementExpression()
+        {
+            ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, IsIdentity = true, IsPrimaryKey = true, Type = DbType.Int32 };
+            return new AlterColumnExpression { TableName = TestTableName1, Column = column };
         }
 
         public static RenameTableExpression GetRenameTableExpression()
@@ -182,10 +226,10 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             var expression = new CreateForeignKeyExpression();
             expression.ForeignKey.Name = "FK_Test";
-            expression.ForeignKey.PrimaryTable = TestTableName1;
-            expression.ForeignKey.ForeignTable = TestTableName2;
-            expression.ForeignKey.PrimaryColumns = new[] { TestColumnName1 };
-            expression.ForeignKey.ForeignColumns = new[] { TestColumnName2 };
+            expression.ForeignKey.PrimaryTable = TestTableName2;
+            expression.ForeignKey.ForeignTable = TestTableName1;
+            expression.ForeignKey.PrimaryColumns = new[] { TestColumnName2 };
+            expression.ForeignKey.ForeignColumns = new[] { TestColumnName1 };
 
             return expression;
         }
@@ -194,10 +238,10 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             var expression = new CreateForeignKeyExpression();
             expression.ForeignKey.Name = "FK_Test";
-            expression.ForeignKey.PrimaryTable = TestTableName1;
-            expression.ForeignKey.ForeignTable = TestTableName2;
-            expression.ForeignKey.PrimaryColumns = new[] { TestColumnName1, "Column2" };
-            expression.ForeignKey.ForeignColumns = new[] { TestColumnName2, "Column4" };
+            expression.ForeignKey.PrimaryTable = TestTableName2;
+            expression.ForeignKey.ForeignTable = TestTableName1;
+            expression.ForeignKey.PrimaryColumns = new[] { TestColumnName2, "TestColumn4" };
+            expression.ForeignKey.ForeignColumns = new[] { TestColumnName1, "TestColumn3" };
 
             return expression;
         }
@@ -214,7 +258,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         public static DeleteIndexExpression GetDeleteIndexExpression()
         {
-            IndexDefinition indexDefinition = new IndexDefinition { Name = TestIndexName };
+            IndexDefinition indexDefinition = new IndexDefinition { Name = TestIndexName, TableName=TestTableName1 };
             return new DeleteIndexExpression { Index = indexDefinition };
         }
 
