@@ -47,7 +47,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         public override void CanCreateTableNamedPrimaryKey()
         {
             //Should work. I think from the docs
-            var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
+            var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
             string sql = generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL, 'TestColumn2' INTEGER NOT NULL, CONSTRAINT 'TestKey' PRIMARY KEY ('TestColumn1'))");
 
@@ -57,7 +57,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         public override void CanCreateTableNamedMultiColumnPrimaryKey()
         {
             //Should work. I think from the docs
-            var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
+            var expression = GeneratorTestHelper.GetCreateTableWithMultiColumNamedPrimaryKeyExpression();
             string sql = generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL, 'TestColumn2' INTEGER NOT NULL, CONSTRAINT 'TestKey' PRIMARY KEY ('TestColumn1', 'TestColumn2'))");
 

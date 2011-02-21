@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             var expression = new CreateTableExpression { TableName = TestTableName1 };
             expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, IsPrimaryKey = true, PrimaryKeyName = "TestKey", Type = DbType.String });
-            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, Type = DbType.Int32 });
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, Type = DbType.Int32, IsPrimaryKey = true });
             return expression;
         }
 

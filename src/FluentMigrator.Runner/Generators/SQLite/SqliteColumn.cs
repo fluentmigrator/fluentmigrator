@@ -24,15 +24,12 @@ namespace FluentMigrator.Runner.Generators.SQLite
             {
                 throw new ArgumentException("SQLite only supports identity on single integer, primary key coulmns");
             }
-            return string.Empty;
+            return column.IsIdentity ? "AUTOINCREMENT" : string.Empty;
 		}
 
         protected override string FormatPrimaryKey(ColumnDefinition column)
         {
-            if (!column.IsPrimaryKey)
-                return string.Empty;
-            //Assume that if its IDENTITY and PRIMARY KEY, the it should be an AUTOINCREMENT column
-            return column.IsIdentity ? "PRIMARY KEY AUTOINCREMENT" : "PRIMARY KEY";
+            return column.IsPrimaryKey ? "PRIMARY KEY" : string.Empty;
         }
 
         protected override string FormatSystemMethods(SystemMethods systemMethod)

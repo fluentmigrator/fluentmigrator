@@ -31,11 +31,6 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return string.Empty;
 		}
 
-        //protected override string FormatPrimaryKey(ColumnDefinition column)
-        //{
-        //    return column.IsPrimaryKey ? "PRIMARY KEY" : string.Empty;
-        //}
-
         protected override string FormatSystemMethods(SystemMethods systemMethod)
         {
             switch (systemMethod)
@@ -46,19 +41,5 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
             return null;
         }
-
-		/// <summary>
-		/// Returns empty string as the constraint for Primary Key. 
-		/// Oracle will generate a coinstraint name if none is specified ie. SYS_C008004
-		/// Oracle is limited to 30 chars and the constraints must be unique for the enire schema
-		/// so there is no way to get an intelligent name using table and column names
-		/// </summary>
-		/// <param name="primaryKeyColumns"></param>
-		/// <param name="tableName"></param>
-		/// <returns></returns>
-        protected override string GetPrimaryKeyConstraintName(IEnumerable<ColumnDefinition> primaryKeyColumns, string tableName)
-		{
-			return string.Empty;
-		}
 	}
 }

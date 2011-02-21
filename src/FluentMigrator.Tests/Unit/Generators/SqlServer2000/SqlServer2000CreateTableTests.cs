@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         [Test]
         public override void CanCreateTableNamedPrimaryKey()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
+            var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
             string sql = generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1]))");
 
@@ -64,7 +64,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         [Test]
         public override void CanCreateTableNamedMultiColumnPrimaryKey()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
+            var expression = GeneratorTestHelper.GetCreateTableWithMultiColumNamedPrimaryKeyExpression();
             string sql = generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1], [TestColumn2]))");
 

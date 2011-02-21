@@ -56,18 +56,19 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         [Test]
         public override void CanCreateTableNamedPrimaryKey()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
+            var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
+
             string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL, `TestColumn2` INTEGER NOT NULL, CONSTRAINT `TestKey` PRIMARY KEY (`TestColumn1`))");
+            sql.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL, `TestColumn2` INTEGER NOT NULL, CONSTRAINT `TestKey` PRIMARY KEY (`TestColumn1`)) ENGINE = INNODB");
 
         }
 
         [Test]
         public override void CanCreateTableNamedMultiColumnPrimaryKey()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
+            var expression = GeneratorTestHelper.GetCreateTableWithMultiColumNamedPrimaryKeyExpression();
             string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL, `TestColumn2` INTEGER NOT NULL, CONSTRAINT `TestKey` PRIMARY KEY (`TestColumn1`, `TestColumn2`))");
+            sql.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL, `TestColumn2` INTEGER NOT NULL, CONSTRAINT `TestKey` PRIMARY KEY (`TestColumn1`, `TestColumn2`)) ENGINE = INNODB");
 
         }
 
