@@ -48,12 +48,12 @@ namespace FluentMigrator.Runner.Generators.MySql
 			
 			// NOTE: The above does not work, as the CHANGE COLUMN syntax in Mysql requires the column definition to be re-specified,
 			// even if it has not changed; so marking this as not working for now
-            throw new DatabaseOperationNotSupportedExecption();
+            return compatabilityMode.HandleCompatabilty("Renaming of columns is not supporteed for MySql");
 		}
 
 		public override string Generate(AlterDefaultConstraintExpression expression)
 		{
-            throw new DatabaseOperationNotSupportedExecption();
+            return compatabilityMode.HandleCompatabilty("Altering of default constrints is not supporteed for MySql");
 		}
 	}
 }

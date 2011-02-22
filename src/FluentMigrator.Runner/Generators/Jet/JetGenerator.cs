@@ -21,17 +21,17 @@ namespace FluentMigrator.Runner.Generators.Jet
 
 		public override string Generate(RenameTableExpression expression)
 		{
-            throw new DatabaseOperationNotSupportedExecption();
+            return compatabilityMode.HandleCompatabilty("Renaming of tables is not supporteed for MySql");
 		}
 
 		public override string Generate(RenameColumnExpression expression)
 		{
-            throw new DatabaseOperationNotSupportedExecption();
+            return compatabilityMode.HandleCompatabilty("Renaming of columns is not supporteed for MySql");
 		}
 
 		public override string Generate(AlterDefaultConstraintExpression expression)
 		{
-            throw new DatabaseOperationNotSupportedExecption();
+            return compatabilityMode.HandleCompatabilty("Altering of default constrints is not supporteed for MySql");
 		}
 	}
 }

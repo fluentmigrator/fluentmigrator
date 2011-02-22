@@ -5,6 +5,8 @@ using System.Text;
 using NUnit.Framework;
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Should;
+using FluentMigrator.Runner.Generators;
+using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {
@@ -50,9 +52,19 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             sql.ShouldBe("DROP INDEX TestIndex");
         }
 
+        [Test]
         public override void CanDeleteSchema()
         {
-            throw new NotImplementedException();
+            var expression = new DeleteSchemaExpression();
+            var result = generator.Generate(expression);
+            result.ShouldBe(string.Empty);
+        }
+
+        [Test]
+        public void CanDeleteSchemaInStrictMode()
+        {
+            generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new DeleteSchemaExpression()));
         }
     }
 }

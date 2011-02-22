@@ -13,9 +13,11 @@ namespace FluentMigrator.Runner.Generators.Generic
 
     public abstract class GenericGenerator : GeneratorBase
     {
+        public CompatabilityMode compatabilityMode;
+
         public GenericGenerator(IColumn column, IQuoter quoter) : base(column,quoter)
         {
-            
+            compatabilityMode = CompatabilityMode.LOOSE;
         }
 
         public virtual string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
@@ -262,17 +264,18 @@ namespace FluentMigrator.Runner.Generators.Generic
         //All Schema method throw by default as only Sql server 2005 and up supports them.
         public override string Generate(CreateSchemaExpression expression)
         {
-            throw new DatabaseOperationNotSupportedExecption();
+            return compatabilityMode.HandleCompatabilty("Schemas are not supported");
+            
         }
 
         public override string Generate(DeleteSchemaExpression expression)
         {
-            throw new DatabaseOperationNotSupportedExecption();
+            return compatabilityMode.HandleCompatabilty("Schemas are not supported");
         }
 
         public override string Generate(AlterSchemaExpression expression)
         {
-            throw new DatabaseOperationNotSupportedExecption();
+            return compatabilityMode.HandleCompatabilty("Schemas are not supported");
         }
         
     }

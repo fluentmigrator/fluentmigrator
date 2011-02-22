@@ -71,14 +71,32 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         public override void CanRenameColumn()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
+            var result = generator.Generate(expression);
+            result.ShouldBe(string.Empty);   
+        }
+
+        [Test]
+        public void CanRenameColumnInStrictMode()
+        {
+            var expression = GeneratorTestHelper.GetRenameColumnExpression();
+            generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
             Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(expression));
-          
+
         }
 
         [Test]
         public override void CanRenameTable()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
+            var result = generator.Generate(expression);
+            result.ShouldBe(string.Empty); 
+        }
+
+        [Test]
+        public void CanRenameTableInStrictMode()
+        {
+            var expression = GeneratorTestHelper.GetRenameColumnExpression();
+            generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
             Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(expression));
         }
 
@@ -105,7 +123,17 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         [Test]
         public override void CanAlterSchema()
         {
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new AlterSchemaExpression()));
+            var expression = new AlterSchemaExpression();
+            var result = generator.Generate(expression);
+            result.ShouldBe(string.Empty);
+           
+        }
+
+        [Test]
+        public void CanAlterSchemaInStrictMode()
+        {
+            generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
         }
     }
 }

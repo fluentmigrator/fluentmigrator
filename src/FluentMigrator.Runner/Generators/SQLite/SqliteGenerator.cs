@@ -40,27 +40,28 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
         public override string Generate(AlterColumnExpression expression)
         {
-            throw new DatabaseOperationNotSupportedExecption("Sqlite does not support alter column");
+            return compatabilityMode.HandleCompatabilty("Sqlite does not support alter column");
+
         }
 
         public override string Generate(RenameColumnExpression expression)
         {
-            throw new DatabaseOperationNotSupportedExecption("Sqlite does not support renaming of columns");
+            return compatabilityMode.HandleCompatabilty("Sqlite does not support renaming of columns");
         }
 
 		public override string Generate(AlterDefaultConstraintExpression expression)
 		{
-            throw new DatabaseOperationNotSupportedExecption();
+            return compatabilityMode.HandleCompatabilty("Sqlite does not support altering of default constraints");
 		}
 
 		public override string Generate(CreateForeignKeyExpression expression)
 		{
-            throw new DatabaseOperationNotSupportedExecption("Forign keys are not supported in Sqlite");
+            return compatabilityMode.HandleCompatabilty("Forign keys are not supported in Sqlite");
 		}
 
 		public override string Generate(DeleteForeignKeyExpression expression)
 		{
-            throw new DatabaseOperationNotSupportedExecption("Forign keys are not supported in Sqlite");
+            return compatabilityMode.HandleCompatabilty("Forign keys are not supported in Sqlite");
 		}
 	}
 }

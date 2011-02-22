@@ -55,6 +55,15 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         [Test]
         public override void CanDeleteSchema()
         {
+            var expression = new DeleteSchemaExpression();
+            var result = generator.Generate(expression);
+            result.ShouldBe(string.Empty);
+        }
+
+        [Test]
+        public void CanDeleteSchemaInStrictMode()
+        {
+            generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
             Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new DeleteSchemaExpression()));
         }
     }

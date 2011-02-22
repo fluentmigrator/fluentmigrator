@@ -171,6 +171,15 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         [Test]
         public override void CanCreateSchema()
         {
+            var expression = new CreateSchemaExpression() { SchemaName = "TestSchema" };
+            var result = generator.Generate(expression);
+            result.ShouldBe(string.Empty);
+        }
+
+        [Test]
+        public void CanCreateSchemaInStrictMode()
+        {
+            generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
             Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
         }
     }

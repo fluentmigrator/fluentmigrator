@@ -111,7 +111,17 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         [Test]
         public override void CanAlterSchema()
         {
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new AlterSchemaExpression()));
+            var expression = new AlterSchemaExpression();
+            var result = generator.Generate(expression);
+            result.ShouldBe(string.Empty);
+
+        }
+
+        [Test]
+        public void CanAlterSchemaInStrictMode()
+        {
+            generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
         }
     }
 }

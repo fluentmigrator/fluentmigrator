@@ -5,6 +5,8 @@ using System.Text;
 using NUnit.Framework;
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Should;
+using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Generators;
 
 namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {
@@ -80,9 +82,20 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             throw new NotImplementedException();
         }
 
+        [Test]
         public override void CanAlterSchema()
         {
-            throw new NotImplementedException();
+            var expression = new AlterSchemaExpression();
+            var result = generator.Generate(expression);
+            result.ShouldBe(string.Empty);
+
+        }
+
+        [Test]
+        public void CanAlterSchemaInStrictMode()
+        {
+            generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
         }
     }
 }

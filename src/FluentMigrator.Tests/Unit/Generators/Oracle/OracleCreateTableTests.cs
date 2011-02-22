@@ -6,6 +6,7 @@ using NUnit.Framework;
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Should;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {
@@ -143,7 +144,16 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public override void CanCreateSchema()
         {
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression()));
+            var expression = new CreateSchemaExpression() { SchemaName = "TestSchema" };
+            var result = generator.Generate(expression);
+            result.ShouldBe(string.Empty);
+        }
+
+        [Test]
+        public void CanCreateSchemaInStrictMode()
+        {
+            generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
         }
     }
 }

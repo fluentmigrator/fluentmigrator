@@ -47,7 +47,17 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         {
                 // MySql does not appear to have a way to change column without re-specifying the existing column definition
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
-            	Assert.Throws<DatabaseOperationNotSupportedExecption>(() =>generator.Generate(expression));
+            var result = generator.Generate(expression);
+            result.ShouldBe(string.Empty);
+        }
+
+        [Test]
+        public void CanRenameColumnInStrictMode()
+        {
+            // MySql does not appear to have a way to change column without re-specifying the existing column definition
+            var expression = GeneratorTestHelper.GetRenameColumnExpression();
+            generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(expression));
         }
 
         [Test]
@@ -98,9 +108,20 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             sql.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` INTEGER NOT NULL AUTO_INCREMENT");
         }
 
+        [Test]
         public override void CanAlterSchema()
         {
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new AlterSchemaExpression()));
+            var expression = new AlterSchemaExpression();
+            var result = generator.Generate(expression);
+            result.ShouldBe(string.Empty);
+
+        }
+
+        [Test]
+        public void CanAlterSchemaInStrictMode()
+        {
+            generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
         }
     }
 }
