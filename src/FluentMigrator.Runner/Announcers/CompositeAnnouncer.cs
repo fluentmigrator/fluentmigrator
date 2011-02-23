@@ -29,6 +29,16 @@ namespace FluentMigrator.Runner.Announcers
 			Each(a => a.Say(message));
 		}
 
+        public void Heading(string message,params object[] args)
+        {
+            Heading(string.Format(message, args));
+        }
+
+        public void Say(string message, params object[] args)
+        {
+            Say(string.Format(message, args));
+        }
+
 		public void Sql(string sql)
 		{
 			Each(a => a.Sql(sql));
@@ -43,6 +53,11 @@ namespace FluentMigrator.Runner.Announcers
 		{
 			Each(a => a.Error(message));
 		}
+
+        public void Error(string message, params object[] args)
+        {
+            Error(string.Format(message ,args));
+        }
 
 		#endregion
 
