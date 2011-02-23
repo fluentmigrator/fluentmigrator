@@ -22,7 +22,7 @@ using System;
 
 namespace FluentMigrator.Runner.Announcers
 {
-	public class BaseAnnouncer : IAnnouncer
+	public class BaseAnnouncer : IAnnouncer, IFormattingAnnouncer
 	{
 		protected readonly Action<string> Write;
 

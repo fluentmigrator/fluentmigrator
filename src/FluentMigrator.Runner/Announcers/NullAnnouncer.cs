@@ -2,7 +2,7 @@
 
 namespace FluentMigrator.Runner.Announcers
 {
-	public class NullAnnouncer : IAnnouncer
+	public class NullAnnouncer : IAnnouncer, IFormattingAnnouncer
 	{
 		#region IAnnouncer Members
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace FluentMigrator.Runner.Announcers
 {
-	public class CompositeAnnouncer : IAnnouncer
+	public class CompositeAnnouncer : IAnnouncer, IFormattingAnnouncer
 	{
 		private readonly IEnumerable<IAnnouncer> _announcers;
 
