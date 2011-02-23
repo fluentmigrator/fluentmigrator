@@ -37,7 +37,7 @@ namespace FluentMigrator.Runner.Initialization.AssemblyLoader
 			{
 				fileName = Path.GetFullPath(this.name);
 			}
-			Assembly assembly = Assembly.LoadFile(fileName);
+            Assembly assembly = Assembly.LoadFrom(fileName);
 			return assembly;
 		}
 	}
