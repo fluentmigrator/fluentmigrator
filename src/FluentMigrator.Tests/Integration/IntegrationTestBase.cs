@@ -24,9 +24,11 @@ using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.MySql;
+using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Runner.Processors.Sqlite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using MySql.Data.MySqlClient;
+using Npgsql;
 
 namespace FluentMigrator.Tests.Integration
 {
@@ -50,6 +52,8 @@ namespace FluentMigrator.Tests.Integration
 				ExecuteWithSqlite(test, IntegrationTestOptions.SqlLite);
 			if (exceptProcessors.Count(t => typeof(MySqlProcessor).IsAssignableFrom(t)) == 0)
 				ExecuteWithMySql(test, IntegrationTestOptions.MySql);
+            if (exceptProcessors.Count(t => typeof(PostgresProcessor).IsAssignableFrom(t)) == 0)
+                ExecuteWithPostgres(test, IntegrationTestOptions.Postgres, tryRollback);
 		}
 
 		protected static void ExecuteWithSqlServer(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions, Boolean tryRollback)
@@ -86,5 +90,20 @@ namespace FluentMigrator.Tests.Integration
 			var processor = new MySqlProcessor(connection, new MySqlGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 			test(processor);
 		}
+
+        protected static void ExecuteWithPostgres(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions, Boolean tryRollback)
+        {
+            if (!serverOptions.IsEnabled)
+                return;
+
+            var connection = new NpgsqlConnection(serverOptions.ConnectionString);
+            var processor = new PostgresProcessor(connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+            test(processor);
+
+//            if (tryRollback && !processor.WasCommitted)
+//            {
+//                processor.RollbackTransaction();
+//            }
+        }
 	}
 }

@@ -137,7 +137,7 @@ namespace FluentMigrator.Runner.Generators
 			string keyColumns = "";
 			foreach (ColumnDefinition column in primaryKeyColumns)
 			{
-				keyColumns += column.Name + ",";
+				keyColumns += FormatName(column) + ",";
 			}
 			keyColumns = keyColumns.TrimEnd(',');
 			result += String.Format(", {0} PRIMARY KEY ({1})", GetPrimaryKeyConstraintName(primaryKeyColumns, tableName), keyColumns);
