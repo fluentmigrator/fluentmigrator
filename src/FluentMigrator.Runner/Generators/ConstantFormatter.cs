@@ -22,7 +22,7 @@ namespace FluentMigrator.Runner.Generators
 			}
 			if (value is bool)
 			{
-				return ((bool)value) ? 1.ToString() : 0.ToString();
+				return FormatBool(value);
 			}
 			if (value is Guid)
 			{
@@ -37,10 +37,22 @@ namespace FluentMigrator.Runner.Generators
                 return "'" + value.ToString() + "'";
             }
 
-
 			return value.ToString();
 		}
+
+	    protected virtual string FormatBool(object value)
+	    {
+	        return ((bool)value) ? 1.ToString() : 0.ToString();
+	    }
 	}
+
+    public class PostgresFormatter : ConstantFormatter
+    {
+        protected override string FormatBool(object value)
+        {
+            return ((bool)value) ? "true" : "false";
+        }
+    }
 
 	public class ConstantFormatterWithQuotedBackslashes : ConstantFormatter
 	{

@@ -322,6 +322,9 @@ namespace FluentMigrator.Tests.Integration
 		[Test]
 		public void MigrateUpWithSqlServerProcessorShouldCommitItsTransaction()
 		{
+            if (!IntegrationTestOptions.SqlServer.IsEnabled)
+                return;
+
 			var connection = new SqlConnection(IntegrationTestOptions.SqlServer.ConnectionString);
 			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 
@@ -342,6 +345,9 @@ namespace FluentMigrator.Tests.Integration
 		[Test]
 		public void MigrateUpSpecificVersionWithSqlServerProcessorShouldCommitItsTransaction()
 		{
+            if (!IntegrationTestOptions.SqlServer.IsEnabled)
+                return;
+
 			var connection = new SqlConnection(IntegrationTestOptions.SqlServer.ConnectionString);
 			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 

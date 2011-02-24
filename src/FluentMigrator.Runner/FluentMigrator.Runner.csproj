@@ -108,6 +108,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\MySql.Data.dll</HintPath>
     </Reference>
+    <Reference Include="Npgsql">
+      <HintPath>..\..\lib\Postgres\Npgsql.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -150,6 +153,9 @@
     <Compile Include="Generators\MySqlTypeMap.cs" />
     <Compile Include="Generators\OracleColumn.cs" />
     <Compile Include="Generators\OracleTypeMap.cs" />
+    <Compile Include="Generators\PostgresColumn.cs" />
+    <Compile Include="Generators\PostgresGenerator.cs" />
+    <Compile Include="Generators\PostgresTypeMap.cs" />
     <Compile Include="Generators\SqliteColumn.cs" />
     <Compile Include="Generators\SqliteTypeMap.cs" />
     <Compile Include="Generators\SqlServer2000TypeMap.cs" />
@@ -184,6 +190,8 @@
     <Compile Include="Processors\Oracle\OracleFactory.cs" />
     <Compile Include="Processors\Oracle\OracleProcessor.cs" />
     <Compile Include="Processors\Oracle\OracleProcessorFactory.cs" />
+    <Compile Include="Processors\Postgres\PostgresProcessor.cs" />
+    <Compile Include="Processors\Postgres\PostgresProcessorFactory.cs" />
     <Compile Include="Processors\ProcessorFactory.cs" />
     <Compile Include="Processors\ProcessorOptions.cs" />
     <Compile Include="Processors\SqlServer\SqlServerCeProcessor.cs" />
