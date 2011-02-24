@@ -24,6 +24,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		src\SolutionInfo.cs = src\SolutionInfo.cs
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.SchemaDump", "src\FluentMigrator.SchemaDump\FluentMigrator.SchemaDump.csproj", "{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		AutomatedRelease|Any CPU = AutomatedRelease|Any CPU
@@ -100,6 +102,15 @@ Global
 		{97849F97-BD7D-453B-B0CF-6CD922BB1596}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{97849F97-BD7D-453B-B0CF-6CD922BB1596}.Release|Any CPU.Build.0 = Release|Any CPU
 		{97849F97-BD7D-453B-B0CF-6CD922BB1596}.Release|x86.ActiveCfg = Release|Any CPU
+		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}.AutomatedRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}.AutomatedRelease|Any CPU.Build.0 = Release|Any CPU
+		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}.AutomatedRelease|x86.ActiveCfg = Release|Any CPU
+		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -109,6 +120,7 @@ Global
 		{664C7334-B44B-4D62-A0F8-063805D630AA} = {CB10ADAF-FB42-457B-ADFE-7CF866C5DA6E}
 		{C2B629E5-9394-48DA-A9E8-4999B398F37E} = {CB10ADAF-FB42-457B-ADFE-7CF866C5DA6E}
 		{97849F97-BD7D-453B-B0CF-6CD922BB1596} = {CB10ADAF-FB42-457B-ADFE-7CF866C5DA6E}
+		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413} = {CB10ADAF-FB42-457B-ADFE-7CF866C5DA6E}
 		{5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C} = {D264186F-3ED6-482D-8E1A-F41C2F83C711}
 		{FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8} = {C17FACD1-2740-44B5-8E6E-B7FF0D54CA40}
 	EndGlobalSection
