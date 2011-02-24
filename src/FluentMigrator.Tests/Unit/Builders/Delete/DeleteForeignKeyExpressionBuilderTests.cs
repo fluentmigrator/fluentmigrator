@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using FluentMigrator.Builders;
 using FluentMigrator.Builders.Delete.ForeignKey;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
@@ -60,6 +61,38 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 			foreignKeyMock.VerifyAll();
 			expressionMock.VerifyAll();
 		}
+
+        [Test]
+        public void CallingOnTableSetsForeignTableName()
+        {
+            var foreignKeyMock = new Mock<ForeignKeyDefinition>();
+            foreignKeyMock.SetupSet(f => f.ForeignTable = "Bacon").AtMostOnce();
+
+            var expressionMock = new Mock<DeleteForeignKeyExpression>();
+            expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMostOnce();
+
+            var builder = new DeleteForeignKeyExpressionBuilder(expressionMock.Object);
+            ((IDeleteForeignKeyOnTableSyntax)builder).OnTable(("Bacon"));
+
+            foreignKeyMock.VerifyAll();
+            expressionMock.VerifyAll();
+        }
+
+        [Test]
+        public void CallingInSchemaSetsForeignTableSchemaName()
+        {
+            var foreignKeyMock = new Mock<ForeignKeyDefinition>();
+            foreignKeyMock.SetupSet(f => f.ForeignTableSchema = "Bacon").AtMostOnce();
+
+            var expressionMock = new Mock<DeleteForeignKeyExpression>();
+            expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMostOnce();
+
+            var builder = new DeleteForeignKeyExpressionBuilder(expressionMock.Object);
+            ((IInSchemaSyntax)builder).InSchema("Bacon");
+
+            foreignKeyMock.VerifyAll();
+            expressionMock.VerifyAll();
+        }
 
 		[Test]
 		public void CallingForeignColumnAddsColumnNameToForeignColumnCollection()
