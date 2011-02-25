@@ -84,7 +84,7 @@ namespace FluentMigrator.Builders.Delete.ForeignKey
 
 		void IInSchemaSyntax.InSchema(string schemaName)
 		{
-			Expression.ForeignKey.PrimaryTableSchema = schemaName;
+			Expression.ForeignKey.ForeignTableSchema = schemaName;
 		}
 	}
 }
