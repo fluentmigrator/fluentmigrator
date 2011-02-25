@@ -202,7 +202,6 @@
     <Compile Include="Unit\Generators\Oracle\OracleDataTests.cs" />
     <Compile Include="Unit\Generators\Oracle\OracleDropTableTests.cs" />
     <Compile Include="Unit\Expressions\PerformDBOperationExpressionTests.cs" />
-    <Compile Include="Unit\Generators\Postgres\PostgresFormatterTests.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresGeneratorTests.cs" />
     <Compile Include="Unit\Generators\SQLite\SQLiteAlterTableTests.cs" />
     <Compile Include="Unit\Generators\SQLite\SQLiteCreateTableTests.cs" />
