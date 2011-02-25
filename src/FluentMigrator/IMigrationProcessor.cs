@@ -30,7 +30,7 @@ namespace FluentMigrator
 		IMigrationProcessorOptions Options { get; }
 
 		void Execute(string template, params object[] args);
-		DataSet ReadTableData(string tableName);
+        DataSet ReadTableData(string schemaName, string tableName);
 		DataSet Read(string template, params object[] args);
 		bool Exists(string template, params object[] args);
 

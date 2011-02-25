@@ -21,11 +21,14 @@ namespace FluentMigrator.Runner
 			Conventions = conventions;
 			VersionTableMetaData = GetVersionTableMetaData();
 			VersionMigration = new VersionMigration(VersionTableMetaData);
+		    VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
 
 			LoadVersionInfo();
 		}
 
-		private VersionInfo _versionInfo;
+	    protected VersionSchemaMigration VersionSchemaMigration { get; set; }
+
+	    private VersionInfo _versionInfo;
 		public IMigrationRunner Runner { get; set; }
 		protected Assembly Assembly { get; set; }
 		public IVersionTableMetaData VersionTableMetaData { get; set; }
@@ -73,11 +76,19 @@ namespace FluentMigrator.Runner
 			}
 		}
 
+        public bool AlreadyCreatedSchemaTable
+        {
+            get
+            {
+                return Processor.SchemaExists(VersionTableMetaData.SchemaName);
+            }
+        }
+
 		public bool AlreadyCreatedVersionTable
 		{
 			get
 			{
-				return Processor.TableExists(VersionTableMetaData.TableName);
+				return Processor.TableExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
 			}
 		}
 
@@ -96,6 +107,9 @@ namespace FluentMigrator.Runner
 				return;
 			}
 
+            if (!AlreadyCreatedSchemaTable)
+                Runner.Up(VersionSchemaMigration);
+
 			if ( !AlreadyCreatedVersionTable )
 			{
 				Runner.Up( VersionMigration );
@@ -103,7 +117,7 @@ namespace FluentMigrator.Runner
 				return;
 			}
 
-			var dataSet = Processor.ReadTableData( VersionTableMetaData.TableName );
+			var dataSet = Processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName );
 			_versionInfo = new VersionInfo();
 
 			foreach ( DataRow row in dataSet.Tables[ 0 ].Rows )
@@ -114,8 +128,14 @@ namespace FluentMigrator.Runner
 
 		public void RemoveVersionTable()
 		{
-			var expression = new DeleteTableExpression { TableName = VersionTableMetaData.TableName };
+		    var expression = new DeleteTableExpression {TableName = VersionTableMetaData.TableName, SchemaName = VersionTableMetaData.SchemaName};
 			expression.ExecuteWith( Processor );
+
+            if (!string.IsNullOrEmpty(VersionTableMetaData.SchemaName))
+            {
+                var schemaExpression = new DeleteSchemaExpression {SchemaName = VersionTableMetaData.SchemaName};
+                schemaExpression.ExecuteWith(Processor);
+            }
 		}
 
 		public void DeleteVersion(long version)

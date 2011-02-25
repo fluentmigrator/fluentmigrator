@@ -77,7 +77,7 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
             foreach(TableDefinition table in tables)
             {
                 table.Indexes = ReadIndexes(table.SchemaName, table.Name);
-                table.ForiengKeys = ReadForeignKeys(table.SchemaName, table.Name);
+                table.ForeignKeys = ReadForeignKeys(table.SchemaName, table.Name);
             }
 
             return tables as IList<TableDefinition>;

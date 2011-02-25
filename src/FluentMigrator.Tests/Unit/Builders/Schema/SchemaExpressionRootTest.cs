@@ -31,6 +31,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
 		private Mock<IMigrationContext> _migrationContextMock;
 		private string _testColumn;
 		private string _testTable;
+		private string _testSchema;
 		private SchemaExpressionRoot _builder;
 
 		[SetUp]
@@ -38,6 +39,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
 		{
 			_migrationContextMock = new Mock<IMigrationContext>();
 			_querySchemaMock = new Mock<IQuerySchema>();
+		    _testSchema = "testSchema";
 			_testTable = "testTable";
 			_testColumn = "testColumn";
 
@@ -48,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
 		[Test]
 		public void TestTableExists()
 		{
-			_querySchemaMock.Setup(x => x.TableExists(_testTable)).Returns(true).AtMostOnce();
+			_querySchemaMock.Setup(x => x.TableExists(null, _testTable)).Returns(true).AtMostOnce();
 
 			_builder.Table(_testTable).Exists().ShouldBeTrue();
 			_migrationContextMock.VerifyAll();
@@ -57,10 +59,28 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
 		[Test]
 		public void TestColumnExists()
 		{
-			_querySchemaMock.Setup(x => x.ColumnExists(_testTable, _testColumn)).Returns(true).AtMostOnce();
+			_querySchemaMock.Setup(x => x.ColumnExists(null, _testTable, _testColumn)).Returns(true).AtMostOnce();
 
 			_builder.Table(_testTable).Column(_testColumn).Exists().ShouldBeTrue();
 			_migrationContextMock.VerifyAll();
 		}
+
+        [Test]
+        public void TestTableExistsWithSchema()
+        {
+            _querySchemaMock.Setup(x => x.TableExists(_testSchema, _testTable)).Returns(true).AtMostOnce();
+
+            _builder.Schema(_testSchema).Table(_testTable).Exists().ShouldBeTrue();
+            _migrationContextMock.VerifyAll();
+        }
+
+        [Test]
+        public void TestColumnExistsWithSchema()
+        {
+            _querySchemaMock.Setup(x => x.ColumnExists(_testSchema, _testTable, _testColumn)).Returns(true).AtMostOnce();
+
+            _builder.Schema(_testSchema).Table(_testTable).Column(_testColumn).Exists().ShouldBeTrue();
+            _migrationContextMock.VerifyAll();
+        }
 	}
 }

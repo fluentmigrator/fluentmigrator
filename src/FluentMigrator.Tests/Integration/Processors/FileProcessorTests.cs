@@ -130,7 +130,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 			throw new NotImplementedException();
 		}
 
-		public override DataSet ReadTableData(string tableName)
+        public override DataSet ReadTableData(string schemaName, string tableName)
 		{
 			throw new NotImplementedException();
 		}
@@ -145,22 +145,22 @@ namespace FluentMigrator.Tests.Integration.Processors
 			throw new NotImplementedException();
 		}
 
-		public override bool TableExists(string tableName)
+        public override bool TableExists(string schemaName, string tableName)
 		{
 			throw new NotImplementedException();
 		}
 
-		public override bool ColumnExists(string tableName, string columnName)
+        public override bool ColumnExists(string schemaName, string tableName, string columnName)
 		{
 			throw new NotImplementedException();
 		}
 
-		public override bool ConstraintExists(string tableName, string constraintName)
+        public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
 		{
 			throw new NotImplementedException();
 		}
 
-        public override bool IndexExists(string tableName, string indexName)
+        public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             throw new NotImplementedException();
         }

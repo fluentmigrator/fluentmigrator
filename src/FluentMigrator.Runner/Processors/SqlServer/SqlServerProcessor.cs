@@ -47,22 +47,22 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             return Exists("SELECT * FROM SYS.SCHEMAS WHERE NAME = '{0}'", FormatSqlEscape(schemaName));
 		}
 
-		public override bool TableExists(string tableName)
+        public override bool TableExists(string schemaName, string tableName)
 		{
             return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{0}'", FormatSqlEscape(tableName));
 		}
 
-		public override bool ColumnExists(string tableName, string columnName)
+        public override bool ColumnExists(string schemaName, string tableName, string columnName)
 		{
             return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'", FormatSqlEscape(tableName), FormatSqlEscape(columnName));
 		}
 
-		public override bool ConstraintExists(string tableName, string constraintName)
+        public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
 		{
             return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_CATALOG = DB_NAME() AND TABLE_NAME = '{0}' AND CONSTRAINT_NAME = '{1}'", FormatSqlEscape(tableName), FormatSqlEscape(constraintName));
 		}
 
-        public override bool IndexExists(string tableName, string indexName)
+        public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             return Exists("SELECT NULL FROM sysindexes WHERE name = '{0}'", FormatSqlEscape(indexName));
         }
@@ -84,7 +84,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 			}
 		}
 
-		public override DataSet ReadTableData(string tableName)
+        public override DataSet ReadTableData(string schemaName, string tableName)
 		{
 			return Read("SELECT * FROM [{0}]", tableName);
 		}

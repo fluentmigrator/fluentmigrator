@@ -21,9 +21,9 @@ namespace FluentMigrator
 	public interface IQuerySchema
 	{
 		bool SchemaExists(string schemaName);
-		bool TableExists(string tableName);
-		bool ColumnExists(string tableName, string columnName);
-		bool ConstraintExists(string tableName, string constraintName);
-        bool IndexExists(string tableName, string indexName);
+		bool TableExists(string schemaName, string tableName);
+		bool ColumnExists(string schemaName, string tableName, string columnName);
+		bool ConstraintExists(string schemaName, string tableName, string constraintName);
+        bool IndexExists(string schemaName, string tableName, string indexName);
     }
 }

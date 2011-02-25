@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using FluentMigrator.VersionTableInfo;
 
 namespace FluentMigrator.Tests.Unit
@@ -24,9 +25,15 @@ namespace FluentMigrator.Tests.Unit
 	public class TestVersionTableMetaData : IVersionTableMetaData 
 	{
 		public const string TABLENAME = "testTableName";
+		public const string SCHEMANAME = "testSchemaName";
 		public const string COLUMNNAME = "testColumnName";
 
-		public string TableName
+	    public string SchemaName
+	    {
+	        get { return SCHEMANAME; }
+	    }
+
+	    public string TableName
 		{
 			get { return TABLENAME; }
 		}

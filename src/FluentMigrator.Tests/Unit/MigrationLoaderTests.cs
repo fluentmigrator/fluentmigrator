@@ -62,54 +62,6 @@ namespace FluentMigrator.Tests.Unit
 			migrationList.Select(x => x.Type).ShouldNotContain(typeof(VersionedMigration));
 			migrationList.Count().ShouldBeGreaterThan(0);
 		}
-
-		[Test]
-		[Ignore("Move to VersionLoaderTests")]
-		public void CanLoadDefaultVersionTableMetaData()
-		{
-//			var conventions = new MigrationConventions();
-//			var asm = Assembly.GetExecutingAssembly();
-//			var loader = new MigrationLoader(conventions, asm, string.Empty);
-//			
-//			IVersionTableMetaData versionTableMetaData = loader.GetVersionTableMetaData(asm);
-//			versionTableMetaData.ShouldBeOfType<TestVersionTableMetaData>();
-		}
-
-		[Test]
-		[Ignore("Move to VersionLoaderTests")]
-		public void CanLoadCustomVersionTableMetaData()
-		{
-//			var conventions = new MigrationConventions();
-//			var asm = GetAssemblyWithCustomVersionTableMetaData();
-//			var loader = new MigrationLoader(conventions, asm, string.Empty);
-//			
-//			IVersionTableMetaData versionTableMetaData = loader.GetVersionTableMetaData(asm);
-//			Assert.AreEqual(TestVersionTableMetaData.TABLENAME,versionTableMetaData.TableName);
-//			Assert.AreEqual(TestVersionTableMetaData.COLUMNNAME, versionTableMetaData.ColumnName);
-		}
-
-
-		/// <summary>
-		/// Creates an assembly by dynamically compiling TestVersionTableMetaData.cs
-		/// </summary>
-		/// <returns></returns>
-		private Assembly GetAssemblyWithCustomVersionTableMetaData()
-		{
-			CodeDomProvider provider = new Microsoft.CSharp.CSharpCodeProvider();
-
-			CompilerParameters parms = new CompilerParameters();
-
-			// Configure parameters
-			parms.GenerateExecutable = false;
-			parms.GenerateInMemory = true;
-			parms.IncludeDebugInformation = false;
-			parms.ReferencedAssemblies.Add("System.dll");
-			parms.ReferencedAssemblies.Add("FluentMigrator.dll");
-
-			CompilerResults results = provider.CompileAssemblyFromFile(parms, "..\\..\\Unit\\TestVersionTableMetaData.cs");
-			Assert.AreEqual(0, results.Errors.Count);
-			return results.CompiledAssembly;
-		}
 	}
 }
 

@@ -16,6 +16,7 @@
 //
 #endregion
 
+using FluentMigrator.Builders.Schema.Table;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Schema.Schema
@@ -33,7 +34,12 @@ namespace FluentMigrator.Builders.Schema.Schema
 
 		public bool Exists()
 		{
-			return _context.QuerySchema.TableExists(_schemaName);
+			return _context.QuerySchema.SchemaExists(_schemaName);
 		}
+
+        public ISchemaTableSyntax Table(string tableName)
+        {
+            return new SchemaTableQuery(_context, _schemaName, tableName);
+        }
 	}
 }

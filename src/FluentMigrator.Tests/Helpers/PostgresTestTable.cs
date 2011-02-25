@@ -9,16 +9,20 @@ namespace FluentMigrator.Tests.Helpers
 {
     public class PostgresTestTable : IDisposable
     {
+        private readonly string _schemaName;
         public NpgsqlConnection Connection { get; private set; }
         public string Name { get; set; }
+        public string NameWithSchema { get; set; }
         public NpgsqlTransaction Transaction { get; private set; }
 
-        public PostgresTestTable(PostgresProcessor processor, params string[] columnDefinitions)
+        public PostgresTestTable(PostgresProcessor processor, string schemaName, params string[] columnDefinitions)
         {
+            _schemaName = schemaName;
             Connection = processor.Connection;
             Transaction = processor.Transaction;
 
-            Name = "Table" + Guid.NewGuid().ToString("N");
+            Name = "\"Table" + Guid.NewGuid().ToString("N") + "\"";
+            NameWithSchema = string.IsNullOrEmpty(_schemaName) ? Name : string.Format("\"{0}\".{1}", _schemaName, Name);
             Create(columnDefinitions);
         }
 
@@ -32,7 +36,8 @@ namespace FluentMigrator.Tests.Helpers
             var sb = new StringBuilder();
 
             sb.Append("CREATE TABLE \"");
-            sb.Append(Name);
+
+            sb.Append(NameWithSchema);
             sb.Append("\" (");
 
             foreach (string definition in columnDefinitions)
@@ -51,7 +56,7 @@ namespace FluentMigrator.Tests.Helpers
 
         public void Drop()
         {
-            using (var command = new NpgsqlCommand(string.Format("DROP TABLE \"{0}\"", Name), Connection, Transaction))
+            using (var command = new NpgsqlCommand(string.Format("DROP TABLE {0}", NameWithSchema), Connection, Transaction))
                 command.ExecuteNonQuery();
         }
     }

@@ -61,13 +61,13 @@ namespace FluentMigrator.Tests.Integration
 
 					runner.Up(new TestCreateAndDropTableMigration());
 
-					processor.TableExists("TestTable").ShouldBeTrue();
+					processor.TableExists(null, "TestTable").ShouldBeTrue();
 
 					// This is a hack until MigrationVersionRunner and MigrationRunner are refactored and merged together
 					//processor.CommitTransaction();
 
 					runner.Down(new TestCreateAndDropTableMigration());
-					processor.TableExists("TestTable").ShouldBeFalse();
+					processor.TableExists(null, "TestTable").ShouldBeFalse();
 				});
 		}
 
@@ -102,10 +102,25 @@ namespace FluentMigrator.Tests.Integration
 
 					runner.Up(new TestForeignKeyNamingConvention());
 
-					processor.ConstraintExists("Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeTrue();
+					processor.ConstraintExists(null, "Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeTrue();
 					runner.Down(new TestForeignKeyNamingConvention());
 				}, false, typeof(SqliteProcessor));
 		}
+
+        [Test]
+        public void CanApplyForeignKeyConventionWithSchema()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestForeignKeyNamingConventionWithSchema());
+
+                    processor.ConstraintExists("TestSchema", "Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeTrue();
+                    runner.Down(new TestForeignKeyNamingConvention());
+                }, false, typeof(SqliteProcessor));
+        }
 
 		[Test]
 		public void CanApplyIndexConvention()
@@ -116,14 +131,32 @@ namespace FluentMigrator.Tests.Integration
 					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
 					runner.Up(new TestIndexNamingConvention());
-					processor.IndexExists("Users", "IX_Users_GroupId").ShouldBeTrue();
-					processor.TableExists("Users").ShouldBeTrue();
+					processor.IndexExists(null, "Users", "IX_Users_GroupId").ShouldBeTrue();
+					processor.TableExists(null, "Users").ShouldBeTrue();
 
 					runner.Down(new TestIndexNamingConvention());
-					processor.IndexExists("Users", "IX_Users_GroupId").ShouldBeFalse();
-					processor.TableExists("Users").ShouldBeFalse();
+					processor.IndexExists(null, "Users", "IX_Users_GroupId").ShouldBeFalse();
+					processor.TableExists(null, "Users").ShouldBeFalse();
 				});
 		}
+
+        [Test]
+        public void CanApplyIndexConventionWithSchema()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestIndexNamingConventionWithSchema());
+                    processor.IndexExists("TestSchema", "Users", "IX_Users_GroupId").ShouldBeTrue();
+                    processor.TableExists("TestSchema", "Users").ShouldBeTrue();
+
+                    runner.Down(new TestIndexNamingConvention());
+                    processor.IndexExists("TestSchema", "Users", "IX_Users_GroupId").ShouldBeFalse();
+                    processor.TableExists("TestSchema", "Users").ShouldBeFalse();
+                });
+        }
 
 		[Test]
 		public void CanCreateAndDropIndex()
@@ -134,20 +167,44 @@ namespace FluentMigrator.Tests.Integration
 					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
 					runner.Up(new TestCreateAndDropTableMigration());
-					processor.IndexExists("TestTable", "IX_TestTable_Name").ShouldBeFalse();
+					processor.IndexExists(null, "TestTable", "IX_TestTable_Name").ShouldBeFalse();
 
 					runner.Up(new TestCreateAndDropIndexMigration());
-					processor.IndexExists("TestTable", "IX_TestTable_Name").ShouldBeTrue();
+					processor.IndexExists(null, "TestTable", "IX_TestTable_Name").ShouldBeTrue();
 
 					runner.Down(new TestCreateAndDropIndexMigration());
-					processor.IndexExists("TestTable", "IX_TestTable_Name").ShouldBeFalse();
+					processor.IndexExists(null, "TestTable", "IX_TestTable_Name").ShouldBeFalse();
 
 					runner.Down(new TestCreateAndDropTableMigration());
-					processor.IndexExists("TestTable", "IX_TestTable_Name").ShouldBeFalse();
+					processor.IndexExists(null, "TestTable", "IX_TestTable_Name").ShouldBeFalse();
 
 					//processor.CommitTransaction();
 				});
 		}
+
+        [Test]
+        public void CanCreateAndDropIndexWithSchema()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateAndDropTableMigrationWithSchema());
+                    processor.IndexExists("TestSchema", "TestTable", "IX_TestTable_Name").ShouldBeFalse();
+
+                    runner.Up(new TestCreateAndDropIndexMigration());
+                    processor.IndexExists("TestSchema", "TestTable", "IX_TestTable_Name").ShouldBeTrue();
+
+                    runner.Down(new TestCreateAndDropIndexMigration());
+                    processor.IndexExists("TestSchema", "TestTable", "IX_TestTable_Name").ShouldBeFalse();
+
+                    runner.Down(new TestCreateAndDropTableMigration());
+                    processor.IndexExists("TestSchema", "TestTable", "IX_TestTable_Name").ShouldBeFalse();
+
+                    //processor.CommitTransaction();
+                });
+        }
 
 		[Test]
 		public void CanRenameTable()
@@ -158,22 +215,48 @@ namespace FluentMigrator.Tests.Integration
 					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
 					runner.Up(new TestCreateAndDropTableMigration());
-					processor.TableExists("TestTable2").ShouldBeTrue();
+					processor.TableExists(null, "TestTable2").ShouldBeTrue();
 
 					runner.Up(new TestRenameTableMigration());
-					processor.TableExists("TestTable2").ShouldBeFalse();
-					processor.TableExists("TestTable'3").ShouldBeTrue();
+					processor.TableExists(null, "TestTable2").ShouldBeFalse();
+					processor.TableExists(null, "TestTable'3").ShouldBeTrue();
 
 					runner.Down(new TestRenameTableMigration());
-					processor.TableExists("TestTable'3").ShouldBeFalse();
-					processor.TableExists("TestTable2").ShouldBeTrue();
+					processor.TableExists(null, "TestTable'3").ShouldBeFalse();
+					processor.TableExists(null, "TestTable2").ShouldBeTrue();
 
 					runner.Down(new TestCreateAndDropTableMigration());
-					processor.TableExists("TestTable2").ShouldBeFalse();
+					processor.TableExists(null, "TestTable2").ShouldBeFalse();
 
 					//processor.CommitTransaction();
 				});
 		}
+
+        [Test]
+        public void CanRenameTableWithSchema()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateAndDropTableMigrationWithSchema());
+                    processor.TableExists("TestSchema", "TestTable2").ShouldBeTrue();
+
+                    runner.Up(new TestRenameTableMigration());
+                    processor.TableExists("TestSchema", "TestTable2").ShouldBeFalse();
+                    processor.TableExists("TestSchema", "TestTable'3").ShouldBeTrue();
+
+                    runner.Down(new TestRenameTableMigration());
+                    processor.TableExists("TestSchema", "TestTable'3").ShouldBeFalse();
+                    processor.TableExists("TestSchema", "TestTable2").ShouldBeTrue();
+
+                    runner.Down(new TestCreateAndDropTableMigration());
+                    processor.TableExists("TestSchema", "TestTable2").ShouldBeFalse();
+
+                    //processor.CommitTransaction();
+                });
+        }
 
 		[Test, Explicit("Sqlite will fail here. Run this explicitly to see other generators process this correctly")]
 		public void CanRenameColumn()
@@ -184,20 +267,44 @@ namespace FluentMigrator.Tests.Integration
 					var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
 					runner.Up(new TestCreateAndDropTableMigration());
-					processor.ColumnExists("TestTable2", "Name").ShouldBeTrue();
+					processor.ColumnExists(null, "TestTable2", "Name").ShouldBeTrue();
 
 					runner.Up(new TestRenameColumnMigration());
-					processor.ColumnExists("TestTable2", "Name").ShouldBeFalse();
-					processor.ColumnExists("TestTable2", "Name'3").ShouldBeTrue();
+					processor.ColumnExists(null, "TestTable2", "Name").ShouldBeFalse();
+					processor.ColumnExists(null, "TestTable2", "Name'3").ShouldBeTrue();
 
 					runner.Down(new TestRenameColumnMigration());
-					processor.ColumnExists("TestTable2", "Name'3").ShouldBeFalse();
-					processor.ColumnExists("TestTable2", "Name").ShouldBeTrue();
+					processor.ColumnExists(null, "TestTable2", "Name'3").ShouldBeFalse();
+					processor.ColumnExists(null, "TestTable2", "Name").ShouldBeTrue();
 
 					runner.Down(new TestCreateAndDropTableMigration());
-					processor.ColumnExists("TestTable2", "Name").ShouldBeFalse();
+					processor.ColumnExists(null, "TestTable2", "Name").ShouldBeFalse();
 				});
 		}
+
+        [Test, Explicit("Sqlite will fail here. Run this explicitly to see other generators process this correctly")]
+        public void CanRenameColumnWithSchema()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateAndDropTableMigrationWithSchema());
+                    processor.ColumnExists("TestSchema", "TestTable2", "Name").ShouldBeTrue();
+
+                    runner.Up(new TestRenameColumnMigration());
+                    processor.ColumnExists("TestSchema", "TestTable2", "Name").ShouldBeFalse();
+                    processor.ColumnExists("TestSchema", "TestTable2", "Name'3").ShouldBeTrue();
+
+                    runner.Down(new TestRenameColumnMigration());
+                    processor.ColumnExists("TestSchema", "TestTable2", "Name'3").ShouldBeFalse();
+                    processor.ColumnExists("TestSchema", "TestTable2", "Name").ShouldBeTrue();
+
+                    runner.Down(new TestCreateAndDropTableMigration());
+                    processor.ColumnExists("TestSchema", "TestTable2", "Name").ShouldBeFalse();
+                });
+        }
 
 		[Test]
 		public void CanLoadMigrations()
@@ -259,7 +366,7 @@ namespace FluentMigrator.Tests.Integration
 				runner.MigrateUp(1);
 
 				runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
-				processor.TableExists("Users").ShouldBeTrue();
+				processor.TableExists(null, "Users").ShouldBeTrue();
 			});
 		}
 
@@ -275,7 +382,7 @@ namespace FluentMigrator.Tests.Integration
 					runner.MigrateUp(1);
 
 					runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
-					processor.TableExists("Users").ShouldBeTrue();
+					processor.TableExists(null, "Users").ShouldBeTrue();
 				}, false, typeof(SqliteProcessor));
 
 				ExecuteWithSupportedProcessors(processor =>
@@ -284,7 +391,7 @@ namespace FluentMigrator.Tests.Integration
 					testRunner.MigrateDown(1);
 
 					testRunner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeFalse();
-					processor.TableExists("Users").ShouldBeFalse();
+					processor.TableExists(null, "Users").ShouldBeFalse();
 				}, false, typeof(SqliteProcessor));
 
 			}
@@ -307,7 +414,7 @@ namespace FluentMigrator.Tests.Integration
 
 				runner.MigrateUp(2);
 
-				processor.TableExists(runner.VersionLoader.VersionTableMetaData.TableName).ShouldBeTrue();
+                processor.TableExists(runner.VersionLoader.VersionTableMetaData.SchemaName, runner.VersionLoader.VersionTableMetaData.TableName).ShouldBeTrue();
 			});
 
 			ExecuteWithSupportedProcessors(processor =>
@@ -315,7 +422,7 @@ namespace FluentMigrator.Tests.Integration
 				MigrationRunner runner = SetupMigrationRunner(processor);
 				runner.RollbackToVersion(0);
 
-				processor.TableExists(runner.VersionLoader.VersionTableMetaData.TableName).ShouldBeFalse();
+                processor.TableExists(runner.VersionLoader.VersionTableMetaData.SchemaName, runner.VersionLoader.VersionTableMetaData.TableName).ShouldBeFalse();
 			});
 		}
 
@@ -525,4 +632,117 @@ namespace FluentMigrator.Tests.Integration
 			Delete.Index("IX_TestTable_Name").OnTable("TestTable");
 		}
 	}
+
+
+    internal class TestForeignKeyNamingConventionWithSchema : Migration
+    {
+        public override void Up()
+        {
+            Create.Table("Users")
+                .InSchema("TestSchema")
+                .WithColumn("UserId").AsInt32().Identity().PrimaryKey()
+                .WithColumn("GroupId").AsInt32().NotNullable()
+                .WithColumn("UserName").AsString(32).NotNullable()
+                .WithColumn("Password").AsString(32).NotNullable();
+
+            Create.Table("Groups")
+                .InSchema("TestSchema")
+                .WithColumn("GroupId").AsInt32().Identity().PrimaryKey()
+                .WithColumn("Name").AsString(32).NotNullable();
+
+            Create.ForeignKey().FromTable("Users").InSchema("TestSchema").ForeignColumn("GroupId").ToTable("Groups").InSchema("TestSchema").PrimaryColumn("GroupId");
+        }
+
+        public override void Down()
+        {
+            Delete.Table("Users");
+            Delete.Table("Groups");
+        }
+    }
+
+    internal class TestIndexNamingConventionWithSchema : Migration
+    {
+        public override void Up()
+        {
+            Create.Table("Users")
+                .InSchema("TestSchema")
+                .WithColumn("UserId").AsInt32().Identity().PrimaryKey()
+                .WithColumn("GroupId").AsInt32().NotNullable()
+                .WithColumn("UserName").AsString(32).NotNullable()
+                .WithColumn("Password").AsString(32).NotNullable();
+
+            Create.Index().OnTable("Users").InSchema("TestSchema").OnColumn("GroupId").Ascending();
+        }
+
+        public override void Down()
+        {
+            Delete.Index("IX_Users_GroupId").OnTable("Users").OnColumn("GroupId");
+            Delete.Table("Users");
+        }
+    }
+
+    internal class TestCreateAndDropTableMigrationWithSchema : Migration
+    {
+        public override void Up()
+        {
+            Create.Table("TestTable")
+                .InSchema("TestSchema")
+                .WithColumn("Id").AsInt32().NotNullable().PrimaryKey().Identity()
+                .WithColumn("Name").AsString(255).NotNullable().WithDefaultValue("Anonymous");
+
+            Create.Table("TestTable2")
+                .InSchema("TestSchema")
+                .WithColumn("Id").AsInt32().NotNullable().PrimaryKey().Identity()
+                .WithColumn("Name").AsString(255).Nullable()
+                .WithColumn("TestTableId").AsInt32().NotNullable();
+
+            Create.Index("ix_Name").OnTable("TestTable2").InSchema("TestSchema").OnColumn("Name").Ascending()
+                .WithOptions().NonClustered();
+
+            Create.Column("Name2").OnTable("TestTable2").InSchema("TestSchema").AsBoolean().Nullable();
+
+            Create.ForeignKey("fk_TestTable2_TestTableId_TestTable_Id")
+                .FromTable("TestTable2").InSchema("TestSchema").ForeignColumn("TestTableId")
+                .ToTable("TestTable").InSchema("TestSchema").PrimaryColumn("Id");
+
+            Insert.IntoTable("TestTable").InSchema("TestSchema").Row(new { Name = "Test" });
+        }
+
+        public override void Down()
+        {
+            Delete.Table("TestTable2").InSchema("TestSchema");
+            Delete.Table("TestTable").InSchema("TestSchema");
+        }
+    }
+
+    internal class TestRenameTableMigrationWithSchema : AutoReversingMigration
+    {
+        public override void Up()
+        {
+            Rename.Table("TestTable2").InSchema("TestSchema").To("TestTable'3");
+        }
+    }
+
+    internal class TestRenameColumnMigrationWithSchema : AutoReversingMigration
+    {
+        public override void Up()
+        {
+            Rename.Column("Name").OnTable("TestTable2").InSchema("TestSchema").To("Name'3");
+        }
+    }
+
+    internal class TestCreateAndDropIndexMigrationWithSchema : Migration
+    {
+        public override void Up()
+        {
+            Create.Index("IX_TestTable_Name").OnTable("TestTable").InSchema("TestSchema").OnColumn("Name");
+        }
+
+        public override void Down()
+        {
+            Delete.Index("IX_TestTable_Name").OnTable("TestTable").InSchema("TestSchema");
+        }
+    }
+
+
 }

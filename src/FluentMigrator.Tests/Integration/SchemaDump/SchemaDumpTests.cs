@@ -53,7 +53,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump {
                 Name = "tableName",
                 Columns = new List<ColumnDefinition>() { new ColumnDefinition() },
                 Indexes = new List<IndexDefinition>() { new IndexDefinition() },
-                ForiengKeys = new List<ForeignKeyDefinition>() { new ForeignKeyDefinition() }
+                ForeignKeys = new List<ForeignKeyDefinition>() { new ForeignKeyDefinition() }
             };
 
             List<TableDefinition> defs = new List<TableDefinition>();

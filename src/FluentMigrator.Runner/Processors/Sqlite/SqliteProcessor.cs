@@ -38,25 +38,25 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
 		public override bool SchemaExists(string schemaName)
 		{
-			throw new NotImplementedException();
+		    return true;
 		}
 
-		public override bool TableExists(string tableName)
+        public override bool TableExists(string schemaName, string tableName)
 		{
             return Exists("select count(*) from sqlite_master where name=\"{0}\" and type='table'", tableName);
 		}
 
-		public override bool ColumnExists(string tableName, string columnName)
+        public override bool ColumnExists(string schemaName, string tableName, string columnName)
 		{
 		    return Read("PRAGMA table_info({0})",tableName).Tables[0].Select(string.Format("Name='{0}'",columnName.Replace("'","''"))).Length>0;
         }
 
-		public override bool ConstraintExists(string tableName, string constraintName)
+        public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
 		{
 			return false;
 		}
 
-        public override bool IndexExists(string tableName, string indexName)
+        public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             return Exists("select count(*) from sqlite_master where name='{0}' and tbl_name='{1}' and type='index'", indexName, tableName);
         }
@@ -86,7 +86,7 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 			}
 		}
 
-		public override DataSet ReadTableData(string tableName)
+        public override DataSet ReadTableData(string schemaName, string tableName)
 		{
 			return Read("select * from {0}", tableName);
 		}

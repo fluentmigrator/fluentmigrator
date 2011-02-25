@@ -45,7 +45,7 @@ namespace FluentMigrator.Tests.Integration
 			var profile = "Debug";
 			var dataSet = new DataSet();
 			dataSet.Tables.Add(new DataTable());
-			processor.Setup(x => x.ReadTableData(It.IsAny<string>())).Returns(dataSet);
+			processor.Setup(x => x.ReadTableData(null, It.IsAny<string>())).Returns(dataSet);
 
 			var runnerContext = new Mock<IRunnerContext>();
 			runnerContext.SetupGet(x => x.Database).Returns("sqlserver");

@@ -32,28 +32,28 @@ namespace FluentMigrator.Runner.Processors.Postgres
             return Exists("select * from information_schema.schemata where schema_name = '{0}'", schemaName);
         }
 
-        public override bool TableExists(string tableName)
+        public override bool TableExists(string schemaName, string tableName)
         {
             return Exists("select * from information_schema.tables where table_name = '{0}'", tableName);
         }
 
-        public override bool ColumnExists(string tableName, string columnName)
+        public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             return Exists("select * from information_schema.columns where table_name = '{0}' and column_name = '{1}'", tableName, columnName);
         }
 
-        public override bool ConstraintExists(string tableName, string constraintName)
+        public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
             //return Exists("select * from pg_catalog.pg_constraint con inner join pg_class cls on con.conrelid = cls.oid where cls.relname = '{0}' and con.conname = '{1}'", tableName, constraintName);
             return Exists("select * from information_schema.table_constraints where constraint_catalog = current_catalog and table_name = '{0}' and constraint_name = '{1}'", tableName, constraintName);
         }
 
-        public override bool IndexExists(string tableName, string indexName)
+        public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             return Exists("select * from pg_catalog.pg_indexes where tablename = '{0}' and indexname = '{1}'", tableName, indexName);
         }
 
-        public override DataSet ReadTableData(string tableName)
+        public override DataSet ReadTableData(string schemaName, string tableName)
         {
             return Read("SELECT * FROM \"{0}\"", tableName);
         }
