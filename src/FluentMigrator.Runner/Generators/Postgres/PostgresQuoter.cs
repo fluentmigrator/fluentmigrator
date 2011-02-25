@@ -6,11 +6,11 @@ namespace FluentMigrator.Runner.Generators.Postgres
 	{
 		public override string FormatBool(bool value) { return value ? "true" : "false"; }
 
-        public override string QuoteSchemaName(string schemaName)
-        {
-            if (string.IsNullOrEmpty(schemaName))
-                schemaName = "public";
-            return base.QuoteSchemaName(schemaName);
-        }
+		public override string QuoteSchemaName(string schemaName)
+		{
+			if (string.IsNullOrEmpty(schemaName))
+				schemaName = "public";
+			return base.QuoteSchemaName(schemaName);
+		}
 	}
 }
