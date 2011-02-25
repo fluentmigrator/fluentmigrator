@@ -1,8 +1,7 @@
-﻿using System;
-using System.Data;
+﻿using System.Data;
 using FluentMigrator.Runner.Generators.Base;
 
-namespace FluentMigrator.Runner.Generators
+namespace FluentMigrator.Runner.Generators.Postgres
 {
 	internal class PostgresTypeMap : TypeMapBase 
     {

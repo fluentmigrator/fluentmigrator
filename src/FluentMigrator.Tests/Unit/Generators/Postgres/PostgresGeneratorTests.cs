@@ -4,6 +4,7 @@ using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.Postgres;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -61,8 +62,19 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 			CreateTableExpression expression = GetCreateTableExpression(tableName);
 			expression.Columns[0].IsPrimaryKey = true;
 			string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text NOT NULL , CONSTRAINT \"PK_NewTable\" PRIMARY KEY (\"ColumnName1\"), \"ColumnName2\" integer NOT NULL)");
+            sql.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text NOT NULL, \"ColumnName2\" integer NOT NULL, PRIMARY KEY (\"ColumnName1\"))");
 		}
+
+        [Test]
+        public void CanCreateTableWithPrimaryKeyNamed()
+        {
+            string tableName = "NewTable";
+            CreateTableExpression expression = GetCreateTableExpression(tableName);
+            expression.Columns[0].IsPrimaryKey = true;
+            expression.Columns[0].PrimaryKeyName = "PK_NewTable";
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text NOT NULL, \"ColumnName2\" integer NOT NULL, CONSTRAINT \"PK_NewTable\" PRIMARY KEY (\"ColumnName1\"))");
+        }
 
 		[Test]
 		public void CanCreateTableWithDefaultValue()
@@ -97,16 +109,27 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
 		[Test]
-		public void CanCreateTableWithMultipartKey()
+		public void CanCreateTableWithMultiColumnPrimaryKey()
 		{
 			string tableName = "NewTable";
 			CreateTableExpression expression = GetCreateTableExpression(tableName);
 			expression.Columns[0].IsPrimaryKey = true;
 			expression.Columns[1].IsPrimaryKey = true;
 			string sql = generator.Generate(expression);
-			// See the note in OracleColumn about why the PK should not be named
-            sql.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text NOT NULL, \"ColumnName2\" integer NOT NULL, CONSTRAINT \"ColumnName1_ColumnName2_PK\" PRIMARY KEY (\"ColumnName1\",\"ColumnName2\"))");
+            sql.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text NOT NULL, \"ColumnName2\" integer NOT NULL, PRIMARY KEY (\"ColumnName1\",\"ColumnName2\"))");
 		}
+
+        [Test]
+        public void CanCreateTableWithMultiColumnPrimaryKeyNamed()
+        {
+            string tableName = "NewTable";
+            CreateTableExpression expression = GetCreateTableExpression(tableName);
+            expression.Columns[0].IsPrimaryKey = true;
+            expression.Columns[0].PrimaryKeyName = "wibble";
+            expression.Columns[1].IsPrimaryKey = true;
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text NOT NULL, \"ColumnName2\" integer NOT NULL, CONSTRAINT \"wibble\" PRIMARY KEY (\"ColumnName1\",\"ColumnName2\"))");
+        }
 
 		[Test]
 		public void CanDropTable()

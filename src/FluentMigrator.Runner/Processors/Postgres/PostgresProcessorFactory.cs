@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.Postgres;
 using Npgsql;
 
 namespace FluentMigrator.Runner.Processors.Postgres

@@ -3,20 +3,41 @@ using System.Data;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
 
-namespace FluentMigrator.Runner.Generators
+namespace FluentMigrator.Runner.Generators.Postgres
 {
     internal class PostgresColumn : ColumnBase
     {
-        public PostgresColumn() : base(new PostgresTypeMap(), new PostgreQuoter()) { }
+        public PostgresColumn() : base(new PostgresTypeMap(), new PostgresQuoter()) { }
 
         protected override string FormatIdentity(ColumnDefinition column)
         {
             return string.Empty;
         }
 
-        protected override string FormatPrimaryKey(ColumnDefinition column)
+//        protected override string FormatPrimaryKey(ColumnDefinition column)
+//        {
+//            return column.IsPrimaryKey ? string.Format(", CONSTRAINT \"PK_{1}\" PRIMARY KEY (\"{0}\")", column.Name, column.TableName) : string.Empty;
+//        }
+
+        public override string AddPrimaryKeyConstraint(string tableName, System.Collections.Generic.IEnumerable<ColumnDefinition> primaryKeyColumns)
         {
-            return column.IsPrimaryKey ? string.Format(", CONSTRAINT \"PK_{1}\" PRIMARY KEY (\"{0}\")", column.Name, column.TableName) : string.Empty;
+            string pkName = GetPrimaryKeyConstraintName(primaryKeyColumns, tableName);
+
+            string cols = string.Empty;
+            bool first = true;
+            foreach (var col in primaryKeyColumns)
+            {
+                if (first)
+                    first = false;
+                else
+                    cols += ",";
+                cols += Quoter.QuoteColumnName(col.Name);
+            }
+
+            if (string.IsNullOrEmpty(pkName))
+                return string.Format(", PRIMARY KEY ({0})", cols);
+
+            return string.Format(", {0}PRIMARY KEY ({1})", pkName, cols);
         }
 
         protected override string FormatSystemMethods(SystemMethods systemMethod)

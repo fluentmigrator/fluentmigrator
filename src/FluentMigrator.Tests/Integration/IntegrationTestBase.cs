@@ -22,6 +22,7 @@ using System.Data.SQLite;
 using System.Linq;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.Postgres;
