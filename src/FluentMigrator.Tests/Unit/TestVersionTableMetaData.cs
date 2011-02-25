@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit
 	[VersionTableMetaData]
 	public class TestVersionTableMetaData : IVersionTableMetaData 
 	{
-		public const string TABLENAME = "testTableName";
+		public const string TABLENAME = "testVersionTableName";
 		public const string SCHEMANAME = "testSchemaName";
 		public const string COLUMNNAME = "testColumnName";
 

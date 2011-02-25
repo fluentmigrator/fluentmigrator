@@ -48,7 +48,7 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
 		{
-		    return Read("PRAGMA table_info({0})",tableName).Tables[0].Select(string.Format("Name='{0}'",columnName.Replace("'","''"))).Length>0;
+		    return Read("PRAGMA table_info([{0}])",tableName).Tables[0].Select(string.Format("Name='{0}'",columnName.Replace("'","''"))).Length>0;
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
@@ -88,7 +88,7 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
         public override DataSet ReadTableData(string schemaName, string tableName)
 		{
-			return Read("select * from {0}", tableName);
+			return Read("select * from [{0}]", tableName);
 		}
 
 		public override void Process(PerformDBOperationExpression expression)
@@ -109,18 +109,66 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 			if (Connection.State != ConnectionState.Open)
 				Connection.Open();
 
-			using (var command = new SQLiteCommand(sql, Connection))
-			{
-				try
-				{
-					command.ExecuteNonQuery();
-				}
-				catch (SQLiteException ex)
-				{
-					throw new SQLiteException(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
-				}
-			}
+            if (sql.Contains("GO"))
+            {
+                ExecuteBatchNonQuery(sql, Connection);
+
+            }
+            else
+            {
+                ExecuteNonQuery(sql, Connection);
+            }
+
+			
 		}
+
+        private void ExecuteNonQuery(string sql, SQLiteConnection connection)
+        {
+            using (var command = new SQLiteCommand(sql, Connection))
+            {
+                try
+                {
+                    command.ExecuteNonQuery();
+                }
+                catch (SQLiteException ex)
+                {
+                    throw new SQLiteException(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
+                }
+            }
+        }
+
+        private void ExecuteBatchNonQuery(string sql, SQLiteConnection conn)
+        {
+            sql += "\nGO";   // make sure last batch is executed.
+            string sqlBatch = string.Empty;
+            
+            using (var command = new SQLiteCommand(sql, Connection))
+            {
+                try
+                {
+                    foreach (string line in sql.Split(new string[2] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        if (line.ToUpperInvariant().Trim() == "GO")
+                        {
+                            if (!string.IsNullOrEmpty(sqlBatch))
+                            {
+                                command.CommandText = sqlBatch;
+                                command.ExecuteNonQuery();
+                                sqlBatch = string.Empty;
+                            }
+                        }
+                        else
+                        {
+                            sqlBatch += line + "\n";
+                        }
+                    }
+                }
+                 catch (SQLiteException ex)
+                {
+                    throw new SQLiteException(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
+                }
+            }
+        }
 
 		public override DataSet Read(string template, params object[] args)
 		{

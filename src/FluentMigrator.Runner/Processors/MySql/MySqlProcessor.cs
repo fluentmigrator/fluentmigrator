@@ -75,6 +75,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
 			using (var command = new MySqlCommand(String.Format(template, args), Connection))
 			{
+				command.CommandTimeout = Options.Timeout;
 				command.ExecuteNonQuery();
 			}
 		}
@@ -84,18 +85,21 @@ namespace FluentMigrator.Runner.Processors.MySql
 			if (Connection.State != ConnectionState.Open) Connection.Open();
 
 			using (var command = new MySqlCommand(String.Format(template, args), Connection))
-			using (var reader = command.ExecuteReader())
 			{
-				try
+				command.CommandTimeout = Options.Timeout;
+				using (var reader = command.ExecuteReader())
 				{
-					if (!reader.Read())
-						return false;
+					try
+					{
+						if (!reader.Read())
+							return false;
 
-					return true;
-				}
-				catch
-				{
-					return false;
+						return true;
+					}
+					catch
+					{
+						return false;
+					}
 				}
 			}
 		}
@@ -111,10 +115,14 @@ namespace FluentMigrator.Runner.Processors.MySql
 
 			DataSet ds = new DataSet();
 			using (var command = new MySqlCommand(String.Format(template, args), Connection))
-			using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
 			{
-				adapter.Fill(ds);
-				return ds;
+				command.CommandTimeout = Options.Timeout;
+
+				using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
+				{
+					adapter.Fill(ds);
+					return ds;
+				}
 			}
 		}
 
@@ -129,7 +137,10 @@ namespace FluentMigrator.Runner.Processors.MySql
 				Connection.Open();
 
 			using (var command = new MySqlCommand(sql, Connection))
+			{
+				command.CommandTimeout = Options.Timeout;
 				command.ExecuteNonQuery();
+			}
 		}
 
 		public override void Process(PerformDBOperationExpression expression)

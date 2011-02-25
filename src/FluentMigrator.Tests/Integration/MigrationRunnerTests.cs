@@ -24,6 +24,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Sqlite;
@@ -429,8 +430,8 @@ namespace FluentMigrator.Tests.Integration
 		[Test]
 		public void MigrateUpWithSqlServerProcessorShouldCommitItsTransaction()
 		{
-            if (!IntegrationTestOptions.SqlServer.IsEnabled)
-                return;
+			if (!IntegrationTestOptions.SqlServer.IsEnabled)
+				return;
 
 			var connection = new SqlConnection(IntegrationTestOptions.SqlServer.ConnectionString);
 			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
@@ -452,8 +453,8 @@ namespace FluentMigrator.Tests.Integration
 		[Test]
 		public void MigrateUpSpecificVersionWithSqlServerProcessorShouldCommitItsTransaction()
 		{
-            if (!IntegrationTestOptions.SqlServer.IsEnabled)
-                return;
+			if (!IntegrationTestOptions.SqlServer.IsEnabled)
+				return;
 
 			var connection = new SqlConnection(IntegrationTestOptions.SqlServer.ConnectionString);
 			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());

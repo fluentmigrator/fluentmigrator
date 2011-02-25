@@ -99,7 +99,7 @@
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Moq, Version=2.6.1014.1, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
+    <Reference Include="Moq, Version=3.1.416.3, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Moq.dll</HintPath>
     </Reference>
@@ -107,10 +107,11 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\MySql.Data.dll</HintPath>
     </Reference>
-    <Reference Include="Npgsql">
+    <Reference Include="Npgsql, Version=2.0.11.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Postgres\Npgsql.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=2.4.6.0, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+    <Reference Include="nunit.framework, Version=2.5.9.10320, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\nunit.framework.dll</HintPath>
     </Reference>
@@ -149,9 +150,9 @@
     <Compile Include="Integration\Migrations\Interleaved\Pass3\2_UserEmail.cs" />
     <Compile Include="Integration\Migrations\Invalid\InvalidMigration.cs" />
     <Compile Include="Integration\Migrations\Invalid\InvalidMigration2.cs" />
-    <Compile Include="Integration\Processors\PostgresProcessorTests.cs" />
     <Compile Include="Integration\Processors\FileProcessorTests.cs" />
     <Compile Include="Integration\Processors\OracleProcessorTests.cs" />
+    <Compile Include="Integration\Processors\PostgresProcessorTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaDumpTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaTestWriter.cs" />
     <Compile Include="Integration\VersionMigrationTests.cs" />
@@ -178,23 +179,49 @@
     <Compile Include="Unit\Expressions\CreateForeignKeyExpressionTests.cs" />
     <Compile Include="Unit\Expressions\CreateIndexExpressionTests.cs" />
     <Compile Include="Unit\Expressions\CreateTableExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\ExecuteEmbeddedSqlExpressionTests.cs" />
     <Compile Include="Unit\Expressions\ExecuteSqlScriptExpressionTests.cs" />
     <Compile Include="Unit\Expressions\ExecuteSqlStatementExpressionTests.cs" />
-    <Compile Include="Unit\Generators\ConstantFormatterTests.cs" />
-    <Compile Include="Unit\Generators\PostgresFormatterTests.cs" />
-    <Compile Include="Unit\Generators\PostgresGeneratorTests.cs" />
-    <Compile Include="Unit\Generators\JetGeneratorTests.cs" />
-    <Compile Include="Unit\Generators\MySqlGeneratorTests.cs" />
-    <Compile Include="Unit\Generators\OracleGeneratorTests.cs" />
+    <Compile Include="Unit\Generators\GenericGenerator\QuoterTests.cs" />
+    <Compile Include="Unit\Generators\BaseDataTests.cs" />
+    <Compile Include="Unit\Generators\GeneratorBaseTests.cs" />
+    <Compile Include="Unit\Generators\GeneratorTestHelper.cs" />
+    <Compile Include="Unit\Generators\GenericGenerator\GenericGeneratorCreateTableTests.cs" />
+    <Compile Include="Unit\Generators\GenericGenerator\GenericGeneratorImplementor.cs" />
+    <Compile Include="Unit\Generators\GenericGenerator\GenericGeneratorTestBase.cs" />
+    <Compile Include="Unit\Generators\Jet\JetAlterTableTests.cs" />
+    <Compile Include="Unit\Generators\Jet\JetCreateTableTests.cs" />
+    <Compile Include="Unit\Generators\Jet\JetDataTests.cs" />
+    <Compile Include="Unit\Generators\Jet\JetDropTableTests.cs" />
+    <Compile Include="Unit\Generators\MySql\MySqlAlterTableTestscs.cs" />
+    <Compile Include="Unit\Generators\MySql\MySqlCreateTableTests.cs" />
+    <Compile Include="Unit\Generators\MySql\MySqlDataTests.cs" />
+    <Compile Include="Unit\Generators\MySql\MySqlDropTableTests.cs" />
+    <Compile Include="Unit\Generators\Oracle\OracleAlterTableTests.cs" />
+    <Compile Include="Unit\Generators\Oracle\OracleCreateTableTests.cs" />
+    <Compile Include="Unit\Generators\Oracle\OracleDataTests.cs" />
+    <Compile Include="Unit\Generators\Oracle\OracleDropTableTests.cs" />
     <Compile Include="Unit\Expressions\PerformDBOperationExpressionTests.cs" />
-    <Compile Include="Unit\Generators\SqliteGeneratorWithConventionsAppliedTests.cs" />
-    <Compile Include="Unit\Generators\SqlServer2000GeneratorTests.cs" />
-    <Compile Include="Unit\Generators\SqlServer2005GeneratorTests.cs" />
-    <Compile Include="Unit\Generators\SqlServer2008GeneratorTests.cs" />
-    <Compile Include="Unit\Generators\SqlServerCeGeneratorTests.cs" />
+    <Compile Include="Unit\Generators\Postgres\PostgresGeneratorTests.cs" />
+    <Compile Include="Unit\Generators\SQLite\SQLiteAlterTableTests.cs" />
+    <Compile Include="Unit\Generators\SQLite\SQLiteCreateTableTests.cs" />
+    <Compile Include="Unit\Generators\SQLite\SQLiteDataTests.cs" />
+    <Compile Include="Unit\Generators\SQLite\SQLiteDropTableTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005AlterTableTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005CreateTableTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005Data.cs" />
+    <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005DropTableTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000AlterTableTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000CreateTableTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000Data.cs" />
+    <Compile Include="Unit\Generators\SqlServer2000\SqlServer2008GeneratorTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2000\SqlServerCeGeneratorTests.cs" />
+    <Compile Include="Unit\Generators\BaseTableAlterTests.cs" />
+    <Compile Include="Unit\Generators\BaseTableCreateTests.cs" />
+    <Compile Include="Unit\Generators\BaseTableDropTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000DropTableTests.cs" />
     <Compile Include="Unit\MigrationLoaderTests.cs" />
     <Compile Include="Unit\MigrationMetadataTests.cs" />
-    <Compile Include="Unit\Generators\SqliteGeneratorTests.cs" />
     <Compile Include="Helpers\SqlServerTestTable.cs" />
     <Compile Include="Unit\Definitions\IndexColumnDefinitionTests.cs" />
     <Compile Include="Unit\Definitions\ForeignKeyDefinitionTests.cs" />
@@ -225,6 +252,10 @@
     <Compile Include="Unit\VersionLoaderTests.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FluentMigrator.SchemaDump\FluentMigrator.SchemaDump.csproj">
+      <Project>{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}</Project>
+      <Name>FluentMigrator.SchemaDump</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FluentMigrator.Console\FluentMigrator.Console.csproj">
       <Project>{664C7334-B44B-4D62-A0F8-063805D630AA}</Project>
       <Name>FluentMigrator.Console</Name>
@@ -232,10 +263,6 @@
     <ProjectReference Include="..\FluentMigrator.Runner\FluentMigrator.Runner.csproj">
       <Project>{CB468AD6-60C2-42E9-B3B0-01968EF94C65}</Project>
       <Name>FluentMigrator.Runner</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\FluentMigrator.SchemaDump\FluentMigrator.SchemaDump.csproj">
-      <Project>{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}</Project>
-      <Name>FluentMigrator.SchemaDump</Name>
     </ProjectReference>
     <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj">
       <Project>{FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8}</Project>
@@ -264,9 +291,15 @@
       <Install>true</Install>
     </BootstrapperPackage>
   </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Embeddedtestscript.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy "$(ProjectDir)..\..\lib\sqlite3.dll" "$(ProjectDir)$(OutDir)" /Y</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

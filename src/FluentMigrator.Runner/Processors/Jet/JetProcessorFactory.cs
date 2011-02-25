@@ -1,11 +1,12 @@
-﻿using System;
-using System.Data;
-using System.Data.OleDb;
-using FluentMigrator.Runner.Generators;
+﻿
 
 namespace FluentMigrator.Runner.Processors.Jet
 {
-	public class JetProcessorFactory : MigrationProcessorFactory
+    using System.Data;
+    using System.Data.OleDb;
+    using FluentMigrator.Runner.Generators.Jet;
+
+    public class JetProcessorFactory : MigrationProcessorFactory
 	{
 		public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
 		{

@@ -20,6 +20,7 @@
 using System.Data;
 using System.Data.SqlServerCe;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.SqlServer;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {

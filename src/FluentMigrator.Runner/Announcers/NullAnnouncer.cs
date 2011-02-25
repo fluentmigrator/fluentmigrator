@@ -2,7 +2,7 @@
 
 namespace FluentMigrator.Runner.Announcers
 {
-	public class NullAnnouncer : IAnnouncer
+	public class NullAnnouncer : IAnnouncer, IFormattingAnnouncer
 	{
 		#region IAnnouncer Members
 
@@ -18,6 +18,14 @@ namespace FluentMigrator.Runner.Announcers
 		{
 		}
 
+        public void Heading(string message,params object[] args)
+        {
+        }
+
+        public void Say(string message, params object[] args)
+        {
+        }
+
 		public void Sql(string sql)
 		{
 		}
@@ -29,6 +37,10 @@ namespace FluentMigrator.Runner.Announcers
 		public void Error(string message)
 		{
 		}
+
+        public void Error(string message, params object[] args)
+        {
+        }
 
 		#endregion
 	}

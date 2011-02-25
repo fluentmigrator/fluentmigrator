@@ -22,12 +22,14 @@ using System.Data;
 using System.IO;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors;
 using NUnit.Framework;
 using NUnit.Should;
+using FluentMigrator.Runner.Generators.SQLite;
 
 namespace FluentMigrator.Tests.Integration.Processors
 {
@@ -69,7 +71,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 		[Test]
 		public void CanDumpCreateTableExpression()
 		{
-			var expression = new CreateTableExpression { TableName = _tableName };
+			var expression = new CreateTableExpression { TableName = _tableName, Columns = new List<ColumnDefinition>{new ColumnDefinition{Name = "TestColumn"}}};
 			string expectedSql = _generator.Generate(expression);
 
 			_fileDumpProcessor.Process(expression);

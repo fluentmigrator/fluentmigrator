@@ -21,6 +21,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Collections.Generic;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.SqlServer;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {

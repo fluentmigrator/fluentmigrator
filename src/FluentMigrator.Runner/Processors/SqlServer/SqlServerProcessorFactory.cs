@@ -1,10 +1,12 @@
-﻿using System.Data;
-using System.Data.SqlClient;
-using FluentMigrator.Runner.Generators;
+﻿
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-	public class SqlServerProcessorFactory : MigrationProcessorFactory
+    using System.Data;
+    using System.Data.SqlClient;
+    using FluentMigrator.Runner.Generators.SqlServer;
+
+    public class SqlServerProcessorFactory : MigrationProcessorFactory
 	{
 		public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
 		{
