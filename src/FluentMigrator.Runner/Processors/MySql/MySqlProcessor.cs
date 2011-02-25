@@ -61,7 +61,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 			return Exists(sql, tableName, constraintName);
 		}
 
-        public override bool IndexExists(string tableName, string indexName)
+		public override bool IndexExists(string tableName, string indexName)
 		{
 			string sql = @"select index_name from information_schema.statistics
 							where table_schema = SCHEMA() and table_name='{0}'
@@ -75,7 +75,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
 			using (var command = new MySqlCommand(String.Format(template, args), Connection))
 			{
-			    command.CommandTimeout = Options.Timeout;
+				command.CommandTimeout = Options.Timeout;
 				command.ExecuteNonQuery();
 			}
 		}
@@ -84,24 +84,24 @@ namespace FluentMigrator.Runner.Processors.MySql
 		{
 			if (Connection.State != ConnectionState.Open) Connection.Open();
 
-            using (var command = new MySqlCommand(String.Format(template, args), Connection))
-            {
-                command.CommandTimeout = Options.Timeout;
-                using (var reader = command.ExecuteReader())
-                {
-                    try
-                    {
-                        if (!reader.Read())
-                            return false;
+			using (var command = new MySqlCommand(String.Format(template, args), Connection))
+			{
+				command.CommandTimeout = Options.Timeout;
+				using (var reader = command.ExecuteReader())
+				{
+					try
+					{
+						if (!reader.Read())
+							return false;
 
-                        return true;
-                    }
-                    catch
-                    {
-                        return false;
-                    }
-                }
-            }
+						return true;
+					}
+					catch
+					{
+						return false;
+					}
+				}
+			}
 		}
 
 		public override DataSet ReadTableData(string tableName)
@@ -114,16 +114,16 @@ namespace FluentMigrator.Runner.Processors.MySql
 			if (Connection.State != ConnectionState.Open) Connection.Open();
 
 			DataSet ds = new DataSet();
-            using (var command = new MySqlCommand(String.Format(template, args), Connection))
-            {
-                command.CommandTimeout = Options.Timeout;
+			using (var command = new MySqlCommand(String.Format(template, args), Connection))
+			{
+				command.CommandTimeout = Options.Timeout;
 
-                using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
-                {
-                    adapter.Fill(ds);
-                    return ds;
-                }
-            }
+				using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
+				{
+					adapter.Fill(ds);
+					return ds;
+				}
+			}
 		}
 
 		protected override void Process(string sql)
@@ -136,11 +136,11 @@ namespace FluentMigrator.Runner.Processors.MySql
 			if (Connection.State != ConnectionState.Open)
 				Connection.Open();
 
-            using (var command = new MySqlCommand(sql, Connection))
-            {
-                command.CommandTimeout = Options.Timeout;
-                command.ExecuteNonQuery();
-            }
+			using (var command = new MySqlCommand(sql, Connection))
+			{
+				command.CommandTimeout = Options.Timeout;
+				command.ExecuteNonQuery();
+			}
 		}
 
 		public override void Process(PerformDBOperationExpression expression)
