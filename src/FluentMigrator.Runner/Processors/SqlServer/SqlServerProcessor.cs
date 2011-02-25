@@ -20,11 +20,8 @@
 using System;
 using System.Data;
 using System.Data.SqlClient;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using FluentMigrator.Builders.Execute;
-using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
@@ -140,26 +137,78 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 			if (Connection.State != ConnectionState.Open)
 				Connection.Open();
 
-			using (var command = new SqlCommand(sql, Connection, Transaction))
-			{
-				try
-				{
-					command.CommandTimeout = Options.Timeout;
-					command.ExecuteNonQuery();
-				}
-				catch (Exception ex)
-				{
-					using (StringWriter message = new StringWriter())
-					{
-						message.WriteLine("An error occured executing the following sql:");
-						message.WriteLine(sql);
-						message.WriteLine("The error was {0}", ex.Message);
+            if (sql.Contains("GO"))
+            {
+                ExecuteBatchNonQuery(sql, Connection);
 
-						throw new Exception(message.ToString(), ex);
-					}
-				}
+            }else{
+                ExecuteNonQuery(sql, Connection, Transaction);
 			}
 		}
+
+        private void ExecuteNonQuery(string sql, SqlConnection connection,SqlTransaction transaction)
+        {
+            using (var command = new SqlCommand(sql, Connection, Transaction))
+            {
+                try
+                {
+                    command.CommandTimeout = Options.Timeout;
+                    command.ExecuteNonQuery();
+                }
+                catch (Exception ex)
+                {
+                    using (StringWriter message = new StringWriter())
+                    {
+                        message.WriteLine("An error occured executing the following sql:");
+                        message.WriteLine(sql);
+                        message.WriteLine("The error was {0}", ex.Message);
+
+                        throw new Exception(message.ToString(), ex);
+                    }
+                }
+            }
+        }
+
+        private void ExecuteBatchNonQuery(string sql, SqlConnection conn)
+        {
+             sql += "\nGO";   // make sure last batch is executed.
+            string sqlBatch = string.Empty;
+
+            using (var command = new SqlCommand(string.Empty, Connection, Transaction))
+            {
+                try
+                {
+                    foreach (string line in sql.Split(new string[2] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        if (line.ToUpperInvariant().Trim() == "GO")
+                        {
+                            if (!string.IsNullOrEmpty(sqlBatch))
+                            {
+                                command.CommandText = sqlBatch;
+                                command.ExecuteNonQuery();
+                                sqlBatch = string.Empty;
+                            }
+                        }
+                        else
+                        {
+                            sqlBatch += line + "\n";
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    using (StringWriter message = new StringWriter())
+                    {
+                        message.WriteLine("An error occured executing the following sql:");
+                        message.WriteLine(sql);
+                        message.WriteLine("The error was {0}", ex.Message);
+
+                        throw new Exception(message.ToString(), ex);
+                    }
+                }
+            }
+        }
+
 
 		public override void Process(PerformDBOperationExpression expression)
 		{

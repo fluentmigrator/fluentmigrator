@@ -1,10 +1,12 @@
-﻿using System.Data;
-using System.Data.SQLite;
-using FluentMigrator.Runner.Generators;
+﻿
 
 namespace FluentMigrator.Runner.Processors.Sqlite
 {
-	public class SqliteProcessorFactory : MigrationProcessorFactory
+    using System.Data;
+    using System.Data.SQLite;
+    using FluentMigrator.Runner.Generators.SQLite;
+
+    public class SqliteProcessorFactory : MigrationProcessorFactory
 	{
 		public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
 		{

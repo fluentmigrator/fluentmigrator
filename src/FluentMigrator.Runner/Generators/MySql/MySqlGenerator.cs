@@ -1,0 +1,59 @@
+#region License
+// 
+// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
+
+namespace FluentMigrator.Runner.Generators.MySql
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Data;
+    using System.Text;
+    using FluentMigrator.Expressions;
+    using FluentMigrator.Model;
+    using FluentMigrator.Runner.Generators.Generic;
+    using FluentMigrator.Runner.Generators.Base;
+
+
+	public class MySqlGenerator : GenericGenerator
+	{
+		public MySqlGenerator() : base(new MySqlColumn(), new MySqlQuoter())
+		{
+		}
+
+        public override string AlterColumn { get { return "ALTER TABLE {0} MODIFY COLUMN {1}"; } }
+
+        public override string DeleteConstraint { get { return "ALTER TABLE {0} DROP FOREIGN KEY {1}"; } }
+
+        public override string CreateTable { get { return "CREATE TABLE {0} ({1}) ENGINE = INNODB"; } }
+
+		public override string Generate(RenameColumnExpression expression)
+		{
+			// may need to add definition to end. blerg
+			//return String.Format("ALTER TABLE `{0}` CHANGE COLUMN {1} {2}", expression.TableName, expression.OldName, expression.NewName);
+			
+			// NOTE: The above does not work, as the CHANGE COLUMN syntax in Mysql requires the column definition to be re-specified,
+			// even if it has not changed; so marking this as not working for now
+            return compatabilityMode.HandleCompatabilty("Renaming of columns is not supporteed for MySql");
+		}
+
+		public override string Generate(AlterDefaultConstraintExpression expression)
+		{
+            return compatabilityMode.HandleCompatabilty("Altering of default constrints is not supporteed for MySql");
+		}
+	}
+}

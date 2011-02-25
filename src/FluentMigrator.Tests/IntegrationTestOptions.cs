@@ -5,8 +5,8 @@
 		public static DatabaseServerOptions SqlServer = new DatabaseServerOptions
 															{
 																ConnectionString =
-                                                                    @"server=.;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator",
-																IsEnabled = false
+                                                                    @"server=.\sqlexpress;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator",
+																IsEnabled = true
 															};
 
 		public static DatabaseServerOptions SqlLite = new DatabaseServerOptions

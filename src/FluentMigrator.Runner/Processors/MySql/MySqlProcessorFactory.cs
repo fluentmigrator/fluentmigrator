@@ -1,9 +1,12 @@
-﻿using System.Data;
-using FluentMigrator.Runner.Generators;
+﻿
 using MySql.Data.MySqlClient;
+
 
 namespace FluentMigrator.Runner.Processors.MySql
 {
+    using System.Data;
+    using FluentMigrator.Runner.Generators.MySql;
+
 	public class MySqlProcessorFactory : MigrationProcessorFactory
 	{
 		public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)

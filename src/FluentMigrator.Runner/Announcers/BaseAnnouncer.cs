@@ -22,7 +22,7 @@ using System;
 
 namespace FluentMigrator.Runner.Announcers
 {
-	public class BaseAnnouncer : IAnnouncer
+	public class BaseAnnouncer : IAnnouncer, IFormattingAnnouncer
 	{
 		protected readonly Action<string> Write;
 
@@ -48,6 +48,16 @@ namespace FluentMigrator.Runner.Announcers
 			Write(message);
 		}
 
+        public virtual void Heading(string message,params object[] args)
+        {
+            Heading(string.Format(message, args));
+        }
+
+        public virtual void Say(string message, params object[] args)
+        {
+            Say(string.Format(message, args));
+        }
+
 		public virtual void Sql(string sql)
 		{
 			if (!ShowSql)
@@ -69,6 +79,11 @@ namespace FluentMigrator.Runner.Announcers
 		{
 			Write(message);
 		}
+
+        public virtual void Error(string message,params object[] args)
+        {
+            Error(string.Format(message, args));
+        }
 
 		public virtual void Dispose()
 		{

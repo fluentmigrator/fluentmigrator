@@ -27,6 +27,7 @@ using FluentMigrator.Runner.Processors.Sqlite;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
+using FluentMigrator.Runner.Generators.SQLite;
 
 namespace FluentMigrator.Tests.Integration.Processors
 {
@@ -39,6 +40,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 		private SQLiteCommand command;
 		private string columnName;
 		private string tableName;
+        private string tableNameThanMustBeEscaped;
 
 		[SetUp]
 		public void SetUp()
@@ -52,7 +54,8 @@ namespace FluentMigrator.Tests.Integration.Processors
 			processor = new SqliteProcessor(connection, new SqliteGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 
 			column = new Mock<ColumnDefinition>();
-			tableName = "NewTable";
+            tableName = "NewTable";
+			tableNameThanMustBeEscaped = "123NewTable";
 			columnName = "ColumnName";
 			column.SetupGet(c => c.Name).Returns(columnName);
 			column.SetupGet(c => c.IsNullable).Returns(true);
@@ -94,12 +97,43 @@ namespace FluentMigrator.Tests.Integration.Processors
 			}
 		}
 
-		public void InsertTable()
-		{
-			SQLiteCommand cmd = connection.CreateCommand();
-			cmd.CommandType = CommandType.Text;
-			cmd.CommandText = string.Format("CREATE TABLE {0} ({1})", tableName, columnName);
-			cmd.ExecuteNonQuery();
-		}
+        [Test]
+        public void IsEscapingTableNameCorrectlyOnTableCreate()
+        {
+            CreateTableExpression expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
+            expression.Columns.Add(column.Object);
+            processor.Process(expression);
+        }
+
+        [Test]
+        public void IsEscapingTableNameCorrectlyOnReadTableData()
+        {
+            CreateTableExpression expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
+            expression.Columns.Add(column.Object);
+            processor.Process(expression);
+            processor.ReadTableData(tableNameThanMustBeEscaped).Tables.Count.ShouldBe(1);
+        }
+
+        [Test]
+        public void IsEscapingTableNameCorrectlyOnTableExists()
+        {
+            CreateTableExpression expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
+            expression.Columns.Add(column.Object);
+            processor.Process(expression);
+            processor.TableExists(tableNameThanMustBeEscaped).ShouldBeTrue();
+        }
+
+        [Test]
+        public void IsEscapingTableNameCorrectlyOnColumnExists()
+        {
+            string columnName = "123ColumnName";
+
+            CreateTableExpression expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
+            expression.Columns.Add(new ColumnDefinition() { Name = "123ColumnName", Type = DbType.AnsiString, IsNullable = true });
+            processor.Process(expression);
+            processor.ColumnExists(tableNameThanMustBeEscaped, columnName).ShouldBeTrue();
+        }
+
+
 	}
 }

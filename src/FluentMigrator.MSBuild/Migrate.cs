@@ -20,58 +20,103 @@ using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
+using System;
+using System.Reflection;
+using System.IO;
 
 namespace FluentMigrator.MSBuild
 {
-	public class Migrate : Task
-	{
+    public class Migrate : Task
+    {
 
-		[Required]
-		public string Database { get; set; }
 
-		[Required]
-		public string Connection { get; set; }
+        /// <summary>
+        /// Initializes a new instance of the <see cref="T:Migrate"/> class.
+        /// </summary>
+        public Migrate()
+        {
+            AppDomain.CurrentDomain.ResourceResolve += new ResolveEventHandler(CurrentDomain_ResourceResolve);
+        }
 
-		[Required]
-		public string Target { get; set; }
+        private static Assembly CurrentDomain_ResourceResolve(object sender, ResolveEventArgs args)
+        {
+            Console.WriteLine("Could Not Resolve {0}", args.Name);
+            return null;
+        }
 
-		public bool Verbose { get; set; }
+        private string databaseType;
+        private string migrationAssembly;
 
-		public string Namespace { get; set; }
+        [Required]
+        public string Connection { get; set; }
 
-		public string Task { get; set; }
+        public string Target { get { return migrationAssembly; } set { migrationAssembly = value; } }
 
-		public long Version { get; set; }
+        public string MigrationAssembly { get { return migrationAssembly; } set { migrationAssembly = value; } }
 
-		public int Steps { get; set; }
+        public string Database { get { return databaseType; } set { databaseType = value; } }
 
-		public string WorkingDirectory { get; set; }
+        public string DatabaseType { get { return databaseType; } set { databaseType = value; } }
 
-		public override bool Execute()
-		{
-			Log.LogCommandLine(MessageImportance.Low, "Creating Context");
-			var announcer = new BaseAnnouncer(msg => Log.LogCommandLine(MessageImportance.Normal, msg))
-								{
-									ShowElapsedTime = Verbose,
-									ShowSql = Verbose
-								};
-			var runnerContext = new RunnerContext(announcer)
-									{
-										Database = Database,
-										Connection = Connection,
-										Target = Target,
-										PreviewOnly = false,
-										Namespace = Namespace,
-										Task = Task,
-										Version = Version,
-										Steps = Steps,
-										WorkingDirectory = WorkingDirectory
-									};
+        public bool Verbose { get; set; }
 
-			Log.LogCommandLine(MessageImportance.Low, "Executing Migration Runner");
-			new TaskExecutor(runnerContext).Execute();
+        public string Namespace { get; set; }
 
-			return true;
-		}
-	}
+        public string Task { get; set; }
+
+        public long Version { get; set; }
+
+        public int Steps { get; set; }
+
+        public string WorkingDirectory { get; set; }
+
+        public override bool Execute()
+        {
+            
+            if (string.IsNullOrEmpty(databaseType))
+            {
+                Log.LogError("You must specific a database type. i.e. mysql or sqlserver");
+                return false;
+            }
+
+            if (string.IsNullOrEmpty(migrationAssembly))
+            {
+                Log.LogError("You must specific a migration assembly");
+                return false;
+            }
+
+
+            Log.LogCommandLine(MessageImportance.Low, "Creating Context");
+            var announcer = new BaseAnnouncer(msg => Log.LogCommandLine(MessageImportance.Normal, msg))
+            {
+                ShowElapsedTime = Verbose,
+                ShowSql = Verbose
+            };
+            var runnerContext = new RunnerContext(announcer)
+            {
+                Database = databaseType,
+                Connection = Connection,
+                Target = Target,
+                PreviewOnly = false,
+                Namespace = Namespace,
+                Task = Task,
+                Version = Version,
+                Steps = Steps,
+                WorkingDirectory = WorkingDirectory
+            };
+
+            Log.LogCommandLine(MessageImportance.Low, "Executing Migration Runner");
+            try
+            {
+                new TaskExecutor(runnerContext).Execute();
+            }
+            catch (Exception ex)
+            {
+                announcer.Error("While executing migrations the following error was encountered: {0}", ex.Message);
+                return false;
+            }
+
+            return true;
+        }
+    }
 }

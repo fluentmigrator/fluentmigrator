@@ -27,6 +27,9 @@ using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.Sqlite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using MySql.Data.MySqlClient;
+using FluentMigrator.Runner.Generators.SQLite;
+using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Runner.Generators.MySql;
 
 namespace FluentMigrator.Tests.Integration
 {
@@ -39,7 +42,7 @@ namespace FluentMigrator.Tests.Integration
 
 		public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback)
 		{
-			ExecuteWithSupportedProcessors(test, tryRollback, new Type[]{});
+            ExecuteWithSupportedProcessors(test, tryRollback, new Type[] {});
 		}
 
 		public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback, params Type[] exceptProcessors)
@@ -57,14 +60,19 @@ namespace FluentMigrator.Tests.Integration
 			if (!serverOptions.IsEnabled)
 				return;
 
-			var connection = new SqlConnection(serverOptions.ConnectionString);
-			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
-			test(processor);
+            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            announcer.Heading("Testing Migration against MS SQL Server");
+            
+            using (var connection = new SqlConnection(serverOptions.ConnectionString))
+            {
+                var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), announcer, new ProcessorOptions());
+                test(processor);
 
-			if (tryRollback && !processor.WasCommitted)
-			{
-			    processor.RollbackTransaction();
-			}
+                if (tryRollback && !processor.WasCommitted)
+                {
+                    processor.RollbackTransaction();
+                }
+            }
 		}
 
 		protected static void ExecuteWithSqlite(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
@@ -72,9 +80,14 @@ namespace FluentMigrator.Tests.Integration
 			if (!serverOptions.IsEnabled)
 				return;
 
-			var connection = new SQLiteConnection(serverOptions.ConnectionString);
-			var processor = new SqliteProcessor(connection, new SqliteGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
-			test(processor);
+            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            announcer.Heading("Testing Migration against SQLite");
+
+            using (var connection = new SQLiteConnection(serverOptions.ConnectionString))
+            {
+                var processor = new SqliteProcessor(connection, new SqliteGenerator(), announcer, new ProcessorOptions());
+                test(processor);
+            }
 		}
 
 		protected static void ExecuteWithMySql(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
@@ -82,9 +95,14 @@ namespace FluentMigrator.Tests.Integration
 			if (!serverOptions.IsEnabled)
 				return;
 
-			var connection = new MySqlConnection(serverOptions.ConnectionString);
-			var processor = new MySqlProcessor(connection, new MySqlGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
-			test(processor);
+            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            announcer.Heading("Testing Migration against MySQL Server");
+
+            using (var connection = new MySqlConnection(serverOptions.ConnectionString))
+            {
+                var processor = new MySqlProcessor(connection, new MySqlGenerator(), announcer, new ProcessorOptions());
+                test(processor);
+            }
 		}
 	}
 }
