@@ -58,7 +58,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(CreateTableExpression expression)
         {
-            return string.Format("CREATE TABLE {0}.{1}",Quoter.QuoteSchemaName(expression.SchemaName),base.Generate(expression));
+            return string.Format("CREATE TABLE {0}.{1}",Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
         }
 
         public override string Generate(DeleteTableExpression expression)

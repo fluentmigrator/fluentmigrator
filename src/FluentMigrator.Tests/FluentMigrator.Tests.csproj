@@ -107,6 +107,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\MySql.Data.dll</HintPath>
     </Reference>
+    <Reference Include="Npgsql, Version=2.0.11.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Postgres\Npgsql.dll</HintPath>
+    </Reference>
     <Reference Include="nunit.framework, Version=2.5.9.10320, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\nunit.framework.dll</HintPath>
@@ -133,6 +137,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\PostgresTestTable.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
     <Compile Include="Integration\PerformDBOperationTests.cs" />
     <Compile Include="Integration\IntegrationTestBase.cs" />
@@ -147,6 +152,7 @@
     <Compile Include="Integration\Migrations\Invalid\InvalidMigration2.cs" />
     <Compile Include="Integration\Processors\FileProcessorTests.cs" />
     <Compile Include="Integration\Processors\OracleProcessorTests.cs" />
+    <Compile Include="Integration\Processors\PostgresProcessorTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaDumpTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaTestWriter.cs" />
     <Compile Include="Integration\VersionMigrationTests.cs" />
@@ -196,6 +202,8 @@
     <Compile Include="Unit\Generators\Oracle\OracleDataTests.cs" />
     <Compile Include="Unit\Generators\Oracle\OracleDropTableTests.cs" />
     <Compile Include="Unit\Expressions\PerformDBOperationExpressionTests.cs" />
+    <Compile Include="Unit\Generators\Postgres\PostgresFormatterTests.cs" />
+    <Compile Include="Unit\Generators\Postgres\PostgresGeneratorTests.cs" />
     <Compile Include="Unit\Generators\SQLite\SQLiteAlterTableTests.cs" />
     <Compile Include="Unit\Generators\SQLite\SQLiteCreateTableTests.cs" />
     <Compile Include="Unit\Generators\SQLite\SQLiteDataTests.cs" />

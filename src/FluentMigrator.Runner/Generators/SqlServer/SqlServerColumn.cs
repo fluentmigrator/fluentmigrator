@@ -1,12 +1,9 @@
-﻿
+﻿using FluentMigrator.Model;
+using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
-    using FluentMigrator.Model;
-    using FluentMigrator.Runner.Generators.Base;
-    using FluentMigrator.Runner.Generators.Generic;
-
-	class SqlServerColumn : ColumnBase
+	internal class SqlServerColumn : ColumnBase
 	{
 		public SqlServerColumn(ITypeMap typeMap) : base(typeMap, new SqlServerQuoter())
 		{

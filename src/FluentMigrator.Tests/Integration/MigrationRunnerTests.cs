@@ -24,6 +24,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Sqlite;
@@ -32,8 +33,6 @@ using FluentMigrator.Tests.Integration.Migrations;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
-using FluentMigrator.Runner.Processors.MySql;
-using FluentMigrator.Runner.Generators.SqlServer;
 
 namespace FluentMigrator.Tests.Integration
 {
@@ -41,9 +40,6 @@ namespace FluentMigrator.Tests.Integration
 	public class MigrationRunnerTests : IntegrationTestBase
 	{
 		private IRunnerContext _runnerContext;
-
-		private readonly bool DoNotUseAutomaticTransactionManagement = false;
-		private readonly bool RollBackTransactionAfterTest = true;
 
 		[SetUp]
 		public void SetUp()
@@ -73,7 +69,7 @@ namespace FluentMigrator.Tests.Integration
 
 					runner.Down(new TestCreateAndDropTableMigration());
 					processor.TableExists("TestTable").ShouldBeFalse();
-				}, RollBackTransactionAfterTest);
+				});
 		}
 
 		[Test]
@@ -97,11 +93,9 @@ namespace FluentMigrator.Tests.Integration
 			runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
 		}
 
-		[Test, Description("SQLite does not support ForeignKey constraints. This test is only run against MS SQL and MySQL")]
+		[Test]
 		public void CanApplyForeignKeyConvention()
 		{
-			var excludedProcessorTypes = new[] { typeof(SqliteProcessor) };
-
 			ExecuteWithSupportedProcessors(
 				processor =>
 				{
@@ -111,7 +105,7 @@ namespace FluentMigrator.Tests.Integration
 
 					processor.ConstraintExists("Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeTrue();
 					runner.Down(new TestForeignKeyNamingConvention());
-				}, RollBackTransactionAfterTest, excludedProcessorTypes);
+				}, false, typeof(SqliteProcessor));
 		}
 
 		[Test]
@@ -129,7 +123,7 @@ namespace FluentMigrator.Tests.Integration
 					runner.Down(new TestIndexNamingConvention());
 					processor.IndexExists("Users", "IX_Users_GroupId").ShouldBeFalse();
 					processor.TableExists("Users").ShouldBeFalse();
-				}, RollBackTransactionAfterTest);
+				});
 		}
 
 		[Test]
@@ -151,7 +145,9 @@ namespace FluentMigrator.Tests.Integration
 
 					runner.Down(new TestCreateAndDropTableMigration());
 					processor.IndexExists("TestTable", "IX_TestTable_Name").ShouldBeFalse();
-				}, RollBackTransactionAfterTest);
+
+					//processor.CommitTransaction();
+				});
 		}
 
 		[Test]
@@ -175,14 +171,14 @@ namespace FluentMigrator.Tests.Integration
 
 					runner.Down(new TestCreateAndDropTableMigration());
 					processor.TableExists("TestTable2").ShouldBeFalse();
-				}, RollBackTransactionAfterTest);
+
+					//processor.CommitTransaction();
+				});
 		}
 
-		[Test, Description("Sqlite will fail here. This test is only run against MS SQL and MySQL")]
+		[Test, Explicit("Sqlite will fail here. Run this explicitly to see other generators process this correctly")]
 		public void CanRenameColumn()
 		{
-			var excludedProcessorTypes = new Type[] { typeof(SqliteProcessor) };
-
 			ExecuteWithSupportedProcessors(
 				processor =>
 				{
@@ -201,7 +197,7 @@ namespace FluentMigrator.Tests.Integration
 
 					runner.Down(new TestCreateAndDropTableMigration());
 					processor.ColumnExists("TestTable2", "Name").ShouldBeFalse();
-				}, RollBackTransactionAfterTest, excludedProcessorTypes);
+				});
 		}
 
 		[Test]
@@ -215,6 +211,8 @@ namespace FluentMigrator.Tests.Integration
 				};
 
 				var runner = new MigrationRunner(typeof(MigrationRunnerTests).Assembly, runnerContext, processor);
+
+				//runner.Processor.CommitTransaction();
 
 				runner.MigrationLoader.Migrations.ShouldNotBeNull();
 			});
@@ -231,6 +229,8 @@ namespace FluentMigrator.Tests.Integration
 				};
 
 				var runner = new MigrationRunner(typeof(TestMigration).Assembly, runnerContext, processor);
+
+				//runner.Processor.CommitTransaction();
 				runner.VersionLoader.VersionInfo.ShouldNotBeNull();
 			});
 		}
@@ -242,12 +242,12 @@ namespace FluentMigrator.Tests.Integration
 			{
 				MigrationRunner runner = SetupMigrationRunner(processor);
 
-				runner.MigrateUp(DoNotUseAutomaticTransactionManagement);
+				runner.MigrateUp();
 
 				runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
 				runner.VersionLoader.VersionInfo.HasAppliedMigration(2).ShouldBeTrue();
 				runner.VersionLoader.VersionInfo.Latest().ShouldBe(2);
-			}, RollBackTransactionAfterTest);
+			});
 		}
 
 		[Test]
@@ -257,39 +257,46 @@ namespace FluentMigrator.Tests.Integration
 			{
 				MigrationRunner runner = SetupMigrationRunner(processor);
 
-				runner.MigrateUp(2, DoNotUseAutomaticTransactionManagement);
+				runner.MigrateUp(1);
 
 				runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
 				processor.TableExists("Users").ShouldBeTrue();
-
-				runner.VersionLoader.VersionInfo.HasAppliedMigration(2).ShouldBeTrue();
-				processor.TableExists("VersionedMigration").ShouldBeTrue();
-			}, RollBackTransactionAfterTest);
+			});
 		}
 
 		[Test]
 		public void CanMigrateASpecificVersionDown()
 		{
-			ExecuteWithSupportedProcessors(processor =>
+			try
 			{
-				MigrationRunner runner = SetupMigrationRunner(processor);
+				ExecuteWithSupportedProcessors(processor =>
+				{
+					MigrationRunner runner = SetupMigrationRunner(processor);
 
-				runner.MigrateUp(2, DoNotUseAutomaticTransactionManagement);
+					runner.MigrateUp(1);
 
-				runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
-				processor.TableExists("Users").ShouldBeTrue();
+					runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
+					processor.TableExists("Users").ShouldBeTrue();
+				}, false, typeof(SqliteProcessor));
 
-				runner.VersionLoader.VersionInfo.HasAppliedMigration(2).ShouldBeTrue();
-				processor.TableExists("VersionedMigration").ShouldBeTrue();
+				ExecuteWithSupportedProcessors(processor =>
+				{
+					MigrationRunner testRunner = SetupMigrationRunner(processor);
+					testRunner.MigrateDown(1);
 
-				runner.MigrateDown(1, DoNotUseAutomaticTransactionManagement);
+					testRunner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeFalse();
+					processor.TableExists("Users").ShouldBeFalse();
+				}, false, typeof(SqliteProcessor));
 
-				runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
-				processor.TableExists("Users").ShouldBeTrue();
-
-				runner.VersionLoader.VersionInfo.HasAppliedMigration(2).ShouldBeFalse();
-				processor.TableExists("VersionedMigration").ShouldBeFalse();
-			}, RollBackTransactionAfterTest);
+			}
+			finally
+			{
+				ExecuteWithSupportedProcessors(processor =>
+				{
+					MigrationRunner testRunner = SetupMigrationRunner(processor);
+					testRunner.RollbackToVersion(0);
+				}, false);
+			}
 		}
 
 		[Test]
@@ -299,20 +306,26 @@ namespace FluentMigrator.Tests.Integration
 			{
 				MigrationRunner runner = SetupMigrationRunner(processor);
 
-				runner.MigrateUp(1, DoNotUseAutomaticTransactionManagement);
+				runner.MigrateUp(2);
 
 				processor.TableExists(runner.VersionLoader.VersionTableMetaData.TableName).ShouldBeTrue();
+			});
 
+			ExecuteWithSupportedProcessors(processor =>
+			{
+				MigrationRunner runner = SetupMigrationRunner(processor);
 				runner.RollbackToVersion(0);
 
 				processor.TableExists(runner.VersionLoader.VersionTableMetaData.TableName).ShouldBeFalse();
-			}, RollBackTransactionAfterTest);
-
+			});
 		}
 
 		[Test]
 		public void MigrateUpWithSqlServerProcessorShouldCommitItsTransaction()
 		{
+			if (!IntegrationTestOptions.SqlServer.IsEnabled)
+				return;
+
 			var connection = new SqlConnection(IntegrationTestOptions.SqlServer.ConnectionString);
 			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 
@@ -333,11 +346,14 @@ namespace FluentMigrator.Tests.Integration
 		[Test]
 		public void MigrateUpSpecificVersionWithSqlServerProcessorShouldCommitItsTransaction()
 		{
+			if (!IntegrationTestOptions.SqlServer.IsEnabled)
+				return;
+
 			var connection = new SqlConnection(IntegrationTestOptions.SqlServer.ConnectionString);
 			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 
 			MigrationRunner runner = SetupMigrationRunner(processor);
-			runner.MigrateUp(2);
+			runner.MigrateUp(1);
 
 			try
 			{

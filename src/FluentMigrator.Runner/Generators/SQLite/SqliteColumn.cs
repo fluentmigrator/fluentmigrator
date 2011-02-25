@@ -1,57 +1,52 @@
-﻿
+﻿using System;
+using System.Data;
+using FluentMigrator.Model;
+using FluentMigrator.Runner.Generators.Base;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FluentMigrator.Runner.Generators.SQLite
 {
-    using System;
-    using System.Data;
-    using FluentMigrator.Model;
-    using FluentMigrator.Runner.Generators.Base;
-    using FluentMigrator.Runner.Generators.Generic;
-    using System.Collections.Generic;
-    using System.Linq;
-
-	class SqliteColumn : ColumnBase
+	internal class SqliteColumn : ColumnBase
 	{
-       
-
 		public SqliteColumn() : base(new SqliteTypeMap(), new SqliteQuoter())
 		{
 		}
 
 		protected override string FormatIdentity(ColumnDefinition column)
 		{
-            //SQLite only supports the concept of Identity in combination with a single primary key
-            //see: http://www.sqlite.org/syntaxdiagrams.html#column-constraint syntax details
-            if (column.IsIdentity && !column.IsPrimaryKey && column.Type != DbType.Int32)
-            {
-                throw new ArgumentException("SQLite only supports identity on single integer, primary key coulmns");
-            }
-            return string.Empty;
+			//SQLite only supports the concept of Identity in combination with a single primary key
+			//see: http://www.sqlite.org/syntaxdiagrams.html#column-constraint syntax details
+			if (column.IsIdentity && !column.IsPrimaryKey && column.Type != DbType.Int32)
+			{
+				throw new ArgumentException("SQLite only supports identity on single integer, primary key coulmns");
+			}
+			return string.Empty;
 		}
 
-        public override bool ShouldPrimaryKeysBeAddedSeparatley(IEnumerable<ColumnDefinition> primaryKeyColumns)
-        {
-            //If there are no identity column then we can add as a separate constrint
-            if(!primaryKeyColumns.Any(x=>x.IsIdentity) && primaryKeyColumns.Any(x=>x.IsPrimaryKey)) return true;
-            return false;
-        }
+		public override bool ShouldPrimaryKeysBeAddedSeparatley(IEnumerable<ColumnDefinition> primaryKeyColumns)
+		{
+			//If there are no identity column then we can add as a separate constrint
+			if (!primaryKeyColumns.Any(x => x.IsIdentity) && primaryKeyColumns.Any(x => x.IsPrimaryKey)) return true;
+			return false;
+		}
 
-        protected override string FormatPrimaryKey(ColumnDefinition column)
-        {
-            if(!column.IsPrimaryKey) return string.Empty;
+		protected override string FormatPrimaryKey(ColumnDefinition column)
+		{
+			if (!column.IsPrimaryKey) return string.Empty;
 
-            return column.IsIdentity ? "PRIMARY KEY AUTOINCREMENT" : string.Empty;
-        }
+			return column.IsIdentity ? "PRIMARY KEY AUTOINCREMENT" : string.Empty;
+		}
 
-        protected override string FormatSystemMethods(SystemMethods systemMethod)
-        {
-            switch (systemMethod)
-            {
-                case SystemMethods.CurrentDateTime:
-                    return "CURRENT_TIMESTAMP";
-            }
+		protected override string FormatSystemMethods(SystemMethods systemMethod)
+		{
+			switch (systemMethod)
+			{
+				case SystemMethods.CurrentDateTime:
+					return "CURRENT_TIMESTAMP";
+			}
 
-            return null;
-        }
+			return null;
+		}
 	}
 }

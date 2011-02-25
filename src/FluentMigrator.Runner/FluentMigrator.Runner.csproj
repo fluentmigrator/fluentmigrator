@@ -108,6 +108,10 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\MySql.Data.dll</HintPath>
     </Reference>
+    <Reference Include="Npgsql, Version=2.0.11.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Postgres\Npgsql.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
@@ -139,7 +143,8 @@
     <Compile Include="Announcers\TextWriterAnnouncer.cs" />
     <Compile Include="CompatabilityMode.cs" />
     <Compile Include="Generators\Base\ColumnBase.cs" />
-    <Compile Include="Generators\CompatabilityModeExtension.cs" />
+    <Compile Include="Extensions\CompatabilityModeExtension.cs" />
+    <Compile Include="Generators\ConstantFormatter.cs" />
     <Compile Include="Generators\Generic\GenericQuoter.cs" />
     <Compile Include="Generators\Generic\GenericGenerator.cs" />
     <Compile Include="Generators\IColumn.cs" />
@@ -156,6 +161,10 @@
     <Compile Include="Generators\Oracle\OracleColumn.cs" />
     <Compile Include="Generators\Oracle\OracleQuoter.cs" />
     <Compile Include="Generators\Oracle\OracleTypeMap.cs" />
+    <Compile Include="Generators\Postgres\PostgreQuoter.cs" />
+    <Compile Include="Generators\Postgres\PostgresColumn.cs" />
+    <Compile Include="Generators\Postgres\PostgresGenerator.cs" />
+    <Compile Include="Generators\Postgres\PostgresTypeMap.cs" />
     <Compile Include="Generators\SQLite\SqliteColumn.cs" />
     <Compile Include="Generators\SQLite\SqliteQuoter.cs" />
     <Compile Include="Generators\SQLite\SqliteTypeMap.cs" />
@@ -193,6 +202,8 @@
     <Compile Include="Processors\Oracle\OracleFactory.cs" />
     <Compile Include="Processors\Oracle\OracleProcessor.cs" />
     <Compile Include="Processors\Oracle\OracleProcessorFactory.cs" />
+    <Compile Include="Processors\Postgres\PostgresProcessor.cs" />
+    <Compile Include="Processors\Postgres\PostgresProcessorFactory.cs" />
     <Compile Include="Processors\ProcessorFactory.cs" />
     <Compile Include="Processors\ProcessorOptions.cs" />
     <Compile Include="Processors\SqlServer\SqlServerCeProcessor.cs" />

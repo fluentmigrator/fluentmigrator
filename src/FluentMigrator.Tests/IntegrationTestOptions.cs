@@ -5,8 +5,8 @@
 		public static DatabaseServerOptions SqlServer = new DatabaseServerOptions
 															{
 																ConnectionString =
-                                                                    @"server=.\sqlexpress;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator",
-																IsEnabled = true
+                                                                    @"server=.;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator",
+																IsEnabled = false
 															};
 
 		public static DatabaseServerOptions SqlLite = new DatabaseServerOptions
@@ -22,6 +22,12 @@
 																@"Database=FluentMigrator;Data Source=localhost;User Id=test;Password=test;",
 															IsEnabled = false
 														};
+
+	    public static DatabaseServerOptions Postgres = new DatabaseServerOptions
+	                                                       {
+                                                               ConnectionString = "Server=127.0.0.1;Port=5432;Database=FluentMigrator;User Id=test;Password=test;",
+	                                                           IsEnabled = false
+	                                                       };
 
 		public class DatabaseServerOptions
 		{
