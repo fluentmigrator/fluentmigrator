@@ -41,6 +41,7 @@ namespace FluentMigrator.Runner
 			var dataExpression = new InsertDataExpression();
 			dataExpression.Rows.Add( CreateVersionInfoInsertionData( version ) );
 			dataExpression.TableName = VersionTableMetaData.TableName;
+			dataExpression.SchemaName = VersionTableMetaData.SchemaName;
 			dataExpression.ExecuteWith( Processor );
 		}
 
@@ -76,7 +77,7 @@ namespace FluentMigrator.Runner
 			}
 		}
 
-        public bool AlreadyCreatedSchemaTable
+        public bool AlreadyCreatedVersionSchema
         {
             get
             {
@@ -107,7 +108,7 @@ namespace FluentMigrator.Runner
 				return;
 			}
 
-            if (!AlreadyCreatedSchemaTable)
+            if (!AlreadyCreatedVersionSchema)
                 Runner.Up(VersionSchemaMigration);
 
 			if ( !AlreadyCreatedVersionTable )
@@ -140,7 +141,7 @@ namespace FluentMigrator.Runner
 
 		public void DeleteVersion(long version)
 		{
-			var expression = new DeleteDataExpression { TableName = VersionTableMetaData.TableName };
+			var expression = new DeleteDataExpression { TableName = VersionTableMetaData.TableName, SchemaName=VersionTableMetaData.SchemaName };
 			expression.Rows.Add(new DeletionDataDefinition
 									{
 										new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version)

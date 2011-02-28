@@ -51,7 +51,6 @@ namespace FluentMigrator.Tests.Integration
 					runner.Down(new VersionMigration(tableMetaData));
                     processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName).ShouldBeFalse();
 				});
-
 		}
 
 
