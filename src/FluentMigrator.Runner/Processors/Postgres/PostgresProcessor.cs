@@ -31,33 +31,33 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
         public override bool SchemaExists(string schemaName)
         {
-            return Exists("select * from information_schema.schemata where schema_name = '{0}'", Quoter.QuoteCommand(schemaName));
+			return Exists("select * from information_schema.schemata where schema_name = '{0}'", Quoter.UnQuoteSchemaName(schemaName));
         }
 
         public override bool TableExists(string schemaName, string tableName)
         {
-            return Exists("select * from information_schema.tables where table_name = '{0}'", Quoter.QuoteCommand(tableName));
+			return Exists("select * from information_schema.tables where table_schema = '{0}' and table_name = '{1}'", Quoter.UnQuoteSchemaName(schemaName), Quoter.UnQuote(tableName));
         }
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
-            return Exists("select * from information_schema.columns where table_name = '{0}' and column_name = '{1}'", Quoter.QuoteCommand(tableName), Quoter.QuoteCommand(columnName));
+			return Exists("select * from information_schema.columns where table_schema = '{0}' and table_name = '{1}' and column_name = '{2}'", Quoter.UnQuoteSchemaName(schemaName), Quoter.UnQuote(tableName), Quoter.UnQuote(columnName));
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
             //return Exists("select * from pg_catalog.pg_constraint con inner join pg_class cls on con.conrelid = cls.oid where cls.relname = '{0}' and con.conname = '{1}'", tableName, constraintName);
-            return Exists("select * from information_schema.table_constraints where constraint_catalog = current_catalog and table_name = '{0}' and constraint_name = '{1}'", Quoter.QuoteCommand(tableName), Quoter.QuoteCommand(constraintName));
+			return Exists("select * from information_schema.table_constraints where constraint_catalog = current_catalog and table_schema = '{0}' and table_name = '{1}' and constraint_name = '{2}'", Quoter.UnQuoteSchemaName(schemaName), Quoter.UnQuote(tableName), Quoter.UnQuote(constraintName));
         }
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
-            return Exists("select * from pg_catalog.pg_indexes where tablename = '{0}' and indexname = '{1}'", Quoter.QuoteCommand(tableName), Quoter.QuoteCommand(indexName));
+			return Exists("select * from pg_catalog.pg_indexes where schemaname='{0}' and tablename = '{1}' and indexname = '{2}'", Quoter.UnQuoteSchemaName(schemaName),Quoter.UnQuote(tableName), Quoter.UnQuote(indexName));
         }
 
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
-            return Read("SELECT * FROM \"{0}\"", Quoter.QuoteCommand(tableName));
+			return Read("SELECT * FROM {0}.{1}", Quoter.QuoteSchemaName(schemaName), Quoter.QuoteTableName(tableName));
         }
 
         public override DataSet Read(string template, params object[] args)

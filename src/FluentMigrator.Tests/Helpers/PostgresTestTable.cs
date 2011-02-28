@@ -35,10 +35,13 @@ namespace FluentMigrator.Tests.Helpers
         {
             var sb = new StringBuilder();
 
-            sb.Append("CREATE TABLE \"");
+			if(!string.IsNullOrEmpty(_schemaName))
+				sb.AppendFormat("CREATE SCHEMA \"{0}\";",_schemaName);
+
+            sb.Append("CREATE TABLE ");
 
             sb.Append(NameWithSchema);
-            sb.Append("\" (");
+            sb.Append(" (");
 
             foreach (string definition in columnDefinitions)
             {
@@ -56,7 +59,12 @@ namespace FluentMigrator.Tests.Helpers
 
         public void Drop()
         {
-            using (var command = new NpgsqlCommand(string.Format("DROP TABLE {0}", NameWithSchema), Connection, Transaction))
+        	var sb = new StringBuilder();
+        	sb.AppendFormat("DROP TABLE {0}", NameWithSchema);
+			if (!string.IsNullOrEmpty(_schemaName))
+				sb.AppendFormat(";DROP SCHEMA \"{0}\"", _schemaName);
+
+            using (var command = new NpgsqlCommand(sb.ToString(), Connection, Transaction))
                 command.ExecuteNonQuery();
         }
     }

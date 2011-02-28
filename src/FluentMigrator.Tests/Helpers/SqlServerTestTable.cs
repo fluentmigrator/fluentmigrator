@@ -48,8 +48,13 @@ namespace FluentMigrator.Tests.Helpers
 
 		public void Create(IEnumerable<string> columnDefinitions)
 		{
-			var sb = new StringBuilder();
+			if (!string.IsNullOrEmpty(_schemaName))
+			{
+				using (var command = new SqlCommand(string.Format("CREATE SCHEMA [{0}]", _schemaName), Connection, Transaction))
+					command.ExecuteNonQuery();
+			}
 
+			var sb = new StringBuilder();
 			sb.Append("CREATE TABLE ");
             if (!string.IsNullOrEmpty(_schemaName))
                 sb.AppendFormat("[{0}].", _schemaName);
@@ -77,8 +82,11 @@ namespace FluentMigrator.Tests.Helpers
             }
             else
             {
-                using (var command = new SqlCommand(string.Format("DROP TABLE [{0}].{1}", _schemaName, Name), Connection, Transaction))
+				using (var command = new SqlCommand(string.Format("DROP TABLE [{0}].{1}",  _schemaName, Name), Connection, Transaction))
                     command.ExecuteNonQuery();
+
+				using (var command = new SqlCommand(string.Format("DROP SCHEMA [{0}]", _schemaName), Connection, Transaction))
+					command.ExecuteNonQuery();
             }
 		}
 	}

@@ -259,7 +259,7 @@ namespace FluentMigrator.Tests.Integration
                 });
         }
 
-		[Test, Explicit("Sqlite will fail here. Run this explicitly to see other generators process this correctly")]
+		[Test]
 		public void CanRenameColumn()
 		{
 			ExecuteWithSupportedProcessors(
@@ -280,10 +280,10 @@ namespace FluentMigrator.Tests.Integration
 
 					runner.Down(new TestCreateAndDropTableMigration());
 					processor.ColumnExists(null, "TestTable2", "Name").ShouldBeFalse();
-				});
+				}, true, typeof(SqliteProcessor));
 		}
 
-        [Test, Explicit("Sqlite will fail here. Run this explicitly to see other generators process this correctly")]
+        [Test]
         public void CanRenameColumnWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -304,7 +304,7 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateAndDropTableMigration());
                     processor.ColumnExists("TestSchema", "TestTable2", "Name").ShouldBeFalse();
-                });
+				}, true, typeof(SqliteProcessor));
         }
 
 		[Test]

@@ -32,26 +32,26 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 
             var expectedSql =
                 @"
-			DECLARE @default sysname, @sql nvarchar(max);
+            DECLARE @default sysname, @sql nvarchar(max);
 
-			-- get name of default constraint
-			SELECT @default = name
-			FROM sys.default_constraints 
-			WHERE parent_object_id = object_id('[TestTable1]')
-			AND type = 'D'
-			AND parent_column_id = (
-				SELECT column_id 
-				FROM sys.columns 
-				WHERE object_id = object_id('[TestTable1]')
-				AND name = '[TestColumn1]'
-			);
+            -- get name of default constraint
+            SELECT @default = name
+            FROM sys.default_constraints 
+            WHERE parent_object_id = object_id('[TestTable1]')
+            AND type = 'D'
+            AND parent_column_id = (
+                SELECT column_id 
+                FROM sys.columns 
+                WHERE object_id = object_id('[TestTable1]')
+                AND name = '[TestColumn1]'
+            );
 
-			-- create alter table command as string and run it
-			SET @sql = N'ALTER TABLE [TestTable1] DROP CONSTRAINT ' + @default;
-			EXEC sp_executesql @sql;
+            -- create alter table command as string and run it
+            SET @sql = N'ALTER TABLE [TestTable1] DROP CONSTRAINT ' + @default;
+            EXEC sp_executesql @sql;
 
-			-- now we can finally drop column
-			ALTER TABLE [TestTable1] DROP COLUMN [TestColumn1];";
+            -- now we can finally drop column
+            ALTER TABLE [TestTable1] DROP COLUMN [TestColumn1];";
 
             sql.ShouldBe(expectedSql);
         }

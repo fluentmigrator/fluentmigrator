@@ -111,7 +111,7 @@ namespace FluentMigrator.Tests.Integration.Processors
             CreateTableExpression expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
             expression.Columns.Add(column.Object);
             processor.Process(expression);
-            processor.ReadTableData(tableNameThanMustBeEscaped).Tables.Count.ShouldBe(1);
+            processor.ReadTableData(null, tableNameThanMustBeEscaped).Tables.Count.ShouldBe(1);
         }
 
         [Test]
@@ -120,7 +120,7 @@ namespace FluentMigrator.Tests.Integration.Processors
             CreateTableExpression expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
             expression.Columns.Add(column.Object);
             processor.Process(expression);
-            processor.TableExists(tableNameThanMustBeEscaped).ShouldBeTrue();
+            processor.TableExists(null, tableNameThanMustBeEscaped).ShouldBeTrue();
         }
 
         [Test]
@@ -131,7 +131,7 @@ namespace FluentMigrator.Tests.Integration.Processors
             CreateTableExpression expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
             expression.Columns.Add(new ColumnDefinition() { Name = "123ColumnName", Type = DbType.AnsiString, IsNullable = true });
             processor.Process(expression);
-            processor.ColumnExists(tableNameThanMustBeEscaped, columnName).ShouldBeTrue();
+            processor.ColumnExists(null, tableNameThanMustBeEscaped, columnName).ShouldBeTrue();
         }
 
 

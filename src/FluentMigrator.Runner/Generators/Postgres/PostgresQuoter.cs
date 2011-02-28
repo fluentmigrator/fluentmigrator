@@ -12,5 +12,13 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 schemaName = "public";
             return base.QuoteSchemaName(schemaName);
         }
+
+		public string UnQuoteSchemaName(string quoted)
+		{
+			if (string.IsNullOrEmpty(quoted))
+				return "public";
+
+			return UnQuote(quoted);
+		}
 	}
 }
