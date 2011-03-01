@@ -39,13 +39,13 @@ namespace FluentMigrator.Runner.Processors.MySql
 			throw new NotImplementedException();
 		}
 
-		public override bool TableExists(string tableName)
+        public override bool TableExists(string schemaName, string tableName)
 		{
 			return Exists(@"select table_name from information_schema.tables 
 							where table_schema = SCHEMA() and table_name='{0}'", tableName);
 		}
 
-		public override bool ColumnExists(string tableName, string columnName)
+        public override bool ColumnExists(string schemaName, string tableName, string columnName)
 		{
 			string sql = @"select column_name from information_schema.columns
 							where table_schema = SCHEMA() and table_name='{0}'
@@ -53,7 +53,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 			return Exists(sql, tableName, columnName);
 		}
 
-		public override bool ConstraintExists(string tableName, string constraintName)
+        public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
 		{
 			string sql = @"select constraint_name from information_schema.table_constraints
 							where table_schema = SCHEMA() and table_name='{0}'
@@ -61,7 +61,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 			return Exists(sql, tableName, constraintName);
 		}
 
-		public override bool IndexExists(string tableName, string indexName)
+        public override bool IndexExists(string schemaName, string tableName, string indexName)
 		{
 			string sql = @"select index_name from information_schema.statistics
 							where table_schema = SCHEMA() and table_name='{0}'
@@ -104,7 +104,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 			}
 		}
 
-		public override DataSet ReadTableData(string tableName)
+        public override DataSet ReadTableData(string schemaName, string tableName)
 		{
 			return Read("select * from {0}", tableName);
 		}

@@ -20,7 +20,9 @@ using System.Reflection;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors.Sqlite;
 using FluentMigrator.Runner.Versioning;
+using FluentMigrator.Tests.Unit;
 using FluentMigrator.VersionTableInfo;
 using NUnit.Framework;
 using NUnit.Should;
@@ -40,16 +42,75 @@ namespace FluentMigrator.Tests.Integration
 					IVersionTableMetaData tableMetaData = new DefaultVersionTableMetaData();
 
 					//ensure table doesn't exist
-					if (processor.TableExists(tableMetaData.TableName))
+                    if (processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName))
 						runner.Down(new VersionMigration(tableMetaData));
 
 					runner.Up(new VersionMigration(tableMetaData));
-					processor.TableExists(tableMetaData.TableName).ShouldBeTrue();
+                    processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName).ShouldBeTrue();
 
 					runner.Down(new VersionMigration(tableMetaData));
-					processor.TableExists(tableMetaData.TableName).ShouldBeFalse();
+                    processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName).ShouldBeFalse();
 				});
+		}
+
+
+        [Test]
+        public void CanUseCustomVersionInfo()
+        {
+            ExecuteWithSupportedProcessors(processor =>
+            {
+                var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3" }, processor);
+
+                IVersionTableMetaData tableMetaData = new TestVersionTableMetaData();
+
+                //ensure table doesn't exist
+                if (processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName))
+                    runner.Down(new VersionMigration(tableMetaData));
+
+                //ensure schema doesn't exist
+                if (processor.SchemaExists(tableMetaData.SchemaName))
+                    runner.Down(new VersionSchemaMigration(tableMetaData));
+
+				
+                runner.Up(new VersionSchemaMigration(tableMetaData));
+                processor.SchemaExists(tableMetaData.SchemaName).ShouldBeTrue();
+
+                runner.Up(new VersionMigration(tableMetaData));
+                processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName).ShouldBeTrue();
+
+                runner.Down(new VersionMigration(tableMetaData));
+                processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName).ShouldBeFalse();
+
+                runner.Down(new VersionSchemaMigration(tableMetaData));
+                processor.SchemaExists(tableMetaData.SchemaName).ShouldBeFalse();
+            }, true, typeof(SqliteProcessor));
+
+        }
+
+		[Test]
+		public void CanUseCustomVersionInfoDefaultSchema()
+		{
+			ExecuteWithSupportedProcessors(processor =>
+			{
+				var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3" }, processor);
+
+				IVersionTableMetaData tableMetaData = new TestVersionTableMetaData{SchemaName=null};
+				
+
+				//ensure table doesn't exist
+				if (processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName))
+					runner.Down(new VersionMigration(tableMetaData));
+
+				runner.Up(new VersionMigration(tableMetaData));
+				processor.TableExists(null, tableMetaData.TableName).ShouldBeTrue();
+
+				runner.Down(new VersionMigration(tableMetaData));
+				processor.TableExists(null, tableMetaData.TableName).ShouldBeFalse();
+
+				
+			});
 
 		}
+
 	}
 }

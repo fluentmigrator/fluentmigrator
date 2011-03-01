@@ -25,27 +25,29 @@ namespace FluentMigrator.Builders.Schema.Table
 	public class SchemaTableQuery : ISchemaTableSyntax
 	{
 		private readonly IMigrationContext _context;
-		private readonly string _tableName;
+	    private readonly string _schemaName;
+	    private readonly string _tableName;
 
-		public SchemaTableQuery(IMigrationContext context, string tableName)
+		public SchemaTableQuery(IMigrationContext context, string schemaName, string tableName)
 		{
 			_context = context;
-			_tableName = tableName;
+		    _schemaName = schemaName;
+		    _tableName = tableName;
 		}
 
 		public bool Exists()
 		{
-			return _context.QuerySchema.TableExists(_tableName);
+			return _context.QuerySchema.TableExists(_schemaName, _tableName);
 		}
 
 		public ISchemaColumnSyntax Column(string columnName)
 		{
-			return new SchemaColumnQuery(_tableName, columnName, _context);
+			return new SchemaColumnQuery(_schemaName, _tableName, columnName, _context);
 		}
 
         public ISchemaIndexSyntax Index(string indexName)
         {
-            return new SchemaIndexQuery(_tableName, indexName, _context);
+            return new SchemaIndexQuery(_schemaName, _tableName, indexName, _context);
         }
 
     }

@@ -22,6 +22,7 @@ namespace FluentMigrator.VersionTableInfo
 {
 	public interface IVersionTableMetaData
 	{
+        string SchemaName { get; }
 		string TableName { get; }
 		string ColumnName { get; }
 	}

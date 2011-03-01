@@ -54,7 +54,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump {
                 Name = "tableName",
                 Columns = new List<ColumnDefinition>() { new ColumnDefinition() },
                 Indexes = new List<IndexDefinition>() { new IndexDefinition() },
-                ForiengKeys = new List<ForeignKeyDefinition>() { new ForeignKeyDefinition() }
+                ForeignKeys = new List<ForeignKeyDefinition>() { new ForeignKeyDefinition() }
             };
 
             List<TableDefinition> defs = new List<TableDefinition>();
@@ -72,7 +72,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump {
         {
             // this is the fun part.. this test should fail until the schema reading code works
             // also assume the target database contains schema described in TestMigration
-            using (var table = new SqlServerTestTable(Processor, "id int")) {
+            using (var table = new SqlServerTestTable(Processor, null, "id int")) {
                 IList<TableDefinition> defs = SchemaDumper.ReadDbSchema();
 
                 SchemaTestWriter testWriter = new SchemaTestWriter();

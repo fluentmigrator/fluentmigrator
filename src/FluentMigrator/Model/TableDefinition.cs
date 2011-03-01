@@ -30,14 +30,14 @@ namespace FluentMigrator.Model {
         public TableDefinition()
 		{
             Columns = new List<ColumnDefinition>();
-            ForiengKeys = new List<ForeignKeyDefinition>();
+            ForeignKeys = new List<ForeignKeyDefinition>();
             Indexes = new List<IndexDefinition>();
 		}
 
         public virtual string Name { get; set; }
         public virtual string SchemaName { get; set; }
         public virtual ICollection<ColumnDefinition> Columns { get; set; }
-        public virtual ICollection<ForeignKeyDefinition> ForiengKeys { get; set; }
+        public virtual ICollection<ForeignKeyDefinition> ForeignKeys { get; set; }
         public virtual ICollection<IndexDefinition> Indexes { get; set; }
 
         public void ApplyConventions(IMigrationConventions conventions) 
@@ -56,7 +56,7 @@ namespace FluentMigrator.Model {
             foreach (IndexDefinition index in Indexes)
                 index.CollectValidationErrors(errors);
 
-            foreach (ForeignKeyDefinition fk in ForiengKeys)
+            foreach (ForeignKeyDefinition fk in ForeignKeys)
                 fk.CollectValidationErrors(errors);
         }
 

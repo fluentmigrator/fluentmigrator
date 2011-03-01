@@ -46,7 +46,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 			}
 		}
 
-		public override DataSet ReadTableData(string tableName)
+        public override DataSet ReadTableData(string schemaName, string tableName)
 		{
 			return Read("SELECT * FROM [{0}]", tableName);
 		}
@@ -79,7 +79,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 			throw new NotImplementedException();
 		}
 
-		public override bool TableExists(string tableName)
+		public override bool TableExists(string schemaName, string tableName)
 		{
 			if (Connection.State != ConnectionState.Open) Connection.Open();
 
@@ -90,7 +90,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 			}
 		}
 
-		public override bool ColumnExists(string tableName, string columnName)
+        public override bool ColumnExists(string schemaName, string tableName, string columnName)
 		{
 			if (Connection.State != ConnectionState.Open) Connection.Open();
 
@@ -101,7 +101,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 			}
 		}
 
-		public override bool ConstraintExists(string tableName, string constraintName)
+        public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
 		{
 			if (Connection.State != ConnectionState.Open) Connection.Open();
 
@@ -112,7 +112,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 			}
 		}
 
-        public override bool IndexExists(string tableName, string indexName)
+        public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
 

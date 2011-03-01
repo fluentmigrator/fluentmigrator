@@ -33,7 +33,7 @@ namespace FluentMigrator.Builders.Schema
 
 		public ISchemaTableSyntax Table(string tableName)
 		{
-			return new SchemaTableQuery(_context, tableName);
+			return new SchemaTableQuery(_context, null, tableName);
 		}
 
 		public ISchemaSchemaSyntax Schema(string schemaName)

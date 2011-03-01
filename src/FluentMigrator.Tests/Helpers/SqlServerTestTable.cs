@@ -26,13 +26,15 @@ namespace FluentMigrator.Tests.Helpers
 {
 	public class SqlServerTestTable : IDisposable
 	{
-		public SqlConnection Connection { get; set; }
+	    private readonly string _schemaName;
+	    public SqlConnection Connection { get; set; }
 		public string Name { get; set; }
 		protected SqlTransaction Transaction { get; set; }
 
-		public SqlServerTestTable(SqlServerProcessor processor, params string[] columnDefinitions)
+		public SqlServerTestTable(SqlServerProcessor processor, string schemaName, params string[] columnDefinitions)
 		{
-			Connection = processor.Connection;
+		    _schemaName = schemaName;
+		    Connection = processor.Connection;
 			Transaction = processor.Transaction;
 
 			Name = "Table" + Guid.NewGuid().ToString("N");
@@ -46,9 +48,16 @@ namespace FluentMigrator.Tests.Helpers
 
 		public void Create(IEnumerable<string> columnDefinitions)
 		{
-			var sb = new StringBuilder();
+			if (!string.IsNullOrEmpty(_schemaName))
+			{
+				using (var command = new SqlCommand(string.Format("CREATE SCHEMA [{0}]", _schemaName), Connection, Transaction))
+					command.ExecuteNonQuery();
+			}
 
+			var sb = new StringBuilder();
 			sb.Append("CREATE TABLE ");
+            if (!string.IsNullOrEmpty(_schemaName))
+                sb.AppendFormat("[{0}].", _schemaName);
 			sb.Append(Name);
 
 			foreach (string definition in columnDefinitions)
@@ -66,8 +75,19 @@ namespace FluentMigrator.Tests.Helpers
 
 		public void Drop()
 		{
-			using (var command = new SqlCommand("DROP TABLE " + Name, Connection, Transaction))
-				command.ExecuteNonQuery();
+            if (string.IsNullOrEmpty(_schemaName))
+            {
+                using (var command = new SqlCommand("DROP TABLE " + Name, Connection, Transaction))
+                    command.ExecuteNonQuery();
+            }
+            else
+            {
+				using (var command = new SqlCommand(string.Format("DROP TABLE [{0}].{1}",  _schemaName, Name), Connection, Transaction))
+                    command.ExecuteNonQuery();
+
+				using (var command = new SqlCommand(string.Format("DROP SCHEMA [{0}]", _schemaName), Connection, Transaction))
+					command.ExecuteNonQuery();
+            }
 		}
 	}
 }

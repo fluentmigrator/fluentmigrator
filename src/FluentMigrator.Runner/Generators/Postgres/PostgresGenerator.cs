@@ -27,7 +27,6 @@ namespace FluentMigrator.Runner.Generators.Postgres
 			return string.Format("CREATE TABLE {0}.{1} ({2})", Quoter.QuoteSchemaName(expression.SchemaName), tableName, Column.Generate(expression.Columns, tableName));
 		}
 
-
 		public override string Generate(AlterColumnExpression expression)
 		{
 			return String.Format("ALTER TABLE {0}.{1} ALTER {2} TYPE {3}", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.Column.Name), ((PostgresColumn)Column).GetColumnType(expression.Column));
@@ -100,10 +99,10 @@ namespace FluentMigrator.Runner.Generators.Postgres
 			var idx = String.Format(result.ToString(), expression.Index.Name, Quoter.QuoteSchemaName(expression.Index.SchemaName), expression.Index.TableName); 
 			if (!expression.Index.IsClustered)
 				return idx;
-              
+			  
 			 // Clustered indexes in Postgres do not cluster updates/inserts to the table after the initial cluster operation is applied.
 			 // To keep the clustered index up to date run CLUSTER TableName periodically
-             
+			 
 			return string.Format("{0}; CLUSTER {1}\"{2}\" ON \"{3}\"", idx, Quoter.QuoteSchemaName(expression.Index.SchemaName), expression.Index.TableName, expression.Index.Name);
 			 */
 		}

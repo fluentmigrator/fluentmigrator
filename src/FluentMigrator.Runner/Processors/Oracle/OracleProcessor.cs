@@ -27,23 +27,23 @@ namespace FluentMigrator.Runner.Processors.Oracle
 			throw new NotImplementedException();
 		}
 
-		public override bool TableExists(string tableName)
+        public override bool TableExists(string schemaName, string tableName)
 		{
 			return Exists("SELECT TABLE_NAME FROM USER_TABLES WHERE LOWER(TABLE_NAME)='{0}'", tableName.ToLower());
 		}
 
-		public override bool ColumnExists(string tableName, string columnName)
+        public override bool ColumnExists(string schemaName, string tableName, string columnName)
 		{
 			return Exists("SELECT COLUMN_NAME FROM USER_TAB_COLUMNS WHERE LOWER(TABLE_NAME) = '{0}' AND LOWER(COLUMN_NAME) = '{1}'", tableName.ToLower(), columnName.ToLower());
 		}
 
-		public override bool ConstraintExists(string tableName, string constraintName)
+        public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
 		{
 			const string sql = @"S'";
 			return Exists(sql, tableName.ToLower(), constraintName.ToLower());
 		}
 
-        public override bool IndexExists(string tableName, string indexName)
+        public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             return Exists("SELECT INDEX_NAME FROM ALL_INDEXES WHERE LOWER(TABLE_NAME) = '{0}' AND LOWER(INDEX_NAME) = '{1}'", tableName.ToLower(), indexName.ToLower());
         }
@@ -71,7 +71,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 			}
 		}
 
-		public override DataSet ReadTableData(string tableName)
+        public override DataSet ReadTableData(string schemaName, string tableName)
 		{
 			return Read("SELECT * FROM {0}", tableName);
 		}

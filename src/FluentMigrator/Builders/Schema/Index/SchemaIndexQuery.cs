@@ -22,20 +22,22 @@ namespace FluentMigrator.Builders.Schema.Index
 {
 	public class SchemaIndexQuery : ISchemaIndexSyntax
 	{
-		private readonly string _tableName;
+	    private readonly string _schemaName;
+	    private readonly string _tableName;
 		private readonly string _indexName;
 		private readonly IMigrationContext _context;
 
-        public SchemaIndexQuery(string tableName, string indexName, IMigrationContext context)
+        public SchemaIndexQuery(string schemaName, string tableName, string indexName, IMigrationContext context)
 		{
-			_tableName = tableName;
+            _schemaName = schemaName;
+            _tableName = tableName;
             _indexName = indexName;
 			_context = context;
 		}
 
 		public bool Exists()
 		{
-			return _context.QuerySchema.IndexExists(_tableName, _indexName);
+			return _context.QuerySchema.IndexExists(_schemaName, _tableName, _indexName);
 		}
 	}
 }

@@ -33,14 +33,37 @@ namespace FluentMigrator.Runner.Versioning
 		public override void Up()
 		{
 			Create.Table(_versionTableMetaData.TableName)
+                .InSchema(_versionTableMetaData.SchemaName)
 				.WithColumn(_versionTableMetaData.ColumnName).AsInt64().NotNullable();
 		}
 
 		public override void Down()
 		{
-			Delete.Table(_versionTableMetaData.TableName);
+			Delete.Table(_versionTableMetaData.TableName).InSchema(_versionTableMetaData.SchemaName);
 		}
 	}
+
+    public class VersionSchemaMigration : Migration
+    {
+        private IVersionTableMetaData _versionTableMetaData;
+
+        public VersionSchemaMigration(IVersionTableMetaData versionTableMetaData)
+		{
+			_versionTableMetaData = versionTableMetaData;
+		}
+
+        public override void Up()
+        {
+            if(!string.IsNullOrEmpty(_versionTableMetaData.SchemaName))
+                Create.Schema(_versionTableMetaData.SchemaName);
+        }
+
+        public override void Down()
+        {
+            if(!string.IsNullOrEmpty(_versionTableMetaData.SchemaName))
+                Delete.Schema(_versionTableMetaData.SchemaName);
+        }
+    }
 
 	internal static class DateTimeExtensions
 	{

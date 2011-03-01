@@ -12,7 +12,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump {
             int tableCount = tables.Count;
             int columnCount = tables.Select(t => t.Columns.Count).Sum();
             int indexCount = tables.Select(t => t.Indexes.Count).Sum();
-            int keyCount = tables.Select(t => t.ForiengKeys.Count).Sum();
+            int keyCount = tables.Select(t => t.ForeignKeys.Count).Sum();
 
             output.Write(GetMessage(tableCount, columnCount, indexCount, keyCount));
         }
