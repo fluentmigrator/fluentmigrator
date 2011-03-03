@@ -43,8 +43,9 @@ namespace FluentMigrator.Runner.Generators.MySql
 
 		public override string Generate(RenameColumnExpression expression)
 		{
+
 			// may need to add definition to end. blerg
-			//return String.Format("ALTER TABLE `{0}` CHANGE COLUMN {1} {2}", expression.TableName, expression.OldName, expression.NewName);
+			//return String.Format("ALTER TABLE `{0}` CHANGE COLUMN {1} {2}", Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.OldName), Quoter.QuoteColumnName(expression.NewName));
 			
 			// NOTE: The above does not work, as the CHANGE COLUMN syntax in Mysql requires the column definition to be re-specified,
 			// even if it has not changed; so marking this as not working for now

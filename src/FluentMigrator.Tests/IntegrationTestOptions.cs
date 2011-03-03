@@ -6,21 +6,21 @@
 															{
 																ConnectionString =
                                                                     @"server=.\SQLEXPRESS;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator",
-																IsEnabled = true
+																IsEnabled = false
 															};
 
 		public static DatabaseServerOptions SqlLite = new DatabaseServerOptions
 															{
 																ConnectionString =
 																	@"Data Source=:memory:;Version=3;New=True;",
-																IsEnabled = true
+                                                                IsEnabled = false
 															};
 
 		public static DatabaseServerOptions MySql = new DatabaseServerOptions
 														{
 															ConnectionString =
-																@"Database=FluentMigrator;Data Source=localhost;User Id=test;Password=test;",
-															IsEnabled = false
+																@"Database=FluentMigrator;Data Source=localhost;User Id=root;Password=;",
+															IsEnabled = true
 														};
 
 	    public static DatabaseServerOptions Postgres = new DatabaseServerOptions
