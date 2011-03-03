@@ -17,7 +17,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 			compatabilityMode = CompatabilityMode.LOOSE;
 		}
 
-		public virtual string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
+        public virtual string CreateTable { get { return "CREATE TABLE {2}{0} ({1})"; } }
 		public virtual string DropTable { get { return "DROP TABLE {0}"; } }
 
 		public virtual string AddColumn { get { return "ALTER TABLE {0} ADD COLUMN {1}"; } }
@@ -52,6 +52,11 @@ namespace FluentMigrator.Runner.Generators.Generic
 			return string.Empty;
 		}
 
+        public virtual string IfNotExistsString(CreateTableExpression expression)
+        {
+            return expression.IfNotExists ? "IF NOT EXISTS " : "";
+        }
+
 		/// <summary>
 		/// Outputs a create table string
 		/// </summary>
@@ -64,7 +69,9 @@ namespace FluentMigrator.Runner.Generators.Generic
 
 			string quotedTableName = Quoter.QuoteTableName(expression.TableName);
 
-			return string.Format(CreateTable, quotedTableName, Column.Generate(expression.Columns, quotedTableName));
+            string ifNotExists = IfNotExistsString(expression);
+
+			return string.Format(CreateTable, quotedTableName, Column.Generate(expression.Columns, quotedTableName),ifNotExists);
 		}
 
 		public override string Generate(DeleteTableExpression expression)

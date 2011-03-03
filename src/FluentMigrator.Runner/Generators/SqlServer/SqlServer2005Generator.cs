@@ -35,7 +35,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 		{
 		}
 
-
+        
         public override string CreateTable { get { return "{0} ({1})"; } }
         public override string DropTable { get { return "{0}"; } }
 
@@ -56,9 +56,16 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string CreateConstraint { get { return "ALTER TABLE {0}.{1} ADD CONSTRAINT {2} FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8}"; } }
         public override string DeleteConstraint { get { return "{0} DROP CONSTRAINT {1}"; } }
 
+        public override string IfNotExistsString(CreateTableExpression expression)
+        {
+            return expression.IfNotExists ? string.Format("IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{0}.{1}') AND type in (N'U')) ", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName)) : "";
+        }
+
+
         public override string Generate(CreateTableExpression expression)
         {
-            return string.Format("CREATE TABLE {0}.{1}",Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            var ifnotExsits = IfNotExistsString(expression);
+            return string.Format("{2}CREATE TABLE {0}.{1}",Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression),ifnotExsits);
         }
 
         public override string Generate(DeleteTableExpression expression)

@@ -202,5 +202,14 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
             Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
         }
+
+        [Test]
+        public override void CanCreateTableWithIFNotExists()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.IfNotExists = true;
+            var result = generator.Generate(expression);
+            result.ShouldBe("IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[TestTable1]') AND type in (N'U')) CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL)");
+        }
     }
 }

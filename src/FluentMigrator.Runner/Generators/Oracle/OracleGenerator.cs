@@ -24,6 +24,11 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         public override string InsertData { get { return "INTO {0} ({1}) VALUES ({2})"; } }
 
+        public override string IfNotExistsString(CreateTableExpression expression)
+        {
+            return compatabilityMode.HandleCompatabilty("If not exists statments are note supported in Oracle");
+        }
+
         //public override string Generate(AlterColumnExpression expression)
         //{
         //    return String.Format("ALTER TABLE {0} MODIFY {1}", expression.TableName, Column.Generate(expression.Column));

@@ -38,11 +38,17 @@ namespace FluentMigrator.Builders.Create.Table
 			_context = context;
 		}
 
-		public ICreateTableWithColumnSyntax InSchema(string schemaName)
+        public ICreateTableWithColumnOrSchemaSyntax InSchema(string schemaName)
 		{
 			Expression.SchemaName = schemaName;
 			return this;
 		}
+
+        public ICreateTableWithColumnOrSchemaSyntax IfNotExists()
+        {
+            Expression.IfNotExists = true;
+            return this;
+        }
 
 		public ICreateTableColumnAsTypeSyntax WithColumn(string name)
 		{
@@ -107,6 +113,8 @@ namespace FluentMigrator.Builders.Create.Table
 			return this;
 		}
 
+      
+
 		public ICreateTableColumnOptionOrWithColumnSyntax References(string foreignKeyName, string foreignTableName, IEnumerable<string> foreignColumnNames)
 		{
 			return References(foreignKeyName, null, foreignTableName, foreignColumnNames);
@@ -133,6 +141,8 @@ namespace FluentMigrator.Builders.Create.Table
 			_context.Expressions.Add(fk);
 			return this;
 		}
+
+
 
 		protected override ColumnDefinition GetColumnForType()
 		{

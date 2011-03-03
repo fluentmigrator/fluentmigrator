@@ -521,6 +521,18 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             sql.ShouldBe("DELETE FROM \"public\".\"Table1\" WHERE \"description\" IS NULL AND \"id\" = 10;");
         }
 
+        [Test]
+        public void CanCreateTableWithIFNotExists()
+        {
+            //Should Not be the same as the Create Table Expression as Protgres just returns false from the query it the table exists but does 
+            //not cause an error in processing
+            string tableName = "NewTable";
+            CreateTableExpression expression = GetCreateTableExpression(tableName);
+            expression.IfNotExists = true;
+            var result = generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text NOT NULL, \"ColumnName2\" integer NOT NULL)");
+        }
+
 		private DeleteTableExpression GetDeleteTableExpression(string tableName)
 		{
 			return new DeleteTableExpression { TableName = tableName };
@@ -539,5 +551,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 			expression.Columns.Add(column2);
 			return expression;
 		}
+
+        
 	}
 }

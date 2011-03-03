@@ -31,6 +31,8 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         public abstract void CanCreateSchema();
 
+        public abstract void CanCreateTableWithIFNotExists();
+
         
 
        

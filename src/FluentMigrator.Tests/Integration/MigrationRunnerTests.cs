@@ -473,12 +473,27 @@ namespace FluentMigrator.Tests.Integration
 			}
 		}
 
+        [Test]
+        public void MigrateUpWithINotExistsClause()
+        {
+            ExecuteWithSupportedProcessors(processor =>
+            {
+                var runner = SetupMigrationRunner(processor);
+
+                runner.Up(new TestIFNotExists());
+
+                processor.TableExists(null,"TestTable1").ShouldBeTrue();
+            });
+
+        }
+
 
 		private static MigrationRunner SetupMigrationRunner(IMigrationProcessor processor)
 		{
 			Assembly asm = typeof(MigrationRunnerTests).Assembly;
 			var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
 			{
+                
 				Namespace = "FluentMigrator.Tests.Integration.Migrations"
 			};
 
@@ -527,6 +542,27 @@ namespace FluentMigrator.Tests.Integration
 			Delete.Table("Groups");
 		}
 	}
+
+    internal class TestIFNotExists : Migration
+    {
+        public override void Up()
+        {
+            Create.Table("TestTable1")
+                .WithColumn("Foo").AsInt32()
+                .WithColumn("Bar").AsString();
+
+            Create.Table("TestTable1").IfNotExists()
+                .WithColumn("Foo").AsInt32()
+                .WithColumn("Bar").AsString();
+        }
+
+        public override void Down()
+        {
+            Delete.Table("Test");
+        }
+        
+
+    }
 
 	internal class TestIndexNamingConvention : Migration
 	{

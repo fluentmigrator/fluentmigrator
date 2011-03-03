@@ -155,5 +155,14 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
             Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
         }
+
+        [Test]
+        public override void CanCreateTableWithIFNotExists()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.IfNotExists = true;
+            generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(expression));
+        }
     }
 }

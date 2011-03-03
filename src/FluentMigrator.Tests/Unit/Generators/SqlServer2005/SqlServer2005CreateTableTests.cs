@@ -372,6 +372,15 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
                 "CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] NVARCHAR(MAX) NOT NULL, [TestColumn2] INT NOT NULL)");
         }
 
+        [Test]
+        public void CanCreateTableWithIFNotExists()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.IfNotExists = true;
+            var result = generator.Generate(expression);
+            result.ShouldBe("IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[TestTable1]') AND type in (N'U')) CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL)");
+        }
+
         
     }
 }

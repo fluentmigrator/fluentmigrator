@@ -41,6 +41,16 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
         }
 
+        public override string IfNotExistsString(CreateTableExpression expression)
+        {
+            return expression.IfNotExists ? string.Format("IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{0}') AND type in (N'U')) ",Quoter.QuoteTableName(expression.TableName)) : "";
+        }
+
+        public override string CreateTable
+        {
+            get { return "{2}CREATE TABLE {0} ({1})"; }
+        }
+
         public override string RenameTable { get { return "sp_rename '{0}', '{1}'"; } }
 
         public override string RenameColumn { get { return "sp_rename '{0}.{1}', '{2}'"; } }

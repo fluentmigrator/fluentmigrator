@@ -182,5 +182,14 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
             Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
         }
+
+        [Test]
+        public override void CanCreateTableWithIFNotExists()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.IfNotExists = true;
+            var result = generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE IF NOT EXISTS `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL, `TestColumn2` INTEGER NOT NULL) ENGINE = INNODB");
+        }
     }
 }

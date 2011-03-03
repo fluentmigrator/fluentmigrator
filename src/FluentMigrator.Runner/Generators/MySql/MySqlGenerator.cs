@@ -39,7 +39,7 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         public override string DeleteConstraint { get { return "ALTER TABLE {0} DROP FOREIGN KEY {1}"; } }
 
-        public override string CreateTable { get { return "CREATE TABLE {0} ({1}) ENGINE = INNODB"; } }
+        public override string CreateTable { get { return "CREATE TABLE {2}{0} ({1}) ENGINE = INNODB"; } }
 
 		public override string Generate(RenameColumnExpression expression)
 		{

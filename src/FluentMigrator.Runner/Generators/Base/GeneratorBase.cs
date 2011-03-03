@@ -50,6 +50,8 @@ namespace FluentMigrator.Runner.Generators.Base
 		public abstract string Generate(UpdateDataExpression expression);
 		public abstract string Generate(AlterSchemaExpression expression);
 
+
+
 		public string Generate(AlterTableExpression expression)
 		{
 			// returns nothing because the individual AddColumn and AlterColumn calls
