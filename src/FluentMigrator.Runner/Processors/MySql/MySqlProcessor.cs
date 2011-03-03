@@ -36,18 +36,18 @@ namespace FluentMigrator.Runner.Processors.MySql
 
 		public override bool SchemaExists(string schemaName)
 		{
-            return false;
+            return true;
 		}
 
         public override bool TableExists(string schemaName, string tableName)
 		{
-			return Exists(@"select table_name from information_schema.tables 
+			return Exists(@"select * from information_schema.tables 
 							where table_schema = SCHEMA() and table_name='{0}'", tableName);
 		}
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
 		{
-			string sql = @"select column_name from information_schema.columns
+			string sql = @"select * from information_schema.columns
 							where table_schema = SCHEMA() and table_name='{0}'
 							and column_name='{1}'";
 			return Exists(sql, tableName, columnName);
@@ -55,7 +55,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
 		{
-			string sql = @"select constraint_name from information_schema.table_constraints
+			string sql = @"select * from information_schema.table_constraints
 							where table_schema = SCHEMA() and table_name='{0}'
 							and constraint_name='{1}'";
 			return Exists(sql, tableName, constraintName);
@@ -63,7 +63,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
 		{
-			string sql = @"select index_name from information_schema.statistics
+			string sql = @"select * from information_schema.statistics
 							where table_schema = SCHEMA() and table_name='{0}'
 							and index_name='{1}'";
 			return Exists(sql, tableName, indexName);
@@ -84,6 +84,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 		{
 			if (Connection.State != ConnectionState.Open) Connection.Open();
 
+          
 			using (var command = new MySqlCommand(String.Format(template, args), Connection))
 			{
 				command.CommandTimeout = Options.Timeout;
@@ -91,10 +92,9 @@ namespace FluentMigrator.Runner.Processors.MySql
 				{
 					try
 					{
-						if (!reader.Read())
-							return false;
-
-						return true;
+                        bool readB = reader.Read();
+                        bool hasRows = reader.HasRows;
+                       return reader.HasRows;
 					}
 					catch
 					{
