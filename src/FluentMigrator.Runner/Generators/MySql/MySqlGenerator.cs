@@ -35,6 +35,8 @@ namespace FluentMigrator.Runner.Generators.MySql
 		{
 		}
 
+        public override string DropIndex { get{ return "DROP INDEX {0} ON {1}"; } }
+
         public override string AlterColumn { get { return "ALTER TABLE {0} MODIFY COLUMN {1}"; } }
 
         public override string DeleteConstraint { get { return "ALTER TABLE {0} DROP FOREIGN KEY {1}"; } }
