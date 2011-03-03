@@ -38,7 +38,7 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
 		public override bool SchemaExists(string schemaName)
 		{
-		    return false;
+            return true;
 		}
 
         public override bool TableExists(string schemaName, string tableName)
