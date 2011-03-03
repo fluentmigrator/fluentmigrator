@@ -478,7 +478,7 @@ namespace FluentMigrator.Tests.Integration
 		}
 
         [Test]
-        public void MigrateUpWithINotExistsClause()
+        public void MigrateUpWithIFNotExistsClause()
         {
             ExecuteWithSupportedProcessors(processor =>
             {
@@ -488,6 +488,8 @@ namespace FluentMigrator.Tests.Integration
 
                 processor.TableExists(null,"TestTable1").ShouldBeTrue();
 
+                runner.Down(new TestIFNotExists());
+                runner.VersionLoader.RemoveVersionTable();
             },true);
 
         }
@@ -567,7 +569,7 @@ namespace FluentMigrator.Tests.Integration
 
         public override void Down()
         {
-            Delete.Table("Test");
+            Delete.Table("TestTable1");
         }
         
 
