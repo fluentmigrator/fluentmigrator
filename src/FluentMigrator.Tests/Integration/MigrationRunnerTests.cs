@@ -558,6 +558,7 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
+
             Create.Table("TestTable1")
                 .WithColumn("Foo").AsInt32()
                 .WithColumn("Bar").AsString();
