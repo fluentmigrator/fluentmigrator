@@ -212,5 +212,15 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 			builder.ShouldBeOfType<CreateIndexExpressionBuilder>();
 			contextMock.VerifyAll();
 		}
+
+        [Test]
+        public void CallingUniqueConstraintShouldCreateAConstraintExpressionWithATypeOfUnique()
+        {
+            var contextMock = new Mock<IMigrationContext>();
+            var root = new CreateExpressionRoot(contextMock.Object);
+            var builder = root.UniqueConstraint();
+            builder.ShouldBeOfType<CreateConstraintExpression>();
+        }
+
 	}
 }

@@ -19,6 +19,7 @@
 using System;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+using FluentMigrator.Expressions;
 
 namespace FluentMigrator
 {
@@ -33,6 +34,9 @@ namespace FluentMigrator
 		public Func<Type, MigrationMetadata> GetMetadataForMigration { get; set; }
 		public Func<string> GetWorkingDirectory { get; set; }
 
+        public Func<Model.ConstraintDefinition, string> GetConstraintName { get; set; }
+
+
 		public MigrationConventions()
 		{
 			GetPrimaryKeyName = DefaultMigrationConventions.GetPrimaryKeyName;
@@ -43,6 +47,8 @@ namespace FluentMigrator
 			TypeIsVersionTableMetaData = DefaultMigrationConventions.TypeIsVersionTableMetaData;
 			GetMetadataForMigration = DefaultMigrationConventions.GetMetadataForMigration;
 			GetWorkingDirectory = DefaultMigrationConventions.GetWorkingDirectory;
+            GetConstraintName = DefaultMigrationConventions.GetConstraintName;
+              
 		}
 	}
 }

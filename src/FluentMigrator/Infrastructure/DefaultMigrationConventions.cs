@@ -21,6 +21,7 @@ using System.Text;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 using FluentMigrator.VersionTableInfo;
+using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Infrastructure
 {
@@ -97,6 +98,27 @@ namespace FluentMigrator.Infrastructure
 
 			return metadata;
 		}
+
+
+        public static string GetConstraintName(ConstraintDefinition expression)
+        {
+            StringBuilder sb = new StringBuilder();
+            if (expression.IsPrimaryKeyConstraint)
+            {
+                sb.Append("PK_");
+            }
+            else
+            {
+                sb.Append("UC_");
+            }
+
+            sb.Append(expression.TableName);
+            foreach (var column in expression.Columns)
+            {
+                sb.Append("_" + column);
+            }
+            return sb.ToString();
+        }
 
 		public static string GetWorkingDirectory()
 		{

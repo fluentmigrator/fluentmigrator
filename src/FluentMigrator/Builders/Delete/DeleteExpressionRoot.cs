@@ -22,6 +22,8 @@ using FluentMigrator.Builders.Delete.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Builders.Delete.Index;
+using FluentMigrator.Builders.Delete.Constraint;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Delete
 {
@@ -89,5 +91,24 @@ namespace FluentMigrator.Builders.Delete
             _context.Expressions.Add(expression);
             return new DeleteIndexExpressionBuilder(expression);
         }
+
+        
+        public IDeleteConstraintOnTableSyntax PrimaryKey(string primaryKeyName)
+        {
+            var expression = new DeleteConstraintExpression(ConstraintType.PrimaryKey);
+            expression.Constraint.Name = primaryKeyName;
+            _context.Expressions.Add(expression);
+            return new DeleteConstraintExpressionBuilder(expression);
+        }
+
+        public IDeleteConstraintOnTableSyntax UniqueConstraint(string constraintName)
+        {
+            var expression = new DeleteConstraintExpression(ConstraintType.Unique);
+            expression.Constraint.Name = constraintName;
+            _context.Expressions.Add(expression);
+            return new DeleteConstraintExpressionBuilder(expression);
+        }
+
+
 	}
 }

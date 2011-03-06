@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using FluentMigrator.Expressions;
 namespace FluentMigrator
 {
 	public interface IMigrationConventions
@@ -29,5 +30,7 @@ namespace FluentMigrator
 		Func<Type, bool> TypeIsProfile { get; set; }
 		Func<Type, bool> TypeIsVersionTableMetaData { get; set; }
 		Func<string> GetWorkingDirectory { get; set; }
+
+        Func<Model.ConstraintDefinition,string> GetConstraintName { get; set; }
 	}
 }

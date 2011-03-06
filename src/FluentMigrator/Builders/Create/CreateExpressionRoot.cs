@@ -22,6 +22,8 @@ using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Builders.Create.Constraint;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Create
 {
@@ -82,6 +84,34 @@ namespace FluentMigrator.Builders.Create
 			return new CreateIndexExpressionBuilder(expression);
 		}
 
-        
-	}
+        public Constraint.ICreateConstraintOnTableSyntax PrimaryKey()
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
+            _context.Expressions.Add(expression);
+            return new CreateConstraintExpressionBuilder(expression);
+        }
+
+        public Constraint.ICreateConstraintOnTableSyntax UniqueConstraint()
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.Unique);
+            _context.Expressions.Add(expression);
+            return new CreateConstraintExpressionBuilder(expression);
+        }
+
+        public Constraint.ICreateConstraintOnTableSyntax PrimaryKey(string primaryKeyName)
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
+            expression.Constraint.Name = primaryKeyName;
+            _context.Expressions.Add(expression);
+            return new CreateConstraintExpressionBuilder(expression);
+        }
+
+        public Constraint.ICreateConstraintOnTableSyntax UniqueConstraint(string constraintName)
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.Unique);
+            expression.Constraint.Name = constraintName;
+            _context.Expressions.Add(expression);
+            return new CreateConstraintExpressionBuilder(expression);
+        }
+    }
 }

@@ -158,6 +158,7 @@
     <Compile Include="Integration\VersionMigrationTests.cs" />
     <Compile Include="Unit\AnnouncerTests.cs" />
     <Compile Include="Unit\AssemblyLoader\AssemblyLoaderTests.cs" />
+    <Compile Include="Unit\Builders\Create\CreateConstraintExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateIndexExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateExpressionRootTests.cs" />
     <Compile Include="Unit\Builders\Delete\DeleteIndexExpressionBuilderTests.cs" />
@@ -174,6 +175,7 @@
     <Compile Include="Unit\Builders\Create\CreateColumnExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Schema\SchemaExpressionRootTest.cs" />
     <Compile Include="Unit\Expressions\AlterSchemaExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\CreateConstraintExpressionTests.cs" />
     <Compile Include="Unit\Expressions\DeleteIndexExpressionTests.cs" />
     <Compile Include="Unit\Expressions\DeleteForeignKeyExpressionTests.cs" />
     <Compile Include="Unit\Expressions\CreateForeignKeyExpressionTests.cs" />

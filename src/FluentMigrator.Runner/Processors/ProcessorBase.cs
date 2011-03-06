@@ -107,31 +107,41 @@ namespace FluentMigrator.Runner.Processors
 			Process(Generator.Generate(expression));
 		}
 
-		public void Process(InsertDataExpression expression)
+        public virtual void Process(InsertDataExpression expression)
 		{
 			Process(Generator.Generate(expression));
 		}
 
-		public void Process(DeleteDataExpression expression)
+        public virtual void Process(DeleteDataExpression expression)
 		{
 			Process(Generator.Generate(expression));
 		}
 
-		public void Process(AlterDefaultConstraintExpression expression)
+        public virtual void Process(AlterDefaultConstraintExpression expression)
 		{
 			Process(Generator.Generate(expression));
 		}
 
-        public void Process(UpdateDataExpression expression)
+        public virtual void Process(UpdateDataExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
 		public abstract void Process(PerformDBOperationExpression expression);
 
-        public void Process(AlterSchemaExpression expression)
+        public virtual void Process(AlterSchemaExpression expression)
         {
           Process(Generator.Generate(expression));
+        }
+
+        public virtual void Process(CreateConstraintExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
+
+        public virtual void Process(DeleteConstraintExpression expression)
+        {
+            Process(Generator.Generate(expression));
         }
 
 		protected abstract void Process(string sql);

@@ -21,6 +21,7 @@ using FluentMigrator.Builders.Alter.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 
+
 namespace FluentMigrator.Builders.Alter
 {
 	public class AlterExpressionRoot : IAlterExpressionRoot
@@ -51,5 +52,7 @@ namespace FluentMigrator.Builders.Alter
 			_context.Expressions.Add(expression);
 			return new AlterColumnExpressionBuilder(expression, _context);
 		}
+
+
 	}
 }

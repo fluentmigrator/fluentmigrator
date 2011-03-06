@@ -21,6 +21,7 @@ using FluentMigrator.Builders.Create.ForeignKey;
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Builders.Create.Constraint;
 
 namespace FluentMigrator.Builders.Create
 {
@@ -33,5 +34,14 @@ namespace FluentMigrator.Builders.Create
 		ICreateForeignKeyFromTableSyntax ForeignKey(string foreignKeyName);
 		ICreateIndexForTableSyntax Index();
 		ICreateIndexForTableSyntax Index(string indexName);
+
+        ICreateConstraintOnTableSyntax PrimaryKey();
+        ICreateConstraintOnTableSyntax UniqueConstraint();
+
+        ICreateConstraintOnTableSyntax PrimaryKey(string primaryKeyName);
+        ICreateConstraintOnTableSyntax UniqueConstraint(string constraintName);
+
+
+
 	}
 }
