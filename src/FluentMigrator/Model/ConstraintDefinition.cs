@@ -18,7 +18,8 @@ namespace FluentMigrator.Model
         public bool IsPrimaryKeyConstraint { get { return ConstraintType.PrimaryKey == constraintType; } }
         public bool IsUniqueConstraint { get { return ConstraintType.Unique == constraintType; } }
 
-        public string Name { get; set; }
+        public string SchemaName { get; set; }
+        public string ConstraintName { get; set; }
         public string TableName { get; set; }
         public ICollection<string> Columns = new HashSet<string>();
 
@@ -38,7 +39,7 @@ namespace FluentMigrator.Model
             return new ConstraintDefinition(constraintType)
             {
                 Columns = Columns,
-                Name = Name,
+                ConstraintName = ConstraintName,
                 TableName = TableName
             };
         }
@@ -49,8 +50,8 @@ namespace FluentMigrator.Model
 
         public void ApplyConventions(IMigrationConventions conventions)
         {
-            if (String.IsNullOrEmpty(Name)){ 
-                Name = conventions.GetConstraintName(this);
+            if (String.IsNullOrEmpty(ConstraintName)){ 
+                ConstraintName = conventions.GetConstraintName(this);
             }
         }
 

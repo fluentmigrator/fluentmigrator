@@ -7,7 +7,7 @@ using FluentMigrator.Expressions;
 namespace FluentMigrator.Builders.Create.Constraint
 {
 
-    public class CreateConstraintExpressionBuilder : ExpressionBuilderBase<CreateConstraintExpression>,ICreateConstraintOnTableSyntax,ICreateConstraintColumnsSyntax
+    public class CreateConstraintExpressionBuilder : ExpressionBuilderBase<CreateConstraintExpression>, ICreateConstraintOnTableSyntax, ICreateConstraintColumnsSyntax, ICreateConstraintWithSchemaOrColumnSyntax
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="T:CreateConstraintExpressionBuilder"/> class.
@@ -17,7 +17,7 @@ namespace FluentMigrator.Builders.Create.Constraint
 
         }
 
-        public ICreateConstraintColumnsSyntax OnTable(string tableName)
+        public ICreateConstraintWithSchemaOrColumnSyntax OnTable(string tableName)
         {
             Expression.Constraint.TableName = tableName;
             return this;
@@ -33,6 +33,12 @@ namespace FluentMigrator.Builders.Create.Constraint
             foreach(var columnName in columnNames){
                 Expression.Constraint.Columns.Add(columnName);
             }
+        }
+
+        public ICreateConstraintColumnsSyntax WithSchema(string schemaName)
+        {
+            Expression.Constraint.SchemaName = schemaName;
+            return this;
         }
 
 

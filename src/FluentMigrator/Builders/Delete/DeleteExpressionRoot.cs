@@ -96,7 +96,7 @@ namespace FluentMigrator.Builders.Delete
         public IDeleteConstraintOnTableSyntax PrimaryKey(string primaryKeyName)
         {
             var expression = new DeleteConstraintExpression(ConstraintType.PrimaryKey);
-            expression.Constraint.Name = primaryKeyName;
+            expression.Constraint.ConstraintName = primaryKeyName;
             _context.Expressions.Add(expression);
             return new DeleteConstraintExpressionBuilder(expression);
         }
@@ -104,7 +104,7 @@ namespace FluentMigrator.Builders.Delete
         public IDeleteConstraintOnTableSyntax UniqueConstraint(string constraintName)
         {
             var expression = new DeleteConstraintExpression(ConstraintType.Unique);
-            expression.Constraint.Name = constraintName;
+            expression.Constraint.ConstraintName = constraintName;
             _context.Expressions.Add(expression);
             return new DeleteConstraintExpressionBuilder(expression);
         }

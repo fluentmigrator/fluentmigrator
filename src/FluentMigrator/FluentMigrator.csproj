@@ -132,6 +132,8 @@
     <Compile Include="Builders\Create\Constraint\ICreateConstraintColumnsSyntax.cs" />
     <Compile Include="Builders\Alter\Table\IAlterTableDropConstraintSyntax.cs" />
     <Compile Include="Builders\Create\Column\ICreateColumnAsTypeOrInSchemaSyntax.cs" />
+    <Compile Include="Builders\Create\Constraint\ICreateConstraintWithSchemaOrColumnSyntax.cs" />
+    <Compile Include="Builders\Create\Constraint\ICreateConstraintWithSchemaSyntax.cs" />
     <Compile Include="Builders\Create\ForeignKey\ICreateForeignKeyPrimaryColumnOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Create\ForeignKey\ICreateForeignKeyForeignColumnOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Create\ForeignKey\ICreateForiegnKeyCascadeSyntax.cs" />

@@ -42,7 +42,7 @@ namespace FluentMigrator.Expressions
         public override string ToString()
         {
           
-            return base.ToString() + Constraint.Name;
+            return base.ToString() + Constraint.ConstraintName;
         }
     }
 }

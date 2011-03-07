@@ -32,7 +32,7 @@ namespace FluentMigrator.Expressions
         public override string ToString()
         {
 
-            return base.ToString() + Constraint.Name;
+            return base.ToString() + Constraint.ConstraintName;
         }
 
         public override void CollectValidationErrors(ICollection<string> errors)

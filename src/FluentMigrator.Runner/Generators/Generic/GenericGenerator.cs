@@ -58,14 +58,14 @@ namespace FluentMigrator.Runner.Generators.Generic
             }
 
             return string.Format(CreateConstraint, Quoter.QuoteTableName(expression.Constraint.TableName),
-                Quoter.Quote(expression.Constraint.Name),
+                Quoter.Quote(expression.Constraint.ConstraintName),
                 constraintType,
                 String.Join(", ", columns));
         }
 
         public override string Generate(DeleteConstraintExpression expression)
         {
-            return string.Format(DeleteConstraint,Quoter.QuoteTableName(expression.Constraint.TableName),Quoter.Quote(expression.Constraint.Name));
+            return string.Format(DeleteConstraint,Quoter.QuoteTableName(expression.Constraint.TableName),Quoter.Quote(expression.Constraint.ConstraintName));
         }
 
 		public virtual string GetUniqueString(CreateIndexExpression column)

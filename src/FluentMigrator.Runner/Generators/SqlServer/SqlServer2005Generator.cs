@@ -56,6 +56,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string CreateForeignKeyConstraint { get { return "ALTER TABLE {0}.{1} ADD CONSTRAINT {2} FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8}"; } }
         public override string DeleteConstraint { get { return "{0} DROP CONSTRAINT {1}"; } }
 
+
+        public override string CreateConstraint { get { return "{0} ADD CONSTRAINT {1} {2} ({3})"; } }
+
         public override string IfNotExistsString(CreateTableExpression expression)
         {
             return expression.IfNotExists ? string.Format("IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'{0}.{1}') AND type in (N'U')) ", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName)) : "";
@@ -101,6 +104,16 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string Generate(DeleteDataExpression expression)
         {
             return string.Format("DELETE FROM {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+        }
+
+        public override string Generate(CreateConstraintExpression expression)
+        {
+            return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.Constraint.SchemaName), base.Generate(expression));
+        }
+
+        public override string Generate(DeleteConstraintExpression expression)
+        {
+            return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.Constraint.SchemaName), base.Generate(expression));
         }
 
         public override string Generate(DeleteForeignKeyExpression expression)
@@ -260,7 +273,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         }
 
 
-
+        
 
         
 

@@ -50,6 +50,20 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
         }
 
+        [Test]
+        public void ATableShouldBeAllowedToSpecifyASchema()
+        {
+            CreateConstraintExpression expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
+
+            CreateConstraintExpressionBuilder builder = new CreateConstraintExpressionBuilder(expression);
+            builder.OnTable("FOO").WithSchema("BAR").Column("BAZ");
+
+            expression.Constraint.SchemaName.ShouldBe("BAR");
+            expression.Constraint.TableName.ShouldBe("FOO");
+            expression.Constraint.Columns.First().ShouldBe("BAZ");
+
+        }
+
 
     }
 }

@@ -5,8 +5,7 @@ using System.Text;
 
 namespace FluentMigrator.Builders.Create.Constraint
 {
-    public interface ICreateConstraintOnTableSyntax
+    public interface ICreateConstraintWithSchemaOrColumnSyntax : ICreateConstraintColumnsSyntax,ICreateConstraintWithSchemaSyntax
     {
-        ICreateConstraintWithSchemaOrColumnSyntax OnTable(string tableName);
     }
 }

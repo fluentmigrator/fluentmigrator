@@ -65,12 +65,12 @@ namespace FluentMigrator.Runner.Generators.MySql
             {
                 return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName), "PRIMARY KEY","");
             }
-            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName),"INDEX ", Quoter.Quote(expression.Constraint.Name));
+            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName),"INDEX ", Quoter.Quote(expression.Constraint.ConstraintName));
         }
 
         public override string Generate(DeleteForeignKeyExpression expression)
 		{
-            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.ForeignKey.ForeignTable), "FOREIGN KEY", Quoter.QuoteColumnName(expression.ForeignKey.Name));
+            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.ForeignKey.ForeignTable), "FOREIGN KEY ", Quoter.QuoteColumnName(expression.ForeignKey.Name));
 		}
 	}
 }

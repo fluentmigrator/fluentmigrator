@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
             var sql = generator.Generate(expression);
-            sql.ShouldBe("DROP INDEX `TestIndex`");
+            sql.ShouldBe("DROP INDEX `TestIndex` ON `TestTable1`");
         }
 
         [Test]
