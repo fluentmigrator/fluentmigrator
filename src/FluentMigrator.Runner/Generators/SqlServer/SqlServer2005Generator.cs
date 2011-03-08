@@ -98,7 +98,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(DeleteForeignKeyExpression expression)
         {
-            return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.ForeignKey.PrimaryTableSchema), base.Generate(expression));
+            return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema), base.Generate(expression));
         }
 
         public override string Generate(InsertDataExpression expression)
@@ -210,7 +210,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 				SELECT column_id 
 				FROM sys.columns 
 				WHERE object_id = object_id('{2}.{0}')
-				AND name = '{1}'
+				AND name = '{3}'
 			);
 
 			-- create alter table command as string and run it
@@ -220,7 +220,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 			-- now we can finally drop column
 			ALTER TABLE {2}.{0} DROP COLUMN {1};";
 
-            return String.Format(sql, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.ColumnName), Quoter.QuoteSchemaName(expression.SchemaName));
+            return String.Format(sql, 
+              Quoter.QuoteTableName(expression.TableName), 
+              Quoter.QuoteColumnName(expression.ColumnName), 
+              Quoter.QuoteSchemaName(expression.SchemaName),
+              expression.ColumnName);
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
@@ -232,24 +236,29 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 			-- get name of default constraint
 			SELECT @default = name
 			FROM sys.default_constraints 
-			WHERE parent_object_id = object_id('{4}.{0}')
+			WHERE parent_object_id = object_id('{3}.{0}')
 			AND type = 'D'
 			AND parent_column_id = (
 				SELECT column_id 
 				FROM sys.columns 
-				WHERE object_id = object_id('{4}.{0}')
-				AND name = '{1}'
+				WHERE object_id = object_id('{3}.{0}')
+				AND name = '{4}'
 			);
 
 			-- create alter table command to drop contraint as string and run it
-			SET @sql = N'ALTER TABLE {4}.{0} DROP CONSTRAINT ' + @default;
+			SET @sql = N'ALTER TABLE {3}.{0} DROP CONSTRAINT ' + @default;
 			EXEC sp_executesql @sql;
 
 			-- create alter table command to create new default constraint as string and run it
-			SET @sql = N'ALTER TABLE {4}.{0} WITH NOCHECK ADD CONSTRAINT [' + @default + '] DEFAULT({2}) FOR {1}';
+			SET @sql = N'ALTER TABLE {3}.{0} WITH NOCHECK ADD CONSTRAINT [' + @default + '] DEFAULT({2}) FOR {1}';
 			EXEC sp_executesql @sql;";
 
-            return String.Format(sql, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.ColumnName), Quoter.QuoteValue(expression.DefaultValue),Quoter.QuoteSchemaName(expression.SchemaName));
+            return String.Format(sql, 
+              Quoter.QuoteTableName(expression.TableName), 
+              Quoter.QuoteColumnName(expression.ColumnName), 
+              Quoter.QuoteValue(expression.DefaultValue),
+              Quoter.QuoteSchemaName(expression.SchemaName),
+              expression.ColumnName);
         }
 
 
