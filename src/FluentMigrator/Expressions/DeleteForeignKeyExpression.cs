@@ -47,6 +47,26 @@ namespace FluentMigrator.Expressions
 			processor.Process(this);
 		}
 
+        public override IMigrationExpression Reverse()
+        {
+            // there are 2 types of delete FK statements
+            //  1) Delete.ForeignKey("FK_Name").OnTable("Table")
+            //  2) Delete.ForeignKey()
+            //      .FromTable("Table1").ForeignColumn("Id")
+            //      .ToTable("Table2").PrimaryColumn("Id");
+
+            // there isn't a way to autoreverse the type 1
+            //  but we can turn the type 2 into Create.ForeignKey().FromTable() ...
+
+            // only type 1 has the specific FK Name so if it's there then we can't auto-reverse
+            if (!String.IsNullOrEmpty(ForeignKey.Name))
+            {
+                return base.Reverse();
+            }
+
+            return new CreateForeignKeyExpression { ForeignKey = ForeignKey.Clone() as ForeignKeyDefinition };
+        }
+
 		public override string ToString()
 		{
 			return base.ToString() + ForeignKey.Name + " "
