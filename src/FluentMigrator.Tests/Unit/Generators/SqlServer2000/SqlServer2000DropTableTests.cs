@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
             var sql = generator.Generate(expression);
 
-            var expectedSql = "\n\t\t\tDECLARE @default sysname, @sql nvarchar(max);\n\n\t\t\t-- get name of default constraint\n\t\t\tSELECT @default = name\n\t\t\tFROM sys.default_constraints \n\t\t\tWHERE parent_object_id = object_id('[TestTable1]')\n\t\t\tAND type = 'D'\n\t\t\tAND parent_column_id = (\n\t\t\t\tSELECT column_id \n\t\t\t\tFROM sys.columns \n\t\t\t\tWHERE object_id = object_id('[TestTable1]')\n\t\t\t\tAND name = '[TestColumn1]'\n\t\t\t);\n\n\t\t\t-- create alter table command as string and run it\n\t\t\tSET @sql = N'ALTER TABLE [TestTable1] DROP CONSTRAINT ' + @default;\n\t\t\tEXEC sp_executesql @sql;\n\n\t\t\t-- now we can finally drop column\n\t\t\tALTER TABLE [TestTable1] DROP COLUMN [TestColumn1];";
+            var expectedSql = "\r\n\t\t\tDECLARE @default sysname, @sql nvarchar(max);\r\n\r\n\t\t\t-- get name of default constraint\r\n\t\t\tSELECT @default = name\r\n\t\t\tFROM sys.default_constraints \r\n\t\t\tWHERE parent_object_id = object_id('[TestTable1]')\r\n\t\t\tAND type = 'D'\r\n\t\t\tAND parent_column_id = (\r\n\t\t\t\tSELECT column_id \r\n\t\t\t\tFROM sys.columns \r\n\t\t\t\tWHERE object_id = object_id('[TestTable1]')\r\n\t\t\t\tAND name = '[TestColumn1]'\r\n\t\t\t);\r\n\r\n\t\t\t-- create alter table command as string and run it\r\n\t\t\tSET @sql = N'ALTER TABLE [TestTable1] DROP CONSTRAINT ' + @default;\r\n\t\t\tEXEC sp_executesql @sql;\r\n\r\n\t\t\t-- now we can finally drop column\r\n\t\t\tALTER TABLE [TestTable1] DROP COLUMN [TestColumn1];";
 
             sql.ShouldBe(expectedSql);
         }
