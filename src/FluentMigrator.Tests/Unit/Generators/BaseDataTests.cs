@@ -12,6 +12,8 @@ using FluentMigrator.Expressions;
 
         public abstract void CanInsertData();
         public abstract void CanDeleteData();
+        public abstract void CanDeleteDataAllRows();
+        public abstract void CanDeleteDataMultipleRows();
         public abstract void CanInsertGuidData();
 
         public abstract void CanUpdateData();

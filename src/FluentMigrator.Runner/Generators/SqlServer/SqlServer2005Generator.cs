@@ -51,7 +51,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string InsertData { get { return "INSERT INTO {0}.{1} ({2}) VALUES ({3})"; } }
         public override string UpdateData { get { return "{0} SET {1} WHERE {2}"; } }
-        public override string DeleteData { get { return "{0} WHERE {1}"; } }
+        public override string DeleteData { get { return "DELETE FROM {0}.{1} WHERE {2}"; } }
 
         public override string CreateConstraint { get { return "ALTER TABLE {0}.{1} ADD CONSTRAINT {2} FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8}"; } }
         public override string DeleteConstraint { get { return "{0} DROP CONSTRAINT {1}"; } }
@@ -93,7 +93,28 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(DeleteDataExpression expression)
         {
-            return string.Format("DELETE FROM {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            var deleteItems = new List<string>();
+
+
+            if (expression.IsAllRows)
+            {
+                deleteItems.Add(string.Format(DeleteData, Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), "1 = 1"));
+            }
+            else
+            {
+                foreach (var row in expression.Rows)
+                {
+                    var whereClauses = new List<string>();
+                    foreach (KeyValuePair<string, object> item in row)
+                    {
+                        whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value)));
+                    }
+
+                    deleteItems.Add(string.Format(DeleteData, Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), String.Join(" AND ", whereClauses.ToArray())));
+                }
+            }
+
+            return String.Join("; ", deleteItems.ToArray());
         }
 
         public override string Generate(DeleteForeignKeyExpression expression)
