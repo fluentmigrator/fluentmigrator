@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Globalization;
+using System.Threading;
 using FluentMigrator.Runner.Generators;
 using NUnit.Framework;
 using NUnit.Should;
@@ -15,7 +17,9 @@ namespace FluentMigrator.Tests.Unit.Generators
 	[TestFixture]
 	public class ConstantFormatterTests
 	{
+        
 		private IQuoter quoter = default(GenericQuoter);
+	    private CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
 
 		[SetUp]
 		public void SetUp()
@@ -200,7 +204,42 @@ namespace FluentMigrator.Tests.Unit.Generators
             quoter.Quote("Table'name").ShouldBe("'Table''name'");
         }
 
-        private enum Foo
+        [Test]
+        public void ShouldHandleDoubleToStringConversionInAnyCulture()
+        {
+            ChangeCulture();
+            quoter.QuoteValue(123.4d).ShouldBe("123.4");
+            RestoreCulture();
+        }
+
+        [Test]
+        public void ShouldHandleFloatToStringConversionInAnyCulture()
+        {
+            ChangeCulture();
+            quoter.QuoteValue(123.4f).ShouldBe("123.4");
+            RestoreCulture();
+        }
+
+        [Test]
+        public void ShouldHandleDecimalToStringConversionInAnyCulture()
+        {           
+            ChangeCulture();
+            quoter.QuoteValue(new Decimal(123.4d)).ShouldBe("123.4");
+            RestoreCulture();
+        }
+
+	    private void RestoreCulture()
+	    {
+	        Thread.CurrentThread.CurrentCulture = currentCulture;
+	    }
+
+	    private void ChangeCulture()
+	    {
+	        Thread.CurrentThread.CurrentCulture = new CultureInfo("nb-NO");
+	    }
+
+
+	    private enum Foo
         {
             Bar,
             Baz

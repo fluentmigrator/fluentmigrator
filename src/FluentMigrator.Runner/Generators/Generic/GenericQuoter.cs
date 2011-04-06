@@ -1,5 +1,7 @@
 ﻿
 
+using System.Globalization;
+
 namespace FluentMigrator.Runner.Generators.Generic
 {
     using System;
@@ -18,7 +20,26 @@ namespace FluentMigrator.Runner.Generators.Generic
             if (value is Guid) { return FormatGuid((Guid)value); }
             if (value is DateTime) { return FormatDateTime((DateTime)value); }
             if (value.GetType().IsEnum) { return FormatEnum(value); }
+            if (value is double) {return FormatDouble((double)value);}
+            if (value is float) {return FormatFloat((float)value);}
+            if (value is decimal) { return FormatDecimal((decimal)value); }
+            
             return value.ToString();
+        }
+
+        private string FormatDecimal(decimal value)
+        {
+            return value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        private string FormatFloat(float value)
+        {
+            return value.ToString(CultureInfo.InvariantCulture);
+        }
+
+        private string FormatDouble(double value)
+        {
+            return value.ToString(CultureInfo.InvariantCulture);
         }
 
         public virtual string FormatNull()
