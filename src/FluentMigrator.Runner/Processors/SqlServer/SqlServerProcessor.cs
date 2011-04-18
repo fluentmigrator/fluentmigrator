@@ -96,7 +96,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override DataSet ReadTableData(string schemaName, string tableName)
 		{
-			return Read("SELECT * FROM [{0}]", tableName);
+            return Read("SELECT * FROM [{0}].[{1}]", SafeSchemaName(schemaName), tableName);
 		}
 
 		public override DataSet Read(string template, params object[] args)
