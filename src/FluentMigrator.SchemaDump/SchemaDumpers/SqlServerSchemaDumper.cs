@@ -166,32 +166,55 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
         {
             switch (typeNum)
             {
-                case (int)SqlDbType.BigInt:
-                    return DbType.Int64;
-                case (int)SqlDbType.Binary:
-                    return DbType.Binary;
-                case (int)SqlDbType.Bit:
-                    return DbType.Boolean;
-                case (int)SqlDbType.Date:
-                    return DbType.Date;
-                case (int)SqlDbType.DateTime:
-                    return DbType.DateTime;
-                case (int)SqlDbType.Decimal:
-                    return DbType.Decimal;
-                case (int)SqlDbType.Float:
-                    return DbType.Int64;
-                case (int)SqlDbType.Image:
-                    return DbType.Object;
-                case (int)SqlDbType.Int:
-                    return DbType.Int32;
-                case (int)SqlDbType.Money:
-                    return DbType.Double;
-                case (int)SqlDbType.SmallInt:
-                    return DbType.Int16;
-                case (int)SqlDbType.UniqueIdentifier:
+                case 34: //'byte[]'
+                    return DbType.Byte;
+                case 35: //'string'
+                    return DbType.String;
+                case 36: //'System.Guid'
                     return DbType.Guid;
-                case (int)SqlDbType.Xml:
-                    return DbType.Xml;
+                case 48: //'byte'
+                    return DbType.Byte;
+                case 52: //'short'
+                    return DbType.Int16;
+                case 56: //'int'
+                    return DbType.Int32;
+                case 58: //'System.DateTime'
+                    return DbType.DateTime;
+                case 59: //'float'
+                    return DbType.Int64;
+                case 60: //'decimal'
+                    return DbType.Decimal;
+                case 61: //'System.DateTime'
+                    return DbType.DateTime;
+                case 62: //'double'
+                    return DbType.Double;
+                case 98: //'object'
+                    return DbType.Object;
+                case 99: //'string'
+                    return DbType.String;
+                case 104: //'bool'
+                    return DbType.Boolean;
+                case 106: //'decimal'
+                    return DbType.Decimal;
+                case 108: //'decimal'
+                    return DbType.Decimal;
+                case 122: //'decimal'
+                    return DbType.Decimal;
+                case 127: //'long'
+                    return DbType.Int64;
+                case 165: //'byte[]'
+                    return DbType.Byte;
+                case 167: //'string'
+                    return DbType.String;
+                case 173: //'byte[]'
+                    return DbType.Byte;
+                case 175: //'string'
+                    return DbType.String;
+                case 189: //'long'
+                    return DbType.Int64;
+                case 231: //'string'
+                case 239: //'string'
+                case 241: //'string'
                 default:
                     return DbType.String;
             }
