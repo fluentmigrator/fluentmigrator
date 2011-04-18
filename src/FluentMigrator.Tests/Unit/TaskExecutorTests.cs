@@ -49,7 +49,7 @@ namespace FluentMigrator.Tests.Integration
 
 			var runnerContext = new Mock<IRunnerContext>();
 			runnerContext.SetupGet(x => x.Database).Returns("sqlserver");
-			runnerContext.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer.ConnectionString);
+			runnerContext.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
 			runnerContext.SetupGet(x => x.Task).Returns(task);
 			runnerContext.SetupGet(x => x.Version).Returns(version);
 			runnerContext.SetupGet(x => x.Steps).Returns(steps);

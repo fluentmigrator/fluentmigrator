@@ -62,7 +62,7 @@ namespace FluentMigrator.Tests.Unit
 			_runnerContextMock.SetupGet(x => x.Announcer).Returns(_announcer.Object);
 			_runnerContextMock.SetupGet(x => x.StopWatch).Returns(_stopWatch.Object);
 			_runnerContextMock.SetupGet(x => x.Target).Returns(Assembly.GetExecutingAssembly().ToString());
-			_runnerContextMock.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer.ConnectionString);
+			_runnerContextMock.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
 			_runnerContextMock.SetupGet(x => x.Database).Returns("sqlserver");
 
 			_runner = new MigrationRunner(Assembly.GetAssembly( typeof( MigrationRunnerTests ) ), _runnerContextMock.Object, _processorMock.Object)
