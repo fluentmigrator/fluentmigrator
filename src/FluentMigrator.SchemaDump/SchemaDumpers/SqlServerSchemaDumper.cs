@@ -154,12 +154,47 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
                         PrimaryKeyName = dr.IsNull("PrimaryKeyName") ? "" : dr["PrimaryKeyName"].ToString(), 
                         Size = int.Parse(dr["Length"].ToString()),
                         TableName = dr["Table"].ToString(),
-                        Type = null //TODO: set this property
+                        Type = GetDbType(int.Parse(dr["TypeID"].ToString())) //TODO: set this property
                     });
                 }
             }
 
             return tables;
+        }
+
+        protected virtual DbType GetDbType(int typeNum)
+        {
+            switch (typeNum)
+            {
+                case (int)SqlDbType.BigInt:
+                    return DbType.Int64;
+                case (int)SqlDbType.Binary:
+                    return DbType.Binary;
+                case (int)SqlDbType.Bit:
+                    return DbType.Boolean;
+                case (int)SqlDbType.Date:
+                    return DbType.Date;
+                case (int)SqlDbType.DateTime:
+                    return DbType.DateTime;
+                case (int)SqlDbType.Decimal:
+                    return DbType.Decimal;
+                case (int)SqlDbType.Float:
+                    return DbType.Int64;
+                case (int)SqlDbType.Image:
+                    return DbType.Object;
+                case (int)SqlDbType.Int:
+                    return DbType.Int32;
+                case (int)SqlDbType.Money:
+                    return DbType.Double;
+                case (int)SqlDbType.SmallInt:
+                    return DbType.Int16;
+                case (int)SqlDbType.UniqueIdentifier:
+                    return DbType.Guid;
+                case (int)SqlDbType.Xml:
+                    return DbType.Xml;
+                default:
+                    return DbType.String;
+            }
         }
 
         protected virtual IList<IndexDefinition> ReadIndexes(string schemaName, string tableName) 
