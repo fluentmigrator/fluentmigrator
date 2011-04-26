@@ -34,6 +34,7 @@ namespace FluentMigrator.Console
 		public bool Verbose;
 		public bool PreviewOnly;
 		public string Namespace;
+        public string Group;
 		public string Task;
 		public bool Output;
 	    public string OutputFilename;
@@ -100,6 +101,11 @@ namespace FluentMigrator.Console
 						"REQUIRED. The connection string to the server and database you want to execute your migrations against.",
 						v => { Connection = v; }
 					},
+                    {
+                        "group=|g=",
+                        "The group of migrations to run.  Default are the migrations assigned to the default group.",
+                        v => { Group = v; }
+                    },
 					{
 						"namespace=|ns=",
 						"The namespace contains the migrations you want to run. Default is all migrations found within the Target Assembly will be run.",
@@ -176,6 +182,9 @@ namespace FluentMigrator.Console
 
 				if ( string.IsNullOrEmpty( Task ) )
 					Task = "migrate";
+
+                if ( string.IsNullOrEmpty( Group ) )
+                    Group = "";
 
 				if ( string.IsNullOrEmpty( ProcessorType ) ||
 					string.IsNullOrEmpty( Connection ) ||
@@ -254,6 +263,7 @@ namespace FluentMigrator.Console
 				PreviewOnly = PreviewOnly,
 				Namespace = Namespace,
 				Task = Task,
+                Group = Group,
 				Version = Version,
 				Steps = Steps,
 				WorkingDirectory = WorkingDirectory,

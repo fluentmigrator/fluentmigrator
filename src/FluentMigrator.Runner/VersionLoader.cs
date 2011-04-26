@@ -12,11 +12,12 @@ namespace FluentMigrator.Runner
 {
 	public class VersionLoader : IVersionLoader
 	{
-		public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions)
+		public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions, string group)
 		{
 			Runner = runner;
 			Processor = runner.Processor;
 			Assembly = assembly;
+            Group = group;
 
 			Conventions = conventions;
 			VersionTableMetaData = GetVersionTableMetaData();
@@ -35,6 +36,7 @@ namespace FluentMigrator.Runner
 		private IMigrationConventions Conventions { get; set; }
 		private IMigrationProcessor Processor { get; set; }
 		private IMigration VersionMigration { get; set; }
+        private string Group { get; set; }
 
 		public void UpdateVersionInfo( long version )
 		{
@@ -59,7 +61,10 @@ namespace FluentMigrator.Runner
 
 		protected virtual InsertionDataDefinition CreateVersionInfoInsertionData( long version )
 		{
-			return new InsertionDataDefinition { new KeyValuePair<string, object>( VersionTableMetaData.ColumnName, version ) };
+			return new InsertionDataDefinition { 
+                new KeyValuePair<string, object>( VersionTableMetaData.ColumnName, version ),
+                new KeyValuePair<string, object>( VersionTableMetaData.GroupName, Group )
+            };
 		}
 
 		public VersionInfo VersionInfo
@@ -117,13 +122,14 @@ namespace FluentMigrator.Runner
 				_versionInfo = new VersionInfo();
 				return;
 			}
-
+           
 			var dataSet = Processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName );
 			_versionInfo = new VersionInfo();
 
 			foreach ( DataRow row in dataSet.Tables[ 0 ].Rows )
 			{
-				_versionInfo.AddAppliedMigration( long.Parse( row[ 0 ].ToString() ) );
+                if ( string.Equals( row[ VersionTableMetaData.GroupName ], Group ) )
+                    _versionInfo.AddAppliedMigration( long.Parse( row[ VersionTableMetaData.ColumnName ].ToString() ) );
 			}
 		}
 
@@ -144,7 +150,8 @@ namespace FluentMigrator.Runner
 			var expression = new DeleteDataExpression { TableName = VersionTableMetaData.TableName, SchemaName=VersionTableMetaData.SchemaName };
 			expression.Rows.Add(new DeletionDataDefinition
 									{
-										new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version)
+										new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version),
+										new KeyValuePair<string, object>(VersionTableMetaData.GroupName, Group)
 									});
 			expression.ExecuteWith( Processor );
 		}

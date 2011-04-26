@@ -30,12 +30,14 @@ namespace FluentMigrator.Runner
 		public Assembly Assembly { get; set; }
 		public string Namespace { get; set; }
 		public SortedList<long, IMigration> Migrations { get; private set; }
+        public string Group { get; set; }
 
-		public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace)
+		public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, string group)
 		{
 			Conventions = conventions;
 			Assembly = assembly;
 			Namespace = @namespace;
+            Group = group; 
 
 			Initialize();
 		}
@@ -49,7 +51,8 @@ namespace FluentMigrator.Runner
 			if (migrationList == null)
 				return;
 
-			foreach (var migrationMetadata in migrationList)
+            // Only keep migrations from the selected group
+			foreach (var migrationMetadata in migrationList.Where(x => x.Group == Group))
 			{
 				if (Migrations.ContainsKey(migrationMetadata.Version))
 					throw new Exception(String.Format("Duplicate migration version {0}.", migrationMetadata.Version));
