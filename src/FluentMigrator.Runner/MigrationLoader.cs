@@ -37,7 +37,7 @@ namespace FluentMigrator.Runner
 			Conventions = conventions;
 			Assembly = assembly;
 			Namespace = @namespace;
-            Group = group; 
+            Group = group;
 
 			Initialize();
 		}
@@ -52,7 +52,7 @@ namespace FluentMigrator.Runner
 				return;
 
             // Only keep migrations from the selected group
-			foreach (var migrationMetadata in migrationList.Where(x => x.Group == Group))
+			foreach (var migrationMetadata in migrationList.Where(x => x.Group.Equals(Group)))
 			{
 				if (Migrations.ContainsKey(migrationMetadata.Version))
 					throw new Exception(String.Format("Duplicate migration version {0}.", migrationMetadata.Version));
@@ -68,8 +68,8 @@ namespace FluentMigrator.Runner
 
 			if (!string.IsNullOrEmpty(Namespace))
 				matchedTypes = Assembly.GetExportedTypes().Where(t => t.Namespace == Namespace && Conventions.TypeIsMigration(t));
-
-			foreach (Type type in matchedTypes)
+            
+            foreach (Type type in matchedTypes)
 				yield return Conventions.GetMetadataForMigration(type);
 		}
 	}
