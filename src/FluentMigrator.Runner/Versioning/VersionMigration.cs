@@ -32,9 +32,10 @@ namespace FluentMigrator.Runner.Versioning
 
 		public override void Up()
 		{
-			Create.Table(_versionTableMetaData.TableName)
+            Create.Table(_versionTableMetaData.TableName)
                 .InSchema(_versionTableMetaData.SchemaName)
-				.WithColumn(_versionTableMetaData.ColumnName).AsInt64().NotNullable();
+                .WithColumn(_versionTableMetaData.GroupName).AsString().NotNullable()
+                .WithColumn(_versionTableMetaData.ColumnName).AsInt64().NotNullable();                
 		}
 
 		public override void Down()
