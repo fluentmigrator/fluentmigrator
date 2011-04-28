@@ -62,7 +62,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         public override void CanAlterColumn()
         {
             //TODO: This will fail if there are any keys attached 
-            var expression = GeneratorTestHelper.GetAlterTableExpression();
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
 
             var sql = generator.Generate(expression);
 

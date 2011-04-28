@@ -16,12 +16,10 @@
 //
 #endregion
 
-using FluentMigrator.Infrastructure;
-
 namespace FluentMigrator.Builders.Alter.Column
 {
-	public interface IAlterColumnOnTableSyntax : IFluentSyntax
-	{
-		IAlterColumnAsTypeOrInSchemaSyntax OnTable(string name);
-	}
+    public interface IAlterColumnAsTypeOrInSchemaSyntax : IAlterColumnAsTypeSyntax
+    {
+        IAlterColumnAsTypeSyntax InSchema(string schemaName);
+    }
 }

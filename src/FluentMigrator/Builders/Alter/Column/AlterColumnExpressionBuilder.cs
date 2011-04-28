@@ -27,7 +27,7 @@ namespace FluentMigrator.Builders.Alter.Column
 	public class AlterColumnExpressionBuilder : ExpressionBuilderWithColumnTypesBase<AlterColumnExpression, IAlterColumnOptionSyntax>,
 		IAlterColumnOnTableSyntax,
 		IAlterColumnOptionSyntax,
-		IAlterColumnAsTypeSyntax
+        IAlterColumnAsTypeOrInSchemaSyntax
 	{
 		private readonly IMigrationContext _context;
 
@@ -37,13 +37,13 @@ namespace FluentMigrator.Builders.Alter.Column
 			_context = context;
 		}
 
-		public IAlterColumnAsTypeSyntax OnTable( string name )
+		public IAlterColumnAsTypeOrInSchemaSyntax OnTable( string name )
 		{
 			Expression.TableName = name;
 			return this;
 		}
 
-		public IAlterColumnOptionSyntax InSchema( string schemaName )
+        public IAlterColumnAsTypeSyntax InSchema(string schemaName)
 		{
 			Expression.SchemaName = schemaName;
 			return this;
