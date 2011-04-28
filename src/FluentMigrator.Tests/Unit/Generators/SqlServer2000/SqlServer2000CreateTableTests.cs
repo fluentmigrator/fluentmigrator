@@ -167,7 +167,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
             expression.Index.IsClustered = true;
             var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE CLUSTERED UNIQUE INDEX [TestIndex] ON [TestTable1] ([TestColumn1] ASC)");
+            sql.ShouldBe("CREATE UNIQUE CLUSTERED INDEX [TestIndex] ON [TestTable1] ([TestColumn1] ASC)");
         }
 
         [Test]
@@ -176,7 +176,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
             expression.Index.IsClustered = true;
             var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE CLUSTERED UNIQUE INDEX [TestIndex] ON [TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
+            sql.ShouldBe("CREATE UNIQUE CLUSTERED INDEX [TestIndex] ON [TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
         }
 
         [Test]

@@ -203,8 +203,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             }
 
             return String.Format(CreateIndex
-                , GetClusterTypeString(expression)
                 , GetUniqueString(expression)
+                , GetClusterTypeString(expression)
                 , Quoter.QuoteIndexName(expression.Index.Name)
                 , Quoter.QuoteSchemaName(expression.Index.SchemaName)
                 , Quoter.QuoteTableName(expression.Index.TableName)
