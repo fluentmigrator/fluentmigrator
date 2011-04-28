@@ -10,7 +10,7 @@ namespace FluentMigrator.SchemaDump.SchemaWriters {
         public abstract void WriteToStream(ICollection<Model.TableDefinition> tables, System.IO.StreamWriter output);
 
         public virtual void WriteToFile(ICollection<Model.TableDefinition> tables, string file) {
-            FileStream fs = new FileStream(file, FileMode.CreateNew);
+            FileStream fs = new FileStream(file, FileMode.Create);
             StreamWriter sr = new StreamWriter(fs);
 
             WriteToStream(tables, sr);

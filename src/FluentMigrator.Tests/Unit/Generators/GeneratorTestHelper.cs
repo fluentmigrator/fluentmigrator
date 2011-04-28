@@ -188,6 +188,31 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static DeleteDataExpression GetDeleteDataMultipleRowsExpression()
+        {
+            var expression = new DeleteDataExpression();
+            expression.TableName = TestTableName1;
+            expression.Rows.Add(new DeletionDataDefinition
+									{
+										new KeyValuePair<string, object>("Name", "Just'in"),
+										new KeyValuePair<string, object>("Website", null)
+									});
+            expression.Rows.Add(new DeletionDataDefinition
+									{
+										new KeyValuePair<string, object>("Website", "github.com")
+									});
+
+            return expression;
+        }
+
+        public static DeleteDataExpression GetDeleteDataAllRowsExpression()
+        {
+            var expression = new DeleteDataExpression();
+            expression.TableName = TestTableName1;
+            expression.IsAllRows = true;
+            return expression;
+        }
+
         public static RenameColumnExpression GetRenameColumnExpression()
         {
             return new RenameColumnExpression { OldName = TestColumnName1, NewName = TestColumnName2, TableName = TestTableName1 };
@@ -225,7 +250,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
-        public static AlterColumnExpression GetAlterTableExpression()
+        public static AlterColumnExpression GetAlterColumnExpression()
         {
             var expression = new AlterColumnExpression();
             expression.TableName = TestTableName1;

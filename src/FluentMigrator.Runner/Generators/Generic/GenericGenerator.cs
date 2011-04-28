@@ -153,8 +153,8 @@ namespace FluentMigrator.Runner.Generators.Generic
 			}
 
 			return String.Format(CreateIndex
-				, GetUniqueString(expression)
-                , GetClusterTypeString(expression)
+                , GetUniqueString(expression)
+				, GetClusterTypeString(expression)
 				, Quoter.QuoteIndexName(expression.Index.Name)
 				, Quoter.QuoteTableName(expression.Index.TableName)
 				, String.Join(", ", indexColumns));
@@ -276,18 +276,27 @@ namespace FluentMigrator.Runner.Generators.Generic
 
 		public override string Generate(DeleteDataExpression expression)
 		{
-			List<string> deleteItems = new List<string>();
-			List<string> whereClauses = new List<string>();
+			var deleteItems = new List<string>();
+			
 
-			foreach (var row in expression.Rows)
-			{
-				foreach (KeyValuePair<string, object> item in row)
-				{
-					whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value)));
-				}
+            if (expression.IsAllRows)
+            {
+                deleteItems.Add(string.Format(DeleteData, Quoter.QuoteTableName(expression.TableName), "1 = 1"));
+            }
+            else
+            {
+                foreach (var row in expression.Rows)
+                {
+                    var whereClauses = new List<string>();
+                    foreach (KeyValuePair<string, object> item in row)
+                    {
+                        whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value)));
+                    }
 
-				deleteItems.Add(string.Format(DeleteData, Quoter.QuoteTableName(expression.TableName), String.Join(" AND ", whereClauses.ToArray())));
-			}
+                    deleteItems.Add(string.Format(DeleteData, Quoter.QuoteTableName(expression.TableName), String.Join(" AND ", whereClauses.ToArray())));
+                }
+            }
+			
 			return String.Join("; ", deleteItems.ToArray());
 		}
 

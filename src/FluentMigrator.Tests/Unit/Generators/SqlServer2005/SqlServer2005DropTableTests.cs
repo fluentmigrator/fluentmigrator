@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 				SELECT column_id 
 				FROM sys.columns 
 				WHERE object_id = object_id('[dbo].[TestTable1]')
-				AND name = '[TestColumn1]'
+				AND name = 'TestColumn1'
 			);
 
 			-- create alter table command as string and run it
@@ -104,7 +104,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 				SELECT column_id 
 				FROM sys.columns 
 				WHERE object_id = object_id('[TestSchema].[TestTable1]')
-				AND name = '[TestColumn1]'
+				AND name = 'TestColumn1'
 			);
 
 			-- create alter table command as string and run it
@@ -121,7 +121,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         public void CanDropForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
-            expression.ForeignKey.PrimaryTableSchema = "TestSchema";
+            expression.ForeignKey.ForeignTableSchema = "TestSchema";
             var sql = generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT [FK_Test]");
         }

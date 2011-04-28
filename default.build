@@ -30,7 +30,7 @@
 	</target>
 	
     <target name="build" description="Builds the app" depends="generate-version">
-		<msbuild project="FluentMigrator.sln">
+		<msbuild project="FluentMigrator (2010).sln">
 			<property name="Configuration" value="AutomatedRelease" />
 			<property name="OutDir" value="..\..\${dir.bin}\\" />
 		</msbuild>

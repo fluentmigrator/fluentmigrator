@@ -32,7 +32,10 @@ namespace FluentMigrator.Expressions
                     sqlText = reader.ReadToEnd();
                 }
             }
-            
+
+            // since all the Processors are using String.Format() in their Execute method
+            //  we need to escape the brackets with double brackets or else it throws an incorrect format error on the String.Format call
+            sqlText = sqlText.Replace("{", "{{").Replace("}", "}}");
             processor.Execute(sqlText);
         }
 

@@ -103,7 +103,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         [Test]
         public override void CanAlterColumn()
         {
-            var expression = GeneratorTestHelper.GetAlterTableExpression();
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
 
             var sql = generator.Generate(expression);
 

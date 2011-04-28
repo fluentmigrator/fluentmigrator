@@ -60,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         public   void CanAlterColumnWithDefaultSchema()
         {
             //TODO: This will fail if there are any keys attached 
-            var expression = GeneratorTestHelper.GetAlterTableExpression();
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
 
             var sql = generator.Generate(expression);
 
@@ -148,7 +148,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         public   void CanAlterColumnWithCustomSchema()
         {
             //TODO: This will fail if there are any keys attached 
-            var expression = GeneratorTestHelper.GetAlterTableExpression();
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
             expression.SchemaName = "TestSchema";
 
             var sql = generator.Generate(expression);

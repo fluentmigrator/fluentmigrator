@@ -154,12 +154,70 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
                         PrimaryKeyName = dr.IsNull("PrimaryKeyName") ? "" : dr["PrimaryKeyName"].ToString(), 
                         Size = int.Parse(dr["Length"].ToString()),
                         TableName = dr["Table"].ToString(),
-                        Type = null //TODO: set this property
+                        Type = GetDbType(int.Parse(dr["TypeID"].ToString())) //TODO: set this property
                     });
                 }
             }
 
             return tables;
+        }
+
+        protected virtual DbType GetDbType(int typeNum)
+        {
+            switch (typeNum)
+            {
+                case 34: //'byte[]'
+                    return DbType.Byte;
+                case 35: //'string'
+                    return DbType.String;
+                case 36: //'System.Guid'
+                    return DbType.Guid;
+                case 48: //'byte'
+                    return DbType.Byte;
+                case 52: //'short'
+                    return DbType.Int16;
+                case 56: //'int'
+                    return DbType.Int32;
+                case 58: //'System.DateTime'
+                    return DbType.DateTime;
+                case 59: //'float'
+                    return DbType.Int64;
+                case 60: //'decimal'
+                    return DbType.Decimal;
+                case 61: //'System.DateTime'
+                    return DbType.DateTime;
+                case 62: //'double'
+                    return DbType.Double;
+                case 98: //'object'
+                    return DbType.Object;
+                case 99: //'string'
+                    return DbType.String;
+                case 104: //'bool'
+                    return DbType.Boolean;
+                case 106: //'decimal'
+                    return DbType.Decimal;
+                case 108: //'decimal'
+                    return DbType.Decimal;
+                case 122: //'decimal'
+                    return DbType.Decimal;
+                case 127: //'long'
+                    return DbType.Int64;
+                case 165: //'byte[]'
+                    return DbType.Byte;
+                case 167: //'string'
+                    return DbType.String;
+                case 173: //'byte[]'
+                    return DbType.Byte;
+                case 175: //'string'
+                    return DbType.String;
+                case 189: //'long'
+                    return DbType.Int64;
+                case 231: //'string'
+                case 239: //'string'
+                case 241: //'string'
+                default:
+                    return DbType.String;
+            }
         }
 
         protected virtual IList<IndexDefinition> ReadIndexes(string schemaName, string tableName) 
