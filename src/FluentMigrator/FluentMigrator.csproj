@@ -124,6 +124,7 @@
     </Compile>
     <Compile Include="Builders\Alter\AlterExpressionRoot.cs" />
     <Compile Include="Builders\Alter\Column\AlterColumnExpressionBuilder.cs" />
+    <Compile Include="Builders\Alter\Column\IAlterColumnAsTypeOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Alter\Column\IAlterColumnAsTypeSyntax.cs" />
     <Compile Include="Builders\Alter\Column\IAlterColumnOnTableSyntax.cs" />
     <Compile Include="Builders\Alter\Column\IAlterColumnOptionSyntax.cs" />
