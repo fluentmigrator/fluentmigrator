@@ -76,7 +76,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 
 		public override bool SchemaExists(string tableName)
 		{
-			throw new NotImplementedException();
+		    return true;
 		}
 
 		public override bool TableExists(string schemaName, string tableName)
