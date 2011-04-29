@@ -152,14 +152,14 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             if (sql.Contains("GO"))
             {
-                ExecuteBatchNonQuery(sql, Connection);
+                ExecuteBatchNonQuery(sql);
 
             }else{
-                ExecuteNonQuery(sql, Connection, Transaction);
+                ExecuteNonQuery(sql);
 			}
 		}
 
-        private void ExecuteNonQuery(string sql, SqlConnection connection,SqlTransaction transaction)
+        private void ExecuteNonQuery(string sql)
         {
             using (var command = new SqlCommand(sql, Connection, Transaction))
             {
@@ -182,7 +182,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
         }
 
-        private void ExecuteBatchNonQuery(string sql, SqlConnection conn)
+        private void ExecuteBatchNonQuery(string sql)
         {
              sql += "\nGO";   // make sure last batch is executed.
             string sqlBatch = string.Empty;
