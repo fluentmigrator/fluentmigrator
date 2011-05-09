@@ -42,7 +42,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool SchemaExists(string schemaName)
         {
-            return Exists("SELECT * FROM SYS.SCHEMAS WHERE NAME = '{0}'", FormatSqlEscape(schemaName));
+			if (string.IsNullOrEmpty(schemaName) || schemaName == "dbo")
+			{
+				return true;
+			}
+			throw new NotSupportedException("Schemas not supported by SQL Compact");
         }
 
         public override bool TableExists(string schemaName, string tableName)
