@@ -25,16 +25,12 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     using FluentMigrator.Expressions;
     using FluentMigrator.Runner.Generators;
 
-    public class SqlServerCeGenerator : SqlServer2005Generator
+	public class SqlServerCeGenerator : SqlServer2000Generator
     {
         public SqlServerCeGenerator()
             : base(new SqlServerColumn(new SqlServerCeTypeMap()))
         {
         }
-
-        //I think that this would be better inheriting form the SqlServer 2000 Generator.  It seems to match it better
-
-
 
         public override string Generate(RenameTableExpression expression)
         {
