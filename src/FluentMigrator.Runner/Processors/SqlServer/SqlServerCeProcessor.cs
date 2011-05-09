@@ -23,6 +23,7 @@ using System.Data;
 using System.Data.SqlServerCe;
 using System.IO;
 using FluentMigrator.Builders.Execute;
+using FluentMigrator.Runner.Generators;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
@@ -46,7 +47,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 			{
 				return true;
 			}
-			throw new NotSupportedException("Schemas not supported by SQL Compact");
+			throw new DatabaseOperationNotSupportedExecption("Schemas not supported by SQL Compact");
         }
 
         public override bool TableExists(string schemaName, string tableName)
