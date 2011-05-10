@@ -62,6 +62,20 @@ namespace FluentMigrator.Tests.Unit
 			migrationList.Select(x => x.Type).ShouldNotContain(typeof(VersionedMigration));
 			migrationList.Count().ShouldBeGreaterThan(0);
 		}
+
+		[Test]
+		public void CanFindMigrationsNestedInNamepsace()
+		{
+			var conventions = new MigrationConventions();
+			var asm = Assembly.GetExecutingAssembly();
+			var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Nested");
+
+			var migrationList = loader.FindMigrations();
+			migrationList.Select(x => x.Type).ShouldContain(typeof(Integration.Migrations.Nested.Group1.FromGroup1));
+			migrationList.Select(x => x.Type).ShouldContain(typeof(Integration.Migrations.Nested.Group1.AnotherFromGroup1));
+			migrationList.Select(x => x.Type).ShouldContain(typeof(Integration.Migrations.Nested.Group2.FromGroup2));
+			migrationList.Select(x => x.Type).ShouldNotContain(typeof(Integration.Migrations.Invalid.InvalidMigration));
+		}
 	}
 }
 
