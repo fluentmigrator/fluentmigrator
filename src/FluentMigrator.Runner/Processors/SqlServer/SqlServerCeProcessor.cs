@@ -23,6 +23,7 @@ using System.Data;
 using System.Data.SqlServerCe;
 using System.IO;
 using FluentMigrator.Builders.Execute;
+using FluentMigrator.Runner.Generators;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
@@ -42,7 +43,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool SchemaExists(string schemaName)
         {
-            return Exists("SELECT * FROM SYS.SCHEMAS WHERE NAME = '{0}'", FormatSqlEscape(schemaName));
+			if (string.IsNullOrEmpty(schemaName) || schemaName == "dbo")
+			{
+				return true;
+			}
+			throw new DatabaseOperationNotSupportedExecption("Schemas not supported by SQL Compact");
         }
 
         public override bool TableExists(string schemaName, string tableName)
