@@ -64,7 +64,10 @@ namespace FluentMigrator.Runner
 			IEnumerable<Type> matchedTypes = Assembly.GetExportedTypes().Where(t => Conventions.TypeIsMigration(t));
 
 			if (!string.IsNullOrEmpty(Namespace))
-				matchedTypes = Assembly.GetExportedTypes().Where(t => t.Namespace == Namespace && Conventions.TypeIsMigration(t));
+			{
+				string matchNested = Namespace + ".";
+				matchedTypes = matchedTypes.Where(t => t.Namespace == Namespace || t.Namespace.StartsWith(matchNested));
+			}
 
 			foreach (Type type in matchedTypes)
 				yield return Conventions.GetMetadataForMigration(type);
