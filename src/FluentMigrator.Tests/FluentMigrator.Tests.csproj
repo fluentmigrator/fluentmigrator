@@ -139,6 +139,7 @@
   <ItemGroup>
     <Compile Include="Helpers\PostgresTestTable.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
+    <Compile Include="Integration\Migrations\SqlServerScriptMigration.cs" />
     <Compile Include="Integration\PerformDBOperationTests.cs" />
     <Compile Include="Integration\IntegrationTestBase.cs" />
     <Compile Include="Integration\MigrationRunnerTests.cs" />
@@ -155,6 +156,7 @@
     <Compile Include="Integration\Processors\PostgresProcessorTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaDumpTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaTestWriter.cs" />
+    <Compile Include="Integration\ScriptMigrationTest.cs" />
     <Compile Include="Integration\VersionMigrationTests.cs" />
     <Compile Include="Unit\AnnouncerTests.cs" />
     <Compile Include="Unit\AssemblyLoader\AssemblyLoaderTests.cs" />
