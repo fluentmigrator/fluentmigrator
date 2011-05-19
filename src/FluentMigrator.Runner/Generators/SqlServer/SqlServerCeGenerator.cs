@@ -25,20 +25,17 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     using FluentMigrator.Expressions;
     using FluentMigrator.Runner.Generators;
 
-    public class SqlServerCeGenerator : SqlServer2005Generator
+    public class SqlServerCeGenerator : SqlServer2000Generator
     {
         public SqlServerCeGenerator()
             : base(new SqlServerColumn(new SqlServerCeTypeMap()))
         {
         }
 
-        //I think that this would be better inheriting form the SqlServer 2000 Generator.  It seems to match it better
-
-
-
         public override string Generate(RenameTableExpression expression)
         {
-            return String.Format("sp_rename '{1}', '{2}'", Quoter.QuoteTableName(expression.OldName), Quoter.QuoteTableName(expression.NewName));
+            // Don't quote the table names, as those square brackets are treated as invalid by SQL Compact.
+            return String.Format("sp_rename '{0}', '{1}'", expression.OldName, expression.NewName);
         }
 
         //All Schema method throw by default as only Sql server 2005 and up supports them.

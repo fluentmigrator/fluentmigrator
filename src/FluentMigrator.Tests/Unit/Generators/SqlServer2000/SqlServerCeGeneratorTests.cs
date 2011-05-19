@@ -22,6 +22,14 @@ namespace FluentMigrator.Tests.Unit.Generators
             generator = new SqlServerCeGenerator();
         }
 
+       [Test]
+       public void CanRenameTable()
+       {
+         var expression = GeneratorTestHelper.GetRenameTableExpression();
+         var sql = generator.Generate(expression);
+        sql.ShouldBe("sp_rename 'TestTable1', 'TestTable2'");
+       }
+
         [Test]
         public void CannotCreateASchema()
         {

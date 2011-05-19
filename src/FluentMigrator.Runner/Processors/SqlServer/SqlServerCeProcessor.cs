@@ -18,7 +18,6 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlServerCe;
 using System.IO;
@@ -26,7 +25,7 @@ using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-    public class SqlServerCeProcessor : ProcessorBase
+   public class SqlServerCeProcessor : ProcessorBase, IDisposable
     {
         public virtual SqlCeConnection Connection { get; set; }
         public SqlCeTransaction Transaction { get; private set; }
@@ -42,7 +41,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool SchemaExists(string schemaName)
         {
-            return Exists("SELECT * FROM SYS.SCHEMAS WHERE NAME = '{0}'", FormatSqlEscape(schemaName));
+            if (string.IsNullOrEmpty(schemaName) || schemaName.ToLower() == "dbo")
+            {
+              return true;
+            }
+            throw new NotSupportedException("Schemas not supported by SQL Compact");
         }
 
         public override bool TableExists(string schemaName, string tableName)
@@ -57,12 +60,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
-            return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_CATALOG = DB_NAME() AND TABLE_NAME = '{0}' AND CONSTRAINT_NAME = '{1}'", FormatSqlEscape(tableName), FormatSqlEscape(constraintName));
+           // See more information http://arcanecode.com/2007/04/19/system-views-in-sql-server-compact-edition-constraints/
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = '{0}' AND CONSTRAINT_NAME = '{1}'", FormatSqlEscape(tableName), FormatSqlEscape(constraintName));
         }
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
-            return Exists("SELECT NULL FROM sysindexes WHERE name = '{0}'", FormatSqlEscape(indexName));
+           return Exists("SELECT NULL FROM INFORMATION_SCHEMA.INDEXES WHERE index_name = '{0}'", FormatSqlEscape(indexName));
         }
 
         public override void Execute(string template, params object[] args)
@@ -84,7 +88,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
-            return Read("SELECT * FROM [{0}]", tableName);
+            return Read("SELECT * FROM {0}", tableName);
         }
 
         public override DataSet Read(string template, params object[] args)
@@ -187,7 +191,29 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         protected string FormatSqlEscape(string sql)
         {
-            return sql.Replace("'", "''");
+           return !string.IsNullOrEmpty(sql) ? sql.Replace("'", "''") : string.Empty;
         }
+
+      ~SqlServerCeProcessor() {
+         Dispose(false);
+      }
+
+      public void Dispose()
+      {
+         Dispose(true);
+      }
+
+      private void Dispose(bool diposing)
+      {
+         if ( diposing)
+         {
+            GC.SuppressFinalize(this);
+         }
+
+         if (Connection == null) return;
+
+         Connection.Dispose();
+         Connection = null;
+      }
     }
 }
