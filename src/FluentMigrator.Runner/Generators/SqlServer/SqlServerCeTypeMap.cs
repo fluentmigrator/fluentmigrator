@@ -31,7 +31,9 @@ namespace FluentMigrator.Runner.Generators
         public const int UnicodeStringCapacity = 4000;
         public const int UnicodeTextCapacity = 1073741823;
         public const int ImageCapacity = 2147483647;
-        public const int DecimalCapacity = 19;
+        // Updated Decimal capacity from 19 to 38 as this is supported by SQL Server
+        // Source - http://msdn.microsoft.com/en-us/library/aa258832%28v=sql.80%29.aspx
+        public const int DecimalCapacity = 38;
 
         protected override void SetupTypeMaps()
         {

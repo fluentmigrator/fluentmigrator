@@ -18,6 +18,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlServerCe;
 using System.IO;
@@ -174,6 +175,121 @@ namespace FluentMigrator.Tests.Integration.Processors
       public void CanRollbackTransaction()
       {
          _processor.RollbackTransaction();
+      }
+
+      [Test]
+      public void CanCreateTableWithDecimalPrecision()
+      {
+         _processor.Process(new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = { new ColumnDefinition { Name = "Bar", Type = DbType.Decimal, Precision = 4, Size = 38} }
+         });
+      }
+
+      [Test]
+      public void SqlCeSupportsDecimalPrecisionAbove19()
+      {
+         _processor.Execute("CREATE TABLE Foo ( Value Numeric(38,4) )");
+
+         _processor.Exists("SELECT * FROM Foo");
+         var schema = _processor.GetTableSchema(string.Empty, "Foo");
+         Assert.IsNotNull(schema, "Table not found");
+
+         Assert.AreEqual(38, schema.Rows[0]["NumericPrecision"]);
+         Assert.AreEqual(4, schema.Rows[0]["NumericScale"]);
+      }
+
+      [Test]
+      public void CanCreateTableWithDecimal()
+      {
+         _processor.Process(new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = { new ColumnDefinition { Name = "Bar", Type = DbType.Decimal } }
+         });
+      }
+
+      [Test]
+      public void CanInsertRowIntoTable()
+      {
+         _processor.Process(new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = { new ColumnDefinition { Name = "Bar", Type = DbType.Decimal } }
+         });
+
+         var insert = new InsertDataExpression {TableName = "Foo"};
+         insert.Rows.Add(new InsertionDataDefinition() { new KeyValuePair<string, object>("Bar", 12)});
+         _processor.Process(insert);
+      }
+
+      [Test]
+      [ExpectedException(typeof(Exception))]
+      public void CanInsertMultipleRowsIntoTable()
+      {
+         _processor.Process(new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = { new ColumnDefinition { Name = "Bar", Type = DbType.Decimal } }
+         });
+
+         var insert = new InsertDataExpression { TableName = "Foo" };
+         insert.Rows.Add(new InsertionDataDefinition() { new KeyValuePair<string, object>("Bar", 41) });
+         insert.Rows.Add(new InsertionDataDefinition() { new KeyValuePair<string, object>("Bar", 42) });
+         _processor.Process(insert);
+      }
+
+      [Test]
+      public void CanCreateAndDropIndex()
+      {
+         _processor.Process(new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = { new ColumnDefinition { Name = "Bar", Type = DbType.Decimal } }
+         });
+
+         var index = new CreateIndexExpression()
+                        {
+                           Index = new IndexDefinition()
+                                      {
+                                         TableName = "Foo"
+                                         ,Name = "IDX_Bar"
+                                         ,Columns = new[] {new IndexColumnDefinition() {Name = "Bar"}}
+                                      }
+                        };
+         _processor.Process(index);
+
+         var dropIndex = new DeleteIndexExpression()
+                           {
+                              Index = new IndexDefinition()
+                                         {
+                                            TableName = "Foo"
+                                            ,Name = "IDX_Bar"
+                                         }
+                           };
+
+         _processor.Process(dropIndex);
+      }
+
+      [Test]
+      public void CanCreateAndDropColumn()
+      {
+         _processor.Process(new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns =
+               {
+                  new ColumnDefinition { Name = "Bar", Type = DbType.Decimal }
+                  , new ColumnDefinition { Name = "Buzz", Type = DbType.Decimal }
+               }
+         });
+
+         _processor.Process(new DeleteColumnExpression()
+         {
+            TableName = "Foo"
+            , ColumnName = "Buzz"
+         });
       }
 
       private void CreateTestTable()

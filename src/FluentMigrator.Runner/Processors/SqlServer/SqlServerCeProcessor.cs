@@ -91,6 +91,27 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             return Read("SELECT * FROM {0}", tableName);
         }
 
+        public DataTable GetTableSchema(string schemaName, string tableName)
+        {
+           try
+           {
+              if (Connection.State != ConnectionState.Open)
+                 Connection.Open();
+
+              using (var command = new SqlCeCommand(String.Format("SELECT * FROM {0} WHERE 1 = 2", tableName), Connection, Transaction))
+              {
+                 var rdr = command.ExecuteReader(CommandBehavior.Default);
+                 // Get the schema table.
+                 return rdr.GetSchemaTable();
+              }
+           }
+           catch (Exception)
+           {
+              return null;
+           }
+        }
+
+
         public override DataSet Read(string template, params object[] args)
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
