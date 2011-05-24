@@ -1,8 +1,8 @@
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using FluentMigrator.Builders.Execute;
+using FluentMigrator.Expressions;
 
 
 namespace FluentMigrator.Runner.Processors.Oracle
@@ -39,7 +39,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
 		{
-			const string sql = @"S'";
+         const string sql = @"SELECT * FROM USER_CONSTRAINTS WHERE LOWER(TABLE_NAME) = '{0}' AND LOWER(CONSTRAINT_NAME) = '{1}'";
 			return Exists(sql, tableName.ToLower(), constraintName.ToLower());
 		}
 
@@ -107,5 +107,29 @@ namespace FluentMigrator.Runner.Processors.Oracle
 			using (var command = OracleFactory.GetCommand(Connection,sql))
 				command.ExecuteNonQuery();
 		}
+
+      /// <summary>
+      /// Override the alter column to handle special case where NOT NULL specified on existing NOT NULL column
+      /// </summary>
+      /// <param name="expression"></param>
+      public override void Process(AlterColumnExpression expression)
+      {
+         try
+         {
+            Process(Generator.Generate(expression));
+         }
+         catch (Exception ex)
+         {
+            // Check if we have the special case
+            if ( ex.Message.StartsWith("ORA-01442: column to be modified to NOT NULL is already NOT NULL") )
+            {
+               // Remove the NOT NULL as it has already been set
+               Process(Generator.Generate(expression).Replace("NOT NULL",""));
+            }
+            else
+               throw;
+         }
+         
+      }
 	}
 }

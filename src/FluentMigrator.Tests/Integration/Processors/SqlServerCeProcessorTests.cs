@@ -107,16 +107,6 @@ namespace FluentMigrator.Tests.Integration.Processors
       }
 
       [Test]
-      public void CanDeleteConstraint()
-      {
-         CreateTestTable();
-
-         var table = _processor.ReadTableData(string.Empty, "Foo");
-
-         Assert.AreEqual(0, table.Tables[0].Rows.Count);
-      }
-
-      [Test]
       public void CanInsertAndReadDataFromTestTable()
       {
          CreateTestTable();

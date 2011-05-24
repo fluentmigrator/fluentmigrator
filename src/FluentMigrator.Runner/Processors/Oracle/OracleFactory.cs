@@ -1,4 +1,5 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
 using System.Data.Common;
 
 namespace FluentMigrator.Runner.Processors.Oracle
@@ -7,7 +8,24 @@ namespace FluentMigrator.Runner.Processors.Oracle
 	{
 		public static DbProviderFactory GetProvider()
 		{
-			return DbProviderFactories.GetFactory("Oracle.DataAccess.Client");
+		   try
+		   {
+            // Try the ODP.Net connection first as this should be more recent and is supported by Oracle
+            return DbProviderFactories.GetFactory("Oracle.DataAccess.Client");
+		   }
+		   catch (Exception ex)
+		   {
+            if (ex.ToString().Contains("The provider is not compatible with the version of Oracle client"))
+            {
+               // Fall back to using the Microsoft Oracle provider as this requires less dependancies to be run
+               // Note: The Microsoft Oracle provider has been depricated in .Net 4.0
+               return DbProviderFactories.GetFactory("System.Data.OracleClient");
+
+               // if this fails, do we need to think about supporting other Oracle providers Post .Net 4.0 [Grant, 20110524]
+            }
+		      throw;
+		   }
+         
 		}
 
 		public static DbConnection GetOpenConnection(string connectionString)

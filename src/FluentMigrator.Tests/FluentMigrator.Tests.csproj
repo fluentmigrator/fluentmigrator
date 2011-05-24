@@ -157,6 +157,7 @@
     <Compile Include="Integration\Migrations\Invalid\InvalidMigration2.cs" />
     <Compile Include="Integration\Processors\FileProcessorTests.cs" />
     <Compile Include="Integration\Processors\OracleProcessorTests.cs" />
+    <Compile Include="Integration\OracleUnitTest.cs" />
     <Compile Include="Integration\Processors\PostgresProcessorTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCeProcessorTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaDumpTests.cs" />

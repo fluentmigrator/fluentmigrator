@@ -144,6 +144,7 @@
     </Compile>
     <Compile Include="Announcers\BaseAnnouncer.cs" />
     <Compile Include="Announcers\CompositeAnnouncer.cs" />
+    <Compile Include="Announcers\DebugAnnouncer.cs" />
     <Compile Include="Announcers\NullAnnouncer.cs" />
     <Compile Include="Announcers\TextWriterAnnouncer.cs" />
     <Compile Include="CompatabilityMode.cs" />
@@ -239,7 +240,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-	<None Include="..\FluentMigrator.snk">
+    <None Include="..\FluentMigrator.snk">
       <Link>FluentMigrator.snk</Link>
     </None>
     <Content Include="SQLServerCENative\amd64\Microsoft.VC90.CRT\msvcr90.dll">
