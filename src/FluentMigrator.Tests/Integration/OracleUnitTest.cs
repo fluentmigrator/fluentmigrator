@@ -55,12 +55,21 @@ namespace FluentMigrator.Tests.Integration
       [TestFixtureSetUp]
       public virtual void TestFixtureSetUp()
       {
+         // Try get server name from environment first
+         Server = Environment.GetEnvironmentVariable("ORACLE_SERVER");
+         if ( String.IsNullOrEmpty(Server) )
+         {
+            // .... default server to be TNS-less connection to the local XE instance
+            Server = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=127.0.0.1)(PORT=1521))(CONNECT_DATA=(SID=XE)))";
+         }
+            
+
          MasterConnectionString = string.Format("Driver={{Microsoft ODBC for Oracle}};Server={0};Uid=system;Pwd={1};", Server, Password);
 
          try
          {
             // Remove any test databases that exist from previous test runs
-            // Done at test fixture setup as the databases cannot be dropped after each tset as they may be in use
+            // Done at test fixture setup time, as the databases cannot always be dropped after each test as they may be in use
             DropDatabases("FM_A");
          }
          catch (OdbcException)
@@ -75,10 +84,8 @@ namespace FluentMigrator.Tests.Integration
          TestDbName = GetUniqueDbName();
          User = TestDbName;
 
-         // Set default server to be TNS-less connection to the local CE instance
-         Server = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=127.0.0.1)(PORT=1521))(CONNECT_DATA=(SID=XE)))";
-
-         ConnectionString = string.Format("user id={0};password={1};Data Source=XE;Pooling=True", User, Password);
+         
+         ConnectionString = string.Format("user id={0};password={1};Data Source={2};Pooling=True", User, Password, Server);
 
          CreateDatabase(TestDbName.ToUpper());
       }
