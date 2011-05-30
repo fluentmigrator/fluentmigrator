@@ -3,8 +3,13 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Oracle
 {
-	internal class OracleColumn : ColumnBase
+	public class OracleColumn : ColumnBase
 	{
+      /// <summary>
+      /// Determines if an exeption is thrown if a Identity column is specified
+      /// </summary>
+	   public bool ThrowExceptionIdentityNotSupported;
+
 		public OracleColumn() : base(new OracleTypeMap(), new OracleQuoter())
 		{
 			int a = ClauseOrder.IndexOf(FormatDefaultValue);
@@ -20,7 +25,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
 		protected override string FormatIdentity(ColumnDefinition column)
 		{
-			if (column.IsIdentity)
+         if (column.IsIdentity && ThrowExceptionIdentityNotSupported)
 			{
 				throw new DatabaseOperationNotSupportedExecption("Oracle does not support identity columns. Please use a SEQUENCE instead");
 			}

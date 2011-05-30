@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
@@ -64,9 +65,19 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
+        public void ThrowsExceptionCreateTableWithIdentity() {
+        
+           var customGenerator = new OracleGenerator(new OracleColumn { ThrowExceptionIdentityNotSupported = true}, new OracleQuoter());
+
+           Assert.Throws<DatabaseOperationNotSupportedExecption>(() => customGenerator.Generate(GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression()));
+        }
+
+        [Test]
         public override void CanCreateTableWithIdentity()
         {
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(()=>generator.Generate(GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression()));
+           string sql = generator.Generate(GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression());
+
+           sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NUMBER(10,0) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL)");
         }
 
         [Test]

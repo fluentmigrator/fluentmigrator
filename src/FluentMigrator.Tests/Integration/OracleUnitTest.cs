@@ -28,7 +28,7 @@ namespace FluentMigrator.Tests.Integration
       /// <summary>
       /// The connection string that the unit test can use within a test
       /// </summary>
-      protected string ConnectionString;
+      public string ConnectionString;
 
       /// <summary>
       /// The temporary test database that has been created for thr user test user

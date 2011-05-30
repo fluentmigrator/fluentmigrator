@@ -144,12 +144,12 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
                         Name = dr["ColumnName"].ToString(),
                         CustomType = "", //TODO: set this property
                         DefaultValue = dr.IsNull("DefaultValue") ? "" : dr["DefaultValue"].ToString(),
-                        IsForeignKey = dr["IsForeignKey"].ToString() == "1",
-                        IsIdentity = dr["IsIdentity"].ToString() == "1",
-                        IsIndexed = dr["IsIndexed"].ToString() == "1",
-                        IsNullable = dr["IsNullable"].ToString() == "1",
-                        IsPrimaryKey = dr["IsPrimaryKey"].ToString() == "1",
-                        IsUnique = dr["IsUnique"].ToString() == "1",
+                        IsForeignKey = AsBoolean(dr, "IsForeignKey"),
+                        IsIdentity = AsBoolean(dr, "IsIdentity"),
+                        IsIndexed = AsBoolean(dr, "IsIndexed"),
+                        IsNullable = AsBoolean(dr, "IsNullable"),
+                        IsPrimaryKey = AsBoolean(dr, "IsPrimaryKey"),
+                        IsUnique = AsBoolean(dr, "IsUnique"),
                         Precision = int.Parse(dr["Precision"].ToString()),
                         PrimaryKeyName = dr.IsNull("PrimaryKeyName") ? "" : dr["PrimaryKeyName"].ToString(), 
                         Size = int.Parse(dr["Length"].ToString()),
@@ -162,7 +162,16 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
             return tables;
         }
 
-        protected virtual DbType GetDbType(int typeNum)
+      public bool AsBoolean(DataRow dr, string column)
+      {
+         if ( dr.Table.Columns[column].DataType.Equals(typeof(bool)) )
+         {
+            return (bool) dr[column];
+         }
+         return dr[column].ToString() == "1";
+      }
+
+	   protected virtual DbType GetDbType(int typeNum)
         {
             switch (typeNum)
             {

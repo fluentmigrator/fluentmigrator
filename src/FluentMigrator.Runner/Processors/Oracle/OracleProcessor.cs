@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Data.Common;
+using System.Linq;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Expressions;
 
@@ -9,10 +10,12 @@ namespace FluentMigrator.Runner.Processors.Oracle
 {
 	public class OracleProcessor : ProcessorBase
 	{
-		public virtual IDbConnection Connection { get; set; }
-		
+	   private bool AutoGenerateSequenceForIdentityColumn = true;
+      private string SequenceNameFormat = "{0}SEQ";
 
-		public OracleProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+	   public virtual IDbConnection Connection { get; set; }
+
+      public OracleProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
 			: base(generator, announcer, options)
 		{
 			Connection = connection;
@@ -31,6 +34,19 @@ namespace FluentMigrator.Runner.Processors.Oracle
 		{
 			return Exists("SELECT TABLE_NAME FROM USER_TABLES WHERE LOWER(TABLE_NAME)='{0}'", tableName.ToLower());
 		}
+
+        public override void Process(CreateTableExpression expression)
+        {
+           Process(Generator.Generate(expression));
+
+           var identityColumns = expression.Columns.Where(c => c.IsIdentity);
+           if (identityColumns.Count() == 1 && AutoGenerateSequenceForIdentityColumn)
+           {
+              Process(
+                     string.Format("CREATE SEQUENCE {0} MINVALUE 1 START WITH 1 INCREMENT BY 1 CACHE 20",
+                                   string.Format(SequenceNameFormat,expression.TableName.ToUpper())));
+           }
+        }
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
 		{

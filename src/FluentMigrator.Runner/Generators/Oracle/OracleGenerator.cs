@@ -1,5 +1,7 @@
 ﻿
 
+using System.Linq;
+
 namespace FluentMigrator.Runner.Generators.Oracle
 {
     using System;
@@ -18,6 +20,11 @@ namespace FluentMigrator.Runner.Generators.Oracle
 		{
 		}
 
+        public OracleGenerator(OracleColumn column, OracleQuoter quoter )
+           : base(column, quoter)
+        {
+        }
+
         public override string AddColumn { get  { return "ALTER TABLE {0} ADD {1}"; } }
 
         public override string RenameTable { get { return "ALTER TABLE {0} RENAME TO {1}";  } }
@@ -31,10 +38,10 @@ namespace FluentMigrator.Runner.Generators.Oracle
         //    return String.Format("ALTER TABLE {0} MODIFY {1}", expression.TableName, Column.Generate(expression.Column));
         //}
 
-        //public override string Generate(CreateTableExpression expression)
-        //{
-        //    return String.Format("CREATE TABLE {0} ({1})", expression.TableName, Column.Generate(expression));
-        //}
+        public override string Generate(CreateTableExpression expression)
+        {
+           return base.Generate(expression);
+        }
 
         //public override string Generate(CreateColumnExpression expression)
         //{
