@@ -24,7 +24,7 @@ namespace FluentMigrator.Runner.Generators
     using System.Data;
     using FluentMigrator.Runner.Generators.Base;
 
-    internal class SqlServerCeTypeMap : TypeMapBase
+    public class SqlServerCeTypeMap : TypeMapBase
     {
         public const int AnsiStringCapacity = 8000;
         public const int AnsiTextCapacity = 2147483647;

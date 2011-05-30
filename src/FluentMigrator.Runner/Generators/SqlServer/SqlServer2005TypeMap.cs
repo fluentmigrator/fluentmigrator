@@ -4,7 +4,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 {
     using System.Data;
 
-	internal class SqlServer2005TypeMap : SqlServer2000TypeMap
+	public class SqlServer2005TypeMap : SqlServer2000TypeMap
 	{
 		protected override void SetupTypeMaps()
 		{
