@@ -27,7 +27,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            throw new System.NotImplementedException();
+            if (Connection.State != ConnectionState.Open) Connection.Open();
+
+            if (expression.Operation != null)
+                expression.Operation(Connection, Transaction);
         }
 
         protected override void Process(string sql)
@@ -63,6 +66,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 }
             }
         }
+        
         public override void BeginTransaction()
         {
             Announcer.Say("Beginning Transaction");
@@ -111,17 +115,17 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool SchemaExists(string schemaName)
         {
-            throw new System.NotImplementedException();
+            return true;
         }
 
         public override bool TableExists(string schemaName, string tableName)
         {
-            throw new System.NotImplementedException();
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{0}'", FormatSqlEscape(tableName));
         }
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
-            throw new System.NotImplementedException();
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'", FormatSqlEscape(tableName), FormatSqlEscape(columnName));
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
@@ -146,7 +150,19 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool Exists(string template, params object[] args)
         {
-            throw new System.NotImplementedException();
+            if (Connection.State != ConnectionState.Open)
+                Connection.Open();
+
+            using (var command = new SqlCeCommand(String.Format(template, args), Connection, Transaction))
+            using (var reader = command.ExecuteReader())
+            {
+                return reader.Read();
+            }
+        }
+
+        protected string FormatSqlEscape(string sql)
+        {
+            return sql.Replace("'", "''");
         }
     }
 }

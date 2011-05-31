@@ -14,6 +14,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe4
         const string ConnectionString = "Data Source=" + DbFile;
         SqlServerCe4Generator generator;
         MigrationRunner runner;
+        SqlServerCe4Processor processor;
+        SqlCeConnection connection;
 
         [SetUp]
         public void Setup()
@@ -26,9 +28,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe4
                 engine.CreateDatabase();
             }
             
-            var connection = new SqlCeConnection(ConnectionString);
-            var processor = new SqlServerCe4Processor(connection);
+            connection = new SqlCeConnection(ConnectionString);
+            processor = new SqlServerCe4Processor(connection);
             runner = new MigrationRunner(processor);
+        }
+
+        [TearDown]
+        public void Teardown()
+        {
+            connection.Close();
+            connection.Dispose();
         }
 
         public class CanCreateTableMigration : Migration
@@ -53,17 +62,54 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe4
 
             var migration = new CanCreateTableMigration();
             runner.Up(migration);
+            processor.TableExists(null, "TestTable1").ShouldBe(true);
+            
             runner.Down(migration);
+            processor.TableExists(null, "TestTable1").ShouldBe(false);
         }
 
+        public class CanCreateTableWithCustomColumnTypeMigration : Migration
+        {
+            public override void Up()
+            {
+                Create.Table("TestTable1")
+                    .WithColumn("TestColumn1").AsString().PrimaryKey()
+                    .WithColumn("TestColumn2").AsCustom("[timestamp]").NotNullable();
+            }
+
+            public override void Down()
+            {
+                Delete.Table("TestTable1");
+            }
+        }
+
+        [Test]
         public override void CanCreateTableWithCustomColumnType()
         {
-            throw new System.NotImplementedException();
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.Columns[1].Type = null;
+            expression.Columns[1].CustomType = "[timestamp]";
+
+            var sql = generator.Generate(expression);
+            sql.ShouldBe(
+                "CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] [timestamp] NOT NULL)");
+
+            var migration = new CanCreateTableWithCustomColumnTypeMigration();
+            runner.Up(migration);
+            processor.TableExists(null, "TestTable1").ShouldBe(true);
+            processor.ColumnExists(null, "TestTable1", "TestColumn2").ShouldBe(true);
+
+            runner.Down(migration);
+            processor.TableExists(null, "TestTable1").ShouldBe(false);
         }
 
+        [Test]
         public override void CanCreateTableWithPrimaryKey()
         {
-            throw new System.NotImplementedException();
+            var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
+            var sql = generator.Generate(expression);
+            sql.ShouldBe(
+                "CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1]))");
         }
 
         public override void CanCreateTableNamedPrimaryKey()
