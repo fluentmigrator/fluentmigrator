@@ -144,6 +144,7 @@
     </Compile>
     <Compile Include="Announcers\BaseAnnouncer.cs" />
     <Compile Include="Announcers\CompositeAnnouncer.cs" />
+    <Compile Include="Announcers\DebugAnnouncer.cs" />
     <Compile Include="Announcers\NullAnnouncer.cs" />
     <Compile Include="Announcers\TextWriterAnnouncer.cs" />
     <Compile Include="CompatabilityMode.cs" />

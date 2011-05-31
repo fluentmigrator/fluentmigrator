@@ -1,6 +1,7 @@
 ﻿using System.Data.SqlServerCe;
 using System.IO;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Processors.SqlServer;
 using NUnit.Framework;
@@ -29,13 +30,14 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe4
             }
             
             connection = new SqlCeConnection(ConnectionString);
-            processor = new SqlServerCe4Processor(connection);
+            processor = new SqlServerCe4Processor(connection, new DebugAnnouncer{ShowSql = true});
             runner = new MigrationRunner(processor);
         }
 
         [TearDown]
         public void Teardown()
         {
+            processor.CommitTransaction();
             connection.Close();
             connection.Dispose();
         }
@@ -73,7 +75,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe4
             public override void Up()
             {
                 Create.Table("TestTable1")
-                    .WithColumn("TestColumn1").AsString().PrimaryKey()
+                    .WithColumn("TestColumn1").AsString()
                     .WithColumn("TestColumn2").AsCustom("[timestamp]").NotNullable();
             }
 
@@ -103,6 +105,21 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe4
             processor.TableExists(null, "TestTable1").ShouldBe(false);
         }
 
+        public class CanCreateTableWithPrimaryKeyMigration : Migration
+        {
+            public override void Up()
+            {
+                Create.Table("TestTable1")
+                    .WithColumn("TestColumn1").AsString().PrimaryKey()
+                    .WithColumn("TestColumn2").AsInt32().NotNullable();
+            }
+
+            public override void Down()
+            {
+                Delete.Table("TestTable1");
+            }
+        }
+
         [Test]
         public override void CanCreateTableWithPrimaryKey()
         {
@@ -110,6 +127,15 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe4
             var sql = generator.Generate(expression);
             sql.ShouldBe(
                 "CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1]))");
+
+            var migration = new CanCreateTableWithPrimaryKeyMigration();
+            runner.Up(migration);
+            processor.TableExists(null, "TestTable1").ShouldBe(true);
+            processor.ConstraintExists(null, "TestTable1", "PK_TestTable1").ShouldBe(true);
+
+            runner.Down(migration);
+            processor.TableExists(null, "TestTable1").ShouldBe(false);
+
         }
 
         public override void CanCreateTableNamedPrimaryKey()

@@ -14,7 +14,19 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         public SqlCeTransaction Transaction { get; set; }
 
         public SqlServerCe4Processor(SqlCeConnection connection)
-            :this(connection, new SqlServerCe4Generator(), new NullAnnouncer(), new ProcessorOptions())
+            :this(connection, new SqlServerCe4Generator(), new NullAnnouncer())
+        {
+            
+        }
+
+        public SqlServerCe4Processor(SqlCeConnection connection, IAnnouncer announcer)
+            : this(connection, new SqlServerCe4Generator(), announcer)
+        {
+            
+        }
+
+        public SqlServerCe4Processor(SqlCeConnection connection, IMigrationGenerator generator, IAnnouncer announcer)
+            : this(connection, generator, announcer, new ProcessorOptions())
         {
             
         }
@@ -130,7 +142,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
-            throw new System.NotImplementedException();
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = '{0}' AND CONSTRAINT_NAME = '{1}'", FormatSqlEscape(tableName), FormatSqlEscape(constraintName));
         }
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
