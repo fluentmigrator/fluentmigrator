@@ -150,6 +150,12 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             throw new System.NotImplementedException();
         }
 
+        public override bool IndexExists(string schemaName, string tableName, string indexName, string columnName)
+        {
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.INDEXES WHERE TABLE_NAME = '{0}' AND INDEX_NAME = '{1}' AND COLUMN_NAME = '{2}'",
+                FormatSqlEscape(tableName), FormatSqlEscape(indexName), FormatSqlEscape(columnName));
+        }
+
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             throw new System.NotImplementedException();

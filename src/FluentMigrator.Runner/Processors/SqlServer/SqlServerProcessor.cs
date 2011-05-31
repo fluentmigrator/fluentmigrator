@@ -77,7 +77,12 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             return Exists("SELECT NULL FROM sysindexes WHERE name = '{0}'", FormatSqlEscape(indexName));
         }
 
-		public override void Execute(string template, params object[] args)
+	    public override bool IndexExists(string schemaName, string tableName, string indexName, string columnName)
+	    {
+	        throw new NotImplementedException();
+	    }
+
+	    public override void Execute(string template, params object[] args)
 		{
 			Process(String.Format(template, args));
 		}

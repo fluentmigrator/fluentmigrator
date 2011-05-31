@@ -157,5 +157,6 @@ namespace FluentMigrator.Runner.Processors
 		public abstract bool ColumnExists(string schemaName, string tableName, string columnName);
 		public abstract bool ConstraintExists(string schemaName, string tableName, string constraintName);
         public abstract bool IndexExists(string schemaName, string tableName, string indexName);        
+        public abstract bool IndexExists(string schemaName, string tableName, string indexName, string columnName);        
     }
 }
