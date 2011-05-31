@@ -23,7 +23,7 @@ namespace FluentMigrator.Runner.Announcers
             Write(NonSqlPrefix + message + " ");
             for (var i = 0; i < 75 - (message.Length + 1); i++)
             {
-                Write("=");
+                Console.Write("=");
             }
             Write("");
             Write("");

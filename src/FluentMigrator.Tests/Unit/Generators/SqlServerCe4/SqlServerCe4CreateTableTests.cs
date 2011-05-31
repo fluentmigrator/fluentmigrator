@@ -3,6 +3,7 @@ using System.IO;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.SqlServer;
 using NUnit.Framework;
 using NUnit.Should;
@@ -30,8 +31,10 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe4
             }
             
             connection = new SqlCeConnection(ConnectionString);
-            processor = new SqlServerCe4Processor(connection, new DebugAnnouncer{ShowSql = true});
-            runner = new MigrationRunner(processor);
+            var debugAnnouncer = new DebugAnnouncer{ShowSql = true};
+            processor = new SqlServerCe4Processor(connection, debugAnnouncer);
+            runner = new MigrationRunner(new RunnerContext(debugAnnouncer),  processor);
+            
         }
 
         [TearDown]
@@ -203,9 +206,36 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe4
 
         }
 
+        public class CanCreateTableWithIdentityMigration : Migration
+        {
+            public override void Up()
+            {
+                Create.Table("TestTable1")
+                    .WithColumn("TestColumn1").AsInt32().Identity()
+                    .WithColumn("TestColumn2").AsInt32();
+            }
+
+            public override void Down()
+            {
+                Delete.Table("TestTable1");
+            }
+        }
+
+        [Test]
         public override void CanCreateTableWithIdentity()
         {
-            throw new System.NotImplementedException();
+            var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
+            var sql = generator.Generate(expression);
+            sql.ShouldBe(
+                "CREATE TABLE [TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(1,1), [TestColumn2] INT NOT NULL)");
+
+            var migration = new CanCreateTableWithIdentityMigration();
+            runner.Up(migration);
+            processor.TableExists(null, "TestTable1").ShouldBe(true);
+
+            runner.Down(migration);
+            processor.TableExists(null, "TestTable1").ShouldBe(false);
+
         }
 
         public override void CanCreateTableWithNullableField()

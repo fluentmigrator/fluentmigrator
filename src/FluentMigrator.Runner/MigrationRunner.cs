@@ -43,14 +43,17 @@ namespace FluentMigrator.Runner
         public IMigrationConventions Conventions { get; private set; }
         public IList<Exception> CaughtExceptions { get; private set; }
 
-        public MigrationRunner(IMigrationProcessor processor)
+        public MigrationRunner(IRunnerContext runnerContext, IMigrationProcessor processor)
         {
+            _announcer = runnerContext.Announcer;
+            _stopWatch = runnerContext.StopWatch;
             Processor = processor;
             SilentlyFail = false;
             CaughtExceptions = null;
-            _announcer = new NullAnnouncer();
-            _stopWatch = new StopWatch();
+
             Conventions = new MigrationConventions();
+            if (!string.IsNullOrEmpty(runnerContext.WorkingDirectory))
+                Conventions.GetWorkingDirectory = () => runnerContext.WorkingDirectory;
         }
 
         public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)

@@ -122,7 +122,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override void Execute(string template, params object[] args)
         {
-            throw new System.NotImplementedException();
+            Process(String.Format(template, args)); 
         }
 
         public override bool SchemaExists(string schemaName)
@@ -147,7 +147,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
-            throw new System.NotImplementedException();
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.INDEXES WHERE TABLE_NAME = '{0}' AND INDEX_NAME = '{1}'",
+                FormatSqlEscape(tableName), FormatSqlEscape(indexName));
         }
 
         public override bool IndexExists(string schemaName, string tableName, string indexName, string columnName)
@@ -158,12 +159,20 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
-            throw new System.NotImplementedException();
+            return Read("SELECT * FROM [{0}]", tableName);
         }
 
         public override DataSet Read(string template, params object[] args)
         {
-            throw new System.NotImplementedException();
+            if (Connection.State != ConnectionState.Open) Connection.Open();
+
+            var ds = new DataSet();
+            using (var command = new SqlCeCommand(String.Format(template, args), Connection, Transaction))
+            using (var adapter = new SqlCeDataAdapter(command))
+            {
+                adapter.Fill(ds);
+                return ds;
+            }
         }
 
         public override bool Exists(string template, params object[] args)
