@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FluentMigrator.Runner</RootNamespace>
     <AssemblyName>FluentMigrator.Runner</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -144,6 +144,7 @@
     </Compile>
     <Compile Include="Announcers\BaseAnnouncer.cs" />
     <Compile Include="Announcers\CompositeAnnouncer.cs" />
+    <Compile Include="Announcers\ConsoleAnnouncer.cs" />
     <Compile Include="Announcers\DebugAnnouncer.cs" />
     <Compile Include="Announcers\NullAnnouncer.cs" />
     <Compile Include="Announcers\TextWriterAnnouncer.cs" />

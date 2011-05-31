@@ -1,11 +1,10 @@
 using System;
-using System.Diagnostics;
 
 namespace FluentMigrator.Runner.Announcers
 {
-    public class DebugAnnouncer : IAnnouncer, IFormattingAnnouncer
+    public class ConsoleAnnouncer: IAnnouncer, IFormattingAnnouncer
     {
-        public DebugAnnouncer()
+        public ConsoleAnnouncer()
         {
             NonSqlPrefix = "-- ";
         }
@@ -16,7 +15,7 @@ namespace FluentMigrator.Runner.Announcers
 
         private void Write(string message)
         {
-            Debug.WriteLine(message);
+            Console.WriteLine(message);
         }
 
         public void Heading(string message)
@@ -24,7 +23,7 @@ namespace FluentMigrator.Runner.Announcers
             Write(NonSqlPrefix + message + " ");
             for (var i = 0; i < 75 - (message.Length + 1); i++)
             {
-                Debug.Write("=");
+                Console.Write("=");
             }
             Write("");
             Write("");
@@ -79,7 +78,7 @@ namespace FluentMigrator.Runner.Announcers
 
         public void Dispose()
         {
-
+            
         }
     }
 }

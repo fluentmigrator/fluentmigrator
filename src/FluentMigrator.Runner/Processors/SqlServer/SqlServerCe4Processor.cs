@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Data;
 using System.Data.SqlServerCe;
-using System.IO;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.SqlServer;
@@ -11,27 +10,23 @@ namespace FluentMigrator.Runner.Processors.SqlServer
     public class SqlServerCe4Processor : ProcessorBase
     {
         public SqlCeConnection Connection { get; set; }
-        public SqlCeTransaction Transaction { get; set; }
 
         public SqlServerCe4Processor(SqlCeConnection connection)
-            :this(connection, new SqlServerCe4Generator(), new NullAnnouncer())
+            : this(connection, new SqlServerCe4Generator(), new NullAnnouncer())
         {
-            
         }
 
         public SqlServerCe4Processor(SqlCeConnection connection, IAnnouncer announcer)
             : this(connection, new SqlServerCe4Generator(), announcer)
         {
-            
         }
 
         public SqlServerCe4Processor(SqlCeConnection connection, IMigrationGenerator generator, IAnnouncer announcer)
             : this(connection, generator, announcer, new ProcessorOptions())
         {
-            
         }
 
-        public SqlServerCe4Processor(SqlCeConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options) 
+        public SqlServerCe4Processor(SqlCeConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
             : base(generator, announcer, options)
         {
             Connection = connection;
@@ -39,10 +34,26 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override void Process(PerformDBOperationExpression expression)
         {
+            if (expression.Operation == null)
+            {
+                return;
+            }
             if (Connection.State != ConnectionState.Open) Connection.Open();
-
-            if (expression.Operation != null)
-                expression.Operation(Connection, Transaction);
+            Announcer.Say("PerformDBOperationExpression");
+            using (var trans = BeginTransaction())
+            {
+                try
+                {
+                    expression.Operation(Connection, trans);
+                    CommitTransaction(trans);
+                }
+                catch (Exception ex)
+                {
+                    Announcer.Error(ex.Message);
+                    RollbackTransaction(trans);
+                    throw;
+                }
+            }
         }
 
         protected override void Process(string sql)
@@ -55,44 +66,37 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
-            if (Transaction == null)
-                BeginTransaction();
-
-            using (var command = new SqlCeCommand(sql, Connection, Transaction))
+            using (var trans = BeginTransaction())
+            using (var command = new SqlCeCommand(sql, Connection, trans))
             {
                 try
                 {
                     command.CommandTimeout = 0; // SQL Server CE does not support non-zero command timeout values!! :/
                     command.ExecuteNonQuery();
+                    CommitTransaction(trans);
                 }
                 catch (Exception ex)
                 {
-                    using (var message = new StringWriter())
-                    {
-                        message.WriteLine("An error occurred executing the following sql:");
-                        message.WriteLine(sql);
-                        message.WriteLine("The error was {0}", ex.Message);
-
-                        throw new Exception(message.ToString(), ex);
-                    }
+                    Announcer.Error(ex.Message);
+                    RollbackTransaction(trans);
+                    throw;
                 }
             }
         }
-        
-        public override void BeginTransaction()
+
+        public new SqlCeTransaction BeginTransaction()
         {
             Announcer.Say("Beginning Transaction");
-            Transaction = Connection.BeginTransaction();
+            return Connection.BeginTransaction();
         }
 
-        public override void CommitTransaction()
+        public void CommitTransaction(SqlCeTransaction transaction)
         {
             Announcer.Say("Committing Transaction");
 
-            if (Transaction != null)
+            if (transaction != null)
             {
-                Transaction.Commit();
-                Transaction.Dispose();
+                transaction.Commit();
             }
 
             if (Connection.State != ConnectionState.Closed)
@@ -101,9 +105,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
         }
 
-        public override void RollbackTransaction()
+        public void RollbackTransaction(SqlCeTransaction transaction)
         {
-            if (Transaction == null)
+            if (transaction == null)
             {
                 Announcer.Say("No transaction was available to rollback!");
                 return;
@@ -111,8 +115,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             Announcer.Say("Rolling back transaction");
 
-            Transaction.Rollback();
-            Transaction.Dispose();
+            transaction.Rollback();
 
             if (Connection.State != ConnectionState.Closed)
             {
@@ -122,7 +125,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override void Execute(string template, params object[] args)
         {
-            Process(String.Format(template, args)); 
+            Process(String.Format(template, args));
         }
 
         public override bool SchemaExists(string schemaName)
@@ -132,29 +135,34 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool TableExists(string schemaName, string tableName)
         {
+            Announcer.Say("TableExists");
             return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{0}'", FormatSqlEscape(tableName));
         }
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
+            Announcer.Say("ColumnExists");
             return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'", FormatSqlEscape(tableName), FormatSqlEscape(columnName));
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
+            Announcer.Say("ConstraintExists");
             return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = '{0}' AND CONSTRAINT_NAME = '{1}'", FormatSqlEscape(tableName), FormatSqlEscape(constraintName));
         }
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
+            Announcer.Say("IndexExists");
             return Exists("SELECT * FROM INFORMATION_SCHEMA.INDEXES WHERE TABLE_NAME = '{0}' AND INDEX_NAME = '{1}'",
-                FormatSqlEscape(tableName), FormatSqlEscape(indexName));
+                          FormatSqlEscape(tableName), FormatSqlEscape(indexName));
         }
 
         public override bool IndexExists(string schemaName, string tableName, string indexName, string columnName)
         {
+            Announcer.Say("IndexExists - columnName");
             return Exists("SELECT * FROM INFORMATION_SCHEMA.INDEXES WHERE TABLE_NAME = '{0}' AND INDEX_NAME = '{1}' AND COLUMN_NAME = '{2}'",
-                FormatSqlEscape(tableName), FormatSqlEscape(indexName), FormatSqlEscape(columnName));
+                          FormatSqlEscape(tableName), FormatSqlEscape(indexName), FormatSqlEscape(columnName));
         }
 
         public override DataSet ReadTableData(string schemaName, string tableName)
@@ -167,10 +175,12 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
             var ds = new DataSet();
-            using (var command = new SqlCeCommand(String.Format(template, args), Connection, Transaction))
+            using (var trans = BeginTransaction())
+            using (var command = new SqlCeCommand(String.Format(template, args), Connection, trans))
             using (var adapter = new SqlCeDataAdapter(command))
             {
                 adapter.Fill(ds);
+                CommitTransaction(trans);
                 return ds;
             }
         }
@@ -180,10 +190,14 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
-            using (var command = new SqlCeCommand(String.Format(template, args), Connection, Transaction))
+            using (var trans = BeginTransaction())
+            using (var command = new SqlCeCommand(String.Format(template, args), Connection, trans))
             using (var reader = command.ExecuteReader())
             {
-                return reader.Read();
+                var exists = reader.Read();
+                reader.Close();
+                CommitTransaction(trans);
+                return exists;
             }
         }
 

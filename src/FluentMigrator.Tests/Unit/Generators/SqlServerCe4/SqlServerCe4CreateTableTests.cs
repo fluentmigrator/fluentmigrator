@@ -31,7 +31,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe4
             }
             
             connection = new SqlCeConnection(ConnectionString);
-            var debugAnnouncer = new DebugAnnouncer{ShowSql = true};
+            var debugAnnouncer = new ConsoleAnnouncer{ShowSql = true};
             processor = new SqlServerCe4Processor(connection, debugAnnouncer);
             runner = new MigrationRunner(new RunnerContext(debugAnnouncer),  processor);
             
