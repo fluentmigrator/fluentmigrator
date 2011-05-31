@@ -138,9 +138,36 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe4
 
         }
 
+        public class CanCreateTableNamedPrimaryKeyMigration : Migration
+        {
+            public override void Up()
+            {
+                Create.Table("TestTable1")
+                    .WithColumn("TestColumn1").AsString().PrimaryKey("TestKey")
+                    .WithColumn("TestColumn2").AsInt32().NotNullable();
+            }
+
+            public override void Down()
+            {
+                Delete.Table("TestTable1");
+            }
+        }
+
+        [Test]
         public override void CanCreateTableNamedPrimaryKey()
         {
-            throw new System.NotImplementedException();
+            var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1]))");
+
+            var migration = new CanCreateTableNamedPrimaryKeyMigration();
+            runner.Up(migration);
+            processor.TableExists(null, "TestTable1").ShouldBe(true);
+            processor.ConstraintExists(null, "TestTable1", "TestKey").ShouldBe(true);
+
+            runner.Down(migration);
+            processor.TableExists(null, "TestTable1").ShouldBe(false);
+
         }
 
         public override void CanCreateTableNamedMultiColumnPrimaryKey()
