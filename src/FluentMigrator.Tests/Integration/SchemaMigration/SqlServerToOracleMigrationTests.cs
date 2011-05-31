@@ -91,8 +91,82 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
 
 
          // Act
-         MigrateTable(create);
+         MigrateTable(GetDefaultSettings(), create);
          
+      }
+
+      [Test]
+      public void CanMigrateGuidAndDateWithDefaultValues()
+      {
+         // Arrange
+         var create = new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = new[]
+                                         {
+                                            new ColumnDefinition
+                                               {
+                                                  Name = "Id", Type = DbType.Guid
+                                                  , DefaultValue = SystemMethods.NewGuid
+                                               },
+                                               new ColumnDefinition
+                                               {
+                                                  Name = "Added", Type = DbType.DateTime
+                                                  , DefaultValue = SystemMethods.CurrentDateTime
+                                               }
+                                         }
+         };
+
+
+
+         // Act
+         MigrateTable(GetDefaultSettings(), create);
+
+      }
+
+      [Test]
+      public void CanMigrateDefaultDate()
+      {
+         // Arrange
+         var create = new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = new[]
+                                         {
+                                               new ColumnDefinition
+                                               {
+                                                  Name = "Added", Type = DbType.DateTime
+                                                  , DefaultValue = "1900-01-01"
+                                               }
+                                         }
+         };
+
+         // Act
+         MigrateTable(GetDefaultSettings(), create);
+
+      }
+
+      [Test]
+      public void CanMigrateDecimal()
+      {
+         // Arrange
+         var create = new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = new[]
+                                         {
+                                               new ColumnDefinition
+                                               {
+                                                  Name = "Value", Type = DbType.Decimal
+                                                  , Size = 38
+                                                  , Precision = 4
+                                               }
+                                         }
+         };
+
+         // Act
+         MigrateTable(GetDefaultSettings(), create);
+
       }
 
       [Test]
@@ -123,15 +197,42 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
 
 
          // Act
-         MigrateTable(create);
+         MigrateTable(GetDefaultSettings(), create);
 
       }
 
-      private void MigrateTable(CreateTableExpression create)
+      [Test]
+      [ExpectedException]
+      public void ThrowsExceptionIfInvalidCodeGenerated()
+      {
+         // Arrange
+
+         // Add in broad coverage of supported data types
+
+         var create = new CreateTableExpression
+         {
+            TableName = "SupportedTypes",
+            Columns = new[]{
+                   new ColumnDefinition {Name = "Col1", Type = DbType.Int32 }
+                    }
+         };
+
+         var settings = GetDefaultSettings();
+         // Modify the context so that invalid class name returned
+         // ... in this case make is start with numeric
+         settings.MigrationClassNamer = (index, table) => "1";
+
+
+         // Act
+         MigrateTable(settings, create);
+
+      }
+
+      private void MigrateTable(SchemaMigrationContext context, CreateTableExpression create)
       {
          using (var connection = new SqlConnection(sqlContext.ConnectionString))
          {
-            var processor = new SqlServerProcessor(connection, new SqlServer2005Generator(), new NullAnnouncer(), new ProcessorOptions());
+            var processor = new SqlServerProcessor(connection, new SqlServer2005Generator(), new DebugAnnouncer(), new ProcessorOptions());
 
             processor.Process(create);
 
@@ -140,23 +241,26 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
             processor.CommitTransaction();
          }
 
-         var settings = new SchemaMigrationSettings()
-         {
-            FromConnectionString = sqlContext.ConnectionString
-            , ToDatabaseType = DatabaseType.Oracle
-            , ToConnectionString = oracleContext.ConnectionString
-            , MigrationsDirectory = _tempDirectory
-         };
+         var migrator = new SqlServerSchemaMigrator(new DebugAnnouncer());
 
-         var migrator = new SqlServerSchemaMigrator();
-
-         migrator.Migrate(settings);
+         migrator.Migrate(context);
 
          var oracleProcessor = new OracleProcessorFactory().Create(oracleContext.ConnectionString, new NullAnnouncer(),
                                              new ProcessorOptions());
 
          // Assert
          Assert.IsTrue(oracleProcessor.TableExists(string.Empty, create.TableName), "Oracle");
+      }
+
+      private SchemaMigrationContext GetDefaultSettings()
+      {
+         return new SchemaMigrationContext
+                   {
+                      FromConnectionString = sqlContext.ConnectionString
+                      , ToDatabaseType = DatabaseType.Oracle
+                      , ToConnectionString = oracleContext.ConnectionString
+                      , MigrationsDirectory = _tempDirectory
+                   };
       }
    }
 }

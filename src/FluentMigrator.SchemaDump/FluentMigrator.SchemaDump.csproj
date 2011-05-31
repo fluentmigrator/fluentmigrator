@@ -43,6 +43,8 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SchemaDumpers\ISchemaDumper.cs" />
     <Compile Include="SchemaDumpers\SqlServerSchemaDumper.cs" />
+    <Compile Include="SchemaMigrations\CSharpMigrationsWriter.cs" />
+    <Compile Include="SchemaMigrations\SchemaMigrationContext.cs" />
     <Compile Include="SchemaMigrations\SqlServerSchemaMigrator.cs" />
     <Compile Include="SchemaWriters\ISchemaWriter.cs" />
     <Compile Include="SchemaWriters\SchemaWriterBase.cs" />

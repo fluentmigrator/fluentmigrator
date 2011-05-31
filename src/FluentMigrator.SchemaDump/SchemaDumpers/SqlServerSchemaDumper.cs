@@ -73,9 +73,11 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
         }
 
         public virtual IList<TableDefinition> ReadDbSchema() {
+           Announcer.Say("Reading table schema");
             IList<TableDefinition> tables = ReadTables();
             foreach(TableDefinition table in tables)
             {
+               Announcer.Say(string.Format("Reading indexes and foreign keys for {0}.{1}", table.SchemaName, table.Name));
                 table.Indexes = ReadIndexes(table.SchemaName, table.Name);
                 table.ForeignKeys = ReadForeignKeys(table.SchemaName, table.Name);
             }
@@ -151,6 +153,7 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
                         IsPrimaryKey = AsBoolean(dr, "IsPrimaryKey"),
                         IsUnique = AsBoolean(dr, "IsUnique"),
                         Precision = int.Parse(dr["Precision"].ToString()),
+                        Scale = int.Parse(dr["Scale"].ToString()),
                         PrimaryKeyName = dr.IsNull("PrimaryKeyName") ? "" : dr["PrimaryKeyName"].ToString(), 
                         Size = int.Parse(dr["Length"].ToString()),
                         TableName = dr["Table"].ToString(),

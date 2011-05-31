@@ -34,6 +34,7 @@ namespace FluentMigrator.Model
 		public virtual DbType? Type { get; set; }
 		public virtual int Size { get; set; }
 		public virtual int Precision { get; set; }
+		public virtual int Scale { get; set; }
 		public virtual string CustomType { get; set; }
 		public virtual object DefaultValue { get; set; }
 		public virtual bool IsForeignKey { get; set; }

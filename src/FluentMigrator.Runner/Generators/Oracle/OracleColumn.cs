@@ -1,4 +1,5 @@
-﻿using FluentMigrator.Model;
+﻿using System.Data;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Oracle
@@ -38,9 +39,32 @@ namespace FluentMigrator.Runner.Generators.Oracle
 			{
 				case SystemMethods.NewGuid:
 					return "sys_guid()";
+            case SystemMethods.CurrentDateTime:
+			      return "SYSDATE";
 			}
 
 			return null;
 		}
+
+      protected override string FormatDefaultValue(ColumnDefinition column)
+      {
+         if (column.DefaultValue is ColumnDefinition.UndefinedDefaultValue)
+            return string.Empty;
+
+         // see if this is for a system method
+         if (column.DefaultValue is SystemMethods)
+         {
+            string method = FormatSystemMethods((SystemMethods)column.DefaultValue);
+            if (string.IsNullOrEmpty(method))
+               return string.Empty;
+
+            return "DEFAULT " + method;
+         }
+
+         if (column.Type == DbType.DateTime)
+            return "DEFAULT " + column.DefaultValue;
+
+         return "DEFAULT " + Quoter.QuoteValue(column.DefaultValue);
+      }
 	}
 }

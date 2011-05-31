@@ -95,7 +95,7 @@ namespace FluentMigrator.Tests.Integration
       /// Creates a new test dtaabase based on the detached databse
       /// </summary>
       [SetUp]
-      public void Setup()
+      public virtual void Setup()
       {
          TestDb = GenerateDbName();
          _testDbFile = Path.Combine(DatabasePath, TestDb + ".mdf");
@@ -108,7 +108,7 @@ namespace FluentMigrator.Tests.Integration
       }
 
       [TearDown]
-      public void TearDown()
+      public virtual void TearDown()
       {
          DropDatabase(TestDb);
       }

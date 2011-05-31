@@ -19,13 +19,10 @@
 using System;
 using System.CodeDom.Compiler;
 using System.Collections.Generic;
-using System.Data;
 using System.Data.SqlClient;
 using System.IO;
-using System.Linq;
 using System.Reflection;
 using System.Text;
-using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.SqlServer;
@@ -40,25 +37,61 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
    /// <summary>
    /// Migrates the schema items from SQL Server to another supprted database type
    /// </summary>
+   /// <example>
+   /// <code>
+   /// var migrator = new SqlServerSchemaMigrator(new TextWriterAnnouncer(Console.Out));
+   /// var context = new SchemaMigrationContext {
+   ///    FromConnectionString = @"Data Source=localhost\sqlexpress;Initial Catalog=Foo;Integrated Security=True"
+   ///    , ToDatabaseType = DatabaseType.Oracle
+   ///    , ToConnectionString = "Data Source=XE;Uid=Foo;Pwd=Foo"
+   ///    , MigrationsDirectory = @".\Migrations"
+   /// };
+   /// migrator.Migrate(context);
+   /// </code>
+   /// </example>
    public class SqlServerSchemaMigrator
    {
+      private readonly IAnnouncer _announcer;
+
+      public SqlServerSchemaMigrator(IAnnouncer announcer)
+      {
+         _announcer = announcer;
+      }
+
       /// <summary>
-      /// Perform migration
+      /// Perform migration using the provided context
       /// </summary>
-      public void Migrate(SchemaMigrationSettings settings)
+      /// <param name="context">The context that control how the migration should be generated/executed</param>
+      public void Migrate(SchemaMigrationContext context)
       {
-         Generate(settings);
+         Generate(context);
 
-         var a = CompileMigrations(GetSourceFiles(settings), typeof(Migration).Assembly.Location);
+         if (context.ExecuteInMemory)
+         {
+            _announcer.Say("Compiling migration");
+            var compiledAssembly = CompileMigrations(GetSourceFiles(context), typeof (Migration).Assembly.Location);
 
-         MigrateUp(a, settings);
+            MigrateUp(compiledAssembly, context);
+         }
       }
 
-      private string[] GetSourceFiles(SchemaMigrationSettings settings)
+      /// <summary>
+      /// Gets a list of source files that should be compiled into the migration assembly
+      /// </summary>
+      /// <param name="context">The context that contain the MigrationsDirectory</param>
+      /// <returns>The C# source files to compile</returns>
+      private string[] GetSourceFiles(SchemaMigrationContext context)
       {
-         return Directory.GetFiles(settings.MigrationsDirectory, "*.cs");
+         return Directory.GetFiles(context.MigrationsDirectory, "*.cs");
       }
 
+      /// <summary>
+      /// Generates an inmemory migration assembly using the provided source files
+      /// </summary>
+      /// <remarks>Throws exception if the assembly cannot be compiled</remarks>
+      /// <param name="files">The files to be compiled</param>
+      /// <param name="additionalAssemblies">Any referenced assemblies required by the source files</param>
+      /// <returns>The compiled assembly</returns>
       private Assembly CompileMigrations(string[] files, params string[] additionalAssemblies)
       {
          var csc = new CSharpCodeProvider(new Dictionary<string, string>() { { "CompilerVersion", "v3.5" } });
@@ -91,185 +124,46 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
          return results.CompiledAssembly;
       }
 
-      private void Generate(SchemaMigrationSettings settings)
+      /// <summary>
+      /// Generates migrations from a SQL Server instance as C# source code
+      /// </summary>
+      /// <param name="context">Define data required to generate the C# migrations</param>
+      private void Generate(SchemaMigrationContext context)
       {
-         using (var connection = new SqlConnection(settings.FromConnectionString))
+         _announcer.Say(string.Format("Generating schema migrations from {0}", context.FromConnectionString));
+         using (var connection = new SqlConnection(context.FromConnectionString))
          {
             var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new NullAnnouncer(),
                                                    new ProcessorOptions());
             var schemaDumper = new SqlServerSchemaDumper(processor, new TextWriterAnnouncer(System.Console.Out));
 
-            var defs = schemaDumper.ReadDbSchema();
-
-            settings.MigrationsDirectory = string.IsNullOrEmpty(settings.MigrationsDirectory)
-                                        ? Path.GetTempPath() + Guid.NewGuid()
-                                        : settings.MigrationsDirectory;
-
-            Directory.CreateDirectory(settings.MigrationsDirectory);
-
-            for (var index = 0; index < defs.Count; index++)
-            {
-               var table = defs[index];
-               using (
-                  var writer =
-                     new StreamWriter(Path.Combine(settings.MigrationsDirectory,
-                                                   string.Format("BaseMigration_{0}_{1}.cs", index, table.Name))))
-               {
-                  WriteToStream(table, "MigrationsDefault", index, writer);
-               }
-            }            
+            var generator = new CSharpMigrationsWriter(_announcer);
+            generator.GenerateTableMigrations(context, schemaDumper);
          }
       }
 
-      public static void WriteToStream(TableDefinition table, string defaultNamespace, int migration, StreamWriter output)
+
+      /// <summary>
+      /// Performs the process of applying the migrations to the ToConnectionString
+      /// </summary>
+      /// <param name="assembly">The assembly to obatin the migrations from</param>
+      /// <param name="context">The context that determine the target database</param>
+      private void MigrateUp(Assembly assembly, SchemaMigrationContext context)
       {
-         //start writing a migration file
-         output.WriteLine("using System;");
-         output.WriteLine("using FluentMigrator;");
-         output.WriteLine(String.Empty);
-         output.WriteLine("namespace {0}", defaultNamespace);
-         output.WriteLine("{");
-         output.WriteLine("\t[Migration({0})]", migration);
-         output.WriteLine("\tpublic class BaseMigration_{0}_{1} : Migration", migration, table.Name);
-         output.WriteLine("\t{");
-         output.WriteLine("\t\tpublic override void Up()");
-         output.WriteLine("\t\t{");
-
-         WriteTable(table, output);
-
-         output.WriteLine("\t\t}"); //end Up method
-
-         output.WriteLine("\t\tpublic override void Down()");
-         output.WriteLine("\t\t{");
-
-         WriteDeleteTable(table, output);
-
-         output.WriteLine("\t\t}"); //end Down method
-         output.WriteLine("\t}"); //end class
-         output.WriteLine(String.Empty);
-         output.WriteLine("}"); //end namespace
-      }
-
-      protected static void WriteTable(TableDefinition table, StreamWriter output)
-      {
-         output.WriteLine("\t\t\tCreate.Table(\"" + table.Name + "\")");
-         foreach (var column in table.Columns)
-         {
-            WriteColumn(column, output, column == table.Columns.Last());
-         }
-      }
-
-      protected static void WriteDeleteTable(TableDefinition table, StreamWriter output)
-      {
-         //Delete.Table("Bar");
-         output.WriteLine("\t\t\tDelete.Table(\"" + table.Name + "\");");
-      }
-
-      protected static void WriteColumn(ColumnDefinition column, StreamWriter output, bool isLastColumn)
-      {
-         var columnSyntax = new StringBuilder();
-         columnSyntax.AppendFormat(".WithColumn(\"{0}\")", column.Name);
-         switch (column.Type)
-         {
-            case DbType.Boolean:
-               columnSyntax.Append(".AsBoolean()");
-               break;
-            case DbType.DateTime:
-               columnSyntax.Append(".AsDateTime()");
-               // How handle default .. could be explict value for function get GETDATE()
-               break;
-            case DbType.Decimal:
-               columnSyntax.AppendFormat(".AsDecimal({0},{1})", column.Precision, column.Size);
-               break;
-            case DbType.Double:
-               columnSyntax.Append(".AsDouble()");
-               break;
-            case DbType.Guid:
-               columnSyntax.Append(".AsGuid()");
-               break;
-            case DbType.Int16:
-               columnSyntax.Append(".AsInt16()");
-               break;
-            case DbType.Int32:
-               columnSyntax.Append(".AsInt32()");
-               break;
-            case DbType.Int64:
-               columnSyntax.Append(".AsInt64()");
-               break;
-            case DbType.String:
-               if ( column.Size > 0 )
-                  columnSyntax.AppendFormat(".AsString({0})", column.Size);
-               else
-                  columnSyntax.Append(".AsString()");
-               break;
-            case DbType.StringFixedLength:
-               columnSyntax.AppendFormat(".AsString({0})", column.Size);
-               break;
-            default:
-               columnSyntax.Append(".AsString()");
-               break;
-         }
-         if (column.IsIdentity)
-            columnSyntax.Append(".Identity()");
-         else if (column.IsIndexed)
-            columnSyntax.Append(".Indexed()");
-
-         if (column.DefaultValue != null && !string.IsNullOrEmpty(column.DefaultValue.ToString()))
-         {
-            var defaultValue = column.DefaultValue.ToString()
-               .Replace("(", "")
-               .Replace(")", ""); // HACK - What if default is string and includes ( ?
-
-            //TODO - Test default valeus for boolean
-            //TODO - Test functions e.g. GetDate(), NewId()
-
-
-            if (defaultValue.StartsWith("'") && defaultValue.EndsWith("'"))
-            {
-               if (column.Type == DbType.DateTime)
-               {
-                  // TODO Handle GetDate()
-                  // Assumes that date in format yyyy-MM-dd
-                  // TODO handle 1900-01-01 is this correct ?s 
-                  defaultValue = string.Format("DateTime.ParseExact({0}, \"yyyy-MM-dd\", null)", defaultValue);
-               }
-
-               defaultValue = defaultValue.Replace("'", "\"");
-
-               // Assume is is a string
-               // Hack - Assumes that default does not include '               
-               columnSyntax.AppendFormat(".WithDefaultValue({0})", defaultValue.Replace("'", "\""));
-            }
-            else
-            {
-               // Insert value as object
-               columnSyntax.AppendFormat(".WithDefaultValue({0})", defaultValue);
-            }
-         }
-
-         if (!column.IsNullable)
-            columnSyntax.Append(".NotNullable()");
-
-         if (isLastColumn) columnSyntax.Append(";");
-         output.WriteLine("\t\t\t\t" + columnSyntax);
-      }
-
-
-      private void MigrateUp(Assembly assembly, SchemaMigrationSettings settings)
-      {
-         var announcer = new NullAnnouncer();
-
-         var runnerContext = new RunnerContext(announcer)
+         var runnerContext = new RunnerContext(_announcer)
                                 {
-                                   Database = settings.ToDatabaseType.ToString().ToLower(),
-                                   Connection = settings.ToConnectionString
+                                   Database = context.ToDatabaseType.ToString().ToLower(),
+                                   Connection = context.ToConnectionString
                                 };
 
-         var factory = ProcessorFactory.GetFactory(settings.ToDatabaseType.ToString());
+         _announcer.Say("Migrating to database type " + runnerContext.Database);
+         _announcer.Say("With connection string " + context.ToConnectionString);
+
+         var factory = ProcessorFactory.GetFactory(context.ToDatabaseType.ToString());
          IMigrationProcessor toProcessor = null;
          try
          {
-            toProcessor = factory.Create(settings.ToConnectionString, announcer, new ProcessorOptions
+            toProcessor = factory.Create(context.ToConnectionString, _announcer, new ProcessorOptions
                                                                                     {
                                                                                        PreviewOnly = false,
                                                                                        Timeout = 30
@@ -283,18 +177,5 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
                ((IDisposable)toProcessor).Dispose();
          }
       }
-   }
-
-   public class SchemaMigrationSettings
-   {
-      public string FromConnectionString { get; set; }
-
-      public DatabaseType ToDatabaseType { get; set; }
-
-      public string ToConnectionString { get; set; }
-
-      public string MigrationsDirectory { get; set; }
-
-      public bool ExecuteInMemory { get; set; }
    }
 }

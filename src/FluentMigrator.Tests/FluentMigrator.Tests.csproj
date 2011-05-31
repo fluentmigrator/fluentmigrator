@@ -164,6 +164,7 @@
     <Compile Include="Integration\Processors\SqlServerCeProcessorTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaDumpTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaTestWriter.cs" />
+    <Compile Include="Unit\Schema\Migrations\CSharpTableMigrationsWriterTests.cs" />
     <Compile Include="Integration\SqlServerUnitTest.cs" />
     <Compile Include="Integration\SchemaMigration\SqlServerToOracleMigrationTests.cs" />
     <Compile Include="Integration\ScriptMigrationTest.cs" />
@@ -386,9 +387,6 @@
       <Link>x86\sqlcese40.dll</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Unit\Schema\Migration\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
