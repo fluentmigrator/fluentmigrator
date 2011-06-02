@@ -39,14 +39,46 @@ namespace FluentMigrator.Runner.Processors.Oracle
         {
            Process(Generator.Generate(expression));
 
-           var identityColumns = expression.Columns.Where(c => c.IsIdentity);
-           if (identityColumns.Count() == 1 && AutoGenerateSequenceForIdentityColumn)
+           if (AutoGenerateSequenceForIdentityColumn)
            {
+              // Generate a sequence starting at one
+              // ... 
               Process(
-                     string.Format("CREATE SEQUENCE {0} MINVALUE 1 START WITH 1 INCREMENT BY 1 CACHE 20",
-                                   string.Format(SequenceNameFormat,expression.TableName.ToUpper())));
+                 string.Format("CREATE SEQUENCE {0} MINVALUE 1 START WITH {1} INCREMENT BY 1 CACHE 20",
+                               string.Format(SequenceNameFormat, expression.TableName.ToUpper())
+                               , 1));
+
            }
         }
+
+        public override void Process(InsertDataExpression expression)
+        {
+           base.Process(expression);
+
+           if (expression.WithIdentity && AutoGenerateSequenceForIdentityColumn)
+           {
+              // Select the current number of rows from the table
+              var count = Read(string.Format("SELECT COUNT(*) FROM {0}", expression.TableName));
+              var startValue = 0;
+              if (count != null && count.Tables[0].Rows.Count == 1)
+                 startValue = int.Parse(count.Tables[0].Rows[0][0].ToString());
+
+              if (startValue > 0)
+              {
+                 // Drop the default sequence that was generated
+                 Process(string.Format("DROP SEQUENCE {0}",
+                                       string.Format(SequenceNameFormat, expression.TableName.ToUpper())));
+
+                 // And re create the sequence with the new start value
+                 Process(
+                    string.Format("CREATE SEQUENCE {0} MINVALUE 1 START WITH {1} INCREMENT BY 1 CACHE 20",
+                                  string.Format(SequenceNameFormat, expression.TableName.ToUpper())
+                                  , startValue + 1));
+              }
+
+           }
+        }
+
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
 		{

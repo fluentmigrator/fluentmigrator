@@ -57,6 +57,11 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
             return Processor.Read("SELECT * FROM [{0}]", tableName);
 		}
 
+        public virtual DataSet ReadTableData(string schemaName, string tableName)
+        {
+           return Processor.Read("SELECT * FROM [{0}].[{1}]", schemaName,tableName);
+        }
+
         public virtual DataSet Read(string template, params object[] args)
 		{
             return Processor.Read(template, args);
@@ -83,6 +88,12 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
             }
 
             return tables as IList<TableDefinition>;
+        }
+
+        public virtual IList<ViewDefinition> ReadViewSchema()
+        {
+           Announcer.Say("Reading view schema");
+           return ReadViews();
         }
 
         protected virtual IList<FluentMigrator.Model.TableDefinition> ReadTables() {
@@ -163,6 +174,49 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
             }
 
             return tables;
+        }
+
+        public virtual IList<ViewDefinition> ReadViews()
+        {
+           string query = @"select  OBJECT_SCHEMA_NAME(v.[object_id],DB_ID()) AS [Schema], v.name AS [View], sc.text As [Sql]
+FROM sys.views v
+INNER JOIN syscomments sc ON v.[object_id] = sc.[id]
+ORDER BY v.name, sc.colid
+";
+           var ds = Read(query);
+           var dt = ds.Tables[0];
+           IList<ViewDefinition> views = new List<ViewDefinition>();
+
+           foreach (DataRow dr in dt.Rows)
+           {
+              var matches = (from t in views
+                                               where t.Name == dr["View"].ToString()
+                                               && t.SchemaName == dr["Schema"].ToString()
+                                               select t).ToList();
+
+              ViewDefinition viewDefinition = null;
+              if (matches.Count > 0) viewDefinition = matches[0];
+
+              // create the view if not found
+              if (viewDefinition == null)
+              {
+                 viewDefinition = new ViewDefinition()
+                 {
+                    Name = dr["View"].ToString(),
+                    SchemaName = dr["Schema"].ToString()
+                 };
+                 viewDefinition.CreateViewSql = dr["Sql"].ToString();
+                 views.Add(viewDefinition);
+              }
+              else
+              {
+                 // Append the sql as the create sql statement may span more than one row
+                 viewDefinition.CreateViewSql += dr["Sql"];
+              }
+              
+           }
+
+           return views;
         }
 
       public bool AsBoolean(DataRow dr, string column)

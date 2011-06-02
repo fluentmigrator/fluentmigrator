@@ -206,6 +206,7 @@
     <Compile Include="Infrastructure\Extensions\ExtensionsForIEnumerable.cs" />
     <Compile Include="IQuerySchema.cs" />
     <Compile Include="Model\TableDefinition.cs" />
+    <Compile Include="Model\ViewDefinition.cs" />
     <Compile Include="ProfileAttribute.cs" />
     <Compile Include="SystemMethods.cs" />
     <Compile Include="VersionTableInfo\DefaultVersionTableMetaData.cs" />

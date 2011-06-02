@@ -43,7 +43,7 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
    /// var context = new SchemaMigrationContext {
    ///    FromConnectionString = @"Data Source=localhost\sqlexpress;Initial Catalog=Foo;Integrated Security=True"
    ///    , ToDatabaseType = DatabaseType.Oracle
-   ///    , ToConnectionString = "Data Source=XE;Uid=Foo;Pwd=Foo"
+   ///    , ToConnectionString = "Uid=Foo;Pwd=Foo;Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=127.0.0.1)(PORT=1521))(CONNECT_DATA=(SID=XE)))"
    ///    , MigrationsDirectory = @".\Migrations"
    /// };
    /// migrator.Migrate(context);
@@ -71,7 +71,12 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
             _announcer.Say("Compiling migration");
             var compiledAssembly = CompileMigrations(GetSourceFiles(context), typeof (Migration).Assembly.Location);
 
-            MigrateUp(compiledAssembly, context);
+            if ( compiledAssembly == null)
+            {
+               _announcer.Say("No migrations found");
+            }
+            else
+               MigrateUp(compiledAssembly, context);
          }
       }
 
@@ -80,9 +85,10 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
       /// </summary>
       /// <param name="context">The context that contain the MigrationsDirectory</param>
       /// <returns>The C# source files to compile</returns>
-      private string[] GetSourceFiles(SchemaMigrationContext context)
+      private static string[] GetSourceFiles(SchemaMigrationContext context)
       {
-         return Directory.GetFiles(context.MigrationsDirectory, "*.cs");
+         var migrationsDirectory = Path.Combine(context.WorkingDirectory, context.MigrationsDirectory);
+         return Directory.GetFiles(migrationsDirectory, "*.cs");
       }
 
       /// <summary>
@@ -92,9 +98,12 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
       /// <param name="files">The files to be compiled</param>
       /// <param name="additionalAssemblies">Any referenced assemblies required by the source files</param>
       /// <returns>The compiled assembly</returns>
-      private Assembly CompileMigrations(string[] files, params string[] additionalAssemblies)
+      private static Assembly CompileMigrations(string[] files, params string[] additionalAssemblies)
       {
-         var csc = new CSharpCodeProvider(new Dictionary<string, string>() { { "CompilerVersion", "v3.5" } });
+         if ( files.Length == 0)
+            return null;
+
+         var csc = new CSharpCodeProvider(new Dictionary<string, string> { { "CompilerVersion", "v3.5" } });
          var parameters = new CompilerParameters(new[] { "mscorlib.dll", "System.dll" }, "foo.dll", true)
          {
             GenerateExecutable = false // Indicate we want dll not exe
@@ -135,10 +144,11 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
          {
             var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new NullAnnouncer(),
                                                    new ProcessorOptions());
-            var schemaDumper = new SqlServerSchemaDumper(processor, new TextWriterAnnouncer(System.Console.Out));
+            var schemaDumper = new SqlServerSchemaDumper(processor, new TextWriterAnnouncer(Console.Out));
 
             var generator = new CSharpMigrationsWriter(_announcer);
             generator.GenerateTableMigrations(context, schemaDumper);
+            generator.GenerateViewMigrations(context, schemaDumper);
          }
       }
 
@@ -155,6 +165,13 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
                                    Database = context.ToDatabaseType.ToString().ToLower(),
                                    Connection = context.ToConnectionString
                                 };
+
+         if (!string.IsNullOrEmpty(context.WorkingDirectory))
+         {
+            _announcer.Say("Set working directory to " + context.WorkingDirectory);
+            runnerContext.WorkingDirectory = context.WorkingDirectory;
+         }
+            
 
          _announcer.Say("Migrating to database type " + runnerContext.Database);
          _announcer.Say("With connection string " + context.ToConnectionString);

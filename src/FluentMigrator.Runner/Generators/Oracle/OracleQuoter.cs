@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.Oracle
@@ -14,6 +11,19 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         public override string CloseQuote { get { return string.Empty; } }
 
+        public override string QuoteValue(object value)
+        {
+           if ( value is Byte[])
+           {
+              return "hextoraw('" + BitConverter.ToString((Byte[])value).Replace("-","") + "')";
+           }
+           return base.QuoteValue(value);
+        }
+
+        public override string FormatDateTime(DateTime value)
+        {
+           return "to_date('" + (value).ToString("yyyy-MM-dd HH:mm:ss") + "', 'YYYY-MM-DD HH24:MI:SS')";
+        }
         
     }
 }

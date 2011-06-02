@@ -162,8 +162,12 @@
     <Compile Include="Integration\OracleUnitTest.cs" />
     <Compile Include="Integration\Processors\PostgresProcessorTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCeProcessorTests.cs" />
+    <Compile Include="Integration\SchemaDump\SchemaDumpTableTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaDumpTests.cs" />
+    <Compile Include="Integration\SchemaDump\SchemaDumpViewTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaTestWriter.cs" />
+    <Compile Include="Unit\Generators\Oracle\OracleQuoterTests.cs" />
+    <Compile Include="Unit\Schema\Migrations\CSharpViewMigrationsWriterTests.cs" />
     <Compile Include="Unit\Schema\Migrations\CSharpTableMigrationsWriterTests.cs" />
     <Compile Include="Integration\SqlServerUnitTest.cs" />
     <Compile Include="Integration\SchemaMigration\SqlServerToOracleMigrationTests.cs" />

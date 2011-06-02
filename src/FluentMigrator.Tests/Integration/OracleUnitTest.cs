@@ -141,7 +141,7 @@ namespace FluentMigrator.Tests.Integration
       {
          Debug.WriteLine("Creating database " + databaseName);
          var query1 = @"CREATE USER " + databaseName + " IDENTIFIED BY " + Password;
-         var query = @"GRANT CONNECT, RESOURCE TO " + databaseName;
+         var query = @"GRANT CONNECT, RESOURCE, CREATE VIEW TO " + databaseName;
 
          using (var con = new OdbcConnection(MasterConnectionString))
          {

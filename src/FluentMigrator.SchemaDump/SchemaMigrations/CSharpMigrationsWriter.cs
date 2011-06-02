@@ -31,29 +31,132 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
          _announcer.Say("Reading database schema");
          var defs = schemaDumper.ReadDbSchema();
 
-         context.MigrationsDirectory = string.IsNullOrEmpty(context.MigrationsDirectory)
-                                           ? Path.GetTempPath() + Guid.NewGuid()
-                                           : context.MigrationsDirectory;
+         SetupMigrationsDirectory(context);
 
-         _announcer.Say("Writing migrations to " + context.MigrationsDirectory);
-
-         Directory.CreateDirectory(context.MigrationsDirectory);
+         int migrations = 0;
 
          for (var index = 0; index < defs.Count; index++)
          {
             var table = defs[index];
-            var csFilename = Path.Combine(context.MigrationsDirectory, context.MigrationClassNamer(index, table) + ".cs");
+
+            // Check if we want to exclude this table
+            if ( context.ExcludeTables.Contains(table.Name))
+            {
+               _announcer.Say("Exluding table " + table.Name);
+               continue;
+            }
+
+            migrations++;
+
+            var migrationsFolder = Path.Combine(context.WorkingDirectory, context.MigrationsDirectory);
+            var csFilename = Path.Combine(migrationsFolder, context.MigrationClassNamer(context.MigrationIndex + migrations, table) + ".cs");
             _announcer.Say("Creating migration " + Path.GetFileName(csFilename));
             using (var writer = new StreamWriter(csFilename))
             {
-               WriteToStream(context, table, index, writer);
+               WriteToStream(context, table, context.MigrationIndex + migrations, writer);
+            }
+
+            if ( context.MigrateData )
+            {
+               var data = schemaDumper.ReadTableData(table.SchemaName, table.Name);
+
+               if (data != null && data.Tables.Count > 0 && data.Tables[0].Rows.Count > 0)
+               {
+                  var dataDirectory = Path.Combine(context.WorkingDirectory, context.DataDirectory);
+                  if (!Directory.Exists(dataDirectory))
+                     Directory.CreateDirectory(dataDirectory);
+                  data.Tables[0].WriteXmlSchema(Path.Combine(dataDirectory, table.Name + ".xsd"));
+                  data.Tables[0].WriteXml(Path.Combine(dataDirectory, table.Name + ".xml"));
+               }
             }
          }
 
-         context.MigrationIndex += defs.Count;
+         context.MigrationIndex += migrations;
+      }
+
+      
+
+      /// <summary>
+      /// Generates FluentMigration C# files based on the views found in <see cref="schemaDumper"/>
+      /// </summary>
+      /// <param name="context">Defines how, what and where the migrations will be generated</param>
+      /// <param name="schemaDumper">The platform specific schema dumper instance to get view information from</param>
+      public void GenerateViewMigrations(SchemaMigrationContext context, ISchemaDumper schemaDumper)
+      {
+         _announcer.Say("Reading views");
+         var defs = schemaDumper.ReadViews();
+
+         SetupMigrationsDirectory(context);
+
+         //TODO: Think about adding custom sort order for view definitions as there may be
+         // dependancies between views.
+         // if ( context.CustomViewSorter != null )
+         //   defs = context.CustomViewSorter(defs);
+
+         int migrations = 0;
+         for (var index = 0; index < defs.Count; index++)
+         {
+            var view = defs[index];
+
+            if ( context.ExcludeViews.Contains(view.Name))
+            {
+               _announcer.Say("Excluding view " + view.Name);
+               continue;
+            }
+
+            migrations++;
+
+            var migrationsFolder = Path.Combine(context.WorkingDirectory, context.MigrationsDirectory);
+            var csFilename = Path.Combine(migrationsFolder, context.MigrationViewClassNamer(context.MigrationIndex + migrations, view) + ".cs");
+
+
+            _announcer.Say("Creating migration " + Path.GetFileName(csFilename));
+            using (var writer = new StreamWriter(csFilename))
+            {
+               WriteToStream(context, view, context.MigrationIndex + migrations, writer);
+            }
+         }
+
+         context.MigrationIndex += migrations;
+      }
+
+      private void SetupMigrationsDirectory(SchemaMigrationContext context)
+      {
+         if (string.IsNullOrEmpty(context.WorkingDirectory))
+            context.WorkingDirectory = Path.GetTempPath() + Guid.NewGuid();
+
+         context.MigrationsDirectory = string.IsNullOrEmpty(context.MigrationsDirectory)
+                                          ? @".\Migrations"
+                                          : context.MigrationsDirectory;
+
+         var migrationsPath = Path.Combine(context.WorkingDirectory, context.MigrationsDirectory);
+         if (!Directory.Exists(migrationsPath))
+            Directory.CreateDirectory(migrationsPath);
+
+         _announcer.Say("Writing migrations to " + migrationsPath);
+
+         Directory.CreateDirectory(context.MigrationsDirectory);
       }
 
       public void WriteToStream(SchemaMigrationContext context, TableDefinition table, int migration, StreamWriter output)
+      {
+         WriteMigration(output, context, migration
+            , () => context.MigrationClassNamer(migration, table)
+            ,() => WriteTable(context, table, output)
+            , () => WriteDeleteTable(table, output));
+      }
+
+     
+
+      public void WriteToStream(SchemaMigrationContext context, ViewDefinition view, int migration, StreamWriter output)
+      {
+         WriteMigration(output, context, migration
+            , () => context.MigrationViewClassNamer(migration, view)
+            , () => WriteView(context, view, output)
+            , () => WriteDeleteView(context, view, output));
+      }
+
+      private void WriteMigration(StreamWriter output, SchemaMigrationContext context, int migration, Func<string> generateName, Action upStatement, Action downStatement)
       {
          //start writing a migration file
          output.WriteLine("using System;");
@@ -62,19 +165,19 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
          output.WriteLine("namespace {0}", context.DefaultMigrationNamespace);
          output.WriteLine("{");
          output.WriteLine("\t[Migration({0})]", migration);
-         output.WriteLine("\tpublic class {0} : Migration", context.MigrationClassNamer(migration, table));
+         output.WriteLine("\tpublic class {0} : Migration", generateName());
          output.WriteLine("\t{");
          output.WriteLine("\t\tpublic override void Up()");
          output.WriteLine("\t\t{");
 
-         WriteTable(context, table, output);
+         upStatement();
 
          output.WriteLine("\t\t}"); //end Up method
 
          output.WriteLine("\t\tpublic override void Down()");
          output.WriteLine("\t\t{");
 
-         WriteDeleteTable(table, output);
+         downStatement();
 
          output.WriteLine("\t\t}"); //end Down method
          output.WriteLine("\t}"); //end class
@@ -89,12 +192,60 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
          {
             WriteColumn(context, column, output, column == table.Columns.Last());
          }
+         if ( context.MigrateData)
+         {
+            output.Write(string.Format("\t\t\tInsert.IntoTable(\"{0}\").DataTable(@\"{1}\\{0}.xml\")",table.Name, context.DataDirectory));
+
+            // Check if the column contains an identity column
+            if ( table.Columns.Where(c => c.IsIdentity).Count() == 1 )
+            {
+               // It does lets add on extra handling for inserting the identity value into the destination database
+               output.Write(".WithIdentity()");
+            }
+              
+            output.Write(";");
+         }
       }
 
       protected static void WriteDeleteTable(TableDefinition table, StreamWriter output)
       {
          //Delete.Table("Bar");
          output.WriteLine("\t\t\tDelete.Table(\"" + table.Name + "\");");
+      }
+
+      protected void WriteView(SchemaMigrationContext context, ViewDefinition view, StreamWriter output)
+      {
+         var scriptsDirectory = Path.Combine(context.WorkingDirectory, context.ScriptsDirectory);
+         var scriptFile = Path.Combine(scriptsDirectory, string.Format("CreateView{0}_SqlServer.sql", view.Name));
+         if ( !File.Exists(scriptFile))
+         {
+            if (!Directory.Exists(scriptsDirectory))
+               Directory.CreateDirectory(scriptsDirectory);
+            File.WriteAllText(scriptFile, view.CreateViewSql);
+         }
+         output.WriteLine("\t\t\tExecute.WithDatabaseType(DatabaseType.SqlServer).Script(@\"{0}\");",  Path.Combine(context.ScriptsDirectory, Path.GetFileName(scriptFile)));
+
+         foreach (var databaseType in context.GenerateAlternateMigrationsFor)
+         {
+            if (!context.ViewConvertor.ContainsKey(databaseType)) continue;
+
+            var alterternateScriptFile = Path.Combine(scriptsDirectory, string.Format("CreateView{0}_{1}.sql", view.Name, databaseType));
+            if (!File.Exists(alterternateScriptFile))
+            {
+               File.WriteAllText(alterternateScriptFile, context.ViewConvertor[databaseType](view));
+            }
+            output.WriteLine("\t\t\tExecute.WithDatabaseType(DatabaseType.{0}).Script(@\"{1}\");", databaseType, Path.Combine(context.ScriptsDirectory, Path.GetFileName(alterternateScriptFile)));
+         }
+      }
+
+      protected static void WriteDeleteView(SchemaMigrationContext context, ViewDefinition view, StreamWriter output)
+      {
+         output.WriteLine("\t\t\tExecute.WithDatabaseType(DatabaseType.SqlServer).Sql(\"DROP VIEW [{0}].[{1}]\");", view.SchemaName, view.Name);
+
+         foreach (var databaseType in context.GenerateAlternateMigrationsFor)
+         {
+            output.WriteLine("\t\t\tExecute.WithDatabaseType(DatabaseType.{0}).Sql(\"DROP VIEW {1}\");", databaseType, view.Name);
+         }
       }
 
       protected void WriteColumn(SchemaMigrationContext context, ColumnDefinition column, StreamWriter output, bool isLastColumn)
@@ -222,5 +373,7 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
          
          columnSyntax.AppendFormat(".WithDefaultValue({0})", defaultValue);
       }
+
+      
    }
 }

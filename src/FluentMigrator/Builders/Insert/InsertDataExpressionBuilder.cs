@@ -16,8 +16,11 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data;
+using System.Linq;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 
@@ -38,7 +41,28 @@ namespace FluentMigrator.Builders.Insert
 			return this;
 		}
 
-		public IInsertDataSyntax InSchema(string schemaName)
+      public IInsertDataSyntax DataTable(string pathToDataTable)
+      {
+         _expression.DataTableFile = pathToDataTable;
+         _expression.InsertRowsSeparately = true;
+         return this;
+      }
+
+	   public IInsertDataSyntax InsertRowsSeparately()
+	   {
+         _expression.InsertRowsSeparately = true;
+
+         return this;
+	   }
+
+	   public IInsertDataSyntax WithIdentity()
+	   {
+	      _expression.WithIdentity = true;
+
+	      return this;
+	   }
+
+	   public IInsertDataSyntax InSchema(string schemaName)
 		{
 			_expression.SchemaName = schemaName;
 			return this;
@@ -53,5 +77,7 @@ namespace FluentMigrator.Builders.Insert
 				data.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(dataAsAnonymousType)));
 			return data;
 		}
+
+     
 	}
 }

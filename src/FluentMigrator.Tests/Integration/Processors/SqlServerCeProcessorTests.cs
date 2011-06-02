@@ -210,12 +210,11 @@ namespace FluentMigrator.Tests.Integration.Processors
          });
 
          var insert = new InsertDataExpression {TableName = "Foo"};
-         insert.Rows.Add(new InsertionDataDefinition() { new KeyValuePair<string, object>("Bar", 12)});
+         insert.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("Bar", 12)});
          _processor.Process(insert);
       }
 
       [Test]
-      [ExpectedException(typeof(Exception))]
       public void CanInsertMultipleRowsIntoTable()
       {
          _processor.Process(new CreateTableExpression
@@ -225,8 +224,8 @@ namespace FluentMigrator.Tests.Integration.Processors
          });
 
          var insert = new InsertDataExpression { TableName = "Foo" };
-         insert.Rows.Add(new InsertionDataDefinition() { new KeyValuePair<string, object>("Bar", 41) });
-         insert.Rows.Add(new InsertionDataDefinition() { new KeyValuePair<string, object>("Bar", 42) });
+         insert.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("Bar", 41) });
+         insert.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("Bar", 42) });
          _processor.Process(insert);
       }
 
@@ -239,20 +238,20 @@ namespace FluentMigrator.Tests.Integration.Processors
             Columns = { new ColumnDefinition { Name = "Bar", Type = DbType.Decimal } }
          });
 
-         var index = new CreateIndexExpression()
+         var index = new CreateIndexExpression
                         {
-                           Index = new IndexDefinition()
+                           Index = new IndexDefinition
                                       {
                                          TableName = "Foo"
                                          ,Name = "IDX_Bar"
-                                         ,Columns = new[] {new IndexColumnDefinition() {Name = "Bar"}}
+                                         ,Columns = new[] {new IndexColumnDefinition {Name = "Bar"}}
                                       }
                         };
          _processor.Process(index);
 
-         var dropIndex = new DeleteIndexExpression()
-                           {
-                              Index = new IndexDefinition()
+         var dropIndex = new DeleteIndexExpression
+                            {
+                              Index = new IndexDefinition
                                          {
                                             TableName = "Foo"
                                             ,Name = "IDX_Bar"
@@ -275,8 +274,8 @@ namespace FluentMigrator.Tests.Integration.Processors
                }
          });
 
-         _processor.Process(new DeleteColumnExpression()
-         {
+         _processor.Process(new DeleteColumnExpression
+                               {
             TableName = "Foo"
             , ColumnName = "Buzz"
          });

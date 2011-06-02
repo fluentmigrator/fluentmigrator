@@ -107,9 +107,34 @@ namespace FluentMigrator.Runner.Processors
 			Process(Generator.Generate(expression));
 		}
 
-		public void Process(InsertDataExpression expression)
+		public virtual void Process(InsertDataExpression expression)
 		{
-			Process(Generator.Generate(expression));
+         if (expression.Rows != null && expression.Rows.Count == 0)
+         {
+            Announcer.Say("No data for " + expression.TableName);
+            return;
+         }
+            
+         // Check if require rows to be inserted separately
+         // This may be required as this is a large dataset or the processor doe snot support inserting multiple
+         if (expression.InsertRowsSeparately && expression.Rows != null && expression.Rows.Count > 1)
+         {
+            
+            foreach (var row in expression.Rows)
+            {
+               var insert = new InsertDataExpression()
+                               {
+                                  DataTableFile = expression.DataTableFile
+                                  ,SchemaName = expression.SchemaName
+                                  ,TableName = expression.TableName
+                                  ,WithIdentity = expression.WithIdentity
+                };
+                insert.Rows.Add(row);
+                Process(Generator.Generate(insert));
+            }
+         }
+         else
+   			Process(Generator.Generate(expression));
 		}
 
 		public void Process(DeleteDataExpression expression)

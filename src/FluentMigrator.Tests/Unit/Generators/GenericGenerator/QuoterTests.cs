@@ -34,9 +34,15 @@ namespace FluentMigrator.Tests.Unit.Generators
         }
 
         [Test]
+        public void CanQuoteBinaryArray()
+        {
+           quoter.QuoteValue(System.Text.Encoding.ASCII.GetBytes("Foo")).ShouldBe("0x466F6F");
+        }
+
+        [Test]
         public void CanEscapeAString()
         {
-            quoter.Quote("Test\"String").ShouldBe("\"Test\"\"String\"");
+           quoter.Quote("Test\"String").ShouldBe("\"Test\"\"String\"");
         }
 
         [Test]

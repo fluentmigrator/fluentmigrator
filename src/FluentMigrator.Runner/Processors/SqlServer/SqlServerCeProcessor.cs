@@ -210,7 +210,14 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 expression.Operation(Connection, Transaction);
         }
 
-        protected string FormatSqlEscape(string sql)
+        public override void Process(Expressions.InsertDataExpression expression)
+        {
+           // Always insert rows separately as SQL CE does not support combining multiple insert statements
+           expression.InsertRowsSeparately = true;
+           base.Process(expression);
+        }
+
+      protected string FormatSqlEscape(string sql)
         {
            return !string.IsNullOrEmpty(sql) ? sql.Replace("'", "''") : string.Empty;
         }

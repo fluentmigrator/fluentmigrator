@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
@@ -29,6 +30,7 @@ using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.SchemaDump.SchemaMigrations;
 using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Integration.SchemaMigration
 {
@@ -91,7 +93,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
 
 
          // Act
-         MigrateTable(GetDefaultSettings(), create);
+         MigrateTable(GetDefaultContext(), create);
          
       }
 
@@ -120,7 +122,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
 
 
          // Act
-         MigrateTable(GetDefaultSettings(), create);
+         MigrateTable(GetDefaultContext(), create);
 
       }
 
@@ -142,10 +144,11 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          };
 
          // Act
-         MigrateTable(GetDefaultSettings(), create);
+         MigrateTable(GetDefaultContext(), create);
 
       }
 
+      
       [Test]
       public void CanMigrateDecimal()
       {
@@ -165,7 +168,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          };
 
          // Act
-         MigrateTable(GetDefaultSettings(), create);
+         MigrateTable(GetDefaultContext(), create);
 
       }
 
@@ -197,7 +200,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
 
 
          // Act
-         MigrateTable(GetDefaultSettings(), create);
+         MigrateTable(GetDefaultContext(), create);
 
       }
 
@@ -217,7 +220,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
                     }
          };
 
-         var settings = GetDefaultSettings();
+         var settings = GetDefaultContext();
          // Modify the context so that invalid class name returned
          // ... in this case make is start with numeric
          settings.MigrationClassNamer = (index, table) => "1";
@@ -228,38 +231,286 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
 
       }
 
-      private void MigrateTable(SchemaMigrationContext context, CreateTableExpression create)
+      [Test]
+      public void CanMigrateTableAndView()
+      {
+         // Arrange
+
+         var create = new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = new[]{
+                   new ColumnDefinition {Name = "Id", Type = DbType.Int32 }
+                    }
+         };
+
+         var context = GetDefaultContext();
+         context.GenerateAlternateMigrationsFor.Add(DatabaseType.Oracle);
+
+         // Act
+         CreateTables(create);
+         CreateViews(new ViewDefinition { Name = "FooView", CreateViewSql = "CREATE VIEW FooView AS SELECT * FROM Foo" });
+         MigrateTable(context);
+
+         // Assert
+         AssertOracleTablesExist(create);
+
+         context.MigrationIndex.ShouldBe(2);
+      }
+
+      [Test]
+      public void CanExcludeTable()
+      {
+         // Arrange
+
+         var create = new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = new[]{
+                   new ColumnDefinition {Name = "Id", Type = DbType.Int32 }
+                    }
+         };
+
+         var context = GetDefaultContext();
+         context.GenerateAlternateMigrationsFor.Add(DatabaseType.Oracle);
+         context.ExcludeTables.Add("Foo");
+
+         // Act
+         CreateTables(create);
+         MigrateTable(context);
+
+         // Assert
+         context.MigrationIndex.ShouldBe(0);
+      }
+
+      [Test]
+      public void CanMigrateTableAndExcludeView()
+      {
+         // Arrange
+
+         var create = new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = new[]{
+                   new ColumnDefinition {Name = "Id", Type = DbType.Int32 }
+                    }
+         };
+
+         var context = GetDefaultContext();
+         context.GenerateAlternateMigrationsFor.Add(DatabaseType.Oracle);
+         context.ExcludeViews.Add("FooView");
+
+         // Act
+         CreateTables(create);
+         CreateViews(new ViewDefinition { Name = "FooView", CreateViewSql = "CREATE VIEW FooView AS SELECT * FROM Foo" });
+         MigrateTable(context);
+
+         // Assert
+         AssertOracleTablesExist(create);
+
+         context.MigrationIndex.ShouldBe(1);
+      }
+
+      [Test]
+      public void CanMigrateTableData()
+      {
+         // Arrange
+
+         var create = new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = new[]{
+                   new ColumnDefinition {Name = "Id", Type = DbType.Int32 }
+                    }
+         };
+
+         var row = new InsertDataExpression()
+                      {
+                         TableName = "Foo"
+                      };
+         row.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("Id", 1)});
+
+         var context = GetDefaultContext();
+         context.GenerateAlternateMigrationsFor.Add(DatabaseType.Oracle);
+         context.ExcludeViews.Add("FooView");
+         context.MigrateData = true;
+
+         // Act
+         CreateTables(create);
+         
+         InsertData(row);
+         CreateViews(new ViewDefinition { Name = "FooView", CreateViewSql = "CREATE VIEW FooView AS SELECT * FROM Foo" });
+         MigrateTable(context);
+         var data = GetOracleTableData("Foo");
+
+         // Assert
+         AssertOracleTablesExist(create);
+
+         context.MigrationIndex.ShouldBe(1);
+         data.Tables[0].Rows.Count.ShouldBe(1);
+      }
+
+      [Test]
+      public void CanMigrateTableWithDate()
+      {
+         // Arrange
+
+         var create = new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = new[]{
+                   new ColumnDefinition {Name = "Test", Type = DbType.DateTime }
+                    }
+         };
+
+         var row = new InsertDataExpression()
+         {
+            TableName = "Foo"
+         };
+         row.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("Test", DateTime.Now) });
+
+         var context = GetDefaultContext();
+         context.GenerateAlternateMigrationsFor.Add(DatabaseType.Oracle);
+         context.MigrateData = true;
+
+         // Act
+         CreateTables(create);
+
+         InsertData(row);
+         MigrateTable(context);
+         var data = GetOracleTableData("Foo");
+
+         // Assert
+         AssertOracleTablesExist(create);
+
+         context.MigrationIndex.ShouldBe(1);
+         data.Tables[0].Rows.Count.ShouldBe(1);
+      }
+
+      [Test]
+      public void CanMigrateTableDataWithIdentity()
+      {
+         // Arrange
+
+         var create = new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = new[]{
+                   new ColumnDefinition {Name = "Id", Type = DbType.Int32, IsIdentity = true}
+                    }
+         };
+
+         var row = new InsertDataExpression()
+         {
+            TableName = "Foo"
+         };
+         row.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("Id", 1) });
+         row.WithIdentity = true;
+
+         var context = GetDefaultContext();
+         context.GenerateAlternateMigrationsFor.Add(DatabaseType.Oracle);
+         context.ExcludeViews.Add("FooView");
+         context.MigrateData = true;
+
+         // Act
+         CreateTables(create);
+
+         InsertData(row);
+         CreateViews(new ViewDefinition { Name = "FooView", CreateViewSql = "CREATE VIEW FooView AS SELECT * FROM Foo" });
+         MigrateTable(context);
+         var data = GetOracleTableData("Foo");
+
+         // Assert
+         AssertOracleTablesExist(create);
+
+         context.MigrationIndex.ShouldBe(1);
+         data.Tables[0].Rows.Count.ShouldBe(1);
+      }
+
+      private void InsertData(InsertDataExpression row)
       {
          using (var connection = new SqlConnection(sqlContext.ConnectionString))
          {
             var processor = new SqlServerProcessor(connection, new SqlServer2005Generator(), new DebugAnnouncer(), new ProcessorOptions());
 
-            processor.Process(create);
-
-            Assert.IsTrue(processor.TableExists(string.Empty, create.TableName), "SqlServer");
+            processor.Process(row);
 
             processor.CommitTransaction();
          }
+      }
+
+      private void MigrateTable(SchemaMigrationContext context, params CreateTableExpression[] createTables)
+      {
+         CreateTables(createTables);
 
          var migrator = new SqlServerSchemaMigrator(new DebugAnnouncer());
 
          migrator.Migrate(context);
 
-         var oracleProcessor = new OracleProcessorFactory().Create(oracleContext.ConnectionString, new NullAnnouncer(),
-                                             new ProcessorOptions());
-
-         // Assert
-         Assert.IsTrue(oracleProcessor.TableExists(string.Empty, create.TableName), "Oracle");
+         AssertOracleTablesExist(createTables);
       }
 
-      private SchemaMigrationContext GetDefaultSettings()
+      private void AssertOracleTablesExist(params CreateTableExpression[] createTables)
+      {
+         if (createTables == null)
+            return;
+         var oracleProcessor = new OracleProcessorFactory().Create(oracleContext.ConnectionString, new NullAnnouncer(),
+                                                                   new ProcessorOptions());
+
+         foreach ( var create in createTables)
+            Assert.IsTrue(oracleProcessor.TableExists(string.Empty, create.TableName), "Oracle");   
+      }
+
+      private DataSet GetOracleTableData(string tableName)
+      {
+         var oracleProcessor = new OracleProcessorFactory().Create(oracleContext.ConnectionString, new NullAnnouncer(),
+                                                                   new ProcessorOptions());
+
+         return oracleProcessor.ReadTableData(string.Empty, tableName);
+      }
+
+      private void CreateTables(params CreateTableExpression[] createTables)
+      {
+         if (createTables == null)
+            return;
+
+         using (var connection = new SqlConnection(sqlContext.ConnectionString))
+         {
+            var processor = new SqlServerProcessor(connection, new SqlServer2005Generator(), new DebugAnnouncer(), new ProcessorOptions());
+
+            foreach (var create in createTables)
+            {
+               processor.Process(create);
+               Assert.IsTrue(processor.TableExists(string.Empty, create.TableName), "SqlServer " + create.TableName);
+            }
+
+            processor.CommitTransaction();
+         }
+      }
+
+      private void CreateViews(params ViewDefinition[] view)
+      {
+         using (var connection = new SqlConnection(sqlContext.ConnectionString))
+         {
+            var processor = new SqlServerProcessor(connection, new SqlServer2005Generator(), new DebugAnnouncer(), new ProcessorOptions());
+
+            foreach (var viewDefinition in view)
+            {
+               processor.Execute(viewDefinition.CreateViewSql);
+            }
+
+            processor.CommitTransaction();
+         }
+      }
+
+      private SchemaMigrationContext GetDefaultContext()
       {
          return new SchemaMigrationContext
                    {
                       FromConnectionString = sqlContext.ConnectionString
                       , ToDatabaseType = DatabaseType.Oracle
                       , ToConnectionString = oracleContext.ConnectionString
-                      , MigrationsDirectory = _tempDirectory
+                      , WorkingDirectory = _tempDirectory
                    };
       }
    }

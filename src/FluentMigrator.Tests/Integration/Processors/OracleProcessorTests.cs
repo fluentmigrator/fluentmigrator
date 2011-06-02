@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -126,6 +127,90 @@ namespace FluentMigrator.Tests.Integration.Processors
          {
             TableName = "Foo",
             Rows = { new InsertionDataDefinition() { new KeyValuePair<string, object>("Id", 1) } }
+         });
+
+         var table = _processor.ReadTableData(string.Empty, "Foo");
+
+         table.Tables[0].Rows.Count.ShouldBe(1);
+      }
+
+      [Test]
+      public void CanInsertAndReadDateFromTestTable()
+      {
+         _processor.Process(new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = { new ColumnDefinition { Name = "Test", Type = DbType.DateTime } }
+         });
+
+         var testDate = DateTime.ParseExact("2011-12-31 22:59", "yyyy-MM-dd HH:mm", null);
+         _processor.Process(new InsertDataExpression()
+         {
+            TableName = "Foo",
+            Rows = { new InsertionDataDefinition() { new KeyValuePair<string, object>("Test", testDate) } }
+         });
+
+         var table = _processor.ReadTableData(string.Empty, "Foo");
+
+         table.Tables[0].Rows.Count.ShouldBe(1);
+         table.Tables[0].Rows[0][0].ShouldBe(testDate);
+      }
+
+      [Test]
+      public void CanInsertMultipleRowsSeparately()
+      {
+         CreateTestTable();
+
+         _processor.Process(new InsertDataExpression()
+                               {
+                                  TableName = "Foo",
+                                  Rows =
+                                     {
+                                        new InsertionDataDefinition() {new KeyValuePair<string, object>("Id", 1)}
+                                        ,new InsertionDataDefinition() {new KeyValuePair<string, object>("Id", 2)}
+                                     }
+                                  ,InsertRowsSeparately = true
+         });
+
+         var table = _processor.ReadTableData(string.Empty, "Foo");
+
+         Assert.AreEqual(2, table.Tables[0].Rows.Count);
+      }
+
+      [Test]
+      public void CanInsertWithIdentity()
+      {
+         CreateTestTableWithIdentity();
+
+         _processor.Process(new InsertDataExpression()
+         {
+            TableName = "Foo"
+            , Rows = { new InsertionDataDefinition() { new KeyValuePair<string, object>("Id", 1) }}
+            , WithIdentity = true
+         });
+
+         var table = _processor.ReadTableData(string.Empty, "Foo");
+
+         Assert.AreEqual(1, table.Tables[0].Rows.Count);
+
+         var nextVal = _processor.Read("SELECT FOOSEQ.nextval from dual");
+
+         Assert.AreEqual(2, nextVal.Tables[0].Rows[0][0], "Next Val");
+      }
+
+      [Test]
+      public void CanInsertBinaryData()
+      {
+         _processor.Process(new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = { new ColumnDefinition { Name = "Data", Type = DbType.Binary, Size = 2000} }
+         });
+
+         _processor.Process(new InsertDataExpression()
+         {
+            TableName = "Foo"
+            ,Rows = { new InsertionDataDefinition() { new KeyValuePair<string, object>("Data", System.Text.Encoding.ASCII.GetBytes("HELLO WORLD")) } }
          });
 
          var table = _processor.ReadTableData(string.Empty, "Foo");
@@ -477,6 +562,15 @@ namespace FluentMigrator.Tests.Integration.Processors
          {
             TableName = "Foo",
             Columns = { new ColumnDefinition { Name = "Id", Type = DbType.Int32 } }
+         });
+      }
+
+      private void CreateTestTableWithIdentity()
+      {
+         _processor.Process(new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = { new ColumnDefinition { Name = "Id", Type = DbType.Int32, IsIdentity = true} }
          });
       }
 

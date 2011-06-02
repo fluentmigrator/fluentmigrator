@@ -16,7 +16,11 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
+using System.Linq;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
@@ -27,12 +31,27 @@ namespace FluentMigrator.Expressions
 		public string SchemaName { get; set; }
 		public string TableName { get; set; }
 
+      /// <summary>
+      /// The name of the data table to obtain data from
+      /// </summary>
+      public string DataTableFile { get; set; }
+
+      /// <summary>
+      /// <para>If <c>True</c> then each insert statement should be individualy inserted as part of the migration.</para> 
+      /// <para> If <c>False</c> then processors can combine mluiple inserts into a single insert</para> 
+      /// </summary>
+      public bool InsertRowsSeparately { get; set; }
+
+      /// <summary>
+      /// Determines if handling indentity insert is required
+      /// </summary>
+      public bool WithIdentity { get; set; }
+
 		public List<InsertionDataDefinition> Rows
 		{
 			get { return _rows; }
 		}
-
-		public void CollectValidationErrors(ICollection<string> errors)
+	   public void CollectValidationErrors(ICollection<string> errors)
 		{
 		}
 
@@ -62,6 +81,39 @@ namespace FluentMigrator.Expressions
 
 		public void ApplyConventions(IMigrationConventions conventions)
 		{
+         if ( ! string.IsNullOrEmpty(DataTableFile))
+         {
+            Rows.AddRange(GetData(Path.Combine(conventions.GetWorkingDirectory(), DataTableFile)));
+         }
 		}
+
+       private static IEnumerable<InsertionDataDefinition> GetData(string pathToDataTable)
+      {
+         var data = new List<InsertionDataDefinition>();
+
+         if (!File.Exists(pathToDataTable))
+            return data;
+
+          var xsd = pathToDataTable.Replace(".xml", ".xsd");
+
+          if (!File.Exists(xsd))
+             return data;
+
+         var dataSet = new DataSet();
+          dataSet.ReadXmlSchema(xsd);
+          dataSet.ReadXml(pathToDataTable);
+
+          var dataAsDataTable = dataSet.Tables[0];
+
+         foreach (DataRow dr in dataAsDataTable.Rows)
+         {
+            var dataRow = new InsertionDataDefinition();
+            dataRow.AddRange(from DataColumn column in dataAsDataTable.Columns
+                             select new KeyValuePair<string, object>(column.ColumnName, dr[column.ColumnName]));
+            data.Add(dataRow);
+         }
+            
+         return data;
+      }
 	}
 }

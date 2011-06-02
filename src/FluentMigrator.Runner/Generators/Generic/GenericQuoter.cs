@@ -23,7 +23,10 @@ namespace FluentMigrator.Runner.Generators.Generic
             if (value is double) {return FormatDouble((double)value);}
             if (value is float) {return FormatFloat((float)value);}
             if (value is decimal) { return FormatDecimal((decimal)value); }
-            
+            if (value is Byte[])
+            {
+               return "0x" + BitConverter.ToString((Byte[])value).Replace("-", "");
+            }
             return value.ToString();
         }
 

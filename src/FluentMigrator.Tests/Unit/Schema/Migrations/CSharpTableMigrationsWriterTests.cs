@@ -6,7 +6,6 @@ using FluentMigrator.Model;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.SchemaDump.SchemaDumpers;
 using FluentMigrator.SchemaDump.SchemaMigrations;
-using FluentMigrator.Tests.Integration;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
@@ -14,22 +13,27 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Unit.Schema.Migrations
 {
    [TestFixture]
-   public class CSharpTableMigrationsWriterTests : SqlServerUnitTest
+   public class CSharpTableMigrationsWriterTests 
    {
       private string _tempDirectory;
+      private DataSet _testData;
 
       [SetUp]
-      public override void Setup()
+      public void Setup()
       {
-         base.Setup();
          _tempDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
          Directory.CreateDirectory(_tempDirectory);
+
+         _testData = new DataSet();
+         var table = new DataTable("Foo");
+         table.Columns.Add(new DataColumn("Id", typeof (int)));
+         table.Rows.Add(1);
+         _testData.Tables.Add(table);
       }
 
       [TearDown]
-      public override void TearDown()
+      public void TearDown()
       {
-         base.TearDown();
          Directory.Delete(_tempDirectory, true);
       }
 
@@ -62,7 +66,116 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          var settings = GenerateTableMigrations(tableDefinitions);
 
          // Assert
-         Assert.IsTrue(File.Exists(Path.Combine(_tempDirectory, "Test.cs")));
+         Assert.IsTrue(File.Exists(Path.Combine(_tempDirectory, @"Migrations\Test.cs")));
+         Assert.AreEqual(1, settings.MigrationIndex);
+      }
+
+      [Test]
+      public void DataFileCreated()
+      {
+         // Arrange
+         var tableDefinitions = new List<TableDefinition>
+                                   {
+                                      new TableDefinition
+                                         {
+                                            Name = "Foo",
+                                            Columns = new[] {new ColumnDefinition {Name = "Id", Type = DbType.Int32}}
+                                         }
+                                   };
+
+         
+         var settings = GetDefaultContext();
+         settings.MigrateData = true;
+         settings.WorkingDirectory = _tempDirectory;
+
+         // Act
+         GenerateTableMigrations(settings,tableDefinitions);
+
+         // Assert
+         var migration = File.ReadAllText(Path.Combine(_tempDirectory, @"Migrations\Test.cs"));
+
+         File.Exists(Path.Combine(_tempDirectory, @"Data\Foo.xml")).ShouldBeTrue();
+         File.Exists(Path.Combine(_tempDirectory, @"Data\Foo.xsd")).ShouldBeTrue();
+         migration.Contains("Insert.IntoTable(\"Foo\").DataTable(@\"Data\\Foo.xml\");").ShouldBeTrue();
+      }
+
+      [Test]
+      public void DataFileNotCreatedIfNoRows()
+      {
+         // Arrange
+         var tableDefinitions = new List<TableDefinition>
+                                   {
+                                      new TableDefinition
+                                         {
+                                            Name = "Foo",
+                                            Columns = new[] {new ColumnDefinition {Name = "Id", Type = DbType.Int32}}
+                                         }
+                                   };
+         var settings = GetDefaultContext();
+         settings.MigrateData = true;
+         settings.WorkingDirectory = _tempDirectory;
+         _testData.Tables[0].Rows.Clear();
+
+         // Act
+         GenerateTableMigrations(settings, tableDefinitions);
+
+         // Assert
+         var migration = File.ReadAllText(Path.Combine(_tempDirectory, @"Migrations\Test.cs"));
+
+         File.Exists(Path.Combine(_tempDirectory, @"Data\Foo.xml")).ShouldBeFalse();
+         File.Exists(Path.Combine(_tempDirectory, @"Data\Foo.xsd")).ShouldBeFalse();
+         migration.Contains("Insert.IntoTable(\"Foo\").DataTable(@\"Data\\Foo.xml\");").ShouldBeTrue();
+      }
+
+      [Test]
+      public void MigrateToIdentityToOracle()
+      {
+         var tableDefinitions = new List<TableDefinition>
+                                   {
+                                      new TableDefinition
+                                         {
+                                            Name = "Foo",
+                                            Columns = new[] {new ColumnDefinition
+                                                                {
+                                                                   Name = "Id", Type = DbType.Int32
+                                                                   , IsIdentity = true
+                                                                }}
+                                         }
+                                   };
+
+         // Arrange
+         var settings = GetDefaultContext();
+         settings.MigrateData = true;
+         settings.WorkingDirectory = _tempDirectory;
+         settings.GenerateAlternateMigrationsFor.Add(DatabaseType.Oracle);
+         GenerateTableMigrations(settings, tableDefinitions);
+
+         // Assert
+         var migration = File.ReadAllText(Path.Combine(_tempDirectory, @"Migrations\Test.cs"));
+
+         migration.Contains("Insert.IntoTable(\"Foo\").DataTable(@\"Data\\Foo.xml\").WithIdentity();").ShouldBeTrue();
+      }
+
+      [Test]
+      public void TestMigrationDataImport()
+      {
+         var tableDefinitions = new List<TableDefinition>
+                                   {
+                                      new TableDefinition
+                                         {
+                                            Name = "Foo",
+                                            Columns = new[] {new ColumnDefinition {Name = "Id", Type = DbType.Int32}}
+                                         }
+                                   };
+
+         // Arrange
+         var settings = GetDefaultContext();
+         settings.MigrateData = true;
+         GenerateTableMigrations(settings, tableDefinitions);
+
+         // Assert
+         var dataDirectory = Path.Combine(settings.WorkingDirectory, settings.DataDirectory);
+         Assert.IsTrue(File.Exists(Path.Combine(dataDirectory, "Foo.xml")));
          Assert.AreEqual(1, settings.MigrationIndex);
       }
 
@@ -85,7 +198,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.Int32, IsIdentity = true } });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.Int32, IsIdentity = true });
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsInt32().Identity()").ShouldBeTrue();
@@ -97,7 +210,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.Int32, IsIndexed = true} });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.Int32, IsIndexed = true});
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsInt32().Indexed()").ShouldBeTrue();
@@ -109,7 +222,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.Binary, Size = 20 } });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.Binary, Size = 20 });
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsBinary(20)").ShouldBeTrue();
@@ -121,7 +234,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.Boolean } });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.Boolean });
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsBoolean()").ShouldBeTrue();
@@ -133,7 +246,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.Byte } });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.Byte });
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsByte()").ShouldBeTrue();
@@ -145,7 +258,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.Currency } });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.Currency });
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsCurrency()").ShouldBeTrue();
@@ -157,7 +270,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.Date } });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.Date });
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsDate()").ShouldBeTrue();
@@ -169,7 +282,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.DateTime } });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.DateTime });
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsDateTime()").ShouldBeTrue();
@@ -181,7 +294,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.DateTime, DefaultValue = "'1900-01-01'"} });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.DateTime, DefaultValue = "'1900-01-01'"});
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsDateTime().WithDefaultValue(\"TO_DATE('1900-01-01', 'YYYY-MM-DD')\")").ShouldBeTrue();
@@ -191,15 +304,11 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
       public void WithColumnDateTimeAndDefaultCustomFormat()
       {
          // Arrange
-         var settings = new SchemaMigrationContext
-                           {
-                              MigrationsDirectory = _tempDirectory
-                              ,MigrationClassNamer = (index, table) => "Test"
-                              , DateTimeDefaultValueFormatter = (columnDefinition, defaultValue) => "XXX"
-                           };
+         var settings = GetDefaultContext();
+         settings.DateTimeDefaultValueFormatter = (columnDefinition, defaultValue) => "XXX";
 
          // Act
-         var migration = GetTestMigration(settings, new[] { new ColumnDefinition { Name = "Id", Type = DbType.DateTime, DefaultValue = "'1900-01-01'" } });
+         var migration = GetTestMigration(settings, new ColumnDefinition { Name = "Id", Type = DbType.DateTime, DefaultValue = "'1900-01-01'" });
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsDateTime().WithDefaultValue(XXX)").ShouldBeTrue();
@@ -211,7 +320,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.Double } });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.Double });
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsDouble()").ShouldBeTrue();
@@ -223,7 +332,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.Decimal, Precision = 19, Scale = 4} });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.Decimal, Precision = 19, Scale = 4});
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsDecimal(19,4)").ShouldBeTrue();
@@ -235,7 +344,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.Guid } });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.Guid });
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsGuid()").ShouldBeTrue();
@@ -247,7 +356,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.Guid, DefaultValue = SystemMethods.NewGuid} });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.Guid, DefaultValue = SystemMethods.NewGuid});
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsGuid().WithDefaultValue(SystemMethods.NewGuid)").ShouldBeTrue();
@@ -259,7 +368,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.Int16 } });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.Int16 });
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsInt16()").ShouldBeTrue();
@@ -271,7 +380,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.Int32 } });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.Int32 });
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsInt32()").ShouldBeTrue();
@@ -283,7 +392,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.Int64 } });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.Int64 });
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsInt64()").ShouldBeTrue();
@@ -295,7 +404,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.String } });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.String });
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsString()").ShouldBeTrue();
@@ -307,7 +416,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.String, Size = 20} });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.String, Size = 20});
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsString(20)").ShouldBeTrue();
@@ -319,7 +428,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.AnsiStringFixedLength, Size = 20 } });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.AnsiStringFixedLength, Size = 20 });
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsFixedLengthAnsiString(20)").ShouldBeTrue();
@@ -331,7 +440,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.StringFixedLength, Size = 20 } });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.StringFixedLength, Size = 20 });
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsFixedLengthString(20)").ShouldBeTrue();
@@ -343,7 +452,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.AnsiString } });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.AnsiString });
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsAnsiString()").ShouldBeTrue();
@@ -355,7 +464,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.AnsiString, Size = 20 } });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.AnsiString, Size = 20 });
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsAnsiString(20)").ShouldBeTrue();
@@ -367,24 +476,18 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Arrange
 
          // Act
-         var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Id", Type = DbType.Xml } });
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Id", Type = DbType.Xml });
 
          //Assert
          migration.Contains(".WithColumn(\"Id\").AsXml()").ShouldBeTrue();
       }
 
-      private string GetTestMigration(ICollection<ColumnDefinition> columns)
+      private string GetTestMigration(params ColumnDefinition[] columns)
       {
-         var settings = new SchemaMigrationContext
-         {
-            MigrationsDirectory = _tempDirectory
-            ,MigrationClassNamer = (index, table) => "Test"
-         };
-
-         return GetTestMigration(settings, columns);
+         return GetTestMigration(GetDefaultContext(), columns);
       }
 
-      private string GetTestMigration(SchemaMigrationContext context, ICollection<ColumnDefinition> columns)
+      private string GetTestMigration(SchemaMigrationContext context, params ColumnDefinition[] columns)
       {
          var tableDefinitions = new List<TableDefinition>
                                    {
@@ -397,20 +500,21 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
 
          GenerateTableMigrations(context, tableDefinitions);
 
-         return File.ReadAllText(Path.Combine(_tempDirectory, "Test.cs"));
+         return File.ReadAllText(Path.Combine(_tempDirectory, @"Migrations\Test.cs"));
       }
 
       /// <summary>
       /// Generates C# files from the supplied table migrations
       /// </summary>
       /// <param name="context">The context that defines how the migrations should be created</param>
-      /// <param name="tableDefinitions">The table definitions that are the source from the migration</param>
-      private static void GenerateTableMigrations(SchemaMigrationContext context, IList<TableDefinition> tableDefinitions)
+      /// <param name="tableDefinitions">The table definitions that are the source for the migration</param>
+      private void GenerateTableMigrations(SchemaMigrationContext context, IList<TableDefinition> tableDefinitions)
       {
          var mockDumper = new Mock<ISchemaDumper>();
          var writer = new CSharpMigrationsWriter(new DebugAnnouncer());
 
          mockDumper.Setup(m => m.ReadDbSchema()).Returns(tableDefinitions);
+         mockDumper.Setup(m => m.ReadTableData(It.IsAny<string>(), It.IsAny<string>())).Returns(_testData);
 
          writer.GenerateTableMigrations(context, mockDumper.Object);
       }
@@ -418,18 +522,23 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
       /// <summary>
       /// Generates C# files from the supplied table migrations
       /// </summary>
-      /// <param name="tableDefinitions">The table definitions that are the source from the migration</param>
+      /// <param name="tableDefinitions">The table definitions that are the source for the migration</param>
       private SchemaMigrationContext GenerateTableMigrations(IList<TableDefinition> tableDefinitions)
       {
-         var settings = new SchemaMigrationContext
-         {
-            MigrationsDirectory = _tempDirectory
-            ,MigrationClassNamer = (index, table) => "Test"
-         };
+         SchemaMigrationContext context = GetDefaultContext();
 
-         GenerateTableMigrations(settings, tableDefinitions);
+         GenerateTableMigrations(context, tableDefinitions);
 
-         return settings;
+         return context;
+      }
+
+      private SchemaMigrationContext GetDefaultContext()
+      {
+         return new SchemaMigrationContext
+                   {
+                      WorkingDirectory = _tempDirectory
+                      ,MigrationClassNamer = (index, table) => "Test"
+                   };
       }
    }
 }
