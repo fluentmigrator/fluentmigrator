@@ -25,8 +25,19 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
+   /// <summary>
+   /// A expression repersentation that allows data to be inserted by a specified database processor
+   /// </summary>
 	public class InsertDataExpression : IMigrationExpression
 	{
+      ///<summary>
+      /// Constructs a new instance of a <see cref="InsertDataExpression"/>
+      ///</summary>
+      public InsertDataExpression()
+      {
+         ReplacementValues = new Dictionary<object, object>();
+      }
+
 		private readonly List<InsertionDataDefinition> _rows = new List<InsertionDataDefinition>();
 		public string SchemaName { get; set; }
 		public string TableName { get; set; }
@@ -51,6 +62,12 @@ namespace FluentMigrator.Expressions
 		{
 			get { return _rows; }
 		}
+
+      /// <summary>
+      /// A dictionary of replacement values that should be applied when inserting the data <see cref="Rows"/> values
+      /// </summary>
+	   public Dictionary<object, object> ReplacementValues { get; private set; }
+
 	   public void CollectValidationErrors(ICollection<string> errors)
 		{
 		}

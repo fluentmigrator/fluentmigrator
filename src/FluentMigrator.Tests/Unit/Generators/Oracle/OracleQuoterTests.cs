@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Framework;
 using NUnit.Should;
@@ -36,6 +37,34 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 
          // Assert
          value.ShouldBe("hextoraw('466F6F')");
+      }
+
+      [Test]
+      public void CanQuoteGuid()
+      {
+         // Arrange
+         var quoter = new OracleQuoter();
+
+         // Act
+
+         var value = quoter.QuoteValue(new Guid("30e16f6e-d8e2-45b9-97aa-9ef500fa1e9b"));
+
+         // Assert
+         value.ShouldBe("hextoraw('30E16F6ED8E245B997AA9EF500FA1E9B')");
+      }
+
+      [Test]
+      public void CanQuoteNull()
+      {
+         // Arrange
+         var quoter = new OracleQuoter();
+
+         // Act
+
+         var value = quoter.QuoteValue(null);
+
+         // Assert
+         value.ShouldBe("NULL");
       }
 
       [Test]

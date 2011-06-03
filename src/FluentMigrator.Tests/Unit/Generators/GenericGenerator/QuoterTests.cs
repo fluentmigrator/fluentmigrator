@@ -100,6 +100,13 @@ namespace FluentMigrator.Tests.Unit.Generators
 				.ShouldBe("NULL");
 		}
 
+      [Test]
+      public void DbNullIsFormattedAsLiteral()
+      {
+         quoter.QuoteValue(DBNull.Value)
+            .ShouldBe("NULL");
+      }
+
 		[Test]
 		public void StringIsFormattedWithQuotes()
 		{

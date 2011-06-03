@@ -146,9 +146,10 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
                                                    new ProcessorOptions());
             var schemaDumper = new SqlServerSchemaDumper(processor, new TextWriterAnnouncer(Console.Out));
 
-            var generator = new CSharpMigrationsWriter(_announcer);
-            generator.GenerateTableMigrations(context, schemaDumper);
-            generator.GenerateViewMigrations(context, schemaDumper);
+            var tables = new CSharpTableMigrationsWriter(_announcer);
+            tables.GenerateMigrations(context, schemaDumper);
+            var views = new CSharpViewMigrationsWriter(_announcer);
+            views.GenerateMigrations(context, schemaDumper);
          }
       }
 

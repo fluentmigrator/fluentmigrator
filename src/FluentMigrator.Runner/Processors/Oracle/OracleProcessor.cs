@@ -39,7 +39,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
         {
            Process(Generator.Generate(expression));
 
-           if (AutoGenerateSequenceForIdentityColumn)
+           if (AutoGenerateSequenceForIdentityColumn && IdentityColumnExists(expression))
            {
               // Generate a sequence starting at one
               // ... 
@@ -51,7 +51,12 @@ namespace FluentMigrator.Runner.Processors.Oracle
            }
         }
 
-        public override void Process(InsertDataExpression expression)
+	   private bool IdentityColumnExists(CreateTableExpression expression)
+	   {
+	      return expression.Columns.Where(c => c.IsIdentity).Count() == 1;
+	   }
+
+	   public override void Process(InsertDataExpression expression)
         {
            base.Process(expression);
 

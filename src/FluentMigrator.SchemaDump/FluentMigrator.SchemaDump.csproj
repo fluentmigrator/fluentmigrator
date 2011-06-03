@@ -44,6 +44,8 @@
     <Compile Include="SchemaDumpers\ISchemaDumper.cs" />
     <Compile Include="SchemaDumpers\SqlServerSchemaDumper.cs" />
     <Compile Include="SchemaMigrations\CSharpMigrationsWriter.cs" />
+    <Compile Include="SchemaMigrations\CSharpTableMigrationsWriter.cs" />
+    <Compile Include="SchemaMigrations\CSharpViewMigrationsWriter.cs" />
     <Compile Include="SchemaMigrations\SchemaMigrationContext.cs" />
     <Compile Include="SchemaMigrations\SqlServerSchemaMigrator.cs" />
     <Compile Include="SchemaWriters\ISchemaWriter.cs" />

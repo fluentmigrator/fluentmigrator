@@ -212,7 +212,10 @@ namespace FluentMigrator.Runner.Generators.Generic
 				foreach (KeyValuePair<string, object> item in row)
 				{
 					columnNames.Add(Quoter.QuoteColumnName(item.Key));
-					columnValues.Add(Quoter.QuoteValue(item.Value));
+
+               var value = ReplaceValueIfRequired(expression, item.Value);
+
+               columnValues.Add(Quoter.QuoteValue(value));
 				}
 
 				string columns = String.Join(", ", columnNames.ToArray());
@@ -222,7 +225,14 @@ namespace FluentMigrator.Runner.Generators.Generic
 			return String.Join("; ", insertStrings.ToArray());
 		}
 
-		public override string Generate(UpdateDataExpression expression)
+      public virtual object ReplaceValueIfRequired(InsertDataExpression expression, object value)
+      {
+         if (value == null)
+            return value;
+         return expression.ReplacementValues.ContainsKey(value) ? expression.ReplacementValues[value] : value;
+      }
+
+	   public override string Generate(UpdateDataExpression expression)
 		{
 
 			List<string> updateItems = new List<string>();

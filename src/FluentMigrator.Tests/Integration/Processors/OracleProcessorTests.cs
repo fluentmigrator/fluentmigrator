@@ -157,6 +157,50 @@ namespace FluentMigrator.Tests.Integration.Processors
       }
 
       [Test]
+      public void CanInsertAndReadBinaryDataTestTable()
+      {
+         _processor.Process(new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = { new ColumnDefinition { Name = "Test", Type = DbType.Binary, Size = int.MaxValue} }
+         });
+
+         var testData = System.Text.Encoding.ASCII.GetBytes(new String('A', 1000));
+         _processor.Process(new InsertDataExpression()
+         {
+            TableName = "Foo",
+            Rows = { new InsertionDataDefinition() { new KeyValuePair<string, object>("Test",testData)  } }
+         });
+
+         var table = _processor.ReadTableData(string.Empty, "Foo");
+
+         table.Tables[0].Rows.Count.ShouldBe(1);
+         table.Tables[0].Rows[0][0].ShouldBe(testData);
+      }
+
+      [Test]
+      public void CanInsertAndReadLargeTextTestTable()
+      {
+         _processor.Process(new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = { new ColumnDefinition { Name = "Test", Type = DbType.String, Size = int.MaxValue } }
+         });
+
+         var testData = new String('A', 1000);
+         _processor.Process(new InsertDataExpression()
+         {
+            TableName = "Foo",
+            Rows = { new InsertionDataDefinition() { new KeyValuePair<string, object>("Test", testData) } }
+         });
+
+         var table = _processor.ReadTableData(string.Empty, "Foo");
+
+         table.Tables[0].Rows.Count.ShouldBe(1);
+         table.Tables[0].Rows[0][0].ShouldBe(testData);
+      }
+
+      [Test]
       public void CanInsertMultipleRowsSeparately()
       {
          CreateTestTable();
@@ -212,6 +256,52 @@ namespace FluentMigrator.Tests.Integration.Processors
             TableName = "Foo"
             ,Rows = { new InsertionDataDefinition() { new KeyValuePair<string, object>("Data", System.Text.Encoding.ASCII.GetBytes("HELLO WORLD")) } }
          });
+
+         var table = _processor.ReadTableData(string.Empty, "Foo");
+
+         Assert.AreEqual(1, table.Tables[0].Rows.Count);
+      }
+
+      [Test]
+      public void CanInsertEmptyStringIntoNullNullColumnWithReplacementValue()
+      {
+         _processor.Process(new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = { new ColumnDefinition { Name = "Data", Type = DbType.String, IsNullable = false} }
+         });
+
+         var insert = new InsertDataExpression()
+                         {
+                            TableName = "Foo"
+                            ,Rows =
+                               {new InsertionDataDefinition() {new KeyValuePair<string, object>("Data", string.Empty)}}
+                         };
+         insert.ReplacementValues.Add(string.Empty, " ");
+
+         _processor.Process(insert);
+
+         var table = _processor.ReadTableData(string.Empty, "Foo");
+
+         Assert.AreEqual(1, table.Tables[0].Rows.Count);
+      }
+
+      [Test]
+      public void CanInsertNull()
+      {
+         _processor.Process(new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = { new ColumnDefinition { Name = "Data", Type = DbType.String, IsNullable = true } }
+         });
+
+         var insert = new InsertDataExpression()
+         {
+            TableName = "Foo"
+            , Rows = { new InsertionDataDefinition() { new KeyValuePair<string, object>("Data", null) } }
+         };
+
+         _processor.Process(insert);
 
          var table = _processor.ReadTableData(string.Empty, "Foo");
 

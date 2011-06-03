@@ -11,6 +11,7 @@ namespace FluentMigrator.Runner.Generators.Generic
         public virtual string QuoteValue(object value)
         {
             if (value == null) { return FormatNull(); }
+            if (value == DBNull.Value) { return FormatNull(); }
 
             string stringValue = value as string;
             if (stringValue != null) { return FormatString(stringValue); }

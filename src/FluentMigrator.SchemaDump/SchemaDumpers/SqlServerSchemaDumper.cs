@@ -166,7 +166,7 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
                         Precision = int.Parse(dr["Precision"].ToString()),
                         Scale = int.Parse(dr["Scale"].ToString()),
                         PrimaryKeyName = dr.IsNull("PrimaryKeyName") ? "" : dr["PrimaryKeyName"].ToString(), 
-                        Size = int.Parse(dr["Length"].ToString()),
+                        Size = GetDbSize(int.Parse(dr["TypeID"].ToString()), int.Parse(dr["Length"].ToString())),
                         TableName = dr["Table"].ToString(),
                         Type = GetDbType(int.Parse(dr["TypeID"].ToString())) //TODO: set this property
                     });
@@ -176,7 +176,30 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
             return tables;
         }
 
-        public virtual IList<ViewDefinition> ReadViews()
+	   private int GetDbSize(int databaseType, int databaseLength)
+	   {
+         // Source http://msdn.microsoft.com/en-us/library/ms187993.aspx (text,ntext,image)
+         // Source http://msdn.microsoft.com/en-us/library/ms176089.aspx (char, varchar)
+         // Source http://msdn.microsoft.com/en-us/library/ms186939.aspx (nchar, nvarchar)
+	      switch ( databaseType)
+	      {
+	         case SqlTypes.Image:
+            case SqlTypes.Text:
+	            return int.MaxValue;
+            case SqlTypes.NText:
+	            return int.MaxValue/2;
+            case SqlTypes.Varchar:
+            case SqlTypes.Varbinary:
+               return databaseLength == -1 ? int.MaxValue : databaseLength;
+            case SqlTypes.NVarchar:
+               //TODO Review to ensure that we do not loose precison when migrating UNICODE characters
+               return databaseLength == -1 ? int.MaxValue : databaseLength / 2;
+            default:
+	            return databaseLength;
+	      }
+	   }
+
+	   public virtual IList<ViewDefinition> ReadViews()
         {
            string query = @"select  OBJECT_SCHEMA_NAME(v.[object_id],DB_ID()) AS [Schema], v.name AS [View], sc.text As [Sql]
 FROM sys.views v
@@ -230,57 +253,58 @@ ORDER BY v.name, sc.colid
 
 	   protected virtual DbType GetDbType(int typeNum)
         {
+           //http://www.sqlservercurry.com/2008/06/find-all-columns-with-varchar-and.html
             switch (typeNum)
             {
-                case 34: //'byte[]'
-                    return DbType.Byte;
-                case 35: //'string'
-                    return DbType.String;
-                case 36: //'System.Guid'
+                case SqlTypes.Image: // 'byte[]'
+                    return DbType.Binary;
+                case SqlTypes.Text: // 'string'
+                    return DbType.AnsiString;
+                case SqlTypes.Uniqueidentifier: //UniqueIdentifier -> 'System.Guid'
                     return DbType.Guid;
-                case 48: //'byte'
+                case SqlTypes.Tinyint: // 'byte'
                     return DbType.Byte;
-                case 52: //'short'
+                case SqlTypes.Smallint: // 'short'
                     return DbType.Int16;
-                case 56: //'int'
+                case SqlTypes.Int: // 'int'
                     return DbType.Int32;
-                case 58: //'System.DateTime'
+                case SqlTypes.Smalldatetime: // 'System.DateTime'
                     return DbType.DateTime;
-                case 59: //'float'
+                case SqlTypes.Real: // 'float'
                     return DbType.Int64;
-                case 60: //'decimal'
+                case SqlTypes.Money: // 'decimal'
                     return DbType.Decimal;
-                case 61: //'System.DateTime'
+                case SqlTypes.Datetime: // 'System.DateTime'
                     return DbType.DateTime;
-                case 62: //'double'
+                case SqlTypes.Float: // 'double'
                     return DbType.Double;
-                case 98: //'object'
+                case SqlTypes.SqlVariant: // 'object'
                     return DbType.Object;
-                case 99: //'string'
+                case SqlTypes.NText: // 'string'
                     return DbType.String;
-                case 104: //'bool'
+                case SqlTypes.Bit: //bit -> 'bool'
                     return DbType.Boolean;
-                case 106: //'decimal'
+                case SqlTypes.Decimal: // 'decimal'
                     return DbType.Decimal;
-                case 108: //'decimal'
+                case SqlTypes.Numeric: // 'decimal'
                     return DbType.Decimal;
-                case 122: //'decimal'
+                case SqlTypes.Smallmoney: // 'decimal'
                     return DbType.Decimal;
-                case 127: //'long'
+                case SqlTypes.Bigint: // 'long'
                     return DbType.Int64;
-                case 165: //'byte[]'
-                    return DbType.Byte;
-                case 167: //'string'
-                    return DbType.String;
-                case 173: //'byte[]'
-                    return DbType.Byte;
-                case 175: //'string'
-                    return DbType.String;
-                case 189: //'long'
+                case SqlTypes.Varbinary: // 'byte[]'
+                    return DbType.Binary;
+                case SqlTypes.Varchar: // 'string'
+                    return DbType.AnsiString;
+                case SqlTypes.Binary: // 'byte[]'
+                    return DbType.Binary;
+                case SqlTypes.Char: //'string'
+                    return DbType.AnsiString;
+                case SqlTypes.Timestamp: //'long'
                     return DbType.Int64;
-                case 231: //'string'
-                case 239: //'string'
-                case 241: //'string'
+                case SqlTypes.NVarchar: //'string'
+                case SqlTypes.NChar: //'string'
+                case SqlTypes.Xml: //'string'
                 default:
                     return DbType.String;
             }
@@ -409,4 +433,35 @@ ORDER BY v.name, sc.colid
             return keys;
         }
 	}
+
+   public class SqlTypes
+   {
+      public const int Image = 34;
+      public const int Text = 35;
+      public const int Uniqueidentifier = 36;
+      public const int Tinyint = 48;
+      public const int Smallint = 52;
+      public const int Int = 56;
+      public const int Smalldatetime = 58;
+      public const int Real = 59;
+      public const int Money = 60;
+      public const int Datetime = 61;
+      public const int Float = 62;
+      public const int SqlVariant = 98;
+      public const int NText = 99;
+      public const int Bit = 104;
+      public const int Decimal = 106;
+      public const int Numeric = 108;
+      public const int Smallmoney = 122;
+      public const int Bigint = 127;
+      public const int Varbinary = 165;
+      public const int Varchar = 167;
+      public const int Binary = 173;
+      public const int Char = 175;
+      public const int Timestamp = 189;
+      public const int NVarchar = 231;
+      public const int NChar = 239;
+      public const int Xml = 241;
+      public const int Sysname = 256;
+   }
 }

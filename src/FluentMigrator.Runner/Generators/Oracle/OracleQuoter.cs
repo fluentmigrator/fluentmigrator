@@ -17,6 +17,12 @@ namespace FluentMigrator.Runner.Generators.Oracle
            {
               return "hextoraw('" + BitConverter.ToString((Byte[])value).Replace("-","") + "')";
            }
+
+           if (value is Guid)
+           {
+              return "hextoraw('" + ((Guid)value).ToString().Replace("-", "").ToUpper() + "')";
+           }
+
            return base.QuoteValue(value);
         }
 

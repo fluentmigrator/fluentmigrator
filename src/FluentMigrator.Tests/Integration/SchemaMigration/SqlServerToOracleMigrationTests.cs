@@ -350,6 +350,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          data.Tables[0].Rows.Count.ShouldBe(1);
       }
 
+
       [Test]
       public void CanMigrateTableWithDate()
       {
@@ -386,6 +387,81 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          context.MigrationIndex.ShouldBe(1);
          data.Tables[0].Rows.Count.ShouldBe(1);
       }
+
+      [Test]
+      public void CanMigrateTableWithGuid()
+      {
+         // Arrange
+
+         var create = new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = new[]{
+                   new ColumnDefinition {Name = "Test", Type = DbType.Guid }
+                    }
+         };
+
+         var row = new InsertDataExpression()
+         {
+            TableName = "Foo"
+         };
+         row.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("Test", Guid.NewGuid()) });
+
+         var context = GetDefaultContext();
+         context.GenerateAlternateMigrationsFor.Add(DatabaseType.Oracle);
+         context.MigrateData = true;
+
+         // Act
+         CreateTables(create);
+
+         InsertData(row);
+         MigrateTable(context);
+         var data = GetOracleTableData("Foo");
+
+         // Assert
+         AssertOracleTablesExist(create);
+
+         context.MigrationIndex.ShouldBe(1);
+         data.Tables[0].Rows.Count.ShouldBe(1);
+      }
+
+      [Test]
+      public void CanMigrateStringWithNullvalue()
+      {
+         // Arrange
+
+         var create = new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = new[]{
+                   new ColumnDefinition {Name = "Test", Type = DbType.String, IsNullable = true}
+                    }
+         };
+
+         var row = new InsertDataExpression()
+         {
+            TableName = "Foo"
+         };
+         row.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("Test", null) });
+
+         var context = GetDefaultContext();
+         context.GenerateAlternateMigrationsFor.Add(DatabaseType.Oracle);
+         context.MigrateData = true;
+
+         // Act
+         CreateTables(create);
+
+         InsertData(row);
+         MigrateTable(context);
+         var data = GetOracleTableData("Foo");
+
+         // Assert
+         AssertOracleTablesExist(create);
+
+         context.MigrationIndex.ShouldBe(1);
+         data.Tables[0].Rows.Count.ShouldBe(1);
+      }
+
 
       [Test]
       public void CanMigrateTableDataWithIdentity()

@@ -61,6 +61,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return "DEFAULT " + method;
          }
 
+         //TODO : Place TO_DATE around default value ?? how specify format??
          if (column.Type == DbType.DateTime)
             return "DEFAULT " + column.DefaultValue;
 

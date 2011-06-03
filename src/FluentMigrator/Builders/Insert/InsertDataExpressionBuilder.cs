@@ -26,6 +26,9 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Insert
 {
+   /// <summary>
+   /// Constructs sets up a <see cref="InsertDataExpression"/> instance from the fluent interface
+   /// </summary>
 	public class InsertDataExpressionBuilder : IInsertDataOrInSchemaSyntax
 	{
 		private readonly InsertDataExpression _expression;
@@ -58,6 +61,18 @@ namespace FluentMigrator.Builders.Insert
 	   public IInsertDataSyntax WithIdentity()
 	   {
 	      _expression.WithIdentity = true;
+
+	      return this;
+	   }
+
+	   public IInsertDataSyntax WithReplacementValue(object oldValue, string newValue)
+	   {
+         if ( ! _expression.ReplacementValues.ContainsKey(oldValue) )
+	         _expression.ReplacementValues.Add(oldValue, newValue);
+         else
+         {
+            _expression.ReplacementValues[oldValue] = newValue;
+         }
 
 	      return this;
 	   }

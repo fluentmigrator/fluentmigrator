@@ -17,13 +17,12 @@
 //
 #endregion
 
-using System.Data;
-
 namespace FluentMigrator.Builders.Insert
 {
 	public interface IInsertDataSyntax
 	{
 		IInsertDataSyntax Row(object dataAsAnonymousType);
+
       /// <summary>
       /// Insert data from a <see cref="DataTable"/> file
       /// </summary>
@@ -45,5 +44,13 @@ namespace FluentMigrator.Builders.Insert
       /// <remarks>See the processor implementation on how this is implemeted</remarks>
       /// <returns>Fluent interface instance to add further data</returns>
 	   IInsertDataSyntax WithIdentity();
+
+      /// <summary>
+      /// Add a replacement value
+      /// </summary>
+      /// <param name="oldValue">The old value to be replaced</param>
+      /// <param name="newValue">The new value to insert if a match is found</param>
+      /// <returns>Fluent interface instance to add further data</returns>
+      IInsertDataSyntax WithReplacementValue(object oldValue, string newValue);
 	}
 }

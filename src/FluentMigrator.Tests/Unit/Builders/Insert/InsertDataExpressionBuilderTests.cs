@@ -50,5 +50,105 @@ namespace FluentMigrator.Tests.Unit.Builders.Insert
 			expression.Rows[1][1].Key.ShouldBe("Data2");
 			expression.Rows[1][1].Value.ShouldBe("Row2Data2");
 		}
+
+      [Test]
+      public void CanAddDataTableAndRowsInsertedSeperately()
+      {
+         var expression = new InsertDataExpression();
+
+         var builder = new InsertDataExpressionBuilder(expression);
+         builder
+            .DataTable("data.xml");
+
+         expression.DataTableFile.ShouldBe("data.xml");
+         expression.InsertRowsSeparately.ShouldBeTrue();
+      }
+
+      [Test]
+      public void InsertRowsSeparatelyFalseByDefault()
+      {
+         var expression = new InsertDataExpression();
+
+         expression.InsertRowsSeparately.ShouldBeFalse();
+      }
+
+      [Test]
+      public void CanSetInsertRowsSeparately()
+      {
+         var expression = new InsertDataExpression();
+
+         var builder = new InsertDataExpressionBuilder(expression);
+         builder
+            .InsertRowsSeparately();
+
+         expression.InsertRowsSeparately.ShouldBeTrue();
+      }
+
+      [Test]
+      public void CanWithIdentityFalseByDefault()
+      {
+         var expression = new InsertDataExpression();
+
+         expression.WithIdentity.ShouldBeFalse();
+      }
+
+      [Test]
+      public void CanAddWithIdentity()
+      {
+         var expression = new InsertDataExpression();
+
+         var builder = new InsertDataExpressionBuilder(expression);
+         builder
+            .WithIdentity();
+
+         expression.WithIdentity.ShouldBeTrue();
+      }
+
+      [Test]
+      public void CanAddReplacementValue()
+      {
+         var expression = new InsertDataExpression();
+
+         var builder = new InsertDataExpressionBuilder(expression);
+         builder
+            .WithReplacementValue(string.Empty, " ");
+            
+         expression.ReplacementValues.Count.ShouldBe(1);
+         expression.ReplacementValues.ContainsKey(string.Empty).ShouldBeTrue();
+         expression.ReplacementValues[string.Empty].ShouldBe(" ");
+      }
+
+      [Test]
+      public void CanAddMultipleReplacementValues()
+      {
+         var expression = new InsertDataExpression();
+
+         var builder = new InsertDataExpressionBuilder(expression);
+         builder
+            .WithReplacementValue(string.Empty, " ")
+            .WithReplacementValue(string.Empty, "Foo");
+
+         expression.ReplacementValues.Count.ShouldBe(1);
+         expression.ReplacementValues.ContainsKey(string.Empty).ShouldBeTrue();
+         expression.ReplacementValues[string.Empty].ShouldBe("Foo");
+      }
+
+      [Test]
+      public void CanAddMultipleReplacementValuesDifferentKey()
+      {
+         var expression = new InsertDataExpression();
+
+         var builder = new InsertDataExpressionBuilder(expression);
+         builder
+            .WithReplacementValue(string.Empty, " ")
+            .WithReplacementValue("Bar", "Foo");
+
+         expression.ReplacementValues.Count.ShouldBe(2);
+         expression.ReplacementValues.ContainsKey(string.Empty).ShouldBeTrue();
+         expression.ReplacementValues[string.Empty].ShouldBe(" ");
+
+         expression.ReplacementValues.ContainsKey("Bar").ShouldBeTrue();
+         expression.ReplacementValues["Bar"].ShouldBe("Foo");
+      }
 	}
 }

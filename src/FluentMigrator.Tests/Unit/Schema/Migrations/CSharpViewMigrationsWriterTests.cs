@@ -194,11 +194,11 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
       private static void GenerateViewMigrations(SchemaMigrationContext context, IList<ViewDefinition> viewDefinitions)
       {
          var mockDumper = new Mock<ISchemaDumper>();
-         var writer = new CSharpMigrationsWriter(new DebugAnnouncer());
+         var writer = new CSharpViewMigrationsWriter(new DebugAnnouncer());
 
          mockDumper.Setup(m => m.ReadViews()).Returns(viewDefinitions);
 
-         writer.GenerateViewMigrations(context, mockDumper.Object);
+         writer.GenerateMigrations(context, mockDumper.Object);
       }
 
       /// <summary>

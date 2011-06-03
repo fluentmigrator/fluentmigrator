@@ -135,22 +135,25 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
 		public override string Generate(InsertDataExpression expression)
 		{
-            List<string> columnNames = new List<string>();
-            List<string> columnValues = new List<string>();
-            List<string> insertStrings = new List<string>();
+            var columnNames = new List<string>();
+            var columnValues = new List<string>();
+            var insertStrings = new List<string>();
 
-            foreach (InsertionDataDefinition row in expression.Rows)
+            foreach (var row in expression.Rows)
             {
                 columnNames.Clear();
                 columnValues.Clear();
-                foreach (KeyValuePair<string, object> item in row)
+                foreach (var item in row)
                 {
-                    columnNames.Add(Quoter.QuoteColumnName(item.Key));
-                    columnValues.Add(Quoter.QuoteValue(item.Value));
+                   columnNames.Add(Quoter.QuoteColumnName(item.Key));
+
+                   var value = ReplaceValueIfRequired(expression, item.Value);
+                 
+                   columnValues.Add(Quoter.QuoteValue(value));
                 }
 
-                string columns = String.Join(", ", columnNames.ToArray());
-                string values = String.Join(", ", columnValues.ToArray());
+                var columns = String.Join(", ", columnNames.ToArray());
+                var values = String.Join(", ", columnValues.ToArray());
                 insertStrings.Add(String.Format(InsertData, Quoter.QuoteTableName(expression.TableName), columns, values));
             }
             return "INSERT ALL " + String.Join(" ", insertStrings.ToArray()) + " SELECT 1 FROM DUAL";

@@ -129,6 +129,12 @@ namespace FluentMigrator.Runner.Processors
                                   ,TableName = expression.TableName
                                   ,WithIdentity = expression.WithIdentity
                 };
+               // Copy the replacement to the new item
+               foreach (var replacement in expression.ReplacementValues)
+               {
+                  insert.ReplacementValues.Add(replacement.Key, replacement.Value);
+               }
+               
                 insert.Rows.Add(row);
                 Process(Generator.Generate(insert));
             }
