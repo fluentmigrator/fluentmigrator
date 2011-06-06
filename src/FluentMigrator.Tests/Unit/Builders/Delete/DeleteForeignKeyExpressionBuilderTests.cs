@@ -142,10 +142,13 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             collectionMock.Verify(x => x.Add("BaconId"), Times.AtMostOnce());
 
 			var foreignKeyMock = new Mock<ForeignKeyDefinition>();
-			foreignKeyMock.SetupGet(f => f.PrimaryColumns).Returns(collectionMock.Object).AtMostOnce();
+            foreignKeyMock.SetupGet(f => f.PrimaryColumns).Returns(collectionMock.Object);
+            foreignKeyMock.VerifyGet(f => f.PrimaryColumns, Times.AtMostOnce());
+			//foreignKeyMock.SetupGet(f => f.PrimaryColumns).Returns(collectionMock.Object).AtMostOnce();
 
 			var expressionMock = new Mock<DeleteForeignKeyExpression>();
-			expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMostOnce();
+			expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object);
+            expressionMock.VerifyGet(e => e.ForeignKey, Times.AtMostOnce());
 
 			var builder = new DeleteForeignKeyExpressionBuilder(expressionMock.Object);
 			builder.PrimaryColumn("BaconId");
