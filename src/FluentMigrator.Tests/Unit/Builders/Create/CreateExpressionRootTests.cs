@@ -37,7 +37,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingTableAddsCreateTableExpressionToContextWithSpecifiedNameSet()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Setup(x => x.Add(It.Is<CreateTableExpression>(e => e.TableName.Equals("Bacon")))).AtMostOnce();
+            collectionMock.Verify(x => x.Add(It.Is<CreateTableExpression>(e => e.TableName.Equals("Bacon"))), Times.AtMostOnce());
 
 			var contextMock = new Mock<IMigrationContext>();
 			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
@@ -67,7 +67,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingColumnAddsCreateColumnExpressionToContextWithSpecifiedNameSet()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Setup(x => x.Add(It.Is<CreateColumnExpression>(e => e.Column.Name.Equals("Bacon")))).AtMostOnce();
+            collectionMock.Verify(x => x.Add(It.Is<CreateColumnExpression>(e => e.Column.Name.Equals("Bacon"))), Times.AtMostOnce());
 
 			var contextMock = new Mock<IMigrationContext>();
 			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
@@ -97,7 +97,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingForeignKeyWithoutNameAddsCreateForeignKeyExpressionToContext()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Setup(x => x.Add(It.IsAny<CreateForeignKeyExpression>())).AtMostOnce();
+            collectionMock.Verify(x => x.Add(It.IsAny<CreateForeignKeyExpression>()), Times.AtMostOnce());
 
 			var contextMock = new Mock<IMigrationContext>();
 			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
@@ -113,7 +113,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingForeignKeyAddsCreateForeignKeyExpressionToContextWithSpecifiedNameSet()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Setup(x => x.Add(It.Is<CreateForeignKeyExpression>(e => e.ForeignKey.Name.Equals("FK_Bacon")))).AtMostOnce();
+            collectionMock.Verify(x => x.Add(It.Is<CreateForeignKeyExpression>(e => e.ForeignKey.Name.Equals("FK_Bacon"))), Times.AtMostOnce());
 
 			var contextMock = new Mock<IMigrationContext>();
 			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
@@ -157,7 +157,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingIndexWithoutNameAddsCreateIndexExpressionToContext()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Setup(x => x.Add(It.IsAny<CreateIndexExpression>())).AtMostOnce();
+            collectionMock.Verify(x => x.Add(It.IsAny<CreateIndexExpression>()), Times.AtMostOnce());
 
 			var contextMock = new Mock<IMigrationContext>();
 			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
@@ -173,7 +173,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingIndexAddsCreateIndexExpressionToContextWithSpecifiedNameSet()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Setup(x => x.Add(It.Is<CreateIndexExpression>(e => e.Index.Name.Equals("IX_Bacon")))).AtMostOnce();
+            collectionMock.Verify(x => x.Add(It.Is<CreateIndexExpression>(e => e.Index.Name.Equals("IX_Bacon"))), Times.AtMostOnce());
 
 			var contextMock = new Mock<IMigrationContext>();
 			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();

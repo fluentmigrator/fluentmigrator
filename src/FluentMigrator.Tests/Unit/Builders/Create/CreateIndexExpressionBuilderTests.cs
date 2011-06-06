@@ -32,7 +32,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingOnTableSetsTableNameToSpecifiedValue()
 		{
 			var indexMock = new Mock<IndexDefinition>();
-			indexMock.SetupSet(x => x.TableName = "Bacon").AtMostOnce();
+			indexMock.VerifySet(x => x.TableName = "Bacon", Times.AtMostOnce());
 
 			var expressionMock = new Mock<CreateIndexExpression>();
 			expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object).AtMostOnce();
@@ -48,7 +48,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingOnColumnAddsNewColumnToExpression()
 		{
 			var collectionMock = new Mock<IList<IndexColumnDefinition>>();
-			collectionMock.Setup(x => x.Add(It.Is<IndexColumnDefinition>(c => c.Name.Equals("BaconId")))).AtMostOnce();
+            collectionMock.Verify(x => x.Add(It.Is<IndexColumnDefinition>(c => c.Name.Equals("BaconId"))), Times.AtMostOnce());
 
 			var indexMock = new Mock<IndexDefinition>();
 			indexMock.SetupGet(x => x.Columns).Returns(collectionMock.Object).AtMostOnce();
@@ -68,7 +68,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingAscendingSetsDirectionToAscending()
 		{
 			var columnMock = new Mock<IndexColumnDefinition>();
-			columnMock.SetupSet(c => c.Direction = Direction.Ascending).AtMostOnce();
+            columnMock.VerifySet(c => c.Direction = Direction.Ascending, Times.AtMostOnce());
 			var expressionMock = new Mock<CreateIndexExpression>();
 
 			var builder = new CreateIndexExpressionBuilder(expressionMock.Object);
@@ -83,7 +83,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingDescendingSetsDirectionToDescending()
 		{
 			var columnMock = new Mock<IndexColumnDefinition>();
-			columnMock.SetupSet(c => c.Direction = Direction.Descending).AtMostOnce();
+            columnMock.VerifySet(c => c.Direction = Direction.Descending, Times.AtMostOnce());
 			var expressionMock = new Mock<CreateIndexExpression>();
 
 			var builder = new CreateIndexExpressionBuilder(expressionMock.Object);
