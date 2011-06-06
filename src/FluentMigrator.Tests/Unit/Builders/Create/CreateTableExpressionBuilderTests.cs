@@ -332,7 +332,8 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             collectionMock.Verify(x => x.Add(It.Is<ColumnDefinition>(c => c.Name.Equals(name))), Times.AtMostOnce());
 
 			var expressionMock = new Mock<CreateTableExpression>();
-			expressionMock.SetupGet(e => e.Columns).Returns(collectionMock.Object).AtMostOnce();
+			expressionMock.SetupGet(e => e.Columns).Returns(collectionMock.Object);
+            expressionMock.VerifyGet(e => e.Columns, Times.AtMostOnce());
 
 			var contextMock = new Mock<IMigrationContext>();
 

@@ -35,7 +35,8 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 			indexMock.VerifySet(x => x.TableName = "Bacon", Times.AtMostOnce());
 
 			var expressionMock = new Mock<DeleteIndexExpression>();
-			expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object).AtMostOnce();
+			expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+            expressionMock.VerifyGet(e => e.Index, Times.AtMostOnce());
 
 			var builder = new DeleteIndexExpressionBuilder(expressionMock.Object);
 			builder.OnTable("Bacon");
@@ -51,10 +52,12 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             collectionMock.Verify(x => x.Add(It.Is<IndexColumnDefinition>(c => c.Name.Equals("BaconId"))), Times.AtMostOnce());
 
 			var indexMock = new Mock<IndexDefinition>();
-			indexMock.SetupGet(x => x.Columns).Returns(collectionMock.Object).AtMostOnce();
+			indexMock.SetupGet(x => x.Columns).Returns(collectionMock.Object);
+            indexMock.VerifyGet(x => x.Columns, Times.AtMostOnce());
 
 			var expressionMock = new Mock<DeleteIndexExpression>();
-			expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object).AtMostOnce();
+			expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+            expressionMock.VerifyGet(e => e.Index, Times.AtMostOnce());
 
 			var builder = new DeleteIndexExpressionBuilder(expressionMock.Object);
 			builder.OnColumn("BaconId");
@@ -72,10 +75,12 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             collectionMock.Verify(x => x.Add(It.Is<IndexColumnDefinition>(c => c.Name.Equals("EggsId"))), Times.AtMostOnce());
 
 			var indexMock = new Mock<IndexDefinition>();
-			indexMock.SetupGet(x => x.Columns).Returns(collectionMock.Object).AtMost(2);
+			indexMock.SetupGet(x => x.Columns).Returns(collectionMock.Object);
+            indexMock.VerifyGet(x => x.Columns, Times.AtMost(2));
 
 			var expressionMock = new Mock<DeleteIndexExpression>();
-			expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object).AtMost(2);
+			expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+            expressionMock.VerifyGet(e => e.Index, Times.AtMost(2));
 
 			var builder = new DeleteIndexExpressionBuilder(expressionMock.Object);
 			builder.OnColumns("BaconId", "EggsId");
