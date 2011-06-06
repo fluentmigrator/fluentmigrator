@@ -50,6 +50,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
 		[Test]
 		public void TestTableExists()
 		{
+            _querySchemaMock.Setup(x => x.TableExists(null, _testTable)).Returns(true);
 			_querySchemaMock.Setup(x => x.TableExists(null, _testTable)).Returns(true).AtMostOnce();
 
 			_builder.Table(_testTable).Exists().ShouldBeTrue();
@@ -59,6 +60,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
 		[Test]
 		public void TestColumnExists()
 		{
+            _querySchemaMock.Setup(x => x.ColumnExists(null, _testTable, _testColumn)).Returns(true);
 			_querySchemaMock.Setup(x => x.ColumnExists(null, _testTable, _testColumn)).Returns(true).AtMostOnce();
 
 			_builder.Table(_testTable).Column(_testColumn).Exists().ShouldBeTrue();
@@ -68,6 +70,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
         [Test]
         public void TestTableExistsWithSchema()
         {
+            _querySchemaMock.Setup(x => x.TableExists(_testSchema, _testTable)).Returns(true);
             _querySchemaMock.Setup(x => x.TableExists(_testSchema, _testTable)).Returns(true).AtMostOnce();
 
             _builder.Schema(_testSchema).Table(_testTable).Exists().ShouldBeTrue();
@@ -77,6 +80,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
         [Test]
         public void TestColumnExistsWithSchema()
         {
+            _querySchemaMock.Setup(x => x.ColumnExists(_testSchema, _testTable, _testColumn)).Returns(true);
             _querySchemaMock.Setup(x => x.ColumnExists(_testSchema, _testTable, _testColumn)).Returns(true).AtMostOnce();
 
             _builder.Schema(_testSchema).Table(_testTable).Column(_testColumn).Exists().ShouldBeTrue();

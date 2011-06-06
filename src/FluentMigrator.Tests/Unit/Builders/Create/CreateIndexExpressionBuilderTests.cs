@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 			indexMock.VerifySet(x => x.TableName = "Bacon", Times.AtMostOnce());
 
 			var expressionMock = new Mock<CreateIndexExpression>();
-			expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object).AtMostOnce();
+            expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object).AtMostOnce();
 
 			var builder = new CreateIndexExpressionBuilder(expressionMock.Object);
 			builder.OnTable("Bacon");
@@ -51,10 +51,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             collectionMock.Verify(x => x.Add(It.Is<IndexColumnDefinition>(c => c.Name.Equals("BaconId"))), Times.AtMostOnce());
 
 			var indexMock = new Mock<IndexDefinition>();
-			indexMock.SetupGet(x => x.Columns).Returns(collectionMock.Object).AtMostOnce();
+            indexMock.Setup(x => x.Columns).Returns(collectionMock.Object);
+			indexMock.VerifyGet(x => x.Columns, Times.AtMostOnce());
 
 			var expressionMock = new Mock<CreateIndexExpression>();
-			expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object).AtMostOnce();
+            expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object).AtMostOnce();
 
 			var builder = new CreateIndexExpressionBuilder(expressionMock.Object);
 			builder.OnColumn("BaconId");

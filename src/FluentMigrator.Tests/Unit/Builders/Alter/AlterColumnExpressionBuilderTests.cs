@@ -262,7 +262,8 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             collectionMock.Verify(x => x.Add(It.Is<AlterDefaultConstraintExpression>(e => e.DefaultValue.Equals(value))), Times.AtMostOnce());
 
             var contextMock = new Mock<IMigrationContext>();
-            contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+            contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
 
             var builder = new AlterColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
 			builder.WithDefaultValue(value);

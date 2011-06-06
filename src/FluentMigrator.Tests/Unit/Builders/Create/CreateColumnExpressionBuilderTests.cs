@@ -323,7 +323,8 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
                                                 )), Times.AtMostOnce());
 
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+            contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
 
 			var columnMock = new Mock<ColumnDefinition>();
 			columnMock.SetupGet(x => x.Name).Returns("BaconId");
