@@ -3,7 +3,7 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
-	internal class SqlServerColumn : ColumnBase
+	public class SqlServerColumn : ColumnBase
 	{
 		public SqlServerColumn(ITypeMap typeMap) : base(typeMap, new SqlServerQuoter())
 		{

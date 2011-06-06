@@ -23,7 +23,7 @@ using System.IO;
 
 namespace FluentMigrator.Runner.Announcers
 {
-	public class TextWriterAnnouncer : BaseAnnouncer
+    public class TextWriterAnnouncer : BaseAnnouncer
 	{
 		public TextWriterAnnouncer(TextWriter writer)
 			: base(msg => writer.Write(msg))

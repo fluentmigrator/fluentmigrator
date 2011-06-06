@@ -6,7 +6,7 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Generators.Base
 {
-	internal abstract class ColumnBase : IColumn
+	public abstract class ColumnBase : IColumn
 	{
 		private readonly ITypeMap _typeMap;
 		private readonly IQuoter _quoter;

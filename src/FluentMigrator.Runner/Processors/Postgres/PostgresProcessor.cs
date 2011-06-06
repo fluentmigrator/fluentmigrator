@@ -55,6 +55,11 @@ namespace FluentMigrator.Runner.Processors.Postgres
 			return Exists("select * from pg_catalog.pg_indexes where schemaname='{0}' and tablename = '{1}' and indexname = '{2}'", Quoter.UnQuoteSchemaName(schemaName),Quoter.UnQuote(tableName), Quoter.UnQuote(indexName));
         }
 
+        public override bool IndexExists(string schemaName, string tableName, string indexName, string columnName)
+        {
+            throw new NotImplementedException();
+        }
+
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
 			return Read("SELECT * FROM {0}.{1}", Quoter.QuoteSchemaName(schemaName), Quoter.QuoteTableName(tableName));
