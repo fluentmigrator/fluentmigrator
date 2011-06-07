@@ -33,12 +33,16 @@ namespace FluentMigrator.Runner.Generators.SQLite
 		public override string Generate(AlterColumnExpression expression)
 		{
 			return compatabilityMode.HandleCompatabilty("Sqlite does not support alter column");
-
 		}
 
 		public override string Generate(RenameColumnExpression expression)
 		{
 			return compatabilityMode.HandleCompatabilty("Sqlite does not support renaming of columns");
+		}
+
+		public override string Generate(DeleteColumnExpression expression)
+		{
+			return compatabilityMode.HandleCompatabilty("Sqlite does not support deleting of columns");
 		}
 
 		public override string Generate(AlterDefaultConstraintExpression expression)
