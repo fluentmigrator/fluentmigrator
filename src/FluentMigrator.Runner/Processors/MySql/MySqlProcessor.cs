@@ -36,7 +36,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
 		public override bool SchemaExists(string schemaName)
 		{
-            return true;
+		    return true;
 		}
 
         public override bool TableExists(string schemaName, string tableName)

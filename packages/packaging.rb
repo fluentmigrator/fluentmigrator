@@ -32,14 +32,14 @@ task :prepare_package => :release do
   copy_files './lib/', output_directory_tools, 'MySql.Data', ['dll']
   copy_files './lib/', output_directory_tools, 'System.Data.SQLite', ['dll']
   copy_files './src/FluentMigrator.Runner/bin/Release/', output_directory_tools, 'FluentMigrator.Runner', ['dll']
-  copy_files './src/FluentMigrator.Console/bin/x86/Release/', output_directory_tools, 'Migrate', ['exe']
-  copy_files './src/FluentMigrator.Console/bin/x86/Release/', output_directory_tools, 'Migrate', ['exe.config']
+  copy_files './src/FluentMigrator.Console/bin/Release/', output_directory_tools, 'Migrate', ['exe']
+  copy_files './src/FluentMigrator.Console/bin/Release/', output_directory_tools, 'Migrate', ['exe.config']
   copy_files './src/FluentMigrator.Nant/bin/Release/', output_directory_tools, 'FluentMigrator.NAnt', ['dll']
   copy_files './src/FluentMigrator.MSBuild/bin/Release/', output_directory_tools, 'FluentMigrator.MSBuild', ['dll']
 end
 
 exec :package => :prepare_package do |cmd|
-  cmd.path_to_command = 'tools/NuPack.exe'
+  cmd.command = 'tools/NuPack.exe'
   cmd.parameters [
     'packages\\FluentMigrator\\FluentMigrator.nuspec',
     'packages\\FluentMigrator'

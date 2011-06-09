@@ -35,10 +35,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
 		public void CallingTableAddsAlterTableExpressionToContextWithSpecifiedNameSet()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-            collectionMock.Setup(x => x.Add(It.Is<AlterTableExpression>(e => e.TableName.Equals("Bacon")))).AtMostOnce();
+            collectionMock.Verify(x => x.Add(It.Is<AlterTableExpression>(e => e.TableName.Equals("Bacon"))), Times.AtMostOnce());
 
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+            contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
 
 			var root = new AlterExpressionRoot(contextMock.Object);
 			root.Table("Bacon");
@@ -52,7 +53,8 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+			contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
 
             var root = new AlterExpressionRoot(contextMock.Object);
 			var builder = root.Table("Bacon");
@@ -65,10 +67,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
 		public void CallingColumnAddsAlterColumnExpressionToContextWithSpecifiedNameSet()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Setup(x => x.Add(It.Is<AlterColumnExpression>(e => e.Column.Name.Equals("Bacon")))).AtMostOnce();
+            collectionMock.Verify(x => x.Add(It.Is<AlterColumnExpression>(e => e.Column.Name.Equals("Bacon"))), Times.AtMostOnce());
 
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+			contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
 
             var root = new AlterExpressionRoot(contextMock.Object);
 			root.Column("Bacon");
@@ -82,7 +85,8 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+			contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
 
             var root = new AlterExpressionRoot(contextMock.Object);
 			var builder = root.Column("Bacon");
