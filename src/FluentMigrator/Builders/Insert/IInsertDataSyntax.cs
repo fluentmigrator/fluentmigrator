@@ -39,6 +39,20 @@ namespace FluentMigrator.Builders.Insert
       IInsertDataSyntax InsertRowsSeparately();
 
       /// <summary>
+      /// Insert the data with case senstive column names
+      /// </summary>
+      /// <remarks>See the processor implementation on how this is implemeted</remarks>
+      /// <returns>Fluent interface instance to add further data</returns>
+      IInsertDataSyntax WithCaseSensitiveColumnNames();
+
+      /// <summary>
+      /// Insert the data with case senstive column names for a specific column
+      /// </summary>
+      /// <remarks>See the processor implementation on how this is implemeted</remarks>
+      /// <returns>Fluent interface instance to add further data</returns>
+      IInsertDataSyntax WithCaseSensitiveColumn(string column);
+
+      /// <summary>
       /// Insert the data with special handling for Identity (or Sequence) column
       /// </summary>
       /// <remarks>See the processor implementation on how this is implemeted</remarks>
@@ -51,6 +65,6 @@ namespace FluentMigrator.Builders.Insert
       /// <param name="oldValue">The old value to be replaced</param>
       /// <param name="newValue">The new value to insert if a match is found</param>
       /// <returns>Fluent interface instance to add further data</returns>
-      IInsertDataSyntax WithReplacementValue(object oldValue, string newValue);
+      IInsertDataSyntax WithReplacementValue(object oldValue, object newValue);
 	}
 }

@@ -1,17 +1,32 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Expressions;
+using FluentMigrator.Model;
+using FluentMigrator.Runner.Generators.Oracle;
 
 
 namespace FluentMigrator.Runner.Processors.Oracle
 {
 	public class OracleProcessor : ProcessorBase
 	{
+      /// <summary>
+      /// If <c>True</c> indicates that sequences should automatically be created to Identity columns
+      /// </summary>
 	   private bool AutoGenerateSequenceForIdentityColumn = true;
+
+      /// <summary>
+      /// The default string.Format to apply to generate a sequence name
+      /// </summary>
       private string SequenceNameFormat = "{0}SEQ";
+
+      /// <summary>
+      /// Delegate function thate allows custom generation of sequenec names based on a table name
+      /// </summary>
+      public Func<string,string> CustomSequenceNamer { get; set; }
 
 	   public virtual IDbConnection Connection { get; set; }
 
@@ -43,10 +58,13 @@ namespace FluentMigrator.Runner.Processors.Oracle
            {
               // Generate a sequence starting at one
               // ... 
-              Process(
-                 string.Format("CREATE SEQUENCE {0} MINVALUE 1 START WITH {1} INCREMENT BY 1 CACHE 20",
-                               string.Format(SequenceNameFormat, expression.TableName.ToUpper())
-                               , 1));
+
+              var sequenceName = string.Format(SequenceNameFormat, expression.TableName.ToUpper());
+              if ( CustomSequenceNamer != null)
+                 sequenceName = CustomSequenceNamer(expression.TableName);
+
+              Process(string.Format("CREATE SEQUENCE {0} MINVALUE 1 START WITH {1} INCREMENT BY 1 CACHE 20",
+                                sequenceName, 1));
 
            }
         }
@@ -57,8 +75,11 @@ namespace FluentMigrator.Runner.Processors.Oracle
 	   }
 
 	   public override void Process(InsertDataExpression expression)
-        {
-           base.Process(expression);
+	   {
+	      QuoteInsertColumnNames(expression);
+
+	      base.Process(expression);   
+           
 
            if (expression.WithIdentity && AutoGenerateSequenceForIdentityColumn)
            {
@@ -70,22 +91,47 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
               if (startValue > 0)
               {
+                 var sequenceName = string.Format(SequenceNameFormat, expression.TableName.ToUpper());
+                 if (CustomSequenceNamer != null)
+                    sequenceName = CustomSequenceNamer(expression.TableName);
+
+
                  // Drop the default sequence that was generated
-                 Process(string.Format("DROP SEQUENCE {0}",
-                                       string.Format(SequenceNameFormat, expression.TableName.ToUpper())));
+                 Process(string.Format("DROP SEQUENCE {0}", sequenceName));
 
                  // And re create the sequence with the new start value
                  Process(
                     string.Format("CREATE SEQUENCE {0} MINVALUE 1 START WITH {1} INCREMENT BY 1 CACHE 20",
-                                  string.Format(SequenceNameFormat, expression.TableName.ToUpper())
+                                  sequenceName
                                   , startValue + 1));
               }
 
            }
         }
 
+	   private void QuoteInsertColumnNames(InsertDataExpression expression)
+	   {
+         if ( ! expression.CaseSensitiveColumnNames)
+            return;
 
-        public override bool ColumnExists(string schemaName, string tableName, string columnName)
+	      var quoter = new OracleQuoter {CaseSensitiveNames = expression.CaseSensitiveColumnNames};
+	      foreach ( var row in expression.Rows )
+	      {
+	         var toRemove = (from nameValue in row
+	                         let quotedName = quoter.QuoteColumnName(nameValue.Key)
+                            where quotedName != nameValue.Key && (expression.CaseSensitiveColumns.Count == 0 || expression.CaseSensitiveColumns.Contains(nameValue.Key))
+	                         select nameValue).ToList();
+
+	         foreach (var keyValuePair in toRemove)
+	         {
+	            row.Remove(keyValuePair);
+	            row.Add(new KeyValuePair<string, object>(quoter.QuoteColumnName(keyValuePair.Key), keyValuePair.Value));
+	         }             
+	      }
+	   }
+
+
+	   public override bool ColumnExists(string schemaName, string tableName, string columnName)
 		{
 			return Exists("SELECT COLUMN_NAME FROM USER_TAB_COLUMNS WHERE LOWER(TABLE_NAME) = '{0}' AND LOWER(COLUMN_NAME) = '{1}'", tableName.ToLower(), columnName.ToLower());
 		}

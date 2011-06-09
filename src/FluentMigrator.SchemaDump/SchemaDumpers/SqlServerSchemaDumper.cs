@@ -121,7 +121,7 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
                 LEFT JOIN sys.default_constraints def ON c.default_object_id = def.object_id
                 LEFT JOIN sys.key_constraints pk ON t.object_id = pk.parent_object_id AND pk.type = 'PK'
                 LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu ON t.name = kcu.TABLE_NAME AND c.name = kcu.COLUMN_NAME AND pk.name = kcu.CONSTRAINT_NAME
-                ORDER BY t.name, c.name";
+                ORDER BY t.name, c.column_id";
             DataSet ds = Read(query);
             DataTable dt = ds.Tables[0];
             IList<TableDefinition> tables = new List<TableDefinition>();
@@ -183,6 +183,8 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
          // Source http://msdn.microsoft.com/en-us/library/ms186939.aspx (nchar, nvarchar)
 	      switch ( databaseType)
 	      {
+            case SqlTypes.NChar:
+	            return databaseLength/2;
 	         case SqlTypes.Image:
             case SqlTypes.Text:
 	            return int.MaxValue;
@@ -269,7 +271,7 @@ ORDER BY v.name, sc.colid
                 case SqlTypes.Int: // 'int'
                     return DbType.Int32;
                 case SqlTypes.Smalldatetime: // 'System.DateTime'
-                    return DbType.DateTime;
+                    return DbType.Date;
                 case SqlTypes.Real: // 'float'
                     return DbType.Int64;
                 case SqlTypes.Money: // 'decimal'
@@ -299,11 +301,12 @@ ORDER BY v.name, sc.colid
                 case SqlTypes.Binary: // 'byte[]'
                     return DbType.Binary;
                 case SqlTypes.Char: //'string'
-                    return DbType.AnsiString;
+                    return DbType.AnsiStringFixedLength;
                 case SqlTypes.Timestamp: //'long'
                     return DbType.Int64;
-                case SqlTypes.NVarchar: //'string'
                 case SqlTypes.NChar: //'string'
+                    return DbType.StringFixedLength;
+                case SqlTypes.NVarchar: //'string'
                 case SqlTypes.Xml: //'string'
                 default:
                     return DbType.String;

@@ -36,6 +36,7 @@ namespace FluentMigrator.Expressions
       public InsertDataExpression()
       {
          ReplacementValues = new Dictionary<object, object>();
+         CaseSensitiveColumns = new List<string>();
       }
 
 		private readonly List<InsertionDataDefinition> _rows = new List<InsertionDataDefinition>();
@@ -46,6 +47,17 @@ namespace FluentMigrator.Expressions
       /// The name of the data table to obtain data from
       /// </summary>
       public string DataTableFile { get; set; }
+
+      /// <summary>
+      /// If <c>True</c> indicates that the names are case sensitive
+      /// </summary>
+      public bool CaseSensitiveColumnNames { get; set; }
+
+
+      /// <summary>
+      /// The case sensitive column name
+      /// </summary>
+      public List<string> CaseSensitiveColumns { get; set; }
 
       /// <summary>
       /// <para>If <c>True</c> then each insert statement should be individualy inserted as part of the migration.</para> 
@@ -125,8 +137,9 @@ namespace FluentMigrator.Expressions
          foreach (DataRow dr in dataAsDataTable.Rows)
          {
             var dataRow = new InsertionDataDefinition();
+
             dataRow.AddRange(from DataColumn column in dataAsDataTable.Columns
-                             select new KeyValuePair<string, object>(column.ColumnName, dr[column.ColumnName]));
+                             select new KeyValuePair<string, object>(column.ColumnName, ((dr[column.ColumnName] is string) ? ((string)dr[column.ColumnName]).Trim() : dr[column.ColumnName])));
             data.Add(dataRow);
          }
             

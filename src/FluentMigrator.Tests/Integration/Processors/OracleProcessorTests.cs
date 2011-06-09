@@ -65,6 +65,7 @@ namespace FluentMigrator.Tests.Integration.Processors
             oracleProcessor.Connection.Dispose();
 
          }         
+         
       }
 
 
@@ -243,6 +244,29 @@ namespace FluentMigrator.Tests.Integration.Processors
       }
 
       [Test]
+      public void CanInsertWithCustomIdentityName()
+      {
+         ((OracleProcessor)_processor).CustomSequenceNamer = tableName => "MYFOOSEQ";
+
+         CreateTestTableWithIdentity();
+
+         _processor.Process(new InsertDataExpression()
+         {
+            TableName = "Foo"
+            ,Rows = { new InsertionDataDefinition() { new KeyValuePair<string, object>("Id", 1) } }
+            ,WithIdentity = true
+         });
+
+         var table = _processor.ReadTableData(string.Empty, "Foo");
+
+         Assert.AreEqual(1, table.Tables[0].Rows.Count);
+
+         var nextVal = _processor.Read("SELECT MYFOOSEQ.nextval from dual");
+
+         Assert.AreEqual(2, nextVal.Tables[0].Rows[0][0], "Next Val");
+      }
+
+      [Test]
       public void CanInsertBinaryData()
       {
          _processor.Process(new CreateTableExpression
@@ -255,6 +279,27 @@ namespace FluentMigrator.Tests.Integration.Processors
          {
             TableName = "Foo"
             ,Rows = { new InsertionDataDefinition() { new KeyValuePair<string, object>("Data", System.Text.Encoding.ASCII.GetBytes("HELLO WORLD")) } }
+         });
+
+         var table = _processor.ReadTableData(string.Empty, "Foo");
+
+         Assert.AreEqual(1, table.Tables[0].Rows.Count);
+      }
+
+      [Test]
+      public void CanInsertChar()
+      {
+         _processor.Process(new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = { new ColumnDefinition { Name = "Data", Type = DbType.AnsiString, Size = 20 } }
+         });
+
+         _processor.Process(new InsertDataExpression()
+         {
+            TableName = "Foo"
+            ,
+            Rows = { new InsertionDataDefinition() { new KeyValuePair<string, object>("Data", new string('A',20)) } }
          });
 
          var table = _processor.ReadTableData(string.Empty, "Foo");

@@ -65,7 +65,7 @@ namespace FluentMigrator.Builders.Insert
 	      return this;
 	   }
 
-	   public IInsertDataSyntax WithReplacementValue(object oldValue, string newValue)
+	   public IInsertDataSyntax WithReplacementValue(object oldValue, object newValue)
 	   {
          if ( ! _expression.ReplacementValues.ContainsKey(oldValue) )
 	         _expression.ReplacementValues.Add(oldValue, newValue);
@@ -93,6 +93,17 @@ namespace FluentMigrator.Builders.Insert
 			return data;
 		}
 
-     
+      public IInsertDataSyntax WithCaseSensitiveColumnNames()
+      {
+         _expression.CaseSensitiveColumnNames = true;
+         return this;
+      }
+
+      public IInsertDataSyntax WithCaseSensitiveColumn(string column)
+      {
+         _expression.CaseSensitiveColumnNames = true;
+         _expression.CaseSensitiveColumns.Add(column);
+         return this;
+      }
 	}
 }

@@ -28,6 +28,7 @@ using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.SchemaDump.SchemaDumpers;
 using Microsoft.CSharp;
@@ -65,6 +66,13 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
       public void Migrate(SchemaMigrationContext context)
       {
          Generate(context);
+
+         if (context.PreMigrationAction != null)
+         {
+            _announcer.Say("Executing pre-migration action");
+            context.PreMigrationAction();
+         }
+            
 
          if (context.ExecuteInMemory)
          {
@@ -186,6 +194,10 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
                                                                                        PreviewOnly = false,
                                                                                        Timeout = 30
                                                                                     });
+
+            if (toProcessor is OracleProcessor && context.OracleSequenceNamer != null)
+               ((OracleProcessor) toProcessor).CustomSequenceNamer = context.OracleSequenceNamer;
+
             var runner = new MigrationRunner(assembly, runnerContext, toProcessor);
             runner.MigrateUp(true);
          }

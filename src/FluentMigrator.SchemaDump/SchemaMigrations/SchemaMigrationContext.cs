@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Text;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.SchemaDump.SchemaMigrations
@@ -21,7 +22,7 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
          DateTimeFormat = "yyyy-MM-dd";
          DateTimeDefaultValueFormatter = (columnDefinition, defaultValue) =>
          {
-            return string.Format("\"TO_DATE('{0}', '{1}')\"", DateTime.ParseExact(defaultValue.Replace("\"", ""), DateTimeFormat, null).ToString(DateTimeFormat), DateTimeFormat.ToUpper());
+            return string.Format("DateTime.ParseExact(\"{0}\", \"{1}\", null)", DateTime.ParseExact(defaultValue.Replace("\"", ""), DateTimeFormat, null).ToString(DateTimeFormat), DateTimeFormat);
          };
          DefaultMigrationNamespace = "MigrationsDefault";
 
@@ -47,6 +48,11 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
          DataDirectory = "Data";
 
          InsertColumnReplacements = new List<InsertColumnReplacement>();
+
+         MigrationEncoding = Encoding.Unicode;
+
+         CaseSenstiveColumns = new List<string>();
+
       }
 
       /// <summary>
@@ -176,23 +182,36 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
       public string WorkingDirectory { get; set; }
 
       public List<InsertColumnReplacement> InsertColumnReplacements { get; private set; }
-   }
-
-   public class InsertColumnReplacement
-   {
-      /// <summary>
-      /// The column definition to be matched
-      /// </summary>
-      public ColumnDefinition ColumnDataToMatch { get; set; }
 
       /// <summary>
-      /// The old value to be replaced
+      /// Delegate that allows the <see cref="TableDefinition"/> to be altered before the schema migration is generated
       /// </summary>
-      public object OldValue { get; set; }
+      public Action<IList<TableDefinition>> PreMigrationTableUpdate { get; set; }
 
       /// <summary>
-      /// The new value to be inserted
+      /// The encoding format to use when savsing and migration string data
       /// </summary>
-      public object NewValue { get; set; }
+      public Encoding MigrationEncoding { get; set; }
+
+      /// <summary>
+      /// A custom delegfate that can be supplied to generate SEQUENEC names
+      /// </summary>
+      /// <remarks>The name of the table to place a sequence on will be provided. The sequqnce name should be returned</remarks>
+      public Func<string, string> OracleSequenceNamer { get; set; }
+
+      /// <summary>
+      /// <c>True</c> indicates that columns in the migration should be treated a case senstive
+      /// </summary>
+      public bool CaseSenstiveColumnNames { get; set; }
+
+      /// <summary>
+      /// The list of columns that are case senstive
+      /// </summary>
+      public List<string> CaseSenstiveColumns { get; private set; }
+
+      /// <summary>
+      /// The action to be executed before the migration takes place
+      /// </summary>
+      public Action PreMigrationAction { get; set; }
    }
 }

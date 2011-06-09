@@ -10,6 +10,7 @@ namespace FluentMigrator.Tests.Integration
    /// <summary>
    /// Provides a context from a which a unit test can create an empty Oracle user database for unit testing
    /// </summary>
+   /// <remarks>For Oracle XE will need to run "ALTER SYSTEM SET PROCESSES=400 SCOPE=SPFILE;" and restart XE</remarks>
    public class OracleUnitTest
    {
       /// <summary>
@@ -116,18 +117,58 @@ namespace FluentMigrator.Tests.Integration
                {
                   while ( reader.Read())
                   {
-                     using (var com = new OdbcCommand(string.Format("DROP USER {0} CASCADE", reader["username"]), con))
-                     {
-                        try
-                        {
-                           com.ExecuteNonQuery();
-                        }
-                        catch (OdbcException ex)
-                        {
-                        }
-                     }   
+                     var userName = reader["username"] as string;
+                     //CloseDatabaseSessions(con, userName);
+                     DropUser(con, userName);   
                   }
                   
+               }
+            }
+         }
+      }
+
+      /// <summary>
+      /// Drops a user schema
+      /// </summary>
+      /// <param name="con">The open connection to drop user from</param>
+      /// <param name="userName">The user name to drop</param>
+      private void DropUser(OdbcConnection con, string userName)
+      {
+         using (var com = new OdbcCommand(string.Format("DROP USER {0} CASCADE", userName), con))
+         {
+            try
+            {
+               com.ExecuteNonQuery();
+            }
+            catch (OdbcException ex)
+            {
+            }
+         }
+      }
+
+      /// <summary>
+      /// Closes open database sessions to a given schema
+      /// </summary>
+      /// <param name="connection">The open connection to execute the query against</param>
+      /// <param name="schema">The schema to close connections for</param>
+      private void CloseDatabaseSessions(OdbcConnection connection, string schema)
+      {
+         using (var killSqlCommand = new OdbcCommand(string.Format("select 'alter system kill session ''' || sid || ',' || serial# || '''' from v$session where username = '{0}'", schema), connection))
+         {
+            using (var killReader = killSqlCommand.ExecuteReader())
+            {
+               while (killReader.Read())
+               {
+                  using (var killCommand = new OdbcCommand(killReader[0] as string, connection))
+                  {
+                     try
+                     {
+                        killCommand.ExecuteNonQuery();
+                     }
+                     catch (OdbcException ex)
+                     {
+                     }
+                  }  
                }
             }
          }

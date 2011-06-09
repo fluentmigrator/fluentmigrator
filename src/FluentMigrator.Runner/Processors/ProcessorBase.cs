@@ -124,10 +124,12 @@ namespace FluentMigrator.Runner.Processors
             {
                var insert = new InsertDataExpression()
                                {
-                                  DataTableFile = expression.DataTableFile
-                                  ,SchemaName = expression.SchemaName
-                                  ,TableName = expression.TableName
-                                  ,WithIdentity = expression.WithIdentity
+                                  CaseSensitiveColumnNames = expression.CaseSensitiveColumnNames
+                                  , CaseSensitiveColumns = expression.CaseSensitiveColumns
+                                  , DataTableFile = expression.DataTableFile
+                                  , SchemaName = expression.SchemaName
+                                  , TableName = expression.TableName
+                                  , WithIdentity = expression.WithIdentity
                 };
                // Copy the replacement to the new item
                foreach (var replacement in expression.ReplacementValues)

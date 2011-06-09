@@ -4,6 +4,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Xml;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.SchemaDump.SchemaDumpers;
@@ -17,8 +18,10 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
    {
       public CSharpTableMigrationsWriter(IAnnouncer announcer) : base(announcer)
       {
-         
+         MapDatabaseTypes = new Dictionary<DbType, DbType>();
       }
+
+      public Dictionary<DbType, DbType> MapDatabaseTypes { get; private set; }
 
       /// <summary>
       /// Generates C# Migrations that Create tables Migrations
@@ -29,6 +32,9 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
       {
          _announcer.Say("Reading database schema");
          var defs = schemaDumper.ReadDbSchema();
+
+         if (context.PreMigrationTableUpdate != null)
+            context.PreMigrationTableUpdate(defs);
 
          SetupMigrationsDirectory(context);
 
@@ -63,7 +69,12 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
                   if (!Directory.Exists(dataDirectory))
                      Directory.CreateDirectory(dataDirectory);
                   data.Tables[0].WriteXmlSchema(Path.Combine(dataDirectory, table.Name + ".xsd"));
-                  data.Tables[0].WriteXml(Path.Combine(dataDirectory, table.Name + ".xml"));
+
+                  using (var writer = new XmlTextWriter(Path.Combine(dataDirectory, table.Name + ".xml"), context.MigrationEncoding))
+                  {
+                     data.Tables[0].WriteXml(writer);   
+                  }
+                  
                }
             }
          }
@@ -110,10 +121,28 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
                output.Write(".WithIdentity()");
             }
 
+            // Add any replacement values
             foreach (var replacement in MatchingReplacements(context.InsertColumnReplacements, table))
             {
                output.Write(string.Format(".WithReplacementValue({0}, {1})", FormatValue(replacement.OldValue), FormatValue(replacement.NewValue)));   
             }
+
+            // Check if we need to honour case senstive column names
+            if ( context.CaseSenstiveColumnNames && context.CaseSenstiveColumns.Count() == 0)
+            {
+               // We do update insert statement
+               output.Write(".WithCaseSensitiveColumnNames()");   
+            }
+
+             if ( context.CaseSenstiveColumns.Count() > 0 )
+             {
+                foreach (var column in context.CaseSenstiveColumns)
+                {
+                   // We do update insert statement
+                   output.Write(string.Format(".WithCaseSensitiveColumn(\"{0}\")",column));    
+                }
+                  
+             }
               
             output.Write(";");
          }
@@ -129,6 +158,11 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
          if ( value is string)
          {
             return string.Format("\"{0}\"", value);
+         }
+
+         if (value is DateTime)
+         {
+            return string.Format("DateTime.ParseExact(\"{0}\", \"yyyy-MM-dd\", null)", ((DateTime)value).ToString("yyyy-MM-dd"));
          }
 
          throw new NotSupportedException(string.Format("Value type {0} not supported for migration replacement", value.GetType().Name));
@@ -171,71 +205,82 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
       {
          var columnSyntax = new StringBuilder();
          columnSyntax.AppendFormat(".WithColumn(\"{0}\")", column.Name);
-         switch (column.Type)
+
+         if (column.Type.HasValue)
          {
-            case DbType.AnsiString:
-               if (column.Size > 0)
-                  columnSyntax.AppendFormat(".AsAnsiString({0})", column.Size);
-               else
-                  columnSyntax.Append(".AsAnsiString()");
-               break;
-            case DbType.AnsiStringFixedLength:
-               columnSyntax.AppendFormat(".AsFixedLengthAnsiString({0})", column.Size);
-               break;
-            case DbType.Binary:
-               columnSyntax.AppendFormat(".AsBinary({0})", column.Size);
-               break;
-            case DbType.Byte:
-               columnSyntax.Append(".AsByte()");
-               break;
-            case DbType.Boolean:
-               columnSyntax.Append(".AsBoolean()");
-               break;
-            case DbType.Currency:
-               columnSyntax.Append(".AsCurrency()");
-               break;
-            case DbType.Date:
-               columnSyntax.Append(".AsDate()");
-               break;
-            case DbType.DateTime:
-               columnSyntax.Append(".AsDateTime()");
-               break;
-            case DbType.Decimal:
-               columnSyntax.AppendFormat(".AsDecimal({0},{1})", column.Precision, column.Scale);
-               break;
-            case DbType.Double:
-               columnSyntax.Append(".AsDouble()");
-               break;
-            case DbType.Guid:
-               columnSyntax.Append(".AsGuid()");
-               break;
-            case DbType.Int16:
-               columnSyntax.Append(".AsInt16()");
-               break;
-            case DbType.Int32:
-               columnSyntax.Append(".AsInt32()");
-               break;
-            case DbType.Int64:
-               columnSyntax.Append(".AsInt64()");
-               break;
-            case DbType.String:
-               if (column.Size > 0)
-                  columnSyntax.AppendFormat(".AsString({0})", column.Size);
-               else
+            var columnType = column.Type.Value;
+            if (MapDatabaseTypes.ContainsKey(columnType))
+            {
+               columnType = MapDatabaseTypes[columnType];
+            }
+
+            switch (columnType)
+            {
+               case DbType.AnsiString:
+                  if (column.Size > 0)
+                     columnSyntax.AppendFormat(".AsAnsiString({0})", column.Size);
+                  else
+                     columnSyntax.Append(".AsAnsiString()");
+                  break;
+               case DbType.AnsiStringFixedLength:
+                  columnSyntax.AppendFormat(".AsFixedLengthAnsiString({0})", column.Size);
+                  break;
+               case DbType.Binary:
+                  columnSyntax.AppendFormat(".AsBinary({0})", column.Size);
+                  break;
+               case DbType.Byte:
+                  columnSyntax.Append(".AsByte()");
+                  break;
+               case DbType.Boolean:
+                  columnSyntax.Append(".AsBoolean()");
+                  break;
+               case DbType.Currency:
+                  columnSyntax.Append(".AsCurrency()");
+                  break;
+               case DbType.Date:
+                  columnSyntax.Append(".AsDate()");
+                  break;
+               case DbType.DateTime:
+                  columnSyntax.Append(".AsDateTime()");
+                  break;
+               case DbType.Decimal:
+                  columnSyntax.AppendFormat(".AsDecimal({0},{1})", column.Precision, column.Scale);
+                  break;
+               case DbType.Double:
+                  columnSyntax.Append(".AsDouble()");
+                  break;
+               case DbType.Guid:
+                  columnSyntax.Append(".AsGuid()");
+                  break;
+               case DbType.Int16:
+                  columnSyntax.Append(".AsInt16()");
+                  break;
+               case DbType.Int32:
+                  columnSyntax.Append(".AsInt32()");
+                  break;
+               case DbType.Int64:
+                  columnSyntax.Append(".AsInt64()");
+                  break;
+               case DbType.String:
+                  if (column.Size > 0)
+                     columnSyntax.AppendFormat(".AsString({0})", column.Size);
+                  else
+                     columnSyntax.Append(".AsString()");
+                  break;
+
+               case DbType.StringFixedLength:
+                  columnSyntax.AppendFormat(".AsFixedLengthString({0})", column.Size);
+                  break;
+               case DbType.Xml:
+                  columnSyntax.Append(".AsXml()");
+                  break;
+               default:
+                  _announcer.Error(string.Format("Unsupported type {0} for column {1}", column.Type, column.Name));
                   columnSyntax.Append(".AsString()");
-               break;
-            
-            case DbType.StringFixedLength:
-               columnSyntax.AppendFormat(".AsFixedLengthString({0})", column.Size);
-               break;
-            case DbType.Xml:
-               columnSyntax.Append(".AsXml()");
-               break;
-            default:
-               _announcer.Error(string.Format("Unsupported type {0} for column {1}", column.Type, column.Name));
-               columnSyntax.Append(".AsString()");
-               break;
+                  break;
+            }
          }
+            
          if (column.IsIdentity)
             columnSyntax.Append(".Identity()");
          else if (column.IsIndexed)
@@ -290,7 +335,7 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
          {
             defaultValue = defaultValue.Replace("'", "\"");
 
-            if (column.Type == DbType.DateTime)
+            if (column.Type == DbType.DateTime || column.Type == DbType.Date)
             {
                defaultValue = context.DateTimeDefaultValueFormatter(column, defaultValue);
             }
@@ -298,6 +343,12 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
             fluentColumnCode.AppendFormat(".WithDefaultValue({0})", defaultValue);
             return;
          }
+
+         if (!defaultValue.StartsWith("\""))
+            defaultValue = "\"" + defaultValue;
+
+         if (!defaultValue.EndsWith("\""))
+            defaultValue = defaultValue + "\"";
          
          fluentColumnCode.AppendFormat(".WithDefaultValue({0})", defaultValue);
       }      

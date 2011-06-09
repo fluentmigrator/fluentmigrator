@@ -72,7 +72,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 
             string sql = generator.Generate(expression);
 
-            string expected = String.Format("INSERT ALL INTO TestTable1 (guid) VALUES ('{0}') SELECT 1 FROM DUAL", GeneratorTestHelper.TestGuid.ToString());
+            string expected = String.Format("INSERT ALL INTO TestTable1 (guid) VALUES (hextoraw('{0}')) SELECT 1 FROM DUAL", GeneratorTestHelper.TestGuid.ToString().Replace("-","").ToUpper());
 
             sql.ShouldBe(expected);
         }

@@ -65,6 +65,39 @@ namespace FluentMigrator.Tests.Unit.Builders.Insert
       }
 
       [Test]
+      public void CanAddCaseSensitiveColumnNames()
+      {
+         var expression = new InsertDataExpression();
+
+         var builder = new InsertDataExpressionBuilder(expression);
+         builder.WithCaseSensitiveColumnNames();
+
+         expression.CaseSensitiveColumnNames.ShouldBeTrue();
+      }
+
+      [Test]
+      public void CanAddCaseSensitiveColumn()
+      {
+         var expression = new InsertDataExpression();
+
+         var builder = new InsertDataExpressionBuilder(expression);
+         builder.WithCaseSensitiveColumn("Foo");
+
+         expression.CaseSensitiveColumnNames.ShouldBeTrue();
+         expression.CaseSensitiveColumns.Contains("Foo");
+      }
+
+      [Test]
+      public void NoCaseSensitiveByDefault()
+      {
+         var expression = new InsertDataExpression();
+
+         var builder = new InsertDataExpressionBuilder(expression);
+
+         expression.CaseSensitiveColumnNames.ShouldBeFalse();
+      }
+
+      [Test]
       public void InsertRowsSeparatelyFalseByDefault()
       {
          var expression = new InsertDataExpression();

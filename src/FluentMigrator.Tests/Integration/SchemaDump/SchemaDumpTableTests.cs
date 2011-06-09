@@ -92,7 +92,16 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
       {
          var column = GetTableColumn("char(200)");
 
-         column.Type.ShouldBe(DbType.AnsiString);
+         column.Type.ShouldBe(DbType.AnsiStringFixedLength);
+         column.Size.ShouldBe(200);
+      }
+
+      [Test]
+      public void SqlServerNChar200IsAnsiString()
+      {
+         var column = GetTableColumn("nchar(200)");
+
+         column.Type.ShouldBe(DbType.StringFixedLength);
          column.Size.ShouldBe(200);
       }
 
@@ -103,6 +112,22 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
 
          column.Type.ShouldBe(DbType.String);
          column.Size.ShouldBe(int.MaxValue);
+      }
+
+      [Test]
+      public void SqlServerDateTimeIsDateTime()
+      {
+         var column = GetTableColumn("datetime");
+
+         column.Type.ShouldBe(DbType.DateTime);
+      }
+
+      [Test]
+      public void SqlServerSmallDateTimeIsDate()
+      {
+         var column = GetTableColumn("smalldatetime");
+
+         column.Type.ShouldBe(DbType.Date);
       }
 
       /// <summary>
