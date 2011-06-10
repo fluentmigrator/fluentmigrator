@@ -37,7 +37,7 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Integration.SchemaMigration
 {
    [TestFixture]
-   public class SqlServerToOracleMigrationTests
+   public class SqlServerToOracleMigrationTests : BaseSchemaMigrationTests
    {
       private SqlServerUnitTest _sqlContext;
       private OracleUnitTest _oracleContext;
@@ -50,6 +50,8 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          _oracleContext = new OracleUnitTest();
          _sqlContext.TestFixtureSetUp();
          _oracleContext.TestFixtureSetUp();
+
+         OracleContext = _oracleContext;
       }
 
       [TestFixtureTearDown]
@@ -324,7 +326,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          row.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("Id", 1)});
 
          // Act
-         var data = MigrateToOracleWithData(create, row, 1);
+         var data = MigrateToOracleWithData(new List<IMigrationExpression> {create, row}, 1);
 
 
          // Assert
@@ -354,8 +356,8 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          row.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("Data", hexData) });
 
          // Act
-         var data = MigrateToOracleWithData(create, row, 1,
-            c => c.PreMigrationTableUpdate = (table) =>
+         var data = MigrateToOracleWithData(new List<IMigrationExpression> {create, row}, 1,
+            c => c.PreMigrationTableUpdate = table =>
                                                 {
                                                    table[0].Columns.Where(column => column.Name == "Data").
                                                       FirstOrDefault().Type = DbType.Binary;
@@ -388,7 +390,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
         
 
          // Act
-         var data = MigrateToOracleWithData(create, row, 1);
+         var data = MigrateToOracleWithData(new List<IMigrationExpression> {create, row}, 1);
 
          // Assert
          data.Tables[0].Rows.Count.ShouldBe(1);
@@ -414,7 +416,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          row.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("Test", "12345678901234567890") });
 
          // Act
-         var data = MigrateToOracleWithData(create, row, 1);
+         var data = MigrateToOracleWithData(new List<IMigrationExpression> {create, row}, 1);
 
          // Assert
          data.Tables[0].Rows.Count.ShouldBe(1);
@@ -439,7 +441,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          row.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("Test", string.Empty) });
 
          // Act
-         var data = MigrateToOracleWithData(create, row, 1);
+         var data = MigrateToOracleWithData(new List<IMigrationExpression> {create, row}, 1);
 
          // Assert
          data.Tables[0].Rows.Count.ShouldBe(1);
@@ -464,14 +466,14 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          row.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("Test", Guid.NewGuid()) });
 
          // Act
-         var data = MigrateToOracleWithData(create, row, 1);
+         var data = MigrateToOracleWithData(new List<IMigrationExpression> {create, row}, 1);
 
          // Assert
          data.Tables[0].Rows.Count.ShouldBe(1);
       }
 
       [Test]
-      public void CanMigrateStringWithNullvalue()
+      public void CanMigrateStringWithNullValue()
       {
          // Arrange
          var create = new CreateTableExpression
@@ -489,7 +491,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          row.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("Test", null) });
 
          // Act
-         var data = MigrateToOracleWithData(create, row, 1);
+         var data = MigrateToOracleWithData(new List<IMigrationExpression> {create, row}, 1);
 
          // Assert
          data.Tables[0].Rows.Count.ShouldBe(1);
@@ -514,7 +516,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          row.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("Test", "A Test") });
         
          // Act
-         var data = MigrateToOracleWithData(create, row, 1, c => c.PreMigrationTableUpdate = tables => { foreach (var column in from table in tables
+         var data = MigrateToOracleWithData(new List<IMigrationExpression> {create, row}, 1, c => c.PreMigrationTableUpdate = tables => { foreach (var column in from table in tables
                                                                               from tableDefinition in tables
                                                                               from column in tableDefinition.Columns
                                                                               where column.Type == DbType.AnsiString
@@ -579,19 +581,50 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          };
 
          var oldVal = DateTime.ParseExact("1900-01-01", "yyyy-MM-dd", null);
-         var newVal = DateTime.ParseExact("2000-01-01", "yyyy-MM-dd", null);
+         var newVal = DateTime.ParseExact("0001-01-01", "yyyy-MM-dd", null);
 
          var row = new InsertDataExpression { TableName = "Foo"};
          row.Rows.Add(new InsertionDataDefinition() { new KeyValuePair<string, object>("Test", oldVal) });
 
          // Act
-         var data = MigrateToOracleWithData(create, row, 1, c => c.InsertColumnReplacements.Add(
+         var data = MigrateToOracleWithData(new List<IMigrationExpression> {create, row}, 1, c => c.InsertColumnReplacements.Add(
             new InsertColumnReplacement
                {
                   ColumnDataToMatch = new ColumnDefinition {Type = DbType.DateTime, IsNullable = true}
                   , OldValue = oldVal
                   , NewValue = newVal
                }));
+
+         // Assert
+         data.Tables[0].Rows[0]["Test"].ShouldBe(newVal);
+      }
+
+      [Test]
+      public void CanMigrateDateAndReplaceDateValue()
+      {
+         // Arrange
+         var create = new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = new[]{
+                   new ColumnDefinition {Name = "Test", Type = DbType.Date, IsNullable = true, DefaultValue = "1900-01-01"}
+                    }
+         };
+
+         var oldVal = DateTime.ParseExact("1900-01-01", "yyyy-MM-dd", null);
+         var newVal = DateTime.ParseExact("0001-01-01", "yyyy-MM-dd", null);
+
+         var row = new InsertDataExpression { TableName = "Foo" };
+         row.Rows.Add(new InsertionDataDefinition() { new KeyValuePair<string, object>("Test", oldVal) });
+
+         // Act
+         var data = MigrateToOracleWithData(new List<IMigrationExpression> {create, row}, 1, c => c.InsertColumnReplacements.Add(
+            new InsertColumnReplacement
+            {
+               ColumnDataToMatch = new ColumnDefinition { Type = DbType.Date, IsNullable = true }
+               ,OldValue = oldVal
+               ,NewValue = newVal
+            }));
 
          // Assert
          data.Tables[0].Rows[0]["Test"].ShouldBe(newVal);
@@ -618,7 +651,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          row.WithIdentity = true;
 
          // Act
-         var data = MigrateToOracleWithData(create, row, 1);
+         var data = MigrateToOracleWithData(new List<IMigrationExpression> {create, row}, 1);
 
          // Assert
         
@@ -646,7 +679,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          row.WithIdentity = true;
 
          // Act
-         var data = MigrateToOracleWithData(create, row, 1, c => c.OracleSequenceNamer = table => "MyTest");
+         var data = MigrateToOracleWithData(new List<IMigrationExpression> {create, row}, 1, c => c.OracleSequenceNamer = table => "MyTest");
 
          // Assert
 
@@ -673,7 +706,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          row.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("id", 1) });
 
          // Act
-         var data = MigrateToOracleWithData(create, row, 1
+         var data = MigrateToOracleWithData(new List<IMigrationExpression> {create, row}, 1
             , c => c.PreMigrationTableUpdate = tables => tables[0].Columns.FirstOrDefault().Name = "\\\"id\\\""
             , c => c.CaseSenstiveColumnNames = true
             , c => c.CaseSenstiveColumns.Add("id"));
@@ -704,7 +737,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          row.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("id", 1), new KeyValuePair<string, object>("Data", 1) });
 
          // Act
-         var data = MigrateToOracleWithData(create, row, 1
+         var data = MigrateToOracleWithData(new List<IMigrationExpression> {create, row}, 1
             , c => c.PreMigrationTableUpdate = tables => tables[0].Columns.Where(column => column.Name.Equals("id")).FirstOrDefault().Name = "\\\"id\\\""
             , c => c.CaseSenstiveColumns.Add("id"));
 
@@ -714,51 +747,68 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          data.Tables[0].Columns[1].ColumnName.ShouldBe("DATA");
       }
 
-      private void InsertData(InsertDataExpression row)
+      [Test]
+      public void CanMigrateTableIndex()
       {
-         using (var connection = new SqlConnection(_sqlContext.ConnectionString))
+         // Arrange
+
+         var create = new CreateTableExpression
          {
-            var processor = new SqlServerProcessor(connection, new SqlServer2005Generator(), new DebugAnnouncer(), new ProcessorOptions());
+            TableName = "Foo",
+            Columns = new[]{
+                   new ColumnDefinition {Name = "Id", Type = DbType.Int32}
+                    }
+         };
 
-            processor.Process(row);
+         var row = new InsertDataExpression
+         {
+            TableName = "Foo"
+         };
+         row.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("Id", 1) });
 
-            processor.CommitTransaction();
-         }
+         var index = new CreateIndexExpression
+                        {
+                           Index =
+                              new IndexDefinition()
+                                 {
+                                    Name = "IDX_Foo",
+                                    TableName = "Foo",
+                                    Columns = new List<IndexColumnDefinition> {new IndexColumnDefinition {Name = "Id"}}
+                                 }
+                        };
+
+         // Act
+         MigrateToOracleWithData(new List<IMigrationExpression> {create, row, index}, 1, c => c.MigrateIndexes = true);
+
+         // Assert
+
+         
       }
 
+      /// <summary>
+      /// Migrates a set of tables using the provided context
+      /// </summary>
+      /// <param name="context">The migration context that controls how items are migrated between SQL Server and Oracle</param>
+      /// <param name="createTables">The tables to be created in SQL Server and migrated to Oracle</param>
       private void MigrateTable(SchemaMigrationContext context, params CreateTableExpression[] createTables)
       {
          CreateTables(createTables);
 
          var migrator = new SqlServerSchemaMigrator(new DebugAnnouncer());
 
+         migrator.Generate(context);
          migrator.Migrate(context);
 
          AssertOracleTablesExist(createTables);
       }
 
-      private void AssertOracleTablesExist(params CreateTableExpression[] createTables)
-      {
-         if (createTables == null)
-            return;
-         var oracleProcessor = new OracleProcessorFactory().Create(_oracleContext.ConnectionString, new NullAnnouncer(),
-                                                                   new ProcessorOptions());
+      
 
-         foreach ( var create in createTables)
-            Assert.IsTrue(oracleProcessor.TableExists(string.Empty, create.TableName), "Oracle");   
-      }
-
-      private void AssertOracleTablesDoNotExist(params CreateTableExpression[] createTables)
-      {
-         if (createTables == null)
-            return;
-         var oracleProcessor = new OracleProcessorFactory().Create(_oracleContext.ConnectionString, new NullAnnouncer(),
-                                                                   new ProcessorOptions());
-
-         foreach (var create in createTables)
-            Assert.IsFalse(oracleProcessor.TableExists(string.Empty, create.TableName), "Oracle");
-      }
-
+      /// <summary>
+      /// Gets data that exists in an existing Oracle table
+      /// </summary>
+      /// <param name="tableName"></param>
+      /// <returns></returns>
       private DataSet GetOracleTableData(string tableName)
       {
          var oracleProcessor = new OracleProcessorFactory().Create(_oracleContext.ConnectionString, new NullAnnouncer(),
@@ -767,6 +817,10 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          return oracleProcessor.ReadTableData(string.Empty, tableName);
       }
 
+      /// <summary>
+      /// Creates tables in SQL Server and asserts that they exist
+      /// </summary>
+      /// <param name="createTables">The tables to be created</param>
       private void CreateTables(params CreateTableExpression[] createTables)
       {
          if (createTables == null)
@@ -786,6 +840,10 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          }
       }
 
+      /// <summary>
+      /// Creates views in SQL Server using the <see cref="ViewDefinition.CreateViewSql"/>
+      /// </summary>
+      /// <param name="view">The views to be created</param>
       private void CreateViews(params ViewDefinition[] view)
       {
          using (var connection = new SqlConnection(_sqlContext.ConnectionString))
@@ -801,6 +859,10 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          }
       }
 
+      /// <summary>
+      /// Obtains the default context that moved from SQL Server to Oracle
+      /// </summary>
+      /// <returns></returns>
       private SchemaMigrationContext GetDefaultContext()
       {
          return new SchemaMigrationContext
@@ -812,6 +874,13 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
                    };
       }
 
+      /// <summary>
+      /// Migrates a table from SQL Server to Oracle
+      /// </summary>
+      /// <param name="create">The table to be created in SQL Server</param>
+      /// <param name="view">The view to be created in SQL Server</param>
+      /// <param name="expectedMigrations">The expected number of migrations</param>
+      /// <param name="contextAction">Delegates that alter the context before the migration is executed</param>
       private void MigrateToOracle(CreateTableExpression create, ViewDefinition view, int expectedMigrations, params Action<SchemaMigrationContext>[] contextAction)
       {
          var context = GetDefaultContext();
@@ -842,7 +911,14 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          context.MigrationIndex.ShouldBe(expectedMigrations);
       }
 
-      private DataSet MigrateToOracleWithData(CreateTableExpression create, InsertDataExpression row, int expectedMigrations, params Action<SchemaMigrationContext>[] contextAction)
+      /// <summary>
+      /// Migrates tables from SQL Server to Oracle and queries the data in the new Oracle table
+      /// </summary>
+      /// <param name="expressions">The expressions to execute as part of the migration</param>
+      /// <param name="expectedMigrations">The number of migrations that should be created</param>
+      /// <param name="contextAction">Delegates that alter the context before the migration is executed</param>
+      /// <returns>The data in the new Oracle table</returns>
+      private DataSet MigrateToOracleWithData(IEnumerable<IMigrationExpression> expressions, int expectedMigrations, params Action<SchemaMigrationContext>[] contextAction)
       {
          var context = GetDefaultContext();
          context.GenerateAlternateMigrationsFor.Add(DatabaseType.Oracle);
@@ -856,17 +932,50 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
             }
          }
 
-         CreateTables(create);
+         CreateTableExpression create = null;
 
-         InsertData(row);
+         using (var connection = new SqlConnection(_sqlContext.ConnectionString))
+         {
+            var processor = new SqlServerProcessor(connection, new SqlServer2005Generator(), new DebugAnnouncer(), new ProcessorOptions());
+
+
+            
+            foreach (var action in expressions)
+            {
+               if (action is CreateTableExpression)
+               {
+                  create = (CreateTableExpression) action;
+                  processor.Process(create);
+                  Assert.IsTrue(processor.TableExists(string.Empty, create.TableName), "SqlServer " + create.TableName);
+                  continue;
+               }
+
+               if (action is InsertDataExpression)
+               {
+                  var insert = (InsertDataExpression)action;
+                  processor.Process(insert);
+                  continue;
+               }
+
+               if (action is CreateIndexExpression)
+               {
+                  var index = (CreateIndexExpression)action;
+                  processor.Process(index);
+                  continue;
+               }
+            }
+
+            processor.CommitTransaction();
+         }
 
          MigrateTable(context);
 
-         AssertOracleTablesExist(create);
+         if (create != null)
+            AssertOracleTablesExist(create);
 
          context.MigrationIndex.ShouldBe(expectedMigrations);
 
-         return GetOracleTableData(create.TableName);
+         return create != null ? GetOracleTableData(create.TableName) : null;
       }
    }
 }

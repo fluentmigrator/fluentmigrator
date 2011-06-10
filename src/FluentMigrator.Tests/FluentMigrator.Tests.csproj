@@ -162,11 +162,16 @@
     <Compile Include="Integration\OracleUnitTest.cs" />
     <Compile Include="Integration\Processors\PostgresProcessorTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCeProcessorTests.cs" />
-    <Compile Include="Integration\SchemaDump\OracleDumpTableTests.cs" />
+    <Compile Include="Integration\SchemaDump\Oracle\OracleDumpTableForeignKeyTests.cs" />
+    <Compile Include="Integration\SchemaDump\Oracle\OracleDumpTableIndexesTests.cs" />
+    <Compile Include="Integration\SchemaDump\Oracle\OracleDumpTableTests.cs" />
+    <Compile Include="Integration\SchemaDump\Oracle\OracleDumpViewTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaDumpTableTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaDumpTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaDumpViewTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaTestWriter.cs" />
+    <Compile Include="Integration\SchemaMigration\BaseSchemaMigrationTests.cs" />
+    <Compile Include="Integration\SchemaMigration\OracleMigrationTests.cs" />
     <Compile Include="Unit\Generators\Oracle\OracleQuoterTests.cs" />
     <Compile Include="Unit\Schema\Migrations\CSharpViewMigrationsWriterTests.cs" />
     <Compile Include="Unit\Schema\Migrations\CSharpTableMigrationsWriterTests.cs" />

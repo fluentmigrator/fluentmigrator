@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Diagnostics;
 using System.IO;
 using FluentMigrator.Model;
@@ -83,6 +82,53 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          migration.Contains("Execute.WithDatabaseType(DatabaseType.SqlServer).Script(@\"Scripts\\CreateViewFoo_SqlServer.sql\");").ShouldBeTrue();
          migration.Contains("Execute.WithDatabaseType(DatabaseType.SqlServer).Sql(\"DROP VIEW [dbo].[Foo]\");").ShouldBeTrue();
          Assert.AreEqual("XXX", File.ReadAllText(Path.Combine(_scriptsDirectory, "CreateViewFoo_SqlServer.sql")));
+      }
+
+      [Test]
+      public void OnlyGeneratesSelectedViews()
+      {
+         // Arrange
+         var context = GetDefaultContext();
+         context.IncludeViews.Add("Foo");
+
+         var migration = GetTestMigration(context
+            , new ViewDefinition {
+               SchemaName = "dbo"
+               ,Name = "Foo"
+               ,CreateViewSql = "XXX"
+            }
+            , new ViewDefinition { Name = "Bar", CreateViewSql = "YYY"});
+
+         // Assert
+         Debug.WriteLine(migration);
+
+
+         File.Exists(Path.Combine(_scriptsDirectory, "CreateViewFoo_SqlServer.sql")).ShouldBeTrue();
+         File.Exists(Path.Combine(_scriptsDirectory, "CreateViewBar_SqlServer.sql")).ShouldBeFalse();
+      }
+
+      [Test]
+      public void GenerateOracleView()
+      {
+         // Arrange
+         var context = GetDefaultContext();
+         context.FromDatabaseType = DatabaseType.Oracle;
+
+
+         var migration = GetTestMigration(context
+            , new ViewDefinition
+            {
+               SchemaName = "dbo"
+               ,Name = "Foo"
+               ,CreateViewSql = "XXX"
+            }
+            );
+
+         // Assert
+         Debug.WriteLine(migration);
+
+
+         File.Exists(Path.Combine(_scriptsDirectory, "CreateViewFoo_Oracle.sql")).ShouldBeTrue();
       }
 
       [Test]
@@ -218,7 +264,8 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
       {
          return new SchemaMigrationContext
                    {
-                       WorkingDirectory = _tempDirectory
+                        FromDatabaseType = DatabaseType.SqlServer
+                      , WorkingDirectory = _tempDirectory
                       ,MigrationViewClassNamer = (index, table) => "Test"
                    };
       }

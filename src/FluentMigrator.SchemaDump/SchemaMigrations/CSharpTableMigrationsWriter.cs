@@ -40,6 +40,8 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
 
          var migrations = 0;
 
+         var foreignkeyTables = new List<TableDefinition>();
+
          foreach (var table in defs)
          {
             // Check if we want to exclude this table
@@ -77,9 +79,82 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
                   
                }
             }
+
+            if ( context.MigrateForeignKeys && table.ForeignKeys.Count > 0)
+            {
+               // Add to list of tables to apply foreign key
+               // ... done as two part process as may me interdepdancies between tables
+               foreignkeyTables.Add(table); 
+            }
+               
          }
 
          context.MigrationIndex += migrations;
+
+         GenerateForeignKeyMigrations(context, foreignkeyTables);
+      }
+
+      public int GenerateForeignKeyMigrations(SchemaMigrationContext context, List<TableDefinition> tables)
+      {
+         if (!context.MigrateForeignKeys || tables.Count <= 0)
+         {
+            return 0;
+         }
+
+         _announcer.Say(string.Format("Found {0} tables with foreign keys", tables.Count));
+
+         var migrations = 0;
+
+         foreach (var foreignkeyTable in tables)
+         {
+            var migrationsFolder = Path.Combine(context.WorkingDirectory, context.MigrationsDirectory);
+
+            migrations++;
+
+            var migrationIndex = context.MigrationIndex+ migrations;
+            var table = foreignkeyTable;
+
+            var csFilename = Path.Combine(migrationsFolder,
+                                          context.MigrationClassNamer(migrationIndex, table) + "ForeignKey.cs");
+            _announcer.Say("Creating migration " + Path.GetFileName(csFilename));
+            using (var writer = new StreamWriter(csFilename))
+            {
+               WriteMigration(writer, context, migrationIndex
+                              , () => context.MigrationClassNamer(migrationIndex, table) + "ForeignKey"
+                              , () => WriteForeignKey(table, writer)
+                              , () => WriteDeleteForeignKey(table, writer));
+            }
+         }
+
+         return migrations;
+      }
+
+      private void WriteDeleteForeignKey(TableDefinition table, StreamWriter writer)
+      {
+         foreach (var foreignKey in table.ForeignKeys)
+         {
+            writer.WriteLine(string.Format("\t\t\tDelete.ForeignKey(\"{0}\");", foreignKey.Name));
+         }
+      }
+
+      private void WriteForeignKey(TableDefinition table, StreamWriter writer)
+      {
+         foreach (var foreignKey in table.ForeignKeys)
+         {
+            writer.WriteLine(string.Format("\t\t\tCreate.ForeignKey(\"{0}\")", foreignKey.Name));
+            writer.WriteLine(string.Format("\t\t\t\t.FromTable(\"{0}\")", foreignKey.ForeignTable));
+            foreach (var column in foreignKey.ForeignColumns)
+            {
+               writer.WriteLine(string.Format("\t\t\t\t\t.ForeignColumn(\"{0}\")", column));
+            }
+            writer.WriteLine(string.Format("\t\t\t\t.ToTable(\"{0}\")", foreignKey.PrimaryTable));
+            foreach (var column in foreignKey.PrimaryColumns)
+            {
+               writer.WriteLine();
+               writer.Write(string.Format("\t\t\t\t\t.PrimaryColumn(\"{0}\")", column));
+            }
+            writer.WriteLine(";");
+         }
       }
 
       /// <summary>
@@ -112,40 +187,80 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
          }
          if ( context.MigrateData)
          {
-            output.Write(string.Format("\t\t\tInsert.IntoTable(\"{0}\").DataTable(@\"{1}\\{0}.xml\")",table.Name, context.DataDirectory));
+            WriteInsertData(output, table, context);
+         }
 
-            // Check if the column contains an identity column
-            if ( ColumnWithIdentitySpecified(table) )
-            {
-               // It does lets add on extra handling for inserting the identity value into the destination database
-               output.Write(".WithIdentity()");
-            }
+         if ( context.MigrateIndexes && table.Indexes.Count > 0 )
+         {
+            foreach (var index in table.Indexes)
+               WriteIndex(output, index, context);
+            
+         }
+      }
 
-            // Add any replacement values
-            foreach (var replacement in MatchingReplacements(context.InsertColumnReplacements, table))
-            {
-               output.Write(string.Format(".WithReplacementValue({0}, {1})", FormatValue(replacement.OldValue), FormatValue(replacement.NewValue)));   
-            }
+      private void WriteIndex(StreamWriter output, IndexDefinition index, SchemaMigrationContext context)
+      {
+         output.WriteLine("\t\t\tCreate.Index(\"" + index.Name + "\").OnTable(\"" + index.TableName + "\")");
+         foreach (var column in index.Columns)
+         {
+            output.Write("\t\t\t\t.OnColumn(\"" + column.Name + "\")");   
+            if ( column.Direction == Direction.Ascending)
+               output.Write(".Ascending()");
+            if (column.Direction == Direction.Descending)
+               output.Write(".Descending()");
+         }
 
-            // Check if we need to honour case senstive column names
-            if ( context.CaseSenstiveColumnNames && context.CaseSenstiveColumns.Count() == 0)
+         if ( index.IsUnique || index.IsClustered )
+         {
+            output.Write(".WithOptions()");
+
+            if ( index.IsUnique )
+               output.Write(".Unique()");
+
+            if (index.IsClustered)
+               output.Write(".Clustered()");
+         }
+            
+         //TODO Add unique etc
+         
+         output.WriteLine(";");
+      }
+
+      private void WriteInsertData(StreamWriter output, TableDefinition table, SchemaMigrationContext context)
+      {
+         output.Write(string.Format("\t\t\tInsert.IntoTable(\"{0}\").DataTable(@\"{1}\\{0}.xml\")",table.Name, context.DataDirectory));
+
+         // Check if the column contains an identity column
+         if ( ColumnWithIdentitySpecified(table) )
+         {
+            // It does lets add on extra handling for inserting the identity value into the destination database
+            output.Write(".WithIdentity()");
+         }
+
+         // Add any replacement values
+         foreach (var replacement in MatchingReplacements(context.InsertColumnReplacements, table))
+         {
+            output.Write(string.Format(".WithReplacementValue({0}, {1})", FormatValue(replacement.OldValue), FormatValue(replacement.NewValue)));   
+         }
+
+         // Check if we need to honour case senstive column names
+         if ( context.CaseSenstiveColumnNames && context.CaseSenstiveColumns.Count() == 0)
+         {
+            // We do update insert statement
+            output.Write(".WithCaseSensitiveColumnNames()");   
+         }
+
+         if ( context.CaseSenstiveColumns.Count() > 0 )
+         {
+            foreach (var column in context.CaseSenstiveColumns)
             {
                // We do update insert statement
-               output.Write(".WithCaseSensitiveColumnNames()");   
+               output.Write(string.Format(".WithCaseSensitiveColumn(\"{0}\")",column));    
             }
-
-             if ( context.CaseSenstiveColumns.Count() > 0 )
-             {
-                foreach (var column in context.CaseSenstiveColumns)
-                {
-                   // We do update insert statement
-                   output.Write(string.Format(".WithCaseSensitiveColumn(\"{0}\")",column));    
-                }
                   
-             }
-              
-            output.Write(";");
          }
+              
+         output.Write(";");
       }
 
       /// <summary>
@@ -306,6 +421,9 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
       /// <param name="context">The context that controls how the column should be generated</param>
       private static void ApplyDefaultValue(StringBuilder fluentColumnCode, ColumnDefinition column, SchemaMigrationContext context)
       {
+         if (column.DefaultValue is ColumnDefinition.UndefinedDefaultValue)
+            return;
+
          // Special case handle system methods
          if (column.DefaultValue != null && column.DefaultValue.ToString().ToLower().Equals("(newid())") || column.DefaultValue.ToString().ToLower().Equals("newguid"))
          {

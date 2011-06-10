@@ -511,6 +511,20 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
       }
 
       [Test]
+      public void WithColumnStringAndUndefinedDefault()
+      {
+         // Arrange
+
+         // Act
+         var migration = GetTestMigration(new ColumnDefinition { Name = "Data", Type = DbType.String, DefaultValue = new ColumnDefinition.UndefinedDefaultValue() });
+
+         //Assert
+         migration.Contains(".WithColumn(\"Data\").AsString()").ShouldBeTrue();
+         migration.Contains(".WithDefaultValue").ShouldBeFalse();
+      }
+
+
+      [Test]
       public void WithColumnStringAndDefault()
       {
          // Arrange
@@ -716,6 +730,94 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          migration.Contains(".WithColumn(\"Data\").AsXml()").ShouldBeTrue();
       }
 
+      [Test]
+      public void WithColumnStringAndIndex()
+      {
+         // Arrange
+         var context = GetDefaultContext();
+         context.MigrateIndexes = true;
+
+         // Act
+         var migration = GetTestMigrationWithIndex(context
+            , new IndexDefinition {Name = "IDX_Foo", TableName = "Foo", Columns = new[] { new IndexColumnDefinition { Name="Data"}}}
+            , new ColumnDefinition { Name = "Data", Type = DbType.Xml });
+
+         //Assert
+
+         Debug.WriteLine(migration);
+
+         migration.Contains(".WithColumn(\"Data\").AsXml()").ShouldBeTrue();
+
+         migration.Contains("Create.Index(\"IDX_Foo\").OnTable(\"Foo\")").ShouldBeTrue();
+         migration.Contains(".OnColumn(\"Data\").Ascending();").ShouldBeTrue();
+      }
+
+      [Test]
+      public void WithColumnStringAndUniqueIndex()
+      {
+         // Arrange
+         var context = GetDefaultContext();
+         context.MigrateIndexes = true;
+
+         // Act
+         var migration = GetTestMigrationWithIndex(context
+            , new IndexDefinition { Name = "IDX_Foo", TableName = "Foo", IsUnique = true, Columns = new[] { new IndexColumnDefinition { Name = "Data" } } }
+            , new ColumnDefinition { Name = "Data", Type = DbType.Xml });
+
+         //Assert
+
+         Debug.WriteLine(migration);
+
+         migration.Contains(".WithColumn(\"Data\").AsXml()").ShouldBeTrue();
+
+         migration.Contains("Create.Index(\"IDX_Foo\").OnTable(\"Foo\")").ShouldBeTrue();
+         migration.Contains(".OnColumn(\"Data\").Ascending().WithOptions().Unique();").ShouldBeTrue();
+      }
+
+      [Test]
+      public void WithColumnStringAndClusteredIndex()
+      {
+         // Arrange
+
+         // Act
+         var migration = GetTestMigrationWithIndex(GetDefaultContext()
+            , new IndexDefinition { Name = "IDX_Foo", TableName = "Foo", IsClustered = true, Columns = new[] { new IndexColumnDefinition { Name = "Data" } } }
+            , new ColumnDefinition { Name = "Data", Type = DbType.Xml });
+
+         //Assert
+
+         Debug.WriteLine(migration);
+
+         migration.Contains(".WithColumn(\"Data\").AsXml()").ShouldBeTrue();
+
+         migration.Contains("Create.Index(\"IDX_Foo\").OnTable(\"Foo\")").ShouldBeTrue();
+         migration.Contains(".OnColumn(\"Data\").Ascending().WithOptions().Clustered();").ShouldBeTrue();
+      }
+
+      [Test]
+      public void WithColumnForeignKey()
+      {
+         // Arrange
+
+         // Act
+         GetTestMigrationWithForeignKey(GetDefaultContext()
+            , new ForeignKeyDefinition { Name = "FK_Foo", ForeignTable = "Foo", ForeignColumns = new[] { "BarId" }, PrimaryTable = "Bar", PrimaryColumns = new[] { "Id" } }
+            , new ColumnDefinition { Name = "Id", Type = DbType.Int32 }
+            , new ColumnDefinition { Name = "BarId", Type = DbType.Int32 });
+
+         //Assert
+
+         var foreignKeyMigration = File.ReadAllText(Path.Combine(_tempDirectory, @"Migrations\TestForeignKey.cs"));
+
+         Debug.WriteLine(foreignKeyMigration);
+
+         foreignKeyMigration.Contains("Create.ForeignKey(\"FK_Foo\")").ShouldBeTrue();
+         foreignKeyMigration.Contains(".FromTable(\"Foo\")").ShouldBeTrue();
+         foreignKeyMigration.Contains(".ForeignColumn(\"BarId\")").ShouldBeTrue();
+         foreignKeyMigration.Contains(".ToTable(\"Bar\")").ShouldBeTrue();
+         foreignKeyMigration.Contains(".PrimaryColumn(\"Id\")").ShouldBeTrue();
+      }
+
       private string GetTestMigration(params ColumnDefinition[] columns)
       {
          return GetTestMigration(GetDefaultContext(), columns);
@@ -723,6 +825,34 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
 
       private string GetTestMigration(SchemaMigrationContext context, params ColumnDefinition[] columns)
       {
+         return GetTestMigrationWithIndex(context, null, columns);
+      }
+
+      private string GetTestMigrationWithIndex(SchemaMigrationContext context, IndexDefinition index, params ColumnDefinition[] columns)
+      {
+                 
+            var tableDefinitions = new List<TableDefinition>
+                                   {
+                                      new TableDefinition
+                                         {
+                                            Name = "Foo",
+                                            Columns = columns
+                                         }
+                                   };
+
+
+            if (index != null)
+               tableDefinitions[0].Indexes = new[] {index};
+
+         GenerateTableMigrations(context, tableDefinitions);
+
+         return File.ReadAllText(Path.Combine(_tempDirectory, @"Migrations\Test.cs"));
+
+      }
+
+      private string GetTestMigrationWithForeignKey(SchemaMigrationContext context, ForeignKeyDefinition foreignKey, params ColumnDefinition[] columns)
+      {
+
          var tableDefinitions = new List<TableDefinition>
                                    {
                                       new TableDefinition
@@ -732,9 +862,14 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
                                          }
                                    };
 
+
+         if (foreignKey != null)
+            tableDefinitions[0].ForeignKeys = new[] { foreignKey };
+
          GenerateTableMigrations(context, tableDefinitions);
 
          return File.ReadAllText(Path.Combine(_tempDirectory, @"Migrations\Test.cs"));
+
       }
 
       /// <summary>
@@ -776,5 +911,9 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
       }
    }
 
+
+   
+
+   
 
 }

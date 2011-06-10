@@ -11,8 +11,6 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
    /// </summary>
    public class SchemaMigrationContext
    {
-      
-
       /// <summary>
       /// Constructs a new instance of a <see cref="SchemaMigrationContext"/>
       /// </summary>
@@ -34,14 +32,22 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
 
          MigrationIndex = 0;
 
-         // By default only generate viewd for SQL Server
+         // By default only generate views for SQL Server
          GenerateAlternateMigrationsFor = new List<DatabaseType>();
 
          ViewConvertor = new Dictionary<DatabaseType, Func<ViewDefinition, string>>
                             {{DatabaseType.Oracle, DefaultSqlServerToOracleViewConvertor}};
 
+         MigrateTables = true; // Migrate tables by default
          ExcludeTables = new List<string>();
+
+         MigrateViews = true; // Migrate views by default
+         IncludeViews = new List<string>();
          ExcludeViews = new List<string>();
+
+         MigrateIndexes = true; // Migrate indexes by default
+
+         MigrateForeignKeys = true; // Migrate Foreign keys by default
 
          MigrationsDirectory = "Migrations";
          ScriptsDirectory = "Scripts";
@@ -72,12 +78,17 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
       }
 
       /// <summary>
+      /// The type of database tht the schema is being migrated from
+      /// </summary>
+      public DatabaseType FromDatabaseType { get; set; }
+
+      /// <summary>
       /// The connection string from which the schema is being read
       /// </summary>
       public string FromConnectionString { get; set; }
 
       /// <summary>
-      /// The type of database taht the schema is baing migrated to
+      /// The type of database that the schema is baing migrated to
       /// </summary>
       public DatabaseType ToDatabaseType { get; set; }
 
@@ -194,7 +205,7 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
       public Encoding MigrationEncoding { get; set; }
 
       /// <summary>
-      /// A custom delegfate that can be supplied to generate SEQUENEC names
+      /// A custom delegfate that can be supplied to generate SEQUENCE names
       /// </summary>
       /// <remarks>The name of the table to place a sequence on will be provided. The sequqnce name should be returned</remarks>
       public Func<string, string> OracleSequenceNamer { get; set; }
@@ -210,8 +221,28 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
       public List<string> CaseSenstiveColumns { get; private set; }
 
       /// <summary>
-      /// The action to be executed before the migration takes place
+      /// If <c>True</c> then indexes should be included in the migration
       /// </summary>
-      public Action PreMigrationAction { get; set; }
+      public bool MigrateIndexes { get; set; }
+
+      /// <summary>
+      /// If <c>True</c> then foreign keys should be included in the migration
+      /// </summary>
+      public bool MigrateForeignKeys { get; set; }
+
+      /// <summary>
+      /// If <c>True</c> then tables should be included in the migration
+      /// </summary>
+      public bool MigrateTables { get; set; }
+
+      /// <summary>
+      /// If <c>True</c> then views should be included in the migration
+      /// </summary>
+      public bool MigrateViews { get; set; }
+
+      /// <summary>
+      /// List of views to migrate. If empty all views are migrated
+      /// </summary>
+      public List<string> IncludeViews { get; private set; }
    }
 }

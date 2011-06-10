@@ -40,6 +40,8 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
                continue;
             }
 
+            if (context.IncludeViews.Count != 0 && !context.IncludeViews.Contains(view.Name)) continue;
+
             migrations++;
 
             var migrationsFolder = Path.Combine(context.WorkingDirectory, context.MigrationsDirectory);
@@ -74,14 +76,14 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
       private void WriteView(SchemaMigrationContext context, ViewDefinition view, StreamWriter output)
       {
          var scriptsDirectory = Path.Combine(context.WorkingDirectory, context.ScriptsDirectory);
-         var scriptFile = Path.Combine(scriptsDirectory, string.Format("CreateView{0}_SqlServer.sql", view.Name));
+         var scriptFile = Path.Combine(scriptsDirectory, string.Format("CreateView{0}_{1}.sql", view.Name, context.FromDatabaseType));
          if ( !File.Exists(scriptFile))
          {
             if (!Directory.Exists(scriptsDirectory))
                Directory.CreateDirectory(scriptsDirectory);
             File.WriteAllText(scriptFile, view.CreateViewSql);
          }
-         output.WriteLine("\t\t\tExecute.WithDatabaseType(DatabaseType.SqlServer).Script(@\"{0}\");",  Path.Combine(context.ScriptsDirectory, Path.GetFileName(scriptFile)));
+         output.WriteLine("\t\t\tExecute.WithDatabaseType(DatabaseType.{0}).Script(@\"{1}\");", context.FromDatabaseType, Path.Combine(context.ScriptsDirectory, Path.GetFileName(scriptFile)));
 
          foreach (var databaseType in context.GenerateAlternateMigrationsFor)
          {
@@ -98,7 +100,10 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
 
       private static void WriteDeleteView(SchemaMigrationContext context, ViewDefinition view, StreamWriter output)
       {
-         output.WriteLine("\t\t\tExecute.WithDatabaseType(DatabaseType.SqlServer).Sql(\"DROP VIEW [{0}].[{1}]\");", view.SchemaName, view.Name);
+         if ( context.FromDatabaseType == DatabaseType.SqlServer)
+            output.WriteLine("\t\t\tExecute.WithDatabaseType(DatabaseType.SqlServer).Sql(\"DROP VIEW [{0}].[{1}]\");", view.SchemaName, view.Name);
+         else
+            output.WriteLine("\t\t\tExecute.WithDatabaseType(DatabaseType.{0}).Sql(\"DROP VIEW {1}\");", context.FromDatabaseType, view.Name);
 
          foreach (var databaseType in context.GenerateAlternateMigrationsFor)
          {

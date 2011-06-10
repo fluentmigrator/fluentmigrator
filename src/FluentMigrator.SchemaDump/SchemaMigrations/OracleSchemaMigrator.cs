@@ -17,23 +17,22 @@
 #endregion
 
 using System.Data;
-using System.Data.SqlClient;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Processors;
-using FluentMigrator.Runner.Processors.SqlServer;
+using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.SchemaDump.SchemaDumpers;
 
 namespace FluentMigrator.SchemaDump.SchemaMigrations
 {
    /// <summary>
-   /// Migrates the schema items from SQL Server to another supprted database type
+   /// Migrates the schema items from Oracle to another supprted database type
    /// </summary>
    /// <example>
    /// <code>
-   /// var migrator = new SqlServerSchemaMigrator(new TextWriterAnnouncer(Console.Out));
+   /// var migrator = new OracleSchemaMigrator(new TextWriterAnnouncer(Console.Out));
    /// var context = new SchemaMigrationContext {
-   ///    FromConnectionString = @"Data Source=localhost\sqlexpress;Initial Catalog=Foo;Integrated Security=True"
+   ///    FromConnectionString = ToConnectionString = "Uid=Bar;Pwd=Bar;Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=127.0.0.1)(PORT=1521))(CONNECT_DATA=(SID=XE)))"
    ///    , ToDatabaseType = DatabaseType.Oracle
    ///    , ToConnectionString = "Uid=Foo;Pwd=Foo;Data Source=(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=127.0.0.1)(PORT=1521))(CONNECT_DATA=(SID=XE)))"
    ///    , MigrationsDirectory = @".\Migrations"
@@ -41,29 +40,27 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
    /// migrator.Migrate(context);
    /// </code>
    /// </example>
-   public class SqlServerSchemaMigrator : BaseSchemaMigrator
+   public class OracleSchemaMigrator : BaseSchemaMigrator
    {
-      
-
-      public SqlServerSchemaMigrator(IAnnouncer announcer) : base(announcer)
+      public OracleSchemaMigrator(IAnnouncer announcer)
+         : base(announcer)
       {
       }
 
       protected override ISchemaDumper GetSchemaDumper(IMigrationProcessor processor)
       {
-         return new SqlServerSchemaDumper((SqlServerProcessor)processor, Announcer);
+         return new OracleSchemaDumper((OracleProcessor)processor, Announcer);
       }
 
       protected override IMigrationProcessor GetProcessor(IDbConnection connection)
       {
-         return new SqlServerProcessor((SqlConnection)connection, new SqlServer2000Generator(), Announcer,
+         return new OracleProcessor(connection, new OracleGenerator(), Announcer,
                                        new ProcessorOptions());
       }
 
       protected override IDbConnection GetConnection(SchemaMigrationContext context)
       {
-         return new SqlConnection(context.FromConnectionString);
+         return OracleFactory.GetOpenConnection(context.FromConnectionString);
       }
-
    }
 }

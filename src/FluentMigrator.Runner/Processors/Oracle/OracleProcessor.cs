@@ -5,7 +5,6 @@ using System.Data.Common;
 using System.Linq;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Expressions;
-using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Oracle;
 
 
@@ -56,7 +55,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
            if (AutoGenerateSequenceForIdentityColumn && IdentityColumnExists(expression))
            {
-              // Generate a sequence starting at one
+              // Generate a sequence starting at one as default
               // ... 
 
               var sequenceName = string.Format(SequenceNameFormat, expression.TableName.ToUpper());
