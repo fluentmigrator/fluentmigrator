@@ -15,7 +15,11 @@ namespace FluentMigrator.Runner.Processors.Oracle
 		   }
 		   catch (Exception ex)
 		   {
-            if (ex.ToString().Contains("The provider is not compatible with the version of Oracle client"))
+            // Ok its failed two cases we handle
+            // First you have Oracle.DataAccess.Client but it has an incorrect version of OCI installed
+            // ... Second the Oracle ODP.Net client is not installed at all
+            if (ex.ToString().Contains("The provider is not compatible with the version of Oracle client")
+               || ex.ToString().Contains("Unable to find the requested .Net Framework Data Provider"))
             {
                // Fall back to using the Microsoft Oracle provider as this requires less dependancies to be run
                // Note: The Microsoft Oracle provider has been depricated in .Net 4.0
