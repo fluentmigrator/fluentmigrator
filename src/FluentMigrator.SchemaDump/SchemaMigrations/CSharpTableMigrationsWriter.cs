@@ -51,17 +51,20 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
                continue;
             }
 
-            migrations++;
-
-            var migrationsFolder = Path.Combine(context.WorkingDirectory, context.MigrationsDirectory);
-            var csFilename = Path.Combine(migrationsFolder, context.MigrationClassNamer(context.MigrationIndex + migrations, table) + ".cs");
-            _announcer.Say("Creating migration " + Path.GetFileName(csFilename));
-            using (var writer = new StreamWriter(csFilename))
+            if (context.MigrationRequired(MigrationType.Tables))
             {
-               WriteToStream(context, table, context.MigrationIndex + migrations, writer);
+               migrations++;
+
+               var migrationsFolder = Path.Combine(context.WorkingDirectory, context.MigrationsDirectory);
+               var csFilename = Path.Combine(migrationsFolder, context.MigrationClassNamer(context.MigrationIndex + migrations, table) + ".cs");
+               _announcer.Say("Creating migration " + Path.GetFileName(csFilename));
+               using (var writer = new StreamWriter(csFilename))
+               {
+                  WriteToStream(context, table, context.MigrationIndex + migrations, writer);
+               }   
             }
 
-            if ( context.MigrateData )
+            if (context.MigrationRequired(MigrationType.Data))
             {
                var data = schemaDumper.ReadTableData(table.SchemaName, table.Name);
 
@@ -80,7 +83,7 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
                }
             }
 
-            if ( context.MigrateForeignKeys && table.ForeignKeys.Count > 0)
+            if (context.MigrationRequired(MigrationType.ForeignKeys) && table.ForeignKeys.Count > 0)
             {
                // Add to list of tables to apply foreign key
                // ... done as two part process as may me interdepdancies between tables
@@ -91,14 +94,15 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
 
          context.MigrationIndex += migrations;
 
-         GenerateForeignKeyMigrations(context, foreignkeyTables);
+         if (context.MigrationRequired(MigrationType.ForeignKeys))
+            GenerateForeignKeyMigrations(context, foreignkeyTables);
       }
 
-      public int GenerateForeignKeyMigrations(SchemaMigrationContext context, List<TableDefinition> tables)
+      private void GenerateForeignKeyMigrations(SchemaMigrationContext context, List<TableDefinition> tables)
       {
-         if (!context.MigrateForeignKeys || tables.Count <= 0)
+         if (!context.MigrationRequired(MigrationType.ForeignKeys) || tables.Count <= 0)
          {
-            return 0;
+            return;
          }
 
          _announcer.Say(string.Format("Found {0} tables with foreign keys", tables.Count));
@@ -126,7 +130,7 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
             }
          }
 
-         return migrations;
+         context.MigrationIndex +=  migrations;
       }
 
       private void WriteDeleteForeignKey(TableDefinition table, StreamWriter writer)
@@ -185,12 +189,12 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
          {
             WriteColumn(context, column, output, column == table.Columns.Last());
          }
-         if ( context.MigrateData)
+         if ( context.MigrationRequired(MigrationType.Data))
          {
             WriteInsertData(output, table, context);
          }
 
-         if ( context.MigrateIndexes && table.Indexes.Count > 0 )
+         if ( context.MigrationRequired(MigrationType.Indexes) && table.Indexes.Count > 0 )
          {
             foreach (var index in table.Indexes)
                WriteIndex(output, index, context);
@@ -398,9 +402,7 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
             
          if (column.IsIdentity)
             columnSyntax.Append(".Identity()");
-         else if (column.IsIndexed)
-            columnSyntax.Append(".Indexed()");
-
+         
          ApplyDefaultValue(columnSyntax, column, context);
 
          if (!column.IsNullable)

@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Integration
       /// <summary>
       /// The temporary test database that has been created for thr user test user
       /// </summary>
-      private string TestDbName = string.Empty;
+      protected string TestDbName = string.Empty;
 
       /// <summary>
       /// The temporary unit test user that has been created for the unit test 

@@ -7,5 +7,7 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers {
       IList<TableDefinition> ReadDbSchema();
       IList<ViewDefinition> ReadViews();
       DataSet ReadTableData(string schemaName, string tableName);
+      IList<ProcedureDefinition> ReadProcedures();
+      IList<FunctionDefinition> ReadFunctions();
    }
 }

@@ -50,20 +50,33 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
       /// <param name="context">Define data required to generate the C# migrations</param>
       public void Generate(SchemaMigrationContext context)
       {
-         Announcer.Say(string.Format("Generating schema migrations from {0}", context.FromConnectionString));
+         Announcer.Say(string.Format("Generating schema {0} migrations from {1}", context.Type, context.FromConnectionString));
          using (var connection = GetConnection(context))
          {
 
             var processor = GetProcessor(connection);
             var schemaDumper = GetSchemaDumper(processor);
 
-            if ( context.MigrateTables)
+            if ( context.MigrationRequired(MigrationType.Tables) || context.MigrationRequired(MigrationType.Data) || context.MigrationRequired(MigrationType.ForeignKeys))
             {
                var tables = new CSharpTableMigrationsWriter(Announcer);
                tables.GenerateMigrations(context, schemaDumper);   
             }
 
-            if (context.MigrateViews)
+            if (context.MigrationRequired(MigrationType.Procedures))
+            {
+               var procedures = new CSharpProcedureMigrationsWriter(Announcer);
+               procedures.GenerateMigrations(context, schemaDumper);
+            }
+
+            if (context.MigrationRequired(MigrationType.Functions))
+            {
+               var functions = new CSharpFunctionMigrationsWriter(Announcer);
+               functions.GenerateMigrations(context, schemaDumper);
+            }
+
+            // Migrate the views last as procedures or functions may be included in them
+            if (context.MigrationRequired(MigrationType.Views))
             {
                var views = new CSharpViewMigrationsWriter(Announcer);
                views.GenerateMigrations(context, schemaDumper);

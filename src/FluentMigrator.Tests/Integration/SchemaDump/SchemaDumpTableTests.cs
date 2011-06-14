@@ -2,6 +2,7 @@
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
+using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.SqlServer;
@@ -130,12 +131,41 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
          column.Type.ShouldBe(DbType.Date);
       }
 
+      [Test]
+      public void CreateTableWithIndexes()
+      {
+         var column = GetTableColumnColumns("CREATE TABLE Foo (Id int, Id2 int)"
+            , new CreateIndexExpression { Index = new IndexDefinition { TableName = "Foo", Name= "IDX_Id", Columns = new [] { new IndexColumnDefinition { Name = "Id" } } } }
+            , new CreateIndexExpression { Index = new IndexDefinition { TableName = "Foo", Name = "IDX_Id2", Columns = new[] { new IndexColumnDefinition { Name = "Id2" } } } }
+            , new CreateIndexExpression { Index = new IndexDefinition { TableName = "Foo", Name = "IDX_All", Columns = new[]
+                                                                                                                          {
+                                                                                                                             new IndexColumnDefinition { Name = "Id" }
+                                                                                                                             ,new IndexColumnDefinition { Name = "Id2" }
+                                                                                                                          } } });
+
+         column.Indexes.Count.ShouldBe(3);
+
+         column.Indexes.Where(i => i.Name == "IDX_Id").First().Columns.Count.ShouldBe(1);
+         column.Indexes.Where(i => i.Name == "IDX_Id2").First().Columns.Count.ShouldBe(1);
+         column.Indexes.Where(i => i.Name == "IDX_All").First().Columns.Count.ShouldBe(2);
+      }
+
       /// <summary>
       /// Creates a single column table using the spplied type and retruns its <see cref="ColumnDefinition"/>
       /// </summary>
       /// <param name="type">The Sql Server data type to apply to the column</param>
       /// <returns>The translated <see cref="ColumnDefinition"/></returns>
-      private ColumnDefinition GetTableColumn(string type)
+      private ColumnDefinition GetTableColumn(string type, params IMigrationExpression[] expresions)
+      {
+         return GetTableColumnColumns(string.Format("CREATE TABLE Foo ( Data {0} NULL )", type), expresions).Columns.ToList()[0];
+      }
+
+      /// <summary>
+      /// Creates a single column table using the spplied type and retruns its <see cref="ColumnDefinition"/>
+      /// </summary>
+      /// <param name="type">The Sql Server data type to apply to the column</param>
+      /// <returns>The translated <see cref="ColumnDefinition"/></returns>
+      private TableDefinition GetTableColumnColumns(string createSql, params IMigrationExpression[] expresions)
       {
          IList<TableDefinition> tables;
 
@@ -144,7 +174,13 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
          {
             var processor = new SqlServerProcessor(connection, new SqlServer2005Generator(), new DebugAnnouncer(), new ProcessorOptions());
 
-            processor.Execute("CREATE TABLE Foo ( Data {0} NULL )", type);
+            processor.Execute(createSql);
+
+            foreach (var expresion in expresions)
+            {
+               if (expresion is CreateIndexExpression)
+                  processor.Process((CreateIndexExpression)expresion);
+            }
 
             Assert.IsTrue(processor.TableExists(string.Empty, "Foo"), "SqlServer");
 
@@ -156,7 +192,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
 
          tables.Count.ShouldBe(1);
 
-         return tables[0].Columns.ToList()[0];
+         return tables[0];
       }
    }
 }

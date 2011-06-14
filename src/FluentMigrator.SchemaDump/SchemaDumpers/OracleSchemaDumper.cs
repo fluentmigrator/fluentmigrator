@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Processors.Oracle;
@@ -232,7 +233,7 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
       /// Gets a list of <see cref="TableDefinition"/> that exist for the user connection
       /// </summary>
       /// <returns>Matching <see cref="TableDefinition"/></returns>
-      protected virtual IList<TableDefinition> ReadTables()
+      public virtual IList<TableDefinition> ReadTables()
       {
          var tables = new List<TableDefinition>();
          var oracleTables = Processor.Read("SELECT TABLE_NAME FROM USER_TABLES");
@@ -378,20 +379,57 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
 
       public IList<ViewDefinition> ReadViews()
       {
-         var oracleTables = Processor.Read("SELECT VIEW_NAME, TEXT FROM USER_VIEWS");
+         var views = Processor.Read("SELECT OBJECT_NAME, dbms_metadata.get_ddl(object_type,object_name) AS SQL FROM USER_OBJECTS WHERE object_type = 'VIEW'");
 
-         return (from DataRow view in oracleTables.Tables[0].Rows
+         return (from DataRow view in views.Tables[0].Rows
                  select new ViewDefinition
-                           {
-                              Name = view["VIEW_NAME"].ToString()
-                              ,
-                              CreateViewSql = string.Format("CREATE VIEW {0} AS {1}", view["VIEW_NAME"], view["TEXT"])
-                           }).ToList();
+                 {
+                    Name = view["OBJECT_NAME"].ToString()
+                    ,CreateViewSql = view["SQL"].ToString()
+                 }).ToList();
+         
       }
 
       public DataSet ReadTableData(string schemaName, string tableName)
       {
          return Processor.ReadTableData(schemaName, tableName);
+      }
+
+      /// <summary>
+      /// Gets a list of procedures that exist for the user
+      /// </summary>
+      /// <returns>The procedures found in the database</returns>
+      public IList<ProcedureDefinition> ReadProcedures()
+      {
+         var oracleProcedures = Processor.Read("SELECT OBJECT_NAME, dbms_metadata.get_ddl(object_type,object_name) AS SQL FROM USER_OBJECTS WHERE object_type = 'PROCEDURE'");
+
+         return (from DataRow view in oracleProcedures.Tables[0].Rows
+                 select new ProcedureDefinition
+                 {
+                    Name = view["OBJECT_NAME"].ToString()
+                    ,Sql = view["SQL"].ToString()
+                 }).ToList();
+      }
+
+      /// <summary>
+      /// Gets a list of functions that exist for the user
+      /// </summary>
+      /// <returns>The functions found in the database</returns>
+      public IList<FunctionDefinition> ReadFunctions()
+      {
+         var procedures = Processor.Read("SELECT OBJECT_NAME, dbms_metadata.get_ddl(object_type,object_name) AS SQL FROM USER_OBJECTS WHERE object_type = 'FUNCTION'");
+
+         return (from DataRow view in procedures.Tables[0].Rows
+                 select new FunctionDefinition
+                 {
+                    Name = view["OBJECT_NAME"].ToString()
+                    ,Sql = view["SQL"].ToString()
+                 }).ToList();
+      }
+
+      private string GetProcedureSql(string toString)
+      {
+         throw new NotImplementedException();
       }
    }
 

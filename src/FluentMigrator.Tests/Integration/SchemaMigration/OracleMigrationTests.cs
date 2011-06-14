@@ -76,6 +76,54 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
       }
 
       [Test]
+      public void WillMigrateTablesDefault()
+      {
+        GetDefaultContext().MigrationRequired(MigrationType.Tables).ShouldBeTrue();
+      }
+
+      [Test]
+      public void WillMigrateViewsDefault()
+      {
+         GetDefaultContext().MigrationRequired(MigrationType.Views).ShouldBeTrue();
+      }
+
+      [Test]
+      public void WillMigrateIndexesDefault()
+      {
+         GetDefaultContext().MigrationRequired(MigrationType.Indexes).ShouldBeTrue();
+      }
+
+      [Test]
+      public void WillMigrateDataDefault()
+      {
+         GetDefaultContext().MigrationRequired(MigrationType.Data).ShouldBeTrue();
+      }
+
+      [Test]
+      public void WillMigrateFunctionsDefault()
+      {
+         GetDefaultContext().MigrationRequired(MigrationType.Functions).ShouldBeTrue();
+      }
+
+      [Test]
+      public void WillMigrateProceduresDefault()
+      {
+         GetDefaultContext().MigrationRequired(MigrationType.Procedures).ShouldBeTrue();
+      }
+
+      [Test]
+      public void WillMigrateForeignKeysDefault()
+      {
+         GetDefaultContext().MigrationRequired(MigrationType.ForeignKeys).ShouldBeTrue();
+      }
+
+      [Test]
+      public void WillMigrateAllByDefault()
+      {
+         GetDefaultContext().MigrationRequired(MigrationType.All).ShouldBeTrue();
+      }
+
+      [Test]
       public void CanMigrateTable()
       {
          // Arrange
@@ -128,7 +176,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          CreateTables(create);
          CreateViews(new ViewDefinition { Name = "FooView", CreateViewSql = "CREATE VIEW FooView AS SELECT * FROM Foo" });
          var context = GetDefaultContext();
-         context.MigrateViews = false;
+         context.Type = MigrationType.Tables;
 
          // Act
          MigrateTable(context);

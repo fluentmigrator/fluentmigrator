@@ -92,9 +92,10 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
 
 
          var context = GetDefaultContext();
-         context.MigrateData = true;
+         context.Type = MigrationType.Tables | MigrationType.Data;
          context.WorkingDirectory = _tempDirectory;
-         context.InsertColumnReplacements.Add(new InsertColumnReplacement() { 
+         context.InsertColumnReplacements.Add(new InsertColumnReplacement
+                                                 { 
             ColumnDataToMatch = new ColumnDefinition { Type = DbType.String }
             ,OldValue = ""
             , NewValue = " "})
@@ -127,7 +128,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
 
          var context = GetDefaultContext();
          context.CaseSenstiveColumnNames = true;
-         context.MigrateData = true;
+         context.Type = MigrationType.Tables | MigrationType.Data;
          context.WorkingDirectory = _tempDirectory;
 
          // Act
@@ -158,7 +159,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          var context = GetDefaultContext();
          context.CaseSenstiveColumnNames = true;
          context.CaseSenstiveColumns.Add("Data");
-         context.MigrateData = true;
+         context.Type = MigrationType.Tables | MigrationType.Data;
          context.WorkingDirectory = _tempDirectory;
 
          // Act
@@ -187,10 +188,10 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
 
 
          var context = GetDefaultContext();
-         context.MigrateData = true;
+         context.Type = MigrationType.Tables | MigrationType.Data;
          context.WorkingDirectory = _tempDirectory;
-         context.InsertColumnReplacements.Add(new InsertColumnReplacement()
-         {
+         context.InsertColumnReplacements.Add(new InsertColumnReplacement
+                                                 {
             ColumnDataToMatch = new ColumnDefinition { Type = DbType.DateTime }
             ,OldValue = DateTime.ParseExact("1900-01-01", "yyyy-MM-dd",null)
             ,NewValue = DateTime.ParseExact("2000-01-01", "yyyy-MM-dd", null)
@@ -223,7 +224,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
 
 
          var context = GetDefaultContext();
-         context.MigrateData = true;
+         context.Type = MigrationType.Tables | MigrationType.Data;
          context.WorkingDirectory = _tempDirectory;
 
          SetupTestData(typeof (string), "Ä Test");
@@ -252,7 +253,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
 
 
          var context = GetDefaultContext();
-         context.MigrateData = true;
+         context.Type = MigrationType.Tables | MigrationType.Data;
          context.WorkingDirectory = _tempDirectory;
          context.MigrationEncoding = Encoding.ASCII;
 
@@ -282,7 +283,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
 
          
          var context = GetDefaultContext();
-         context.MigrateData = true;
+         context.Type = MigrationType.Tables | MigrationType.Data;
          context.WorkingDirectory = _tempDirectory;
 
          // Act
@@ -309,7 +310,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
                                          }
                                    };
          var context = GetDefaultContext();
-         context.MigrateData = true;
+         context.Type = MigrationType.Tables | MigrationType.Data;
          context.WorkingDirectory = _tempDirectory;
          _testData.Tables[0].Rows.Clear();
 
@@ -342,7 +343,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
 
          // Arrange
          var context = GetDefaultContext();
-         context.MigrateData = true;
+         context.Type = MigrationType.Tables | MigrationType.Data;
          context.WorkingDirectory = _tempDirectory;
          context.GenerateAlternateMigrationsFor.Add(DatabaseType.Oracle);
          GenerateTableMigrations(context, tableDefinitions);
@@ -367,7 +368,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
 
          // Arrange
          var context = GetDefaultContext();
-         context.MigrateData = true;
+         context.Type = MigrationType.Tables | MigrationType.Data;
          GenerateTableMigrations(context, tableDefinitions);
 
          // Assert
@@ -426,8 +427,11 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          migration.Contains(".WithColumn(\"Data\").AsInt32().Identity()").ShouldBeTrue();
       }
 
+      /// <summary>
+      /// Shluld not use Indexes syntax as this should be done using <see cref="MigrationType.Indexes"/>
+      /// </summary>
       [Test]
-      public void CreatesIndexedColumn()
+      public void DoesNotCreateIndexedColumn()
       {
          // Arrange
 
@@ -435,7 +439,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          var migration = GetTestMigration(new ColumnDefinition { Name = "Data", Type = DbType.Int32, IsIndexed = true});
 
          //Assert
-         migration.Contains(".WithColumn(\"Data\").AsInt32().Indexed()").ShouldBeTrue();
+         migration.Contains(".WithColumn(\"Data\").AsInt32().NotNullable();").ShouldBeTrue();
       }
 
       [Test]
@@ -735,18 +739,18 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
       {
          // Arrange
          var context = GetDefaultContext();
-         context.MigrateIndexes = true;
+         context.Type = MigrationType.Tables | MigrationType.Indexes;
 
          // Act
          var migration = GetTestMigrationWithIndex(context
             , new IndexDefinition {Name = "IDX_Foo", TableName = "Foo", Columns = new[] { new IndexColumnDefinition { Name="Data"}}}
-            , new ColumnDefinition { Name = "Data", Type = DbType.Xml });
+            , new ColumnDefinition { Name = "Data", Type = DbType.String, IsIndexed = true});
 
          //Assert
 
          Debug.WriteLine(migration);
 
-         migration.Contains(".WithColumn(\"Data\").AsXml()").ShouldBeTrue();
+         migration.Contains(".WithColumn(\"Data\").AsString().NotNullable();").ShouldBeTrue();
 
          migration.Contains("Create.Index(\"IDX_Foo\").OnTable(\"Foo\")").ShouldBeTrue();
          migration.Contains(".OnColumn(\"Data\").Ascending();").ShouldBeTrue();
@@ -757,7 +761,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
       {
          // Arrange
          var context = GetDefaultContext();
-         context.MigrateIndexes = true;
+         context.Type = MigrationType.Tables | MigrationType.Indexes;
 
          // Act
          var migration = GetTestMigrationWithIndex(context
@@ -852,6 +856,8 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
 
       private string GetTestMigrationWithForeignKey(SchemaMigrationContext context, ForeignKeyDefinition foreignKey, params ColumnDefinition[] columns)
       {
+
+         context.Type = context.Type | MigrationType.ForeignKeys;
 
          var tableDefinitions = new List<TableDefinition>
                                    {

@@ -30,6 +30,10 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
 
          MigrationViewClassNamer = (index, view) => string.Format("BaseViewMigration_{0}_{1}", index, view.Name);
 
+         MigrationProcedureClassNamer = (index, procedure) => string.Format("BaseProcedureMigration_{0}_{1}", index, procedure.Name);
+
+         MigrationFunctionClassNamer = (index, function) => string.Format("BaseFunctionMigration_{0}_{1}", index, function.Name);
+
          MigrationIndex = 0;
 
          // By default only generate views for SQL Server
@@ -38,16 +42,16 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
          ViewConvertor = new Dictionary<DatabaseType, Func<ViewDefinition, string>>
                             {{DatabaseType.Oracle, DefaultSqlServerToOracleViewConvertor}};
 
-         MigrateTables = true; // Migrate tables by default
          ExcludeTables = new List<string>();
 
-         MigrateViews = true; // Migrate views by default
          IncludeViews = new List<string>();
          ExcludeViews = new List<string>();
 
-         MigrateIndexes = true; // Migrate indexes by default
+         IncludeProcedures = new List<string>();
+         ExcludeProcedures = new List<string>();
 
-         MigrateForeignKeys = true; // Migrate Foreign keys by default
+         IncludeFunctions = new List<string>();
+         ExcludeFunctions = new List<string>();
 
          MigrationsDirectory = "Migrations";
          ScriptsDirectory = "Scripts";
@@ -59,6 +63,11 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
 
          CaseSenstiveColumns = new List<string>();
 
+      }
+
+      public bool MigrationRequired(MigrationType required)
+      {
+         return (Type & required) == required;
       }
 
       /// <summary>
@@ -129,6 +138,16 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
       public Func<int, ViewDefinition, string> MigrationViewClassNamer { get; set; }
 
       /// <summary>
+      /// Delegate that specifies how migration class name should be named for procedures
+      /// </summary>
+      public Func<int, ProcedureDefinition, string> MigrationProcedureClassNamer { get; set; }
+
+      /// <summary>
+      /// Delegate that specifies how migration class name should be named for functions
+      /// </summary>
+      public Func<int, FunctionDefinition, string> MigrationFunctionClassNamer { get; set; }
+
+      /// <summary>
       /// Defines the format for parsing date/times input from schema
       /// </summary>
       public string InputDateTimeFormat { get; set; }
@@ -155,32 +174,14 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
       public List<DatabaseType> GenerateAlternateMigrationsFor { get; private set; }
 
       /// <summary>
-      /// A list of tables to be excluded from the migration
+      /// The types of items to be migrated
       /// </summary>
-      public List<string> ExcludeTables { get;
-         private set;
-      }
-
-      /// <summary>
-      /// A list of views to be excluded from the migration
-      /// </summary>
-      public List<string> ExcludeViews
-      {
-         get;
-         private set;
-      }
-
-
+      public MigrationType Type = MigrationType.All;
 
       /// <summary>
       /// Defines datatype specific delegates that will attempt convert from SQL Server view syntax to the specified database
       /// </summary>
       public Dictionary<DatabaseType, Func<ViewDefinition, string>> ViewConvertor { get; private set; }
-
-      /// <summary>
-      /// If <c>True</c> then data should be exported and imported into the new database as part of the migration
-      /// </summary>
-      public bool MigrateData { get; set; }
 
       /// <summary>
       /// The directory where migration data is saved to/read from
@@ -221,28 +222,54 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
       public List<string> CaseSenstiveColumns { get; private set; }
 
       /// <summary>
-      /// If <c>True</c> then indexes should be included in the migration
+      /// A list of tables to be excluded from the migration
       /// </summary>
-      public bool MigrateIndexes { get; set; }
+      public List<string> ExcludeTables
+      {
+         get;
+         private set;
+      }
 
       /// <summary>
-      /// If <c>True</c> then foreign keys should be included in the migration
+      /// A list of views to be excluded from the migration
       /// </summary>
-      public bool MigrateForeignKeys { get; set; }
-
-      /// <summary>
-      /// If <c>True</c> then tables should be included in the migration
-      /// </summary>
-      public bool MigrateTables { get; set; }
-
-      /// <summary>
-      /// If <c>True</c> then views should be included in the migration
-      /// </summary>
-      public bool MigrateViews { get; set; }
+      public List<string> ExcludeViews
+      {
+         get;
+         private set;
+      }
 
       /// <summary>
       /// List of views to migrate. If empty all views are migrated
       /// </summary>
       public List<string> IncludeViews { get; private set; }
+
+      /// <summary>
+      /// A list of procedures to be excluded from the migration
+      /// </summary>
+      public List<string> ExcludeProcedures
+      {
+         get;
+         private set;
+      }
+
+      /// <summary>
+      /// List of procedures to migrate. If empty all views are migrated
+      /// </summary>
+      public List<string> IncludeProcedures { get; private set; }
+
+      /// <summary>
+      /// A list of functions to be excluded from the migration
+      /// </summary>
+      public List<string> ExcludeFunctions
+      {
+         get;
+         private set;
+      }
+
+      /// <summary>
+      /// List of functions to migrate. If empty all views are migrated
+      /// </summary>
+      public List<string> IncludeFunctions { get; private set; }
    }
 }

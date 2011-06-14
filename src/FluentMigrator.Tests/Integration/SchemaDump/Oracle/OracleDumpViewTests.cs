@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System.Diagnostics;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Processors;
@@ -34,7 +35,18 @@ namespace FluentMigrator.Tests.Integration.SchemaDump.Oracle
       {
          var view = GetView("SELECT 1 As One FROM DUAL");
 
-         view.CreateViewSql.ShouldBe("CREATE VIEW FOO AS SELECT 1 As One FROM DUAL");
+         view.CreateViewSql.Contains(string.Format("CREATE OR REPLACE FORCE VIEW \"{0}\".\"{1}\"", TestDbName.ToUpper(), "FOO")).ShouldBeTrue();
+         view.CreateViewSql.Contains("SELECT 1 As One FROM DUAL").ShouldBeTrue();
+      }
+
+      [Test]
+      public void GetLongViewDefinition()
+      {
+         var sql = string.Format("SELECT '{0}' As One FROM DUAL", new string('A', 2000));
+         var view = GetView(sql);
+
+         view.CreateViewSql.Contains(string.Format("CREATE OR REPLACE FORCE VIEW \"{0}\".\"{1}\"", TestDbName.ToUpper(), "FOO")).ShouldBeTrue();
+         view.CreateViewSql.Contains(sql).ShouldBeTrue();
       }
 
       /// <summary>

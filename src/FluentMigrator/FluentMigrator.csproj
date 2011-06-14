@@ -182,6 +182,7 @@
     <Compile Include="Builders\Insert\InsertExpressionRoot.cs" />
     <Compile Include="Expressions\UpdateDataExpression.cs" />
     <Compile Include="ForwardOnlyMigration.cs" />
+    <Compile Include="Model\FunctionDefinition.cs" />
     <Compile Include="Model\DeletionDataDefinition.cs" />
     <Compile Include="Model\InsertionDataDefinition.cs" />
     <Compile Include="Builders\Rename\Column\IRenameColumnToSyntax.cs" />
@@ -205,6 +206,7 @@
     <Compile Include="IMigrationProcessorOptions.cs" />
     <Compile Include="Infrastructure\Extensions\ExtensionsForIEnumerable.cs" />
     <Compile Include="IQuerySchema.cs" />
+    <Compile Include="Model\ProcedureDefinition.cs" />
     <Compile Include="Model\TableDefinition.cs" />
     <Compile Include="Model\ViewDefinition.cs" />
     <Compile Include="ProfileAttribute.cs" />

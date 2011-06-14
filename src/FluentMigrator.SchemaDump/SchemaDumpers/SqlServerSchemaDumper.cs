@@ -90,13 +90,15 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
             return tables as IList<TableDefinition>;
         }
 
+
+
         public virtual IList<ViewDefinition> ReadViewSchema()
         {
            Announcer.Say("Reading view schema");
            return ReadViews();
         }
 
-        protected virtual IList<FluentMigrator.Model.TableDefinition> ReadTables() {
+        public virtual IList<TableDefinition> ReadTables() {
             string query = @"SELECT OBJECT_SCHEMA_NAME(t.[object_id],DB_ID()) AS [Schema], t.name AS [Table], 
                 c.[Name] AS ColumnName,
                 t.object_id AS [TableID],
@@ -322,7 +324,7 @@ ORDER BY v.name, sc.colid
               I.[allow_row_locks], I.[allow_page_locks], IC.[is_descending_key], IC.[is_included_column] 
             FROM sys.[tables] AS T  
               INNER JOIN sys.[indexes] I ON T.[object_id] = I.[object_id]  
-              INNER JOIN sys.[index_columns] IC ON I.[object_id] = IC.[object_id] 
+              INNER JOIN sys.[index_columns] IC ON I.[object_id] = IC.[object_id] AND I.index_id = IC.index_id
               INNER JOIN sys.[all_columns] AC ON T.[object_id] = AC.[object_id] AND IC.[column_id] = AC.[column_id] 
             WHERE T.[is_ms_shipped] = 0 AND I.[type_desc] <> 'HEAP' 
             AND T.object_id = OBJECT_ID('[{0}].[{1}]')
@@ -341,7 +343,7 @@ ORDER BY v.name, sc.colid
                 IndexDefinition iDef = null;
                 if (matches.Count > 0) iDef = matches[0];
 
-                // create the table if not found
+                // create the index if not found
                 if (iDef == null) {
                     iDef = new IndexDefinition()
                     {
@@ -435,6 +437,78 @@ ORDER BY v.name, sc.colid
 
             return keys;
         }
+
+	   public IList<ProcedureDefinition> ReadProcedures()
+	   {
+	      var procedures = new List<ProcedureDefinition>();
+
+         // NOTE: Query for SQL 2005 for greater ... would need to be refactored to support SQL Server 2000
+         var procedureQuery = Processor.Read("SELECT schema_Name(so.schema_id)  as  SchemaName, o.name, c.text FROM syscomments c, sysobjects o, sys.objects so WHERE c.id = o.id AND xtype = 'P' AND so.object_id = o.id ORDER BY colid");
+
+         foreach ( DataRow dr in procedureQuery.Tables[0].Rows )
+         {
+            var matches = (from t in procedures
+                                             where t.Name == dr["name"].ToString()
+                                             select t).ToList();
+
+            ProcedureDefinition procedureDef = null;
+            if (matches.Count > 0) procedureDef = matches[0];
+
+            // create the procedure if not found
+            if (procedureDef == null)
+            {
+               procedureDef = new ProcedureDefinition()
+               {
+                  SchemaName = dr["SchemaName"].ToString(),
+                  Name = dr["Name"].ToString(),
+                  Sql = dr["Text"].ToString()
+               };
+               procedures.Add(procedureDef);
+            }
+            else
+            {
+               procedureDef.Sql += dr["Text"].ToString();
+            }
+         }
+         
+	      return procedures;
+	   }
+
+      public IList<FunctionDefinition> ReadFunctions()
+      {
+         var procedures = new List<FunctionDefinition>();
+
+         // NOTE: Query for SQL 2005 for greater ... would need to be refactored to support SQL Server 2000
+         var query = Processor.Read("SELECT schema_Name(so.schema_id)  as  SchemaName, o.name, c.text FROM syscomments c, sysobjects o, sys.objects so WHERE c.id = o.id AND xtype = 'FN' AND so.object_id = o.id ORDER BY colid");
+
+         foreach (DataRow dr in query.Tables[0].Rows)
+         {
+            var matches = (from t in procedures
+                           where t.Name == dr["name"].ToString()
+                           select t).ToList();
+
+            FunctionDefinition functionDefinition = null;
+            if (matches.Count > 0) functionDefinition = matches[0];
+
+            // create the procedure if not found
+            if (functionDefinition == null)
+            {
+               functionDefinition = new FunctionDefinition()
+               {
+                  SchemaName = dr["SchemaName"].ToString(),
+                  Name = dr["Name"].ToString(),
+                  Sql = dr["Text"].ToString()
+               };
+               procedures.Add(functionDefinition);
+            }
+            else
+            {
+               functionDefinition.Sql += dr["Text"].ToString();
+            }
+         }
+
+         return procedures;
+      }
 	}
 
    public class SqlTypes

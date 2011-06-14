@@ -30,39 +30,39 @@ namespace FluentMigrator
       /// <summary>
       /// Microsoft Jet database e.g. Access, Excel
       /// </summary>
-      Jet = 0,
+      Jet = 2,
       /// <summary>
       /// MySql database - http://www.mysql.com
       /// </summary>
-      MySql = 2,
+      MySql = 4,
       /// <summary>
       /// Oracle database - http://www.oracle.com/us/products/database/index.html
       /// </summary>
-      Oracle = 4,
+      Oracle = 8,
       /// <summary>
       /// Postgres - http://www.postgresql.org
       /// </summary>
-      Postgres = 8,
+      Postgres = 16,
       /// <summary>
       /// Sqllite - http://www.sqlite.org/ 
       /// </summary>
-      Sqlite = 16,
+      Sqlite = 32,
       /// <summary>
       /// Microsoft Sql Server 2000 - http://www.microsoft.com/sqlserver
       /// </summary>
-      SqlServer2000 = 32,
+      SqlServer2000 = 64,
       /// <summary>
       /// Microsoft Sql Server 2005 - http://www.microsoft.com/sqlserver
       /// </summary>
-      SqlServer2005 = 64,
+      SqlServer2005 = 128,
       /// <summary>
       /// Microsoft Sql Server 2008 - http://www.microsoft.com/sqlserver
       /// </summary>
-      SqlServer2008 = 128,
+      SqlServer2008 = 256,
       /// <summary>
       /// Microsoft Sql Compact - http://blogs.msdn.com/b/sqlservercompact/
       /// </summary>
-      SqlServerCe = 256,
+      SqlServerCe = 512,
       /// <summary>
       /// Any Version of Microsoft SQL Server (Excluding Compact Edition)
       /// </summary>

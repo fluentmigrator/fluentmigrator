@@ -748,6 +748,51 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
       }
 
       [Test]
+      public void CanMigrateTableAndIndexWithOneColumnNameCaseSensitive()
+      {
+         // Arrange
+
+         var create = new CreateTableExpression
+         {
+            TableName = "Foo",
+            Columns = new[]{
+                   new ColumnDefinition {Name = "id", Type = DbType.Int32}
+                   , new ColumnDefinition {Name = "Data", Type = DbType.Int32}
+                    }
+         };
+
+         var index = new CreateIndexExpression()
+                        {
+                           Index =
+                              new IndexDefinition()
+                                 {
+                                    Name = "IDX_id",
+                                    TableName = "Foo",
+                                    Columns = new[] {new IndexColumnDefinition {Name = "id"}}
+                                 }
+                        };
+
+         // Act
+
+         var context = GetDefaultContext();
+         context.CaseSenstiveColumns.Add("id");
+         context.PreMigrationTableUpdate = tables =>
+                                              {
+                                                 tables.First().Columns.First().Name = "\\\"id\\\"";
+                                                 tables.First().Indexes.First().Columns.First().Name = "\\\"id\\\"";
+                                              };
+
+         CreateTables(create);
+         CreateIndexes(index);
+
+         MigrateTable(context);
+
+         // Assert
+
+
+      }
+
+      [Test]
       public void CanMigrateTableIndex()
       {
          // Arrange
@@ -778,7 +823,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
                         };
 
          // Act
-         MigrateToOracleWithData(new List<IMigrationExpression> {create, row, index}, 1, c => c.MigrateIndexes = true);
+         MigrateToOracleWithData(new List<IMigrationExpression> { create, row, index }, 1, c => c.Type = c.Type | MigrationType.Indexes);
 
          // Assert
 
@@ -800,6 +845,25 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          migrator.Migrate(context);
 
          AssertOracleTablesExist(createTables);
+      }
+
+      /// <summary>
+      /// Migrates a set of tables using the provided context
+      /// </summary>
+      /// <param name="indexes">The indexes to be created in SQL Server and migrated to Oracle</param>
+      private void CreateIndexes(params CreateIndexExpression[] indexes)
+      {
+         using (var connection = new SqlConnection(_sqlContext.ConnectionString))
+         {
+            var processor = new SqlServerProcessor(connection, new SqlServer2005Generator(), new DebugAnnouncer(), new ProcessorOptions());
+
+            foreach (var index in indexes)
+            {
+               processor.Process(index);
+            }
+
+            processor.CommitTransaction();
+         }
       }
 
       
@@ -922,7 +986,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
       {
          var context = GetDefaultContext();
          context.GenerateAlternateMigrationsFor.Add(DatabaseType.Oracle);
-         context.MigrateData = true;
+         context.Type = context.Type | MigrationType.Data;
 
          if (contextAction != null)
          {

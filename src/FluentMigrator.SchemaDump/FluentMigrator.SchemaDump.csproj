@@ -45,6 +45,9 @@
     <Compile Include="SchemaDumpers\OracleSchemaDumper.cs" />
     <Compile Include="SchemaDumpers\SqlServerSchemaDumper.cs" />
     <Compile Include="SchemaMigrations\BaseSchemaMigrator.cs" />
+    <Compile Include="SchemaMigrations\CSharpFunctionMigrationsWriter.cs" />
+    <Compile Include="SchemaMigrations\CSharpProcedureMigrationsWriter.cs" />
+    <Compile Include="SchemaMigrations\MigrationType.cs" />
     <Compile Include="SchemaMigrations\OracleSchemaMigrator.cs" />
     <Compile Include="SchemaMigrations\CSharpMigrationsWriter.cs" />
     <Compile Include="SchemaMigrations\CSharpTableMigrationsWriter.cs" />
