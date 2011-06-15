@@ -34,11 +34,11 @@ namespace FluentMigrator.Tests.Unit.AssemblyLoader
 			string filename = GetType().Assembly.Location;
 			string assemblyName = GetType().Assembly.GetName().Name;
 			IAssemblyLoader assemblyLoaderFromFile = AssemblyLoaderFactory.GetAssemblyLoader(filename);
-			Assert.IsInstanceOfType(typeof(AssemblyLoaderFromFile),assemblyLoaderFromFile);
+            Assert.IsInstanceOf(typeof(AssemblyLoaderFromFile), assemblyLoaderFromFile);
 			Assembly assemblyFromFile = assemblyLoaderFromFile.Load();
 
 			IAssemblyLoader assemblyLoaderFromName = AssemblyLoaderFactory.GetAssemblyLoader(assemblyName);
-			Assert.IsInstanceOfType(typeof(AssemblyLoaderFromName), assemblyLoaderFromName);
+            Assert.IsInstanceOf(typeof(AssemblyLoaderFromName), assemblyLoaderFromName);
 			Assembly assemblyFromName = assemblyLoaderFromName.Load();
 
 			Assert.AreEqual(assemblyFromFile.FullName,assemblyFromName.FullName );

@@ -233,7 +233,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
 			var contextMock = new Mock<IMigrationContext>();
 
 			var columnMock = new Mock<ColumnDefinition>();
-			columnMock.SetupSet(c => c.DefaultValue = value).AtMostOnce();
+            columnMock.VerifySet(c => c.DefaultValue = value, Times.AtMostOnce());
 
 			var expressionMock = new Mock<AlterTableExpression>();
 
@@ -289,7 +289,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
 		private void VerifyColumnProperty<T>(T expected, Expression<Func<ColumnDefinition, T>> columnExpression, Action<AlterTableExpressionBuilder> callToTest)
 		{
 			var columnMock = new Mock<ColumnDefinition>();
-			columnMock.SetupSet(columnExpression).AtMostOnce();
+            columnMock.VerifySet(columnExpression, Times.AtMostOnce());
 
             var expressionMock = new Mock<AlterTableExpression>();
 
@@ -307,7 +307,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
         private void VerifyColumnDbType(DbType expected, Action<AlterTableExpressionBuilder> callToTest)
 		{
 			var columnMock = new Mock<ColumnDefinition>();
-			columnMock.SetupSet(c => c.Type = expected).AtMostOnce();
+            columnMock.VerifySet(c => c.Type = expected, Times.AtMostOnce());
 
             var expressionMock = new Mock<AlterTableExpression>();
 
@@ -325,7 +325,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
         private void VerifyColumnSize(int expected, Action<AlterTableExpressionBuilder> callToTest)
 		{
 			var columnMock = new Mock<ColumnDefinition>();
-			columnMock.SetupSet(c => c.Size = expected).AtMostOnce();
+            columnMock.VerifySet(c => c.Size = expected, Times.AtMostOnce());
 
             var expressionMock = new Mock<AlterTableExpression>();
 
@@ -342,7 +342,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
         private void VerifyColumnPrecision(int expected, Action<AlterTableExpressionBuilder> callToTest)
 		{
 			var columnMock = new Mock<ColumnDefinition>();
-			columnMock.SetupSet(c => c.Precision = expected).AtMostOnce();
+            columnMock.VerifySet(c => c.Precision = expected, Times.AtMostOnce());
 
             var expressionMock = new Mock<AlterTableExpression>();
 

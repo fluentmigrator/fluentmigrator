@@ -18,7 +18,8 @@ namespace FluentMigrator.Tests.Unit
 			var _runnerMock = new Mock<IMigrationRunner>();
 			var _conventionsMock = new Mock<IMigrationConventions>();
 
-			_runnerContextMock.SetupGet(x => x.Profile).Returns(string.Empty);
+            _runnerContextMock.Setup(x => x.Profile).Returns(string.Empty);
+			//_runnerContextMock.VerifyGet(x => x.Profile).Returns(string.Empty);
 			_runnerMock.SetupGet(x => x.MigrationAssembly).Returns(typeof(MigrationRunnerTests).Assembly);
 
 			var profileLoader = new ProfileLoader(_runnerContextMock.Object, _runnerMock.Object, _conventionsMock.Object);

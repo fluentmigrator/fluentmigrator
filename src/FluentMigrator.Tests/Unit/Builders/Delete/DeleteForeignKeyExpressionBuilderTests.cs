@@ -34,10 +34,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 		public void CallingFromTableSetsForeignTableName()
 		{
 			var foreignKeyMock = new Mock<ForeignKeyDefinition>();
-			foreignKeyMock.SetupSet(f => f.ForeignTable = "Bacon").AtMostOnce();
+			foreignKeyMock.VerifySet(f => f.ForeignTable = "Bacon", Times.AtMostOnce());
 
 			var expressionMock = new Mock<DeleteForeignKeyExpression>();
-			expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMostOnce();
+			expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object);
+            expressionMock.VerifyGet(e => e.ForeignKey, Times.AtMostOnce());
 
 			var builder = new DeleteForeignKeyExpressionBuilder(expressionMock.Object);
 			builder.FromTable("Bacon");
@@ -50,10 +51,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 		public void CallingToTableSetsPrimaryTableName()
 		{
 			var foreignKeyMock = new Mock<ForeignKeyDefinition>();
-			foreignKeyMock.SetupSet(f => f.PrimaryTable = "Bacon").AtMostOnce();
+            foreignKeyMock.VerifySet(f => f.PrimaryTable = "Bacon", Times.AtMostOnce());
 
 			var expressionMock = new Mock<DeleteForeignKeyExpression>();
-			expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMostOnce();
+			expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object);
+            expressionMock.VerifyGet(e => e.ForeignKey, Times.AtMostOnce());
 
 			var builder = new DeleteForeignKeyExpressionBuilder(expressionMock.Object);
 			builder.ToTable("Bacon");
@@ -66,10 +68,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
         public void CallingOnTableSetsForeignTableName()
         {
             var foreignKeyMock = new Mock<ForeignKeyDefinition>();
-            foreignKeyMock.SetupSet(f => f.ForeignTable = "Bacon").AtMostOnce();
+            foreignKeyMock.VerifySet(f => f.ForeignTable = "Bacon", Times.AtMostOnce());
 
             var expressionMock = new Mock<DeleteForeignKeyExpression>();
-            expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMostOnce();
+            expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object);
+            expressionMock.VerifyGet(e => e.ForeignKey, Times.AtMostOnce());
 
             var builder = new DeleteForeignKeyExpressionBuilder(expressionMock.Object);
             ((IDeleteForeignKeyOnTableSyntax)builder).OnTable(("Bacon"));
@@ -82,10 +85,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
         public void CallingInSchemaSetsForeignTableSchemaName()
         {
             var foreignKeyMock = new Mock<ForeignKeyDefinition>();
-            foreignKeyMock.SetupSet(f => f.ForeignTableSchema = "Bacon").AtMostOnce();
+            foreignKeyMock.VerifySet(f => f.ForeignTableSchema = "Bacon", Times.AtMostOnce());
 
             var expressionMock = new Mock<DeleteForeignKeyExpression>();
-            expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMostOnce();
+            expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object);
+            expressionMock.VerifyGet(e => e.ForeignKey, Times.AtMostOnce());
 
             var builder = new DeleteForeignKeyExpressionBuilder(expressionMock.Object);
             ((IInSchemaSyntax)builder).InSchema("Bacon");
@@ -98,13 +102,15 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 		public void CallingForeignColumnAddsColumnNameToForeignColumnCollection()
 		{
 			var collectionMock = new Mock<IList<string>>();
-			collectionMock.Setup(x => x.Add("BaconId")).AtMostOnce();
+            collectionMock.Verify(x => x.Add("BaconId"), Times.AtMostOnce());
 
 			var foreignKeyMock = new Mock<ForeignKeyDefinition>();
-			foreignKeyMock.SetupGet(f => f.ForeignColumns).Returns(collectionMock.Object).AtMostOnce();
+			foreignKeyMock.SetupGet(f => f.ForeignColumns).Returns(collectionMock.Object);
+            foreignKeyMock.VerifyGet(f => f.ForeignColumns, Times.AtMostOnce());
 
 			var expressionMock = new Mock<DeleteForeignKeyExpression>();
-			expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMostOnce();
+			expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object);
+            expressionMock.VerifyGet(e => e.ForeignKey, Times.AtMostOnce());
 
 			var builder = new DeleteForeignKeyExpressionBuilder(expressionMock.Object);
 			builder.ForeignColumn("BaconId");
@@ -118,14 +124,16 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 		public void CallingForeignColumnsAddsColumnNamesToForeignColumnCollection()
 		{
 			var collectionMock = new Mock<IList<string>>();
-			collectionMock.Setup(x => x.Add("BaconId")).AtMostOnce();
-			collectionMock.Setup(x => x.Add("EggsId")).AtMostOnce();
+            collectionMock.Verify(x => x.Add("BaconId"), Times.AtMostOnce());
+            collectionMock.Verify(x => x.Add("EggsId"), Times.AtMostOnce());
 
 			var foreignKeyMock = new Mock<ForeignKeyDefinition>();
-			foreignKeyMock.SetupGet(f => f.ForeignColumns).Returns(collectionMock.Object).AtMost(2);
+			foreignKeyMock.SetupGet(f => f.ForeignColumns).Returns(collectionMock.Object);
+            foreignKeyMock.VerifyGet(f => f.ForeignColumns, Times.AtMost(2));
 
 			var expressionMock = new Mock<DeleteForeignKeyExpression>();
-			expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMost(2);
+			expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object);
+            expressionMock.VerifyGet(e => e.ForeignKey, Times.AtMost(2));
 
 			var builder = new DeleteForeignKeyExpressionBuilder(expressionMock.Object);
 			builder.ForeignColumns("BaconId", "EggsId");
@@ -139,13 +147,16 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 		public void CallingPrimaryColumnAddsColumnNameToPrimaryColumnCollection()
 		{
 			var collectionMock = new Mock<IList<string>>();
-			collectionMock.Setup(x => x.Add("BaconId")).AtMostOnce();
+            collectionMock.Verify(x => x.Add("BaconId"), Times.AtMostOnce());
 
 			var foreignKeyMock = new Mock<ForeignKeyDefinition>();
-			foreignKeyMock.SetupGet(f => f.PrimaryColumns).Returns(collectionMock.Object).AtMostOnce();
+            foreignKeyMock.SetupGet(f => f.PrimaryColumns).Returns(collectionMock.Object);
+            foreignKeyMock.VerifyGet(f => f.PrimaryColumns, Times.AtMostOnce());
+			//foreignKeyMock.SetupGet(f => f.PrimaryColumns).Returns(collectionMock.Object).AtMostOnce();
 
 			var expressionMock = new Mock<DeleteForeignKeyExpression>();
-			expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMostOnce();
+			expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object);
+            expressionMock.VerifyGet(e => e.ForeignKey, Times.AtMostOnce());
 
 			var builder = new DeleteForeignKeyExpressionBuilder(expressionMock.Object);
 			builder.PrimaryColumn("BaconId");
@@ -159,14 +170,16 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 		public void CallingPrimaryColumnsAddsColumnNamesToForeignColumnCollection()
 		{
 			var collectionMock = new Mock<IList<string>>();
-			collectionMock.Setup(x => x.Add("BaconId")).AtMostOnce();
-			collectionMock.Setup(x => x.Add("EggsId")).AtMostOnce();
+            collectionMock.Verify(x => x.Add("BaconId"), Times.AtMostOnce());
+            collectionMock.Verify(x => x.Add("EggsId"), Times.AtMostOnce());
 
 			var foreignKeyMock = new Mock<ForeignKeyDefinition>();
-			foreignKeyMock.SetupGet(f => f.PrimaryColumns).Returns(collectionMock.Object).AtMost(2);
+			foreignKeyMock.SetupGet(f => f.PrimaryColumns).Returns(collectionMock.Object);
+            foreignKeyMock.VerifyGet(f => f.PrimaryColumns, Times.AtMost(2));
 
 			var expressionMock = new Mock<DeleteForeignKeyExpression>();
-			expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object).AtMost(2);
+			expressionMock.SetupGet(e => e.ForeignKey).Returns(foreignKeyMock.Object);
+            expressionMock.VerifyGet(e => e.ForeignKey, Times.AtMost(2));
 
 			var builder = new DeleteForeignKeyExpressionBuilder(expressionMock.Object);
 			builder.PrimaryColumns("BaconId", "EggsId");
