@@ -931,7 +931,8 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
       {
          return new SchemaMigrationContext
                    {
-                      FromConnectionString = _sqlContext.ConnectionString
+                      FromDatabaseType = DatabaseType.SqlServer
+                      , FromConnectionString = _sqlContext.ConnectionString
                       , ToDatabaseType = DatabaseType.Oracle
                       , ToConnectionString = _oracleContext.ConnectionString
                       , WorkingDirectory = _tempDirectory

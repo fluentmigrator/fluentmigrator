@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
-using System.Reflection;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Processors.Oracle;
@@ -65,14 +64,14 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
          foreach (var table in tables)
          {
             Announcer.Say(string.Format("Reading indexes and foreign keys for {0}", table.Name));
-            table.Indexes = ReadIndexes(table.SchemaName, table.Name);
-            table.ForeignKeys = ReadForeignKeys(table.SchemaName, table.Name);
+            table.Indexes = ReadIndexes(table.Name);
+            table.ForeignKeys = ReadForeignKeys(table.Name);
          }
 
          return tables;
       }
 
-      private ICollection<ForeignKeyDefinition> ReadForeignKeys(string schemaName, string name)
+      private ICollection<ForeignKeyDefinition> ReadForeignKeys(string name)
       {
          try
          {
@@ -93,7 +92,7 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
          
       }
 
-      private ICollection<ForeignKeyDefinition> ParseForeignKeyDefinition(string table, string sql)
+      private static ICollection<ForeignKeyDefinition> ParseForeignKeyDefinition(string table, string sql)
       {
          var definitions = new List<ForeignKeyDefinition>();
          using (var reader = new StringReader(sql))
@@ -122,7 +121,7 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
          return definitions;
       }
 
-      private ICollection<string> GetColumnNames(string sql)
+      private static ICollection<string> GetColumnNames(string sql)
       {
          var columnsStart = sql.IndexOf("(");
          var columnsEnd = sql.IndexOf(")", columnsStart);
@@ -135,7 +134,7 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
          return null;
       }
 
-      private string GetForeignKeyName(string sql)
+      private static string GetForeignKeyName(string sql)
       {
          var start = sql.IndexOf("ADD CONSTRAINT ") + "ADD CONSTRAINT ".Length;
          var end = sql.IndexOf("FOREIGN KEY ", start);
@@ -144,7 +143,7 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
 
       }
 
-      private string GetPrimaryTable(string sql)
+      private static string GetPrimaryTable(string sql)
       {
          var start = sql.IndexOf("REFERENCES ") + "REFERENCES ".Length;
          var end = sql.IndexOf("(", start);
@@ -153,7 +152,7 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
 
       }
 
-      private ICollection<IndexDefinition> ReadIndexes(string schemaName, string name)
+      private ICollection<IndexDefinition> ReadIndexes(string name)
       {
          var indexDefinitions = Processor.Read("SELECT u.index_name, DBMS_METADATA.GET_DDL('INDEX',u.index_name) As Sql FROM USER_INDEXES u WHERE TABLE_NAME = '{0}'", name);
 
@@ -235,148 +234,179 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
       /// <returns>Matching <see cref="TableDefinition"/></returns>
       public virtual IList<TableDefinition> ReadTables()
       {
-         var tables = new List<TableDefinition>();
-         var oracleTables = Processor.Read("SELECT TABLE_NAME FROM USER_TABLES");
+         var views = Processor.Read("SELECT OBJECT_NAME, dbms_metadata.get_ddl(object_type,object_name) AS SQL FROM USER_OBJECTS WHERE object_type = 'TABLE'");
 
-         foreach (DataRow table in oracleTables.Tables[0].Rows)
+         return (from DataRow table in views.Tables[0].Rows
+                         select new TableDefinition
+                                   {
+                                      Name = table["OBJECT_NAME"].ToString()
+                                      ,Columns = ParseColumns(table["OBJECT_NAME"].ToString(),table["SQL"].ToString())
+                                   }).ToList();
+
+      }
+
+      private static ICollection<ColumnDefinition> ParseColumns(string table, string sql)
+      {
+         var columns = new List<ColumnDefinition>();
+         using ( var reader = new StringReader(sql))
          {
-            var tableName = table["TABLE_NAME"] as string;
-            var schema = GetTableSchema(tableName);
-
-            var definition = new TableDefinition {Name = tableName};
-
-            foreach (DataRow schemaRow in schema.Rows)
+            var foundCreate = false;
+            while (reader.Peek() > 0)
             {
-               var column = new ColumnDefinition
-                               {
-                                  Name = schemaRow["ColumnName"] as string
-                               };
+               var line = reader.ReadLine();
 
-               MapColumnUsingProviderType(schemaRow, column);
+               if ( string.IsNullOrEmpty(line))
+                  continue;
 
-               if (column.Type != null)
+               line = line.Trim();
+
+               if ( line.StartsWith("CREATE TABLE"))
                {
-                  definition.Columns.Add(column);
+                  foundCreate = true;
                   continue;
                }
 
-               MapColumnUsingDataType(schemaRow, column);
-               definition.Columns.Add(column);
+               if ( foundCreate)
+               {
+                  // Check if start of column definitions
+                  if (line.StartsWith("("))
+                     line = line.Substring(1).Trim();
+
+                  if (line.StartsWith(")"))
+                     break; // End of column deinitions stop now
+
+                  var column = GetColumnFromSql(line);
+                  column.TableName = table;
+                  columns.Add(column);
+               }
+               
             }
-
-            tables.Add(definition);
+         
          }
-
-         return tables;
+         return columns;
       }
 
-      /// <summary>
-      /// Attemps to map the <see cref="ColumnDefinition.Type"/> and <see cref="ColumnDefinition.Size"/> based on the DataType 
-      /// </summary>
-      /// <param name="schemaRow">The row containing the oracle schema information</param>
-      /// <param name="column">The column to be mapped</param>
-      private static void MapColumnUsingDataType(DataRow schemaRow, ColumnDefinition column)
+      private static ColumnDefinition GetColumnFromSql(string line)
       {
-         switch (((Type) schemaRow["DataType"]).FullName)
-         {
-            case "System.String":
-               column.Type = DbType.String;
-               column.Size = int.Parse(schemaRow["ColumnSize"].ToString());
-               break;
-            case "System.Decimal":
-               var precision = int.Parse(schemaRow["NumericPrecision"].ToString());
-               int scale = int.Parse(schemaRow["NumericScale"].ToString());
-               if (precision == 1 && scale == 0)
-               {
-                  column.Type = DbType.Boolean;
-                  column.Size = precision;
-               }
+         var column = new ColumnDefinition();
+         var firstSpace = line.IndexOf(" ");
+         column.Name = line.Substring(0, firstSpace).Trim().Replace("\"", "");
 
-               if (precision == 3 && scale == 0)
-                  column.Type = DbType.Byte;
-               if (precision == 5 && scale == 0)
-                  column.Type = DbType.Int16;
-               if (precision == 10 && scale == 0)
-                  column.Type = DbType.Int32;
-               if (precision == 20 && scale == 0)
-                  column.Type = DbType.Int64;
-               if (precision == 24 && scale == 129)
-                  column.Type = DbType.Single;
+         var remainingLine = line.Substring(firstSpace).Trim();
+         var nextSpace = remainingLine.IndexOf(" ");
 
-               if (precision == 126)
-                  column.Type = DbType.Double;
-
-               if (column.Type == null)
-               {
-                  column.Type = DbType.Decimal;
-                  column.Precision = precision;
-                  column.Scale = scale;
-               }
-               break;
-            case "System.Byte[]":
-               var size = int.Parse(schemaRow["ColumnSize"].ToString());
-               // Special case assume that RAW(16) is a Guid
-               column.Type = size == 16 ? DbType.Guid : DbType.Binary;
-               column.Size = int.Parse(schemaRow["ColumnSize"].ToString());
-               break;
-            case "System.DateTime":
-               column.Type = DbType.DateTime;
-               break;
-            case "System.Double":
-               column.Type = DbType.Double;
-               break;
+         var type = remainingLine.Substring(0, nextSpace == -1 ? remainingLine.Length : nextSpace).Trim();
+         var args = string.Empty;
+         if (type.Contains("(") && type.Contains(")")) {
+            args = remainingLine.Substring(type.IndexOf("(")+1, type.IndexOf(")") - type.IndexOf("(")-1);
+            type = type.Substring(0,type.IndexOf("("));
          }
-      }
 
-      /// <summary>
-      /// Attemps to map the <see cref="ColumnDefinition.Type"/> and <see cref="ColumnDefinition.Size"/> based on the ProviderType from Oracle
-      /// </summary>
-      /// <param name="schemaRow">The row containing the oracle schema information</param>
-      /// <param name="column">The column to be mapped</param>
-      private static void MapColumnUsingProviderType(DataRow schemaRow, ColumnDefinition column)
-      {
-         var providerType = int.Parse(schemaRow["ProviderType"].ToString());
-         switch (providerType)
+         switch ( type )
          {
-            case OracleTypes.Char:
+
+            case "BLOB":
+               column.Type = DbType.Binary;
+               column.Size = int.MaxValue;
+               break;
+           
+            case "CHAR":
                column.Type = DbType.AnsiStringFixedLength;
-               column.Size = int.Parse(schemaRow["ColumnSize"].ToString());
+               column.Size = int.Parse(args);
                break;
-            case OracleTypes.NChar:
-               column.Type = DbType.StringFixedLength;
-               column.Size = int.Parse(schemaRow["ColumnSize"].ToString());
+            case "CLOB":
+               column.Type = DbType.String;
+               column.Size = int.MaxValue;
                break;
-            case OracleTypes.Date:
+
+            case "DATE":
                column.Type = DbType.Date;
                break;
-            case OracleTypes.Varchar:
+            case "DOUBLE":
+               column.Type = DbType.Double;
+               break;
+            case "FLOAT":
+               var floatSize = int.Parse(args);
+               column.Type = floatSize == 126 ? DbType.Double : DbType.Single;
+               break;
+            case "NCHAR":
+               column.Type = DbType.StringFixedLength;
+               column.Size = int.Parse(args);
+               break;
+            case "NCLOB":
+               column.Type = DbType.String;
+               column.Size = int.MaxValue;
+               break;
+            case "NUMBER":
+               var scale = int.Parse(args.Split(',')[0]);
+               var precision = int.Parse(args.Split(',')[1]);
+
+               if ( scale == 1)
+               {
+                  column.Type = DbType.Boolean;
+                  column.Size = 1;
+               }
+
+               if (scale == 3)
+               {
+                  column.Type = DbType.Byte;
+               }
+
+               if (column.Type == null && scale <= 5 && precision == 0)
+               {
+                  column.Type = DbType.Int16;
+               }
+
+               if (column.Type == null && scale <= 10 && precision == 0)
+               {
+                  column.Type = DbType.Int32;
+               }
+
+               if (column.Type == null && scale <= 20 && precision == 0)
+               {
+                  column.Type = DbType.Int64;
+               }
+
+               if ( column.Type == null)
+               {
+                  column.Type = DbType.Decimal;
+                  column.Scale = scale;
+                  column.Precision = precision;
+               }
+                  
+               break;
+            case "RAW":
+               var rawSize = int.Parse(args);
+
+               if (rawSize == 16)
+                  column.Type = DbType.Guid;
+               else
+               {
+                  column.Type = DbType.Binary;
+                  column.Size = rawSize;
+               }
+               break;
+            case "TIMESTAMP":
+               column.Type = DbType.DateTime;
+               break;
+            case "NVARCHAR2":
+               column.Type = DbType.String;
+               column.Size = int.Parse(args);
+               break;
+            case "VARCHAR2":
                column.Type = DbType.AnsiString;
-               column.Size = int.Parse(schemaRow["ColumnSize"].ToString());
+               column.Size = int.Parse(args);
                break;
          }
+
+         return column;
       }
 
-
-      public DataTable GetTableSchema(string tableName)
-      {
-         try
-         {
-            var strQuery = string.Format("SELECT * FROM {0} WHERE 1 = 2", tableName);
-
-            using ( var command = Processor.Connection.CreateCommand() )
-            {
-               command.CommandText = strQuery;
-               var rdr = command.ExecuteReader();
-               // Get the schema table.
-               return rdr.GetSchemaTable();   
-            }
-         }
-         catch (Exception)
-         {
-            return null;
-         }
-      }
-
+      /// <summary>
+      /// Gets the views that exist in the Oracle database
+      /// </summary>
+      /// <remarks>The CreateViewSql includes schema refences to the schema it cam from which may need to be replaced</remarks>
+      /// <returns>The view definition</returns>
       public IList<ViewDefinition> ReadViews()
       {
          var views = Processor.Read("SELECT OBJECT_NAME, dbms_metadata.get_ddl(object_type,object_name) AS SQL FROM USER_OBJECTS WHERE object_type = 'VIEW'");
@@ -426,19 +456,5 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
                     ,Sql = view["SQL"].ToString()
                  }).ToList();
       }
-
-      private string GetProcedureSql(string toString)
-      {
-         throw new NotImplementedException();
-      }
-   }
-
-   public class OracleTypes
-   {
-      public const int Char = 3;
-      public const int Date = 6;
-      public const int NChar = 11;
-      public const int NVarchar2 = 14;
-      public const int Varchar = 22;
    }
 }

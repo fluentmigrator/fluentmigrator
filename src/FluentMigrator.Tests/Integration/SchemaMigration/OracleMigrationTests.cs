@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Diagnostics;
 using System.IO;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
@@ -155,6 +156,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          CreateViews(new ViewDefinition { Name = "FooView", CreateViewSql = "CREATE VIEW FooView AS SELECT * FROM Foo"});
          var context = GetDefaultContext();
 
+
          // Act
          MigrateTable(context);
 
@@ -218,7 +220,8 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
       {
          return new SchemaMigrationContext
          {
-            FromConnectionString = _source.ConnectionString
+            FromDatabaseType = DatabaseType.Oracle
+            , FromConnectionString = _source.ConnectionString
             ,ToDatabaseType = DatabaseType.Oracle
             ,ToConnectionString = _destination.ConnectionString
             ,WorkingDirectory = _tempDirectory
@@ -249,7 +252,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
       }
 
       /// <summary>
-      /// Creates views in SQL Server using the <see cref="ViewDefinition.CreateViewSql"/>
+      /// Creates views in Oracle using the <see cref="ViewDefinition.CreateViewSql"/>
       /// </summary>
       /// <param name="view">The views to be created</param>
       private void CreateViews(params ViewDefinition[] view)
@@ -279,6 +282,19 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          var migrator = new OracleSchemaMigrator(new DebugAnnouncer());
 
          migrator.Generate(context);
+
+         if (Directory.Exists(Path.Combine(_tempDirectory, "Scripts")))
+         {
+            // Replace Schema from source to destintion
+            foreach (var filename in Directory.GetFiles(Path.Combine(_tempDirectory, "Scripts"), "CreateView*.sql"))
+            {
+               var text = File.ReadAllText(filename);
+               File.Delete(filename);
+               File.WriteAllText(filename, text.Replace(_source.TestDbName.ToUpper(), _destination.TestDbName.ToUpper()));
+            }   
+         }
+         
+
          migrator.Migrate(context);
 
          AssertOracleTablesExist(createTables);
