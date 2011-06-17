@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         public override void CanDropForeignKey()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
-               var sql = generator.Generate(expression);
+            var sql = generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE `TestTable1` DROP FOREIGN KEY `FK_Test`");
         }
 
@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
             var sql = generator.Generate(expression);
-            sql.ShouldBe("DROP INDEX `TestIndex`");
+            sql.ShouldBe("DROP INDEX `TestIndex` ON `TestTable1`");
         }
 
         [Test]

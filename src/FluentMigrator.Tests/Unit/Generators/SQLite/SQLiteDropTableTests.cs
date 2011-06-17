@@ -25,8 +25,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE 'TestTable1' DROP COLUMN 'TestColumn1'");
-
+            sql.ShouldBe(String.Empty); //because sqlite doesnt support removing columns
         }
 
         [Test]
