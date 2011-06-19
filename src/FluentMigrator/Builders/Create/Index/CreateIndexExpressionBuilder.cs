@@ -87,5 +87,11 @@ namespace FluentMigrator.Builders.Create.Index
 			Expression.Index.IsClustered = true;
 			return this;
 		}
+
+        public ICreateIndexOptionsSyntax WithUniqueConstraint(string constraintName)
+        {
+            Expression.Index.WithUniqueContraint = constraintName;
+            return this;
+        }
 	}
 }

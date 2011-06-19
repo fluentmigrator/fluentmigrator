@@ -20,6 +20,7 @@ using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration
@@ -27,6 +28,7 @@ namespace FluentMigrator.Tests.Integration
    /// <summary>
    /// A base class for SQL Server unit test that allow a temporary SQL Server database to be quickly created and dropped for each unit test
    /// </summary>
+   /// <remarks>If UAC is enabled then require administrator privileges to create and delete MSSQL Express databases</remarks>
    /// <remarks>The database is dropped between each unit test to ensure the independance of</remarks>
    public class SqlServerUnitTest
    {
@@ -78,6 +80,15 @@ namespace FluentMigrator.Tests.Integration
          DatabasePath = CreateDatabase(BlankDatabaseName);
 
          BlankTemplateDatabaseFile = Path.Combine(DatabasePath, BlankDatabaseName + ".mdf");
+
+         // Delete old temp databases that may exist from previous test runs that have been aborted
+         foreach (var database in
+            Directory.GetFiles(DatabasePath, "UT_*.mdf").Where(database => !database.Equals(BlankTemplateDatabaseFile, StringComparison.InvariantCultureIgnoreCase)))
+         {
+            File.Delete(database);
+            if ( File.Exists(database.Replace(".mdf", ".ldf")) )
+               File.Delete(database.Replace(".mdf", ".ldf"));
+         }
 
          DetachDatabase(BlankDatabaseName);
 
@@ -144,7 +155,7 @@ WHERE database_id = 1 AND FILE_ID = 1";
       /// <returns></returns>
       private static string GenerateDbName()
       {
-         return "A" + Guid.NewGuid().ToString().Replace("-", "");
+         return "UT_" + Guid.NewGuid().ToString().Replace("-", "");
       }
 
       /// <summary>

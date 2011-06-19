@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FluentMigrator.Runner.Announcers
 {
@@ -44,7 +45,18 @@ namespace FluentMigrator.Runner.Announcers
 			Each(a => a.Sql(sql));
 		}
 
-		public void ElapsedTime(TimeSpan timeSpan)
+        public bool AnnounceTime { 
+            get
+            {
+                return _announcers.Where(a => a.AnnounceTime).Count() >0;
+            }
+            set
+            {
+                Each(a => a.AnnounceTime = value);
+            }
+        }
+
+	    public void ElapsedTime(TimeSpan timeSpan)
 		{
 			Each(a => a.ElapsedTime(timeSpan));
 		}

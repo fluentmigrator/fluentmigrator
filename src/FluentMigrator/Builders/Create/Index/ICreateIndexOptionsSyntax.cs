@@ -23,5 +23,6 @@ namespace FluentMigrator.Builders.Create.Index
 		ICreateIndexOptionsSyntax Unique();
 		ICreateIndexOptionsSyntax NonClustered();
 		ICreateIndexOptionsSyntax Clustered();
+        ICreateIndexOptionsSyntax WithUniqueConstraint(string constraintName);
 	}
 }

@@ -48,7 +48,7 @@ namespace FluentMigrator.Runner.Announcers
 
 		public override void Say(string message)
 		{
-			Info(NonSqlPrefix + message);
+            Info(NonSqlPrefix + message);
 		}
 
 		public override void Sql(string sql)
@@ -82,7 +82,7 @@ namespace FluentMigrator.Runner.Announcers
 
 		private void Info(string message)
 		{
-			Write(message);
+			Write(TimePrefix() + message);
 			Write(Environment.NewLine);
 		}
 	}

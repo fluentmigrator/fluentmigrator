@@ -830,6 +830,63 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
          
       }
 
+      [Test]
+      public void CanForeignKeyToUniqueColumn()
+      {
+          // Arrange
+
+          var create = new CreateTableExpression
+          {
+              TableName = "Foo",
+              Columns = new[]{
+                   new ColumnDefinition {Name = "Id", Type = DbType.Int32, IsPrimaryKey = true}
+                   , new ColumnDefinition {Name = "Type", Type = DbType.Int32}
+                    }
+          };
+
+          var index = new CreateIndexExpression
+          {
+              Index =
+                 new IndexDefinition()
+                 {
+                     Name = "IDX_FooType",
+                     TableName = "Foo",
+                     IsUnique = true,
+                     Columns = new List<IndexColumnDefinition> { new IndexColumnDefinition { Name = "Type" } }
+                 }
+          };
+
+          var secondTable = new CreateTableExpression
+          {
+              TableName = "Bar",
+              Columns = new[]{
+                   new ColumnDefinition {Name = "Id", Type = DbType.Int32, IsPrimaryKey = true}
+                   , new ColumnDefinition {Name = "FooType", Type = DbType.Int32}
+                    }
+          };
+
+          var foreignKey = new CreateForeignKeyExpression
+          {
+              ForeignKey =
+                 new ForeignKeyDefinition()
+                 {
+                     Name = "FK_FooType",
+                     ForeignTable = "Bar",
+                     ForeignColumns = new [] { "FooType" },
+                     PrimaryTable= "Foo",
+                     PrimaryColumns = new[] { "Type" }
+                 }
+          };
+
+          // Act
+          MigrateToOracleWithData(new List<IMigrationExpression> { create, index, secondTable, foreignKey }, 2);
+
+          // Assert
+
+
+      }
+
+
       /// <summary>
       /// Migrates a set of tables using the provided context
       /// </summary>
@@ -1027,6 +1084,13 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
                   var index = (CreateIndexExpression)action;
                   processor.Process(index);
                   continue;
+               }
+
+               if (action is CreateForeignKeyExpression)
+               {
+                   var index = (CreateForeignKeyExpression)action;
+                   processor.Process(index);
+                   continue;
                }
             }
 

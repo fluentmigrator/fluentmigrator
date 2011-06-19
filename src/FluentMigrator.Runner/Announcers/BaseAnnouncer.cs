@@ -31,31 +31,37 @@ namespace FluentMigrator.Runner.Announcers
 			Write = write;
 			ShowSql = false;
 			ShowElapsedTime = false;
+		    AnnounceTime = false;
 		}
 
 		public bool ShowSql { get; set; }
 		public bool ShowElapsedTime { get; set; }
 
+        /// <summary>
+        /// <c>True</c> indicates that teh time of each action should be announced, <c>False</c> no extra time prefix will be added
+        /// </summary>
+        public bool AnnounceTime { get; set; }
+
 		#region IAnnouncer Members
 
 		public virtual void Heading(string message)
 		{
-			Write(message);
+            Write(TimePrefix() + message);
 		}
 
 		public virtual void Say(string message)
 		{
-			Write(message);
+            Write(TimePrefix() + message);
 		}
 
         public virtual void Heading(string message,params object[] args)
         {
-            Heading(string.Format(message, args));
+            Heading(TimePrefix() + string.Format(message, args));
         }
 
         public virtual void Say(string message, params object[] args)
         {
-            Say(string.Format(message, args));
+            Say(TimePrefix() + string.Format(message, args));
         }
 
 		public virtual void Sql(string sql)
@@ -77,17 +83,25 @@ namespace FluentMigrator.Runner.Announcers
 
 		public virtual void Error(string message)
 		{
-			Write(message);
+            Write(TimePrefix() + message);
 		}
 
         public virtual void Error(string message,params object[] args)
         {
-            Error(string.Format(message, args));
+            Error(TimePrefix() + string.Format(message, args));
         }
 
 		public virtual void Dispose()
 		{
 		}
+
+        public virtual string TimePrefix()
+        {
+            if (AnnounceTime)
+                return DateTime.Now.ToString("dd/MMM/yyyy HH:mm:ss") + " ";
+
+            return string.Empty;
+        }
 
 		#endregion
 	}

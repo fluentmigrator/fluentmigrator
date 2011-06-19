@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
+using System.Text;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Oracle;
 
 
@@ -108,7 +110,44 @@ namespace FluentMigrator.Runner.Processors.Oracle
            }
         }
 
-	   private void QuoteInsertColumnNames(InsertDataExpression expression)
+        /// <summary>
+        /// Specail case for Oracle to add Unique Contraint. Required to enable foreign keys to a non primary key column
+       /// See http://forums.oracle.com/forums/thread.jspa?threadID=1094544&tstart=0 for more information
+        /// </summary>
+        /// <param name="expression"></param>
+       public override void Process(CreateIndexExpression expression)
+       {
+           base.Process(expression);
+
+           // Check if we have a unique index beging created ... and we wish to create a corresponding unique constraint
+           if (!string.IsNullOrEmpty(expression.Index.WithUniqueContraint) && expression.Index.IsUnique)
+           {
+               // 
+               Process(
+                    string.Format("ALTER TABLE {0} ADD CONSTRAINT {1} UNIQUE ({2}) USING INDEX {3}",
+                                  expression.Index.TableName
+                                  , expression.Index.WithUniqueContraint
+                                  , GetIndexColumns(expression.Index.Columns)
+                                  , expression.Index.Name));
+           }
+       }
+
+	    private static object GetIndexColumns(IEnumerable<IndexColumnDefinition> columns)
+	    {
+	        var result = new StringBuilder();
+
+	        foreach (var column in columns)
+	        {
+                if (result.Length > 0)
+                    result.Append(", ");
+
+	            result.Append(column.Name);
+	        }
+
+            return result.ToString();
+	    }
+
+	    private void QuoteInsertColumnNames(InsertDataExpression expression)
 	   {
          if ( ! expression.CaseSensitiveColumnNames)
             return;

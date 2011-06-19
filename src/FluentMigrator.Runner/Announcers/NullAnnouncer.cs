@@ -30,7 +30,9 @@ namespace FluentMigrator.Runner.Announcers
 		{
 		}
 
-		public void ElapsedTime(TimeSpan timeSpan)
+        public bool AnnounceTime { get; set; }
+
+	    public void ElapsedTime(TimeSpan timeSpan)
 		{
 		}
 

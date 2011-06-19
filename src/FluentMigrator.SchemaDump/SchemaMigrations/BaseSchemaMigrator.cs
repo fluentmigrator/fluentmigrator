@@ -50,6 +50,7 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
       /// <param name="context">Define data required to generate the C# migrations</param>
       public void Generate(SchemaMigrationContext context)
       {
+          Announcer.AnnounceTime = context.AnnounceTime;
          Announcer.Say(string.Format("Generating schema {0} migrations from {1}", context.Type, context.FromConnectionString));
          using (var connection = GetConnection(context))
          {
@@ -90,6 +91,8 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
       /// <param name="context">The context that control how the migration should be generated/executed</param>
       public void Migrate(SchemaMigrationContext context)
       {
+          Announcer.AnnounceTime = context.AnnounceTime;
+
          if (context.ExecuteInMemory)
          {
             Announcer.Say("Compiling migration");

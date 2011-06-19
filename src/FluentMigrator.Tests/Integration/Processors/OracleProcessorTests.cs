@@ -19,8 +19,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
-using System.Diagnostics;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Announcers;
@@ -72,13 +70,13 @@ namespace FluentMigrator.Tests.Integration.Processors
 		[Test]
 		public void TestQuery()
 		{
-			DbConnection connection = OracleFactory.GetOpenConnection
+			var connection = OracleFactory.GetOpenConnection
             (ConnectionString);
 
-			string sql = "Select * from Dual";
-			DataSet ds = new DataSet();
+			const string sql = "Select * from Dual";
+			var ds = new DataSet();
 			using (var command = OracleFactory.GetCommand(connection,sql ))
-			using (DbDataAdapter adapter = OracleFactory.GetDataAdapter(command))
+			using (var adapter = OracleFactory.GetDataAdapter(command))
 			{
 				adapter.Fill(ds);
 			}
@@ -124,10 +122,10 @@ namespace FluentMigrator.Tests.Integration.Processors
          CreateTestTable();
 
 
-         _processor.Process(new InsertDataExpression()
-         {
+         _processor.Process(new InsertDataExpression
+                                {
             TableName = "Foo",
-            Rows = { new InsertionDataDefinition() { new KeyValuePair<string, object>("Id", 1) } }
+            Rows = { new InsertionDataDefinition { new KeyValuePair<string, object>("Id", 1) } }
          });
 
          var table = _processor.ReadTableData(string.Empty, "Foo");
@@ -145,10 +143,10 @@ namespace FluentMigrator.Tests.Integration.Processors
          });
 
          var testDate = DateTime.ParseExact("2011-12-31 22:59", "yyyy-MM-dd HH:mm", null);
-         _processor.Process(new InsertDataExpression()
-         {
+         _processor.Process(new InsertDataExpression
+                                {
             TableName = "Foo",
-            Rows = { new InsertionDataDefinition() { new KeyValuePair<string, object>("Test", testDate) } }
+            Rows = { new InsertionDataDefinition { new KeyValuePair<string, object>("Test", testDate) } }
          });
 
          var table = _processor.ReadTableData(string.Empty, "Foo");
@@ -167,10 +165,10 @@ namespace FluentMigrator.Tests.Integration.Processors
          });
 
          var testData = System.Text.Encoding.ASCII.GetBytes(new String('A', 1000));
-         _processor.Process(new InsertDataExpression()
-         {
+         _processor.Process(new InsertDataExpression
+                                {
             TableName = "Foo",
-            Rows = { new InsertionDataDefinition() { new KeyValuePair<string, object>("Test",testData)  } }
+            Rows = { new InsertionDataDefinition { new KeyValuePair<string, object>("Test",testData)  } }
          });
 
          var table = _processor.ReadTableData(string.Empty, "Foo");
@@ -189,10 +187,10 @@ namespace FluentMigrator.Tests.Integration.Processors
          });
 
          var testData = new String('A', 1000);
-         _processor.Process(new InsertDataExpression()
-         {
+         _processor.Process(new InsertDataExpression
+                                {
             TableName = "Foo",
-            Rows = { new InsertionDataDefinition() { new KeyValuePair<string, object>("Test", testData) } }
+            Rows = { new InsertionDataDefinition { new KeyValuePair<string, object>("Test", testData) } }
          });
 
          var table = _processor.ReadTableData(string.Empty, "Foo");
@@ -206,13 +204,13 @@ namespace FluentMigrator.Tests.Integration.Processors
       {
          CreateTestTable();
 
-         _processor.Process(new InsertDataExpression()
-                               {
+         _processor.Process(new InsertDataExpression
+                                {
                                   TableName = "Foo",
                                   Rows =
                                      {
-                                        new InsertionDataDefinition() {new KeyValuePair<string, object>("Id", 1)}
-                                        ,new InsertionDataDefinition() {new KeyValuePair<string, object>("Id", 2)}
+                                        new InsertionDataDefinition {new KeyValuePair<string, object>("Id", 1)}
+                                        ,new InsertionDataDefinition {new KeyValuePair<string, object>("Id", 2)}
                                      }
                                   ,InsertRowsSeparately = true
          });
@@ -227,10 +225,10 @@ namespace FluentMigrator.Tests.Integration.Processors
       {
          CreateTestTableWithIdentity();
 
-         _processor.Process(new InsertDataExpression()
-         {
+         _processor.Process(new InsertDataExpression
+                                {
             TableName = "Foo"
-            , Rows = { new InsertionDataDefinition() { new KeyValuePair<string, object>("Id", 1) }}
+            , Rows = { new InsertionDataDefinition { new KeyValuePair<string, object>("Id", 1) }}
             , WithIdentity = true
          });
 
@@ -250,20 +248,20 @@ namespace FluentMigrator.Tests.Integration.Processors
 
          CreateTestTableWithIdentity();
 
-         _processor.Process(new InsertDataExpression()
-         {
+         _processor.Process(new InsertDataExpression
+                                {
             TableName = "Foo"
-            ,Rows = { new InsertionDataDefinition() { new KeyValuePair<string, object>("Id", 1) } }
+            ,Rows = { new InsertionDataDefinition { new KeyValuePair<string, object>("Id", 1) } }
             ,WithIdentity = true
          });
 
          var table = _processor.ReadTableData(string.Empty, "Foo");
 
-         Assert.AreEqual(1, table.Tables[0].Rows.Count);
+         1.ShouldBe(table.Tables[0].Rows.Count);
 
          var nextVal = _processor.Read("SELECT MYFOOSEQ.nextval from dual");
 
-         Assert.AreEqual(2, nextVal.Tables[0].Rows[0][0], "Next Val");
+         2.ShouldBe(nextVal.Tables[0].Rows[0][0]);
       }
 
       [Test]
@@ -275,15 +273,15 @@ namespace FluentMigrator.Tests.Integration.Processors
             Columns = { new ColumnDefinition { Name = "Data", Type = DbType.Binary, Size = 2000} }
          });
 
-         _processor.Process(new InsertDataExpression()
-         {
+         _processor.Process(new InsertDataExpression
+                                {
             TableName = "Foo"
-            ,Rows = { new InsertionDataDefinition() { new KeyValuePair<string, object>("Data", System.Text.Encoding.ASCII.GetBytes("HELLO WORLD")) } }
+            ,Rows = { new InsertionDataDefinition { new KeyValuePair<string, object>("Data", System.Text.Encoding.ASCII.GetBytes("HELLO WORLD")) } }
          });
 
          var table = _processor.ReadTableData(string.Empty, "Foo");
 
-         Assert.AreEqual(1, table.Tables[0].Rows.Count);
+         1.ShouldBe(table.Tables[0].Rows.Count);
       }
 
       [Test]
@@ -295,16 +293,16 @@ namespace FluentMigrator.Tests.Integration.Processors
             Columns = { new ColumnDefinition { Name = "Data", Type = DbType.AnsiString, Size = 20 } }
          });
 
-         _processor.Process(new InsertDataExpression()
-         {
+         _processor.Process(new InsertDataExpression
+                                {
             TableName = "Foo"
             ,
-            Rows = { new InsertionDataDefinition() { new KeyValuePair<string, object>("Data", new string('A',20)) } }
+            Rows = { new InsertionDataDefinition { new KeyValuePair<string, object>("Data", new string('A',20)) } }
          });
 
          var table = _processor.ReadTableData(string.Empty, "Foo");
 
-         Assert.AreEqual(1, table.Tables[0].Rows.Count);
+         1.ShouldBe(table.Tables[0].Rows.Count);
       }
 
       [Test]
@@ -316,11 +314,11 @@ namespace FluentMigrator.Tests.Integration.Processors
             Columns = { new ColumnDefinition { Name = "Data", Type = DbType.String, IsNullable = false} }
          });
 
-         var insert = new InsertDataExpression()
-                         {
+         var insert = new InsertDataExpression
+                          {
                             TableName = "Foo"
                             ,Rows =
-                               {new InsertionDataDefinition() {new KeyValuePair<string, object>("Data", string.Empty)}}
+                               {new InsertionDataDefinition {new KeyValuePair<string, object>("Data", string.Empty)}}
                          };
          insert.ReplacementValues.Add(string.Empty, " ");
 
@@ -328,7 +326,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 
          var table = _processor.ReadTableData(string.Empty, "Foo");
 
-         Assert.AreEqual(1, table.Tables[0].Rows.Count);
+         1.ShouldBe(table.Tables[0].Rows.Count);
       }
 
       [Test]
@@ -340,17 +338,17 @@ namespace FluentMigrator.Tests.Integration.Processors
             Columns = { new ColumnDefinition { Name = "Data", Type = DbType.String, IsNullable = true } }
          });
 
-         var insert = new InsertDataExpression()
-         {
+         var insert = new InsertDataExpression
+                          {
             TableName = "Foo"
-            , Rows = { new InsertionDataDefinition() { new KeyValuePair<string, object>("Data", null) } }
+            , Rows = { new InsertionDataDefinition { new KeyValuePair<string, object>("Data", null) } }
          };
 
          _processor.Process(insert);
 
          var table = _processor.ReadTableData(string.Empty, "Foo");
 
-         Assert.AreEqual(1, table.Tables[0].Rows.Count);
+         1.ShouldBe(table.Tables[0].Rows.Count);
       }
 
       [Test]
@@ -367,7 +365,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 
          var table = _processor.ReadTableData(string.Empty, "Foo");
 
-         Assert.AreEqual(0, table.Tables[0].Rows.Count);
+         0.ShouldBe(table.Tables[0].Rows.Count);
       }
 
       [Test]
@@ -384,8 +382,8 @@ namespace FluentMigrator.Tests.Integration.Processors
 
          var table = _processor.ReadTableData(string.Empty, "Foo");
 
-         Assert.AreEqual(1, table.Tables[0].Rows.Count, "Count");
-         Assert.AreEqual(2, table.Tables[0].Rows[0]["Id"], "Value");
+         1.ShouldBe(table.Tables[0].Rows.Count);
+         2.ShouldBe(table.Tables[0].Rows[0]["Id"]);
       }
 
       [Test]
@@ -394,8 +392,8 @@ namespace FluentMigrator.Tests.Integration.Processors
          CreateTestTable();
 
 
-         _processor.Process(new RenameTableExpression()
-         { 
+         _processor.Process(new RenameTableExpression
+                                { 
             OldName = "Foo",
             NewName = "Bar"
              
@@ -413,8 +411,8 @@ namespace FluentMigrator.Tests.Integration.Processors
 
          _processor.TableExists(string.Empty, "Foo").ShouldBeTrue();
 
-         _processor.Process(new DeleteTableExpression()
-         {
+         _processor.Process(new DeleteTableExpression
+                                {
             TableName = "Foo"
          });
 
@@ -428,8 +426,8 @@ namespace FluentMigrator.Tests.Integration.Processors
          CreateTestTable();
 
 
-         _processor.Process(new RenameColumnExpression()
-         {
+         _processor.Process(new RenameColumnExpression
+                                {
             TableName = "Foo",
             OldName = "Id",
             NewName = "Bar"
@@ -446,11 +444,11 @@ namespace FluentMigrator.Tests.Integration.Processors
          CreateTestTable();
 
 
-         _processor.Process(new CreateColumnExpression()
-         {
+         _processor.Process(new CreateColumnExpression
+                                {
             TableName = "Foo"
-            , Column = new ColumnDefinition()
-                          {
+            , Column = new ColumnDefinition
+                           {
                              Name = "Bar",
                              Type = DbType.Int32
                           }
@@ -480,8 +478,8 @@ namespace FluentMigrator.Tests.Integration.Processors
          });
 
 
-         _processor.Process(new DeleteColumnExpression()
-         {
+         _processor.Process(new DeleteColumnExpression
+                                {
             TableName = "Foo"
             , ColumnName = "Bar"
          });
@@ -504,12 +502,12 @@ namespace FluentMigrator.Tests.Integration.Processors
          });
 
 
-         _processor.Process(new AlterColumnExpression()
-         {
+         _processor.Process(new AlterColumnExpression
+                                {
             TableName = "Foo"
             ,
-            Column = new ColumnDefinition()
-            {
+            Column = new ColumnDefinition
+                         {
                Name = "Id",
                Type = DbType.StringFixedLength,
                Size = 100
@@ -535,12 +533,12 @@ namespace FluentMigrator.Tests.Integration.Processors
          });
 
 
-         _processor.Process(new AlterColumnExpression()
-         {
+         _processor.Process(new AlterColumnExpression
+                                {
             TableName = "Foo"
             ,
-            Column = new ColumnDefinition()
-            {
+            Column = new ColumnDefinition
+                         {
                Name = "Id"
                , Type = DbType.StringFixedLength
                , Size = 100
@@ -568,12 +566,12 @@ namespace FluentMigrator.Tests.Integration.Processors
          });
 
 
-         _processor.Process(new AlterColumnExpression()
-         {
+         _processor.Process(new AlterColumnExpression
+                                {
             TableName = "Foo"
             ,
-            Column = new ColumnDefinition()
-            {
+            Column = new ColumnDefinition
+                         {
                Name = "Id"
                , Type = DbType.StringFixedLength
                , Size = 100
@@ -601,12 +599,12 @@ namespace FluentMigrator.Tests.Integration.Processors
          });
 
 
-         _processor.Process(new AlterColumnExpression()
-         {
+         _processor.Process(new AlterColumnExpression
+                                {
             TableName = "Foo"
             ,
-            Column = new ColumnDefinition()
-            {
+            Column = new ColumnDefinition
+                         {
                Name = "Id"
                , Type = DbType.StringFixedLength
                , Size = 10
@@ -630,7 +628,7 @@ namespace FluentMigrator.Tests.Integration.Processors
       {
          CanCheckIndexExists();
 
-         _processor.Process(new DeleteIndexExpression() { Index = new IndexDefinition() { TableName = "Foo", Name = "IDX_Id"}});
+         _processor.Process(new DeleteIndexExpression { Index = new IndexDefinition { TableName = "Foo", Name = "IDX_Id"}});
 
          _processor.IndexExists(string.Empty, "Foo", "IDX_Id").ShouldBeFalse();
       }
@@ -664,10 +662,10 @@ namespace FluentMigrator.Tests.Integration.Processors
 
 
 
-         _processor.Process(new CreateForeignKeyExpression()
-                               {
-                                  ForeignKey = new ForeignKeyDefinition()
-                                                  {
+         _processor.Process(new CreateForeignKeyExpression
+                                {
+                                  ForeignKey = new ForeignKeyDefinition
+                                                   {
                                                      PrimaryTable = "Foo"
                                                      , PrimaryColumns = new[] { "Id" }
                                                      , ForeignTable = "Bar"
@@ -679,12 +677,57 @@ namespace FluentMigrator.Tests.Integration.Processors
       }
 
       [Test]
+      public void CreateForiegnKeyThatReferencesNonPrimaryKeyColumn()
+      {
+          _processor.Process(new CreateTableExpression
+          {
+              TableName = "Foo",
+              Columns =
+                  {
+                      new ColumnDefinition { Name = "Id", Type = DbType.Int32, IsPrimaryKey = true }
+                      , new ColumnDefinition { Name = "Type", Type = DbType.Int32 }
+                  }
+          });
+
+          _processor.Process(new CreateIndexExpression
+          {
+              Index = new IndexDefinition { Name = "UI_Type", TableName = "Foo", IsUnique = true, Columns = new[] { new IndexColumnDefinition { Name = "Type" } }, WithUniqueContraint = "UC_TYPE" }
+          });
+
+          _processor.Process(new CreateTableExpression
+          {
+              TableName = "Bar",
+              Columns =
+               {
+                  new ColumnDefinition { Name = "Id", Type = DbType.Int32, IsUnique = true }
+                  , new ColumnDefinition { Name = "FooTypeId", Type = DbType.Int32, IsUnique = true }
+               }
+          });
+
+
+
+          _processor.Process(new CreateForeignKeyExpression
+          {
+              ForeignKey = new ForeignKeyDefinition
+              {
+                  PrimaryTable = "Foo"
+                , PrimaryColumns = new[] { "Type" }
+                , ForeignTable = "Bar"
+                , ForeignColumns = new[] { "FooTypeId" }
+                , Name = "FK_Foo_Bar"
+              }
+
+          });
+      }
+
+      [Test]
       public void DropForiegnKey()
       {
          CreateForiegnKey();
 
-         _processor.Process(new DeleteForeignKeyExpression() { ForeignKey = new ForeignKeyDefinition()
-                                                                               {
+         _processor.Process(new DeleteForeignKeyExpression
+                                { ForeignKey = new ForeignKeyDefinition
+                                                   {
                                                                                   ForeignTable = "Bar"
                                                                                   , Name = "FK_Foo_Bar"
                                                                                }

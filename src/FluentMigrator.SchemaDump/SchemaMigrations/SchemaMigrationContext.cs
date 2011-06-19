@@ -16,6 +16,7 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
       /// </summary>
       public SchemaMigrationContext()
       {
+          AnnounceTime = false;
          InputDateTimeFormat = "yyyy-MM-dd";
          DateTimeFormat = "yyyy-MM-dd";
          DateTimeDefaultValueFormatter = (columnDefinition, defaultValue) =>
@@ -64,6 +65,11 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
          CaseSenstiveColumns = new List<string>();
 
       }
+
+       /// <summary>
+       /// <c>True</c> indicates that the time of each migration step should be included in the migration announcer stream
+       /// </summary>
+      public bool AnnounceTime { get; set; }
 
       public bool MigrationRequired(MigrationType required)
       {

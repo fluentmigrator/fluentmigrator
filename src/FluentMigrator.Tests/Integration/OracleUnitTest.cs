@@ -21,6 +21,7 @@ using System.Data.Odbc;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using FluentMigrator.Runner.Processors.Oracle;
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration
@@ -81,9 +82,9 @@ namespace FluentMigrator.Tests.Integration
             // .... default server to be TNS-less connection to the local XE instance
             Server = "(DESCRIPTION=(ADDRESS=(PROTOCOL=TCP)(HOST=127.0.0.1)(PORT=1521))(CONNECT_DATA=(SID=XE)))";
          }
-            
 
-         MasterConnectionString = string.Format("Driver={{Microsoft ODBC for Oracle}};Server={0};Uid=system;Pwd={1};", Server, Password);
+
+         MasterConnectionString = string.Format("user id=system;password={1};Data Source={0};", Server, Password);
 
          try
          {
@@ -202,12 +203,11 @@ namespace FluentMigrator.Tests.Integration
          var query1 = @"CREATE USER " + databaseName + " IDENTIFIED BY " + Password;
          var query = @"GRANT CONNECT, RESOURCE, CREATE VIEW TO " + databaseName;
 
-         using (var con = new OdbcConnection(MasterConnectionString))
+         using (var con = OracleFactory.GetOpenConnection(MasterConnectionString))
          {
-            con.Open();
-
-            using (var com = new OdbcCommand(query1, con))
+            using (var com = con.CreateCommand())
             {
+                com.CommandText = query1;
                com.ExecuteNonQuery();
                com.CommandText = query;
                com.ExecuteNonQuery();

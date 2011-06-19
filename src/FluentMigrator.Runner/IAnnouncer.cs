@@ -29,6 +29,9 @@ namespace FluentMigrator.Runner
 		void Say(string message);
         
 		void Sql(string sql);
+
+        bool AnnounceTime { get; set; }
+
 		void ElapsedTime(TimeSpan timeSpan);
         void Error(string message);
 

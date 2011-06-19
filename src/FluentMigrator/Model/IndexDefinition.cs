@@ -31,6 +31,12 @@ namespace FluentMigrator.Model
 		public virtual string TableName { get; set; }
 		public virtual bool IsUnique { get; set; }
 		public bool IsClustered { get; set; }
+
+        /// <summary>
+        /// The name of the unique constraint to be created on the <see cref="TableName"/> using the same columns as in the <see cref="Columns"/>
+        /// </summary>
+        public string WithUniqueContraint { get; set; }
+        
 		public virtual ICollection<IndexColumnDefinition> Columns { get; set; }
 
 		public IndexDefinition()

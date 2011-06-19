@@ -25,7 +25,9 @@ namespace FluentMigrator.Runner.Announcers
          Debug.WriteLine(sql);
       }
 
-      public void ElapsedTime(TimeSpan timeSpan)
+      public bool AnnounceTime { get; set; }
+
+       public void ElapsedTime(TimeSpan timeSpan)
       {
          
       }
