@@ -64,7 +64,20 @@ namespace FluentMigrator.Expressions
                 return base.Reverse();
             }
 
-            return new CreateForeignKeyExpression { ForeignKey = ForeignKey.Clone() as ForeignKeyDefinition };
+            var reverseForeignKey = new ForeignKeyDefinition
+            {
+                Name = ForeignKey.Name,
+                ForeignTableSchema = ForeignKey.PrimaryTableSchema,
+                ForeignTable = ForeignKey.PrimaryTable,
+                PrimaryTableSchema = ForeignKey.ForeignTableSchema,
+                PrimaryTable = ForeignKey.ForeignTable,
+                ForeignColumns = new List<string>(ForeignKey.PrimaryColumns),
+                PrimaryColumns = new List<string>(ForeignKey.ForeignColumns),
+                OnDelete = ForeignKey.OnDelete,
+                OnUpdate = ForeignKey.OnUpdate
+            };
+
+            return new CreateForeignKeyExpression { ForeignKey = reverseForeignKey };
         }
 
 		public override string ToString()
