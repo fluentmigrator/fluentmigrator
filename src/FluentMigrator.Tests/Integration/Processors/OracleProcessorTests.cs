@@ -691,7 +691,11 @@ namespace FluentMigrator.Tests.Integration.Processors
 
           _processor.Process(new CreateIndexExpression
           {
-              Index = new IndexDefinition { Name = "UI_Type", TableName = "Foo", IsUnique = true, Columns = new[] { new IndexColumnDefinition { Name = "Type" } }, WithUniqueContraint = "UC_TYPE" }
+              Index = new IndexDefinition { Name = "UI_Type"
+                  , TableName = "Foo"
+                  , IsUnique = true
+                  , Columns = new[] { new IndexColumnDefinition { Name = "Type" } }
+                  , WithUniqueContraint = "UC_TYPE" }
           });
 
           _processor.Process(new CreateTableExpression

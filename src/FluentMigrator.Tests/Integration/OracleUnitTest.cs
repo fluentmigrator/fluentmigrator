@@ -17,7 +17,7 @@
 #endregion
 
 using System;
-using System.Data.Odbc;
+using System.Data.Common;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
@@ -92,7 +92,7 @@ namespace FluentMigrator.Tests.Integration
             // Done at test fixture setup time, as the databases cannot always be dropped after each test as they may be in use
             DropDatabases("FM_A");
          }
-         catch (OdbcException)
+         catch (Exception)
          {
             Debug.WriteLine("Just making sure database doesn't exist error");
          }
@@ -126,12 +126,12 @@ namespace FluentMigrator.Tests.Integration
          if ( string.IsNullOrEmpty(databaseName))
             throw new ArgumentException("Database name not specified");
 
-         using (var con = new OdbcConnection(MasterConnectionString))
+         using (var con = OracleFactory.GetOpenConnection(MasterConnectionString))
          {
-            con.Open();
-
-            using (var nameCom = new OdbcCommand(string.Format("select UserName from DBA_USERS WHERE USERNAME Like '{0}%'", databaseName), con))
+             using (var nameCom = con.CreateCommand())
             {
+                nameCom.CommandText = string.Format("select UserName from DBA_USERS WHERE USERNAME Like '{0}%'",
+                                                    databaseName);
                using (var reader = nameCom.ExecuteReader())
                {
                   while ( reader.Read())
@@ -151,44 +151,17 @@ namespace FluentMigrator.Tests.Integration
       /// </summary>
       /// <param name="con">The open connection to drop user from</param>
       /// <param name="userName">The user name to drop</param>
-      private void DropUser(OdbcConnection con, string userName)
+      private void DropUser(DbConnection con, string userName)
       {
-         using (var com = new OdbcCommand(string.Format("DROP USER {0} CASCADE", userName), con))
+         using (var com = con.CreateCommand())
          {
+            com.CommandText = string.Format("DROP USER {0} CASCADE", userName);
             try
             {
                com.ExecuteNonQuery();
             }
-            catch (OdbcException ex)
+            catch (Exception ex)
             {
-            }
-         }
-      }
-
-      /// <summary>
-      /// Closes open database sessions to a given schema
-      /// </summary>
-      /// <param name="connection">The open connection to execute the query against</param>
-      /// <param name="schema">The schema to close connections for</param>
-      private void CloseDatabaseSessions(OdbcConnection connection, string schema)
-      {
-         using (var killSqlCommand = new OdbcCommand(string.Format("select 'alter system kill session ''' || sid || ',' || serial# || '''' from v$session where username = '{0}'", schema), connection))
-         {
-            using (var killReader = killSqlCommand.ExecuteReader())
-            {
-               while (killReader.Read())
-               {
-                  using (var killCommand = new OdbcCommand(killReader[0] as string, connection))
-                  {
-                     try
-                     {
-                        killCommand.ExecuteNonQuery();
-                     }
-                     catch (OdbcException ex)
-                     {
-                     }
-                  }  
-               }
             }
          }
       }
