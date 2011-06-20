@@ -16,7 +16,6 @@
 //
 #endregion
 
-using System;
 using System.Data;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.Postgres;
@@ -32,7 +31,8 @@ namespace FluentMigrator.Tests.Integration.Processors
 	[TestFixture]
 	public class PostgresProcessorTests
 	{
-		public NpgsqlConnection Connection { get; set; }
+	    private readonly PostgresQuoter quoter = new PostgresQuoter();
+	    public NpgsqlConnection Connection { get; set; }
 		public PostgresProcessor Processor { get; set; }
 
 		[SetUp]
@@ -48,11 +48,19 @@ namespace FluentMigrator.Tests.Integration.Processors
 			Processor.CommitTransaction();
 		}
 
+
 		[Test]
 		public void CallingSchemaExistsReturnsTrueIfSchemaExists()
 		{
 			Processor.SchemaExists("public").ShouldBeTrue();
 		}
+
+        [Test]
+        public void CallingSchemaExistsCanAcceptSchemaNameWithSingleQuote()
+        {
+            using (new PostgresTestTable(Processor, "Test'Schema", "id int"))
+                Processor.SchemaExists("Test'Schema").ShouldBeTrue();
+        }
 
 		[Test]
 		public void CallingSchemaExistsReturnsFalseIfSchemaDoesNotExist()
@@ -116,8 +124,6 @@ namespace FluentMigrator.Tests.Integration.Processors
 		[Test]
 		public void CallingIndexExistsReturnsTrueIfIndexExists()
 		{
-			var quoter = new PostgresQuoter();
-
 			using (var table = new PostgresTestTable(Processor, null, "id int"))
 			{
 				var idxName = string.Format("\"idx_{0}\"", quoter.UnQuote(table.Name));
@@ -143,6 +149,54 @@ namespace FluentMigrator.Tests.Integration.Processors
 			using (var table = new PostgresTestTable(Processor, null, "id int"))
 				Processor.IndexExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
 		}
+
+        [Test]
+        public void CallingIndexExistsCanAcceptIndexNameWithSingleQuote()
+        {
+            using (var table = new PostgresTestTable(Processor, null, "id int"))
+            {
+                var idxName = string.Format("\"id'x_{0}\"", quoter.UnQuote(table.Name));
+
+                var cmd = table.Connection.CreateCommand();
+                cmd.Transaction = table.Transaction;
+                cmd.CommandText = string.Format("CREATE INDEX {0} ON {1} (id)", idxName, table.Name);
+                cmd.ExecuteNonQuery();
+
+                Processor.IndexExists(null, table.Name, idxName).ShouldBeTrue();
+            }
+        }
+
+        [Test]
+        public void CallingIndexExistsCanAcceptTableNameWithSingleQuote()
+        {
+            using (var table = new PostgresTestTable(null, "TestSingle'Quote", Processor, "id int"))
+            {
+                var idxName = string.Format("\"idx_{0}\"", quoter.UnQuote(table.Name));
+
+                var cmd = table.Connection.CreateCommand();
+                cmd.Transaction = table.Transaction;
+                cmd.CommandText = string.Format("CREATE INDEX {0} ON {1} (id)", idxName, table.Name);
+                cmd.ExecuteNonQuery();
+
+                Processor.IndexExists(null, table.Name, idxName).ShouldBeTrue();
+            }
+        }
+
+        [Test]
+        public void CallingIndexExistsCanAcceptSchemaNameWithSingleQuote()
+        {
+            using (var table = new PostgresTestTable(Processor, "Test'Schema", "id int"))
+            {
+                var idxName = string.Format("\"idx_{0}\"", quoter.UnQuote(table.Name));
+
+                var cmd = table.Connection.CreateCommand();
+                cmd.Transaction = table.Transaction;
+                cmd.CommandText = string.Format("CREATE INDEX {0} ON {1} (id)", idxName, table.NameWithSchema);
+                cmd.ExecuteNonQuery();
+
+                Processor.IndexExists("Test'Schema", table.Name, idxName).ShouldBeTrue();
+            }
+        }
 
 		[Test]
 		public void CanReadData()
@@ -207,6 +261,20 @@ namespace FluentMigrator.Tests.Integration.Processors
 				Processor.TableExists("TestSchema2", table.Name).ShouldBeFalse();
 		}
 
+        [Test]
+        public void CallingTableExistsCanAcceptTableNameWithSingleQuote()
+        {
+            using (var table = new PostgresTestTable(null, "TestSingle'Quote", Processor, "id int"))
+                Processor.TableExists(null, table.Name).ShouldBeTrue();
+        }
+
+        [Test]
+        public void CallingTableExistsCanAcceptSchemaNameWithSingleQuote()
+        {
+            using (var table = new PostgresTestTable(Processor, "Test'Schema", "id int"))
+                Processor.TableExists("Test'Schema", table.Name).ShouldBeTrue();
+        }
+
 		[Test]
 		public void CallingColumnExistsReturnsTrueIfColumnExistsWithSchema()
 		{
@@ -234,8 +302,51 @@ namespace FluentMigrator.Tests.Integration.Processors
 				Processor.ColumnExists("TestSchema", table.Name, "DoesNotExist").ShouldBeFalse();
 		}
 
+        [Test]
+        public void CallingColumnExistsCanAcceptColumnNameWithSingleQuote()
+        {
+            var columnNameWithSingleQuote = quoter.Quote("i'd");
+            using (var table = new PostgresTestTable(Processor, null, string.Format("{0} int", columnNameWithSingleQuote)))
+                Processor.ColumnExists(null, table.Name, "i'd").ShouldBeTrue();
+        }
+
+        [Test]
+        public void CallingColumnExistsCanAcceptTableNameWithSingleQuote()
+        {
+            using (var table = new PostgresTestTable("TestSchema", "TestSingle'Quote", Processor, "id int"))
+                Processor.ColumnExists("TestSchema", table.Name, "id").ShouldBeTrue();
+        }
+
+        [Test]
+        public void CallingColumnExistsCanAcceptSchemaNameWithSingleQuote()
+        {
+            using (var table = new PostgresTestTable("Test'Schema", "TestSingle'Quote", Processor, "id int"))
+                Processor.ColumnExists("Test'Schema", table.Name, "id").ShouldBeTrue();
+        }
+
+        [Test]
+        public void CallingConstraintExistsCanAcceptConstraintNameWithSingleQuote()
+        {
+            using (var table = new PostgresTestTable(Processor, "TestSchema", "id int", @"wibble int CONSTRAINT ""c'1"" CHECK(wibble > 0)"))
+                Processor.ConstraintExists("TestSchema", table.Name, "c'1").ShouldBeTrue();
+        }
+
+        [Test]
+        public void CallingConstraintExistsCanAcceptTableNameWithSingleQuote()
+        {
+            using (var table = new PostgresTestTable("TestSchema", "TestSingle'Quote", Processor, "id int", "wibble int CONSTRAINT c1 CHECK(wibble > 0)"))
+                Processor.ConstraintExists("TestSchema", table.Name, "c1").ShouldBeTrue();
+        }
+
+        [Test]
+        public void CallingConstraintExistsCanAcceptSchemaNameWithSingleQuote()
+        {
+            using (var table = new PostgresTestTable(Processor, "Test'Schema", "id int", "wibble int CONSTRAINT c1 CHECK(wibble > 0)"))
+                Processor.ConstraintExists("Test'Schema", table.Name, "c1").ShouldBeTrue();
+        }
+
 		[Test]
-		public void CallingContraintExistsReturnsTrueIfConstraintExistsWithSchema()
+		public void CallingConstraintExistsReturnsTrueIfConstraintExistsWithSchema()
 		{
 			using (var table = new PostgresTestTable(Processor, "TestSchema", "id int", "wibble int CONSTRAINT c1 CHECK(wibble > 0)"))
 				Processor.ConstraintExists("TestSchema", table.Name, "c1").ShouldBeTrue();
@@ -264,9 +375,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 		[Test]
 		public void CallingIndexExistsReturnsTrueIfIndexExistsWithSchema()
 		{
-			var quoter = new PostgresQuoter();
-
-			using (var table = new PostgresTestTable(Processor, "TestSchema", "id int"))
+		    using (var table = new PostgresTestTable(Processor, "TestSchema", "id int"))
 			{
 				var idxName = string.Format("\"idx_{0}\"", quoter.UnQuote(table.Name));
 
@@ -279,7 +388,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 			}
 		}
 
-		[Test]
+	    [Test]
 		public void CallingIndexExistsReturnsFalseIfTableDoesNotExistWithSchema()
 		{
 			Processor.IndexExists("TestSchema", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
