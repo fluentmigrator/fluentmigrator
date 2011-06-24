@@ -154,7 +154,7 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
 
       private ICollection<IndexDefinition> ReadIndexes(string name)
       {
-         var indexDefinitions = Processor.Read("SELECT u.index_name, DBMS_METADATA.GET_DDL('INDEX',u.index_name) As Sql FROM USER_INDEXES u WHERE TABLE_NAME = '{0}'", name);
+         var indexDefinitions = Processor.Read("SELECT u.index_name, DBMS_METADATA.get_ddl('INDEX',u.index_name) As Sql FROM USER_INDEXES u WHERE TABLE_NAME = '{0}'", name);
 
          return (from DataRow index in indexDefinitions.Tables[0].Rows
                  let sql = index["SQL"].ToString()
@@ -234,18 +234,25 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
       /// <returns>Matching <see cref="TableDefinition"/></returns>
       public virtual IList<TableDefinition> ReadTables()
       {
-         var views = Processor.Read("SELECT OBJECT_NAME, dbms_metadata.get_ddl(object_type,object_name) AS SQL FROM USER_OBJECTS WHERE object_type = 'TABLE'");
+          var dataSet = Processor.Read("SELECT OBJECT_NAME FROM USER_OBJECTS WHERE object_type = 'TABLE' ORDER BY OBJECT_NAME");
 
-         return (from DataRow table in views.Tables[0].Rows
+         return (from DataRow table in dataSet.Tables[0].Rows
                          select new TableDefinition
                                    {
                                       Name = table["OBJECT_NAME"].ToString()
-                                      ,Columns = ParseColumns(table["OBJECT_NAME"].ToString(),table["SQL"].ToString())
+                                      ,Columns = ParseColumns(table["OBJECT_NAME"].ToString(), GetTableDefintion(table["OBJECT_NAME"].ToString()))
                                    }).ToList();
 
       }
 
-      private static ICollection<ColumnDefinition> ParseColumns(string table, string sql)
+       private string GetTableDefintion(string tableName)
+       {
+           //TODO: Look at using dbms_metadata.get_xml instead and parse xml as text may be too brittle and have too many edge cases
+           var dataSet = Processor.Read("SELECT dbms_metadata.get_sxml_ddl(object_type,object_name) AS SQL FROM USER_OBJECTS WHERE object_type = 'TABLE' AND OBJECT_NAME = '{0}'", tableName);
+           return dataSet.Tables[0].Rows.Count == 1 ? dataSet.Tables[0].Rows[0]["SQL"].ToString() : string.Empty;
+       }
+
+       private static ICollection<ColumnDefinition> ParseColumns(string table, string sql)
       {
          var columns = new List<ColumnDefinition>();
          using ( var reader = new StringReader(sql))
@@ -273,7 +280,10 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
                      line = line.Substring(1).Trim();
 
                   if (line.StartsWith(")"))
-                     break; // End of column deinitions stop now
+                     break; // End of column definitions stop now
+
+                  if (!line.StartsWith("\""))
+                      break; // End of column definitions stop now
 
                   var column = GetColumnFromSql(line);
                   column.TableName = table;
@@ -338,42 +348,49 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
                column.Size = int.MaxValue;
                break;
             case "NUMBER":
-               var scale = int.Parse(args.Split(',')[0]);
-               var precision = int.Parse(args.Split(',')[1]);
 
-               if ( scale == 1)
-               {
-                  column.Type = DbType.Boolean;
-                  column.Size = 1;
-               }
+                 if ( string.IsNullOrEmpty(args) )
+                 {
+                     column.Type = DbType.Int32;
+                 }
+                 else
+                 {
+                     var scale = int.Parse(args.Split(',')[0]);
+                     var precision = int.Parse(args.Split(',')[1]);
 
-               if (scale == 3)
-               {
-                  column.Type = DbType.Byte;
-               }
+                     if (scale == 1)
+                     {
+                         column.Type = DbType.Boolean;
+                         column.Size = 1;
+                     }
 
-               if (column.Type == null && scale <= 5 && precision == 0)
-               {
-                  column.Type = DbType.Int16;
-               }
+                     if (scale == 3)
+                     {
+                         column.Type = DbType.Byte;
+                     }
 
-               if (column.Type == null && scale <= 10 && precision == 0)
-               {
-                  column.Type = DbType.Int32;
-               }
+                     if (column.Type == null && scale <= 5 && precision == 0)
+                     {
+                         column.Type = DbType.Int16;
+                     }
 
-               if (column.Type == null && scale <= 20 && precision == 0)
-               {
-                  column.Type = DbType.Int64;
-               }
+                     if (column.Type == null && scale <= 10 && precision == 0)
+                     {
+                         column.Type = DbType.Int32;
+                     }
 
-               if ( column.Type == null)
-               {
-                  column.Type = DbType.Decimal;
-                  column.Scale = scale;
-                  column.Precision = precision;
-               }
-                  
+                     if (column.Type == null && scale <= 20 && precision == 0)
+                     {
+                         column.Type = DbType.Int64;
+                     }
+
+                     if (column.Type == null)
+                     {
+                         column.Type = DbType.Decimal;
+                         column.Scale = scale;
+                         column.Precision = precision;
+                     }
+                 }
                break;
             case "RAW":
                var rawSize = int.Parse(args);
@@ -409,7 +426,7 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
       /// <returns>The view definition</returns>
       public IList<ViewDefinition> ReadViews()
       {
-         var views = Processor.Read("SELECT OBJECT_NAME, dbms_metadata.get_ddl(object_type,object_name) AS SQL FROM USER_OBJECTS WHERE object_type = 'VIEW'");
+         var views = Processor.Read("SELECT OBJECT_NAME, dbms_metadata.get_sxml_ddl(object_type,object_name) AS SQL FROM USER_OBJECTS WHERE object_type = 'VIEW'");
 
          return (from DataRow view in views.Tables[0].Rows
                  select new ViewDefinition
