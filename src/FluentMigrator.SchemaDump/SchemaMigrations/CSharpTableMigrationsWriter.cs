@@ -51,7 +51,7 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
                continue;
             }
 
-            if (context.MigrationRequired(MigrationType.Tables))
+            if (context.MigrationRequired(MigrationType.Tables) || (context.MigrationRequired(MigrationType.Indexes) && table.Indexes.Count > 0))
             {
                migrations++;
 
@@ -173,7 +173,7 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
          WriteMigration(output, context, migration
             , () => context.MigrationClassNamer(migration, table)
             ,() => WriteTable(context, table, output)
-            , () => WriteDeleteTable(table, output));
+            , () => WriteDeleteTable(context, table, output));
       }
 
       /// <summary>
@@ -184,25 +184,36 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
       /// <param name="output">The output stream to append the C# code to</param>
       private void WriteTable(SchemaMigrationContext context, TableDefinition table, StreamWriter output)
       {
-         output.WriteLine("\t\t\tCreate.Table(\"" + table.Name + "\")");
-         foreach (var column in table.Columns)
-         {
-            WriteColumn(context, column, output, column == table.Columns.Last());
-         }
-         if ( context.MigrationRequired(MigrationType.Data))
-         {
-            WriteInsertData(output, table, context);
-         }
+          if ( context.MigrationRequired(MigrationType.Tables) )
+          {
+              output.WriteLine("\t\t\tCreate.Table(\"" + table.Name + "\")");
+              foreach (var column in table.Columns)
+              {
+                  WriteColumn(context, column, output, column == table.Columns.Last());
+              }
+              if (context.MigrationRequired(MigrationType.Data))
+              {
+                  WriteInsertData(output, table, context);
+              }
+          }
 
-         if ( context.MigrationRequired(MigrationType.Indexes) && table.Indexes.Count > 0 )
+          if ( context.MigrationRequired(MigrationType.Indexes) && table.Indexes.Count > 0 )
          {
-            foreach (var index in table.Indexes)
+             var primaryKey = table.Columns.Where(c => c.IsPrimaryKey);
+             var primaryKeyName = string.Empty;
+             if ( primaryKey.Count() > 0 )
+             {
+                 primaryKeyName = primaryKey.First().PrimaryKeyName;
+             }
+
+
+            foreach (var index in table.Indexes.Where(i => i.Name != primaryKeyName))
                WriteIndex(output, index, context);
             
          }
       }
 
-      private void WriteIndex(StreamWriter output, IndexDefinition index, SchemaMigrationContext context)
+       private void WriteIndex(StreamWriter output, IndexDefinition index, SchemaMigrationContext context)
       {
          output.WriteLine("\t\t\tCreate.Index(\"" + index.Name + "\").OnTable(\"" + index.TableName + "\")");
          foreach (var column in index.Columns)
@@ -224,11 +235,14 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
             if (index.IsClustered)
                output.Write(".Clustered()");
          }
-            
-         //TODO Add unique etc
-         
+                     
          output.WriteLine(";");
       }
+
+       private static void WriteDeleteIndex(StreamWriter output, IndexDefinition index)
+       {
+           output.WriteLine("\t\t\tDelete.Index(\"" + index.Name + "\");");
+       }
 
       private void WriteInsertData(StreamWriter output, TableDefinition table, SchemaMigrationContext context)
       {
@@ -308,9 +322,26 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
          return table.Columns.Where(c => c.IsIdentity).Count() == 1;
       }
 
-      private static void WriteDeleteTable(TableDefinition table, StreamWriter output)
+      private static void WriteDeleteTable(SchemaMigrationContext context, TableDefinition table, StreamWriter output)
       {
-         output.WriteLine("\t\t\tDelete.Table(\"" + table.Name + "\");");
+          if (context.MigrationRequired(MigrationType.Indexes) && table.Indexes.Count > 0)
+          {
+              var primaryKey = table.Columns.Where(c => c.IsPrimaryKey);
+              var primaryKeyName = string.Empty;
+              if (primaryKey.Count() > 0)
+              {
+                  primaryKeyName = primaryKey.First().PrimaryKeyName;
+              }
+
+
+              foreach (var index in table.Indexes.Where(i => i.Name != primaryKeyName))
+                  WriteDeleteIndex(output, index);
+          }
+
+          if (context.MigrationRequired(MigrationType.Tables))
+          {
+              output.WriteLine("\t\t\tDelete.Table(\"" + table.Name + "\");");
+          }
       }
 
       /// <summary>
@@ -410,6 +441,9 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
 
          if (column.IsNullable)
             columnSyntax.Append(".Nullable()");
+
+         if (column.IsPrimaryKey)
+             columnSyntax.Append(".PrimaryKey()");
 
          if (isLastColumn) columnSyntax.Append(";");
          output.WriteLine("\t\t\t\t" + columnSyntax);

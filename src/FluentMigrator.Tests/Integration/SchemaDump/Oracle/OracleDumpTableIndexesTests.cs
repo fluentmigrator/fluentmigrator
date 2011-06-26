@@ -115,7 +115,6 @@ namespace FluentMigrator.Tests.Integration.SchemaDump.Oracle
          table.Indexes.First().Columns.Count.ShouldBe(2);
       }
 
-
       private TableDefinition CreateTable(IEnumerable<ColumnDefinition> columns, CreateIndexExpression index)
       {
          

@@ -152,7 +152,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
             ,Columns = new List<ColumnDefinition> { new ColumnDefinition { Name = "Id", Type = DbType.Int32 } }
          };
 
-         CreateTables(create);
+         ExecuteMigrations(create);
          CreateViews(new ViewDefinition { Name = "FooView", CreateViewSql = "CREATE VIEW FooView AS SELECT * FROM Foo"});
          var context = GetDefaultContext();
 
@@ -175,7 +175,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
             Columns = new List<ColumnDefinition> { new ColumnDefinition { Name = "Id", Type = DbType.Int32 } }
          };
 
-         CreateTables(create);
+         ExecuteMigrations(create);
          CreateViews(new ViewDefinition { Name = "FooView", CreateViewSql = "CREATE VIEW FooView AS SELECT * FROM Foo" });
          var context = GetDefaultContext();
          context.Type = MigrationType.Tables;
@@ -197,7 +197,7 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
             ,Columns = new List<ColumnDefinition> { new ColumnDefinition { Name = "Id", Type = DbType.Int32 } }
          };
 
-         CreateTables(create);
+         ExecuteMigrations(create);
          CreateViews(
             new ViewDefinition { Name = "FooView", CreateViewSql = "CREATE VIEW FooView AS SELECT * FROM Foo" }
             ,new ViewDefinition { Name = "FooView2", CreateViewSql = "CREATE VIEW FooView2 AS SELECT * FROM Foo" }
@@ -210,6 +210,38 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
 
          // Assert
          context.MigrationIndex.ShouldBe(2);
+      }
+
+      [Test]
+      public void WillOnlyGenerateForeignKeyMigration()
+      {
+          // Act
+          var create = new CreateTableExpression
+          {
+              TableName = "Foo"
+             ,Columns = new List<ColumnDefinition> { new ColumnDefinition { Name = "Id", Type = DbType.Int32, IsPrimaryKey = true} }
+          };
+
+          var createBar = new CreateTableExpression
+          {
+              TableName = "FooBar"
+             ,Columns = new List<ColumnDefinition> { new ColumnDefinition { Name = "Id", Type = DbType.Int32 } }
+          };
+
+
+
+          ExecuteMigrations(create, createBar, new CreateForeignKeyExpression { ForeignKey = new ForeignKeyDefinition { Name = "FK_Foo", ForeignTable = "FooBar", ForeignColumns = new [] { "Id"}, PrimaryTable = "Foo", PrimaryColumns = new [] { "Id"}}});
+
+
+          var context = GetDefaultContext();
+          context.Type = MigrationType.ForeignKeys;
+
+          // Act
+          GenerateMigrations(context);
+
+          // Assert
+
+          context.MigrationIndex.ShouldBe(1);
       }
 
       /// <summary>
@@ -231,20 +263,29 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
       /// <summary>
       /// Creates tables in source oracle database and asserts that they exist
       /// </summary>
-      /// <param name="createTables">The tables to be created</param>
-      private void CreateTables(params CreateTableExpression[] createTables)
+      /// <param name="experssions">The tables to be created</param>
+      private void ExecuteMigrations(params IMigrationExpression[] experssions)
       {
-         if (createTables == null)
+         if (experssions == null)
             return;
 
          using (var connection = OracleFactory.GetOpenConnection(_source.ConnectionString))
          {
             var processor = new OracleProcessor(connection, new OracleGenerator(), new DebugAnnouncer(), new ProcessorOptions());
 
-            foreach (var create in createTables)
+            foreach (var expression in experssions)
             {
-               processor.Process(create);
-               Assert.IsTrue(processor.TableExists(string.Empty, create.TableName), "Source " + create.TableName);
+                if (expression is CreateTableExpression)
+                {
+                    var create = (CreateTableExpression)expression;
+                    processor.Process(create);
+                    Assert.IsTrue(processor.TableExists(string.Empty, create.TableName), "Source " + create.TableName);                    
+                }
+
+                if (expression is CreateForeignKeyExpression)
+                {
+                    processor.Process((CreateForeignKeyExpression)expression);
+                }
             }
 
             processor.CommitTransaction();
@@ -277,13 +318,9 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
       /// <param name="createTables">The tables to be created in source Oracle and migrated to Oracle</param>
       private void MigrateTable(SchemaMigrationContext context, params CreateTableExpression[] createTables)
       {
-         CreateTables(createTables);
+         OracleSchemaMigrator migrator = GenerateMigrations(context, createTables);
 
-         var migrator = new OracleSchemaMigrator(new DebugAnnouncer());
-
-         migrator.Generate(context);
-
-         if (Directory.Exists(Path.Combine(_tempDirectory, "Scripts")))
+          if (Directory.Exists(Path.Combine(_tempDirectory, "Scripts")))
          {
             // Replace Schema from source to destintion
             foreach (var filename in Directory.GetFiles(Path.Combine(_tempDirectory, "Scripts"), "CreateView*.sql"))
@@ -299,5 +336,15 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
 
          AssertOracleTablesExist(createTables);
       }
+
+      private OracleSchemaMigrator GenerateMigrations(SchemaMigrationContext context, params CreateTableExpression[] createTables)
+       {
+           ExecuteMigrations(createTables);
+
+           var migrator = new OracleSchemaMigrator(new DebugAnnouncer());
+
+           migrator.Generate(context);
+           return migrator;
+       }
    }
 }

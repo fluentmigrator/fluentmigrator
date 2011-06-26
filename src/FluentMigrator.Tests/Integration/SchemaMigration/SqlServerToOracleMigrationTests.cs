@@ -886,6 +886,60 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
 
       }
 
+      [Test]
+      public void CanMigratePrimaryKey()
+      {
+          // Arrange
+
+          var create = new CreateTableExpression
+          {
+              TableName = "Foo",
+              Columns = new[]{
+                   new ColumnDefinition {Name = "Id", Type = DbType.Int32, IsPrimaryKey = true}
+                    }
+          };
+
+          // Act
+          MigrateToOracleWithData(new List<IMigrationExpression> { create }, 1);
+
+          // Assert
+
+
+      }
+
+      [Test]
+      public void WillOnlyGenerateForeignKeyMigration()
+      {
+          // Act
+          var create = new CreateTableExpression
+          {
+              TableName = "Foo"
+             ,Columns = new List<ColumnDefinition> { new ColumnDefinition { Name = "Id", Type = DbType.Int32, IsPrimaryKey = true } }
+          };
+
+          var createBar = new CreateTableExpression
+          {
+              TableName = "FooBar"
+             ,Columns = new List<ColumnDefinition> { new ColumnDefinition { Name = "Id", Type = DbType.Int32 } }
+          };
+
+
+
+          ExecuteMigrations(create, createBar, new CreateForeignKeyExpression { ForeignKey = new ForeignKeyDefinition { Name = "FK_Foo", ForeignTable = "FooBar", ForeignColumns = new[] { "Id" }, PrimaryTable = "Foo", PrimaryColumns = new[] { "Id" } } });
+
+
+          var context = GetDefaultContext();
+          context.Type = MigrationType.ForeignKeys;
+
+          // Act
+          var migrator = new SqlServerSchemaMigrator(new DebugAnnouncer());
+          migrator.Generate(context);
+
+          // Assert
+
+          context.MigrationIndex.ShouldBe(1);
+      }
+
 
       /// <summary>
       /// Migrates a set of tables using the provided context
@@ -959,6 +1013,38 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
 
             processor.CommitTransaction();
          }
+      }
+
+      /// <summary>
+      /// Creates tables in source oracle database and asserts that they exist
+      /// </summary>
+      /// <param name="expressions">The tables to be created</param>
+      private void ExecuteMigrations(params IMigrationExpression[] expressions)
+      {
+          if (expressions == null)
+              return;
+
+          using (var connection = new SqlConnection(_sqlContext.ConnectionString))
+          {
+              var processor = new SqlServerProcessor(connection, new SqlServer2005Generator(), new DebugAnnouncer(), new ProcessorOptions());
+
+              foreach (var expression in expressions)
+              {
+                  if (expression is CreateTableExpression)
+                  {
+                      var create = (CreateTableExpression)expression;
+                      processor.Process(create);
+                      Assert.IsTrue(processor.TableExists(string.Empty, create.TableName), "Source " + create.TableName);
+                  }
+
+                  if (expression is CreateForeignKeyExpression)
+                  {
+                      processor.Process((CreateForeignKeyExpression)expression);
+                  }
+              }
+
+              processor.CommitTransaction();
+          }
       }
 
       /// <summary>

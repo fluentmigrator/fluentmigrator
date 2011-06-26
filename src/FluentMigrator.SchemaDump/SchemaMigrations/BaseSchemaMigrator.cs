@@ -58,7 +58,7 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
             var processor = GetProcessor(connection);
             var schemaDumper = GetSchemaDumper(processor);
 
-            if ( context.MigrationRequired(MigrationType.Tables) || context.MigrationRequired(MigrationType.Data) || context.MigrationRequired(MigrationType.ForeignKeys))
+            if (context.MigrationRequired(MigrationType.Tables) || context.MigrationRequired(MigrationType.Indexes) || context.MigrationRequired(MigrationType.Data) || context.MigrationRequired(MigrationType.ForeignKeys))
             {
                var tables = new CSharpTableMigrationsWriter(Announcer);
                tables.GenerateMigrations(context, schemaDumper);   

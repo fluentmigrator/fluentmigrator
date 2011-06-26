@@ -373,29 +373,33 @@ ORDER BY v.name, sc.colid
             return indexes;
         }
 
-        protected virtual IList<ForeignKeyDefinition> ReadForeignKeys(string schemaName, string tableName) 
+        protected virtual IList<ForeignKeyDefinition> ReadForeignKeys(string schemaName, string tableName)
         {
-            string query = @"SELECT C.CONSTRAINT_SCHEMA AS Contraint_Schema, 
-                    C.CONSTRAINT_NAME AS Constraint_Name,
-	                FK.CONSTRAINT_SCHEMA AS ForeignTableSchema,
-	                FK.TABLE_NAME AS FK_Table,
-	                CU.COLUMN_NAME AS FK_Column,
-	                PK.CONSTRAINT_SCHEMA as PrimaryTableSchema,
-	                PK.TABLE_NAME AS PK_Table,
-	                PT.COLUMN_NAME AS PK_Column
-                FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS C
-                INNER JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS FK ON C.CONSTRAINT_NAME = FK.CONSTRAINT_NAME
-                INNER JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS PK ON C.UNIQUE_CONSTRAINT_NAME = PK.CONSTRAINT_NAME
-                INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE CU ON C.CONSTRAINT_NAME = CU.CONSTRAINT_NAME
-                INNER JOIN (
-                SELECT i1.TABLE_NAME, i2.COLUMN_NAME
-                FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS i1
-                INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE i2 ON i1.CONSTRAINT_NAME = i2.CONSTRAINT_NAME
-                WHERE i1.CONSTRAINT_TYPE = 'PRIMARY KEY'
-                ) PT ON PT.TABLE_NAME = PK.TABLE_NAME
-                WHERE PK.TABLE_NAME = '{1}'
-                AND PK.CONSTRAINT_SCHEMA = '{0}'
-                ORDER BY Constraint_Name";
+            // Source http://blog.sqlauthority.com/2006/11/01/sql-server-query-to-display-foreign-key-relationships-and-name-of-the-constraint-for-each-table-in-database/
+            string query =
+                @"SELECT
+C.CONSTRAINT_NAME As Constraint_Name,
+FK.CONSTRAINT_SCHEMA AS ForeignTableSchema,
+FK.TABLE_NAME As FK_Table,
+CU.COLUMN_NAME As FK_Column ,
+PK.CONSTRAINT_SCHEMA as PrimaryTableSchema,
+PK.TABLE_NAME As PK_Table,
+PT.COLUMN_NAME As PK_Column
+FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS As C
+INNER JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS As FK ON C.CONSTRAINT_NAME = FK.CONSTRAINT_NAME
+INNER JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS As PK ON C.UNIQUE_CONSTRAINT_NAME = PK.CONSTRAINT_NAME
+INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE As CU ON C.CONSTRAINT_NAME = CU.CONSTRAINT_NAME
+INNER JOIN (
+SELECT i1.TABLE_NAME, i2.COLUMN_NAME
+FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS i1
+INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE i2 ON i1.CONSTRAINT_NAME = i2.CONSTRAINT_NAME
+WHERE i1.CONSTRAINT_TYPE = 'PRIMARY KEY'
+) As PT ON PT.TABLE_NAME = PK.TABLE_NAME
+WHERE FK.TABLE_NAME = '{1}'
+AND FK.CONSTRAINT_SCHEMA = '{0}'
+ORDER BY 1,2,3,4";
+
+
             DataSet ds = Read(query, schemaName, tableName);
             DataTable dt = ds.Tables[0];
             IList<ForeignKeyDefinition> keys = new List<ForeignKeyDefinition>();
@@ -426,13 +430,13 @@ ORDER BY v.name, sc.colid
                 ms = (from m in d.ForeignColumns
                            where m == dr["FK_Table"].ToString()
                            select m).ToList();
-                if (ms.Count == 0) d.ForeignColumns.Add(dr["FK_Table"].ToString());
+                if (ms.Count == 0) d.ForeignColumns.Add(dr["FK_Column"].ToString());
 
                 // Primary Columns
                 ms = (from m in d.PrimaryColumns
                            where m == dr["PK_Table"].ToString()
                            select m).ToList();
-                if (ms.Count == 0) d.PrimaryColumns.Add(dr["PK_Table"].ToString());
+                if (ms.Count == 0) d.PrimaryColumns.Add(dr["PK_Column"].ToString());
             }
 
             return keys;

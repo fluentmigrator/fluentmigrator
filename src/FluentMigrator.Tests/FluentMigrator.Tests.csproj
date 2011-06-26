@@ -162,11 +162,11 @@
     <Compile Include="Integration\OracleUnitTest.cs" />
     <Compile Include="Integration\Processors\PostgresProcessorTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCeProcessorTests.cs" />
+    <Compile Include="Integration\SchemaDump\SchemaDumpForeignKeyTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaDumpFunctionsTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaDumpProcedureTests.cs" />
     <Compile Include="Integration\SchemaDump\Oracle\OracleDumpFunctionsTests.cs" />
     <Compile Include="Integration\SchemaDump\Oracle\OracleDumpProcedureTests.cs" />
-    <Compile Include="Integration\SchemaDump\Oracle\OracleDumpTableForeignKeyTests.cs" />
     <Compile Include="Integration\SchemaDump\Oracle\OracleDumpTableIndexesTests.cs" />
     <Compile Include="Integration\SchemaDump\Oracle\OracleDumpTableTests.cs" />
     <Compile Include="Integration\SchemaDump\Oracle\OracleDumpViewTests.cs" />
