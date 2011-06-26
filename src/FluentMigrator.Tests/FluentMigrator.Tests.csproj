@@ -162,7 +162,6 @@
     <Compile Include="Integration\OracleUnitTest.cs" />
     <Compile Include="Integration\Processors\PostgresProcessorTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCeProcessorTests.cs" />
-    <Compile Include="Integration\SchemaDump\SchemaDumpForeignKeyTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaDumpFunctionsTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaDumpProcedureTests.cs" />
     <Compile Include="Integration\SchemaDump\Oracle\OracleDumpFunctionsTests.cs" />
