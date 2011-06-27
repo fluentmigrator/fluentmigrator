@@ -139,13 +139,11 @@ namespace FluentMigrator.Tests.Integration
 
             cmd.ExecuteNonQuery();
 
-            // Return teh location of where database files are located
-            cmd.CommandText =
-               @"SELECT SUBSTRING(physical_name, 1,CHARINDEX(N'master.mdf',
-LOWER(physical_name)) - 1) DataFileLocation
-FROM master.sys.master_files
-WHERE database_id = 1 AND FILE_ID = 1";
-            return cmd.ExecuteScalar() as string;
+             cmd.Parameters.AddWithValue("DatabaseName", databaseName);
+
+            // Return the location of where database files are located
+            cmd.CommandText = "SELECT physical_name FROM sys.master_files WHERE db_name(database_id) = @DatabaseName and type_desc = 'ROWS'";
+            return Path.GetDirectoryName(cmd.ExecuteScalar() as string);
          }
       }
 
