@@ -248,7 +248,7 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
        private string GetTableDefintion(string tableName)
        {
            //TODO: Look at using dbms_metadata.get_xml instead and parse xml as text may be too brittle and have too many edge cases
-           var dataSet = Processor.Read("SELECT dbms_metadata.get_sxml_ddl(object_type,object_name) AS SQL FROM USER_OBJECTS WHERE object_type = 'TABLE' AND OBJECT_NAME = '{0}'", tableName);
+           var dataSet = Processor.Read("SELECT dbms_metadata.get_ddl(object_type,object_name) AS SQL FROM USER_OBJECTS WHERE object_type = 'TABLE' AND OBJECT_NAME = '{0}'", tableName);
            return dataSet.Tables[0].Rows.Count == 1 ? dataSet.Tables[0].Rows[0]["SQL"].ToString() : string.Empty;
        }
 
@@ -426,7 +426,7 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
       /// <returns>The view definition</returns>
       public IList<ViewDefinition> ReadViews()
       {
-         var views = Processor.Read("SELECT OBJECT_NAME, dbms_metadata.get_sxml_ddl(object_type,object_name) AS SQL FROM USER_OBJECTS WHERE object_type = 'VIEW'");
+          var views = Processor.Read("SELECT OBJECT_NAME, dbms_metadata.get_ddl(object_type,object_name) AS SQL FROM USER_OBJECTS WHERE object_type = 'VIEW'");
 
          return (from DataRow view in views.Tables[0].Rows
                  select new ViewDefinition
