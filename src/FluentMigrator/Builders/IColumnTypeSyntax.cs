@@ -26,6 +26,7 @@ namespace FluentMigrator.Builders
 	{
 		TNext AsAnsiString();
 		TNext AsAnsiString(int size);
+	    TNext AsBinary();
 		TNext AsBinary(int size);
 		TNext AsBoolean();
 		TNext AsByte();
