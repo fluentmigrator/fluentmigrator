@@ -28,6 +28,10 @@ namespace FluentMigrator
    public enum DatabaseType
    {
       /// <summary>
+      /// Unknown database type
+      /// </summary>
+      Unknown = 0,
+      /// <summary>
       /// Microsoft Jet database e.g. Access, Excel
       /// </summary>
       Jet = 2,
@@ -66,6 +70,7 @@ namespace FluentMigrator
       /// <summary>
       /// Any Version of Microsoft SQL Server (Excluding Compact Edition)
       /// </summary>
-      SqlServer = SqlServer2000 + SqlServer2005 + SqlServer2008
+      SqlServer = SqlServer2000 + SqlServer2005 + SqlServer2008,
+       
    }
 }
