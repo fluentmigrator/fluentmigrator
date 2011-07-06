@@ -157,6 +157,7 @@
     <Compile Include="Builders\Execute\NullExecuteExpression.cs" />
     <Compile Include="Builders\ExpressionBuilderWithColumnTypesBase.cs" />
     <Compile Include="Builders\IInSchemaSyntax.cs" />
+    <Compile Include="Builders\Insert\IInsertIdentitySyntax.cs" />
     <Compile Include="Builders\Insert\IInsertDataOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Insert\IInsertDataSyntax.cs" />
     <Compile Include="Builders\Insert\IInsertExpressionRoot.cs" />

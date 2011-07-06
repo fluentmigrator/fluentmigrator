@@ -351,7 +351,7 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          // Assert
          var migration = File.ReadAllText(Path.Combine(_tempDirectory, @"Migrations\Test.cs"));
 
-         migration.Contains("Insert.IntoTable(\"Foo\").DataTable(@\"Data\\Foo.xml\").WithIdentity();").ShouldBeTrue();
+         migration.Contains("Insert.IntoTable(\"Foo\").DataTable(@\"Data\\Foo.xml\").WithIdentity().OnColumn(\"Data\");").ShouldBeTrue();
       }
 
       [Test]
@@ -375,6 +375,18 @@ namespace FluentMigrator.Tests.Unit.Schema.Migrations
          var dataDirectory = Path.Combine(context.WorkingDirectory, context.DataDirectory);
          Assert.IsTrue(File.Exists(Path.Combine(dataDirectory, "Foo.xml")));
          Assert.AreEqual(1, context.MigrationIndex);
+      }
+
+      [Test]
+      public void ChecksIfTableExists()
+      {
+          // Arrange
+
+          // Act
+          var migration = GetTestMigration(new[] { new ColumnDefinition { Name = "Data", Type = DbType.Int32 } });
+
+          //Assert
+          migration.Contains("if (Schema.Table(\"Foo\").Exists()) return;").ShouldBeTrue();
       }
 
       [Test]

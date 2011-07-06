@@ -162,6 +162,7 @@
     <Compile Include="Integration\OracleUnitTest.cs" />
     <Compile Include="Integration\Processors\PostgresProcessorTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCeProcessorTests.cs" />
+    <Compile Include="Integration\Runners\SqlServerSchemaMigratorConsoleTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaDumpFunctionsTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaDumpProcedureTests.cs" />
     <Compile Include="Integration\SchemaDump\Oracle\OracleDumpFunctionsTests.cs" />
@@ -174,6 +175,7 @@
     <Compile Include="Integration\SchemaDump\SchemaDumpViewTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaTestWriter.cs" />
     <Compile Include="Integration\SchemaMigration\BaseSchemaMigrationTests.cs" />
+    <Compile Include="Integration\SchemaMigration\SqlServerMigrationTests.cs" />
     <Compile Include="Integration\SchemaMigration\OracleMigrationTests.cs" />
     <Compile Include="Unit\Generators\Oracle\OracleQuoterTests.cs" />
     <Compile Include="Unit\Schema\Migrations\CSharpFunctionMigrationsWriterTests.cs" />
@@ -299,6 +301,10 @@
     <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj">
       <Project>{FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8}</Project>
       <Name>FluentMigrator</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\FluentSchemaMigrator.Console\FluentSchemaMigrator.Console.csproj">
+      <Project>{1B0E4619-6FFF-4C41-A19C-6B0236B3D92D}</Project>
+      <Name>FluentSchemaMigrator.Console</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

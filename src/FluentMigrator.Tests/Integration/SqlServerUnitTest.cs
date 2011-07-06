@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
@@ -32,6 +33,10 @@ namespace FluentMigrator.Tests.Integration
    /// <remarks>The database is dropped between each unit test to ensure the independance of</remarks>
    public class SqlServerUnitTest
    {
+       public SqlServerUnitTest()
+       {
+           DeleteOldDatabases = true;
+       }
       /// <summary>
       /// The connection string that wil be sued to create temporary databses
       /// </summary>
@@ -71,7 +76,12 @@ namespace FluentMigrator.Tests.Integration
       /// </summary>
       public string DatabasePath;
 
-      [TestFixtureSetUp]
+       /// <summary>
+       /// 
+       /// </summary>
+       public bool DeleteOldDatabases;
+
+       [TestFixtureSetUp]
       public void TestFixtureSetUp()
       {
          BlankDatabaseName = GenerateDbName();
@@ -81,13 +91,18 @@ namespace FluentMigrator.Tests.Integration
 
          BlankTemplateDatabaseFile = Path.Combine(DatabasePath, BlankDatabaseName + ".mdf");
 
-         // Delete old temp databases that may exist from previous test runs that have been aborted
-         foreach (var database in
-            Directory.GetFiles(DatabasePath, "UT_*.mdf").Where(database => !database.Equals(BlankTemplateDatabaseFile, StringComparison.InvariantCultureIgnoreCase)))
+         if (DeleteOldDatabases)
          {
-            File.Delete(database);
-            if ( File.Exists(database.Replace(".mdf", ".ldf")) )
-               File.Delete(database.Replace(".mdf", ".ldf"));
+             
+             // Delete old temp databases that may exist from previous test runs that have been aborted
+             foreach (var database in
+                Directory.GetFiles(DatabasePath, "UT_*.mdf").Where(database => !database.Equals(BlankTemplateDatabaseFile, StringComparison.InvariantCultureIgnoreCase)))
+             {
+                 DropDatabase(Path.GetFileNameWithoutExtension(database));
+                 File.Delete(database);
+                 if (File.Exists(database.Replace(".mdf", ".ldf")))
+                     File.Delete(database.Replace(".mdf", ".ldf"));
+             }    
          }
 
          DetachDatabase(BlankDatabaseName);
@@ -109,13 +124,11 @@ namespace FluentMigrator.Tests.Integration
       public virtual void Setup()
       {
          TestDb = GenerateDbName();
-         _testDbFile = Path.Combine(DatabasePath, TestDb + ".mdf");
-         File.Copy(BlankTemplateDatabaseFile, _testDbFile);
 
-         CreateDatabaseWithAttachedFile(TestDb, _testDbFile);
+         CreateDatabase(TestDb);
 
          // Setup connection string for unit test to connect to temp db
-         ConnectionString = @"Data Source=.\SqlExpress;Integrated Security=True;Initial Catalog=" + TestDb;
+         ConnectionString = @"Data Source=.\SqlExpress;Integrated Security=True;Initial Catalog=" + TestDb + ";";
       }
 
       [TearDown]

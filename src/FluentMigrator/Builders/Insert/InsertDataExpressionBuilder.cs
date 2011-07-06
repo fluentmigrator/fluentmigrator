@@ -29,7 +29,7 @@ namespace FluentMigrator.Builders.Insert
    /// <summary>
    /// Constructs sets up a <see cref="InsertDataExpression"/> instance from the fluent interface
    /// </summary>
-	public class InsertDataExpressionBuilder : IInsertDataOrInSchemaSyntax
+    public class InsertDataExpressionBuilder : IInsertDataOrInSchemaSyntax, IInsertIdentitySyntax
 	{
 		private readonly InsertDataExpression _expression;
 
@@ -58,7 +58,7 @@ namespace FluentMigrator.Builders.Insert
          return this;
 	   }
 
-	   public IInsertDataSyntax WithIdentity()
+	   public IInsertIdentitySyntax WithIdentity()
 	   {
 	      _expression.WithIdentity = true;
 
@@ -77,7 +77,14 @@ namespace FluentMigrator.Builders.Insert
 	      return this;
 	   }
 
-	   public IInsertDataSyntax InSchema(string schemaName)
+       public IInsertIdentitySyntax OnColumn(string name)
+       {
+           _expression.IdentityColumn = name;
+
+           return this;
+       }
+
+       public IInsertDataSyntax InSchema(string schemaName)
 		{
 			_expression.SchemaName = schemaName;
 			return this;

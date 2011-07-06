@@ -29,8 +29,8 @@ namespace FluentSchemaMigrator.Console
 	{
 		private readonly TextWriter _announcerOutput;
         internal readonly SchemaMigrationContext SchemaMigrationContext = new SchemaMigrationContext();
-	    private bool ShowHelp;
-        private bool GenerateOnly;
+	    private bool _showHelp;
+        private bool _generateOnly;
 
 	    static void DisplayHelp( OptionSet p )
 		{
@@ -85,7 +85,7 @@ namespace FluentSchemaMigrator.Console
 						    }
 					},
 					{
-						"conn=",
+						"conn=|connection=",
 						"REQUIRED. The connection string to the source database",
 						v => { SchemaMigrationContext.FromConnectionString = v; }
 					},
@@ -95,19 +95,19 @@ namespace FluentSchemaMigrator.Console
 						v => { SchemaMigrationContext.ToDatabaseType = (DatabaseType)Enum.Parse(typeof(DatabaseType), v); }
 					},
 					{
-						"destconn=",
+						"destconn=|destconnection=",
 						"OPTIONAL. The connection string to the destination database",
 						v => { SchemaMigrationContext.ToConnectionString = v; }
 					},
 					{
 						"workingdirectory=|wd=",
-						"The directory to load SQL scripts specified by migrations from.",
+						"The directory that contains Scripts and Data as sub folders",
 						v => { SchemaMigrationContext.WorkingDirectory = v; }
 					},
 					{
 						"help|h|?",
 						"Displays this help menu.",
-						v => { ShowHelp = true; }
+						v => { _showHelp = true; }
 					}
 				};
 
@@ -132,7 +132,7 @@ namespace FluentSchemaMigrator.Console
 					return;
 				}
 
-				if ( ShowHelp )
+				if ( _showHelp )
 				{
 					DisplayHelp( optionSet );
 					return;
@@ -158,7 +158,7 @@ namespace FluentSchemaMigrator.Console
 
 
 
-	        GenerateOnly = SchemaMigrationContext.ToDatabaseType.Equals(DatabaseType.Unknown)
+	        _generateOnly = SchemaMigrationContext.ToDatabaseType.Equals(DatabaseType.Unknown)
 	                       ||
 	                       string.IsNullOrEmpty(SchemaMigrationContext.ToConnectionString);
 
@@ -185,7 +185,7 @@ namespace FluentSchemaMigrator.Console
 
             migrator.Generate(SchemaMigrationContext);
 
-            if ( GenerateOnly )
+            if ( _generateOnly )
                 return;
 
             migrator.Migrate(SchemaMigrationContext);

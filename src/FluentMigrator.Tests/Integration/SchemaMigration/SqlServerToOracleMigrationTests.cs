@@ -659,6 +659,35 @@ namespace FluentMigrator.Tests.Integration.SchemaMigration
       }
 
       [Test]
+      public void CanMigrateTableDataWithIdentityOnColumn()
+      {
+          // Arrange
+
+          var create = new CreateTableExpression
+          {
+              TableName = "Foo",
+              Columns = new[]{
+                   new ColumnDefinition {Name = "Id", Type = DbType.Int32, IsIdentity = true}
+                    }
+          };
+
+          var row = new InsertDataExpression
+          {
+              TableName = "Foo"
+          };
+          row.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("Id", 100) });
+          row.WithIdentity = true;
+          row.IdentityColumn = "Id";
+
+          // Act
+          var data = MigrateToOracleWithData(new List<IMigrationExpression> { create, row }, 1);
+
+          // Assert
+
+          data.Tables[0].Rows.Count.ShouldBe(1);
+      }
+
+      [Test]
       public void CanMigrateTableDataWithCustomIdentity()
       {
          // Arrange

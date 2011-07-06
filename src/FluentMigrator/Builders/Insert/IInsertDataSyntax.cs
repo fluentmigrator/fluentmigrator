@@ -57,7 +57,7 @@ namespace FluentMigrator.Builders.Insert
       /// </summary>
       /// <remarks>See the processor implementation on how this is implemeted</remarks>
       /// <returns>Fluent interface instance to add further data</returns>
-	   IInsertDataSyntax WithIdentity();
+      IInsertIdentitySyntax WithIdentity();
 
       /// <summary>
       /// Add a replacement value

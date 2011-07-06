@@ -138,6 +138,19 @@ namespace FluentMigrator.Tests.Unit.Builders.Insert
       }
 
       [Test]
+      public void CanAddWithIdentityOnColumn()
+      {
+          var expression = new InsertDataExpression();
+
+          var builder = new InsertDataExpressionBuilder(expression);
+          builder
+             .WithIdentity().OnColumn("Test");
+
+          expression.WithIdentity.ShouldBeTrue();
+          expression.IdentityColumn.ShouldBe("Test");
+      }
+
+      [Test]
       public void CanAddReplacementValue()
       {
          var expression = new InsertDataExpression();

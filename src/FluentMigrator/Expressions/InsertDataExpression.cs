@@ -70,6 +70,11 @@ namespace FluentMigrator.Expressions
       /// </summary>
       public bool WithIdentity { get; set; }
 
+      /// <summary>
+      /// The name of the identity column
+      /// </summary>
+      public string IdentityColumn { get; set; }
+
 		public List<InsertionDataDefinition> Rows
 		{
 			get { return _rows; }

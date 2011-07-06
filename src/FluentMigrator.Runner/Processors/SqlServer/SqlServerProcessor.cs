@@ -235,29 +235,33 @@ namespace FluentMigrator.Runner.Processors.SqlServer
       {
          try
          {
-            // Check if we need to enrol specail identity handling to insert Identity values
+            // Check if we need to enrol special identity handling to insert Identity values
             if ( expression.WithIdentity )
             {
                // Turn identity insert on
-               Execute("SET IDENTITY_INSERT {0}[{1}] ON", GetSchemaPrefix(expression.SchemaName), expression.TableName);
+                Execute("SET IDENTITY_INSERT {0}[{1}] ON", GetSchemaPrefix(expression.SchemaName), expression.TableName);
             }
                
-            base.Process(expression);   
+            base.Process(expression);  
+ 
+             
          }
          finally
          {
             if (expression.WithIdentity )
             {
                // Turn the identity insert off
-               Execute("SET IDENTITY_INSERT {0}[{1}] OFF", GetSchemaPrefix(expression.SchemaName), expression.TableName);
+                Execute("SET IDENTITY_INSERT {0}[{1}] OFF", GetSchemaPrefix(expression.SchemaName), expression.TableName);
+
+                Execute("DBCC CHECKIDENT (\"{0}{1}\")", GetSchemaPrefix(expression.SchemaName), expression.TableName);
             }
          }
       }
 
-	   private string GetSchemaPrefix(string schemaName)
+	   private static string GetSchemaPrefix(string schemaName)
 	   {
          if (!string.IsNullOrEmpty(schemaName))
-            return string.Format("[{0}]", schemaName);
+            return string.Format("[{0}].", schemaName);
 	      return string.Empty;
 	   }
 

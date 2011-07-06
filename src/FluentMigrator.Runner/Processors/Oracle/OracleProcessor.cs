@@ -84,9 +84,12 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
            if (expression.WithIdentity && AutoGenerateSequenceForIdentityColumn)
            {
-              // Select the current number of rows from the table
-              var count = Read(string.Format("SELECT COUNT(*) FROM {0}", expression.TableName));
-              var startValue = 0;
+               // If the identity column is known then select MAX value else just assume that COUNT(*) isthe lastest value
+               var count = Read(!string.IsNullOrEmpty(expression.IdentityColumn) ?
+                   string.Format("SELECT COALESCE(MAX({1}),0) FROM {0}", expression.TableName, expression.IdentityColumn) 
+                   : string.Format("SELECT COUNT(*) FROM {0}", expression.TableName));
+
+               var startValue = 0;
               if (count != null && count.Tables[0].Rows.Count == 1)
                  startValue = int.Parse(count.Tables[0].Rows[0][0].ToString());
 

@@ -186,6 +186,9 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
       {
           if ( context.MigrationRequired(MigrationType.Tables) )
           {
+              output.WriteLine("\t\t\tif (Schema.Table(\"{0}\").Exists()) return;", table.Name);
+              output.WriteLine("");
+
               output.WriteLine("\t\t\tCreate.Table(\"" + table.Name + "\")");
               foreach (var column in table.Columns)
               {
@@ -249,10 +252,13 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
          output.Write(string.Format("\t\t\tInsert.IntoTable(\"{0}\").DataTable(@\"{1}\\{0}.xml\")",table.Name, context.DataDirectory));
 
          // Check if the column contains an identity column
-         if ( ColumnWithIdentitySpecified(table) )
+          var identityColumn = ColumnWithIdentitySpecified(table);
+          if (!string.IsNullOrEmpty(identityColumn))
          {
             // It does lets add on extra handling for inserting the identity value into the destination database
-            output.Write(".WithIdentity()");
+            output.Write(".WithIdentity().OnColumn(\"");
+            output.Write(identityColumn);
+            output.Write("\")");
          }
 
          // Add any replacement values
@@ -317,9 +323,16 @@ namespace FluentMigrator.SchemaDump.SchemaMigrations
                   columnDefinition.IsNullable == possibleReplacement.ColumnDataToMatch.IsNullable).Count() > 0)).ToList();
       }
 
-      private static bool ColumnWithIdentitySpecified(TableDefinition table)
+      private static string ColumnWithIdentitySpecified(TableDefinition table)
       {
-         return table.Columns.Where(c => c.IsIdentity).Count() == 1;
+         var column = table.Columns.Where(c => c.IsIdentity);
+
+          if ( column.Count() == 1)
+          {
+              return column.First().Name;
+          }
+
+          return string.Empty;
       }
 
       private static void WriteDeleteTable(SchemaMigrationContext context, TableDefinition table, StreamWriter output)

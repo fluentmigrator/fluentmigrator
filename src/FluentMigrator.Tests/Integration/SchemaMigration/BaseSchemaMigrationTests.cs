@@ -2,6 +2,7 @@
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Oracle;
+using FluentMigrator.Runner.Processors.SqlServer;
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration.SchemaMigration
