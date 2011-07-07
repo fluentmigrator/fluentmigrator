@@ -31,6 +31,7 @@ namespace FluentMigrator.Console
 		private readonly TextWriter _announcerOutput;
 		public string ProcessorType;
 		public string Connection;
+		public string ConnectionStringName;
 		public bool Verbose;
 		public bool PreviewOnly;
 		public string Namespace;
@@ -66,8 +67,11 @@ namespace FluentMigrator.Console
 			System.Console.WriteLine( "  Oracle: Server=172.0.0.1;Database=Foo;Uid=USERNAME;Pwd=BLAH" );
 			System.Console.WriteLine( "  SqlLite: Data Source=:memory:;Version=3;New=True" );
 			System.Console.WriteLine( "  SqlServer: server=127.0.0.1;database=Foo;user id=USERNAME;password=BLAH" );
-			System.Console.WriteLine( "             server=.\\SQLExpress;database=Foo;trusted_connection=true" );
-			System.Console.WriteLine( hr );
+			System.Console.WriteLine("             server=.\\SQLExpress;database=Foo;trusted_connection=true");
+			System.Console.WriteLine("   ");
+			System.Console.WriteLine("OR use a named connection string from the machine.config:");
+			System.Console.WriteLine("  migrate -a bin\\debug\\MyMigrations.dll -db SqlServer2008 -connectionName \"namedConnection\" -profile \"Debug\"");
+			System.Console.WriteLine(hr);
 			System.Console.WriteLine( "Options:" );
 			p.WriteOptionDescriptions( System.Console.Out );
 		}
@@ -99,6 +103,11 @@ namespace FluentMigrator.Console
 						"connectionString=|connection=|conn=|c=",
 						"REQUIRED. The connection string to the server and database you want to execute your migrations against.",
 						v => { Connection = v; }
+					},
+					{
+						"connectionStringName=|connectionName=|C=",
+						"The connection string to the server and database you want to execute your migrations against.",
+						v => { ConnectionStringName = v; }
 					},
 					{
 						"namespace=|ns=",
@@ -178,7 +187,7 @@ namespace FluentMigrator.Console
 					Task = "migrate";
 
 				if ( string.IsNullOrEmpty( ProcessorType ) ||
-					string.IsNullOrEmpty( Connection ) ||
+					(string.IsNullOrEmpty( Connection ) && string.IsNullOrEmpty( ConnectionStringName )) ||
 					string.IsNullOrEmpty( TargetAssembly ) )
 				{
 					DisplayHelp( optionSet );
@@ -260,6 +269,7 @@ namespace FluentMigrator.Console
 				Profile = Profile,
 				Timeout = Timeout,
 			};
+			runnerContext.UseConnectionName(ConnectionStringName);
 
 			new TaskExecutor( runnerContext ).Execute();
 		}
