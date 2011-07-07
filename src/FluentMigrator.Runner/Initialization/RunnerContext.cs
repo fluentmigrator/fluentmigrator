@@ -40,6 +40,22 @@ namespace FluentMigrator.Runner.Initialization
 			get; set;
 		}
 
+		/// <summary>
+		/// Uses a connection string named in the connectionStrings portion of the machine.config or app.config
+		/// </summary>
+		public void UseConnectionName(string connectionStringName)
+		{
+			if (!string.IsNullOrEmpty(connectionStringName))
+			{
+				var connection = ConfigurationManager.ConnectionStrings[connectionStringName];
+				if (connection != null && !string.IsNullOrEmpty(connection.ConnectionString))
+				{
+					Connection = connection.ConnectionString;
+				}
+				else throw new ArgumentException("Could not find connection string named by " + connectionStringName);
+			}
+		}
+
 		public IStopWatch StopWatch
 		{
 			get; private set;
