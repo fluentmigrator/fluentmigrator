@@ -45,6 +45,7 @@ namespace FluentMigrator.Console
 		public string Profile;
 		public int Timeout;
 		public bool ShowHelp;
+		private string DotNetVersion;
 
 		static void DisplayHelp( OptionSet p )
 		{
@@ -108,6 +109,11 @@ namespace FluentMigrator.Console
 						"connectionStringName=|connectionName=|C=",
 						"The connection string to the server and database you want to execute your migrations against.",
 						v => { ConnectionStringName = v; }
+					},
+					{
+						"dotNetVersion=",
+						"The connection string to the server and database you want to execute your migrations against.",
+						v => { DotNetVersion = v; }
 					},
 					{
 						"namespace=|ns=",
@@ -268,6 +274,7 @@ namespace FluentMigrator.Console
 				WorkingDirectory = WorkingDirectory,
 				Profile = Profile,
 				Timeout = Timeout,
+				DotNetVersion = DotNetVersion,
 			};
 			runnerContext.UseConnectionName(ConnectionStringName);
 
