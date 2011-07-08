@@ -43,7 +43,12 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         public override string CreateTable { get { return "CREATE TABLE {2}{0} ({1}) ENGINE = INNODB"; } }
 
-		public override string Generate(RenameColumnExpression expression)
+        public override string Generate(DeleteIndexExpression expression)
+        {
+            return string.Format("DROP INDEX {0} ON {1}", Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName));
+        }
+
+        public override string Generate(RenameColumnExpression expression)
 		{
 
 			// may need to add definition to end. blerg
