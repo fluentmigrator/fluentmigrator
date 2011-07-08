@@ -34,6 +34,7 @@ namespace FluentMigrator.Runner.Initialization
 		public string WorkingDirectory { get; set; }
 		public string Profile { get; set; }
 		public int Timeout { get; set; }
+		public string DotNetVersion { get; set; }
 
 		public IAnnouncer Announcer
 		{
@@ -47,12 +48,8 @@ namespace FluentMigrator.Runner.Initialization
 		{
 			if (!string.IsNullOrEmpty(connectionStringName))
 			{
-				var connection = ConfigurationManager.ConnectionStrings[connectionStringName];
-				if (connection != null && !string.IsNullOrEmpty(connection.ConnectionString))
-				{
-					Connection = connection.ConnectionString;
-				}
-				else throw new ArgumentException("Could not find connection string named by " + connectionStringName);
+				var manager = new NetConfigManager(DotNetVersion);
+				Connection = manager.GetConnectionString(connectionStringName);
 			}
 		}
 
