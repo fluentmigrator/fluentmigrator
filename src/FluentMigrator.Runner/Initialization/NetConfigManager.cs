@@ -21,7 +21,7 @@ namespace FluentMigrator.Runner.Initialization
 		{
 			get
 			{
-				if (version == null)
+				if (string.IsNullOrEmpty(version))
 					return null;
 				else
 				{
