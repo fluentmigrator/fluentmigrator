@@ -160,8 +160,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         public   void CanCreateForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
-            expression.ForeignKey.ForeignTableSchema = "TestSchema";
-            expression.ForeignKey.PrimaryTableSchema = "TestSchema";
+            expression.ForeignKey.SchemaOfTableContainingForeignKey = "TestSchema";
+            expression.ForeignKey.SchemaOfTableContainingPrimaryKey = "TestSchema";
             var sql = generator.Generate(expression);
             sql.ShouldBe(
                 "ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2])");
@@ -172,8 +172,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         public   void CanCreateMulitColumnForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
-            expression.ForeignKey.ForeignTableSchema = "TestSchema";
-            expression.ForeignKey.PrimaryTableSchema = "TestSchema";
+            expression.ForeignKey.SchemaOfTableContainingForeignKey = "TestSchema";
+            expression.ForeignKey.SchemaOfTableContainingPrimaryKey = "TestSchema";
             var sql = generator.Generate(expression);
             sql.ShouldBe(
                 "ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2], [TestColumn4])");

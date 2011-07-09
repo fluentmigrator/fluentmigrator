@@ -121,7 +121,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         public void CanDropForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
-            expression.ForeignKey.ForeignTableSchema = "TestSchema";
+            expression.ForeignKey.SchemaOfTableContainingForeignKey = "TestSchema";
             var sql = generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT [FK_Test]");
         }

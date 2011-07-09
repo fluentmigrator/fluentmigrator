@@ -67,12 +67,12 @@ namespace FluentMigrator.Expressions
             var reverseForeignKey = new ForeignKeyDefinition
             {
                 Name = ForeignKey.Name,
-                ForeignTableSchema = ForeignKey.PrimaryTableSchema,
-                ForeignTable = ForeignKey.PrimaryTable,
-                PrimaryTableSchema = ForeignKey.ForeignTableSchema,
-                PrimaryTable = ForeignKey.ForeignTable,
-                ForeignColumns = new List<string>(ForeignKey.PrimaryColumns),
-                PrimaryColumns = new List<string>(ForeignKey.ForeignColumns),
+                SchemaOfTableContainingForeignKey = ForeignKey.SchemaOfTableContainingPrimaryKey,
+                TableContainingForeignKey = ForeignKey.TableContainingPrimayKey,
+                SchemaOfTableContainingPrimaryKey = ForeignKey.SchemaOfTableContainingForeignKey,
+                TableContainingPrimayKey = ForeignKey.TableContainingForeignKey,
+                ColumnsInForeignKeyTableToInclude = new List<string>(ForeignKey.ColumnsInPrimaryKeyTableToInclude),
+                ColumnsInPrimaryKeyTableToInclude = new List<string>(ForeignKey.ColumnsInForeignKeyTableToInclude),
                 OnDelete = ForeignKey.OnDelete,
                 OnUpdate = ForeignKey.OnUpdate
             };
@@ -83,8 +83,8 @@ namespace FluentMigrator.Expressions
 		public override string ToString()
 		{
 			return base.ToString() + ForeignKey.Name + " "
-				+ ForeignKey.ForeignTable + " (" + string.Join(", ", ForeignKey.ForeignColumns.ToArray()) + ") "
-				+ ForeignKey.PrimaryTable + " (" + string.Join(", ", ForeignKey.PrimaryColumns.ToArray()) + ")";
+				+ ForeignKey.TableContainingForeignKey + " (" + string.Join(", ", ForeignKey.ColumnsInForeignKeyTableToInclude.ToArray()) + ") "
+				+ ForeignKey.TableContainingPrimayKey + " (" + string.Join(", ", ForeignKey.ColumnsInPrimaryKeyTableToInclude.ToArray()) + ")";
 		}
 	}
 }

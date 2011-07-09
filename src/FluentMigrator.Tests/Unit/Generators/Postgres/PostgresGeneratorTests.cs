@@ -303,10 +303,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 		{
 			var expression = new CreateForeignKeyExpression();
 			expression.ForeignKey.Name = "FK_Test";
-			expression.ForeignKey.PrimaryTable = "TestPrimaryTable";
-			expression.ForeignKey.ForeignTable = "TestForeignTable";
-			expression.ForeignKey.PrimaryColumns = new[] { "Column1", "Column2" };
-			expression.ForeignKey.ForeignColumns = new[] { "Column3", "Column4" };
+			expression.ForeignKey.TableContainingPrimayKey = "TestPrimaryTable";
+			expression.ForeignKey.TableContainingForeignKey = "TestForeignTable";
+			expression.ForeignKey.ColumnsInPrimaryKeyTableToInclude = new[] { "Column1", "Column2" };
+			expression.ForeignKey.ColumnsInForeignKeyTableToInclude = new[] { "Column3", "Column4" };
 
 			string sql = generator.Generate(expression);
 			sql.ShouldBe("ALTER TABLE \"public\".\"TestForeignTable\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"Column3\",\"Column4\") REFERENCES \"public\".\"TestPrimaryTable\" (\"Column1\",\"Column2\")");
@@ -317,11 +317,11 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         {
             var expression = new CreateForeignKeyExpression();
             expression.ForeignKey.Name = "FK_Test";
-            expression.ForeignKey.PrimaryTable = "TestPrimaryTable";
-            expression.ForeignKey.ForeignTable = "TestForeignTable";
-            expression.ForeignKey.PrimaryColumns = new[] { "Column1", "Column2" };
-            expression.ForeignKey.ForeignColumns = new[] { "Column3", "Column4" };
-            expression.ForeignKey.PrimaryTableSchema = "wibble";
+            expression.ForeignKey.TableContainingPrimayKey = "TestPrimaryTable";
+            expression.ForeignKey.TableContainingForeignKey = "TestForeignTable";
+            expression.ForeignKey.ColumnsInPrimaryKeyTableToInclude = new[] { "Column1", "Column2" };
+            expression.ForeignKey.ColumnsInForeignKeyTableToInclude = new[] { "Column3", "Column4" };
+            expression.ForeignKey.SchemaOfTableContainingPrimaryKey = "wibble";
 
             string sql = generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE \"public\".\"TestForeignTable\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"Column3\",\"Column4\") REFERENCES \"wibble\".\"TestPrimaryTable\" (\"Column1\",\"Column2\")");
@@ -332,10 +332,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         {
             var expression = new CreateForeignKeyExpression();
             expression.ForeignKey.Name = "FK_Test";
-            expression.ForeignKey.PrimaryTable = "TestPrimaryTable";
-            expression.ForeignKey.ForeignTable = "TestForeignTable";
-            expression.ForeignKey.PrimaryColumns = new[] { "Column1", "Column2" };
-            expression.ForeignKey.ForeignColumns = new[] { "Column3", "Column4" };
+            expression.ForeignKey.TableContainingPrimayKey = "TestPrimaryTable";
+            expression.ForeignKey.TableContainingForeignKey = "TestForeignTable";
+            expression.ForeignKey.ColumnsInPrimaryKeyTableToInclude = new[] { "Column1", "Column2" };
+            expression.ForeignKey.ColumnsInForeignKeyTableToInclude = new[] { "Column3", "Column4" };
             expression.ForeignKey.OnDelete = Rule.Cascade;
 
             string sql = generator.Generate(expression);
@@ -347,10 +347,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         {
             var expression = new CreateForeignKeyExpression();
             expression.ForeignKey.Name = "FK_Test";
-            expression.ForeignKey.PrimaryTable = "TestPrimaryTable";
-            expression.ForeignKey.ForeignTable = "TestForeignTable";
-            expression.ForeignKey.PrimaryColumns = new[] { "Column1", "Column2" };
-            expression.ForeignKey.ForeignColumns = new[] { "Column3", "Column4" };
+            expression.ForeignKey.TableContainingPrimayKey = "TestPrimaryTable";
+            expression.ForeignKey.TableContainingForeignKey = "TestForeignTable";
+            expression.ForeignKey.ColumnsInPrimaryKeyTableToInclude = new[] { "Column1", "Column2" };
+            expression.ForeignKey.ColumnsInForeignKeyTableToInclude = new[] { "Column3", "Column4" };
             expression.ForeignKey.OnUpdate = Rule.SetNull;
 
             string sql = generator.Generate(expression);
@@ -362,10 +362,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         {
             var expression = new CreateForeignKeyExpression();
             expression.ForeignKey.Name = "FK_Test";
-            expression.ForeignKey.PrimaryTable = "TestPrimaryTable";
-            expression.ForeignKey.ForeignTable = "TestForeignTable";
-            expression.ForeignKey.PrimaryColumns = new[] { "Column1", "Column2" };
-            expression.ForeignKey.ForeignColumns = new[] { "Column3", "Column4" };
+            expression.ForeignKey.TableContainingPrimayKey = "TestPrimaryTable";
+            expression.ForeignKey.TableContainingForeignKey = "TestForeignTable";
+            expression.ForeignKey.ColumnsInPrimaryKeyTableToInclude = new[] { "Column1", "Column2" };
+            expression.ForeignKey.ColumnsInForeignKeyTableToInclude = new[] { "Column3", "Column4" };
             expression.ForeignKey.OnUpdate = Rule.SetNull;
             expression.ForeignKey.OnDelete = Rule.SetDefault;
 
@@ -378,7 +378,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 		{
 			var expression = new DeleteForeignKeyExpression();
 			expression.ForeignKey.Name = "FK_Test";
-			expression.ForeignKey.ForeignTable = "TestPrimaryTable";
+			expression.ForeignKey.TableContainingForeignKey = "TestPrimaryTable";
 
 			string sql = generator.Generate(expression);
 			sql.ShouldBe("ALTER TABLE \"public\".\"TestPrimaryTable\" DROP CONSTRAINT \"FK_Test\"");

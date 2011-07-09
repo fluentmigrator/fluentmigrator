@@ -75,7 +75,7 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         public override string Generate(DeleteForeignKeyExpression expression)
 		{
-            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.ForeignKey.ForeignTable), "FOREIGN KEY ", Quoter.QuoteColumnName(expression.ForeignKey.Name));
+            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.ForeignKey.TableContainingForeignKey), "FOREIGN KEY ", Quoter.QuoteColumnName(expression.ForeignKey.Name));
 		}
 	}
 }

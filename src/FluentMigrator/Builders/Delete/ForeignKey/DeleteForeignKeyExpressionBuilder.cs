@@ -35,56 +35,56 @@ namespace FluentMigrator.Builders.Delete.ForeignKey
 
 		public IDeleteForeignKeyForeignColumnOrInSchemaSyntax FromTable(string foreignTableName)
 		{
-			Expression.ForeignKey.ForeignTable = foreignTableName;
+			Expression.ForeignKey.TableContainingForeignKey = foreignTableName;
 			return this;
 		}
 
 		public IDeleteForeignKeyForeignColumnSyntax InSchema(string foreignSchemaName)
 		{
-			Expression.ForeignKey.ForeignTableSchema = foreignSchemaName;
+			Expression.ForeignKey.SchemaOfTableContainingForeignKey = foreignSchemaName;
 			return this;
 		}
 
 		public IDeleteForeignKeyToTableSyntax ForeignColumn(string column)
 		{
-			Expression.ForeignKey.ForeignColumns.Add(column);
+			Expression.ForeignKey.ColumnsInForeignKeyTableToInclude.Add(column);
 			return this;
 		}
 
 		public IDeleteForeignKeyToTableSyntax ForeignColumns(params string[] columns)
 		{
 			foreach (var column in columns)
-				Expression.ForeignKey.ForeignColumns.Add(column);
+				Expression.ForeignKey.ColumnsInForeignKeyTableToInclude.Add(column);
 
 			return this;
 		}
 
 		public IDeleteForeignKeyPrimaryColumnSyntax ToTable(string table)
 		{
-			Expression.ForeignKey.PrimaryTable = table;
+			Expression.ForeignKey.TableContainingPrimayKey = table;
 			return this;
 		}
 
 		public void PrimaryColumn(string column)
 		{
-			Expression.ForeignKey.PrimaryColumns.Add(column);
+			Expression.ForeignKey.ColumnsInPrimaryKeyTableToInclude.Add(column);
 		}
 
 		public void PrimaryColumns(params string[] columns)
 		{
 			foreach (var column in columns)
-				Expression.ForeignKey.PrimaryColumns.Add(column);
+				Expression.ForeignKey.ColumnsInPrimaryKeyTableToInclude.Add(column);
 		}
 
 		IInSchemaSyntax IDeleteForeignKeyOnTableSyntax.OnTable(string foreignTableName)
 		{
-            Expression.ForeignKey.ForeignTable = foreignTableName;
+            Expression.ForeignKey.TableContainingForeignKey = foreignTableName;
 			return this;
 		}
 
 		void IInSchemaSyntax.InSchema(string schemaName)
 		{
-			Expression.ForeignKey.ForeignTableSchema = schemaName;
+			Expression.ForeignKey.SchemaOfTableContainingForeignKey = schemaName;
 		}
 	}
 }

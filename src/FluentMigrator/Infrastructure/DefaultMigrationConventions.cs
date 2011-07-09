@@ -37,18 +37,18 @@ namespace FluentMigrator.Infrastructure
 			var sb = new StringBuilder();
 
 			sb.Append("FK_");
-			sb.Append(foreignKey.ForeignTable);
+			sb.Append(foreignKey.TableContainingForeignKey);
 
-			foreach (string foreignColumn in foreignKey.ForeignColumns)
+			foreach (string foreignColumn in foreignKey.ColumnsInForeignKeyTableToInclude)
 			{
 				sb.Append("_");
 				sb.Append(foreignColumn);
 			}
 
 			sb.Append("_");
-			sb.Append(foreignKey.PrimaryTable);
+			sb.Append(foreignKey.TableContainingPrimayKey);
 
-			foreach (string primaryColumn in foreignKey.PrimaryColumns)
+			foreach (string primaryColumn in foreignKey.ColumnsInPrimaryKeyTableToInclude)
 			{
 				sb.Append("_");
 				sb.Append(primaryColumn);

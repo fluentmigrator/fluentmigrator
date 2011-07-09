@@ -39,8 +39,8 @@ namespace FluentMigrator.Tests.Unit
 		{
 			var foreignKey = new ForeignKeyDefinition
 			{
-				ForeignTable = "Users", ForeignColumns = new[] { "GroupId" },
-				PrimaryTable = "Groups", PrimaryColumns = new[] { "Id" }
+				TableContainingForeignKey = "Users", ColumnsInForeignKeyTableToInclude = new[] { "GroupId" },
+				TableContainingPrimayKey = "Groups", ColumnsInPrimaryKeyTableToInclude = new[] { "Id" }
 			};
 
 			DefaultMigrationConventions.GetForeignKeyName(foreignKey).ShouldBe("FK_Users_GroupId_Groups_Id");
@@ -51,8 +51,8 @@ namespace FluentMigrator.Tests.Unit
 		{
 			var foreignKey = new ForeignKeyDefinition
 			{
-				ForeignTable = "Users", ForeignColumns = new[] { "ColumnA", "ColumnB" },
-				PrimaryTable = "Groups", PrimaryColumns = new[] { "ColumnC", "ColumnD" }
+				TableContainingForeignKey = "Users", ColumnsInForeignKeyTableToInclude = new[] { "ColumnA", "ColumnB" },
+				TableContainingPrimayKey = "Groups", ColumnsInPrimaryKeyTableToInclude = new[] { "ColumnC", "ColumnD" }
 			};
 
 			DefaultMigrationConventions.GetForeignKeyName(foreignKey).ShouldBe("FK_Users_ColumnA_ColumnB_Groups_ColumnC_ColumnD");

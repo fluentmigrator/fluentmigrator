@@ -26,19 +26,19 @@ namespace FluentMigrator.Model
 	public class ForeignKeyDefinition : ICloneable, ICanBeConventional, ICanBeValidated
 	{
 		public virtual string Name { get; set; }
-		public virtual string ForeignTable { get; set; }
-		public virtual string ForeignTableSchema { get; set; }
-		public virtual string PrimaryTable { get; set; }
-		public virtual string PrimaryTableSchema { get; set; }
+		public virtual string TableContainingForeignKey { get; set; }
+		public virtual string SchemaOfTableContainingForeignKey { get; set; }
+		public virtual string TableContainingPrimayKey { get; set; }
+		public virtual string SchemaOfTableContainingPrimaryKey { get; set; }
 		public virtual Rule OnDelete { get; set; }
 		public virtual Rule OnUpdate { get; set; }
-		public virtual ICollection<string> ForeignColumns { get; set; }
-		public virtual ICollection<string> PrimaryColumns { get; set; }
+		public virtual ICollection<string> ColumnsInForeignKeyTableToInclude { get; set; }
+		public virtual ICollection<string> ColumnsInPrimaryKeyTableToInclude { get; set; }
 
 		public ForeignKeyDefinition()
 		{
-			ForeignColumns = new List<string>();
-			PrimaryColumns = new List<string>();
+			ColumnsInForeignKeyTableToInclude = new List<string>();
+			ColumnsInPrimaryKeyTableToInclude = new List<string>();
 		}
 
 		public void ApplyConventions(IMigrationConventions conventions)
@@ -52,19 +52,19 @@ namespace FluentMigrator.Model
 			if (String.IsNullOrEmpty(Name))
 				errors.Add(ErrorMessages.ForeignKeyNameCannotBeNullOrEmpty);
 
-			if (String.IsNullOrEmpty(ForeignTable))
+			if (String.IsNullOrEmpty(TableContainingForeignKey))
 				errors.Add(ErrorMessages.ForeignTableNameCannotBeNullOrEmpty);
 
-			if (String.IsNullOrEmpty(PrimaryTable))
+			if (String.IsNullOrEmpty(TableContainingPrimayKey))
 				errors.Add(ErrorMessages.PrimaryTableNameCannotBeNullOrEmpty);
 
-			if (!String.IsNullOrEmpty(ForeignTable) && !String.IsNullOrEmpty(PrimaryTable) && ForeignTable.Equals(PrimaryTable))
+			if (!String.IsNullOrEmpty(TableContainingForeignKey) && !String.IsNullOrEmpty(TableContainingPrimayKey) && TableContainingForeignKey.Equals(TableContainingPrimayKey))
 				errors.Add(ErrorMessages.ForeignKeyCannotBeSelfReferential);
 
-			if (ForeignColumns.Count == 0)
+			if (ColumnsInForeignKeyTableToInclude.Count == 0)
 				errors.Add(ErrorMessages.ForeignKeyMustHaveOneOrMoreForeignColumns);
 
-			if (PrimaryColumns.Count == 0)
+			if (ColumnsInPrimaryKeyTableToInclude.Count == 0)
 				errors.Add(ErrorMessages.ForeignKeyMustHaveOneOrMorePrimaryColumns);
 		}
 
@@ -73,12 +73,12 @@ namespace FluentMigrator.Model
 			return new ForeignKeyDefinition
 			{
 				Name = Name,
-				ForeignTableSchema = ForeignTableSchema,
-				ForeignTable = ForeignTable,
-				PrimaryTableSchema = PrimaryTableSchema,
-				PrimaryTable = PrimaryTable,
-				ForeignColumns = new List<string>(ForeignColumns),
-				PrimaryColumns = new List<string>(PrimaryColumns),
+				SchemaOfTableContainingForeignKey = SchemaOfTableContainingForeignKey,
+				TableContainingForeignKey = TableContainingForeignKey,
+				SchemaOfTableContainingPrimaryKey = SchemaOfTableContainingPrimaryKey,
+				TableContainingPrimayKey = TableContainingPrimayKey,
+				ColumnsInForeignKeyTableToInclude = new List<string>(ColumnsInForeignKeyTableToInclude),
+				ColumnsInPrimaryKeyTableToInclude = new List<string>(ColumnsInPrimaryKeyTableToInclude),
                 OnDelete = OnDelete,
                 OnUpdate = OnUpdate
 			};

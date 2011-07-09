@@ -56,10 +56,10 @@ namespace FluentMigrator.Expressions
 			return base.ToString() +
 					string.Format("{0} {1}({2}) {3}({4})",
 								ForeignKey.Name,
-								ForeignKey.ForeignTable,
-								string.Join(", ", ForeignKey.ForeignColumns.ToArray()),
-								ForeignKey.PrimaryTable,
-								string.Join(", ", ForeignKey.PrimaryColumns.ToArray()));
+								ForeignKey.TableContainingForeignKey,
+								string.Join(", ", ForeignKey.ColumnsInForeignKeyTableToInclude.ToArray()),
+								ForeignKey.TableContainingPrimayKey,
+								string.Join(", ", ForeignKey.ColumnsInPrimaryKeyTableToInclude.ToArray()));
 		}
 	}
 }

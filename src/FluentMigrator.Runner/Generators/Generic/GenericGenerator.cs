@@ -167,7 +167,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
 		public override string Generate(CreateForeignKeyExpression expression)
 		{
-			if (expression.ForeignKey.PrimaryColumns.Count != expression.ForeignKey.ForeignColumns.Count)
+			if (expression.ForeignKey.ColumnsInPrimaryKeyTableToInclude.Count != expression.ForeignKey.ColumnsInForeignKeyTableToInclude.Count)
 			{
 				throw new ArgumentException("Number of primary columns and secondary columns must be equal");
 			}
@@ -178,21 +178,21 @@ namespace FluentMigrator.Runner.Generators.Generic
 
 			List<string> primaryColumns = new List<string>();
 			List<string> foreignColumns = new List<string>();
-			foreach (var column in expression.ForeignKey.PrimaryColumns)
+			foreach (var column in expression.ForeignKey.ColumnsInPrimaryKeyTableToInclude)
 			{
 				primaryColumns.Add(Quoter.QuoteColumnName(column));
 			}
 
-			foreach (var column in expression.ForeignKey.ForeignColumns)
+			foreach (var column in expression.ForeignKey.ColumnsInForeignKeyTableToInclude)
 			{
 				foreignColumns.Add(Quoter.QuoteColumnName(column));
 			}
 			return string.Format(
 				CreateForeignKeyConstraint,
-				Quoter.QuoteTableName(expression.ForeignKey.ForeignTable),
+				Quoter.QuoteTableName(expression.ForeignKey.TableContainingForeignKey),
 				Quoter.QuoteColumnName(keyName),
 				String.Join(", ", foreignColumns.ToArray()),
-				Quoter.QuoteTableName(expression.ForeignKey.PrimaryTable),
+				Quoter.QuoteTableName(expression.ForeignKey.TableContainingPrimayKey),
 				String.Join(", ", primaryColumns.ToArray()),
 				FormatCascade("DELETE", expression.ForeignKey.OnDelete),
 				FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)
@@ -201,12 +201,12 @@ namespace FluentMigrator.Runner.Generators.Generic
 
 		public virtual string GenerateForeignKeyName(CreateForeignKeyExpression expression)
 		{
-			return string.Format("FK_{0}_{1}", expression.ForeignKey.PrimaryTable.Substring(0, 5), expression.ForeignKey.ForeignTable.Substring(0, 5));
+			return string.Format("FK_{0}_{1}", expression.ForeignKey.TableContainingPrimayKey.Substring(0, 5), expression.ForeignKey.TableContainingForeignKey.Substring(0, 5));
 		}
 
 		public override string Generate(DeleteForeignKeyExpression expression)
 		{
-			return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.ForeignKey.ForeignTable), Quoter.QuoteColumnName(expression.ForeignKey.Name));
+			return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.ForeignKey.TableContainingForeignKey), Quoter.QuoteColumnName(expression.ForeignKey.Name));
 		}
 
 

@@ -126,16 +126,16 @@ namespace FluentMigrator.Builders.Alter.Column
 				ForeignKey = new ForeignKeyDefinition
 				{
 					Name = foreignKeyName,
-					PrimaryTable = Expression.TableName,
-					PrimaryTableSchema = Expression.SchemaName,
-					ForeignTable = foreignTableName,
-					ForeignTableSchema = foreignTableSchema
+					TableContainingPrimayKey = Expression.TableName,
+					SchemaOfTableContainingPrimaryKey = Expression.SchemaName,
+					TableContainingForeignKey = foreignTableName,
+					SchemaOfTableContainingForeignKey = foreignTableSchema
 				}
 			};
 
-			fk.ForeignKey.PrimaryColumns.Add( Expression.Column.Name );
+			fk.ForeignKey.ColumnsInPrimaryKeyTableToInclude.Add( Expression.Column.Name );
 			foreach ( var foreignColumnName in foreignColumnNames )
-				fk.ForeignKey.ForeignColumns.Add( foreignColumnName );
+				fk.ForeignKey.ColumnsInForeignKeyTableToInclude.Add( foreignColumnName );
 
 			_context.Expressions.Add( fk );
 			return this;

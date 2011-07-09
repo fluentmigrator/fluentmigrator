@@ -318,26 +318,26 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
                     d = new ForeignKeyDefinition()
                     {
                         Name = dr["Constraint_Name"].ToString(),
-                        ForeignTableSchema = dr["ForeignTableSchema"].ToString(),
-                        ForeignTable = dr["FK_Table"].ToString(),
-                        PrimaryTable = dr["PK_Table"].ToString(),
-                        PrimaryTableSchema = dr["PrimaryTableSchema"].ToString()
+                        SchemaOfTableContainingForeignKey = dr["ForeignTableSchema"].ToString(),
+                        TableContainingForeignKey = dr["FK_Table"].ToString(),
+                        TableContainingPrimayKey = dr["PK_Table"].ToString(),
+                        SchemaOfTableContainingPrimaryKey = dr["PrimaryTableSchema"].ToString()
                     };
                     keys.Add(d);
                 }
 
                 ICollection<string> ms;
                 // Foreign Columns
-                ms = (from m in d.ForeignColumns
+                ms = (from m in d.ColumnsInForeignKeyTableToInclude
                            where m == dr["FK_Table"].ToString()
                            select m).ToList();
-                if (ms.Count == 0) d.ForeignColumns.Add(dr["FK_Table"].ToString());
+                if (ms.Count == 0) d.ColumnsInForeignKeyTableToInclude.Add(dr["FK_Table"].ToString());
 
                 // Primary Columns
-                ms = (from m in d.PrimaryColumns
+                ms = (from m in d.ColumnsInPrimaryKeyTableToInclude
                            where m == dr["PK_Table"].ToString()
                            select m).ToList();
-                if (ms.Count == 0) d.PrimaryColumns.Add(dr["PK_Table"].ToString());
+                if (ms.Count == 0) d.ColumnsInPrimaryKeyTableToInclude.Add(dr["PK_Table"].ToString());
             }
 
             return keys;

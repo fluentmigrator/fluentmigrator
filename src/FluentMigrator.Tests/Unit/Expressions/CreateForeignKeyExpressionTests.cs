@@ -34,10 +34,10 @@ namespace FluentMigrator.Tests.Unit.Expressions
 						{
 							ForeignKey = new ForeignKeyDefinition
 											{
-												ForeignColumns = new Collection<string> { "User_id" },
-												ForeignTable = "UserRoles",
-												PrimaryColumns = new Collection<string> { "Id" },
-												PrimaryTable = "User",
+												ColumnsInForeignKeyTableToInclude = new Collection<string> { "User_id" },
+												TableContainingForeignKey = "UserRoles",
+												ColumnsInPrimaryKeyTableToInclude = new Collection<string> { "Id" },
+												TableContainingPrimayKey = "User",
 												Name = "FK"
 											}
 						}.ToString();

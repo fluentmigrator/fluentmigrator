@@ -268,10 +268,10 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             var expression = new CreateForeignKeyExpression();
             expression.ForeignKey.Name = "FK_Test";
-            expression.ForeignKey.PrimaryTable = TestTableName2;
-            expression.ForeignKey.ForeignTable = TestTableName1;
-            expression.ForeignKey.PrimaryColumns = new[] { TestColumnName2 };
-            expression.ForeignKey.ForeignColumns = new[] { TestColumnName1 };
+            expression.ForeignKey.TableContainingPrimayKey = TestTableName2;
+            expression.ForeignKey.TableContainingForeignKey = TestTableName1;
+            expression.ForeignKey.ColumnsInPrimaryKeyTableToInclude = new[] { TestColumnName2 };
+            expression.ForeignKey.ColumnsInForeignKeyTableToInclude = new[] { TestColumnName1 };
 
             return expression;
         }
@@ -280,10 +280,10 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             var expression = new CreateForeignKeyExpression();
             expression.ForeignKey.Name = "FK_Test";
-            expression.ForeignKey.PrimaryTable = TestTableName2;
-            expression.ForeignKey.ForeignTable = TestTableName1;
-            expression.ForeignKey.PrimaryColumns = new[] { TestColumnName2, "TestColumn4" };
-            expression.ForeignKey.ForeignColumns = new[] { TestColumnName1, "TestColumn3" };
+            expression.ForeignKey.TableContainingPrimayKey = TestTableName2;
+            expression.ForeignKey.TableContainingForeignKey = TestTableName1;
+            expression.ForeignKey.ColumnsInPrimaryKeyTableToInclude = new[] { TestColumnName2, "TestColumn4" };
+            expression.ForeignKey.ColumnsInForeignKeyTableToInclude = new[] { TestColumnName1, "TestColumn3" };
 
             return expression;
         }
@@ -308,7 +308,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             var expression = new DeleteForeignKeyExpression();
             expression.ForeignKey.Name = "FK_Test";
-            expression.ForeignKey.ForeignTable = TestTableName1;
+            expression.ForeignKey.TableContainingForeignKey = TestTableName1;
             return expression;
         }
 

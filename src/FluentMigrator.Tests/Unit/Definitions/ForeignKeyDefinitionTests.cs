@@ -47,7 +47,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
 		[Test]
 		public void ErrorIsReturnedWhenForeignTableNameIsNull()
 		{
-			var column = new ForeignKeyDefinition { ForeignTable = null };
+			var column = new ForeignKeyDefinition { TableContainingForeignKey = null };
 			var errors = ValidationHelper.CollectErrors(column);
 			errors.ShouldContain(ErrorMessages.ForeignTableNameCannotBeNullOrEmpty);
 		}
@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
 		[Test]
 		public void ErrorIsNotReturnedWhenTableNameIsNotNullOrEmptyString()
 		{
-			var column = new ForeignKeyDefinition { ForeignTable = "Bacon" };
+			var column = new ForeignKeyDefinition { TableContainingForeignKey = "Bacon" };
 			var errors = ValidationHelper.CollectErrors(column);
 			errors.ShouldNotContain(ErrorMessages.ForeignTableNameCannotBeNullOrEmpty);
 		}
@@ -63,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
 		[Test]
 		public void ErrorIsReturnedWhenForeignTableNameIsEmptyString()
 		{
-			var column = new ForeignKeyDefinition { ForeignTable = String.Empty };
+			var column = new ForeignKeyDefinition { TableContainingForeignKey = String.Empty };
 			var errors = ValidationHelper.CollectErrors(column);
 			errors.ShouldContain(ErrorMessages.ForeignTableNameCannotBeNullOrEmpty);
 		}
@@ -71,7 +71,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
 		[Test]
 		public void ErrorIsReturnedWhenPrimaryTableNameIsNull()
 		{
-			var column = new ForeignKeyDefinition { PrimaryTable = null };
+			var column = new ForeignKeyDefinition { TableContainingPrimayKey = null };
 			var errors = ValidationHelper.CollectErrors(column);
 			errors.ShouldContain(ErrorMessages.PrimaryTableNameCannotBeNullOrEmpty);
 		}
@@ -79,7 +79,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
 		[Test]
 		public void ErrorIsReturnedWhenPrimaryTableNameIsEmptyString()
 		{
-			var column = new ForeignKeyDefinition { PrimaryTable = String.Empty };
+			var column = new ForeignKeyDefinition { TableContainingPrimayKey = String.Empty };
 			var errors = ValidationHelper.CollectErrors(column);
 			errors.ShouldContain(ErrorMessages.PrimaryTableNameCannotBeNullOrEmpty);
 		}
@@ -87,7 +87,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
 		[Test]
 		public void ErrorIsNotReturnedWhenPrimaryTableNameIsNotNullOrEmptyString()
 		{
-			var column = new ForeignKeyDefinition { PrimaryTable = "Bacon" };
+			var column = new ForeignKeyDefinition { TableContainingPrimayKey = "Bacon" };
 			var errors = ValidationHelper.CollectErrors(column);
 			errors.ShouldNotContain(ErrorMessages.PrimaryTableNameCannotBeNullOrEmpty);
 		}
@@ -95,7 +95,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
 		[Test]
 		public void ErrorIsReturnedWhenPrimaryTableNameIsSameAsForeignTableName()
 		{
-			var column = new ForeignKeyDefinition { PrimaryTable = "Bacon", ForeignTable = "Bacon" };
+			var column = new ForeignKeyDefinition { TableContainingPrimayKey = "Bacon", TableContainingForeignKey = "Bacon" };
 			var errors = ValidationHelper.CollectErrors(column);
 			errors.ShouldContain(ErrorMessages.ForeignKeyCannotBeSelfReferential);
 		}
@@ -103,7 +103,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
 		[Test]
 		public void ErrorIsNotReturnedWhenPrimaryTableNameIsDifferentThanForeignTableName()
 		{
-			var column = new ForeignKeyDefinition { PrimaryTable = "Bacon", ForeignTable = "NotBacon" };
+			var column = new ForeignKeyDefinition { TableContainingPrimayKey = "Bacon", TableContainingForeignKey = "NotBacon" };
 			var errors = ValidationHelper.CollectErrors(column);
 			errors.ShouldNotContain(ErrorMessages.ForeignKeyCannotBeSelfReferential);
 		}
@@ -111,7 +111,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
 		[Test]
 		public void ErrorIsReturnedWhenForeignColumnsIsEmpty()
 		{
-			var column = new ForeignKeyDefinition { ForeignColumns = new string[0] };
+			var column = new ForeignKeyDefinition { ColumnsInForeignKeyTableToInclude = new string[0] };
 			var errors = ValidationHelper.CollectErrors(column);
 			errors.ShouldContain(ErrorMessages.ForeignKeyMustHaveOneOrMoreForeignColumns);
 		}
@@ -119,7 +119,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
 		[Test]
 		public void ErrorIsNotReturnedWhenForeignColumnsIsNotEmpty()
 		{
-			var column = new ForeignKeyDefinition { ForeignColumns = new[] { "Bacon" } };
+			var column = new ForeignKeyDefinition { ColumnsInForeignKeyTableToInclude = new[] { "Bacon" } };
 			var errors = ValidationHelper.CollectErrors(column);
 			errors.ShouldNotContain(ErrorMessages.ForeignKeyMustHaveOneOrMoreForeignColumns);
 		}
@@ -127,7 +127,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
 		[Test]
 		public void ErrorIsReturnedWhenPrimaryColumnsIsEmpty()
 		{
-			var column = new ForeignKeyDefinition { PrimaryColumns = new string[0] };
+			var column = new ForeignKeyDefinition { ColumnsInPrimaryKeyTableToInclude = new string[0] };
 			var errors = ValidationHelper.CollectErrors(column);
 			errors.ShouldContain(ErrorMessages.ForeignKeyMustHaveOneOrMorePrimaryColumns);
 		}
@@ -135,7 +135,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
 		[Test]
 		public void ErrorIsNotReturnedWhenPrimaryColumnsIsNotEmpty()
 		{
-			var column = new ForeignKeyDefinition { PrimaryColumns = new[] { "Bacon" } };
+			var column = new ForeignKeyDefinition { ColumnsInPrimaryKeyTableToInclude = new[] { "Bacon" } };
 			var errors = ValidationHelper.CollectErrors(column);
 			errors.ShouldNotContain(ErrorMessages.ForeignKeyMustHaveOneOrMorePrimaryColumns);
 		}

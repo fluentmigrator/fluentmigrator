@@ -64,12 +64,6 @@ namespace FluentMigrator.Builders.Create.Table
 			return this;
 		}
 
-		public ICreateTableColumnOptionOrWithColumnSyntax ForeignKey()
-		{
-			CurrentColumn.IsForeignKey = true;
-			return this;
-		}
-
 		public ICreateTableColumnOptionOrWithColumnSyntax Identity()
 		{
 			CurrentColumn.IsIdentity = true;
@@ -113,30 +107,30 @@ namespace FluentMigrator.Builders.Create.Table
 			return this;
 		}
 
-      
 
-		public ICreateTableColumnOptionOrWithColumnSyntax References(string foreignKeyName, string foreignTableName, IEnumerable<string> foreignColumnNames)
+
+        public ICreateTableColumnOptionOrWithColumnSyntax References(string foreignKeyName, string tableContainingPrimaryKey, IEnumerable<string> columnsToIncludeFromThePrimaryKeyTable)
 		{
-			return References(foreignKeyName, null, foreignTableName, foreignColumnNames);
+            return References(foreignKeyName, null, tableContainingPrimaryKey, columnsToIncludeFromThePrimaryKeyTable);
 		}
 
-		public ICreateTableColumnOptionOrWithColumnSyntax References(string foreignKeyName, string foreignTableSchema, string foreignTableName, IEnumerable<string> foreignColumnNames)
+		public ICreateTableColumnOptionOrWithColumnSyntax References(string foreignKeyName, string schemaContainingPrimaryKey, string tableContainingPrimaryKey, IEnumerable<string> columnsToIncludeFromThePrimaryKeyTable)
 		{
 			var fk = new CreateForeignKeyExpression
 						{
 							ForeignKey = new ForeignKeyDefinition
 											{
 												Name = foreignKeyName,
-												PrimaryTable = Expression.TableName,
-												PrimaryTableSchema = Expression.SchemaName,
-												ForeignTable = foreignTableName,
-												ForeignTableSchema = foreignTableSchema
+                                                TableContainingPrimayKey = tableContainingPrimaryKey,
+												SchemaOfTableContainingPrimaryKey = schemaContainingPrimaryKey,
+												TableContainingForeignKey = Expression.TableName,
+                                                SchemaOfTableContainingForeignKey = Expression.SchemaName
 											}
 						};
 
-			fk.ForeignKey.PrimaryColumns.Add(CurrentColumn.Name);
-			foreach (var foreignColumnName in foreignColumnNames)
-				fk.ForeignKey.ForeignColumns.Add(foreignColumnName);
+			fk.ForeignKey.ColumnsInPrimaryKeyTableToInclude.Add(CurrentColumn.Name);
+            foreach (var foreignColumnName in columnsToIncludeFromThePrimaryKeyTable)
+				fk.ForeignKey.ColumnsInForeignKeyTableToInclude.Add(foreignColumnName);
 
 			_context.Expressions.Add(fk);
 			return this;

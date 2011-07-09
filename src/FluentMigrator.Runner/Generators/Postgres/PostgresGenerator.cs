@@ -49,18 +49,18 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
 		public override string Generate(CreateForeignKeyExpression expression)
 		{
-			var primaryColumns = GetColumnList(expression.ForeignKey.PrimaryColumns);
-			var foreignColumns = GetColumnList(expression.ForeignKey.ForeignColumns);
+			var primaryColumns = GetColumnList(expression.ForeignKey.ColumnsInPrimaryKeyTableToInclude);
+			var foreignColumns = GetColumnList(expression.ForeignKey.ColumnsInForeignKeyTableToInclude);
 
 			const string sql = "ALTER TABLE {0}.{1} ADD CONSTRAINT {2} FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8}";
 
 			return string.Format(sql,
-								Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema),
-								Quoter.QuoteTableName(expression.ForeignKey.ForeignTable),
+								Quoter.QuoteSchemaName(expression.ForeignKey.SchemaOfTableContainingForeignKey),
+								Quoter.QuoteTableName(expression.ForeignKey.TableContainingForeignKey),
 								Quoter.Quote(expression.ForeignKey.Name),
 								foreignColumns,
-								Quoter.QuoteSchemaName(expression.ForeignKey.PrimaryTableSchema),
-								Quoter.QuoteTableName(expression.ForeignKey.PrimaryTable),
+								Quoter.QuoteSchemaName(expression.ForeignKey.SchemaOfTableContainingPrimaryKey),
+								Quoter.QuoteTableName(expression.ForeignKey.TableContainingPrimayKey),
 								primaryColumns,
 								FormatCascade("DELETE", expression.ForeignKey.OnDelete),
 								FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)
@@ -69,7 +69,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
 		public override string Generate(DeleteForeignKeyExpression expression)
 		{
-			return string.Format("ALTER TABLE {0}.{1} DROP CONSTRAINT {2}", Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema), Quoter.QuoteTableName(expression.ForeignKey.ForeignTable), Quoter.Quote(expression.ForeignKey.Name));
+			return string.Format("ALTER TABLE {0}.{1} DROP CONSTRAINT {2}", Quoter.QuoteSchemaName(expression.ForeignKey.SchemaOfTableContainingForeignKey), Quoter.QuoteTableName(expression.ForeignKey.TableContainingForeignKey), Quoter.Quote(expression.ForeignKey.Name));
 		}
 
 		public override string Generate(CreateIndexExpression expression)

@@ -139,7 +139,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(DeleteForeignKeyExpression expression)
         {
-            return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema), base.Generate(expression));
+            return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.ForeignKey.SchemaOfTableContainingForeignKey), base.Generate(expression));
         }
 
         public override string Generate(InsertDataExpression expression)
@@ -172,30 +172,30 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         
         public override string Generate(CreateForeignKeyExpression expression)
         {
-            if (expression.ForeignKey.PrimaryColumns.Count != expression.ForeignKey.ForeignColumns.Count)
+            if (expression.ForeignKey.ColumnsInPrimaryKeyTableToInclude.Count != expression.ForeignKey.ColumnsInForeignKeyTableToInclude.Count)
             {
                 throw new ArgumentException("Number of primary columns and secondary columns must be equal");
             }
 
             List<string> primaryColumns = new List<string>();
             List<string> foreignColumns = new List<string>();
-            foreach (var column in expression.ForeignKey.PrimaryColumns)
+            foreach (var column in expression.ForeignKey.ColumnsInPrimaryKeyTableToInclude)
             {
                 primaryColumns.Add(Quoter.QuoteColumnName(column));
             }
 
-            foreach (var column in expression.ForeignKey.ForeignColumns)
+            foreach (var column in expression.ForeignKey.ColumnsInForeignKeyTableToInclude)
             {
                 foreignColumns.Add(Quoter.QuoteColumnName(column));
             }
             return string.Format(
                 CreateForeignKeyConstraint,
-                Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema),
-                Quoter.QuoteTableName(expression.ForeignKey.ForeignTable),
+                Quoter.QuoteSchemaName(expression.ForeignKey.SchemaOfTableContainingForeignKey),
+                Quoter.QuoteTableName(expression.ForeignKey.TableContainingForeignKey),
                 Quoter.QuoteColumnName(expression.ForeignKey.Name),
                 String.Join(", ", foreignColumns.ToArray()),
-                Quoter.QuoteSchemaName(expression.ForeignKey.PrimaryTableSchema),
-                Quoter.QuoteTableName(expression.ForeignKey.PrimaryTable),
+                Quoter.QuoteSchemaName(expression.ForeignKey.SchemaOfTableContainingPrimaryKey),
+                Quoter.QuoteTableName(expression.ForeignKey.TableContainingPrimayKey),
                 String.Join(", ", primaryColumns.ToArray()),
                 FormatCascade("DELETE", expression.ForeignKey.OnDelete),
                 FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)

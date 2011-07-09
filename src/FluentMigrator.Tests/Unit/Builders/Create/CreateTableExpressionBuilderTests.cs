@@ -244,12 +244,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 			columnMock.VerifyAll();
 		}
 
-		[Test]
-		public void CallingForeignKeySetsIsForeignKeyToTrue()
-		{
-			VerifyColumnProperty(true, c => c.IsForeignKey, b => b.ForeignKey());
-		}
-
+	
 		[Test]
 		public void CallingIdentitySetsIsIdentityToTrue()
 		{
@@ -292,12 +287,12 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
 			collectionMock.Verify(x => x.Add(It.Is<CreateForeignKeyExpression>(
 				fk => fk.ForeignKey.Name == "fk_foo" &&
-						fk.ForeignKey.ForeignTable == "FooTable" &&
-						fk.ForeignKey.ForeignColumns.Contains("BarColumn") &&
-						fk.ForeignKey.ForeignColumns.Count == 1 &&
-						fk.ForeignKey.PrimaryTable == "Bacon" &&
-						fk.ForeignKey.PrimaryColumns.Contains("BaconId") &&
-						fk.ForeignKey.PrimaryColumns.Count == 1
+						fk.ForeignKey.TableContainingForeignKey == "FooTable" &&
+						fk.ForeignKey.ColumnsInForeignKeyTableToInclude.Contains("BarColumn") &&
+						fk.ForeignKey.ColumnsInForeignKeyTableToInclude.Count == 1 &&
+						fk.ForeignKey.TableContainingPrimayKey == "Bacon" &&
+						fk.ForeignKey.ColumnsInPrimaryKeyTableToInclude.Contains("BaconId") &&
+						fk.ForeignKey.ColumnsInPrimaryKeyTableToInclude.Count == 1
                                                 )), Times.AtMostOnce());
 
 			var contextMock = new Mock<IMigrationContext>();

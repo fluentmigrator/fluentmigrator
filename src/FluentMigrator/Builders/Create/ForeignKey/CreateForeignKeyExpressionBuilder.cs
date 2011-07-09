@@ -35,45 +35,45 @@ namespace FluentMigrator.Builders.Create.ForeignKey
 
 		public ICreateForeignKeyForeignColumnOrInSchemaSyntax FromTable(string table)
 		{
-			Expression.ForeignKey.ForeignTable = table;
+			Expression.ForeignKey.TableContainingForeignKey = table;
 			return this;
 		}
 
 		public ICreateForeignKeyToTableSyntax ForeignColumn(string column)
 		{
-			Expression.ForeignKey.ForeignColumns.Add(column);
+			Expression.ForeignKey.ColumnsInForeignKeyTableToInclude.Add(column);
 			return this;
 		}
 
 		public ICreateForeignKeyToTableSyntax ForeignColumns(params string[] columns)
 		{
 			foreach(var column in columns)
-				Expression.ForeignKey.ForeignColumns.Add(column);
+				Expression.ForeignKey.ColumnsInForeignKeyTableToInclude.Add(column);
 			return this;
 		}
 
 		ICreateForeignKeyForeignColumnSyntax ICreateForeignKeyForeignColumnOrInSchemaSyntax.InSchema(string schemaName)
 		{
-			Expression.ForeignKey.ForeignTableSchema = schemaName;
+			Expression.ForeignKey.SchemaOfTableContainingForeignKey = schemaName;
 			return this;
 		}
 
 		public ICreateForeignKeyPrimaryColumnOrInSchemaSyntax ToTable(string table)
 		{
-			Expression.ForeignKey.PrimaryTable = table;
+			Expression.ForeignKey.TableContainingPrimayKey = table;
 			return this;
 		}
 
 		public ICreateForiegnKeyCascadeSyntax PrimaryColumn(string column)
 		{
-			Expression.ForeignKey.PrimaryColumns.Add(column);
+			Expression.ForeignKey.ColumnsInPrimaryKeyTableToInclude.Add(column);
 			return this;
 		}
 
 		public ICreateForiegnKeyCascadeSyntax PrimaryColumns(params string[] columns)
 		{
 			foreach(var column in columns)
-				Expression.ForeignKey.PrimaryColumns.Add(column);
+				Expression.ForeignKey.ColumnsInPrimaryKeyTableToInclude.Add(column);
 			return this;
 		}
 
@@ -97,7 +97,7 @@ namespace FluentMigrator.Builders.Create.ForeignKey
 
 		ICreateForeignKeyPrimaryColumnSyntax ICreateForeignKeyPrimaryColumnOrInSchemaSyntax.InSchema(string schemaName)
 		{
-			Expression.ForeignKey.PrimaryTableSchema = schemaName;
+			Expression.ForeignKey.SchemaOfTableContainingPrimaryKey = schemaName;
 			return this;
 		}
 	}
