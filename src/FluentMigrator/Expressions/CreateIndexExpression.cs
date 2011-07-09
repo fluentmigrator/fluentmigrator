@@ -54,7 +54,7 @@ namespace FluentMigrator.Expressions
 		public override string ToString()
 		{
             
-			return base.ToString() + " " + Index.Name + " for " + Index.TableName + " (" + string.Join(", ", Index.Columns.Select(x => x.Name).ToArray()) + ")";
+			return base.ToString() + Index.Name + " for " + Index.TableName + " (" + string.Join(", ", Index.Columns.Select(x => x.Name).ToArray()) + ")";
 		}
 	}
 }

@@ -47,7 +47,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
 													TableName = "Table",
 													Name = "NameIndex"
 												}
-			}.ToString().ShouldBe("CreateIndex Table (Name, Slug)");
+            }.ToString().ShouldBe("CreateIndex NameIndex for Table (Name, Slug)");
 			
 		}
 	}
