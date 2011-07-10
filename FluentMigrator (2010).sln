@@ -11,6 +11,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		default.build = default.build
 		default.msbuild = default.msbuild
+		src\SolutionInfo.cs = src\SolutionInfo.cs
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Runner", "src\FluentMigrator.Runner\FluentMigrator.Runner.csproj", "{CB468AD6-60C2-42E9-B3B0-01968EF94C65}"
