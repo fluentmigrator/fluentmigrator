@@ -1,0 +1,77 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <!-- Paths to various parts of the build -->
+  <PropertyGroup>
+    <pathbase>$(MSBuildProjectDirectory)</pathbase>
+    <productname>fluentmigrator</productname>
+    <builddir>build</builddir>
+    <dirsample>$(MSBuildProjectDirectory)\src\FluentMigrator.Example</dirsample>
+    <pathdist>dist</pathdist>
+    <buildplatform>net-3.5</buildplatform>
+    <buildconfig>release</buildconfig>
+    <majorversion>1.0</majorversion>
+    <completeversion>$(majorversion).0.${build.number}</completeversion>
+  </PropertyGroup>
+
+  <!-- Deletes the output folders for a clean build -->
+  <Target Name="Clean">
+    <Message Text="Removing old build Files" />
+    <RemoveDir Directories="$(builddir)" />
+  </Target>
+
+  <!-- Generates the AssemblyInfo.cs -->
+  <!--
+  <target name="GenerateVersion" DependsOnTargets="Clean">
+    <asminfo output="${path.base}\src\SolutionInfo.cs" language="CSharp">
+      <attributes>
+        <attribute type="System.Reflection.AssemblyProductAttribute" value="FluentMigrator" />
+        <attribute type="System.Reflection.AssemblyVersionAttribute" value="${complete.version}"/>
+        <attribute type="System.Reflection.AssemblyCopyrightAttribute" value="Copyright - Sean Chambers 2008-2010" />
+        <attribute type="System.Reflection.AssemblyConfigurationAttribute" value="${build.config}" />
+      </attributes>
+    </asminfo>
+  </target>
+
+  <target name="build" description="Builds the app" depends="generate-version">
+    <msbuild project="FluentMigrator (2010).sln">
+      <property name="Configuration" value="AutomatedRelease" />
+      <property name="OutDir" value="..\..\${dir.bin}\\" />
+    </msbuild>
+  </target>
+
+  <target name="package-bin">
+    <mkdir dir="${path.dist}" if="${not(directory::exists(path.dist))}"/>
+    <zip zipfile="${path.dist}\${product.name}-${major.version}-${build.config}-${build.platform}.zip" ziplevel="9">
+      <fileset basedir="${dir.bin}">
+        <include name="**/*.*"/>
+      </fileset>
+    </zip>
+  </target>
+
+  <target name="package-source">
+    <mkdir dir="${path.dist}" if="${not(directory::exists(path.dist))}"/>
+    <zip zipfile="${path.dist}\${product.name}-${major.version}-source.zip" ziplevel="9">
+      <fileset basedir="${path.base}">
+        <include name="lib/*.*"/>
+        <include name="**/*.cs"/>
+        <include name="**/*.csproj"/>
+        <include name="**/*.sln"/>
+        <include name="**/*.txt"/>
+        <include name="**/*.build"/>
+        <include name="**/*.include"/>
+        <include name="**/*.snk"/>
+      </fileset>
+    </zip>
+  </target>
+
+  <target name="package-sample">
+    <mkdir dir="${path.dist}" if="${not(directory::exists(path.dist))}"/>
+    <zip zipfile="${path.dist}\${product.name}-${major.version}-sample.zip" ziplevel="9">
+      <fileset basedir="${dir.sample}">
+        <include name="**/*.*"/>
+      </fileset>
+    </zip>
+  </target>
+  -->
+</Project>
