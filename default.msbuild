@@ -6,40 +6,90 @@
     <pathbase>$(MSBuildProjectDirectory)</pathbase>
     <productname>fluentmigrator</productname>
     <builddir>build</builddir>
+    <buildlibs>$(pathbase)\tools\MSBuild</buildlibs>
+    <sourcedir>$(pathbase)\src</sourcedir>
     <dirsample>$(MSBuildProjectDirectory)\src\FluentMigrator.Example</dirsample>
     <pathdist>dist</pathdist>
     <buildplatform>net-3.5</buildplatform>
     <buildconfig>release</buildconfig>
-    <majorversion>1.0</majorversion>
-    <completeversion>$(majorversion).0.${build.number}</completeversion>
+    <majorversion>1</majorversion>
+    <minorversion>0</minorversion>
+
+    <PropertyGroup>
+      <Configuration Condition="$(Configuration)==''">Release</Configuration>
+      <Platform>Any CPU</Platform>
+    </PropertyGroup>
   </PropertyGroup>
 
   <!-- Deletes the output folders for a clean build -->
-  <Target Name="Clean">
+  <Target Name="_Clean">
     <Message Text="Removing old build Files" />
     <RemoveDir Directories="$(builddir)" />
   </Target>
+  
+  <!-- Update Assembly Version Files -->
+  <UsingTask TaskName="MSBuild.ExtensionPack.Framework.AssemblyInfo" AssemblyFile="$(buildlibs)\MSBuild.ExtensionPack.dll"/>
+  <Target Name="_VersionUpdate" DependsOnTargets="_Clean">
+    <ItemGroup>
+      <AssemblyInfoFiles Include="$(sourcedir)\**\AssemblyInfo.cs" />
+    </ItemGroup>
+    <!--
+            AssemblyBuildNumberFormat=""
+            AssemblyRevisionType="$(AssemblyRevisionType)"
+            AssemblyRevisionFormat="$(AssemblyRevisionFormat)"   
 
-  <!-- Generates the AssemblyInfo.cs -->
+            AssemblyFileBuildNumberFormat="YYMM"
+            AssemblyFileRevisionType="$(AssemblyFileRevisionType)"
+            AssemblyFileRevisionFormat="$(AssemblyFileRevisionFormat)"  
+      -->
+    <MSBuild.ExtensionPack.Framework.AssemblyInfo AssemblyInfoFiles="@(AssemblyInfoFiles)"
+          
+          AssemblyMajorVersion="$(majorversion)"
+          AssemblyMinorVersion="$(minorversion)"
+          AssemblyBuildNumberType="Julian"
+          AssemblyRevisionType="NoIncrement"
+          AssemblyRevision="$(RevisionNumber)"
+ 
+                                                  
+          AssemblyFileMajorVersion="$(majorversion)"
+          AssemblyFileMinorVersion="$(minorversion)"
+          AssemblyFileBuildNumberType="Julian"
+          AssemblyFileRevisionType="NoIncrement"
+          AssemblyFileRevision="$(RevisionNumber)"
+                                                  
+          AssemblyCompany="FluentMigrator Project"
+          AssemblyCopyright="© FluentMigrator Project - All rights reserved"
+          AssemblyProduct="FluentMigrator"
+          AssemblyTitle="FluentMigrator"
+          
+        
+                                                    >
+      <Output TaskParameter="MaxAssemblyVersion" PropertyName="MaxAssemblyVersion"/>
+    </MSBuild.ExtensionPack.Framework.AssemblyInfo>
+  </Target>
+
+  <!-- Build for running the tests -->
+  <Target Name="Build" DependsOnTargets="_VersionUpdate">
+    <ItemGroup>
+      <ProjectReferences Include="$(MSBuildProjectDirectory)\*.sln" />
+    </ItemGroup>
+
+    <MSBuild Projects="@(ProjectReferences)" Properties="Configuration=Debug;Platform=$(Platform);" />
+  </Target>
+  
+  <!-- Clean the build and then Rebuild for release -->
+
+  <Target Name="_Build" DependsOnTargets="_Clean">
+    <ItemGroup>
+      <ProjectReferences Include="$(MSBuildProjectDirectory)\*.sln" />
+    </ItemGroup>
+
+    <MSBuild Projects="@(ProjectReferences)" Properties="Configuration=$(Configuration);Platform=$(Platform);" />
+  </Target>
+  
+  <!-- Package the binaries -->
   <!--
-  <target name="GenerateVersion" DependsOnTargets="Clean">
-    <asminfo output="${path.base}\src\SolutionInfo.cs" language="CSharp">
-      <attributes>
-        <attribute type="System.Reflection.AssemblyProductAttribute" value="FluentMigrator" />
-        <attribute type="System.Reflection.AssemblyVersionAttribute" value="${complete.version}"/>
-        <attribute type="System.Reflection.AssemblyCopyrightAttribute" value="Copyright - Sean Chambers 2008-2010" />
-        <attribute type="System.Reflection.AssemblyConfigurationAttribute" value="${build.config}" />
-      </attributes>
-    </asminfo>
-  </target>
-
-  <target name="build" description="Builds the app" depends="generate-version">
-    <msbuild project="FluentMigrator (2010).sln">
-      <property name="Configuration" value="AutomatedRelease" />
-      <property name="OutDir" value="..\..\${dir.bin}\\" />
-    </msbuild>
-  </target>
-
+  
   <target name="package-bin">
     <mkdir dir="${path.dist}" if="${not(directory::exists(path.dist))}"/>
     <zip zipfile="${path.dist}\${product.name}-${major.version}-${build.config}-${build.platform}.zip" ziplevel="9">
