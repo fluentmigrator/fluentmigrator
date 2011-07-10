@@ -14,24 +14,24 @@
     <buildconfig>release</buildconfig>
     <majorversion>1</majorversion>
     <minorversion>0</minorversion>
-
-    <PropertyGroup>
-      <Configuration Condition="$(Configuration)==''">Release</Configuration>
-      <Platform>Any CPU</Platform>
-    </PropertyGroup>
   </PropertyGroup>
-
+  
+  <PropertyGroup>
+    <Configuration Condition="$(Configuration)==''">Release</Configuration>
+    <Platform>Any CPU</Platform>
+  </PropertyGroup>
+  
   <!-- Deletes the output folders for a clean build -->
-  <Target Name="_Clean">
+  <Target Name="_Clean" Condition="Exists($(builddir))">
     <Message Text="Removing old build Files" />
-    <RemoveDir Directories="$(builddir)" />
+    <RemoveDir Directories="$(builddir)"  />
   </Target>
   
   <!-- Update Assembly Version Files -->
   <UsingTask TaskName="MSBuild.ExtensionPack.Framework.AssemblyInfo" AssemblyFile="$(buildlibs)\MSBuild.ExtensionPack.dll"/>
   <Target Name="_VersionUpdate" DependsOnTargets="_Clean">
     <ItemGroup>
-      <AssemblyInfoFiles Include="$(sourcedir)\**\AssemblyInfo.cs" />
+      <AssemblyInfoFiles Include="$(sourcedir)\SolutionInfo.cs" />
     </ItemGroup>
     <!--
             AssemblyBuildNumberFormat=""
@@ -55,15 +55,7 @@
           AssemblyFileMinorVersion="$(minorversion)"
           AssemblyFileBuildNumberType="Julian"
           AssemblyFileRevisionType="NoIncrement"
-          AssemblyFileRevision="$(RevisionNumber)"
-                                                  
-          AssemblyCompany="FluentMigrator Project"
-          AssemblyCopyright="© FluentMigrator Project - All rights reserved"
-          AssemblyProduct="FluentMigrator"
-          AssemblyTitle="FluentMigrator"
-          
-        
-                                                    >
+          AssemblyFileRevision="$(RevisionNumber)"                                        >
       <Output TaskParameter="MaxAssemblyVersion" PropertyName="MaxAssemblyVersion"/>
     </MSBuild.ExtensionPack.Framework.AssemblyInfo>
   </Target>
