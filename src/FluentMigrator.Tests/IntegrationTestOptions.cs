@@ -6,7 +6,7 @@
 															{
 																ConnectionString =
                                                                     @"server=.\SQLEXPRESS;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator",
-																IsEnabled = false
+																IsEnabled = true
 															};
 
 		public static DatabaseServerOptions SqlLite = new DatabaseServerOptions
@@ -20,7 +20,7 @@
 														{
 															ConnectionString =
 																@"Database=FluentMigrator;Data Source=localhost;User Id=root;Password=;",
-															IsEnabled = false
+															IsEnabled = true
 														};
 
 	    public static DatabaseServerOptions Postgres = new DatabaseServerOptions
