@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>FluentMigrator</name>
+    </assembly>
+    <members>
+        <member name="M:FluentMigrator.Builders.Delete.IDeleteExpressionRoot.Index(System.String)">
+            <summary>
+            Deletes an index
+            </summary>
+            <param name="indexName">the name of the index</param>
+            <returns></returns>
+        </member>
+        <member name="M:FluentMigrator.Builders.Delete.IDeleteExpressionRoot.Index">
+            <summary>
+            Deletes an index, based on the naming convention in effect
+            </summary>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
