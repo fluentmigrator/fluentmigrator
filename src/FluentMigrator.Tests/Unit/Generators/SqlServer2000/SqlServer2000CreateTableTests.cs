@@ -5,6 +5,8 @@ using System.Text;
 using NUnit.Framework;
 using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Should;
+using System.Data;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Expressions;
 
@@ -41,6 +43,22 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var sql = generator.Generate(expression);
             sql.ShouldBe(
                 "CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] [timestamp] NOT NULL, PRIMARY KEY ([TestColumn1]))");
+        }
+
+        [Test]
+        public void CanCreateTableWithGetDateDefault()
+        {
+            ColumnDefinition column = new ColumnDefinition
+            {
+                Name = "TestColumn1",
+                Type = DbType.String,
+                Size = 5,
+                DefaultValue = "GetDate()"
+            };
+            var expression = new CreateTableExpression { TableName = "TestTable1" };
+            expression.Columns.Add(column);
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(5) NOT NULL DEFAULT GetDate())");
         }
 
         [Test]
