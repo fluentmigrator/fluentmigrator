@@ -22,7 +22,7 @@ namespace FluentMigrator.Runner.Initialization.AssemblyLoader
 	{
 		public static IAssemblyLoader GetAssemblyLoader(string name)
 		{
-			if (name.ToLower().Contains(".dll"))
+			if (name.ToLower().Contains(".dll") || name.ToLower().Contains(".exe"))
 			{
 				return new AssemblyLoaderFromFile(name);
 			}
