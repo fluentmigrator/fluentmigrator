@@ -10,55 +10,24 @@ namespace FluentMigrator.Runner.Initialization
 	/// </summary>
 	internal class NetConfigManager
 	{
-		private string version;
+		private string configPath;
 
-		public NetConfigManager(string version)
+		public NetConfigManager(string configPath)
 		{
-			this.version = version;
+			ConfigPath = configPath;
 		}
 
-		internal string ConfigPath
+		public string ConfigPath
 		{
 			get
 			{
-				if (string.IsNullOrEmpty(version))
-					return null;
+				if (!string.IsNullOrEmpty(configPath))
+					return configPath;
 				else
-				{
-					bool is64bit = IntPtr.Size == 8;
-					string _64 = is64bit? "64" : "";
-					string windir = Environment.GetEnvironmentVariable("windir");
-					switch(version)
-					{
-						case "2":
-						case "2.0":
-						case "2.0.50727":
-							return NullifyIfNotExists(string.Format(@"{1}\Microsoft.NET\Framework{0}\v2.0.50727\CONFIG\machine.config", _64, windir));
-
-						case "3":
-						case "3.0":
-							return NullifyIfNotExists(string.Format(@"{1}\Microsoft.NET\Framework{0}\v3.0\CONFIG\machine.config", _64, windir));
-
-						case "3.5":
-							return NullifyIfNotExists(string.Format(@"{1}\Microsoft.NET\Framework{0}\v3.5\CONFIG\machine.config", _64, windir));
-
-						case "4":
-						case "4.0":
-						case "4.0.30319":
-							return NullifyIfNotExists(string.Format(@"{1}\Microsoft.NET\Framework{0}\v4.0.30319\CONFIG\machine.config", _64, windir));
-
-						default:
-							throw new ArgumentException(string.Format("Couldn't deceipher .NET version {0}", version));
-					}
-				}
+					// returning null will force the usage of the machine config that is currently in memory
+					return null;
 			}
-		}
-
-		private string NullifyIfNotExists(string path)
-		{
-			if (File.Exists(path))
-				return path;
-			else return null;
+			set { configPath = value; }
 		}
 
 		public string GetConnectionString(string named)
@@ -66,7 +35,10 @@ namespace FluentMigrator.Runner.Initialization
 			var path = ConfigPath;
 			if (path != null)
 			{
-				Console.WriteLine("Using config " + path);
+				if (!File.Exists(path))
+					throw new FileNotFoundException("The config file specified could not be found", path);
+
+				Console.WriteLine(string.Format("Using config '{0}'", path));
 				var c = new XmlDocument();
 				c.Load(path);
 				var xpath = string.Format("//connectionStrings/add[@name='{0}']/@connectionString", named);

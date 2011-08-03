@@ -34,7 +34,7 @@ namespace FluentMigrator.Runner.Initialization
 		public string WorkingDirectory { get; set; }
 		public string Profile { get; set; }
 		public int Timeout { get; set; }
-		public string DotNetVersion { get; set; }
+		public string ConnectionStringConfigPath { get; set; }
 
 		public IAnnouncer Announcer
 		{
@@ -48,7 +48,7 @@ namespace FluentMigrator.Runner.Initialization
 		{
 			if (!string.IsNullOrEmpty(connectionStringName))
 			{
-				var manager = new NetConfigManager(DotNetVersion);
+				var manager = new NetConfigManager(ConnectionStringConfigPath);
 				Connection = manager.GetConnectionString(connectionStringName);
 			}
 		}
