@@ -45,7 +45,7 @@ namespace FluentMigrator.Console
 		public string Profile;
 		public int Timeout;
 		public bool ShowHelp;
-		public string DotNetVersion;
+		public string ConnectionStringConfigPath;
 
 		static void DisplayHelp( OptionSet p )
 		{
@@ -107,14 +107,14 @@ namespace FluentMigrator.Console
 					},
 					{
 						"connectionStringName=|connectionName=|C=",
-						"The name of the connection string named in machine config. Use --dotNetVersion to specify which .NET framework version you are using for configuration",
+						"The name of the connection string named in machine config. Use --connectionStringConfigPath to specify where the machine.config lives",
 						v => { ConnectionStringName = v; }
 					},
 					{
-						"dotNetVersion=",
-						string.Format("The version of .NET Framework that you want to use for machine configuration. Used in conjunction with --connectionStringName. This "
-							+ "will use Framework64 only if this process is running as 64-bit (which it {0})", (IntPtr.Size == 8)? "is" : "isn't"),
-						v => { DotNetVersion = v; }
+						"connectionStringConfigPath=|configPath=",
+						string.Format("The path of the machine.config where the connection string named by connectionStringName"+
+							" is found. If not specified, it defaults to the machine.config used by the currently running CLR version"),
+						v => { ConnectionStringConfigPath = v; }
 					},
 					{
 						"namespace=|ns=",
@@ -275,7 +275,7 @@ namespace FluentMigrator.Console
 				WorkingDirectory = WorkingDirectory,
 				Profile = Profile,
 				Timeout = Timeout,
-				DotNetVersion = DotNetVersion,
+				ConnectionStringConfigPath = ConnectionStringConfigPath,
 			};
 			runnerContext.UseConnectionName(ConnectionStringName);
 
