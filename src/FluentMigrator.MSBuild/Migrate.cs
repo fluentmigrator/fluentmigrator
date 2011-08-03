@@ -70,6 +70,8 @@ namespace FluentMigrator.MSBuild
 
         public string WorkingDirectory { get; set; }
 
+        public string Profile { get; set; }
+
         public override bool Execute()
         {
             
@@ -102,7 +104,8 @@ namespace FluentMigrator.MSBuild
                 Task = Task,
                 Version = Version,
                 Steps = Steps,
-                WorkingDirectory = WorkingDirectory
+                WorkingDirectory = WorkingDirectory,
+                Profile = Profile 
             };
 
             Log.LogCommandLine(MessageImportance.Low, "Executing Migration Runner");
