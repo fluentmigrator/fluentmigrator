@@ -31,7 +31,7 @@ namespace FluentMigrator.Runner
 	    private VersionInfo _versionInfo;
 		public IMigrationRunner Runner { get; set; }
 		protected Assembly Assembly { get; set; }
-		public IVersionTableMetaData VersionTableMetaData { get; set; }
+		public IVersionTableMetaData VersionTableMetaData { get; private set; }
 		private IMigrationConventions Conventions { get; set; }
 		private IMigrationProcessor Processor { get; set; }
 		private IMigration VersionMigration { get; set; }
