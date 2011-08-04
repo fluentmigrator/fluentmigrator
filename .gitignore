@@ -17,3 +17,7 @@ packages/FluentMigrator/
 _UpgradeReport_Files
 UpgradeLog.XML
 *.bak
+pulls/*.patch
+src/*.vs10x
+*.vs10x
+src/FluentMigrator.Tests/FluentMigrator.VisualState.xml
