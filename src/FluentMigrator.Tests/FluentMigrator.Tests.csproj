@@ -142,6 +142,7 @@
     <Compile Include="Integration\Migrations\Nested\Group1\AnotherFromGroup1.cs" />
     <Compile Include="Integration\Migrations\Nested\Group1\FromGroup1.cs" />
     <Compile Include="Integration\Migrations\Nested\Group2\FromGroup2.cs" />
+    <Compile Include="Integration\Migrations\Nested\NotGrouped.cs" />
     <Compile Include="Integration\PerformDBOperationTests.cs" />
     <Compile Include="Integration\IntegrationTestBase.cs" />
     <Compile Include="Integration\MigrationRunnerTests.cs" />
