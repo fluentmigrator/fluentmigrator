@@ -34,10 +34,23 @@ namespace FluentMigrator.Runner.Initialization
 		public string WorkingDirectory { get; set; }
 		public string Profile { get; set; }
 		public int Timeout { get; set; }
+		public string ConnectionStringConfigPath { get; set; }
 
 		public IAnnouncer Announcer
 		{
 			get; set;
+		}
+
+		/// <summary>
+		/// Uses a connection string named in the connectionStrings portion of the machine.config or app.config
+		/// </summary>
+		public void UseConnectionName(string connectionStringName)
+		{
+			if (!string.IsNullOrEmpty(connectionStringName))
+			{
+				var manager = new NetConfigManager(ConnectionStringConfigPath);
+				Connection = manager.GetConnectionString(connectionStringName);
+			}
 		}
 
 		public IStopWatch StopWatch
