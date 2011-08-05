@@ -48,7 +48,7 @@ namespace FluentMigrator.Runner.Initialization
 		{
 			if (!string.IsNullOrEmpty(connectionStringName))
 			{
-				var manager = new NetConfigManager(ConnectionStringConfigPath);
+				var manager = new NetConfigManager(ConnectionStringConfigPath, Target);
 				Connection = manager.GetConnectionString(connectionStringName);
 			}
 		}
