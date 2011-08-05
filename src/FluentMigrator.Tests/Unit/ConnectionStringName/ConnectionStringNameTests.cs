@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 
-namespace FluentMigrator.Tests.Unit
+namespace FluentMigrator.Tests.Unit.ConnectionStringName
 {
 	[TestFixture]
 	class ConnectionStringNameTests
