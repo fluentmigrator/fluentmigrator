@@ -290,6 +290,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Unit\ConnectionStringName\Fixtures\WithConnectionString.config" />
+    <None Include="Unit\ConnectionStringName\Fixtures\WithWrongConnectionString.config" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
