@@ -45,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.ConnectionStringName
 		[Test]
 		public void ItTriesAppConfigSecond()
 		{
-			var sut = new NetConfigManager("non-existent.config", "WithConnectionString.exe");
+			var sut = new NetConfigManager(null, GetPath("WithConnectionString.exe"));
 			var result = sut.GetConnectionString(CONNECTION_NAME);
 			Assert.That(result, Is.EqualTo("From App Config"));
 		}
@@ -53,13 +53,17 @@ namespace FluentMigrator.Tests.Unit.ConnectionStringName
 		[Test]
 		public void ItFailsSilentlyOnMissingAppConfig()
 		{
-
+			var sut = new NetConfigManager(null, GetPath("WithNoConfig.exe"));
+			Assert.Throws<ArgumentException>(() =>
+				sut.GetConnectionString(CONNECTION_NAME));
 		}
 
 		[Test]
 		public void ItFailsSilentlyOnMissingAppConfigConnectionString()
 		{
-
+			var sut = new NetConfigManager(null, GetPath("WithNoConnectionString.exe"));
+			Assert.Throws<ArgumentException>(() =>
+				sut.GetConnectionString(CONNECTION_NAME));
 		}
 
 		// TODO: figure out how to test machine.config settings

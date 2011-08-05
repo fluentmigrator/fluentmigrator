@@ -30,6 +30,7 @@ namespace FluentMigrator.Runner.Initialization
 				var cs = GetConnectionStringFromPath(named, ConfigPath);
 				if (cs != null)
 					return cs;
+				else throw new ArgumentException("Couldn't find connection string in app config even though it was specified");
 			}
 
 			if (!string.IsNullOrEmpty(AssemblyPath))
@@ -45,7 +46,12 @@ namespace FluentMigrator.Runner.Initialization
 
 			// if all above failed, just use .NET's native mechanism, which includes `machine.config`
 			var connection = ConfigurationManager.ConnectionStrings[named];
-			return GetConnectionString(named, connection);
+			var ret = GetConnectionString(named, connection);
+
+			if (ret == null)
+				throw new ArgumentException("Couldn't find the connection string in app.config or machine.config. Try specifying a path to connection string explicitly");
+
+			return ret;
 		}
 
 		private static string GetConnectionStringFromPath(string named, string path)
@@ -66,7 +72,7 @@ namespace FluentMigrator.Runner.Initialization
 		{
 			if (connection != null && !string.IsNullOrEmpty(connection.ConnectionString))
 				return connection.ConnectionString;
-			else throw new ArgumentException("Could not find connection string named by " + named);
+			else return null; 
 		}
 	}
 }
