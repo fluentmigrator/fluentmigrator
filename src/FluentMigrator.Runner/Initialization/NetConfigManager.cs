@@ -8,7 +8,7 @@ namespace FluentMigrator.Runner.Initialization
 	/// <summary>
 	/// Understands the surrounding environment and delivers the proper environment settings
 	/// </summary>
-	internal class NetConfigManager
+	public class NetConfigManager
 	{
 
 		public NetConfigManager(string configPath, string targetAssemblyPath)
