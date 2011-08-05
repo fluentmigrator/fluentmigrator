@@ -45,7 +45,9 @@ namespace FluentMigrator.Tests.Unit.ConnectionStringName
 		[Test]
 		public void ItTriesAppConfigSecond()
 		{
-
+			var sut = new NetConfigManager("non-existent.config", "WithConnectionString.exe");
+			var result = sut.GetConnectionString(CONNECTION_NAME);
+			Assert.That(result, Is.EqualTo("From App Config"));
 		}
 
 		[Test]

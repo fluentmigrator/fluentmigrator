@@ -290,6 +290,8 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Unit\ConnectionStringName\Fixtures\WithConnectionString.config" />
+    <None Include="Unit\ConnectionStringName\Fixtures\WithConnectionString.exe.config" />
+    <None Include="Unit\ConnectionStringName\Fixtures\WithNoConnectionString.exe.config" />
     <None Include="Unit\ConnectionStringName\Fixtures\WithWrongConnectionString.config" />
   </ItemGroup>
   <ItemGroup>
