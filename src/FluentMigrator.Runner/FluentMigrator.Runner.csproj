@@ -194,7 +194,7 @@
     <Compile Include="Initialization\AssemblyLoader\AssemblyLoaderFromName.cs" />
     <Compile Include="Initialization\AssemblyLoader\IAssemblyLoader.cs" />
     <Compile Include="Initialization\IRunnerContext.cs" />
-    <Compile Include="Initialization\NetConfigManager.cs" />
+    <Compile Include="Initialization\ConnectionString\NetConfigManager.cs" />
     <Compile Include="Initialization\RunnerContext.cs" />
     <Compile Include="Initialization\TaskExecutor.cs" />
     <Compile Include="IProfileLoader.cs" />
