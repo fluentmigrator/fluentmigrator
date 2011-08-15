@@ -61,7 +61,7 @@ namespace FluentMigrator.Runner
             ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
         }
 
-        public VersionLoader VersionLoader { get; set; }
+        public IVersionLoader VersionLoader { get; set; }
 
         public void ApplyProfiles()
         {

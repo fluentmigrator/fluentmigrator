@@ -17,6 +17,9 @@
 #endregion
 
 using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -27,8 +30,6 @@ using FluentMigrator.Tests.Integration.Migrations;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
-using System.Collections;
-using System.Collections.Generic;
 
 namespace FluentMigrator.Tests.Unit
 {
@@ -43,6 +44,7 @@ namespace FluentMigrator.Tests.Unit
         private Mock<IMigrationLoader> _migrationLoaderMock;
         private Mock<IProfileLoader> _profileLoaderMock;
         private Mock<IRunnerContext> _runnerContextMock;
+        private Mock<IVersionLoader> _versionLoaderMock;
         private SortedList<long, IMigration> _migrationList;
 
         [SetUp]
@@ -53,6 +55,8 @@ namespace FluentMigrator.Tests.Unit
             _processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
             _migrationLoaderMock = new Mock<IMigrationLoader>(MockBehavior.Loose);
             _profileLoaderMock = new Mock<IProfileLoader>(MockBehavior.Loose);
+            _versionLoaderMock = new Mock<IVersionLoader>(MockBehavior.Loose);
+
             _announcer = new Mock<IAnnouncer>();
             _stopWatch = new Mock<IStopWatch>();
 
@@ -70,11 +74,14 @@ namespace FluentMigrator.Tests.Unit
             _runnerContextMock.SetupGet(x => x.Database).Returns("sqlserver");
 
             _migrationLoaderMock.SetupGet(x => x.Migrations).Returns(_migrationList);
+            _versionLoaderMock.SetupGet(x => x.AlreadyCreatedVersionSchema).Returns(true);
+            _versionLoaderMock.SetupGet(x => x.AlreadyCreatedVersionTable).Returns(true);
 
             _runner = new MigrationRunner(Assembly.GetAssembly(typeof(MigrationRunnerTests)), _runnerContextMock.Object, _processorMock.Object)
                         {
                             MigrationLoader = _migrationLoaderMock.Object,
-                            ProfileLoader = _profileLoaderMock.Object
+                            ProfileLoader = _profileLoaderMock.Object,
+                            VersionLoader = _versionLoaderMock.Object
                         };
         }
 
@@ -188,6 +195,28 @@ namespace FluentMigrator.Tests.Unit
         public void LoadsCorrectCallingAssembly()
         {
             _runner.MigrationAssembly.ShouldBe(Assembly.GetAssembly(typeof(MigrationRunnerTests)));
+        }
+
+        [Test]
+        public void RollbackOnlyOneStepsOfTwoShouldNotDeleteVersionInfoTable()
+        {
+            long fakeMigrationVersion = 2009010101;
+            long fakeMigrationVersion2 = 2009010102;
+
+            _runner.MigrationLoader.Migrations.Add(fakeMigrationVersion, new TestMigration());
+            _runner.MigrationLoader.Migrations.Add(fakeMigrationVersion2, new TestMigration());
+
+            _runner.VersionLoader.VersionInfo.AddAppliedMigration(fakeMigrationVersion);
+            _runner.VersionLoader.VersionInfo.AddAppliedMigration(fakeMigrationVersion2);
+
+
+            var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
+
+            _runner.Rollback(1);
+
+            _runner.VersionLoader.LoadVersionInfo();
+
+            _runner.VersionLoader.VersionInfo.AppliedMigrations().Count().ShouldBe(1);
         }
 
         [Test]
