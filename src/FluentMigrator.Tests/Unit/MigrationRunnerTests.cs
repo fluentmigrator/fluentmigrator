@@ -27,268 +27,293 @@ using FluentMigrator.Tests.Integration.Migrations;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace FluentMigrator.Tests.Unit
 {
-	[TestFixture]
-	public class MigrationRunnerTests
-	{
-		private MigrationRunner _runner;
-		private Mock<IAnnouncer> _announcer;
-		private Mock<IStopWatch> _stopWatch;
+    [TestFixture]
+    public class MigrationRunnerTests
+    {
+        private MigrationRunner _runner;
+        private Mock<IAnnouncer> _announcer;
+        private Mock<IStopWatch> _stopWatch;
 
-		private Mock<IMigrationProcessor> _processorMock;
-		private Mock<IMigrationLoader> _migrationLoaderMock;
-		private Mock<IProfileLoader> _profileLoaderMock;
-		private Mock<IRunnerContext> _runnerContextMock;
+        private Mock<IMigrationProcessor> _processorMock;
+        private Mock<IMigrationLoader> _migrationLoaderMock;
+        private Mock<IProfileLoader> _profileLoaderMock;
+        private Mock<IRunnerContext> _runnerContextMock;
+        private SortedList<long, IMigration> _migrationList;
 
-		[SetUp]
-		public void SetUp()
-		{
-			_runnerContextMock = new Mock<IRunnerContext>(MockBehavior.Loose);
-			_processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
-			_migrationLoaderMock = new Mock<IMigrationLoader>(MockBehavior.Loose);
-			_profileLoaderMock = new Mock<IProfileLoader>(MockBehavior.Loose);
-			_announcer = new Mock<IAnnouncer>();
-			_stopWatch = new Mock<IStopWatch>();
+        [SetUp]
+        public void SetUp()
+        {
+            _migrationList = new SortedList<long, IMigration>();
+            _runnerContextMock = new Mock<IRunnerContext>(MockBehavior.Loose);
+            _processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
+            _migrationLoaderMock = new Mock<IMigrationLoader>(MockBehavior.Loose);
+            _profileLoaderMock = new Mock<IProfileLoader>(MockBehavior.Loose);
+            _announcer = new Mock<IAnnouncer>();
+            _stopWatch = new Mock<IStopWatch>();
 
-			var options = new ProcessorOptions
-							{
-								PreviewOnly = true
-							};
-			_processorMock.SetupGet(x => x.Options).Returns(options);
+            var options = new ProcessorOptions
+                            {
+                                PreviewOnly = true
+                            };
+            _processorMock.SetupGet(x => x.Options).Returns(options);
 
-			_runnerContextMock.SetupGet(x => x.Namespace).Returns("FluentMigrator.Tests.Integration.Migrations");
-			_runnerContextMock.SetupGet(x => x.Announcer).Returns(_announcer.Object);
-			_runnerContextMock.SetupGet(x => x.StopWatch).Returns(_stopWatch.Object);
-			_runnerContextMock.SetupGet(x => x.Target).Returns(Assembly.GetExecutingAssembly().ToString());
-			_runnerContextMock.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
-			_runnerContextMock.SetupGet(x => x.Database).Returns("sqlserver");
+            _runnerContextMock.SetupGet(x => x.Namespace).Returns("FluentMigrator.Tests.Integration.Migrations");
+            _runnerContextMock.SetupGet(x => x.Announcer).Returns(_announcer.Object);
+            _runnerContextMock.SetupGet(x => x.StopWatch).Returns(_stopWatch.Object);
+            _runnerContextMock.SetupGet(x => x.Target).Returns(Assembly.GetExecutingAssembly().ToString());
+            _runnerContextMock.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
+            _runnerContextMock.SetupGet(x => x.Database).Returns("sqlserver");
 
-			_runner = new MigrationRunner(Assembly.GetAssembly( typeof( MigrationRunnerTests ) ), _runnerContextMock.Object, _processorMock.Object)
-			          	{
-			          		MigrationLoader = _migrationLoaderMock.Object,
-			          		ProfileLoader = _profileLoaderMock.Object
-			          	};
-		}
+            _migrationLoaderMock.SetupGet(x => x.Migrations).Returns(_migrationList);
 
-		[Test]
-		public void CanAnnounceUp()
-		{
-			_announcer.Setup(x => x.Heading(It.IsRegex(containsAll("Test", "migrating"))));
-			_runner.Up(new TestMigration());
-			_announcer.VerifyAll();
-		}
+            _runner = new MigrationRunner(Assembly.GetAssembly(typeof(MigrationRunnerTests)), _runnerContextMock.Object, _processorMock.Object)
+                        {
+                            MigrationLoader = _migrationLoaderMock.Object,
+                            ProfileLoader = _profileLoaderMock.Object
+                        };
+        }
 
-		[Test]
-		public void CanAnnounceUpFinish()
-		{
-			_announcer.Setup(x => x.Say(It.IsRegex(containsAll("Test", "migrated"))));
-			_runner.Up(new TestMigration());
-			_announcer.VerifyAll();
-		}
+        [Test]
+        public void CanAnnounceUp()
+        {
+            _announcer.Setup(x => x.Heading(It.IsRegex(containsAll("Test", "migrating"))));
+            _runner.Up(new TestMigration());
+            _announcer.VerifyAll();
+        }
 
-		[Test]
-		public void CanAnnounceDown()
-		{
-			_announcer.Setup(x => x.Heading(It.IsRegex(containsAll("Test", "reverting"))));
-			_runner.Down(new TestMigration());
-			_announcer.VerifyAll();
-		}
+        [Test]
+        public void CanAnnounceUpFinish()
+        {
+            _announcer.Setup(x => x.Say(It.IsRegex(containsAll("Test", "migrated"))));
+            _runner.Up(new TestMigration());
+            _announcer.VerifyAll();
+        }
 
-		[Test]
-		public void CanAnnounceDownFinish()
-		{
-			_announcer.Setup(x => x.Say(It.IsRegex(containsAll("Test", "reverted"))));
-			_runner.Down(new TestMigration());
-			_announcer.VerifyAll();
-		}
+        [Test]
+        public void CanAnnounceDown()
+        {
+            _announcer.Setup(x => x.Heading(It.IsRegex(containsAll("Test", "reverting"))));
+            _runner.Down(new TestMigration());
+            _announcer.VerifyAll();
+        }
 
-		[Test]
-		public void CanAnnounceUpElapsedTime()
-		{
-			var ts = new TimeSpan(0, 0, 0, 1, 3);
-			_announcer.Setup(x => x.ElapsedTime(It.Is<TimeSpan>(y => y == ts)));
+        [Test]
+        public void CanAnnounceDownFinish()
+        {
+            _announcer.Setup(x => x.Say(It.IsRegex(containsAll("Test", "reverted"))));
+            _runner.Down(new TestMigration());
+            _announcer.VerifyAll();
+        }
 
-			_stopWatch.Setup(x => x.ElapsedTime()).Returns(ts);
+        [Test]
+        public void CanAnnounceUpElapsedTime()
+        {
+            var ts = new TimeSpan(0, 0, 0, 1, 3);
+            _announcer.Setup(x => x.ElapsedTime(It.Is<TimeSpan>(y => y == ts)));
 
-			_runner.Up(new TestMigration());
+            _stopWatch.Setup(x => x.ElapsedTime()).Returns(ts);
 
-			_announcer.VerifyAll();
-		}
+            _runner.Up(new TestMigration());
 
-		[Test]
-		public void CanAnnounceDownElapsedTime()
-		{
-			var ts = new TimeSpan(0, 0, 0, 1, 3);
-			_announcer.Setup(x => x.ElapsedTime(It.Is<TimeSpan>(y => y == ts)));
+            _announcer.VerifyAll();
+        }
 
-			_stopWatch.Setup(x => x.ElapsedTime()).Returns(ts);
+        [Test]
+        public void CanAnnounceDownElapsedTime()
+        {
+            var ts = new TimeSpan(0, 0, 0, 1, 3);
+            _announcer.Setup(x => x.ElapsedTime(It.Is<TimeSpan>(y => y == ts)));
 
-			_runner.Down(new TestMigration());
+            _stopWatch.Setup(x => x.ElapsedTime()).Returns(ts);
 
-			_announcer.VerifyAll();
-		}
+            _runner.Down(new TestMigration());
 
-		[Test]
-		public void CanReportExceptions()
-		{
-			_processorMock.Setup(x => x.Process(It.IsAny<CreateTableExpression>())).Throws(new Exception("Oops"));
+            _announcer.VerifyAll();
+        }
 
-			_announcer.Setup(x => x.Error(It.IsRegex(containsAll("Oops"))));
+        [Test]
+        public void CanReportExceptions()
+        {
+            _processorMock.Setup(x => x.Process(It.IsAny<CreateTableExpression>())).Throws(new Exception("Oops"));
 
-			try
-			{
-				_runner.Up(new TestMigration());
-			}
-			catch (Exception)
-			{
-			}
+            _announcer.Setup(x => x.Error(It.IsRegex(containsAll("Oops"))));
 
-			_announcer.VerifyAll();
-		}
+            try
+            {
+                _runner.Up(new TestMigration());
+            }
+            catch (Exception)
+            {
+            }
 
-		[Test]
-		public void CanSayExpression()
-		{
-			_announcer.Setup(x => x.Say(It.IsRegex(containsAll("CreateTable"))));
+            _announcer.VerifyAll();
+        }
 
-			_stopWatch.Setup(x => x.ElapsedTime()).Returns(new TimeSpan(0, 0, 0, 1, 3));
+        [Test]
+        public void CanSayExpression()
+        {
+            _announcer.Setup(x => x.Say(It.IsRegex(containsAll("CreateTable"))));
 
-			_runner.Up(new TestMigration());
+            _stopWatch.Setup(x => x.ElapsedTime()).Returns(new TimeSpan(0, 0, 0, 1, 3));
 
-			_announcer.VerifyAll();
-		}
+            _runner.Up(new TestMigration());
 
-		[Test]
-		public void CanTimeExpression()
-		{
-			var ts = new TimeSpan(0, 0, 0, 1, 3);
-			_announcer.Setup(x => x.ElapsedTime(It.Is<TimeSpan>(y => y == ts)));
+            _announcer.VerifyAll();
+        }
 
-			_stopWatch.Setup(x => x.ElapsedTime()).Returns(ts);
+        [Test]
+        public void CanTimeExpression()
+        {
+            var ts = new TimeSpan(0, 0, 0, 1, 3);
+            _announcer.Setup(x => x.ElapsedTime(It.Is<TimeSpan>(y => y == ts)));
 
-			_runner.Up(new TestMigration());
+            _stopWatch.Setup(x => x.ElapsedTime()).Returns(ts);
 
-			_announcer.VerifyAll();
-		}
+            _runner.Up(new TestMigration());
 
-		private string containsAll(params string[] words)
-		{
-			return ".*?" + string.Join(".*?", words) + ".*?";
-		}
+            _announcer.VerifyAll();
+        }
 
-		[Test]
-		public void LoadsCorrectCallingAssembly()
-		{
-			_runner.MigrationAssembly.ShouldBe(Assembly.GetAssembly(typeof(MigrationRunnerTests)));
-		}
+        private string containsAll(params string[] words)
+        {
+            return ".*?" + string.Join(".*?", words) + ".*?";
+        }
 
-		[Test]
-		public void RollbackToVersionZeroShouldDeleteVersionInfoTable()
-		{
-			var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
+        [Test]
+        public void LoadsCorrectCallingAssembly()
+        {
+            _runner.MigrationAssembly.ShouldBe(Assembly.GetAssembly(typeof(MigrationRunnerTests)));
+        }
 
-			_runner.RollbackToVersion(0);
-			
-			_processorMock.Verify(
-				pm => pm.Process(It.Is<DeleteTableExpression>(
-					dte => dte.TableName == versionInfoTableName)
-					)
-				);
-		}
+        [Test]
+        public void RollbackLastVersionShouldDeleteVersionInfoTable()
+        {
+            long fakeMigrationVersion = 2009010101;
+            _runner.MigrationLoader.Migrations.Add(fakeMigrationVersion, new TestMigration());
 
-		[Test]
-		public void RollbackToVersionZeroShouldNotCreateVersionInfoTableAfterRemoval()
-		{
-			var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
+            var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
 
-			_runner.RollbackToVersion(0);
+            _runner.Rollback(1);
 
-			//Should only be called once in setup
-			_processorMock.Verify(
-				pm => pm.Process(It.Is<CreateTableExpression>(
-					dte => dte.TableName == versionInfoTableName)
-					),
-					Times.Once()
-				);
-		}
+            _processorMock.Verify(
+                pm => pm.Process(It.Is<DeleteTableExpression>(
+                    dte => dte.TableName == versionInfoTableName)
+                    )
+                );
+        }
 
-		[Test]
-		public void RollbackToVersionShouldLoadVersionInfoIfVersionGreaterThanZero()
-		{
-			var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
+        [Test]
+        public void RollbackToVersionZeroShouldDeleteVersionInfoTable()
+        {
+            var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
 
-			_runner.RollbackToVersion(1);
+            _runner.RollbackToVersion(0);
 
-			_processorMock.Verify(
-				pm => pm.Process(It.Is<DeleteTableExpression>(
-					dte => dte.TableName == versionInfoTableName)
-					),
-					Times.Never()
-				);
+            _processorMock.Verify(
+                pm => pm.Process(It.Is<DeleteTableExpression>(
+                    dte => dte.TableName == versionInfoTableName)
+                    )
+                );
 
-			//Once in setup, once after rollback
-			_processorMock.Verify(
-				pm => pm.Process(It.Is<CreateTableExpression>(
-					dte => dte.TableName == versionInfoTableName)
-					),
-					Times.Exactly(2)
-				);
-		}
 
-		[Test,Ignore("Move to MigrationLoader tests")]
-		public void HandlesNullMigrationList()
-		{
-			//set migrations to return empty list
-//			var asm = Assembly.GetAssembly(typeof(MigrationVersionRunnerUnitTests));
-//			_migrationLoaderMock.Setup(x => x.FindMigrations(asm, null)).Returns<IEnumerable<Migration>>(null);
-//
-//			_runner.Migrations.Count.ShouldBe(0);
-//
-//			_vrunner.MigrateUp();
-//
-//			_migrationLoaderMock.VerifyAll();
-		}
+        }
 
-		[Test, ExpectedException(typeof(Exception))]
-		[Ignore("Move to migrationloader tests")]
-		public void ShouldThrowExceptionIfDuplicateVersionNumbersAreLoaded()
-		{
-//			_migrationLoaderMock.Setup(x => x.FindMigrationsIn(It.IsAny<Assembly>(), null)).Returns(new List<MigrationMetadata>
-//			                                                                         	{
-//			                                                                         		new MigrationMetadata {Version = 1, Type = typeof(UserToRole)},
-//			                                                                         		new MigrationMetadata {Version = 2, Type = typeof(FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass2.UserToRole)},
-//			                                                                         		new MigrationMetadata {Version = 2, Type = typeof(FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass2.UserToRole)}
-//			                                                                         	});
-//
-//			_vrunner.MigrateUp();
-		}
+        [Test]
+        public void RollbackToVersionZeroShouldNotCreateVersionInfoTableAfterRemoval()
+        {
+            var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
 
-		[Test]
-		[Ignore("Move to migrationloader tests")]
-		public void HandlesMigrationThatDoesNotInheritFromMigrationBaseClass()
-		{
-//			_migrationLoaderMock.Setup(x => x.FindMigrationsIn(It.IsAny<Assembly>(), null)).Returns(new List<MigrationMetadata>
-//			                                                                         	{
-//			                                                                         		new MigrationMetadata {Version = 1, Type = typeof(MigrationThatDoesNotInheritFromMigrationBaseClass)},
-//			                                                                         	});
-//
-//			_vrunner.Migrations[1].ShouldNotBeNull();
-//			_vrunner.Migrations[1].ShouldBeOfType<MigrationThatDoesNotInheritFromMigrationBaseClass>();
-		}
+            _runner.RollbackToVersion(0);
 
-		private class MigrationThatDoesNotInheritFromMigrationBaseClass : IMigration
-		{
-			public void GetUpExpressions(IMigrationContext context)
-			{
-				throw new NotImplementedException();
-			}
+            //Should only be called once in setup
+            _processorMock.Verify(
+                pm => pm.Process(It.Is<CreateTableExpression>(
+                    dte => dte.TableName == versionInfoTableName)
+                    ),
+                    Times.Once()
+                );
+        }
 
-			public void GetDownExpressions(IMigrationContext context)
-			{
-				throw new NotImplementedException();
-			}
-		}
-	}
+        [Test]
+        public void RollbackToVersionShouldLoadVersionInfoIfVersionGreaterThanZero()
+        {
+            var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
+
+            _runner.RollbackToVersion(1);
+
+            _processorMock.Verify(
+                pm => pm.Process(It.Is<DeleteTableExpression>(
+                    dte => dte.TableName == versionInfoTableName)
+                    ),
+                    Times.Never()
+                );
+
+            //Once in setup, once after rollback
+            _processorMock.Verify(
+                pm => pm.Process(It.Is<CreateTableExpression>(
+                    dte => dte.TableName == versionInfoTableName)
+                    ),
+                    Times.Exactly(2)
+                );
+        }
+
+        [Test, Ignore("Move to MigrationLoader tests")]
+        public void HandlesNullMigrationList()
+        {
+            //set migrations to return empty list
+            //			var asm = Assembly.GetAssembly(typeof(MigrationVersionRunnerUnitTests));
+            //			_migrationLoaderMock.Setup(x => x.FindMigrations(asm, null)).Returns<IEnumerable<Migration>>(null);
+            //
+            //			_runner.Migrations.Count.ShouldBe(0);
+            //
+            //			_vrunner.MigrateUp();
+            //
+            //			_migrationLoaderMock.VerifyAll();
+        }
+
+        [Test, ExpectedException(typeof(Exception))]
+        [Ignore("Move to migrationloader tests")]
+        public void ShouldThrowExceptionIfDuplicateVersionNumbersAreLoaded()
+        {
+            //			_migrationLoaderMock.Setup(x => x.FindMigrationsIn(It.IsAny<Assembly>(), null)).Returns(new List<MigrationMetadata>
+            //			                                                                         	{
+            //			                                                                         		new MigrationMetadata {Version = 1, Type = typeof(UserToRole)},
+            //			                                                                         		new MigrationMetadata {Version = 2, Type = typeof(FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass2.UserToRole)},
+            //			                                                                         		new MigrationMetadata {Version = 2, Type = typeof(FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass2.UserToRole)}
+            //			                                                                         	});
+            //
+            //			_vrunner.MigrateUp();
+        }
+
+        [Test]
+        [Ignore("Move to migrationloader tests")]
+        public void HandlesMigrationThatDoesNotInheritFromMigrationBaseClass()
+        {
+            //			_migrationLoaderMock.Setup(x => x.FindMigrationsIn(It.IsAny<Assembly>(), null)).Returns(new List<MigrationMetadata>
+            //			                                                                         	{
+            //			                                                                         		new MigrationMetadata {Version = 1, Type = typeof(MigrationThatDoesNotInheritFromMigrationBaseClass)},
+            //			                                                                         	});
+            //
+            //			_vrunner.Migrations[1].ShouldNotBeNull();
+            //			_vrunner.Migrations[1].ShouldBeOfType<MigrationThatDoesNotInheritFromMigrationBaseClass>();
+        }
+
+        private class MigrationThatDoesNotInheritFromMigrationBaseClass : IMigration
+        {
+            public void GetUpExpressions(IMigrationContext context)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void GetDownExpressions(IMigrationContext context)
+            {
+                throw new NotImplementedException();
+            }
+        }
+    }
 }
