@@ -30,6 +30,8 @@ using FluentMigrator.Tests.Integration.Migrations;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
+using FluentMigrator.Runner.Versioning;
+using System.Data;
 
 namespace FluentMigrator.Tests.Unit
 {
@@ -44,8 +46,8 @@ namespace FluentMigrator.Tests.Unit
         private Mock<IMigrationLoader> _migrationLoaderMock;
         private Mock<IProfileLoader> _profileLoaderMock;
         private Mock<IRunnerContext> _runnerContextMock;
-        private Mock<IVersionLoader> _versionLoaderMock;
         private SortedList<long, IMigration> _migrationList;
+        private TestVersionLoader _fakeVersionLoader;
 
         [SetUp]
         public void SetUp()
@@ -55,15 +57,15 @@ namespace FluentMigrator.Tests.Unit
             _processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
             _migrationLoaderMock = new Mock<IMigrationLoader>(MockBehavior.Loose);
             _profileLoaderMock = new Mock<IProfileLoader>(MockBehavior.Loose);
-            _versionLoaderMock = new Mock<IVersionLoader>(MockBehavior.Loose);
 
             _announcer = new Mock<IAnnouncer>();
             _stopWatch = new Mock<IStopWatch>();
 
             var options = new ProcessorOptions
                             {
-                                PreviewOnly = true
+                                PreviewOnly = false
                             };
+
             _processorMock.SetupGet(x => x.Options).Returns(options);
 
             _runnerContextMock.SetupGet(x => x.Namespace).Returns("FluentMigrator.Tests.Integration.Migrations");
@@ -74,15 +76,37 @@ namespace FluentMigrator.Tests.Unit
             _runnerContextMock.SetupGet(x => x.Database).Returns("sqlserver");
 
             _migrationLoaderMock.SetupGet(x => x.Migrations).Returns(_migrationList);
-            _versionLoaderMock.SetupGet(x => x.AlreadyCreatedVersionSchema).Returns(true);
-            _versionLoaderMock.SetupGet(x => x.AlreadyCreatedVersionTable).Returns(true);
 
             _runner = new MigrationRunner(Assembly.GetAssembly(typeof(MigrationRunnerTests)), _runnerContextMock.Object, _processorMock.Object)
                         {
                             MigrationLoader = _migrationLoaderMock.Object,
                             ProfileLoader = _profileLoaderMock.Object,
-                            VersionLoader = _versionLoaderMock.Object
                         };
+
+            _fakeVersionLoader = new TestVersionLoader(_runner, _runner.VersionLoader.VersionTableMetaData);
+
+            _runner.VersionLoader = _fakeVersionLoader;
+
+            _processorMock.Setup(x => x.SchemaExists(It.Is<string>(s => s == _runner.VersionLoader.VersionTableMetaData.SchemaName)))
+                          .Returns(true);
+
+            _processorMock.Setup(x => x.TableExists(It.Is<string>(s => s == _runner.VersionLoader.VersionTableMetaData.SchemaName),
+                                                    It.Is<string>(t => t == _runner.VersionLoader.VersionTableMetaData.TableName)))
+                          .Returns(true);
+        }
+
+        private void LoadVersionData(params long[] fakeVersions)
+        {
+            _fakeVersionLoader.Versions.Clear();
+            _runner.MigrationLoader.Migrations.Clear();
+
+            foreach (var version in fakeVersions)
+            {
+                _fakeVersionLoader.Versions.Add(version);
+                _runner.MigrationLoader.Migrations.Add(version, new TestMigration());
+            }
+
+            _fakeVersionLoader.LoadVersionInfo();
         }
 
         [Test]
@@ -203,38 +227,29 @@ namespace FluentMigrator.Tests.Unit
             long fakeMigrationVersion = 2009010101;
             long fakeMigrationVersion2 = 2009010102;
 
-            _runner.MigrationLoader.Migrations.Add(fakeMigrationVersion, new TestMigration());
-            _runner.MigrationLoader.Migrations.Add(fakeMigrationVersion2, new TestMigration());
-
-            _runner.VersionLoader.VersionInfo.AddAppliedMigration(fakeMigrationVersion);
-            _runner.VersionLoader.VersionInfo.AddAppliedMigration(fakeMigrationVersion2);
-
-
             var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
 
-            _runner.Rollback(1);
+            LoadVersionData(fakeMigrationVersion, fakeMigrationVersion2);
 
             _runner.VersionLoader.LoadVersionInfo();
+            _runner.Rollback(1);
 
-            _runner.VersionLoader.VersionInfo.AppliedMigrations().Count().ShouldBe(1);
+            _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();
+
         }
 
         [Test]
         public void RollbackLastVersionShouldDeleteVersionInfoTable()
         {
             long fakeMigrationVersion = 2009010101;
-            _runner.MigrationLoader.Migrations.Add(fakeMigrationVersion, new TestMigration());
-            _runner.VersionLoader.VersionInfo.AddAppliedMigration(fakeMigrationVersion);
+
+            LoadVersionData(fakeMigrationVersion);
 
             var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
 
             _runner.Rollback(1);
 
-            _processorMock.Verify(
-                pm => pm.Process(It.Is<DeleteTableExpression>(
-                    dte => dte.TableName == versionInfoTableName)
-                    )
-                );
+            _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeTrue();
         }
 
         [Test]
