@@ -259,12 +259,7 @@ namespace FluentMigrator.Tests.Unit
 
             _runner.RollbackToVersion(0);
 
-            _processorMock.Verify(
-                pm => pm.Process(It.Is<DeleteTableExpression>(
-                    dte => dte.TableName == versionInfoTableName)
-                    )
-                );
-
+            _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeTrue();
 
         }
 
@@ -291,20 +286,18 @@ namespace FluentMigrator.Tests.Unit
 
             _runner.RollbackToVersion(1);
 
-            _processorMock.Verify(
-                pm => pm.Process(It.Is<DeleteTableExpression>(
-                    dte => dte.TableName == versionInfoTableName)
-                    ),
-                    Times.Never()
-                );
+            _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();
 
-            //Once in setup, once after rollback
+            //Once in setup
             _processorMock.Verify(
                 pm => pm.Process(It.Is<CreateTableExpression>(
                     dte => dte.TableName == versionInfoTableName)
                     ),
-                    Times.Exactly(2)
+                    Times.Exactly(1)
                 );
+
+            //After setup is done, fake version loader owns the proccess
+            _fakeVersionLoader.DidLoadVersionInfoGetCalled.ShouldBe(true);
         }
 
         [Test, Ignore("Move to MigrationLoader tests")]
