@@ -220,9 +220,9 @@ namespace FluentMigrator.Runner
                     ApplyMigrationDown(migrationNumber);
                 }
 
-                if (VersionLoader.VersionInfo.AppliedMigrations().Any())
-                    VersionLoader.LoadVersionInfo();
-                else
+                VersionLoader.LoadVersionInfo();
+
+                if (!VersionLoader.VersionInfo.AppliedMigrations().Any())
                     VersionLoader.RemoveVersionTable();
 
                 if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }

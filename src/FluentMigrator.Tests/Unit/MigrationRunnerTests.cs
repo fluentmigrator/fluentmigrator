@@ -195,6 +195,7 @@ namespace FluentMigrator.Tests.Unit
         {
             long fakeMigrationVersion = 2009010101;
             _runner.MigrationLoader.Migrations.Add(fakeMigrationVersion, new TestMigration());
+            _runner.VersionLoader.VersionInfo.AddAppliedMigration(fakeMigrationVersion);
 
             var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
 
