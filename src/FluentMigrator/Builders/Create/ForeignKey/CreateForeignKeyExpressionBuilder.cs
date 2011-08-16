@@ -26,7 +26,7 @@ namespace FluentMigrator.Builders.Create.ForeignKey
 		ICreateForeignKeyForeignColumnOrInSchemaSyntax,
 		ICreateForeignKeyToTableSyntax,
 		ICreateForeignKeyPrimaryColumnOrInSchemaSyntax,
-		ICreateForiegnKeyCascadeSyntax
+		ICreateForeignKeyCascadeSyntax
 	{
 		public CreateForeignKeyExpressionBuilder(CreateForeignKeyExpression expression)
 			: base(expression)
@@ -64,26 +64,26 @@ namespace FluentMigrator.Builders.Create.ForeignKey
 			return this;
 		}
 
-		public ICreateForiegnKeyCascadeSyntax PrimaryColumn(string column)
+		public ICreateForeignKeyCascadeSyntax PrimaryColumn(string column)
 		{
 			Expression.ForeignKey.PrimaryColumns.Add(column);
 			return this;
 		}
 
-		public ICreateForiegnKeyCascadeSyntax PrimaryColumns(params string[] columns)
+		public ICreateForeignKeyCascadeSyntax PrimaryColumns(params string[] columns)
 		{
 			foreach(var column in columns)
 				Expression.ForeignKey.PrimaryColumns.Add(column);
 			return this;
 		}
 
-		public ICreateForiegnKeyCascadeSyntax OnDelete(Rule rule)
+		public ICreateForeignKeyCascadeSyntax OnDelete(Rule rule)
 		{
 			Expression.ForeignKey.OnDelete = rule;
 			return this;
 		}
 
-		public ICreateForiegnKeyCascadeSyntax OnUpdate(Rule rule)
+		public ICreateForeignKeyCascadeSyntax OnUpdate(Rule rule)
 		{
 			Expression.ForeignKey.OnUpdate = rule;
 			return this;
