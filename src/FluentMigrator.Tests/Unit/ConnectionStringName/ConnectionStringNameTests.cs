@@ -5,7 +5,6 @@ using System.Text;
 using NUnit.Framework;
 using FluentMigrator.Runner.Initialization;
 using System.IO;
-using FluentMigrator.Runner.Initialization.ConnectionString;
 
 namespace FluentMigrator.Tests.Unit.ConnectionStringName
 {
