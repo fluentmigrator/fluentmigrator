@@ -34,31 +34,6 @@ namespace FluentMigrator.Builders.Execute
 			_context = context;
 		}
 
-        /// <summary>
-        /// Executes expression where it matches any of the provided database types
-        /// </summary>
-        /// <param name="type">The type</param>
-        /// <returns>An expression that can process the requested type</returns>
-        public IExecuteExpressionRoot WithDatabaseType(DatabaseType type)
-        {
-            if (_context.QuerySchema is IMigrationProcessor)
-            {
-                var name = _context.QuerySchema.GetType().Name;
-                if (!string.IsNullOrEmpty(name))
-                    name = name.Replace("Processor", "");
-
-                var types = type.ToString()
-                   .Split(new[] { ", " }, StringSplitOptions.None);
-
-                var match = types.FirstOrDefault(t => t == name || t.StartsWith(name));
-
-                if (match != null)
-                    return this;
-            }
-
-            return new NullExecuteExpression();
-        }
-
 		public void Sql(string sqlStatement)
 		{
 			var expression = new ExecuteSqlStatementExpression { SqlStatement = sqlStatement };

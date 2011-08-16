@@ -24,13 +24,6 @@ namespace FluentMigrator.Builders.Execute
 {
 	public interface IExecuteExpressionRoot : IFluentSyntax
 	{
-        /// <summary>
-        /// Executes expression where it matches any of the provided database types
-        /// </summary>
-        /// <param name="type">The type</param>
-        /// <returns>An expression that can process the requested type</returns>
-        IExecuteExpressionRoot WithDatabaseType(DatabaseType type);
-
 		void Sql(string sqlStatement);		
 		void Script(string pathToSqlScript);		
 		void WithConnection(Action<IDbConnection, IDbTransaction> operation);

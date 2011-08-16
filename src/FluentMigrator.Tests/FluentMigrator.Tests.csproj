@@ -145,7 +145,7 @@
   <ItemGroup>
     <Compile Include="Helpers\PostgresTestTable.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
-    <Compile Include="Unit\Builders\Execute\ExecuteExpressionRootTests.cs" />
+    <Compile Include="Unit\Builders\IfDatabase\IfDatabaseExpressionRootTests.cs" />
     <Compile Include="Unit\ConnectionStringName\ConnectionStringNameTests.cs" />
     <Compile Include="Integration\Migrations\Nested\Group1\AnotherFromGroup1.cs" />
     <Compile Include="Integration\Migrations\Nested\Group1\FromGroup1.cs" />
