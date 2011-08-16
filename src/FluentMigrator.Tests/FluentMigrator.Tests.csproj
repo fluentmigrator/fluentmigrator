@@ -262,6 +262,7 @@
     <Compile Include="Integration\Migrations\VersionedMigration.cs" />
     <Compile Include="Unit\StopWatchTests.cs" />
     <Compile Include="Unit\TaskExecutorTests.cs" />
+    <Compile Include="Unit\TestVersionLoader.cs" />
     <Compile Include="Unit\TestVersionTableMetaData.cs" />
     <Compile Include="Unit\Versioning\VersionInfoTests.cs" />
     <Compile Include="Unit\VersionLoaderTests.cs" />
