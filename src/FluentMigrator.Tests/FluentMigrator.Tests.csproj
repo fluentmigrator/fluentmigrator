@@ -163,6 +163,7 @@
     <Compile Include="Unit\Builders\Alter\AlterTableExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateIndexExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateExpressionRootTests.cs" />
+    <Compile Include="Unit\Builders\Delete\DeleteDataExpressionTests.cs" />
     <Compile Include="Unit\Builders\Delete\DeleteIndexExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Delete\DeleteExpressionRootTests.cs" />
     <Compile Include="Unit\Builders\Delete\DeleteForeignKeyExpressionBuilderTests.cs" />

@@ -80,6 +80,22 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 			contextMock.VerifyAll();
 		}
 
+        [Test]
+        public void CallingFromTableReturnsDeleteDataExpressionBuilder() {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+            var contextMock = new Mock<IMigrationContext>();
+
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+            contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
+
+            var root = new DeleteExpressionRoot(contextMock.Object);
+            var builder = root.FromTable("TestTable");
+
+            builder.ShouldBeOfType<DeleteDataExpressionBuilder>();
+            contextMock.VerifyAll();
+            
+        }
+
 		[Test]
 		public void CallingForeignKeyAddsDeleteForeignKeyExpressionToContext()
 		{
@@ -128,5 +144,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 			collectionMock.VerifyAll();
 			contextMock.VerifyAll();
 		}
+
+
 	}
 }
