@@ -77,7 +77,7 @@ namespace FluentMigrator.Runner
 			}
 		}
 
-        public bool AlreadyCreatedVersionSchema
+        public bool VersionSchemaExists
         {
             get
             {
@@ -85,7 +85,7 @@ namespace FluentMigrator.Runner
             }
         }
 
-		public bool AlreadyCreatedVersionTable
+		public bool VersionTableExists
 		{
 			get
 			{
@@ -95,36 +95,24 @@ namespace FluentMigrator.Runner
 
 		public void LoadVersionInfo()
 		{
-			if ( Processor.Options.PreviewOnly )
-			{
-				if ( !AlreadyCreatedVersionTable )
-				{
-					Runner.Up( VersionMigration );
-					VersionInfo = new VersionInfo();
-				}
-				else
-					VersionInfo = new VersionInfo();
+            _versionInfo = new VersionInfo();
 
-				return;
-			}
-
-            if (!AlreadyCreatedVersionSchema)
+            if (!VersionSchemaExists && !Processor.Options.PreviewOnly) {
                 Runner.Up(VersionSchemaMigration);
+            }
 
-			if ( !AlreadyCreatedVersionTable )
-			{
+			if ( !VersionTableExists && !Processor.Options.PreviewOnly){
+                Runner.Announcer.Start(0);
 				Runner.Up( VersionMigration );
-				_versionInfo = new VersionInfo();
-				return;
+                Runner.Announcer.Stop();
 			}
 
-			var dataSet = Processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName );
-			_versionInfo = new VersionInfo();
-
-			foreach ( DataRow row in dataSet.Tables[ 0 ].Rows )
-			{
-				_versionInfo.AddAppliedMigration( long.Parse( row[ 0 ].ToString() ) );
-			}
+            if (VersionTableExists) {
+                var dataSet = Processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
+                foreach (DataRow row in dataSet.Tables[0].Rows) {
+                    _versionInfo.AddAppliedMigration(long.Parse(row[0].ToString()));
+                }
+            }
 		}
 
 		public void RemoveVersionTable()

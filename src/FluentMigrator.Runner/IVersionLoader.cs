@@ -7,8 +7,8 @@ namespace FluentMigrator.Runner
 	public interface IVersionLoader
 	{
 		//VersionInfo VersionInfo { get; }
-	    bool AlreadyCreatedVersionSchema { get; }
-		bool AlreadyCreatedVersionTable { get; }
+	    bool VersionSchemaExists { get; }
+		bool VersionTableExists { get; }
 		void RemoveVersionTable();
 		IVersionTableMetaData GetVersionTableMetaData();
 	}

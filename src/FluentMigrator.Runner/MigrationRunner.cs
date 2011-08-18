@@ -25,13 +25,14 @@ using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Announcers;
 
 namespace FluentMigrator.Runner
 {
 	public class MigrationRunner : IMigrationRunner
 	{
 		private Assembly _migrationAssembly;
-		private IAnnouncer _announcer;
+        public IAnnouncer Announcer { get; private set; }
 		private IStopWatch _stopWatch;
 		private bool _alreadyOutputPreviewOnlyModeWarning;
 		public bool SilentlyFail { get; set; }
@@ -45,7 +46,7 @@ namespace FluentMigrator.Runner
 		public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
 		{
 			_migrationAssembly = assembly;
-			_announcer = runnerContext.Announcer;
+			Announcer = runnerContext.Announcer;
 			Processor = processor;
 			_stopWatch = runnerContext.StopWatch;
 
@@ -119,12 +120,14 @@ namespace FluentMigrator.Runner
 
         private IEnumerable<long> GetUpMigrationsToApply(long version)
         {
+
             return MigrationLoader.Migrations.Keys.Where(x => IsMigrationStepNeededForUpMigration(x, version));
         }
 
 
         private bool IsMigrationStepNeededForUpMigration(long versionOfMigration, long targetVersion)
         {
+            
             if (versionOfMigration <= targetVersion && !VersionLoader.VersionInfo.HasAppliedMigration(versionOfMigration))
             {
                 return true;
@@ -175,16 +178,19 @@ namespace FluentMigrator.Runner
 
 		private void ApplyMigrationUp(long version)
 		{
+            
+            Announcer.Start(version);
 			if (!_alreadyOutputPreviewOnlyModeWarning && Processor.Options.PreviewOnly) {
-				_announcer.Heading("PREVIEW-ONLY MODE");
+				Announcer.Heading("PREVIEW-ONLY MODE");
 				_alreadyOutputPreviewOnlyModeWarning = true;
 			}
 
-			if (!VersionLoader.VersionInfo.HasAppliedMigration(version))
-			{
-				Up(MigrationLoader.Migrations[version]);
-				VersionLoader.UpdateVersionInfo(version);
-			}
+            if (!VersionLoader.VersionInfo.HasAppliedMigration(version)) {
+                Announcer.IsApplied = false;
+                Up(MigrationLoader.Migrations[version]);
+                VersionLoader.UpdateVersionInfo(version);
+            }
+            Announcer.Stop();
 		}
 
 		private void ApplyMigrationDown(long version)
@@ -269,8 +275,10 @@ namespace FluentMigrator.Runner
 
 		public void Up(IMigration migration)
 		{
-			var name = migration.GetType().Name;
-			_announcer.Heading(name + ": migrating");
+            var name = migration.GetType().Name;
+            Announcer.Heading(migration.GetType().Name + ": migrating");
+
+            Announcer.SetName(name);
 
 			CaughtExceptions = new List<Exception>();
 
@@ -280,15 +288,16 @@ namespace FluentMigrator.Runner
 			_stopWatch.Start();
 			ExecuteExpressions(context.Expressions);
 			_stopWatch.Stop();
-
-			_announcer.Say(name + ": migrated");
-			_announcer.ElapsedTime(_stopWatch.ElapsedTime());
+            Announcer.Say(name + ": migrated");
+            Announcer.ElapsedTime(_stopWatch.ElapsedTime());
+            Announcer.ExecutionTime(_stopWatch.ElapsedTime().TotalSeconds);
 		}
 
 		public void Down(IMigration migration)
 		{
-			var name = migration.GetType().Name;
-			_announcer.Heading(name + ": reverting");
+            var name = migration.GetType().Name;
+            Announcer.Heading(migration.GetType().Name + ": migrating");
+            Announcer.SetName(name);
 
 			CaughtExceptions = new List<Exception>();
 
@@ -298,9 +307,9 @@ namespace FluentMigrator.Runner
 			_stopWatch.Start();
 			ExecuteExpressions(context.Expressions);
 			_stopWatch.Stop();
-
-			_announcer.Say(name + ": reverted");
-			_announcer.ElapsedTime(_stopWatch.ElapsedTime());
+            Announcer.Say(name + ": migrated");
+            Announcer.ElapsedTime(_stopWatch.ElapsedTime());
+            Announcer.ExecutionTime(_stopWatch.ElapsedTime().TotalSeconds);
 		}
 
 		/// <summary>
@@ -309,26 +318,19 @@ namespace FluentMigrator.Runner
 		/// <param name="expressions"></param>
 		protected void ExecuteExpressions(ICollection<IMigrationExpression> expressions)
 		{
-			long insertTicks = 0;
-			int insertCount = 0;
 			foreach (IMigrationExpression expression in expressions)
 			{
 				try
 				{
 					expression.ApplyConventions(Conventions);
-					if (expression is InsertDataExpression)
-					{
-						insertTicks += Time(() => expression.ExecuteWith(Processor));
-						insertCount++;
-					}
-					else
-					{
-						AnnounceTime(expression.ToString(), () => expression.ExecuteWith(Processor));
-					}
+                    _stopWatch.Start();
+					expression.ExecuteWith(Processor);
+                    _stopWatch.Stop();
+                   
 				}
 				catch (Exception er)
 				{
-					_announcer.Error(er.Message);
+					Announcer.Error(er.Message);
 
 					//catch the error and move onto the next expression
 					if (SilentlyFail)
@@ -339,25 +341,9 @@ namespace FluentMigrator.Runner
 					throw;
 				}
 			}
-
-			if (insertCount > 0)
-			{
-				var avg = new TimeSpan(insertTicks / insertCount);
-				var msg = string.Format("-> {0} Insert operations completed in {1} taking an average of {2}", insertCount, new TimeSpan(insertTicks), avg);
-				_announcer.Say(msg);
-			}
 		}
 
-		private void AnnounceTime(string message, Action action)
-		{
-			_announcer.Say(message);
-
-			_stopWatch.Start();
-			action();
-			_stopWatch.Stop();
-
-			_announcer.ElapsedTime(_stopWatch.ElapsedTime());
-		}
+		
 
 		private long Time(Action action)
 		{
