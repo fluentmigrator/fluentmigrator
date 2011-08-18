@@ -11,8 +11,8 @@
 
 using System.Reflection;
 [assembly: AssemblyProduct("FluentMigrator")]
-[assembly: AssemblyVersion("1.0.11191.0")]
-[assembly: AssemblyFileVersion("1.0.11191.0")]
+[assembly: AssemblyVersion("1.0.11230.0")]
+[assembly: AssemblyFileVersion("1.0.11230.0")]
 
 [assembly: AssemblyCopyright("Copyright - FluentMigrator Project 2011  - All rights reserved")]
 [assembly: AssemblyConfiguration("debug")]
