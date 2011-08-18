@@ -164,7 +164,6 @@
     <Compile Include="Builders\Execute\IExecuteExpressionRoot.cs" />
     <Compile Include="Builders\ExpressionBuilderWithColumnTypesBase.cs" />
     <Compile Include="Builders\IInSchemaSyntax.cs" />
-    <Compile Include="Builders\Insert\IAllowIdentityInsert.cs" />
     <Compile Include="Builders\Insert\IInsertDataOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Insert\IInsertDataSyntax.cs" />
     <Compile Include="Builders\Insert\IInsertExpressionRoot.cs" />
