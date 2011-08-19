@@ -148,6 +148,9 @@
       <Link>FluentMigrator.snk</Link>
     </None>
     <None Include="app.config" />
+    <Content Include="app.40.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

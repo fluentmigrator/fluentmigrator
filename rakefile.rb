@@ -30,7 +30,7 @@ namespace :build do
     msb.solution = "FluentMigrator (2010).sln"
   end
   
-  @platforms = ['x86', 'x64']
+  @platforms = ['x86', 'AnyCPU']
   @versions = ['v3.5', 'v4.0']
   @platforms.each do |p|
     @versions.each do |v|
@@ -40,13 +40,22 @@ namespace :build do
       desc "build the console app for target .NET Framework version ${v}"
       task "console-#{v}-#{p}" => [:release, "compile-console-#{v}-#{p}", "dist/console-#{v}-#{p}"] do
         cp_r FileList['src/FluentMigrator.Console/bin/Release/*'], "dist/console-#{v}-#{p}"
+        cp_r FileList['src/FluentMigrator.Nant/bin/Release/FluentMigrator.Nant.*'], "dist/console-#{v}-#{p}"
+        cp_r FileList['src/FluentMigrator.MSBuild/bin/Release/FluentMigrator.MSBuild.*'], "dist/console-#{v}-#{p}"
+		
+        if to_nuget_version(v) == '40' then 
+          File.delete("dist/console-#{v}-#{p}/Migrate.exe.config")
+          File.rename("dist/console-#{v}-#{p}/app.40.config", "dist/console-#{v}-#{p}/Migrate.exe.config")
+        else
+          File.delete("dist/console-#{v}-#{p}/app.40.config")
+        end
       end
       
       msbuild "compile-console-#{v}-#{p}" do |msb|
-        msb.properties :configuration => :Release, :TargetFrameworkVersion => v 
+        msb.properties :configuration => :Release, :TargetFrameworkVersion => v, :PlatformTarget => p 
         msb.targets :Clean, :Rebuild
         msb.verbosity = 'quiet'
-        msb.solution = 'src/FluentMigrator.Console/FluentMigrator.Console.csproj'
+        msb.solution = 'FluentMigrator (2010).sln'
       end
       
     end
