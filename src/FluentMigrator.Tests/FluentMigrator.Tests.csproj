@@ -41,7 +41,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <PlatformTarget>AnyCPU</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
@@ -145,6 +145,7 @@
   <ItemGroup>
     <Compile Include="Helpers\PostgresTestTable.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
+    <Compile Include="Unit\Builders\IfDatabase\IfDatabaseExpressionRootTests.cs" />
     <Compile Include="Unit\ConnectionStringName\ConnectionStringNameTests.cs" />
     <Compile Include="Integration\Migrations\Nested\Group1\AnotherFromGroup1.cs" />
     <Compile Include="Integration\Migrations\Nested\Group1\FromGroup1.cs" />
