@@ -155,6 +155,9 @@
     <Compile Include="Builders\Execute\ExecuteExpressionRoot.cs" />
     <Compile Include="Builders\Execute\IExecuteExpressionRoot.cs" />
     <Compile Include="Builders\ExpressionBuilderWithColumnTypesBase.cs" />
+    <Compile Include="Builders\IfDatabase\IfDatabaseExpressionRoot.cs" />
+    <Compile Include="Builders\IfDatabase\IIfDatabaseExpressionRoot.cs" />
+    <Compile Include="Builders\IfDatabase\NullIfDatabaseProcessor.cs" />
     <Compile Include="Builders\IInSchemaSyntax.cs" />
     <Compile Include="Builders\Insert\IInsertDataOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Insert\IInsertDataSyntax.cs" />
@@ -169,6 +172,7 @@
     <Compile Include="Builders\Update\IUpdateWhereSyntax.cs" />
     <Compile Include="Builders\Update\UpdateExpressionRoot.cs" />
     <Compile Include="Builders\Update\IUpdateExpressionRoot.cs" />
+    <Compile Include="DatabaseType.cs" />
     <Compile Include="Expressions\AlterColumnExpression.cs" />
     <Compile Include="Expressions\AlterDefaultConstraintExpression.cs" />
     <Compile Include="Expressions\AlterTableExpression.cs" />

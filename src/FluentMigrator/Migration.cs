@@ -20,6 +20,7 @@ using System;
 using FluentMigrator.Builders.Alter;
 using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.Delete;
+using FluentMigrator.Builders.IfDatabase;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Builders.Rename;
 using FluentMigrator.Builders.Schema;
@@ -102,5 +103,10 @@ namespace FluentMigrator
 	    {
 	        get { return new UpdateExpressionRoot(_context);}
 	    }
+
+        public IIfDatabaseExpressionRoot IfDatabase(DatabaseType databaseType)
+        {
+           return new IfDatabaseExpressionRoot(_context, databaseType); 
+        }
 	}
 }
