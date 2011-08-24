@@ -18,13 +18,13 @@
 
 namespace FluentMigrator
 {
-	public interface IQuerySchema
-	{
-		bool SchemaExists(string schemaName);
-		bool TableExists(string schemaName, string tableName);
-		bool ColumnExists(string schemaName, string tableName, string columnName);
-		bool ConstraintExists(string schemaName, string tableName, string constraintName);
-	        bool IndexExists(string schemaName, string tableName, string indexName);
-		string DatabaseType { get; }
+    public interface IQuerySchema
+    {
+        bool SchemaExists(string schemaName);
+        bool TableExists(string schemaName, string tableName);
+        bool ColumnExists(string schemaName, string tableName, string columnName);
+        bool ConstraintExists(string schemaName, string tableName, string constraintName);
+        bool IndexExists(string schemaName, string tableName, string indexName);
+        string DatabaseType { get; }
     }
 }

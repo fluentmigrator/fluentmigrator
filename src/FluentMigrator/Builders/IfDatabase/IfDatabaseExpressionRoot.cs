@@ -48,8 +48,10 @@ namespace FluentMigrator.Builders.IfDatabase
         /// <remarks>If the database type does not apply then a <seealso cref="NullIfDatabaseProcessor"/> will be used as a container to void any fluent expressions that would have been executed</remarks>
         /// <param name="context">The context to add expressions to if the database type applies</param>
         /// <param name="databaseType">The database type that the expressions relate to</param>
-        public IfDatabaseExpressionRoot(IMigrationContext context, DatabaseType databaseType)
+        public IfDatabaseExpressionRoot(IMigrationContext context, params string[] databaseType)
         {
+            if (databaseType == null) throw new ArgumentNullException("databaseType");
+
             _context = DatabaseTypeApplies(context, databaseType) ? context : new MigrationContext(new MigrationConventions(), new NullIfDatabaseProcessor(), context.MigrationAssembly);
         }
 
@@ -120,20 +122,15 @@ namespace FluentMigrator.Builders.IfDatabase
         /// <param name="context">The context to evaluate</param>
         /// <param name="databaseType">The type to be checked</param>
         /// <returns><c>True</c> if the database type applies, <c>False</c> if not</returns>
-        private static bool DatabaseTypeApplies(IMigrationContext context, DatabaseType databaseType)
+        private static bool DatabaseTypeApplies(IMigrationContext context, params string[] databaseType)
         {
             if (context.QuerySchema is IMigrationProcessor)
             {
-                var name = context.QuerySchema.GetType().Name;
-                if (!string.IsNullOrEmpty(name))
-                    name = name.Replace("Processor", "");
+                string currentDatabaseType = context.QuerySchema.DatabaseType;
 
-                var types = databaseType.ToString()
-                   .Split(new[] { ", " }, StringSplitOptions.None);
-
-                var match = types.FirstOrDefault(t => t == name || t.StartsWith(name));
-
-                return match != null;
+                return (from db in databaseType
+                        where currentDatabaseType.StartsWith(db, StringComparison.InvariantCultureIgnoreCase)
+                        select db).Any();
             }
 
             return false;

@@ -25,17 +25,17 @@ using FluentMigrator.Runner.Generators.SqlServer;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-	public class SqlServer2000ProcessorFactory : MigrationProcessorFactory
-	{
-		public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
-		{
-			var connection = new SqlConnection(connectionString);
-			return new SqlServerProcessor(connection, new SqlServer2000Generator(), announcer, options);
-		}
+    public class SqlServer2000ProcessorFactory : MigrationProcessorFactory
+    {
+        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
+        {
+            var connection = new SqlConnection(connectionString);
+            return new SqlServerProcessor(connection, new SqlServer2000Generator(), announcer, options);
+        }
 
-		public override IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
-		{
-			return new SqlServerProcessor((SqlConnection)connection, new SqlServer2000Generator(), announcer, options);
-		}
-	}
+        public override IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
+        {
+            return new SqlServerProcessor((SqlConnection)connection, new SqlServer2000Generator(), announcer, options);
+        }
+    }
 }

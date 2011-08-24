@@ -25,6 +25,8 @@ namespace FluentMigrator.Builders.IfDatabase
     /// </summary>
     public class NullIfDatabaseProcessor : IQuerySchema
     {
+        public string DatabaseType { get { return "Unknown"; } }
+
         public bool SchemaExists(string schemaName)
         {
             return false;
