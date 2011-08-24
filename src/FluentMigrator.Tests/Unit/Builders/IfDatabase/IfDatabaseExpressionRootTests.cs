@@ -120,10 +120,13 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
         [Test]
         public void WillAddSchemaExpression()
         {
+            var databaseTypes = new List<string>() { "Unknown" };
             // Arrange
             var unknownProcessorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
 
-            var context = ExecuteTestMigration(new List<string>() { "Unknown" }, unknownProcessorMock.Object, m => m.Schema.Table("Foo").Exists());
+            unknownProcessorMock.SetupGet(x => x.DatabaseType).Returns(databaseTypes.First());
+
+            var context = ExecuteTestMigration(databaseTypes, unknownProcessorMock.Object, m => m.Schema.Table("Foo").Exists());
 
             context.Expressions.Count.ShouldBe(0);
 
