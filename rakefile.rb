@@ -24,7 +24,7 @@ namespace :build do
   msbuild :release do |msb|
     # this doesnt work for me, and it builds fine w/o it. sry if it breaks for you. -josh c
     #msb.path_to_command =  File.join(ENV['windir'], 'Microsoft.NET', 'Framework',  'v4.0.30319', 'MSBuild.exe')
-	msb.properties :configuration => :Release, :TargetFrameworkVersion => 'v3.5'
+	msb.properties :configuration => :Release
     msb.targets :Clean, :Rebuild
     msb.verbosity = 'quiet'
     msb.solution = "FluentMigrator (2010).sln"
