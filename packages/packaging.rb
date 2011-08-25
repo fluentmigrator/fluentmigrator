@@ -46,8 +46,8 @@ def prepare_tools_package
   FileUtils.mkdir_p output_directory_tools
   FileUtils.mkdir_p output_directory_content
   
-  copy_files './packages/luentMigrator.Tools/', output_directory_tools, 'install', ['ps1']
-  copy_files './packages/luentMigrator.Tools/', output_directory_content, 'InstallationDummyFile', ['txt']
+  copy_files './packages/', output_directory_tools, 'install', ['ps1']
+  copy_files './packages/', output_directory_content, 'InstallationDummyFile', ['txt']
 
   @platforms.each do |p|
     FileUtils.mkdir_p output_directory_tools + p + '/'
