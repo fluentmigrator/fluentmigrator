@@ -273,12 +273,6 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
 		}
 
 		[Test]
-		public void CallingForeignKeySetsIsForeignKeyToTrue()
-		{
-			VerifyColumnProperty(c => c.IsForeignKey = true, b => b.ForeignKey());
-		}
-
-		[Test]
 		public void CallingIdentitySetsIsIdentityToTrue()
 		{
 			VerifyColumnProperty(c => c.IsIdentity = true, b => b.Identity());

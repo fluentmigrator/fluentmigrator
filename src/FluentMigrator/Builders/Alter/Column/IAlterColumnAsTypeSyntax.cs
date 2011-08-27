@@ -20,7 +20,7 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Alter.Column
 {
-	public interface IAlterColumnAsTypeSyntax : IColumnTypeSyntax<IAlterColumnOptionSyntax>
+	public interface IAlterColumnAsTypeSyntax : IColumnTypeSyntax<IAlterColumnOptionOrForeignKeySyntax>
 	{
 	}
 }

@@ -20,7 +20,7 @@ using System;
 
 namespace FluentMigrator.Builders.Create.Table
 {
-	public interface ICreateTableColumnAsTypeSyntax : IColumnTypeSyntax<ICreateTableColumnOptionOrWithColumnSyntax>
+	public interface ICreateTableColumnAsTypeSyntax : IColumnTypeSyntax<ICreateTableColumnOptionOrWithColumnOrForeignKeySyntax>
 	{
 	}
 }

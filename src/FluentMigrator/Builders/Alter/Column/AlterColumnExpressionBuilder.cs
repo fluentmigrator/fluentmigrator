@@ -24,11 +24,13 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Alter.Column
 {
-	public class AlterColumnExpressionBuilder : ExpressionBuilderWithColumnTypesBase<AlterColumnExpression, IAlterColumnOptionSyntax>,
+	public class AlterColumnExpressionBuilder : ExpressionBuilderWithColumnTypesBase<AlterColumnExpression, IAlterColumnOptionOrForeignKeySyntax>,
 		IAlterColumnOnTableSyntax,
-		IAlterColumnOptionSyntax,
-        IAlterColumnAsTypeOrInSchemaSyntax
-	{
+        IAlterColumnAsTypeOrInSchemaSyntax,
+        IAlterColumnOptionOrForeignKeySyntax,
+        IAlterColumnOptionOrForeignKeyCascadeSyntax
+    {
+        public ForeignKeyDefinition CurrentForeignKey { get; set; }
 		private readonly IMigrationContext _context;
 
 		public AlterColumnExpressionBuilder( AlterColumnExpression expression, IMigrationContext context )
@@ -49,9 +51,9 @@ namespace FluentMigrator.Builders.Alter.Column
 			return this;
 		}
 
-		public IAlterColumnOptionSyntax WithDefaultValue( object value )
+		public IAlterColumnOptionOrForeignKeySyntax WithDefaultValue( object value )
 		{
-			// we need to do a drop constraint and then add constraint to change the defualt value
+			// we need to do a drop constraint and then add constraint to change the default value
 			var dc = new AlterDefaultConstraintExpression
 						{
 							TableName = Expression.TableName,
@@ -63,86 +65,139 @@ namespace FluentMigrator.Builders.Alter.Column
 			_context.Expressions.Add( dc );
 
 			return this;
-		}
+        }
 
-		public IAlterColumnOptionSyntax ForeignKey()
-		{
-			Expression.Column.IsForeignKey = true;
-			return this;
-		}
-
-		public IAlterColumnOptionSyntax Identity()
+		public IAlterColumnOptionOrForeignKeySyntax Identity()
 		{
 			Expression.Column.IsIdentity = true;
 			return this;
 		}
 
-		public IAlterColumnOptionSyntax Indexed()
+		public IAlterColumnOptionOrForeignKeySyntax Indexed()
 		{
 			Expression.Column.IsIndexed = true;
 			return this;
 		}
 
-		public IAlterColumnOptionSyntax PrimaryKey()
+		public IAlterColumnOptionOrForeignKeySyntax PrimaryKey()
 		{
 			Expression.Column.IsPrimaryKey = true;
 			return this;
 		}
 
-		public IAlterColumnOptionSyntax PrimaryKey( string primaryKeyName )
+		public IAlterColumnOptionOrForeignKeySyntax PrimaryKey( string primaryKeyName )
 		{
 			Expression.Column.IsPrimaryKey = true;
 			Expression.Column.PrimaryKeyName = primaryKeyName;
 			return this;
 		}
 
-		public IAlterColumnOptionSyntax Nullable()
+		public IAlterColumnOptionOrForeignKeySyntax Nullable()
 		{
 			Expression.Column.IsNullable = true;
 			return this;
 		}
 
-		public IAlterColumnOptionSyntax NotNullable()
+		public IAlterColumnOptionOrForeignKeySyntax NotNullable()
 		{
 			Expression.Column.IsNullable = false;
 			return this;
 		}
 
-		public IAlterColumnOptionSyntax Unique()
+		public IAlterColumnOptionOrForeignKeySyntax Unique()
 		{
 			Expression.Column.IsUnique = true;
 			return this;
-		}
+        }
 
-		public IAlterColumnOptionSyntax References( string foreignKeyName, string foreignTableName, IEnumerable<string> foreignColumnNames )
-		{
-			return References( foreignKeyName, null, foreignTableName, foreignColumnNames );
-		}
+        public IAlterColumnOptionOrForeignKeyCascadeSyntax ForeignKey(string primaryTableName, string primaryColumnName)
+        {
+            return ForeignKey(null, null, primaryTableName, primaryColumnName);
+        }
 
-		public IAlterColumnOptionSyntax References( string foreignKeyName, string foreignTableSchema, string foreignTableName, IEnumerable<string> foreignColumnNames )
-		{
-			var fk = new CreateForeignKeyExpression
-			{
-				ForeignKey = new ForeignKeyDefinition
-				{
-					Name = foreignKeyName,
-					PrimaryTable = Expression.TableName,
-					PrimaryTableSchema = Expression.SchemaName,
-					ForeignTable = foreignTableName,
-					ForeignTableSchema = foreignTableSchema
-				}
-			};
+        public IAlterColumnOptionOrForeignKeyCascadeSyntax ForeignKey(string foreignKeyName, string primaryTableName, string primaryColumnName)
+        {
+            return ForeignKey(foreignKeyName, null, primaryTableName, primaryColumnName);
+        }
 
-			fk.ForeignKey.PrimaryColumns.Add( Expression.Column.Name );
-			foreach ( var foreignColumnName in foreignColumnNames )
-				fk.ForeignKey.ForeignColumns.Add( foreignColumnName );
+        public IAlterColumnOptionOrForeignKeyCascadeSyntax ForeignKey(string foreignKeyName, string primaryTableSchema, string primaryTableName, string primaryColumnName)
+        {
+            Expression.Column.IsForeignKey = true;
 
-			_context.Expressions.Add( fk );
-			return this;
-		}
+            var fk = new CreateForeignKeyExpression
+            {
+                ForeignKey = new ForeignKeyDefinition
+                {
+                    Name = foreignKeyName,
+                    PrimaryTable = primaryTableName,
+                    PrimaryTableSchema = primaryTableSchema,
+                    ForeignTable = Expression.TableName,
+                    ForeignTableSchema = Expression.SchemaName
+                }
+            };
+
+            fk.ForeignKey.ForeignColumns.Add(Expression.Column.Name);
+            fk.ForeignKey.PrimaryColumns.Add(primaryColumnName);
+
+            _context.Expressions.Add(fk);
+            CurrentForeignKey = fk.ForeignKey;
+            return this;
+        }
+
+        public IAlterColumnOptionOrForeignKeyCascadeSyntax ReferencedBy(string foreignTableName, string foreignColumnName)
+        {
+            return ReferencedBy(null, foreignTableName, foreignColumnName);
+        }
+
+        public IAlterColumnOptionOrForeignKeyCascadeSyntax ReferencedBy(string foreignKeyName, string foreignTableName, string foreignColumnName)
+        {
+            return ReferencedBy(foreignKeyName, null, foreignTableName, foreignColumnName);
+        }
+
+        public IAlterColumnOptionOrForeignKeyCascadeSyntax ReferencedBy(string foreignKeyName, string foreignTableSchema, string foreignTableName, string foreignColumnName)
+        {
+            var fk = new CreateForeignKeyExpression
+            {
+                ForeignKey = new ForeignKeyDefinition
+                {
+                    Name = foreignKeyName,
+                    PrimaryTable = Expression.TableName,
+                    PrimaryTableSchema = Expression.SchemaName,
+                    ForeignTable = foreignTableName,
+                    ForeignTableSchema = foreignTableSchema
+                }
+            };
+
+            fk.ForeignKey.PrimaryColumns.Add(Expression.Column.Name);
+            fk.ForeignKey.ForeignColumns.Add(foreignColumnName);
+
+            _context.Expressions.Add(fk);
+            CurrentForeignKey = fk.ForeignKey;
+            return this;
+        }
+
+        public IAlterColumnOptionOrForeignKeyCascadeSyntax OnDelete(Rule rule)
+        {
+            CurrentForeignKey.OnDelete = rule;
+            return this;
+        }
+
+        public IAlterColumnOptionOrForeignKeyCascadeSyntax OnUpdate(Rule rule)
+        {
+            CurrentForeignKey.OnUpdate = rule;
+            return this;
+        }
+
+        public IAlterColumnOptionOrForeignKeyCascadeSyntax OnDeleteOrUpdate(Rule rule)
+        {
+            CurrentForeignKey.OnDelete = rule;
+            CurrentForeignKey.OnUpdate = rule;
+            return this;
+        }
+
 		protected override ColumnDefinition GetColumnForType()
 		{
 			return Expression.Column;
-		}
+        }
 	}
 }

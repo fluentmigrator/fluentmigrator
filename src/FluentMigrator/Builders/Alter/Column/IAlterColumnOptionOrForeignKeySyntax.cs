@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -16,11 +16,10 @@
 //
 #endregion
 
-using System;
-
-namespace FluentMigrator.Builders.Create.Table
+namespace FluentMigrator.Builders.Alter.Column
 {
-	public interface ICreateTableColumnOptionOrWithColumnSyntax : IColumnOptionSyntax<ICreateTableColumnOptionOrWithColumnSyntax>, ICreateTableWithColumnSyntax
+	public interface IAlterColumnOptionOrForeignKeySyntax
+        : IColumnOptionOrForeignKeySyntax<IAlterColumnOptionOrForeignKeySyntax,IAlterColumnOptionOrForeignKeyCascadeSyntax>
 	{
 	}
 }
