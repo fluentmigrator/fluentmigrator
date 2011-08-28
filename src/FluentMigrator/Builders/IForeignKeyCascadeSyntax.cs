@@ -16,9 +16,17 @@
 //
 #endregion
 
-namespace FluentMigrator.Builders.Create.Column
+using System.Collections.Generic;
+using FluentMigrator.Infrastructure;
+using System.Data;
+
+namespace FluentMigrator.Builders
 {
-	public interface ICreateColumnOptionSyntax : IColumnOptionSyntax<ICreateColumnOptionSyntax>
-	{
+    public interface IForeignKeyCascadeSyntax<TNext> : IFluentSyntax
+        where TNext : IFluentSyntax
+    {
+        TNext OnDelete(Rule rule);
+        TNext OnUpdate(Rule rule);
+        TNext OnDeleteOrUpdate(Rule rule);
 	}
 }

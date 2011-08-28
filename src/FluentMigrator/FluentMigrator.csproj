@@ -124,16 +124,22 @@
     </Compile>
     <Compile Include="Builders\Alter\AlterExpressionRoot.cs" />
     <Compile Include="Builders\Alter\Column\AlterColumnExpressionBuilder.cs" />
+    <Compile Include="Builders\Alter\Column\IAlterColumnOptionOrForeignKeyCascadeSyntax.cs" />
     <Compile Include="Builders\Alter\Column\IAlterColumnAsTypeOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Alter\Column\IAlterColumnAsTypeSyntax.cs" />
     <Compile Include="Builders\Alter\Column\IAlterColumnOnTableSyntax.cs" />
-    <Compile Include="Builders\Alter\Column\IAlterColumnOptionSyntax.cs" />
+    <Compile Include="Builders\Alter\Column\IAlterColumnOptionOrForeignKeySyntax.cs" />
     <Compile Include="Builders\Alter\IAlterExpressionRoot.cs" />
     <Compile Include="Builders\Alter\Table\AlterTableExpressionBuilder.cs" />
+    <Compile Include="Builders\Alter\Table\IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax.cs" />
     <Compile Include="Builders\Alter\Table\IAlterTableAddColumnOrAlterColumnOrSchemaSyntax.cs" />
     <Compile Include="Builders\Alter\Table\IAlterTableAddColumOrAlterColumnSyntax.cs" />
     <Compile Include="Builders\Alter\Table\IAlterTableColumnAsTypeSyntax.cs" />
-    <Compile Include="Builders\Alter\Table\IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax.cs" />
+    <Compile Include="Builders\Alter\Table\IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeySyntax.cs" />
+    <Compile Include="Builders\Create\Column\ICreateColumnOptionOrForeignKeyCascadeSyntax.cs" />
+    <Compile Include="Builders\Create\Table\ICreateTableColumnOptionOrWithColumnOrForeignKeyCascadeSyntax.cs" />
+    <Compile Include="Builders\IColumnOptionOrForeignKeySyntax.cs" />
+    <Compile Include="Builders\IForeignKeyCascadeSyntax.cs" />
     <Compile Include="Builders\Create\Column\ICreateColumnAsTypeOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Create\ForeignKey\ICreateForeignKeyPrimaryColumnOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Create\ForeignKey\ICreateForeignKeyForeignColumnOrInSchemaSyntax.cs" />
@@ -250,7 +256,7 @@
     <Compile Include="Builders\ExpressionBuilderBase.cs" />
     <Compile Include="Builders\Create\Column\ICreateColumnOnTableSyntax.cs" />
     <Compile Include="Builders\Create\Column\CreateColumnExpressionBuilder.cs" />
-    <Compile Include="Builders\Create\Column\ICreateColumnOptionSyntax.cs" />
+    <Compile Include="Builders\Create\Column\ICreateColumnOptionOrForeignKeySyntax.cs" />
     <Compile Include="Builders\Create\Column\ICreateColumnAsTypeSyntax.cs" />
     <Compile Include="Builders\Create\Table\ICreateTableWithColumnSyntax.cs" />
     <Compile Include="Builders\Create\Table\CreateTableExpressionBuilder.cs" />
@@ -276,7 +282,7 @@
     <Compile Include="Model\ColumnDefinition.cs" />
     <Compile Include="Model\ForeignKeyDefinition.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Builders\Create\Table\ICreateTableColumnOptionOrWithColumnSyntax.cs" />
+    <Compile Include="Builders\Create\Table\ICreateTableColumnOptionOrWithColumnOrForeignKeySyntax.cs" />
     <Compile Include="Builders\Create\Table\ICreateTableColumnAsTypeSyntax.cs" />
     <Compile Include="VersionTableInfo\VersionTableMetaDataAttribute.cs" />
   </ItemGroup>

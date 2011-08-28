@@ -19,7 +19,9 @@
 
 namespace FluentMigrator.Builders.Alter.Table
 {
-    public interface IAlterTableColumnAsTypeSyntax : IColumnTypeSyntax<IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeySyntax>
+    public interface IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeySyntax :
+        IColumnOptionOrForeignKeySyntax<IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeySyntax,IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax>, 
+        IAlterTableAddColumnOrAlterColumnSyntax
     {
     }
 }
