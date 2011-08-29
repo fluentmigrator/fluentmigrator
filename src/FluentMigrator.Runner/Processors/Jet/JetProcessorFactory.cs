@@ -14,7 +14,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 			return new JetProcessor(connection, new JetGenerator(), announcer, options);
 		}
 
-		public override IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
+		public virtual IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
 		{
 			return new JetProcessor((OleDbConnection) connection, new JetGenerator(), announcer, options);
 		}

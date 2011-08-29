@@ -1,11 +1,8 @@
-using System.Data;
-
 namespace FluentMigrator.Runner.Processors
 {
 	public abstract class MigrationProcessorFactory : IMigrationProcessorFactory
 	{
 		public abstract IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options);
-		public abstract IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options);
 
 		public virtual bool IsForProvider(string provider)
 		{

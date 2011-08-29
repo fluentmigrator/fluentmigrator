@@ -442,7 +442,7 @@ namespace FluentMigrator.Tests.Integration
 				return;
 
 			var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
-			var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+			var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlClientDbFactory());
 
 			MigrationRunner runner = SetupMigrationRunner(processor);
 			runner.MigrateUp();
@@ -465,7 +465,7 @@ namespace FluentMigrator.Tests.Integration
 				return;
 
 			var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
-			var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+			var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlClientDbFactory());
 
 			MigrationRunner runner = SetupMigrationRunner(processor);
 			runner.MigrateUp(1);
@@ -499,7 +499,7 @@ namespace FluentMigrator.Tests.Integration
 			{
 				connection.Close();
 
-				var cleanupProcessor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+				var cleanupProcessor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlClientDbFactory());
 				MigrationRunner cleanupRunner = SetupMigrationRunner(cleanupProcessor);
 				cleanupRunner.RollbackToVersion(0);
 

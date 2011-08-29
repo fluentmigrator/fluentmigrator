@@ -18,7 +18,6 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SQLite;
 
@@ -181,7 +180,7 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
             DataSet ds = new DataSet();
             using (var command = new SQLiteCommand(String.Format(template, args), Connection))
-            using (SQLiteDataAdapter adapter = new SQLiteDataAdapter(command))
+            using (var adapter = new SQLiteDataAdapter(command))
             {
                 adapter.Fill(ds);
                 return ds;

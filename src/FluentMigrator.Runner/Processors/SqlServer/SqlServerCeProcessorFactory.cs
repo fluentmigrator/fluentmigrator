@@ -32,7 +32,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             return new SqlServerCeProcessor(connection, new SqlServerCeGenerator(), announcer, options);
         }
 
-        public override IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
+        public virtual IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             return new SqlServerCeProcessor((SqlCeConnection)connection, new SqlServerCeGenerator(), announcer, options);
         }

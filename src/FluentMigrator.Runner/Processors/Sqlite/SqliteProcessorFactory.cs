@@ -14,7 +14,7 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 			return new SqliteProcessor(connection, new SqliteGenerator(), announcer, options);
 		}
 
-		public override IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
+		public virtual IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
 		{
 			return new SqliteProcessor((SQLiteConnection)connection, new SqliteGenerator(), announcer, options);
 		}

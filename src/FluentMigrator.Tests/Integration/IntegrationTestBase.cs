@@ -96,8 +96,7 @@ namespace FluentMigrator.Tests.Integration
         {
             using (var connection = new SqlConnection(serverOptions.ConnectionString))
             {
-
-                var processor = new SqlServerProcessor(connection, generator, announcer, new ProcessorOptions());
+                var processor = new SqlServerProcessor(connection, generator, announcer, new ProcessorOptions(), new SqlClientDbFactory());
                 test(processor);
 
                 if (tryRollback && !processor.WasCommitted)

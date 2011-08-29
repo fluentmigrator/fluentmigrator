@@ -15,7 +15,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 			return new OracleProcessor(connection, new OracleGenerator(), announcer, options);
 		}
 
-		public override IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
+		public virtual IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
 		{
 			return new OracleProcessor(connection, new OracleGenerator(), announcer, options);
 		}

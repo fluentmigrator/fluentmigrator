@@ -15,7 +15,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 			return new MySqlProcessor(connection, new MySqlGenerator(), announcer, options);
 		}
 
-		public override IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
+		public virtual IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
 		{
 			return new MySqlProcessor((MySqlConnection)connection, new MySqlGenerator(), announcer, options);
 		}

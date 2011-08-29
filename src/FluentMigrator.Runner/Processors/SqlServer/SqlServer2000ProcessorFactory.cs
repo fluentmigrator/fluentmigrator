@@ -1,4 +1,5 @@
 #region License
+
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // Copyright (c) 2010, Nathan Brown
@@ -15,27 +16,53 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-#endregion
 
-using System.Data;
-using System.Data.SqlClient;
-using System.Collections.Generic;
-using FluentMigrator.Runner.Generators;
-using FluentMigrator.Runner.Generators.SqlServer;
+#endregion
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-    public class SqlServer2000ProcessorFactory : MigrationProcessorFactory
-    {
-        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
-        {
-            var connection = new SqlConnection(connectionString);
-            return new SqlServerProcessor(connection, new SqlServer2000Generator(), announcer, options);
-        }
+	using System;
+	using System.Data.Common;
+	using System.Data.SqlClient;
+	using Generators.SqlServer;
 
-        public override IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
-        {
-            return new SqlServerProcessor((SqlConnection)connection, new SqlServer2000Generator(), announcer, options);
-        }
-    }
+	public class SqlServer2000ProcessorFactory : MigrationProcessorFactory
+	{
+		public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
+		{
+			var factory = new SqlClientDbFactory();
+			var connection = factory.CreateConnection(connectionString);
+			return new SqlServerProcessor(connection, new SqlServer2000Generator(), announcer, options, factory);
+		}
+	}
+
+	public class SqlClientDbFactory : IDbFactory
+	{
+		private readonly DbProviderFactory factory;
+
+		public SqlClientDbFactory()
+		{
+			factory = SqlClientFactory.Instance;
+		}
+
+		public DbConnection CreateConnection(string connectionString)
+		{
+			return new SqlConnection(connectionString);
+		}
+
+		public DbCommand CreateCommand(string commandText, DbConnection connection, DbTransaction transaction)
+		{
+			var command = connection.CreateCommand();
+			command.CommandText = commandText;
+			command.Transaction = transaction;
+			return command;
+		}
+
+		public DbDataAdapter CreateDataAdapter(DbCommand command)
+		{
+			var dataAdapter = factory.CreateDataAdapter();
+			dataAdapter.SelectCommand = command;
+			return dataAdapter;
+		}
+	}
 }

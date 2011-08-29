@@ -12,7 +12,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
 			return new PostgresProcessor(connection, new PostgresGenerator(), announcer, options);
 		}
 
-		public override IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
+		public virtual IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
 		{
 			return new PostgresProcessor((NpgsqlConnection)connection, new PostgresGenerator(), announcer, options);
 		}
