@@ -39,7 +39,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 		public void SetUp()
 		{
 			Connection = new NpgsqlConnection(IntegrationTestOptions.Postgres.ConnectionString);
-			Processor = new PostgresProcessor(Connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+			Processor = new PostgresProcessor(Connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new PostgresDbFactory());
 		}
 
 		[TearDown]

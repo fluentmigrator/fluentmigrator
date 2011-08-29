@@ -126,7 +126,7 @@ namespace FluentMigrator.Tests.Integration
 			if (!serverOptions.IsEnabled)
 				return;
 			var connection = new NpgsqlConnection(serverOptions.ConnectionString);
-			var processor = new PostgresProcessor(connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+			var processor = new PostgresProcessor(connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new PostgresDbFactory());
 			test(processor);
 
 		}

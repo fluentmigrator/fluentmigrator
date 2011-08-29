@@ -1,20 +1,23 @@
-﻿using System.Data;
-using FluentMigrator.Runner.Generators.Postgres;
-using Npgsql;
-
-namespace FluentMigrator.Runner.Processors.Postgres
+﻿namespace FluentMigrator.Runner.Processors.Postgres
 {
+	using Generators.Postgres;
+	using Npgsql;
+
 	public class PostgresProcessorFactory : MigrationProcessorFactory
 	{
 		public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
 		{
-			var connection = new NpgsqlConnection(connectionString);
-			return new PostgresProcessor(connection, new PostgresGenerator(), announcer, options);
+			var factory = new PostgresDbFactory();
+			var connection = factory.CreateConnection(connectionString);
+			return new PostgresProcessor(connection, new PostgresGenerator(), announcer, options, factory);
 		}
+	}
 
-		public virtual IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
+	public class PostgresDbFactory : DbFactoryBase
+	{
+		public PostgresDbFactory()
+			: base(NpgsqlFactory.Instance)
 		{
-			return new PostgresProcessor((NpgsqlConnection)connection, new PostgresGenerator(), announcer, options);
 		}
 	}
 }
