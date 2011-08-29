@@ -205,7 +205,7 @@
     <Compile Include="Processors\MySql\MySqlDbFactory.cs" />
     <Compile Include="Processors\MySql\MySqlProcessor.cs" />
     <Compile Include="Processors\MySql\MySqlProcessorFactory.cs" />
-    <Compile Include="Processors\Oracle\OracleFactory.cs" />
+    <Compile Include="Processors\Oracle\OracleDbFactory.cs" />
     <Compile Include="Processors\Oracle\OracleProcessor.cs" />
     <Compile Include="Processors\Oracle\OracleProcessorFactory.cs" />
     <Compile Include="Processors\Postgres\PostgresProcessor.cs" />
