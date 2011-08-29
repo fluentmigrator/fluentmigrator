@@ -1,4 +1,5 @@
 #region License
+
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // Copyright (c) 2010, Nathan Brown
@@ -15,26 +16,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-#endregion
 
-using System.Data;
-using System.Data.SqlServerCe;
-using FluentMigrator.Runner.Generators;
-using FluentMigrator.Runner.Generators.SqlServer;
+#endregion
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-    public class SqlServerCeProcessorFactory : MigrationProcessorFactory
-    {
-        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
-        {
-            var connection = new SqlCeConnection(connectionString);
-            return new SqlServerCeProcessor(connection, new SqlServerCeGenerator(), announcer, options);
-        }
+	using Generators.SqlServer;
 
-        public virtual IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
-        {
-            return new SqlServerCeProcessor((SqlCeConnection)connection, new SqlServerCeGenerator(), announcer, options);
-        }
-    }
+	public class SqlServerCeProcessorFactory : MigrationProcessorFactory
+	{
+		public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
+		{
+			var factory = new SqlCeDbFactory();
+			var connection = factory.CreateConnection(connectionString);
+			return new SqlServerCeProcessor(connection, new SqlServerCeGenerator(), announcer, options, factory);
+		}
+	}
 }

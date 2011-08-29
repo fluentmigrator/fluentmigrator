@@ -60,7 +60,7 @@ namespace FluentMigrator.Runner.Processors.Jet
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
-            DataSet ds = new DataSet();
+            var ds = new DataSet();
             using (var command = new OleDbCommand(String.Format(template, args), Connection))
             using (var adapter = new OleDbDataAdapter(command))
             {

@@ -21,8 +21,6 @@
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-	using System;
-	using System.Data.SqlClient;
 	using Generators.SqlServer;
 
 	public class SqlServer2000ProcessorFactory : MigrationProcessorFactory
@@ -32,13 +30,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 			var factory = new SqlClientDbFactory();
 			var connection = factory.CreateConnection(connectionString);
 			return new SqlServerProcessor(connection, new SqlServer2000Generator(), announcer, options, factory);
-		}
-	}
-
-	public class SqlClientDbFactory : DbFactoryBase
-	{
-		public SqlClientDbFactory() : base(SqlClientFactory.Instance)
-		{
 		}
 	}
 }

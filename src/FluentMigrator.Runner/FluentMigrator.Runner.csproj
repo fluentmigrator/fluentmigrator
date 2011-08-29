@@ -214,6 +214,8 @@
     <Compile Include="Processors\ProcessorOptions.cs" />
     <Compile Include="Processors\IDbFactory.cs" />
     <Compile Include="Processors\DbFactoryBase.cs" />
+    <Compile Include="Processors\SqlServer\SqlCeDbFactory.cs" />
+    <Compile Include="Processors\SqlServer\SqlClientDbFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServerCeProcessor.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2008ProcessorFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2005ProcessorFactory.cs" />
