@@ -22,7 +22,6 @@
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
 	using System;
-	using System.Data.Common;
 	using System.Data.SqlClient;
 	using Generators.SqlServer;
 
@@ -36,33 +35,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 		}
 	}
 
-	public class SqlClientDbFactory : IDbFactory
+	public class SqlClientDbFactory : DbFactoryBase
 	{
-		private readonly DbProviderFactory factory;
-
-		public SqlClientDbFactory()
+		public SqlClientDbFactory() : base(SqlClientFactory.Instance)
 		{
-			factory = SqlClientFactory.Instance;
-		}
-
-		public DbConnection CreateConnection(string connectionString)
-		{
-			return new SqlConnection(connectionString);
-		}
-
-		public DbCommand CreateCommand(string commandText, DbConnection connection, DbTransaction transaction)
-		{
-			var command = connection.CreateCommand();
-			command.CommandText = commandText;
-			command.Transaction = transaction;
-			return command;
-		}
-
-		public DbDataAdapter CreateDataAdapter(DbCommand command)
-		{
-			var dataAdapter = factory.CreateDataAdapter();
-			dataAdapter.SelectCommand = command;
-			return dataAdapter;
 		}
 	}
 }

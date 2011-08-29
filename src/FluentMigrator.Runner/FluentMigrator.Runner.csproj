@@ -202,6 +202,7 @@
     <Compile Include="Processors\Jet\JetProcessor.cs" />
     <Compile Include="Processors\Jet\JetProcessorFactory.cs" />
     <Compile Include="Processors\MigrationProcessorFactory.cs" />
+    <Compile Include="Processors\MySql\MySqlDbFactory.cs" />
     <Compile Include="Processors\MySql\MySqlProcessor.cs" />
     <Compile Include="Processors\MySql\MySqlProcessorFactory.cs" />
     <Compile Include="Processors\Oracle\OracleFactory.cs" />
@@ -212,6 +213,7 @@
     <Compile Include="Processors\ProcessorFactory.cs" />
     <Compile Include="Processors\ProcessorOptions.cs" />
     <Compile Include="Processors\IDbFactory.cs" />
+    <Compile Include="Processors\DbFactoryBase.cs" />
     <Compile Include="Processors\SqlServer\SqlServerCeProcessor.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2008ProcessorFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2005ProcessorFactory.cs" />

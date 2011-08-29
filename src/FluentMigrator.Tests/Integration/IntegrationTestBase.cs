@@ -141,7 +141,7 @@ namespace FluentMigrator.Tests.Integration
 
 			using (var connection = new MySqlConnection(serverOptions.ConnectionString))
 			{
-				var processor = new MySqlProcessor(connection, new MySqlGenerator(), announcer, new ProcessorOptions());
+				var processor = new MySqlProcessor(connection, new MySqlGenerator(), announcer, new ProcessorOptions(), new MySqlDbFactory());
 				test(processor);
 			}
 		}
