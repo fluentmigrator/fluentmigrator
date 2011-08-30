@@ -2,9 +2,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 {
 	using System.Data.SqlServerCe;
 
-	public class SqlCeDbFactory : DbFactoryBase
+	public class SqlServerCeDbFactory : DbFactoryBase
 	{
-		public SqlCeDbFactory()
+		public SqlServerCeDbFactory()
 			: base(SqlCeProviderFactory.Instance)
 		{
 		}

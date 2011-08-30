@@ -7,7 +7,7 @@
 	{
 		public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
 		{
-			var factory = new SqlClientDbFactory();
+			var factory = new SqlServerDbFactory();
 			DbConnection connection = factory.CreateConnection(connectionString);
 			return new SqlServerProcessor(connection, new SqlServer2008Generator(), announcer, options, factory);
 		}

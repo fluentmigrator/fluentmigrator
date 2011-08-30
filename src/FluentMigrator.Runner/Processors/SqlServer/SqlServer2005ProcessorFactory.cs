@@ -25,7 +25,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 	{
 		public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
 		{
-			var factory = new SqlClientDbFactory();
+			var factory = new SqlServerDbFactory();
 			var connection = factory.CreateConnection(connectionString);
 			return new SqlServerProcessor(connection, new SqlServer2005Generator(), announcer, options, factory);
 		}

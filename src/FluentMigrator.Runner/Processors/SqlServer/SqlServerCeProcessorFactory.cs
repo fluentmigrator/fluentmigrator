@@ -27,7 +27,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 	{
 		public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
 		{
-			var factory = new SqlCeDbFactory();
+			var factory = new SqlServerCeDbFactory();
 			var connection = factory.CreateConnection(connectionString);
 			return new SqlServerCeProcessor(connection, new SqlServerCeGenerator(), announcer, options, factory);
 		}

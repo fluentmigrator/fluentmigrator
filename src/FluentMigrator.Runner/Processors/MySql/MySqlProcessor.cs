@@ -98,10 +98,7 @@ namespace FluentMigrator.Runner.Processors.MySql
                 {
                     try
                     {
-                        if (!reader.Read())
-                            return false;
-
-                        return true;
+                    	return reader.Read();
                     }
                     catch
                     {

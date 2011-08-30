@@ -26,10 +26,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 {
 	using System.Data.Common;
 
-	public class SqlServerProcessor : ProcessorBase
+	public sealed class SqlServerProcessor : ProcessorBase
     {
 		private readonly IDbFactory factory;
-		public virtual DbConnection Connection { get; protected set; }
+		public DbConnection Connection { get; private set; }
         public DbTransaction Transaction { get; private set; }
         public bool WasCommitted { get; private set; }
 
@@ -44,10 +44,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         	this.factory = factory;
         	Connection = connection;
             connection.Open();
-            Transaction = connection.BeginTransaction();
+            BeginTransaction();
         }
 
-        private static string SafeSchemaName(string schemaName)
+		private static string SafeSchemaName(string schemaName)
         {
             return string.IsNullOrEmpty(schemaName) ? "dbo" : FormatSqlEscape(schemaName);
         }
