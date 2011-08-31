@@ -38,7 +38,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(RenameTableExpression expression)
         {
-            return String.Format("sp_rename '{1}', '{2}'", Quoter.QuoteTableName(expression.OldName), Quoter.QuoteTableName(expression.NewName));
+            return String.Format("sp_rename '{0}', '{1}'", Quoter.QuoteTableName(expression.OldName), Quoter.QuoteTableName(expression.NewName));
         }
 
         //All Schema method throw by default as only Sql server 2005 and up supports them.
