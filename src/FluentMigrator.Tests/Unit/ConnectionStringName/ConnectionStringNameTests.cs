@@ -8,64 +8,64 @@ using System.IO;
 
 namespace FluentMigrator.Tests.Unit.ConnectionStringName
 {
-	[TestFixture]
-	class ConnectionStringNameTests
-	{
-		private static string GetPath(string relative) 
-		{
-			return string.Format(@"..\..\Unit\ConnectionStringName\Fixtures\{0}", relative);
-		}
+    [TestFixture]
+    class ConnectionStringNameTests
+    {
+        private static string GetPath(string relative)
+        {
+            return string.Format(@"..\..\Unit\ConnectionStringName\Fixtures\{0}", relative);
+        }
 
-		private const string CONNECTION_NAME = "Test.Connection";
+        private const string CONNECTION_NAME = "Test.Connection";
 
-		[Test]
-		public void ItFirstTriesConfigPath()
-		{
-			var sut = new NetConfigManager(GetPath("WithConnectionString.config"), null);
-			var result = sut.GetConnectionString(CONNECTION_NAME);
-			Assert.That(result, Is.EqualTo("From Arbitrary Config"));
-		}
+        [Test]
+        public void ItFirstTriesConfigPath()
+        {
+            var sut = new NetConfigManager(GetPath("WithConnectionString.config"), null);
+            var result = sut.LoadConnectionString(CONNECTION_NAME);
+            Assert.That(result, Is.EqualTo("From Arbitrary Config"));
+        }
 
-		[Test]
-		public void ItFailsIfTheConfigPathWasSpecifiedButCouldntResolveString()
-		{
-			var sut = new NetConfigManager(GetPath("WithWrongConnectionString.config"), null);
-			Assert.Throws<ArgumentException>(() =>
-				sut.GetConnectionString(CONNECTION_NAME));
-		}
+        [Test]
+        public void ItFailsIfTheConfigPathWasSpecifiedButCouldntResolveString()
+        {
+            var sut = new NetConfigManager(GetPath("WithWrongConnectionString.config"), null);
+            Assert.Throws<ArgumentException>(() =>
+                sut.LoadConnectionString(CONNECTION_NAME));
+        }
 
-		[Test]
-		public void ItFailsIfTheConfigPathWasSpecifiedButCouldntResolveFile()
-		{
-			var sut = new NetConfigManager(GetPath("WithWrongPath.config"), null);
-			Assert.Throws<FileNotFoundException>(() =>
-				sut.GetConnectionString(CONNECTION_NAME));
-		}
+        [Test]
+        public void ItFailsIfTheConfigPathWasSpecifiedButCouldntResolveFile()
+        {
+            var sut = new NetConfigManager(GetPath("WithWrongPath.config"), null);
+            Assert.Throws<FileNotFoundException>(() =>
+                sut.LoadConnectionString(CONNECTION_NAME));
+        }
 
-		[Test]
-		public void ItTriesAppConfigSecond()
-		{
-			var sut = new NetConfigManager(null, GetPath("WithConnectionString.exe"));
-			var result = sut.GetConnectionString(CONNECTION_NAME);
-			Assert.That(result, Is.EqualTo("From App Config"));
-		}
+        [Test]
+        public void ItTriesAppConfigSecond()
+        {
+            var sut = new NetConfigManager(null, GetPath("WithConnectionString.exe"));
+            var result = sut.LoadConnectionString(CONNECTION_NAME);
+            Assert.That(result, Is.EqualTo("From App Config"));
+        }
 
-		[Test]
-		public void ItFailsSilentlyOnMissingAppConfig()
-		{
-			var sut = new NetConfigManager(null, GetPath("WithNoConfig.exe"));
-			Assert.Throws<ArgumentException>(() =>
-				sut.GetConnectionString(CONNECTION_NAME));
-		}
+        [Test]
+        public void ItFailsSilentlyOnMissingAppConfig()
+        {
+            var sut = new NetConfigManager(null, GetPath("WithNoConfig.exe"));
+            Assert.Throws<ArgumentException>(() =>
+                sut.LoadConnectionString(CONNECTION_NAME));
+        }
 
-		[Test]
-		public void ItFailsSilentlyOnMissingAppConfigConnectionString()
-		{
-			var sut = new NetConfigManager(null, GetPath("WithNoConnectionString.exe"));
-			Assert.Throws<ArgumentException>(() =>
-				sut.GetConnectionString(CONNECTION_NAME));
-		}
+        [Test]
+        public void ItFailsSilentlyOnMissingAppConfigConnectionString()
+        {
+            var sut = new NetConfigManager(null, GetPath("WithNoConnectionString.exe"));
+            Assert.Throws<ArgumentException>(() =>
+                sut.LoadConnectionString(CONNECTION_NAME));
+        }
 
-		// TODO: figure out how to test machine.config settings
-	}
+        // TODO: figure out how to test machine.config settings
+    }
 }

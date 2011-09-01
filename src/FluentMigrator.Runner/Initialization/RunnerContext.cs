@@ -42,18 +42,6 @@ namespace FluentMigrator.Runner.Initialization
             set;
         }
 
-        /// <summary>
-        /// Uses a connection string named in the connectionStrings portion of the machine.config or app.config
-        /// </summary>
-        public void UseConnectionName(string connectionStringName)
-        {
-            if (!string.IsNullOrEmpty(connectionStringName))
-            {
-                var manager = new NetConfigManager(ConnectionStringConfigPath, Target);
-                Connection = manager.GetConnectionString(connectionStringName);
-            }
-        }
-
         public IStopWatch StopWatch
         {
             get;
@@ -69,53 +57,9 @@ namespace FluentMigrator.Runner.Initialization
                     return _processor;
                 }
 
-                var configFile = Path.Combine(Environment.CurrentDirectory, Target);
-                if (File.Exists(configFile + ".config"))
-                {
-                    var config = ConfigurationManager.OpenExeConfiguration(configFile);
-                    var connections = config.ConnectionStrings.ConnectionStrings;
+                var manager = new NetConfigManager(ConnectionStringConfigPath, Target);
 
-                    if (connections.Count > 1)
-                    {
-                        if (string.IsNullOrEmpty(Connection))
-                        {
-                            ReadConnectionString(connections[Environment.MachineName], config.FilePath);
-                        }
-                        else
-                        {
-                            ReadConnectionString(connections[Connection], config.FilePath);
-                        }
-                    }
-                    else if (connections.Count == 1)
-                    {
-                        ReadConnectionString(connections[0], config.FilePath);
-                    }
-                }
-
-                if (NotUsingConfig && !string.IsNullOrEmpty(Connection))
-                {
-                    ConnectionString = Connection;
-                }
-
-                if (string.IsNullOrEmpty(ConnectionString))
-                {
-                    throw new ArgumentException("Connection String or Name is required \"/connection\"");
-                }
-
-                if (string.IsNullOrEmpty(Database))
-                {
-                    throw new ArgumentException(
-                        "Database Type is required \"/db [db type]\". Available db types is [sqlserver], [sqlite]");
-                }
-
-                if (NotUsingConfig)
-                {
-                    Console.WriteLine("Using Database {0} and Connection String {1}", Database, ConnectionString);
-                }
-                else
-                {
-                    Console.WriteLine("Using Connection {0} from Configuration file {1}", Connection, ConfigFile);
-                }
+                manager.LoadConnectionString(Environment.CurrentDirectory);
 
                 if (Timeout == 0)
                 {
@@ -133,23 +77,5 @@ namespace FluentMigrator.Runner.Initialization
             }
         }
 
-        private void ReadConnectionString(ConnectionStringSettings connection, string configurationFile)
-        {
-            if (connection != null)
-            {
-                var factory = ProcessorFactory.Factories.Where(f => f.IsForProvider(connection.ProviderName)).FirstOrDefault();
-                if (factory != null)
-                {
-                    Database = factory.Name;
-                    Connection = connection.Name;
-                    ConnectionString = connection.ConnectionString;
-                    ConfigFile = configurationFile;
-                }
-            }
-            else
-            {
-                Console.WriteLine("connection is null!");
-            }
-        }
     }
 }

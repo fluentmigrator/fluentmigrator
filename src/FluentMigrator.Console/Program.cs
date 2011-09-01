@@ -20,18 +20,20 @@ using System;
 
 namespace FluentMigrator.Console
 {
-	class Program
-	{
-		static void Main(string[] args)
-		{
-			try
-			{
-				new MigratorConsole(args);
-			}
-			catch (ArgumentException ex)
-			{
-				System.Console.WriteLine(ex.Message);
-			}
-		}
-	}
+    class Program
+    {
+        static void Main(string[] args)
+        {
+            try
+            {
+                new MigratorConsole(args);
+
+                System.Console.ReadLine();
+            }
+            catch (ArgumentException ex)
+            {
+                System.Console.WriteLine(ex.Message);
+            }
+        }
+    }
 }

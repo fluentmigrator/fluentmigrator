@@ -2,77 +2,144 @@
 using System.Configuration;
 using System.IO;
 using System.Xml;
+using System.Linq;
+using FluentMigrator.Runner.Processors;
 
 namespace FluentMigrator.Runner.Initialization
 {
-	/// <summary>
-	/// Understands the surrounding environment and delivers the proper environment settings
-	/// </summary>
-	public class NetConfigManager
-	{
+    /// <summary>
+    /// Understands the surrounding environment and delivers the proper environment settings
+    /// </summary>
+    public class NetConfigManager
+    {
 
-		public NetConfigManager(string configPath, string targetAssemblyPath)
-		{
-			ConfigPath = configPath;
-			AssemblyPath = targetAssemblyPath;
-		}
+        public NetConfigManager(string connection, string configPath, string target, string database)
+        {
+            ConfigPath = configPath;
+            Database = database;
+            NotUsingConfig = true;
+        }
 
-		private string ConfigPath { get; set; }
-		private string AssemblyPath { get; set; }
+        private string ConfigPath { get; private set; }
+        private string Target { get; private set; }
+        private string Connection { get; private set; }
+        private string ConnectionString { get; private set; }
+        private string Database { get; private set; }
+        private string ConfigFile { get; private set; }
+        private bool NotUsingConfig { get; private set; }
 
-		public string GetConnectionString(string named)
-		{
-			if (!string.IsNullOrEmpty(ConfigPath))
-			{
-				if (!File.Exists(ConfigPath))
-					throw new FileNotFoundException("The config file specified could not be found", ConfigPath);
+        public void LoadConnectionString()
+        {
+            if (!String.IsNullOrEmpty(Connection))
+            {
+                if (NotUsingConfig)
+                    LoadFromFile(ConfigPath);
 
-				var cs = GetConnectionStringFromPath(named, ConfigPath);
-				if (cs != null)
-					return cs;
-				else throw new ArgumentException("Couldn't find connection string in app config even though it was specified");
-			}
+                if (NotUsingConfig)
+                {
+                    string defaultConfigFile = Environment.CurrentDirectory + Target;
 
-			if (!string.IsNullOrEmpty(AssemblyPath))
-			{
-				var conf = ConfigurationManager.OpenExeConfiguration(AssemblyPath);
-				if (conf != null && conf.ConnectionStrings != null && conf.ConnectionStrings.ConnectionStrings != null)
-				{
-					var cs = GetConnectionString(named, conf.ConnectionStrings.ConnectionStrings[named]);
-					if (cs != null)
-						return cs;
-				}
-			}
+                    LoadFromFile(defaultConfigFile);
+                }
 
-			// if all above failed, just use .NET's native mechanism, which includes `machine.config`
-			var connection = ConfigurationManager.ConnectionStrings[named];
-			var ret = GetConnectionString(named, connection);
+                if (NotUsingConfig)
+                    LoadFromMachineConfig(false);
 
-			if (ret == null)
-				throw new ArgumentException("Couldn't find the connection string in app.config or machine.config. Try specifying a path to connection string explicitly");
+                if (NotUsingConfig)
+                {
+                    if (NotUsingConfig && !string.IsNullOrEmpty(Connection))
+                    {
+                        ConnectionString = Connection;
+                    }
+                }
+            }
+            else
+                LoadFromMachineConfig(true);
 
-			return ret;
-		}
+            if (string.IsNullOrEmpty(ConnectionString))
+            {
+                throw new ArgumentException("Connection String or Name is required \"/connection\"");
+            }
 
-		private static string GetConnectionStringFromPath(string named, string path)
-		{
-			if (!File.Exists(path))
-				return null;
+            if (string.IsNullOrEmpty(Database))
+            {
+                throw new ArgumentException(
+                    "Database Type is required \"/db [db type]\". Available db types is [sqlserver], [sqlite]");
+            }
 
-			Console.WriteLine(string.Format("Using config '{0}'", path));
-			var c = new XmlDocument();
-			c.Load(path);
-			var xpath = string.Format("//connectionStrings/add[@name='{0}']/@connectionString", named);
-			var attr = c.SelectSingleNode(xpath) as XmlAttribute;
+            if (NotUsingConfig)
+            {
+                Console.WriteLine("Using Database {0} and Connection String {1}", Database, ConnectionString);
+            }
+            else
+            {
+                Console.WriteLine("Using Connection {0} from Configuration file {1}", Connection, ConfigFile);
+            }
+        }
 
-			return (attr != null && !string.IsNullOrEmpty(attr.Value)) ? attr.Value : null;
-		}
+        private void LoadFromMachineConfig(bool useDefault)
+        {
+            ConnectionStringSettings machineConnectionString = null;
 
-		private static string GetConnectionString(string named, ConnectionStringSettings connection)
-		{
-			if (connection != null && !string.IsNullOrEmpty(connection.ConnectionString))
-				return connection.ConnectionString;
-			else return null; 
-		}
-	}
+            if (ConfigurationManager.ConnectionStrings.Count > 0)
+            {
+                if (useDefault)
+                    machineConnectionString = ConfigurationManager.ConnectionStrings[0];
+                else
+                    machineConnectionString = (from cnn in ConfigurationManager.ConnectionStrings.OfType<ConnectionStringSettings>()
+                                               where cnn.Name == Connection
+                                               select cnn).FirstOrDefault();
+
+                ReadConnectionString(machineConnectionString, "machine.config");
+            }
+        }
+
+        private void LoadFromFile(string path)
+        {
+            if (!String.IsNullOrEmpty(path) && File.Exists(path))
+            {
+                string configFile = path.Trim();
+
+                if (!configFile.EndsWith(".config", StringComparison.InvariantCultureIgnoreCase))
+                    configFile += ".config";
+
+                var config = ConfigurationManager.OpenExeConfiguration(configFile);
+                var connections = config.ConnectionStrings.ConnectionStrings;
+
+                if (connections != null && connections.Count > 0)
+                {
+                    if (string.IsNullOrEmpty(Connection))
+                    {
+                        ReadConnectionString(connections[Environment.MachineName], config.FilePath);
+                    }
+                    else
+                    {
+                        ReadConnectionString(connections[Connection], config.FilePath);
+                    }
+                }
+            }
+        }
+
+        private void ReadConnectionString(ConnectionStringSettings connection, string configurationFile)
+        {
+            if (connection != null)
+            {
+                var factory = ProcessorFactory.Factories.Where(f => f.IsForProvider(Database)).FirstOrDefault();
+
+                if (factory != null)
+                {
+                    Database = factory.Name;
+                    Connection = connection.Name;
+                    ConnectionString = connection.ConnectionString;
+                    ConfigFile = configurationFile;
+                    NotUsingConfig = false;
+                }
+            }
+            else
+            {
+                Console.WriteLine("connection is null!");
+            }
+        }
+
+    }
 }
