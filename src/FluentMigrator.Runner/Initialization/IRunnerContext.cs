@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner.Initialization
         IAnnouncer Announcer { get; }
         IStopWatch StopWatch { get; }
         int Timeout { get; set; }
-        public string ConnectionStringConfigPath { get; set; }
+        string ConnectionStringConfigPath { get; set; }
         //IMigrationProcessor Processor { get; }
     }
 }

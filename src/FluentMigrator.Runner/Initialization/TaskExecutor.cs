@@ -81,7 +81,7 @@ namespace FluentMigrator.Runner.Initialization
 
         public IMigrationProcessor InitializeProcessor()
         {
-            var manager = new NetConfigManager(RunnerContext.Connection, RunnerContext.ConnectionStringConfigPath, RunnerContext.Target, RunnerContext.Database)
+            var manager = new NetConfigManager(RunnerContext.Connection, RunnerContext.ConnectionStringConfigPath, RunnerContext.Target, RunnerContext.Database);
 
             if (RunnerContext.Timeout == 0)
             {
