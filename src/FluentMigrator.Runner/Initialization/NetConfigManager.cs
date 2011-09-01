@@ -102,7 +102,10 @@ namespace FluentMigrator.Runner.Initialization
                 if (!configFile.EndsWith(".config", StringComparison.InvariantCultureIgnoreCase))
                     configFile += ".config";
 
-                var config = ConfigurationManager.OpenExeConfiguration(configFile);
+                var fileMap = new ExeConfigurationFileMap() { ExeConfigFilename = configFile };
+
+                var config = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
+
                 var connections = config.ConnectionStrings.ConnectionStrings;
 
                 if (connections != null && connections.Count > 0)
@@ -121,7 +124,7 @@ namespace FluentMigrator.Runner.Initialization
 
         private void ReadConnectionString(ConnectionStringSettings connectionSetting, string configurationFile)
         {
-            if (connection != null)
+            if (connectionSetting != null)
             {
                 var factory = ProcessorFactory.Factories.Where(f => f.IsForProvider(Database)).FirstOrDefault();
 
