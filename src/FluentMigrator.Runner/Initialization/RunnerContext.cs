@@ -14,14 +14,7 @@ namespace FluentMigrator.Runner.Initialization
             StopWatch = new StopWatch();
         }
 
-        private string ConfigFile;
-        private string ConnectionString;
         private IMigrationProcessor _processor;
-
-        private bool NotUsingConfig
-        {
-            get { return string.IsNullOrEmpty(ConfigFile); }
-        }
 
         public string Database { get; set; }
         public string Connection { get; set; }
@@ -57,9 +50,9 @@ namespace FluentMigrator.Runner.Initialization
                     return _processor;
                 }
 
-                var manager = new NetConfigManager(ConnectionStringConfigPath, Target);
+                var manager = new NetConfigManager(Connection, ConnectionStringConfigPath, Target, Database);
 
-                manager.LoadConnectionString(Environment.CurrentDirectory);
+                manager.LoadConnectionString();
 
                 if (Timeout == 0)
                 {
@@ -67,7 +60,7 @@ namespace FluentMigrator.Runner.Initialization
                 }
 
                 var processorFactory = ProcessorFactory.GetFactory(Database);
-                _processor = processorFactory.Create(ConnectionString, Announcer, new ProcessorOptions
+                _processor = processorFactory.Create(manager.ConnectionString, Announcer, new ProcessorOptions
                                                                                     {
                                                                                         PreviewOnly = PreviewOnly,
                                                                                         Timeout = Timeout

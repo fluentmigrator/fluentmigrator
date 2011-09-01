@@ -20,8 +20,10 @@ namespace FluentMigrator.Runner.Initialization
 
         public NetConfigManager(string connection, string configPath, string target, string database)
         {
+            this.connection = connection;
             this.configPath = configPath;
             this.Database = database;
+            this.target = target;
             this.notUsingConfig = true;
         }
 
@@ -117,7 +119,7 @@ namespace FluentMigrator.Runner.Initialization
             }
         }
 
-        private void ReadConnectionString(ConnectionStringSettings connection, string configurationFile)
+        private void ReadConnectionString(ConnectionStringSettings connectionSetting, string configurationFile)
         {
             if (connection != null)
             {
@@ -126,8 +128,8 @@ namespace FluentMigrator.Runner.Initialization
                 if (factory != null)
                 {
                     Database = factory.Name;
-                    connection = connection.Name;
-                    ConnectionString = connection.ConnectionString;
+                    connection = connectionSetting.Name;
+                    ConnectionString = connectionSetting.ConnectionString;
                     configFile = configurationFile;
                     notUsingConfig = false;
                 }
