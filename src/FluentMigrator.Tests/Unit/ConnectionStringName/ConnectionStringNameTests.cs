@@ -9,7 +9,7 @@ using System.IO;
 namespace FluentMigrator.Tests.Unit.ConnectionStringName
 {
     [TestFixture]
-    class ConnectionStringNameTests
+    internal class ConnectionStringNameTests
     {
         private static string GetPath(string relative)
         {
@@ -45,4 +45,5 @@ namespace FluentMigrator.Tests.Unit.ConnectionStringName
         }
 
         // TODO: For proper testing remove dependency on .NET Config Manager
+    }
 }
