@@ -12,44 +12,41 @@ namespace FluentMigrator.Runner.Initialization
     /// </summary>
     public class NetConfigManager
     {
+        private string configPath;
+        private string target;
+        private string connection;
+        private string configFile;
+        private bool notUsingConfig;
 
         public NetConfigManager(string connection, string configPath, string target, string database)
         {
-            ConfigPath = configPath;
-            Database = database;
-            NotUsingConfig = true;
+            this.configPath = configPath;
+            this.Database = database;
+            this.notUsingConfig = true;
         }
-
-        private string ConfigPath { get; private set; }
-        private string Target { get; private set; }
-        private string Connection { get; private set; }
-        private string ConnectionString { get; private set; }
-        private string Database { get; private set; }
-        private string ConfigFile { get; private set; }
-        private bool NotUsingConfig { get; private set; }
 
         public void LoadConnectionString()
         {
-            if (!String.IsNullOrEmpty(Connection))
+            if (!String.IsNullOrEmpty(connection))
             {
-                if (NotUsingConfig)
-                    LoadFromFile(ConfigPath);
+                if (notUsingConfig)
+                    LoadFromFile(configPath);
 
-                if (NotUsingConfig)
+                if (notUsingConfig)
                 {
-                    string defaultConfigFile = Environment.CurrentDirectory + Target;
+                    string defaultConfigFile = Environment.CurrentDirectory + target;
 
                     LoadFromFile(defaultConfigFile);
                 }
 
-                if (NotUsingConfig)
+                if (notUsingConfig)
                     LoadFromMachineConfig(false);
 
-                if (NotUsingConfig)
+                if (notUsingConfig)
                 {
-                    if (NotUsingConfig && !string.IsNullOrEmpty(Connection))
+                    if (notUsingConfig && !string.IsNullOrEmpty(connection))
                     {
-                        ConnectionString = Connection;
+                        ConnectionString = connection;
                     }
                 }
             }
@@ -67,13 +64,13 @@ namespace FluentMigrator.Runner.Initialization
                     "Database Type is required \"/db [db type]\". Available db types is [sqlserver], [sqlite]");
             }
 
-            if (NotUsingConfig)
+            if (notUsingConfig)
             {
                 Console.WriteLine("Using Database {0} and Connection String {1}", Database, ConnectionString);
             }
             else
             {
-                Console.WriteLine("Using Connection {0} from Configuration file {1}", Connection, ConfigFile);
+                Console.WriteLine("Using Connection {0} from Configuration file {1}", connection, configFile);
             }
         }
 
@@ -87,7 +84,7 @@ namespace FluentMigrator.Runner.Initialization
                     machineConnectionString = ConfigurationManager.ConnectionStrings[0];
                 else
                     machineConnectionString = (from cnn in ConfigurationManager.ConnectionStrings.OfType<ConnectionStringSettings>()
-                                               where cnn.Name == Connection
+                                               where cnn.Name == connection
                                                select cnn).FirstOrDefault();
 
                 ReadConnectionString(machineConnectionString, "machine.config");
@@ -108,13 +105,13 @@ namespace FluentMigrator.Runner.Initialization
 
                 if (connections != null && connections.Count > 0)
                 {
-                    if (string.IsNullOrEmpty(Connection))
+                    if (string.IsNullOrEmpty(connection))
                     {
                         ReadConnectionString(connections[Environment.MachineName], config.FilePath);
                     }
                     else
                     {
-                        ReadConnectionString(connections[Connection], config.FilePath);
+                        ReadConnectionString(connections[connection], config.FilePath);
                     }
                 }
             }
@@ -129,10 +126,10 @@ namespace FluentMigrator.Runner.Initialization
                 if (factory != null)
                 {
                     Database = factory.Name;
-                    Connection = connection.Name;
+                    connection = connection.Name;
                     ConnectionString = connection.ConnectionString;
-                    ConfigFile = configurationFile;
-                    NotUsingConfig = false;
+                    configFile = configurationFile;
+                    notUsingConfig = false;
                 }
             }
             else
@@ -140,6 +137,9 @@ namespace FluentMigrator.Runner.Initialization
                 Console.WriteLine("connection is null!");
             }
         }
+
+        public string ConnectionString { get; private set; }
+        public string Database { get; private set; }
 
     }
 }
