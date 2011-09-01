@@ -26,68 +26,68 @@ using Mono.Options;
 
 namespace FluentMigrator.Console
 {
-	public class MigratorConsole
-	{
-		private readonly TextWriter _announcerOutput;
-		public string ProcessorType;
-		public string Connection;
-		public string ConnectionStringName;
-		public bool Verbose;
-		public bool PreviewOnly;
-		public string Namespace;
-		public string Task;
-		public bool Output;
-	    public string OutputFilename;
-		public long Version;
-		public int Steps;
-		public string TargetAssembly;
-		public string WorkingDirectory;
-		public string Profile;
-		public int Timeout;
-		public bool ShowHelp;
-		public string ConnectionStringConfigPath;
+    public class MigratorConsole
+    {
+        private readonly TextWriter _announcerOutput;
+        public string ProcessorType;
+        public string Connection;
+        public string ConnectionStringName;
+        public bool Verbose;
+        public bool PreviewOnly;
+        public string Namespace;
+        public string Task;
+        public bool Output;
+        public string OutputFilename;
+        public long Version;
+        public int Steps;
+        public string TargetAssembly;
+        public string WorkingDirectory;
+        public string Profile;
+        public int Timeout;
+        public bool ShowHelp;
+        public string ConnectionStringConfigPath;
 
-		static void DisplayHelp( OptionSet p )
-		{
-			const string hr = "-------------------------------------------------------------------------------";
-			System.Console.WriteLine( hr );
-			System.Console.WriteLine( "=============================== FluentMigrator ================================" );
-			System.Console.WriteLine( hr );
-			System.Console.WriteLine( "Source Code:" );
-			System.Console.WriteLine( "  http://github.com/schambers/fluentmigrator/network" );
-			System.Console.WriteLine( "Ask For Help:" );
-			System.Console.WriteLine( "  http://groups.google.com/group/fluentmigrator-google-group" );
-			System.Console.WriteLine( hr );
-			System.Console.WriteLine( "Usage:" );
-			System.Console.WriteLine( "  migrate [OPTIONS]" );
-			System.Console.WriteLine( "Example:" );
-			System.Console.WriteLine( "  migrate -a bin\\debug\\MyMigrations.dll -db SqlServer2008 -conn \"SEE_BELOW\" -profile \"Debug\"" );
-			System.Console.WriteLine( hr );
-			System.Console.WriteLine( "Example Connection Strings:" );
-			System.Console.WriteLine( "  MySql: Data Source=172.0.0.1;Database=Foo;User Id=USERNAME;Password=BLAH" );
-			System.Console.WriteLine( "  Oracle: Server=172.0.0.1;Database=Foo;Uid=USERNAME;Pwd=BLAH" );
-			System.Console.WriteLine( "  SqlLite: Data Source=:memory:;Version=3;New=True" );
-			System.Console.WriteLine( "  SqlServer: server=127.0.0.1;database=Foo;user id=USERNAME;password=BLAH" );
-			System.Console.WriteLine("             server=.\\SQLExpress;database=Foo;trusted_connection=true");
-			System.Console.WriteLine("   ");
-			System.Console.WriteLine("OR use a named connection string from the machine.config:");
-			System.Console.WriteLine("  migrate -a bin\\debug\\MyMigrations.dll -db SqlServer2008 -connectionName \"namedConnection\" -profile \"Debug\"");
-			System.Console.WriteLine(hr);
-			System.Console.WriteLine( "Options:" );
-			p.WriteOptionDescriptions( System.Console.Out );
-		}
+        static void DisplayHelp(OptionSet p)
+        {
+            const string hr = "-------------------------------------------------------------------------------";
+            System.Console.WriteLine(hr);
+            System.Console.WriteLine("=============================== FluentMigrator ================================");
+            System.Console.WriteLine(hr);
+            System.Console.WriteLine("Source Code:");
+            System.Console.WriteLine("  http://github.com/schambers/fluentmigrator/network");
+            System.Console.WriteLine("Ask For Help:");
+            System.Console.WriteLine("  http://groups.google.com/group/fluentmigrator-google-group");
+            System.Console.WriteLine(hr);
+            System.Console.WriteLine("Usage:");
+            System.Console.WriteLine("  migrate [OPTIONS]");
+            System.Console.WriteLine("Example:");
+            System.Console.WriteLine("  migrate -a bin\\debug\\MyMigrations.dll -db SqlServer2008 -conn \"SEE_BELOW\" -profile \"Debug\"");
+            System.Console.WriteLine(hr);
+            System.Console.WriteLine("Example Connection Strings:");
+            System.Console.WriteLine("  MySql: Data Source=172.0.0.1;Database=Foo;User Id=USERNAME;Password=BLAH");
+            System.Console.WriteLine("  Oracle: Server=172.0.0.1;Database=Foo;Uid=USERNAME;Pwd=BLAH");
+            System.Console.WriteLine("  SqlLite: Data Source=:memory:;Version=3;New=True");
+            System.Console.WriteLine("  SqlServer: server=127.0.0.1;database=Foo;user id=USERNAME;password=BLAH");
+            System.Console.WriteLine("             server=.\\SQLExpress;database=Foo;trusted_connection=true");
+            System.Console.WriteLine("   ");
+            System.Console.WriteLine("OR use a named connection string from the machine.config:");
+            System.Console.WriteLine("  migrate -a bin\\debug\\MyMigrations.dll -db SqlServer2008 -connectionName \"namedConnection\" -profile \"Debug\"");
+            System.Console.WriteLine(hr);
+            System.Console.WriteLine("Options:");
+            p.WriteOptionDescriptions(System.Console.Out);
+        }
 
-		public MigratorConsole( params string[] args )
-			: this( System.Console.Out, args )
-		{
-		}
+        public MigratorConsole(params string[] args)
+            : this(System.Console.Out, args)
+        {
+        }
 
-		public MigratorConsole( TextWriter announcerOutput, params string[] args )
-		{
-			_announcerOutput = announcerOutput;
-			try
-			{
-				var optionSet = new OptionSet
+        public MigratorConsole(TextWriter announcerOutput, params string[] args)
+        {
+            _announcerOutput = announcerOutput;
+            try
+            {
+                var optionSet = new OptionSet
 				{
 					{
 						"assembly=|a=|target=",
@@ -178,108 +178,107 @@ namespace FluentMigrator.Console
 					}
 				};
 
-				try
-				{
-					optionSet.Parse( args );
-				}
-				catch ( OptionException e )
-				{
-					System.Console.WriteLine( "FluentMigrator.Console:" );
-					System.Console.WriteLine( e.Message );
-					System.Console.WriteLine( "Try 'migrate --help' for more information." );
-					return;
-				}
+                try
+                {
+                    optionSet.Parse(args);
+                }
+                catch (OptionException e)
+                {
+                    System.Console.WriteLine("FluentMigrator.Console:");
+                    System.Console.WriteLine(e.Message);
+                    System.Console.WriteLine("Try 'migrate --help' for more information.");
+                    return;
+                }
 
-				if ( string.IsNullOrEmpty( Task ) )
-					Task = "migrate";
+                if (string.IsNullOrEmpty(Task))
+                    Task = "migrate";
 
-				if ( string.IsNullOrEmpty( ProcessorType ) ||
-					(string.IsNullOrEmpty( Connection ) && string.IsNullOrEmpty( ConnectionStringName )) ||
-					string.IsNullOrEmpty( TargetAssembly ) )
-				{
-					DisplayHelp( optionSet );
-					Environment.ExitCode = 1;
-					return;
-				}
+                if (string.IsNullOrEmpty(ProcessorType) ||
+                    (string.IsNullOrEmpty(Connection) && string.IsNullOrEmpty(ConnectionStringName)) ||
+                    string.IsNullOrEmpty(TargetAssembly))
+                {
+                    DisplayHelp(optionSet);
+                    Environment.ExitCode = 1;
+                    return;
+                }
 
-				if ( ShowHelp )
-				{
-					DisplayHelp( optionSet );
-					return;
-				}
+                if (ShowHelp)
+                {
+                    DisplayHelp(optionSet);
+                    return;
+                }
 
-				if ( Output )
-				{
-				    if (string.IsNullOrEmpty(OutputFilename))
-				        OutputFilename = TargetAssembly + ".sql";
+                if (Output)
+                {
+                    if (string.IsNullOrEmpty(OutputFilename))
+                        OutputFilename = TargetAssembly + ".sql";
 
-				    ExecuteMigrations(OutputFilename);
-				}
-				else
-					ExecuteMigrations();
-			}
-			catch ( Exception ex )
-			{
-				System.Console.WriteLine( "!! An error has occurred.  The error is:" );
-				System.Console.WriteLine( ex );
-				Environment.ExitCode = 1;
-			}
-		}
+                    ExecuteMigrations(OutputFilename);
+                }
+                else
+                    ExecuteMigrations();
+            }
+            catch (Exception ex)
+            {
+                System.Console.WriteLine("!! An error has occurred.  The error is:");
+                System.Console.WriteLine(ex);
+                Environment.ExitCode = 1;
+            }
+        }
 
-		private void ExecuteMigrations()
-		{
-			var consoleAnnouncer = new TextWriterAnnouncer( _announcerOutput )
-			{
-				ShowElapsedTime = Verbose,
-				ShowSql = Verbose
-			};
-			ExecuteMigrations( consoleAnnouncer );
-		}
+        private void ExecuteMigrations()
+        {
+            var consoleAnnouncer = new TextWriterAnnouncer(_announcerOutput)
+            {
+                ShowElapsedTime = Verbose,
+                ShowSql = Verbose
+            };
+            ExecuteMigrations(consoleAnnouncer);
+        }
 
-		private void ExecuteMigrations( string outputTo )
-		{
-			using ( var sw = new StreamWriter( outputTo ) )
-			{
-				var fileAnnouncer = new TextWriterAnnouncer( sw )
-									{
-										ShowElapsedTime = false,
-										ShowSql = true
-									};
-				var consoleAnnouncer = new TextWriterAnnouncer( _announcerOutput )
-										{
-											ShowElapsedTime = Verbose,
-											ShowSql = Verbose
-										};
-				var announcer = new CompositeAnnouncer( new[]
+        private void ExecuteMigrations(string outputTo)
+        {
+            using (var sw = new StreamWriter(outputTo))
+            {
+                var fileAnnouncer = new TextWriterAnnouncer(sw)
+                                    {
+                                        ShowElapsedTime = false,
+                                        ShowSql = true
+                                    };
+                var consoleAnnouncer = new TextWriterAnnouncer(_announcerOutput)
+                                        {
+                                            ShowElapsedTime = Verbose,
+                                            ShowSql = Verbose
+                                        };
+                var announcer = new CompositeAnnouncer(new[]
 								{
 									consoleAnnouncer,
 									fileAnnouncer
 								});
 
-				ExecuteMigrations( announcer );
-			}
-		}
+                ExecuteMigrations(announcer);
+            }
+        }
 
-		private void ExecuteMigrations( IAnnouncer announcer )
-		{
-			var runnerContext = new RunnerContext( announcer )
-			{
-				Database = ProcessorType,
-				Connection = Connection,
-				Target = TargetAssembly,
-				PreviewOnly = PreviewOnly,
-				Namespace = Namespace,
-				Task = Task,
-				Version = Version,
-				Steps = Steps,
-				WorkingDirectory = WorkingDirectory,
-				Profile = Profile,
-				Timeout = Timeout,
-				ConnectionStringConfigPath = ConnectionStringConfigPath,
-			};
-			runnerContext.UseConnectionName(ConnectionStringName);
+        private void ExecuteMigrations(IAnnouncer announcer)
+        {
+            var runnerContext = new RunnerContext(announcer)
+            {
+                Database = ProcessorType,
+                Connection = Connection,
+                Target = TargetAssembly,
+                PreviewOnly = PreviewOnly,
+                Namespace = Namespace,
+                Task = Task,
+                Version = Version,
+                Steps = Steps,
+                WorkingDirectory = WorkingDirectory,
+                Profile = Profile,
+                Timeout = Timeout,
+                ConnectionStringConfigPath = ConnectionStringConfigPath,
+            };
 
-			new TaskExecutor( runnerContext ).Execute();
-		}
-	}
+            new TaskExecutor(runnerContext).Execute();
+        }
+    }
 }
