@@ -50,7 +50,7 @@ namespace FluentMigrator.Runner.Initialization
                     return _processor;
                 }
 
-                var manager = new NetConfigManager(Connection, ConnectionStringConfigPath, Target, Database);
+                var manager = new ConnectionStringManager(Connection, ConnectionStringConfigPath, Target, Database);
 
                 manager.LoadConnectionString();
 

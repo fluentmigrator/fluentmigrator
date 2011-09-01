@@ -23,51 +23,26 @@ namespace FluentMigrator.Tests.Unit.ConnectionStringName
         [Test]
         public void ItFirstTriesConfigPath()
         {
-            var sut = new NetConfigManager(CONNECTION_NAME, GetPath("WithConnectionString.config"), TARGET, DATABASE);
+            var sut = new ConnectionStringManager(CONNECTION_NAME, GetPath("WithConnectionString.config"), TARGET, DATABASE);
             sut.LoadConnectionString();
             Assert.That(sut.ConnectionString, Is.EqualTo("From Arbitrary Config"));
         }
 
         [Test]
-        public void ItFailsIfTheConfigPathWasSpecifiedButCouldntResolveString()
-        {
-            var sut = new NetConfigManager(CONNECTION_NAME, GetPath("WithWrongConnectionString.config"), TARGET, DATABASE);
-            Assert.Throws<ArgumentException>(() =>
-                sut.LoadConnectionString());
-        }
-
-        [Test]
-        public void ItFailsIfTheConfigPathWasSpecifiedButCouldntResolveFile()
-        {
-            var sut = new NetConfigManager(CONNECTION_NAME, GetPath("WithWrongPath.config"), TARGET, DATABASE);
-            Assert.Throws<FileNotFoundException>(() =>
-                sut.LoadConnectionString());
-        }
-
-        [Test]
         public void ItTriesAppConfigSecond()
         {
-            var sut = new NetConfigManager(CONNECTION_NAME, GetPath("WithConnectionString.exe"), TARGET, DATABASE);
+            var sut = new ConnectionStringManager(CONNECTION_NAME, GetPath("WithConnectionString.exe"), TARGET, DATABASE);
             sut.LoadConnectionString();
             Assert.That(sut.ConnectionString, Is.EqualTo("From App Config"));
         }
 
         [Test]
-        public void ItFailsSilentlyOnMissingAppConfig()
+        public void ItTriesMachineConfigThird()
         {
-            var sut = new NetConfigManager(CONNECTION_NAME, GetPath("WithNoConfig.exe"), TARGET, DATABASE);
-            Assert.Throws<ArgumentException>(() =>
-                sut.LoadConnectionString());
+            var sut = new ConnectionStringManager("LocalSqlServer", GetPath("nonexists.exe"), TARGET, DATABASE);
+            sut.LoadConnectionString();
+            Assert.That(sut.ConnectionString, Is.StringStarting("data source=.\\SQLEXPRESS"));
         }
 
-        [Test]
-        public void ItFailsSilentlyOnMissingAppConfigConnectionString()
-        {
-            var sut = new NetConfigManager(CONNECTION_NAME, GetPath("WithNoConnectionString.exe"), TARGET, DATABASE);
-            Assert.Throws<ArgumentException>(() =>
-                sut.LoadConnectionString());
-        }
-
-        // TODO: figure out how to test machine.config settings
-    }
+        // TODO: For proper testing remove dependency on .NET Config Manager
 }
