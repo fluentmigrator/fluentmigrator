@@ -17,9 +17,6 @@
 #endregion
 
 using System;
-using System.Configuration;
-using System.IO;
-using System.Linq;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Processors;
 
@@ -42,7 +39,7 @@ namespace FluentMigrator.Runner.Initialization
         {
             var assembly = AssemblyLoaderFactory.GetAssemblyLoader(RunnerContext.Target).Load();
 
-            var processor = InitializeProcessor();
+			var processor = InitializeProcessor(assembly.Location);
 
             Runner = new MigrationRunner(assembly, RunnerContext, processor);
         }
@@ -79,9 +76,9 @@ namespace FluentMigrator.Runner.Initialization
             }
         }
 
-        public IMigrationProcessor InitializeProcessor()
+    	private IMigrationProcessor InitializeProcessor(string assemblyLocation)
         {
-            var manager = new ConnectionStringManager(RunnerContext.Connection, RunnerContext.ConnectionStringConfigPath, RunnerContext.Target, RunnerContext.Database);
+            var manager = new ConnectionStringManager(RunnerContext.Connection, RunnerContext.ConnectionStringConfigPath, assemblyLocation, RunnerContext.Database);
 
             if (RunnerContext.Timeout == 0)
             {
@@ -97,6 +94,5 @@ namespace FluentMigrator.Runner.Initialization
 
             return processor;
         }
-
     }
 }
