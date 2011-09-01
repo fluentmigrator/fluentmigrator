@@ -13,8 +13,8 @@ namespace FluentMigrator.Runner.Initialization
     /// </summary>
     public class ConnectionStringManager
     {
-        private string configPath;
-        private string target;
+        private readonly string configPath;
+        private readonly string target;
         private string connection;
         private string configFile;
         private bool notUsingConfig;
