@@ -9,7 +9,7 @@ using System.IO;
 namespace FluentMigrator.Tests.Unit.ConnectionStringName
 {
     [TestFixture]
-    class ConnectionStringNameTests
+    internal class ConnectionStringNameTests
     {
         private static string GetPath(string relative)
         {
@@ -43,6 +43,7 @@ namespace FluentMigrator.Tests.Unit.ConnectionStringName
             sut.LoadConnectionString();
             Assert.That(sut.ConnectionString, Is.StringStarting("data source=.\\SQLEXPRESS"));
         }
+
+        // TODO: For proper testing remove dependency on .NET Config Manager
     }
-    // TODO: For proper testing remove dependency on .NET Config Manager
 }
