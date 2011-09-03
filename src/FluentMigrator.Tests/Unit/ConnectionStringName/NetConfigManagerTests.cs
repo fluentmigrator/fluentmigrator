@@ -18,16 +18,6 @@ namespace FluentMigrator.Tests.Unit.ConnectionStringName
         }
 
         [Test]
-        public void LoadsConfigurationFromConfigFile()
-        {
-            var sut = new NetConfigManager();
-
-            Configuration config = sut.LoadFromFile(GetPath("WithConnectionString.config"));
-
-            config.ConnectionStrings.ConnectionStrings[1].ConnectionString.ShouldBe("From Arbitrary Config");
-        }
-
-        [Test]
         [ExpectedException(ExpectedException = typeof(ArgumentException))]
         public void ThrowsIfNullPath()
         {
@@ -45,5 +35,44 @@ namespace FluentMigrator.Tests.Unit.ConnectionStringName
             sut.LoadFromFile(GetPath("FileDoesNotExist.config"));
         }
 
+        [Test]
+        public void LoadsConfigurationFromConfigFile()
+        {
+            var sut = new NetConfigManager();
+
+            Configuration config = sut.LoadFromFile(GetPath("WithConnectionString.config"));
+
+            config.ConnectionStrings.ConnectionStrings[1].ConnectionString.ShouldBe("From Arbitrary Config");
+        }
+
+        [Test]
+        public void LoadsConfigurationFromExeConfigFile()
+        {
+            var sut = new NetConfigManager();
+
+            Configuration config = sut.LoadFromFile(GetPath("WithConnectionString.exe.config"));
+
+            config.ConnectionStrings.ConnectionStrings[1].ConnectionString.ShouldBe("From App Config");
+        }
+
+        [Test]
+        public void AddsConfigExtensionWhenNoExtensionIsSpecified()
+        {
+            var sut = new NetConfigManager();
+
+            Configuration config = sut.LoadFromFile(GetPath("WithConnectionString.exe"));
+
+            config.ConnectionStrings.ConnectionStrings[1].ConnectionString.ShouldBe("From App Config");
+        }
+
+        [Test]
+        public void LoadsConfigurationFromMachineConfigFile()
+        {
+            var sut = new NetConfigManager();
+
+            Configuration config = sut.LoadFromMachineConfiguration();
+
+            config.EvaluationContext.IsMachineLevel.ShouldBeTrue();
+        }
     }
 }

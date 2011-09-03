@@ -27,7 +27,7 @@ namespace FluentMigrator.Runner.Initialization
 
         public System.Configuration.Configuration LoadFromMachineConfiguration()
         {
-            throw new NotImplementedException();
+            return ConfigurationManager.OpenMachineConfiguration();
         }
     }
 }
