@@ -35,17 +35,17 @@ namespace FluentMigrator.Runner.Initialization
             if (!String.IsNullOrEmpty(connection))
             {
                 if (notUsingConfig)
-                    LoadFromFile(configPath);
+                    LoadConnectionStringFromConfigurationFile(configManager.LoadFromFile(configFile), false);
 
                 if (notUsingConfig)
                 {
                     string defaultConfigFile = assemblyLocation;
 
-                    LoadFromFile(defaultConfigFile);
+                    LoadConnectionStringFromConfigurationFile(configManager.LoadFromFile(defaultConfigFile), false);
                 }
 
                 if (notUsingConfig)
-                    LoadFromMachineConfig(false);
+                    LoadConnectionStringFromConfigurationFile(configManager.LoadFromMachineConfiguration(), false);
 
                 if (notUsingConfig)
                 {
@@ -56,67 +56,28 @@ namespace FluentMigrator.Runner.Initialization
                 }
             }
             else
-                LoadFromMachineConfig(true);
+                LoadConnectionStringFromConfigurationFile(configManager.LoadFromMachineConfiguration(), true);
 
-            if (string.IsNullOrEmpty(ConnectionString))
-            {
-                throw new ArgumentException("Connection String or Name is required \"/connection\"");
-            }
-
-            if (string.IsNullOrEmpty(database))
-            {
-                throw new ArgumentException(
-                    "Database Type is required \"/db [db type]\". Available db types is [sqlserver], [sqlite]");
-            }
-
-            if (notUsingConfig)
-            {
-                Console.WriteLine("Using Database {0} and Connection String {1}", database, ConnectionString);
-            }
-            else
-            {
-                Console.WriteLine("Using Connection {0} from Configuration file {1}", connection, configFile);
-            }
+            OutputResults();
         }
 
-        private void LoadFromMachineConfig(bool useDefault)
+        private void LoadConnectionStringFromConfigurationFile(Configuration configurationFile, bool useDefault)
         {
-            var config = configManager.LoadFromMachineConfiguration();
-
-            var connections = config.ConnectionStrings.ConnectionStrings;
+            var connections = configurationFile.ConnectionStrings.ConnectionStrings;
 
             if (connections == null || connections.Count <= 0)
                 return;
 
-            ConnectionStringSettings machineConnectionString;
+            ConnectionStringSettings connectionString;
 
             if (useDefault)
-                machineConnectionString = connections[0];
+                connectionString = connections[0];
+            else if (string.IsNullOrEmpty(connection))
+                connectionString = connections[Environment.MachineName];
             else
-                machineConnectionString = (from cnn in connections.OfType<ConnectionStringSettings>()
-                                           where cnn.Name == connection
-                                           select cnn).FirstOrDefault();
+                connectionString = connections[connection];
 
-            ReadConnectionString(machineConnectionString, "machine.config");
-        }
-
-        private void LoadFromFile(string path)
-        {
-            var config = configManager.LoadFromFile(path);
-
-            var connections = config.ConnectionStrings.ConnectionStrings;
-
-            if (connections == null || connections.Count <= 0)
-                return;
-
-            if (string.IsNullOrEmpty(connection))
-            {
-                ReadConnectionString(connections[Environment.MachineName], config.FilePath);
-            }
-            else
-            {
-                ReadConnectionString(connections[connection], config.FilePath);
-            }
+            ReadConnectionString(connectionString, configurationFile.FilePath);
         }
 
         private void ReadConnectionString(ConnectionStringSettings connectionSetting, string configurationFile)
@@ -137,6 +98,29 @@ namespace FluentMigrator.Runner.Initialization
             else
             {
                 Console.WriteLine("connection is null!");
+            }
+        }
+
+        private void OutputResults()
+        {
+            if (string.IsNullOrEmpty(ConnectionString))
+            {
+                throw new ArgumentException("Connection String or Name is required \"/connection\"");
+            }
+
+            if (string.IsNullOrEmpty(database))
+            {
+                throw new ArgumentException(
+                    "Database Type is required \"/db [db type]\". Available db types is [sqlserver], [sqlite]");
+            }
+
+            if (notUsingConfig)
+            {
+                Console.WriteLine("Using Database {0} and Connection String {1}", database, ConnectionString);
+            }
+            else
+            {
+                Console.WriteLine("Using Connection {0} from Configuration file {1}", connection, configFile);
             }
         }
 
