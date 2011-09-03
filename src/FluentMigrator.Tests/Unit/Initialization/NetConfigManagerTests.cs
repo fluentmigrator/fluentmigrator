@@ -7,7 +7,7 @@ using NUnit.Should;
 using FluentMigrator.Runner.Initialization;
 using System.Configuration;
 
-namespace FluentMigrator.Tests.Unit.ConnectionStringName
+namespace FluentMigrator.Tests.Unit.Initialization
 {
     [TestFixture]
     public class NetConfigManagerTests

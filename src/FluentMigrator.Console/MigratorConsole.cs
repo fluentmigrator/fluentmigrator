@@ -31,7 +31,6 @@ namespace FluentMigrator.Console
         private readonly TextWriter _announcerOutput;
         public string ProcessorType;
         public string Connection;
-        public string ConnectionStringName;
         public bool Verbose;
         public bool PreviewOnly;
         public string Namespace;
@@ -102,12 +101,12 @@ namespace FluentMigrator.Console
 					},
 					{
 						"connectionString=|connection=|conn=|c=",
-						"REQUIRED. The connection string to the server and database you want to execute your migrations against.",
+						"REQUIRED. The name of the connection string or the connection string itself to the server and database you want to execute your migrations against.",
 						v => { Connection = v; }
 					},
 					{
 						"connectionStringConfigPath=|configPath=",
-						string.Format("The path of the machine.config where the connection string named by connectionStringName"+
+						string.Format("The path of the machine.config where the connection string named by connectionString"+
 							" is found. If not specified, it defaults to the machine.config used by the currently running CLR version"),
 						v => { ConnectionStringConfigPath = v; }
 					},
@@ -189,7 +188,7 @@ namespace FluentMigrator.Console
                     Task = "migrate";
 
                 if (string.IsNullOrEmpty(ProcessorType) ||
-                    (string.IsNullOrEmpty(Connection) && string.IsNullOrEmpty(ConnectionStringName)) ||
+                    string.IsNullOrEmpty(Connection) ||
                     string.IsNullOrEmpty(TargetAssembly))
                 {
                     DisplayHelp(optionSet);

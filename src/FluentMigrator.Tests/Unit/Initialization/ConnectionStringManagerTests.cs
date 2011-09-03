@@ -9,7 +9,7 @@ using Moq;
 using System.Configuration;
 using System.Reflection;
 
-namespace FluentMigrator.Tests.Unit.ConnectionStringName
+namespace FluentMigrator.Tests.Unit.Initialization
 {
     [TestFixture]
     internal class ConnectionStringManagerTests
