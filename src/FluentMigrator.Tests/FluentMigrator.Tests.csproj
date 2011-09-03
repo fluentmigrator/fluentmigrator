@@ -126,6 +126,7 @@
       <HintPath>..\..\lib\nunit.should.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -146,7 +147,6 @@
     <Compile Include="Helpers\PostgresTestTable.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
     <Compile Include="Unit\Builders\IfDatabase\IfDatabaseExpressionRootTests.cs" />
-    <Compile Include="Unit\ConnectionStringName\ConnectionStringNameTests.cs" />
     <Compile Include="Integration\Migrations\Nested\Group1\AnotherFromGroup1.cs" />
     <Compile Include="Integration\Migrations\Nested\Group1\FromGroup1.cs" />
     <Compile Include="Integration\Migrations\Nested\Group2\FromGroup2.cs" />
@@ -188,6 +188,10 @@
     <Compile Include="Unit\Builders\Create\CreateTableExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateColumnExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Schema\SchemaExpressionRootTest.cs" />
+    <Compile Include="Unit\Initialization\ConnectionStringManagerTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Unit\Initialization\NetConfigManagerTests.cs" />
     <Compile Include="Unit\Expressions\AlterSchemaExpressionTests.cs" />
     <Compile Include="Unit\Expressions\AlterColumnExpressionTests.cs" />
     <Compile Include="Unit\Expressions\DeleteIndexExpressionTests.cs" />
@@ -291,10 +295,11 @@
     <None Include="testscript.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Unit\ConnectionStringName\Fixtures\WithConnectionString.config" />
-    <None Include="Unit\ConnectionStringName\Fixtures\WithConnectionString.exe.config" />
-    <None Include="Unit\ConnectionStringName\Fixtures\WithNoConnectionString.exe.config" />
-    <None Include="Unit\ConnectionStringName\Fixtures\WithWrongConnectionString.config" />
+    <None Include="Unit\Initialization\Fixtures\FromMachineConfig.config" />
+    <None Include="Unit\Initialization\Fixtures\WithConnectionString.config" />
+    <None Include="Unit\Initialization\Fixtures\WithConnectionString.exe.config" />
+    <None Include="Unit\Initialization\Fixtures\WithNoConnectionString.exe.config" />
+    <None Include="Unit\Initialization\Fixtures\WithWrongConnectionString.config" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
