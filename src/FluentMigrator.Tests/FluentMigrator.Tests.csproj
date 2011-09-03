@@ -188,6 +188,9 @@
     <Compile Include="Unit\Builders\Create\CreateTableExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateColumnExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Schema\SchemaExpressionRootTest.cs" />
+    <Compile Include="Unit\ConnectionStringName\ConnectionStringManagerTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Unit\ConnectionStringName\NetConfigManagerTests.cs" />
     <Compile Include="Unit\Expressions\AlterSchemaExpressionTests.cs" />
     <Compile Include="Unit\Expressions\AlterColumnExpressionTests.cs" />
@@ -292,6 +295,7 @@
     <None Include="testscript.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Unit\ConnectionStringName\Fixtures\FromMachineConfig.config" />
     <None Include="Unit\ConnectionStringName\Fixtures\WithConnectionString.config" />
     <None Include="Unit\ConnectionStringName\Fixtures\WithConnectionString.exe.config" />
     <None Include="Unit\ConnectionStringName\Fixtures\WithNoConnectionString.exe.config" />

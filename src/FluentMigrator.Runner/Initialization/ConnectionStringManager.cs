@@ -18,6 +18,7 @@ namespace FluentMigrator.Runner.Initialization
         private string database;
         private string configFile;
         private bool notUsingConfig;
+        private INetConfigManager configManager;
 
         public ConnectionStringManager(INetConfigManager configManager, string connection, string configPath, string assemblyLocation, string database)
         {
@@ -25,7 +26,8 @@ namespace FluentMigrator.Runner.Initialization
             this.configPath = configPath;
             this.database = database;
             this.assemblyLocation = assemblyLocation;
-            notUsingConfig = true;
+            this.notUsingConfig = true;
+            this.configManager = configManager;
         }
 
         public void LoadConnectionString()
@@ -79,14 +81,19 @@ namespace FluentMigrator.Runner.Initialization
 
         private void LoadFromMachineConfig(bool useDefault)
         {
-            if (ConfigurationManager.ConnectionStrings.Count == 0)
+            var config = configManager.LoadFromMachineConfiguration();
+
+            var connections = config.ConnectionStrings.ConnectionStrings;
+
+            if (connections == null || connections.Count <= 0)
                 return;
 
             ConnectionStringSettings machineConnectionString;
+
             if (useDefault)
-                machineConnectionString = ConfigurationManager.ConnectionStrings[0];
+                machineConnectionString = connections[0];
             else
-                machineConnectionString = (from cnn in ConfigurationManager.ConnectionStrings.OfType<ConnectionStringSettings>()
+                machineConnectionString = (from cnn in connections.OfType<ConnectionStringSettings>()
                                            where cnn.Name == connection
                                            select cnn).FirstOrDefault();
 
@@ -95,17 +102,7 @@ namespace FluentMigrator.Runner.Initialization
 
         private void LoadFromFile(string path)
         {
-            if (String.IsNullOrEmpty(path) || !File.Exists(path))
-                return;
-
-            string configFile = path.Trim();
-
-            if (!configFile.EndsWith(".config", StringComparison.InvariantCultureIgnoreCase))
-                configFile += ".config";
-
-            var fileMap = new ExeConfigurationFileMap { ExeConfigFilename = configFile };
-
-            var config = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
+            var config = configManager.LoadFromFile(path);
 
             var connections = config.ConnectionStrings.ConnectionStrings;
 

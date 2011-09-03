@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.ConnectionStringName
 
             Configuration config = sut.LoadFromFile(GetPath("WithConnectionString.config"));
 
-            config.ConnectionStrings.ConnectionStrings[1].ConnectionString.ShouldBe("From Arbitrary Config");
+            config.ConnectionStrings.ConnectionStrings[0].ConnectionString.ShouldBe("From Arbitrary Config");
         }
 
         [Test]
@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.ConnectionStringName
 
             Configuration config = sut.LoadFromFile(GetPath("WithConnectionString.exe.config"));
 
-            config.ConnectionStrings.ConnectionStrings[1].ConnectionString.ShouldBe("From App Config");
+            config.ConnectionStrings.ConnectionStrings[0].ConnectionString.ShouldBe("From App Config");
         }
 
         [Test]
@@ -62,7 +62,7 @@ namespace FluentMigrator.Tests.Unit.ConnectionStringName
 
             Configuration config = sut.LoadFromFile(GetPath("WithConnectionString.exe"));
 
-            config.ConnectionStrings.ConnectionStrings[1].ConnectionString.ShouldBe("From App Config");
+            config.ConnectionStrings.ConnectionStrings[0].ConnectionString.ShouldBe("From App Config");
         }
 
         [Test]
