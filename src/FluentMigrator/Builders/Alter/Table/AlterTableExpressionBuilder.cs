@@ -173,5 +173,35 @@ namespace FluentMigrator.Builders.Alter.Table
         {
             return CurrentColumn;
         }
+
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax ForeignKey(string primaryTableName, string primaryColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax ForeignKey(string foreignKeyName, string primaryTableName, string primaryColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax ForeignKey(string foreignKeyName, string primaryTableSchema, string primaryTableName, string primaryColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax ReferencedBy(string foreignTableName, string foreignColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax ReferencedBy(string foreignKeyName, string foreignTableName, string foreignColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax ReferencedBy(string foreignKeyName, string foreignTableSchema, string foreignTableName, string foreignColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
     }
 }

@@ -135,5 +135,35 @@ namespace FluentMigrator.Builders.Create.Column
 		{
 			return Expression.Column;
 		}
-	}
+
+        public ICreateColumnOptionSyntax ForeignKey(string primaryTableName, string primaryColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public ICreateColumnOptionSyntax ForeignKey(string foreignKeyName, string primaryTableName, string primaryColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public ICreateColumnOptionSyntax ForeignKey(string foreignKeyName, string primaryTableSchema, string primaryTableName, string primaryColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public ICreateColumnOptionSyntax ReferencedBy(string foreignTableName, string foreignColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public ICreateColumnOptionSyntax ReferencedBy(string foreignKeyName, string foreignTableName, string foreignColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public ICreateColumnOptionSyntax ReferencedBy(string foreignKeyName, string foreignTableSchema, string foreignTableName, string foreignColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+    }
 }

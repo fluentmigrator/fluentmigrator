@@ -140,9 +140,40 @@ namespace FluentMigrator.Builders.Alter.Column
 			_context.Expressions.Add( fk );
 			return this;
 		}
+
 		protected override ColumnDefinition GetColumnForType()
 		{
 			return Expression.Column;
 		}
-	}
+
+        public IAlterColumnOptionSyntax ForeignKey(string primaryTableName, string primaryColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IAlterColumnOptionSyntax ForeignKey(string foreignKeyName, string primaryTableName, string primaryColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IAlterColumnOptionSyntax ForeignKey(string foreignKeyName, string primaryTableSchema, string primaryTableName, string primaryColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IAlterColumnOptionSyntax ReferencedBy(string foreignTableName, string foreignColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IAlterColumnOptionSyntax ReferencedBy(string foreignKeyName, string foreignTableName, string foreignColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public IAlterColumnOptionSyntax ReferencedBy(string foreignKeyName, string foreignTableSchema, string foreignTableName, string foreignColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+    }
 }

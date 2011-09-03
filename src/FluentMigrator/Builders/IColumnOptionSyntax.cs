@@ -25,7 +25,6 @@ namespace FluentMigrator.Builders
 		where TNext : IFluentSyntax
 	{
 		TNext WithDefaultValue(object value);
-		TNext ForeignKey();
 		TNext Identity();
 		TNext Indexed();
 		TNext PrimaryKey();
@@ -33,7 +32,15 @@ namespace FluentMigrator.Builders
 		TNext Nullable();
 		TNext NotNullable();
 		TNext Unique();
-		TNext References(string foreignKeyName, string foreignTableName, IEnumerable<string> foreignColumnNames);
+        TNext ForeignKey(string primaryTableName, string primaryColumnName);
+        TNext ForeignKey(string foreignKeyName, string primaryTableName, string primaryColumnName);
+        TNext ForeignKey(string foreignKeyName, string primaryTableSchema, string primaryTableName, string primaryColumnName);
+        TNext ReferencedBy(string foreignTableName, string foreignColumnName);
+        TNext ReferencedBy(string foreignKeyName, string foreignTableName, string foreignColumnName);
+        TNext ReferencedBy(string foreignKeyName, string foreignTableSchema, string foreignTableName, string foreignColumnName);
+
+        TNext ForeignKey();
+        TNext References(string foreignKeyName, string foreignTableName, IEnumerable<string> foreignColumnNames);
 		TNext References(string foreignKeyName, string foreignTableSchema, string foreignTableName, IEnumerable<string> foreignColumnNames);
 	}
 }

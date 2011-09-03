@@ -138,5 +138,35 @@ namespace FluentMigrator.Builders.Create.Table
 		{
 			return CurrentColumn;
 		}
-	}
+
+        public ICreateTableColumnOptionOrWithColumnSyntax ForeignKey(string primaryTableName, string primaryColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public ICreateTableColumnOptionOrWithColumnSyntax ForeignKey(string foreignKeyName, string primaryTableName, string primaryColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public ICreateTableColumnOptionOrWithColumnSyntax ForeignKey(string foreignKeyName, string primaryTableSchema, string primaryTableName, string primaryColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public ICreateTableColumnOptionOrWithColumnSyntax ReferencedBy(string foreignTableName, string foreignColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public ICreateTableColumnOptionOrWithColumnSyntax ReferencedBy(string foreignKeyName, string foreignTableName, string foreignColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public ICreateTableColumnOptionOrWithColumnSyntax ReferencedBy(string foreignKeyName, string foreignTableSchema, string foreignTableName, string foreignColumnName)
+        {
+            throw new System.NotImplementedException();
+        }
+    }
 }
