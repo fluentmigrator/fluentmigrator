@@ -106,11 +106,6 @@ namespace FluentMigrator.Console
 						v => { Connection = v; }
 					},
 					{
-						"connectionStringName=|connectionName=|C=",
-						"The name of the connection string named in machine config. Use --connectionStringConfigPath to specify where the machine.config lives",
-						v => { ConnectionStringName = v; }
-					},
-					{
 						"connectionStringConfigPath=|configPath=",
 						string.Format("The path of the machine.config where the connection string named by connectionStringName"+
 							" is found. If not specified, it defaults to the machine.config used by the currently running CLR version"),

@@ -27,8 +27,6 @@ namespace FluentMigrator.Console
             try
             {
                 new MigratorConsole(args);
-
-                System.Console.ReadLine();
             }
             catch (ArgumentException ex)
             {
