@@ -34,10 +34,10 @@ namespace FluentMigrator.Runner.Initialization
         {
             if (!String.IsNullOrEmpty(connection))
             {
-                if (notUsingConfig)
+                if (notUsingConfig && !String.IsNullOrEmpty(configFile))
                     LoadConnectionStringFromConfigurationFile(configManager.LoadFromFile(configFile), false);
 
-                if (notUsingConfig)
+                if (notUsingConfig && !String.IsNullOrEmpty(assemblyLocation))
                 {
                     string defaultConfigFile = assemblyLocation;
 

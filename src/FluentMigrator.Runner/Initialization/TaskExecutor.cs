@@ -80,6 +80,8 @@ namespace FluentMigrator.Runner.Initialization
         {
             var manager = new ConnectionStringManager(new NetConfigManager(), RunnerContext.Connection, RunnerContext.ConnectionStringConfigPath, assemblyLocation, RunnerContext.Database);
 
+            manager.LoadConnectionString();
+
             if (RunnerContext.Timeout == 0)
             {
                 RunnerContext.Timeout = 30; // Set default timeout for command
