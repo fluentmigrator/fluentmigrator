@@ -14,7 +14,7 @@ namespace FluentMigrator.Tests.Unit.ConnectionStringName
     {
         private static string GetPath(string relative)
         {
-            return string.Format(@"..\..\Unit\ConnectionStringName\Fixtures\{0}", relative);
+            return string.Format(@"..\..\Unit\Initialization\Fixtures\{0}", relative);
         }
 
         [Test]
