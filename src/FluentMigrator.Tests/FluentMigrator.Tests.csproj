@@ -126,6 +126,7 @@
       <HintPath>..\..\lib\nunit.should.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -146,7 +147,6 @@
     <Compile Include="Helpers\PostgresTestTable.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
     <Compile Include="Unit\Builders\IfDatabase\IfDatabaseExpressionRootTests.cs" />
-    <Compile Include="Unit\ConnectionStringName\ConnectionStringNameTests.cs" />
     <Compile Include="Integration\Migrations\Nested\Group1\AnotherFromGroup1.cs" />
     <Compile Include="Integration\Migrations\Nested\Group1\FromGroup1.cs" />
     <Compile Include="Integration\Migrations\Nested\Group2\FromGroup2.cs" />
@@ -188,6 +188,7 @@
     <Compile Include="Unit\Builders\Create\CreateTableExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateColumnExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Schema\SchemaExpressionRootTest.cs" />
+    <Compile Include="Unit\ConnectionStringName\NetConfigManagerTests.cs" />
     <Compile Include="Unit\Expressions\AlterSchemaExpressionTests.cs" />
     <Compile Include="Unit\Expressions\AlterColumnExpressionTests.cs" />
     <Compile Include="Unit\Expressions\DeleteIndexExpressionTests.cs" />

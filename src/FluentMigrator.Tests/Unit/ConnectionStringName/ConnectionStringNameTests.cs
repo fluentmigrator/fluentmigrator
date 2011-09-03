@@ -11,11 +11,6 @@ namespace FluentMigrator.Tests.Unit.ConnectionStringName
     [TestFixture]
     internal class ConnectionStringNameTests
     {
-        private static string GetPath(string relative)
-        {
-            return string.Format(@"..\..\Unit\ConnectionStringName\Fixtures\{0}", relative);
-        }
-
         private const string TARGET = "FluentMigrator.Tests.dll";
         private const string DATABASE = "sqlserver2008";
         private const string CONNECTION_NAME = "Test.Connection";

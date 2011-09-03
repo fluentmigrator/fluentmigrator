@@ -19,7 +19,7 @@ namespace FluentMigrator.Runner.Initialization
         private string configFile;
         private bool notUsingConfig;
 
-        public ConnectionStringManager(string connection, string configPath, string assemblyLocation, string database)
+        public ConnectionStringManager(INetConfigManager configManager, string connection, string configPath, string assemblyLocation, string database)
         {
             this.connection = connection;
             this.configPath = configPath;
@@ -103,7 +103,7 @@ namespace FluentMigrator.Runner.Initialization
             if (!configFile.EndsWith(".config", StringComparison.InvariantCultureIgnoreCase))
                 configFile += ".config";
 
-            var fileMap = new ExeConfigurationFileMap {ExeConfigFilename = configFile};
+            var fileMap = new ExeConfigurationFileMap { ExeConfigFilename = configFile };
 
             var config = ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
 

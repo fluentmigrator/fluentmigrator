@@ -39,7 +39,7 @@ namespace FluentMigrator.Runner.Initialization
         {
             var assembly = AssemblyLoaderFactory.GetAssemblyLoader(RunnerContext.Target).Load();
 
-			var processor = InitializeProcessor(assembly.Location);
+            var processor = InitializeProcessor(assembly.Location);
 
             Runner = new MigrationRunner(assembly, RunnerContext, processor);
         }
@@ -76,9 +76,9 @@ namespace FluentMigrator.Runner.Initialization
             }
         }
 
-    	private IMigrationProcessor InitializeProcessor(string assemblyLocation)
+        private IMigrationProcessor InitializeProcessor(string assemblyLocation)
         {
-            var manager = new ConnectionStringManager(RunnerContext.Connection, RunnerContext.ConnectionStringConfigPath, assemblyLocation, RunnerContext.Database);
+            var manager = new ConnectionStringManager(new NetConfigManager(), RunnerContext.Connection, RunnerContext.ConnectionStringConfigPath, assemblyLocation, RunnerContext.Database);
 
             if (RunnerContext.Timeout == 0)
             {
