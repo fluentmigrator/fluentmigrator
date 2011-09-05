@@ -1,12 +1,10 @@
 ﻿namespace FluentMigrator.Runner.Processors.Oracle
 {
-	using System.Data.Common;
-
-	public class OracleDbFactory : DbFactoryBase
-	{
-		public OracleDbFactory()
-			: base(DbProviderFactories.GetFactory("Oracle.DataAccess.Client"))
-		{
-		}
-	}
+    public class OracleDbFactory : ReflectionBasedDbFactory
+    {
+        public OracleDbFactory()
+            : base("Oracle.DataAccess", "Oracle.DataAccess.Client.OracleClientFactory")
+        {
+        }
+    }
 }

@@ -1,11 +1,9 @@
 namespace FluentMigrator.Runner.Processors.MySql
 {
-	using global::MySql.Data.MySqlClient;
-
-	public class MySqlDbFactory : DbFactoryBase
-	{
-		public MySqlDbFactory() : base(MySqlClientFactory.Instance)
-		{
-		}
-	}
+    public class MySqlDbFactory : ReflectionBasedDbFactory
+    {
+        public MySqlDbFactory() : base("MySql.Data", "MySql.Data.MySqlClient.MySqlClientFactory")
+        {
+        }
+    }
 }

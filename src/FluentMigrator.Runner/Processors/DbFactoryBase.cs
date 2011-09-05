@@ -1,22 +1,46 @@
 namespace FluentMigrator.Runner.Processors
 {
-	using System;
-	using System.Data.Common;
+    using System.Data.Common;
 
-	public class DbFactoryBase : IDbFactory
+	public abstract class DbFactoryBase : IDbFactory
 	{
-		private readonly DbProviderFactory factory;
+		private volatile DbProviderFactory factory;
+	    private readonly object @lock = new object();
 
 		protected DbFactoryBase(DbProviderFactory factory)
 		{
 			this.factory = factory;
 		}
 
-		#region IDbFactory Members
+	    protected DbFactoryBase()
+	    {
+	    }
+
+	    private DbProviderFactory Factory
+	    {
+	        get
+	        {
+	            if (factory == null)
+	            {
+	                lock (@lock)
+	                {
+	                    if (factory == null)
+	                    {
+	                        factory = CreateFactory();
+	                    }
+	                }
+	            }
+	            return factory;
+	        }
+	    }
+
+	    protected abstract DbProviderFactory CreateFactory();
+
+	    #region IDbFactory Members
 
 		public DbConnection CreateConnection(string connectionString)
 		{
-			DbConnection connection = factory.CreateConnection();
+			DbConnection connection = Factory.CreateConnection();
 			connection.ConnectionString = connectionString;
 			return connection;
 		}
@@ -31,7 +55,7 @@ namespace FluentMigrator.Runner.Processors
 
 		public DbDataAdapter CreateDataAdapter(DbCommand command)
 		{
-			DbDataAdapter dataAdapter = factory.CreateDataAdapter();
+			DbDataAdapter dataAdapter = Factory.CreateDataAdapter();
 			dataAdapter.SelectCommand = command;
 			return dataAdapter;
 		}

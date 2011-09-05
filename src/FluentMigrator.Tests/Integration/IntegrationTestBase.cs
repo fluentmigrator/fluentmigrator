@@ -18,7 +18,6 @@
 
 using System;
 using System.Data.SqlClient;
-using System.Data.SQLite;
 using System.Linq;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.Postgres;
@@ -114,9 +113,10 @@ namespace FluentMigrator.Tests.Integration
 			var announcer = new TextWriterAnnouncer(System.Console.Out);
 			announcer.Heading("Testing Migration against SQLite");
 
-			using (var connection = new SQLiteConnection(serverOptions.ConnectionString))
+		    var factory = new SqliteDbFactory();
+            using (var connection =  factory.CreateConnection(serverOptions.ConnectionString))
 			{
-				var processor = new SqliteProcessor(connection, new SqliteGenerator(), announcer, new ProcessorOptions());
+			    var processor = new SqliteProcessor(connection, new SqliteGenerator(), announcer, new ProcessorOptions(), factory);
 				test(processor);
 			}
 		}
