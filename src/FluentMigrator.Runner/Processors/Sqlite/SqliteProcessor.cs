@@ -19,7 +19,6 @@
 
 using System;
 using System.Data;
-using System.Data.SQLite;
 using System.Data.Common;
 
 using FluentMigrator.Builders.Execute;
@@ -138,9 +137,9 @@ namespace FluentMigrator.Runner.Processors.Sqlite
                 {
                     command.ExecuteNonQuery();
                 }
-                catch (SQLiteException ex)
+                catch (DbException ex)
                 {
-                    throw new SQLiteException(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
+                    throw new Exception(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
                 }
             }
         }
@@ -171,9 +170,9 @@ namespace FluentMigrator.Runner.Processors.Sqlite
                         }
                     }
                 }
-                catch (SQLiteException ex)
+                catch (DbException ex)
                 {
-                    throw new SQLiteException(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
+                    throw new Exception(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
                 }
             }
         }
