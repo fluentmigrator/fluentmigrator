@@ -74,6 +74,8 @@ namespace FluentMigrator.Runner.Initialization
                     Runner.MigrateDown(RunnerContext.Version);
                     break;
             }
+
+            RunnerContext.Announcer.Say("Task completed.");
         }
 
         private IMigrationProcessor InitializeProcessor(string assemblyLocation)
