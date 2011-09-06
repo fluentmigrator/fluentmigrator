@@ -10,19 +10,19 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {
     public class OracleAlterTableTests : BaseTableAlterTests
     {
-        private OracleGenerator generator;
+        private OracleGenerator _generator;
 
         [SetUp]
         public void Setup()
         {
-            generator = new OracleGenerator();
+            _generator = new OracleGenerator();
         }
 
         [Test]
         public override void CanAddColumn()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
-            string sql = generator.Generate(expression);
+            string sql = _generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NVARCHAR2(5) NOT NULL");
         }
 
@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public override void CanAddDecimalColumn()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
-            string sql = generator.Generate(expression);
+            string sql = _generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NUMBER(19,2) NOT NULL");
         }
 
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
                 DefaultValue = SystemMethods.CurrentDateTime
             };
             var expression = new CreateColumnExpression { TableName = "TestTable1", Column = column };
-            var sql = generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 DATE DEFAULT sysdate NOT NULL");
         }
 
@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public override void CanRenameColumn()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
-            string sql = generator.Generate(expression);
+            string sql = _generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE TestTable1 RENAME COLUMN TestColumn1 TO TestColumn2");
         }
 
@@ -60,20 +60,23 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public override void CanRenameTable()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
-            string sql = generator.Generate(expression);
+            string sql = _generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE TestTable1 RENAME TO TestTable2");
         }
 
         [Test]
         public override void CanAlterColumn()
         {
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
+            string sql = _generator.Generate(expression);
+            sql.ShouldBe("ALTER TABLE TestTable1 MODIFY TestColumn1 NVARCHAR2(20) NOT NULL");
         }
 
         [Test]
         public override void CanCreateForeignKey()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
-            string sql = generator.Generate(expression);
+            string sql = _generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT FK_Test FOREIGN KEY (TestColumn1) REFERENCES TestTable2 (TestColumn2)");
         }
 
@@ -81,7 +84,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public override void CanCreateMulitColumnForeignKey()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
-            string sql = generator.Generate(expression);
+            string sql = _generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT FK_Test FOREIGN KEY (TestColumn1, TestColumn3) REFERENCES TestTable2 (TestColumn2, TestColumn4)");
         }
 
@@ -94,15 +97,15 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public override void CanAlterSchema()
         {
             var expression = new AlterSchemaExpression();
-            var result = generator.Generate(expression);
+            var result = _generator.Generate(expression);
             result.ShouldBe(string.Empty);
         }
 
         [Test]
         public void CanAlterSchemaInStrictMode()
         {
-            generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(new CreateSchemaExpression()));
+            _generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new CreateSchemaExpression()));
         }
     }
 }
