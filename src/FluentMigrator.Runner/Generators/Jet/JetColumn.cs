@@ -1,19 +1,15 @@
-﻿
+﻿using System;
+using System.Data;
+using FluentMigrator.Model;
+using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Jet
 {
-    using System;
-    using System.Data;
-    using FluentMigrator.Model;
-    using FluentMigrator.Runner.Generators.Base;
-    using FluentMigrator.Runner.Generators.Generic;
-
-	internal class JetColumn : ColumnBase
-	{
-		public JetColumn() : base(new JetTypeMap(), new JetQuoter())
-		{
-           
-		}
+    internal class JetColumn : ColumnBase
+    {
+        public JetColumn() : base(new JetTypeMap(), new JetQuoter())
+        {
+        }
 
         protected override string FormatType(ColumnDefinition column)
         {
@@ -36,9 +32,9 @@ namespace FluentMigrator.Runner.Generators.Jet
             return string.Empty;
         }
 
-		protected override string FormatSystemMethods(SystemMethods systemMethod)
-		{
-			throw new NotImplementedException();
-		}
-	}
+        protected override object FormatSystemMethods(SystemMethods systemMethod)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }

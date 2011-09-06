@@ -47,7 +47,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
                 Name = "TestColumn1",
                 Type = DbType.String,
                 Size = 5,
-                DefaultValue = "GetDate()"
+                DefaultValue = (FunctionValue) "GetDate()"
             };
             var expression = new CreateTableExpression { TableName = "TestTable1" };
             expression.Columns.Add(column);

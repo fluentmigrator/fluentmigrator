@@ -1,4 +1,5 @@
-﻿using FluentMigrator.Model;
+﻿using System;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Oracle
@@ -18,6 +19,16 @@ namespace FluentMigrator.Runner.Generators.Oracle
             }
         }
 
+        protected override string FormatDefaultValue(ColumnDefinition column)
+        {
+            if (column.DefaultValue is FunctionValue)
+            {
+                return "DEFAULT " + column.DefaultValue;
+            }
+
+            return base.FormatDefaultValue(column);
+        }
+
         protected override string FormatIdentity(ColumnDefinition column)
         {
             if (column.IsIdentity)
@@ -27,15 +38,15 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return string.Empty;
         }
 
-        protected override string FormatSystemMethods(SystemMethods systemMethod)
+        protected override object FormatSystemMethods(SystemMethods systemMethod)
         {
             switch (systemMethod)
             {
                 case SystemMethods.NewGuid:
-                    return "sys_guid()";
+                    return (FunctionValue) "sys_guid()";
             }
 
-            return null;
+            throw new NotImplementedException();
         }
     }
 }

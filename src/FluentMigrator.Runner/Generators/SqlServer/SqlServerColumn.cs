@@ -3,41 +3,52 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
-	internal class SqlServerColumn : ColumnBase
-	{
-		public SqlServerColumn(ITypeMap typeMap) : base(typeMap, new SqlServerQuoter())
-		{
-		}
+    internal class SqlServerColumn : ColumnBase
+    {
+        public SqlServerColumn(ITypeMap typeMap) : base(typeMap, new SqlServerQuoter())
+        {
+        }
 
-		protected override string FormatDefaultValue(ColumnDefinition column)
-		{
-            if(column.DefaultValue is string && column.DefaultValue.ToString().EndsWith("()"))
-                return "DEFAULT " + column.DefaultValue.ToString();
+        protected override string FormatDefaultValue(ColumnDefinition column)
+        {
+            if (column.DefaultValue is FunctionValue)
+                return "DEFAULT " + (FunctionValue)column.DefaultValue;
 
-			var defaultValue = base.FormatDefaultValue(column);
+            var defaultValue = base.FormatDefaultValue(column);
 
-			if(!string.IsNullOrEmpty(defaultValue))
-				return string.Format("CONSTRAINT DF_{0}_{1} ", column.TableName, column.Name) + defaultValue;
+            if (!string.IsNullOrEmpty(defaultValue))
+                return string.Format("CONSTRAINT DF_{0}_{1} ", column.TableName, column.Name) + defaultValue;
 
-			return string.Empty;
-		}
+            return string.Empty;
 
-		protected override string FormatIdentity(ColumnDefinition column)
-		{
-			return column.IsIdentity ? "IDENTITY(1,1)" : string.Empty;
-		}
+            //if (column.DefaultValue is string && column.DefaultValue.ToString().EndsWith("()"))
+            //    return "DEFAULT " + column.DefaultValue.ToString();
 
-        protected override string FormatSystemMethods(SystemMethods systemMethod)
+            //var defaultValue = base.FormatDefaultValue(column);
+
+            //if (!string.IsNullOrEmpty(defaultValue))
+            //    return string.Format("CONSTRAINT DF_{0}_{1} ", column.TableName, column.Name) + defaultValue;
+
+            //return string.Empty;
+
+        }
+
+        protected override string FormatIdentity(ColumnDefinition column)
+        {
+            return column.IsIdentity ? "IDENTITY(1,1)" : string.Empty;
+        }
+
+        protected override object FormatSystemMethods(SystemMethods systemMethod)
         {
             switch (systemMethod)
             {
                 case SystemMethods.NewGuid:
-                    return "NEWID()";
+                    return (FunctionValue) "NEWID()";
                 case SystemMethods.CurrentDateTime:
-                    return "GETDATE()";
+                    return (FunctionValue) "GETDATE()";
             }
 
             return null;
         }
-	}
+    }
 }

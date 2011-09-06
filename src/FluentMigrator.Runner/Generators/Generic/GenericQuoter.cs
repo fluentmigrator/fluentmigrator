@@ -14,6 +14,8 @@ namespace FluentMigrator.Runner.Generators.Generic
 
             string stringValue = value as string;
             if (stringValue != null) { return FormatString(stringValue); }
+            var functionValue = value as FunctionValue;
+            if (functionValue != null) { return FormatString(functionValue.Value); }
 
             if (value is char) { return FormatChar((char)value); }
             if (value is bool) { return FormatBool((bool)value); }

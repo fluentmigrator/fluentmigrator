@@ -31,7 +31,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         public void CanAddColumnWithGetDateDefault()
         {
             ColumnDefinition column = new ColumnDefinition { Name = "TestColumn1", Type = DbType.String, 
-                Size = 5, DefaultValue = "GetDate()" };
+                Size = 5, DefaultValue = (FunctionValue)"GetDate()" };
             var expression = new CreateColumnExpression { TableName = "TestTable1", Column = column };
             var sql = generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL DEFAULT GetDate()");
