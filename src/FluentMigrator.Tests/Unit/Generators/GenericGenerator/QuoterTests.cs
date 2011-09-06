@@ -2,30 +2,28 @@
 using System.Globalization;
 using System.Threading;
 using FluentMigrator.Runner.Generators;
-using NUnit.Framework;
-using NUnit.Should;
-using FluentMigrator.Runner.Generators.Base;
 using FluentMigrator.Runner.Generators.Generic;
-using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Runner.Generators.Jet;
 using FluentMigrator.Runner.Generators.MySql;
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Generators.SQLite;
-using FluentMigrator.Runner.Generators.Jet;
+using FluentMigrator.Runner.Generators.SqlServer;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {
-	[TestFixture]
-	public class ConstantFormatterTests
-	{
-        
-		private IQuoter quoter = default(GenericQuoter);
-	    private CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
+    [TestFixture]
+    public class ConstantFormatterTests
+    {
+        private IQuoter quoter = default(GenericQuoter);
+        private CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
 
-		[SetUp]
-		public void SetUp()
-		{
-			quoter = new GenericQuoter();
-		}
+        [SetUp]
+        public void SetUp()
+        {
+            quoter = new GenericQuoter();
+        }
 
         [Test]
         public void CanQuoteAString()
@@ -87,84 +85,84 @@ namespace FluentMigrator.Tests.Unit.Generators
             quoter.QuoteColumnName("\"SchemaName\"").ShouldBe("\"SchemaName\"");
         }
 
-		[Test]
-		public void NullIsFormattedAsLiteral()
-		{
-			quoter.QuoteValue(null)
-				.ShouldBe("NULL");
-		}
+        [Test]
+        public void NullIsFormattedAsLiteral()
+        {
+            quoter.QuoteValue(null)
+                .ShouldBe("NULL");
+        }
 
-		[Test]
-		public void StringIsFormattedWithQuotes()
-		{
+        [Test]
+        public void StringIsFormattedWithQuotes()
+        {
             quoter.QuoteValue("value")
-				.ShouldBe("'value'");
-		}
+                .ShouldBe("'value'");
+        }
 
-		[Test]
-		public void StringWithQuoteIsFormattedWithDoubleQuote()
-		{
+        [Test]
+        public void StringWithQuoteIsFormattedWithDoubleQuote()
+        {
             quoter.QuoteValue("val'ue")
-				.ShouldBe("'val''ue'");
-		}
+                .ShouldBe("'val''ue'");
+        }
 
-		[Test]
-		public void CharIsFormattedWithQuotes()
-		{
+        [Test]
+        public void CharIsFormattedWithQuotes()
+        {
             quoter.QuoteValue('A')
-				.ShouldBe("'A'");
-		}
+                .ShouldBe("'A'");
+        }
 
-		[Test]
-		public void TrueIsFormattedAsOne()
-		{
+        [Test]
+        public void TrueIsFormattedAsOne()
+        {
             quoter.QuoteValue(true)
-				.ShouldBe("1");
-		}
+                .ShouldBe("1");
+        }
 
-		[Test]
-		public void FalseIsFormattedAsZero()
-		{
+        [Test]
+        public void FalseIsFormattedAsZero()
+        {
             quoter.QuoteValue(false)
-				.ShouldBe("0");
-		}
+                .ShouldBe("0");
+        }
 
-		[Test]
-		public void GuidIsFormattedWithQuotes()
-		{
-			Guid guid = new Guid("00000000-0000-0000-0000-000000000000");
+        [Test]
+        public void GuidIsFormattedWithQuotes()
+        {
+            Guid guid = new Guid("00000000-0000-0000-0000-000000000000");
             quoter.QuoteValue(guid)
-				.ShouldBe("'00000000-0000-0000-0000-000000000000'");
-		}
+                .ShouldBe("'00000000-0000-0000-0000-000000000000'");
+        }
 
-		[Test]
-		public void DateTimeIsFormattedIso8601WithQuotes()
-		{
-			DateTime date = new DateTime(2010,1,2,18,4,5,123);
+        [Test]
+        public void DateTimeIsFormattedIso8601ExceptTWithQuotes()
+        {
+            DateTime date = new DateTime(2010, 1, 2, 18, 4, 5, 123);
             quoter.QuoteValue(date)
-				.ShouldBe("'2010-01-02T18:04:05'");
-		}
+                .ShouldBe("to_date('2010-01-02 18:04:05', 'yyyy-mm-dd hh24:mi:ss')");
+        }
 
-		[Test]
-		public void Int32IsBare()
-		{
+        [Test]
+        public void Int32IsBare()
+        {
             quoter.QuoteValue(1234)
-				.ShouldBe("1234");
-		}
+                .ShouldBe("1234");
+        }
 
-		[Test]
-		public void CustomTypeIsBare()
-		{
+        [Test]
+        public void CustomTypeIsBare()
+        {
             quoter.QuoteValue(new CustomClass())
-				.ShouldBe("CustomClass");
-		}
+                .ShouldBe("CustomClass");
+        }
 
-	    [Test]
-	    public void EnumIsFormattedAsString()
-	    {
+        [Test]
+        public void EnumIsFormattedAsString()
+        {
             quoter.QuoteValue(Foo.Bar)
                 .ShouldBe("'Bar'");
-	    }
+        }
 
         [Test]
         public void ShouldEscapeJetObjectNames()
@@ -222,35 +220,34 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         [Test]
         public void ShouldHandleDecimalToStringConversionInAnyCulture()
-        {           
+        {
             ChangeCulture();
             quoter.QuoteValue(new Decimal(123.4d)).ShouldBe("123.4");
             RestoreCulture();
         }
 
-	    private void RestoreCulture()
-	    {
-	        Thread.CurrentThread.CurrentCulture = currentCulture;
-	    }
+        private void RestoreCulture()
+        {
+            Thread.CurrentThread.CurrentCulture = currentCulture;
+        }
 
-	    private void ChangeCulture()
-	    {
-	        Thread.CurrentThread.CurrentCulture = new CultureInfo("nb-NO");
-	    }
+        private void ChangeCulture()
+        {
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("nb-NO");
+        }
 
-
-	    private enum Foo
+        private enum Foo
         {
             Bar,
             Baz
         }
 
-		private class CustomClass
-		{
-			public override string ToString()
-			{
-				return "CustomClass";
-			}
-		}
-	}
+        private class CustomClass
+        {
+            public override string ToString()
+            {
+                return "CustomClass";
+            }
+        }
+    }
 }
