@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
 
@@ -6,6 +8,8 @@ namespace FluentMigrator.Runner.Generators.Oracle
 {
     internal class OracleColumn : ColumnBase
     {
+        private const int OracleObjectNameMaxLength = 30;
+
         public OracleColumn() : base(new OracleTypeMap(), new OracleQuoter())
         {
             int a = ClauseOrder.IndexOf(FormatDefaultValue);
@@ -49,6 +53,22 @@ namespace FluentMigrator.Runner.Generators.Oracle
             }
 
             throw new NotImplementedException();
+        }
+
+        protected override string GetPrimaryKeyConstraintName(IEnumerable<ColumnDefinition> primaryKeyColumns, string tableName)
+        {
+            var primaryKeyName = primaryKeyColumns.First().PrimaryKeyName;
+
+            if (string.IsNullOrEmpty(primaryKeyName))
+            {
+                return string.Empty;
+            }
+
+            if (primaryKeyName.Length > OracleObjectNameMaxLength)
+                primaryKeyName = primaryKeyName.Substring(0, OracleObjectNameMaxLength);
+
+            var result = string.Format("CONSTRAINT {0} ", Quoter.QuoteIndexName(primaryKeyName));
+            return result;
         }
     }
 }
