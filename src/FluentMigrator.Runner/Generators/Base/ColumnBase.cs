@@ -64,8 +64,13 @@ namespace FluentMigrator.Runner.Generators.Base
 
             if (defaultValue is string && string.IsNullOrEmpty((string)defaultValue))
                 return string.Empty;
-            if (defaultValue is FunctionValue && string.IsNullOrEmpty(((FunctionValue)defaultValue).Value))
-                return string.Empty;
+            if (defaultValue is FunctionValue)
+            {
+                var result = string.IsNullOrEmpty(((FunctionValue) defaultValue).Value)
+                                 ? string.Empty
+                                 : "DEFAULT " + defaultValue;
+                return result;
+            }
 
             return "DEFAULT " + Quoter.QuoteValue(defaultValue);
         }

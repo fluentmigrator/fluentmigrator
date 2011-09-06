@@ -1,4 +1,6 @@
-﻿using FluentMigrator.Expressions;
+﻿using System.Data;
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Framework;
@@ -30,6 +32,20 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
             string sql = generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NUMBER(19,2) NOT NULL");
+        }
+
+        [Test]
+        public void CanAddColumnWithSystemMethodsCurrentDateTimeDefault()
+        {
+            var column = new ColumnDefinition
+            {
+                Name = "TestColumn1",
+                Type = DbType.Date,
+                DefaultValue = SystemMethods.CurrentDateTime
+            };
+            var expression = new CreateColumnExpression { TableName = "TestTable1", Column = column };
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 DATE DEFAULT sysdate NOT NULL");
         }
 
         [Test]

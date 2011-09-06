@@ -44,6 +44,8 @@ namespace FluentMigrator.Runner.Generators.Oracle
             {
                 case SystemMethods.NewGuid:
                     return (FunctionValue) "sys_guid()";
+                case SystemMethods.CurrentDateTime:
+                    return (FunctionValue) "sysdate";
             }
 
             throw new NotImplementedException();
