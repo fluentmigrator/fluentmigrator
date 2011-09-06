@@ -10,7 +10,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
         public const int UnicodeStringCapacity = 2000;
         public const int UnicodeTextCapacity = int.MaxValue;
         public const int BlobCapacity = 2147483647;
-        public const int DecimalCapacity = 19;
+        public const int DecimalCapacity = 38;
         public const int XmlCapacity = 1073741823;
 
         protected override void SetupTypeMaps()
