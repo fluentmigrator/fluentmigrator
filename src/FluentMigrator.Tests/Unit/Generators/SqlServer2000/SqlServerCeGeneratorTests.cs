@@ -1,19 +1,13 @@
-﻿
+﻿using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.SqlServer;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {
-    using System;
-    using System.Data;
-    using FluentMigrator.Expressions;
-    using FluentMigrator.Model;
-    using NUnit.Framework;
-    using FluentMigrator.Runner.Generators.SqlServer;
-    using NUnit.Should;
-    using FluentMigrator.Runner.Generators;
-
     public class SqlServerCeGeneratorTests : GeneratorTestBase
     {
-       
         SqlServerCeGenerator generator;
 
         [SetUp]
@@ -25,19 +19,19 @@ namespace FluentMigrator.Tests.Unit.Generators
         [Test]
         public void CannotCreateASchema()
         {
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(new CreateSchemaExpression()));
         }
 
         [Test]
         public void CannotAlterASchema()
         {
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new AlterSchemaExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(new AlterSchemaExpression()));
         }
 
         [Test]
         public void CannotDeleteASchema()
         {
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new DeleteSchemaExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(new DeleteSchemaExpression()));
         }
 
         [Test]

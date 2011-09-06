@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
-using FluentMigrator.Runner.Generators.SqlServer;
-using NUnit.Should;
 using System.Data;
-using FluentMigrator.Model;
 using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.SqlServer;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 {
@@ -20,8 +17,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         public void Setup()
         {
             generator = new SqlServer2000Generator();
-
-
         }
 
         [Test]
@@ -49,8 +44,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var sql = generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] DECIMAL(19,2) NOT NULL");
         }
-
-        
 
         [Test]
         public override void CanRenameTable()
@@ -86,7 +79,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var sql = generator.Generate(expression);
             sql.ShouldBe(
                 "ALTER TABLE [TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [TestTable2] ([TestColumn2])");
-
         }
 
         [Test]
@@ -96,7 +88,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var sql = generator.Generate(expression);
             sql.ShouldBe(
                 "ALTER TABLE [TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [TestTable2] ([TestColumn2], [TestColumn4])");
-
         }
 
         [Test]
@@ -131,7 +122,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         public void CanAlterSchemaInStrictMode()
         {
             generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(new CreateSchemaExpression()));
         }
     }
 }

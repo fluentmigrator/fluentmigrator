@@ -1,9 +1,8 @@
-﻿
-using NUnit.Framework;
-using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Generators.Jet;
-using NUnit.Should;
+﻿using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.Jet;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.Jet
 {
@@ -15,7 +14,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         public void SetUp()
         {
             generator = new JetGenerator();
-
         }
 
         [Test]
@@ -64,7 +62,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         public void CanDeleteSchemaInStrictMode()
         {
             generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new DeleteSchemaExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(new DeleteSchemaExpression()));
         }
     }
 }

@@ -1,13 +1,11 @@
-﻿
+﻿using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.Jet;
+using NUnit.Framework;
+using NUnit.Should;
+
 namespace FluentMigrator.Tests.Unit.Generators.Jet
 {
-    using NUnit.Should;
-    using NUnit.Framework;
-    using FluentMigrator.Runner.Generators.Jet;
-    using System.Data;
-    using FluentMigrator.Runner.Generators;
-    using FluentMigrator.Expressions;
-
     public class JetAlterTableTests : BaseTableAlterTests
     {
         //ALTER TABLE table
@@ -26,7 +24,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         [Test]
         public override void CanAddColumn()
         {
-
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
 
             var result = generator.Generate(expression);
@@ -36,8 +33,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         [Test]
         public override void CanAddDecimalColumn()
         {
-
-
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
 
             var result = generator.Generate(expression);
@@ -53,7 +48,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             var result = generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE [TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [TestTable2] ([TestColumn2])");
-
         }
 
         [Test]
@@ -64,7 +58,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             var result = generator.Generate(expression);
             result.ShouldBe(
                 "ALTER TABLE [TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [TestTable2] ([TestColumn2], [TestColumn4])");
-
         }
 
         [Test]
@@ -80,8 +73,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
             generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(expression));
-
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(expression));
         }
 
         [Test]
@@ -97,7 +89,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
             generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(expression));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(expression));
         }
 
         [Test]
@@ -126,14 +118,13 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             var expression = new AlterSchemaExpression();
             var result = generator.Generate(expression);
             result.ShouldBe(string.Empty);
-           
         }
 
         [Test]
         public void CanAlterSchemaInStrictMode()
         {
             generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(new CreateSchemaExpression()));
         }
     }
 }

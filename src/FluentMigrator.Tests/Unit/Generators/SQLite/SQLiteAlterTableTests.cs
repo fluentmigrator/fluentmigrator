@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.SQLite;
 using NUnit.Framework;
 using NUnit.Should;
-using FluentMigrator.Runner.Generators.SQLite;
-using FluentMigrator.Runner.Generators;
-using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Tests.Unit.Generators.SQLite
 {
@@ -20,14 +16,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             generator = new SqliteGenerator();
         }
 
-
         [Test]
         public override void CanAddColumn()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
             string sql = generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE 'TestTable1' ADD COLUMN 'TestColumn1' TEXT NOT NULL");
-	
         }
 
         [Test]
@@ -50,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         public void CanRenameColumnInStrictMode()
         {
             generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(GeneratorTestHelper.GetRenameColumnExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(GeneratorTestHelper.GetRenameColumnExpression()));
         }
 
         [Test]
@@ -59,7 +53,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetRenameTableExpression();
             string sql = generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE 'TestTable1' RENAME TO 'TestTable2'");
-	
         }
 
         [Test]
@@ -75,7 +68,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
             generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(expression));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(expression));
         }
 
         [Test]
@@ -90,7 +83,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         public void CanCreateForeignKeyInStrictMode()
         {
             generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(GeneratorTestHelper.GetCreateForeignKeyExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(GeneratorTestHelper.GetCreateForeignKeyExpression()));
         }
 
         [Test]
@@ -99,15 +92,13 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
             var result = generator.Generate(expression);
             result.ShouldBe(string.Empty);
-            
         }
 
         [Test]
         public void CanCreateMulitColumnForeignKeyInStrictMode()
         {
-
             generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression()));
         }
 
         [Test]
@@ -118,7 +109,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             string sql = generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE 'TestTable1' ADD COLUMN 'TestColumn1' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT");
-    
         }
 
         [Test]
@@ -127,14 +117,13 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = new AlterSchemaExpression();
             var result = generator.Generate(expression);
             result.ShouldBe(string.Empty);
-
         }
 
         [Test]
         public void CanAlterSchemaInStrictMode()
         {
             generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(new CreateSchemaExpression()));
         }
     }
 }

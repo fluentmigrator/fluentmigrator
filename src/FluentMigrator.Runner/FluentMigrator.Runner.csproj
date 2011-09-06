@@ -161,7 +161,7 @@
     <Compile Include="Generators\MySql\MySqlColumn.cs" />
     <Compile Include="Generators\MySql\MySqlQuoter.cs" />
     <Compile Include="Generators\MySql\MySqlTypeMap.cs" />
-    <Compile Include="Generators\DatabaseOperationNotSupportedExecption.cs" />
+    <Compile Include="Generators\DatabaseOperationNotSupportedException.cs" />
     <Compile Include="Generators\Oracle\OracleColumn.cs" />
     <Compile Include="Generators\Oracle\OracleQuoter.cs" />
     <Compile Include="Generators\Oracle\OracleTypeMap.cs" />

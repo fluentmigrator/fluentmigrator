@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
-using FluentMigrator.Runner.Generators.SQLite;
-using NUnit.Should;
-using FluentMigrator.Expressions;
+﻿using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.SQLite;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.SQLite
 {
@@ -19,7 +15,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             generator = new SqliteGenerator();
         }
-
 
         [Test]
         public override void CanCreateTable()
@@ -50,7 +45,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
             string sql = generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL, 'TestColumn2' INTEGER NOT NULL, CONSTRAINT 'TestKey' PRIMARY KEY ('TestColumn1'))");
-
         }
 
         [Test]
@@ -60,7 +54,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumNamedPrimaryKeyExpression();
             string sql = generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL, 'TestColumn2' INTEGER NOT NULL, CONSTRAINT 'TestKey' PRIMARY KEY ('TestColumn1', 'TestColumn2'))");
-
         }
 
         [Test]
@@ -72,14 +65,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             var sql = generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 'TestColumn2' INTEGER NOT NULL)");
-
         }
 
         [Test]
         public override void CanCreateTableWithNullableField()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
-           
 
             var result = generator.Generate(expression);
 
@@ -96,7 +87,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             result.ShouldBe(
                 "CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL DEFAULT 'Default', 'TestColumn2' INTEGER NOT NULL DEFAULT 0)");
-     
         }
 
         [Test]
@@ -117,7 +107,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
             string sql = generator.Generate(expression);
             sql.ShouldBe("CREATE INDEX 'TestIndex' ON 'TestTable1' ('TestColumn1' ASC)");
-
         }
 
         [Test]
@@ -134,7 +123,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
             var result = generator.Generate(expression);
             result.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL, 'TestColumn2' INTEGER NOT NULL, PRIMARY KEY ('TestColumn1', 'TestColumn2'))");
-   
         }
 
         [Test]
@@ -143,7 +131,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
             var sql = generator.Generate(expression);
             sql.ShouldBe("CREATE UNIQUE INDEX 'TestIndex' ON 'TestTable1' ('TestColumn1' ASC)");
-
         }
 
         [Test]
@@ -153,7 +140,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             var sql = generator.Generate(expression);
             sql.ShouldBe("CREATE UNIQUE INDEX 'TestIndex' ON 'TestTable1' ('TestColumn1' ASC, 'TestColumn2' DESC)");
-
         }
 
         [Test]
@@ -168,7 +154,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         public void CanCreateSchemaInStrictMode()
         {
             generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(new CreateSchemaExpression()));
         }
     }
 }

@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
-using FluentMigrator.Runner.Generators.MySql;
-using NUnit.Should;
+﻿using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
-using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Generators.MySql;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.MySql
 {
@@ -23,9 +19,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         [Test]
         public override void CanAddColumn()
         {
-
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
-        
 
             var sql = generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` VARCHAR(5) NOT NULL");
@@ -34,9 +28,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         [Test]
         public override void CanAddDecimalColumn()
         {
-
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
-    
 
             var sql = generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` DECIMAL(19,2) NOT NULL");
@@ -45,7 +37,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         [Test]
         public override void CanRenameColumn()
         {
-                // MySql does not appear to have a way to change column without re-specifying the existing column definition
+            // MySql does not appear to have a way to change column without re-specifying the existing column definition
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
             var result = generator.Generate(expression);
             result.ShouldBe(string.Empty);
@@ -57,7 +49,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             // MySql does not appear to have a way to change column without re-specifying the existing column definition
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
             generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(expression));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(expression));
         }
 
         [Test]
@@ -85,7 +77,6 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
                     var sql = generator.Generate(expression);
             sql.ShouldBe(
                 "ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`) REFERENCES `TestTable2` (`TestColumn2`)");
-
         }
 
         [Test]
@@ -95,7 +86,6 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             var sql = generator.Generate(expression);
             sql.ShouldBe(
                 "ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`, `TestColumn3`) REFERENCES `TestTable2` (`TestColumn2`, `TestColumn4`)");
-
         }
 
         [Test]
@@ -114,14 +104,13 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             var expression = new AlterSchemaExpression();
             var result = generator.Generate(expression);
             result.ShouldBe(string.Empty);
-
         }
 
         [Test]
         public void CanAlterSchemaInStrictMode()
         {
             generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(new CreateSchemaExpression()));
         }
     }
 }

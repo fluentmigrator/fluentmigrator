@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
-using FluentMigrator.Runner.Generators.Oracle;
-using NUnit.Should;
+﻿using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
-using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Generators.Oracle;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {
@@ -15,10 +11,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         private OracleGenerator generator;
 
         [SetUp]
-		public void Setup()
-		{
-			generator = new OracleGenerator();
-		}
+        public void Setup()
+        {
+            generator = new OracleGenerator();
+        }
 
         [Test]
         public override void CanCreateTable()
@@ -42,7 +38,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
             string sql = generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL, PRIMARY KEY (TestColumn1))");
-
         }
 
         [Test]
@@ -51,7 +46,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
             string sql = generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL, CONSTRAINT TestKey PRIMARY KEY (TestColumn1))");
-
         }
 
         [Test]
@@ -60,13 +54,12 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumNamedPrimaryKeyExpression();
             string sql = generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL, CONSTRAINT TestKey PRIMARY KEY (TestColumn1, TestColumn2))");
-
         }
 
         [Test]
         public override void CanCreateTableWithIdentity()
         {
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(()=>generator.Generate(GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression()));
         }
 
         [Test]
@@ -95,7 +88,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNull()
         {
-           //Not sure how this would work in oracle.  Someone please add a test
+            //Not sure how this would work in oracle.  Someone please add a test
         }
 
         [Test]
@@ -135,10 +128,9 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         {
 
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
-               string sql = generator.Generate(expression);
+            string sql = generator.Generate(expression);
             // See the note in OracleColumn about why the PK should not be named
-               sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL, PRIMARY KEY (TestColumn1, TestColumn2))");
-
+            sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL, PRIMARY KEY (TestColumn1, TestColumn2))");
         }
 
         [Test]
@@ -153,7 +145,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public void CanCreateSchemaInStrictMode()
         {
             generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(new CreateSchemaExpression()));
         }
     }
 }

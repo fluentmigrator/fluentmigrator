@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
-using FluentMigrator.Runner.Generators.MySql;
-using NUnit.Should;
+﻿using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
-using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Generators.MySql;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.MySql
 {
@@ -65,7 +61,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         public void CanDeleteSchemaInStrictMode()
         {
             generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new DeleteSchemaExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(new DeleteSchemaExpression()));
         }
     }
 }

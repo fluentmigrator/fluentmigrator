@@ -17,24 +17,18 @@
 //
 #endregion
 
-
+using System;
+using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
-    using System;
-    using FluentMigrator.Expressions;
-    using FluentMigrator.Runner.Generators;
-
     public class SqlServerCeGenerator : SqlServer2005Generator
     {
-        public SqlServerCeGenerator()
-            : base(new SqlServerColumn(new SqlServerCeTypeMap()))
+        public SqlServerCeGenerator() : base(new SqlServerColumn(new SqlServerCeTypeMap()))
         {
         }
 
         //I think that this would be better inheriting form the SqlServer 2000 Generator.  It seems to match it better
-
-
 
         public override string Generate(RenameTableExpression expression)
         {
@@ -44,17 +38,17 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         //All Schema method throw by default as only Sql server 2005 and up supports them.
         public override string Generate(CreateSchemaExpression expression)
         {
-            throw new DatabaseOperationNotSupportedExecption();
+            throw new DatabaseOperationNotSupportedException();
         }
 
         public override string Generate(DeleteSchemaExpression expression)
         {
-            throw new DatabaseOperationNotSupportedExecption();
+            throw new DatabaseOperationNotSupportedException();
         }
 
         public override string Generate(AlterSchemaExpression expression)
         {
-            throw new DatabaseOperationNotSupportedExecption();
+            throw new DatabaseOperationNotSupportedException();
         }
 
         public override string Generate(DeleteColumnExpression expression)
