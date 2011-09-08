@@ -3,26 +3,28 @@ using System.Data;
 using System.IO;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Runner.Generators.Postgres;
-using Npgsql;
 
 namespace FluentMigrator.Runner.Processors.Postgres
 {
-    public class PostgresProcessor : ProcessorBase
-    {
-        readonly PostgresQuoter quoter = new PostgresQuoter();
-        public NpgsqlConnection Connection { get; set; }
-        public NpgsqlTransaction Transaction { get; private set; }
-        public bool WasCommitted { get; private set; }
+	using System.Data.Common;
 
-        public override string DatabaseType
+	public class PostgresProcessor : ProcessorBase
+    {
+		private readonly IDbFactory factory;
+		readonly PostgresQuoter quoter = new PostgresQuoter();
+        public DbConnection Connection { get; private set; }
+        public DbTransaction Transaction { get; private set; }
+
+		public override string DatabaseType
         {
             get { return "Postgres"; }
         }
 
-        public PostgresProcessor(NpgsqlConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+        public PostgresProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(generator, announcer, options)
         {
-            Connection = connection;
+        	this.factory = factory;
+        	Connection = connection;
             connection.Open();
             Transaction = connection.BeginTransaction();
         }
@@ -66,9 +68,9 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
-            DataSet ds = new DataSet();
-            using (NpgsqlCommand command = new NpgsqlCommand(String.Format(template, args), Connection, Transaction))
-            using (NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(command))
+            var ds = new DataSet();
+			using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
+			using (var adapter = factory.CreateDataAdapter(command))
             {
                 adapter.Fill(ds);
                 return ds;
@@ -80,7 +82,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
-            using (var command = new NpgsqlCommand(String.Format(template, args), Connection, Transaction))
+			using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -97,8 +99,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
             Announcer.Say("Committing Transaction");
             Transaction.Commit();
-            WasCommitted = true;
-            if (Connection.State != ConnectionState.Closed)
+        	if (Connection.State != ConnectionState.Closed)
             {
                 Connection.Close();
             }
@@ -108,8 +109,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
             Announcer.Say("Rolling back transaction");
             Transaction.Rollback();
-            WasCommitted = true;
-            if (Connection.State != ConnectionState.Closed)
+        	if (Connection.State != ConnectionState.Closed)
             {
                 Connection.Close();
             }
@@ -125,7 +125,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
-            using (var command = new NpgsqlCommand(sql, Connection, Transaction))
+            using (var command = factory.CreateCommand(sql, Connection, Transaction))
             {
                 try
                 {
@@ -134,7 +134,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
                 }
                 catch (Exception ex)
                 {
-                    using (StringWriter message = new StringWriter())
+                    using (var message = new StringWriter())
                     {
                         message.WriteLine("An error occurred executing the following sql:");
                         message.WriteLine(sql);
@@ -154,17 +154,17 @@ namespace FluentMigrator.Runner.Processors.Postgres
                 expression.Operation(Connection, Transaction);
         }
 
-        protected string FormatToSafeSchemaName(string schemaName)
+		private string FormatToSafeSchemaName(string schemaName)
         {
             return FormatSqlEscape(quoter.UnQuoteSchemaName(schemaName));
         }
 
-        protected string FormatToSafeName(string sqlName)
+		private string FormatToSafeName(string sqlName)
         {
             return FormatSqlEscape(quoter.UnQuote(sqlName));
         }
 
-        protected string FormatSqlEscape(string sql)
+		private static string FormatSqlEscape(string sql)
         {
             return sql.Replace("'", "''");
         }

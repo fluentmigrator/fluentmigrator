@@ -117,7 +117,8 @@ namespace FluentMigrator.Tests.Integration.Processors
         }
 
         public string DumpFilename { get; set; }
-        private string FormattedDateTime
+        
+		private static string FormattedDateTime
         {
             get { return DateTime.Now.ToString("yyyyMMdd"); }
         }

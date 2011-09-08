@@ -8,6 +8,8 @@ using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration.Processors
 {
+	using Runner.Processors;
+
 	[TestFixture]
 	public class OracleProcessorTests
 	{
@@ -17,13 +19,14 @@ namespace FluentMigrator.Tests.Integration.Processors
 		[Explicit]
 		public void TestQuery()
 		{
-			DbConnection connection = OracleFactory.GetOpenConnection
+			IDbFactory oracleFactory = new OracleDbFactory();
+			DbConnection connection = oracleFactory.CreateConnection
 				(connectionString);
 
 			string sql = "Select * from Users";
 			DataSet ds = new DataSet();
-			using (var command = OracleFactory.GetCommand(connection,sql ))
-			using (DbDataAdapter adapter = OracleFactory.GetDataAdapter(command))
+			using (var command = oracleFactory.CreateCommand(sql, connection))
+			using (DbDataAdapter adapter = oracleFactory.CreateDataAdapter(command))
 			{
 				adapter.Fill(ds);
 			}

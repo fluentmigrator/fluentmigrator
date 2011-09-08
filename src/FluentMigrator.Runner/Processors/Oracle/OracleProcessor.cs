@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using FluentMigrator.Builders.Execute;
@@ -9,21 +8,22 @@ namespace FluentMigrator.Runner.Processors.Oracle
 {
     public class OracleProcessor : ProcessorBase
     {
-        public virtual IDbConnection Connection { get; set; }
+    	private DbConnection Connection { get; set; }
+    	private readonly IDbFactory factory;
 
         public override string DatabaseType
         {
             get { return "Oracle"; }
         }
 
-        public OracleProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+        public OracleProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, OracleDbFactory factory)
             : base(generator, announcer, options)
         {
             Connection = connection;
+        	this.factory = factory;
 
-
-            //oracle does not support ddl transactions
-            //this.Transaction = this.Connection.BeginTransaction();
+        	//oracle does not support ddl transactions
+        	//this.Transaction = this.Connection.BeginTransaction();
         }
 
         public override bool SchemaExists(string schemaName)
@@ -57,7 +57,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
-            using (var command = OracleFactory.GetCommand(Connection, String.Format(template, args)))
+            using (var command = factory.CreateCommand(String.Format(template, args), Connection))
             {
                 command.ExecuteNonQuery();
             }
@@ -68,7 +68,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
-            using (var command = OracleFactory.GetCommand(Connection, String.Format(template, args)))
+            using (var command = factory.CreateCommand(String.Format(template, args), Connection))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -84,9 +84,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
-            DataSet ds = new DataSet();
-            using (var command = OracleFactory.GetCommand(Connection, String.Format(template, args)))
-            using (DbDataAdapter adapter = OracleFactory.GetDataAdapter(command))
+            var ds = new DataSet();
+            using (var command = factory.CreateCommand(String.Format(template, args), Connection))
+            using (DbDataAdapter adapter = factory.CreateDataAdapter(command))
             {
                 adapter.Fill(ds);
                 return ds;
@@ -108,7 +108,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
-            using (var command = OracleFactory.GetCommand(Connection, sql))
+            using (var command = factory.CreateCommand(sql, Connection))
                 command.ExecuteNonQuery();
         }
     }

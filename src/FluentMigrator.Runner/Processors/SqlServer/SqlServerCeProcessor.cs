@@ -18,29 +18,30 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Data.SqlServerCe;
 using System.IO;
 using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-    public class SqlServerCeProcessor : ProcessorBase
-    {
-        public virtual SqlCeConnection Connection { get; set; }
-        public SqlCeTransaction Transaction { get; private set; }
-        public bool WasCommitted { get; private set; }
+	using System.Data.Common;
 
-        public override string DatabaseType
+	public sealed class SqlServerCeProcessor : ProcessorBase
+    {
+		private readonly IDbFactory factory;
+		private readonly DbConnection connection;
+		private DbTransaction transaction;
+
+		public override string DatabaseType
         {
             get { return "SqlServerCe"; }
         }
 
-        public SqlServerCeProcessor(SqlCeConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+        public SqlServerCeProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(generator, announcer, options)
         {
-            Connection = connection;
+        	this.factory = factory;
+        	this.connection = connection;
             connection.Open();
             BeginTransaction();
         }
@@ -77,10 +78,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool Exists(string template, params object[] args)
         {
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            if (connection.State != ConnectionState.Open)
+                connection.Open();
 
-            using (var command = new SqlCeCommand(String.Format(template, args), Connection, Transaction))
+			using (var command = factory.CreateCommand(String.Format(template, args), connection, transaction))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -94,11 +95,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override DataSet Read(string template, params object[] args)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (connection.State != ConnectionState.Open) connection.Open();
 
             var ds = new DataSet();
-            using (var command = new SqlCeCommand(String.Format(template, args), Connection, Transaction))
-            using (var adapter = new SqlCeDataAdapter(command))
+			using (var command = factory.CreateCommand(String.Format(template, args), connection, transaction))
+			using (var adapter = factory.CreateDataAdapter(command))
             {
                 adapter.Fill(ds);
                 return ds;
@@ -108,30 +109,28 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         public override void BeginTransaction()
         {
             Announcer.Say("Beginning Transaction");
-            Transaction = Connection.BeginTransaction();
+            transaction = connection.BeginTransaction();
         }
 
         public override void CommitTransaction()
         {
             Announcer.Say("Committing Transaction");
 
-            if (Transaction != null)
+            if (transaction != null)
             {
-                Transaction.Commit();
-                Transaction = null;
+                transaction.Commit();
+                transaction = null;
             }
 
-            WasCommitted = true;
-
-            if (Connection.State != ConnectionState.Closed)
+        	if (connection.State != ConnectionState.Closed)
             {
-                Connection.Close();
+                connection.Close();
             }
         }
 
         public override void RollbackTransaction()
         {
-            if (Transaction == null)
+            if (transaction == null)
             {
                 Announcer.Say("No transaction was available to rollback!");
                 return;
@@ -139,12 +138,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             Announcer.Say("Rolling back transaction");
 
-            Transaction.Rollback();
+            transaction.Rollback();
 
-            WasCommitted = true;
-            if (Connection.State != ConnectionState.Closed)
+        	if (connection.State != ConnectionState.Closed)
             {
-                Connection.Close();
+                connection.Close();
             }
         }
 
@@ -155,13 +153,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
 
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            if (connection.State != ConnectionState.Open)
+                connection.Open();
 
-            if (Transaction == null)
+            if (transaction == null)
                 BeginTransaction();
 
-            using (var command = new SqlCeCommand(sql, Connection, Transaction))
+			using (var command = factory.CreateCommand(sql, connection, transaction))
             {
                 try
                 {
@@ -184,13 +182,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            if (connection.State != ConnectionState.Open) connection.Open();
 
             if (expression.Operation != null)
-                expression.Operation(Connection, Transaction);
+                expression.Operation(connection, transaction);
         }
 
-        protected string FormatSqlEscape(string sql)
+		private static string FormatSqlEscape(string sql)
         {
             return sql.Replace("'", "''");
         }

@@ -34,8 +34,8 @@ namespace FluentMigrator.Tests.Helpers
 
         private void Init(PostgresProcessor processor, IEnumerable<string> columnDefinitions)
         {      
-            Connection = processor.Connection;
-            Transaction = processor.Transaction;
+            Connection = (NpgsqlConnection) processor.Connection;
+            Transaction = (NpgsqlTransaction) processor.Transaction;
                 
             NameWithSchema = string.IsNullOrEmpty(_schemaName) ? Name : string.Format("\"{0}\".{1}", _schemaName, Name);
             Create(columnDefinitions);

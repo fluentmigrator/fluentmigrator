@@ -17,29 +17,31 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Data;
 using FluentMigrator.Builders.Execute;
-using MySql.Data.MySqlClient;
 
 namespace FluentMigrator.Runner.Processors.MySql
 {
-    public class MySqlProcessor : ProcessorBase
+	using System.Data.Common;
+
+	public class MySqlProcessor : ProcessorBase
     {
-        public MySqlConnection Connection { get; set; }
+		private readonly IDbFactory factory;
+		private DbConnection Connection { get; set; }
 
         public override string DatabaseType
         {
             get { return "MySql"; }
         }
 
-        public MySqlProcessor(MySqlConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+        public MySqlProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(generator, announcer, options)
         {
-            Connection = connection;
+        	this.factory = factory;
+        	Connection = connection;
         }
 
-        public override bool SchemaExists(string schemaName)
+		public override bool SchemaExists(string schemaName)
         {
             return true;
         }
@@ -52,33 +54,33 @@ namespace FluentMigrator.Runner.Processors.MySql
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
-            string sql = @"select column_name from information_schema.columns
+        	const string sql = @"select column_name from information_schema.columns
 							where table_schema = SCHEMA() and table_name='{0}'
 							and column_name='{1}'";
-            return Exists(sql, tableName, columnName);
+        	return Exists(sql, tableName, columnName);
         }
 
-        public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
+    	public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
-            string sql = @"select constraint_name from information_schema.table_constraints
+        	const string sql = @"select constraint_name from information_schema.table_constraints
 							where table_schema = SCHEMA() and table_name='{0}'
 							and constraint_name='{1}'";
-            return Exists(sql, tableName, constraintName);
+        	return Exists(sql, tableName, constraintName);
         }
 
-        public override bool IndexExists(string schemaName, string tableName, string indexName)
+    	public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
-            string sql = @"select index_name from information_schema.statistics
+        	const string sql = @"select index_name from information_schema.statistics
 							where table_schema = SCHEMA() and table_name='{0}'
 							and index_name='{1}'";
-            return Exists(sql, tableName, indexName);
+        	return Exists(sql, tableName, indexName);
         }
 
-        public override void Execute(string template, params object[] args)
+    	public override void Execute(string template, params object[] args)
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
-            using (var command = new MySqlCommand(String.Format(template, args), Connection))
+            using (var command = factory.CreateCommand(String.Format(template, args), Connection))
             {
                 command.CommandTimeout = Options.Timeout;
                 command.ExecuteNonQuery();
@@ -89,17 +91,14 @@ namespace FluentMigrator.Runner.Processors.MySql
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
-            using (var command = new MySqlCommand(String.Format(template, args), Connection))
+			using (var command = factory.CreateCommand(String.Format(template, args), Connection))
             {
                 command.CommandTimeout = Options.Timeout;
                 using (var reader = command.ExecuteReader())
                 {
                     try
                     {
-                        if (!reader.Read())
-                            return false;
-
-                        return true;
+                    	return reader.Read();
                     }
                     catch
                     {
@@ -118,12 +117,12 @@ namespace FluentMigrator.Runner.Processors.MySql
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
-            DataSet ds = new DataSet();
-            using (var command = new MySqlCommand(String.Format(template, args), Connection))
+            var ds = new DataSet();
+            using (var command =  factory.CreateCommand(String.Format(template, args), Connection))
             {
                 command.CommandTimeout = Options.Timeout;
 
-                using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
+				using (var adapter = factory.CreateDataAdapter(command))
                 {
                     adapter.Fill(ds);
                     return ds;
@@ -141,7 +140,7 @@ namespace FluentMigrator.Runner.Processors.MySql
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
-            using (var command = new MySqlCommand(sql, Connection))
+			using (var command = factory.CreateCommand(sql, Connection))
             {
                 command.CommandTimeout = Options.Timeout;
                 command.ExecuteNonQuery();
