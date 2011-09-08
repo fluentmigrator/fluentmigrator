@@ -1,6 +1,5 @@
 using System;
 using System.Data;
-using System.Data.Common;
 using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.Oracle
@@ -28,7 +27,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             if (schemaName == null)
                 throw new ArgumentNullException("schemaName");
 
-            if (string.IsNullOrEmpty(schemaName))
+            if (schemaName.Length == 0)
                 return false;
 
             return Exists("SELECT 1 FROM ALL_USERS WHERE USERNAME = '{0}'", schemaName.ToUpper());
@@ -41,10 +40,10 @@ namespace FluentMigrator.Runner.Processors.Oracle
             if (tableName == null)
                 throw new ArgumentNullException("tableName");
 
-            if (string.IsNullOrEmpty(tableName))
+            if (tableName.Length == 0)
                 return false;
 
-            if (string.IsNullOrEmpty(schemaName))
+            if (schemaName.Length == 0)
                 return Exists("SELECT 1 FROM USER_TABLES WHERE TABLE_NAME = '{0}'", tableName.ToUpper());
 
             return Exists("SELECT 1 FROM ALL_TABLES WHERE OWNER = '{0}' AND TABLE_NAME = '{1}'", schemaName.ToUpper(), tableName.ToUpper());
@@ -59,7 +58,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             if (columnName == null)
                 throw new ArgumentNullException("columnName");
 
-            if (string.IsNullOrEmpty(columnName) || string.IsNullOrEmpty(tableName))
+            if (columnName.Length == 0 || tableName.Length == 0)
                 return false;
 
             if (string.IsNullOrEmpty(schemaName))
@@ -79,10 +78,10 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
             //In Oracle DB constraint name is unique within the schema, so the table name is not used in the query
 
-            if (string.IsNullOrEmpty(constraintName))
+            if (constraintName.Length == 0)
                 return false;
 
-            if (string.IsNullOrEmpty(schemaName))
+            if (schemaName.Length == 0)
                 return Exists("SELECT 1 FROM USER_CONSTRAINTS WHERE CONSTRAINT_NAME = '{0}'", constraintName.ToUpper());
 
             return Exists("SELECT 1 FROM ALL_CONSTRAINTS WHERE OWNER = '{0}' AND CONSTRAINT_NAME = '{1}'", schemaName.ToUpper(), constraintName.ToUpper());
@@ -99,10 +98,10 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
             //In Oracle DB index name is unique within the schema, so the table name is not used in the query
 
-            if (string.IsNullOrEmpty(indexName))
+            if (indexName.Length == 0)
                 return false;
 
-            if (string.IsNullOrEmpty(schemaName))
+            if (schemaName.Length == 0)
                 return Exists("SELECT 1 FROM USER_INDEXES WHERE INDEX_NAME = '{0}'", indexName.ToUpper());
 
             return Exists("SELECT 1 FROM ALL_INDEXES WHERE OWNER = '{0}' AND INDEX_NAME = '{1}'", schemaName.ToUpper(), indexName.ToUpper());
@@ -110,6 +109,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         public override void Execute(string template, params object[] args)
         {
+            if (template == null)
+                throw new ArgumentNullException("template");
+
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
@@ -121,6 +123,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         public override bool Exists(string template, params object[] args)
         {
+            if (template == null)
+                throw new ArgumentNullException("template");
+
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
@@ -138,7 +143,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             if (tableName == null)
                 throw new ArgumentNullException("tableName");
 
-            if (string.IsNullOrEmpty(schemaName))
+            if (schemaName.Length == 0)
                 return Read("SELECT * FROM {0}", tableName.ToUpper());
 
             return Read("SELECT * FROM {0}.{1}", schemaName.ToUpper(), tableName.ToUpper());
@@ -146,14 +151,17 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         public override DataSet Read(string template, params object[] args)
         {
+            if (template == null)
+                throw new ArgumentNullException("template");
+
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
-            var ds = new DataSet();
+            var resultDataSet = new DataSet();
             using (var command = OracleFactory.GetCommand(Connection, String.Format(template, args)))
-            using (DbDataAdapter adapter = OracleFactory.GetDataAdapter(command))
+            using (var adapter = OracleFactory.GetDataAdapter(command))
             {
-                adapter.Fill(ds);
-                return ds;
+                adapter.Fill(resultDataSet);
+                return resultDataSet;
             }
         }
 
