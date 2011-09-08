@@ -23,7 +23,7 @@ namespace FluentMigrator.Builders.Create.ForeignKey
 {
 	public interface ICreateForeignKeyPrimaryColumnSyntax: IFluentSyntax
 	{
-		ICreateForiegnKeyCascadeSyntax PrimaryColumn(string column);
-		ICreateForiegnKeyCascadeSyntax PrimaryColumns(params string[] columns);
+		ICreateForeignKeyCascadeSyntax PrimaryColumn(string column);
+		ICreateForeignKeyCascadeSyntax PrimaryColumns(params string[] columns);
 	}
 }

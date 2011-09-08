@@ -21,7 +21,6 @@ using System.Data.SqlClient;
 using System.Data.SQLite;
 using System.Linq;
 using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.MySql;
@@ -51,7 +50,10 @@ namespace FluentMigrator.Tests.Integration
 		public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback, params Type[] exceptProcessors)
 		{
 			if (exceptProcessors.Count(t => typeof(SqlServerProcessor).IsAssignableFrom(t)) == 0)
-				ExecuteWithSqlServer(test, IntegrationTestOptions.SqlServer, tryRollback);
+			{
+                ExecuteWithSqlServer2005(test, tryRollback);
+                ExecuteWithSqlServer2008(test, tryRollback);
+			}
 			if (exceptProcessors.Count(t => typeof(SqliteProcessor).IsAssignableFrom(t)) == 0)
 				ExecuteWithSqlite(test, IntegrationTestOptions.SqlLite);
 			if (exceptProcessors.Count(t => typeof(MySqlProcessor).IsAssignableFrom(t)) == 0)
@@ -60,25 +62,50 @@ namespace FluentMigrator.Tests.Integration
 				ExecuteWithPostgres(test, IntegrationTestOptions.Postgres, tryRollback);
 		}
 
-		protected static void ExecuteWithSqlServer(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions, Boolean tryRollback)
-		{
-			if (!serverOptions.IsEnabled)
-				return;
+        protected static void ExecuteWithSqlServer2008(Action<IMigrationProcessor> test, bool tryRollback)
+        {
 
-			var announcer = new TextWriterAnnouncer(System.Console.Out);
-			announcer.Heading("Testing Migration against MS SQL Server");
+            var serverOptions = IntegrationTestOptions.SqlServer;
 
-			using (var connection = new SqlConnection(serverOptions.ConnectionString))
-			{
-				var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), announcer, new ProcessorOptions());
-				test(processor);
+            if (!serverOptions.IsEnabled)
+                return;
 
-				if (tryRollback && !processor.WasCommitted)
-				{
-					processor.RollbackTransaction();
-				}
-			}
-		}
+            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            announcer.Heading("Testing Migration against MS SQL Server 2008");
+            var generator = new SqlServer2008Generator();
+
+            ExecuteWithSqlServer(serverOptions, announcer, generator, test, tryRollback);
+        }
+
+        protected static void ExecuteWithSqlServer2005(Action<IMigrationProcessor> test, bool tryRollback)
+        {
+
+            var serverOptions = IntegrationTestOptions.SqlServer;
+
+            if (!serverOptions.IsEnabled)
+                return;
+
+            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            announcer.Heading("Testing Migration against MS SQL Server 2005");
+            var generator = new SqlServer2005Generator();
+
+            ExecuteWithSqlServer(serverOptions, announcer, generator, test, tryRollback);
+        }
+
+        private static void ExecuteWithSqlServer(IntegrationTestOptions.DatabaseServerOptions serverOptions, TextWriterAnnouncer announcer, SqlServer2005Generator generator, Action<IMigrationProcessor> test, bool tryRollback)
+        {
+            using (var connection = new SqlConnection(serverOptions.ConnectionString))
+            {
+
+                var processor = new SqlServerProcessor(connection, generator, announcer, new ProcessorOptions());
+                test(processor);
+
+                if (tryRollback && !processor.WasCommitted)
+                {
+                    processor.RollbackTransaction();
+                }
+            }
+        }
 
 		protected static void ExecuteWithSqlite(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
 		{

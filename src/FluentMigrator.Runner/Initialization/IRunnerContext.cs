@@ -18,21 +18,22 @@
 
 namespace FluentMigrator.Runner.Initialization
 {
-	public interface IRunnerContext
-	{
-		string Database { get; set; }
-		string Connection { get; set; }
-		string Target { get; set; }
-		bool PreviewOnly { get; set; }
-		string Namespace { get; set; }
-		string Task { get; set; }
-		long Version { get; set; }
-		int Steps { get; set; }
-		string WorkingDirectory { get; set; }
-		string Profile { get; set; }
-		IAnnouncer Announcer { get; }
-		IStopWatch StopWatch { get; }
-		int Timeout { get; set; }
-		//IMigrationProcessor Processor { get; }
-	}
+    public interface IRunnerContext
+    {
+        string Database { get; set; }
+        string Connection { get; set; }
+        string Target { get; set; }
+        bool PreviewOnly { get; set; }
+        string Namespace { get; set; }
+        string Task { get; set; }
+        long Version { get; set; }
+        int Steps { get; set; }
+        string WorkingDirectory { get; set; }
+        string Profile { get; set; }
+        IAnnouncer Announcer { get; }
+        IStopWatch StopWatch { get; }
+        int Timeout { get; set; }
+        string ConnectionStringConfigPath { get; set; }
+        //IMigrationProcessor Processor { get; }
+    }
 }

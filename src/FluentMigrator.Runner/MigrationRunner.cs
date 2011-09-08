@@ -29,71 +29,71 @@ using FluentMigrator.Runner.Announcers;
 
 namespace FluentMigrator.Runner
 {
-	public class MigrationRunner : IMigrationRunner
-	{
-		private Assembly _migrationAssembly;
+    public class MigrationRunner : IMigrationRunner
+    {
+        private Assembly _migrationAssembly;
         public IAnnouncer Announcer { get; private set; }
-		private IStopWatch _stopWatch;
-		private bool _alreadyOutputPreviewOnlyModeWarning;
-		public bool SilentlyFail { get; set; }
+        private IStopWatch _stopWatch;
+        private bool _alreadyOutputPreviewOnlyModeWarning;
+        public bool SilentlyFail { get; set; }
 
-		public IMigrationProcessor Processor { get; private set; }
-		public IMigrationLoader MigrationLoader { get; set; }
-		public IProfileLoader ProfileLoader { get; set; }
-		public IMigrationConventions Conventions { get; private set; }
-		public IList<Exception> CaughtExceptions { get; private set; }
+        public IMigrationProcessor Processor { get; private set; }
+        public IMigrationLoader MigrationLoader { get; set; }
+        public IProfileLoader ProfileLoader { get; set; }
+        public IMigrationConventions Conventions { get; private set; }
+        public IList<Exception> CaughtExceptions { get; private set; }
 
-		public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
-		{
-			_migrationAssembly = assembly;
+        public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
+        {
+            _migrationAssembly = assembly;
 			Announcer = runnerContext.Announcer;
-			Processor = processor;
-			_stopWatch = runnerContext.StopWatch;
+            Processor = processor;
+            _stopWatch = runnerContext.StopWatch;
 
-			SilentlyFail = false;
-			CaughtExceptions = null;
+            SilentlyFail = false;
+            CaughtExceptions = null;
 
-			Conventions = new MigrationConventions();
-			if (!string.IsNullOrEmpty(runnerContext.WorkingDirectory))
-				Conventions.GetWorkingDirectory = () => runnerContext.WorkingDirectory;
+            Conventions = new MigrationConventions();
+            if (!string.IsNullOrEmpty(runnerContext.WorkingDirectory))
+                Conventions.GetWorkingDirectory = () => runnerContext.WorkingDirectory;
 
-			VersionLoader = new VersionLoader(this, _migrationAssembly, Conventions);
-			MigrationLoader = new MigrationLoader(Conventions, _migrationAssembly, runnerContext.Namespace);
-			ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
-		}
+            VersionLoader = new VersionLoader(this, _migrationAssembly, Conventions);
+            MigrationLoader = new MigrationLoader(Conventions, _migrationAssembly, runnerContext.Namespace);
+            ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
+        }
 
-		public VersionLoader VersionLoader { get; set; }
+        public IVersionLoader VersionLoader { get; set; }
 
-		public void ApplyProfiles()
-		{
-			ProfileLoader.ApplyProfiles();
-		}
+        public void ApplyProfiles()
+        {
+            ProfileLoader.ApplyProfiles();
+        }
 
         public void MigrateUp()
         {
             MigrateUp(true);
         }
 
-		public void MigrateUp(bool useAutomaticTransactionManagement)
-		{
-			try
-			{
-				foreach (var version in MigrationLoader.Migrations.Keys)
-				{
-					ApplyMigrationUp(version);
-				}
+        public void MigrateUp(bool useAutomaticTransactionManagement)
+        {
+            try
+            {
+                foreach (var version in MigrationLoader.Migrations.Keys)
+                {
+                    ApplyMigrationUp(version);
+                }
 
-				ApplyProfiles();
+                ApplyProfiles();
 
                 if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
-				VersionLoader.LoadVersionInfo();
-			}
-			catch (Exception)
-			{
-				if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
-				throw;
-			}
-		}
+                VersionLoader.LoadVersionInfo();
+            }
+            catch (Exception)
+            {
+                if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
+                throw;
+            }
+        }
 
         public void MigrateUp(long targetVersion)
         {
@@ -101,22 +101,22 @@ namespace FluentMigrator.Runner
         }
 
         public void MigrateUp(long targetVersion, bool useAutomaticTransactionManagement)
-		{
-			try 
-			{
+        {
+            try
+            {
                 foreach (var neededMigrationVersion in GetUpMigrationsToApply(targetVersion))
-				{
+                {
                     ApplyMigrationUp(neededMigrationVersion);
                 }
                 if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
                 VersionLoader.LoadVersionInfo();
-			} 
-			catch (Exception) 
-			{
+            }
+            catch (Exception)
+            {
                 if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
-				throw;
-			}
-		}
+                throw;
+            }
+        }
 
         private IEnumerable<long> GetUpMigrationsToApply(long version)
         {
@@ -133,7 +133,7 @@ namespace FluentMigrator.Runner
                 return true;
             }
             return false;
-   
+
         }
 
         public void MigrateDown(long targetVersion)
@@ -142,23 +142,23 @@ namespace FluentMigrator.Runner
         }
 
         public void MigrateDown(long targetVersion, bool useAutomaticTransactionManagement)
-		{
-			try
-			{
+        {
+            try
+            {
                 foreach (var neededMigrationVersion in GetDownMigrationsToApply(targetVersion))
-				{
+                {
                     ApplyMigrationDown(neededMigrationVersion);
                 }
 
                 if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
-				VersionLoader.LoadVersionInfo();
-			}
-			catch (Exception)
-			{
+                VersionLoader.LoadVersionInfo();
+            }
+            catch (Exception)
+            {
                 if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
-				throw;
-			}
-		}
+                throw;
+            }
+        }
 
         private IEnumerable<long> GetDownMigrationsToApply(long targetVersion)
         {
@@ -176,14 +176,14 @@ namespace FluentMigrator.Runner
 
         }
 
-		private void ApplyMigrationUp(long version)
-		{
+        private void ApplyMigrationUp(long version)
+        {
             
             Announcer.Start(version);
 			if (!_alreadyOutputPreviewOnlyModeWarning && Processor.Options.PreviewOnly) {
 				Announcer.Heading("PREVIEW-ONLY MODE");
-				_alreadyOutputPreviewOnlyModeWarning = true;
-			}
+                _alreadyOutputPreviewOnlyModeWarning = true;
+            }
 
             if (!VersionLoader.VersionInfo.HasAppliedMigration(version)) {
                 Announcer.IsApplied = false;
@@ -191,25 +191,25 @@ namespace FluentMigrator.Runner
                 VersionLoader.UpdateVersionInfo(version);
             }
             Announcer.Stop();
-		}
+        }
 
-		private void ApplyMigrationDown(long version)
-		{
-			try
-			{
-				Down(MigrationLoader.Migrations[version]);
-				VersionLoader.DeleteVersion(version);
-			}
-			catch (KeyNotFoundException ex)
-			{
-				string msg = string.Format("VersionInfo references version {0} but no Migrator was found attributed with that version.", version);
-				throw new Exception(msg, ex);
-			}
-			catch (Exception ex)
-			{
-				throw new Exception("Error rolling back version " + version, ex);
-			}
-		}
+        private void ApplyMigrationDown(long version)
+        {
+            try
+            {
+                Down(MigrationLoader.Migrations[version]);
+                VersionLoader.DeleteVersion(version);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                string msg = string.Format("VersionInfo references version {0} but no Migrator was found attributed with that version.", version);
+                throw new Exception(msg, ex);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error rolling back version " + version, ex);
+            }
+        }
 
         public void Rollback(int steps)
         {
@@ -217,7 +217,7 @@ namespace FluentMigrator.Runner
         }
 
         public void Rollback(int steps, bool useAutomaticTransactionManagement)
-		{
+        {
             try
             {
                 foreach (var migrationNumber in VersionLoader.VersionInfo.AppliedMigrations().Take(steps))
@@ -226,6 +226,10 @@ namespace FluentMigrator.Runner
                 }
 
                 VersionLoader.LoadVersionInfo();
+
+                if (!VersionLoader.VersionInfo.AppliedMigrations().Any())
+                    VersionLoader.RemoveVersionTable();
+
                 if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
             }
             catch (Exception)
@@ -233,7 +237,7 @@ namespace FluentMigrator.Runner
                 if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
                 throw;
             }
-		}
+        }
 
         public void RollbackToVersion(long version)
         {
@@ -241,7 +245,7 @@ namespace FluentMigrator.Runner
         }
 
         public void RollbackToVersion(long version, bool useAutomaticTransactionManagement)
-		{
+        {
             //TODO: Extract VersionsToApply Strategy
             try
             {
@@ -266,94 +270,94 @@ namespace FluentMigrator.Runner
                 if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
                 throw;
             }
-		}
+        }
 
-		public Assembly MigrationAssembly
-		{
-			get { return _migrationAssembly; }
-		}
+        public Assembly MigrationAssembly
+        {
+            get { return _migrationAssembly; }
+        }
 
-		public void Up(IMigration migration)
-		{
+        public void Up(IMigration migration)
+        {
             var name = migration.GetType().Name;
             Announcer.Heading(migration.GetType().Name + ": migrating");
 
             Announcer.SetName(name);
 
-			CaughtExceptions = new List<Exception>();
+            CaughtExceptions = new List<Exception>();
 
-			var context = new MigrationContext(Conventions, Processor,MigrationAssembly);
-			migration.GetUpExpressions(context);
+            var context = new MigrationContext(Conventions, Processor, MigrationAssembly);
+            migration.GetUpExpressions(context);
 
-			_stopWatch.Start();
-			ExecuteExpressions(context.Expressions);
-			_stopWatch.Stop();
+            _stopWatch.Start();
+            ExecuteExpressions(context.Expressions);
+            _stopWatch.Stop();
             Announcer.Say(name + ": migrated");
             Announcer.ElapsedTime(_stopWatch.ElapsedTime());
             Announcer.ExecutionTime(_stopWatch.ElapsedTime().TotalSeconds);
-		}
+        }
 
-		public void Down(IMigration migration)
-		{
+        public void Down(IMigration migration)
+        {
             var name = migration.GetType().Name;
             Announcer.Heading(migration.GetType().Name + ": migrating");
             Announcer.SetName(name);
 
-			CaughtExceptions = new List<Exception>();
+            CaughtExceptions = new List<Exception>();
 
-			var context = new MigrationContext(Conventions, Processor, MigrationAssembly);
-			migration.GetDownExpressions(context);
+            var context = new MigrationContext(Conventions, Processor, MigrationAssembly);
+            migration.GetDownExpressions(context);
 
-			_stopWatch.Start();
-			ExecuteExpressions(context.Expressions);
-			_stopWatch.Stop();
+            _stopWatch.Start();
+            ExecuteExpressions(context.Expressions);
+            _stopWatch.Stop();
             Announcer.Say(name + ": migrated");
             Announcer.ElapsedTime(_stopWatch.ElapsedTime());
             Announcer.ExecutionTime(_stopWatch.ElapsedTime().TotalSeconds);
-		}
+        }
 
-		/// <summary>
-		/// execute each migration expression in the expression collection
-		/// </summary>
-		/// <param name="expressions"></param>
-		protected void ExecuteExpressions(ICollection<IMigrationExpression> expressions)
-		{
-			foreach (IMigrationExpression expression in expressions)
-			{
-				try
-				{
-					expression.ApplyConventions(Conventions);
+        /// <summary>
+        /// execute each migration expression in the expression collection
+        /// </summary>
+        /// <param name="expressions"></param>
+        protected void ExecuteExpressions(ICollection<IMigrationExpression> expressions)
+        {
+            foreach (IMigrationExpression expression in expressions)
+            {
+                try
+                {
+                    expression.ApplyConventions(Conventions);
                     _stopWatch.Start();
 					expression.ExecuteWith(Processor);
                     _stopWatch.Stop();
                    
 				}
-				catch (Exception er)
-				{
+                catch (Exception er)
+                {
 					Announcer.Error(er.Message);
 
-					//catch the error and move onto the next expression
-					if (SilentlyFail)
-					{
-						CaughtExceptions.Add(er);
-						continue;
-					}
-					throw;
-				}
-			}
-		}
+                    //catch the error and move onto the next expression
+                    if (SilentlyFail)
+                    {
+                        CaughtExceptions.Add(er);
+                        continue;
+                    }
+                    throw;
+                }
+            }
+        }
 
 		
 
-		private long Time(Action action)
-		{
-			_stopWatch.Start();
+        private long Time(Action action)
+        {
+            _stopWatch.Start();
 
-			action();
+            action();
 
-			_stopWatch.Stop();
+            _stopWatch.Stop();
 
-			return _stopWatch.ElapsedTime().Ticks;
-		}
-	}
+            return _stopWatch.ElapsedTime().Ticks;
+        }
+    }
 }

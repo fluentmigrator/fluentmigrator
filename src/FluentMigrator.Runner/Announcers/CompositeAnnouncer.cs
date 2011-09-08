@@ -66,5 +66,19 @@ namespace FluentMigrator.Runner.Announcers
 			foreach (var announcer in _announcers)
 				predicate(announcer);
 		}
-	}
+
+
+        public void SetName(string name) {
+            Say(name);
+        }
+
+        public void ExecutionTime(double time) {
+            Say(time.ToString());
+        }
+
+        public bool IsApplied { get; set; }
+
+        public void Start(long version) { }
+        public void Stop() { }
+    }
 }

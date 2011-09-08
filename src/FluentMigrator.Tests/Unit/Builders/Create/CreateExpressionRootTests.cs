@@ -27,6 +27,7 @@ using FluentMigrator.Infrastructure;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
+using FluentMigrator.Builders.Create.Constraint;
 
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
@@ -231,7 +232,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             var contextMock = new Mock<IMigrationContext>();
             var root = new CreateExpressionRoot(contextMock.Object);
             var builder = root.UniqueConstraint();
-            builder.ShouldBeOfType<CreateConstraintExpression>();
+            builder.ShouldBeOfType<CreateConstraintExpressionBuilder>();
         }
 
 	}

@@ -27,8 +27,9 @@ namespace FluentMigrator.Runner
 	public class MigrationLoader : IMigrationLoader
 	{
 		public IMigrationConventions Conventions { get; private set; }
-		public Assembly Assembly { get; set; }
-		public string Namespace { get; set; }
+		public Assembly Assembly { get; private set; }
+		public string Namespace { get; private set; }
+		public bool LoadNestedNamespaces { get; private set; }
 		public SortedList<long, IMigration> Migrations { get; private set; }
 
 		public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace)
@@ -36,6 +37,15 @@ namespace FluentMigrator.Runner
 			Conventions = conventions;
 			Assembly = assembly;
 			Namespace = @namespace;
+
+			Initialize();
+		}
+		public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, bool loadNestedNamespaces)
+		{
+			Conventions = conventions;
+			Assembly = assembly;
+			Namespace = @namespace;
+			LoadNestedNamespaces = loadNestedNamespaces;
 
 			Initialize();
 		}
@@ -64,7 +74,16 @@ namespace FluentMigrator.Runner
 			IEnumerable<Type> matchedTypes = Assembly.GetExportedTypes().Where(t => Conventions.TypeIsMigration(t));
 
 			if (!string.IsNullOrEmpty(Namespace))
-				matchedTypes = Assembly.GetExportedTypes().Where(t => t.Namespace == Namespace && Conventions.TypeIsMigration(t));
+			{
+				Func<Type, bool> shouldInclude = t => t.Namespace == Namespace;
+				if (LoadNestedNamespaces)
+				{
+					string matchNested = Namespace + ".";
+					shouldInclude = t => t.Namespace == Namespace || t.Namespace.StartsWith(matchNested);
+				}
+
+				matchedTypes = matchedTypes.Where(shouldInclude);
+			}
 
 			foreach (Type type in matchedTypes)
 				yield return Conventions.GetMetadataForMigration(type);

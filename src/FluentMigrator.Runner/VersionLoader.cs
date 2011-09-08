@@ -28,7 +28,7 @@ namespace FluentMigrator.Runner
 
 	    protected VersionSchemaMigration VersionSchemaMigration { get; set; }
 
-	    private VersionInfo _versionInfo;
+	    private IVersionInfo _versionInfo;
 		public IMigrationRunner Runner { get; set; }
 		protected Assembly Assembly { get; set; }
 		public IVersionTableMetaData VersionTableMetaData { get; set; }
@@ -62,7 +62,7 @@ namespace FluentMigrator.Runner
 			return new InsertionDataDefinition { new KeyValuePair<string, object>( VersionTableMetaData.ColumnName, version ) };
 		}
 
-		public VersionInfo VersionInfo
+		public IVersionInfo VersionInfo
 		{
 			get
 			{
@@ -102,9 +102,7 @@ namespace FluentMigrator.Runner
             }
 
 			if ( !VersionTableExists && !Processor.Options.PreviewOnly){
-                Runner.Announcer.Start(0);
 				Runner.Up( VersionMigration );
-                Runner.Announcer.Stop();
 			}
 
             if (VersionTableExists) {
@@ -136,5 +134,5 @@ namespace FluentMigrator.Runner
 									});
 			expression.ExecuteWith( Processor );
 		}
-	}
+    }
 }

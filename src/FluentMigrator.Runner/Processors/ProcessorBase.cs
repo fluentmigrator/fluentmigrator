@@ -37,6 +37,10 @@ namespace FluentMigrator.Runner.Processors
 			Options = options;
 		}
 
+        public virtual string DatabaseType {
+            get { return string.Empty; }
+        }
+
 		public virtual void Process(CreateSchemaExpression expression)
 		{
 			Process(Generator.Generate(expression));

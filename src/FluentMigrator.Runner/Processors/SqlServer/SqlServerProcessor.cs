@@ -25,139 +25,146 @@ using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-	public class SqlServerProcessor : ProcessorBase
-	{
-		public virtual SqlConnection Connection { get; set; }
-		public SqlTransaction Transaction { get; private set; }
-		public bool WasCommitted { get; private set; }
+    public class SqlServerProcessor : ProcessorBase
+    {
+        public virtual SqlConnection Connection { get; set; }
+        public SqlTransaction Transaction { get; private set; }
+        public bool WasCommitted { get; private set; }
 
-		public SqlServerProcessor(SqlConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
-			: base(generator, announcer, options)
-		{
-			Connection = connection;
-			connection.Open();
-			Transaction = connection.BeginTransaction();
-		}
+        public override string DatabaseType
+        {
+            get { return "SqlServer"; }
+        }
 
-		private string SafeSchemaName(string schemaName)
-		{
-			return string.IsNullOrEmpty(schemaName) ? "dbo" : FormatSqlEscape(schemaName);
-		}
+        public SqlServerProcessor(SqlConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+            : base(generator, announcer, options)
+        {
+            Connection = connection;
+            connection.Open();
+            Transaction = connection.BeginTransaction();
+        }
 
-		public override bool SchemaExists(string schemaName)
-		{
-			return Exists("SELECT * FROM SYS.SCHEMAS WHERE NAME = '{0}'", SafeSchemaName(schemaName));
-		}
+        private string SafeSchemaName(string schemaName)
+        {
+            return string.IsNullOrEmpty(schemaName) ? "dbo" : FormatSqlEscape(schemaName);
+        }
+
+        public override bool SchemaExists(string schemaName)
+        {
+            return Exists("SELECT * FROM SYS.SCHEMAS WHERE NAME = '{0}'", SafeSchemaName(schemaName));
+        }
 
         public override bool TableExists(string schemaName, string tableName)
-		{
-        	try
-        	{
-        		return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}'", SafeSchemaName(schemaName), FormatSqlEscape(tableName));
-        	}
-        	catch (Exception e)
-        	{
-        		Console.WriteLine(e);
-        	}
-        	return false;
-		}
+        {
+            try
+            {
+                return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}'", SafeSchemaName(schemaName), FormatSqlEscape(tableName));
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            return false;
+        }
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
-		{
-			return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}'", SafeSchemaName(schemaName), FormatSqlEscape(tableName), FormatSqlEscape(columnName));
-		}
+        {
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}'", SafeSchemaName(schemaName), FormatSqlEscape(tableName), FormatSqlEscape(columnName));
+        }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
-		{
-			return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_CATALOG = DB_NAME() AND TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND CONSTRAINT_NAME = '{2}'", SafeSchemaName(schemaName), FormatSqlEscape(tableName), FormatSqlEscape(constraintName));
-		}
+        {
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_CATALOG = DB_NAME() AND TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND CONSTRAINT_NAME = '{2}'", SafeSchemaName(schemaName), FormatSqlEscape(tableName), FormatSqlEscape(constraintName));
+        }
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             return Exists("SELECT NULL FROM sysindexes WHERE name = '{0}'", FormatSqlEscape(indexName));
         }
 
-		public override void Execute(string template, params object[] args)
-		{
-			Process(String.Format(template, args));
-		}
+        public override void Execute(string template, params object[] args)
+        {
+            Process(String.Format(template, args));
+        }
 
-		public override bool Exists(string template, params object[] args)
-		{
-			if (Connection.State != ConnectionState.Open)
-				Connection.Open();
+        public override bool Exists(string template, params object[] args)
+        {
+            if (Connection.State != ConnectionState.Open)
+                Connection.Open();
 
-			using (var command = new SqlCommand(String.Format(template, args), Connection, Transaction))
-			using (var reader = command.ExecuteReader())
-			{
-				return reader.Read();
-			}
-		}
+            using (var command = new SqlCommand(String.Format(template, args), Connection, Transaction))
+            using (var reader = command.ExecuteReader())
+            {
+                return reader.Read();
+            }
+        }
 
         public override DataSet ReadTableData(string schemaName, string tableName)
-		{
-			return Read("SELECT * FROM [{0}]", tableName);
-		}
+        {
+            return Read("SELECT * FROM [{0}].[{1}]", SafeSchemaName(schemaName), tableName);
+        }
 
-		public override DataSet Read(string template, params object[] args)
-		{
-			if (Connection.State != ConnectionState.Open) Connection.Open();
+        public override DataSet Read(string template, params object[] args)
+        {
+            if (Connection.State != ConnectionState.Open) Connection.Open();
 
-			DataSet ds = new DataSet();
-			using (var command = new SqlCommand(String.Format(template, args), Connection, Transaction))
-			using (SqlDataAdapter adapter = new SqlDataAdapter(command))
-			{
-				adapter.Fill(ds);
-				return ds;
-			}
-		}
+            DataSet ds = new DataSet();
+            using (var command = new SqlCommand(String.Format(template, args), Connection, Transaction))
+            using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+            {
+                adapter.Fill(ds);
+                return ds;
+            }
+        }
 
-		public override void BeginTransaction()
-		{
-			Announcer.Say( "Beginning Transaction" );
-			Transaction = Connection.BeginTransaction();
-		}
+        public override void BeginTransaction()
+        {
+            Announcer.Say("Beginning Transaction");
+            Transaction = Connection.BeginTransaction();
+        }
 
-		public override void CommitTransaction()
-		{
-			Announcer.Say("Committing Transaction");
-			Transaction.Commit();
-			WasCommitted = true;
-			if (Connection.State != ConnectionState.Closed)
-			{
-				Connection.Close();
-			}
-		}
+        public override void CommitTransaction()
+        {
+            Announcer.Say("Committing Transaction");
+            Transaction.Commit();
+            WasCommitted = true;
+            if (Connection.State != ConnectionState.Closed)
+            {
+                Connection.Close();
+            }
+        }
 
-		public override void RollbackTransaction()
-		{
-			Announcer.Say("Rolling back transaction");
-			Transaction.Rollback();
-			WasCommitted = true;
-			if (Connection.State != ConnectionState.Closed)
-			{
-				Connection.Close();
-			}
-		}
+        public override void RollbackTransaction()
+        {
+            Announcer.Say("Rolling back transaction");
+            Transaction.Rollback();
+            WasCommitted = true;
+            if (Connection.State != ConnectionState.Closed)
+            {
+                Connection.Close();
+            }
+        }
 
-		protected override void Process(string sql)
-		{
-			Announcer.Sql(sql);
+        protected override void Process(string sql)
+        {
+            Announcer.Sql(sql);
 
-			if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
-				return;
+            if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
+                return;
 
-			if (Connection.State != ConnectionState.Open)
-				Connection.Open();
+            if (Connection.State != ConnectionState.Open)
+                Connection.Open();
 
             if (sql.Contains("GO"))
             {
                 ExecuteBatchNonQuery(sql);
 
-            }else{
+            }
+            else
+            {
                 ExecuteNonQuery(sql);
-			}
-		}
+            }
+        }
 
         private void ExecuteNonQuery(string sql)
         {
@@ -184,7 +191,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         private void ExecuteBatchNonQuery(string sql)
         {
-             sql += "\nGO";   // make sure last batch is executed.
+            sql += "\nGO";   // make sure last batch is executed.
             string sqlBatch = string.Empty;
 
             using (var command = new SqlCommand(string.Empty, Connection, Transaction))
@@ -223,17 +230,17 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         }
 
 
-		public override void Process(PerformDBOperationExpression expression)
-		{
-			if (Connection.State != ConnectionState.Open) Connection.Open();
+        public override void Process(PerformDBOperationExpression expression)
+        {
+            if (Connection.State != ConnectionState.Open) Connection.Open();
 
-			if (expression.Operation != null)
-				expression.Operation(Connection, Transaction);
-		}
+            if (expression.Operation != null)
+                expression.Operation(Connection, Transaction);
+        }
 
         protected string FormatSqlEscape(string sql)
         {
             return sql.Replace("'", "''");
         }
-	}
+    }
 }

@@ -32,5 +32,10 @@ namespace FluentMigrator.Runner
 		void ElapsedTime(TimeSpan timeSpan);
         void Error(string message);
 
+        void SetName(string name);
+        void ExecutionTime(double time);
+        bool IsApplied { get; set; }
+        void Start(long version);
+        void Stop();
 	}
 }

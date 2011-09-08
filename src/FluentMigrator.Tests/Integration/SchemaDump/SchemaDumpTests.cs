@@ -31,7 +31,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump {
         public SchemaDumpTests() 
         {
             Connection = new SqlConnection(IntegrationTestOptions.SqlServer.ConnectionString);
-            Processor = new SqlServerProcessor(Connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+            Processor = new SqlServerProcessor(Connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
             SchemaDumper = new SqlServerSchemaDumper(Processor, new TextWriterAnnouncer(System.Console.Out));
         }
 

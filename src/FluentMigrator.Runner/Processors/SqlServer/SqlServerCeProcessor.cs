@@ -32,6 +32,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         public SqlCeTransaction Transaction { get; private set; }
         public bool WasCommitted { get; private set; }
 
+        public override string DatabaseType
+        {
+            get { return "SqlServerCe"; }
+        }
+
         public SqlServerCeProcessor(SqlCeConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
             : base(generator, announcer, options)
         {
@@ -109,11 +114,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         public override void CommitTransaction()
         {
             Announcer.Say("Committing Transaction");
-            
+
             if (Transaction != null)
             {
                 Transaction.Commit();
-                Transaction = null;    
+                Transaction = null;
             }
 
             WasCommitted = true;
@@ -133,7 +138,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
 
             Announcer.Say("Rolling back transaction");
-            
+
             Transaction.Rollback();
 
             WasCommitted = true;

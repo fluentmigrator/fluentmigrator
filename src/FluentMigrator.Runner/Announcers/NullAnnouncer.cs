@@ -43,5 +43,18 @@ namespace FluentMigrator.Runner.Announcers
         }
 
 		#endregion
-	}
+
+
+        public void SetName(string name) {
+      
+        }
+
+        public void ExecutionTime(double time) {
+          
+        }
+
+        public bool IsApplied { get; set; }
+        public void Start(long version) { }
+        public void Stop() { }
+    }
 }

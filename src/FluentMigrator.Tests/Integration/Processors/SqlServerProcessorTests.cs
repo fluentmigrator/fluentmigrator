@@ -38,7 +38,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 		public void SetUp()
 		{
 			Connection = new SqlConnection(IntegrationTestOptions.SqlServer.ConnectionString);
-			Processor = new SqlServerProcessor(Connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+			Processor = new SqlServerProcessor(Connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
 		}
 
 		[TearDown]
