@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
-using FluentMigrator.Runner.Generators.SqlServer;
-using NUnit.Should;
+﻿using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
-using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Generators.SqlServer;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 {
-
     public class SqlServer2000DropTableTests : BaseTableDropTests
     {
         protected SqlServer2000Generator generator;
@@ -19,8 +14,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         public void Setup()
         {
             generator = new SqlServer2000Generator();
-
-
         }
 
         [Test]
@@ -30,8 +23,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
             var sql = generator.Generate(expression);
 
-            var expectedSql = 
-                @"
+            const string expectedSql = @"
 			DECLARE @default sysname, @sql nvarchar(max);
 
 			-- get name of default constraint
@@ -94,7 +86,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         public void CanDeleteSchemaInStrictMode()
         {
             generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new DeleteSchemaExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(new DeleteSchemaExpression()));
         }
     }
 }

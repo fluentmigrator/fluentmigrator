@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -16,23 +16,35 @@
 //
 #endregion
 
-namespace FluentMigrator.VersionTableInfo
+using System;
+
+namespace FluentMigrator
 {
-    public class DefaultVersionTableMetaData : IVersionTableMetaData
+    public class FunctionValue
     {
-        public string SchemaName
+        public string Value { get; set; }
+
+        public FunctionValue(string value)
         {
-            get { return string.Empty; }
+            if (value == null)
+                throw new ArgumentNullException("value");
+
+            Value = value;
         }
 
-        public string TableName
+        public override string ToString()
         {
-            get { return "VersionInfo"; }
+            return Value;
         }
 
-        public string ColumnName
+        public static implicit operator FunctionValue(string value)
         {
-            get { return "Version"; }
+            return new FunctionValue(value);
+        }
+
+        public static implicit operator string(FunctionValue value)
+        {
+            return value.Value;
         }
     }
 }

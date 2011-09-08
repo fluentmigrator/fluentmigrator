@@ -1,14 +1,11 @@
-﻿
+﻿using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.Jet;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.Jet
 {
-    using System;
-    using NUnit.Should;
-    using NUnit.Framework;
-    using FluentMigrator.Runner.Generators.Jet;
-    using FluentMigrator.Runner.Generators;
-    using FluentMigrator.Expressions;
-
     public class JetCreateTableTests : BaseTableCreateTests
     {
         protected JetGenerator generator;
@@ -50,7 +47,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
 
             result.ShouldBe(
                 "CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL, [TestColumn2] INTEGER NOT NULL, PRIMARY KEY ([TestColumn1]))");
-     
         }
 
         [Test]
@@ -67,7 +63,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
             string sql = generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL, [TestColumn2] INTEGER NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1]))");
-
         }
 
         [Test]
@@ -76,7 +71,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumNamedPrimaryKeyExpression();
             string sql = generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL, [TestColumn2] INTEGER NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1], [TestColumn2]))");
-
         }
 
         [Test]
@@ -93,7 +87,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         public override void CanCreateTableWithNullableField()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
-   
+
             var result = generator.Generate(expression);
 
             result.ShouldBe(
@@ -104,12 +98,11 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         public override void CanCreateTableWithDefaultValue()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
-            
+
             var result = generator.Generate(expression);
 
             result.ShouldBe(
                 "CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL DEFAULT 'Default', [TestColumn2] INTEGER NOT NULL DEFAULT 0)");
-     
         }
 
         [Test]
@@ -176,9 +169,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         public void CanCreateSchemaInStrictMode()
         {
             generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(new CreateSchemaExpression()));
         }
-
-
     }
 }

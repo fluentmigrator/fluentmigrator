@@ -23,67 +23,59 @@ using System.IO;
 
 namespace FluentMigrator.Runner.Announcers
 {
-	public class TextWriterAnnouncer : BaseAnnouncer
-	{
-		public TextWriterAnnouncer(TextWriter writer)
-			: base(msg => writer.Write(msg))
-		{
-			NonSqlPrefix = "-- ";
-		}
+    public class TextWriterAnnouncer : BaseAnnouncer
+    {
+        public string NonSqlPrefix { get; set; }
 
-		public string NonSqlPrefix { get; set; }
+        public TextWriterAnnouncer(TextWriter writer) : base(writer.Write)
+        {
+            NonSqlPrefix = "-- ";
+        }
 
-		#region IAnnouncer Members
+        public override void Heading(string message)
+        {
+            var value = NonSqlPrefix + message + " ";
+            Write(value.PadRight(78, '='));
+            Write(Environment.NewLine);
+            Write(Environment.NewLine);
+        }
 
-		public override void Heading(string message)
-		{
-			Write(NonSqlPrefix + message + " ");
-			for (var i = 0; i < 75 - (message.Length + 1); i++)
-			{
-				Write("=");
-			}
-			Write(Environment.NewLine);
-			Write(Environment.NewLine);
-		}
+        public override void Say(string message)
+        {
+            Info(NonSqlPrefix + message);
+        }
 
-		public override void Say(string message)
-		{
-			Info(NonSqlPrefix + message);
-		}
+        public override void Sql(string sql)
+        {
+            if (!ShowSql)
+                return;
 
-		public override void Sql(string sql)
-		{
-			if (!ShowSql)
-				return;
+            if (!string.IsNullOrEmpty(sql))
+                Info(sql);
+            else
+                Say("No SQL statement executed.");
+        }
 
-			if (!string.IsNullOrEmpty(sql))
-				Info(sql);
-			else
-				Say("No SQL statement executed.");
-		}
+        public override void ElapsedTime(TimeSpan timeSpan)
+        {
+            if (!ShowElapsedTime)
+                return;
 
-		public override void ElapsedTime(TimeSpan timeSpan)
-		{
-			if (!ShowElapsedTime)
-				return;
+            Say(string.Format("-> {0}s", timeSpan.TotalSeconds));
+            Write(Environment.NewLine);
+        }
 
-			Say(string.Format("-> {0}s", timeSpan.TotalSeconds));
-			Write(Environment.NewLine);
-		}
+        public override void Error(string message)
+        {
+            Write(NonSqlPrefix + "ERROR: ");
+            Write(message);
+            Write(Environment.NewLine);
+        }
 
-		public override void Error(string message)
-		{
-			Write(NonSqlPrefix + "ERROR: ");
-			Write(message);
-			Write(Environment.NewLine);
-		}
-
-		#endregion
-
-		private void Info(string message)
-		{
-			Write(message);
-			Write(Environment.NewLine);
-		}
-	}
+        private void Info(string message)
+        {
+            Write(message);
+            Write(Environment.NewLine);
+        }
+    }
 }

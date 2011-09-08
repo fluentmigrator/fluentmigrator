@@ -1,4 +1,22 @@
-﻿
+﻿#region License
+
+// 
+// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+#endregion
 
 using System.Globalization;
 
@@ -14,6 +32,8 @@ namespace FluentMigrator.Runner.Generators.Generic
 
             string stringValue = value as string;
             if (stringValue != null) { return FormatString(stringValue); }
+            var functionValue = value as FunctionValue;
+            if (functionValue != null) { return FormatString(functionValue.Value); }
 
             if (value is char) { return FormatChar((char)value); }
             if (value is bool) { return FormatBool((bool)value); }
@@ -69,7 +89,8 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public virtual string FormatDateTime(DateTime value)
         {
-            return ValueQuote + (value).ToString("yyyy-MM-ddTHH:mm:ss") + ValueQuote;
+            var result = ValueQuote + (value).ToString("yyyy-MM-ddTHH:mm:ss") + ValueQuote;
+            return result;
         }
 
         public virtual string FormatEnum(object value)
@@ -80,8 +101,6 @@ namespace FluentMigrator.Runner.Generators.Generic
         public virtual string ValueQuote { get { return "'"; } }
 
         public virtual string EscapeValueQuote { get { return ValueQuote + ValueQuote; } }
-
-
 
         /// <summary>
         /// Returns the opening quote identifier - " is the standard according to the specification
