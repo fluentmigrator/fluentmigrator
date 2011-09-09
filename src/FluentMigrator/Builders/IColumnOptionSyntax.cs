@@ -48,6 +48,6 @@ namespace FluentMigrator.Builders
 	        [Obsolete("Please use ReferencedBy syntax. This method will be removed in the next version")]
 	        TNext References(string foreignKeyName, string foreignTableName, IEnumerable<string> foreignColumnNames);
 	        [Obsolete("Please use ReferencedBy syntax. This method will be removed in the next version")]
-		TNext References(string foreignKeyName, string foreignTableSchema, string foreignTableName, IEnumerable<string> foreignColumnNames);
+		    TNext References(string foreignKeyName, string foreignTableSchema, string foreignTableName, IEnumerable<string> foreignColumnNames);
 	}
 }

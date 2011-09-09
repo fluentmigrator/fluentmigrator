@@ -163,20 +163,20 @@ namespace FluentMigrator.Builders.Create.Column
             return this;
         }
 
-        [Obsolete("Use ForeignKey(string,string)")]
+
         public ICreateColumnOptionSyntax ForeignKey()
         {
             Expression.Column.IsForeignKey = true;
             return this;
         }
 
-        [Obsolete("Use ReferencedBy")]
+        [Obsolete("Please use ReferencedBy syntax. This method will be removed in the next version")]
         public ICreateColumnOptionSyntax References(string foreignKeyName, string foreignTableName, IEnumerable<string> foreignColumnNames)
         {
             return References(foreignKeyName, null, foreignTableName, foreignColumnNames);
         }
 
-        [Obsolete("Use ReferencedBy")]
+        [Obsolete("Please use ReferencedBy syntax. This method will be removed in the next version")]
         public ICreateColumnOptionSyntax References(string foreignKeyName, string foreignTableSchema, string foreignTableName, IEnumerable<string> foreignColumnNames)
         {
             var fk = new CreateForeignKeyExpression
