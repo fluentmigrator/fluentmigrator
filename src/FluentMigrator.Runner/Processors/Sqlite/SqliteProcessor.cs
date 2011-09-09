@@ -18,26 +18,28 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Data.SQLite;
+using System.Data.Common;
 
 using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.Sqlite
 {
+
     public class SqliteProcessor : ProcessorBase
     {
-        public SQLiteConnection Connection { get; set; }
+        private readonly DbFactoryBase factory;
+        public DbConnection Connection { get; set; }
 
         public override string DatabaseType
         {
             get { return "Sqlite"; }
         }
 
-        public SqliteProcessor(SQLiteConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+        public SqliteProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, DbFactoryBase factory)
             : base(generator, announcer, options)
         {
+            this.factory = factory;
             Connection = connection;
         }
 
@@ -75,7 +77,7 @@ namespace FluentMigrator.Runner.Processors.Sqlite
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
-            using (var command = new SQLiteCommand(String.Format(template, args), Connection))
+            using (var command = factory.CreateCommand(String.Format(template, args), Connection))
             using (var reader = command.ExecuteReader())
             {
                 try
@@ -116,42 +118,42 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
             if (sql.Contains("GO"))
             {
-                ExecuteBatchNonQuery(sql, Connection);
+                ExecuteBatchNonQuery(sql);
 
             }
             else
             {
-                ExecuteNonQuery(sql, Connection);
+                ExecuteNonQuery(sql);
             }
 
 
         }
 
-        private void ExecuteNonQuery(string sql, SQLiteConnection connection)
+        private void ExecuteNonQuery(string sql)
         {
-            using (var command = new SQLiteCommand(sql, Connection))
+            using (var command = factory.CreateCommand(sql, Connection))
             {
                 try
                 {
                     command.ExecuteNonQuery();
                 }
-                catch (SQLiteException ex)
+                catch (DbException ex)
                 {
-                    throw new SQLiteException(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
+                    throw new Exception(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
                 }
             }
         }
 
-        private void ExecuteBatchNonQuery(string sql, SQLiteConnection conn)
+        private void ExecuteBatchNonQuery(string sql)
         {
             sql += "\nGO";   // make sure last batch is executed.
             string sqlBatch = string.Empty;
 
-            using (var command = new SQLiteCommand(sql, Connection))
+            using (var command = factory.CreateCommand(sql, Connection))
             {
                 try
                 {
-                    foreach (string line in sql.Split(new string[2] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries))
+                    foreach (string line in sql.Split(new[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries))
                     {
                         if (line.ToUpperInvariant().Trim() == "GO")
                         {
@@ -168,9 +170,9 @@ namespace FluentMigrator.Runner.Processors.Sqlite
                         }
                     }
                 }
-                catch (SQLiteException ex)
+                catch (DbException ex)
                 {
-                    throw new SQLiteException(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
+                    throw new Exception(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
                 }
             }
         }
@@ -179,9 +181,9 @@ namespace FluentMigrator.Runner.Processors.Sqlite
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
-            DataSet ds = new DataSet();
-            using (var command = new SQLiteCommand(String.Format(template, args), Connection))
-            using (SQLiteDataAdapter adapter = new SQLiteDataAdapter(command))
+            var ds = new DataSet();
+            using (var command = factory.CreateCommand(String.Format(template, args), Connection))
+            using (var adapter = factory.CreateDataAdapter(command))
             {
                 adapter.Fill(ds);
                 return ds;

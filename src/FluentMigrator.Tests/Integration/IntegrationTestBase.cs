@@ -18,7 +18,6 @@
 
 using System;
 using System.Data.SqlClient;
-using System.Data.SQLite;
 using System.Linq;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.Postgres;
@@ -96,8 +95,7 @@ namespace FluentMigrator.Tests.Integration
         {
             using (var connection = new SqlConnection(serverOptions.ConnectionString))
             {
-
-                var processor = new SqlServerProcessor(connection, generator, announcer, new ProcessorOptions());
+                var processor = new SqlServerProcessor(connection, generator, announcer, new ProcessorOptions(), new SqlServerDbFactory());
                 test(processor);
 
                 if (tryRollback && !processor.WasCommitted)
@@ -115,9 +113,10 @@ namespace FluentMigrator.Tests.Integration
 			var announcer = new TextWriterAnnouncer(System.Console.Out);
 			announcer.Heading("Testing Migration against SQLite");
 
-			using (var connection = new SQLiteConnection(serverOptions.ConnectionString))
+		    var factory = new SqliteDbFactory();
+            using (var connection =  factory.CreateConnection(serverOptions.ConnectionString))
 			{
-				var processor = new SqliteProcessor(connection, new SqliteGenerator(), announcer, new ProcessorOptions());
+			    var processor = new SqliteProcessor(connection, new SqliteGenerator(), announcer, new ProcessorOptions(), factory);
 				test(processor);
 			}
 		}
@@ -127,7 +126,7 @@ namespace FluentMigrator.Tests.Integration
 			if (!serverOptions.IsEnabled)
 				return;
 			var connection = new NpgsqlConnection(serverOptions.ConnectionString);
-			var processor = new PostgresProcessor(connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+			var processor = new PostgresProcessor(connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new PostgresDbFactory());
 			test(processor);
 
 		}
@@ -142,7 +141,7 @@ namespace FluentMigrator.Tests.Integration
 
 			using (var connection = new MySqlConnection(serverOptions.ConnectionString))
 			{
-				var processor = new MySqlProcessor(connection, new MySqlGenerator(), announcer, new ProcessorOptions());
+				var processor = new MySqlProcessor(connection, new MySqlGenerator(), announcer, new ProcessorOptions(), new MySqlDbFactory());
 				test(processor);
 			}
 		}

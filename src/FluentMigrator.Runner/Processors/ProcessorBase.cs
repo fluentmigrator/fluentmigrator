@@ -16,10 +16,7 @@
 //
 #endregion
 
-using System.Collections.Generic;
-using FluentMigrator.Model;
 using FluentMigrator.Builders.Execute;
-using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Processors

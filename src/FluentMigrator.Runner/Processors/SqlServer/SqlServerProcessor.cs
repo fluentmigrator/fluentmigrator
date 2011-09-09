@@ -19,16 +19,18 @@
 
 using System;
 using System.Data;
-using System.Data.SqlClient;
 using System.IO;
 using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-    public class SqlServerProcessor : ProcessorBase
+	using System.Data.Common;
+
+	public sealed class SqlServerProcessor : ProcessorBase
     {
-        public virtual SqlConnection Connection { get; set; }
-        public SqlTransaction Transaction { get; private set; }
+		private readonly IDbFactory factory;
+		public DbConnection Connection { get; private set; }
+        public DbTransaction Transaction { get; private set; }
         public bool WasCommitted { get; private set; }
 
         public override string DatabaseType
@@ -36,15 +38,16 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             get { return "SqlServer"; }
         }
 
-        public SqlServerProcessor(SqlConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+        public SqlServerProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(generator, announcer, options)
         {
-            Connection = connection;
+        	this.factory = factory;
+        	Connection = connection;
             connection.Open();
-            Transaction = connection.BeginTransaction();
+            BeginTransaction();
         }
 
-        private string SafeSchemaName(string schemaName)
+		private static string SafeSchemaName(string schemaName)
         {
             return string.IsNullOrEmpty(schemaName) ? "dbo" : FormatSqlEscape(schemaName);
         }
@@ -92,7 +95,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
-            using (var command = new SqlCommand(String.Format(template, args), Connection, Transaction))
+            using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -108,9 +111,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
-            DataSet ds = new DataSet();
-            using (var command = new SqlCommand(String.Format(template, args), Connection, Transaction))
-            using (SqlDataAdapter adapter = new SqlDataAdapter(command))
+            var ds = new DataSet();
+            using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
+            using (var adapter = factory.CreateDataAdapter(command))
             {
                 adapter.Fill(ds);
                 return ds;
@@ -168,7 +171,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         private void ExecuteNonQuery(string sql)
         {
-            using (var command = new SqlCommand(sql, Connection, Transaction))
+            using (var command = factory.CreateCommand(sql, Connection, Transaction))
             {
                 try
                 {
@@ -177,7 +180,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 }
                 catch (Exception ex)
                 {
-                    using (StringWriter message = new StringWriter())
+                    using (var message = new StringWriter())
                     {
                         message.WriteLine("An error occured executing the following sql:");
                         message.WriteLine(sql);
@@ -194,11 +197,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             sql += "\nGO";   // make sure last batch is executed.
             string sqlBatch = string.Empty;
 
-            using (var command = new SqlCommand(string.Empty, Connection, Transaction))
+            using (var command = factory.CreateCommand(string.Empty, Connection, Transaction))
             {
                 try
                 {
-                    foreach (string line in sql.Split(new string[2] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries))
+                    foreach (string line in sql.Split(new[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries))
                     {
                         if (line.ToUpperInvariant().Trim() == "GO")
                         {
@@ -217,7 +220,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 }
                 catch (Exception ex)
                 {
-                    using (StringWriter message = new StringWriter())
+                    using (var message = new StringWriter())
                     {
                         message.WriteLine("An error occured executing the following sql:");
                         message.WriteLine(sql);
@@ -238,7 +241,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 expression.Operation(Connection, Transaction);
         }
 
-        protected string FormatSqlEscape(string sql)
+		private static string FormatSqlEscape(string sql)
         {
             return sql.Replace("'", "''");
         }

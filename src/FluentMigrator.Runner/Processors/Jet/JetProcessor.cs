@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using FluentMigrator.Builders.Execute;
@@ -8,7 +7,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 {
     public class JetProcessor : ProcessorBase
     {
-        public OleDbConnection Connection { get; set; }
+    	private OleDbConnection Connection { get; set; }
 
         public override string DatabaseType
         {
@@ -61,7 +60,7 @@ namespace FluentMigrator.Runner.Processors.Jet
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
-            DataSet ds = new DataSet();
+            var ds = new DataSet();
             using (var command = new OleDbCommand(String.Format(template, args), Connection))
             using (var adapter = new OleDbDataAdapter(command))
             {

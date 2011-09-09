@@ -27,15 +27,15 @@ namespace FluentMigrator.Tests.Helpers
 	public class SqlServerTestTable : IDisposable
 	{
 	    private readonly string _schemaName;
-	    public SqlConnection Connection { get; set; }
+		private SqlConnection Connection { get; set; }
 		public string Name { get; set; }
-		protected SqlTransaction Transaction { get; set; }
+		private SqlTransaction Transaction { get; set; }
 
 		public SqlServerTestTable(SqlServerProcessor processor, string schemaName, params string[] columnDefinitions)
 		{
 		    _schemaName = schemaName;
-		    Connection = processor.Connection;
-			Transaction = processor.Transaction;
+		    Connection = (SqlConnection) processor.Connection;
+			Transaction = (SqlTransaction) processor.Transaction;
 
 			Name = "Table" + Guid.NewGuid().ToString("N");
 			Create(columnDefinitions);
