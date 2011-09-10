@@ -28,8 +28,10 @@ namespace FluentMigrator.Builders.Alter.Column
 	public class AlterColumnExpressionBuilder : ExpressionBuilderWithColumnTypesBase<AlterColumnExpression, IAlterColumnOptionSyntax>,
 		IAlterColumnOnTableSyntax,
 		IAlterColumnOptionSyntax,
-        IAlterColumnAsTypeOrInSchemaSyntax
+        IAlterColumnAsTypeOrInSchemaSyntax,
+        IAlterColumnOptionOrForeignKeyCascadeSyntax
 	{
+        public ForeignKeyDefinition CurrentForeignKey { get; set; }
 		private readonly IMigrationContext _context;
 
 		public AlterColumnExpressionBuilder( AlterColumnExpression expression, IMigrationContext context )
@@ -109,17 +111,17 @@ namespace FluentMigrator.Builders.Alter.Column
 			return this;
         }
 
-        public IAlterColumnOptionSyntax ForeignKey(string primaryTableName, string primaryColumnName)
+        public IAlterColumnOptionOrForeignKeyCascadeSyntax ForeignKey(string primaryTableName, string primaryColumnName)
         {
             return ForeignKey(null, null, primaryTableName, primaryColumnName);
         }
 
-        public IAlterColumnOptionSyntax ForeignKey(string foreignKeyName, string primaryTableName, string primaryColumnName)
+        public IAlterColumnOptionOrForeignKeyCascadeSyntax ForeignKey(string foreignKeyName, string primaryTableName, string primaryColumnName)
         {
             return ForeignKey(foreignKeyName, null, primaryTableName, primaryColumnName);
         }
 
-        public IAlterColumnOptionSyntax ForeignKey(string foreignKeyName, string primaryTableSchema, string primaryTableName, string primaryColumnName)
+        public IAlterColumnOptionOrForeignKeyCascadeSyntax ForeignKey(string foreignKeyName, string primaryTableSchema, string primaryTableName, string primaryColumnName)
         {
             Expression.Column.IsForeignKey = true;
 
@@ -139,20 +141,21 @@ namespace FluentMigrator.Builders.Alter.Column
             fk.ForeignKey.ForeignColumns.Add(Expression.Column.Name);
 
             _context.Expressions.Add(fk);
+            CurrentForeignKey = fk.ForeignKey;
             return this;
         }
 
-        public IAlterColumnOptionSyntax ReferencedBy(string foreignTableName, string foreignColumnName)
+        public IAlterColumnOptionOrForeignKeyCascadeSyntax ReferencedBy(string foreignTableName, string foreignColumnName)
         {
             return ReferencedBy(null, null, foreignTableName, foreignColumnName);
         }
 
-        public IAlterColumnOptionSyntax ReferencedBy(string foreignKeyName, string foreignTableName, string foreignColumnName)
+        public IAlterColumnOptionOrForeignKeyCascadeSyntax ReferencedBy(string foreignKeyName, string foreignTableName, string foreignColumnName)
         {
             return ReferencedBy(foreignKeyName, null, foreignTableName, foreignColumnName);
         }
 
-        public IAlterColumnOptionSyntax ReferencedBy(string foreignKeyName, string foreignTableSchema, string foreignTableName, string foreignColumnName)
+        public IAlterColumnOptionOrForeignKeyCascadeSyntax ReferencedBy(string foreignKeyName, string foreignTableSchema, string foreignTableName, string foreignColumnName)
         {
             var fk = new CreateForeignKeyExpression
             {
@@ -170,6 +173,7 @@ namespace FluentMigrator.Builders.Alter.Column
             fk.ForeignKey.ForeignColumns.Add(foreignColumnName);
 
             _context.Expressions.Add(fk);
+            CurrentForeignKey = fk.ForeignKey;
             return this;
         }
 
@@ -206,6 +210,25 @@ namespace FluentMigrator.Builders.Alter.Column
                 fk.ForeignKey.ForeignColumns.Add(foreignColumnName);
 
             _context.Expressions.Add(fk);
+            return this;
+        }
+
+        public IAlterColumnOptionOrForeignKeyCascadeSyntax OnDelete(Rule rule)
+        {
+            CurrentForeignKey.OnDelete = rule;
+            return this;
+        }
+
+        public IAlterColumnOptionOrForeignKeyCascadeSyntax OnUpdate(Rule rule)
+        {
+            CurrentForeignKey.OnUpdate = rule;
+            return this;
+        }
+
+        public IAlterColumnOptionSyntax OnDeleteOrUpdate(Rule rule)
+        {
+            OnDelete(rule);
+            OnUpdate(rule);
             return this;
         }
 

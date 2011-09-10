@@ -28,8 +28,10 @@ namespace FluentMigrator.Builders.Create.Column
 	public class CreateColumnExpressionBuilder : ExpressionBuilderWithColumnTypesBase<CreateColumnExpression, ICreateColumnOptionSyntax>,
 		ICreateColumnOnTableSyntax,
 		ICreateColumnOptionSyntax,
-		ICreateColumnAsTypeOrInSchemaSyntax
+		ICreateColumnAsTypeOrInSchemaSyntax,
+        ICreateColumnOptionOrForeignKeyCascadeSyntax
 	{
+        public ForeignKeyDefinition CurrentForeignKey { get; set; }
 		private readonly IMigrationContext _context;
 
 		public CreateColumnExpressionBuilder(CreateColumnExpression expression, IMigrationContext context)
@@ -99,17 +101,17 @@ namespace FluentMigrator.Builders.Create.Column
 			return this;
         }
 
-        public ICreateColumnOptionSyntax ForeignKey(string primaryTableName, string primaryColumnName)
+        public ICreateColumnOptionOrForeignKeyCascadeSyntax ForeignKey(string primaryTableName, string primaryColumnName)
         {
             return ForeignKey(null, null, primaryTableName, primaryColumnName);
         }
 
-        public ICreateColumnOptionSyntax ForeignKey(string foreignKeyName, string primaryTableName, string primaryColumnName)
+        public ICreateColumnOptionOrForeignKeyCascadeSyntax ForeignKey(string foreignKeyName, string primaryTableName, string primaryColumnName)
         {
             return ForeignKey(foreignKeyName, null, primaryTableName, primaryColumnName);
         }
 
-        public ICreateColumnOptionSyntax ForeignKey(string foreignKeyName, string primaryTableSchema, string primaryTableName, string primaryColumnName)
+        public ICreateColumnOptionOrForeignKeyCascadeSyntax ForeignKey(string foreignKeyName, string primaryTableSchema, string primaryTableName, string primaryColumnName)
         {
             Expression.Column.IsForeignKey = true;
 
@@ -129,20 +131,21 @@ namespace FluentMigrator.Builders.Create.Column
             fk.ForeignKey.ForeignColumns.Add(Expression.Column.Name);
 
             _context.Expressions.Add(fk);
+            CurrentForeignKey = fk.ForeignKey;
             return this;
         }
 
-        public ICreateColumnOptionSyntax ReferencedBy(string foreignTableName, string foreignColumnName)
+        public ICreateColumnOptionOrForeignKeyCascadeSyntax ReferencedBy(string foreignTableName, string foreignColumnName)
         {
             return ReferencedBy(null, null, foreignTableName, foreignColumnName);
         }
 
-        public ICreateColumnOptionSyntax ReferencedBy(string foreignKeyName, string foreignTableName, string foreignColumnName)
+        public ICreateColumnOptionOrForeignKeyCascadeSyntax ReferencedBy(string foreignKeyName, string foreignTableName, string foreignColumnName)
         {
             return ReferencedBy(foreignKeyName, null, foreignTableName, foreignColumnName);
         }
 
-        public ICreateColumnOptionSyntax ReferencedBy(string foreignKeyName, string foreignTableSchema, string foreignTableName, string foreignColumnName)
+        public ICreateColumnOptionOrForeignKeyCascadeSyntax ReferencedBy(string foreignKeyName, string foreignTableSchema, string foreignTableName, string foreignColumnName)
         {
             var fk = new CreateForeignKeyExpression
             {
@@ -160,6 +163,7 @@ namespace FluentMigrator.Builders.Create.Column
             fk.ForeignKey.ForeignColumns.Add(foreignColumnName);
 
             _context.Expressions.Add(fk);
+            CurrentForeignKey = fk.ForeignKey;
             return this;
         }
 
@@ -196,6 +200,25 @@ namespace FluentMigrator.Builders.Create.Column
                 fk.ForeignKey.ForeignColumns.Add(foreignColumnName);
 
             _context.Expressions.Add(fk);
+            return this;
+        }
+
+        public ICreateColumnOptionOrForeignKeyCascadeSyntax OnDelete(Rule rule)
+        {
+            CurrentForeignKey.OnDelete = rule;
+            return this;
+        }
+
+        public ICreateColumnOptionOrForeignKeyCascadeSyntax OnUpdate(Rule rule)
+        {
+            CurrentForeignKey.OnUpdate = rule;
+            return this;
+        }
+
+        public ICreateColumnOptionSyntax OnDeleteOrUpdate(Rule rule)
+        {
+            OnDelete(rule);
+            OnUpdate(rule);
             return this;
         }
 

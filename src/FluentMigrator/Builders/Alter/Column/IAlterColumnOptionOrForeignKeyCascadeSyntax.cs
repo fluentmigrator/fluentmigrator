@@ -16,12 +16,11 @@
 //
 #endregion
 
-
-namespace FluentMigrator.Builders.Alter.Table
+namespace FluentMigrator.Builders.Alter.Column
 {
-    public interface IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax :
-        IColumnOptionSyntax<IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax, IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax>, 
-        IAlterTableAddColumnOrAlterColumnSyntax
-    {
-    }
+    public interface IAlterColumnOptionOrForeignKeyCascadeSyntax : 
+        IAlterColumnOptionSyntax,
+        IForeignKeyCascadeSyntax<IAlterColumnOptionSyntax, IAlterColumnOptionOrForeignKeyCascadeSyntax>
+	{
+	}
 }

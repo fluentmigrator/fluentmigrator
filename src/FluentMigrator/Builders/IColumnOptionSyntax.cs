@@ -22,8 +22,9 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders
 {
-	public interface IColumnOptionSyntax<TNext> : IFluentSyntax
+	public interface IColumnOptionSyntax<TNext,TNextFk> : IFluentSyntax
 		where TNext : IFluentSyntax
+        where TNextFk : IFluentSyntax
 	{
 		TNext WithDefaultValue(object value);
 		TNext Identity();
@@ -35,15 +36,15 @@ namespace FluentMigrator.Builders
 		TNext Nullable();
 		TNext NotNullable();
 		TNext Unique();
-		
-	        TNext ForeignKey(string primaryTableName, string primaryColumnName);
-	        TNext ForeignKey(string foreignKeyName, string primaryTableName, string primaryColumnName);
-	        TNext ForeignKey(string foreignKeyName, string primaryTableSchema, string primaryTableName, string primaryColumnName);
+
+            TNextFk ForeignKey(string primaryTableName, string primaryColumnName);
+            TNextFk ForeignKey(string foreignKeyName, string primaryTableName, string primaryColumnName);
+            TNextFk ForeignKey(string foreignKeyName, string primaryTableSchema, string primaryTableName, string primaryColumnName);
 	        TNext ForeignKey();
-	        
-	        TNext ReferencedBy(string foreignTableName, string foreignColumnName);
-	        TNext ReferencedBy(string foreignKeyName, string foreignTableName, string foreignColumnName);
-	        TNext ReferencedBy(string foreignKeyName, string foreignTableSchema, string foreignTableName, string foreignColumnName);
+
+            TNextFk ReferencedBy(string foreignTableName, string foreignColumnName);
+            TNextFk ReferencedBy(string foreignKeyName, string foreignTableName, string foreignColumnName);
+            TNextFk ReferencedBy(string foreignKeyName, string foreignTableSchema, string foreignTableName, string foreignColumnName);
 	       
 	        [Obsolete("Please use ReferencedBy syntax. This method will be removed in the next version")]
 	        TNext References(string foreignKeyName, string foreignTableName, IEnumerable<string> foreignColumnNames);
