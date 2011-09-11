@@ -1,26 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
-using FluentMigrator.Runner.Generators.SqlServer;
-using NUnit.Should;
+﻿using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
-using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Generators.SqlServer;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 {
-
     public class SqlServer2000DropTableTests : BaseTableDropTests
     {
-        protected SqlServer2000Generator generator;
+        private SqlServer2000Generator _generator;
 
         [SetUp]
         public void Setup()
         {
-            generator = new SqlServer2000Generator();
-
-
+            _generator = new SqlServer2000Generator();
         }
 
         [Test]
@@ -28,9 +21,9 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         {
             //This does not work if it is a primary key
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
-            var sql = generator.Generate(expression);
+            var sql = _generator.Generate(expression);
 
-            var expectedSql = 
+            var expectedSql =
                 @"
 			DECLARE @default sysname, @sql nvarchar(max);
 
@@ -60,7 +53,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         public override void CanDropForeignKey()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
-            var sql = generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE [TestTable1] DROP CONSTRAINT [FK_Test]");
         }
 
@@ -69,7 +62,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
 
-            var sql = generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("DROP TABLE [TestTable1]");
         }
 
@@ -78,7 +71,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
 
-            var sql = generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("DROP INDEX [TestTable1].[TestIndex]");
         }
 
@@ -86,15 +79,15 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         public override void CanDeleteSchema()
         {
             var expression = new DeleteSchemaExpression();
-            var result = generator.Generate(expression);
+            var result = _generator.Generate(expression);
             result.ShouldBe(string.Empty);
         }
 
         [Test]
         public void CanDeleteSchemaInStrictMode()
         {
-            generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new DeleteSchemaExpression()));
+            _generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new DeleteSchemaExpression()));
         }
     }
 }
