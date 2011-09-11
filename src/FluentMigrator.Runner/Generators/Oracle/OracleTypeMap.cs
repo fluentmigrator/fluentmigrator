@@ -33,10 +33,10 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         protected override void SetupTypeMaps()
         {
-            SetTypeMap(DbType.AnsiStringFixedLength, "CHAR(255)");
-            SetTypeMap(DbType.AnsiStringFixedLength, "CHAR($size)", AnsiStringCapacity);
-            SetTypeMap(DbType.AnsiString, "VARCHAR2(255)");
-            SetTypeMap(DbType.AnsiString, "VARCHAR2($size)", AnsiStringCapacity);
+            SetTypeMap(DbType.AnsiStringFixedLength, "CHAR(255 CHAR)");
+            SetTypeMap(DbType.AnsiStringFixedLength, "CHAR($size CHAR)", AnsiStringCapacity);
+            SetTypeMap(DbType.AnsiString, "VARCHAR2(255 CHAR)");
+            SetTypeMap(DbType.AnsiString, "VARCHAR2($size CHAR)", AnsiStringCapacity);
             SetTypeMap(DbType.AnsiString, "CLOB", AnsiTextCapacity);
             SetTypeMap(DbType.Binary, "RAW(2000)");
             SetTypeMap(DbType.Binary, "RAW($size)", AnsiStringCapacity);
