@@ -57,6 +57,17 @@ namespace FluentMigrator.Tests.Unit.Expressions
         }
 
         [Test]
+        public void ResourceFinderFindFileWithFullNameAndNamespace()
+        {
+            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = "FluentMigrator.Tests.InitialSchema.sql", MigrationAssembly = Assembly.GetExecutingAssembly() };
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute("InitialSchema")).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+
+        [Test]
         public void ToStringIsDescriptive()
         {
             var expression = new ExecuteSqlScriptExpression { SqlScript = testSqlScript };
