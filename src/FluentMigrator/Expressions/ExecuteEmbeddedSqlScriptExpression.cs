@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using FluentMigrator.Infrastructure;
 using System.Reflection;
 using System.IO;
@@ -18,7 +17,7 @@ namespace FluentMigrator.Expressions
         {
             
             string sqlText;
-            string embeddedResourceName = GetQualifiedResourcePath(SqlScript);
+            string embeddedResourceName = GetQualifiedResourcePath();
 
             if (string.IsNullOrEmpty(embeddedResourceName))
             {
@@ -39,14 +38,15 @@ namespace FluentMigrator.Expressions
             processor.Execute(sqlText);
         }
 
-        private string GetQualifiedResourcePath(string resourceName)
+        private string GetQualifiedResourcePath()
         {
             var resources = MigrationAssembly.GetManifestResourceNames();
-            var fullManifestPath = resources.Where(x => x.ToLowerInvariant().EndsWith(SqlScript.ToLowerInvariant()));
-            return fullManifestPath.FirstOrDefault();
+            //resource full name is in format `namespace.resourceName`
+            return resources.Where(x => x.EndsWith(string.Format(".{0}", SqlScript), StringComparison.InvariantCultureIgnoreCase))
+                .FirstOrDefault();
         }
 
-        public override void ApplyConventions(IMigrationConventions conventions)
+    	public override void ApplyConventions(IMigrationConventions conventions)
         {
            
         }
