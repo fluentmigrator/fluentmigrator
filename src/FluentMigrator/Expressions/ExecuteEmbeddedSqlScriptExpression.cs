@@ -24,15 +24,13 @@ namespace FluentMigrator.Expressions
                 throw new ArgumentNullException(string.Format("Could find resource named {0} in assembly {1}",SqlScript,MigrationAssembly.FullName));
             }
 
-            using (var stream = MigrationAssembly.GetManifestResourceStream(embeddedResourceName))
-            {
-                using (var reader = new StreamReader(stream))
-                {
-                    sqlText = reader.ReadToEnd();
-                }
-            }
+        	using (var stream = MigrationAssembly.GetManifestResourceStream(embeddedResourceName))
+        	using (var reader = new StreamReader(stream))
+        	{
+        		sqlText = reader.ReadToEnd();
+        	}
 
-            // since all the Processors are using String.Format() in their Execute method
+        	// since all the Processors are using String.Format() in their Execute method
             //  we need to escape the brackets with double brackets or else it throws an incorrect format error on the String.Format call
             sqlText = sqlText.Replace("{", "{{").Replace("}", "}}");
             processor.Execute(sqlText);
@@ -42,7 +40,8 @@ namespace FluentMigrator.Expressions
         {
             var resources = MigrationAssembly.GetManifestResourceNames();
             //resource full name is in format `namespace.resourceName`
-            return resources.Where(x => x.EndsWith(string.Format(".{0}", SqlScript), StringComparison.InvariantCultureIgnoreCase))
+            var pointedSqlScript = string.Format(".{0}", SqlScript);
+            return resources.Where(x => x.EndsWith(pointedSqlScript, StringComparison.InvariantCultureIgnoreCase))
                 .FirstOrDefault();
         }
 

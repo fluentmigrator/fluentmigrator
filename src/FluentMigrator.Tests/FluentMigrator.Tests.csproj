@@ -327,9 +327,6 @@
     <EmbeddedResource Include="DropInitialSchema.sql" />
     <EmbeddedResource Include="InitialSchema.sql" />
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="x\InitialSchema.sql" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>
