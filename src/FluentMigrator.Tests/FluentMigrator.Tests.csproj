@@ -319,13 +319,19 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Embeddedtestscript.sql">
+    <EmbeddedResource Include="EmbeddedResources\Embeddedtestscript.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="DropInitialSchema.sql" />
-    <EmbeddedResource Include="InitialSchema.sql" />
+    <EmbeddedResource Include="EmbeddedResources\DropInitialSchema.sql" />
+    <EmbeddedResource Include="EmbeddedResources\InitialSchema.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="EmbeddedResources\A\NotUniqueResource.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="EmbeddedResources\B\NotUniqueResource.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

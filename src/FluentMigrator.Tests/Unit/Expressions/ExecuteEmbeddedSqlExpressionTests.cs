@@ -4,10 +4,12 @@ using FluentMigrator.Tests.Helpers;
 using FluentMigrator.Infrastructure;
 using Moq;
 using NUnit.Should;
+using System;
 using System.Reflection;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
+
     [TestFixture]
     public class ExecuteEmbeddedSqlScriptExpressionTests
     {
@@ -59,12 +61,22 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ResourceFinderFindFileWithFullNameAndNamespace()
         {
-            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = "FluentMigrator.Tests.InitialSchema.sql", MigrationAssembly = Assembly.GetExecutingAssembly() };
+            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = "FluentMigrator.Tests.EmbeddedResources.InitialSchema.sql", MigrationAssembly = Assembly.GetExecutingAssembly() };
             var processor = new Mock<IMigrationProcessor>();
             processor.Setup(x => x.Execute("InitialSchema")).Verifiable();
 
             expression.ExecuteWith(processor.Object);
             processor.Verify();
+        }
+
+        [Test]
+        public void ResourceFinderFindThrowsExceptionIfFoundMoreThenOneResource()
+        {
+            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = "NotUniqueResource.sql", MigrationAssembly = Assembly.GetExecutingAssembly() };
+            var processor = new Mock<IMigrationProcessor>();
+
+            Assert.Throws<InvalidOperationException>(() => expression.ExecuteWith(processor.Object));
+            processor.Verify(x => x.Execute("NotUniqueResource"), Times.Never());
         }
 
         [Test]

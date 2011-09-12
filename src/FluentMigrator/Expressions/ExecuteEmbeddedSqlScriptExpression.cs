@@ -19,11 +19,6 @@ namespace FluentMigrator.Expressions
             string sqlText;
             string embeddedResourceName = GetQualifiedResourcePath();
 
-            if (string.IsNullOrEmpty(embeddedResourceName))
-            {
-                throw new ArgumentNullException(string.Format("Could find resource named {0} in assembly {1}",SqlScript,MigrationAssembly.FullName));
-            }
-
             using (var stream = MigrationAssembly.GetManifestResourceStream(embeddedResourceName))
             using (var reader = new StreamReader(stream))
             {
@@ -44,7 +39,20 @@ namespace FluentMigrator.Expressions
             var sqlScriptParts = SqlScript.Split('.').Reverse().ToArray();
             Func<string, bool> isNameMatch = x => x.Split('.').Reverse().Take(sqlScriptParts.Length).SequenceEqual(sqlScriptParts, StringComparer.InvariantCultureIgnoreCase);
 
-            return resources.Where(isNameMatch).FirstOrDefault();
+            string result = null;
+            var foundResources = resources.Where(isNameMatch).ToArray();
+            
+            if(foundResources.Length == 0)
+                throw new ArgumentNullException(string.Format("Could not find resource named {0} in assembly {1}", SqlScript, MigrationAssembly.FullName));
+
+            if(foundResources.Length > 1)
+                throw new InvalidOperationException(string.Format(@"Could not find unique resource named {0} in assembly {1}.
+Possible candidates are:
+ 
+{2}
+", SqlScript, MigrationAssembly.FullName, string.Join("\r\n\t", foundResources)));
+
+            return foundResources[0];
         }
 
     	public override void ApplyConventions(IMigrationConventions conventions)
