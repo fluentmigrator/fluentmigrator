@@ -1,15 +1,32 @@
+#region License
+// 
+// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System;
 using System.Data;
 using System.Data.Common;
 using FluentMigrator.Builders.Execute;
 
-
 namespace FluentMigrator.Runner.Processors.Oracle
 {
     public class OracleProcessor : ProcessorBase
     {
-    	private DbConnection Connection { get; set; }
-    	private readonly IDbFactory factory;
+        private DbConnection Connection { get; set; }
+        private readonly IDbFactory _factory;
 
         public override string DatabaseType
         {
@@ -20,44 +37,106 @@ namespace FluentMigrator.Runner.Processors.Oracle
             : base(generator, announcer, options)
         {
             Connection = connection;
-        	this.factory = factory;
+            _factory = factory;
 
-        	//oracle does not support ddl transactions
-        	//this.Transaction = this.Connection.BeginTransaction();
+            //oracle does not support ddl transactions
+            //this.Transaction = this.Connection.BeginTransaction();
         }
 
         public override bool SchemaExists(string schemaName)
         {
-            return true;
+            if (schemaName == null)
+                throw new ArgumentNullException("schemaName");
+
+            if (schemaName.Length == 0)
+                return false;
+
+            return Exists("SELECT 1 FROM ALL_USERS WHERE USERNAME = '{0}'", schemaName.ToUpper());
         }
 
         public override bool TableExists(string schemaName, string tableName)
         {
-            return Exists("SELECT TABLE_NAME FROM USER_TABLES WHERE LOWER(TABLE_NAME)='{0}'", tableName.ToLower());
+            if (schemaName == null)
+                throw new ArgumentNullException("schemaName");
+            if (tableName == null)
+                throw new ArgumentNullException("tableName");
+
+            if (tableName.Length == 0)
+                return false;
+
+            if (schemaName.Length == 0)
+                return Exists("SELECT 1 FROM USER_TABLES WHERE TABLE_NAME = '{0}'", tableName.ToUpper());
+
+            return Exists("SELECT 1 FROM ALL_TABLES WHERE OWNER = '{0}' AND TABLE_NAME = '{1}'", schemaName.ToUpper(), tableName.ToUpper());
         }
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
-            return Exists("SELECT COLUMN_NAME FROM USER_TAB_COLUMNS WHERE LOWER(TABLE_NAME) = '{0}' AND LOWER(COLUMN_NAME) = '{1}'", tableName.ToLower(), columnName.ToLower());
+            if (schemaName == null)
+                throw new ArgumentNullException("schemaName");
+            if (tableName == null)
+                throw new ArgumentNullException("tableName");
+            if (columnName == null)
+                throw new ArgumentNullException("columnName");
+
+            if (columnName.Length == 0 || tableName.Length == 0)
+                return false;
+
+            if (string.IsNullOrEmpty(schemaName))
+                return Exists("SELECT 1 FROM USER_TAB_COLUMNS WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'", tableName.ToUpper(), columnName.ToUpper());
+
+            return Exists("SELECT 1 FROM ALL_TAB_COLUMNS WHERE OWNER = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}'", schemaName.ToUpper(), tableName.ToUpper(), columnName.ToUpper());
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
-            const string sql = @"S'";
-            return Exists(sql, tableName.ToLower(), constraintName.ToLower());
+            if (schemaName == null)
+                throw new ArgumentNullException("schemaName");
+            if (tableName == null)
+                throw new ArgumentNullException("tableName");
+            if (constraintName == null)
+                throw new ArgumentNullException("constraintName");
+
+            //In Oracle DB constraint name is unique within the schema, so the table name is not used in the query
+
+            if (constraintName.Length == 0)
+                return false;
+
+            if (schemaName.Length == 0)
+                return Exists("SELECT 1 FROM USER_CONSTRAINTS WHERE CONSTRAINT_NAME = '{0}'", constraintName.ToUpper());
+
+            return Exists("SELECT 1 FROM ALL_CONSTRAINTS WHERE OWNER = '{0}' AND CONSTRAINT_NAME = '{1}'", schemaName.ToUpper(), constraintName.ToUpper());
         }
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
-            return Exists("SELECT INDEX_NAME FROM ALL_INDEXES WHERE LOWER(TABLE_NAME) = '{0}' AND LOWER(INDEX_NAME) = '{1}'", tableName.ToLower(), indexName.ToLower());
+            if (schemaName == null)
+                throw new ArgumentNullException("schemaName");
+            if (tableName == null)
+                throw new ArgumentNullException("tableName");
+            if (indexName == null)
+                throw new ArgumentNullException("indexName");
+
+            //In Oracle DB index name is unique within the schema, so the table name is not used in the query
+
+            if (indexName.Length == 0)
+                return false;
+
+            if (schemaName.Length == 0)
+                return Exists("SELECT 1 FROM USER_INDEXES WHERE INDEX_NAME = '{0}'", indexName.ToUpper());
+
+            return Exists("SELECT 1 FROM ALL_INDEXES WHERE OWNER = '{0}' AND INDEX_NAME = '{1}'", schemaName.ToUpper(), indexName.ToUpper());
         }
 
         public override void Execute(string template, params object[] args)
         {
+            if (template == null)
+                throw new ArgumentNullException("template");
+
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
-            using (var command = factory.CreateCommand(String.Format(template, args), Connection))
+            using (var command = _factory.CreateCommand(String.Format(template, args), Connection))
             {
                 command.ExecuteNonQuery();
             }
@@ -65,10 +144,13 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         public override bool Exists(string template, params object[] args)
         {
+            if (template == null)
+                throw new ArgumentNullException("template");
+
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
-            using (var command = factory.CreateCommand(String.Format(template, args), Connection))
+            using (var command = _factory.CreateCommand(String.Format(template, args), Connection))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -77,25 +159,40 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
-            return Read("SELECT * FROM {0}", tableName);
+            if (schemaName == null)
+                throw new ArgumentNullException("schemaName");
+            if (tableName == null)
+                throw new ArgumentNullException("tableName");
+
+            if (schemaName.Length == 0)
+                return Read("SELECT * FROM {0}", tableName.ToUpper());
+
+            return Read("SELECT * FROM {0}.{1}", schemaName.ToUpper(), tableName.ToUpper());
         }
 
         public override DataSet Read(string template, params object[] args)
         {
+            if (template == null)
+                throw new ArgumentNullException("template");
+
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
-            var ds = new DataSet();
-            using (var command = factory.CreateCommand(String.Format(template, args), Connection))
-            using (DbDataAdapter adapter = factory.CreateDataAdapter(command))
+            var result = new DataSet();
+            using (var command = _factory.CreateCommand(String.Format(template, args), Connection))
+            using (var adapter = _factory.CreateDataAdapter(command))
             {
-                adapter.Fill(ds);
-                return ds;
+                adapter.Fill(result);
+                return result;
             }
         }
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            throw new NotImplementedException();
+            if (Connection.State != ConnectionState.Open)
+                Connection.Open();
+
+            if (expression.Operation != null)
+                expression.Operation(Connection, null);
         }
 
         protected override void Process(string sql)
@@ -108,7 +205,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
-            using (var command = factory.CreateCommand(sql, Connection))
+            using (var command = _factory.CreateCommand(sql, Connection))
                 command.ExecuteNonQuery();
         }
     }
