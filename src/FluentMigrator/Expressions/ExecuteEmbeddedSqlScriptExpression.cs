@@ -43,7 +43,7 @@ namespace FluentMigrator.Expressions
             var foundResources = resources.Where(isNameMatch).ToArray();
             
             if(foundResources.Length == 0)
-                throw new ArgumentNullException(string.Format("Could not find resource named {0} in assembly {1}", SqlScript, MigrationAssembly.FullName));
+                throw new InvalidOperationException(string.Format("Could not find resource named {0} in assembly {1}", SqlScript, MigrationAssembly.FullName));
 
             if(foundResources.Length > 1)
                 throw new InvalidOperationException(string.Format(@"Could not find unique resource named {0} in assembly {1}.
