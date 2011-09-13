@@ -16,25 +16,23 @@
 //
 #endregion
 
-using System;
-
 namespace FluentMigrator.VersionTableInfo
 {
-	public class DefaultVersionTableMetaData : IVersionTableMetaData
-	{
-	    public string SchemaName
-	    {
-            get { return null; }
-	    }
+    public class DefaultVersionTableMetaData : IVersionTableMetaData
+    {
+        public string SchemaName
+        {
+            get { return string.Empty; }
+        }
 
-	    public string TableName
-		{
-			get { return "VersionInfo"; }
-		}
+        public string TableName
+        {
+            get { return "VersionInfo"; }
+        }
 
-		public string ColumnName
-		{
-			get { return "Version";}
-		}
-	}
+        public string ColumnName
+        {
+            get { return "Version"; }
+        }
+    }
 }

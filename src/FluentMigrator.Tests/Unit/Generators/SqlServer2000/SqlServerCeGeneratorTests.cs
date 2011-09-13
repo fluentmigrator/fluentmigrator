@@ -1,50 +1,44 @@
-﻿
+﻿using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.SqlServer;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {
-    using System;
-    using System.Data;
-    using FluentMigrator.Expressions;
-    using FluentMigrator.Model;
-    using NUnit.Framework;
-    using FluentMigrator.Runner.Generators.SqlServer;
-    using NUnit.Should;
-    using FluentMigrator.Runner.Generators;
-
     public class SqlServerCeGeneratorTests : GeneratorTestBase
     {
-       
-        SqlServerCeGenerator generator;
+        private SqlServerCeGenerator _generator;
 
         [SetUp]
         public void SetUp()
         {
-            generator = new SqlServerCeGenerator();
+            _generator = new SqlServerCeGenerator();
         }
 
         [Test]
         public void CannotCreateASchema()
         {
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new CreateSchemaExpression()));
         }
 
         [Test]
         public void CannotAlterASchema()
         {
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new AlterSchemaExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new AlterSchemaExpression()));
         }
 
         [Test]
         public void CannotDeleteASchema()
         {
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new DeleteSchemaExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new DeleteSchemaExpression()));
         }
 
         [Test]
         public void CreatesTheCorrectSyntaxToDropAnIndex()
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
-            var sql = generator.Generate(expression);
+            var sql = _generator.Generate(expression);
 
             sql.ShouldBe("DROP INDEX [TestTable1].[TestIndex]");
         }
