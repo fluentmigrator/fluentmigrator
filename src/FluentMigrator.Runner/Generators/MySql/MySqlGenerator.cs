@@ -44,6 +44,12 @@ namespace FluentMigrator.Runner.Generators.MySql
 SELECT CONCAT(
           'ALTER TABLE {0} CHANGE {1} {2} ',
           CAST(COLUMN_TYPE AS CHAR),
+          IF(ISNULL(CHARACTER_SET_NAME),
+             '',
+             CONCAT(' CHARACTER SET ', CHARACTER_SET_NAME)),
+          IF(ISNULL(COLLATION_NAME),
+             '',
+             CONCAT(' COLLATE ', COLLATION_NAME)),
           ' ',
           IF(IS_NULLABLE = 'NO', 'NOT NULL ', ''),
           IF(IS_NULLABLE = 'NO' AND COLUMN_DEFAULT IS NULL,
