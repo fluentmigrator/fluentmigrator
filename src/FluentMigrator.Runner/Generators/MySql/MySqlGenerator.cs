@@ -40,32 +40,10 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         public override string Generate(RenameColumnExpression expression)
         {
-            return string.Format(@"
-SELECT CONCAT(
-          'ALTER TABLE {0} CHANGE {1} {2} ',
-          CAST(COLUMN_TYPE AS CHAR),
-          IF(ISNULL(CHARACTER_SET_NAME),
-             '',
-             CONCAT(' CHARACTER SET ', CHARACTER_SET_NAME)),
-          IF(ISNULL(COLLATION_NAME),
-             '',
-             CONCAT(' COLLATE ', COLLATION_NAME)),
-          ' ',
-          IF(IS_NULLABLE = 'NO', 'NOT NULL ', ''),
-          IF(IS_NULLABLE = 'NO' AND COLUMN_DEFAULT IS NULL,
-             '',
-             CONCAT('DEFAULT ', QUOTE(COLUMN_DEFAULT), ' ')),
-          UPPER(extra))
-  INTO @change_statement
-  FROM INFORMATION_SCHEMA.COLUMNS
- WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}';
-
-PREPARE r FROM @change_statement;
-EXECUTE r;
-DEALLOCATE PREPARE r;", expression.TableName, expression.OldName, expression.NewName);
+            return string.Format("ALTER TABLE {0} CHANGE {1} {2} ", Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.OldName), Quoter.QuoteColumnName(expression.NewName));
         }
 
-		public override string Generate(AlterDefaultConstraintExpression expression)
+        public override string Generate(AlterDefaultConstraintExpression expression)
 		{
             return compatabilityMode.HandleCompatabilty("Altering of default constrints is not supporteed for MySql");
 		}
