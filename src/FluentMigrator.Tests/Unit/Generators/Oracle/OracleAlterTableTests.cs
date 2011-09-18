@@ -51,6 +51,9 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public override void CanAlterColumn()
         {
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("ALTER TABLE TestTable1 MODIFY TestColumn1 NVARCHAR2(20) NOT NULL");
         }
 
         [Test]
