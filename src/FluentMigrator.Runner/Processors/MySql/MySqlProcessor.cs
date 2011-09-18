@@ -49,15 +49,15 @@ namespace FluentMigrator.Runner.Processors.MySql
         public override bool TableExists(string schemaName, string tableName)
         {
             return Exists(@"select table_name from information_schema.tables 
-							where table_schema = SCHEMA() and table_name='{0}'", tableName);
+							where table_schema = SCHEMA() and table_name='{0}'", FormatSqlEscape(tableName));
         }
 
-        public override bool ColumnExists(string schemaName, string tableName, string columnName)
+	    public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
         	const string sql = @"select column_name from information_schema.columns
 							where table_schema = SCHEMA() and table_name='{0}'
 							and column_name='{1}'";
-        	return Exists(sql, tableName, columnName);
+            return Exists(sql, FormatSqlEscape(tableName), FormatSqlEscape(columnName));
         }
 
     	public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
@@ -65,7 +65,7 @@ namespace FluentMigrator.Runner.Processors.MySql
         	const string sql = @"select constraint_name from information_schema.table_constraints
 							where table_schema = SCHEMA() and table_name='{0}'
 							and constraint_name='{1}'";
-        	return Exists(sql, tableName, constraintName);
+            return Exists(sql, FormatSqlEscape(tableName), FormatSqlEscape(constraintName));
         }
 
     	public override bool IndexExists(string schemaName, string tableName, string indexName)
@@ -73,7 +73,7 @@ namespace FluentMigrator.Runner.Processors.MySql
         	const string sql = @"select index_name from information_schema.statistics
 							where table_schema = SCHEMA() and table_name='{0}'
 							and index_name='{1}'";
-        	return Exists(sql, tableName, indexName);
+            return Exists(sql, FormatSqlEscape(tableName), FormatSqlEscape(indexName));
         }
 
     	public override void Execute(string template, params object[] args)
@@ -153,6 +153,36 @@ namespace FluentMigrator.Runner.Processors.MySql
 
             if (expression.Operation != null)
                 expression.Operation(Connection, null);
+        }
+
+        public override void Process(Expressions.RenameColumnExpression expression)
+        {
+            string columnDefinitionSql = string.Format(@"
+SELECT CONCAT(
+          CAST(COLUMN_TYPE AS CHAR),
+          IF(ISNULL(CHARACTER_SET_NAME),
+             '',
+             CONCAT(' CHARACTER SET ', CHARACTER_SET_NAME)),
+          IF(ISNULL(COLLATION_NAME),
+             '',
+             CONCAT(' COLLATE ', COLLATION_NAME)),
+          ' ',
+          IF(IS_NULLABLE = 'NO', 'NOT NULL ', ''),
+          IF(IS_NULLABLE = 'NO' AND COLUMN_DEFAULT IS NULL,
+             '',
+             CONCAT('DEFAULT ', QUOTE(COLUMN_DEFAULT), ' ')),
+          UPPER(extra))
+  FROM INFORMATION_SCHEMA.COLUMNS
+ WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'", FormatSqlEscape(expression.TableName), FormatSqlEscape(expression.OldName));
+
+            var columnDefinition = Read(columnDefinitionSql).Tables[0].Rows[0].Field<string>(0);
+
+            Process(Generator.Generate(expression) + columnDefinition);
+        }
+
+        private static string FormatSqlEscape(string value)
+        {
+            return value.Replace("'", "''");
         }
     }
 }
