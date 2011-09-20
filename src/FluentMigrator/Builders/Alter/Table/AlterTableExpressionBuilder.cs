@@ -94,6 +94,27 @@ namespace FluentMigrator.Builders.Alter.Table
             return this;
         }
 
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithDefaultFunctionValue(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                throw new ArgumentException("Argument should not be empty", "value");
+
+            var result = WithDefaultValue(new FunctionValue(value));
+            return result;
+        }
+
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithDefaultGuidValue()
+        {
+            var result = WithDefaultValue(SystemMethods.NewGuid);
+            return result;
+        }
+
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithDefaultCurrentDateTimeValue()
+        {
+            var result = WithDefaultValue(SystemMethods.CurrentDateTime);
+            return result;
+        }
+
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax Identity()
         {
             CurrentColumn.IsIdentity = true;

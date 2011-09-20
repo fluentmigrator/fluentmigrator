@@ -1,69 +1,87 @@
-﻿using System;
+﻿#region License
+// 
+// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
+using System;
 using System.Data;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Postgres
 {
-	internal class PostgresColumn : ColumnBase
-	{
-		public PostgresColumn() : base(new PostgresTypeMap(), new PostgresQuoter()) { }
+    internal class PostgresColumn : ColumnBase
+    {
+        public PostgresColumn() : base(new PostgresTypeMap(), new PostgresQuoter()) { }
 
-		protected override string FormatIdentity(ColumnDefinition column)
-		{
-			return string.Empty;
-		}
+        protected override string FormatIdentity(ColumnDefinition column)
+        {
+            return string.Empty;
+        }
 
-		public override string AddPrimaryKeyConstraint(string tableName, System.Collections.Generic.IEnumerable<ColumnDefinition> primaryKeyColumns)
-		{
-			string pkName = GetPrimaryKeyConstraintName(primaryKeyColumns, tableName);
+        public override string AddPrimaryKeyConstraint(string tableName, System.Collections.Generic.IEnumerable<ColumnDefinition> primaryKeyColumns)
+        {
+            var pkName = GetPrimaryKeyConstraintName(primaryKeyColumns, tableName);
 
-			string cols = string.Empty;
-			bool first = true;
-			foreach (var col in primaryKeyColumns)
-			{
-				if (first)
-					first = false;
-				else
-					cols += ",";
-				cols += Quoter.QuoteColumnName(col.Name);
-			}
+            string cols = string.Empty;
+            bool first = true;
+            foreach (var col in primaryKeyColumns)
+            {
+                if (first)
+                    first = false;
+                else
+                    cols += ",";
+                cols += Quoter.QuoteColumnName(col.Name);
+            }
 
-			if (string.IsNullOrEmpty(pkName))
-				return string.Format(", PRIMARY KEY ({0})", cols);
+            if (string.IsNullOrEmpty(pkName))
+                return string.Format(", PRIMARY KEY ({0})", cols);
 
-			return string.Format(", {0}PRIMARY KEY ({1})", pkName, cols);
-		}
+            return string.Format(", {0}PRIMARY KEY ({1})", pkName, cols);
+        }
 
-		protected override string FormatSystemMethods(SystemMethods systemMethod)
-		{
-			switch (systemMethod)
-			{
-				case SystemMethods.NewGuid:
-					//need to run the script share/contrib/uuid-ossp.sql to install the uuid_generate4 function
-					return "uuid_generate_v4()";
-				case SystemMethods.CurrentDateTime:
-					return "now()";
-			}
+        protected override FunctionValue FormatSystemMethods(SystemMethods systemMethod)
+        {
+            switch (systemMethod)
+            {
+                case SystemMethods.NewGuid:
+                    //need to run the script share/contrib/uuid-ossp.sql to install the uuid_generate4 function
+                    return new FunctionValue("uuid_generate_v4()");
+                case SystemMethods.CurrentDateTime:
+                    return new FunctionValue("now()");
+            }
 
-			throw new NotImplementedException();
-		}
+            throw new NotImplementedException();
+        }
 
-		protected override string FormatType(ColumnDefinition column)
-		{
-			if (column.IsIdentity)
-			{
-				if (column.Type == DbType.Int64)
-					return "bigserial";
-				return "serial";
-			}
+        protected override string FormatType(ColumnDefinition column)
+        {
+            if (column.IsIdentity)
+            {
+                if (column.Type == DbType.Int64)
+                    return "bigserial";
+                return "serial";
+            }
 
-			return base.FormatType(column);
-		}
+            return base.FormatType(column);
+        }
 
-		public string GetColumnType(ColumnDefinition column)
-		{
-			return FormatType(column);
-		}
-	}
+        public string GetColumnType(ColumnDefinition column)
+        {
+            return FormatType(column);
+        }
+    }
 }

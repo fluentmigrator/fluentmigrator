@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public override void CanCreateTableWithPrimaryKey()
         {
-            //After a quick goolge the below tested statment should work.
+            //After a quick google the below tested statment should work.
             //CONSTRAINT constraint_name PRIMARY KEY (column1, column2, . column_n)
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
             string sql = _generator.Generate(expression);
@@ -66,28 +66,54 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public override void CanCreateTableWithNullableField()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
-
-            var result = _generator.Generate(expression);
-
-            result.ShouldBe(
+            string sql = _generator.Generate(expression);
+            sql.ShouldBe(
                 "CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255), TestColumn2 NUMBER(10,0) NOT NULL)");
         }
 
         [Test]
         public override void CanCreateTableWithDefaultValue()
         {
-            var expression = GeneratorTestHelper.GetCreateTableExpression();
-            expression.Columns[0].DefaultValue = "abc";
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
             string sql = _generator.Generate(expression);
 
             // Oracle requires the DEFAULT clause to appear before the NOT NULL clause
-            sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) DEFAULT 'abc' NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL)");
+            sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) DEFAULT 'Default' NOT NULL, TestColumn2 NUMBER(10,0) DEFAULT 0 NOT NULL)");
         }
 
         [Test]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNull()
         {
-            //Not sure how this would work in oracle.  Someone please add a test
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
+            expression.Columns[0].DefaultValue = null;
+            string sql = _generator.Generate(expression);
+
+            sql.ShouldBe(
+                "CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) DEFAULT NULL NOT NULL, TestColumn2 NUMBER(10,0) DEFAULT 0 NOT NULL)");
+        }
+
+        [Test]
+        public void CanCreateTableWithDefaultFunctionValue()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultFunctionValue();
+            string sql = _generator.Generate(expression);
+            sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(50) DEFAULT TestFunction NOT NULL)");
+        }
+
+        [Test]
+        public void CanCreateTableWithDefaultGuidValue()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultGuidValue();
+            string sql = _generator.Generate(expression);
+            sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(50) DEFAULT sys_guid() NOT NULL)");
+        }
+
+        [Test]
+        public void CanCreateTableWithDefaultCurrentDateValue()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultCurrentDateTimeValue();
+            string sql = _generator.Generate(expression);
+            sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(50) DEFAULT sysdate NOT NULL)");
         }
 
         [Test]
@@ -134,9 +160,9 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public override void CanCreateSchema()
         {
-            var expression = new CreateSchemaExpression() { SchemaName = "TestSchema" };
-            var result = _generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            var expression = new CreateSchemaExpression { SchemaName = "TestSchema" };
+            var sql = _generator.Generate(expression);
+            sql.ShouldBe(string.Empty);
         }
 
         [Test]

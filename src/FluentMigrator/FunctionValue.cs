@@ -17,26 +17,34 @@
 #endregion
 
 using System;
-using FluentMigrator.Model;
-using FluentMigrator.Runner.Generators.Base;
 
-namespace FluentMigrator.Runner.Generators.MySql
+namespace FluentMigrator
 {
-    internal class MySqlColumn : ColumnBase
+    public class FunctionValue
     {
-        public MySqlColumn()
-            : base(new MySqlTypeMap(), new MySqlQuoter())
+        public string Value { get; set; }
+
+        public FunctionValue(string value)
         {
+            if (value == null)
+                throw new ArgumentNullException("value");
+
+            Value = value;
         }
 
-        protected override string FormatIdentity(ColumnDefinition column)
+        public override string ToString()
         {
-            return column.IsIdentity ? "AUTO_INCREMENT" : string.Empty;
+            return Value;
         }
 
-        protected override FunctionValue FormatSystemMethods(SystemMethods systemMethod)
+        public static implicit operator FunctionValue(string value)
         {
-            throw new NotImplementedException();
+            return new FunctionValue(value);
+        }
+
+        public static implicit operator string(FunctionValue value)
+        {
+            return value.Value;
         }
     }
 }

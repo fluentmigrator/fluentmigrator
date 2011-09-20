@@ -1,6 +1,4 @@
-﻿using System.Data;
-using FluentMigrator.Expressions;
-using FluentMigrator.Model;
+﻿using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
@@ -18,7 +16,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             _generator = new SqlServer2000Generator();
         }
 
-        [Test] 
+        [Test]
         public override void CanCreateTable()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -37,22 +35,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var sql = _generator.Generate(expression);
             sql.ShouldBe(
                 "CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] [timestamp] NOT NULL, PRIMARY KEY ([TestColumn1]))");
-        }
-
-        [Test]
-        public void CanCreateTableWithGetDateDefault()
-        {
-            ColumnDefinition column = new ColumnDefinition
-            {
-                Name = "TestColumn1",
-                Type = DbType.String,
-                Size = 5,
-                DefaultValue = "GetDate()"
-            };
-            var expression = new CreateTableExpression { TableName = "TestTable1" };
-            expression.Columns.Add(column);
-            var sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(5) NOT NULL DEFAULT GetDate())");
         }
 
         [Test]
@@ -105,7 +87,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
             var sql = _generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT DF_TestTable1_TestColumn1 DEFAULT 'Default', [TestColumn2] INT NOT NULL CONSTRAINT DF_TestTable1_TestColumn2 DEFAULT 0)");
+                "CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT DF_TESTTABLE1_TESTCOLUMN1 DEFAULT 'Default', [TestColumn2] INT NOT NULL CONSTRAINT DF_TESTTABLE1_TESTCOLUMN2 DEFAULT 0)");
         }
 
         [Test]
@@ -116,7 +98,31 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             expression.Columns[0].TableName = expression.TableName;
             var sql = _generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT DF_TestTable1_TestColumn1 DEFAULT NULL, [TestColumn2] INT NOT NULL)");
+                "CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT DF_TESTTABLE1_TESTCOLUMN1 DEFAULT NULL, [TestColumn2] INT NOT NULL)");
+        }
+
+        [Test]
+        public void CanCreateTableWithDefaultFunctionValue()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultFunctionValue();
+            string sql = _generator.Generate(expression);
+            sql.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(50) NOT NULL DEFAULT TestFunction)");
+        }
+
+        [Test]
+        public void CanCreateTableWithDefaultGuidValue()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultGuidValue();
+            string sql = _generator.Generate(expression);
+            sql.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(50) NOT NULL DEFAULT NEWID())");
+        }
+
+        [Test]
+        public void CanCreateTableWithDefaultCurrentDateValue()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultCurrentDateTimeValue();
+            string sql = _generator.Generate(expression);
+            sql.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(50) NOT NULL DEFAULT GETDATE())");
         }
 
         [Test]
@@ -198,7 +204,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         [Test]
         public override void CanCreateSchema()
         {
-            var expression = new CreateSchemaExpression() { SchemaName = "TestSchema" };
+            var expression = new CreateSchemaExpression { SchemaName = "TestSchema" };
             var result = _generator.Generate(expression);
             result.ShouldBe(string.Empty);
         }
