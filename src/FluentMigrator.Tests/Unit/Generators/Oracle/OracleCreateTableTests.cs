@@ -24,7 +24,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL)");
         }
 
-        [Test]
         public override void CanCreateTableWithCustomColumnType()
         {
             //Do not knows any oracle custom types. Not testing for it.  If someone else knows please add a test
@@ -93,7 +92,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithDefaultFunctionValue()
+        public override void CanCreateTableWithDefaultFunctionValue()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultFunctionValue();
             string sql = _generator.Generate(expression);
@@ -101,7 +100,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithDefaultGuidValue()
+        public override void CanCreateTableWithDefaultGuidValue()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultGuidValue();
             string sql = _generator.Generate(expression);
@@ -109,7 +108,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithDefaultCurrentDateValue()
+        public override void CanCreateTableWithDefaultCurrentDateValue()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultCurrentDateTimeValue();
             string sql = _generator.Generate(expression);

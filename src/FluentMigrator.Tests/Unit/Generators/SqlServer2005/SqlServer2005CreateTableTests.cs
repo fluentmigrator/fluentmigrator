@@ -7,7 +7,7 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 {
-    public class SqlServer2005CreateTableTests : GeneratorTestBase
+    public class SqlServer2005CreateTableTests
     {
         protected SqlServer2005Generator generator;
 

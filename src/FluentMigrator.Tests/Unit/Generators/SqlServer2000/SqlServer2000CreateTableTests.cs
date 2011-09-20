@@ -102,7 +102,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public void CanCreateTableWithDefaultFunctionValue()
+        public override void CanCreateTableWithDefaultFunctionValue()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultFunctionValue();
             string sql = _generator.Generate(expression);
@@ -110,7 +110,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public void CanCreateTableWithDefaultGuidValue()
+        public override void CanCreateTableWithDefaultGuidValue()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultGuidValue();
             string sql = _generator.Generate(expression);
@@ -118,7 +118,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public void CanCreateTableWithDefaultCurrentDateValue()
+        public override void CanCreateTableWithDefaultCurrentDateValue()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultCurrentDateTimeValue();
             string sql = _generator.Generate(expression);

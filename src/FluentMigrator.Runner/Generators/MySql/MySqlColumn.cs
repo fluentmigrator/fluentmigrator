@@ -29,6 +29,15 @@ namespace FluentMigrator.Runner.Generators.MySql
         {
         }
 
+        protected override string FormatDefaultValue(ColumnDefinition column)
+        {
+            if (column.DefaultValue is FunctionValue || column.DefaultValue is SystemMethods)
+                throw new DatabaseOperationNotSupportedException(
+                    "Sorry, MySql does not support functions as default values ​​for columns");
+
+            return base.FormatDefaultValue(column);
+        }
+
         protected override string FormatIdentity(ColumnDefinition column)
         {
             return column.IsIdentity ? "AUTO_INCREMENT" : string.Empty;

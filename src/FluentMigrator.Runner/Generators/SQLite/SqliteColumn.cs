@@ -17,11 +17,11 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace FluentMigrator.Runner.Generators.SQLite
 {
@@ -30,6 +30,20 @@ namespace FluentMigrator.Runner.Generators.SQLite
         public SqliteColumn()
             : base(new SqliteTypeMap(), new SqliteQuoter())
         {
+        }
+
+        protected override string FormatDefaultValue(ColumnDefinition column)
+        {
+            if (column == null)
+                throw new ArgumentNullException("column");
+
+            if (column.DefaultValue != null && column.DefaultValue is SystemMethods && (SystemMethods)column.DefaultValue == SystemMethods.CurrentDateTime)
+            {
+                var defaultValue = "DEFAULT " + FormatSystemMethods(SystemMethods.CurrentDateTime);
+                return defaultValue;
+            }
+
+            return base.FormatDefaultValue(column);
         }
 
         protected override string FormatIdentity(ColumnDefinition column)
@@ -46,15 +60,17 @@ namespace FluentMigrator.Runner.Generators.SQLite
         public override bool ShouldPrimaryKeysBeAddedSeparatley(IEnumerable<ColumnDefinition> primaryKeyColumns)
         {
             //If there are no identity column then we can add as a separate constrint
-            if (!primaryKeyColumns.Any(x => x.IsIdentity) && primaryKeyColumns.Any(x => x.IsPrimaryKey)) return true;
-            return false;
+            var result = !primaryKeyColumns.Any(x => x.IsIdentity) && primaryKeyColumns.Any(x => x.IsPrimaryKey);
+            return result;
         }
 
         protected override string FormatPrimaryKey(ColumnDefinition column)
         {
-            if (!column.IsPrimaryKey) return string.Empty;
+            if (!column.IsPrimaryKey)
+                return string.Empty;
 
-            return column.IsIdentity ? "PRIMARY KEY AUTOINCREMENT" : string.Empty;
+            var result = column.IsIdentity ? "PRIMARY KEY AUTOINCREMENT" : string.Empty;
+            return result;
         }
 
         protected override FunctionValue FormatSystemMethods(SystemMethods systemMethod)
@@ -63,6 +79,9 @@ namespace FluentMigrator.Runner.Generators.SQLite
             {
                 case SystemMethods.CurrentDateTime:
                     return "CURRENT_TIMESTAMP";
+                case SystemMethods.NewGuid:
+                    throw new DatabaseOperationNotSupportedException(
+                        "Sorry, SQLite does not support GUID as default values ​​for columns");
             }
 
             throw new NotImplementedException();

@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
 using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 {
-    public class SqlServer2005Data : GeneratorTestBase
+    public class SqlServer2005Data
     {
         protected SqlServer2005Generator generator;
 
@@ -16,8 +13,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         public void Setup()
         {
             generator = new SqlServer2005Generator();
-
-
         }
 
         [Test]
@@ -65,7 +60,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         [Test]
         public void CanInsertGuidDataWithDefaultSchema()
         {
-
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
 
             var sql = generator.Generate(expression);
@@ -110,7 +104,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         [Test]
         public void CanInsertGuidDataWithCustomSchema()
         {
-
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
             expression.SchemaName = "TestSchema";
             var sql = generator.Generate(expression);

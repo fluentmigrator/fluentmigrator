@@ -1,14 +1,6 @@
-﻿
-namespace FluentMigrator.Tests.Unit.Generators
+﻿namespace FluentMigrator.Tests.Unit.Generators
 {
-
-
-    using System.Collections.Generic;
-    using System.Data;
-    using FluentMigrator.Expressions;
-    using FluentMigrator.Model;
-
-    public abstract class BaseTableCreateTests : GeneratorTestBase
+    public abstract class BaseTableCreateTests
     {
         //Create Tests
         public abstract void CanCreateTable();
@@ -22,6 +14,10 @@ namespace FluentMigrator.Tests.Unit.Generators
         public abstract void CanCreateTableWithNullableField();
         public abstract void CanCreateTableWithDefaultValue();
         public abstract void CanCreateTableWithDefaultValueExplicitlySetToNull();
+        public abstract void CanCreateTableWithDefaultFunctionValue();
+        public abstract void CanCreateTableWithDefaultGuidValue();
+        public abstract void CanCreateTableWithDefaultCurrentDateValue();
+
         public abstract void CanCreateTableWithMultiColumnPrimaryKey();
 
         public abstract void CanCreateIndex();
@@ -30,13 +26,5 @@ namespace FluentMigrator.Tests.Unit.Generators
         public abstract void CanCreateMultiColumnUniqueIndex();
 
         public abstract void CanCreateSchema();
-
-        
-
-       
-
-        
-
-       
     }
 }

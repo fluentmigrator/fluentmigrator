@@ -45,6 +45,18 @@ namespace FluentMigrator.Runner.Generators.Jet
             return base.FormatType(column);
         }
 
+        protected override string FormatDefaultValue(ColumnDefinition column)
+        {
+            if (column == null)
+                throw new ArgumentNullException("column");
+
+            if (column.DefaultValue is FunctionValue || column.DefaultValue is SystemMethods)
+                throw new DatabaseOperationNotSupportedException(
+                    "Sorry, Jet does not support function correctly as the default values ​​for columns");
+
+            return base.FormatDefaultValue(column);
+        }
+
         protected override string FormatIdentity(ColumnDefinition column)
         {
             //Indentity type is handled by FormartType
