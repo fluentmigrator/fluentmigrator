@@ -65,22 +65,22 @@ namespace FluentMigrator.Builders.Alter.Column
             return this;
         }
 
-        public IAlterColumnOptionSyntax WithDefaultFunctionValue(string value)
+        public IAlterColumnOptionSyntax WithDefaultExpression(string value)
         {
             if (string.IsNullOrEmpty(value))
                 throw new ArgumentException("Argument should not be empty", "value");
 
-            var result = WithDefaultValue(new FunctionValue(value));
+            var result = WithDefaultValue(new ExpressionString(value));
             return result;
         }
 
-        public IAlterColumnOptionSyntax WithDefaultGuidValue()
+        public IAlterColumnOptionSyntax WithDefaultGuid()
         {
             var result = WithDefaultValue(SystemMethods.NewGuid);
             return result;
         }
 
-        public IAlterColumnOptionSyntax WithDefaultCurrentDateTimeValue()
+        public IAlterColumnOptionSyntax WithDefaultCurrentDateTime()
         {
             var result = WithDefaultValue(SystemMethods.CurrentDateTime);
             return result;

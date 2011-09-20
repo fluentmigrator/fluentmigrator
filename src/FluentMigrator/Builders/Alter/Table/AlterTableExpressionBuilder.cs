@@ -94,22 +94,22 @@ namespace FluentMigrator.Builders.Alter.Table
             return this;
         }
 
-        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithDefaultFunctionValue(string value)
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithDefaultExpression(string value)
         {
             if (string.IsNullOrEmpty(value))
                 throw new ArgumentException("Argument should not be empty", "value");
 
-            var result = WithDefaultValue(new FunctionValue(value));
+            var result = WithDefaultValue(new ExpressionString(value));
             return result;
         }
 
-        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithDefaultGuidValue()
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithDefaultGuid()
         {
             var result = WithDefaultValue(SystemMethods.NewGuid);
             return result;
         }
 
-        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithDefaultCurrentDateTimeValue()
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithDefaultCurrentDateTime()
         {
             var result = WithDefaultValue(SystemMethods.CurrentDateTime);
             return result;

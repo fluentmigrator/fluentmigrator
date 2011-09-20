@@ -267,9 +267,9 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [Test]
-        public void CallingWithDefaultFunctionValueSetsDefaultValue()
+        public void CallingWithDefaultExpressionSetsDefaultValue()
         {
-            var value = new FunctionValue("TestValue");
+            var value = new ExpressionString("TestValue");
 
             var columnMock = new Mock<ColumnDefinition>();
             columnMock.VerifySet(c => c.DefaultValue = value, Times.AtMostOnce());
@@ -283,13 +283,13 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             var contextMock = new Mock<IMigrationContext>();
 
             var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
-            builder.WithDefaultFunctionValue(value);
+            builder.WithDefaultExpression(value);
 
             columnMock.VerifyAll();
         }
 
         [Test]
-        public void CallingWithDefaultGuidValueSetsDefaultValue()
+        public void CallingWithDefaultGuidSetsDefaultValue()
         {
             var columnMock = new Mock<ColumnDefinition>();
             columnMock.VerifySet(c => c.DefaultValue = SystemMethods.NewGuid, Times.AtMostOnce());
@@ -303,13 +303,13 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             var contextMock = new Mock<IMigrationContext>();
 
             var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
-            builder.WithDefaultGuidValue();
+            builder.WithDefaultGuid();
 
             columnMock.VerifyAll();
         }
 
         [Test]
-        public void CallingWithDefaultCurrentDateTimeValueSetsDefaultValue()
+        public void CallingWithDefaultCurrentDateTimeSetsDefaultValue()
         {
             var columnMock = new Mock<ColumnDefinition>();
             columnMock.VerifySet(c => c.DefaultValue = SystemMethods.CurrentDateTime, Times.AtMostOnce());
@@ -323,11 +323,10 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             var contextMock = new Mock<IMigrationContext>();
 
             var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
-            builder.WithDefaultCurrentDateTimeValue();
+            builder.WithDefaultCurrentDateTime();
 
             columnMock.VerifyAll();
         }
-
 
         [Test]
         public void CallingForeignKeySetsIsForeignKeyToTrue()

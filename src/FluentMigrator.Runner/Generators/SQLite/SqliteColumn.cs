@@ -73,7 +73,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
             return result;
         }
 
-        protected override FunctionValue FormatSystemMethods(SystemMethods systemMethod)
+        protected override ExpressionString FormatSystemMethods(SystemMethods systemMethod)
         {
             switch (systemMethod)
             {

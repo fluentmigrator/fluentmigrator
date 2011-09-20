@@ -50,7 +50,7 @@ namespace FluentMigrator.Runner.Generators.Jet
             if (column == null)
                 throw new ArgumentNullException("column");
 
-            if (column.DefaultValue is FunctionValue || column.DefaultValue is SystemMethods)
+            if (column.DefaultValue is ExpressionString || column.DefaultValue is SystemMethods)
                 throw new DatabaseOperationNotSupportedException(
                     "Sorry, Jet does not support function correctly as the default values ​​for columns");
 
@@ -63,7 +63,7 @@ namespace FluentMigrator.Runner.Generators.Jet
             return string.Empty;
         }
 
-        protected override FunctionValue FormatSystemMethods(SystemMethods systemMethod)
+        protected override ExpressionString FormatSystemMethods(SystemMethods systemMethod)
         {
             throw new NotImplementedException();
         }

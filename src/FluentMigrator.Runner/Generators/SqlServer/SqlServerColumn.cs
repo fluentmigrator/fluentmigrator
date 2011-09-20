@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
             var defaultValue = base.FormatDefaultValue(column);
 
-            if (column.DefaultValue is FunctionValue || column.DefaultValue is SystemMethods)
+            if (column.DefaultValue is ExpressionString || column.DefaultValue is SystemMethods)
                 return defaultValue;
 
             if (!string.IsNullOrEmpty(defaultValue))
@@ -48,14 +48,14 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return column.IsIdentity ? "IDENTITY(1,1)" : string.Empty;
         }
 
-        protected override FunctionValue FormatSystemMethods(SystemMethods systemMethod)
+        protected override ExpressionString FormatSystemMethods(SystemMethods systemMethod)
         {
             switch (systemMethod)
             {
                 case SystemMethods.NewGuid:
-                    return new FunctionValue("NEWID()");
+                    return new ExpressionString("NEWID()");
                 case SystemMethods.CurrentDateTime:
-                    return new FunctionValue("GETDATE()");
+                    return new ExpressionString("GETDATE()");
             }
 
             throw new NotImplementedException();

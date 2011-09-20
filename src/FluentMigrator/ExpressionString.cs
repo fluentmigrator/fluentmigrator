@@ -20,11 +20,11 @@ using System;
 
 namespace FluentMigrator
 {
-    public class FunctionValue
+    public class ExpressionString
     {
         public string Value { get; set; }
 
-        public FunctionValue(string value)
+        public ExpressionString(string value)
         {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -37,12 +37,12 @@ namespace FluentMigrator
             return Value;
         }
 
-        public static implicit operator FunctionValue(string value)
+        public static implicit operator ExpressionString(string value)
         {
-            return new FunctionValue(value);
+            return new ExpressionString(value);
         }
 
-        public static implicit operator string(FunctionValue value)
+        public static implicit operator string(ExpressionString value)
         {
             return value.Value;
         }

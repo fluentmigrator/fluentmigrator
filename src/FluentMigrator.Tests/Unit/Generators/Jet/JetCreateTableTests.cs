@@ -110,23 +110,23 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public override void CanCreateTableWithDefaultFunctionValue()
+        public override void CanCreateTableWithDefaultExpression()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithDefaultFunctionValue();
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultExpression();
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(expression));
         }
 
         [Test]
-        public override void CanCreateTableWithDefaultGuidValue()
+        public override void CanCreateTableWithDefaultGuid()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithDefaultGuidValue();
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultGuid();
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(expression));
         }
 
         [Test]
-        public override void CanCreateTableWithDefaultCurrentDateValue()
+        public override void CanCreateTableWithDefaultCurrentDate()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithDefaultCurrentDateTimeValue();
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultCurrentDateTime();
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(expression));
         }
 

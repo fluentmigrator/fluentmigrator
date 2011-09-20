@@ -55,22 +55,22 @@ namespace FluentMigrator.Builders.Create.Column
             return this;
         }
 
-        public ICreateColumnOptionSyntax WithDefaultFunctionValue(string value)
+        public ICreateColumnOptionSyntax WithDefaultExpression(string value)
         {
             if (string.IsNullOrEmpty(value))
                 throw new ArgumentException("Argument should not be empty", "value");
 
-            Expression.Column.DefaultValue = new FunctionValue(value);
+            Expression.Column.DefaultValue = new ExpressionString(value);
             return this;
         }
 
-        public ICreateColumnOptionSyntax WithDefaultGuidValue()
+        public ICreateColumnOptionSyntax WithDefaultGuid()
         {
             Expression.Column.DefaultValue = SystemMethods.NewGuid;
             return this;
         }
 
-        public ICreateColumnOptionSyntax WithDefaultCurrentDateTimeValue()
+        public ICreateColumnOptionSyntax WithDefaultCurrentDateTime()
         {
             Expression.Column.DefaultValue = SystemMethods.CurrentDateTime;
             return this;

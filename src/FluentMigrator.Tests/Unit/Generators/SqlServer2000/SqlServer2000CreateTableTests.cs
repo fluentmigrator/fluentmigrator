@@ -102,26 +102,26 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public override void CanCreateTableWithDefaultFunctionValue()
+        public override void CanCreateTableWithDefaultExpression()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithDefaultFunctionValue();
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultExpression();
             string sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(50) NOT NULL DEFAULT TestFunction)");
         }
 
         [Test]
-        public override void CanCreateTableWithDefaultGuidValue()
+        public override void CanCreateTableWithDefaultGuid()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithDefaultGuidValue();
-            string sql = _generator.Generate(expression);
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultGuid();
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(50) NOT NULL DEFAULT NEWID())");
         }
 
         [Test]
-        public override void CanCreateTableWithDefaultCurrentDateValue()
+        public override void CanCreateTableWithDefaultCurrentDate()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithDefaultCurrentDateTimeValue();
-            string sql = _generator.Generate(expression);
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultCurrentDateTime();
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(50) NOT NULL DEFAULT GETDATE())");
         }
 

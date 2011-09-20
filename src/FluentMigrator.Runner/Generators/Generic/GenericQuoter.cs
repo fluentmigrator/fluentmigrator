@@ -32,8 +32,8 @@ namespace FluentMigrator.Runner.Generators.Generic
             var stringValue = value as string;
             if (stringValue != null) return FormatString(stringValue);
 
-            var functionValue = value as FunctionValue;
-            if (functionValue != null) return FormatFunctionValue(functionValue);
+            var expressionString = value as ExpressionString;
+            if (expressionString != null) return FormatExpressionString(expressionString);
 
             if (value is char) { return FormatChar((char)value); }
             if (value is bool) { return FormatBool((bool)value); }
@@ -47,9 +47,9 @@ namespace FluentMigrator.Runner.Generators.Generic
             return value.ToString();
         }
 
-        protected virtual string FormatFunctionValue(FunctionValue functionValue)
+        protected virtual string FormatExpressionString(ExpressionString expressionString)
         {
-            var result = functionValue.Value;
+            var result = expressionString.Value;
             return result;
         }
 

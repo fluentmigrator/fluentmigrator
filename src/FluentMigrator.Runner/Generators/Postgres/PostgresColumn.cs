@@ -53,15 +53,15 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return string.Format(", {0}PRIMARY KEY ({1})", pkName, cols);
         }
 
-        protected override FunctionValue FormatSystemMethods(SystemMethods systemMethod)
+        protected override ExpressionString FormatSystemMethods(SystemMethods systemMethod)
         {
             switch (systemMethod)
             {
                 case SystemMethods.NewGuid:
                     //need to run the script share/contrib/uuid-ossp.sql to install the uuid_generate4 function
-                    return new FunctionValue("uuid_generate_v4()");
+                    return new ExpressionString("uuid_generate_v4()");
                 case SystemMethods.CurrentDateTime:
-                    return new FunctionValue("now()");
+                    return new ExpressionString("now()");
             }
 
             throw new NotImplementedException();

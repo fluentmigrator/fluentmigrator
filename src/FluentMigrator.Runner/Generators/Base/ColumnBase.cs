@@ -82,7 +82,7 @@ namespace FluentMigrator.Runner.Generators.Base
 
             if (defaultValue is string && string.IsNullOrEmpty((string)defaultValue))
                 return string.Empty;
-            if (defaultValue is FunctionValue && string.IsNullOrEmpty(((FunctionValue)defaultValue).Value))
+            if (defaultValue is ExpressionString && string.IsNullOrEmpty(((ExpressionString)defaultValue).Value))
                 return string.Empty;
 
             return "DEFAULT " + Quoter.QuoteValue(defaultValue);
@@ -90,7 +90,7 @@ namespace FluentMigrator.Runner.Generators.Base
 
         protected abstract string FormatIdentity(ColumnDefinition column);
 
-        protected abstract FunctionValue FormatSystemMethods(SystemMethods systemMethod);
+        protected abstract ExpressionString FormatSystemMethods(SystemMethods systemMethod);
 
         protected virtual string FormatPrimaryKey(ColumnDefinition column)
         {

@@ -58,22 +58,22 @@ namespace FluentMigrator.Builders.Create.Table
             return this;
         }
 
-        public ICreateTableColumnOptionOrWithColumnSyntax WithDefaultFunctionValue(string value)
+        public ICreateTableColumnOptionOrWithColumnSyntax WithDefaultExpression(string value)
         {
             if (string.IsNullOrEmpty(value))
                 throw new ArgumentException("Argument should not be empty", "value");
 
-            var result = WithDefaultValue(new FunctionValue(value));
+            var result = WithDefaultValue(new ExpressionString(value));
             return result;
         }
 
-        public ICreateTableColumnOptionOrWithColumnSyntax WithDefaultGuidValue()
+        public ICreateTableColumnOptionOrWithColumnSyntax WithDefaultGuid()
         {
             var result = WithDefaultValue(SystemMethods.NewGuid);
             return result;
         }
 
-        public ICreateTableColumnOptionOrWithColumnSyntax WithDefaultCurrentDateTimeValue()
+        public ICreateTableColumnOptionOrWithColumnSyntax WithDefaultCurrentDateTime()
         {
             var result = WithDefaultValue(SystemMethods.CurrentDateTime);
             return result;

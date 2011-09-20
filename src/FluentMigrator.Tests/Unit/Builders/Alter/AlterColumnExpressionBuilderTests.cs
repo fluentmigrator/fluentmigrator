@@ -273,9 +273,9 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
         }
 
         [Test]
-        public void CallingWithDefaultFunctionValueAddsAlterDefaultConstraintExpression()
+        public void CallingWithDefaultExpressionAddsAlterDefaultConstraintExpression()
         {
-            var value = new FunctionValue("TestValue");
+            var value = new ExpressionString("TestValue");
 
             var columnMock = new Mock<ColumnDefinition>();
             columnMock.VerifySet(c => c.DefaultValue = value, Times.AtMostOnce());
@@ -294,14 +294,14 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
 
             var builder = new AlterColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
-            builder.WithDefaultFunctionValue(value);
+            builder.WithDefaultExpression(value);
 
             collectionMock.VerifyAll();
             contextMock.VerifyAll();
         }
 
         [Test]
-        public void CallingWithDefaultGuidValueAddsAlterDefaultConstraintExpression()
+        public void CallingWithDefaultGuidAddsAlterDefaultConstraintExpression()
         {
             const SystemMethods value = SystemMethods.NewGuid;
 
@@ -322,14 +322,14 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
 
             var builder = new AlterColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
-            builder.WithDefaultGuidValue();
+            builder.WithDefaultGuid();
 
             collectionMock.VerifyAll();
             contextMock.VerifyAll();
         }
 
         [Test]
-        public void CallingWithDefaultCurrentDateTimeValueAddsAlterDefaultConstraintExpression()
+        public void CallingWithDefaultCurrentDateTimeAddsAlterDefaultConstraintExpression()
         {
             const SystemMethods value = SystemMethods.CurrentDateTime;
 
@@ -350,7 +350,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
 
             var builder = new AlterColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
-            builder.WithDefaultCurrentDateTimeValue();
+            builder.WithDefaultCurrentDateTime();
 
             collectionMock.VerifyAll();
             contextMock.VerifyAll();

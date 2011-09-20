@@ -1,4 +1,5 @@
-﻿using FluentMigrator.Expressions;
+﻿using System.Linq;
+using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Framework;
@@ -35,7 +36,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             //After a quick google the below tested statment should work.
             //CONSTRAINT constraint_name PRIMARY KEY (column1, column2, . column_n)
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL, PRIMARY KEY (TestColumn1))");
         }
 
@@ -43,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public override void CanCreateTableNamedPrimaryKey()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL, CONSTRAINT TestKey PRIMARY KEY (TestColumn1))");
         }
 
@@ -51,21 +52,22 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public override void CanCreateTableNamedMultiColumnPrimaryKey()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumNamedPrimaryKeyExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL, CONSTRAINT TestKey PRIMARY KEY (TestColumn1, TestColumn2))");
         }
 
         [Test]
         public override void CanCreateTableWithIdentity()
         {
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression()));
+            var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(expression));
         }
 
         [Test]
         public override void CanCreateTableWithNullableField()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe(
                 "CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255), TestColumn2 NUMBER(10,0) NOT NULL)");
         }
@@ -74,7 +76,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public override void CanCreateTableWithDefaultValue()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
 
             // Oracle requires the DEFAULT clause to appear before the NOT NULL clause
             sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) DEFAULT 'Default' NOT NULL, TestColumn2 NUMBER(10,0) DEFAULT 0 NOT NULL)");
@@ -84,34 +86,33 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public override void CanCreateTableWithDefaultValueExplicitlySetToNull()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
-            expression.Columns[0].DefaultValue = null;
-            string sql = _generator.Generate(expression);
-
+            expression.Columns.First().DefaultValue = null;
+            var sql = _generator.Generate(expression);
             sql.ShouldBe(
                 "CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) DEFAULT NULL NOT NULL, TestColumn2 NUMBER(10,0) DEFAULT 0 NOT NULL)");
         }
 
         [Test]
-        public override void CanCreateTableWithDefaultFunctionValue()
+        public override void CanCreateTableWithDefaultExpression()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithDefaultFunctionValue();
-            string sql = _generator.Generate(expression);
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultExpression();
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(50) DEFAULT TestFunction NOT NULL)");
         }
 
         [Test]
-        public override void CanCreateTableWithDefaultGuidValue()
+        public override void CanCreateTableWithDefaultGuid()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithDefaultGuidValue();
-            string sql = _generator.Generate(expression);
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultGuid();
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(50) DEFAULT sys_guid() NOT NULL)");
         }
 
         [Test]
-        public override void CanCreateTableWithDefaultCurrentDateValue()
+        public override void CanCreateTableWithDefaultCurrentDate()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithDefaultCurrentDateTimeValue();
-            string sql = _generator.Generate(expression);
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultCurrentDateTime();
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(50) DEFAULT sysdate NOT NULL)");
         }
 
@@ -119,7 +120,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public override void CanCreateIndex()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE INDEX TestIndex ON TestTable1 (TestColumn1 ASC)");
         }
 
@@ -127,7 +128,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public override void CanCreateMultiColumnIndex()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE INDEX TestIndex ON TestTable1 (TestColumn1 ASC, TestColumn2 DESC)");
         }
 
@@ -135,7 +136,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public override void CanCreateUniqueIndex()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE UNIQUE INDEX TestIndex ON TestTable1 (TestColumn1 ASC)");
         }
 
@@ -143,7 +144,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public override void CanCreateMultiColumnUniqueIndex()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE UNIQUE INDEX TestIndex ON TestTable1 (TestColumn1 ASC, TestColumn2 DESC)");
         }
 
@@ -151,7 +152,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public override void CanCreateTableWithMultiColumnPrimaryKey()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             // See the note in OracleColumn about why the PK should not be named
             sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL, PRIMARY KEY (TestColumn1, TestColumn2))");
         }

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using System.Linq;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.MySql;
@@ -41,7 +41,6 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         public override void CanCreateTableWithPrimaryKey()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
-
             var sql = _generator.Generate(expression);
             sql.ShouldBe(
                 "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL, `TestColumn2` INTEGER NOT NULL, PRIMARY KEY (`TestColumn1`)) ENGINE = INNODB");
@@ -51,8 +50,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         public override void CanCreateTableNamedPrimaryKey()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
-
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL, `TestColumn2` INTEGER NOT NULL, CONSTRAINT `TestKey` PRIMARY KEY (`TestColumn1`)) ENGINE = INNODB");
         }
 
@@ -60,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         public override void CanCreateTableNamedMultiColumnPrimaryKey()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumNamedPrimaryKeyExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL, `TestColumn2` INTEGER NOT NULL, CONSTRAINT `TestKey` PRIMARY KEY (`TestColumn1`, `TestColumn2`)) ENGINE = INNODB");
         }
 
@@ -77,7 +75,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         public override void CanCreateTableWithNullableField()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
-            expression.Columns[0].IsNullable = true;
+            expression.Columns.First().IsNullable = true;
             var sql = _generator.Generate(expression);
             sql.ShouldBe(
                 "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255), `TestColumn2` INTEGER NOT NULL) ENGINE = INNODB");
@@ -96,32 +94,30 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         public override void CanCreateTableWithDefaultValueExplicitlySetToNull()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
-            expression.Columns[0].DefaultValue = null;
-
+            expression.Columns.First().DefaultValue = null;
             var sql = _generator.Generate(expression);
-
             sql.ShouldBe(
                 "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL DEFAULT NULL, `TestColumn2` INTEGER NOT NULL DEFAULT 0) ENGINE = INNODB");
         }
 
         [Test]
-        public override void CanCreateTableWithDefaultFunctionValue()
+        public override void CanCreateTableWithDefaultExpression()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithDefaultFunctionValue();
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultExpression();
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(expression));
         }
 
         [Test]
-        public override void CanCreateTableWithDefaultGuidValue()
+        public override void CanCreateTableWithDefaultGuid()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithDefaultGuidValue();
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultGuid();
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(expression));
         }
 
         [Test]
-        public override void CanCreateTableWithDefaultCurrentDateValue()
+        public override void CanCreateTableWithDefaultCurrentDate()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithDefaultCurrentDateTimeValue();
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultCurrentDateTime();
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(expression));
         }
 
@@ -170,15 +166,16 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         public override void CanCreateSchema()
         {
             var expression = new CreateSchemaExpression { SchemaName = "TestSchema" };
-            var result = _generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            var sql = _generator.Generate(expression);
+            sql.ShouldBe(string.Empty);
         }
 
         [Test]
         public void CanCreateSchemaInStrictMode()
         {
             _generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new CreateSchemaExpression()));
+            var expression = new CreateSchemaExpression();
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(expression));
         }
     }
 }

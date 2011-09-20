@@ -26,9 +26,9 @@ namespace FluentMigrator.Builders
         where TNext : IFluentSyntax
     {
         TNext WithDefaultValue(object value);
-        TNext WithDefaultFunctionValue(string value);
-        TNext WithDefaultGuidValue();
-        TNext WithDefaultCurrentDateTimeValue();
+        TNext WithDefaultExpression(string value);
+        TNext WithDefaultGuid();
+        TNext WithDefaultCurrentDateTime();
         TNext Identity();
         TNext Indexed();
 

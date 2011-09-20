@@ -20,7 +20,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public override void CanCreateMultiColumnUniqueIndex()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC,\"TestColumn2\" DESC)");
         }
 
@@ -28,7 +28,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public override void CanCreateSchema()
         {
             var expression = new CreateSchemaExpression { SchemaName = "Schema1" };
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE SCHEMA \"Schema1\"");
         }
 
@@ -36,7 +36,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public override void CanCreateTable()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" integer NOT NULL)");
         }
 
@@ -49,7 +49,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public override void CanCreateTableWithPrimaryKey()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" integer NOT NULL, PRIMARY KEY (\"TestColumn1\"))");
         }
 
@@ -57,7 +57,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public override void CanCreateTableWithIdentity()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" serial NOT NULL, \"TestColumn2\" integer NOT NULL)");
         }
 
@@ -65,7 +65,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public override void CanCreateTableWithNullableField()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe(
                 "CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" text, \"TestColumn2\" integer NOT NULL)");
         }
@@ -82,7 +82,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public override void CanCreateTableWithDefaultValue()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" text NOT NULL DEFAULT 'Default', \"TestColumn2\" integer NOT NULL DEFAULT 0)");
         }
 
@@ -91,32 +91,32 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
             expression.Columns[0].DefaultValue = null;
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe(
                 "CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" text NOT NULL DEFAULT NULL, \"TestColumn2\" integer NOT NULL DEFAULT 0)");
         }
 
         [Test]
-        public override void CanCreateTableWithDefaultFunctionValue()
+        public override void CanCreateTableWithDefaultExpression()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithDefaultFunctionValue();
-            string sql = _generator.Generate(expression);
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultExpression();
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" varchar(50) NOT NULL DEFAULT TestFunction)");
         }
 
         [Test]
-        public override void CanCreateTableWithDefaultGuidValue()
+        public override void CanCreateTableWithDefaultGuid()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithDefaultGuidValue();
-            string sql = _generator.Generate(expression);
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultGuid();
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" varchar(50) NOT NULL DEFAULT uuid_generate_v4())");
         }
 
         [Test]
-        public override void CanCreateTableWithDefaultCurrentDateValue()
+        public override void CanCreateTableWithDefaultCurrentDate()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithDefaultCurrentDateTimeValue();
-            string sql = _generator.Generate(expression);
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultCurrentDateTime();
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" varchar(50) NOT NULL DEFAULT now())");
         }
 
@@ -124,7 +124,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public override void CanCreateTableWithMultiColumnPrimaryKey()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" integer NOT NULL, PRIMARY KEY (\"TestColumn1\",\"TestColumn2\"))");
         }
 
@@ -132,7 +132,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public override void CanCreateTableNamedMultiColumnPrimaryKey()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumNamedPrimaryKeyExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" integer NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\",\"TestColumn2\"))");
         }
 
@@ -140,7 +140,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public override void CanCreateIndex()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC)");
         }
 
@@ -148,7 +148,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public override void CanCreateMultiColumnIndex()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC,\"TestColumn2\" DESC)");
         }
 
@@ -156,7 +156,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         public override void CanCreateUniqueIndex()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC)");
         }
     }

@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
-        public static CreateTableExpression GetCreateTableWithDefaultFunctionValue()
+        public static CreateTableExpression GetCreateTableWithDefaultExpression()
         {
             var expression = new CreateTableExpression { TableName = TestTableName1 };
             expression.Columns.Add(new ColumnDefinition
@@ -41,21 +41,21 @@ namespace FluentMigrator.Tests.Unit.Generators
                                            Name = TestColumnName1,
                                            Type = DbType.String,
                                            Size = 50,
-                                           DefaultValue = new FunctionValue(TestFunctionName)
+                                           DefaultValue = new ExpressionString(TestFunctionName)
                                        });
             return expression;
         }
 
-        public static CreateTableExpression GetCreateTableWithDefaultGuidValue()
+        public static CreateTableExpression GetCreateTableWithDefaultGuid()
         {
-            var expression = GetCreateTableWithDefaultFunctionValue();
+            var expression = GetCreateTableWithDefaultExpression();
             expression.Columns.First().DefaultValue = SystemMethods.NewGuid;
             return expression;
         }
 
-        public static CreateTableExpression GetCreateTableWithDefaultCurrentDateTimeValue()
+        public static CreateTableExpression GetCreateTableWithDefaultCurrentDateTime()
         {
-            var expression = GetCreateTableWithDefaultFunctionValue();
+            var expression = GetCreateTableWithDefaultExpression();
             expression.Columns.First().DefaultValue = SystemMethods.CurrentDateTime;
             return expression;
         }

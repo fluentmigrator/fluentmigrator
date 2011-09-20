@@ -51,14 +51,14 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return string.Empty;
         }
 
-        protected override FunctionValue FormatSystemMethods(SystemMethods systemMethod)
+        protected override ExpressionString FormatSystemMethods(SystemMethods systemMethod)
         {
             switch (systemMethod)
             {
                 case SystemMethods.NewGuid:
-                    return new FunctionValue("sys_guid()");
+                    return new ExpressionString("sys_guid()");
                 case SystemMethods.CurrentDateTime:
-                    return new FunctionValue("sysdate");
+                    return new ExpressionString("sysdate");
             }
 
             throw new NotImplementedException();

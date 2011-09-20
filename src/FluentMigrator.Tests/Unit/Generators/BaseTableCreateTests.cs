@@ -14,9 +14,9 @@
         public abstract void CanCreateTableWithNullableField();
         public abstract void CanCreateTableWithDefaultValue();
         public abstract void CanCreateTableWithDefaultValueExplicitlySetToNull();
-        public abstract void CanCreateTableWithDefaultFunctionValue();
-        public abstract void CanCreateTableWithDefaultGuidValue();
-        public abstract void CanCreateTableWithDefaultCurrentDateValue();
+        public abstract void CanCreateTableWithDefaultExpression();
+        public abstract void CanCreateTableWithDefaultGuid();
+        public abstract void CanCreateTableWithDefaultCurrentDate();
 
         public abstract void CanCreateTableWithMultiColumnPrimaryKey();
 

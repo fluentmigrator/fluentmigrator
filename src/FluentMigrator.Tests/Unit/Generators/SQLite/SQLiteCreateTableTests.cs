@@ -21,7 +21,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         public override void CanCreateTable()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL, 'TestColumn2' INTEGER NOT NULL)");
         }
 
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             //Should work. I think from the docs
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL, 'TestColumn2' INTEGER NOT NULL, CONSTRAINT 'TestKey' PRIMARY KEY ('TestColumn1'))");
         }
 
@@ -53,7 +53,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             //Should work. I think from the docs
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumNamedPrimaryKeyExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL, 'TestColumn2' INTEGER NOT NULL, CONSTRAINT 'TestKey' PRIMARY KEY ('TestColumn1', 'TestColumn2'))");
         }
 
@@ -72,10 +72,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         public override void CanCreateTableWithNullableField()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
-
-            var result = _generator.Generate(expression);
-
-            result.ShouldBe(
+            var sql = _generator.Generate(expression);
+            sql.ShouldBe(
                 "CREATE TABLE 'TestTable1' ('TestColumn1' TEXT, 'TestColumn2' INTEGER NOT NULL)");
         }
 
@@ -83,10 +81,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         public override void CanCreateTableWithDefaultValue()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
-
-            var result = _generator.Generate(expression);
-
-            result.ShouldBe(
+            var sql = _generator.Generate(expression);
+            sql.ShouldBe(
                 "CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL DEFAULT 'Default', 'TestColumn2' INTEGER NOT NULL DEFAULT 0)");
         }
 
@@ -94,35 +90,33 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         public override void CanCreateTableWithDefaultValueExplicitlySetToNull()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
-            expression.Columns[0].DefaultValue = null;
-
-            var result = _generator.Generate(expression);
-
-            result.ShouldBe(
+            expression.Columns.First().DefaultValue = null;
+            var sql = _generator.Generate(expression);
+            sql.ShouldBe(
                 "CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL DEFAULT NULL, 'TestColumn2' INTEGER NOT NULL DEFAULT 0)");
         }
 
         [Test]
-        public override void CanCreateTableWithDefaultFunctionValue()
+        public override void CanCreateTableWithDefaultExpression()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithDefaultFunctionValue();
-            string sql = _generator.Generate(expression);
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultExpression();
+            var sql = _generator.Generate(expression);
             sql.ShouldBe(
                 "CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL DEFAULT (TestFunction))");
         }
 
         [Test]
-        public override void CanCreateTableWithDefaultGuidValue()
+        public override void CanCreateTableWithDefaultGuid()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithDefaultGuidValue();
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultGuid();
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(expression));
         }
 
         [Test]
-        public override void CanCreateTableWithDefaultCurrentDateValue()
+        public override void CanCreateTableWithDefaultCurrentDate()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithDefaultCurrentDateTimeValue();
-            string sql = _generator.Generate(expression);
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultCurrentDateTime();
+            var sql = _generator.Generate(expression);
             sql.ShouldBe(
                 "CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP)");
         }
@@ -131,7 +125,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         public override void CanCreateIndex()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE INDEX 'TestIndex' ON 'TestTable1' ('TestColumn1' ASC)");
         }
 
@@ -139,7 +133,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         public override void CanCreateMultiColumnIndex()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
-            string sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE INDEX 'TestIndex' ON 'TestTable1' ('TestColumn1' ASC, 'TestColumn2' DESC)");
         }
 
@@ -147,8 +141,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         public override void CanCreateTableWithMultiColumnPrimaryKey()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
-            var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL, 'TestColumn2' INTEGER NOT NULL, PRIMARY KEY ('TestColumn1', 'TestColumn2'))");
+            var sql = _generator.Generate(expression);
+            sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL, 'TestColumn2' INTEGER NOT NULL, PRIMARY KEY ('TestColumn1', 'TestColumn2'))");
         }
 
         [Test]
@@ -163,7 +157,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         public override void CanCreateMultiColumnUniqueIndex()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
-
             var sql = _generator.Generate(expression);
             sql.ShouldBe("CREATE UNIQUE INDEX 'TestIndex' ON 'TestTable1' ('TestColumn1' ASC, 'TestColumn2' DESC)");
         }
@@ -172,8 +165,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         public override void CanCreateSchema()
         {
             var expression = new CreateSchemaExpression { SchemaName = "TestSchema" };
-            var result = _generator.Generate(expression);
-            result.ShouldBe(string.Empty);
+            var sql = _generator.Generate(expression);
+            sql.ShouldBe(string.Empty);
         }
 
         [Test]

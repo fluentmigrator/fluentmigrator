@@ -22,9 +22,9 @@ namespace FluentMigrator.Runner.Generators.SQLite
 {
     public class SqliteQuoter : GenericQuoter
     {
-        protected override string FormatFunctionValue(FunctionValue functionValue)
+        protected override string FormatExpressionString(ExpressionString expressionString)
         {
-            var result = "(" + functionValue.Value + ")";
+            var result = "(" + expressionString.Value + ")";
             return result;
         }
 
