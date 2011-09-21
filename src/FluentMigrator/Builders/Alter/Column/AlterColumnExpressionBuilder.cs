@@ -17,7 +17,6 @@
 #endregion
 
 using System.Collections.Generic;
-using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
@@ -25,88 +24,109 @@ using System;
 
 namespace FluentMigrator.Builders.Alter.Column
 {
-	public class AlterColumnExpressionBuilder : ExpressionBuilderWithColumnTypesBase<AlterColumnExpression, IAlterColumnOptionSyntax>,
-		IAlterColumnOnTableSyntax,
-		IAlterColumnOptionSyntax,
+    public class AlterColumnExpressionBuilder : ExpressionBuilderWithColumnTypesBase<AlterColumnExpression, IAlterColumnOptionSyntax>,
+        IAlterColumnOnTableSyntax,
+        IAlterColumnOptionSyntax,
         IAlterColumnAsTypeOrInSchemaSyntax
-	{
-		private readonly IMigrationContext _context;
+    {
+        private readonly IMigrationContext _context;
 
-		public AlterColumnExpressionBuilder( AlterColumnExpression expression, IMigrationContext context )
-			: base( expression )
-		{
-			_context = context;
-		}
+        public AlterColumnExpressionBuilder(AlterColumnExpression expression, IMigrationContext context)
+            : base(expression)
+        {
+            _context = context;
+        }
 
-		public IAlterColumnAsTypeOrInSchemaSyntax OnTable( string name )
-		{
-			Expression.TableName = name;
-			return this;
-		}
+        public IAlterColumnAsTypeOrInSchemaSyntax OnTable(string name)
+        {
+            Expression.TableName = name;
+            return this;
+        }
 
         public IAlterColumnAsTypeSyntax InSchema(string schemaName)
-		{
-			Expression.SchemaName = schemaName;
-			return this;
-		}
+        {
+            Expression.SchemaName = schemaName;
+            return this;
+        }
 
-		public IAlterColumnOptionSyntax WithDefaultValue( object value )
-		{
-			// we need to do a drop constraint and then add constraint to change the defualt value
-			var dc = new AlterDefaultConstraintExpression
-						{
-							TableName = Expression.TableName,
-							SchemaName = Expression.SchemaName,
-							ColumnName = Expression.Column.Name,
-							DefaultValue = value
-						};
+        public IAlterColumnOptionSyntax WithDefaultValue(object value)
+        {
+            // we need to do a drop constraint and then add constraint to change the defualt value
+            var defaultConstraintExpression = new AlterDefaultConstraintExpression
+                                                  {
+                                                      TableName = Expression.TableName,
+                                                      SchemaName = Expression.SchemaName,
+                                                      ColumnName = Expression.Column.Name,
+                                                      DefaultValue = value
+                                                  };
 
-			_context.Expressions.Add( dc );
+            _context.Expressions.Add(defaultConstraintExpression);
 
-			return this;
-		}
+            return this;
+        }
 
-		public IAlterColumnOptionSyntax Identity()
-		{
-			Expression.Column.IsIdentity = true;
-			return this;
-		}
+        public IAlterColumnOptionSyntax WithDefaultExpression(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                throw new ArgumentException("Argument should not be empty", "value");
 
-		public IAlterColumnOptionSyntax Indexed()
-		{
-			Expression.Column.IsIndexed = true;
-			return this;
-		}
+            var result = WithDefaultValue(new ExpressionString(value));
+            return result;
+        }
 
-		public IAlterColumnOptionSyntax PrimaryKey()
-		{
-			Expression.Column.IsPrimaryKey = true;
-			return this;
-		}
+        public IAlterColumnOptionSyntax WithDefaultGuid()
+        {
+            var result = WithDefaultValue(SystemMethods.NewGuid);
+            return result;
+        }
 
-		public IAlterColumnOptionSyntax PrimaryKey( string primaryKeyName )
-		{
-			Expression.Column.IsPrimaryKey = true;
-			Expression.Column.PrimaryKeyName = primaryKeyName;
-			return this;
-		}
+        public IAlterColumnOptionSyntax WithDefaultCurrentDateTime()
+        {
+            var result = WithDefaultValue(SystemMethods.CurrentDateTime);
+            return result;
+        }
 
-		public IAlterColumnOptionSyntax Nullable()
-		{
-			Expression.Column.IsNullable = true;
-			return this;
-		}
+        public IAlterColumnOptionSyntax Identity()
+        {
+            Expression.Column.IsIdentity = true;
+            return this;
+        }
 
-		public IAlterColumnOptionSyntax NotNullable()
-		{
-			Expression.Column.IsNullable = false;
-			return this;
-		}
+        public IAlterColumnOptionSyntax Indexed()
+        {
+            Expression.Column.IsIndexed = true;
+            return this;
+        }
+
+        public IAlterColumnOptionSyntax PrimaryKey()
+        {
+            Expression.Column.IsPrimaryKey = true;
+            return this;
+        }
+
+        public IAlterColumnOptionSyntax PrimaryKey(string primaryKeyName)
+        {
+            Expression.Column.IsPrimaryKey = true;
+            Expression.Column.PrimaryKeyName = primaryKeyName;
+            return this;
+        }
+
+        public IAlterColumnOptionSyntax Nullable()
+        {
+            Expression.Column.IsNullable = true;
+            return this;
+        }
+
+        public IAlterColumnOptionSyntax NotNullable()
+        {
+            Expression.Column.IsNullable = false;
+            return this;
+        }
 
         public IAlterColumnOptionSyntax Unique()
-		{
-			Expression.Column.IsUnique = true;
-			return this;
+        {
+            Expression.Column.IsUnique = true;
+            return this;
         }
 
         public IAlterColumnOptionSyntax ForeignKey(string primaryTableName, string primaryColumnName)
@@ -209,9 +229,9 @@ namespace FluentMigrator.Builders.Alter.Column
             return this;
         }
 
-		protected override ColumnDefinition GetColumnForType()
-		{
-			return Expression.Column;
-		}
+        protected override ColumnDefinition GetColumnForType()
+        {
+            return Expression.Column;
+        }
     }
 }

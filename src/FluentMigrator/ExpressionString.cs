@@ -16,19 +16,35 @@
 //
 #endregion
 
-using FluentMigrator.Runner.Generators.Generic;
+using System;
 
-namespace FluentMigrator.Runner.Generators.SQLite
+namespace FluentMigrator
 {
-    public class SqliteQuoter : GenericQuoter
+    public class ExpressionString
     {
-        protected override string FormatExpressionString(ExpressionString expressionString)
+        public string Value { get; set; }
+
+        public ExpressionString(string value)
         {
-            var result = "(" + expressionString.Value + ")";
-            return result;
+            if (value == null)
+                throw new ArgumentNullException("value");
+
+            Value = value;
         }
 
-        public override string OpenQuote { get { return "'"; } }
-        public override string CloseQuote { get { return "'"; } }
+        public override string ToString()
+        {
+            return Value;
+        }
+
+        public static implicit operator ExpressionString(string value)
+        {
+            return new ExpressionString(value);
+        }
+
+        public static implicit operator string(ExpressionString value)
+        {
+            return value.Value;
+        }
     }
 }

@@ -188,6 +188,8 @@
     <Compile Include="Unit\Builders\Create\CreateTableExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateColumnExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Schema\SchemaExpressionRootTest.cs" />
+    <Compile Include="Unit\ExpressionStringTests.cs" />
+    <Compile Include="Unit\Generators\Postgres\PostgresCreateTableTests.cs" />
     <Compile Include="Unit\Initialization\ConnectionStringManagerTests.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -204,11 +206,8 @@
     <Compile Include="Unit\Expressions\ExecuteSqlStatementExpressionTests.cs" />
     <Compile Include="Unit\Generators\GenericGenerator\QuoterTests.cs" />
     <Compile Include="Unit\Generators\BaseDataTests.cs" />
-    <Compile Include="Unit\Generators\GeneratorBaseTests.cs" />
     <Compile Include="Unit\Generators\GeneratorTestHelper.cs" />
-    <Compile Include="Unit\Generators\GenericGenerator\GenericGeneratorCreateTableTests.cs" />
     <Compile Include="Unit\Generators\GenericGenerator\GenericGeneratorImplementor.cs" />
-    <Compile Include="Unit\Generators\GenericGenerator\GenericGeneratorTestBase.cs" />
     <Compile Include="Unit\Generators\Jet\JetAlterTableTests.cs" />
     <Compile Include="Unit\Generators\Jet\JetCreateTableTests.cs" />
     <Compile Include="Unit\Generators\Jet\JetDataTests.cs" />

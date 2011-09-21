@@ -1,14 +1,8 @@
-﻿
-using FluentMigrator.Expressions;
-using FluentMigrator.Model;
-using System.Data;
-namespace FluentMigrator.Tests.Unit.Generators
+﻿namespace FluentMigrator.Tests.Unit.Generators
 {
-
-    public abstract class BaseTableAlterTests : GeneratorTestBase
+    public abstract class BaseTableAlterTests
     {
         //Alter Tests
-
         public abstract void CanAddColumn();
         public abstract void CanAddDecimalColumn();
         public abstract void CanRenameColumn();
@@ -19,8 +13,5 @@ namespace FluentMigrator.Tests.Unit.Generators
         public abstract void CanCreateAutoIncrementColumn();
 
         public abstract void CanAlterSchema();
-       
-
-        
     }
 }

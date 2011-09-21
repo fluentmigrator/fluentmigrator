@@ -1,18 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
-using FluentMigrator.Runner.Generators.SqlServer;
-using NUnit.Should;
 using System.Data;
-using FluentMigrator.Model;
 using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Generators;
+using FluentMigrator.Model;
+using FluentMigrator.Runner.Generators.SqlServer;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 {
-    public class SqlServer2005AlterTableTests : GeneratorTestBase
+    public class SqlServer2005AlterTableTests
     {
         protected SqlServer2005Generator generator;
 
@@ -23,7 +19,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public   void CanAddColumnWithDefaultSchema()
+        public void CanAddColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
             var sql = generator.Generate(expression);
@@ -31,17 +27,15 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public   void CanAddDecimalColumnWithDefaultSchema()
+        public void CanAddDecimalColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
             var sql = generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] DECIMAL(19,2) NOT NULL");
         }
 
-        
-
         [Test]
-        public   void CanRenameTableWithDefaultSchema()
+        public void CanRenameTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
             var sql = generator.Generate(expression);
@@ -49,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public   void CanRenameColumnWithDefaultSchema()
+        public void CanRenameColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
             var sql = generator.Generate(expression);
@@ -57,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public   void CanAlterColumnWithDefaultSchema()
+        public void CanAlterColumnWithDefaultSchema()
         {
             //TODO: This will fail if there are any keys attached 
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
@@ -68,23 +62,21 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public   void CanCreateForeignKeyWithDefaultSchema()
+        public void CanCreateForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
             var sql = generator.Generate(expression);
             sql.ShouldBe(
                 "ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2])");
-
         }
 
         [Test]
-        public   void CanCreateMulitColumnForeignKeyWithDefaultSchema()
+        public void CanCreateMulitColumnForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
             var sql = generator.Generate(expression);
             sql.ShouldBe(
                 "ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [dbo].[TestTable2] ([TestColumn2], [TestColumn4])");
-
         }
 
         [Test]
@@ -101,13 +93,13 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             sql.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] XML NOT NULL");
         }
 
-        public   void CanCreateAutoIncrementColumnWithDefaultSchema()
+        public void CanCreateAutoIncrementColumnWithDefaultSchema()
         {
             throw new NotImplementedException();
         }
 
         [Test]
-        public   void CanAddColumnWithCustomSchema()
+        public void CanAddColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
             expression.SchemaName = "TestSchema";
@@ -116,7 +108,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public   void CanAddDecimalColumnWithCustomSchema()
+        public void CanAddDecimalColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
             expression.SchemaName = "TestSchema";
@@ -124,10 +116,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             sql.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD [TestColumn1] DECIMAL(19,2) NOT NULL");
         }
 
-
-
         [Test]
-        public   void CanRenameTableWithCustomSchema()
+        public void CanRenameTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
             expression.SchemaName = "TestSchema";
@@ -136,7 +126,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public   void CanRenameColumnWithCustomSchema()
+        public void CanRenameColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
             expression.SchemaName = "TestSchema";
@@ -145,7 +135,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public   void CanAlterColumnWithCustomSchema()
+        public void CanAlterColumnWithCustomSchema()
         {
             //TODO: This will fail if there are any keys attached 
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
@@ -157,7 +147,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public   void CanCreateForeignKeyWithCustomSchema()
+        public void CanCreateForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
@@ -165,11 +155,10 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var sql = generator.Generate(expression);
             sql.ShouldBe(
                 "ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2])");
-
         }
 
         [Test]
-        public   void CanCreateMulitColumnForeignKeyWithCustomSchema()
+        public void CanCreateMulitColumnForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
@@ -177,7 +166,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var sql = generator.Generate(expression);
             sql.ShouldBe(
                 "ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2], [TestColumn4])");
-
         }
 
         [Test]
@@ -195,13 +183,13 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             sql.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD [TestColumn1] XML NOT NULL");
         }
 
-        public   void CanCreateAutoIncrementColumnWithCustomSchema()
+        public void CanCreateAutoIncrementColumnWithCustomSchema()
         {
             throw new NotImplementedException();
         }
 
         [Test]
-        public   void CanAlterSchema()
+        public void CanAlterSchema()
         {
             var expression = new AlterSchemaExpression
             {
@@ -211,10 +199,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             };
 
             var sql = generator.Generate(expression);
-            sql.ShouldBe(
-              "ALTER SCHEMA [DEST] TRANSFER [SOURCE].[TABLE]");
+            sql.ShouldBe("ALTER SCHEMA [DEST] TRANSFER [SOURCE].[TABLE]");
         }
-
-        
     }
 }

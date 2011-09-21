@@ -4,9 +4,9 @@ using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
 using NUnit.Should;
 
-namespace FluentMigrator.Tests.Unit.Generators
+namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 {
-    public class SqlServerCeGeneratorTests : GeneratorTestBase
+    public class SqlServerCeGeneratorTests
     {
         private SqlServerCeGenerator _generator;
 
@@ -19,19 +19,22 @@ namespace FluentMigrator.Tests.Unit.Generators
         [Test]
         public void CannotCreateASchema()
         {
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new CreateSchemaExpression()));
+            var expression = new CreateSchemaExpression();
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(expression));
         }
 
         [Test]
         public void CannotAlterASchema()
         {
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new AlterSchemaExpression()));
+            var expression = new AlterSchemaExpression();
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(expression));
         }
 
         [Test]
         public void CannotDeleteASchema()
         {
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new DeleteSchemaExpression()));
+            var expression = new DeleteSchemaExpression();
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(expression));
         }
 
         [Test]
@@ -39,7 +42,6 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
             var sql = _generator.Generate(expression);
-
             sql.ShouldBe("DROP INDEX [TestTable1].[TestIndex]");
         }
     }

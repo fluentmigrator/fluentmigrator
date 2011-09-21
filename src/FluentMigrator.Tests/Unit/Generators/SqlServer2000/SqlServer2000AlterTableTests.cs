@@ -30,8 +30,13 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         [Test]
         public void CanAddColumnWithGetDateDefault()
         {
-            ColumnDefinition column = new ColumnDefinition { Name = "TestColumn1", Type = DbType.String, 
-                Size = 5, DefaultValue = "GetDate()" };
+            var column = new ColumnDefinition
+                             {
+                                 Name = "TestColumn1",
+                                 Type = DbType.String,
+                                 Size = 5,
+                                 DefaultValue = new ExpressionString("GetDate()")
+                             };
             var expression = new CreateColumnExpression { TableName = "TestTable1", Column = column };
             var sql = _generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL DEFAULT GetDate()");
@@ -121,7 +126,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         public void CanAlterSchemaInStrictMode()
         {
             _generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new CreateSchemaExpression()));
+            var expression = new CreateSchemaExpression();
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(expression));
         }
     }
 }

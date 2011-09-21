@@ -1,26 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
+﻿using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.SqlServer;
+using NUnit.Framework;
 using NUnit.Should;
-using FluentMigrator.Runner.Generators;
-using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 {
-
-    public class SqlServer2005DropTableTests : GeneratorTestBase
+    public class SqlServer2005DropTableTests
     {
-        protected SqlServer2005Generator generator;
+        private SqlServer2005Generator generator;
 
         [SetUp]
         public void Setup()
         {
             generator = new SqlServer2005Generator();
-
-
         }
 
         [Test]
@@ -28,11 +20,10 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         {
             //This does not work if it is a primary key
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
-        
+
             var sql = generator.Generate(expression);
 
-            var expectedSql =
-                @"
+            const string expectedSql = @"
 			DECLARE @default sysname, @sql nvarchar(max);
 
 			-- get name of default constraint
@@ -91,8 +82,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             expression.SchemaName = "TestSchema";
             var sql = generator.Generate(expression);
 
-            var expectedSql =
-                @"
+            const string expectedSql = @"
 			DECLARE @default sysname, @sql nvarchar(max);
 
 			-- get name of default constraint
@@ -132,7 +122,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
             expression.SchemaName = "TestSchema";
             var sql = generator.Generate(expression);
-           
+
             sql.ShouldBe("DROP TABLE [TestSchema].[TestTable1]");
         }
 
@@ -142,16 +132,14 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
             expression.Index.SchemaName = "TestSchema";
             var sql = generator.Generate(expression);
-           
+
             sql.ShouldBe("DROP INDEX [TestIndex] ON [TestSchema].[TestTable1]");
         }
-
-
 
         [Test]
         public void CanDeleteSchema()
         {
-            var expression = new DeleteSchemaExpression() { SchemaName = "TestSchema" };
+            var expression = new DeleteSchemaExpression { SchemaName = "TestSchema" };
             var sql = generator.Generate(expression);
             sql.ShouldBe("DROP SCHEMA [TestSchema]");
         }

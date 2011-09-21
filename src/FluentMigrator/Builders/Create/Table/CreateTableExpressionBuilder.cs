@@ -17,7 +17,6 @@
 #endregion
 
 using System.Collections.Generic;
-using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
@@ -57,6 +56,27 @@ namespace FluentMigrator.Builders.Create.Table
         {
             CurrentColumn.DefaultValue = value;
             return this;
+        }
+
+        public ICreateTableColumnOptionOrWithColumnSyntax WithDefaultExpression(string value)
+        {
+            if (string.IsNullOrEmpty(value))
+                throw new ArgumentException("Argument should not be empty", "value");
+
+            var result = WithDefaultValue(new ExpressionString(value));
+            return result;
+        }
+
+        public ICreateTableColumnOptionOrWithColumnSyntax WithDefaultGuid()
+        {
+            var result = WithDefaultValue(SystemMethods.NewGuid);
+            return result;
+        }
+
+        public ICreateTableColumnOptionOrWithColumnSyntax WithDefaultCurrentDateTime()
+        {
+            var result = WithDefaultValue(SystemMethods.CurrentDateTime);
+            return result;
         }
 
         public ICreateTableColumnOptionOrWithColumnSyntax Identity()
