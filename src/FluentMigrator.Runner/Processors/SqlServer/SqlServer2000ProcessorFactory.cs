@@ -30,12 +30,12 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var connection = new SqlConnection(connectionString);
-            return new SqlServerProcessor(connection, new SqlServer2000Generator(), announcer, options);
+            return new SqlServer2000Processor(connection, new SqlServer2000Generator(), announcer, options);
         }
 
         public override IMigrationProcessor Create(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
-            return new SqlServerProcessor((SqlConnection)connection, new SqlServer2000Generator(), announcer, options);
+            return new SqlServer2000Processor((SqlConnection)connection, new SqlServer2000Generator(), announcer, options);
         }
     }
 }
