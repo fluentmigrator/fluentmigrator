@@ -112,7 +112,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanAnnounceUp()
         {
-            _announcer.Setup(x => x.Heading(It.IsRegex(containsAll("Test", "migrating"))));
+            _announcer.Setup(x => x.Heading(It.IsRegex(containsAll("2011093000", "Test", "migrating"))));
             _runner.Up(new TestMigration());
             _announcer.VerifyAll();
         }
@@ -120,7 +120,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanAnnounceUpFinish()
         {
-            _announcer.Setup(x => x.Say(It.IsRegex(containsAll("Test", "migrated"))));
+            _announcer.Setup(x => x.Say(It.IsRegex(containsAll("2011093000", "Test", "migrated"))));
             _runner.Up(new TestMigration());
             _announcer.VerifyAll();
         }
@@ -128,7 +128,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanAnnounceDown()
         {
-            _announcer.Setup(x => x.Heading(It.IsRegex(containsAll("Test", "reverting"))));
+            _announcer.Setup(x => x.Heading(It.IsRegex(containsAll("2011093000", "Test", "reverting"))));
             _runner.Down(new TestMigration());
             _announcer.VerifyAll();
         }
@@ -136,7 +136,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanAnnounceDownFinish()
         {
-            _announcer.Setup(x => x.Say(It.IsRegex(containsAll("Test", "reverted"))));
+            _announcer.Setup(x => x.Say(It.IsRegex(containsAll("2011093000", "Test", "reverted"))));
             _runner.Down(new TestMigration());
             _announcer.VerifyAll();
         }
