@@ -192,8 +192,7 @@ namespace FluentMigrator.Console
 
                 if (string.IsNullOrEmpty(Task))
                     Task = "migrate";
-
-				}
+				
                 if ( string.IsNullOrEmpty( Group ) )
                 {
                     Group = "";
