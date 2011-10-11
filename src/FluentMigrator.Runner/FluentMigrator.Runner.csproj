@@ -109,26 +109,11 @@
     <AssemblyOriginatorKeyFile>..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="MySql.Data, Version=1.0.10.1, Culture=neutral, PublicKeyToken=c5687fc88969c44d">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\MySql.Data.dll</HintPath>
-    </Reference>
-    <Reference Include="Npgsql, Version=2.0.11.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Postgres\Npgsql.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.configuration" />
-    <Reference Include="System.Data.SQLite">
-      <HintPath>..\..\lib\System.Data.SQLite.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Data.SqlServerCe, Version=4.0.0.1, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\SQLServerCE4\Private\System.Data.SqlServerCe.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -161,7 +146,7 @@
     <Compile Include="Generators\MySql\MySqlColumn.cs" />
     <Compile Include="Generators\MySql\MySqlQuoter.cs" />
     <Compile Include="Generators\MySql\MySqlTypeMap.cs" />
-    <Compile Include="Generators\DatabaseOperationNotSupportedExecption.cs" />
+    <Compile Include="Generators\DatabaseOperationNotSupportedException.cs" />
     <Compile Include="Generators\Oracle\OracleColumn.cs" />
     <Compile Include="Generators\Oracle\OracleQuoter.cs" />
     <Compile Include="Generators\Oracle\OracleTypeMap.cs" />
@@ -193,7 +178,10 @@
     <Compile Include="Initialization\AssemblyLoader\AssemblyLoaderFromFile.cs" />
     <Compile Include="Initialization\AssemblyLoader\AssemblyLoaderFromName.cs" />
     <Compile Include="Initialization\AssemblyLoader\IAssemblyLoader.cs" />
+    <Compile Include="Initialization\INetConfigManager.cs" />
     <Compile Include="Initialization\IRunnerContext.cs" />
+    <Compile Include="Initialization\ConnectionStringManager.cs" />
+    <Compile Include="Initialization\NetConfigManager.cs" />
     <Compile Include="Initialization\RunnerContext.cs" />
     <Compile Include="Initialization\TaskExecutor.cs" />
     <Compile Include="IProfileLoader.cs" />
@@ -201,15 +189,23 @@
     <Compile Include="Processors\Jet\JetProcessor.cs" />
     <Compile Include="Processors\Jet\JetProcessorFactory.cs" />
     <Compile Include="Processors\MigrationProcessorFactory.cs" />
+    <Compile Include="Processors\MySql\MySqlDbFactory.cs" />
     <Compile Include="Processors\MySql\MySqlProcessor.cs" />
     <Compile Include="Processors\MySql\MySqlProcessorFactory.cs" />
-    <Compile Include="Processors\Oracle\OracleFactory.cs" />
+    <Compile Include="Processors\Oracle\OracleDbFactory.cs" />
     <Compile Include="Processors\Oracle\OracleProcessor.cs" />
     <Compile Include="Processors\Oracle\OracleProcessorFactory.cs" />
+    <Compile Include="Processors\Postgres\PostgresDbFactory.cs" />
     <Compile Include="Processors\Postgres\PostgresProcessor.cs" />
     <Compile Include="Processors\Postgres\PostgresProcessorFactory.cs" />
     <Compile Include="Processors\ProcessorFactory.cs" />
     <Compile Include="Processors\ProcessorOptions.cs" />
+    <Compile Include="Processors\IDbFactory.cs" />
+    <Compile Include="Processors\DbFactoryBase.cs" />
+    <Compile Include="Processors\ReflectionBasedDbFactory.cs" />
+    <Compile Include="Processors\Sqlite\SqliteDbFactory.cs" />
+    <Compile Include="Processors\SqlServer\SqlServerCeDbFactory.cs" />
+    <Compile Include="Processors\SqlServer\SqlServerDbFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServerCeProcessor.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2008ProcessorFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2005ProcessorFactory.cs" />
@@ -228,6 +224,7 @@
     <Compile Include="ProfileLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StopWatch.cs" />
+    <Compile Include="Versioning\IVersionInfo.cs" />
     <Compile Include="Versioning\VersionInfo.cs" />
     <Compile Include="Versioning\VersionMigration.cs" />
     <Compile Include="VersionLoader.cs" />
@@ -239,7 +236,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-	<None Include="..\FluentMigrator.snk">
+    <None Include="..\FluentMigrator.snk">
       <Link>FluentMigrator.snk</Link>
     </None>
     <Content Include="SQLServerCENative\amd64\Microsoft.VC90.CRT\msvcr90.dll">

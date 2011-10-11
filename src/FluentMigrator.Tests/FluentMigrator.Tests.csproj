@@ -98,6 +98,12 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup>
+    <SignAssembly>false</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>FluentMigrator.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Moq, Version=3.1.416.3, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
@@ -120,6 +126,7 @@
       <HintPath>..\..\lib\nunit.should.dll</HintPath>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -139,6 +146,11 @@
   <ItemGroup>
     <Compile Include="Helpers\PostgresTestTable.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
+    <Compile Include="Unit\Builders\IfDatabase\IfDatabaseExpressionRootTests.cs" />
+    <Compile Include="Integration\Migrations\Nested\Group1\AnotherFromGroup1.cs" />
+    <Compile Include="Integration\Migrations\Nested\Group1\FromGroup1.cs" />
+    <Compile Include="Integration\Migrations\Nested\Group2\FromGroup2.cs" />
+    <Compile Include="Integration\Migrations\Nested\NotGrouped.cs" />
     <Compile Include="Integration\PerformDBOperationTests.cs" />
     <Compile Include="Integration\IntegrationTestBase.cs" />
     <Compile Include="Integration\MigrationRunnerTests.cs" />
@@ -158,6 +170,9 @@
     <Compile Include="Integration\VersionMigrationTests.cs" />
     <Compile Include="Unit\AnnouncerTests.cs" />
     <Compile Include="Unit\AssemblyLoader\AssemblyLoaderTests.cs" />
+    <Compile Include="Unit\Builders\Alter\AlterExpressionRootTests.cs" />
+    <Compile Include="Unit\Builders\Alter\AlterColumnExpressionBuilderTests.cs" />
+    <Compile Include="Unit\Builders\Alter\AlterTableExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateIndexExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateExpressionRootTests.cs" />
     <Compile Include="Unit\Builders\Delete\DeleteIndexExpressionBuilderTests.cs" />
@@ -173,7 +188,12 @@
     <Compile Include="Unit\Builders\Create\CreateTableExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateColumnExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Schema\SchemaExpressionRootTest.cs" />
+    <Compile Include="Unit\Initialization\ConnectionStringManagerTests.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Unit\Initialization\NetConfigManagerTests.cs" />
     <Compile Include="Unit\Expressions\AlterSchemaExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\AlterColumnExpressionTests.cs" />
     <Compile Include="Unit\Expressions\DeleteIndexExpressionTests.cs" />
     <Compile Include="Unit\Expressions\DeleteForeignKeyExpressionTests.cs" />
     <Compile Include="Unit\Expressions\CreateForeignKeyExpressionTests.cs" />
@@ -247,6 +267,7 @@
     <Compile Include="Integration\Migrations\VersionedMigration.cs" />
     <Compile Include="Unit\StopWatchTests.cs" />
     <Compile Include="Unit\TaskExecutorTests.cs" />
+    <Compile Include="Unit\TestVersionLoader.cs" />
     <Compile Include="Unit\TestVersionTableMetaData.cs" />
     <Compile Include="Unit\Versioning\VersionInfoTests.cs" />
     <Compile Include="Unit\VersionLoaderTests.cs" />
@@ -270,9 +291,15 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="FluentMigrator.snk" />
     <None Include="testscript.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Unit\Initialization\Fixtures\FromMachineConfig.config" />
+    <None Include="Unit\Initialization\Fixtures\WithConnectionString.config" />
+    <None Include="Unit\Initialization\Fixtures\WithConnectionString.exe.config" />
+    <None Include="Unit\Initialization\Fixtures\WithNoConnectionString.exe.config" />
+    <None Include="Unit\Initialization\Fixtures\WithWrongConnectionString.config" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -292,9 +319,19 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Embeddedtestscript.sql">
+    <EmbeddedResource Include="EmbeddedResources\Embeddedtestscript.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="EmbeddedResources\DropInitialSchema.sql" />
+    <EmbeddedResource Include="EmbeddedResources\InitialSchema.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="EmbeddedResources\A\NotUniqueResource.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="EmbeddedResources\B\NotUniqueResource.sql" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

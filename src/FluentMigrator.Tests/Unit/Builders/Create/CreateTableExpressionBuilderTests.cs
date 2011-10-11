@@ -233,7 +233,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 			var contextMock = new Mock<IMigrationContext>();
 
 			var columnMock = new Mock<ColumnDefinition>();
-			columnMock.SetupSet(c => c.DefaultValue = value).AtMostOnce();
+            columnMock.VerifySet(c => c.DefaultValue = value, Times.AtMostOnce());
 
 			var expressionMock = new Mock<CreateTableExpression>();
 
@@ -290,7 +290,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingReferencesAddsNewForeignKeyExpressionToContext()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Setup(x => x.Add(It.Is<CreateForeignKeyExpression>(
+			collectionMock.Verify(x => x.Add(It.Is<CreateForeignKeyExpression>(
 				fk => fk.ForeignKey.Name == "fk_foo" &&
 						fk.ForeignKey.ForeignTable == "FooTable" &&
 						fk.ForeignKey.ForeignColumns.Contains("BarColumn") &&
@@ -298,10 +298,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 						fk.ForeignKey.PrimaryTable == "Bacon" &&
 						fk.ForeignKey.PrimaryColumns.Contains("BaconId") &&
 						fk.ForeignKey.PrimaryColumns.Count == 1
-												))).AtMostOnce();
+                                                )), Times.AtMostOnce());
 
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+            contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
 
 			var columnMock = new Mock<ColumnDefinition>();
 			columnMock.SetupGet(x => x.Name).Returns("BaconId");
@@ -320,7 +321,81 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 			contextMock.VerifyAll();
 			columnMock.VerifyAll();
 			expressionMock.VerifyAll();
-		}
+        }
+
+        [Test]
+        public void CallingReferencedByAddsNewForeignKeyExpressionToContext()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+            collectionMock.Verify(x => x.Add(It.Is<CreateForeignKeyExpression>(
+                fk => fk.ForeignKey.Name == "fk_foo" &&
+                        fk.ForeignKey.ForeignTable == "FooTable" &&
+                        fk.ForeignKey.ForeignColumns.Contains("BarColumn") &&
+                        fk.ForeignKey.ForeignColumns.Count == 1 &&
+                        fk.ForeignKey.PrimaryTable == "Bacon" &&
+                        fk.ForeignKey.PrimaryColumns.Contains("BaconId") &&
+                        fk.ForeignKey.PrimaryColumns.Count == 1
+                                                )), Times.AtMostOnce());
+
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+            contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
+
+            var columnMock = new Mock<ColumnDefinition>();
+            columnMock.SetupGet(x => x.Name).Returns("BaconId");
+
+            var expressionMock = new Mock<CreateTableExpression>();
+            expressionMock.SetupGet(x => x.TableName).Returns("Bacon");
+
+            var builder = new CreateTableExpressionBuilder(expressionMock.Object, contextMock.Object)
+                            {
+                                CurrentColumn = columnMock.Object
+                            };
+
+            builder.ReferencedBy("fk_foo", "FooTable", "BarColumn");
+
+            collectionMock.VerifyAll();
+            contextMock.VerifyAll();
+            columnMock.VerifyAll();
+            expressionMock.VerifyAll();
+        }
+
+        [Test]
+        public void CallingForeignKeyAddsNewForeignKeyExpressionToContext()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+            collectionMock.Verify(x => x.Add(It.Is<CreateForeignKeyExpression>(
+                fk => fk.ForeignKey.Name == "fk_foo" &&
+                        fk.ForeignKey.PrimaryTable == "FooTable" &&
+                        fk.ForeignKey.PrimaryColumns.Contains("BarColumn") &&
+                        fk.ForeignKey.PrimaryColumns.Count == 1 &&
+                        fk.ForeignKey.ForeignTable == "Bacon" &&
+                        fk.ForeignKey.ForeignColumns.Contains("BaconId") &&
+                        fk.ForeignKey.ForeignColumns.Count == 1
+                                                )), Times.AtMostOnce());
+
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+            contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
+
+            var columnMock = new Mock<ColumnDefinition>();
+            columnMock.SetupGet(x => x.Name).Returns("BaconId");
+
+            var expressionMock = new Mock<CreateTableExpression>();
+            expressionMock.SetupGet(x => x.TableName).Returns("Bacon");
+
+            var builder = new CreateTableExpressionBuilder(expressionMock.Object, contextMock.Object)
+                            {
+                                CurrentColumn = columnMock.Object
+                            };
+
+            builder.ForeignKey("fk_foo", "FooTable", "BarColumn");
+
+            collectionMock.VerifyAll();
+            contextMock.VerifyAll();
+            columnMock.VerifyAll();
+            expressionMock.VerifyAll();
+        }
 
 		[Test]
 		public void CallingWithColumnAddsNewColumnToExpression()
@@ -328,10 +403,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 			const string name = "BaconId";
 
 			var collectionMock = new Mock<IList<ColumnDefinition>>();
-			collectionMock.Setup(x => x.Add(It.Is<ColumnDefinition>(c => c.Name.Equals(name)))).AtMostOnce();
+            collectionMock.Verify(x => x.Add(It.Is<ColumnDefinition>(c => c.Name.Equals(name))), Times.AtMostOnce());
 
 			var expressionMock = new Mock<CreateTableExpression>();
-			expressionMock.SetupGet(e => e.Columns).Returns(collectionMock.Object).AtMostOnce();
+			expressionMock.SetupGet(e => e.Columns).Returns(collectionMock.Object);
+            expressionMock.VerifyGet(e => e.Columns, Times.AtMostOnce());
 
 			var contextMock = new Mock<IMigrationContext>();
 
@@ -345,7 +421,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		private void VerifyColumnProperty<T>(T expected, Expression<Func<ColumnDefinition, T>> columnExpression, Action<CreateTableExpressionBuilder> callToTest)
 		{
 			var columnMock = new Mock<ColumnDefinition>();
-			columnMock.SetupSet(columnExpression).AtMostOnce();
+            columnMock.VerifySet(columnExpression, Times.AtMostOnce());
 
 			var expressionMock = new Mock<CreateTableExpression>();
 
@@ -363,7 +439,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		private void VerifyColumnDbType(DbType expected, Action<CreateTableExpressionBuilder> callToTest)
 		{
 			var columnMock = new Mock<ColumnDefinition>();
-			columnMock.SetupSet(c => c.Type = expected).AtMostOnce();
+            columnMock.VerifySet(c => c.Type = expected, Times.AtMostOnce());
 
 			var expressionMock = new Mock<CreateTableExpression>();
 
@@ -381,7 +457,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		private void VerifyColumnSize(int expected, Action<CreateTableExpressionBuilder> callToTest)
 		{
 			var columnMock = new Mock<ColumnDefinition>();
-			columnMock.SetupSet(c => c.Size = expected).AtMostOnce();
+            columnMock.VerifySet(c => c.Size = expected, Times.AtMostOnce());
 
 			var expressionMock = new Mock<CreateTableExpression>();
 
@@ -398,7 +474,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		private void VerifyColumnPrecision(int expected, Action<CreateTableExpressionBuilder> callToTest)
 		{
 			var columnMock = new Mock<ColumnDefinition>();
-			columnMock.SetupSet(c => c.Precision = expected).AtMostOnce();
+            columnMock.VerifySet(c => c.Precision = expected, Times.AtMostOnce());
 
 			var expressionMock = new Mock<CreateTableExpression>();
 

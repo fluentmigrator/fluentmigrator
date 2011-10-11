@@ -10,77 +10,78 @@ using FluentMigrator.VersionTableInfo;
 
 namespace FluentMigrator.Runner
 {
-	public class VersionLoader : IVersionLoader
-	{
-		public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions, string group)
-		{
-			Runner = runner;
-			Processor = runner.Processor;
-			Assembly = assembly;
+    public class VersionLoader : IVersionLoader
+    {
+        public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions, string group)
+        {
+            Runner = runner;
+            Processor = runner.Processor;
+            Assembly = assembly;
             Group = group;
 
-			Conventions = conventions;
-			VersionTableMetaData = GetVersionTableMetaData();
-			VersionMigration = new VersionMigration(VersionTableMetaData);
-		    VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
+            Conventions = conventions;
+            VersionTableMetaData = GetVersionTableMetaData();
+            VersionMigration = new VersionMigration(VersionTableMetaData);
+            VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
 
-			LoadVersionInfo();
-		}
+            LoadVersionInfo();
+        }
 
-	    protected VersionSchemaMigration VersionSchemaMigration { get; set; }
+        protected VersionSchemaMigration VersionSchemaMigration { get; set; }
 
-	    private VersionInfo _versionInfo;
-		public IMigrationRunner Runner { get; set; }
-		protected Assembly Assembly { get; set; }
-		public IVersionTableMetaData VersionTableMetaData { get; set; }
-		private IMigrationConventions Conventions { get; set; }
-		private IMigrationProcessor Processor { get; set; }
-		private IMigration VersionMigration { get; set; }
+        private IVersionInfo _versionInfo;
+        public IMigrationRunner Runner { get; set; }
+        protected Assembly Assembly { get; set; }
+        public IVersionTableMetaData VersionTableMetaData { get; private set; }
+        private IMigrationConventions Conventions { get; set; }
+        private IMigrationProcessor Processor { get; set; }
+        private IMigration VersionMigration { get; set; }
         private string Group { get; set; }
 
-		public void UpdateVersionInfo( long version )
-		{
-			var dataExpression = new InsertDataExpression();
-			dataExpression.Rows.Add( CreateVersionInfoInsertionData( version ) );
-			dataExpression.TableName = VersionTableMetaData.TableName;
-			dataExpression.SchemaName = VersionTableMetaData.SchemaName;
-			dataExpression.ExecuteWith( Processor );
-		}
+        public void UpdateVersionInfo(long version)
+        {
+            var dataExpression = new InsertDataExpression();
+            dataExpression.Rows.Add(CreateVersionInfoInsertionData(version));
+            dataExpression.TableName = VersionTableMetaData.TableName;
+            dataExpression.SchemaName = VersionTableMetaData.SchemaName;
+            dataExpression.ExecuteWith(Processor);
+        }
 
-		public IVersionTableMetaData GetVersionTableMetaData()
-		{
-			Type matchedType = Assembly.GetExportedTypes().Where(t => Conventions.TypeIsVersionTableMetaData(t)).FirstOrDefault();
+        public IVersionTableMetaData GetVersionTableMetaData()
+        {
+            Type matchedType = Assembly.GetExportedTypes().Where(t => Conventions.TypeIsVersionTableMetaData(t)).FirstOrDefault();
 
-			if (matchedType == null)
-			{
-				return new DefaultVersionTableMetaData();
-			}
+            if (matchedType == null)
+            {
+                return new DefaultVersionTableMetaData();
+            }
 
-			return (IVersionTableMetaData)Activator.CreateInstance(matchedType);
-		}
+            return (IVersionTableMetaData)Activator.CreateInstance(matchedType);
+        }
 
-		protected virtual InsertionDataDefinition CreateVersionInfoInsertionData( long version )
-		{
-			return new InsertionDataDefinition { 
+
+        protected virtual InsertionDataDefinition CreateVersionInfoInsertionData( long version )
+        {
+            return new InsertionDataDefinition { 
                 new KeyValuePair<string, object>( VersionTableMetaData.ColumnName, version ),
                 new KeyValuePair<string, object>( VersionTableMetaData.GroupName, Group )
             };
-		}
+        }
 
-		public VersionInfo VersionInfo
-		{
-			get
-			{
-				return _versionInfo;
-			}
-			set
-			{
-				if (value == null)
-					throw new ArgumentException("Cannot set VersionInfo to null");
+        public IVersionInfo VersionInfo
+        {
+            get
+            {
+                return _versionInfo;
+            }
+            set
+            {
+                if (value == null)
+                    throw new ArgumentException("Cannot set VersionInfo to null");
 
-				_versionInfo = value;
-			}
-		}
+                _versionInfo = value;
+            }
+        }
 
         public bool AlreadyCreatedVersionSchema
         {
@@ -90,70 +91,70 @@ namespace FluentMigrator.Runner
             }
         }
 
-		public bool AlreadyCreatedVersionTable
-		{
-			get
-			{
-				return Processor.TableExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
-			}
-		}
+        public bool AlreadyCreatedVersionTable
+        {
+            get
+            {
+                return Processor.TableExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
+            }
+        }
 
-		public void LoadVersionInfo()
-		{
-			if ( Processor.Options.PreviewOnly )
-			{
-				if ( !AlreadyCreatedVersionTable )
-				{
-					Runner.Up( VersionMigration );
-					VersionInfo = new VersionInfo();
-				}
-				else
-					VersionInfo = new VersionInfo();
+        public void LoadVersionInfo()
+        {
+            if (Processor.Options.PreviewOnly)
+            {
+                if (!AlreadyCreatedVersionTable)
+                {
+                    Runner.Up(VersionMigration);
+                    VersionInfo = new VersionInfo();
+                }
+                else
+                    VersionInfo = new VersionInfo();
 
-				return;
-			}
+                return;
+            }
 
             if (!AlreadyCreatedVersionSchema)
                 Runner.Up(VersionSchemaMigration);
 
-			if ( !AlreadyCreatedVersionTable )
-			{
-				Runner.Up( VersionMigration );
-				_versionInfo = new VersionInfo();
-				return;
-			}
+            if (!AlreadyCreatedVersionTable)
+            {
+                Runner.Up(VersionMigration);
+                _versionInfo = new VersionInfo();
+                return;
+            }
            
-			var dataSet = Processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName );
-			_versionInfo = new VersionInfo();
+            var dataSet = Processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
+            _versionInfo = new VersionInfo();
 
-			foreach ( DataRow row in dataSet.Tables[ 0 ].Rows )
-			{
+            foreach ( DataRow row in dataSet.Tables[ 0 ].Rows )
+            {
                 if ( string.Equals( row[ VersionTableMetaData.GroupName ], Group ) )
                     _versionInfo.AddAppliedMigration( long.Parse( row[ VersionTableMetaData.ColumnName ].ToString() ) );
-			}
-		}
+            }
+        }
 
-		public void RemoveVersionTable()
-		{
-		    var expression = new DeleteTableExpression {TableName = VersionTableMetaData.TableName, SchemaName = VersionTableMetaData.SchemaName};
-			expression.ExecuteWith( Processor );
+        public void RemoveVersionTable()
+        {
+            var expression = new DeleteTableExpression { TableName = VersionTableMetaData.TableName, SchemaName = VersionTableMetaData.SchemaName };
+            expression.ExecuteWith(Processor);
 
             if (!string.IsNullOrEmpty(VersionTableMetaData.SchemaName))
             {
-                var schemaExpression = new DeleteSchemaExpression {SchemaName = VersionTableMetaData.SchemaName};
+                var schemaExpression = new DeleteSchemaExpression { SchemaName = VersionTableMetaData.SchemaName };
                 schemaExpression.ExecuteWith(Processor);
             }
-		}
+        }
 
-		public void DeleteVersion(long version)
-		{
-			var expression = new DeleteDataExpression { TableName = VersionTableMetaData.TableName, SchemaName=VersionTableMetaData.SchemaName };
-			expression.Rows.Add(new DeletionDataDefinition
+        public void DeleteVersion(long version)
+        {
+            var expression = new DeleteDataExpression { TableName = VersionTableMetaData.TableName, SchemaName = VersionTableMetaData.SchemaName };
+            expression.Rows.Add(new DeletionDataDefinition
 									{
 										new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version),
 										new KeyValuePair<string, object>(VersionTableMetaData.GroupName, Group)
 									});
-			expression.ExecuteWith( Processor );
-		}
-	}
+            expression.ExecuteWith(Processor);
+        }
+    }
 }

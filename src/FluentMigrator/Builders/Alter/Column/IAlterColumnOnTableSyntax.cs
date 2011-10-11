@@ -22,6 +22,6 @@ namespace FluentMigrator.Builders.Alter.Column
 {
 	public interface IAlterColumnOnTableSyntax : IFluentSyntax
 	{
-		IAlterColumnAsTypeSyntax OnTable(string name);
+		IAlterColumnAsTypeOrInSchemaSyntax OnTable(string name);
 	}
 }

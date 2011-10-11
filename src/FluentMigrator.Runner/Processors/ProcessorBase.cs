@@ -16,146 +16,144 @@
 //
 #endregion
 
-using System.Collections.Generic;
-using FluentMigrator.Model;
 using FluentMigrator.Builders.Execute;
-using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Processors
 {
-	public abstract class ProcessorBase : IMigrationProcessor
-	{
-		protected readonly IMigrationGenerator Generator;
-		protected readonly IAnnouncer Announcer;
-		public IMigrationProcessorOptions Options { get; private set; }
+    public abstract class ProcessorBase : IMigrationProcessor
+    {
+        protected readonly IMigrationGenerator Generator;
+        protected readonly IAnnouncer Announcer;
+        public IMigrationProcessorOptions Options { get; private set; }
+        public abstract string DatabaseType { get; }
 
-		protected ProcessorBase(IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
-		{
-			Generator = generator;
-			Announcer = announcer;
-			Options = options;
-		}
+        protected ProcessorBase(IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
+        {
+            Generator = generator;
+            Announcer = announcer;
+            Options = options;
+        }
 
-		public virtual void Process(CreateSchemaExpression expression)
-		{
-			Process(Generator.Generate(expression));
-		}
+        public virtual void Process(CreateSchemaExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
 
-		public virtual void Process(DeleteSchemaExpression expression)
-		{
-			Process(Generator.Generate(expression));
-		}
+        public virtual void Process(DeleteSchemaExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
 
-		public virtual void Process(CreateTableExpression expression)
-		{
-			Process(Generator.Generate(expression));
-		}
+        public virtual void Process(CreateTableExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
 
         public virtual void Process(AlterTableExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-		public virtual void Process(AlterColumnExpression expression)
-		{
-			Process(Generator.Generate(expression));
-		}
+        public virtual void Process(AlterColumnExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
 
-		public virtual void Process(CreateColumnExpression expression)
-		{
-			Process(Generator.Generate(expression));
-		}
+        public virtual void Process(CreateColumnExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
 
-		public virtual void Process(DeleteTableExpression expression)
-		{
-			Process(Generator.Generate(expression));
-		}
+        public virtual void Process(DeleteTableExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
 
-		public virtual void Process(DeleteColumnExpression expression)
-		{
-			Process(Generator.Generate(expression));
-		}
+        public virtual void Process(DeleteColumnExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
 
-		public virtual void Process(CreateForeignKeyExpression expression)
-		{
-			Process(Generator.Generate(expression));
-		}
+        public virtual void Process(CreateForeignKeyExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
 
-		public virtual void Process(DeleteForeignKeyExpression expression)
-		{
-			Process(Generator.Generate(expression));
-		}
+        public virtual void Process(DeleteForeignKeyExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
 
-		public virtual void Process(CreateIndexExpression expression)
-		{
-			Process(Generator.Generate(expression));
-		}
+        public virtual void Process(CreateIndexExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
 
-		public virtual void Process(DeleteIndexExpression expression)
-		{
-			Process(Generator.Generate(expression));
-		}
+        public virtual void Process(DeleteIndexExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
 
-		public virtual void Process(RenameTableExpression expression)
-		{
-			Process(Generator.Generate(expression));
-		}
+        public virtual void Process(RenameTableExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
 
-		public virtual void Process(RenameColumnExpression expression)
-		{
-			Process(Generator.Generate(expression));
-		}
+        public virtual void Process(RenameColumnExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
 
-		public void Process(InsertDataExpression expression)
-		{
-			Process(Generator.Generate(expression));
-		}
+        public void Process(InsertDataExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
 
-		public void Process(DeleteDataExpression expression)
-		{
-			Process(Generator.Generate(expression));
-		}
+        public void Process(DeleteDataExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
 
-		public void Process(AlterDefaultConstraintExpression expression)
-		{
-			Process(Generator.Generate(expression));
-		}
+        public void Process(AlterDefaultConstraintExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
 
         public void Process(UpdateDataExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-		public abstract void Process(PerformDBOperationExpression expression);
+        public abstract void Process(PerformDBOperationExpression expression);
 
         public void Process(AlterSchemaExpression expression)
         {
-          Process(Generator.Generate(expression));
+            Process(Generator.Generate(expression));
         }
 
-		protected abstract void Process(string sql);
+        protected abstract void Process(string sql);
 
-		public virtual void BeginTransaction()
-		{
-		}
+        public virtual void BeginTransaction()
+        {
+        }
 
-		public virtual void CommitTransaction()
-		{
-		}
+        public virtual void CommitTransaction()
+        {
+        }
 
-		public virtual void RollbackTransaction()
-		{
-		}
+        public virtual void RollbackTransaction()
+        {
+        }
 
         public abstract System.Data.DataSet ReadTableData(string schemaName, string tableName);
-		public abstract System.Data.DataSet Read(string template, params object[] args);
-		public abstract bool Exists(string template, params object[] args);
-		public abstract void Execute(string template, params object[] args);
-		public abstract bool SchemaExists(string schemaName);
-		public abstract bool TableExists(string schemaName, string tableName);
-		public abstract bool ColumnExists(string schemaName, string tableName, string columnName);
-		public abstract bool ConstraintExists(string schemaName, string tableName, string constraintName);
-        public abstract bool IndexExists(string schemaName, string tableName, string indexName);        
+        public abstract System.Data.DataSet Read(string template, params object[] args);
+        public abstract bool Exists(string template, params object[] args);
+        public abstract void Execute(string template, params object[] args);
+        public abstract bool SchemaExists(string schemaName);
+        public abstract bool TableExists(string schemaName, string tableName);
+        public abstract bool ColumnExists(string schemaName, string tableName, string columnName);
+        public abstract bool ConstraintExists(string schemaName, string tableName, string constraintName);
+        public abstract bool IndexExists(string schemaName, string tableName, string indexName);
     }
 }

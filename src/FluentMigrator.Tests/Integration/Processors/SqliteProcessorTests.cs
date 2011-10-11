@@ -17,11 +17,10 @@
 #endregion
 
 using System.Data;
-using System.Data.SQLite;
+using System.Data.Common;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Sqlite;
 using Moq;
@@ -31,13 +30,13 @@ using FluentMigrator.Runner.Generators.SQLite;
 
 namespace FluentMigrator.Tests.Integration.Processors
 {
-	[TestFixture]
+    [TestFixture]
 	public class SqliteProcessorTests
 	{
-		private SQLiteConnection connection;
+		private DbConnection connection;
 		private SqliteProcessor processor;
 		private Mock<ColumnDefinition> column;
-		private SQLiteCommand command;
+		private DbCommand command;
 		private string columnName;
 		private string tableName;
         private string tableNameThanMustBeEscaped;
@@ -46,12 +45,13 @@ namespace FluentMigrator.Tests.Integration.Processors
 		public void SetUp()
 		{
 			// This connection used in the tests
-			connection = new SQLiteConnection { ConnectionString = "Data Source=:memory:;Version=3;New=True;" };
-			connection.Open();
-			command = connection.CreateCommand();
+		    var factory = new SqliteDbFactory();
+            connection = factory.CreateConnection("Data Source=:memory:;Version=3;New=True;");
+		    connection.Open();
+		    command = connection.CreateCommand();
 
-			// SUT
-			processor = new SqliteProcessor(connection, new SqliteGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+		    // SUT
+		    processor = new SqliteProcessor(connection, new SqliteGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), factory);
 
 			column = new Mock<ColumnDefinition>();
             tableName = "NewTable";
@@ -65,14 +65,16 @@ namespace FluentMigrator.Tests.Integration.Processors
 		[Test]
 		public void CanDefaultAutoIncrementColumnTypeToInteger()
 		{
-			ColumnDefinition column = new ColumnDefinition();
-			column.Name = "Id";
-			column.IsIdentity = true;
-			column.IsPrimaryKey = true;
-			column.Type = DbType.Int64;
-			column.IsNullable = false;
+		    var column = new ColumnDefinition
+		                     {
+		                         Name = "Id",
+		                         IsIdentity = true,
+		                         IsPrimaryKey = true,
+		                         Type = DbType.Int64,
+		                         IsNullable = false
+		                     };
 
-			CreateTableExpression expression = new CreateTableExpression { TableName = tableName };
+		    var expression = new CreateTableExpression { TableName = tableName };
 			expression.Columns.Add(column);
 
 			using (command)
@@ -86,7 +88,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 		[Test]
 		public void CanCreateTableExpression()
 		{
-			CreateTableExpression expression = new CreateTableExpression { TableName = tableName };
+			var expression = new CreateTableExpression { TableName = tableName };
 			expression.Columns.Add(column.Object);
 
 			using (command)
@@ -100,7 +102,7 @@ namespace FluentMigrator.Tests.Integration.Processors
         [Test]
         public void IsEscapingTableNameCorrectlyOnTableCreate()
         {
-            CreateTableExpression expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
+            var expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
             expression.Columns.Add(column.Object);
             processor.Process(expression);
         }
@@ -108,7 +110,7 @@ namespace FluentMigrator.Tests.Integration.Processors
         [Test]
         public void IsEscapingTableNameCorrectlyOnReadTableData()
         {
-            CreateTableExpression expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
+            var expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
             expression.Columns.Add(column.Object);
             processor.Process(expression);
             processor.ReadTableData(null, tableNameThanMustBeEscaped).Tables.Count.ShouldBe(1);
@@ -117,7 +119,7 @@ namespace FluentMigrator.Tests.Integration.Processors
         [Test]
         public void IsEscapingTableNameCorrectlyOnTableExists()
         {
-            CreateTableExpression expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
+            var expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
             expression.Columns.Add(column.Object);
             processor.Process(expression);
             processor.TableExists(null, tableNameThanMustBeEscaped).ShouldBeTrue();
@@ -126,14 +128,12 @@ namespace FluentMigrator.Tests.Integration.Processors
         [Test]
         public void IsEscapingTableNameCorrectlyOnColumnExists()
         {
-            string columnName = "123ColumnName";
+            const string columnName = "123ColumnName";
 
-            CreateTableExpression expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
+            var expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
             expression.Columns.Add(new ColumnDefinition() { Name = "123ColumnName", Type = DbType.AnsiString, IsNullable = true });
             processor.Process(expression);
             processor.ColumnExists(null, tableNameThanMustBeEscaped, columnName).ShouldBeTrue();
         }
-
-
 	}
 }

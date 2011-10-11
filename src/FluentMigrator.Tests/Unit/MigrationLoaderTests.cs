@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.CodeDom;
 using System.CodeDom.Compiler;
 using System.Reflection;
@@ -61,6 +62,55 @@ namespace FluentMigrator.Tests.Unit
 			var migrationList = loader.FindMigrations();
 			migrationList.Select(x => x.Type).ShouldNotContain(typeof(VersionedMigration));
 			migrationList.Count().ShouldBeGreaterThan(0);
+		}
+
+		[Test]
+		public void DefaultBehaviorIsToNotLoadNestedNamespaces()
+		{
+			var conventions = new MigrationConventions();
+			var asm = Assembly.GetExecutingAssembly();
+			var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Nested");
+
+			loader.LoadNestedNamespaces.ShouldBe(false);
+		}
+
+		[Test]
+		public void FindsMigrationsInNestedNamepsaceWhenLoadNestedNamespacesEnabled()
+		{
+			var conventions = new MigrationConventions();
+			var asm = Assembly.GetExecutingAssembly();
+			var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Nested", true);
+
+			List<Type> expected = new List<Type>()
+			{
+				typeof(Integration.Migrations.Nested.NotGrouped),
+				typeof(Integration.Migrations.Nested.Group1.FromGroup1),
+				typeof(Integration.Migrations.Nested.Group1.AnotherFromGroup1),
+				typeof(Integration.Migrations.Nested.Group2.FromGroup2),
+			};
+
+			var migrationList = loader.FindMigrations();
+			List<Type> actual = migrationList.Select(m => m.Type).ToList();
+
+			CollectionAssert.AreEquivalent(expected, actual);
+		}
+
+		[Test]
+		public void DoesNotFindsMigrationsInNestedNamepsaceWhenLoadNestedNamespacesDisabled()
+		{
+			var conventions = new MigrationConventions();
+			var asm = Assembly.GetExecutingAssembly();
+			var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Nested", false);
+
+			List<Type> expected = new List<Type>()
+			{
+				typeof(Integration.Migrations.Nested.NotGrouped),
+			};
+
+			var migrationList = loader.FindMigrations();
+			List<Type> actual = migrationList.Select(m => m.Type).ToList();
+
+			CollectionAssert.AreEquivalent(expected, actual);
 		}
 	}
 }

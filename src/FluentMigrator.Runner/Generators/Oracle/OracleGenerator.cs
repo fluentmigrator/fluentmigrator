@@ -1,33 +1,46 @@
-﻿
+﻿#region License
+
+// 
+// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+
+#endregion
+
+using System;
+using System.Collections.Generic;
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
+using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.Oracle
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Data;
-    using System.Text;
-    using FluentMigrator.Expressions;
-    using FluentMigrator.Model;
-    using FluentMigrator.Runner.Generators.Generic;
-    using FluentMigrator.Runner.Generators.Base;
 
-	public class OracleGenerator : GenericGenerator
-	{
+    public class OracleGenerator : GenericGenerator
+    {
         public OracleGenerator()
             : base(new OracleColumn(), new OracleQuoter())
-		{
-		}
+        {
+        }
 
-        public override string AddColumn { get  { return "ALTER TABLE {0} ADD {1}"; } }
+        public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
 
-        public override string RenameTable { get { return "ALTER TABLE {0} RENAME TO {1}";  } }
+        public override string AlterColumn { get { return "ALTER TABLE {0} MODIFY {1}"; } }
+
+        public override string RenameTable { get { return "ALTER TABLE {0} RENAME TO {1}"; } }
 
         public override string InsertData { get { return "INTO {0} ({1}) VALUES ({2})"; } }
-
-        //public override string Generate(AlterColumnExpression expression)
-        //{
-        //    return String.Format("ALTER TABLE {0} MODIFY {1}", expression.TableName, Column.Generate(expression.Column));
-        //}
 
         //public override string Generate(CreateTableExpression expression)
         //{
@@ -124,11 +137,11 @@ namespace FluentMigrator.Runner.Generators.Oracle
         //    return String.Format("ALTER TABLE {0} RENAME COLUMN {1} TO {2}", expression.TableName, expression.OldName, expression.NewName);
         //}
 
-		public override string Generate(InsertDataExpression expression)
-		{
-            List<string> columnNames = new List<string>();
-            List<string> columnValues = new List<string>();
-            List<string> insertStrings = new List<string>();
+        public override string Generate(InsertDataExpression expression)
+        {
+            var columnNames = new List<string>();
+            var columnValues = new List<string>();
+            var insertStrings = new List<string>();
 
             foreach (InsertionDataDefinition row in expression.Rows)
             {
@@ -145,8 +158,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 insertStrings.Add(String.Format(InsertData, Quoter.QuoteTableName(expression.TableName), columns, values));
             }
             return "INSERT ALL " + String.Join(" ", insertStrings.ToArray()) + " SELECT 1 FROM DUAL";
-
-		}
+        }
 
 
         //public override string Generate(UpdateDataExpression expression)
@@ -208,10 +220,10 @@ namespace FluentMigrator.Runner.Generators.Oracle
         //    return result.ToString();
         //}
 
-		public override string Generate(AlterDefaultConstraintExpression expression)
-		{
-			throw new NotImplementedException();
-		}
+        public override string Generate(AlterDefaultConstraintExpression expression)
+        {
+            throw new NotImplementedException();
+        }
 
         //private string GetColumnList(IEnumerable<string> columns)
         //{
@@ -251,5 +263,5 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         //    return string.Format(" ON {0} {1}", onWhat, action);
         //}
-	}
+    }
 }

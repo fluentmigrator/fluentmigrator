@@ -18,135 +18,142 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Data;
-using System.Data.SQLite;
+using System.Data.Common;
 
 using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.Sqlite
 {
-	public class SqliteProcessor : ProcessorBase
-	{
-		public SQLiteConnection Connection { get; set; }
 
-		public SqliteProcessor(SQLiteConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
-			: base(generator, announcer, options)
-		{
-			Connection = connection;
-		}
+    public class SqliteProcessor : ProcessorBase
+    {
+        private readonly DbFactoryBase factory;
+        public DbConnection Connection { get; set; }
 
-		public override bool SchemaExists(string schemaName)
-		{
-		    return true;
-		}
+        public override string DatabaseType
+        {
+            get { return "Sqlite"; }
+        }
+
+        public SqliteProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, DbFactoryBase factory)
+            : base(generator, announcer, options)
+        {
+            this.factory = factory;
+            Connection = connection;
+        }
+
+        public override bool SchemaExists(string schemaName)
+        {
+            return true;
+        }
 
         public override bool TableExists(string schemaName, string tableName)
-		{
+        {
             return Exists("select count(*) from sqlite_master where name=\"{0}\" and type='table'", tableName);
-		}
+        }
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
-		{
-		    return Read("PRAGMA table_info([{0}])",tableName).Tables[0].Select(string.Format("Name='{0}'",columnName.Replace("'","''"))).Length>0;
+        {
+            return Read("PRAGMA table_info([{0}])", tableName).Tables[0].Select(string.Format("Name='{0}'", columnName.Replace("'", "''"))).Length > 0;
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
-		{
-			return false;
-		}
+        {
+            return false;
+        }
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             return Exists("select count(*) from sqlite_master where name='{0}' and tbl_name='{1}' and type='index'", indexName, tableName);
         }
 
-		public override void Execute(string template, params object[] args)
-		{
-			Process(String.Format(template, args));
-		}
+        public override void Execute(string template, params object[] args)
+        {
+            Process(String.Format(template, args));
+        }
 
-		public override bool Exists(string template, params object[] args)
-		{
-			if (Connection.State != ConnectionState.Open) Connection.Open();
+        public override bool Exists(string template, params object[] args)
+        {
+            if (Connection.State != ConnectionState.Open) Connection.Open();
 
-			using (var command = new SQLiteCommand(String.Format(template, args), Connection))
-			using (var reader = command.ExecuteReader())
-			{
-				try
-				{
-					if (!reader.Read()) return false;
-					if (int.Parse(reader[0].ToString()) <= 0) return false;
-					return true;
-				}
-				catch
-				{
-					return false;
-				}
-			}
-		}
+            using (var command = factory.CreateCommand(String.Format(template, args), Connection))
+            using (var reader = command.ExecuteReader())
+            {
+                try
+                {
+                    if (!reader.Read()) return false;
+                    if (int.Parse(reader[0].ToString()) <= 0) return false;
+                    return true;
+                }
+                catch
+                {
+                    return false;
+                }
+            }
+        }
 
         public override DataSet ReadTableData(string schemaName, string tableName)
-		{
-			return Read("select * from [{0}]", tableName);
-		}
+        {
+            return Read("select * from [{0}]", tableName);
+        }
 
-		public override void Process(PerformDBOperationExpression expression)
-		{
-			if (Connection.State != ConnectionState.Open) Connection.Open();
-				
-			if (expression.Operation != null)
-				expression.Operation(Connection, null);
-		}
+        public override void Process(PerformDBOperationExpression expression)
+        {
+            if (Connection.State != ConnectionState.Open) Connection.Open();
 
-		protected override void Process(string sql)
-		{
-			Announcer.Sql(sql);
+            if (expression.Operation != null)
+                expression.Operation(Connection, null);
+        }
 
-			if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
-				return;
+        protected override void Process(string sql)
+        {
+            Announcer.Sql(sql);
 
-			if (Connection.State != ConnectionState.Open)
-				Connection.Open();
+            if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
+                return;
+
+            if (Connection.State != ConnectionState.Open)
+                Connection.Open();
 
             if (sql.Contains("GO"))
             {
-                ExecuteBatchNonQuery(sql, Connection);
+                ExecuteBatchNonQuery(sql);
 
             }
             else
             {
-                ExecuteNonQuery(sql, Connection);
+                ExecuteNonQuery(sql);
             }
 
-			
-		}
 
-        private void ExecuteNonQuery(string sql, SQLiteConnection connection)
+        }
+
+        private void ExecuteNonQuery(string sql)
         {
-            using (var command = new SQLiteCommand(sql, Connection))
+            using (var command = factory.CreateCommand(sql, Connection))
             {
                 try
                 {
                     command.ExecuteNonQuery();
                 }
-                catch (SQLiteException ex)
+                catch (DbException ex)
                 {
-                    throw new SQLiteException(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
+                    throw new Exception(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
                 }
             }
         }
 
-        private void ExecuteBatchNonQuery(string sql, SQLiteConnection conn)
+        private void ExecuteBatchNonQuery(string sql)
         {
             sql += "\nGO";   // make sure last batch is executed.
             string sqlBatch = string.Empty;
-            
-            using (var command = new SQLiteCommand(sql, Connection))
+
+            using (var command = factory.CreateCommand(sql, Connection))
             {
                 try
                 {
-                    foreach (string line in sql.Split(new string[2] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries))
+                    foreach (string line in sql.Split(new[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries))
                     {
                         if (line.ToUpperInvariant().Trim() == "GO")
                         {
@@ -163,24 +170,24 @@ namespace FluentMigrator.Runner.Processors.Sqlite
                         }
                     }
                 }
-                 catch (SQLiteException ex)
+                catch (DbException ex)
                 {
-                    throw new SQLiteException(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
+                    throw new Exception(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
                 }
             }
         }
 
-		public override DataSet Read(string template, params object[] args)
-		{
-			if (Connection.State != ConnectionState.Open) Connection.Open();
+        public override DataSet Read(string template, params object[] args)
+        {
+            if (Connection.State != ConnectionState.Open) Connection.Open();
 
-			DataSet ds = new DataSet();
-			using (var command = new SQLiteCommand(String.Format(template, args), Connection))
-			using (SQLiteDataAdapter adapter = new SQLiteDataAdapter(command))
-			{
-				adapter.Fill(ds);
-				return ds;
-			}
-		}
-	}
+            var ds = new DataSet();
+            using (var command = factory.CreateCommand(String.Format(template, args), Connection))
+            using (var adapter = factory.CreateDataAdapter(command))
+            {
+                adapter.Fill(ds);
+                return ds;
+            }
+        }
+    }
 }

@@ -17,138 +17,172 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Data;
 using FluentMigrator.Builders.Execute;
-using MySql.Data.MySqlClient;
 
 namespace FluentMigrator.Runner.Processors.MySql
 {
-	public class MySqlProcessor : ProcessorBase
-	{
-		public MySqlConnection Connection { get; set; }
+	using System.Data.Common;
 
-		public MySqlProcessor(MySqlConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
-			: base(generator, announcer, options)
-		{
-			Connection = connection;
-		}
+	public class MySqlProcessor : ProcessorBase
+    {
+		private readonly IDbFactory factory;
+		private DbConnection Connection { get; set; }
+
+        public override string DatabaseType
+        {
+            get { return "MySql"; }
+        }
+
+        public MySqlProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+            : base(generator, announcer, options)
+        {
+        	this.factory = factory;
+        	Connection = connection;
+        }
 
 		public override bool SchemaExists(string schemaName)
-		{
-			throw new NotImplementedException();
-		}
+        {
+            return true;
+        }
 
         public override bool TableExists(string schemaName, string tableName)
-		{
-			return Exists(@"select table_name from information_schema.tables 
-							where table_schema = SCHEMA() and table_name='{0}'", tableName);
-		}
+        {
+            return Exists(@"select table_name from information_schema.tables 
+							where table_schema = SCHEMA() and table_name='{0}'", FormatSqlEscape(tableName));
+        }
 
-        public override bool ColumnExists(string schemaName, string tableName, string columnName)
-		{
-			string sql = @"select column_name from information_schema.columns
+	    public override bool ColumnExists(string schemaName, string tableName, string columnName)
+        {
+        	const string sql = @"select column_name from information_schema.columns
 							where table_schema = SCHEMA() and table_name='{0}'
 							and column_name='{1}'";
-			return Exists(sql, tableName, columnName);
-		}
+            return Exists(sql, FormatSqlEscape(tableName), FormatSqlEscape(columnName));
+        }
 
-        public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
-		{
-			string sql = @"select constraint_name from information_schema.table_constraints
+    	public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
+        {
+        	const string sql = @"select constraint_name from information_schema.table_constraints
 							where table_schema = SCHEMA() and table_name='{0}'
 							and constraint_name='{1}'";
-			return Exists(sql, tableName, constraintName);
-		}
+            return Exists(sql, FormatSqlEscape(tableName), FormatSqlEscape(constraintName));
+        }
 
-        public override bool IndexExists(string schemaName, string tableName, string indexName)
-		{
-			string sql = @"select index_name from information_schema.statistics
+    	public override bool IndexExists(string schemaName, string tableName, string indexName)
+        {
+        	const string sql = @"select index_name from information_schema.statistics
 							where table_schema = SCHEMA() and table_name='{0}'
 							and index_name='{1}'";
-			return Exists(sql, tableName, indexName);
-		}
+            return Exists(sql, FormatSqlEscape(tableName), FormatSqlEscape(indexName));
+        }
 
-		public override void Execute(string template, params object[] args)
-		{
-			if (Connection.State != ConnectionState.Open) Connection.Open();
+    	public override void Execute(string template, params object[] args)
+        {
+            if (Connection.State != ConnectionState.Open) Connection.Open();
 
-			using (var command = new MySqlCommand(String.Format(template, args), Connection))
-			{
-				command.CommandTimeout = Options.Timeout;
-				command.ExecuteNonQuery();
-			}
-		}
+            using (var command = factory.CreateCommand(String.Format(template, args), Connection))
+            {
+                command.CommandTimeout = Options.Timeout;
+                command.ExecuteNonQuery();
+            }
+        }
 
-		public override bool Exists(string template, params object[] args)
-		{
-			if (Connection.State != ConnectionState.Open) Connection.Open();
+        public override bool Exists(string template, params object[] args)
+        {
+            if (Connection.State != ConnectionState.Open) Connection.Open();
 
-			using (var command = new MySqlCommand(String.Format(template, args), Connection))
-			{
-				command.CommandTimeout = Options.Timeout;
-				using (var reader = command.ExecuteReader())
-				{
-					try
-					{
-						if (!reader.Read())
-							return false;
-
-						return true;
-					}
-					catch
-					{
-						return false;
-					}
-				}
-			}
-		}
+			using (var command = factory.CreateCommand(String.Format(template, args), Connection))
+            {
+                command.CommandTimeout = Options.Timeout;
+                using (var reader = command.ExecuteReader())
+                {
+                    try
+                    {
+                    	return reader.Read();
+                    }
+                    catch
+                    {
+                        return false;
+                    }
+                }
+            }
+        }
 
         public override DataSet ReadTableData(string schemaName, string tableName)
-		{
-			return Read("select * from {0}", tableName);
-		}
+        {
+            return Read("select * from {0}", tableName);
+        }
 
-		public override DataSet Read(string template, params object[] args)
-		{
-			if (Connection.State != ConnectionState.Open) Connection.Open();
+        public override DataSet Read(string template, params object[] args)
+        {
+            if (Connection.State != ConnectionState.Open) Connection.Open();
 
-			DataSet ds = new DataSet();
-			using (var command = new MySqlCommand(String.Format(template, args), Connection))
-			{
-				command.CommandTimeout = Options.Timeout;
+            var ds = new DataSet();
+            using (var command =  factory.CreateCommand(String.Format(template, args), Connection))
+            {
+                command.CommandTimeout = Options.Timeout;
 
-				using (MySqlDataAdapter adapter = new MySqlDataAdapter(command))
-				{
-					adapter.Fill(ds);
-					return ds;
-				}
-			}
-		}
+				using (var adapter = factory.CreateDataAdapter(command))
+                {
+                    adapter.Fill(ds);
+                    return ds;
+                }
+            }
+        }
 
-		protected override void Process(string sql)
-		{
-			Announcer.Sql(sql);
+        protected override void Process(string sql)
+        {
+            Announcer.Sql(sql);
 
-			if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
-				return;
+            if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
+                return;
 
-			if (Connection.State != ConnectionState.Open)
-				Connection.Open();
+            if (Connection.State != ConnectionState.Open)
+                Connection.Open();
 
-			using (var command = new MySqlCommand(sql, Connection))
-			{
-				command.CommandTimeout = Options.Timeout;
-				command.ExecuteNonQuery();
-			}
-		}
+			using (var command = factory.CreateCommand(sql, Connection))
+            {
+                command.CommandTimeout = Options.Timeout;
+                command.ExecuteNonQuery();
+            }
+        }
 
-		public override void Process(PerformDBOperationExpression expression)
-		{
-			if (Connection.State != ConnectionState.Open) Connection.Open();
+        public override void Process(PerformDBOperationExpression expression)
+        {
+            if (Connection.State != ConnectionState.Open) Connection.Open();
 
-			if (expression.Operation != null)
-				expression.Operation(Connection, null);
-		}
-	}
+            if (expression.Operation != null)
+                expression.Operation(Connection, null);
+        }
+
+        public override void Process(Expressions.RenameColumnExpression expression)
+        {
+            string columnDefinitionSql = string.Format(@"
+SELECT CONCAT(
+          CAST(COLUMN_TYPE AS CHAR),
+          IF(ISNULL(CHARACTER_SET_NAME),
+             '',
+             CONCAT(' CHARACTER SET ', CHARACTER_SET_NAME)),
+          IF(ISNULL(COLLATION_NAME),
+             '',
+             CONCAT(' COLLATE ', COLLATION_NAME)),
+          ' ',
+          IF(IS_NULLABLE = 'NO', 'NOT NULL ', ''),
+          IF(IS_NULLABLE = 'NO' AND COLUMN_DEFAULT IS NULL,
+             '',
+             CONCAT('DEFAULT ', QUOTE(COLUMN_DEFAULT), ' ')),
+          UPPER(extra))
+  FROM INFORMATION_SCHEMA.COLUMNS
+ WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'", FormatSqlEscape(expression.TableName), FormatSqlEscape(expression.OldName));
+
+            var columnDefinition = Read(columnDefinitionSql).Tables[0].Rows[0].Field<string>(0);
+
+            Process(Generator.Generate(expression) + columnDefinition);
+        }
+
+        private static string FormatSqlEscape(string value)
+        {
+            return value.Replace("'", "''");
+        }
+    }
 }

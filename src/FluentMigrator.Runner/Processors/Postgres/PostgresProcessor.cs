@@ -1,25 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using System.Linq;
-using System.Text;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Runner.Generators.Postgres;
-using Npgsql;
 
 namespace FluentMigrator.Runner.Processors.Postgres
 {
-    public class PostgresProcessor : ProcessorBase
-    {
-        PostgresQuoter Quoter=new PostgresQuoter();
-        public NpgsqlConnection Connection { get; set; }
-        public NpgsqlTransaction Transaction { get; private set; }
-        public bool WasCommitted { get; private set; }
+	using System.Data.Common;
 
-        public PostgresProcessor(NpgsqlConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options) : base(generator, announcer, options)
+	public class PostgresProcessor : ProcessorBase
+    {
+		private readonly IDbFactory factory;
+		readonly PostgresQuoter quoter = new PostgresQuoter();
+        public DbConnection Connection { get; private set; }
+        public DbTransaction Transaction { get; private set; }
+
+		public override string DatabaseType
         {
-            Connection = connection;
+            get { return "Postgres"; }
+        }
+
+        public PostgresProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+            : base(generator, announcer, options)
+        {
+        	this.factory = factory;
+        	Connection = connection;
             connection.Open();
             Transaction = connection.BeginTransaction();
         }
@@ -31,42 +36,41 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
         public override bool SchemaExists(string schemaName)
         {
-			return Exists("select * from information_schema.schemata where schema_name = '{0}'", Quoter.UnQuoteSchemaName(schemaName));
+            return Exists("select * from information_schema.schemata where schema_name = '{0}'", FormatToSafeSchemaName(schemaName));
         }
 
         public override bool TableExists(string schemaName, string tableName)
         {
-			return Exists("select * from information_schema.tables where table_schema = '{0}' and table_name = '{1}'", Quoter.UnQuoteSchemaName(schemaName), Quoter.UnQuote(tableName));
+            return Exists("select * from information_schema.tables where table_schema = '{0}' and table_name = '{1}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(tableName));
         }
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
-			return Exists("select * from information_schema.columns where table_schema = '{0}' and table_name = '{1}' and column_name = '{2}'", Quoter.UnQuoteSchemaName(schemaName), Quoter.UnQuote(tableName), Quoter.UnQuote(columnName));
+            return Exists("select * from information_schema.columns where table_schema = '{0}' and table_name = '{1}' and column_name = '{2}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(tableName), FormatToSafeName(columnName));
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
-            //return Exists("select * from pg_catalog.pg_constraint con inner join pg_class cls on con.conrelid = cls.oid where cls.relname = '{0}' and con.conname = '{1}'", tableName, constraintName);
-			return Exists("select * from information_schema.table_constraints where constraint_catalog = current_catalog and table_schema = '{0}' and table_name = '{1}' and constraint_name = '{2}'", Quoter.UnQuoteSchemaName(schemaName), Quoter.UnQuote(tableName), Quoter.UnQuote(constraintName));
+            return Exists("select * from information_schema.table_constraints where constraint_catalog = current_catalog and table_schema = '{0}' and table_name = '{1}' and constraint_name = '{2}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(tableName), FormatToSafeName(constraintName));
         }
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
-			return Exists("select * from pg_catalog.pg_indexes where schemaname='{0}' and tablename = '{1}' and indexname = '{2}'", Quoter.UnQuoteSchemaName(schemaName),Quoter.UnQuote(tableName), Quoter.UnQuote(indexName));
+            return Exists("select * from pg_catalog.pg_indexes where schemaname='{0}' and tablename = '{1}' and indexname = '{2}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(tableName), FormatToSafeName(indexName));
         }
 
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
-			return Read("SELECT * FROM {0}.{1}", Quoter.QuoteSchemaName(schemaName), Quoter.QuoteTableName(tableName));
+            return Read("SELECT * FROM {0}.{1}", quoter.QuoteSchemaName(schemaName), quoter.QuoteTableName(tableName));
         }
 
         public override DataSet Read(string template, params object[] args)
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
-            DataSet ds = new DataSet();
-            using (NpgsqlCommand command = new NpgsqlCommand(String.Format(template, args), Connection, Transaction))
-            using (NpgsqlDataAdapter adapter = new NpgsqlDataAdapter(command))
+            var ds = new DataSet();
+			using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
+			using (var adapter = factory.CreateDataAdapter(command))
             {
                 adapter.Fill(ds);
                 return ds;
@@ -78,7 +82,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
-            using (var command = new NpgsqlCommand(String.Format(template, args), Connection, Transaction))
+			using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -95,8 +99,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
             Announcer.Say("Committing Transaction");
             Transaction.Commit();
-            WasCommitted = true;
-            if (Connection.State != ConnectionState.Closed)
+        	if (Connection.State != ConnectionState.Closed)
             {
                 Connection.Close();
             }
@@ -106,8 +109,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
             Announcer.Say("Rolling back transaction");
             Transaction.Rollback();
-            WasCommitted = true;
-            if (Connection.State != ConnectionState.Closed)
+        	if (Connection.State != ConnectionState.Closed)
             {
                 Connection.Close();
             }
@@ -123,7 +125,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
-            using (var command = new NpgsqlCommand(sql, Connection, Transaction))
+            using (var command = factory.CreateCommand(sql, Connection, Transaction))
             {
                 try
                 {
@@ -132,7 +134,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
                 }
                 catch (Exception ex)
                 {
-                    using (StringWriter message = new StringWriter())
+                    using (var message = new StringWriter())
                     {
                         message.WriteLine("An error occurred executing the following sql:");
                         message.WriteLine(sql);
@@ -152,6 +154,19 @@ namespace FluentMigrator.Runner.Processors.Postgres
                 expression.Operation(Connection, Transaction);
         }
 
-        
+		private string FormatToSafeSchemaName(string schemaName)
+        {
+            return FormatSqlEscape(quoter.UnQuoteSchemaName(schemaName));
+        }
+
+		private string FormatToSafeName(string sqlName)
+        {
+            return FormatSqlEscape(quoter.UnQuote(sqlName));
+        }
+
+		private static string FormatSqlEscape(string sql)
+        {
+            return sql.Replace("'", "''");
+        }
     }
 }

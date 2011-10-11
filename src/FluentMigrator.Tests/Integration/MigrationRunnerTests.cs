@@ -46,9 +46,6 @@ namespace FluentMigrator.Tests.Integration
 		{
 			_runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
 										{
-											Database = "sqlserver",
-											Target = GetType().Assembly.Location,
-											Connection = IntegrationTestOptions.SqlServer.ConnectionString,
 											Namespace = "FluentMigrator.Tests.Integration.Migrations"
 										};
 		}
@@ -119,7 +116,7 @@ namespace FluentMigrator.Tests.Integration
                     runner.Up(new TestForeignKeyNamingConventionWithSchema());
 
                     processor.ConstraintExists("TestSchema", "Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeTrue();
-                    runner.Down(new TestForeignKeyNamingConvention());
+                    runner.Down(new TestForeignKeyNamingConventionWithSchema());
                 }, false, typeof(SqliteProcessor));
         }
 
@@ -153,7 +150,7 @@ namespace FluentMigrator.Tests.Integration
                     processor.IndexExists("TestSchema", "Users", "IX_Users_GroupId").ShouldBeTrue();
                     processor.TableExists("TestSchema", "Users").ShouldBeTrue();
 
-                    runner.Down(new TestIndexNamingConvention());
+                    runner.Down(new TestIndexNamingConventionWithSchema());
                     processor.IndexExists("TestSchema", "Users", "IX_Users_GroupId").ShouldBeFalse();
                     processor.TableExists("TestSchema", "Users").ShouldBeFalse();
                 });
@@ -191,18 +188,21 @@ namespace FluentMigrator.Tests.Integration
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
+                    runner.Up(new TestCreateSchema());
+
                     runner.Up(new TestCreateAndDropTableMigrationWithSchema());
                     processor.IndexExists("TestSchema", "TestTable", "IX_TestTable_Name").ShouldBeFalse();
 
-                    runner.Up(new TestCreateAndDropIndexMigration());
+                    runner.Up(new TestCreateAndDropIndexMigrationWithSchema());
                     processor.IndexExists("TestSchema", "TestTable", "IX_TestTable_Name").ShouldBeTrue();
 
-                    runner.Down(new TestCreateAndDropIndexMigration());
+                    runner.Down(new TestCreateAndDropIndexMigrationWithSchema());
                     processor.IndexExists("TestSchema", "TestTable", "IX_TestTable_Name").ShouldBeFalse();
 
-                    runner.Down(new TestCreateAndDropTableMigration());
+                    runner.Down(new TestCreateAndDropTableMigrationWithSchema());
                     processor.IndexExists("TestSchema", "TestTable", "IX_TestTable_Name").ShouldBeFalse();
 
+                    runner.Down(new TestCreateSchema());
                     //processor.CommitTransaction();
                 });
         }
@@ -241,19 +241,23 @@ namespace FluentMigrator.Tests.Integration
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
+                    runner.Up(new TestCreateSchema());
+
                     runner.Up(new TestCreateAndDropTableMigrationWithSchema());
                     processor.TableExists("TestSchema", "TestTable2").ShouldBeTrue();
 
-                    runner.Up(new TestRenameTableMigration());
+                    runner.Up(new TestRenameTableMigrationWithSchema());
                     processor.TableExists("TestSchema", "TestTable2").ShouldBeFalse();
                     processor.TableExists("TestSchema", "TestTable'3").ShouldBeTrue();
 
-                    runner.Down(new TestRenameTableMigration());
+                    runner.Down(new TestRenameTableMigrationWithSchema());
                     processor.TableExists("TestSchema", "TestTable'3").ShouldBeFalse();
                     processor.TableExists("TestSchema", "TestTable2").ShouldBeTrue();
 
-                    runner.Down(new TestCreateAndDropTableMigration());
+                    runner.Down(new TestCreateAndDropTableMigrationWithSchema());
                     processor.TableExists("TestSchema", "TestTable2").ShouldBeFalse();
+
+                    runner.Down(new TestCreateSchema());
 
                     //processor.CommitTransaction();
                 });
@@ -291,19 +295,23 @@ namespace FluentMigrator.Tests.Integration
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
+                    runner.Up(new TestCreateSchema());
+
                     runner.Up(new TestCreateAndDropTableMigrationWithSchema());
                     processor.ColumnExists("TestSchema", "TestTable2", "Name").ShouldBeTrue();
 
-                    runner.Up(new TestRenameColumnMigration());
+                    runner.Up(new TestRenameColumnMigrationWithSchema());
                     processor.ColumnExists("TestSchema", "TestTable2", "Name").ShouldBeFalse();
                     processor.ColumnExists("TestSchema", "TestTable2", "Name'3").ShouldBeTrue();
 
-                    runner.Down(new TestRenameColumnMigration());
+                    runner.Down(new TestRenameColumnMigrationWithSchema());
                     processor.ColumnExists("TestSchema", "TestTable2", "Name'3").ShouldBeFalse();
                     processor.ColumnExists("TestSchema", "TestTable2", "Name").ShouldBeTrue();
 
-                    runner.Down(new TestCreateAndDropTableMigration());
+                    runner.Down(new TestCreateAndDropTableMigrationWithSchema());
                     processor.ColumnExists("TestSchema", "TestTable2", "Name").ShouldBeFalse();
+
+                    runner.Down(new TestCreateSchema());
 				}, true, typeof(SqliteProcessor));
         }
 
@@ -389,7 +397,7 @@ namespace FluentMigrator.Tests.Integration
 				ExecuteWithSupportedProcessors(processor =>
 				{
 					MigrationRunner testRunner = SetupMigrationRunner(processor);
-					testRunner.MigrateDown(1);
+					testRunner.MigrateDown(0);
 
 					testRunner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeFalse();
 					processor.TableExists(null, "Users").ShouldBeFalse();
@@ -430,11 +438,11 @@ namespace FluentMigrator.Tests.Integration
 		[Test]
 		public void MigrateUpWithSqlServerProcessorShouldCommitItsTransaction()
 		{
-			if (!IntegrationTestOptions.SqlServer.IsEnabled)
+			if (!IntegrationTestOptions.SqlServer2008.IsEnabled)
 				return;
 
-			var connection = new SqlConnection(IntegrationTestOptions.SqlServer.ConnectionString);
-			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+			var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
+			var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
 
 			MigrationRunner runner = SetupMigrationRunner(processor);
 			runner.MigrateUp();
@@ -453,11 +461,11 @@ namespace FluentMigrator.Tests.Integration
 		[Test]
 		public void MigrateUpSpecificVersionWithSqlServerProcessorShouldCommitItsTransaction()
 		{
-			if (!IntegrationTestOptions.SqlServer.IsEnabled)
+			if (!IntegrationTestOptions.SqlServer2008.IsEnabled)
 				return;
 
-			var connection = new SqlConnection(IntegrationTestOptions.SqlServer.ConnectionString);
-			var processor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+			var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
+			var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
 
 			MigrationRunner runner = SetupMigrationRunner(processor);
 			runner.MigrateUp(1);
@@ -491,7 +499,7 @@ namespace FluentMigrator.Tests.Integration
 			{
 				connection.Close();
 
-				var cleanupProcessor = new SqlServerProcessor(connection, new SqlServer2000Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+				var cleanupProcessor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
 				MigrationRunner cleanupRunner = SetupMigrationRunner(cleanupProcessor);
 				cleanupRunner.RollbackToVersion(0);
 
@@ -639,6 +647,7 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
+            Create.Schema("TestSchema");
             Create.Table("Users")
                 .InSchema("TestSchema")
                 .WithColumn("UserId").AsInt32().Identity().PrimaryKey()
@@ -656,8 +665,9 @@ namespace FluentMigrator.Tests.Integration
 
         public override void Down()
         {
-            Delete.Table("Users");
-            Delete.Table("Groups");
+            Delete.Table("Users").InSchema("TestSchema");
+            Delete.Table("Groups").InSchema("TestSchema");
+            Delete.Schema("TestSchema");
         }
     }
 
@@ -665,6 +675,8 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
+            Create.Schema("TestSchema");
+
             Create.Table("Users")
                 .InSchema("TestSchema")
                 .WithColumn("UserId").AsInt32().Identity().PrimaryKey()
@@ -677,8 +689,9 @@ namespace FluentMigrator.Tests.Integration
 
         public override void Down()
         {
-            Delete.Index("IX_Users_GroupId").OnTable("Users").OnColumn("GroupId");
-            Delete.Table("Users");
+            Delete.Index("IX_Users_GroupId").OnTable("Users").InSchema("TestSchema").OnColumn("GroupId");
+            Delete.Table("Users").InSchema("TestSchema");
+            Delete.Schema("TestSchema");
         }
     }
 
@@ -745,5 +758,17 @@ namespace FluentMigrator.Tests.Integration
         }
     }
 
+    internal class TestCreateSchema : Migration
+    {
+        public override void Up()
+        {
+            Create.Schema("TestSchema");
+        }
+
+        public override void Down()
+        {
+            Delete.Schema("TestSchema");
+        }
+    }
 
 }

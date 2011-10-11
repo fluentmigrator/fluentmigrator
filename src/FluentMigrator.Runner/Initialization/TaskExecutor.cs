@@ -17,157 +17,86 @@
 #endregion
 
 using System;
-using System.Configuration;
-using System.IO;
-using System.Linq;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Processors;
 
 namespace FluentMigrator.Runner.Initialization
 {
-	public class TaskExecutor
-	{
-		private IMigrationRunner Runner { get; set; }
-		private IRunnerContext RunnerContext { get; set; }
-		private string ConfigFile;
-		private string ConnectionString;
+    public class TaskExecutor
+    {
+        private IMigrationRunner Runner { get; set; }
+        private IRunnerContext RunnerContext { get; set; }
 
-		private bool NotUsingConfig
-		{
-			get { return string.IsNullOrEmpty( ConfigFile ); }
-		}
+        public TaskExecutor(IRunnerContext runnerContext)
+        {
+            if (runnerContext == null)
+                throw new ArgumentNullException("runnerContext", "RunnerContext cannot be null");
 
-		public TaskExecutor(IRunnerContext runnerContext)
-		{
-			if (runnerContext == null)
-				throw new ArgumentNullException("runnerContext", "RunnerContext cannot be null");
+            RunnerContext = runnerContext;
+        }
 
-			RunnerContext = runnerContext;
-		}
+        private void Initialize()
+        {
+            var assembly = AssemblyLoaderFactory.GetAssemblyLoader(RunnerContext.Target).Load();
 
-		private void Initialize()
-		{
-			var assembly = AssemblyLoaderFactory.GetAssemblyLoader(RunnerContext.Target).Load();
+            var processor = InitializeProcessor(assembly.Location);
 
-			var processor = InitializeProcessor();
+            Runner = new MigrationRunner(assembly, RunnerContext, processor);
+        }
 
-			Runner = new MigrationRunner(assembly, RunnerContext, processor);
-		}
+        public void Execute()
+        {
+            Initialize();
 
-		public void Execute()
-		{
-			Initialize();
+            switch (RunnerContext.Task)
+            {
+                case null:
+                case "":
+                case "migrate":
+                case "migrate:up":
+                    if (RunnerContext.Version != 0)
+                        Runner.MigrateUp(RunnerContext.Version);
+                    else
+                        Runner.MigrateUp();
+                    break;
+                case "rollback":
+                    if (RunnerContext.Steps == 0)
+                        RunnerContext.Steps = 1;
+                    Runner.Rollback(RunnerContext.Steps);
+                    break;
+                case "rollback:toversion":
+                    Runner.RollbackToVersion(RunnerContext.Version);
+                    break;
+                case "rollback:all":
+                    Runner.RollbackToVersion(0);
+                    break;
+                case "migrate:down":
+                    Runner.MigrateDown(RunnerContext.Version);
+                    break;
+            }
 
-			switch (RunnerContext.Task)
-			{
-				case null:
-				case "":
-				case "migrate":
-				case "migrate:up":
-					if (RunnerContext.Version != 0)
-						Runner.MigrateUp(RunnerContext.Version);
-					else
-						Runner.MigrateUp();
-					break;
-				case "rollback":
-					if (RunnerContext.Steps == 0)
-						RunnerContext.Steps = 1;
-					Runner.Rollback(RunnerContext.Steps);
-					break;
-				case "rollback:toversion":
-					Runner.RollbackToVersion(RunnerContext.Version);
-					break;
-				case "rollback:all":
-					Runner.RollbackToVersion(0);
-					break;
-				case "migrate:down":
-					Runner.MigrateDown(RunnerContext.Version);
-					break;
-			}
-		}
+            RunnerContext.Announcer.Say("Task completed.");
+        }
 
-		public IMigrationProcessor InitializeProcessor()
-		{
-			var configFile = Path.Combine( Environment.CurrentDirectory, RunnerContext.Target );
-			if ( File.Exists( configFile + ".config" ) )
-			{
-				var config = ConfigurationManager.OpenExeConfiguration( configFile );
-				var connections = config.ConnectionStrings.ConnectionStrings;
+        private IMigrationProcessor InitializeProcessor(string assemblyLocation)
+        {
+            var manager = new ConnectionStringManager(new NetConfigManager(), RunnerContext.Connection, RunnerContext.ConnectionStringConfigPath, assemblyLocation, RunnerContext.Database);
 
-				if ( connections.Count > 1 )
-				{
-					if ( string.IsNullOrEmpty( RunnerContext.Connection ) )
-					{
-						ReadConnectionString( connections[ Environment.MachineName ], config.FilePath );
-					}
-					else
-					{
-						ReadConnectionString( connections[ RunnerContext.Connection ], config.FilePath );
-					}
-				}
-				else if ( connections.Count == 1 )
-				{
-					ReadConnectionString( connections[ 0 ], config.FilePath );
-				}
-			}
+            manager.LoadConnectionString();
 
-			if ( NotUsingConfig && !string.IsNullOrEmpty( RunnerContext.Connection ) )
-			{
-				ConnectionString = RunnerContext.Connection;
-			}
+            if (RunnerContext.Timeout == 0)
+            {
+                RunnerContext.Timeout = 30; // Set default timeout for command
+            }
 
-			if ( string.IsNullOrEmpty( ConnectionString ) )
-			{
-				throw new ArgumentException( "Connection String or Name is required \"/connection\"" );
-			}
+            var processorFactory = ProcessorFactory.GetFactory(RunnerContext.Database);
+            var processor = processorFactory.Create(manager.ConnectionString, RunnerContext.Announcer, new ProcessorOptions
+            {
+                PreviewOnly = RunnerContext.PreviewOnly,
+                Timeout = RunnerContext.Timeout
+            });
 
-			if ( string.IsNullOrEmpty( RunnerContext.Database ) )
-			{
-				throw new ArgumentException(
-					"Database Type is required \"/db [db type]\". Available db types is [sqlserver], [sqlite]" );
-			}
-
-			if ( NotUsingConfig )
-			{
-				Console.WriteLine( "Using Database {0} and Connection String {1}", RunnerContext.Database, ConnectionString );
-			}
-			else
-			{
-				Console.WriteLine( "Using Connection {0} from Configuration file {1}", RunnerContext.Connection, ConfigFile );
-			}
-
-			if ( RunnerContext.Timeout == 0 )
-			{
-				RunnerContext.Timeout = 30; // Set default timeout for command
-			}
-
-			var processorFactory = ProcessorFactory.GetFactory( RunnerContext.Database );
-			var processor = processorFactory.Create( ConnectionString, RunnerContext.Announcer, new ProcessorOptions
-			{
-				PreviewOnly = RunnerContext.PreviewOnly,
-				Timeout = RunnerContext.Timeout
-			} );
-
-			return processor;
-		}
-
-		private void ReadConnectionString( ConnectionStringSettings connection, string configurationFile )
-		{
-			if ( connection != null )
-			{
-				var factory = ProcessorFactory.Factories.Where( f => f.IsForProvider( connection.ProviderName ) ).FirstOrDefault();
-				if ( factory != null )
-				{
-					RunnerContext.Database = factory.Name;
-					RunnerContext.Connection = connection.Name;
-					ConnectionString = connection.ConnectionString;
-					ConfigFile = configurationFile;
-				}
-			}
-			else
-			{
-				Console.WriteLine( "connection is null!" );
-			}
-		}
-	}
+            return processor;
+        }
+    }
 }

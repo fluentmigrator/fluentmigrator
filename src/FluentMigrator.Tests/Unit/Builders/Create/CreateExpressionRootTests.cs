@@ -37,10 +37,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingTableAddsCreateTableExpressionToContextWithSpecifiedNameSet()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Setup(x => x.Add(It.Is<CreateTableExpression>(e => e.TableName.Equals("Bacon")))).AtMostOnce();
+            collectionMock.Verify(x => x.Add(It.Is<CreateTableExpression>(e => e.TableName.Equals("Bacon"))), Times.AtMostOnce());
 
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+            contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
 
 			var root = new CreateExpressionRoot(contextMock.Object);
 			root.Table("Bacon");
@@ -54,7 +55,8 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+            contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
 
 			var root = new CreateExpressionRoot(contextMock.Object);
 			var builder = root.Table("Bacon");
@@ -67,10 +69,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingColumnAddsCreateColumnExpressionToContextWithSpecifiedNameSet()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Setup(x => x.Add(It.Is<CreateColumnExpression>(e => e.Column.Name.Equals("Bacon")))).AtMostOnce();
+            collectionMock.Verify(x => x.Add(It.Is<CreateColumnExpression>(e => e.Column.Name.Equals("Bacon"))), Times.AtMostOnce());
 
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+			contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
 
 			var root = new CreateExpressionRoot(contextMock.Object);
 			root.Column("Bacon");
@@ -84,7 +87,8 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+			contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
 
 			var root = new CreateExpressionRoot(contextMock.Object);
 			var builder = root.Column("Bacon");
@@ -97,10 +101,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingForeignKeyWithoutNameAddsCreateForeignKeyExpressionToContext()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Setup(x => x.Add(It.IsAny<CreateForeignKeyExpression>())).AtMostOnce();
+            collectionMock.Verify(x => x.Add(It.IsAny<CreateForeignKeyExpression>()), Times.AtMostOnce());
 
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+			contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
 
 			var root = new CreateExpressionRoot(contextMock.Object);
 			root.ForeignKey();
@@ -113,10 +118,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingForeignKeyAddsCreateForeignKeyExpressionToContextWithSpecifiedNameSet()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Setup(x => x.Add(It.Is<CreateForeignKeyExpression>(e => e.ForeignKey.Name.Equals("FK_Bacon")))).AtMostOnce();
+            collectionMock.Verify(x => x.Add(It.Is<CreateForeignKeyExpression>(e => e.ForeignKey.Name.Equals("FK_Bacon"))), Times.AtMostOnce());
 
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+			contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
 
 			var root = new CreateExpressionRoot(contextMock.Object);
 			root.ForeignKey("FK_Bacon");
@@ -130,7 +136,8 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+			contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
 
 			var root = new CreateExpressionRoot(contextMock.Object);
 			var builder = root.ForeignKey();
@@ -144,7 +151,8 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+			contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
 
 			var root = new CreateExpressionRoot(contextMock.Object);
 			var builder = root.ForeignKey("FK_Bacon");
@@ -157,10 +165,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingIndexWithoutNameAddsCreateIndexExpressionToContext()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Setup(x => x.Add(It.IsAny<CreateIndexExpression>())).AtMostOnce();
+            collectionMock.Verify(x => x.Add(It.IsAny<CreateIndexExpression>()), Times.AtMostOnce());
 
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+			contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
 
 			var root = new CreateExpressionRoot(contextMock.Object);
 			root.Index();
@@ -173,10 +182,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		public void CallingIndexAddsCreateIndexExpressionToContextWithSpecifiedNameSet()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Setup(x => x.Add(It.Is<CreateIndexExpression>(e => e.Index.Name.Equals("IX_Bacon")))).AtMostOnce();
+            collectionMock.Verify(x => x.Add(It.Is<CreateIndexExpression>(e => e.Index.Name.Equals("IX_Bacon"))), Times.AtMostOnce());
 
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+			contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
 
 			var root = new CreateExpressionRoot(contextMock.Object);
 			root.Index("IX_Bacon");
@@ -190,7 +200,8 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+			contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
 
 			var root = new CreateExpressionRoot(contextMock.Object);
 			var builder = root.Index();
@@ -204,7 +215,8 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
 			var contextMock = new Mock<IMigrationContext>();
-			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object).AtMostOnce();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+			contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
 
 			var root = new CreateExpressionRoot(contextMock.Object);
 			var builder = root.Index("IX_Bacon");

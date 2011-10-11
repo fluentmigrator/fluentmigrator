@@ -1,12 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
-using FluentMigrator.Runner.Generators.Oracle;
-using NUnit.Should;
-using FluentMigrator.Expressions;
+﻿using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.Oracle;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {
@@ -55,6 +51,9 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public override void CanAlterColumn()
         {
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("ALTER TABLE TestTable1 MODIFY TestColumn1 NVARCHAR2(20) NOT NULL");
         }
 
         [Test]
@@ -63,7 +62,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
             string sql = generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT FK_Test FOREIGN KEY (TestColumn1) REFERENCES TestTable2 (TestColumn2)");
-	
         }
 
         [Test]
@@ -72,7 +70,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
             string sql = generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT FK_Test FOREIGN KEY (TestColumn1, TestColumn3) REFERENCES TestTable2 (TestColumn2, TestColumn4)");
-	
         }
 
         [Test]
@@ -86,14 +83,13 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = new AlterSchemaExpression();
             var result = generator.Generate(expression);
             result.ShouldBe(string.Empty);
-
         }
 
         [Test]
         public void CanAlterSchemaInStrictMode()
         {
             generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedExecption>(() => generator.Generate(new CreateSchemaExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(new CreateSchemaExpression()));
         }
     }
 }

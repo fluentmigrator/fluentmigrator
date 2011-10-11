@@ -120,8 +120,8 @@ namespace FluentMigrator.Runner.Generators.Generic
 			}
 
 			return String.Format(CreateIndex
+                , GetUniqueString(expression)
 				, GetClusterTypeString(expression)
-				, GetUniqueString(expression)
 				, Quoter.QuoteIndexName(expression.Index.Name)
 				, Quoter.QuoteTableName(expression.Index.TableName)
 				, String.Join(", ", indexColumns));

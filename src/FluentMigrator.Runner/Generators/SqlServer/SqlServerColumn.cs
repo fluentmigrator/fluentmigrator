@@ -11,6 +11,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
 		protected override string FormatDefaultValue(ColumnDefinition column)
 		{
+            if(column.DefaultValue is string && column.DefaultValue.ToString().EndsWith("()"))
+                return "DEFAULT " + column.DefaultValue.ToString();
+
 			var defaultValue = base.FormatDefaultValue(column);
 
 			if(!string.IsNullOrEmpty(defaultValue))
