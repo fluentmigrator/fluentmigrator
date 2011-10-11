@@ -253,7 +253,16 @@ namespace FluentMigrator.Runner
                     }
                 }
 
-                if (version == 0)
+                bool removeVersionTable = false;
+
+                // Only remove the version table if this is the very last migration
+                /*
+                var metadata = VersionLoader.GetVersionTableMetaData();
+                var data = Processor.ReadTableData(metadata.SchemaName, metadata.TableName);
+                removeVersionTable = (data.Tables[metadata.TableName].Rows.Count == 0);
+                */
+
+                if (removeVersionTable)
                     VersionLoader.RemoveVersionTable();
                 else
                     VersionLoader.LoadVersionInfo();
