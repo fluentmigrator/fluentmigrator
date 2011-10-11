@@ -26,6 +26,7 @@ namespace FluentMigrator.Tests.Unit
 	{
 		public const string TABLENAME = "testVersionTableName";
 		public const string COLUMNNAME = "testColumnName";
+        public const string GROUPCOLUMNNAME = "testGroupColumnName";
 
 		public TestVersionTableMetaData()
 		{
@@ -43,5 +44,15 @@ namespace FluentMigrator.Tests.Unit
 		{
 			get { return COLUMNNAME; }
 		}
+
+        public string GroupName
+        {
+            get { return GROUPCOLUMNNAME; }
+        }
+
+        public string DefaultGroupName
+        {
+            get { return ""; }
+        }
 	}
 }

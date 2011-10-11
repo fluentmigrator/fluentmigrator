@@ -31,20 +31,30 @@ namespace FluentMigrator.Runner
 		public string Namespace { get; private set; }
 		public bool LoadNestedNamespaces { get; private set; }
 		public SortedList<long, IMigration> Migrations { get; private set; }
+        public string Group { get; set; }
 
-		public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace)
+        public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace)
+            : this(conventions, assembly, @namespace, "") { }
+
+		public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, string group)
 		{
 			Conventions = conventions;
 			Assembly = assembly;
 			Namespace = @namespace;
+            Group = group;
 
 			Initialize();
 		}
-		public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, bool loadNestedNamespaces)
+
+        public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, bool loadNestedNamespaces)
+            : this(conventions, assembly, @namespace, "", loadNestedNamespaces) { }
+
+		public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, string group, bool loadNestedNamespaces)
 		{
 			Conventions = conventions;
 			Assembly = assembly;
 			Namespace = @namespace;
+            Group = group;
 			LoadNestedNamespaces = loadNestedNamespaces;
 
 			Initialize();
@@ -59,7 +69,8 @@ namespace FluentMigrator.Runner
 			if (migrationList == null)
 				return;
 
-			foreach (var migrationMetadata in migrationList)
+            // Only keep migrations from the selected group
+			foreach (var migrationMetadata in migrationList.Where(x => x.Group.Equals(Group)))
 			{
 				if (Migrations.ContainsKey(migrationMetadata.Version))
 					throw new Exception(String.Format("Duplicate migration version {0}.", migrationMetadata.Version));

@@ -25,5 +25,8 @@ namespace FluentMigrator.VersionTableInfo
         string SchemaName { get; }
 		string TableName { get; }
 		string ColumnName { get; }
+        string GroupName { get; }
+
+        string DefaultGroupName { get; }
 	}
 }

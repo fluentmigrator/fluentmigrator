@@ -56,8 +56,8 @@ namespace FluentMigrator.Runner
             if (!string.IsNullOrEmpty(runnerContext.WorkingDirectory))
                 Conventions.GetWorkingDirectory = () => runnerContext.WorkingDirectory;
 
-            VersionLoader = new VersionLoader(this, _migrationAssembly, Conventions);
-            MigrationLoader = new MigrationLoader(Conventions, _migrationAssembly, runnerContext.Namespace);
+            VersionLoader = new VersionLoader(this, _migrationAssembly, Conventions, runnerContext.Group);
+            MigrationLoader = new MigrationLoader(Conventions, _migrationAssembly, runnerContext.Namespace, runnerContext.Group);
             ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
         }
 
@@ -253,7 +253,16 @@ namespace FluentMigrator.Runner
                     }
                 }
 
-                if (version == 0)
+                bool removeVersionTable = false;
+
+                // Only remove the version table if this is the very last migration
+                /*
+                var metadata = VersionLoader.GetVersionTableMetaData();
+                var data = Processor.ReadTableData(metadata.SchemaName, metadata.TableName);
+                removeVersionTable = (data.Tables[metadata.TableName].Rows.Count == 0);
+                */
+
+                if (removeVersionTable)
                     VersionLoader.RemoveVersionTable();
                 else
                     VersionLoader.LoadVersionInfo();
