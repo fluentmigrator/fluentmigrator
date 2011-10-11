@@ -12,6 +12,9 @@ namespace FluentMigrator.Runner
 {
     public class VersionLoader : IVersionLoader
     {
+        public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions) :
+            this(runner, assembly, conventions, "") { }
+
         public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions, string group)
         {
             Runner = runner;
