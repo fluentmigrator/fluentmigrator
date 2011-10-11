@@ -25,6 +25,7 @@ namespace FluentMigrator.Runner
             Conventions = conventions;
             VersionTableMetaData = GetVersionTableMetaData();
             VersionMigration = new VersionMigration(VersionTableMetaData);
+            GroupVersionMigration = new VersionGroupMigration(VersionTableMetaData);
             VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
 
             LoadVersionInfo();
@@ -39,6 +40,7 @@ namespace FluentMigrator.Runner
         private IMigrationConventions Conventions { get; set; }
         private IMigrationProcessor Processor { get; set; }
         private IMigration VersionMigration { get; set; }
+        private IMigration GroupVersionMigration { get; set; }
         private string Group { get; set; }
 
         public void UpdateVersionInfo(long version)
@@ -102,18 +104,25 @@ namespace FluentMigrator.Runner
             }
         }
 
+        public bool AlreadyAppliedGroupMigration
+        {
+            get
+            {
+                return Processor.ColumnExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName, VersionTableMetaData.GroupName);
+            }
+        }
+
         public void LoadVersionInfo()
         {
             if (Processor.Options.PreviewOnly)
             {
                 if (!AlreadyCreatedVersionTable)
-                {
                     Runner.Up(VersionMigration);
-                    VersionInfo = new VersionInfo();
-                }
-                else
-                    VersionInfo = new VersionInfo();
 
+                if (!AlreadyAppliedGroupMigration)                
+                    Runner.Up(GroupVersionMigration);
+                
+                VersionInfo = new VersionInfo();
                 return;
             }
 
@@ -121,12 +130,15 @@ namespace FluentMigrator.Runner
                 Runner.Up(VersionSchemaMigration);
 
             if (!AlreadyCreatedVersionTable)
-            {
                 Runner.Up(VersionMigration);
+
+            if (!AlreadyAppliedGroupMigration)
+            {
+                Runner.Up(GroupVersionMigration);
                 _versionInfo = new VersionInfo();
                 return;
             }
-           
+
             var dataSet = Processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
             _versionInfo = new VersionInfo();
 
