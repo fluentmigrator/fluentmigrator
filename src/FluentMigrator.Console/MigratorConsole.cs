@@ -195,7 +195,7 @@ namespace FluentMigrator.Console
 				
                 if ( string.IsNullOrEmpty( Group ) )
                 {
-                    Group = "";
+                    Group = "";  // Should get this from the VersionTableMetadata...
                 }
                 if (string.IsNullOrEmpty(ProcessorType) ||
                     string.IsNullOrEmpty(Connection) ||
