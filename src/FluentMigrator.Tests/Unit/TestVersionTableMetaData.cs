@@ -49,5 +49,10 @@ namespace FluentMigrator.Tests.Unit
         {
             get { return GROUPCOLUMNNAME; }
         }
+
+        public string DefaultGroupName
+        {
+            get { return ""; }
+        }
 	}
 }
