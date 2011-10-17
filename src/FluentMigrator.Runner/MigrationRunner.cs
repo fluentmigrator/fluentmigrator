@@ -75,72 +75,56 @@ namespace FluentMigrator.Runner
 
         public void MigrateUp(bool useAutomaticTransactionManagement)
         {
-            try
-            {
-                foreach (var version in MigrationLoader.Migrations.Keys)
-                {
-                	var migrationMetadata = MigrationLoader.MigrationMetadata[version];
-
-					if (!migrationMetadata.Transactionless)
-                		Processor.BeginTransaction();
-
-                    ApplyMigrationUp(version);
-
-					if (!migrationMetadata.Transactionless)
-						Processor.CommitTransaction();
-                }
-
-                ApplyProfiles();
-            	Processor.CloseConnection();
-            	VersionLoader.LoadVersionInfo();
-            }
-            catch (Exception)
-            {
-				if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
-                throw;
-            }
-			finally
-			{
-				Processor.CloseConnection();
-			}
+			MigrateUpInner(useAutomaticTransactionManagement, MigrationLoader.Migrations.Keys, true);
         }
 
-        public void MigrateUp(long targetVersion)
+    	public void MigrateUp(long targetVersion)
         {
             MigrateUp(targetVersion, true);
         }
 
-        public void MigrateUp(long targetVersion, bool useAutomaticTransactionManagement)
+    	public void MigrateUp(long targetVersion, bool useAutomaticTransactionManagement)
         {
-            try
-            {
-                foreach (var neededMigrationVersion in GetUpMigrationsToApply(targetVersion))
-                {
-					var migrationMetadata = MigrationLoader.MigrationMetadata[neededMigrationVersion];
-
-					if (!migrationMetadata.Transactionless)
-						Processor.BeginTransaction();
-
-                    ApplyMigrationUp(neededMigrationVersion);
-
-					if (!migrationMetadata.Transactionless)
-						Processor.CommitTransaction();
-                }
-
-                VersionLoader.LoadVersionInfo();
-            }
-            catch (Exception)
-            {
-                if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
-                throw;
-            }
-			finally
-            {
-            	Processor.CloseConnection();
-            }
+			MigrateUpInner(useAutomaticTransactionManagement, GetUpMigrationsToApply(targetVersion), false);            
         }
 
-        private IEnumerable<long> GetUpMigrationsToApply(long version)
+    	private void MigrateUpInner(bool useAutomaticTransactionManagement, IEnumerable<long> versions, bool applyProfiles)
+    	{
+    		try
+    		{
+    			foreach (var version in versions)
+    			{
+    				var migrationMetadata = MigrationLoader.MigrationMetadata[version];
+
+    				if (!migrationMetadata.Transactionless)
+    					Processor.BeginTransaction();
+    				
+    				ApplyMigrationUp(version);
+
+    				if (!migrationMetadata.Transactionless)
+    					Processor.CommitTransaction();
+    			}
+
+				if (applyProfiles)
+					ApplyProfiles();
+
+    			VersionLoader.LoadVersionInfo();
+    		}
+    		catch (Exception)
+    		{
+    			if (useAutomaticTransactionManagement)
+    			{
+    				Processor.RollbackTransaction();
+    			}
+    			throw;
+    		}
+    		finally
+    		{
+    			Processor.CloseConnection();
+    		}
+    	}
+
+    	private IEnumerable<long> GetUpMigrationsToApply(long version)
         {
             return MigrationLoader.Migrations.Keys.Where(x => IsMigrationStepNeededForUpMigration(x, version));
         }
@@ -182,7 +166,6 @@ namespace FluentMigrator.Runner
         {
             return MigrationLoader.Migrations.Keys.Where(x => IsMigrationStepNeededForDownMigration(x, targetVersion));
         }
-
 
         private bool IsMigrationStepNeededForDownMigration(long versionOfMigration, long targetVersion)
         {
