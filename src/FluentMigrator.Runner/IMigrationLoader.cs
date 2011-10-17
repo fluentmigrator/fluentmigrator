@@ -25,6 +25,7 @@ namespace FluentMigrator.Runner
 	public interface IMigrationLoader
 	{
 		SortedList<long, IMigration> Migrations { get; }
+		Dictionary<long, IMigrationMetadata> MigrationMetadata { get; }
 		//IEnumerable<MigrationMetadata> FindMigrationsIn(Assembly assembly, string @namespace);
 	}
 }

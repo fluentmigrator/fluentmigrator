@@ -17,9 +17,7 @@
 #endregion
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -30,8 +28,6 @@ using FluentMigrator.Tests.Integration.Migrations;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
-using FluentMigrator.Runner.Versioning;
-using System.Data;
 
 namespace FluentMigrator.Tests.Unit
 {
@@ -47,12 +43,14 @@ namespace FluentMigrator.Tests.Unit
         private Mock<IProfileLoader> _profileLoaderMock;
         private Mock<IRunnerContext> _runnerContextMock;
         private SortedList<long, IMigration> _migrationList;
+        private Dictionary<long, IMigrationMetadata> _migrationMetadata;
         private TestVersionLoader _fakeVersionLoader;
 
         [SetUp]
         public void SetUp()
         {
             _migrationList = new SortedList<long, IMigration>();
+			_migrationMetadata = new Dictionary<long, IMigrationMetadata>();
             _runnerContextMock = new Mock<IRunnerContext>(MockBehavior.Loose);
             _processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
             _migrationLoaderMock = new Mock<IMigrationLoader>(MockBehavior.Loose);
@@ -76,6 +74,7 @@ namespace FluentMigrator.Tests.Unit
             _runnerContextMock.SetupGet(x => x.Database).Returns("sqlserver");
 
             _migrationLoaderMock.SetupGet(x => x.Migrations).Returns(_migrationList);
+            _migrationLoaderMock.SetupGet(x => x.MigrationMetadata).Returns(_migrationMetadata);
 
             _runner = new MigrationRunner(Assembly.GetAssembly(typeof(MigrationRunnerTests)), _runnerContextMock.Object, _processorMock.Object)
                         {
@@ -97,13 +96,28 @@ namespace FluentMigrator.Tests.Unit
 
         private void LoadVersionData(params long[] fakeVersions)
         {
+        	LoadVersionData(version => new MigrationMetadata
+        	                     	{
+        	                     		Type = typeof (TestMigration),
+        	                     		Version = version,
+        	                     		Transactionless = false
+        	                     	}, fakeVersions);
+        }
+		
+		private void LoadVersionData(Func<long, MigrationMetadata> factory, params long[] fakeVersions)
+        {
             _fakeVersionLoader.Versions.Clear();
             _runner.MigrationLoader.Migrations.Clear();
 
             foreach (var version in fakeVersions)
             {
                 _fakeVersionLoader.Versions.Add(version);
-                _runner.MigrationLoader.Migrations.Add(version, new TestMigration());
+
+            	var migrationMetadata = factory(version);
+            	var migration = (IMigration) Activator.CreateInstance(migrationMetadata.Type ?? typeof(TestMigration));
+
+            	_runner.MigrationLoader.Migrations.Add(version, migration);
+            	_runner.MigrationLoader.MigrationMetadata.Add(version, migrationMetadata);
             }
 
             _fakeVersionLoader.LoadVersionInfo();
@@ -340,6 +354,52 @@ namespace FluentMigrator.Tests.Unit
             //			_vrunner.Migrations[1].ShouldNotBeNull();
             //			_vrunner.Migrations[1].ShouldBeOfType<MigrationThatDoesNotInheritFromMigrationBaseClass>();
         }
+
+		[Test]
+		public void ShouldBeginTransactionBeforePerformingUpMigration()
+		{
+			LoadVersionData(1);
+
+			_runner.MigrateUp();
+
+			_processorMock.Verify(x => x.BeginTransaction());
+		}
+
+		[Test]
+		public void ShouldCommitTransactionAfterPerformingSuccessfullUpMigration()
+		{
+			LoadVersionData(1);
+
+			_runner.MigrateUp();
+
+			_processorMock.Verify(x => x.CommitTransaction());
+		}
+
+		[Test]
+		public void ShouldNotUseTransactionWhilePerformingUpTransactionlessMigration()
+		{
+			LoadVersionData(version => new MigrationMetadata
+			                           	{
+											Type = typeof(TestMigration),
+			                           		Version = version,
+											Transactionless = true
+			                           	}, 1);
+
+			_runner.MigrateUp();
+
+			_processorMock.Verify(x => x.BeginTransaction(), Times.Never());
+			_processorMock.Verify(x => x.CommitTransaction(), Times.Never());
+		}
+
+    	[Test]
+    	public void ShouldCloseConnectionOnlyOnceAfterPerformingAllUpMigrations()
+    	{
+    		LoadVersionData(1, 2, 3);
+
+			_runner.MigrateUp();
+
+			_processorMock.Verify(x => x.CloseConnection(), Times.Once());
+    	}
 
         private class MigrationThatDoesNotInheritFromMigrationBaseClass : IMigration
         {

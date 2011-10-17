@@ -79,19 +79,30 @@ namespace FluentMigrator.Runner
             {
                 foreach (var version in MigrationLoader.Migrations.Keys)
                 {
+                	var migrationMetadata = MigrationLoader.MigrationMetadata[version];
+
+					if (!migrationMetadata.Transactionless)
+                		Processor.BeginTransaction();
+
                     ApplyMigrationUp(version);
+
+					if (!migrationMetadata.Transactionless)
+						Processor.CommitTransaction();
                 }
 
                 ApplyProfiles();
-
-                if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
-                VersionLoader.LoadVersionInfo();
+            	Processor.CloseConnection();
+            	VersionLoader.LoadVersionInfo();
             }
             catch (Exception)
             {
-                if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
+				if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
                 throw;
             }
+			finally
+			{
+				Processor.CloseConnection();
+			}
         }
 
         public void MigrateUp(long targetVersion)
@@ -105,15 +116,27 @@ namespace FluentMigrator.Runner
             {
                 foreach (var neededMigrationVersion in GetUpMigrationsToApply(targetVersion))
                 {
+					var migrationMetadata = MigrationLoader.MigrationMetadata[neededMigrationVersion];
+
+					if (!migrationMetadata.Transactionless)
+						Processor.BeginTransaction();
+
                     ApplyMigrationUp(neededMigrationVersion);
+
+					if (!migrationMetadata.Transactionless)
+						Processor.CommitTransaction();
                 }
-                if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
+
                 VersionLoader.LoadVersionInfo();
             }
             catch (Exception)
             {
                 if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
                 throw;
+            }
+			finally
+            {
+            	Processor.CloseConnection();
             }
         }
 
@@ -122,7 +145,6 @@ namespace FluentMigrator.Runner
             return MigrationLoader.Migrations.Keys.Where(x => IsMigrationStepNeededForUpMigration(x, version));
         }
 
-
         private bool IsMigrationStepNeededForUpMigration(long versionOfMigration, long targetVersion)
         {
             if (versionOfMigration <= targetVersion && !VersionLoader.VersionInfo.HasAppliedMigration(versionOfMigration))
@@ -130,7 +152,6 @@ namespace FluentMigrator.Runner
                 return true;
             }
             return false;
-
         }
 
         public void MigrateDown(long targetVersion)

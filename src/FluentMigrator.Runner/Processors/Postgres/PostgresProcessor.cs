@@ -108,7 +108,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
         public override void RollbackTransaction()
         {
             Announcer.Say("Rolling back transaction");
-            Transaction.Rollback();
+        	Transaction.Rollback();
         	if (Connection.State != ConnectionState.Closed)
             {
                 Connection.Close();

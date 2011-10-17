@@ -33,9 +33,9 @@ namespace FluentMigrator.Runner.Processors
             Generator = generator;
             Announcer = announcer;
             Options = options;
-        }
+        }    	
 
-        public virtual void Process(CreateSchemaExpression expression)
+    	public virtual void Process(CreateSchemaExpression expression)
         {
             Process(Generator.Generate(expression));
         }
@@ -145,6 +145,10 @@ namespace FluentMigrator.Runner.Processors
         public virtual void RollbackTransaction()
         {
         }
+
+		public virtual void CloseConnection()
+		{			
+		}
 
         public abstract System.Data.DataSet ReadTableData(string schemaName, string tableName);
         public abstract System.Data.DataSet Read(string template, params object[] args);
