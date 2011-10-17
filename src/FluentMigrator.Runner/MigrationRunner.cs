@@ -144,13 +144,16 @@ namespace FluentMigrator.Runner
                     ApplyMigrationDown(neededMigrationVersion);
                 }
 
-                if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
                 VersionLoader.LoadVersionInfo();
             }
             catch (Exception)
             {
                 if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
                 throw;
+            }
+			finally
+            {
+            	Processor.CloseConnection();
             }
         }
 
@@ -236,13 +239,15 @@ namespace FluentMigrator.Runner
 
                 if (!VersionLoader.VersionInfo.AppliedMigrations().Any())
                     VersionLoader.RemoveVersionTable();
-
-                if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
             }
             catch (Exception)
             {
                 if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
                 throw;
+            }
+			finally
+            {
+            	Processor.CloseConnection();
             }
         }
 
@@ -269,14 +274,16 @@ namespace FluentMigrator.Runner
                     VersionLoader.RemoveVersionTable();
                 else
                     VersionLoader.LoadVersionInfo();
-
-                if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
             }
             catch (Exception)
             {
                 if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
                 throw;
             }
+			finally
+			{
+				Processor.CloseConnection();
+			}
         }
 
         public Assembly MigrationAssembly
