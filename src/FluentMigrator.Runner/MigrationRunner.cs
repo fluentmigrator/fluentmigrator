@@ -94,15 +94,7 @@ namespace FluentMigrator.Runner
     		{
     			foreach (var version in versions)
     			{
-    				var migrationMetadata = MigrationLoader.MigrationMetadata[version];
-
-    				if (!migrationMetadata.Transactionless)
-    					Processor.BeginTransaction();
-    				
     				ApplyMigrationUp(version);
-
-    				if (!migrationMetadata.Transactionless)
-    					Processor.CommitTransaction();
     			}
 
 				if (applyProfiles)
@@ -187,8 +179,16 @@ namespace FluentMigrator.Runner
 
             if (!VersionLoader.VersionInfo.HasAppliedMigration(version))
             {
+				var migrationMetadata = MigrationLoader.MigrationMetadata[version];
+
+				if (!migrationMetadata.Transactionless)
+					Processor.BeginTransaction();
+
                 Up(MigrationLoader.Migrations[version]);
                 VersionLoader.UpdateVersionInfo(version);
+
+				if (!migrationMetadata.Transactionless)
+					Processor.CommitTransaction();
             }
         }
 
@@ -196,8 +196,16 @@ namespace FluentMigrator.Runner
         {
             try
             {
+				var migrationMetadata = MigrationLoader.MigrationMetadata[version];
+
+				if (!migrationMetadata.Transactionless)
+					Processor.BeginTransaction();
+
                 Down(MigrationLoader.Migrations[version]);
                 VersionLoader.DeleteVersion(version);
+
+				if (!migrationMetadata.Transactionless)
+					Processor.CommitTransaction();
             }
             catch (KeyNotFoundException ex)
             {
