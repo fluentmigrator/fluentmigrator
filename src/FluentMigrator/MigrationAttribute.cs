@@ -24,10 +24,18 @@ namespace FluentMigrator
 	public class MigrationAttribute : Attribute
 	{
 		public long Version { get; private set; }
+		public bool Transactionless { get; private set; }
 
 		public MigrationAttribute(long version)
 		{
 			Version = version;
+			Transactionless = false;
+		}
+		
+		public MigrationAttribute(long version, bool transactionless)
+		{
+			Version = version;
+			Transactionless = transactionless;
 		}
 	}
 }
