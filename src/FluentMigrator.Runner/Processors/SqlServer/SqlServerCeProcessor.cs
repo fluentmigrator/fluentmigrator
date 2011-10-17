@@ -43,7 +43,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         	this.factory = factory;
         	this.connection = connection;
             connection.Open();
-            BeginTransaction();
         }
 
         public override bool SchemaExists(string schemaName)
@@ -121,11 +120,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 transaction.Commit();
                 transaction = null;
             }
-
-        	if (connection.State != ConnectionState.Closed)
-            {
-                connection.Close();
-            }
         }
 
         public override void RollbackTransaction()
@@ -137,14 +131,15 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
 
             Announcer.Say("Rolling back transaction");
-
             transaction.Rollback();
-
-        	if (connection.State != ConnectionState.Closed)
-            {
-                connection.Close();
-            }
+        	transaction = null;
         }
+
+		public override void CloseConnection()
+		{
+			if (connection.State != ConnectionState.Closed)
+				connection.Close();
+		}
 
         protected override void Process(string sql)
         {

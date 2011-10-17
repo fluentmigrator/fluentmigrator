@@ -146,9 +146,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 		public override void CloseConnection()
 		{
 			if (Connection.State != ConnectionState.Closed)
-			{
 				Connection.Close();
-			}
 		}
 
         protected override void Process(string sql)
