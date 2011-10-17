@@ -195,6 +195,12 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 expression.Operation(Connection, null);
         }
 
+		public override void CloseConnection()
+		{
+			if (Connection.State != ConnectionState.Closed)
+				Connection.Close();
+		}
+
         protected override void Process(string sql)
         {
             Announcer.Sql(sql);

@@ -180,6 +180,12 @@ SELECT CONCAT(
             Process(Generator.Generate(expression) + columnDefinition);
         }
 
+		public override void CloseConnection()
+		{
+			if (Connection.State != ConnectionState.Closed)
+				Connection.Close();
+		}
+
         private static string FormatSqlEscape(string value)
         {
             return value.Replace("'", "''");
