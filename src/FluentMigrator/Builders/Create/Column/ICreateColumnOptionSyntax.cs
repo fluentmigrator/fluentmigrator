@@ -18,7 +18,7 @@
 
 namespace FluentMigrator.Builders.Create.Column
 {
-	public interface ICreateColumnOptionSyntax : IColumnOptionSyntax<ICreateColumnOptionSyntax>
+    public interface ICreateColumnOptionSyntax : IColumnOptionSyntax<ICreateColumnOptionSyntax,ICreateColumnOptionOrForeignKeyCascadeSyntax>
 	{
 	}
 }

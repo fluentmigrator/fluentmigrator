@@ -27,9 +27,11 @@ namespace FluentMigrator.Builders.Alter.Table
     public class AlterTableExpressionBuilder : ExpressionBuilderWithColumnTypesBase<AlterTableExpression, IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax>,
         IAlterTableAddColumnOrAlterColumnOrSchemaSyntax,
         IAlterTableColumnAsTypeSyntax,
-        IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax
+        IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax,
+        IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax
     {
         public ColumnDefinition CurrentColumn { get; set; }
+        public ForeignKeyDefinition CurrentForeignKey { get; set; }
         private readonly IMigrationContext _context;
 
         public AlterTableExpressionBuilder(AlterTableExpression expression, IMigrationContext context)
@@ -137,17 +139,17 @@ namespace FluentMigrator.Builders.Alter.Table
             return this;
         }
 
-        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax ForeignKey(string primaryTableName, string primaryColumnName)
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax ForeignKey(string primaryTableName, string primaryColumnName)
         {
             return ForeignKey(null, null, primaryTableName, primaryColumnName);
         }
 
-        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax ForeignKey(string foreignKeyName, string primaryTableName, string primaryColumnName)
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax ForeignKey(string foreignKeyName, string primaryTableName, string primaryColumnName)
         {
             return ForeignKey(foreignKeyName, null, primaryTableName, primaryColumnName);
         }
 
-        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax ForeignKey(string foreignKeyName, string primaryTableSchema, string primaryTableName, string primaryColumnName)
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax ForeignKey(string foreignKeyName, string primaryTableSchema, string primaryTableName, string primaryColumnName)
         {
             CurrentColumn.IsForeignKey = true;
 
@@ -167,20 +169,21 @@ namespace FluentMigrator.Builders.Alter.Table
             fk.ForeignKey.ForeignColumns.Add(CurrentColumn.Name);
 
             _context.Expressions.Add(fk);
+            CurrentForeignKey = fk.ForeignKey;
             return this;
         }
 
-        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax ReferencedBy(string foreignTableName, string foreignColumnName)
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax ReferencedBy(string foreignTableName, string foreignColumnName)
         {
             return ReferencedBy(null, null, foreignTableName, foreignColumnName);
         }
 
-        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax ReferencedBy(string foreignKeyName, string foreignTableName, string foreignColumnName)
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax ReferencedBy(string foreignKeyName, string foreignTableName, string foreignColumnName)
         {
             return ReferencedBy(foreignKeyName, null, foreignTableName, foreignColumnName);
         }
 
-        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax ReferencedBy(string foreignKeyName, string foreignTableSchema, string foreignTableName, string foreignColumnName)
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax ReferencedBy(string foreignKeyName, string foreignTableSchema, string foreignTableName, string foreignColumnName)
         {
             var fk = new CreateForeignKeyExpression
             {
@@ -198,23 +201,24 @@ namespace FluentMigrator.Builders.Alter.Table
             fk.ForeignKey.ForeignColumns.Add(foreignColumnName);
 
             _context.Expressions.Add(fk);
+            CurrentForeignKey = fk.ForeignKey;
             return this;
         }
 
-        [Obsolete("Use ForeignKey(string,string)")]
+
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax ForeignKey()
         {
             CurrentColumn.IsForeignKey = true;
             return this;
         }
 
-        [Obsolete("Use ReferencedBy")]
+        [Obsolete("Please use ReferencedBy syntax. This method will be removed in the next version")]
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax References(string foreignKeyName, string foreignTableName, IEnumerable<string> foreignColumnNames)
         {
             return References(foreignKeyName, null, foreignTableName, foreignColumnNames);
         }
 
-        [Obsolete("Use ReferencedBy")]
+        [Obsolete("Please use ReferencedBy syntax. This method will be removed in the next version")]
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax References(string foreignKeyName, string foreignTableSchema, string foreignTableName, IEnumerable<string> foreignColumnNames)
         {
             var fk = new CreateForeignKeyExpression
@@ -234,6 +238,25 @@ namespace FluentMigrator.Builders.Alter.Table
                 fk.ForeignKey.ForeignColumns.Add(foreignColumnName);
 
             _context.Expressions.Add(fk);
+            return this;
+        }
+
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax OnDelete(System.Data.Rule rule)
+        {
+            CurrentForeignKey.OnDelete = rule;
+            return this;
+        }
+
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax OnUpdate(System.Data.Rule rule)
+        {
+            CurrentForeignKey.OnUpdate = rule;
+            return this;
+        }
+
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax OnDeleteOrUpdate(System.Data.Rule rule)
+        {
+            OnDelete(rule);
+            OnUpdate(rule);
             return this;
         }
 

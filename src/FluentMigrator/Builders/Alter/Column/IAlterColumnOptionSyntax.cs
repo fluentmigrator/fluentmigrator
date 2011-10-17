@@ -18,7 +18,7 @@
 
 namespace FluentMigrator.Builders.Alter.Column
 {
-	public interface IAlterColumnOptionSyntax : IColumnOptionSyntax<IAlterColumnOptionSyntax>
+    public interface IAlterColumnOptionSyntax : IColumnOptionSyntax<IAlterColumnOptionSyntax, IAlterColumnOptionOrForeignKeyCascadeSyntax>
 	{
 	}
 }
