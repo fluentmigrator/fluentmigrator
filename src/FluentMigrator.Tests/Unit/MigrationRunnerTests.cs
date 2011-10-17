@@ -94,17 +94,17 @@ namespace FluentMigrator.Tests.Unit
                           .Returns(true);
         }
 
-        private void LoadVersionData(params long[] fakeVersions)
+        private void LoadVersionData(bool loadVersionInfo, params long[] fakeVersions)
         {
-        	LoadVersionData(version => new MigrationMetadata
-        	                     	{
-        	                     		Type = typeof (TestMigration),
-        	                     		Version = version,
-        	                     		Transactionless = false
-        	                     	}, fakeVersions);
+			LoadVersionData(loadVersionInfo, version => new MigrationMetadata
+			                                            	{
+			                                            		Type = typeof (TestMigration),
+			                                            		Version = version,
+			                                            		Transactionless = false
+			                                            	}, fakeVersions);
         }
 		
-		private void LoadVersionData(Func<long, MigrationMetadata> factory, params long[] fakeVersions)
+		private void LoadVersionData(bool loadVersionInfo, Func<long, MigrationMetadata> factory, params long[] fakeVersions)
         {
             _fakeVersionLoader.Versions.Clear();
             _runner.MigrationLoader.Migrations.Clear();
@@ -120,7 +120,8 @@ namespace FluentMigrator.Tests.Unit
             	_runner.MigrationLoader.MigrationMetadata.Add(version, migrationMetadata);
             }
 
-            _fakeVersionLoader.LoadVersionInfo();
+			if (loadVersionInfo)
+				_fakeVersionLoader.LoadVersionInfo();
         }
 
         [Test]
@@ -243,7 +244,7 @@ namespace FluentMigrator.Tests.Unit
 
             var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
 
-            LoadVersionData(fakeMigrationVersion, fakeMigrationVersion2);
+            LoadVersionData(true, fakeMigrationVersion, fakeMigrationVersion2);
 
             _runner.VersionLoader.LoadVersionInfo();
             _runner.Rollback(1);
@@ -257,7 +258,7 @@ namespace FluentMigrator.Tests.Unit
         {
             long fakeMigrationVersion = 2009010101;
 
-            LoadVersionData(fakeMigrationVersion);
+            LoadVersionData(true, fakeMigrationVersion);
 
             var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
 
@@ -358,7 +359,8 @@ namespace FluentMigrator.Tests.Unit
 		[Test]
 		public void ShouldBeginTransactionBeforePerformingUpMigration()
 		{
-			LoadVersionData(1);
+			LoadVersionData(false, 1);
+			_fakeVersionLoader.Versions.Clear();
 
 			_runner.MigrateUp();
 
@@ -368,7 +370,8 @@ namespace FluentMigrator.Tests.Unit
 		[Test]
 		public void ShouldCommitTransactionAfterPerformingSuccessfullUpMigration()
 		{
-			LoadVersionData(1);
+			LoadVersionData(false, 1);
+			_fakeVersionLoader.Versions.Clear();
 
 			_runner.MigrateUp();
 
@@ -378,12 +381,12 @@ namespace FluentMigrator.Tests.Unit
 		[Test]
 		public void ShouldNotUseTransactionWhilePerformingUpTransactionlessMigration()
 		{
-			LoadVersionData(version => new MigrationMetadata
-			                           	{
-											Type = typeof(TestMigration),
-			                           		Version = version,
-											Transactionless = true
-			                           	}, 1);
+			LoadVersionData(false, version => new MigrationMetadata
+			                                            	{
+			                                            		Type = typeof(TestMigration),
+			                                            		Version = version,
+			                                            		Transactionless = true
+			                                            	}, 1);
 
 			_runner.MigrateUp();
 
@@ -394,7 +397,7 @@ namespace FluentMigrator.Tests.Unit
     	[Test]
     	public void ShouldCloseConnectionOnlyOnceAfterPerformingAllUpMigrations()
     	{
-    		LoadVersionData(1, 2, 3);
+    		LoadVersionData(true, 1, 2, 3);
 
 			_runner.MigrateUp();
 
