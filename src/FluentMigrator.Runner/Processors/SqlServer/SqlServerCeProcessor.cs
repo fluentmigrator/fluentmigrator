@@ -29,8 +29,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 	public sealed class SqlServerCeProcessor : ProcessorBase
     {
 		private readonly IDbFactory factory;
-		private readonly DbConnection connection;
-		private DbTransaction transaction;
+		public DbConnection Connection { get; private set; }
+		public DbTransaction Transaction { get; private set; }
 
 		public override string DatabaseType
         {
@@ -41,7 +41,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             : base(generator, announcer, options)
         {
         	this.factory = factory;
-        	this.connection = connection;
+        	this.Connection = connection;
             connection.Open();
         }
 
@@ -77,10 +77,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool Exists(string template, params object[] args)
         {
-            if (connection.State != ConnectionState.Open)
-                connection.Open();
+            if (Connection.State != ConnectionState.Open)
+                Connection.Open();
 
-			using (var command = factory.CreateCommand(String.Format(template, args), connection, transaction))
+			using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -94,10 +94,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override DataSet Read(string template, params object[] args)
         {
-            if (connection.State != ConnectionState.Open) connection.Open();
+            if (Connection.State != ConnectionState.Open) Connection.Open();
 
             var ds = new DataSet();
-			using (var command = factory.CreateCommand(String.Format(template, args), connection, transaction))
+			using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
 			using (var adapter = factory.CreateDataAdapter(command))
             {
                 adapter.Fill(ds);
@@ -108,37 +108,37 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         public override void BeginTransaction()
         {
             Announcer.Say("Beginning Transaction");
-            transaction = connection.BeginTransaction();
+            Transaction = Connection.BeginTransaction();
         }
 
         public override void CommitTransaction()
         {
             Announcer.Say("Committing Transaction");
 
-            if (transaction != null)
+            if (Transaction != null)
             {
-                transaction.Commit();
-                transaction = null;
+                Transaction.Commit();
+                Transaction = null;
             }
         }
 
         public override void RollbackTransaction()
         {
-            if (transaction == null)
+            if (Transaction == null)
             {
                 Announcer.Say("No transaction was available to rollback!");
                 return;
             }
 
             Announcer.Say("Rolling back transaction");
-            transaction.Rollback();
-        	transaction = null;
+            Transaction.Rollback();
+        	Transaction = null;
         }
 
-		public override void CloseConnection()
+		protected override void CloseConnection()
 		{
-			if (connection.State != ConnectionState.Closed)
-				connection.Close();
+			if (Connection.State != ConnectionState.Closed)
+				Connection.Close();
 		}
 
         protected override void Process(string sql)
@@ -148,13 +148,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
 
-            if (connection.State != ConnectionState.Open)
-                connection.Open();
+            if (Connection.State != ConnectionState.Open)
+                Connection.Open();
 
-            if (transaction == null)
+            if (Transaction == null)
                 BeginTransaction();
 
-			using (var command = factory.CreateCommand(sql, connection, transaction))
+			using (var command = factory.CreateCommand(sql, Connection, Transaction))
             {
                 try
                 {
@@ -177,15 +177,22 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            if (connection.State != ConnectionState.Open) connection.Open();
+            if (Connection.State != ConnectionState.Open) Connection.Open();
 
             if (expression.Operation != null)
-                expression.Operation(connection, transaction);
+                expression.Operation(Connection, Transaction);
         }
 
 		private static string FormatSqlEscape(string sql)
         {
             return sql.Replace("'", "''");
         }
+
+		protected override void Dispose(bool disposing)
+		{
+			var connection = this.Connection;
+			if (connection != null)
+				connection.Dispose();
+		}
     }
 }

@@ -128,10 +128,17 @@ namespace FluentMigrator.Runner.Processors.Jet
             }
         }
 
-		public override void CloseConnection()
+    	protected override void CloseConnection()
 		{
 			if (Connection.State != ConnectionState.Closed)
 				Connection.Close();
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			var connection = Connection;
+			if (connection != null)
+				connection.Dispose();
 		}
     }
 }

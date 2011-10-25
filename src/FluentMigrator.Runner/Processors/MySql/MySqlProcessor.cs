@@ -180,7 +180,7 @@ SELECT CONCAT(
             Process(Generator.Generate(expression) + columnDefinition);
         }
 
-		public override void CloseConnection()
+		protected override void CloseConnection()
 		{
 			if (Connection.State != ConnectionState.Closed)
 				Connection.Close();
@@ -190,5 +190,12 @@ SELECT CONCAT(
         {
             return value.Replace("'", "''");
         }
+
+		protected override void Dispose(bool disposing)
+		{
+			var connection = Connection;
+			if (connection != null)
+				connection.Dispose();
+		}
     }
 }

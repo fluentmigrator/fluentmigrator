@@ -195,7 +195,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 expression.Operation(Connection, null);
         }
 
-		public override void CloseConnection()
+    	protected override void CloseConnection()
 		{
 			if (Connection.State != ConnectionState.Closed)
 				Connection.Close();
@@ -214,5 +214,12 @@ namespace FluentMigrator.Runner.Processors.Oracle
             using (var command = _factory.CreateCommand(sql, Connection))
                 command.ExecuteNonQuery();
         }
+
+		protected override void Dispose(bool disposing)
+		{
+			var connection = Connection;
+			if (connection != null)
+				connection.Dispose();
+		}
     }
 }
