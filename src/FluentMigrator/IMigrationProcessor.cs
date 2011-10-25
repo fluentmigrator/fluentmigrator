@@ -1,4 +1,5 @@
 #region License
+
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -14,34 +15,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-#endregion
 
-using System.Data;
-using System.Collections.Generic;
-using FluentMigrator.Builders.Execute;
-using FluentMigrator.Builders.Insert;
-using FluentMigrator.Expressions;
-using FluentMigrator.Model;
+#endregion
 
 namespace FluentMigrator
 {
-	public interface IMigrationProcessor : IQuerySchema
+	using System;
+	using System.Data;
+	using Builders.Execute;
+	using Expressions;
+
+	public interface IMigrationProcessor : IQuerySchema, IDisposable
 	{
 		IMigrationProcessorOptions Options { get; }
 
 		void Execute(string template, params object[] args);
-        DataSet ReadTableData(string schemaName, string tableName);
+		DataSet ReadTableData(string schemaName, string tableName);
 		DataSet Read(string template, params object[] args);
 		bool Exists(string template, params object[] args);
 
 		void BeginTransaction();
 		void CommitTransaction();
 		void RollbackTransaction();
-		void CloseConnection();
 
 		void Process(CreateSchemaExpression expression);
 		void Process(DeleteSchemaExpression expression);
-	    void Process(AlterTableExpression expression);
+		void Process(AlterTableExpression expression);
 		void Process(AlterColumnExpression expression);
 		void Process(CreateTableExpression expression);
 		void Process(CreateColumnExpression expression);
@@ -57,7 +56,7 @@ namespace FluentMigrator
 		void Process(AlterDefaultConstraintExpression expression);
 		void Process(PerformDBOperationExpression expression);
 		void Process(DeleteDataExpression expression);
-        void Process(UpdateDataExpression expression);
-        void Process( AlterSchemaExpression expression );
+		void Process(UpdateDataExpression expression);
+		void Process(AlterSchemaExpression expression);
 	}
 }

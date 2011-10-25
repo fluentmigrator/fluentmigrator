@@ -108,7 +108,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
         	Transaction = null;
         }
 
-		public override void CloseConnection()
+		protected override void CloseConnection()
 		{
 			if (Connection.State != ConnectionState.Closed)
 				Connection.Close();
@@ -167,5 +167,15 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
             return sql.Replace("'", "''");
         }
+
+		protected override void Dispose(bool disposing)
+		{
+			var transaction = Transaction;
+			if (transaction != null)
+				transaction.Dispose();
+			var connection = Connection;
+			if (connection != null)
+				connection.Dispose();
+		}
     }
 }

@@ -24,76 +24,73 @@ namespace FluentMigrator.Runner.Initialization
 {
     public class TaskExecutor
     {
-        private IMigrationRunner Runner { get; set; }
-        private IRunnerContext RunnerContext { get; set; }
+    	private readonly IRunnerContext runnerContext;
 
         public TaskExecutor(IRunnerContext runnerContext)
         {
             if (runnerContext == null)
                 throw new ArgumentNullException("runnerContext", "RunnerContext cannot be null");
 
-            RunnerContext = runnerContext;
+            this.runnerContext = runnerContext;
         }
 
-        private void Initialize()
+		public void Execute()
+		{
+			var assembly = AssemblyLoaderFactory.GetAssemblyLoader(runnerContext.Target).Load();
+
+			using (var processor = InitializeProcessor(assembly.Location))
+			{
+				ExecuteTask(new MigrationRunner(assembly, runnerContext, processor));
+				runnerContext.Announcer.Say("Task completed.");
+			}
+		}
+
+		private void ExecuteTask(IMigrationRunner runner)
+    	{
+    		switch (runnerContext.Task)
+    		{
+    			case null:
+    			case "":
+    			case "migrate":
+    			case "migrate:up":
+    				if (runnerContext.Version != 0)
+    					runner.MigrateUp(runnerContext.Version);
+    				else
+    					runner.MigrateUp();
+    				break;
+    			case "rollback":
+    				if (runnerContext.Steps == 0)
+    					runnerContext.Steps = 1;
+    				runner.Rollback(runnerContext.Steps);
+    				break;
+    			case "rollback:toversion":
+    				runner.RollbackToVersion(runnerContext.Version);
+    				break;
+    			case "rollback:all":
+    				runner.RollbackToVersion(0);
+    				break;
+    			case "migrate:down":
+    				runner.MigrateDown(runnerContext.Version);
+    				break;
+    		}
+    	}
+
+    	private IMigrationProcessor InitializeProcessor(string assemblyLocation)
         {
-            var assembly = AssemblyLoaderFactory.GetAssemblyLoader(RunnerContext.Target).Load();
-
-            var processor = InitializeProcessor(assembly.Location);
-
-            Runner = new MigrationRunner(assembly, RunnerContext, processor);
-        }
-
-        public void Execute()
-        {
-            Initialize();
-
-            switch (RunnerContext.Task)
-            {
-                case null:
-                case "":
-                case "migrate":
-                case "migrate:up":
-                    if (RunnerContext.Version != 0)
-                        Runner.MigrateUp(RunnerContext.Version);
-                    else
-                        Runner.MigrateUp();
-                    break;
-                case "rollback":
-                    if (RunnerContext.Steps == 0)
-                        RunnerContext.Steps = 1;
-                    Runner.Rollback(RunnerContext.Steps);
-                    break;
-                case "rollback:toversion":
-                    Runner.RollbackToVersion(RunnerContext.Version);
-                    break;
-                case "rollback:all":
-                    Runner.RollbackToVersion(0);
-                    break;
-                case "migrate:down":
-                    Runner.MigrateDown(RunnerContext.Version);
-                    break;
-            }
-
-            RunnerContext.Announcer.Say("Task completed.");
-        }
-
-        private IMigrationProcessor InitializeProcessor(string assemblyLocation)
-        {
-            var manager = new ConnectionStringManager(new NetConfigManager(), RunnerContext.Connection, RunnerContext.ConnectionStringConfigPath, assemblyLocation, RunnerContext.Database);
+            var manager = new ConnectionStringManager(new NetConfigManager(), runnerContext.Connection, runnerContext.ConnectionStringConfigPath, assemblyLocation, runnerContext.Database);
 
             manager.LoadConnectionString();
 
-            if (RunnerContext.Timeout == 0)
+            if (runnerContext.Timeout == 0)
             {
-                RunnerContext.Timeout = 30; // Set default timeout for command
+                runnerContext.Timeout = 30; // Set default timeout for command
             }
 
-            var processorFactory = ProcessorFactory.GetFactory(RunnerContext.Database);
-            var processor = processorFactory.Create(manager.ConnectionString, RunnerContext.Announcer, new ProcessorOptions
+            var processorFactory = ProcessorFactory.GetFactory(runnerContext.Database);
+            var processor = processorFactory.Create(manager.ConnectionString, runnerContext.Announcer, new ProcessorOptions
             {
-                PreviewOnly = RunnerContext.PreviewOnly,
-                Timeout = RunnerContext.Timeout
+                PreviewOnly = runnerContext.PreviewOnly,
+                Timeout = runnerContext.Timeout
             });
 
             return processor;

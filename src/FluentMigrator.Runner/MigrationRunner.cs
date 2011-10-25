@@ -108,15 +108,8 @@ namespace FluentMigrator.Runner
     		}
     		catch (Exception)
     		{
-    			if (useAutomaticTransactionManagement)
-    			{
-    				Processor.RollbackTransaction();
-    			}
+    			if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
     			throw;
-    		}
-    		finally
-    		{
-    			Processor.CloseConnection();
     		}
     	}
 
@@ -157,10 +150,6 @@ namespace FluentMigrator.Runner
             {
                 if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
                 throw;
-            }
-			finally
-            {
-            	Processor.CloseConnection();
             }
         }
 
@@ -255,10 +244,6 @@ namespace FluentMigrator.Runner
                 if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
                 throw;
             }
-			finally
-            {
-            	Processor.CloseConnection();
-            }
         }
 
         public void RollbackToVersion(long version)
@@ -293,10 +278,6 @@ namespace FluentMigrator.Runner
                 if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
                 throw;
             }
-			finally
-			{
-				Processor.CloseConnection();
-			}
         }
 
         public Assembly MigrationAssembly

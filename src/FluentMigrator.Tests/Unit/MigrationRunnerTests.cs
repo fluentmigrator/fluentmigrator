@@ -393,28 +393,5 @@ namespace FluentMigrator.Tests.Unit
 			_processorMock.Verify(x => x.BeginTransaction(), Times.Never());
 			_processorMock.Verify(x => x.CommitTransaction(), Times.Never());
 		}
-
-    	[Test]
-    	public void ShouldCloseConnectionOnlyOnceAfterPerformingAllUpMigrations()
-    	{
-    		LoadVersionData(true, 1, 2, 3);
-
-			_runner.MigrateUp();
-
-			_processorMock.Verify(x => x.CloseConnection(), Times.Once());
-    	}
-
-        private class MigrationThatDoesNotInheritFromMigrationBaseClass : IMigration
-        {
-            public void GetUpExpressions(IMigrationContext context)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void GetDownExpressions(IMigrationContext context)
-            {
-                throw new NotImplementedException();
-            }
-        }
     }
 }

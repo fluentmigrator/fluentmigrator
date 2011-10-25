@@ -22,20 +22,17 @@ using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System;
 using System.Reflection;
-using System.IO;
 
 namespace FluentMigrator.MSBuild
 {
     public class Migrate : Task
     {
-
-
         /// <summary>
         /// Initializes a new instance of the <see cref="T:Migrate"/> class.
         /// </summary>
         public Migrate()
         {
-            AppDomain.CurrentDomain.ResourceResolve += new ResolveEventHandler(CurrentDomain_ResourceResolve);
+            AppDomain.CurrentDomain.ResourceResolve += CurrentDomain_ResourceResolve;
         }
 
         private static Assembly CurrentDomain_ResourceResolve(object sender, ResolveEventArgs args)
@@ -86,7 +83,6 @@ namespace FluentMigrator.MSBuild
                 Log.LogError("You must specific a migration assembly");
                 return false;
             }
-
 
             Log.LogCommandLine(MessageImportance.Low, "Creating Context");
             var announcer = new BaseAnnouncer(msg => Log.LogCommandLine(MessageImportance.Normal, msg))
