@@ -42,6 +42,9 @@ namespace FluentMigrator
 		string Generate(AlterDefaultConstraintExpression expression);
 		string Generate(DeleteDataExpression expression);
         string Generate(UpdateDataExpression expression);
-    string Generate(AlterSchemaExpression expression);
+        string Generate(AlterSchemaExpression expression);
+	    string Generate(CreateSequenceExpression expression);
+
+	    string Generate(DeleteSequenceExpression expression);
 	}
 }

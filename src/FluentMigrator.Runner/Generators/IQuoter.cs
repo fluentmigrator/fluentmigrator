@@ -11,5 +11,6 @@
 		string QuoteIndexName(string indexName);
 		string QuoteSchemaName(string schemaName);
 		string QuoteCommand(string command);
+        string QuoteSequenceName(string sequenceName);
 	}
 }

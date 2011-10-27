@@ -59,5 +59,15 @@ namespace FluentMigrator.Runner.Generators.SQLite
 		{
 			return compatabilityMode.HandleCompatabilty("Forign keys are not supported in Sqlite");
 		}
+
+	    public override string Generate(CreateSequenceExpression expression)
+	    {
+            return compatabilityMode.HandleCompatabilty("Sequences are not supported in Sqlite");
+	    }
+
+        public override string Generate(DeleteSequenceExpression expression)
+        {
+            return compatabilityMode.HandleCompatabilty("Sequences are not supported in Sqlite");
+        }
 	}
 }

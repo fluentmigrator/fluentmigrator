@@ -49,6 +49,8 @@ namespace FluentMigrator.Runner.Generators.Base
 		public abstract string Generate(DeleteDataExpression expression);
 		public abstract string Generate(UpdateDataExpression expression);
 		public abstract string Generate(AlterSchemaExpression expression);
+        public abstract string Generate(CreateSequenceExpression expression);
+        public abstract string Generate(DeleteSequenceExpression expression);
 
 		public string Generate(AlterTableExpression expression)
 		{

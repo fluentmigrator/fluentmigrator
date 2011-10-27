@@ -25,7 +25,9 @@ using FluentMigrator.Builders.Delete.Index;
 
 namespace FluentMigrator.Builders.Delete
 {
-	public class DeleteExpressionRoot : IDeleteExpressionRoot
+    using Sequence;
+
+    public class DeleteExpressionRoot : IDeleteExpressionRoot
 	{
 		private readonly IMigrationContext _context;
 
@@ -89,5 +91,12 @@ namespace FluentMigrator.Builders.Delete
             _context.Expressions.Add(expression);
             return new DeleteIndexExpressionBuilder(expression);
         }
+
+	    public IInSchemaSyntax Sequence(string sequenceName)
+	    {
+            var expression = new DeleteSequenceExpression { SequenceName = sequenceName};
+            _context.Expressions.Add(expression);
+            return new DeleteSequenceExpressionBuilder(expression);
+	    }
 	}
 }
