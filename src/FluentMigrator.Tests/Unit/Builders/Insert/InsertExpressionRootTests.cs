@@ -32,17 +32,15 @@ namespace FluentMigrator.Tests.Unit.Builders.Insert
 		public void CallingIntoTableSetsTableName()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Verify(x => x.Add(It.Is<InsertDataExpression>(e => e.TableName.Equals("Bacon"))), Times.AtMostOnce() );
-
+			
 			var contextMock = new Mock<IMigrationContext>();
             contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
-			contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
-
+			
 			var root = new InsertExpressionRoot(contextMock.Object);
 			root.IntoTable("Bacon");
 
-			collectionMock.VerifyAll();
-			contextMock.VerifyAll();
+            collectionMock.Verify(x => x.Add(It.Is<InsertDataExpression>(e => e.TableName.Equals("Bacon"))));
+            contextMock.VerifyGet(x => x.Expressions);
 		}
 	}
 }
