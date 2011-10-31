@@ -215,9 +215,11 @@ namespace FluentMigrator.Runner
         {
             try
             {
-                foreach (var migrationNumber in VersionLoader.VersionInfo.AppliedMigrations().Take(steps))
+                IEnumerable<long> migrations = VersionLoader.VersionInfo.AppliedMigrations().Intersect(MigrationLoader.Migrations.Keys);
+
+                foreach (var migrationNumber in migrations.Take(steps))
                 {
-                    ApplyMigrationDown(migrationNumber);
+                    ApplyMigrationDown(migrationNumber);       
                 }
 
                 VersionLoader.LoadVersionInfo();
@@ -244,8 +246,10 @@ namespace FluentMigrator.Runner
             //TODO: Extract VersionsToApply Strategy
             try
             {
-                // Get the migrations between current and the to version
-                foreach (var migrationNumber in VersionLoader.VersionInfo.AppliedMigrations())
+                // Get the migrations between current and the to version 
+                IEnumerable<long> migrations = VersionLoader.VersionInfo.AppliedMigrations().Intersect(MigrationLoader.Migrations.Keys);
+
+                foreach (var migrationNumber in migrations)
                 {
                     if (version < migrationNumber || version == 0)
                     {

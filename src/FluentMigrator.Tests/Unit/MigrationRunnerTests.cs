@@ -109,6 +109,24 @@ namespace FluentMigrator.Tests.Unit
             _fakeVersionLoader.LoadVersionInfo();
         }
 
+        private void LoadVersionDataWithMigrationListAsSubset(long[] fakeVersions, params long[] migrations)
+        {
+            _fakeVersionLoader.Versions.Clear();
+            _runner.MigrationLoader.Migrations.Clear();
+
+            foreach (var version in fakeVersions)
+            {
+                _fakeVersionLoader.Versions.Add(version);
+
+            }
+            foreach (var version in migrations)
+            {
+                 _runner.MigrationLoader.Migrations.Add(version, new TestMigration());
+            }
+            _fakeVersionLoader.LoadVersionInfo();
+        }
+
+
         [Test]
         public void CanAnnounceUp()
         {
@@ -299,6 +317,67 @@ namespace FluentMigrator.Tests.Unit
             //After setup is done, fake version loader owns the proccess
             _fakeVersionLoader.DidLoadVersionInfoGetCalled.ShouldBe(true);
         }
+
+        [Test]
+        public void RollbackWithNamespaceShouldLimitByNamespace()
+        {
+            const long fakeMigration1 = 2011010101;
+            const long fakeMigration2 = 2011010102;
+            const long fakeMigration3 = 2011010103;
+
+            LoadVersionDataWithMigrationListAsSubset(
+                new[] { fakeMigration1, fakeMigration2, fakeMigration3 },
+                new[] { fakeMigration1, fakeMigration2 }
+                );
+
+            _fakeVersionLoader.Versions.ShouldContain(fakeMigration3);
+            _fakeVersionLoader.Versions.ShouldContain(fakeMigration2);
+            _runner.Rollback(1);
+            _fakeVersionLoader.Versions.ShouldNotContain(fakeMigration2);
+            _fakeVersionLoader.Versions.ShouldContain(fakeMigration3);            
+        }
+
+        [Test]
+        public void RollbackWithNamespaceShouldNotSelectOutsideNamespace()
+        {
+            const long fakeMigration1 = 2011010101;
+            const long fakeMigration2 = 2011010102;
+            const long fakeMigration3 = 2011010103;
+
+            LoadVersionDataWithMigrationListAsSubset(
+                new[] { fakeMigration1, fakeMigration2, fakeMigration3 },
+                new[] { fakeMigration1, fakeMigration3 }
+            );
+
+            _runner.Rollback(2);
+            _fakeVersionLoader.Versions.ShouldContain(fakeMigration2);
+            _fakeVersionLoader.Versions.ShouldNotContain(fakeMigration3);
+            _fakeVersionLoader.Versions.ShouldNotContain(fakeMigration1);
+            
+        }
+
+        [Test]
+        public void RollbackToVersionWithNamespaceShouldLimitByNamespace()
+        {
+            const long fakeMigration1 = 2011010101;
+            const long fakeMigration2 = 2011010102;
+            const long fakeMigration3 = 2011010103;
+
+            LoadVersionDataWithMigrationListAsSubset(
+                new[] { fakeMigration1, fakeMigration2, fakeMigration3 },
+                new[] { fakeMigration1, fakeMigration2 }
+                );
+
+            _fakeVersionLoader.Versions.ShouldContain(fakeMigration3);
+            _fakeVersionLoader.Versions.ShouldContain(fakeMigration2);
+            _runner.RollbackToVersion(2011010101);
+            _fakeVersionLoader.Versions.ShouldContain(fakeMigration1);
+            _fakeVersionLoader.Versions.ShouldNotContain(fakeMigration2);
+            _fakeVersionLoader.Versions.ShouldContain(fakeMigration3);
+            
+        }
+
+
 
         [Test, Ignore("Move to MigrationLoader tests")]
         public void HandlesNullMigrationList()
