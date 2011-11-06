@@ -178,6 +178,14 @@ namespace FluentMigrator.Runner.Generators.Generic
         }
 
         /// <summary>
+        /// Quotes a Sequence name
+        /// </summary>
+        public virtual string QuoteSequenceName(string sequenceName)
+        {
+            return IsQuoted(sequenceName) ? sequenceName : Quote(sequenceName);
+        }
+
+        /// <summary>
         /// Provides and unquoted, unescaped string
         /// </summary>
         public virtual string UnQuote(string quoted)

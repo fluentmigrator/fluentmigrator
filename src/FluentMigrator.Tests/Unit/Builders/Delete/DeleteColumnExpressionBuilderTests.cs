@@ -30,12 +30,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 		public void CallingFromTableSetsTableName()
 		{
 			var expressionMock = new Mock<DeleteColumnExpression>();
-            expressionMock.VerifySet(x => x.TableName = "Bacon", Times.AtMostOnce());
-
+            
 			var builder = new DeleteColumnExpressionBuilder(expressionMock.Object);
 			builder.FromTable("Bacon");
 
-			expressionMock.VerifyAll();
+            expressionMock.VerifySet(x => x.TableName = "Bacon");
 		}
 	}
 }

@@ -121,5 +121,15 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             return String.Format(sql,Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.ColumnName),Quoter.QuoteValue(expression.DefaultValue));
         }
+
+        public override string Generate(CreateSequenceExpression expression)
+        {
+            return compatabilityMode.HandleCompatabilty("Sequences are not supported in SqlSever2000");
+        }
+
+        public override string Generate(DeleteSequenceExpression expression)
+        {
+            return compatabilityMode.HandleCompatabilty("Sequences are not supported in SqlServer2000");
+        }
     }
 }

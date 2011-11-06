@@ -16,25 +16,28 @@
 //
 #endregion
 
-using FluentMigrator.Builders.Rename.Column;
+using FluentMigrator.Builders.Delete.Column;
 using FluentMigrator.Expressions;
 using Moq;
 using NUnit.Framework;
 
-namespace FluentMigrator.Tests.Unit.Builders.Rename
+namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
-	[TestFixture]
-	public class RenameColumnExpressionBuilderTests
+    using FluentMigrator.Builders.Delete.Sequence;
+
+    [TestFixture]
+	public class DeleteSequenceExpressionBuilderTests
 	{
 		[Test]
-		public void CallingToSetsNewName()
+		public void CallingInSchemaSetsInSchema()
 		{
-			var expressionMock = new Mock<RenameColumnExpression>();
-            
-			var builder = new RenameColumnExpressionBuilder(expressionMock.Object);
-			builder.To("Bacon");
+			var expressionMock = new Mock<DeleteSequenceExpression>();
+            expressionMock.SetupSet(x => x.SchemaName = "Bacon");
 
-            expressionMock.VerifySet(x => x.NewName = "Bacon");
+            var builder = new DeleteSequenceExpressionBuilder(expressionMock.Object);
+			builder.InSchema("Bacon");
+
+			expressionMock.VerifyAll();
 		}
 	}
 }

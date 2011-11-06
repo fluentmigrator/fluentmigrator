@@ -25,7 +25,9 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Create
 {
-	public class CreateExpressionRoot : ICreateExpressionRoot
+    using Sequence;
+
+    public class CreateExpressionRoot : ICreateExpressionRoot
 	{
 		private readonly IMigrationContext _context;
 
@@ -81,5 +83,12 @@ namespace FluentMigrator.Builders.Create
 			_context.Expressions.Add(expression);
 			return new CreateIndexExpressionBuilder(expression);
 		}
+
+        public ICreateSequenceInSchemaSyntax Sequence(string sequenceName)
+        {
+            var expression = new CreateSequenceExpression { Sequence = { Name = sequenceName } };
+			_context.Expressions.Add(expression);
+			return new CreateSequenceExpressionBuilder(expression);
+        }
 	}
 }

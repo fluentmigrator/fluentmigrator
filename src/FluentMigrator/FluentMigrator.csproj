@@ -141,6 +141,9 @@
     <Compile Include="Builders\Create\Index\ICreateIndexOnColumnOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Create\Index\ICreateIndexColumnOptionsSyntax.cs" />
     <Compile Include="Builders\Create\Index\ICreateIndexOptionsSyntax.cs" />
+    <Compile Include="Builders\Create\Sequence\CreateSequenceExpressionBuilder.cs" />
+    <Compile Include="Builders\Create\Sequence\ICreateSequenceInSchemaSyntax.cs" />
+    <Compile Include="Builders\Create\Sequence\ICreateSequenceSyntax.cs" />
     <Compile Include="Builders\Create\Table\ICreateTableWithColumnOrSchemaSyntax.cs" />
     <Compile Include="Builders\Delete\DeleteDataExpressionBuilder.cs" />
     <Compile Include="Builders\Delete\ForeignKey\IDeleteForeignKeyForeignColumnOrInSchemaSyntax.cs" />
@@ -151,6 +154,7 @@
     <Compile Include="Builders\Delete\Index\DeleteIndexExpressionBuilder.cs" />
     <Compile Include="Builders\Delete\Index\IDeleteIndexForTableSyntax.cs" />
     <Compile Include="Builders\Delete\Index\IDeleteIndexOnColumnSyntax.cs" />
+    <Compile Include="Builders\Delete\Sequence\DeleteSequenceExpressionBuilder.cs" />
     <Compile Include="Builders\Delete\Table\DeleteTableExpressionBuilder.cs" />
     <Compile Include="Builders\Execute\ExecuteExpressionRoot.cs" />
     <Compile Include="Builders\Execute\IExecuteExpressionRoot.cs" />
@@ -176,7 +180,9 @@
     <Compile Include="Expressions\AlterDefaultConstraintExpression.cs" />
     <Compile Include="Expressions\AlterTableExpression.cs" />
     <Compile Include="Expressions\AlterSchemaExpression.cs" />
+    <Compile Include="Expressions\CreateSequenceExpression.cs" />
     <Compile Include="Expressions\DeleteDataExpression.cs" />
+    <Compile Include="Expressions\DeleteSequenceExpression.cs" />
     <Compile Include="Expressions\ExecuteEmbeddedSqlScriptExpression.cs" />
     <Compile Include="Expressions\InsertDataExpression.cs" />
     <Compile Include="Builders\Insert\InsertDataExpressionBuilder.cs" />
@@ -206,6 +212,7 @@
     <Compile Include="IMigrationProcessorOptions.cs" />
     <Compile Include="Infrastructure\Extensions\ExtensionsForIEnumerable.cs" />
     <Compile Include="IQuerySchema.cs" />
+    <Compile Include="Model\SequenceDefinition.cs" />
     <Compile Include="Model\TableDefinition.cs" />
     <Compile Include="ProfileAttribute.cs" />
     <Compile Include="SystemMethods.cs" />
