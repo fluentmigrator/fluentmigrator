@@ -25,7 +25,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 {
     public class OracleProcessor : ProcessorBase
     {
-        private DbConnection Connection { get; set; }
+        private IDbConnection Connection { get; set; }
         private readonly IDbFactory _factory;
 
         public override string DatabaseType
@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             get { return "Oracle"; }
         }
 
-        public OracleProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, OracleDbFactory factory)
+        public OracleProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, OracleDbFactory factory)
             : base(generator, announcer, options)
         {
             Connection = connection;
@@ -179,8 +179,8 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
             var result = new DataSet();
             using (var command = _factory.CreateCommand(String.Format(template, args), Connection))
-            using (var adapter = _factory.CreateDataAdapter(command))
             {
+                var adapter = _factory.CreateDataAdapter(command);
                 adapter.Fill(result);
                 return result;
             }

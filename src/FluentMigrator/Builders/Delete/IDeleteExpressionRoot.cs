@@ -42,5 +42,7 @@ namespace FluentMigrator.Builders.Delete
         /// </summary>
         /// <returns></returns>
         IDeleteIndexForTableSyntax Index();
+
+        IInSchemaSyntax Sequence(string sequenceName);
     }
 }
