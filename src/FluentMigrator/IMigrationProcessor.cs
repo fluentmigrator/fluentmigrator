@@ -58,5 +58,9 @@ namespace FluentMigrator
 		void Process(DeleteDataExpression expression);
         void Process(UpdateDataExpression expression);
         void Process( AlterSchemaExpression expression );
+
+	    void Process(CreateSequenceExpression expression);
+
+	    void Process(DeleteSequenceExpression expression);
 	}
 }

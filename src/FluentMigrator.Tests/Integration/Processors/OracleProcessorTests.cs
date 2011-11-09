@@ -20,14 +20,13 @@ namespace FluentMigrator.Tests.Integration.Processors
 		public void TestQuery()
 		{
 			IDbFactory oracleFactory = new OracleDbFactory();
-			DbConnection connection = oracleFactory.CreateConnection
-				(connectionString);
+			var connection = oracleFactory.CreateConnection(connectionString);
 
 			string sql = "Select * from Users";
 			DataSet ds = new DataSet();
 			using (var command = oracleFactory.CreateCommand(sql, connection))
-			using (DbDataAdapter adapter = oracleFactory.CreateDataAdapter(command))
 			{
+			    var adapter = oracleFactory.CreateDataAdapter(command);
 				adapter.Fill(ds);
 			}
 

@@ -72,7 +72,7 @@ namespace FluentMigrator.Infrastructure
 			return sb.ToString();
 		}
 
-		public static bool TypeIsMigration(Type type)
+        public static bool TypeIsMigration(Type type)
 		{
 			return typeof(IMigration).IsAssignableFrom(type) && type.HasAttribute<MigrationAttribute>();
 		}

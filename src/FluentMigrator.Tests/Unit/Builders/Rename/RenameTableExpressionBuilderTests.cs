@@ -30,12 +30,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Rename
 		public void CallingToSetsNewName()
 		{
 			var expressionMock = new Mock<RenameTableExpression>();
-			expressionMock.VerifySet(x => x.NewName = "Bacon", Times.AtMostOnce());
-
+			
 			var builder = new RenameTableExpressionBuilder(expressionMock.Object);
 			builder.To("Bacon");
 
-			expressionMock.VerifyAll();
+            expressionMock.VerifySet(x => x.NewName = "Bacon");
 		}
 	}
 }

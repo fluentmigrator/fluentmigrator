@@ -1,5 +1,6 @@
 namespace FluentMigrator.Runner.Processors
 {
+    using System.Data;
     using System.Data.Common;
 
 	public abstract class DbFactoryBase : IDbFactory
@@ -38,31 +39,31 @@ namespace FluentMigrator.Runner.Processors
 
 	    #region IDbFactory Members
 
-		public DbConnection CreateConnection(string connectionString)
+		public IDbConnection CreateConnection(string connectionString)
 		{
-			DbConnection connection = Factory.CreateConnection();
+			var connection = Factory.CreateConnection();
 			connection.ConnectionString = connectionString;
 			return connection;
 		}
 
-		public DbCommand CreateCommand(string commandText, DbConnection connection, DbTransaction transaction)
+		public IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction)
 		{
-			DbCommand command = connection.CreateCommand();
+			var command = connection.CreateCommand();
 			command.CommandText = commandText;
 			command.Transaction = transaction;
 			return command;
 		}
 
-		public DbDataAdapter CreateDataAdapter(DbCommand command)
+		public IDbDataAdapter CreateDataAdapter(IDbCommand command)
 		{
-			DbDataAdapter dataAdapter = Factory.CreateDataAdapter();
+			IDbDataAdapter dataAdapter = Factory.CreateDataAdapter();
 			dataAdapter.SelectCommand = command;
 			return dataAdapter;
 		}
 
-		public DbCommand CreateCommand(string commandText, DbConnection connection)
+		public IDbCommand CreateCommand(string commandText, IDbConnection connection)
 		{
-			DbCommand command = connection.CreateCommand();
+			var command = connection.CreateCommand();
 			command.CommandText = commandText;
 			return command;
 		}

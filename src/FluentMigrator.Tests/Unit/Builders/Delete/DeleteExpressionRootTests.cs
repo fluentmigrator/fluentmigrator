@@ -35,34 +35,30 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 		public void CallingTableAddsDeleteTableExpressionToContextWithSpecifiedName()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-            collectionMock.Verify(x => x.Add(It.Is<DeleteTableExpression>(e => e.TableName.Equals("Bacon"))), Times.AtMostOnce());
-
+            
 			var contextMock = new Mock<IMigrationContext>();
             contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
-			contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
-
+			
 			var root = new DeleteExpressionRoot(contextMock.Object);
 			root.Table("Bacon");
 
-			collectionMock.VerifyAll();
-			contextMock.VerifyAll();
+            collectionMock.Verify(x => x.Add(It.Is<DeleteTableExpression>(e => e.TableName.Equals("Bacon"))));
+            contextMock.VerifyGet(x => x.Expressions);
 		}
 
 		[Test]
 		public void CallingColumnAddsDeleteColumnExpressionToContextWithSpecifiedName()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-            collectionMock.Verify(x => x.Add(It.Is<DeleteColumnExpression>(e => e.ColumnName.Equals("Bacon"))), Times.AtMostOnce());
-
+            
 			var contextMock = new Mock<IMigrationContext>();
             contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
-			contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
-
+			
 			var root = new DeleteExpressionRoot(contextMock.Object);
 			root.Column("Bacon");
 
-			collectionMock.VerifyAll();
-			contextMock.VerifyAll();
+            collectionMock.Verify(x => x.Add(It.Is<DeleteColumnExpression>(e => e.ColumnName.Equals("Bacon"))));
+            contextMock.VerifyGet(x => x.Expressions);
 		}
 
 		[Test]
@@ -71,30 +67,27 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
 			var contextMock = new Mock<IMigrationContext>();
             contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
-            contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
-
+            
 			var root = new DeleteExpressionRoot(contextMock.Object);
 			var builder = root.Column("Bacon");
 
 			builder.ShouldBeOfType<DeleteColumnExpressionBuilder>();
-			contextMock.VerifyAll();
+            contextMock.VerifyGet(x => x.Expressions);
 		}
 
 		[Test]
 		public void CallingForeignKeyAddsDeleteForeignKeyExpressionToContext()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-            collectionMock.Verify(x => x.Add(It.IsAny<DeleteForeignKeyExpression>()), Times.AtMostOnce());
-
+            
 			var contextMock = new Mock<IMigrationContext>();
             contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
-			contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
-
+			
 			var root = new DeleteExpressionRoot(contextMock.Object);
 			root.ForeignKey();
 
-			collectionMock.VerifyAll();
-			contextMock.VerifyAll();
+            collectionMock.Verify(x => x.Add(It.IsAny<DeleteForeignKeyExpression>()));
+            contextMock.VerifyGet(x => x.Expressions);
 		}
 
 		[Test]
@@ -103,30 +96,42 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
 			var contextMock = new Mock<IMigrationContext>();
             contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
-			contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
-
+			
 			var root = new DeleteExpressionRoot(contextMock.Object);
 			var builder = root.ForeignKey();
 
 			builder.ShouldBeOfType<DeleteForeignKeyExpressionBuilder>();
-			contextMock.VerifyAll();
+            contextMock.VerifyGet(x => x.Expressions);
 		}
 
 		[Test]
 		public void CallingForeignKeyWithNameAddsDeleteForeignKeyExpressionToContextWithSpecifiedName()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-            collectionMock.Verify(x => x.Add(It.Is<DeleteForeignKeyExpression>(e => e.ForeignKey.Name.Equals("FK_Bacon"))), Times.AtMostOnce());
-
+            
 			var contextMock = new Mock<IMigrationContext>();
             contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
-			contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
-
+			
 			var root = new DeleteExpressionRoot(contextMock.Object);
 			root.ForeignKey("FK_Bacon");
 
-			collectionMock.VerifyAll();
-			contextMock.VerifyAll();
+            collectionMock.Verify(x => x.Add(It.Is<DeleteForeignKeyExpression>(e => e.ForeignKey.Name.Equals("FK_Bacon"))));
+            contextMock.VerifyGet(x => x.Expressions);
 		}
+
+        [Test]
+        public void CallingSequenceAddsDeleteSequenceExpressionToContextWithSpecifiedName()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+            
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+            
+            var root = new DeleteExpressionRoot(contextMock.Object);
+            root.Sequence("Bacon");
+
+            collectionMock.Verify(x => x.Add(It.Is<DeleteSequenceExpression>(e => e.SequenceName.Equals("Bacon"))));
+            contextMock.VerifyGet(x => x.Expressions);
+        }
 	}
 }

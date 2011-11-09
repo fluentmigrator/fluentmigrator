@@ -3,6 +3,7 @@
 namespace FluentMigrator.Tests.Unit.Generators
 {
     using System;
+    using FluentMigrator.Expressions;
     using FluentMigrator.Runner.Generators.Generic;
 
     public class GenericGeneratorImplementor : GenericGenerator
@@ -103,6 +104,16 @@ namespace FluentMigrator.Tests.Unit.Generators
         }
 
         public override string Generate(FluentMigrator.Expressions.AlterSchemaExpression expression)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override string Generate(CreateSequenceExpression expression)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override string Generate(DeleteSequenceExpression expression)
         {
             throw new NotImplementedException();
         }

@@ -135,5 +135,15 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 					}
 					return base.Generate(expression);
 				}
+
+        public override string Generate(CreateSequenceExpression expression)
+        {
+            return compatabilityMode.HandleCompatabilty("Sequences are not supported in SqlSever2000");
+        }
+
+        public override string Generate(DeleteSequenceExpression expression)
+        {
+            return compatabilityMode.HandleCompatabilty("Sequences are not supported in SqlServer2000");
+        }
     }
 }

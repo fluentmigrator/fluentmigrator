@@ -24,7 +24,9 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Create
 {
-	public interface ICreateExpressionRoot : IFluentSyntax
+    using Sequence;
+
+    public interface ICreateExpressionRoot : IFluentSyntax
 	{
 		void Schema(string schemaName);
 		ICreateTableWithColumnOrSchemaSyntax Table(string tableName);
@@ -33,5 +35,7 @@ namespace FluentMigrator.Builders.Create
 		ICreateForeignKeyFromTableSyntax ForeignKey(string foreignKeyName);
 		ICreateIndexForTableSyntax Index();
 		ICreateIndexForTableSyntax Index(string indexName);
+
+        ICreateSequenceInSchemaSyntax Sequence(string sequenceName);
 	}
 }
