@@ -47,7 +47,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
 
-        public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
+				public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
+
+				public virtual string IdentityInsert { get { return "SET IDENTITY_INSERT {0} {1}"; } }
 
         //Not need for the nonclusted keyword as it is the default mode
         public override string GetClusterTypeString(CreateIndexExpression column)
@@ -126,9 +128,10 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 				{
 					if (expression.UsingIdentityInsert)
 					{
-						return string.Format("SET IDENTITY_INSERT {0} ON; {1}; SET IDENTITY_INSERT {0} OFF",
-									Quoter.QuoteTableName(expression.TableName),
-									base.Generate(expression));
+						return string.Format("{0}; {1}; {2}",
+									string.Format(IdentityInsert, Quoter.QuoteTableName(expression.TableName), "ON"),
+									base.Generate(expression),
+									string.Format(IdentityInsert, Quoter.QuoteTableName(expression.TableName), "OFF"));
 					}
 					return base.Generate(expression);
 				}
