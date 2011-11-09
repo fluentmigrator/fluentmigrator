@@ -121,5 +121,16 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             return String.Format(sql,Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.ColumnName),Quoter.QuoteValue(expression.DefaultValue));
         }
+
+				public override string Generate(InsertDataExpression expression)
+				{
+					if (expression.UsingIdentityInsert)
+					{
+						return string.Format("SET IDENTITY_INSERT {0} ON; {1}; SET IDENTITY_INSERT {0} OFF",
+									Quoter.QuoteTableName(expression.TableName),
+									base.Generate(expression));
+					}
+					return base.Generate(expression);
+				}
     }
 }

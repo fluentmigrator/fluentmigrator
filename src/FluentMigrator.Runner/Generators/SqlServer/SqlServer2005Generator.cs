@@ -128,6 +128,14 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             List<string> columnValues = new List<string>();
             List<string> insertStrings = new List<string>();
 
+					  if (expression.UsingIdentityInsert) 
+						{
+							insertStrings.Add(string.Format("SET IDENTITY_INSERT {0}.{1} {2}",
+										Quoter.QuoteSchemaName(expression.SchemaName),
+										Quoter.QuoteTableName(expression.TableName),
+										"ON"));
+					  }
+
             foreach (InsertionDataDefinition row in expression.Rows)
             {
                 columnNames.Clear();
@@ -145,7 +153,16 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                     ,Quoter.QuoteTableName(expression.TableName)
                     , columns
                     , values));
-            }
+						}
+
+						if (expression.UsingIdentityInsert)
+						{
+							insertStrings.Add(string.Format("SET IDENTITY_INSERT {0}.{1} {2}",
+										Quoter.QuoteSchemaName(expression.SchemaName),
+										Quoter.QuoteTableName(expression.TableName),
+										"OFF"));
+						}
+
             return String.Join("; ", insertStrings.ToArray());
         }
 

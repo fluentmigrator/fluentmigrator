@@ -50,5 +50,15 @@ namespace FluentMigrator.Tests.Unit.Builders.Insert
 			expression.Rows[1][1].Key.ShouldBe("Data2");
 			expression.Rows[1][1].Value.ShouldBe("Row2Data2");
 		}
+
+		[Test]
+		public void UsingIdentityInsertGetsSetWhenWithIdentityInsertIsCalled() 
+		{
+			var expression = new InsertDataExpression();
+			var builder = new InsertDataExpressionBuilder(expression);
+			builder.WithIdentityInsert();
+
+			expression.UsingIdentityInsert.ShouldBe(true);
+		}
 	}
 }

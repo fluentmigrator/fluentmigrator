@@ -38,6 +38,12 @@ namespace FluentMigrator.Builders.Insert
 			return this;
 		}
 
+		public IInsertDataSyntax WithIdentityInsert()
+		{
+			_expression.UsingIdentityInsert = true;
+			return this;
+		}
+
 		public IInsertDataSyntax InSchema(string schemaName)
 		{
 			_expression.SchemaName = schemaName;
