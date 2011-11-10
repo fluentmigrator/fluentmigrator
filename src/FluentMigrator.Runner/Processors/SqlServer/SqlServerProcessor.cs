@@ -24,14 +24,18 @@ using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-    public sealed class SqlServerProcessor : ProcessorBase
+	public sealed class SqlServerProcessor : ProcessorBase
     {
 		private readonly IDbFactory factory;
 		public IDbConnection Connection { get; private set; }
         public IDbTransaction Transaction { get; private set; }
-        public bool WasCommitted { get; private set; }
 
-        public override string DatabaseType
+		public bool TransactionOpened
+		{
+			get { return Transaction != null; }
+		}
+
+		public override string DatabaseType
         {
             get { return "SqlServer"; }
         }
@@ -42,7 +46,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         	this.factory = factory;
         	Connection = connection;
             connection.Open();
-            BeginTransaction();
         }
 
 		private static string SafeSchemaName(string schemaName)
@@ -83,7 +86,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             return Exists("SELECT NULL FROM sysindexes WHERE name = '{0}'", FormatSqlEscape(indexName));
         }
 
-	    public override void Execute(string template, params object[] args)
+        public override void Execute(string template, params object[] args)
         {
             Process(String.Format(template, args));
         }
@@ -128,23 +131,21 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             Announcer.Say("Committing Transaction");
             Transaction.Commit();
-            WasCommitted = true;
-            if (Connection.State != ConnectionState.Closed)
-            {
-                Connection.Close();
-            }
+			Transaction = null;
         }
 
         public override void RollbackTransaction()
         {
             Announcer.Say("Rolling back transaction");
             Transaction.Rollback();
-            WasCommitted = true;
-            if (Connection.State != ConnectionState.Closed)
-            {
-                Connection.Close();
-            }
+        	Transaction = null;
         }
+
+		protected override void CloseConnection()
+		{
+			if (Connection.State != ConnectionState.Closed)
+				Connection.Close();
+		}
 
         protected override void Process(string sql)
         {
@@ -159,7 +160,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             if (sql.Contains("GO"))
             {
                 ExecuteBatchNonQuery(sql);
-
             }
             else
             {
@@ -169,7 +169,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         private void ExecuteNonQuery(string sql)
         {
-            using (var command = factory.CreateCommand(sql, Connection, Transaction))
+            using (var command = CreateCommand(sql))
             {
                 try
                 {
@@ -190,12 +190,12 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
         }
 
-        private void ExecuteBatchNonQuery(string sql)
+		private void ExecuteBatchNonQuery(string sql)
         {
             sql += "\nGO";   // make sure last batch is executed.
             string sqlBatch = string.Empty;
 
-            using (var command = factory.CreateCommand(string.Empty, Connection, Transaction))
+            using (var command = CreateCommand(string.Empty))
             {
                 try
                 {
@@ -230,8 +230,12 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
         }
 
+		private DbCommand CreateCommand(string sql)
+		{
+			return factory.CreateCommand(sql, Connection, Transaction);
+		}
 
-        public override void Process(PerformDBOperationExpression expression)
+		public override void Process(PerformDBOperationExpression expression)
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
@@ -243,5 +247,15 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             return sql.Replace("'", "''");
         }
+
+		protected override void Dispose(bool disposing)
+		{
+			var transaction = Transaction;
+			if (transaction != null)
+				transaction.Dispose();
+			var connection = Connection;
+			if (connection != null)
+				connection.Dispose();
+		}
     }
 }

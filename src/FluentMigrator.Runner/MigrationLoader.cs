@@ -19,8 +19,8 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using FluentMigrator.Infrastructure;
 using System.Linq;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Runner
 {
@@ -31,6 +31,7 @@ namespace FluentMigrator.Runner
 		public string Namespace { get; private set; }
 		public bool LoadNestedNamespaces { get; private set; }
 		public SortedList<long, IMigration> Migrations { get; private set; }
+		public Dictionary<long, IMigrationMetadata> MigrationMetadata { get; private set; }
 
 		public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace)
 		{
@@ -53,16 +54,19 @@ namespace FluentMigrator.Runner
 		private void Initialize()
 		{
 			Migrations = new SortedList<long, IMigration>();
+			MigrationMetadata = new Dictionary<long, IMigrationMetadata>();
 
 			IEnumerable<MigrationMetadata> migrationList = FindMigrations();
 
-			if (migrationList == null)
+			if (MigrationMetadata == null)
 				return;
 
 			foreach (var migrationMetadata in migrationList)
 			{
 				if (Migrations.ContainsKey(migrationMetadata.Version))
 					throw new Exception(String.Format("Duplicate migration version {0}.", migrationMetadata.Version));
+
+				MigrationMetadata.Add(migrationMetadata.Version, migrationMetadata);
 
 				var migration = migrationMetadata.Type.Assembly.CreateInstance(migrationMetadata.Type.FullName);
 				Migrations.Add(migrationMetadata.Version, migration as IMigration);

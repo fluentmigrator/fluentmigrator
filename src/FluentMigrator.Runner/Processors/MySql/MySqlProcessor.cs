@@ -178,9 +178,22 @@ SELECT CONCAT(
             Process(Generator.Generate(expression) + columnDefinition);
         }
 
+		protected override void CloseConnection()
+		{
+			if (Connection.State != ConnectionState.Closed)
+				Connection.Close();
+		}
+
         private static string FormatSqlEscape(string value)
         {
             return value.Replace("'", "''");
         }
+
+		protected override void Dispose(bool disposing)
+		{
+			var connection = Connection;
+			if (connection != null)
+				connection.Dispose();
+		}
     }
 }

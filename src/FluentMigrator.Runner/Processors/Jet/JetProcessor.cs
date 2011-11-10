@@ -127,5 +127,18 @@ namespace FluentMigrator.Runner.Processors.Jet
                 return indexes.Rows.Count > 0;
             }
         }
+
+    	protected override void CloseConnection()
+		{
+			if (Connection.State != ConnectionState.Closed)
+				Connection.Close();
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			var connection = Connection;
+			if (connection != null)
+				connection.Dispose();
+		}
     }
 }

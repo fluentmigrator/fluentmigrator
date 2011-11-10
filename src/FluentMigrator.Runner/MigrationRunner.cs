@@ -18,8 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using FluentMigrator.Expressions;
@@ -30,9 +28,9 @@ namespace FluentMigrator.Runner
 {
     public class MigrationRunner : IMigrationRunner
     {
-        private Assembly _migrationAssembly;
-        private IAnnouncer _announcer;
-        private IStopWatch _stopWatch;
+        private readonly Assembly _migrationAssembly;
+        private readonly IAnnouncer _announcer;
+        private readonly IStopWatch _stopWatch;
         private bool _alreadyOutputPreviewOnlyModeWarning;
         public bool SilentlyFail { get; set; }
 
@@ -70,58 +68,55 @@ namespace FluentMigrator.Runner
 
         public void MigrateUp()
         {
+#pragma warning disable 612,618
             MigrateUp(true);
+#pragma warning restore 612,618
         }
 
+		[Obsolete("Please avoid to use this method. It was made public by mistake and would be removed in future")]
         public void MigrateUp(bool useAutomaticTransactionManagement)
         {
-            try
-            {
-                foreach (var version in MigrationLoader.Migrations.Keys)
-                {
-                    ApplyMigrationUp(version);
-                }
-
-                ApplyProfiles();
-
-                if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
-                VersionLoader.LoadVersionInfo();
-            }
-            catch (Exception)
-            {
-                if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
-                throw;
-            }
+			MigrateUpInner(useAutomaticTransactionManagement, MigrationLoader.Migrations.Keys, true);
         }
 
-        public void MigrateUp(long targetVersion)
+    	public void MigrateUp(long targetVersion)
         {
+#pragma warning disable 612,618
             MigrateUp(targetVersion, true);
+#pragma warning restore 612,618
         }
 
-        public void MigrateUp(long targetVersion, bool useAutomaticTransactionManagement)
+		[Obsolete("Please avoid to use this method. It was made public by mistake and would be removed in future")]
+    	public void MigrateUp(long targetVersion, bool useAutomaticTransactionManagement)
         {
-            try
-            {
-                foreach (var neededMigrationVersion in GetUpMigrationsToApply(targetVersion))
-                {
-                    ApplyMigrationUp(neededMigrationVersion);
-                }
-                if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
-                VersionLoader.LoadVersionInfo();
-            }
-            catch (Exception)
-            {
-                if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
-                throw;
-            }
+			MigrateUpInner(useAutomaticTransactionManagement, GetUpMigrationsToApply(targetVersion), false);            
         }
 
-        private IEnumerable<long> GetUpMigrationsToApply(long version)
+    	private void MigrateUpInner(bool useAutomaticTransactionManagement, IEnumerable<long> versions, bool applyProfiles)
+    	{
+    		try
+    		{
+    			foreach (var version in versions)
+    			{
+    				ApplyMigrationUp(version);
+    			}
+
+				if (applyProfiles)
+					ApplyProfiles();
+
+    			VersionLoader.LoadVersionInfo();
+    		}
+    		catch (Exception)
+    		{
+    			if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
+    			throw;
+    		}
+    	}
+
+    	private IEnumerable<long> GetUpMigrationsToApply(long version)
         {
             return MigrationLoader.Migrations.Keys.Where(x => IsMigrationStepNeededForUpMigration(x, version));
         }
-
 
         private bool IsMigrationStepNeededForUpMigration(long versionOfMigration, long targetVersion)
         {
@@ -130,14 +125,16 @@ namespace FluentMigrator.Runner
                 return true;
             }
             return false;
-
         }
 
         public void MigrateDown(long targetVersion)
         {
+#pragma warning disable 612,618
             MigrateDown(targetVersion, true);
+#pragma warning restore 612,618
         }
 
+		[Obsolete("Please avoid to use this method. It was made public by mistake and would be removed in future")]
         public void MigrateDown(long targetVersion, bool useAutomaticTransactionManagement)
         {
             try
@@ -147,7 +144,6 @@ namespace FluentMigrator.Runner
                     ApplyMigrationDown(neededMigrationVersion);
                 }
 
-                if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
                 VersionLoader.LoadVersionInfo();
             }
             catch (Exception)
@@ -161,7 +157,6 @@ namespace FluentMigrator.Runner
         {
             return MigrationLoader.Migrations.Keys.Where(x => IsMigrationStepNeededForDownMigration(x, targetVersion)).Reverse();
         }
-
 
         private bool IsMigrationStepNeededForDownMigration(long versionOfMigration, long targetVersion)
         {
@@ -183,8 +178,16 @@ namespace FluentMigrator.Runner
 
             if (!VersionLoader.VersionInfo.HasAppliedMigration(version))
             {
+				var migrationMetadata = MigrationLoader.MigrationMetadata[version];
+
+				if (!migrationMetadata.Transactionless)
+					Processor.BeginTransaction();
+
                 Up(MigrationLoader.Migrations[version]);
                 VersionLoader.UpdateVersionInfo(version);
+
+				if (!migrationMetadata.Transactionless)
+					Processor.CommitTransaction();
             }
         }
 
@@ -192,8 +195,16 @@ namespace FluentMigrator.Runner
         {
             try
             {
+				var migrationMetadata = MigrationLoader.MigrationMetadata[version];
+
+				if (!migrationMetadata.Transactionless)
+					Processor.BeginTransaction();
+
                 Down(MigrationLoader.Migrations[version]);
                 VersionLoader.DeleteVersion(version);
+
+				if (!migrationMetadata.Transactionless)
+					Processor.CommitTransaction();
             }
             catch (KeyNotFoundException ex)
             {
@@ -208,9 +219,12 @@ namespace FluentMigrator.Runner
 
         public void Rollback(int steps)
         {
+#pragma warning disable 612,618
             Rollback(steps, true);
+#pragma warning restore 612,618
         }
 
+		[Obsolete("Please avoid to use this method. It was made public by mistake and would be removed in future")]
         public void Rollback(int steps, bool useAutomaticTransactionManagement)
         {
             try
@@ -224,8 +238,6 @@ namespace FluentMigrator.Runner
 
                 if (!VersionLoader.VersionInfo.AppliedMigrations().Any())
                     VersionLoader.RemoveVersionTable();
-
-                if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
             }
             catch (Exception)
             {
@@ -236,9 +248,12 @@ namespace FluentMigrator.Runner
 
         public void RollbackToVersion(long version)
         {
+#pragma warning disable 612,618
             RollbackToVersion(version, true);
+#pragma warning restore 612,618
         }
 
+		[Obsolete("Please avoid to use this method. It was made public by mistake and would be removed in future")]
         public void RollbackToVersion(long version, bool useAutomaticTransactionManagement)
         {
             //TODO: Extract VersionsToApply Strategy
@@ -257,8 +272,6 @@ namespace FluentMigrator.Runner
                     VersionLoader.RemoveVersionTable();
                 else
                     VersionLoader.LoadVersionInfo();
-
-                if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
             }
             catch (Exception)
             {
@@ -283,7 +296,9 @@ namespace FluentMigrator.Runner
             migration.GetUpExpressions(context);
 
             _stopWatch.Start();
+#pragma warning disable 612,618
             ExecuteExpressions(context.Expressions);
+#pragma warning restore 612,618
             _stopWatch.Stop();
 
             _announcer.Say(name + ": migrated");
@@ -301,7 +316,9 @@ namespace FluentMigrator.Runner
             migration.GetDownExpressions(context);
 
             _stopWatch.Start();
+#pragma warning disable 612,618
             ExecuteExpressions(context.Expressions);
+#pragma warning restore 612,618
             _stopWatch.Stop();
 
             _announcer.Say(name + ": reverted");
@@ -312,6 +329,7 @@ namespace FluentMigrator.Runner
         /// execute each migration expression in the expression collection
         /// </summary>
         /// <param name="expressions"></param>
+		[Obsolete("Please avoid to use this method. It was made public by mistake and would be removed in future")]
         protected void ExecuteExpressions(ICollection<IMigrationExpression> expressions)
         {
             long insertTicks = 0;
@@ -323,12 +341,14 @@ namespace FluentMigrator.Runner
                     expression.ApplyConventions(Conventions);
                     if (expression is InsertDataExpression)
                     {
-                        insertTicks += Time(() => expression.ExecuteWith(Processor));
+                    	var insertDataExpression = (InsertDataExpression) expression;
+                    	insertTicks += Time(() => insertDataExpression.ExecuteWith(Processor));
                         insertCount++;
                     }
                     else
                     {
-                        AnnounceTime(expression.ToString(), () => expression.ExecuteWith(Processor));
+                    	var localExpression = expression;
+                    	AnnounceTime(expression.ToString(), () => localExpression.ExecuteWith(Processor));
                     }
                 }
                 catch (Exception er)

@@ -21,12 +21,13 @@ using System.Collections.Generic;
 
 namespace FluentMigrator.Infrastructure
 {
-	public class MigrationMetadata
+	public class MigrationMetadata : IMigrationMetadata
 	{
 		private readonly Dictionary<string, object> _traits = new Dictionary<string, object>();
 
 		public Type Type { get; set; }
 		public long Version { get; set; }
+		public bool Transactionless { get; set; }
 
 		public object Trait(string name)
 		{

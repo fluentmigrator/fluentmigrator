@@ -25,11 +25,11 @@ using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.Sqlite
 {
-
     public class SqliteProcessor : ProcessorBase
     {
         private readonly DbFactoryBase factory;
         public IDbConnection Connection { get; set; }
+        public DbTransaction Transaction { get; set; }
 
         public override string DatabaseType
         {
@@ -77,7 +77,7 @@ namespace FluentMigrator.Runner.Processors.Sqlite
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
-            using (var command = factory.CreateCommand(String.Format(template, args), Connection))
+			using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             using (var reader = command.ExecuteReader())
             {
                 try
@@ -106,6 +106,12 @@ namespace FluentMigrator.Runner.Processors.Sqlite
                 expression.Operation(Connection, null);
         }
 
+    	protected override void CloseConnection()
+		{
+			if (Connection.State != ConnectionState.Closed)
+				Connection.Close();
+		}
+
         protected override void Process(string sql)
         {
             Announcer.Sql(sql);
@@ -119,19 +125,16 @@ namespace FluentMigrator.Runner.Processors.Sqlite
             if (sql.Contains("GO"))
             {
                 ExecuteBatchNonQuery(sql);
-
             }
             else
             {
                 ExecuteNonQuery(sql);
             }
-
-
         }
 
         private void ExecuteNonQuery(string sql)
         {
-            using (var command = factory.CreateCommand(sql, Connection))
+            using (var command = factory.CreateCommand(sql, Connection, Transaction))
             {
                 try
                 {
@@ -149,7 +152,7 @@ namespace FluentMigrator.Runner.Processors.Sqlite
             sql += "\nGO";   // make sure last batch is executed.
             string sqlBatch = string.Empty;
 
-            using (var command = factory.CreateCommand(sql, Connection))
+			using (var command = factory.CreateCommand(sql, Connection, Transaction))
             {
                 try
                 {
@@ -182,12 +185,35 @@ namespace FluentMigrator.Runner.Processors.Sqlite
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
             var ds = new DataSet();
-            using (var command = factory.CreateCommand(String.Format(template, args), Connection))
+			using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             {
                 var adapter = factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
                 return ds;
             }
         }
+
+		public override void BeginTransaction()
+		{
+			Announcer.Say("Beginning Transaction");
+			Transaction = Connection.BeginTransaction();
+		}
+
+		public override void CommitTransaction()
+		{
+			Announcer.Say("Committing Transaction");
+			Transaction.Commit();
+			Transaction = null;
+		}
+
+		protected override void Dispose(bool disposing)
+		{
+			var transaction = Transaction;
+			if (transaction != null)
+				transaction.Dispose();
+			var connection = Connection;
+			if (connection != null)
+				connection.Dispose();
+		}
     }
 }

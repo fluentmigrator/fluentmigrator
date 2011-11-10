@@ -21,7 +21,9 @@ using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Processors
 {
-    public abstract class ProcessorBase : IMigrationProcessor
+	using System;
+
+	public abstract class ProcessorBase : IMigrationProcessor
     {
         protected readonly IMigrationGenerator Generator;
         protected readonly IAnnouncer Announcer;
@@ -33,9 +35,9 @@ namespace FluentMigrator.Runner.Processors
             Generator = generator;
             Announcer = announcer;
             Options = options;
-        }
+        }    	
 
-        public virtual void Process(CreateSchemaExpression expression)
+    	public virtual void Process(CreateSchemaExpression expression)
         {
             Process(Generator.Generate(expression));
         }
@@ -156,6 +158,10 @@ namespace FluentMigrator.Runner.Processors
         {
         }
 
+		protected virtual void CloseConnection()
+		{			
+		}
+
         public abstract System.Data.DataSet ReadTableData(string schemaName, string tableName);
         public abstract System.Data.DataSet Read(string template, params object[] args);
         public abstract bool Exists(string template, params object[] args);
@@ -165,5 +171,20 @@ namespace FluentMigrator.Runner.Processors
         public abstract bool ColumnExists(string schemaName, string tableName, string columnName);
         public abstract bool ConstraintExists(string schemaName, string tableName, string constraintName);
         public abstract bool IndexExists(string schemaName, string tableName, string indexName);
+    	
+		public void Dispose()
+		{
+			Dispose(true);
+			GC.SuppressFinalize(this);
+		}
+
+    	~ProcessorBase()
+		{
+			Dispose(false);
+		}
+
+    	protected virtual void Dispose(bool disposing)
+    	{
+    	}
     }
 }
