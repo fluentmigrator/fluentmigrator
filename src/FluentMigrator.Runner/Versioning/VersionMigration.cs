@@ -34,8 +34,7 @@ namespace FluentMigrator.Runner.Versioning
 		{
 			Create.Table(_versionTableMetaData.TableName)
                 .InSchema(_versionTableMetaData.SchemaName)
-				.WithColumn(_versionTableMetaData.ColumnName).AsInt64().NotNullable()
-                .PrimaryKey();
+				.WithColumn(_versionTableMetaData.ColumnName).AsInt64().NotNullable();
 		}
 
 		public override void Down()
