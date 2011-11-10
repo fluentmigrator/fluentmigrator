@@ -190,7 +190,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
 			return string.Format("ALTER TABLE {0}.{1} SET SCHEMA {2}", Quoter.QuoteSchemaName(expression.SourceSchemaName), Quoter.QuoteTableName(expression.TableName), Quoter.QuoteSchemaName(expression.DestinationSchemaName));
 		}
 
-
+        
 		protected string GetColumnList(IEnumerable<string> columns)
 		{
 			var result = "";

@@ -29,15 +29,15 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 	public sealed class SqlServerCeProcessor : ProcessorBase
     {
 		private readonly IDbFactory factory;
-		public DbConnection Connection { get; private set; }
-		public DbTransaction Transaction { get; private set; }
+		public IDbConnection Connection { get; private set; }
+		public IDbTransaction Transaction { get; private set; }
 
 		public override string DatabaseType
         {
             get { return "SqlServerCe"; }
         }
 
-        public SqlServerCeProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public SqlServerCeProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(generator, announcer, options)
         {
         	this.factory = factory;
@@ -98,8 +98,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             var ds = new DataSet();
 			using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
-			using (var adapter = factory.CreateDataAdapter(command))
             {
+			    var adapter = factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
                 return ds;
             }

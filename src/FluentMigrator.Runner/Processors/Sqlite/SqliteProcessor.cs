@@ -28,7 +28,7 @@ namespace FluentMigrator.Runner.Processors.Sqlite
     public class SqliteProcessor : ProcessorBase
     {
         private readonly DbFactoryBase factory;
-        public DbConnection Connection { get; set; }
+        public IDbConnection Connection { get; set; }
         public DbTransaction Transaction { get; set; }
 
         public override string DatabaseType
@@ -36,7 +36,7 @@ namespace FluentMigrator.Runner.Processors.Sqlite
             get { return "Sqlite"; }
         }
 
-        public SqliteProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, DbFactoryBase factory)
+        public SqliteProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, DbFactoryBase factory)
             : base(generator, announcer, options)
         {
             this.factory = factory;
@@ -186,8 +186,8 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
             var ds = new DataSet();
 			using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
-            using (var adapter = factory.CreateDataAdapter(command))
             {
+                var adapter = factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
                 return ds;
             }

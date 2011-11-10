@@ -60,8 +60,10 @@ namespace FluentMigrator.Builders.Alter.Column
 							ColumnName = Expression.Column.Name,
 							DefaultValue = value
 						};
-
+            
 			_context.Expressions.Add( dc );
+
+		    Expression.Column.DefaultValue = value;
 
 			return this;
 		}

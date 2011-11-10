@@ -33,10 +33,10 @@ namespace FluentMigrator.Tests.Integration.Processors
     [TestFixture]
 	public class SqliteProcessorTests
 	{
-		private DbConnection connection;
+		private IDbConnection connection;
 		private SqliteProcessor processor;
 		private Mock<ColumnDefinition> column;
-		private DbCommand command;
+		private IDbCommand command;
 		private string columnName;
 		private string tableName;
         private string tableNameThanMustBeEscaped;

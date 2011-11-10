@@ -27,14 +27,14 @@ namespace FluentMigrator.Runner.Processors.MySql
 	public class MySqlProcessor : ProcessorBase
     {
 		private readonly IDbFactory factory;
-		private DbConnection Connection { get; set; }
+		private IDbConnection Connection { get; set; }
 
         public override string DatabaseType
         {
             get { return "MySql"; }
         }
 
-        public MySqlProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public MySqlProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(generator, announcer, options)
         {
         	this.factory = factory;
@@ -122,11 +122,9 @@ namespace FluentMigrator.Runner.Processors.MySql
             {
                 command.CommandTimeout = Options.Timeout;
 
-				using (var adapter = factory.CreateDataAdapter(command))
-                {
-                    adapter.Fill(ds);
-                    return ds;
-                }
+                var adapter = factory.CreateDataAdapter(command);
+                adapter.Fill(ds);
+                return ds;
             }
         }
 

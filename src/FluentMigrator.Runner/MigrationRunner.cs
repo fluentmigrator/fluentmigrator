@@ -155,7 +155,7 @@ namespace FluentMigrator.Runner
 
         private IEnumerable<long> GetDownMigrationsToApply(long targetVersion)
         {
-            return MigrationLoader.Migrations.Keys.Where(x => IsMigrationStepNeededForDownMigration(x, targetVersion));
+            return MigrationLoader.Migrations.Keys.Where(x => IsMigrationStepNeededForDownMigration(x, targetVersion)).Reverse();
         }
 
         private bool IsMigrationStepNeededForDownMigration(long versionOfMigration, long targetVersion)

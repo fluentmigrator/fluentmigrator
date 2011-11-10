@@ -12,15 +12,15 @@ namespace FluentMigrator.Runner.Processors.Postgres
     {
 		private readonly IDbFactory factory;
 		readonly PostgresQuoter quoter = new PostgresQuoter();
-        public DbConnection Connection { get; private set; }
-        public DbTransaction Transaction { get; private set; }
+        public IDbConnection Connection { get; private set; }
+        public IDbTransaction Transaction { get; private set; }
 
 		public override string DatabaseType
         {
             get { return "Postgres"; }
         }
 
-        public PostgresProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public PostgresProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(generator, announcer, options)
         {
         	this.factory = factory;
@@ -58,7 +58,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
             return Exists("select * from pg_catalog.pg_indexes where schemaname='{0}' and tablename = '{1}' and indexname = '{2}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(tableName), FormatToSafeName(indexName));
         }
 
-        public override DataSet ReadTableData(string schemaName, string tableName)
+	    public override DataSet ReadTableData(string schemaName, string tableName)
         {
             return Read("SELECT * FROM {0}.{1}", quoter.QuoteSchemaName(schemaName), quoter.QuoteTableName(tableName));
         }
@@ -69,8 +69,8 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
             var ds = new DataSet();
 			using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
-			using (var adapter = factory.CreateDataAdapter(command))
-            {
+			{
+			    var adapter = factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
                 return ds;
             }

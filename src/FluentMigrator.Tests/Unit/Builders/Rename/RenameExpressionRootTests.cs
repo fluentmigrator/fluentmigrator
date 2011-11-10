@@ -35,17 +35,15 @@ namespace FluentMigrator.Tests.Unit.Builders.Rename
 		public void CallingTableAddsRenameTableExpressionToContextWithSpecifiedOldName()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			collectionMock.Verify(x => x.Add(It.Is<RenameTableExpression>(e => e.OldName.Equals("Bacon"))), Times.AtMostOnce());
-
+			
 			var contextMock = new Mock<IMigrationContext>();
 			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object);
-            contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
-
+            
 			var root = new RenameExpressionRoot(contextMock.Object);
 			root.Table("Bacon");
 
-			collectionMock.VerifyAll();
-			contextMock.VerifyAll();
+            collectionMock.Verify(x => x.Add(It.Is<RenameTableExpression>(e => e.OldName.Equals("Bacon"))));
+            contextMock.VerifyGet(x => x.Expressions);
 		}
 
 		[Test]
@@ -54,30 +52,27 @@ namespace FluentMigrator.Tests.Unit.Builders.Rename
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
 			var contextMock = new Mock<IMigrationContext>();
 			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object);
-            contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
-
+            
 			var root = new RenameExpressionRoot(contextMock.Object);
 			var builder = root.Table("Bacon");
 
 			builder.ShouldBeOfType<RenameTableExpressionBuilder>();
-			contextMock.VerifyAll();
+            contextMock.VerifyGet(x => x.Expressions);
 		}
 
 		[Test]
 		public void CallingColumnAddsRenameColumnExpressionToContextWithSpecifiedOldName()
 		{
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-            collectionMock.Verify(x => x.Add(It.Is<RenameColumnExpression>(e => e.OldName.Equals("Bacon"))), Times.AtMostOnce());
-
+            
 			var contextMock = new Mock<IMigrationContext>();
 			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object);
-            contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
-
+            
 			var root = new RenameExpressionRoot(contextMock.Object);
 			root.Column("Bacon");
 
-			collectionMock.VerifyAll();
-			contextMock.VerifyAll();
+            collectionMock.Verify(x => x.Add(It.Is<RenameColumnExpression>(e => e.OldName.Equals("Bacon"))));
+            contextMock.VerifyGet(x => x.Expressions);
 		}
 
 		[Test]
@@ -86,13 +81,12 @@ namespace FluentMigrator.Tests.Unit.Builders.Rename
 			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
 			var contextMock = new Mock<IMigrationContext>();
 			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object);
-            contextMock.VerifyGet(x => x.Expressions, Times.AtMostOnce());
-
+            
 			var root = new RenameExpressionRoot(contextMock.Object);
 			var builder = root.Column("Bacon");
 
 			builder.ShouldBeOfType<RenameColumnExpressionBuilder>();
-			contextMock.VerifyAll();
+            contextMock.VerifyGet(x => x.Expressions);
 		}
 	}
 }
