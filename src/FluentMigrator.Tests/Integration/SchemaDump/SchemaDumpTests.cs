@@ -100,7 +100,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump {
 
             SchemaTestWriter testWriter = new SchemaTestWriter();
             var output = GetOutput(testWriter, defs);
-            string expectedMessage = testWriter.GetMessage(4, 9, 3, 1);            
+            string expectedMessage = testWriter.GetMessage(4, 9, 2, 1);            
 
             runner.Down(new TestMigration());
 
