@@ -9,17 +9,22 @@ namespace FluentMigrator.Runner
 {
 	public class ProfileLoader : IProfileLoader
 	{
-		public ProfileLoader(IRunnerContext runnerContext, IMigrationRunner runner, IMigrationConventions conventions)
+        public ProfileLoader(IRunnerContext runnerContext, IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions)
+            : this(runnerContext, runner, new[] { assembly }, conventions)
 		{
-			Runner = runner;
-			Assembly = runner.MigrationAssembly;
-			Profile = runnerContext.Profile;
-			Conventions = conventions;
-
-			Initialize();
 		}
 
-		private Assembly Assembly { get; set; }
+        public ProfileLoader(IRunnerContext runnerContext, IMigrationRunner runner, IEnumerable<Assembly> assemblies, IMigrationConventions conventions)
+        {
+            Runner = runner;
+            Assemblies = assemblies.ToList();
+            Profile = runnerContext.Profile;
+            Conventions = conventions;
+
+            Initialize();
+        }
+
+		private IList<Assembly> Assemblies { get; set; }
 		private string Profile { get; set; }
 		protected IMigrationConventions Conventions { get; set; }
 		private IMigrationRunner Runner { get; set; }
@@ -31,21 +36,23 @@ namespace FluentMigrator.Runner
 			_profiles = new List<IMigration>();
 
 			if (!string.IsNullOrEmpty(Profile))
-				_profiles = FindProfilesIn(Assembly, Profile);
+				_profiles = FindProfilesIn(Assemblies, Profile);
 		}
 
 		public IEnumerable<IMigration> FindProfilesIn(Assembly assembly, string profile)
 		{
-			IEnumerable<Type> matchedTypes = assembly.GetExportedTypes()
+		    IEnumerable<Type> matchedTypes = assembly.GetExportedTypes()
 				.Where(t => Conventions.TypeIsProfile(t) && t.GetOneAttribute<ProfileAttribute>().ProfileName.ToLower() == profile.ToLower());
 
-			foreach (Type type in matchedTypes)
-			{
-				yield return type.Assembly.CreateInstance(type.FullName) as IMigration;
-			}
+		    return matchedTypes.Select(type => type.Assembly.CreateInstance(type.FullName) as IMigration);
 		}
 
-		public IEnumerable<IMigration> Profiles
+	    public IEnumerable<IMigration>  FindProfilesIn(IEnumerable<Assembly> assemblies, string profile)
+        {
+            return assemblies.SelectMany(assembly => FindProfilesIn(assembly, profile));
+        }
+
+	    public IEnumerable<IMigration> Profiles
 		{
 			get
 			{

@@ -27,28 +27,36 @@ namespace FluentMigrator.Runner
 	public class MigrationLoader : IMigrationLoader
 	{
 		public IMigrationConventions Conventions { get; private set; }
-		public Assembly Assembly { get; private set; }
+		public IList<Assembly> Assemblies { get; private set; }
 		public string Namespace { get; private set; }
 		public bool LoadNestedNamespaces { get; private set; }
 		public SortedList<long, IMigration> Migrations { get; private set; }
 
 		public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace)
+            : this (conventions, new[] { assembly }, @namespace)
 		{
-			Conventions = conventions;
-			Assembly = assembly;
-			Namespace = @namespace;
-
-			Initialize();
 		}
+
 		public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, bool loadNestedNamespaces)
+            : this (conventions, new [] { assembly }, @namespace, loadNestedNamespaces)
 		{
-			Conventions = conventions;
-			Assembly = assembly;
-			Namespace = @namespace;
-			LoadNestedNamespaces = loadNestedNamespaces;
-
-			Initialize();
 		}
+
+        public MigrationLoader(IMigrationConventions conventions, IEnumerable<Assembly> assemblies, string @namespace, bool loadNestedNamespaces)
+        {
+            Conventions = conventions;
+            Assemblies = assemblies.ToList();
+            Namespace = @namespace;
+            LoadNestedNamespaces = loadNestedNamespaces;
+
+            Initialize();
+        }
+
+        public MigrationLoader(IMigrationConventions conventions, IEnumerable<Assembly> assemblies, string @namespace)
+            : this(conventions, assemblies, @namespace, false)
+        {
+            
+        }
 
 		private void Initialize()
 		{
@@ -71,7 +79,7 @@ namespace FluentMigrator.Runner
 
 		public IEnumerable<MigrationMetadata> FindMigrations()
 		{
-			IEnumerable<Type> matchedTypes = Assembly.GetExportedTypes().Where(t => Conventions.TypeIsMigration(t));
+            IEnumerable<Type> matchedTypes = Assemblies.SelectMany(a => a.GetExportedTypes()).Where(t => Conventions.TypeIsMigration(t));
 
 			if (!string.IsNullOrEmpty(Namespace))
 			{
