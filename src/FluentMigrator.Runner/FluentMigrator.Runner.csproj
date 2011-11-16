@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FluentMigrator.Runner</RootNamespace>
     <AssemblyName>FluentMigrator.Runner</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -178,10 +178,12 @@
     <Compile Include="Initialization\AssemblyLoader\AssemblyLoaderFromFile.cs" />
     <Compile Include="Initialization\AssemblyLoader\AssemblyLoaderFromName.cs" />
     <Compile Include="Initialization\AssemblyLoader\IAssemblyLoader.cs" />
+    <Compile Include="Initialization\IAssemblyInitializer.cs" />
     <Compile Include="Initialization\INetConfigManager.cs" />
     <Compile Include="Initialization\IRunnerContext.cs" />
     <Compile Include="Initialization\ConnectionStringManager.cs" />
     <Compile Include="Initialization\NetConfigManager.cs" />
+    <Compile Include="Initialization\OnAssemblyLoadAttribute.cs" />
     <Compile Include="Initialization\RunnerContext.cs" />
     <Compile Include="Initialization\TaskExecutor.cs" />
     <Compile Include="IProfileLoader.cs" />
