@@ -17,6 +17,8 @@
 #endregion
 
 using System;
+using System.Linq;
+using System.Reflection;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Processors;
 
@@ -42,7 +44,62 @@ namespace FluentMigrator.Runner.Initialization
             var processor = InitializeProcessor(assembly.Location);
 
             Runner = new MigrationRunner(assembly, RunnerContext, processor);
+
+            GreetAssembly(assembly, RunnerContext);
         }
+
+        private static void GreetAssembly(Assembly assembly, IRunnerContext RunnerContext)
+        {
+            
+            System.Console.WriteLine("Looking for OnAssemblyLoad in {0}", assembly.ToString());
+            // should we check for current namespace?
+            var types = assembly.GetTypes().Where(
+                x => (
+                    //String.Equals(x.Namespace, "Whatever", StringComparison.Ordinal) &&
+                    x.GetCustomAttributes(false).Contains(new OnAssemblyLoadAttribute())));
+            foreach (Type type in types)
+            {                
+                System.Console.WriteLine("Found: {0}", type.FullName);
+                             
+                if (typeof(IAssemblyInitializer).IsAssignableFrom(type))
+                {
+                    System.Console.WriteLine("Is IAssemblyIntializer: {0}", type.FullName);
+                    var loader = (IAssemblyInitializer) type.Assembly.CreateInstance(type.FullName);                    
+                    loader.Initialize(RunnerContext);
+                    //type.InvokeMember("Initialize", BindingFlags.InvokeMethod, null, obj, new[] { RunnerContext });
+                }
+                else
+                {
+                    System.Console.WriteLine("Is not IAssemblyIntializer: {0}", type.FullName);
+                }
+            }
+
+            foreach (Object obj in assembly.GetCustomAttributes(typeof(OnAssemblyLoadAttribute), false))
+            {
+                Type type = obj.GetType();
+                var loader = type.Assembly.CreateInstance(type.FullName);
+                
+                if (typeof(IAssemblyInitializer).IsAssignableFrom(type))
+                {
+                    System.Console.WriteLine("Is IAssemblyIntializer: {0}", type.FullName);
+                } 
+                else
+                {
+                    System.Console.WriteLine("Is not IAssemblyIntializer: {0}", type.FullName);    
+                }
+                System.Console.WriteLine("Invoking Initialize");
+                type.InvokeMember("Initialize", BindingFlags.InvokeMethod, null, obj, new[] { RunnerContext });
+            }
+            /*
+            foreach (object obj in from obj in assembly.GetCustomAttributes(typeof (OnAssemblyLoadAttribute), false)
+                                   from method in obj.GetType().GetMethods()
+                                   select obj)
+            {
+                obj.GetType().InvokeMember("Initialize", BindingFlags.InvokeMethod, null, obj, new[] { RunnerContext });
+            }
+             */
+        }
+
 
         public void Execute()
         {
