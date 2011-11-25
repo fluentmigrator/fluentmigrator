@@ -115,7 +115,7 @@ namespace FluentMigrator.MSBuild
             }
             catch (Exception ex)
             {
-                announcer.Error("While executing migrations the following error was encountered: {0}", ex.Message);
+                announcer.Error("While executing migrations the following error was encountered: {0}, {1}", ex.Message, ex.StackTrace);
                 return false;
             }
 
