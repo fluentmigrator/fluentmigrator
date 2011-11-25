@@ -27,7 +27,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override string DatabaseType
         {
-            get { return "SqlServer"; }
+            get { return "SqlServer2000"; }
         }
 
         public override bool SchemaExists(string schemaName)
