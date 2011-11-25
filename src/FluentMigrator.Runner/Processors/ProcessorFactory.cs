@@ -67,7 +67,7 @@ namespace FluentMigrator.Runner.Processors
 					}
 				}
 
-				return factories;
+				return factories.OrderBy(x => x.Name);
 			}
 		}
 	}
