@@ -284,7 +284,10 @@ namespace FluentMigrator.Runner.Generators.SqlServer
               expression.ColumnName);
         }
 
-
+        public override string Generate(CreateConstraintExpression expression)
+        {
+            return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.Constraint.SchemaName), base.Generate(expression));
+        }
 
         public override string Generate(DeleteConstraintExpression expression)
         {
