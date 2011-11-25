@@ -16,14 +16,16 @@
 //
 #endregion
 
-using FluentMigrator.Builders.Create.Column;
-using FluentMigrator.Builders.Create.ForeignKey;
-using FluentMigrator.Builders.Create.Index;
-using FluentMigrator.Builders.Create.Table;
-using FluentMigrator.Infrastructure;
+
 
 namespace FluentMigrator.Builders.Create
 {
+    using FluentMigrator.Builders.Create.Column;
+    using FluentMigrator.Builders.Create.Constraint;
+    using FluentMigrator.Builders.Create.ForeignKey;
+    using FluentMigrator.Builders.Create.Index;
+    using FluentMigrator.Builders.Create.Table;
+    using FluentMigrator.Infrastructure;
     using Sequence;
 
     public interface ICreateExpressionRoot : IFluentSyntax
@@ -37,5 +39,11 @@ namespace FluentMigrator.Builders.Create
 		ICreateIndexForTableSyntax Index(string indexName);
 
         ICreateSequenceInSchemaSyntax Sequence(string sequenceName);
+
+        ICreateConstraintOnTableSyntax PrimaryKey();
+        ICreateConstraintOnTableSyntax PrimaryKey(string primaryKeyName);
+
+        ICreateConstraintOnTableSyntax UniqueConstraint();
+        ICreateConstraintOnTableSyntax UniqueConstraint(string constraintName);
 	}
 }

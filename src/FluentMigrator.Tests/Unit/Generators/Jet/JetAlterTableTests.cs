@@ -126,5 +126,13 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             _generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new CreateSchemaExpression()));
         }
+
+        [Test]
+        public void CanCreateMultiColmnNamedUniqueConstraint()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnNamedUniqueConstraintExpression();
+            var result = _generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE ([TestColumn1], [TestColumn2])");
+        }
     }
 }

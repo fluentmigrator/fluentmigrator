@@ -13,7 +13,7 @@
         {
             ConnectionString =
                 @"server=.\SQLEXPRESS;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator",
-            IsEnabled = false
+            IsEnabled = true
         };
 
 		public static DatabaseServerOptions SqlLite = new DatabaseServerOptions
