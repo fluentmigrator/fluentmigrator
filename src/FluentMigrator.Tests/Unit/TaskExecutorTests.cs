@@ -131,7 +131,6 @@ namespace FluentMigrator.Tests.Unit
 
         protected override void Initialize()
         {
-            base.Initialize();
             Runner = runner;
         }
     }

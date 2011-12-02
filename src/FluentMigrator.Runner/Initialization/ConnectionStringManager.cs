@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Configuration;
-using System.IO;
 using System.Linq;
 using FluentMigrator.Runner.Processors;
 
@@ -47,12 +46,9 @@ namespace FluentMigrator.Runner.Initialization
                 if (notUsingConfig)
                     LoadConnectionStringFromConfigurationFile(configManager.LoadFromMachineConfiguration(), false);
 
-                if (notUsingConfig)
+                if (notUsingConfig && !string.IsNullOrEmpty(connection))
                 {
-                    if (notUsingConfig && !string.IsNullOrEmpty(connection))
-                    {
-                        ConnectionString = connection;
-                    }
+                    ConnectionString = connection;
                 }
             }
             else
@@ -82,22 +78,18 @@ namespace FluentMigrator.Runner.Initialization
 
         private void ReadConnectionString(ConnectionStringSettings connectionSetting, string configurationFile)
         {
-            if (connectionSetting != null)
-            {
-                var factory = ProcessorFactory.Factories.Where(f => f.IsForProvider(database)).FirstOrDefault();
+            if (connectionSetting == null)
+                return;
+            
+            var factory = ProcessorFactory.Factories.Where(f => f.IsForProvider(database)).FirstOrDefault();
 
-                if (factory != null)
-                {
-                    database = factory.Name;
-                    connection = connectionSetting.Name;
-                    ConnectionString = connectionSetting.ConnectionString;
-                    configFile = configurationFile;
-                    notUsingConfig = false;
-                }
-            }
-            else
+            if (factory != null)
             {
-                Console.WriteLine("connection is null!");
+                database = factory.Name;
+                connection = connectionSetting.Name;
+                ConnectionString = connectionSetting.ConnectionString;
+                configFile = configurationFile;
+                notUsingConfig = false;
             }
         }
 
