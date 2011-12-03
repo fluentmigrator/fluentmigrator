@@ -80,7 +80,7 @@ namespace FluentMigrator.Runner.Initialization
 
         private IMigrationProcessor InitializeProcessor(string assemblyLocation)
         {
-            var manager = new ConnectionStringManager(new NetConfigManager(), RunnerContext.Connection, RunnerContext.ConnectionStringConfigPath, assemblyLocation, RunnerContext.Database);
+            var manager = new ConnectionStringManager(new NetConfigManager(), RunnerContext.Announcer, RunnerContext.Connection, RunnerContext.ConnectionStringConfigPath, assemblyLocation, RunnerContext.Database);
 
             manager.LoadConnectionString();
 
