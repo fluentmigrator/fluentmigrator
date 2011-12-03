@@ -115,7 +115,7 @@ namespace FluentMigrator.Tests.Unit
             runnerContext.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
             runnerContext.SetupGet(x => x.Target).Returns(GetType().Assembly.Location);
 
-	        Assert.Throws<ArgumentException>(() => new TaskExecutor(runnerContext.Object).Execute());
+	        Assert.Throws<ProcessorFactoryNotFoundException>(() => new TaskExecutor(runnerContext.Object).Execute());
 
 	    }
 	}
