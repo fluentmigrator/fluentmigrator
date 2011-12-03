@@ -18,9 +18,10 @@ namespace FluentMigrator.Runner.Initialization
         private string database;
         private string configFile;
         private bool notUsingConfig;
-        private INetConfigManager configManager;
+        private readonly INetConfigManager configManager;
+        private readonly IAnnouncer announcer;
 
-        public ConnectionStringManager(INetConfigManager configManager, string connection, string configPath, string assemblyLocation, string database)
+        public ConnectionStringManager(INetConfigManager configManager, IAnnouncer announcer, string connection, string configPath, string assemblyLocation, string database)
         {
             this.connection = connection;
             this.configPath = configPath;
@@ -28,6 +29,7 @@ namespace FluentMigrator.Runner.Initialization
             this.assemblyLocation = assemblyLocation;
             this.notUsingConfig = true;
             this.configManager = configManager;
+            this.announcer = announcer;
         }
 
         public void LoadConnectionString()
@@ -82,46 +84,31 @@ namespace FluentMigrator.Runner.Initialization
 
         private void ReadConnectionString(ConnectionStringSettings connectionSetting, string configurationFile)
         {
-            if (connectionSetting != null)
-            {
-                var factory = ProcessorFactory.Factories.Where(f => f.IsForProvider(database)).FirstOrDefault();
+            if (connectionSetting == null) return;
 
-                if (factory != null)
-                {
-                    database = factory.Name;
-                    connection = connectionSetting.Name;
-                    ConnectionString = connectionSetting.ConnectionString;
-                    configFile = configurationFile;
-                    notUsingConfig = false;
-                }
-            }
-            else
+            var factory = ProcessorFactory.Factories.Where(f => f.IsForProvider(database)).FirstOrDefault();
+
+            if (factory != null)
             {
-                Console.WriteLine("connection is null!");
+                database = factory.Name;
+                connection = connectionSetting.Name;
+                ConnectionString = connectionSetting.ConnectionString;
+                configFile = configurationFile;
+                notUsingConfig = false;
             }
         }
 
         private void OutputResults()
         {
             if (string.IsNullOrEmpty(ConnectionString))
-            {
                 throw new ArgumentException("Connection String or Name is required \"/connection\"");
-            }
 
             if (string.IsNullOrEmpty(database))
-            {
-                throw new ArgumentException(
-                    "Database Type is required \"/db [db type]\". Available db types is [sqlserver], [sqlite]");
-            }
+                throw new ArgumentException("Database Type is required \"/db [db type]\". Available db types is [sqlserver], [sqlite]");
 
-            if (notUsingConfig)
-            {
-                Console.WriteLine("Using Database {0} and Connection String {1}", database, ConnectionString);
-            }
-            else
-            {
-                Console.WriteLine("Using Connection {0} from Configuration file {1}", connection, configFile);
-            }
+            announcer.Say(notUsingConfig
+                ? string.Format("Using Database {0} and Connection String {1}", database, ConnectionString) 
+                : string.Format("Using Connection {0} from Configuration file {1}", connection, configFile));
         }
 
         public string ConnectionString { get; private set; }
