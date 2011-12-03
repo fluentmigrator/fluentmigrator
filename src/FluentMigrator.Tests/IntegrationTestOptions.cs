@@ -12,7 +12,7 @@
         public static DatabaseServerOptions SqlServer2008 = new DatabaseServerOptions
         {
             ConnectionString =
-                @"server=ACTIVE703\SQLEXPRESS;uid=testfm;pwd=test;Trusted_Connection=yes;database=FluentMigrator",
+                @"server=.\SQLEXPRESS;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator",
             IsEnabled = false
         };
 

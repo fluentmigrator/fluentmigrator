@@ -12,5 +12,5 @@
 [assembly: System.Reflection.AssemblyProductAttribute("FluentMigrator")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
 [assembly: System.Reflection.AssemblyCopyrightAttribute("Copyright - Sean Chambers 2008-2010")]
-[assembly: System.Reflection.AssemblyConfigurationAttribute("release")]
+[assembly: System.Reflection.AssemblyConfigurationAttribute("debug")]
 
