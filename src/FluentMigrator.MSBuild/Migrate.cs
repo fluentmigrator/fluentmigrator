@@ -113,9 +113,14 @@ namespace FluentMigrator.MSBuild
             {
                 new TaskExecutor(runnerContext).Execute();
             }
-            catch (Exception ex)
+            catch (ProcessorFactoryNotFoundException ex)
             {
                 announcer.Error("While executing migrations the following error was encountered: {0}", ex.Message);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                announcer.Error("While executing migrations the following error was encountered: {0}, {1}", ex.Message, ex.StackTrace);
                 return false;
             }
 
