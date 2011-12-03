@@ -82,22 +82,17 @@ namespace FluentMigrator.Runner.Initialization
 
         private void ReadConnectionString(ConnectionStringSettings connectionSetting, string configurationFile)
         {
-            if (connectionSetting != null)
-            {
-                var factory = ProcessorFactory.Factories.Where(f => f.IsForProvider(database)).FirstOrDefault();
+            if (connectionSetting == null) return;
 
-                if (factory != null)
-                {
-                    database = factory.Name;
-                    connection = connectionSetting.Name;
-                    ConnectionString = connectionSetting.ConnectionString;
-                    configFile = configurationFile;
-                    notUsingConfig = false;
-                }
-            }
-            else
+            var factory = ProcessorFactory.Factories.Where(f => f.IsForProvider(database)).FirstOrDefault();
+
+            if (factory != null)
             {
-                Console.WriteLine("connection is null!");
+                database = factory.Name;
+                connection = connectionSetting.Name;
+                ConnectionString = connectionSetting.ConnectionString;
+                configFile = configurationFile;
+                notUsingConfig = false;
             }
         }
 
