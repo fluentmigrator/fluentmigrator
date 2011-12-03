@@ -24,7 +24,7 @@ namespace FluentMigrator.Runner.Initialization
 {
     public class TaskExecutor
     {
-        private IMigrationRunner Runner { get; set; }
+        protected IMigrationRunner Runner { get; set; }
         private IRunnerContext RunnerContext { get; set; }
 
         public TaskExecutor(IRunnerContext runnerContext)
@@ -35,7 +35,7 @@ namespace FluentMigrator.Runner.Initialization
             RunnerContext = runnerContext;
         }
 
-        private void Initialize()
+        protected virtual void Initialize()
         {
             var assembly = AssemblyLoaderFactory.GetAssemblyLoader(RunnerContext.Target).Load();
 
@@ -90,6 +90,9 @@ namespace FluentMigrator.Runner.Initialization
             }
 
             var processorFactory = ProcessorFactory.GetFactory(RunnerContext.Database);
+            if(processorFactory == null)
+                throw new ProcessorFactoryNotFoundException(string.Format("The provider or dbtype parameter is incorrect. Available choices are {0}: ", ProcessorFactory.ListAvailableProcessorTypes()));
+            
             var processor = processorFactory.Create(manager.ConnectionString, RunnerContext.Announcer, new ProcessorOptions
             {
                 PreviewOnly = RunnerContext.PreviewOnly,

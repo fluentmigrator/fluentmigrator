@@ -17,6 +17,7 @@
 #endregion
 
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Runner.Processors.Sqlite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using NUnit.Framework;
@@ -53,5 +54,26 @@ namespace FluentMigrator.Tests.Unit.Runners
 			IMigrationProcessorFactory factory = ProcessorFactory.GetFactory("SqlServer2008");
 			Assert.IsTrue(factory.GetType() == typeof(SqlServer2008ProcessorFactory));
 		}
+
+	    [Test]
+	    public void RetrievesSqlServerProcessorFactoryIfArgumentIsSqlServer()
+	    {
+            IMigrationProcessorFactory factory = ProcessorFactory.GetFactory("SqlServer");
+            Assert.IsTrue(factory.GetType() == typeof(SqlServerProcessorFactory));
+	    }
+
+        [Test]
+        public void CanRetrieveSqlServerCeFactoryWithArgumentString()
+        {
+            IMigrationProcessorFactory factory = ProcessorFactory.GetFactory("SqlServerCe");
+            Assert.IsTrue(factory.GetType() == typeof(SqlServerCeProcessorFactory));
+        }
+
+        [Test]
+        public void CanRetrieveOracleFactoryWithArgumentString()
+        {
+            IMigrationProcessorFactory factory = ProcessorFactory.GetFactory("Oracle");
+            Assert.IsTrue(factory.GetType() == typeof(OracleProcessorFactory));
+        }
 	}
 }

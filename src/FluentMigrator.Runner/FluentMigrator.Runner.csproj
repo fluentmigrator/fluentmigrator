@@ -182,6 +182,7 @@
     <Compile Include="Initialization\IRunnerContext.cs" />
     <Compile Include="Initialization\ConnectionStringManager.cs" />
     <Compile Include="Initialization\NetConfigManager.cs" />
+    <Compile Include="Initialization\ProcessorFactoryNotFoundException.cs" />
     <Compile Include="Initialization\RunnerContext.cs" />
     <Compile Include="Initialization\TaskExecutor.cs" />
     <Compile Include="IProfileLoader.cs" />
