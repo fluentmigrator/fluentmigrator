@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Configuration;
-using System.Linq;
-using FluentMigrator.Runner.Processors;
 
 namespace FluentMigrator.Runner.Initialization
 {
@@ -11,58 +9,58 @@ namespace FluentMigrator.Runner.Initialization
     /// </summary>
     public class ConnectionStringManager
     {
-        private readonly string configPath;
-        private readonly string assemblyLocation;
-        private string connection;
-        private string database;
-        private string configFile;
-        private bool notUsingConfig;
-        private readonly INetConfigManager configManager;
         private readonly IAnnouncer announcer;
+        private readonly string assemblyLocation;
+        private readonly INetConfigManager configManager;
+        private readonly string configPath;
+        private readonly string database;
+        private string configFile;
+        private string connection;
+        private Func<string> machineNameProvider = () => Environment.MachineName;
+        private bool notUsingConfig;
 
-        public ConnectionStringManager(INetConfigManager configManager, IAnnouncer announcer, string connection, string configPath, string assemblyLocation, string database)
+        public ConnectionStringManager(INetConfigManager configManager, IAnnouncer announcer, string connection, string configPath, string assemblyLocation,
+                                       string database)
         {
             this.connection = connection;
             this.configPath = configPath;
             this.database = database;
             this.assemblyLocation = assemblyLocation;
-            this.notUsingConfig = true;
+            notUsingConfig = true;
             this.configManager = configManager;
             this.announcer = announcer;
         }
 
+        public string ConnectionString { get; private set; }
+
+        public Func<string> MachineNameProvider
+        {
+            get { return machineNameProvider; }
+            set { machineNameProvider = value; }
+        }
+
         public void LoadConnectionString()
         {
-            if (!String.IsNullOrEmpty(connection))
+            if (notUsingConfig && !string.IsNullOrEmpty(configPath))
+                LoadConnectionStringFromConfigurationFile(configManager.LoadFromFile(configPath));
+
+            if (notUsingConfig && !String.IsNullOrEmpty(assemblyLocation))
             {
-                if (notUsingConfig && !String.IsNullOrEmpty(configFile))
-                    LoadConnectionStringFromConfigurationFile(configManager.LoadFromFile(configFile), false);
+                string defaultConfigFile = assemblyLocation;
 
-                if (notUsingConfig && !String.IsNullOrEmpty(assemblyLocation))
-                {
-                    string defaultConfigFile = assemblyLocation;
-
-                    LoadConnectionStringFromConfigurationFile(configManager.LoadFromFile(defaultConfigFile), false);
-                }
-
-                if (notUsingConfig)
-                    LoadConnectionStringFromConfigurationFile(configManager.LoadFromMachineConfiguration(), false);
-
-                if (notUsingConfig)
-                {
-                    if (notUsingConfig && !string.IsNullOrEmpty(connection))
-                    {
-                        ConnectionString = connection;
-                    }
-                }
+                LoadConnectionStringFromConfigurationFile(configManager.LoadFromFile(defaultConfigFile));
             }
-            else
-                LoadConnectionStringFromConfigurationFile(configManager.LoadFromMachineConfiguration(), true);
+
+            if (notUsingConfig)
+                LoadConnectionStringFromConfigurationFile(configManager.LoadFromMachineConfiguration());
+
+            if (notUsingConfig && !string.IsNullOrEmpty(connection))
+                ConnectionString = connection;
 
             OutputResults();
         }
 
-        private void LoadConnectionStringFromConfigurationFile(Configuration configurationFile, bool useDefault)
+        private void LoadConnectionStringFromConfigurationFile(Configuration configurationFile)
         {
             var connections = configurationFile.ConnectionStrings.ConnectionStrings;
 
@@ -71,10 +69,8 @@ namespace FluentMigrator.Runner.Initialization
 
             ConnectionStringSettings connectionString;
 
-            if (useDefault)
-                connectionString = connections[0];
-            else if (string.IsNullOrEmpty(connection))
-                connectionString = connections[Environment.MachineName];
+            if (string.IsNullOrEmpty(connection))
+                connectionString = connections[MachineNameProvider()];
             else
                 connectionString = connections[connection];
 
@@ -85,31 +81,20 @@ namespace FluentMigrator.Runner.Initialization
         {
             if (connectionSetting == null) return;
 
-            var factory = ProcessorFactory.Factories.Where(f => f.IsForProvider(database)).FirstOrDefault();
-
-            if (factory != null)
-            {
-                database = factory.Name;
-                connection = connectionSetting.Name;
-                ConnectionString = connectionSetting.ConnectionString;
-                configFile = configurationFile;
-                notUsingConfig = false;
-            }
+            connection = connectionSetting.Name;
+            ConnectionString = connectionSetting.ConnectionString;
+            configFile = configurationFile;
+            notUsingConfig = false;
         }
 
         private void OutputResults()
         {
             if (string.IsNullOrEmpty(ConnectionString))
-                throw new ArgumentException("Connection String or Name is required \"/connection\"");
-
-            if (string.IsNullOrEmpty(database))
-                throw new ArgumentException("Database Type is required \"/db [db type]\". Available db types is [sqlserver], [sqlite]");
+                throw new ApplicationException("Unable to resolve any connectionstring using parameters \"/connection\" and \"/configPath\"");
 
             announcer.Say(notUsingConfig
-                ? string.Format("Using Database {0} and Connection String {1}", database, ConnectionString) 
-                : string.Format("Using Connection {0} from Configuration file {1}", connection, configFile));
+                              ? string.Format("Using Database {0} and Connection String {1}", database, ConnectionString)
+                              : string.Format("Using Connection {0} from Configuration file {1}", connection, configFile));
         }
-
-        public string ConnectionString { get; private set; }
     }
 }
