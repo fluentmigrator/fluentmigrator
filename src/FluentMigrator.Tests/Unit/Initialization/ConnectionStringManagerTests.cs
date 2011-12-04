@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using FluentMigrator.Runner;
+﻿using FluentMigrator.Runner;
 using NUnit.Framework;
 using FluentMigrator.Runner.Initialization;
-using System.IO;
 using Moq;
 using System.Configuration;
-using System.Reflection;
 
 namespace FluentMigrator.Tests.Unit.Initialization
 {
