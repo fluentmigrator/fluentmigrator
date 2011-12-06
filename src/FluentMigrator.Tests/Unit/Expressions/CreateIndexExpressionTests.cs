@@ -17,9 +17,11 @@
 #endregion
 
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
+using Moq;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -49,6 +51,20 @@ namespace FluentMigrator.Tests.Unit.Expressions
 												}
 			}.ToString().ShouldBe("CreateIndex Table (Name, Slug)");
 			
+		}
+
+		[Test]
+		public void ShouldDelegateApplyConventionsToIndexDefinition()
+		{
+			var definitionMock = new Mock<IndexDefinition>();
+			var createIndexExpression = new CreateIndexExpression { Index = definitionMock.Object} ;
+			var migrationConventions = new Mock<IMigrationConventions>(MockBehavior.Strict).Object;
+
+			definitionMock.Setup(id => id.ApplyConventions(migrationConventions)).Verifiable();
+
+			createIndexExpression.ApplyConventions(migrationConventions);
+
+			definitionMock.VerifyAll();
 		}
 	}
 }
