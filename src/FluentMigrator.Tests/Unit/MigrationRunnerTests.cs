@@ -280,6 +280,66 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        public void RollbackToVersionShouldShouldLimitMigrationsToNamespace()
+        {
+            const long fakeMigration1 = 2011010101;
+            const long fakeMigration2 = 2011010102;
+            const long fakeMigration3 = 2011010103;
+
+            LoadVersionData(fakeMigration1,fakeMigration3);
+
+            _fakeVersionLoader.Versions.Add(fakeMigration2);
+            _fakeVersionLoader.LoadVersionInfo();
+
+            _runner.RollbackToVersion(2011010101);
+            
+            _fakeVersionLoader.Versions.ShouldContain(fakeMigration1);
+            _fakeVersionLoader.Versions.ShouldContain(fakeMigration2);
+            _fakeVersionLoader.Versions.ShouldNotContain(fakeMigration3);
+        }
+
+        [Test]
+        public void RollbackToVersionZeroShouldShouldLimitMigrationsToNamespace()
+        {
+            const long fakeMigration1 = 2011010101;
+            const long fakeMigration2 = 2011010102;
+            const long fakeMigration3 = 2011010103;
+
+            LoadVersionData(fakeMigration1, fakeMigration2, fakeMigration3);
+
+            _runner.MigrationLoader.Migrations.Remove(fakeMigration1);
+            _runner.MigrationLoader.Migrations.Remove(fakeMigration2);
+            _fakeVersionLoader.LoadVersionInfo();
+
+            _runner.RollbackToVersion(0);
+
+            _fakeVersionLoader.Versions.ShouldContain(fakeMigration1);
+            _fakeVersionLoader.Versions.ShouldContain(fakeMigration2);
+            _fakeVersionLoader.Versions.ShouldNotContain(fakeMigration3);
+        }
+
+        [Test]
+        public void RollbackShouldLimitMigrationsToNamespace()
+        {
+            const long fakeMigration1 = 2011010101;
+            const long fakeMigration2 = 2011010102;
+            const long fakeMigration3 = 2011010103;
+
+            LoadVersionData(fakeMigration1, fakeMigration3);
+
+            _fakeVersionLoader.Versions.Add(fakeMigration2);
+            _fakeVersionLoader.LoadVersionInfo();
+
+            _runner.Rollback(2);
+
+            _fakeVersionLoader.Versions.ShouldNotContain(fakeMigration1);
+            _fakeVersionLoader.Versions.ShouldContain(fakeMigration2);
+            _fakeVersionLoader.Versions.ShouldNotContain(fakeMigration3);
+
+            _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();
+        }
+
+        [Test]
         public void RollbackToVersionShouldLoadVersionInfoIfVersionGreaterThanZero()
         {
             var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;

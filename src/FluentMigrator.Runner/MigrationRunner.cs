@@ -215,7 +215,9 @@ namespace FluentMigrator.Runner
         {
             try
             {
-                foreach (var migrationNumber in VersionLoader.VersionInfo.AppliedMigrations().Take(steps))
+                var migrations = VersionLoader.VersionInfo.AppliedMigrations().Intersect(MigrationLoader.Migrations.Keys);
+
+                foreach (var migrationNumber in migrations.Take(steps))
                 {
                     ApplyMigrationDown(migrationNumber);
                 }
@@ -241,22 +243,23 @@ namespace FluentMigrator.Runner
 
         public void RollbackToVersion(long version, bool useAutomaticTransactionManagement)
         {
-            //TODO: Extract VersionsToApply Strategy
             try
             {
+                var migrations = VersionLoader.VersionInfo.AppliedMigrations().Intersect(MigrationLoader.Migrations.Keys);
+
                 // Get the migrations between current and the to version
-                foreach (var migrationNumber in VersionLoader.VersionInfo.AppliedMigrations())
+                foreach (var migrationNumber in migrations)
                 {
-                    if (version < migrationNumber || version == 0)
+                    if (version < migrationNumber)
                     {
                         ApplyMigrationDown(migrationNumber);
                     }
                 }
 
-                if (version == 0)
+                VersionLoader.LoadVersionInfo();
+
+                if (version == 0 && !VersionLoader.VersionInfo.AppliedMigrations().Any())
                     VersionLoader.RemoveVersionTable();
-                else
-                    VersionLoader.LoadVersionInfo();
 
                 if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
             }
