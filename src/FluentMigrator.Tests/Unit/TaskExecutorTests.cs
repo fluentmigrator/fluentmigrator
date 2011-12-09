@@ -1,21 +1,3 @@
-#region License
-// 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-#endregion
-
 using System;
 using System.Data;
 using System.Linq.Expressions;
@@ -27,16 +9,20 @@ using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit
 {
-	[TestFixture]
-	public class TaskExecutorTests : IntegrationTestBase
-	{
-        private Mock<IMigrationRunner> _migrationRunner;
+    [TestFixture]
+    public class TaskExecutorTests : IntegrationTestBase
+    {
+        #region Setup/Teardown
 
         [SetUp]
         public void SetUp()
         {
             _migrationRunner = new Mock<IMigrationRunner>();
         }
+
+        #endregion
+
+        private Mock<IMigrationRunner> _migrationRunner;
 
         private void Verify(Expression<Action<IMigrationRunner>> func, string task, long version, int steps)
         {
@@ -66,6 +52,23 @@ namespace FluentMigrator.Tests.Unit
             taskExecutor.Execute();
 
             _migrationRunner.VerifyAll();
+        }
+
+        [Test]
+        public void InvalidProviderNameShouldThrowArgumentException()
+        {
+            var runnerContext = new Mock<IRunnerContext>();
+            runnerContext.SetupGet(x => x.Database).Returns("sqlWRONG");
+            runnerContext.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
+            runnerContext.SetupGet(x => x.Target).Returns(GetType().Assembly.Location);
+
+            Assert.Throws<ProcessorFactoryNotFoundException>(() => new TaskExecutor(runnerContext.Object).Execute());
+        }
+
+        [Test]
+        public void ShouldCallMigrateDownIfSpecified()
+        {
+            Verify(x => x.MigrateDown(It.Is<long>(c => c == 20)), "migrate:down", 20, 0);
         }
 
         [Test]
@@ -100,34 +103,16 @@ namespace FluentMigrator.Tests.Unit
         {
             Verify(x => x.Rollback(It.Is<int>(c => c == 1)), "rollback", 0, 0);
         }
+    }
 
-        [Test]
-        public void ShouldCallMigrateDownIfSpecified()
-        {
-            Verify(x => x.MigrateDown(It.Is<long>(c => c == 20)), "migrate:down", 20, 0);
-        }
-
-	    [Test]
-	    public void InvalidProviderNameShouldThrowArgumentException()
-	    {
-            var runnerContext = new Mock<IRunnerContext>();
-            runnerContext.SetupGet(x => x.Database).Returns("sqlWRONG");
-            runnerContext.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
-            runnerContext.SetupGet(x => x.Target).Returns(GetType().Assembly.Location);
-
-	        Assert.Throws<ProcessorFactoryNotFoundException>(() => new TaskExecutor(runnerContext.Object).Execute());
-
-	    }
-	}
-
-    class FakeTaskExecutor: TaskExecutor
+    internal class FakeTaskExecutor : TaskExecutor
     {
         private readonly IMigrationRunner runner;
 
         public FakeTaskExecutor(IRunnerContext runnerContext, IMigrationRunner runner) : base(runnerContext)
-         {
-             this.runner = runner;
-         }
+        {
+            this.runner = runner;
+        }
 
         protected override void Initialize()
         {
