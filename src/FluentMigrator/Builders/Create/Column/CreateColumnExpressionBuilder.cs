@@ -17,7 +17,6 @@
 #endregion
 
 using System.Collections.Generic;
-using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
@@ -25,78 +24,78 @@ using System;
 
 namespace FluentMigrator.Builders.Create.Column
 {
-	public class CreateColumnExpressionBuilder : ExpressionBuilderWithColumnTypesBase<CreateColumnExpression, ICreateColumnOptionSyntax>,
-		ICreateColumnOnTableSyntax,
-		ICreateColumnOptionSyntax,
-		ICreateColumnAsTypeOrInSchemaSyntax
-	{
-		private readonly IMigrationContext _context;
+    public class CreateColumnExpressionBuilder : ExpressionBuilderWithColumnTypesBase<CreateColumnExpression, ICreateColumnOptionSyntax>,
+        ICreateColumnOnTableSyntax,
+        ICreateColumnOptionSyntax,
+        ICreateColumnAsTypeOrInSchemaSyntax
+    {
+        private readonly IMigrationContext _context;
 
-		public CreateColumnExpressionBuilder(CreateColumnExpression expression, IMigrationContext context)
-			: base(expression)
-		{
-			_context = context;
-		}
+        public CreateColumnExpressionBuilder(CreateColumnExpression expression, IMigrationContext context)
+            : base(expression)
+        {
+            _context = context;
+        }
 
-		public ICreateColumnAsTypeOrInSchemaSyntax OnTable(string name)
-		{
-			Expression.TableName = name;
-			return this;
-		}
+        public ICreateColumnAsTypeOrInSchemaSyntax OnTable(string name)
+        {
+            Expression.TableName = name;
+            return this;
+        }
 
-		public ICreateColumnAsTypeSyntax InSchema(string schemaName)
-		{
-			Expression.SchemaName = schemaName;
-			return this;
-		}
+        public ICreateColumnAsTypeSyntax InSchema(string schemaName)
+        {
+            Expression.SchemaName = schemaName;
+            return this;
+        }
 
-		public ICreateColumnOptionSyntax WithDefaultValue(object value)
-		{
-			Expression.Column.DefaultValue = value;
-			return this;
-		}
+        public ICreateColumnOptionSyntax WithDefaultValue(object value)
+        {
+            Expression.Column.DefaultValue = value;
+            return this;
+        }
 
-		public ICreateColumnOptionSyntax Identity()
-		{
-			Expression.Column.IsIdentity = true;
-			return this;
-		}
+        public ICreateColumnOptionSyntax Identity()
+        {
+            Expression.Column.IsIdentity = true;
+            return this;
+        }
 
-		public ICreateColumnOptionSyntax Indexed()
-		{
-			Expression.Column.IsIndexed = true;
-			return this;
-		}
+        public ICreateColumnOptionSyntax Indexed()
+        {
+            Expression.Column.IsIndexed = true;
+            return this;
+        }
 
-		public ICreateColumnOptionSyntax PrimaryKey()
-		{
-			Expression.Column.IsPrimaryKey = true;
-			return this;
-		}
+        public ICreateColumnOptionSyntax PrimaryKey()
+        {
+            Expression.Column.IsPrimaryKey = true;
+            return this;
+        }
 
-		public ICreateColumnOptionSyntax PrimaryKey(string primaryKeyName)
-		{
-			Expression.Column.IsPrimaryKey = true;
-			Expression.Column.PrimaryKeyName = primaryKeyName;
-			return this;
-		}
+        public ICreateColumnOptionSyntax PrimaryKey(string primaryKeyName)
+        {
+            Expression.Column.IsPrimaryKey = true;
+            Expression.Column.PrimaryKeyName = primaryKeyName;
+            return this;
+        }
 
-		public ICreateColumnOptionSyntax Nullable()
-		{
-			Expression.Column.IsNullable = true;
-			return this;
-		}
+        public ICreateColumnOptionSyntax Nullable()
+        {
+            Expression.Column.IsNullable = true;
+            return this;
+        }
 
-		public ICreateColumnOptionSyntax NotNullable()
-		{
-			Expression.Column.IsNullable = false;
-			return this;
-		}
+        public ICreateColumnOptionSyntax NotNullable()
+        {
+            Expression.Column.IsNullable = false;
+            return this;
+        }
 
-		public ICreateColumnOptionSyntax Unique()
-		{
-			Expression.Column.IsUnique = true;
-			return this;
+        public ICreateColumnOptionSyntax Unique()
+        {
+            Expression.Column.IsUnique = true;
+            return this;
         }
 
         public ICreateColumnOptionSyntax ForeignKey(string primaryTableName, string primaryColumnName)
@@ -199,9 +198,9 @@ namespace FluentMigrator.Builders.Create.Column
             return this;
         }
 
-		protected override ColumnDefinition GetColumnForType()
-		{
-			return Expression.Column;
-		}
+        protected override ColumnDefinition GetColumnForType()
+        {
+            return Expression.Column;
+        }
     }
 }
