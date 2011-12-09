@@ -35,14 +35,11 @@ namespace FluentMigrator.Tests.Integration.SchemaDump {
             SchemaDumper = new SqlServerSchemaDumper(Processor, new TextWriterAnnouncer(System.Console.Out));
         }
 
-        [SetUp]
-        public void SetUp() 
+        [TestFixtureTearDown]
+        public void FixtureTearDown()
         {
-        }
-
-        [TearDown]
-        public void TearDown() 
-        {
+            if (Connection != null)
+                Connection.Dispose();
         }
 
         [Test]
