@@ -28,6 +28,7 @@ namespace FluentMigrator.Builders
         TNext WithDefaultValue(object value);
         TNext Identity();
         TNext Indexed();
+        TNext Indexed(string indexName);
 
         TNext PrimaryKey();
         TNext PrimaryKey(string primaryKeyName);
@@ -35,6 +36,7 @@ namespace FluentMigrator.Builders
         TNext Nullable();
         TNext NotNullable();
         TNext Unique();
+        TNext Unique(string indexName);
 
         TNext ForeignKey(string primaryTableName, string primaryColumnName);
         TNext ForeignKey(string foreignKeyName, string primaryTableName, string primaryColumnName);
