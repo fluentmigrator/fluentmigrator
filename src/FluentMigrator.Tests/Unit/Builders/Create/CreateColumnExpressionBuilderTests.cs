@@ -18,7 +18,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Data;
+using System.Linq;
 using FluentMigrator.Builders.Create.Column;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -283,6 +285,70 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [Test]
+        public void CallingIndexedAddsIndexExpressionToContext()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+
+            var columnMock = new Mock<ColumnDefinition>();
+            columnMock.SetupGet(x => x.Name).Returns("BaconId");
+
+            var expressionMock = new Mock<CreateColumnExpression>();
+            expressionMock.SetupGet(x => x.SchemaName).Returns("Eggs");
+            expressionMock.SetupGet(x => x.TableName).Returns("Bacon");
+            expressionMock.SetupGet(x => x.Column).Returns(columnMock.Object);
+
+            var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
+
+            builder.Indexed();
+
+            collectionMock.Verify(x => x.Add(It.Is<CreateIndexExpression>(
+                ix => ix.Index.Name == null
+                      && ix.Index.TableName == "Bacon"
+                      && ix.Index.SchemaName == "Eggs"
+                      && !ix.Index.IsUnique
+                      && !ix.Index.IsClustered
+                      && ix.Index.Columns.All(c => c.Name == "BaconId")
+                                                 )));
+
+            contextMock.VerifyGet(x => x.Expressions);
+        }
+
+        [Test]
+        public void CallingIndexedNamedAddsIndexExpressionToContext()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+
+            var columnMock = new Mock<ColumnDefinition>();
+            columnMock.SetupGet(x => x.Name).Returns("BaconId");
+
+            var expressionMock = new Mock<CreateColumnExpression>();
+            expressionMock.SetupGet(x => x.SchemaName).Returns("Eggs");
+            expressionMock.SetupGet(x => x.TableName).Returns("Bacon");
+            expressionMock.SetupGet(x => x.Column).Returns(columnMock.Object);
+
+            var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
+
+            builder.Indexed("IX_Bacon_BaconId");
+
+            collectionMock.Verify(x => x.Add(It.Is<CreateIndexExpression>(
+                ix => ix.Index.Name == "IX_Bacon_BaconId"
+                      && ix.Index.TableName == "Bacon"
+                      && ix.Index.SchemaName == "Eggs"
+                      && !ix.Index.IsUnique
+                      && !ix.Index.IsClustered
+                      && ix.Index.Columns.All(c => c.Name == "BaconId")
+                                                 )));
+
+            contextMock.VerifyGet(x => x.Expressions);
+        }
+
+        [Test]
         public void CallingPrimaryKeySetsIsPrimaryKeyToTrue()
         {
             VerifyColumnProperty(c => c.IsPrimaryKey = true, b => b.PrimaryKey());
@@ -304,6 +370,70 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         public void CallingUniqueSetsIsUniqueToTrue()
         {
             VerifyColumnProperty(c => c.IsUnique = true, b => b.Unique());
+        }
+
+        [Test]
+        public void CallingUniqueAddsIndexExpressionToContext()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+
+            var columnMock = new Mock<ColumnDefinition>();
+            columnMock.SetupGet(x => x.Name).Returns("BaconId");
+
+            var expressionMock = new Mock<CreateColumnExpression>();
+            expressionMock.SetupGet(x => x.SchemaName).Returns("Eggs");
+            expressionMock.SetupGet(x => x.TableName).Returns("Bacon");
+            expressionMock.SetupGet(x => x.Column).Returns(columnMock.Object);
+
+            var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
+
+            builder.Unique();
+
+            collectionMock.Verify(x => x.Add(It.Is<CreateIndexExpression>(
+                ix => ix.Index.Name == null
+                      && ix.Index.TableName == "Bacon"
+                      && ix.Index.SchemaName == "Eggs"
+                      && ix.Index.IsUnique
+                      && !ix.Index.IsClustered
+                      && ix.Index.Columns.All(c => c.Name == "BaconId")
+                                                 )));
+
+            contextMock.VerifyGet(x => x.Expressions);
+        }
+
+        [Test]
+        public void CallingUniqueNamedAddsIndexExpressionToContext()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+
+            var columnMock = new Mock<ColumnDefinition>();
+            columnMock.SetupGet(x => x.Name).Returns("BaconId");
+
+            var expressionMock = new Mock<CreateColumnExpression>();
+            expressionMock.SetupGet(x => x.SchemaName).Returns("Eggs");
+            expressionMock.SetupGet(x => x.TableName).Returns("Bacon");
+            expressionMock.SetupGet(x => x.Column).Returns(columnMock.Object);
+
+            var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
+
+            builder.Unique("IX_Bacon_BaconId");
+
+            collectionMock.Verify(x => x.Add(It.Is<CreateIndexExpression>(
+                ix => ix.Index.Name == "IX_Bacon_BaconId"
+                      && ix.Index.TableName == "Bacon"
+                      && ix.Index.SchemaName == "Eggs"
+                      && ix.Index.IsUnique
+                      && !ix.Index.IsClustered
+                      && ix.Index.Columns.All(c => c.Name == "BaconId")
+                                                 )));
+
+            contextMock.VerifyGet(x => x.Expressions);
         }
 
         [Test]
@@ -412,6 +542,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             expression.Column = columnMock.Object;
 
             var contextMock = new Mock<IMigrationContext>();
+            contextMock.SetupGet(mc => mc.Expressions).Returns(new Collection<IMigrationExpression>());
 
             callToTest(new CreateColumnExpressionBuilder(expression, contextMock.Object));
 
