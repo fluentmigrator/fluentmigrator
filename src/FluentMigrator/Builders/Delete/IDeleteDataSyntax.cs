@@ -22,5 +22,6 @@ namespace FluentMigrator.Builders.Delete
 	{
 		IDeleteDataSyntax Row(object dataAsAnonymousType);
 		void AllRows();
+        void IsNull(string columnName);
 	}
 }
