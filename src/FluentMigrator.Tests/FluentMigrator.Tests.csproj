@@ -191,6 +191,7 @@
     <Compile Include="Unit\Builders\Create\CreateTableExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateColumnExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Schema\SchemaExpressionRootTest.cs" />
+    <Compile Include="Unit\Definitions\IndexDefinitionTests.cs" />
     <Compile Include="Unit\Initialization\ConnectionStringManagerTests.cs">
       <SubType>Code</SubType>
     </Compile>
