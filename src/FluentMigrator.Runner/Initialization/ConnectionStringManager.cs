@@ -90,7 +90,7 @@ namespace FluentMigrator.Runner.Initialization
         private void OutputResults()
         {
             if (string.IsNullOrEmpty(ConnectionString))
-                throw new ApplicationException("Unable to resolve any connectionstring using parameters \"/connection\" and \"/configPath\"");
+                throw new UndeterminableConnectionException("Unable to resolve any connectionstring using parameters \"/connection\" and \"/configPath\"");
 
             announcer.Say(notUsingConfig
                               ? string.Format("Using Database {0} and Connection String {1}", database, ConnectionString)

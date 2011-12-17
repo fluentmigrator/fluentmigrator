@@ -185,6 +185,7 @@
     <Compile Include="Initialization\ProcessorFactoryNotFoundException.cs" />
     <Compile Include="Initialization\RunnerContext.cs" />
     <Compile Include="Initialization\TaskExecutor.cs" />
+    <Compile Include="Initialization\UndeterminableConnectionException.cs" />
     <Compile Include="IProfileLoader.cs" />
     <Compile Include="IVersionLoader.cs" />
     <Compile Include="Processors\Jet\JetProcessor.cs" />
