@@ -143,9 +143,9 @@ namespace FluentMigrator.Runner
         {
             var expression = new DeleteDataExpression { TableName = VersionTableMetaData.TableName, SchemaName = VersionTableMetaData.SchemaName };
             expression.Rows.Add(new DeletionDataDefinition
-									{
-										new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version)
-									});
+                                    {
+                                        new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version)
+                                    });
             expression.ExecuteWith(Processor);
         }
     }
