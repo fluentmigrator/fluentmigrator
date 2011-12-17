@@ -101,7 +101,7 @@ namespace FluentMigrator.Console
 					},
 					{
 						"connectionString=|connection=|conn=|c=",
-						"REQUIRED. The name of the connection string or the connection string itself to the server and database you want to execute your migrations against.",
+						"The name of the connection string (falls back to machine name) or the connection string itself to the server and database you want to execute your migrations against.",
 						v => { Connection = v; }
 					},
 					{
@@ -188,7 +188,6 @@ namespace FluentMigrator.Console
                     Task = "migrate";
 
                 if (string.IsNullOrEmpty(ProcessorType) ||
-                    string.IsNullOrEmpty(Connection) ||
                     string.IsNullOrEmpty(TargetAssembly))
                 {
                     DisplayHelp(optionSet);
