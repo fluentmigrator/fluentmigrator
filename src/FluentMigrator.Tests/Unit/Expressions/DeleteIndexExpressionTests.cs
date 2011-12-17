@@ -22,6 +22,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Tests.Helpers;
+using Moq;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -52,6 +53,20 @@ namespace FluentMigrator.Tests.Unit.Expressions
 					Name = "NameIndex"
 				}
 			}.ToString().ShouldBe("DeleteIndex Table (Name, Slug)");
+		}
+
+		[Test]
+		public void ShouldDelegateApplyConventionsToIndexDefinition()
+		{
+			var definitionMock = new Mock<IndexDefinition>();
+			var createIndexExpression = new DeleteIndexExpression { Index = definitionMock.Object };
+			var migrationConventions = new Mock<IMigrationConventions>(MockBehavior.Strict).Object;
+
+			definitionMock.Setup(id => id.ApplyConventions(migrationConventions)).Verifiable();
+
+			createIndexExpression.ApplyConventions(migrationConventions);
+
+			definitionMock.VerifyAll();
 		}
 	}
 }
