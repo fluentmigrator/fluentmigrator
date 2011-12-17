@@ -107,8 +107,6 @@ namespace FluentMigrator.Runner
 
             _versionInfo = new VersionInfo();
             
-            if (Processor.Options.PreviewOnly) return;
-
             var dataSet = Processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
 
             foreach (DataRow row in dataSet.Tables[0].Rows)
