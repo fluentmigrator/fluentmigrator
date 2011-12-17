@@ -95,19 +95,6 @@ namespace FluentMigrator.Runner
 
         public void LoadVersionInfo()
         {
-            if (Processor.Options.PreviewOnly)
-            {
-                if (!AlreadyCreatedVersionTable)
-                {
-                    Runner.Up(VersionMigration);
-                    VersionInfo = new VersionInfo();
-                }
-                else
-                    VersionInfo = new VersionInfo();
-
-                return;
-            }
-
             if (!AlreadyCreatedVersionSchema)
                 Runner.Up(VersionSchemaMigration);
 
@@ -118,8 +105,9 @@ namespace FluentMigrator.Runner
                 return;
             }
 
-            var dataSet = Processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
             _versionInfo = new VersionInfo();
+            
+            var dataSet = Processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
 
             foreach (DataRow row in dataSet.Tables[0].Rows)
             {
@@ -143,9 +131,9 @@ namespace FluentMigrator.Runner
         {
             var expression = new DeleteDataExpression { TableName = VersionTableMetaData.TableName, SchemaName = VersionTableMetaData.SchemaName };
             expression.Rows.Add(new DeletionDataDefinition
-									{
-										new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version)
-									});
+                                    {
+                                        new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version)
+                                    });
             expression.ExecuteWith(Processor);
         }
     }
