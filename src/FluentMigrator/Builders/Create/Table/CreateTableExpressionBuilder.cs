@@ -67,7 +67,30 @@ namespace FluentMigrator.Builders.Create.Table
 
         public ICreateTableColumnOptionOrWithColumnSyntax Indexed()
         {
+            return Indexed(null);
+        }
+
+        public ICreateTableColumnOptionOrWithColumnSyntax Indexed(string indexName)
+        {
             CurrentColumn.IsIndexed = true;
+
+            var index = new CreateIndexExpression
+            {
+                Index = new IndexDefinition
+                {
+                    Name = indexName,
+                    SchemaName = Expression.SchemaName,
+                    TableName = Expression.TableName
+                }
+            };
+
+            index.Index.Columns.Add(new IndexColumnDefinition
+            {
+                Name = CurrentColumn.Name
+            });
+
+            _context.Expressions.Add(index);
+
             return this;
         }
 
@@ -98,7 +121,31 @@ namespace FluentMigrator.Builders.Create.Table
 
         public ICreateTableColumnOptionOrWithColumnSyntax Unique()
         {
+            return Unique(null);
+        }
+
+        public ICreateTableColumnOptionOrWithColumnSyntax Unique(string indexName)
+        {
             CurrentColumn.IsUnique = true;
+
+            var index = new CreateIndexExpression
+            {
+                Index = new IndexDefinition
+                {
+                    Name = indexName,
+                    SchemaName = Expression.SchemaName,
+                    TableName = Expression.TableName,
+                    IsUnique = true
+                }
+            };
+
+            index.Index.Columns.Add(new IndexColumnDefinition
+            {
+                Name = CurrentColumn.Name
+            });
+
+            _context.Expressions.Add(index);
+
             return this;
         }
 
