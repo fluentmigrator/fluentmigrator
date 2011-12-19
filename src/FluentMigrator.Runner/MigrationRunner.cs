@@ -18,21 +18,21 @@
 
 using System;
 using System.Collections.Generic;
-using System.Configuration;
-using System.IO;
 using System.Linq;
 using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Versioning;
+using FluentMigrator.VersionTableInfo;
 
 namespace FluentMigrator.Runner
 {
     public class MigrationRunner : IMigrationRunner
     {
-        private Assembly _migrationAssembly;
-        private IAnnouncer _announcer;
-        private IStopWatch _stopWatch;
+        private readonly Assembly _migrationAssembly;
+        private readonly IAnnouncer _announcer;
+        private readonly IStopWatch _stopWatch;
         private bool _alreadyOutputPreviewOnlyModeWarning;
         public bool SilentlyFail { get; set; }
 
@@ -277,8 +277,12 @@ namespace FluentMigrator.Runner
 
         public void Up(IMigration migration)
         {
-            var name = migration.GetType().Name;
-            _announcer.Heading(name + ": migrating");
+            if (migration == null) throw new ArgumentNullException("migration");
+
+            var migrationName = GetMigrationName(migration);
+            var migrationVersion = GetMigrationVersion(migration);
+
+            _announcer.Heading(string.Format("{0} {1}: migrating", migrationVersion, migrationName));
 
             CaughtExceptions = new List<Exception>();
 
@@ -289,14 +293,18 @@ namespace FluentMigrator.Runner
             ExecuteExpressions(context.Expressions);
             _stopWatch.Stop();
 
-            _announcer.Say(name + ": migrated");
+            _announcer.Say(string.Format("{0} {1}: migrated", migrationVersion, migrationName));
             _announcer.ElapsedTime(_stopWatch.ElapsedTime());
         }
 
         public void Down(IMigration migration)
         {
-            var name = migration.GetType().Name;
-            _announcer.Heading(name + ": reverting");
+            if (migration == null) throw new ArgumentNullException("migration");
+
+            var migrationName = GetMigrationName(migration);
+            var migrationVersion = GetMigrationVersion(migration);
+
+            _announcer.Heading(string.Format("{0} {1}: reverting", migrationVersion, migrationName));
 
             CaughtExceptions = new List<Exception>();
 
@@ -307,8 +315,39 @@ namespace FluentMigrator.Runner
             ExecuteExpressions(context.Expressions);
             _stopWatch.Stop();
 
-            _announcer.Say(name + ": reverted");
+            _announcer.Say(string.Format("{0} {1}: reverted", migrationVersion, migrationName));
             _announcer.ElapsedTime(_stopWatch.ElapsedTime());
+        }
+
+        private static string GetMigrationName(IMigration migration)
+        {
+            if (migration == null) throw new ArgumentNullException("migration");
+
+            var migrationName = migration.GetType().Name;
+            return migrationName;
+        }
+
+        private static string GetMigrationVersion(IMigration migration)
+        {
+            if (migration == null) throw new ArgumentNullException("migration");
+
+            var migrationType = migration.GetType();
+
+            if (migrationType == typeof(VersionSchemaMigration) || migrationType == typeof(VersionMigration))
+                return string.Empty;
+
+            var attributes = migrationType.GetCustomAttributes(false); //VersionTableMetaData
+            if (attributes.Any(x => x.GetType() == typeof(ProfileAttribute) || x.GetType() == typeof(VersionTableMetaDataAttribute)))
+                return string.Empty;
+
+            var migrationAttribute = attributes
+                .Where(x => x.GetType() == typeof (MigrationAttribute))
+                .FirstOrDefault() as MigrationAttribute;
+            if (migrationAttribute == null)
+                throw new InvalidOperationException(string.Format("Migration should have attribute {0}", typeof(MigrationAttribute).Name));
+
+            var migrationVersion = migrationAttribute.Version;
+            return migrationVersion.ToString();
         }
 
         /// <summary>
