@@ -35,14 +35,11 @@ namespace FluentMigrator.Tests.Integration.SchemaDump {
             SchemaDumper = new SqlServerSchemaDumper(Processor, new TextWriterAnnouncer(System.Console.Out));
         }
 
-        [SetUp]
-        public void SetUp() 
+        [TestFixtureTearDown]
+        public void FixtureTearDown()
         {
-        }
-
-        [TearDown]
-        public void TearDown() 
-        {
+            if (Connection != null)
+                Connection.Dispose();
         }
 
         [Test]
@@ -100,7 +97,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump {
 
             SchemaTestWriter testWriter = new SchemaTestWriter();
             var output = GetOutput(testWriter, defs);
-            string expectedMessage = testWriter.GetMessage(4, 9, 2, 1);            
+            string expectedMessage = testWriter.GetMessage(4, 9, 3, 1);            
 
             runner.Down(new TestMigration());
 

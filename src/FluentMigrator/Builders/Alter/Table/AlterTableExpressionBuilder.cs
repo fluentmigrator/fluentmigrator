@@ -102,7 +102,30 @@ namespace FluentMigrator.Builders.Alter.Table
 
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax Indexed()
         {
+            return Indexed(null);
+        }
+
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax Indexed(string indexName)
+        {
             CurrentColumn.IsIndexed = true;
+
+            var index = new CreateIndexExpression
+                            {
+                                Index = new IndexDefinition
+                                            {
+                                                Name = indexName,
+                                                SchemaName = Expression.SchemaName,
+                                                TableName = Expression.TableName
+                                            }
+                            };
+
+            index.Index.Columns.Add(new IndexColumnDefinition
+                                        {
+                                            Name = CurrentColumn.Name
+                                        });
+
+            _context.Expressions.Add(index);
+
             return this;
         }
 
@@ -133,7 +156,31 @@ namespace FluentMigrator.Builders.Alter.Table
 
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax Unique()
         {
+            return Unique(null);
+        }
+
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax Unique(string indexName)
+        {
             CurrentColumn.IsUnique = true;
+
+            var index = new CreateIndexExpression
+            {
+                Index = new IndexDefinition
+                {
+                    Name = indexName,
+                    SchemaName = Expression.SchemaName,
+                    TableName = Expression.TableName,
+                    IsUnique = true
+                }
+            };
+
+            index.Index.Columns.Add(new IndexColumnDefinition
+            {
+                Name = CurrentColumn.Name
+            });
+
+            _context.Expressions.Add(index);
+
             return this;
         }
 

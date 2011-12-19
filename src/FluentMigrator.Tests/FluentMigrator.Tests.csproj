@@ -148,7 +148,6 @@
     <Compile Include="IntegrationTestOptions.cs" />
     <Compile Include="Unit\Builders\Create\CreateSequenceExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Delete\DeleteConstriantTest.cs" />
-    <Compile Include="Unit\Builders\Delete\DeleteDataExpressionTests.cs" />
     <Compile Include="Unit\Builders\Delete\DeleteSequenceExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\IfDatabase\IfDatabaseExpressionRootTests.cs" />
     <Compile Include="Integration\Migrations\Nested\Group1\AnotherFromGroup1.cs" />
@@ -192,6 +191,7 @@
     <Compile Include="Unit\Builders\Create\CreateTableExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateColumnExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Schema\SchemaExpressionRootTest.cs" />
+    <Compile Include="Unit\Definitions\IndexDefinitionTests.cs" />
     <Compile Include="Unit\Initialization\ConnectionStringManagerTests.cs">
       <SubType>Code</SubType>
     </Compile>

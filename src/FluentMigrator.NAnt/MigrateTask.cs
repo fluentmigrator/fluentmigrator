@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
 using NAnt.Core;
@@ -78,7 +79,18 @@ namespace FluentMigrator.NAnt
 								Timeout = Timeout
 									};
 
-			new TaskExecutor(runnerContext).Execute();
+		    try
+		    {
+		        new TaskExecutor(runnerContext).Execute();
+		    }
+            catch (ProcessorFactoryNotFoundException ex)
+            {
+                announcer.Error("While executing migrations the following error was encountered: {0}", ex.Message);
+            }
+		    catch (Exception e)
+		    {
+                announcer.Error("While executing migrations the following error was encountered: {0}, {1}", e.Message, e.StackTrace);
+		    }
 		}
 	}
 }

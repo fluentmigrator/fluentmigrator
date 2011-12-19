@@ -38,7 +38,7 @@ namespace FluentMigrator.Model
 			Columns = new List<IndexColumnDefinition>();
 		}
 
-		public void ApplyConventions(IMigrationConventions conventions)
+		public virtual void ApplyConventions(IMigrationConventions conventions)
 		{
 			if (String.IsNullOrEmpty(Name))
 				Name = conventions.GetIndexName(this);
