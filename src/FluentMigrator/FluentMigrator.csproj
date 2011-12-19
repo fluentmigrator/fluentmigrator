@@ -150,6 +150,8 @@
     <Compile Include="Builders\Create\Sequence\ICreateSequenceInSchemaSyntax.cs" />
     <Compile Include="Builders\Create\Sequence\ICreateSequenceSyntax.cs" />
     <Compile Include="Builders\Create\Table\ICreateTableWithColumnOrSchemaSyntax.cs" />
+    <Compile Include="Builders\Delete\Constraint\DeleteConstraintExpressionBuilder.cs" />
+    <Compile Include="Builders\Delete\Constraint\IDeleteConstraintOnTableSyntax.cs" />
     <Compile Include="Builders\Delete\DeleteDataExpressionBuilder.cs" />
     <Compile Include="Builders\Delete\ForeignKey\IDeleteForeignKeyForeignColumnOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Delete\ForeignKey\IDeleteForeignKeyOnTableSyntax.cs" />
