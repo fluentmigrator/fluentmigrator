@@ -20,7 +20,7 @@
 
 namespace FluentMigrator.Tests.Integration.Migrations
 {
-	[Migration(2011093000)]
+	[Migration(1)]
 	public class TestMigration : Migration
 	{
 		public override void Up()

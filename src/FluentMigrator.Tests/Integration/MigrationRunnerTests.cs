@@ -23,7 +23,6 @@ using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
@@ -511,7 +510,7 @@ namespace FluentMigrator.Tests.Integration
 		}
 	}
 
-
+    [Migration(1)]
 	internal class TestForeignKeyNamingConvention : Migration
 	{
 		public override void Up()
@@ -536,7 +535,8 @@ namespace FluentMigrator.Tests.Integration
 		}
 	}
 
-	internal class TestIndexNamingConvention : Migration
+    [Migration(1)]
+    internal class TestIndexNamingConvention : Migration
 	{
 		public override void Up()
 		{
@@ -556,7 +556,8 @@ namespace FluentMigrator.Tests.Integration
 		}
 	}
 
-	internal class TestForeignKeySilentFailure : Migration
+    [Migration(1)]
+    internal class TestForeignKeySilentFailure : Migration
 	{
 		public override void Up()
 		{
@@ -581,7 +582,8 @@ namespace FluentMigrator.Tests.Integration
 		}
 	}
 
-	internal class TestCreateAndDropTableMigration : Migration
+    [Migration(1)]
+    internal class TestCreateAndDropTableMigration : Migration
 	{
 		public override void Up()
 		{
@@ -613,7 +615,8 @@ namespace FluentMigrator.Tests.Integration
 		}
 	}
 
-	internal class TestRenameTableMigration : AutoReversingMigration
+    [Migration(1)]
+    internal class TestRenameTableMigration : AutoReversingMigration
 	{
 		public override void Up()
 		{
@@ -621,7 +624,8 @@ namespace FluentMigrator.Tests.Integration
 		}
 	}
 
-	internal class TestRenameColumnMigration : AutoReversingMigration
+    [Migration(1)]
+    internal class TestRenameColumnMigration : AutoReversingMigration
 	{
 		public override void Up()
 		{
@@ -629,7 +633,8 @@ namespace FluentMigrator.Tests.Integration
 		}
 	}
 
-	internal class TestCreateAndDropIndexMigration : Migration
+    [Migration(1)]
+    internal class TestCreateAndDropIndexMigration : Migration
 	{
 		public override void Up()
 		{
@@ -643,6 +648,7 @@ namespace FluentMigrator.Tests.Integration
 	}
 
 
+    [Migration(1)]
     internal class TestForeignKeyNamingConventionWithSchema : Migration
     {
         public override void Up()
@@ -671,6 +677,7 @@ namespace FluentMigrator.Tests.Integration
         }
     }
 
+    [Migration(1)]
     internal class TestIndexNamingConventionWithSchema : Migration
     {
         public override void Up()
@@ -695,6 +702,7 @@ namespace FluentMigrator.Tests.Integration
         }
     }
 
+    [Migration(1)]
     internal class TestCreateAndDropTableMigrationWithSchema : Migration
     {
         public override void Up()
@@ -729,6 +737,7 @@ namespace FluentMigrator.Tests.Integration
         }
     }
 
+    [Migration(1)]
     internal class TestRenameTableMigrationWithSchema : AutoReversingMigration
     {
         public override void Up()
@@ -737,6 +746,7 @@ namespace FluentMigrator.Tests.Integration
         }
     }
 
+    [Migration(1)]
     internal class TestRenameColumnMigrationWithSchema : AutoReversingMigration
     {
         public override void Up()
@@ -745,6 +755,7 @@ namespace FluentMigrator.Tests.Integration
         }
     }
 
+    [Migration(1)]
     internal class TestCreateAndDropIndexMigrationWithSchema : Migration
     {
         public override void Up()
@@ -758,6 +769,7 @@ namespace FluentMigrator.Tests.Integration
         }
     }
 
+    [Migration(1)]
     internal class TestCreateSchema : Migration
     {
         public override void Up()
@@ -770,5 +782,4 @@ namespace FluentMigrator.Tests.Integration
             Delete.Schema("TestSchema");
         }
     }
-
 }

@@ -146,6 +146,7 @@
   <ItemGroup>
     <Compile Include="Helpers\PostgresTestTable.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
+    <Compile Include="Integration\Migrations\Specific\EmptyMigrationForAddVersionToLogTest.cs" />
     <Compile Include="Unit\Builders\IfDatabase\IfDatabaseExpressionRootTests.cs" />
     <Compile Include="Integration\Migrations\Nested\Group1\AnotherFromGroup1.cs" />
     <Compile Include="Integration\Migrations\Nested\Group1\FromGroup1.cs" />

@@ -17,9 +17,7 @@
 #endregion
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -27,11 +25,10 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Tests.Integration.Migrations;
+using FluentMigrator.Tests.Integration.Migrations.Specific;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
-using FluentMigrator.Runner.Versioning;
-using System.Data;
 
 namespace FluentMigrator.Tests.Unit
 {
@@ -113,7 +110,7 @@ namespace FluentMigrator.Tests.Unit
         public void CanAnnounceUp()
         {
             _announcer.Setup(x => x.Heading(It.IsRegex(containsAll("2011093000", "Test", "migrating"))));
-            _runner.Up(new TestMigration());
+            _runner.Up(new EmptyMigrationForAddVersionToLogTest());
             _announcer.VerifyAll();
         }
 
@@ -121,7 +118,7 @@ namespace FluentMigrator.Tests.Unit
         public void CanAnnounceUpFinish()
         {
             _announcer.Setup(x => x.Say(It.IsRegex(containsAll("2011093000", "Test", "migrated"))));
-            _runner.Up(new TestMigration());
+            _runner.Up(new EmptyMigrationForAddVersionToLogTest());
             _announcer.VerifyAll();
         }
 
@@ -129,7 +126,7 @@ namespace FluentMigrator.Tests.Unit
         public void CanAnnounceDown()
         {
             _announcer.Setup(x => x.Heading(It.IsRegex(containsAll("2011093000", "Test", "reverting"))));
-            _runner.Down(new TestMigration());
+            _runner.Down(new EmptyMigrationForAddVersionToLogTest());
             _announcer.VerifyAll();
         }
 
@@ -137,7 +134,7 @@ namespace FluentMigrator.Tests.Unit
         public void CanAnnounceDownFinish()
         {
             _announcer.Setup(x => x.Say(It.IsRegex(containsAll("2011093000", "Test", "reverted"))));
-            _runner.Down(new TestMigration());
+            _runner.Down(new EmptyMigrationForAddVersionToLogTest());
             _announcer.VerifyAll();
         }
 
