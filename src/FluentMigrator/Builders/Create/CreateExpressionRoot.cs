@@ -16,20 +16,18 @@
 //
 #endregion
 
-
+using FluentMigrator.Builders.Create.Column;
+using FluentMigrator.Builders.Create.Constraint;
+using FluentMigrator.Builders.Create.ForeignKey;
+using FluentMigrator.Builders.Create.Index;
+using FluentMigrator.Builders.Create.Sequence;
+using FluentMigrator.Builders.Create.Table;
+using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Create
 {
-    using FluentMigrator.Builders.Create.Column;
-    using FluentMigrator.Builders.Create.Constraint;
-    using FluentMigrator.Builders.Create.ForeignKey;
-    using FluentMigrator.Builders.Create.Index;
-    using FluentMigrator.Builders.Create.Table;
-    using FluentMigrator.Expressions;
-    using FluentMigrator.Infrastructure;
-    using Sequence;
-    using FluentMigrator.Model;
-
     public class CreateExpressionRoot : ICreateExpressionRoot
 	{
 		private readonly IMigrationContext _context;
