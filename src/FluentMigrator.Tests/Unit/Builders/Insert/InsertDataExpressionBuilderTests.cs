@@ -18,6 +18,7 @@
 
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Extensions;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -52,13 +53,14 @@ namespace FluentMigrator.Tests.Unit.Builders.Insert
 		}
 
 		[Test]
-		public void UsingIdentityInsertGetsSetWhenWithIdentityInsertIsCalled() 
+		public void SqlServerIdentityInsertAddsCorrectAdditionalFeature() 
 		{
 			var expression = new InsertDataExpression();
 			var builder = new InsertDataExpressionBuilder(expression);
-			builder.WithIdentityInsert();
+			builder.WithSqlServerIdentityInsert();
 
-			expression.UsingIdentityInsert.ShouldBe(true);
+			expression.AdditionalFeatures.ShouldContain(
+				new System.Collections.Generic.KeyValuePair<string, object>(SqlServerExtensions.IdentityInsert, true));
 		}
 	}
 }

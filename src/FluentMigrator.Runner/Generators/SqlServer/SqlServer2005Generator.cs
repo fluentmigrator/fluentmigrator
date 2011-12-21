@@ -130,7 +130,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             List<string> columnValues = new List<string>();
             List<string> insertStrings = new List<string>();
 
-					  if (expression.UsingIdentityInsert) 
+						if (IsUsingIdentityInsert(expression)) 
 						{
 							insertStrings.Add(string.Format(IdentityInsert,
 										Quoter.QuoteSchemaName(expression.SchemaName),
@@ -157,7 +157,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                     , values));
 						}
 
-						if (expression.UsingIdentityInsert)
+						if (IsUsingIdentityInsert(expression))
 						{
 							insertStrings.Add(string.Format(IdentityInsert,
 										Quoter.QuoteSchemaName(expression.SchemaName),

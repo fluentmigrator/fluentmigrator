@@ -38,11 +38,11 @@ namespace FluentMigrator.Builders.Insert
 			return this;
 		}
 
-		public IInsertDataSyntax WithIdentityInsert()
+		public IInsertDataSyntax AddAdditionalFeature(string feature, object value)
 		{
-			_expression.UsingIdentityInsert = true;
+			_expression.AdditionalFeatures.Add(feature, value);
 			return this;
-		}
+		} 
 
 		public IInsertDataSyntax InSchema(string schemaName)
 		{

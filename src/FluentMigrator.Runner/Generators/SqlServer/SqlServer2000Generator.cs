@@ -16,7 +16,7 @@
 //
 #endregion
 
-
+using FluentMigrator.Runner.Extensions;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
@@ -126,7 +126,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
 				public override string Generate(InsertDataExpression expression)
 				{
-					if (expression.UsingIdentityInsert)
+					if (IsUsingIdentityInsert(expression))
 					{
 						return string.Format("{0}; {1}; {2}",
 									string.Format(IdentityInsert, Quoter.QuoteTableName(expression.TableName), "ON"),
@@ -134,6 +134,14 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 									string.Format(IdentityInsert, Quoter.QuoteTableName(expression.TableName), "OFF"));
 					}
 					return base.Generate(expression);
+				}
+
+				protected static bool IsUsingIdentityInsert(InsertDataExpression expression) {
+					if (expression.AdditionalFeatures.ContainsKey(SqlServerExtensions.IdentityInsert)) {
+						return (bool) expression.AdditionalFeatures[SqlServerExtensions.IdentityInsert];
+					}
+
+					return false;
 				}
 
         public override string Generate(CreateSequenceExpression expression)
@@ -145,5 +153,10 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
             return compatabilityMode.HandleCompatabilty("Sequences are not supported in SqlServer2000");
         }
+
+				public override bool IsAdditionalFeatureSupported(string feature)
+				{
+					return (feature == SqlServerExtensions.IdentityInsert);
+				}
     }
 }
