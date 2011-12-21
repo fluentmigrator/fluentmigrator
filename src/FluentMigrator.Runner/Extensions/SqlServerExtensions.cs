@@ -13,7 +13,8 @@ namespace FluentMigrator.Runner.Extensions
 		/// <returns></returns>
 		public static IInsertDataSyntax WithSqlServerIdentityInsert(this InsertDataExpressionBuilder expression)
 		{
-			expression.AddAdditionalFeature(IdentityInsert, true);
+			IInsertDataAdditionalFeatures castExpression = expression;
+			castExpression.AddAdditionalFeature(IdentityInsert, true);
 			return expression;
 		}
 	}

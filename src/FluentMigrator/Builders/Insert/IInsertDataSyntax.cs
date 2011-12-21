@@ -21,6 +21,5 @@ namespace FluentMigrator.Builders.Insert
 	public interface IInsertDataSyntax
 	{
 		IInsertDataSyntax Row(object dataAsAnonymousType);
-		IInsertDataSyntax AddAdditionalFeature(string feature, object value);
 	}
 }
