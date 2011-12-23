@@ -121,7 +121,7 @@ namespace FluentMigrator.Runner.Processors.Jet
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
-            var restrict = new[] { null, null, indexName, null, null, tableName };
+            var restrict = new[] { null, null, indexName, null, tableName };
             using (var indexes = Connection.GetOleDbSchemaTable(OleDbSchemaGuid.Indexes, restrict))
             {
                 return indexes.Rows.Count > 0;
