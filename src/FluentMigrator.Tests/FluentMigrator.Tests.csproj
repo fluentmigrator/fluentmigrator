@@ -147,7 +147,7 @@
     <Compile Include="Helpers\PostgresTestTable.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
     <Compile Include="Unit\Builders\Create\CreateSequenceExpressionBuilderTests.cs" />
-    <Compile Include="Unit\Builders\Delete\DeleteDataExpressionTests.cs" />
+    <Compile Include="Unit\Builders\Delete\DeleteConstriantTest.cs" />
     <Compile Include="Unit\Builders\Delete\DeleteSequenceExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\IfDatabase\IfDatabaseExpressionRootTests.cs" />
     <Compile Include="Integration\Migrations\Nested\Group1\AnotherFromGroup1.cs" />

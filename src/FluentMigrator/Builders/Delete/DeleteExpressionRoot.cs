@@ -16,16 +16,19 @@
 //
 #endregion
 
-using FluentMigrator.Builders.Delete.Column;
-using FluentMigrator.Builders.Delete.ForeignKey;
-using FluentMigrator.Builders.Delete.Table;
-using FluentMigrator.Expressions;
-using FluentMigrator.Infrastructure;
-using FluentMigrator.Builders.Delete.Index;
+
 
 namespace FluentMigrator.Builders.Delete
 {
+    using FluentMigrator.Builders.Delete.Column;
+    using FluentMigrator.Builders.Delete.ForeignKey;
+    using FluentMigrator.Builders.Delete.Table;
+    using FluentMigrator.Expressions;
+    using FluentMigrator.Infrastructure;
+    using FluentMigrator.Builders.Delete.Index;
     using Sequence;
+    using FluentMigrator.Builders.Delete.Constraint;
+    using FluentMigrator.Model;
 
     public class DeleteExpressionRoot : IDeleteExpressionRoot
 	{
@@ -98,5 +101,21 @@ namespace FluentMigrator.Builders.Delete
             _context.Expressions.Add(expression);
             return new DeleteSequenceExpressionBuilder(expression);
 	    }
+
+        public IDeleteConstraintOnTableSyntax PrimaryKey(string primaryKeyName)
+        {
+            var expression = new DeleteConstraintExpression(ConstraintType.PrimaryKey);
+            expression.Constraint.ConstraintName = primaryKeyName;
+            _context.Expressions.Add(expression);
+            return new DeleteConstraintExpressionBuilder(expression);
+        }
+
+        public IDeleteConstraintOnTableSyntax UniqueConstraint(string constraintName)
+        {
+            var expression = new DeleteConstraintExpression(ConstraintType.Unique);
+            expression.Constraint.ConstraintName = constraintName;
+            _context.Expressions.Add(expression);
+            return new DeleteConstraintExpressionBuilder(expression);
+        }
 	}
 }

@@ -51,6 +51,8 @@ namespace FluentMigrator.Runner.Generators.Base
 		public abstract string Generate(AlterSchemaExpression expression);
         public abstract string Generate(CreateSequenceExpression expression);
         public abstract string Generate(DeleteSequenceExpression expression);
+        public abstract string Generate(CreateConstraintExpression expression);
+        public abstract string Generate(DeleteConstraintExpression expression);
 
 		public string Generate(AlterTableExpression expression)
 		{

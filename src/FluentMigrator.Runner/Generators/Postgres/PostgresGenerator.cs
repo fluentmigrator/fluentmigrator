@@ -47,7 +47,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
 			return string.Format("ALTER TABLE {0}.{1} DROP COLUMN {2}", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.ColumnName));
 		}
 
-		public override string Generate(CreateForeignKeyExpression expression)
+        public override string Generate(CreateForeignKeyExpression expression)
 		{
 			var primaryColumns = GetColumnList(expression.ForeignKey.PrimaryColumns);
 			var foreignColumns = GetColumnList(expression.ForeignKey.ForeignColumns);
