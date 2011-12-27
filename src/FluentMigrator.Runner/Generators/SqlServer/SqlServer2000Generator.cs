@@ -16,7 +16,7 @@
 //
 #endregion
 
-
+using FluentMigrator.Runner.Extensions;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
@@ -47,7 +47,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
 
-        public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
+				public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
+
+				public virtual string IdentityInsert { get { return "SET IDENTITY_INSERT {0} {1}"; } }
 
         //Not need for the nonclusted keyword as it is the default mode
         public override string GetClusterTypeString(CreateIndexExpression column)
@@ -122,6 +124,26 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return String.Format(sql,Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.ColumnName),Quoter.QuoteValue(expression.DefaultValue));
         }
 
+				public override string Generate(InsertDataExpression expression)
+				{
+					if (IsUsingIdentityInsert(expression))
+					{
+						return string.Format("{0}; {1}; {2}",
+									string.Format(IdentityInsert, Quoter.QuoteTableName(expression.TableName), "ON"),
+									base.Generate(expression),
+									string.Format(IdentityInsert, Quoter.QuoteTableName(expression.TableName), "OFF"));
+					}
+					return base.Generate(expression);
+				}
+
+				protected static bool IsUsingIdentityInsert(InsertDataExpression expression) {
+					if (expression.AdditionalFeatures.ContainsKey(SqlServerExtensions.IdentityInsert)) {
+						return (bool) expression.AdditionalFeatures[SqlServerExtensions.IdentityInsert];
+					}
+
+					return false;
+				}
+
         public override string Generate(CreateSequenceExpression expression)
         {
             return compatabilityMode.HandleCompatabilty("Sequences are not supported in SqlSever2000");
@@ -131,5 +153,10 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
             return compatabilityMode.HandleCompatabilty("Sequences are not supported in SqlServer2000");
         }
+
+				public override bool IsAdditionalFeatureSupported(string feature)
+				{
+					return (feature == SqlServerExtensions.IdentityInsert);
+				}
     }
 }

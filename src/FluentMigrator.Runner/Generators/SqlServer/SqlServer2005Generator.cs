@@ -28,6 +28,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
 	public class SqlServer2005Generator : SqlServer2000Generator
 	{
+
 		public SqlServer2005Generator() : base(new SqlServerColumn(new SqlServer2005TypeMap()))		{
 		}
 
@@ -51,9 +52,10 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string InsertData { get { return "INSERT INTO {0}.{1} ({2}) VALUES ({3})"; } }
         public override string UpdateData { get { return "{0} SET {1} WHERE {2}"; } }
-        public override string DeleteData { get { return "DELETE FROM {0}.{1} WHERE {2}"; } }
+				public override string DeleteData { get { return "DELETE FROM {0}.{1} WHERE {2}"; } }
+				public override string IdentityInsert { get { return "SET IDENTITY_INSERT {0}.{1} {2}"; } }
 
-        public override string CreateConstraint { get { return "ALTER TABLE {0}.{1} ADD CONSTRAINT {2} FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8}"; } }
+				public override string CreateConstraint { get { return "ALTER TABLE {0}.{1} ADD CONSTRAINT {2} FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8}"; } }
         public override string DeleteConstraint { get { return "{0} DROP CONSTRAINT {1}"; } }
 
         public override string Generate(CreateTableExpression expression)
@@ -128,6 +130,14 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             List<string> columnValues = new List<string>();
             List<string> insertStrings = new List<string>();
 
+						if (IsUsingIdentityInsert(expression)) 
+						{
+							insertStrings.Add(string.Format(IdentityInsert,
+										Quoter.QuoteSchemaName(expression.SchemaName),
+										Quoter.QuoteTableName(expression.TableName),
+										"ON"));
+					  }
+
             foreach (InsertionDataDefinition row in expression.Rows)
             {
                 columnNames.Clear();
@@ -145,7 +155,16 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                     ,Quoter.QuoteTableName(expression.TableName)
                     , columns
                     , values));
-            }
+						}
+
+						if (IsUsingIdentityInsert(expression))
+						{
+							insertStrings.Add(string.Format(IdentityInsert,
+										Quoter.QuoteSchemaName(expression.SchemaName),
+										Quoter.QuoteTableName(expression.TableName),
+										"OFF"));
+						}
+
             return String.Join("; ", insertStrings.ToArray());
         }
 

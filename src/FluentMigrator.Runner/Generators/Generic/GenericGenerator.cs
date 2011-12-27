@@ -203,6 +203,18 @@ namespace FluentMigrator.Runner.Generators.Generic
 
 		public override string Generate(InsertDataExpression expression)
 		{
+			if (compatabilityMode == CompatabilityMode.STRICT) {
+				List<string> unsupportedFeatures = expression.AdditionalFeatures.Keys.Where(x => !IsAdditionalFeatureSupported(x)).ToList();
+
+				if (unsupportedFeatures.Any()) 
+				{
+					string errorMessage =
+						string.Format("The following database specific additional features are not supported in strict mode [{0}]",
+						              expression.AdditionalFeatures.Keys.Aggregate((x, y) => x + ", " + y));
+					return compatabilityMode.HandleCompatabilty(errorMessage);
+				}
+			}
+			
 			List<string> columnNames = new List<string>();
 			List<string> columnValues = new List<string>();
 			List<string> insertStrings = new List<string>();
@@ -224,7 +236,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 			return String.Join("; ", insertStrings.ToArray());
 		}
 
-		public override string Generate(UpdateDataExpression expression)
+    	public override string Generate(UpdateDataExpression expression)
 		{
 
 			List<string> updateItems = new List<string>();

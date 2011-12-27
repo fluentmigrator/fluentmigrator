@@ -163,6 +163,7 @@
     <Compile Include="Builders\IfDatabase\IIfDatabaseExpressionRoot.cs" />
     <Compile Include="Builders\IfDatabase\NullIfDatabaseProcessor.cs" />
     <Compile Include="Builders\IInSchemaSyntax.cs" />
+    <Compile Include="Builders\Insert\IInsertDataAdditionalFeatures.cs" />
     <Compile Include="Builders\Insert\IInsertDataOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Insert\IInsertDataSyntax.cs" />
     <Compile Include="Builders\Insert\IInsertExpressionRoot.cs" />
