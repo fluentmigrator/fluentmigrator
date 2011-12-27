@@ -30,7 +30,7 @@ namespace FluentMigrator.Runner
 {
     public class MigrationRunner : IMigrationRunner
     {
-        private Assembly _migrationAssembly;
+        private IList<Assembly> _migrationAssemblies;
         private IAnnouncer _announcer;
         private IStopWatch _stopWatch;
         private bool _alreadyOutputPreviewOnlyModeWarning;
@@ -43,8 +43,14 @@ namespace FluentMigrator.Runner
         public IList<Exception> CaughtExceptions { get; private set; }
 
         public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
+            : this(new[] { assembly }, runnerContext, processor)
         {
-            _migrationAssembly = assembly;
+            
+        }
+
+        public MigrationRunner(IEnumerable<Assembly> assemblies, IRunnerContext runnerContext, IMigrationProcessor processor)
+        {
+            _migrationAssemblies = assemblies.ToList();
             _announcer = runnerContext.Announcer;
             Processor = processor;
             _stopWatch = runnerContext.StopWatch;
@@ -56,9 +62,9 @@ namespace FluentMigrator.Runner
             if (!string.IsNullOrEmpty(runnerContext.WorkingDirectory))
                 Conventions.GetWorkingDirectory = () => runnerContext.WorkingDirectory;
 
-            VersionLoader = new VersionLoader(this, _migrationAssembly, Conventions);
-            MigrationLoader = new MigrationLoader(Conventions, _migrationAssembly, runnerContext.Namespace);
-            ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
+            VersionLoader = new VersionLoader(this, _migrationAssemblies, Conventions);
+            MigrationLoader = new MigrationLoader(Conventions, _migrationAssemblies, runnerContext.Namespace);
+            ProfileLoader = new ProfileLoader(runnerContext, this, _migrationAssemblies, Conventions);
         }
 
         public IVersionLoader VersionLoader { get; set; }
@@ -270,9 +276,9 @@ namespace FluentMigrator.Runner
             }
         }
 
-        public Assembly MigrationAssembly
+        public IList<Assembly> MigrationAssemblies
         {
-            get { return _migrationAssembly; }
+            get { return _migrationAssemblies; }
         }
 
         public void Up(IMigration migration)
@@ -282,7 +288,7 @@ namespace FluentMigrator.Runner
 
             CaughtExceptions = new List<Exception>();
 
-            var context = new MigrationContext(Conventions, Processor, MigrationAssembly);
+            var context = new MigrationContext(Conventions, Processor, migration.GetType().Assembly);
             migration.GetUpExpressions(context);
 
             _stopWatch.Start();
@@ -300,7 +306,7 @@ namespace FluentMigrator.Runner
 
             CaughtExceptions = new List<Exception>();
 
-            var context = new MigrationContext(Conventions, Processor, MigrationAssembly);
+            var context = new MigrationContext(Conventions, Processor, migration.GetType().Assembly);
             migration.GetDownExpressions(context);
 
             _stopWatch.Start();

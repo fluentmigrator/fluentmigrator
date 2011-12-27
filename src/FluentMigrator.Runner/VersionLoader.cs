@@ -13,10 +13,16 @@ namespace FluentMigrator.Runner
     public class VersionLoader : IVersionLoader
     {
         public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions)
+            : this(runner, new[] { assembly }, conventions)
+        {
+            
+        }
+
+        public VersionLoader(IMigrationRunner runner, IEnumerable<Assembly> assemblies, IMigrationConventions conventions)
         {
             Runner = runner;
             Processor = runner.Processor;
-            Assembly = assembly;
+            Assemblies = assemblies.ToList();
 
             Conventions = conventions;
             VersionTableMetaData = GetVersionTableMetaData();
@@ -25,12 +31,11 @@ namespace FluentMigrator.Runner
 
             LoadVersionInfo();
         }
-
         protected VersionSchemaMigration VersionSchemaMigration { get; set; }
 
         private IVersionInfo _versionInfo;
         public IMigrationRunner Runner { get; set; }
-        protected Assembly Assembly { get; set; }
+        protected IList<Assembly> Assemblies { get; set; }
         public IVersionTableMetaData VersionTableMetaData { get; private set; }
         private IMigrationConventions Conventions { get; set; }
         private IMigrationProcessor Processor { get; set; }
@@ -47,7 +52,7 @@ namespace FluentMigrator.Runner
 
         public IVersionTableMetaData GetVersionTableMetaData()
         {
-            Type matchedType = Assembly.GetExportedTypes().Where(t => Conventions.TypeIsVersionTableMetaData(t)).FirstOrDefault();
+            var matchedType = Assemblies.SelectMany(a => a.GetExportedTypes()).Where(t => Conventions.TypeIsVersionTableMetaData(t)).FirstOrDefault();
 
             if (matchedType == null)
             {
