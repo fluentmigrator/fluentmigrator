@@ -52,6 +52,11 @@ namespace FluentMigrator.Runner.Generators.Base
         public abstract string Generate(CreateSequenceExpression expression);
         public abstract string Generate(DeleteSequenceExpression expression);
 
+		public virtual bool IsAdditionalFeatureSupported(string feature)
+		{
+			return false;
+		}
+
 		public string Generate(AlterTableExpression expression)
 		{
 			// returns nothing because the individual AddColumn and AlterColumn calls
