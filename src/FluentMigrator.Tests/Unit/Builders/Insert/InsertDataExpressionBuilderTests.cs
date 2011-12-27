@@ -18,6 +18,7 @@
 
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Extensions;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -49,6 +50,28 @@ namespace FluentMigrator.Tests.Unit.Builders.Insert
 
 			expression.Rows[1][1].Key.ShouldBe("Data2");
 			expression.Rows[1][1].Value.ShouldBe("Row2Data2");
+		}
+
+		[Test]
+		public void SqlServerIdentityInsertAddsCorrectAdditionalFeature() 
+		{
+			var expression = new InsertDataExpression();
+			var builder = new InsertDataExpressionBuilder(expression);
+			builder.WithIdentityInsert();
+
+			expression.AdditionalFeatures.ShouldContain(
+				new System.Collections.Generic.KeyValuePair<string, object>(SqlServerExtensions.IdentityInsert, true));
+		}
+
+		[Test]
+		public void SqlServerIdentityInsertCalledTwiceAddsCorrectAdditionalFeature()
+		{
+			var expression = new InsertDataExpression();
+			var builder = new InsertDataExpressionBuilder(expression);
+			builder.WithIdentityInsert().WithIdentityInsert();
+
+			expression.AdditionalFeatures.ShouldContain(
+				new System.Collections.Generic.KeyValuePair<string, object>(SqlServerExtensions.IdentityInsert, true));
 		}
 	}
 }

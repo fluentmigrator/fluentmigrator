@@ -23,7 +23,7 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Insert
 {
-	public class InsertDataExpressionBuilder : IInsertDataOrInSchemaSyntax
+	public class InsertDataExpressionBuilder : IInsertDataOrInSchemaSyntax, IInsertDataAdditionalFeatures
 	{
 		private readonly InsertDataExpression _expression;
 
@@ -37,6 +37,17 @@ namespace FluentMigrator.Builders.Insert
 			_expression.Rows.Add(GetData(dataAsAnonymousType));
 			return this;
 		}
+
+		IInsertDataSyntax IInsertDataAdditionalFeatures.AddAdditionalFeature(string feature, object value)
+		{
+			if (!_expression.AdditionalFeatures.ContainsKey(feature)) {
+				_expression.AdditionalFeatures.Add(feature, value);
+			}
+			else {
+				_expression.AdditionalFeatures[feature] = value;
+			}
+			return this;
+		} 
 
 		public IInsertDataSyntax InSchema(string schemaName)
 		{
