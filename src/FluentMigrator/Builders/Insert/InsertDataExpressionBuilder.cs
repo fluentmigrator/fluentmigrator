@@ -40,7 +40,12 @@ namespace FluentMigrator.Builders.Insert
 
 		IInsertDataSyntax IInsertDataAdditionalFeatures.AddAdditionalFeature(string feature, object value)
 		{
-			_expression.AdditionalFeatures.Add(feature, value);
+			if (!_expression.AdditionalFeatures.ContainsKey(feature)) {
+				_expression.AdditionalFeatures.Add(feature, value);
+			}
+			else {
+				_expression.AdditionalFeatures[feature] = value;
+			}
 			return this;
 		} 
 

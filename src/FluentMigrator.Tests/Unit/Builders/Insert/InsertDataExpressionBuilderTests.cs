@@ -57,7 +57,18 @@ namespace FluentMigrator.Tests.Unit.Builders.Insert
 		{
 			var expression = new InsertDataExpression();
 			var builder = new InsertDataExpressionBuilder(expression);
-			builder.WithSqlServerIdentityInsert();
+			builder.WithIdentityInsert();
+
+			expression.AdditionalFeatures.ShouldContain(
+				new System.Collections.Generic.KeyValuePair<string, object>(SqlServerExtensions.IdentityInsert, true));
+		}
+
+		[Test]
+		public void SqlServerIdentityInsertCalledTwiceAddsCorrectAdditionalFeature()
+		{
+			var expression = new InsertDataExpression();
+			var builder = new InsertDataExpressionBuilder(expression);
+			builder.WithIdentityInsert().WithIdentityInsert();
 
 			expression.AdditionalFeatures.ShouldContain(
 				new System.Collections.Generic.KeyValuePair<string, object>(SqlServerExtensions.IdentityInsert, true));

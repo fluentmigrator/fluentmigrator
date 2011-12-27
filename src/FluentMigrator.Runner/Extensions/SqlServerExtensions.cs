@@ -1,4 +1,5 @@
-﻿using FluentMigrator.Builders.Insert;
+﻿using System;
+using FluentMigrator.Builders.Insert;
 
 namespace FluentMigrator.Runner.Extensions
 {
@@ -11,9 +12,12 @@ namespace FluentMigrator.Runner.Extensions
 		/// </summary>
 		/// <param name="expression"></param>
 		/// <returns></returns>
-		public static IInsertDataSyntax WithSqlServerIdentityInsert(this InsertDataExpressionBuilder expression)
+		public static IInsertDataSyntax WithIdentityInsert(this IInsertDataSyntax expression)
 		{
-			IInsertDataAdditionalFeatures castExpression = expression;
+			IInsertDataAdditionalFeatures castExpression = expression as IInsertDataAdditionalFeatures;
+			if (castExpression == null) {
+				throw new InvalidOperationException("WithIdentityInsert must be called on an object that implements IInsertDataAdditionalFeatures.");
+			}
 			castExpression.AddAdditionalFeature(IdentityInsert, true);
 			return expression;
 		}
