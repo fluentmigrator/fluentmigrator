@@ -133,5 +133,20 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             collectionMock.Verify(x => x.Add(It.Is<DeleteSequenceExpression>(e => e.SequenceName.Equals("Bacon"))));
             contextMock.VerifyGet(x => x.Expressions);
         }
+
+        [Test]
+        public void CallingDefaultConstraintAddsDeleteDefaultConstraintExpressionToContext()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+
+            var root = new DeleteExpressionRoot(contextMock.Object);
+            root.DefaultConstraint();
+
+            collectionMock.Verify(x => x.Add(It.IsAny<DeleteDefaultConstraintExpression>()));
+            contextMock.VerifyGet(x => x.Expressions);
+        }
     }
 }

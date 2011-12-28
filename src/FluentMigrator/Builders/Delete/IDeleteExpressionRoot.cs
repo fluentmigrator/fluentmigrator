@@ -17,6 +17,7 @@
 #endregion
 
 using FluentMigrator.Builders.Delete.Column;
+using FluentMigrator.Builders.Delete.DefaultConstraint;
 using FluentMigrator.Builders.Delete.ForeignKey;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Builders.Delete.Index;
@@ -44,5 +45,7 @@ namespace FluentMigrator.Builders.Delete
         IDeleteIndexForTableSyntax Index();
 
         IInSchemaSyntax Sequence(string sequenceName);
+
+        IDeleteDefaultConstraintOnTableSyntax DefaultConstraint();
     }
 }
