@@ -190,6 +190,10 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return string.Format("ALTER TABLE {0}.{1} SET SCHEMA {2}", Quoter.QuoteSchemaName(expression.SourceSchemaName), Quoter.QuoteTableName(expression.TableName), Quoter.QuoteSchemaName(expression.DestinationSchemaName));
         }
 
+        public override string Generate(DeleteDefaultConstraintExpression expression)
+        {
+            return compatabilityMode.HandleCompatabilty("Default constraints are not supported");
+        }
 
         protected string GetColumnList(IEnumerable<string> columns)
         {

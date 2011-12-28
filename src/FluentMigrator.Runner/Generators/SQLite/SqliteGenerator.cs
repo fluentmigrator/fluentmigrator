@@ -70,5 +70,10 @@ namespace FluentMigrator.Runner.Generators.SQLite
         {
             return compatabilityMode.HandleCompatabilty("Sequences are not supported in Sqlite");
         }
+
+        public override string Generate(DeleteDefaultConstraintExpression expression)
+        {
+            return compatabilityMode.HandleCompatabilty("Default constraints are not supported");
+        }
     }
 }
