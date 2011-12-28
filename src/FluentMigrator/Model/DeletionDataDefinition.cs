@@ -20,8 +20,7 @@ using System.Collections.Generic;
 
 namespace FluentMigrator.Model
 {
-	public class DeletionDataDefinition : List<KeyValuePair<string, object>>
-	{
-
-	}
+    public class DeletionDataDefinition : List<KeyValuePair<string, object>>
+    {
+    }
 }

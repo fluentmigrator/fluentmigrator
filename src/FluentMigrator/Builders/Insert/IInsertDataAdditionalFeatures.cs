@@ -1,7 +1,7 @@
 ﻿namespace FluentMigrator.Builders.Insert
 {
-	public interface IInsertDataAdditionalFeatures
-	{
-		IInsertDataSyntax AddAdditionalFeature(string feature, object value);
-	}
+    public interface IInsertDataAdditionalFeatures
+    {
+        IInsertDataSyntax AddAdditionalFeature(string feature, object value);
+    }
 }

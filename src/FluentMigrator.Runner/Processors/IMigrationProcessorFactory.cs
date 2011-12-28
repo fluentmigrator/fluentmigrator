@@ -1,11 +1,11 @@
 ﻿namespace FluentMigrator.Runner.Processors
 {
-	public interface IMigrationProcessorFactory
-	{
-		IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options);
+    public interface IMigrationProcessorFactory
+    {
+        IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options);
 
-		bool IsForProvider(string provider);
+        bool IsForProvider(string provider);
 
-		string Name { get; }
-	}
+        string Name { get; }
+    }
 }

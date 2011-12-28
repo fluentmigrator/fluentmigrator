@@ -18,16 +18,16 @@
 
 namespace FluentMigrator.Runner.Initialization.AssemblyLoader
 {
-	public class AssemblyLoaderFactory
-	{
-		public static IAssemblyLoader GetAssemblyLoader(string name)
-		{
-			if (name.ToLower().Contains(".dll") || name.ToLower().Contains(".exe"))
-			{
-				return new AssemblyLoaderFromFile(name);
-			}
+    public class AssemblyLoaderFactory
+    {
+        public static IAssemblyLoader GetAssemblyLoader(string name)
+        {
+            if (name.ToLower().Contains(".dll") || name.ToLower().Contains(".exe"))
+            {
+                return new AssemblyLoaderFromFile(name);
+            }
 
-			return new AssemblyLoaderFromName(name);
-		}
-	}
+            return new AssemblyLoaderFromName(name);
+        }
+    }
 }

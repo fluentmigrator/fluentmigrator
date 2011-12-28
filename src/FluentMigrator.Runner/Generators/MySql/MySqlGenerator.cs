@@ -22,10 +22,11 @@ namespace FluentMigrator.Runner.Generators.MySql
     using Generic;
 
     public class MySqlGenerator : GenericGenerator
-	{
-		public MySqlGenerator() : base(new MySqlColumn(), new MySqlQuoter())
-		{
-		}
+    {
+        public MySqlGenerator()
+            : base(new MySqlColumn(), new MySqlQuoter())
+        {
+        }
 
         public override string AlterColumn { get { return "ALTER TABLE {0} MODIFY COLUMN {1}"; } }
 
@@ -44,9 +45,9 @@ namespace FluentMigrator.Runner.Generators.MySql
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
-		{
+        {
             return compatabilityMode.HandleCompatabilty("Altering of default constraints is not supporteed for MySql");
-		}
+        }
 
         public override string Generate(CreateSequenceExpression expression)
         {
@@ -57,5 +58,5 @@ namespace FluentMigrator.Runner.Generators.MySql
         {
             return compatabilityMode.HandleCompatabilty("Sequences is not supporteed for MySql");
         }
-	}
+    }
 }

@@ -22,7 +22,6 @@ using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System;
 using System.Reflection;
-using System.IO;
 
 namespace FluentMigrator.MSBuild
 {
@@ -74,7 +73,7 @@ namespace FluentMigrator.MSBuild
 
         public override bool Execute()
         {
-            
+
             if (string.IsNullOrEmpty(databaseType))
             {
                 Log.LogError("You must specific a database type. i.e. mysql or sqlserver");
@@ -105,7 +104,7 @@ namespace FluentMigrator.MSBuild
                 Version = Version,
                 Steps = Steps,
                 WorkingDirectory = WorkingDirectory,
-                Profile = Profile 
+                Profile = Profile
             };
 
             Log.LogCommandLine(MessageImportance.Low, "Executing Migration Runner");

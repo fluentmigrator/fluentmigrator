@@ -28,71 +28,71 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Builders.Alter
 {
-	[TestFixture]
-	public class AlterExpressionRootTests
-	{
-		[Test]
-		public void CallingTableAddsAlterTableExpressionToContextWithSpecifiedNameSet()
-		{
-			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-            
+    [TestFixture]
+    public class AlterExpressionRootTests
+    {
+        [Test]
+        public void CallingTableAddsAlterTableExpressionToContextWithSpecifiedNameSet()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
 
-			var contextMock = new Mock<IMigrationContext>();
+
+            var contextMock = new Mock<IMigrationContext>();
             contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
-            
 
-			var root = new AlterExpressionRoot(contextMock.Object);
-			root.Table("Bacon");
+
+            var root = new AlterExpressionRoot(contextMock.Object);
+            root.Table("Bacon");
 
             collectionMock.Verify(x => x.Add(It.Is<AlterTableExpression>(e => e.TableName.Equals("Bacon"))));
             contextMock.VerifyGet(x => x.Expressions);
-		}
+        }
 
-		[Test]
-		public void CallingTableReturnsAlterTableExpressionBuilder()
-		{
-			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			var contextMock = new Mock<IMigrationContext>();
+        [Test]
+        public void CallingTableReturnsAlterTableExpressionBuilder()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+            var contextMock = new Mock<IMigrationContext>();
             contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
-			
+
             var root = new AlterExpressionRoot(contextMock.Object);
-			var builder = root.Table("Bacon");
+            var builder = root.Table("Bacon");
 
             builder.ShouldBeOfType<AlterTableExpressionBuilder>();
 
             contextMock.VerifyGet(x => x.Expressions);
-		}
+        }
 
-		[Test]
-		public void CallingColumnAddsAlterColumnExpressionToContextWithSpecifiedNameSet()
-		{
-			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-            
+        [Test]
+        public void CallingColumnAddsAlterColumnExpressionToContextWithSpecifiedNameSet()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
 
-			var contextMock = new Mock<IMigrationContext>();
+
+            var contextMock = new Mock<IMigrationContext>();
             contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
-			
+
 
             var root = new AlterExpressionRoot(contextMock.Object);
-			root.Column("Bacon");
+            root.Column("Bacon");
 
             collectionMock.Verify(x => x.Add(It.Is<AlterColumnExpression>(e => e.Column.Name.Equals("Bacon"))));
             contextMock.VerifyGet(x => x.Expressions);
-		}
+        }
 
-		[Test]
-		public void CallingColumnReturnsAlterColumnExpression()
-		{
-			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			var contextMock = new Mock<IMigrationContext>();
+        [Test]
+        public void CallingColumnReturnsAlterColumnExpression()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+            var contextMock = new Mock<IMigrationContext>();
             contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
-			
+
 
             var root = new AlterExpressionRoot(contextMock.Object);
-			var builder = root.Column("Bacon");
+            var builder = root.Column("Bacon");
 
             builder.ShouldBeOfType<AlterColumnExpressionBuilder>();
             contextMock.VerifyGet(x => x.Expressions);
-		}
-	}
+        }
+    }
 }

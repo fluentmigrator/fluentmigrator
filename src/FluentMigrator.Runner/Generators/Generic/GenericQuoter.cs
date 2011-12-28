@@ -1,6 +1,4 @@
-﻿
-
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace FluentMigrator.Runner.Generators.Generic
 {

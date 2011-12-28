@@ -65,7 +65,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         public override void CanCreateForeignKey()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
-                    var sql = _generator.Generate(expression);
+            var sql = _generator.Generate(expression);
             sql.ShouldBe(
                 "ALTER TABLE `TestTable1` ADD CONSTRAINT `FK_Test` FOREIGN KEY (`TestColumn1`) REFERENCES `TestTable2` (`TestColumn2`)");
         }

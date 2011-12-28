@@ -1,17 +1,15 @@
-﻿using System;
-
-namespace FluentMigrator.Tests.Integration.Migrations.Nested
+﻿namespace FluentMigrator.Tests.Integration.Migrations.Nested
 {
-	[Migration(301)]
-	public class NotGrouped
-		: Migration
-	{
-		public override void Up()
-		{
-		}
+    [Migration(301)]
+    public class NotGrouped
+        : Migration
+    {
+        public override void Up()
+        {
+        }
 
-		public override void Down()
-		{
-		}
-	}
+        public override void Down()
+        {
+        }
+    }
 }

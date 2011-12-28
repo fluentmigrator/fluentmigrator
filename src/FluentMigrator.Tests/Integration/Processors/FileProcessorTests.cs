@@ -25,7 +25,6 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors;
 using NUnit.Framework;
 using NUnit.Should;
@@ -117,8 +116,8 @@ namespace FluentMigrator.Tests.Integration.Processors
         }
 
         public string DumpFilename { get; set; }
-        
-		private static string FormattedDateTime
+
+        private static string FormattedDateTime
         {
             get { return DateTime.Now.ToString("yyyyMMdd"); }
         }

@@ -25,70 +25,70 @@ using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
-	[TestFixture]
-	public class CreateIndexExpressionBuilderTests
-	{
-		[Test]
-		public void CallingOnTableSetsTableNameToSpecifiedValue()
-		{
-			var indexMock = new Mock<IndexDefinition>();
-			
+    [TestFixture]
+    public class CreateIndexExpressionBuilderTests
+    {
+        [Test]
+        public void CallingOnTableSetsTableNameToSpecifiedValue()
+        {
+            var indexMock = new Mock<IndexDefinition>();
 
-			var expressionMock = new Mock<CreateIndexExpression>();
+
+            var expressionMock = new Mock<CreateIndexExpression>();
             expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
-            
-			var builder = new CreateIndexExpressionBuilder(expressionMock.Object);
-			builder.OnTable("Bacon");
+
+            var builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+            builder.OnTable("Bacon");
 
             indexMock.VerifySet(x => x.TableName = "Bacon");
             expressionMock.VerifyGet(e => e.Index);
-		}
+        }
 
-		[Test]
-		public void CallingOnColumnAddsNewColumnToExpression()
-		{
-			var collectionMock = new Mock<IList<IndexColumnDefinition>>();
-            
-			var indexMock = new Mock<IndexDefinition>();
+        [Test]
+        public void CallingOnColumnAddsNewColumnToExpression()
+        {
+            var collectionMock = new Mock<IList<IndexColumnDefinition>>();
+
+            var indexMock = new Mock<IndexDefinition>();
             indexMock.Setup(x => x.Columns).Returns(collectionMock.Object);
-			
-			var expressionMock = new Mock<CreateIndexExpression>();
+
+            var expressionMock = new Mock<CreateIndexExpression>();
             expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
-            
-			var builder = new CreateIndexExpressionBuilder(expressionMock.Object);
-			builder.OnColumn("BaconId");
+
+            var builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+            builder.OnColumn("BaconId");
 
             collectionMock.Verify(x => x.Add(It.Is<IndexColumnDefinition>(c => c.Name.Equals("BaconId"))));
             indexMock.VerifyGet(x => x.Columns);
             expressionMock.VerifyGet(e => e.Index);
-		}
+        }
 
-		[Test]
-		public void CallingAscendingSetsDirectionToAscending()
-		{
-			var columnMock = new Mock<IndexColumnDefinition>();
+        [Test]
+        public void CallingAscendingSetsDirectionToAscending()
+        {
+            var columnMock = new Mock<IndexColumnDefinition>();
             var expressionMock = new Mock<CreateIndexExpression>();
 
-			var builder = new CreateIndexExpressionBuilder(expressionMock.Object);
-			builder.CurrentColumn = columnMock.Object;
+            var builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+            builder.CurrentColumn = columnMock.Object;
 
-			builder.Ascending();
+            builder.Ascending();
 
             columnMock.VerifySet(c => c.Direction = Direction.Ascending);
-		}
+        }
 
-		[Test]
-		public void CallingDescendingSetsDirectionToDescending()
-		{
-			var columnMock = new Mock<IndexColumnDefinition>();
+        [Test]
+        public void CallingDescendingSetsDirectionToDescending()
+        {
+            var columnMock = new Mock<IndexColumnDefinition>();
             var expressionMock = new Mock<CreateIndexExpression>();
 
-			var builder = new CreateIndexExpressionBuilder(expressionMock.Object);
-			builder.CurrentColumn = columnMock.Object;
+            var builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+            builder.CurrentColumn = columnMock.Object;
 
-			builder.Descending();
+            builder.Descending();
 
             columnMock.VerifySet(c => c.Direction = Direction.Descending);
-		}
-	}
+        }
+    }
 }

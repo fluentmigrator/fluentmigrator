@@ -110,8 +110,8 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         public override void CanCreateIndex()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
-                   var sql = _generator.Generate(expression);
-                   sql.ShouldBe("CREATE INDEX `TestIndex` ON `TestTable1` (`TestColumn1` ASC)");
+            var sql = _generator.Generate(expression);
+            sql.ShouldBe("CREATE INDEX `TestIndex` ON `TestTable1` (`TestColumn1` ASC)");
         }
 
         [Test]

@@ -20,30 +20,30 @@ using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Builders.Rename.Table
 {
-	public class RenameTableExpressionBuilder : ExpressionBuilderBase<RenameTableExpression>,
-		IRenameTableToOrInSchemaSyntax,
-		IInSchemaSyntax
-	{
-		public RenameTableExpressionBuilder(RenameTableExpression expression)
-			: base(expression)
-		{
-		}
+    public class RenameTableExpressionBuilder : ExpressionBuilderBase<RenameTableExpression>,
+        IRenameTableToOrInSchemaSyntax,
+        IInSchemaSyntax
+    {
+        public RenameTableExpressionBuilder(RenameTableExpression expression)
+            : base(expression)
+        {
+        }
 
-		public IInSchemaSyntax To(string name)
-		{
-			Expression.NewName = name;
-			return this;
-		}
+        public IInSchemaSyntax To(string name)
+        {
+            Expression.NewName = name;
+            return this;
+        }
 
-		IRenameTableToSyntax IRenameTableToOrInSchemaSyntax.InSchema(string schemaName)
-		{
-			Expression.SchemaName = schemaName;
-			return this;
-		}
+        IRenameTableToSyntax IRenameTableToOrInSchemaSyntax.InSchema(string schemaName)
+        {
+            Expression.SchemaName = schemaName;
+            return this;
+        }
 
-		public void InSchema(string schemaName)
-		{
-			Expression.SchemaName = schemaName;
-		}
-	}
+        public void InSchema(string schemaName)
+        {
+            Expression.SchemaName = schemaName;
+        }
+    }
 }

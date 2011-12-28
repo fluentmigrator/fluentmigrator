@@ -20,8 +20,8 @@ using FluentMigrator.Builders.Rename.Column;
 
 namespace FluentMigrator.Builders.Rename
 {
-	public interface IRenameColumnTableSyntax
-	{
-		IRenameColumnToOrInSchemaSyntax OnTable(string tableName);
-	}
+    public interface IRenameColumnTableSyntax
+    {
+        IRenameColumnToOrInSchemaSyntax OnTable(string tableName);
+    }
 }

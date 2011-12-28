@@ -23,29 +23,29 @@ using System.Linq;
 
 namespace FluentMigrator.Expressions
 {
-	public class DeleteForeignKeyExpression : MigrationExpressionBase
-	{
-		public virtual ForeignKeyDefinition ForeignKey { get; set; }
+    public class DeleteForeignKeyExpression : MigrationExpressionBase
+    {
+        public virtual ForeignKeyDefinition ForeignKey { get; set; }
 
-		public DeleteForeignKeyExpression()
-		{
-			ForeignKey = new ForeignKeyDefinition();
-		}
+        public DeleteForeignKeyExpression()
+        {
+            ForeignKey = new ForeignKeyDefinition();
+        }
 
         public override void ApplyConventions(IMigrationConventions conventions)
         {
             ForeignKey.ApplyConventions(conventions);
         }
 
-		public override void CollectValidationErrors(ICollection<string> errors)
-		{
-			ForeignKey.CollectValidationErrors(errors);
-		}
+        public override void CollectValidationErrors(ICollection<string> errors)
+        {
+            ForeignKey.CollectValidationErrors(errors);
+        }
 
-		public override void ExecuteWith(IMigrationProcessor processor)
-		{
-			processor.Process(this);
-		}
+        public override void ExecuteWith(IMigrationProcessor processor)
+        {
+            processor.Process(this);
+        }
 
         public override IMigrationExpression Reverse()
         {
@@ -80,11 +80,11 @@ namespace FluentMigrator.Expressions
             return new CreateForeignKeyExpression { ForeignKey = reverseForeignKey };
         }
 
-		public override string ToString()
-		{
-			return base.ToString() + ForeignKey.Name + " "
-				+ ForeignKey.ForeignTable + " (" + string.Join(", ", ForeignKey.ForeignColumns.ToArray()) + ") "
-				+ ForeignKey.PrimaryTable + " (" + string.Join(", ", ForeignKey.PrimaryColumns.ToArray()) + ")";
-		}
-	}
+        public override string ToString()
+        {
+            return base.ToString() + ForeignKey.Name + " "
+                + ForeignKey.ForeignTable + " (" + string.Join(", ", ForeignKey.ForeignColumns.ToArray()) + ") "
+                + ForeignKey.PrimaryTable + " (" + string.Join(", ", ForeignKey.PrimaryColumns.ToArray()) + ")";
+        }
+    }
 }

@@ -22,20 +22,20 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Model
 {
-	public class IndexColumnDefinition : ICloneable, ICanBeValidated
-	{
-		public virtual string Name { get; set; }
-		public virtual Direction Direction { get; set; }
+    public class IndexColumnDefinition : ICloneable, ICanBeValidated
+    {
+        public virtual string Name { get; set; }
+        public virtual Direction Direction { get; set; }
 
-		public virtual void CollectValidationErrors(ICollection<string> errors)
-		{
-			if (String.IsNullOrEmpty(Name))
-				errors.Add(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
-		}
+        public virtual void CollectValidationErrors(ICollection<string> errors)
+        {
+            if (String.IsNullOrEmpty(Name))
+                errors.Add(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
+        }
 
-		public object Clone()
-		{
-			return MemberwiseClone();
-		}
-	}
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
+    }
 }

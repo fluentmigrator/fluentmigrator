@@ -6,7 +6,7 @@ namespace FluentMigrator.Runner.Generators
     public class DatabaseOperationNotSupportedException : Exception
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:OperationNotSupportedException"/> class.
+        /// Initializes a new instance of the <see cref="T:DatabaseOperationNotSupportedException"/> class.
         /// </summary>
         public DatabaseOperationNotSupportedException(string message) : base(message) { }
 

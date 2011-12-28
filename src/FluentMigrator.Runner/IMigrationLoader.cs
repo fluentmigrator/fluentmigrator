@@ -17,14 +17,11 @@
 #endregion
 
 using System.Collections.Generic;
-using System.Reflection;
-using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Runner
 {
-	public interface IMigrationLoader
-	{
-		SortedList<long, IMigration> Migrations { get; }
-		//IEnumerable<MigrationMetadata> FindMigrationsIn(Assembly assembly, string @namespace);
-	}
+    public interface IMigrationLoader
+    {
+        SortedList<long, IMigration> Migrations { get; }
+    }
 }

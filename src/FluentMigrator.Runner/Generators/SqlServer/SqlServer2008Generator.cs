@@ -16,16 +16,13 @@
 //
 #endregion
 
-
-
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
-    using System;
-    using FluentMigrator.Expressions;
-
-	public class SqlServer2008Generator : SqlServer2005Generator
-	{
-		public SqlServer2008Generator() : base(new SqlServerColumn(new SqlServer2008TypeMap()))		{
-		}
-	}
+    public class SqlServer2008Generator : SqlServer2005Generator
+    {
+        public SqlServer2008Generator()
+            : base(new SqlServerColumn(new SqlServer2008TypeMap()))
+        {
+        }
+    }
 }

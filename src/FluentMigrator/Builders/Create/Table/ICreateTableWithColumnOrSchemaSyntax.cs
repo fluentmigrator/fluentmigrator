@@ -18,8 +18,8 @@
 
 namespace FluentMigrator.Builders.Create.Table
 {
-	public interface ICreateTableWithColumnOrSchemaSyntax : ICreateTableWithColumnSyntax
-	{
-		ICreateTableWithColumnSyntax InSchema(string schemaName);
-	}
+    public interface ICreateTableWithColumnOrSchemaSyntax : ICreateTableWithColumnSyntax
+    {
+        ICreateTableWithColumnSyntax InSchema(string schemaName);
+    }
 }

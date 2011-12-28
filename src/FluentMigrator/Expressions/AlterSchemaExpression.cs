@@ -19,32 +19,31 @@
 using System;
 using System.Collections.Generic;
 using FluentMigrator.Infrastructure;
-using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-	public class AlterSchemaExpression : MigrationExpressionBase
-	{
-		public virtual string SourceSchemaName { get; set; }
-		public virtual string TableName { get; set; }
-		public virtual string DestinationSchemaName { get; set; }
-    
-		public override void CollectValidationErrors(ICollection<string> errors)
-		{
-			if (String.IsNullOrEmpty(TableName))
-				errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
-      if (String.IsNullOrEmpty(DestinationSchemaName))
-        errors.Add(ErrorMessages.DestinationSchemaCannotBeNull);
-		}
+    public class AlterSchemaExpression : MigrationExpressionBase
+    {
+        public virtual string SourceSchemaName { get; set; }
+        public virtual string TableName { get; set; }
+        public virtual string DestinationSchemaName { get; set; }
 
-		public override void ExecuteWith(IMigrationProcessor processor)
-		{
-			processor.Process(this);
-		}
+        public override void CollectValidationErrors(ICollection<string> errors)
+        {
+            if (String.IsNullOrEmpty(TableName))
+                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
+            if (String.IsNullOrEmpty(DestinationSchemaName))
+                errors.Add(ErrorMessages.DestinationSchemaCannotBeNull);
+        }
 
-		public override string ToString()
-		{
-      return base.ToString() + DestinationSchemaName + " Table " + TableName;
-		}
-	}
+        public override void ExecuteWith(IMigrationProcessor processor)
+        {
+            processor.Process(this);
+        }
+
+        public override string ToString()
+        {
+            return base.ToString() + DestinationSchemaName + " Table " + TableName;
+        }
+    }
 }

@@ -24,73 +24,73 @@ using NAnt.Core.Attributes;
 
 namespace FluentMigrator.NAnt
 {
-	[TaskName("migrate")]
-	public class MigrateTask : Task
-	{
-		[TaskAttribute("database")]
-		public string Database { get; set; }
+    [TaskName("migrate")]
+    public class MigrateTask : Task
+    {
+        [TaskAttribute("database")]
+        public string Database { get; set; }
 
-		[TaskAttribute("connection")]
-		public string Connection { get; set; }
+        [TaskAttribute("connection")]
+        public string Connection { get; set; }
 
-		[TaskAttribute("target")]
-		public string Target { get; set; }
+        [TaskAttribute("target")]
+        public string Target { get; set; }
 
-		[TaskAttribute("namespace")]
-		public string Namespace { get; set; }
+        [TaskAttribute("namespace")]
+        public string Namespace { get; set; }
 
-		[TaskAttribute("task")]
-		public string Task { get; set; }
+        [TaskAttribute("task")]
+        public string Task { get; set; }
 
-		[TaskAttribute("to")]
-		public long Version { get; set; }
+        [TaskAttribute("to")]
+        public long Version { get; set; }
 
-		[TaskAttribute("steps")]
-		public int Steps { get; set; }
+        [TaskAttribute("steps")]
+        public int Steps { get; set; }
 
-		[TaskAttribute("workingdirectory")]
-		public string WorkingDirectory { get; set; }
+        [TaskAttribute("workingdirectory")]
+        public string WorkingDirectory { get; set; }
 
-		[TaskAttribute("profile")]
-		public string Profile { get; set; }
+        [TaskAttribute("profile")]
+        public string Profile { get; set; }
 
-		[TaskAttribute( "timeout" )]
-		public int Timeout { get; set; }
+        [TaskAttribute("timeout")]
+        public int Timeout { get; set; }
 
-		protected override void ExecuteTask()
-		{
-			var announcer = new TextWriterAnnouncer(System.Console.Out)
-			{
-				ShowElapsedTime = Verbose,
-				ShowSql = Verbose
-			};
-			var runnerContext = new RunnerContext(announcer)
-									{
-										Database = Database,
-										Connection = Connection,
-										Target = Target,
-										PreviewOnly = false,
-										Namespace = Namespace,
-										Task = Task,
-										Version = Version,
-										Steps = Steps,
-										WorkingDirectory = WorkingDirectory,
-										Profile = Profile,
-								Timeout = Timeout
-									};
+        protected override void ExecuteTask()
+        {
+            var announcer = new TextWriterAnnouncer(System.Console.Out)
+            {
+                ShowElapsedTime = Verbose,
+                ShowSql = Verbose
+            };
+            var runnerContext = new RunnerContext(announcer)
+                                    {
+                                        Database = Database,
+                                        Connection = Connection,
+                                        Target = Target,
+                                        PreviewOnly = false,
+                                        Namespace = Namespace,
+                                        Task = Task,
+                                        Version = Version,
+                                        Steps = Steps,
+                                        WorkingDirectory = WorkingDirectory,
+                                        Profile = Profile,
+                                        Timeout = Timeout
+                                    };
 
-		    try
-		    {
-		        new TaskExecutor(runnerContext).Execute();
-		    }
+            try
+            {
+                new TaskExecutor(runnerContext).Execute();
+            }
             catch (ProcessorFactoryNotFoundException ex)
             {
                 announcer.Error("While executing migrations the following error was encountered: {0}", ex.Message);
             }
-		    catch (Exception e)
-		    {
+            catch (Exception e)
+            {
                 announcer.Error("While executing migrations the following error was encountered: {0}, {1}", e.Message, e.StackTrace);
-		    }
-		}
-	}
+            }
+        }
+    }
 }

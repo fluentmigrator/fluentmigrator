@@ -1,15 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.IO;
-using System.Text;
-using FluentMigrator;
 
-namespace FluentMigrator.SchemaDump.SchemaWriters {
-    public abstract class SchemaWriterBase : ISchemaWriter {
+namespace FluentMigrator.SchemaDump.SchemaWriters
+{
+    public abstract class SchemaWriterBase : ISchemaWriter
+    {
         public abstract void WriteToStream(ICollection<Model.TableDefinition> tables, System.IO.StreamWriter output);
 
-        public virtual void WriteToFile(ICollection<Model.TableDefinition> tables, string file) {
+        public virtual void WriteToFile(ICollection<Model.TableDefinition> tables, string file)
+        {
             FileStream fs = new FileStream(file, FileMode.Create);
             StreamWriter sr = new StreamWriter(fs);
 

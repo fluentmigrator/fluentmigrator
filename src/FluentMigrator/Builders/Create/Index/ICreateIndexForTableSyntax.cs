@@ -18,8 +18,8 @@
 
 namespace FluentMigrator.Builders.Create.Index
 {
-	public interface ICreateIndexForTableSyntax
-	{
-		ICreateIndexOnColumnOrInSchemaSyntax OnTable(string tableName);
-	}
+    public interface ICreateIndexForTableSyntax
+    {
+        ICreateIndexOnColumnOrInSchemaSyntax OnTable(string tableName);
+    }
 }

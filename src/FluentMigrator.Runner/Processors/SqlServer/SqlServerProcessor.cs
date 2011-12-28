@@ -26,8 +26,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 {
     public sealed class SqlServerProcessor : ProcessorBase
     {
-		private readonly IDbFactory factory;
-		public IDbConnection Connection { get; private set; }
+        private readonly IDbFactory factory;
+        public IDbConnection Connection { get; private set; }
         public IDbTransaction Transaction { get; private set; }
         public bool WasCommitted { get; private set; }
 
@@ -39,13 +39,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         public SqlServerProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(generator, announcer, options)
         {
-        	this.factory = factory;
-        	Connection = connection;
+            this.factory = factory;
+            Connection = connection;
             connection.Open();
             BeginTransaction();
         }
 
-		private static string SafeSchemaName(string schemaName)
+        private static string SafeSchemaName(string schemaName)
         {
             return string.IsNullOrEmpty(schemaName) ? "dbo" : FormatSqlEscape(schemaName);
         }
@@ -83,7 +83,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             return Exists("SELECT NULL FROM sysindexes WHERE name = '{0}'", FormatSqlEscape(indexName));
         }
 
-	    public override void Execute(string template, params object[] args)
+        public override void Execute(string template, params object[] args)
         {
             Process(String.Format(template, args));
         }
@@ -239,7 +239,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 expression.Operation(Connection, Transaction);
         }
 
-		private static string FormatSqlEscape(string sql)
+        private static string FormatSqlEscape(string sql)
         {
             return sql.Replace("'", "''");
         }

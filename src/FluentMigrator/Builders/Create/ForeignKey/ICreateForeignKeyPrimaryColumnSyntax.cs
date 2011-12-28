@@ -16,14 +16,13 @@
 //
 #endregion
 
-using System;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Create.ForeignKey
 {
-	public interface ICreateForeignKeyPrimaryColumnSyntax: IFluentSyntax
-	{
-		ICreateForeignKeyCascadeSyntax PrimaryColumn(string column);
-		ICreateForeignKeyCascadeSyntax PrimaryColumns(params string[] columns);
-	}
+    public interface ICreateForeignKeyPrimaryColumnSyntax : IFluentSyntax
+    {
+        ICreateForeignKeyCascadeSyntax PrimaryColumn(string column);
+        ICreateForeignKeyCascadeSyntax PrimaryColumns(params string[] columns);
+    }
 }

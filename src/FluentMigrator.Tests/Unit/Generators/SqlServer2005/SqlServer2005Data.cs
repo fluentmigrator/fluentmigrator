@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
@@ -17,8 +14,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         public void Setup()
         {
             generator = new SqlServer2005Generator();
-
-
         }
 
         [Test]
@@ -33,36 +28,36 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             sql.ShouldBe(expected);
         }
 
-				[Test]
-				public void CanInsertDataWithIdentityInsert()
-				{
-					var expression = GeneratorTestHelper.GetInsertDataExpression();
-					expression.AdditionalFeatures.Add(SqlServerExtensions.IdentityInsert, true);
-					var sql = generator.Generate(expression);
+        [Test]
+        public void CanInsertDataWithIdentityInsert()
+        {
+            var expression = GeneratorTestHelper.GetInsertDataExpression();
+            expression.AdditionalFeatures.Add(SqlServerExtensions.IdentityInsert, true);
+            var sql = generator.Generate(expression);
 
-					var expected = "SET IDENTITY_INSERT [dbo].[TestTable1] ON;";
-					expected += " INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (1, 'Just''in', 'codethinked.com');";
-					expected += @" INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (2, 'Na\te', 'kohari.org');";
-					expected += " SET IDENTITY_INSERT [dbo].[TestTable1] OFF";
+            var expected = "SET IDENTITY_INSERT [dbo].[TestTable1] ON;";
+            expected += " INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (1, 'Just''in', 'codethinked.com');";
+            expected += @" INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (2, 'Na\te', 'kohari.org');";
+            expected += " SET IDENTITY_INSERT [dbo].[TestTable1] OFF";
 
-					sql.ShouldBe(expected);
-				}
+            sql.ShouldBe(expected);
+        }
 
-				[Test]
-				public void CanInsertDataWithIdentityInsertInStrictMode()
-				{
-					var expression = GeneratorTestHelper.GetInsertDataExpression();
-					expression.AdditionalFeatures.Add(SqlServerExtensions.IdentityInsert, true);
-					generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-					var sql = generator.Generate(expression);
+        [Test]
+        public void CanInsertDataWithIdentityInsertInStrictMode()
+        {
+            var expression = GeneratorTestHelper.GetInsertDataExpression();
+            expression.AdditionalFeatures.Add(SqlServerExtensions.IdentityInsert, true);
+            generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+            var sql = generator.Generate(expression);
 
-					var expected = "SET IDENTITY_INSERT [dbo].[TestTable1] ON;";
-					expected += " INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (1, 'Just''in', 'codethinked.com');";
-					expected += @" INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (2, 'Na\te', 'kohari.org');";
-					expected += " SET IDENTITY_INSERT [dbo].[TestTable1] OFF";
+            var expected = "SET IDENTITY_INSERT [dbo].[TestTable1] ON;";
+            expected += " INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (1, 'Just''in', 'codethinked.com');";
+            expected += @" INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (2, 'Na\te', 'kohari.org');";
+            expected += " SET IDENTITY_INSERT [dbo].[TestTable1] OFF";
 
-					sql.ShouldBe(expected);
-				}
+            sql.ShouldBe(expected);
+        }
 
         [Test]
         public void CanDeleteDataWithDefaultSchema()

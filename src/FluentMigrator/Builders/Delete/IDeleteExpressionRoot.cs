@@ -23,14 +23,14 @@ using FluentMigrator.Builders.Delete.Index;
 
 namespace FluentMigrator.Builders.Delete
 {
-	public interface IDeleteExpressionRoot : IFluentSyntax
-	{
-		void Schema(string schemaName);
-		IInSchemaSyntax Table(string tableName);
-		IDeleteColumnFromTableSyntax Column(string columnName);
-		IDeleteForeignKeyFromTableSyntax ForeignKey();
-		IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName);
-		IDeleteDataOrInSchemaSyntax FromTable(string tableName);
+    public interface IDeleteExpressionRoot : IFluentSyntax
+    {
+        void Schema(string schemaName);
+        IInSchemaSyntax Table(string tableName);
+        IDeleteColumnFromTableSyntax Column(string columnName);
+        IDeleteForeignKeyFromTableSyntax ForeignKey();
+        IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName);
+        IDeleteDataOrInSchemaSyntax FromTable(string tableName);
         /// <summary>
         /// Deletes an index
         /// </summary>

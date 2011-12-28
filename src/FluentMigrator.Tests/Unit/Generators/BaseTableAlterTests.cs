@@ -1,8 +1,4 @@
-﻿
-using FluentMigrator.Expressions;
-using FluentMigrator.Model;
-using System.Data;
-namespace FluentMigrator.Tests.Unit.Generators
+﻿namespace FluentMigrator.Tests.Unit.Generators
 {
 
     public abstract class BaseTableAlterTests : GeneratorTestBase
@@ -19,8 +15,5 @@ namespace FluentMigrator.Tests.Unit.Generators
         public abstract void CanCreateAutoIncrementColumn();
 
         public abstract void CanAlterSchema();
-       
-
-        
     }
 }

@@ -463,7 +463,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             expressionMock.SetupGet(x => x.SchemaName).Returns("Eggs");
             expressionMock.SetupGet(x => x.TableName).Returns("Bacon");
 
-            var builder = new AlterTableExpressionBuilder(expressionMock.Object, contextMock.Object) {CurrentColumn = columnMock.Object};
+            var builder = new AlterTableExpressionBuilder(expressionMock.Object, contextMock.Object) { CurrentColumn = columnMock.Object };
 
             builder.Unique("IX_Bacon_BaconId");
 

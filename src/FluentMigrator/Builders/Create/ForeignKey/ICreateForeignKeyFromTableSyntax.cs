@@ -20,8 +20,8 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Create.ForeignKey
 {
-	public interface ICreateForeignKeyFromTableSyntax : IFluentSyntax
-	{
-		ICreateForeignKeyForeignColumnOrInSchemaSyntax FromTable(string table);
-	}
+    public interface ICreateForeignKeyFromTableSyntax : IFluentSyntax
+    {
+        ICreateForeignKeyForeignColumnOrInSchemaSyntax FromTable(string table);
+    }
 }
