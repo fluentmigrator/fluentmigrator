@@ -20,8 +20,8 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Create.Column
 {
-	public interface ICreateColumnOnTableSyntax : IFluentSyntax
-	{
-		ICreateColumnAsTypeOrInSchemaSyntax OnTable(string name);
-	}
+    public interface ICreateColumnOnTableSyntax : IFluentSyntax
+    {
+        ICreateColumnAsTypeOrInSchemaSyntax OnTable(string name);
+    }
 }

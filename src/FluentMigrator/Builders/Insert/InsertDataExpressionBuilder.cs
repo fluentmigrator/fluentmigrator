@@ -23,46 +23,48 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Insert
 {
-	public class InsertDataExpressionBuilder : IInsertDataOrInSchemaSyntax, IInsertDataAdditionalFeatures
-	{
-		private readonly InsertDataExpression _expression;
+    public class InsertDataExpressionBuilder : IInsertDataOrInSchemaSyntax, IInsertDataAdditionalFeatures
+    {
+        private readonly InsertDataExpression _expression;
 
-		public InsertDataExpressionBuilder(InsertDataExpression expression)
-		{
-			_expression = expression;
-		}
+        public InsertDataExpressionBuilder(InsertDataExpression expression)
+        {
+            _expression = expression;
+        }
 
-		public IInsertDataSyntax Row(object dataAsAnonymousType)
-		{
-			_expression.Rows.Add(GetData(dataAsAnonymousType));
-			return this;
-		}
+        public IInsertDataSyntax Row(object dataAsAnonymousType)
+        {
+            _expression.Rows.Add(GetData(dataAsAnonymousType));
+            return this;
+        }
 
-		IInsertDataSyntax IInsertDataAdditionalFeatures.AddAdditionalFeature(string feature, object value)
-		{
-			if (!_expression.AdditionalFeatures.ContainsKey(feature)) {
-				_expression.AdditionalFeatures.Add(feature, value);
-			}
-			else {
-				_expression.AdditionalFeatures[feature] = value;
-			}
-			return this;
-		} 
+        IInsertDataSyntax IInsertDataAdditionalFeatures.AddAdditionalFeature(string feature, object value)
+        {
+            if (!_expression.AdditionalFeatures.ContainsKey(feature))
+            {
+                _expression.AdditionalFeatures.Add(feature, value);
+            }
+            else
+            {
+                _expression.AdditionalFeatures[feature] = value;
+            }
+            return this;
+        }
 
-		public IInsertDataSyntax InSchema(string schemaName)
-		{
-			_expression.SchemaName = schemaName;
-			return this;
-		}
+        public IInsertDataSyntax InSchema(string schemaName)
+        {
+            _expression.SchemaName = schemaName;
+            return this;
+        }
 
-		private static InsertionDataDefinition GetData(object dataAsAnonymousType)
-		{
-			var data = new InsertionDataDefinition();
-			var properties = TypeDescriptor.GetProperties(dataAsAnonymousType);
+        private static InsertionDataDefinition GetData(object dataAsAnonymousType)
+        {
+            var data = new InsertionDataDefinition();
+            var properties = TypeDescriptor.GetProperties(dataAsAnonymousType);
 
-			foreach (PropertyDescriptor property in properties)
-				data.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(dataAsAnonymousType)));
-			return data;
-		}
-	}
+            foreach (PropertyDescriptor property in properties)
+                data.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(dataAsAnonymousType)));
+            return data;
+        }
+    }
 }

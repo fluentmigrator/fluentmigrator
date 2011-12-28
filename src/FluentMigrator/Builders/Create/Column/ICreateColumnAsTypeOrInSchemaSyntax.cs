@@ -18,8 +18,8 @@
 
 namespace FluentMigrator.Builders.Create.Column
 {
-	public interface ICreateColumnAsTypeOrInSchemaSyntax : ICreateColumnAsTypeSyntax
-	{
-		ICreateColumnAsTypeSyntax InSchema(string schemaName);
-	}
+    public interface ICreateColumnAsTypeOrInSchemaSyntax : ICreateColumnAsTypeSyntax
+    {
+        ICreateColumnAsTypeSyntax InSchema(string schemaName);
+    }
 }

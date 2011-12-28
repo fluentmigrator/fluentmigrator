@@ -24,57 +24,57 @@ using FluentMigrator.Runner.Processors.SqlServer;
 
 namespace FluentMigrator.Tests.Helpers
 {
-	public class SqlServerTestTable : IDisposable
-	{
-	    private readonly string _schemaName;
-		private SqlConnection Connection { get; set; }
-		public string Name { get; set; }
-		private SqlTransaction Transaction { get; set; }
+    public class SqlServerTestTable : IDisposable
+    {
+        private readonly string _schemaName;
+        private SqlConnection Connection { get; set; }
+        public string Name { get; set; }
+        private SqlTransaction Transaction { get; set; }
 
-		public SqlServerTestTable(SqlServerProcessor processor, string schemaName, params string[] columnDefinitions)
-		{
-		    _schemaName = schemaName;
-		    Connection = (SqlConnection) processor.Connection;
-			Transaction = (SqlTransaction) processor.Transaction;
+        public SqlServerTestTable(SqlServerProcessor processor, string schemaName, params string[] columnDefinitions)
+        {
+            _schemaName = schemaName;
+            Connection = (SqlConnection)processor.Connection;
+            Transaction = (SqlTransaction)processor.Transaction;
 
-			Name = "Table" + Guid.NewGuid().ToString("N");
-			Create(columnDefinitions);
-		}
+            Name = "Table" + Guid.NewGuid().ToString("N");
+            Create(columnDefinitions);
+        }
 
-		public void Dispose()
-		{
-			Drop();
-		}
+        public void Dispose()
+        {
+            Drop();
+        }
 
-		public void Create(IEnumerable<string> columnDefinitions)
-		{
-			if (!string.IsNullOrEmpty(_schemaName))
-			{
-				using (var command = new SqlCommand(string.Format("CREATE SCHEMA [{0}]", _schemaName), Connection, Transaction))
-					command.ExecuteNonQuery();
-			}
+        public void Create(IEnumerable<string> columnDefinitions)
+        {
+            if (!string.IsNullOrEmpty(_schemaName))
+            {
+                using (var command = new SqlCommand(string.Format("CREATE SCHEMA [{0}]", _schemaName), Connection, Transaction))
+                    command.ExecuteNonQuery();
+            }
 
-			var sb = new StringBuilder();
-			sb.Append("CREATE TABLE ");
+            var sb = new StringBuilder();
+            sb.Append("CREATE TABLE ");
             if (!string.IsNullOrEmpty(_schemaName))
                 sb.AppendFormat("[{0}].", _schemaName);
-			sb.Append(Name);
+            sb.Append(Name);
 
-			foreach (string definition in columnDefinitions)
-			{
-				sb.Append("(");
-				sb.Append(definition);
-				sb.Append("), ");
-			}
+            foreach (string definition in columnDefinitions)
+            {
+                sb.Append("(");
+                sb.Append(definition);
+                sb.Append("), ");
+            }
 
-			sb.Remove(sb.Length - 2, 2);
+            sb.Remove(sb.Length - 2, 2);
 
-			using (var command = new SqlCommand(sb.ToString(), Connection, Transaction))
-				command.ExecuteNonQuery();
-		}
+            using (var command = new SqlCommand(sb.ToString(), Connection, Transaction))
+                command.ExecuteNonQuery();
+        }
 
-		public void Drop()
-		{
+        public void Drop()
+        {
             if (string.IsNullOrEmpty(_schemaName))
             {
                 using (var command = new SqlCommand("DROP TABLE " + Name, Connection, Transaction))
@@ -82,12 +82,12 @@ namespace FluentMigrator.Tests.Helpers
             }
             else
             {
-				using (var command = new SqlCommand(string.Format("DROP TABLE [{0}].{1}",  _schemaName, Name), Connection, Transaction))
+                using (var command = new SqlCommand(string.Format("DROP TABLE [{0}].{1}", _schemaName, Name), Connection, Transaction))
                     command.ExecuteNonQuery();
 
-				using (var command = new SqlCommand(string.Format("DROP SCHEMA [{0}]", _schemaName), Connection, Transaction))
-					command.ExecuteNonQuery();
+                using (var command = new SqlCommand(string.Format("DROP SCHEMA [{0}]", _schemaName), Connection, Transaction))
+                    command.ExecuteNonQuery();
             }
-		}
-	}
+        }
+    }
 }

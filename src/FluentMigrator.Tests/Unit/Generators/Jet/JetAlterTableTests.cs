@@ -65,7 +65,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
             var result = _generator.Generate(expression);
-            result.ShouldBe(string.Empty);   
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
@@ -81,7 +81,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
             var result = _generator.Generate(expression);
-            result.ShouldBe(string.Empty); 
+            result.ShouldBe(string.Empty);
         }
 
         [Test]

@@ -24,24 +24,24 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
-	[TestFixture]
-	public class CreateForeignKeyExpressionTests
-	{
-		[Test]
-		public void ToStringIsDescriptive()
-		{
-			var sql = new CreateForeignKeyExpression
-						{
-							ForeignKey = new ForeignKeyDefinition
-											{
-												ForeignColumns = new Collection<string> { "User_id" },
-												ForeignTable = "UserRoles",
-												PrimaryColumns = new Collection<string> { "Id" },
-												PrimaryTable = "User",
-												Name = "FK"
-											}
-						}.ToString();
-			sql.ShouldBe("CreateForeignKey FK UserRoles(User_id) User(Id)");
-		}
-	}
+    [TestFixture]
+    public class CreateForeignKeyExpressionTests
+    {
+        [Test]
+        public void ToStringIsDescriptive()
+        {
+            var sql = new CreateForeignKeyExpression
+                        {
+                            ForeignKey = new ForeignKeyDefinition
+                                            {
+                                                ForeignColumns = new Collection<string> { "User_id" },
+                                                ForeignTable = "UserRoles",
+                                                PrimaryColumns = new Collection<string> { "Id" },
+                                                PrimaryTable = "User",
+                                                Name = "FK"
+                                            }
+                        }.ToString();
+            sql.ShouldBe("CreateForeignKey FK UserRoles(User_id) User(Id)");
+        }
+    }
 }

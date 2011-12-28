@@ -2,10 +2,10 @@
 {
     using Expressions;
 
-    public class DeleteSequenceExpressionBuilder : ExpressionBuilderBase<DeleteSequenceExpression>,
-												IInSchemaSyntax
+    public class DeleteSequenceExpressionBuilder : ExpressionBuilderBase<DeleteSequenceExpression>, IInSchemaSyntax
     {
-        public DeleteSequenceExpressionBuilder(DeleteSequenceExpression expression) : base(expression)
+        public DeleteSequenceExpressionBuilder(DeleteSequenceExpression expression)
+            : base(expression)
         {
         }
 

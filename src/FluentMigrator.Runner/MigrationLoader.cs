@@ -24,69 +24,69 @@ using System.Linq;
 
 namespace FluentMigrator.Runner
 {
-	public class MigrationLoader : IMigrationLoader
-	{
-		public IMigrationConventions Conventions { get; private set; }
-		public Assembly Assembly { get; private set; }
-		public string Namespace { get; private set; }
-		public bool LoadNestedNamespaces { get; private set; }
-		public SortedList<long, IMigration> Migrations { get; private set; }
+    public class MigrationLoader : IMigrationLoader
+    {
+        public IMigrationConventions Conventions { get; private set; }
+        public Assembly Assembly { get; private set; }
+        public string Namespace { get; private set; }
+        public bool LoadNestedNamespaces { get; private set; }
+        public SortedList<long, IMigration> Migrations { get; private set; }
 
-		public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace)
-		{
-			Conventions = conventions;
-			Assembly = assembly;
-			Namespace = @namespace;
+        public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace)
+        {
+            Conventions = conventions;
+            Assembly = assembly;
+            Namespace = @namespace;
 
-			Initialize();
-		}
-		public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, bool loadNestedNamespaces)
-		{
-			Conventions = conventions;
-			Assembly = assembly;
-			Namespace = @namespace;
-			LoadNestedNamespaces = loadNestedNamespaces;
+            Initialize();
+        }
+        public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, bool loadNestedNamespaces)
+        {
+            Conventions = conventions;
+            Assembly = assembly;
+            Namespace = @namespace;
+            LoadNestedNamespaces = loadNestedNamespaces;
 
-			Initialize();
-		}
+            Initialize();
+        }
 
-		private void Initialize()
-		{
-			Migrations = new SortedList<long, IMigration>();
+        private void Initialize()
+        {
+            Migrations = new SortedList<long, IMigration>();
 
-			IEnumerable<MigrationMetadata> migrationList = FindMigrations();
+            IEnumerable<MigrationMetadata> migrationList = FindMigrations();
 
-			if (migrationList == null)
-				return;
+            if (migrationList == null)
+                return;
 
-			foreach (var migrationMetadata in migrationList)
-			{
-				if (Migrations.ContainsKey(migrationMetadata.Version))
-					throw new Exception(String.Format("Duplicate migration version {0}.", migrationMetadata.Version));
+            foreach (var migrationMetadata in migrationList)
+            {
+                if (Migrations.ContainsKey(migrationMetadata.Version))
+                    throw new Exception(String.Format("Duplicate migration version {0}.", migrationMetadata.Version));
 
-				var migration = migrationMetadata.Type.Assembly.CreateInstance(migrationMetadata.Type.FullName);
-				Migrations.Add(migrationMetadata.Version, migration as IMigration);
-			}
-		}
+                var migration = migrationMetadata.Type.Assembly.CreateInstance(migrationMetadata.Type.FullName);
+                Migrations.Add(migrationMetadata.Version, migration as IMigration);
+            }
+        }
 
-		public IEnumerable<MigrationMetadata> FindMigrations()
-		{
-			IEnumerable<Type> matchedTypes = Assembly.GetExportedTypes().Where(t => Conventions.TypeIsMigration(t));
+        public IEnumerable<MigrationMetadata> FindMigrations()
+        {
+            IEnumerable<Type> matchedTypes = Assembly.GetExportedTypes().Where(t => Conventions.TypeIsMigration(t));
 
-			if (!string.IsNullOrEmpty(Namespace))
-			{
-				Func<Type, bool> shouldInclude = t => t.Namespace == Namespace;
-				if (LoadNestedNamespaces)
-				{
-					string matchNested = Namespace + ".";
-					shouldInclude = t => t.Namespace == Namespace || t.Namespace.StartsWith(matchNested);
-				}
+            if (!string.IsNullOrEmpty(Namespace))
+            {
+                Func<Type, bool> shouldInclude = t => t.Namespace == Namespace;
+                if (LoadNestedNamespaces)
+                {
+                    string matchNested = Namespace + ".";
+                    shouldInclude = t => t.Namespace == Namespace || t.Namespace.StartsWith(matchNested);
+                }
 
-				matchedTypes = matchedTypes.Where(shouldInclude);
-			}
+                matchedTypes = matchedTypes.Where(shouldInclude);
+            }
 
-			foreach (Type type in matchedTypes)
-				yield return Conventions.GetMetadataForMigration(type);
-		}
-	}
+            foreach (Type type in matchedTypes)
+                yield return Conventions.GetMetadataForMigration(type);
+        }
+    }
 }

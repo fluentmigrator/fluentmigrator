@@ -25,69 +25,69 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
-	[TestFixture]
-	public class AlterSchemaExpressionTests
-	{
-		[Test]
-		public void ErrorIsReturnedWhenTableNameIsNull()
-		{
-			var expression = new AlterSchemaExpression { TableName = null };
-			var errors = ValidationHelper.CollectErrors(expression);
-			errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
-		}
+    [TestFixture]
+    public class AlterSchemaExpressionTests
+    {
+        [Test]
+        public void ErrorIsReturnedWhenTableNameIsNull()
+        {
+            var expression = new AlterSchemaExpression { TableName = null };
+            var errors = ValidationHelper.CollectErrors(expression);
+            errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
+        }
 
-		[Test]
-		public void ErrorIsReturnedWhenTableNameIsEmptyString()
-		{
-      var expression = new AlterSchemaExpression { TableName = String.Empty };
-			var errors = ValidationHelper.CollectErrors(expression);
-			errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
-		}
+        [Test]
+        public void ErrorIsReturnedWhenTableNameIsEmptyString()
+        {
+            var expression = new AlterSchemaExpression { TableName = String.Empty };
+            var errors = ValidationHelper.CollectErrors(expression);
+            errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
+        }
 
-		[Test]
-		public void ErrorIsNotReturnedWhenTableNameIsNotNullEmptyString()
-		{
-      var expression = new AlterSchemaExpression { TableName = "Bacon" };
-			var errors = ValidationHelper.CollectErrors(expression);
-			errors.ShouldNotContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
-		}
+        [Test]
+        public void ErrorIsNotReturnedWhenTableNameIsNotNullEmptyString()
+        {
+            var expression = new AlterSchemaExpression { TableName = "Bacon" };
+            var errors = ValidationHelper.CollectErrors(expression);
+            errors.ShouldNotContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
+        }
 
-		[Test]
-		public void ErrorIsReturnedWhenDestinationSchemaNameIsNull()
-		{
-      var expression = new AlterSchemaExpression { DestinationSchemaName = null };
-			var errors = ValidationHelper.CollectErrors(expression);
-			errors.ShouldContain(ErrorMessages.DestinationSchemaCannotBeNull);
-		}
+        [Test]
+        public void ErrorIsReturnedWhenDestinationSchemaNameIsNull()
+        {
+            var expression = new AlterSchemaExpression { DestinationSchemaName = null };
+            var errors = ValidationHelper.CollectErrors(expression);
+            errors.ShouldContain(ErrorMessages.DestinationSchemaCannotBeNull);
+        }
 
-		[Test]
-		public void ErrorIsReturnedWhenDestinationSchemaNameIsEmptyString()
-		{
-      var expression = new AlterSchemaExpression { DestinationSchemaName = String.Empty };
-			var errors = ValidationHelper.CollectErrors(expression);
-			errors.ShouldContain(ErrorMessages.DestinationSchemaCannotBeNull);
-		}
+        [Test]
+        public void ErrorIsReturnedWhenDestinationSchemaNameIsEmptyString()
+        {
+            var expression = new AlterSchemaExpression { DestinationSchemaName = String.Empty };
+            var errors = ValidationHelper.CollectErrors(expression);
+            errors.ShouldContain(ErrorMessages.DestinationSchemaCannotBeNull);
+        }
 
-		[Test]
-		public void ErrorIsNotReturnedWhenDestinationSchemaNameIsNotNullEmptyString()
-		{
-      var expression = new AlterSchemaExpression { DestinationSchemaName = "Bacon" };
-			var errors = ValidationHelper.CollectErrors(expression);
-			errors.ShouldNotContain(ErrorMessages.DestinationSchemaCannotBeNull);
-		}
+        [Test]
+        public void ErrorIsNotReturnedWhenDestinationSchemaNameIsNotNullEmptyString()
+        {
+            var expression = new AlterSchemaExpression { DestinationSchemaName = "Bacon" };
+            var errors = ValidationHelper.CollectErrors(expression);
+            errors.ShouldNotContain(ErrorMessages.DestinationSchemaCannotBeNull);
+        }
 
-		[Test]
-		[ExpectedException(typeof(NotSupportedException))]
-		public void ReverseThrowsException()
-		{
-      new AlterSchemaExpression().Reverse();
-		}
+        [Test]
+        [ExpectedException(typeof(NotSupportedException))]
+        public void ReverseThrowsException()
+        {
+            new AlterSchemaExpression().Reverse();
+        }
 
-		[Test]
-		public void ToStringIsDescriptive()
-		{
-      var expression = new AlterSchemaExpression { TableName = "Test", DestinationSchemaName = "Bacon" };
-			expression.ToString().ShouldBe("AlterSchema Bacon Table Test");
-		}
-	}
+        [Test]
+        public void ToStringIsDescriptive()
+        {
+            var expression = new AlterSchemaExpression { TableName = "Test", DestinationSchemaName = "Bacon" };
+            expression.ToString().ShouldBe("AlterSchema Bacon Table Test");
+        }
+    }
 }

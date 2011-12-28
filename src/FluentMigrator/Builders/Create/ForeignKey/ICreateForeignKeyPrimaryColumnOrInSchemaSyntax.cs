@@ -20,8 +20,8 @@
 
 namespace FluentMigrator.Builders.Create.ForeignKey
 {
-	public interface ICreateForeignKeyPrimaryColumnOrInSchemaSyntax : ICreateForeignKeyPrimaryColumnSyntax
-	{
-		ICreateForeignKeyPrimaryColumnSyntax InSchema(string schemaName);
-	}
+    public interface ICreateForeignKeyPrimaryColumnOrInSchemaSyntax : ICreateForeignKeyPrimaryColumnSyntax
+    {
+        ICreateForeignKeyPrimaryColumnSyntax InSchema(string schemaName);
+    }
 }

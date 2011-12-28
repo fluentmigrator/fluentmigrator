@@ -17,11 +17,7 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
-using System.Data;
-using FluentMigrator.Builders.Create.Column;
 using FluentMigrator.Expressions;
-using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using Moq;
 using NUnit.Framework;
@@ -31,13 +27,13 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
     using FluentMigrator.Builders.Create.Sequence;
 
     [TestFixture]
-	public class CreateSequenceExpressionBuilderTests
-	{
-		[Test]
-		public void CallingInSchemaSetsSchemaName()
-		{
-			VerifySequenceProperty(c => c.SchemaName = "Schema", b => b.InSchema("Schema"));
-		}
+    public class CreateSequenceExpressionBuilderTests
+    {
+        [Test]
+        public void CallingInSchemaSetsSchemaName()
+        {
+            VerifySequenceProperty(c => c.SchemaName = "Schema", b => b.InSchema("Schema"));
+        }
 
         [Test]
         public void CallingIncrementBySetsIncrement()
@@ -74,20 +70,20 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         {
             VerifySequenceProperty(c => c.Cycle = true, b => b.Cycle());
         }
-		
-		private void VerifySequenceProperty(Action<SequenceDefinition> sequenceExpression, Action<CreateSequenceExpressionBuilder> callToTest)
-		{
-			var sequenceMock = new Mock<SequenceDefinition>();
-            
+
+        private void VerifySequenceProperty(Action<SequenceDefinition> sequenceExpression, Action<CreateSequenceExpressionBuilder> callToTest)
+        {
+            var sequenceMock = new Mock<SequenceDefinition>();
+
             var expressionMock = new Mock<CreateSequenceExpression>();
-			expressionMock.SetupProperty(e => e.Sequence);
+            expressionMock.SetupProperty(e => e.Sequence);
 
-			var expression = expressionMock.Object;
-			expression.Sequence = sequenceMock.Object;
+            var expression = expressionMock.Object;
+            expression.Sequence = sequenceMock.Object;
 
-			callToTest(new CreateSequenceExpressionBuilder(expression));
+            callToTest(new CreateSequenceExpressionBuilder(expression));
 
             sequenceMock.VerifySet(sequenceExpression);
-		}
-	}
+        }
+    }
 }

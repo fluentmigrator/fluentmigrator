@@ -32,7 +32,7 @@ namespace FluentMigrator.Builders.IfDatabase
     /// <summary>
     /// Defines fluent expressions that can be conditionally executed
     /// </summary>
-    public interface IIfDatabaseExpressionRoot 
+    public interface IIfDatabaseExpressionRoot
     {
         IAlterExpressionRoot Alter { get; }
 

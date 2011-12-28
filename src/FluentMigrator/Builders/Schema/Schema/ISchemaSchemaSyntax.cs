@@ -22,9 +22,9 @@ using FluentMigrator.Builders.Schema.Table;
 
 namespace FluentMigrator.Builders.Schema.Schema
 {
-	public interface ISchemaSchemaSyntax
-	{
-		bool Exists();
-	    ISchemaTableSyntax Table(string tableName);
-	}
+    public interface ISchemaSchemaSyntax
+    {
+        bool Exists();
+        ISchemaTableSyntax Table(string tableName);
+    }
 }

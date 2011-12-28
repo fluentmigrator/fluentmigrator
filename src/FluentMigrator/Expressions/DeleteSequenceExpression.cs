@@ -1,9 +1,9 @@
-﻿namespace FluentMigrator.Expressions
-{
-    using System;
-    using System.Collections.Generic;
-    using Infrastructure;
+﻿using System;
+using System.Collections.Generic;
+using FluentMigrator.Infrastructure;
 
+namespace FluentMigrator.Expressions
+{
     public class DeleteSequenceExpression : MigrationExpressionBase
     {
         public virtual string SchemaName { get; set; }

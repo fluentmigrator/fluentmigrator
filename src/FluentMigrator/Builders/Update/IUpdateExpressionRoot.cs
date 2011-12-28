@@ -20,8 +20,8 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Update
 {
-	public interface IUpdateExpressionRoot : IFluentSyntax
-	{
+    public interface IUpdateExpressionRoot : IFluentSyntax
+    {
         IUpdateSetOrInSchemaSyntax Table(string tableName);
-	}
+    }
 }

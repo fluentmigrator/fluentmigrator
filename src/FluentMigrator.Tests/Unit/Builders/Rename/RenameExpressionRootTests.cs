@@ -28,65 +28,65 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Builders.Rename
 {
-	[TestFixture]
-	public class RenameExpressionRootTests
-	{
-		[Test]
-		public void CallingTableAddsRenameTableExpressionToContextWithSpecifiedOldName()
-		{
-			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			
-			var contextMock = new Mock<IMigrationContext>();
-			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object);
-            
-			var root = new RenameExpressionRoot(contextMock.Object);
-			root.Table("Bacon");
+    [TestFixture]
+    public class RenameExpressionRootTests
+    {
+        [Test]
+        public void CallingTableAddsRenameTableExpressionToContextWithSpecifiedOldName()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object);
+
+            var root = new RenameExpressionRoot(contextMock.Object);
+            root.Table("Bacon");
 
             collectionMock.Verify(x => x.Add(It.Is<RenameTableExpression>(e => e.OldName.Equals("Bacon"))));
             contextMock.VerifyGet(x => x.Expressions);
-		}
+        }
 
-		[Test]
-		public void CallingTableReturnsRenameTableExpressionBuilder()
-		{
-			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			var contextMock = new Mock<IMigrationContext>();
-			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object);
-            
-			var root = new RenameExpressionRoot(contextMock.Object);
-			var builder = root.Table("Bacon");
+        [Test]
+        public void CallingTableReturnsRenameTableExpressionBuilder()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object);
 
-			builder.ShouldBeOfType<RenameTableExpressionBuilder>();
+            var root = new RenameExpressionRoot(contextMock.Object);
+            var builder = root.Table("Bacon");
+
+            builder.ShouldBeOfType<RenameTableExpressionBuilder>();
             contextMock.VerifyGet(x => x.Expressions);
-		}
+        }
 
-		[Test]
-		public void CallingColumnAddsRenameColumnExpressionToContextWithSpecifiedOldName()
-		{
-			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-            
-			var contextMock = new Mock<IMigrationContext>();
-			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object);
-            
-			var root = new RenameExpressionRoot(contextMock.Object);
-			root.Column("Bacon");
+        [Test]
+        public void CallingColumnAddsRenameColumnExpressionToContextWithSpecifiedOldName()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object);
+
+            var root = new RenameExpressionRoot(contextMock.Object);
+            root.Column("Bacon");
 
             collectionMock.Verify(x => x.Add(It.Is<RenameColumnExpression>(e => e.OldName.Equals("Bacon"))));
             contextMock.VerifyGet(x => x.Expressions);
-		}
+        }
 
-		[Test]
-		public void CallingColumnReturnsRenameColumnExpressionBuilder()
-		{
-			var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-			var contextMock = new Mock<IMigrationContext>();
-			contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object);
-            
-			var root = new RenameExpressionRoot(contextMock.Object);
-			var builder = root.Column("Bacon");
+        [Test]
+        public void CallingColumnReturnsRenameColumnExpressionBuilder()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.SetupGet(x => x.Expressions).Returns(collectionMock.Object);
 
-			builder.ShouldBeOfType<RenameColumnExpressionBuilder>();
+            var root = new RenameExpressionRoot(contextMock.Object);
+            var builder = root.Column("Bacon");
+
+            builder.ShouldBeOfType<RenameColumnExpressionBuilder>();
             contextMock.VerifyGet(x => x.Expressions);
-		}
-	}
+        }
+    }
 }

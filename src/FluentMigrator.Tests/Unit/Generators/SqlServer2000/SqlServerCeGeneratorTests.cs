@@ -8,24 +8,24 @@ namespace FluentMigrator.Tests.Unit.Generators
 {
     public class SqlServerCeGeneratorTests : GeneratorTestBase
     {
-        private SqlServerCeGenerator _generator;
-
         [SetUp]
         public void SetUp()
         {
             _generator = new SqlServerCeGenerator();
         }
 
-        [Test]
-        public void CannotCreateASchema()
-        {
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new CreateSchemaExpression()));
-        }
+        private SqlServerCeGenerator _generator;
 
         [Test]
         public void CannotAlterASchema()
         {
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new AlterSchemaExpression()));
+        }
+
+        [Test]
+        public void CannotCreateASchema()
+        {
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new CreateSchemaExpression()));
         }
 
         [Test]

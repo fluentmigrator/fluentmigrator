@@ -23,7 +23,8 @@ namespace FluentMigrator.Runner.Initialization
 
         public IAnnouncer Announcer
         {
-            get; private set;
+            get;
+            private set;
         }
 
         public IStopWatch StopWatch

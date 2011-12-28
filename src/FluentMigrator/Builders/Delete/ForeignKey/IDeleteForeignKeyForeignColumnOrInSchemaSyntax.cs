@@ -18,8 +18,8 @@
 
 namespace FluentMigrator.Builders.Delete.ForeignKey
 {
-	public interface IDeleteForeignKeyForeignColumnOrInSchemaSyntax : IDeleteForeignKeyForeignColumnSyntax
-	{
-		IDeleteForeignKeyForeignColumnSyntax InSchema(string foreignSchemaName);
-	}
+    public interface IDeleteForeignKeyForeignColumnOrInSchemaSyntax : IDeleteForeignKeyForeignColumnSyntax
+    {
+        IDeleteForeignKeyForeignColumnSyntax InSchema(string foreignSchemaName);
+    }
 }

@@ -31,73 +31,73 @@ using FluentMigrator.Runner.Generators.SQLite;
 namespace FluentMigrator.Tests.Integration.Processors
 {
     [TestFixture]
-	public class SqliteProcessorTests
-	{
-		private IDbConnection connection;
-		private SqliteProcessor processor;
-		private Mock<ColumnDefinition> column;
-		private IDbCommand command;
-		private string columnName;
-		private string tableName;
+    public class SqliteProcessorTests
+    {
+        private IDbConnection connection;
+        private SqliteProcessor processor;
+        private Mock<ColumnDefinition> column;
+        private IDbCommand command;
+        private string columnName;
+        private string tableName;
         private string tableNameThanMustBeEscaped;
 
-		[SetUp]
-		public void SetUp()
-		{
-			// This connection used in the tests
-		    var factory = new SqliteDbFactory();
+        [SetUp]
+        public void SetUp()
+        {
+            // This connection used in the tests
+            var factory = new SqliteDbFactory();
             connection = factory.CreateConnection("Data Source=:memory:;Version=3;New=True;");
-		    connection.Open();
-		    command = connection.CreateCommand();
+            connection.Open();
+            command = connection.CreateCommand();
 
-		    // SUT
-		    processor = new SqliteProcessor(connection, new SqliteGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), factory);
+            // SUT
+            processor = new SqliteProcessor(connection, new SqliteGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), factory);
 
-			column = new Mock<ColumnDefinition>();
+            column = new Mock<ColumnDefinition>();
             tableName = "NewTable";
-			tableNameThanMustBeEscaped = "123NewTable";
-			columnName = "ColumnName";
-			column.SetupGet(c => c.Name).Returns(columnName);
-			column.SetupGet(c => c.IsNullable).Returns(true);
-			column.SetupGet(c => c.Type).Returns(DbType.Int32);
-		}
+            tableNameThanMustBeEscaped = "123NewTable";
+            columnName = "ColumnName";
+            column.SetupGet(c => c.Name).Returns(columnName);
+            column.SetupGet(c => c.IsNullable).Returns(true);
+            column.SetupGet(c => c.Type).Returns(DbType.Int32);
+        }
 
-		[Test]
-		public void CanDefaultAutoIncrementColumnTypeToInteger()
-		{
-		    var column = new ColumnDefinition
-		                     {
-		                         Name = "Id",
-		                         IsIdentity = true,
-		                         IsPrimaryKey = true,
-		                         Type = DbType.Int64,
-		                         IsNullable = false
-		                     };
+        [Test]
+        public void CanDefaultAutoIncrementColumnTypeToInteger()
+        {
+            var column = new ColumnDefinition
+                             {
+                                 Name = "Id",
+                                 IsIdentity = true,
+                                 IsPrimaryKey = true,
+                                 Type = DbType.Int64,
+                                 IsNullable = false
+                             };
 
-		    var expression = new CreateTableExpression { TableName = tableName };
-			expression.Columns.Add(column);
+            var expression = new CreateTableExpression { TableName = tableName };
+            expression.Columns.Add(column);
 
-			using (command)
-			{
-				processor.Process(expression);
-				command.CommandText = string.Format("SELECT name FROM sqlite_master WHERE type='table' and name='{0}'", tableName);
-				command.ExecuteReader().Read().ShouldBeTrue();
-			}
-		}
+            using (command)
+            {
+                processor.Process(expression);
+                command.CommandText = string.Format("SELECT name FROM sqlite_master WHERE type='table' and name='{0}'", tableName);
+                command.ExecuteReader().Read().ShouldBeTrue();
+            }
+        }
 
-		[Test]
-		public void CanCreateTableExpression()
-		{
-			var expression = new CreateTableExpression { TableName = tableName };
-			expression.Columns.Add(column.Object);
+        [Test]
+        public void CanCreateTableExpression()
+        {
+            var expression = new CreateTableExpression { TableName = tableName };
+            expression.Columns.Add(column.Object);
 
-			using (command)
-			{
-				processor.Process(expression);
-				command.CommandText = string.Format("SELECT name FROM sqlite_master WHERE type='table' and name='{0}'", tableName);
-				command.ExecuteReader().Read().ShouldBeTrue();
-			}
-		}
+            using (command)
+            {
+                processor.Process(expression);
+                command.CommandText = string.Format("SELECT name FROM sqlite_master WHERE type='table' and name='{0}'", tableName);
+                command.ExecuteReader().Read().ShouldBeTrue();
+            }
+        }
 
         [Test]
         public void IsEscapingTableNameCorrectlyOnTableCreate()
@@ -135,5 +135,5 @@ namespace FluentMigrator.Tests.Integration.Processors
             processor.Process(expression);
             processor.ColumnExists(null, tableNameThanMustBeEscaped, columnName).ShouldBeTrue();
         }
-	}
+    }
 }

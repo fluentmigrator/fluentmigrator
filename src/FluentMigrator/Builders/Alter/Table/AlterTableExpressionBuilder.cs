@@ -46,14 +46,14 @@ namespace FluentMigrator.Builders.Alter.Table
 
         public void ToSchema(string schemaName)
         {
-          var alterSchema = new AlterSchemaExpression
-                                {
-                                  SourceSchemaName = Expression.SchemaName,
-                                  TableName = Expression.TableName,
-                                  DestinationSchemaName = schemaName
-                                };
+            var alterSchema = new AlterSchemaExpression
+                                  {
+                                      SourceSchemaName = Expression.SchemaName,
+                                      TableName = Expression.TableName,
+                                      DestinationSchemaName = schemaName
+                                  };
 
-          _context.Expressions.Add( alterSchema );
+            _context.Expressions.Add(alterSchema);
         }
 
         public IAlterTableColumnAsTypeSyntax AddColumn(string name)

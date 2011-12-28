@@ -23,14 +23,14 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Delete
 {
-	public class DeleteDataExpressionBuilder : IDeleteDataOrInSchemaSyntax
-	{
-		private readonly DeleteDataExpression _expression;
+    public class DeleteDataExpressionBuilder : IDeleteDataOrInSchemaSyntax
+    {
+        private readonly DeleteDataExpression _expression;
 
-		public DeleteDataExpressionBuilder(DeleteDataExpression expression)
-		{
-			_expression = expression;
-		}
+        public DeleteDataExpressionBuilder(DeleteDataExpression expression)
+        {
+            _expression = expression;
+        }
 
         public void IsNull(string columnName)
         {
@@ -40,31 +40,31 @@ namespace FluentMigrator.Builders.Delete
 									});
         }
 
-		public IDeleteDataSyntax Row(object dataAsAnonymousType)
-		{
-			_expression.Rows.Add(GetData(dataAsAnonymousType));
-			return this;
-		}
+        public IDeleteDataSyntax Row(object dataAsAnonymousType)
+        {
+            _expression.Rows.Add(GetData(dataAsAnonymousType));
+            return this;
+        }
 
-		public IDeleteDataSyntax InSchema(string schemaName)
-		{
-			_expression.SchemaName = schemaName;
-			return this;
-		}
+        public IDeleteDataSyntax InSchema(string schemaName)
+        {
+            _expression.SchemaName = schemaName;
+            return this;
+        }
 
-		public void AllRows()
-		{
-			_expression.IsAllRows = true;
-		}
+        public void AllRows()
+        {
+            _expression.IsAllRows = true;
+        }
 
-		private static DeletionDataDefinition GetData(object dataAsAnonymousType)
-		{
-			var data = new DeletionDataDefinition();
-			var properties = TypeDescriptor.GetProperties(dataAsAnonymousType);
+        private static DeletionDataDefinition GetData(object dataAsAnonymousType)
+        {
+            var data = new DeletionDataDefinition();
+            var properties = TypeDescriptor.GetProperties(dataAsAnonymousType);
 
-			foreach (PropertyDescriptor property in properties)
-				data.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(dataAsAnonymousType)));
-			return data;
-		}
-	}
+            foreach (PropertyDescriptor property in properties)
+                data.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(dataAsAnonymousType)));
+            return data;
+        }
+    }
 }

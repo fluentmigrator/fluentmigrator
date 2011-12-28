@@ -18,8 +18,8 @@
 
 namespace FluentMigrator.Builders.Insert
 {
-	public interface IInsertDataOrInSchemaSyntax : IInsertDataSyntax
-	{
-		IInsertDataSyntax InSchema(string schemaName);
-	}
+    public interface IInsertDataOrInSchemaSyntax : IInsertDataSyntax
+    {
+        IInsertDataSyntax InSchema(string schemaName);
+    }
 }
