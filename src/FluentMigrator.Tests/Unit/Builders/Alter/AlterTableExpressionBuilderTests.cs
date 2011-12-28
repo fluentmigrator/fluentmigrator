@@ -245,6 +245,22 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
         }
 
         [Test]
+        public void CallingWithDefaultSetsDefaultValue()
+        {
+            var contextMock = new Mock<IMigrationContext>();
+
+            var columnMock = new Mock<ColumnDefinition>();
+
+            var expressionMock = new Mock<AlterTableExpression>();
+
+            var builder = new AlterTableExpressionBuilder(expressionMock.Object, contextMock.Object);
+            builder.CurrentColumn = columnMock.Object;
+            builder.WithDefault(SystemMethods.CurrentDateTime);
+
+            columnMock.VerifySet(c => c.DefaultValue = SystemMethods.CurrentDateTime);
+        }
+
+        [Test]
         public void CallingForeignKeySetsIsForeignKeyToTrue()
         {
             VerifyColumnProperty(c => c.IsForeignKey = true, b => b.ForeignKey());

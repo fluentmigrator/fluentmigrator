@@ -88,6 +88,12 @@ namespace FluentMigrator.Builders.Alter.Table
             return this;
         }
 
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithDefault(SystemMethods method)
+        {
+            CurrentColumn.DefaultValue = method;
+            return this;
+        }
+
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithDefaultValue(object value)
         {
             CurrentColumn.DefaultValue = value;
