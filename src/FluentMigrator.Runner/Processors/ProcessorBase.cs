@@ -142,6 +142,11 @@ namespace FluentMigrator.Runner.Processors
             Process(Generator.Generate(expression));
         }
 
+        public void Process(DeleteDefaultConstraintExpression expression)
+        {
+            throw new System.NotImplementedException();
+        }
+
         protected abstract void Process(string sql);
 
         public virtual void BeginTransaction()

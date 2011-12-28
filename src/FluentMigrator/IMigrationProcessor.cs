@@ -59,5 +59,6 @@ namespace FluentMigrator
         void Process(CreateSequenceExpression expression);
 
         void Process(DeleteSequenceExpression expression);
+        void Process(DeleteDefaultConstraintExpression expression);
     }
 }
