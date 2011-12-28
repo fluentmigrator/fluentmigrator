@@ -16,7 +16,6 @@
 //
 #endregion
 
-using FluentMigrator.Builders.Delete.Column;
 using FluentMigrator.Expressions;
 using Moq;
 using NUnit.Framework;
@@ -26,18 +25,18 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
     using FluentMigrator.Builders.Delete.Sequence;
 
     [TestFixture]
-	public class DeleteSequenceExpressionBuilderTests
-	{
-		[Test]
-		public void CallingInSchemaSetsInSchema()
-		{
-			var expressionMock = new Mock<DeleteSequenceExpression>();
+    public class DeleteSequenceExpressionBuilderTests
+    {
+        [Test]
+        public void CallingInSchemaSetsInSchema()
+        {
+            var expressionMock = new Mock<DeleteSequenceExpression>();
             expressionMock.SetupSet(x => x.SchemaName = "Bacon");
 
             var builder = new DeleteSequenceExpressionBuilder(expressionMock.Object);
-			builder.InSchema("Bacon");
+            builder.InSchema("Bacon");
 
-			expressionMock.VerifyAll();
-		}
-	}
+            expressionMock.VerifyAll();
+        }
+    }
 }

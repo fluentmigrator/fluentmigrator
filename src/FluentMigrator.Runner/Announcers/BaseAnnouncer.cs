@@ -22,33 +22,33 @@ using System;
 
 namespace FluentMigrator.Runner.Announcers
 {
-	public class BaseAnnouncer : IAnnouncer, IFormattingAnnouncer
-	{
-		protected readonly Action<string> Write;
+    public class BaseAnnouncer : IAnnouncer, IFormattingAnnouncer
+    {
+        protected readonly Action<string> Write;
 
-		public BaseAnnouncer(Action<string> write)
-		{
-			Write = write;
-			ShowSql = false;
-			ShowElapsedTime = false;
-		}
+        public BaseAnnouncer(Action<string> write)
+        {
+            Write = write;
+            ShowSql = false;
+            ShowElapsedTime = false;
+        }
 
-		public bool ShowSql { get; set; }
-		public bool ShowElapsedTime { get; set; }
+        public bool ShowSql { get; set; }
+        public bool ShowElapsedTime { get; set; }
 
-		#region IAnnouncer Members
+        #region IAnnouncer Members
 
-		public virtual void Heading(string message)
-		{
-			Write(message);
-		}
+        public virtual void Heading(string message)
+        {
+            Write(message);
+        }
 
-		public virtual void Say(string message)
-		{
-			Write(message);
-		}
+        public virtual void Say(string message)
+        {
+            Write(message);
+        }
 
-        public virtual void Heading(string message,params object[] args)
+        public virtual void Heading(string message, params object[] args)
         {
             Heading(string.Format(message, args));
         }
@@ -58,37 +58,37 @@ namespace FluentMigrator.Runner.Announcers
             Say(string.Format(message, args));
         }
 
-		public virtual void Sql(string sql)
-		{
-			if (!ShowSql)
-				return;
+        public virtual void Sql(string sql)
+        {
+            if (!ShowSql)
+                return;
 
-			if (!string.IsNullOrEmpty(sql))
-				Write(sql);
-		}
+            if (!string.IsNullOrEmpty(sql))
+                Write(sql);
+        }
 
-		public virtual void ElapsedTime(TimeSpan timeSpan)
-		{
-			if (!ShowElapsedTime)
-				return;
+        public virtual void ElapsedTime(TimeSpan timeSpan)
+        {
+            if (!ShowElapsedTime)
+                return;
 
-			Write(timeSpan.TotalSeconds.ToString());
-		}
+            Write(timeSpan.TotalSeconds.ToString());
+        }
 
-		public virtual void Error(string message)
-		{
-			Write(message);
-		}
+        public virtual void Error(string message)
+        {
+            Write(message);
+        }
 
-        public virtual void Error(string message,params object[] args)
+        public virtual void Error(string message, params object[] args)
         {
             Error(string.Format(message, args));
         }
 
-		public virtual void Dispose()
-		{
-		}
+        public virtual void Dispose()
+        {
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

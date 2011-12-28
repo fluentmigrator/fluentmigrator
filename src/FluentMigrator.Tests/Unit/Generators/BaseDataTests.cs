@@ -1,12 +1,5 @@
-﻿
-namespace FluentMigrator.Tests.Unit.Generators
+﻿namespace FluentMigrator.Tests.Unit.Generators
 {
-    using NUnit.Framework;
-using FluentMigrator.Expressions;
-    using FluentMigrator.Model;
-    using System.Collections.Generic;
-    using System;
-
     public abstract class BaseDataTests : GeneratorTestBase
     {
 
@@ -17,7 +10,5 @@ using FluentMigrator.Expressions;
         public abstract void CanInsertGuidData();
 
         public abstract void CanUpdateData();
-
-        
     }
 }

@@ -16,7 +16,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         private const string testSqlScript = "embeddedtestscript.sql";
         private const string scriptContents = "TEST SCRIPT";
 
-    	[Test]
+        [Test]
         public void ErrorIsReturnWhenSqlScriptIsNullOrEmpty()
         {
             var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = null };
@@ -47,7 +47,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             processor.Verify();
         }
 
-		[Test]
+        [Test]
         public void ResourceFinderFindFileWithFullName()
         {
             var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = "InitialSchema.sql", MigrationAssembly = Assembly.GetExecutingAssembly() };

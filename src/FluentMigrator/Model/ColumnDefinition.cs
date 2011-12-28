@@ -23,50 +23,50 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Model
 {
-	public class ColumnDefinition : ICloneable, ICanBeConventional, ICanBeValidated
-	{
-		public ColumnDefinition()
-		{
-			DefaultValue = new UndefinedDefaultValue();
-		}
+    public class ColumnDefinition : ICloneable, ICanBeConventional, ICanBeValidated
+    {
+        public ColumnDefinition()
+        {
+            DefaultValue = new UndefinedDefaultValue();
+        }
 
-		public virtual string Name { get; set; }
-		public virtual DbType? Type { get; set; }
-		public virtual int Size { get; set; }
-		public virtual int Precision { get; set; }
-		public virtual string CustomType { get; set; }
-		public virtual object DefaultValue { get; set; }
-		public virtual bool IsForeignKey { get; set; }
-		public virtual bool IsIdentity { get; set; }
-		public virtual bool IsIndexed { get; set; }
-		public virtual bool IsPrimaryKey { get; set; }
-		public virtual string PrimaryKeyName { get; set; }
-		public virtual bool IsNullable { get; set; }
-		public virtual bool IsUnique { get; set; }
-		public virtual string TableName { get; set; }
+        public virtual string Name { get; set; }
+        public virtual DbType? Type { get; set; }
+        public virtual int Size { get; set; }
+        public virtual int Precision { get; set; }
+        public virtual string CustomType { get; set; }
+        public virtual object DefaultValue { get; set; }
+        public virtual bool IsForeignKey { get; set; }
+        public virtual bool IsIdentity { get; set; }
+        public virtual bool IsIndexed { get; set; }
+        public virtual bool IsPrimaryKey { get; set; }
+        public virtual string PrimaryKeyName { get; set; }
+        public virtual bool IsNullable { get; set; }
+        public virtual bool IsUnique { get; set; }
+        public virtual string TableName { get; set; }
 
-		public void ApplyConventions(IMigrationConventions conventions)
-		{
-			if ( String.IsNullOrEmpty( PrimaryKeyName ) )
-				PrimaryKeyName = conventions.GetPrimaryKeyName(TableName);
-		}
+        public void ApplyConventions(IMigrationConventions conventions)
+        {
+            if (String.IsNullOrEmpty(PrimaryKeyName))
+                PrimaryKeyName = conventions.GetPrimaryKeyName(TableName);
+        }
 
-		public virtual void CollectValidationErrors(ICollection<string> errors)
-		{
-			if (String.IsNullOrEmpty(Name))
-				errors.Add(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
+        public virtual void CollectValidationErrors(ICollection<string> errors)
+        {
+            if (String.IsNullOrEmpty(Name))
+                errors.Add(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
 
-			if (Type == null && CustomType == null)
-				errors.Add(ErrorMessages.ColumnTypeMustBeDefined);
-		}
+            if (Type == null && CustomType == null)
+                errors.Add(ErrorMessages.ColumnTypeMustBeDefined);
+        }
 
-		public object Clone()
-		{
-			return MemberwiseClone();
-		}
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
 
-		public class UndefinedDefaultValue
-		{
-		}
-	}
+        public class UndefinedDefaultValue
+        {
+        }
+    }
 }

@@ -18,8 +18,8 @@
 
 namespace FluentMigrator.Infrastructure
 {
-	public interface ICanBeConventional
-	{
-		void ApplyConventions(IMigrationConventions conventions);
-	}
+    public interface ICanBeConventional
+    {
+        void ApplyConventions(IMigrationConventions conventions);
+    }
 }

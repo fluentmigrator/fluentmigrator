@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using NUnit.Framework;
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Should;
-using FluentMigrator.Expressions;
-using FluentMigrator.Model;
 
 namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {

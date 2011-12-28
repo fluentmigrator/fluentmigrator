@@ -16,18 +16,15 @@
 //
 #endregion
 
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using FluentMigrator.Builders.Schema.Column;
 using FluentMigrator.Builders.Schema.Index;
 
 namespace FluentMigrator.Builders.Schema.Table
 {
-	public interface ISchemaTableSyntax
-	{
-		bool Exists();
-		ISchemaColumnSyntax Column(string column);
+    public interface ISchemaTableSyntax
+    {
+        bool Exists();
+        ISchemaColumnSyntax Column(string column);
         ISchemaIndexSyntax Index(string indexName);
     }
 }

@@ -16,26 +16,25 @@
 //
 #endregion
 
-using System;
 using System.Collections.Generic;
 using FluentMigrator.Expressions;
 using System.Reflection;
 
 namespace FluentMigrator.Infrastructure
 {
-	public class MigrationContext : IMigrationContext
-	{
-		public virtual IMigrationConventions Conventions { get; set; }
-		public virtual ICollection<IMigrationExpression> Expressions { get; set; }
-		public virtual IQuerySchema QuerySchema { get; set; }
+    public class MigrationContext : IMigrationContext
+    {
+        public virtual IMigrationConventions Conventions { get; set; }
+        public virtual ICollection<IMigrationExpression> Expressions { get; set; }
+        public virtual IQuerySchema QuerySchema { get; set; }
         public virtual Assembly MigrationAssembly { get; set; }
 
-		public MigrationContext(IMigrationConventions conventions, IQuerySchema querySchema, Assembly migrationAssembly)
-		{
-			Conventions = conventions;
-			Expressions = new List<IMigrationExpression>();
-			QuerySchema = querySchema;
+        public MigrationContext(IMigrationConventions conventions, IQuerySchema querySchema, Assembly migrationAssembly)
+        {
+            Conventions = conventions;
+            Expressions = new List<IMigrationExpression>();
+            QuerySchema = querySchema;
             MigrationAssembly = migrationAssembly;
-		}
-	}
+        }
+    }
 }

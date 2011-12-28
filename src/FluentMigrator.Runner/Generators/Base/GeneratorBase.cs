@@ -20,65 +20,65 @@ using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Generators.Base
 {
-	public abstract class GeneratorBase : IMigrationGenerator
-	{
-		private readonly IColumn _column;
-		private readonly IQuoter _quoter;
+    public abstract class GeneratorBase : IMigrationGenerator
+    {
+        private readonly IColumn _column;
+        private readonly IQuoter _quoter;
 
-		public GeneratorBase(IColumn column, IQuoter quoter)
-		{
-			_column = column;
-			_quoter = quoter;
-		}
+        public GeneratorBase(IColumn column, IQuoter quoter)
+        {
+            _column = column;
+            _quoter = quoter;
+        }
 
-		public abstract string Generate(CreateSchemaExpression expression);
-		public abstract string Generate(DeleteSchemaExpression expression);
-		public abstract string Generate(CreateTableExpression expression);
-		public abstract string Generate(AlterColumnExpression expression);
-		public abstract string Generate(CreateColumnExpression expression);
-		public abstract string Generate(DeleteTableExpression expression);
-		public abstract string Generate(DeleteColumnExpression expression);
-		public abstract string Generate(CreateForeignKeyExpression expression);
-		public abstract string Generate(DeleteForeignKeyExpression expression);
-		public abstract string Generate(CreateIndexExpression expression);
-		public abstract string Generate(DeleteIndexExpression expression);
-		public abstract string Generate(RenameTableExpression expression);
-		public abstract string Generate(RenameColumnExpression expression);
-		public abstract string Generate(InsertDataExpression expression);
-		public abstract string Generate(AlterDefaultConstraintExpression expression);
-		public abstract string Generate(DeleteDataExpression expression);
-		public abstract string Generate(UpdateDataExpression expression);
-		public abstract string Generate(AlterSchemaExpression expression);
+        public abstract string Generate(CreateSchemaExpression expression);
+        public abstract string Generate(DeleteSchemaExpression expression);
+        public abstract string Generate(CreateTableExpression expression);
+        public abstract string Generate(AlterColumnExpression expression);
+        public abstract string Generate(CreateColumnExpression expression);
+        public abstract string Generate(DeleteTableExpression expression);
+        public abstract string Generate(DeleteColumnExpression expression);
+        public abstract string Generate(CreateForeignKeyExpression expression);
+        public abstract string Generate(DeleteForeignKeyExpression expression);
+        public abstract string Generate(CreateIndexExpression expression);
+        public abstract string Generate(DeleteIndexExpression expression);
+        public abstract string Generate(RenameTableExpression expression);
+        public abstract string Generate(RenameColumnExpression expression);
+        public abstract string Generate(InsertDataExpression expression);
+        public abstract string Generate(AlterDefaultConstraintExpression expression);
+        public abstract string Generate(DeleteDataExpression expression);
+        public abstract string Generate(UpdateDataExpression expression);
+        public abstract string Generate(AlterSchemaExpression expression);
         public abstract string Generate(CreateSequenceExpression expression);
         public abstract string Generate(DeleteSequenceExpression expression);
 
-		public virtual bool IsAdditionalFeatureSupported(string feature)
-		{
-			return false;
-		}
+        public virtual bool IsAdditionalFeatureSupported(string feature)
+        {
+            return false;
+        }
 
-		public string Generate(AlterTableExpression expression)
-		{
-			// returns nothing because the individual AddColumn and AlterColumn calls
-			//  create CreateColumnExpression and AlterColumnExpression respectively
-			return string.Empty;
-		}
-
-
-
-		protected IColumn Column
-		{
-			get { return _column; }
-		}
-
-		protected IQuoter Quoter
-		{
-			get { return _quoter; }
-		}
+        public string Generate(AlterTableExpression expression)
+        {
+            // returns nothing because the individual AddColumn and AlterColumn calls
+            //  create CreateColumnExpression and AlterColumnExpression respectively
+            return string.Empty;
+        }
 
 
 
-	}
+        protected IColumn Column
+        {
+            get { return _column; }
+        }
+
+        protected IQuoter Quoter
+        {
+            get { return _quoter; }
+        }
+
+
+
+    }
 
 
 }

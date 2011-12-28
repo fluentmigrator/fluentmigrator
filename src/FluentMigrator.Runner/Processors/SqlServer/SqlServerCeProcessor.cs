@@ -24,15 +24,13 @@ using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-	using System.Data.Common;
-
-	public sealed class SqlServerCeProcessor : ProcessorBase
+    public sealed class SqlServerCeProcessor : ProcessorBase
     {
-		private readonly IDbFactory factory;
-		private readonly IDbConnection connection;
-		private IDbTransaction transaction;
+        private readonly IDbFactory factory;
+        private readonly IDbConnection connection;
+        private IDbTransaction transaction;
 
-		public override string DatabaseType
+        public override string DatabaseType
         {
             get { return "SqlServerCe"; }
         }
@@ -40,8 +38,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         public SqlServerCeProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(generator, announcer, options)
         {
-        	this.factory = factory;
-        	this.connection = connection;
+            this.factory = factory;
+            this.connection = connection;
             connection.Open();
             BeginTransaction();
         }
@@ -81,7 +79,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             if (connection.State != ConnectionState.Open)
                 connection.Open();
 
-			using (var command = factory.CreateCommand(String.Format(template, args), connection, transaction))
+            using (var command = factory.CreateCommand(String.Format(template, args), connection, transaction))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -98,9 +96,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             if (connection.State != ConnectionState.Open) connection.Open();
 
             var ds = new DataSet();
-			using (var command = factory.CreateCommand(String.Format(template, args), connection, transaction))
-			{
-			    var adapter = factory.CreateDataAdapter(command);
+            using (var command = factory.CreateCommand(String.Format(template, args), connection, transaction))
+            {
+                var adapter = factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
                 return ds;
             }
@@ -122,7 +120,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 transaction = null;
             }
 
-        	if (connection.State != ConnectionState.Closed)
+            if (connection.State != ConnectionState.Closed)
             {
                 connection.Close();
             }
@@ -140,7 +138,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             transaction.Rollback();
 
-        	if (connection.State != ConnectionState.Closed)
+            if (connection.State != ConnectionState.Closed)
             {
                 connection.Close();
             }
@@ -159,7 +157,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             if (transaction == null)
                 BeginTransaction();
 
-			using (var command = factory.CreateCommand(sql, connection, transaction))
+            using (var command = factory.CreateCommand(sql, connection, transaction))
             {
                 try
                 {
@@ -188,7 +186,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 expression.Operation(connection, transaction);
         }
 
-		private static string FormatSqlEscape(string sql)
+        private static string FormatSqlEscape(string sql)
         {
             return sql.Replace("'", "''");
         }

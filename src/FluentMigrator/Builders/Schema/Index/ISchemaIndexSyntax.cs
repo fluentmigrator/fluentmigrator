@@ -16,12 +16,10 @@
 //
 #endregion
 
-using System;
-
 namespace FluentMigrator.Builders.Schema.Index
 {
-	public interface ISchemaIndexSyntax
-	{
-		bool Exists();
-	}
+    public interface ISchemaIndexSyntax
+    {
+        bool Exists();
+    }
 }

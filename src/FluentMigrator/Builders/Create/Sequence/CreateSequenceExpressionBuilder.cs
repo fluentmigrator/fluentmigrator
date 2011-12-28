@@ -4,7 +4,8 @@
 
     public class CreateSequenceExpressionBuilder : ExpressionBuilderBase<CreateSequenceExpression>, ICreateSequenceSyntax, ICreateSequenceInSchemaSyntax
     {
-        public CreateSequenceExpressionBuilder(CreateSequenceExpression expression) : base(expression)
+        public CreateSequenceExpressionBuilder(CreateSequenceExpression expression)
+            : base(expression)
         {
         }
 

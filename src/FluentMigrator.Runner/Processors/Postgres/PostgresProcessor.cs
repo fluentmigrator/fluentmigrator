@@ -6,16 +6,14 @@ using FluentMigrator.Runner.Generators.Postgres;
 
 namespace FluentMigrator.Runner.Processors.Postgres
 {
-	using System.Data.Common;
-
-	public class PostgresProcessor : ProcessorBase
+    public class PostgresProcessor : ProcessorBase
     {
-		private readonly IDbFactory factory;
-		readonly PostgresQuoter quoter = new PostgresQuoter();
+        private readonly IDbFactory factory;
+        readonly PostgresQuoter quoter = new PostgresQuoter();
         public IDbConnection Connection { get; private set; }
         public IDbTransaction Transaction { get; private set; }
 
-		public override string DatabaseType
+        public override string DatabaseType
         {
             get { return "Postgres"; }
         }
@@ -23,8 +21,8 @@ namespace FluentMigrator.Runner.Processors.Postgres
         public PostgresProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(generator, announcer, options)
         {
-        	this.factory = factory;
-        	Connection = connection;
+            this.factory = factory;
+            Connection = connection;
             connection.Open();
             Transaction = connection.BeginTransaction();
         }
@@ -59,7 +57,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
             return Exists("select * from pg_catalog.pg_indexes where schemaname='{0}' and tablename = '{1}' and indexname = '{2}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(tableName), FormatToSafeName(indexName));
         }
 
-	    public override DataSet ReadTableData(string schemaName, string tableName)
+        public override DataSet ReadTableData(string schemaName, string tableName)
         {
             return Read("SELECT * FROM {0}.{1}", quoter.QuoteSchemaName(schemaName), quoter.QuoteTableName(tableName));
         }
@@ -69,9 +67,9 @@ namespace FluentMigrator.Runner.Processors.Postgres
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
             var ds = new DataSet();
-			using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
-			{
-			    var adapter = factory.CreateDataAdapter(command);
+            using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
+            {
+                var adapter = factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
                 return ds;
             }
@@ -82,7 +80,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
-			using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
+            using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -99,7 +97,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
             Announcer.Say("Committing Transaction");
             Transaction.Commit();
-        	if (Connection.State != ConnectionState.Closed)
+            if (Connection.State != ConnectionState.Closed)
             {
                 Connection.Close();
             }
@@ -109,7 +107,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
             Announcer.Say("Rolling back transaction");
             Transaction.Rollback();
-        	if (Connection.State != ConnectionState.Closed)
+            if (Connection.State != ConnectionState.Closed)
             {
                 Connection.Close();
             }
@@ -154,17 +152,17 @@ namespace FluentMigrator.Runner.Processors.Postgres
                 expression.Operation(Connection, Transaction);
         }
 
-		private string FormatToSafeSchemaName(string schemaName)
+        private string FormatToSafeSchemaName(string schemaName)
         {
             return FormatSqlEscape(quoter.UnQuoteSchemaName(schemaName));
         }
 
-		private string FormatToSafeName(string sqlName)
+        private string FormatToSafeName(string sqlName)
         {
             return FormatSqlEscape(quoter.UnQuote(sqlName));
         }
 
-		private static string FormatSqlEscape(string sql)
+        private static string FormatSqlEscape(string sql)
         {
             return sql.Replace("'", "''");
         }

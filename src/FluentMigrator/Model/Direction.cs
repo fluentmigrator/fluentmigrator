@@ -16,13 +16,11 @@
 //
 #endregion
 
-using System;
-
 namespace FluentMigrator.Model
 {
-	public enum Direction
-	{
-		Ascending = 0,
-		Descending = 1
-	}
+    public enum Direction
+    {
+        Ascending = 0,
+        Descending = 1
+    }
 }

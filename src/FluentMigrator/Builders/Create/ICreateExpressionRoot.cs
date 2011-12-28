@@ -19,23 +19,22 @@
 using FluentMigrator.Builders.Create.Column;
 using FluentMigrator.Builders.Create.ForeignKey;
 using FluentMigrator.Builders.Create.Index;
+using FluentMigrator.Builders.Create.Sequence;
 using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Create
 {
-    using Sequence;
-
     public interface ICreateExpressionRoot : IFluentSyntax
-	{
-		void Schema(string schemaName);
-		ICreateTableWithColumnOrSchemaSyntax Table(string tableName);
-		ICreateColumnOnTableSyntax Column(string columnName);
-		ICreateForeignKeyFromTableSyntax ForeignKey();
-		ICreateForeignKeyFromTableSyntax ForeignKey(string foreignKeyName);
-		ICreateIndexForTableSyntax Index();
-		ICreateIndexForTableSyntax Index(string indexName);
+    {
+        void Schema(string schemaName);
+        ICreateTableWithColumnOrSchemaSyntax Table(string tableName);
+        ICreateColumnOnTableSyntax Column(string columnName);
+        ICreateForeignKeyFromTableSyntax ForeignKey();
+        ICreateForeignKeyFromTableSyntax ForeignKey(string foreignKeyName);
+        ICreateIndexForTableSyntax Index();
+        ICreateIndexForTableSyntax Index(string indexName);
 
         ICreateSequenceInSchemaSyntax Sequence(string sequenceName);
-	}
+    }
 }

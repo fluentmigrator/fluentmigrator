@@ -20,8 +20,8 @@
 
 namespace FluentMigrator.Builders.Delete.Index
 {
-	public interface IDeleteIndexOnColumnOrInSchemaSyntax : IDeleteIndexOnColumnSyntax
-	{
-		IDeleteIndexOnColumnSyntax InSchema(string schemaName);
-	}
+    public interface IDeleteIndexOnColumnOrInSchemaSyntax : IDeleteIndexOnColumnSyntax
+    {
+        IDeleteIndexOnColumnSyntax InSchema(string schemaName);
+    }
 }

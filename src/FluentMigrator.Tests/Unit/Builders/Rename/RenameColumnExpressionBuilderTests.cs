@@ -23,18 +23,18 @@ using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Builders.Rename
 {
-	[TestFixture]
-	public class RenameColumnExpressionBuilderTests
-	{
-		[Test]
-		public void CallingToSetsNewName()
-		{
-			var expressionMock = new Mock<RenameColumnExpression>();
-            
-			var builder = new RenameColumnExpressionBuilder(expressionMock.Object);
-			builder.To("Bacon");
+    [TestFixture]
+    public class RenameColumnExpressionBuilderTests
+    {
+        [Test]
+        public void CallingToSetsNewName()
+        {
+            var expressionMock = new Mock<RenameColumnExpression>();
+
+            var builder = new RenameColumnExpressionBuilder(expressionMock.Object);
+            builder.To("Bacon");
 
             expressionMock.VerifySet(x => x.NewName = "Bacon");
-		}
-	}
+        }
+    }
 }

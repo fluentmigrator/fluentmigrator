@@ -18,10 +18,7 @@
 #endregion
 
 using System;
-using System.Data;
-using FluentMigrator.Builders.Execute;
 using FluentMigrator.Builders.IfDatabase;
-using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Processors.Jet;
 using Moq;

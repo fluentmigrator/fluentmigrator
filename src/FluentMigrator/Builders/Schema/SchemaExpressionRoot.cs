@@ -22,23 +22,23 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Schema
 {
-	public class SchemaExpressionRoot : ISchemaExpressionRoot
-	{
-		private readonly IMigrationContext _context;
+    public class SchemaExpressionRoot : ISchemaExpressionRoot
+    {
+        private readonly IMigrationContext _context;
 
-		public SchemaExpressionRoot(IMigrationContext context)
-		{
-			_context = context;
-		}
+        public SchemaExpressionRoot(IMigrationContext context)
+        {
+            _context = context;
+        }
 
-		public ISchemaTableSyntax Table(string tableName)
-		{
-			return new SchemaTableQuery(_context, null, tableName);
-		}
+        public ISchemaTableSyntax Table(string tableName)
+        {
+            return new SchemaTableQuery(_context, null, tableName);
+        }
 
-		public ISchemaSchemaSyntax Schema(string schemaName)
-		{
-			return new SchemaSchemaQuery(_context, schemaName);
-		}
-	}
+        public ISchemaSchemaSyntax Schema(string schemaName)
+        {
+            return new SchemaSchemaQuery(_context, schemaName);
+        }
+    }
 }

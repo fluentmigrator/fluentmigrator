@@ -21,84 +21,84 @@ using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Builders.Create.ForeignKey
 {
-	public class CreateForeignKeyExpressionBuilder: ExpressionBuilderBase<CreateForeignKeyExpression>,
-		ICreateForeignKeyFromTableSyntax,
-		ICreateForeignKeyForeignColumnOrInSchemaSyntax,
-		ICreateForeignKeyToTableSyntax,
-		ICreateForeignKeyPrimaryColumnOrInSchemaSyntax,
-		ICreateForeignKeyCascadeSyntax
-	{
-		public CreateForeignKeyExpressionBuilder(CreateForeignKeyExpression expression)
-			: base(expression)
-		{
-		}
+    public class CreateForeignKeyExpressionBuilder : ExpressionBuilderBase<CreateForeignKeyExpression>,
+        ICreateForeignKeyFromTableSyntax,
+        ICreateForeignKeyForeignColumnOrInSchemaSyntax,
+        ICreateForeignKeyToTableSyntax,
+        ICreateForeignKeyPrimaryColumnOrInSchemaSyntax,
+        ICreateForeignKeyCascadeSyntax
+    {
+        public CreateForeignKeyExpressionBuilder(CreateForeignKeyExpression expression)
+            : base(expression)
+        {
+        }
 
-		public ICreateForeignKeyForeignColumnOrInSchemaSyntax FromTable(string table)
-		{
-			Expression.ForeignKey.ForeignTable = table;
-			return this;
-		}
+        public ICreateForeignKeyForeignColumnOrInSchemaSyntax FromTable(string table)
+        {
+            Expression.ForeignKey.ForeignTable = table;
+            return this;
+        }
 
-		public ICreateForeignKeyToTableSyntax ForeignColumn(string column)
-		{
-			Expression.ForeignKey.ForeignColumns.Add(column);
-			return this;
-		}
+        public ICreateForeignKeyToTableSyntax ForeignColumn(string column)
+        {
+            Expression.ForeignKey.ForeignColumns.Add(column);
+            return this;
+        }
 
-		public ICreateForeignKeyToTableSyntax ForeignColumns(params string[] columns)
-		{
-			foreach(var column in columns)
-				Expression.ForeignKey.ForeignColumns.Add(column);
-			return this;
-		}
+        public ICreateForeignKeyToTableSyntax ForeignColumns(params string[] columns)
+        {
+            foreach (var column in columns)
+                Expression.ForeignKey.ForeignColumns.Add(column);
+            return this;
+        }
 
-		ICreateForeignKeyForeignColumnSyntax ICreateForeignKeyForeignColumnOrInSchemaSyntax.InSchema(string schemaName)
-		{
-			Expression.ForeignKey.ForeignTableSchema = schemaName;
-			return this;
-		}
+        ICreateForeignKeyForeignColumnSyntax ICreateForeignKeyForeignColumnOrInSchemaSyntax.InSchema(string schemaName)
+        {
+            Expression.ForeignKey.ForeignTableSchema = schemaName;
+            return this;
+        }
 
-		public ICreateForeignKeyPrimaryColumnOrInSchemaSyntax ToTable(string table)
-		{
-			Expression.ForeignKey.PrimaryTable = table;
-			return this;
-		}
+        public ICreateForeignKeyPrimaryColumnOrInSchemaSyntax ToTable(string table)
+        {
+            Expression.ForeignKey.PrimaryTable = table;
+            return this;
+        }
 
-		public ICreateForeignKeyCascadeSyntax PrimaryColumn(string column)
-		{
-			Expression.ForeignKey.PrimaryColumns.Add(column);
-			return this;
-		}
+        public ICreateForeignKeyCascadeSyntax PrimaryColumn(string column)
+        {
+            Expression.ForeignKey.PrimaryColumns.Add(column);
+            return this;
+        }
 
-		public ICreateForeignKeyCascadeSyntax PrimaryColumns(params string[] columns)
-		{
-			foreach(var column in columns)
-				Expression.ForeignKey.PrimaryColumns.Add(column);
-			return this;
-		}
+        public ICreateForeignKeyCascadeSyntax PrimaryColumns(params string[] columns)
+        {
+            foreach (var column in columns)
+                Expression.ForeignKey.PrimaryColumns.Add(column);
+            return this;
+        }
 
-		public ICreateForeignKeyCascadeSyntax OnDelete(Rule rule)
-		{
-			Expression.ForeignKey.OnDelete = rule;
-			return this;
-		}
+        public ICreateForeignKeyCascadeSyntax OnDelete(Rule rule)
+        {
+            Expression.ForeignKey.OnDelete = rule;
+            return this;
+        }
 
-		public ICreateForeignKeyCascadeSyntax OnUpdate(Rule rule)
-		{
-			Expression.ForeignKey.OnUpdate = rule;
-			return this;
-		}
+        public ICreateForeignKeyCascadeSyntax OnUpdate(Rule rule)
+        {
+            Expression.ForeignKey.OnUpdate = rule;
+            return this;
+        }
 
-		public void OnDeleteOrUpdate(Rule rule)
-		{
-			Expression.ForeignKey.OnDelete = rule;
-			Expression.ForeignKey.OnUpdate = rule;
-		}
+        public void OnDeleteOrUpdate(Rule rule)
+        {
+            Expression.ForeignKey.OnDelete = rule;
+            Expression.ForeignKey.OnUpdate = rule;
+        }
 
-		ICreateForeignKeyPrimaryColumnSyntax ICreateForeignKeyPrimaryColumnOrInSchemaSyntax.InSchema(string schemaName)
-		{
-			Expression.ForeignKey.PrimaryTableSchema = schemaName;
-			return this;
-		}
-	}
+        ICreateForeignKeyPrimaryColumnSyntax ICreateForeignKeyPrimaryColumnOrInSchemaSyntax.InSchema(string schemaName)
+        {
+            Expression.ForeignKey.PrimaryTableSchema = schemaName;
+            return this;
+        }
+    }
 }

@@ -1,21 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Linq;
 using NUnit.Framework;
 using NUnit.Should;
 using FluentMigrator.Expressions;
 using Moq;
 using FluentMigrator.Builders.Delete;
 
-namespace FluentMigrator.Tests.Unit.Builders.Delete {
+namespace FluentMigrator.Tests.Unit.Builders.Delete
+{
     [TestFixture]
-    public class DeleteDataExpressionTests {
+    public class DeleteDataExpressionTests
+    {
 
         [Test]
-        public void CallingIsNullAddsANullColumn() {
+        public void CallingIsNullAddsANullColumn()
+        {
             var expressionMock = new Mock<DeleteDataExpression>();
-            
+
 
             var builder = new DeleteDataExpressionBuilder(expressionMock.Object);
             builder.IsNull("TestColumn");
@@ -28,7 +28,8 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete {
         }
 
         [Test]
-        public void CallingRowAddAColumn() {
+        public void CallingRowAddAColumn()
+        {
             var expressionMock = new Mock<DeleteDataExpression>();
 
 
@@ -43,7 +44,8 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete {
         }
 
         [Test]
-        public void CallingRowTwiceAddTwoColumns() {
+        public void CallingRowTwiceAddTwoColumns()
+        {
             var expressionMock = new Mock<DeleteDataExpression>();
 
 
@@ -60,6 +62,6 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete {
             rowobject[0].Key.ShouldBe("TestColumn2");
             rowobject[0].Value.ShouldBe("TestValue2");
 
-        }        
+        }
     }
 }

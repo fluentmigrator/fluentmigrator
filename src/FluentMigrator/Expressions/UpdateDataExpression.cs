@@ -19,7 +19,6 @@
 using System;
 using System.Collections.Generic;
 using FluentMigrator.Infrastructure;
-using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {

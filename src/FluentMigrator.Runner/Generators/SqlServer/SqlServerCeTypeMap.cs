@@ -17,13 +17,11 @@
 //
 #endregion
 
-
+using System.Data;
+using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators
 {
-    using System.Data;
-    using FluentMigrator.Runner.Generators.Base;
-
     internal class SqlServerCeTypeMap : TypeMapBase
     {
         public const int AnsiStringCapacity = 8000;

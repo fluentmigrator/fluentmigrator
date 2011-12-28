@@ -23,18 +23,18 @@ using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
-	[TestFixture]
-	public class DeleteColumnExpressionBuilderTests
-	{
-		[Test]
-		public void CallingFromTableSetsTableName()
-		{
-			var expressionMock = new Mock<DeleteColumnExpression>();
-            
-			var builder = new DeleteColumnExpressionBuilder(expressionMock.Object);
-			builder.FromTable("Bacon");
+    [TestFixture]
+    public class DeleteColumnExpressionBuilderTests
+    {
+        [Test]
+        public void CallingFromTableSetsTableName()
+        {
+            var expressionMock = new Mock<DeleteColumnExpression>();
+
+            var builder = new DeleteColumnExpressionBuilder(expressionMock.Object);
+            builder.FromTable("Bacon");
 
             expressionMock.VerifySet(x => x.TableName = "Bacon");
-		}
-	}
+        }
+    }
 }

@@ -1,7 +1,4 @@
-﻿
-using FluentMigrator.Expressions;
-using FluentMigrator.Model;
-namespace FluentMigrator.Tests.Unit.Generators
+﻿namespace FluentMigrator.Tests.Unit.Generators
 {
     public abstract class BaseTableDropTests : GeneratorTestBase
     {
@@ -12,8 +9,5 @@ namespace FluentMigrator.Tests.Unit.Generators
         public abstract void CanDeleteIndex();
 
         public abstract void CanDeleteSchema();
-        
-        
-
     }
 }

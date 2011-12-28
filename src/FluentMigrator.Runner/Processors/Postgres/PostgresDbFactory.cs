@@ -1,9 +1,9 @@
+using System;
+using System.Data.Common;
+using System.Reflection;
+
 namespace FluentMigrator.Runner.Processors.Postgres
 {
-    using System;
-    using System.Data.Common;
-    using System.Reflection;
-
     public class PostgresDbFactory : ReflectionBasedDbFactory
     {
         public PostgresDbFactory()

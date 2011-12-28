@@ -22,36 +22,36 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
-	public class ExecuteSqlScriptExpression : MigrationExpressionBase
-	{
-		public string SqlScript { get; set; }
+    public class ExecuteSqlScriptExpression : MigrationExpressionBase
+    {
+        public string SqlScript { get; set; }
 
-		public override void ExecuteWith( IMigrationProcessor processor )
-		{
-			string sqlText;
-			using (var reader = File.OpenText(SqlScript))
-				sqlText = reader.ReadToEnd();
+        public override void ExecuteWith(IMigrationProcessor processor)
+        {
+            string sqlText;
+            using (var reader = File.OpenText(SqlScript))
+                sqlText = reader.ReadToEnd();
 
             // since all the Processors are using String.Format() in their Execute method
             //  we need to escape the brackets with double brackets or else it throws an incorrect format error on the String.Format call
             sqlText = sqlText.Replace("{", "{{").Replace("}", "}}");
-			processor.Execute(sqlText);
-		}
+            processor.Execute(sqlText);
+        }
 
-		public override void ApplyConventions(IMigrationConventions conventions)
-		{
-			SqlScript = string.Format(@"{0}\{1}", conventions.GetWorkingDirectory(), SqlScript);
-		}
+        public override void ApplyConventions(IMigrationConventions conventions)
+        {
+            SqlScript = string.Format(@"{0}\{1}", conventions.GetWorkingDirectory(), SqlScript);
+        }
 
-		public override void CollectValidationErrors( ICollection<string> errors )
-		{
-			if (string.IsNullOrEmpty(SqlScript))
-				errors.Add(ErrorMessages.SqlScriptCannotBeNullOrEmpty);
-		}
+        public override void CollectValidationErrors(ICollection<string> errors)
+        {
+            if (string.IsNullOrEmpty(SqlScript))
+                errors.Add(ErrorMessages.SqlScriptCannotBeNullOrEmpty);
+        }
 
-		public override string ToString()
-		{
-			return base.ToString() + SqlScript;
-		}
-	}
+        public override string ToString()
+        {
+            return base.ToString() + SqlScript;
+        }
+    }
 }

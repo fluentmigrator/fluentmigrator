@@ -18,7 +18,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             _generator = new SqlServer2000Generator();
         }
 
-        [Test] 
+        [Test]
         public override void CanCreateTable()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();

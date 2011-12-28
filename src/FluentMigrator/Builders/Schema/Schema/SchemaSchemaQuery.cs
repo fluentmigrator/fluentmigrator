@@ -21,25 +21,25 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Schema.Schema
 {
-	public class SchemaSchemaQuery : ISchemaSchemaSyntax
-	{
-		private readonly IMigrationContext _context;
-		private readonly string _schemaName;
+    public class SchemaSchemaQuery : ISchemaSchemaSyntax
+    {
+        private readonly IMigrationContext _context;
+        private readonly string _schemaName;
 
-		public SchemaSchemaQuery(IMigrationContext context, string schemaName)
-		{
-			_context = context;
-			_schemaName = schemaName;
-		}
+        public SchemaSchemaQuery(IMigrationContext context, string schemaName)
+        {
+            _context = context;
+            _schemaName = schemaName;
+        }
 
-		public bool Exists()
-		{
-			return _context.QuerySchema.SchemaExists(_schemaName);
-		}
+        public bool Exists()
+        {
+            return _context.QuerySchema.SchemaExists(_schemaName);
+        }
 
         public ISchemaTableSyntax Table(string tableName)
         {
             return new SchemaTableQuery(_context, _schemaName, tableName);
         }
-	}
+    }
 }

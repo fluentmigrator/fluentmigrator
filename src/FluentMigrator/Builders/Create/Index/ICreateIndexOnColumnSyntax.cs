@@ -18,9 +18,9 @@
 
 namespace FluentMigrator.Builders.Create.Index
 {
-	public interface ICreateIndexOnColumnSyntax
-	{
-		ICreateIndexColumnOptionsSyntax OnColumn(string columnName);
-		ICreateIndexOptionsSyntax WithOptions();
-	}
+    public interface ICreateIndexOnColumnSyntax
+    {
+        ICreateIndexColumnOptionsSyntax OnColumn(string columnName);
+        ICreateIndexOptionsSyntax WithOptions();
+    }
 }
