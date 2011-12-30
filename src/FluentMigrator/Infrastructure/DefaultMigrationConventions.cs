@@ -102,5 +102,25 @@ namespace FluentMigrator.Infrastructure
         {
             return Environment.CurrentDirectory;
         }
+
+        public static string GetConstraintName(ConstraintDefinition expression)
+        {
+            StringBuilder sb = new StringBuilder();
+            if (expression.IsPrimaryKeyConstraint)
+            {
+                sb.Append("PK_");
+            }
+            else
+            {
+                sb.Append("UC_");
+            }
+
+            sb.Append(expression.TableName);
+            foreach (var column in expression.Columns)
+            {
+                sb.Append("_" + column);
+            }
+            return sb.ToString();
+        }
     }
 }

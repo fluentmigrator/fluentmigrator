@@ -56,8 +56,10 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string DeleteData { get { return "DELETE FROM {0}.{1} WHERE {2}"; } }
         public override string IdentityInsert { get { return "SET IDENTITY_INSERT {0}.{1} {2}"; } }
 
-        public override string CreateConstraint { get { return "ALTER TABLE {0}.{1} ADD CONSTRAINT {2} FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8}"; } }
+        public override string CreateForeignKeyConstraint { get { return "ALTER TABLE {0}.{1} ADD CONSTRAINT {2} FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8}"; } }
         public override string DeleteConstraint { get { return "{0} DROP CONSTRAINT {1}"; } }
+
+        public override string CreateConstraint { get { return "{0} ADD CONSTRAINT {1} {2} ({3})"; } }
 
         public override string Generate(CreateTableExpression expression)
         {
@@ -189,7 +191,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 foreignColumns.Add(Quoter.QuoteColumnName(column));
             }
             return string.Format(
-                CreateConstraint,
+                CreateForeignKeyConstraint,
                 Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema),
                 Quoter.QuoteTableName(expression.ForeignKey.ForeignTable),
                 Quoter.QuoteColumnName(expression.ForeignKey.Name),
@@ -302,10 +304,15 @@ namespace FluentMigrator.Runner.Generators.SqlServer
               expression.ColumnName);
         }
 
+        public override string Generate(CreateConstraintExpression expression)
+        {
+            return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.Constraint.SchemaName), base.Generate(expression));
+        }
 
-
-
-
+        public override string Generate(DeleteConstraintExpression expression)
+        {
+            return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.Constraint.SchemaName), base.Generate(expression));
+        }
 
         public override string Generate(CreateSchemaExpression expression)
         {
