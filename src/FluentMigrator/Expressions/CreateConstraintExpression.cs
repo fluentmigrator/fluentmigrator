@@ -1,19 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-    
 
     public class CreateConstraintExpression : MigrationExpressionBase
     {
         public ConstraintDefinition Constraint { get; private set; }
-
-
-       
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:CreateConstraintExpression"/> class.
@@ -21,7 +14,6 @@ namespace FluentMigrator.Expressions
         public CreateConstraintExpression(ConstraintType type)
         {
             Constraint = new ConstraintDefinition(type);
-
         }
 
         public override void ExecuteWith(IMigrationProcessor processor)
@@ -41,7 +33,7 @@ namespace FluentMigrator.Expressions
 
         public override string ToString()
         {
-          
+
             return base.ToString() + Constraint.ConstraintName;
         }
     }
