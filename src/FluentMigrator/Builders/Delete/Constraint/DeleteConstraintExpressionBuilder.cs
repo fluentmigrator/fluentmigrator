@@ -2,7 +2,7 @@
 
 namespace FluentMigrator.Builders.Delete.Constraint
 {
-    public class DeleteConstraintExpressionBuilder : ExpressionBuilderBase<DeleteConstraintExpression>, IDeleteConstraintOnTableSyntax
+    public class DeleteConstraintExpressionBuilder : ExpressionBuilderBase<DeleteConstraintExpression>, IDeleteConstraintOnTableSyntax, IInSchemaSyntax
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="T:CreateConstraintExpressionBuilder"/> class.
@@ -12,9 +12,15 @@ namespace FluentMigrator.Builders.Delete.Constraint
         {
         }
 
-        public void FromTable(string tableName)
+        public IInSchemaSyntax FromTable(string tableName)
         {
             Expression.Constraint.TableName = tableName;
+            return this;
+        }
+
+        public void InSchema(string schemaName)
+        {
+            Expression.Constraint.SchemaName = schemaName;
         }
     }
 }

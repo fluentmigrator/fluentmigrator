@@ -3,7 +3,6 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-
     public class CreateConstraintExpression : MigrationExpressionBase
     {
         public ConstraintDefinition Constraint { get; private set; }

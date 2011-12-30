@@ -208,7 +208,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public void CanDropPrimaryKeyConstraint()
+        public void CanDropPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
             var result = generator.Generate(expression);
@@ -216,7 +216,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public void CanDropUniqueConstraint()
+        public void CanDropPrimaryKeyConstraintWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            var result = generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT [TESTPRIMARYKEY]");
+        }
+
+        [Test]
+        public void CanDropUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();
             var result = generator.Generate(expression);
@@ -224,7 +233,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public void CanCreatePrimaryKeyConstraint()
+        public void CanDropUniqueConstraintWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            var result = generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT [TESTUNIQUECONSTRAINT]");
+        }
+
+        [Test]
+        public void CanCreatePrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
             var result = generator.Generate(expression);
@@ -232,7 +250,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public void CanCreateNamedPrimaryKeyConstraint()
+        public void CanCreatePrimaryKeyConstraintWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            var result = generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1])");
+        }
+
+        [Test]
+        public void CanCreateNamedPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
             var result = generator.Generate(expression);
@@ -240,7 +267,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public void CanCreateMultiColmnPrimaryKeyConstraint()
+        public void CanCreateNamedPrimaryKeyConstraintWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            var result = generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY ([TestColumn1])");
+        }
+
+        [Test]
+        public void CanCreateMultiColumnPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnPrimaryKeyExpression();
             var result = generator.Generate(expression);
@@ -248,7 +284,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public void CanCreateMultiColmnNamedPrimaryKeyConstraint()
+        public void CanCreateMultiColumnPrimaryKeyConstraintWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnPrimaryKeyExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            var result = generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1_TestColumn2] PRIMARY KEY ([TestColumn1], [TestColumn2])");
+        }
+
+        [Test]
+        public void CanCreateMultiColumnNamedPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnNamedPrimaryKeyExpression();
             var result = generator.Generate(expression);
@@ -256,7 +301,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public void CanCreateUniqueConstraint()
+        public void CanCreateMultiColumnNamedPrimaryKeyConstraintWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnNamedPrimaryKeyExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            var result = generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY ([TestColumn1], [TestColumn2])");
+        }
+
+        [Test]
+        public void CanCreateUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
             var result = generator.Generate(expression);
@@ -264,7 +318,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public void CanCreateNamedUniqueConstraint()
+        public void CanCreateUniqueConstraintWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            var result = generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [UC_TestTable1_TestColumn1] UNIQUE ([TestColumn1])");
+        }
+
+        [Test]
+        public void CanCreateNamedUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
             var result = generator.Generate(expression);
@@ -272,7 +335,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public void CanCreateMultiColmnUniqueConstraint()
+        public void CanCreateNamedUniqueConstraintWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            var result = generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE ([TestColumn1])");
+        }
+
+        [Test]
+        public void CanCreateMultiColumnUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
             var result = generator.Generate(expression);
@@ -280,11 +352,29 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public void CanCreateMultiColmnNamedUniqueConstraint()
+        public void CanCreateMultiColumnUniqueConstraintWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            var result = generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [UC_TestTable1_TestColumn1_TestColumn2] UNIQUE ([TestColumn1], [TestColumn2])");
+        }
+
+        [Test]
+        public void CanCreateMultiColumnNamedUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnNamedUniqueConstraintExpression();
             var result = generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE ([TestColumn1], [TestColumn2])");
+        }
+
+        [Test]
+        public void CanCreateMultiColumnNamedUniqueConstraintWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnNamedUniqueConstraintExpression();
+            expression.Constraint.SchemaName = "TestSchema";
+            var result = generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE ([TestColumn1], [TestColumn2])");
         }
     }
 }

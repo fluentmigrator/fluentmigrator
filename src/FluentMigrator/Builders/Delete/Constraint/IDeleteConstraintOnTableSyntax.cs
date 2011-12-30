@@ -2,6 +2,6 @@
 {
     public interface IDeleteConstraintOnTableSyntax
     {
-        void FromTable(string tableName);
+        IInSchemaSyntax FromTable(string tableName);
     }
 }
