@@ -118,8 +118,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             sql.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD [TestColumn1] DECIMAL(19,2) NOT NULL");
         }
 
-
-
         [Test]
         public void CanRenameTableWithCustomSchema()
         {

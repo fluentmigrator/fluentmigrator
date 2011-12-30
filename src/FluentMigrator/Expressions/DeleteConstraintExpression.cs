@@ -1,14 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
     public class DeleteConstraintExpression : MigrationExpressionBase
     {
-
         public ConstraintDefinition Constraint { get; private set; }
 
         /// <summary>

@@ -95,7 +95,6 @@ namespace FluentMigrator.Runner.Generators.Generic
             return String.Format(DropColumn, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.ColumnName));
         }
 
-
         public override string Generate(RenameColumnExpression expression)
         {
             return String.Format(RenameColumn, expression.TableName, expression.OldName, expression.NewName);

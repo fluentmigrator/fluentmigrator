@@ -157,7 +157,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateMultiColmnUniqueConstraint()
+        public void CanCreateMultiColumnUniqueConstraint()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
             var result = generator.Generate(expression);
@@ -165,7 +165,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateMultiColmnNamedUniqueConstraint()
+        public void CanCreateMultiColumnNamedUniqueConstraint()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnNamedUniqueConstraintExpression();
             var result = generator.Generate(expression);

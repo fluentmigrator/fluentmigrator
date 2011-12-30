@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using System.Collections.Generic;
 using NUnit.Framework;
 using FluentMigrator.Expressions;
 using Moq;
@@ -13,9 +10,8 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
     [TestFixture]
     public class DeleteConstraintTest
     {
-
         [Test]
-        public void CallingDeletePrimaryKeyCreatesADeleteConstrantExpression()
+        public void CallingDeletePrimaryKeyCreatesADeleteConstraintExpression()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
 
@@ -25,8 +21,8 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             var root = new DeleteExpressionRoot(contextMock.Object);
             root.PrimaryKey("TestKey");
 
-            collectionMock.Verify(x => x.Add(It.Is<DeleteConstraintExpression> (e => e.Constraint.IsPrimaryKeyConstraint==true)));
-            collectionMock.Verify(x=>x.Add(It.Is<DeleteConstraintExpression>(e=>e.Constraint.ConstraintName == "TestKey")));
+            collectionMock.Verify(x => x.Add(It.Is<DeleteConstraintExpression>(e => e.Constraint.IsPrimaryKeyConstraint == true)));
+            collectionMock.Verify(x => x.Add(It.Is<DeleteConstraintExpression>(e => e.Constraint.ConstraintName == "TestKey")));
             contextMock.VerifyGet(x => x.Expressions);
         }
 

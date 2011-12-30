@@ -10,7 +10,6 @@ namespace FluentMigrator.Builders.Delete.Constraint
         public DeleteConstraintExpressionBuilder(DeleteConstraintExpression expression)
             : base(expression)
         {
-
         }
 
         public void FromTable(string tableName)

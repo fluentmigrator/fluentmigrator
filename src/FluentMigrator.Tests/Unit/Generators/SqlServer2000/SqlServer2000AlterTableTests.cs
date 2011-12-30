@@ -162,7 +162,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public void CanCreateMultiColmnPrimaryKeyConstraint()
+        public void CanCreateMultiColumnPrimaryKeyConstraint()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnPrimaryKeyExpression();
             var result = _generator.Generate(expression);
@@ -170,7 +170,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public void CanCreateMultiColmnNamedPrimaryKeyConstraint()
+        public void CanCreateMultiColumnNamedPrimaryKeyConstraint()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnNamedPrimaryKeyExpression();
             var result = _generator.Generate(expression);
@@ -194,7 +194,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public void CanCreateMultiColmnUniqueConstraint()
+        public void CanCreateMultiColumnUniqueConstraint()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
             var result = _generator.Generate(expression);
@@ -202,7 +202,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
-        public void CanCreateMultiColmnNamedUniqueConstraint()
+        public void CanCreateMultiColumnNamedUniqueConstraint()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnNamedUniqueConstraintExpression();
             var result = _generator.Generate(expression);

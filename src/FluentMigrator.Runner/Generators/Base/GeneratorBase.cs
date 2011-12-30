@@ -66,8 +66,6 @@ namespace FluentMigrator.Runner.Generators.Base
             return string.Empty;
         }
 
-
-
         protected IColumn Column
         {
             get { return _column; }

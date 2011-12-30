@@ -1,20 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using FluentMigrator.Expressions;
+﻿using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Builders.Create.Constraint
 {
-
-    public class CreateConstraintExpressionBuilder : ExpressionBuilderBase<CreateConstraintExpression>, ICreateConstraintOnTableSyntax, ICreateConstraintColumnsSyntax, ICreateConstraintWithSchemaOrColumnSyntax
+    public class CreateConstraintExpressionBuilder : ExpressionBuilderBase<CreateConstraintExpression>, ICreateConstraintOnTableSyntax, ICreateConstraintWithSchemaOrColumnSyntax
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="T:CreateConstraintExpressionBuilder"/> class.
         /// </summary>
-        public CreateConstraintExpressionBuilder(CreateConstraintExpression expression) : base(expression)
+        public CreateConstraintExpressionBuilder(CreateConstraintExpression expression)
+            : base(expression)
         {
-
         }
 
         public ICreateConstraintWithSchemaOrColumnSyntax OnTable(string tableName)
@@ -30,7 +25,8 @@ namespace FluentMigrator.Builders.Create.Constraint
 
         public void Columns(string[] columnNames)
         {
-            foreach(var columnName in columnNames){
+            foreach (var columnName in columnNames)
+            {
                 Expression.Constraint.Columns.Add(columnName);
             }
         }
