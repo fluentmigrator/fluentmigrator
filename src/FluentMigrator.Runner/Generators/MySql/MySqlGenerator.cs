@@ -29,8 +29,8 @@ namespace FluentMigrator.Runner.Generators.MySql
         }
 
         public override string AlterColumn { get { return "ALTER TABLE {0} MODIFY COLUMN {1}"; } }
-
-        public override string DeleteConstraint { get { return "ALTER TABLE {0} DROP FOREIGN KEY {1}"; } }
+        public override string DeleteConstraint { get { return "ALTER TABLE {0} DROP {1}{2}"; } }
+        //public override string DeleteConstraint { get { return "ALTER TABLE {0} DROP FOREIGN KEY {1}"; } }
 
         public override string CreateTable { get { return "CREATE TABLE {0} ({1}) ENGINE = INNODB"; } }
 
@@ -57,6 +57,20 @@ namespace FluentMigrator.Runner.Generators.MySql
         public override string Generate(DeleteSequenceExpression expression)
         {
             return compatabilityMode.HandleCompatabilty("Sequences is not supporteed for MySql");
+        }
+
+        public override string Generate(DeleteConstraintExpression expression)
+        {
+            if (expression.Constraint.IsPrimaryKeyConstraint)
+            {
+                return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName), "PRIMARY KEY", "");
+            }
+            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName), "INDEX ", Quoter.Quote(expression.Constraint.ConstraintName));
+        }
+
+        public override string Generate(DeleteForeignKeyExpression expression)
+        {
+            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.ForeignKey.ForeignTable), "FOREIGN KEY ", Quoter.QuoteColumnName(expression.ForeignKey.Name));
         }
     }
 }

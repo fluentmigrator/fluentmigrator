@@ -40,9 +40,9 @@ namespace FluentMigrator.Runner.Generators.Generic
         public virtual string UpdateData { get { return "UPDATE {0} SET {1} WHERE {2}"; } }
         public virtual string DeleteData { get { return "DELETE FROM {0} WHERE {1}"; } }
 
-        public virtual string CreateConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}"; } }
+        public virtual string CreateConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})"; } }
         public virtual string DeleteConstraint { get { return "ALTER TABLE {0} DROP CONSTRAINT {1}"; } }
-
+        public virtual string CreateForeignKeyConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}"; } }
 
         public virtual string GetUniqueString(CreateIndexExpression column)
         {
@@ -94,7 +94,6 @@ namespace FluentMigrator.Runner.Generators.Generic
         {
             return String.Format(DropColumn, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.ColumnName));
         }
-
 
         public override string Generate(RenameColumnExpression expression)
         {
@@ -157,7 +156,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                 foreignColumns.Add(Quoter.QuoteColumnName(column));
             }
             return string.Format(
-                CreateConstraint,
+                CreateForeignKeyConstraint,
                 Quoter.QuoteTableName(expression.ForeignKey.ForeignTable),
                 Quoter.QuoteColumnName(keyName),
                 String.Join(", ", foreignColumns.ToArray()),
@@ -166,6 +165,29 @@ namespace FluentMigrator.Runner.Generators.Generic
                 FormatCascade("DELETE", expression.ForeignKey.OnDelete),
                 FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)
                 );
+        }
+
+        public override string Generate(CreateConstraintExpression expression)
+        {
+
+            var constraintType = (expression.Constraint.IsPrimaryKeyConstraint) ? "PRIMARY KEY" : "UNIQUE";
+
+            string[] columns = new string[expression.Constraint.Columns.Count];
+
+            for (int i = 0; i < expression.Constraint.Columns.Count; i++)
+            {
+                columns[i] = Quoter.QuoteColumnName(expression.Constraint.Columns.ElementAt(i));
+            }
+
+            return string.Format(CreateConstraint, Quoter.QuoteTableName(expression.Constraint.TableName),
+                Quoter.Quote(expression.Constraint.ConstraintName),
+                constraintType,
+                String.Join(", ", columns));
+        }
+
+        public override string Generate(DeleteConstraintExpression expression)
+        {
+            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName), Quoter.Quote(expression.Constraint.ConstraintName));
         }
 
         public virtual string GenerateForeignKeyName(CreateForeignKeyExpression expression)

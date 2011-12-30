@@ -32,6 +32,7 @@ namespace FluentMigrator
         public Func<Type, bool> TypeIsVersionTableMetaData { get; set; }
         public Func<Type, MigrationMetadata> GetMetadataForMigration { get; set; }
         public Func<string> GetWorkingDirectory { get; set; }
+        public Func<Model.ConstraintDefinition, string> GetConstraintName { get; set; }
 
         public MigrationConventions()
         {
@@ -43,6 +44,7 @@ namespace FluentMigrator
             TypeIsVersionTableMetaData = DefaultMigrationConventions.TypeIsVersionTableMetaData;
             GetMetadataForMigration = DefaultMigrationConventions.GetMetadataForMigration;
             GetWorkingDirectory = DefaultMigrationConventions.GetWorkingDirectory;
+            GetConstraintName = DefaultMigrationConventions.GetConstraintName;
         }
     }
 }

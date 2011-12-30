@@ -20,6 +20,7 @@ using FluentMigrator.Builders.Delete.Column;
 using FluentMigrator.Builders.Delete.ForeignKey;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Builders.Delete.Index;
+using FluentMigrator.Builders.Delete.Constraint;
 
 namespace FluentMigrator.Builders.Delete
 {
@@ -31,6 +32,7 @@ namespace FluentMigrator.Builders.Delete
         IDeleteForeignKeyFromTableSyntax ForeignKey();
         IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName);
         IDeleteDataOrInSchemaSyntax FromTable(string tableName);
+
         /// <summary>
         /// Deletes an index
         /// </summary>
@@ -44,5 +46,19 @@ namespace FluentMigrator.Builders.Delete
         IDeleteIndexForTableSyntax Index();
 
         IInSchemaSyntax Sequence(string sequenceName);
+
+        /// <summary>
+        /// Deletes a named Primary Key from a table
+        /// </summary>
+        /// <param name="primaryKeyName"></param>
+        /// <returns></returns>
+        IDeleteConstraintOnTableSyntax PrimaryKey(string primaryKeyName);
+
+        /// <summary>
+        /// Deletes a named Unique Constraint From a table
+        /// </summary>
+        /// <param name="constraintName"></param>
+        /// <returns></returns>
+        IDeleteConstraintOnTableSyntax UniqueConstraint(string constraintName);
     }
 }

@@ -128,5 +128,85 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             _generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new CreateSchemaExpression()));
         }
+
+        [Test]
+        public void CanDropPrimaryKeyConstraint()
+        {
+            var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
+            var result = _generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] DROP CONSTRAINT [TESTPRIMARYKEY]");
+        }
+
+        [Test]
+        public void CanDropUniqueConstraint()
+        {
+            var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();
+            var result = _generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] DROP CONSTRAINT [TESTUNIQUECONSTRAINT]");
+        }
+
+        [Test]
+        public void CanCreatePrimaryKeyConstraint()
+        {
+            var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
+            var result = _generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1])");
+        }
+
+        [Test]
+        public void CanCreateNamedPrimaryKeyConstraint()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
+            var result = _generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY ([TestColumn1])");
+        }
+
+        [Test]
+        public void CanCreateMultiColumnPrimaryKeyConstraint()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnPrimaryKeyExpression();
+            var result = _generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1_TestColumn2] PRIMARY KEY ([TestColumn1], [TestColumn2])");
+        }
+
+        [Test]
+        public void CanCreateMultiColumnNamedPrimaryKeyConstraint()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnNamedPrimaryKeyExpression();
+            var result = _generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY ([TestColumn1], [TestColumn2])");
+        }
+
+        [Test]
+        public void CanCreateUniqueConstraint()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
+            var result = _generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD CONSTRAINT [UC_TestTable1_TestColumn1] UNIQUE ([TestColumn1])");
+        }
+
+        [Test]
+        public void CanCreateNamedUniqueConstraint()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
+            var result = _generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE ([TestColumn1])");
+        }
+
+        [Test]
+        public void CanCreateMultiColumnUniqueConstraint()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
+            var result = _generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD CONSTRAINT [UC_TestTable1_TestColumn1_TestColumn2] UNIQUE ([TestColumn1], [TestColumn2])");
+        }
+
+        [Test]
+        public void CanCreateMultiColumnNamedUniqueConstraint()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnNamedUniqueConstraintExpression();
+            var result = _generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE ([TestColumn1], [TestColumn2])");
+        }
     }
 }

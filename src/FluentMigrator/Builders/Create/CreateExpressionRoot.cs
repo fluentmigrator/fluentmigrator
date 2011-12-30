@@ -17,12 +17,14 @@
 #endregion
 
 using FluentMigrator.Builders.Create.Column;
+using FluentMigrator.Builders.Create.Constraint;
 using FluentMigrator.Builders.Create.ForeignKey;
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Builders.Create.Sequence;
 using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Create
 {
@@ -88,6 +90,36 @@ namespace FluentMigrator.Builders.Create
             var expression = new CreateSequenceExpression { Sequence = { Name = sequenceName } };
             _context.Expressions.Add(expression);
             return new CreateSequenceExpressionBuilder(expression);
+        }
+
+        public ICreateConstraintOnTableSyntax UniqueConstraint()
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.Unique);
+            _context.Expressions.Add(expression);
+            return new CreateConstraintExpressionBuilder(expression);
+        }
+
+        public Constraint.ICreateConstraintOnTableSyntax UniqueConstraint(string constraintName)
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.Unique);
+            expression.Constraint.ConstraintName = constraintName;
+            _context.Expressions.Add(expression);
+            return new CreateConstraintExpressionBuilder(expression);
+        }
+
+        public Constraint.ICreateConstraintOnTableSyntax PrimaryKey()
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
+            _context.Expressions.Add(expression);
+            return new CreateConstraintExpressionBuilder(expression);
+        }
+
+        public Constraint.ICreateConstraintOnTableSyntax PrimaryKey(string primaryKeyName)
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
+            expression.Constraint.ConstraintName = primaryKeyName;
+            _context.Expressions.Add(expression);
+            return new CreateConstraintExpressionBuilder(expression);
         }
     }
 }

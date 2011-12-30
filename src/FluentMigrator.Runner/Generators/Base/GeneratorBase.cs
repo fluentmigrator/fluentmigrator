@@ -51,6 +51,8 @@ namespace FluentMigrator.Runner.Generators.Base
         public abstract string Generate(AlterSchemaExpression expression);
         public abstract string Generate(CreateSequenceExpression expression);
         public abstract string Generate(DeleteSequenceExpression expression);
+        public abstract string Generate(CreateConstraintExpression expression);
+        public abstract string Generate(DeleteConstraintExpression expression);
 
         public virtual bool IsAdditionalFeatureSupported(string feature)
         {
@@ -64,8 +66,6 @@ namespace FluentMigrator.Runner.Generators.Base
             return string.Empty;
         }
 
-
-
         protected IColumn Column
         {
             get { return _column; }
@@ -75,10 +75,5 @@ namespace FluentMigrator.Runner.Generators.Base
         {
             get { return _quoter; }
         }
-
-
-
     }
-
-
 }
