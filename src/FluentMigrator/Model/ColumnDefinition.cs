@@ -44,6 +44,7 @@ namespace FluentMigrator.Model
         public virtual bool IsNullable { get; set; }
         public virtual bool IsUnique { get; set; }
         public virtual string TableName { get; set; }
+        public virtual ColumnModificationType ModificationType { get; set; }
 
         public void ApplyConventions(IMigrationConventions conventions)
         {
@@ -68,5 +69,10 @@ namespace FluentMigrator.Model
         public class UndefinedDefaultValue
         {
         }
+    }
+
+    public enum ColumnModificationType {
+        Create,
+        Alter
     }
 }

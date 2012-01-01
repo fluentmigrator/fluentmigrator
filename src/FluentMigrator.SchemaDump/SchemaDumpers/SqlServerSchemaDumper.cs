@@ -17,8 +17,8 @@
 //
 #endregion
 
-using System.Data;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Model;
@@ -157,7 +157,8 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
                         PrimaryKeyName = dr.IsNull("PrimaryKeyName") ? "" : dr["PrimaryKeyName"].ToString(),
                         Size = int.Parse(dr["Length"].ToString()),
                         TableName = dr["Table"].ToString(),
-                        Type = GetDbType(int.Parse(dr["TypeID"].ToString())) //TODO: set this property
+                        Type = GetDbType(int.Parse(dr["TypeID"].ToString())), //TODO: set this property
+												ModificationType = ColumnModificationType.Create
                     });
                 }
             }

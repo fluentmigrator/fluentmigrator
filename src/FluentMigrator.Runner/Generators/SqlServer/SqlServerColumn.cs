@@ -17,7 +17,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             var defaultValue = base.FormatDefaultValue(column);
 
-            if (!string.IsNullOrEmpty(defaultValue))
+            if (column.ModificationType == ColumnModificationType.Create && !string.IsNullOrEmpty(defaultValue))
                 return string.Format("CONSTRAINT DF_{0}_{1} ", column.TableName, column.Name) + defaultValue;
 
             return string.Empty;

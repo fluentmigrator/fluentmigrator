@@ -16,12 +16,11 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
-using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
-using System;
 
 namespace FluentMigrator.Builders.Create.Table
 {
@@ -47,7 +46,7 @@ namespace FluentMigrator.Builders.Create.Table
 
         public ICreateTableColumnAsTypeSyntax WithColumn(string name)
         {
-            var column = new ColumnDefinition { Name = name, TableName = Expression.TableName };
+            var column = new ColumnDefinition { Name = name, TableName = Expression.TableName, ModificationType = ColumnModificationType.Create };
             Expression.Columns.Add(column);
             CurrentColumn = column;
             return this;

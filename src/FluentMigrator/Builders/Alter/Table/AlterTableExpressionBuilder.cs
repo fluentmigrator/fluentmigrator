@@ -16,11 +16,11 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
-using System;
 
 namespace FluentMigrator.Builders.Alter.Table
 {
@@ -58,7 +58,7 @@ namespace FluentMigrator.Builders.Alter.Table
 
         public IAlterTableColumnAsTypeSyntax AddColumn(string name)
         {
-            var column = new ColumnDefinition { Name = name };
+            var column = new ColumnDefinition { Name = name, ModificationType = ColumnModificationType.Create };
             var createColumn = new CreateColumnExpression
                                    {
                                        Column = column,
@@ -74,7 +74,7 @@ namespace FluentMigrator.Builders.Alter.Table
 
         public IAlterTableColumnAsTypeSyntax AlterColumn(string name)
         {
-            var column = new ColumnDefinition { Name = name };
+            var column = new ColumnDefinition { Name = name, ModificationType = ColumnModificationType.Alter };
             var alterColumn = new AlterColumnExpression
             {
                 Column = column,
@@ -90,6 +90,19 @@ namespace FluentMigrator.Builders.Alter.Table
 
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithDefaultValue(object value)
         {
+            if (CurrentColumn.ModificationType == ColumnModificationType.Alter) {
+                // TODO: This is code duplication from the AlterColumnExpressionBuilder
+                // we need to do a drop constraint and then add constraint to change the defualt value
+                var dc = new AlterDefaultConstraintExpression {
+                    TableName = Expression.TableName,
+                    SchemaName = Expression.SchemaName,
+                    ColumnName = CurrentColumn.Name,
+                    DefaultValue = value
+                };
+
+                _context.Expressions.Add(dc);
+            }		
+
             CurrentColumn.DefaultValue = value;
             return this;
         }

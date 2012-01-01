@@ -31,7 +31,7 @@ namespace FluentMigrator.Expressions
 
         public AlterColumnExpression()
         {
-            Column = new ColumnDefinition();
+            Column = new ColumnDefinition() { ModificationType = ColumnModificationType.Alter };
         }
 
         public override void CollectValidationErrors(ICollection<string> errors)
