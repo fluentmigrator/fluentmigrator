@@ -27,7 +27,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE [TestTable1] ADD COLUMN [TestColumn1] VARCHAR(5) NOT NULL");
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD COLUMN [TestColumn1] VARCHAR(5)");
         }
 
         [Test]
@@ -37,7 +37,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
 
             var result = _generator.Generate(expression);
 
-            result.ShouldBe("ALTER TABLE [TestTable1] ADD COLUMN [TestColumn1] DECIMAL(19,2) NOT NULL");
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD COLUMN [TestColumn1] DECIMAL(19,2)");
         }
 
         [Test]
@@ -109,7 +109,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
 
             var sql = _generator.Generate(expression);
 
-            sql.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] COUNTER NOT NULL");
+            sql.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] COUNTER");
         }
 
         [Test]

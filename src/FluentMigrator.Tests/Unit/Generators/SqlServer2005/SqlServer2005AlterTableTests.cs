@@ -23,7 +23,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
             var sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL");
+            sql.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5)");
         }
 
         [Test]
@@ -31,7 +31,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
             var sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] DECIMAL(19,2) NOT NULL");
+            sql.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] DECIMAL(19,2)");
         }
 
         [Test]
@@ -92,7 +92,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             expression.Column.Type = DbType.Xml;
 
             var sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] XML NOT NULL");
+            sql.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] XML");
         }
 
         public void CanCreateAutoIncrementColumnWithDefaultSchema()
@@ -106,7 +106,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
             expression.SchemaName = "TestSchema";
             var sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL");
+            sql.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD [TestColumn1] NVARCHAR(5)");
         }
 
         [Test]
@@ -115,7 +115,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
             expression.SchemaName = "TestSchema";
             var sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD [TestColumn1] DECIMAL(19,2) NOT NULL");
+            sql.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD [TestColumn1] DECIMAL(19,2)");
         }
 
         [Test]
@@ -184,7 +184,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             expression.SchemaName = "TestSchema";
 
             var sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD [TestColumn1] XML NOT NULL");
+            sql.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD [TestColumn1] XML");
         }
 
         public void CanCreateAutoIncrementColumnWithCustomSchema()

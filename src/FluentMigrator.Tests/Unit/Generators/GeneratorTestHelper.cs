@@ -73,11 +73,11 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         }
 
-        public static CreateTableExpression GetCreateTableWithNullableColumn()
+        public static CreateTableExpression GetCreateTableWithNonNullableColumn()
         {
             var expression = new CreateTableExpression { TableName = TestTableName1 };
-            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, IsNullable = true, Type = DbType.String });
-            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, Type = DbType.Int32 });
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, Type = DbType.String });
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, IsNullable = false, Type = DbType.Int32 });
             return expression;
         }
 

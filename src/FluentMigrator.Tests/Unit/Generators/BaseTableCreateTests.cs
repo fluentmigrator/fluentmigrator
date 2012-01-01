@@ -11,7 +11,7 @@
         public abstract void CanCreateTableNamedMultiColumnPrimaryKey();
 
         public abstract void CanCreateTableWithIdentity();
-        public abstract void CanCreateTableWithNullableField();
+        public abstract void CanCreateTableWithNonNullableField();
         public abstract void CanCreateTableWithDefaultValue();
         public abstract void CanCreateTableWithDefaultValueExplicitlySetToNull();
         public abstract void CanCreateTableWithMultiColumnPrimaryKey();

@@ -23,7 +23,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
 
             var result = _generator.Generate(expression);
 
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL, [TestColumn2] INTEGER NOT NULL)");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255), [TestColumn2] INTEGER)");
         }
 
         [Test]
@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
 
             var restul = _generator.Generate(expression);
 
-            restul.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL, [TestColumn2] [timestamp] NOT NULL)");
+            restul.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255), [TestColumn2] [timestamp])");
         }
 
         [Test]
@@ -46,7 +46,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             var result = _generator.Generate(expression);
 
             result.ShouldBe(
-                "CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL, [TestColumn2] INTEGER NOT NULL, PRIMARY KEY ([TestColumn1]))");
+                "CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255), [TestColumn2] INTEGER, PRIMARY KEY ([TestColumn1]))");
         }
 
         [Test]
@@ -54,7 +54,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
             var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL, [TestColumn2] INTEGER NOT NULL, PRIMARY KEY ([TestColumn1], [TestColumn2]))");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255), [TestColumn2] INTEGER, PRIMARY KEY ([TestColumn1], [TestColumn2]))");
         }
 
         [Test]
@@ -62,7 +62,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
             string sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL, [TestColumn2] INTEGER NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1]))");
+            sql.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255), [TestColumn2] INTEGER, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1]))");
         }
 
         [Test]
@@ -70,7 +70,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumNamedPrimaryKeyExpression();
             string sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL, [TestColumn2] INTEGER NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1], [TestColumn2]))");
+            sql.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255), [TestColumn2] INTEGER, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1], [TestColumn2]))");
         }
 
         [Test]
@@ -80,13 +80,13 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             var result = _generator.Generate(expression);
 
             result.ShouldBe(
-                "CREATE TABLE [TestTable1] ([TestColumn1] COUNTER NOT NULL, [TestColumn2] INTEGER NOT NULL)");
+                "CREATE TABLE [TestTable1] ([TestColumn1] COUNTER, [TestColumn2] INTEGER)");
         }
 
         [Test]
-        public override void CanCreateTableWithNullableField()
+        public override void CanCreateTableWithNonNullableField()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
+            var expression = GeneratorTestHelper.GetCreateTableWithNonNullableColumn();
 
             var result = _generator.Generate(expression);
 
@@ -102,7 +102,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             var result = _generator.Generate(expression);
 
             result.ShouldBe(
-                "CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL DEFAULT 'Default', [TestColumn2] INTEGER NOT NULL DEFAULT 0)");
+                "CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) DEFAULT 'Default', [TestColumn2] INTEGER DEFAULT 0)");
         }
 
         [Test]
@@ -114,7 +114,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             var result = _generator.Generate(expression);
 
             result.ShouldBe(
-                "CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) NOT NULL DEFAULT NULL, [TestColumn2] INTEGER NOT NULL DEFAULT 0)");
+                "CREATE TABLE [TestTable1] ([TestColumn1] VARCHAR(255) DEFAULT NULL, [TestColumn2] INTEGER DEFAULT 0)");
         }
 
         [Test]
