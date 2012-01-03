@@ -19,10 +19,10 @@
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using FluentMigrator.Expressions;
     using FluentMigrator.Model;
-    using System.Linq;
-    using System.Collections.Generic;
 
     public class SqlServer2005Generator : SqlServer2000Generator
     {
@@ -291,15 +291,15 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             EXEC sp_executesql @sql;
 
             -- create alter table command to create new default constraint as string and run it
-            SET @sql = N'ALTER TABLE {3}.{0} WITH NOCHECK ADD CONSTRAINT [' + @default + '] DEFAULT({2}) FOR {1}';
-            EXEC sp_executesql @sql;";
+            ALTER TABLE {3}.{0} WITH NOCHECK ADD CONSTRAINT {5} DEFAULT({2}) FOR {1};";
 
             return String.Format(sql,
-              Quoter.QuoteTableName(expression.TableName),
-              Quoter.QuoteColumnName(expression.ColumnName),
-              Quoter.QuoteValue(expression.DefaultValue),
-              Quoter.QuoteSchemaName(expression.SchemaName),
-              expression.ColumnName);
+                Quoter.QuoteTableName(expression.TableName),
+                Quoter.QuoteColumnName(expression.ColumnName),
+                Quoter.QuoteValue(expression.DefaultValue),
+                Quoter.QuoteSchemaName(expression.SchemaName),
+                expression.ColumnName,
+                SqlServerColumn.GetDefaultConstraintName(expression.TableName, expression.ColumnName));
         }
 
         public override string Generate(CreateConstraintExpression expression)
