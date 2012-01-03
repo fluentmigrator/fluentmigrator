@@ -78,6 +78,17 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
+        public void CanAlterColumnWithDefaultValue() {
+            //TODO: This will fail if there are any keys attached 
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
+            expression.Column.DefaultValue = "Foo";
+
+            var sql = _generator.Generate(expression);
+
+            sql.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL");
+        }
+
+        [Test]
         public override void CanCreateForeignKey()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();

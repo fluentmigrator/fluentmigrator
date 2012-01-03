@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
-using System.Data;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {
@@ -256,6 +256,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             expression.Column.Type = DbType.String;
             expression.Column.Size = 20;
             expression.Column.IsNullable = false;
+            expression.Column.ModificationType = ColumnModificationType.Alter;
 
             return expression;
         }

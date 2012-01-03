@@ -31,7 +31,7 @@ namespace FluentMigrator.Expressions
 
         public CreateColumnExpression()
         {
-            Column = new ColumnDefinition();
+            Column = new ColumnDefinition { ModificationType = ColumnModificationType.Create};
         }
 
         public override void ApplyConventions(IMigrationConventions conventions)
