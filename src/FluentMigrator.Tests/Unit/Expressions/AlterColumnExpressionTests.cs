@@ -20,6 +20,7 @@ using System;
 using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Model;
 using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
 using NUnit.Should;
@@ -29,6 +30,13 @@ namespace FluentMigrator.Tests.Unit.Expressions
     [TestFixture]
     public class AlterColumnExpressionTests
     {
+        [Test]
+        public void ModificationTypeShouldBeSetToAlter()
+        {
+            var expression = new CreateColumnExpression();
+            Assert.AreEqual(ColumnModificationType.Create, expression.Column.ModificationType);
+        }
+
         [Test]
         public void ErrorIsReturnedWhenOldNameIsNull()
         {
