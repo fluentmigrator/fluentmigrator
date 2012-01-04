@@ -199,6 +199,7 @@
     <Compile Include="Builders\Insert\InsertExpressionRoot.cs" />
     <Compile Include="Expressions\UpdateDataExpression.cs" />
     <Compile Include="ForwardOnlyMigration.cs" />
+    <Compile Include="MigrationBase.cs" />
     <Compile Include="Model\ConstraintDefinition.cs" />
     <Compile Include="Model\DeletionDataDefinition.cs" />
     <Compile Include="Model\InsertionDataDefinition.cs" />
