@@ -112,10 +112,13 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             EXEC sp_executesql @sql;
 
             -- create alter table command to create new default constraint as string and run it
-            SET @sql = N'ALTER TABLE {0} WITH NOCHECK ADD CONSTRAINT [' + @default + '] DEFAULT({2}) FOR {1}';
-            EXEC sp_executesql @sql;";
+            ALTER TABLE {0} WITH NOCHECK ADD CONSTRAINT {3} DEFAULT({2}) FOR {1};";
 
-            return String.Format(sql, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.ColumnName), Quoter.QuoteValue(expression.DefaultValue));
+            return String.Format(sql,
+                Quoter.QuoteTableName(expression.TableName),
+                Quoter.QuoteColumnName(expression.ColumnName),
+                Quoter.QuoteValue(expression.DefaultValue),
+                SqlServerColumn.GetDefaultConstraintName(expression.TableName, expression.ColumnName));
         }
 
         public override string Generate(InsertDataExpression expression)
