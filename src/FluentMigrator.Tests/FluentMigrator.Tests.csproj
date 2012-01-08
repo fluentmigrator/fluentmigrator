@@ -196,6 +196,7 @@
     <Compile Include="Unit\Definitions\IndexDefinitionTests.cs" />
     <Compile Include="Unit\Expressions\DeleteDefaultConstraintExpressionTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000GeneratorTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005GeneratorTests.cs" />
     <Compile Include="Unit\Initialization\ConnectionStringManagerTests.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -303,7 +304,6 @@
     <None Include="testscript.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Unit\Generators\SqlServer2005\SqlServer2005AlterTableTests.cs.orig" />
     <None Include="Unit\Initialization\Fixtures\FromMachineConfig.config" />
     <None Include="Unit\Initialization\Fixtures\WithConnectionString.config" />
     <None Include="Unit\Initialization\Fixtures\WithConnectionString.exe.config" />
