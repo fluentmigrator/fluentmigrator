@@ -23,5 +23,4 @@ src/*.vs10x
 *.vs10x
 src/FluentMigrator.Tests/FluentMigrator.VisualState.xml
 examplecommand.txt
-fluentmigrator.vssettings
-*.dotsettings
+*.dotsettings.user
