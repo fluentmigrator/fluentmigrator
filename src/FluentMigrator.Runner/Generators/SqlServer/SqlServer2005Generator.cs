@@ -307,6 +307,27 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.Constraint.SchemaName), base.Generate(expression));
         }
 
+        public override string Generate(DeleteDefaultConstraintExpression expression)
+        {
+            const string sql =
+                "DECLARE @default sysname, @sql nvarchar(max);\r\n\r\n" +
+                "-- get name of default constraint\r\n" +
+                "SELECT @default = name\r\n" +
+                "FROM sys.default_constraints\r\n" +
+                "WHERE parent_object_id = object_id('{2}.{0}')\r\n" + "" +
+                "AND type = 'D'\r\n" + "" +
+                "AND parent_column_id = (\r\n" + "" +
+                "SELECT column_id\r\n" +
+                "FROM sys.columns\r\n" +
+                "WHERE object_id = object_id('{2}.{0}')\r\n" +
+                "AND name = '{1}'\r\n" +
+                ");\r\n\r\n" +
+                "-- create alter table command to drop contraint as string and run it\r\n" +
+                "SET @sql = N'ALTER TABLE {2}.{0} DROP CONSTRAINT ' + @default;\r\n" +
+                "EXEC sp_executesql @sql;";
+            return String.Format(sql, Quoter.QuoteTableName(expression.TableName), expression.ColumnName, Quoter.QuoteSchemaName(expression.SchemaName));
+        }
+
         public override string Generate(DeleteConstraintExpression expression)
         {
             return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.Constraint.SchemaName), base.Generate(expression));

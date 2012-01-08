@@ -149,6 +149,7 @@
     <Compile Include="Unit\Builders\Create\CreateSequenceExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Delete\DeleteConstriantTest.cs" />
     <Compile Include="Unit\Builders\Delete\DeleteDataExpressionTests.cs" />
+    <Compile Include="Unit\Builders\Delete\DeleteDefaultConstraintExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Delete\DeleteSequenceExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\IfDatabase\IfDatabaseExpressionRootTests.cs" />
     <Compile Include="Integration\Migrations\Nested\Group1\AnotherFromGroup1.cs" />
@@ -193,6 +194,8 @@
     <Compile Include="Unit\Builders\Create\CreateColumnExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Schema\SchemaExpressionRootTest.cs" />
     <Compile Include="Unit\Definitions\IndexDefinitionTests.cs" />
+    <Compile Include="Unit\Expressions\DeleteDefaultConstraintExpressionTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000GeneratorTests.cs" />
     <Compile Include="Unit\Initialization\ConnectionStringManagerTests.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -300,6 +303,7 @@
     <None Include="testscript.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Unit\Generators\SqlServer2005\SqlServer2005AlterTableTests.cs.orig" />
     <None Include="Unit\Initialization\Fixtures\FromMachineConfig.config" />
     <None Include="Unit\Initialization\Fixtures\WithConnectionString.config" />
     <None Include="Unit\Initialization\Fixtures\WithConnectionString.exe.config" />

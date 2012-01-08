@@ -267,6 +267,25 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [Test]
+        public void CallingWithDefaultSetsDefaultValue()
+        {
+            var columnMock = new Mock<ColumnDefinition>();
+
+            var expressionMock = new Mock<CreateColumnExpression>();
+            expressionMock.SetupProperty(e => e.Column);
+
+            var expression = expressionMock.Object;
+            expression.Column = columnMock.Object;
+
+            var contextMock = new Mock<IMigrationContext>();
+
+            var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
+            builder.WithDefault(SystemMethods.NewGuid);
+
+            columnMock.VerifySet(c => c.DefaultValue = SystemMethods.NewGuid);
+        }
+
+        [Test]
         public void CallingForeignKeySetsIsForeignKeyToTrue()
         {
             VerifyColumnProperty(c => c.IsForeignKey = true, b => b.ForeignKey());

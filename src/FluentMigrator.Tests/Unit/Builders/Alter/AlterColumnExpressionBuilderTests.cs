@@ -555,5 +555,29 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             collectionMock.Verify(x => x.Add(It.Is<AlterDefaultConstraintExpression>(e => e.DefaultValue.Equals(value))));
             contextMock.VerifyGet(x => x.Expressions);
         }
+
+        [Test]
+        public void CallingWithDefaultAddsAlterDefaultConstraintExpression()
+        {
+            var columnMock = new Mock<ColumnDefinition>();
+
+            var expressionMock = new Mock<AlterColumnExpression>();
+            expressionMock.SetupProperty(e => e.Column);
+
+            var expression = expressionMock.Object;
+            expression.Column = columnMock.Object;
+
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+
+            var builder = new AlterColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
+            builder.WithDefault(SystemMethods.NewGuid);
+
+            columnMock.VerifySet(c => c.DefaultValue = SystemMethods.NewGuid);
+            collectionMock.Verify(x => x.Add(It.Is<AlterDefaultConstraintExpression>(e => e.DefaultValue.Equals(SystemMethods.NewGuid))));
+            contextMock.VerifyGet(x => x.Expressions);
+        }
     }
 }

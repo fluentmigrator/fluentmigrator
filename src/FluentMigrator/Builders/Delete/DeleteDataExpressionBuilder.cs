@@ -35,9 +35,9 @@ namespace FluentMigrator.Builders.Delete
         public void IsNull(string columnName)
         {
             _expression.Rows.Add(new DeletionDataDefinition
-									{
-										new KeyValuePair<string, object>(columnName, null)
-									});
+                                    {
+                                        new KeyValuePair<string, object>(columnName, null)
+                                    });
         }
 
         public IDeleteDataSyntax Row(object dataAsAnonymousType)

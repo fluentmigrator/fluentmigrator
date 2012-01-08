@@ -152,6 +152,10 @@
     <Compile Include="Builders\Create\Table\ICreateTableWithColumnOrSchemaSyntax.cs" />
     <Compile Include="Builders\Delete\Constraint\DeleteConstraintExpressionBuilder.cs" />
     <Compile Include="Builders\Delete\Constraint\IDeleteConstraintOnTableSyntax.cs" />
+    <Compile Include="Builders\Delete\DefaultConstraint\DeleteDefaultConstraintExpressionBuilder.cs" />
+    <Compile Include="Builders\Delete\DefaultConstraint\IDeleteDefaultConstraintOnColumnOrInSchemaSyntax.cs" />
+    <Compile Include="Builders\Delete\DefaultConstraint\IDeleteDefaultConstraintOnColumnSyntax.cs" />
+    <Compile Include="Builders\Delete\DefaultConstraint\IDeleteDefaultConstraintOnTableSyntax.cs" />
     <Compile Include="Builders\Delete\DeleteDataExpressionBuilder.cs" />
     <Compile Include="Builders\Delete\ForeignKey\IDeleteForeignKeyForeignColumnOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Delete\ForeignKey\IDeleteForeignKeyOnTableSyntax.cs" />
@@ -192,6 +196,7 @@
     <Compile Include="Expressions\CreateSequenceExpression.cs" />
     <Compile Include="Expressions\DeleteConstraintExpression.cs" />
     <Compile Include="Expressions\DeleteDataExpression.cs" />
+    <Compile Include="Expressions\DeleteDefaultConstraintExpression.cs" />
     <Compile Include="Expressions\DeleteSequenceExpression.cs" />
     <Compile Include="Expressions\ExecuteEmbeddedSqlScriptExpression.cs" />
     <Compile Include="Expressions\InsertDataExpression.cs" />

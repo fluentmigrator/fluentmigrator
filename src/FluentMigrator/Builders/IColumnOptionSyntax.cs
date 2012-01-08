@@ -25,6 +25,7 @@ namespace FluentMigrator.Builders
     public interface IColumnOptionSyntax<TNext> : IFluentSyntax
         where TNext : IFluentSyntax
     {
+        TNext WithDefault(SystemMethods method);
         TNext WithDefaultValue(object value);
         TNext Identity();
         TNext Indexed();
