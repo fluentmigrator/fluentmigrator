@@ -76,9 +76,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             builder.AppendLine();
 
-            builder.Append(String.Format("-- now we can finally drop column\r\nALTER TABLE {0} DROP COLUMN {1};"
-                , Quoter.QuoteTableName(expression.TableName)
-                , Quoter.QuoteColumnName(expression.ColumnName)));
+            builder.Append(String.Format("-- now we can finally drop column\r\nALTER TABLE {0} DROP COLUMN {1};",
+                Quoter.QuoteTableName(expression.TableName),
+                Quoter.QuoteColumnName(expression.ColumnName)));
 
             return builder.ToString();
         }
@@ -97,11 +97,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             builder.AppendLine();
 
-            builder.Append(String.Format("-- create alter table command to create new default constraint as string and run it\r\nALTER TABLE {0} WITH NOCHECK ADD CONSTRAINT {3} DEFAULT({2}) FOR {1};"
-                , Quoter.QuoteTableName(expression.TableName)
-                , Quoter.QuoteColumnName(expression.ColumnName)
-                , Quoter.QuoteValue(expression.DefaultValue)
-                , SqlServerColumn.GetDefaultConstraintName(expression.TableName, expression.ColumnName)));
+            builder.Append(String.Format("-- create alter table command to create new default constraint as string and run it\r\nALTER TABLE {0} WITH NOCHECK ADD CONSTRAINT {3} DEFAULT({2}) FOR {1};",
+                Quoter.QuoteTableName(expression.TableName),
+                Quoter.QuoteColumnName(expression.ColumnName),
+                Quoter.QuoteValue(expression.DefaultValue),
+                SqlServerColumn.GetDefaultConstraintName(expression.TableName, expression.ColumnName)));
 
             return builder.ToString();
         }

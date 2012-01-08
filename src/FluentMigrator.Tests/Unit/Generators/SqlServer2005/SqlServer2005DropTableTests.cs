@@ -24,30 +24,25 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 
             var sql = generator.Generate(expression);
 
-            var expectedSql =
-                @"
-            DECLARE @default sysname, @sql nvarchar(max);
+            const string expected = "DECLARE @default sysname, @sql nvarchar(max);\r\n\r\n" +
+                        "-- get name of default constraint\r\n" +
+                        "SELECT @default = name\r\n" +
+                        "FROM sys.default_constraints\r\n" +
+                        "WHERE parent_object_id = object_id('[dbo].[TestTable1]')\r\n" + "" +
+                        "AND type = 'D'\r\n" + "" +
+                        "AND parent_column_id = (\r\n" + "" +
+                        "SELECT column_id\r\n" +
+                        "FROM sys.columns\r\n" +
+                        "WHERE object_id = object_id('[dbo].[TestTable1]')\r\n" +
+                        "AND name = 'TestColumn1'\r\n" +
+                        ");\r\n\r\n" +
+                        "-- create alter table command to drop contraint as string and run it\r\n" +
+                        "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + @default;\r\n" +
+                        "EXEC sp_executesql @sql;\r\n\r\n" +
+                        "-- now we can finally drop column\r\n" +
+                        "ALTER TABLE [dbo].[TestTable1] DROP COLUMN [TestColumn1];";
 
-            -- get name of default constraint
-            SELECT @default = name
-            FROM sys.default_constraints 
-            WHERE parent_object_id = object_id('[dbo].[TestTable1]')
-            AND type = 'D'
-            AND parent_column_id = (
-                SELECT column_id 
-                FROM sys.columns 
-                WHERE object_id = object_id('[dbo].[TestTable1]')
-                AND name = 'TestColumn1'
-            );
-
-            -- create alter table command as string and run it
-            SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + @default;
-            EXEC sp_executesql @sql;
-
-            -- now we can finally drop column
-            ALTER TABLE [dbo].[TestTable1] DROP COLUMN [TestColumn1];";
-
-            sql.ShouldBe(expectedSql);
+            sql.ShouldBe(expected);
         }
 
         [Test]
@@ -84,30 +79,25 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             expression.SchemaName = "TestSchema";
             var sql = generator.Generate(expression);
 
-            var expectedSql =
-                @"
-            DECLARE @default sysname, @sql nvarchar(max);
+            const string expected = "DECLARE @default sysname, @sql nvarchar(max);\r\n\r\n" +
+                         "-- get name of default constraint\r\n" +
+                         "SELECT @default = name\r\n" +
+                         "FROM sys.default_constraints\r\n" +
+                         "WHERE parent_object_id = object_id('[TestSchema].[TestTable1]')\r\n" + "" +
+                         "AND type = 'D'\r\n" + "" +
+                         "AND parent_column_id = (\r\n" + "" +
+                         "SELECT column_id\r\n" +
+                         "FROM sys.columns\r\n" +
+                         "WHERE object_id = object_id('[TestSchema].[TestTable1]')\r\n" +
+                         "AND name = 'TestColumn1'\r\n" +
+                         ");\r\n\r\n" +
+                         "-- create alter table command to drop contraint as string and run it\r\n" +
+                         "SET @sql = N'ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT ' + @default;\r\n" +
+                         "EXEC sp_executesql @sql;\r\n\r\n" +
+                         "-- now we can finally drop column\r\n" +
+                         "ALTER TABLE [TestSchema].[TestTable1] DROP COLUMN [TestColumn1];";
 
-            -- get name of default constraint
-            SELECT @default = name
-            FROM sys.default_constraints 
-            WHERE parent_object_id = object_id('[TestSchema].[TestTable1]')
-            AND type = 'D'
-            AND parent_column_id = (
-                SELECT column_id 
-                FROM sys.columns 
-                WHERE object_id = object_id('[TestSchema].[TestTable1]')
-                AND name = 'TestColumn1'
-            );
-
-            -- create alter table command as string and run it
-            SET @sql = N'ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT ' + @default;
-            EXEC sp_executesql @sql;
-
-            -- now we can finally drop column
-            ALTER TABLE [TestSchema].[TestTable1] DROP COLUMN [TestColumn1];";
-
-            sql.ShouldBe(expectedSql);
+            sql.ShouldBe(expected);
         }
 
         [Test]
