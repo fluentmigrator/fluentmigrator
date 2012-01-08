@@ -114,5 +114,10 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             throw new NotImplementedException();
         }
+
+        public override string Generate(DeleteDefaultConstraintExpression expression)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -52,6 +52,12 @@ namespace FluentMigrator.Builders.Create.Table
             return this;
         }
 
+        public ICreateTableColumnOptionOrWithColumnSyntax WithDefault(SystemMethods method)
+        {
+            CurrentColumn.DefaultValue = method;
+            return this;
+        }
+
         public ICreateTableColumnOptionOrWithColumnSyntax WithDefaultValue(object value)
         {
             CurrentColumn.DefaultValue = value;

@@ -49,6 +49,12 @@ namespace FluentMigrator.Builders.Create.Column
             return this;
         }
 
+        public ICreateColumnOptionSyntax WithDefault(SystemMethods method)
+        {
+            Expression.Column.DefaultValue = method;
+            return this;
+        }
+
         public ICreateColumnOptionSyntax WithDefaultValue(object value)
         {
             Expression.Column.DefaultValue = value;
