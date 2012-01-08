@@ -18,7 +18,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             var defaultValue = base.FormatDefaultValue(column);
 
             if (column.ModificationType == ColumnModificationType.Create && !string.IsNullOrEmpty(defaultValue))
-                return "CONSTRAINT " + GetDefaultConstraintName(column.TableName, column.Name) + defaultValue;
+                return "CONSTRAINT " + GetDefaultConstraintName(column.TableName, column.Name) + " " + defaultValue;
 
             return string.Empty;
         }
@@ -43,7 +43,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public static string GetDefaultConstraintName(string tableName, string columnName)
         {
-            return string.Format("DF_{0}_{1} ", tableName, columnName);
+            return string.Format("DF_{0}_{1}", tableName, columnName);
         }
     }
 }

@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Text;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Generators.Generic;
@@ -64,61 +65,45 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string Generate(DeleteColumnExpression expression)
         {
             // before we drop a column, we have to drop any default value constraints in SQL Server
-            const string sql = @"
-            DECLARE @default sysname, @sql nvarchar(max);
+            var builder = new StringBuilder();
 
-            -- get name of default constraint
-            SELECT @default = name
-            FROM sys.default_constraints 
-            WHERE parent_object_id = object_id('{0}')
-            AND type = 'D'
-            AND parent_column_id = (
-                SELECT column_id 
-                FROM sys.columns 
-                WHERE object_id = object_id('{0}')
-                AND name = '{1}'
-            );
+            builder.AppendLine(Generate(new DeleteDefaultConstraintExpression
+                                            {
+                                                ColumnName = expression.ColumnName,
+                                                SchemaName = expression.SchemaName,
+                                                TableName = expression.TableName
+                                            }));
 
-            -- create alter table command as string and run it
-            SET @sql = N'ALTER TABLE {0} DROP CONSTRAINT ' + @default;
-            EXEC sp_executesql @sql;
+            builder.AppendLine();
 
-            -- now we can finally drop column
-            ALTER TABLE {0} DROP COLUMN {1};";
+            builder.Append(String.Format("-- now we can finally drop column\r\nALTER TABLE {0} DROP COLUMN {1};",
+                Quoter.QuoteTableName(expression.TableName),
+                Quoter.QuoteColumnName(expression.ColumnName)));
 
-            return String.Format(sql, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.ColumnName));
+            return builder.ToString();
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
-            const string sql =
-                @"
-            DECLARE @default sysname, @sql nvarchar(max);
+            // before we alter a default constraint on a column, we have to drop any default value constraints in SQL Server
+            var builder = new StringBuilder();
 
-            -- get name of default constraint
-            SELECT @default = name
-            FROM sys.default_constraints 
-            WHERE parent_object_id = object_id('{0}')
-            AND type = 'D'
-            AND parent_column_id = (
-                SELECT column_id 
-                FROM sys.columns 
-                WHERE object_id = object_id('{0}')
-                AND name = '{1}'
-            );
+            builder.AppendLine(Generate(new DeleteDefaultConstraintExpression
+                                            {
+                                                ColumnName = expression.ColumnName,
+                                                SchemaName = expression.SchemaName,
+                                                TableName = expression.TableName
+                                            }));
 
-            -- create alter table command to drop contraint as string and run it
-            SET @sql = N'ALTER TABLE {0} DROP CONSTRAINT ' + @default;
-            EXEC sp_executesql @sql;
+            builder.AppendLine();
 
-            -- create alter table command to create new default constraint as string and run it
-            ALTER TABLE {0} WITH NOCHECK ADD CONSTRAINT {3} DEFAULT({2}) FOR {1};";
-
-            return String.Format(sql,
+            builder.Append(String.Format("-- create alter table command to create new default constraint as string and run it\r\nALTER TABLE {0} WITH NOCHECK ADD CONSTRAINT {3} DEFAULT({2}) FOR {1};",
                 Quoter.QuoteTableName(expression.TableName),
                 Quoter.QuoteColumnName(expression.ColumnName),
                 Quoter.QuoteValue(expression.DefaultValue),
-                SqlServerColumn.GetDefaultConstraintName(expression.TableName, expression.ColumnName));
+                SqlServerColumn.GetDefaultConstraintName(expression.TableName, expression.ColumnName)));
+
+            return builder.ToString();
         }
 
         public override string Generate(InsertDataExpression expression)
@@ -145,7 +130,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sequences are not supported in SqlSever2000");
+            return compatabilityMode.HandleCompatabilty("Sequences are not supported in SqlServer2000");
         }
 
         public override string Generate(DeleteSequenceExpression expression)
