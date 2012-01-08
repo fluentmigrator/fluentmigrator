@@ -62,6 +62,61 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
+        public void CanAlterDefaultConstraintWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
+            var sql = generator.Generate(expression);
+
+            const string expected = "DECLARE @default sysname, @sql nvarchar(max);\r\n\r\n" +
+            "-- get name of default constraint\r\n" +
+            "SELECT @default = name\r\n" +
+            "FROM sys.default_constraints\r\n" +
+            "WHERE parent_object_id = object_id('[dbo].[TestTable1]')\r\n" + "" +
+            "AND type = 'D'\r\n" + "" +
+            "AND parent_column_id = (\r\n" + "" +
+            "SELECT column_id\r\n" +
+            "FROM sys.columns\r\n" +
+            "WHERE object_id = object_id('[dbo].[TestTable1]')\r\n" +
+            "AND name = 'TestColumn1'\r\n" +
+            ");\r\n\r\n" +
+            "-- create alter table command to drop contraint as string and run it\r\n" +
+            "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + @default;\r\n" +
+            "EXEC sp_executesql @sql;\r\n\r\n" +
+            "-- create alter table command to create new default constraint as string and run it\r\n" +
+            "ALTER TABLE [dbo].[TestTable1] WITH NOCHECK ADD CONSTRAINT DF_TestTable1_TestColumn1 DEFAULT(1) FOR [TestColumn1];";
+
+            sql.ShouldBe(expected);
+        }
+
+        [Test]
+        public void CanAlterDefaultConstraintWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
+            expression.SchemaName = "TestSchema";
+            var sql = generator.Generate(expression);
+
+            const string expected = "DECLARE @default sysname, @sql nvarchar(max);\r\n\r\n" +
+            "-- get name of default constraint\r\n" +
+            "SELECT @default = name\r\n" +
+            "FROM sys.default_constraints\r\n" +
+            "WHERE parent_object_id = object_id('[TestSchema].[TestTable1]')\r\n" + "" +
+            "AND type = 'D'\r\n" + "" +
+            "AND parent_column_id = (\r\n" + "" +
+            "SELECT column_id\r\n" +
+            "FROM sys.columns\r\n" +
+            "WHERE object_id = object_id('[TestSchema].[TestTable1]')\r\n" +
+            "AND name = 'TestColumn1'\r\n" +
+            ");\r\n\r\n" +
+            "-- create alter table command to drop contraint as string and run it\r\n" +
+            "SET @sql = N'ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT ' + @default;\r\n" +
+            "EXEC sp_executesql @sql;\r\n\r\n" +
+            "-- create alter table command to create new default constraint as string and run it\r\n" +
+            "ALTER TABLE [TestSchema].[TestTable1] WITH NOCHECK ADD CONSTRAINT DF_TestTable1_TestColumn1 DEFAULT(1) FOR [TestColumn1];";
+
+            sql.ShouldBe(expected);
+        }
+
+        [Test]
         public void CanCreateForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
