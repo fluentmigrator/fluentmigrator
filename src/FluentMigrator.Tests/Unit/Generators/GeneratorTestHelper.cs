@@ -402,5 +402,15 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static AlterDefaultConstraintExpression GetAlterDefaultConstraintExpression()
+        {
+            var expression = new AlterDefaultConstraintExpression
+                                 {
+                                     ColumnName = TestColumnName1,
+                                     DefaultValue = 1,
+                                     TableName = TestTableName1
+                                 };
+            return expression;
+        }
     }
 }
