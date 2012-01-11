@@ -34,7 +34,7 @@ namespace FluentMigrator.Runner
         private bool _alreadyOutputPreviewOnlyModeWarning;
 
         /// <summary>The arbitrary application context passed to the task runner.</summary>
-        private object _applicationContext { get; set; }
+        public object ApplicationContext { get; private set; }
 
         public bool SilentlyFail { get; set; }
 
@@ -50,7 +50,7 @@ namespace FluentMigrator.Runner
             _announcer = runnerContext.Announcer;
             Processor = processor;
             _stopWatch = runnerContext.StopWatch;
-            _applicationContext = runnerContext.ApplicationContext;
+            ApplicationContext = runnerContext.ApplicationContext;
 
             SilentlyFail = false;
             CaughtExceptions = null;
@@ -285,7 +285,7 @@ namespace FluentMigrator.Runner
 
             CaughtExceptions = new List<Exception>();
 
-            var context = new MigrationContext(Conventions, Processor, MigrationAssembly, _applicationContext);
+            var context = new MigrationContext(Conventions, Processor, MigrationAssembly, ApplicationContext);
             migration.GetUpExpressions(context);
 
             _stopWatch.Start();
@@ -303,7 +303,7 @@ namespace FluentMigrator.Runner
 
             CaughtExceptions = new List<Exception>();
 
-            var context = new MigrationContext(Conventions, Processor, MigrationAssembly, _applicationContext);
+            var context = new MigrationContext(Conventions, Processor, MigrationAssembly, ApplicationContext);
             migration.GetDownExpressions(context);
 
             _stopWatch.Start();
