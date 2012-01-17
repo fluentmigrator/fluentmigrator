@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>FluentMigrator</id>
+	<title>Fluent Migrator</title>
+    <version>$version$</version>
+    <authors>Shawn Chambers</authors>
+    <owners>Shawn Chambers</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Fluent Migrations Framework for .NET</description>
+    <summary>Fluent Migrations Framework for .NET</summary>
+    <language>en-US</language>
+  </metadata>
+  <files>
+	<file src="FluentMigrator.dll" target="lib\net35" />
+	<file src="FluentMigrator.pdb" target="lib\net35" />
+	<file src="FluentMigrator.xml" target="lib\net35" />
+	<file src="*.dll" target="tools" />
+	<file src="*.exe" target="tools" />
+	<file src="*.exe.config" target="tools" />
+	<file src="*.pdb" target="tools" />
+	<file src="*.xml" target="tools" />
+	<file src="SQLServerCENative\**\*.dll" target="tools\SQLServerCENative" />
+	<file src="SQLServerCENative\**\*.manifest" target="tools\SQLServerCENative" />
+  </files>
+</package>

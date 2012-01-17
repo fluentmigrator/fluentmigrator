@@ -4,15 +4,15 @@
     <!-- Paths to various parts of the build -->
 	<property name="path.base" value="${project::get-base-directory()}"/>
 	<property name="product.name" value="fluentmigrator" />
-    <property name="dir.bin" value="build" />
 	<property name="dir.sample" value="${path.base}\src\FluentMigrator.Example" />
 	<property name="path.dist" value="dist" />
 	<property name="build.platform" value="net-3.5" />
-	<property name="build.config" value="release" />
+	<property name="build.config" value="Release" />
+	<property name="dir.bin" value="build\${build.config}" />
 	<property name="major.version" value="1.0" />
 	<property name="complete.version" value="${major.version}.0.${build.number}" />
 	
-	<target name="all" depends="generate-version build package-bin package-source package-sample" />
+	<target name="all" depends="generate-version build package-bin package-source package-sample package-nuget" />
 
 	<target name="clean" description="Deletes the output folders for a clean build">
         <delete dir="${dir.bin}"/>
@@ -31,10 +31,16 @@
 	
     <target name="build" description="Builds the app" depends="generate-version">
 		<msbuild project="FluentMigrator (2010).sln">
-			<property name="Configuration" value="AutomatedRelease" />
-			<property name="OutDir" value="..\..\${dir.bin}\\" />
+			<property name="Configuration" value="${build.config}" />
+			<property name="OutputPath" value="..\\..\\${dir.bin}\\" />
 		</msbuild>
     </target>
+
+	<target name="package-nuget" description="Generates the NuGet Package">
+		<exec program="tools/NuGet.exe">
+			<arg line="pack nuget\FluentMigrator.nuspec -Properties version=${complete.version} -BasePath build\${build.config} -OutputDirectory dist" />
+		</exec>
+	</target>
 
 	<target name="package-bin">
 		<mkdir dir="${path.dist}" if="${not(directory::exists(path.dist))}"/>
