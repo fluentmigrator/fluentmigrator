@@ -30,6 +30,9 @@ namespace FluentMigrator
     {
         internal IMigrationContext _context;
         private readonly object _mutex = new object();
+        
+        /// <summary>The arbitrary application context passed to the task runner.</summary>
+        public object ApplicationContext { get; protected set; }
 
         public abstract void Up();
         public abstract void Down();
@@ -45,6 +48,7 @@ namespace FluentMigrator
             lock (_mutex)
             {
                 _context = context;
+                ApplicationContext = context.ApplicationContext;
                 Up();
                 _context = null;
             }
@@ -55,6 +59,7 @@ namespace FluentMigrator
             lock (_mutex)
             {
                 _context = context;
+                ApplicationContext = context.ApplicationContext;
                 Down();
                 _context = null;
             }
