@@ -64,8 +64,8 @@ namespace FluentMigrator.Runner
                 if (Migrations.ContainsKey(migrationMetadata.Version))
                     throw new Exception(String.Format("Duplicate migration version {0}.", migrationMetadata.Version));
 
-                var migration = migrationMetadata.Type.Assembly.CreateInstance(migrationMetadata.Type.FullName);
-                Migrations.Add(migrationMetadata.Version, migration as IMigration);
+                var migration = (IMigration)migrationMetadata.Type.Assembly.CreateInstance(migrationMetadata.Type.FullName);
+                Migrations.Add(migrationMetadata.Version, new MigrationWithMetaDataAdapter(migration, migrationMetadata));
             }
         }
 
