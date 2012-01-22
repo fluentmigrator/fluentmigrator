@@ -278,10 +278,22 @@ namespace FluentMigrator.Runner
             get { return _migrationAssembly; }
         }
 
+        private string GetMigrationName(IMigration migration)
+        {
+            if (migration == null) throw new ArgumentNullException("migration");
+
+            IMigrationMetadata metadata = migration as IMigrationMetadata;
+            if (metadata != null)
+            {
+                return string.Format("{0}: {1}", metadata.Version, metadata.Type.Name);
+            }
+            return migration.GetType().Name;
+        }
+
         public void Up(IMigration migration)
         {
-            var name = migration.GetType().Name;
-            _announcer.Heading(name + ": migrating");
+            var name = GetMigrationName(migration);
+            _announcer.Heading(string.Format("{0} migrating", name));
 
             CaughtExceptions = new List<Exception>();
 
@@ -292,14 +304,14 @@ namespace FluentMigrator.Runner
             ExecuteExpressions(context.Expressions);
             _stopWatch.Stop();
 
-            _announcer.Say(name + ": migrated");
+            _announcer.Say(string.Format("{0} migrated", name));
             _announcer.ElapsedTime(_stopWatch.ElapsedTime());
         }
 
         public void Down(IMigration migration)
         {
-            var name = migration.GetType().Name;
-            _announcer.Heading(name + ": reverting");
+            var name = GetMigrationName(migration);
+            _announcer.Heading(string.Format("{0} reverting", name));
 
             CaughtExceptions = new List<Exception>();
 
@@ -310,7 +322,7 @@ namespace FluentMigrator.Runner
             ExecuteExpressions(context.Expressions);
             _stopWatch.Stop();
 
-            _announcer.Say(name + ": reverted");
+            _announcer.Say(string.Format("{0} reverted", name));
             _announcer.ElapsedTime(_stopWatch.ElapsedTime());
         }
 
