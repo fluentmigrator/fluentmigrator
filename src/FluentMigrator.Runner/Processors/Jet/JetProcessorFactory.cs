@@ -8,7 +8,8 @@
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var connection = new OleDbConnection(connectionString);
-            return new JetProcessor(connection, new JetGenerator(), announcer, options);
+            var generator = this.GetGenerator<JetGenerator>(options);
+            return new JetProcessor(connection, generator, announcer, options);
         }
     }
 }

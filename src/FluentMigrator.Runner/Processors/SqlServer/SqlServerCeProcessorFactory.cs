@@ -29,7 +29,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             var factory = new SqlServerCeDbFactory();
             var connection = factory.CreateConnection(connectionString);
-            return new SqlServerCeProcessor(connection, new SqlServerCeGenerator(), announcer, options, factory);
+            var generator = this.GetGenerator<SqlServerCeGenerator>(options);
+            return new SqlServerCeProcessor(connection, generator, announcer, options, factory);
         }
     }
 }

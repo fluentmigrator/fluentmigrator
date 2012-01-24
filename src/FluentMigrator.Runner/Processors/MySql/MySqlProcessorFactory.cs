@@ -8,7 +8,8 @@ namespace FluentMigrator.Runner.Processors.MySql
         {
             var factory = new MySqlDbFactory();
             var connection = factory.CreateConnection(connectionString);
-            return new MySqlProcessor(connection, new MySqlGenerator(), announcer, options, factory);
+            var generator = this.GetGenerator<MySqlGenerator>(options);
+            return new MySqlProcessor(connection, generator, announcer, options, factory);
         }
     }
 }
