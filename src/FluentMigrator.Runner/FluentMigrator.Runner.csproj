@@ -131,10 +131,8 @@
     <Compile Include="Announcers\CompositeAnnouncer.cs" />
     <Compile Include="Announcers\NullAnnouncer.cs" />
     <Compile Include="Announcers\TextWriterAnnouncer.cs" />
-    <Compile Include="CompatabilityMode.cs" />
     <Compile Include="Extensions\SqlServerExtensions.cs" />
     <Compile Include="Generators\Base\ColumnBase.cs" />
-    <Compile Include="Extensions\CompatabilityModeExtension.cs" />
     <Compile Include="Generators\Generic\GenericQuoter.cs" />
     <Compile Include="Generators\Generic\GenericGenerator.cs" />
     <Compile Include="Generators\IColumn.cs" />

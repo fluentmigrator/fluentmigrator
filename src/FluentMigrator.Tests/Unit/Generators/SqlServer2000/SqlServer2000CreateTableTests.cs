@@ -206,7 +206,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         [Test]
         public void CanCreateSchemaInStrictMode()
         {
-            _generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+            _generator.StrictCompatibility = true;
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new CreateSchemaExpression()));
         }
     }

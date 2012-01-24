@@ -46,17 +46,17 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Altering of default constraints is not supporteed for MySql");
+            return this.UnsupportedCommand("MySQL does not support default constraints.");
         }
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sequences is not supporteed for MySql");
+            return this.UnsupportedCommand("MySQL does not support sequences.");
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sequences is not supporteed for MySql");
+            return this.UnsupportedCommand("MySQL does not support sequences.");
         }
 
         public override string Generate(DeleteConstraintExpression expression)
@@ -75,7 +75,7 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Default constraints are not supported");
+            return this.UnsupportedCommand("MySQL does not support default constraints.");
         }
     }
 }
