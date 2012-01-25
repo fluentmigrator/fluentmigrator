@@ -17,7 +17,6 @@
 #endregion
 
 using System.Data;
-using System.Data.Common;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Announcers;

@@ -59,7 +59,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         [Test]
         public void CanDeleteSchemaInStrictMode()
         {
-            _generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+            _generator.CompatibilityMode = CompatibilityMode.Strict;
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new DeleteSchemaExpression()));
         }
     }

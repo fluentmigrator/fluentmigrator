@@ -35,5 +35,8 @@ namespace FluentMigrator.Runner.Initialization
 
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         public object ApplicationContext { get; set; }
+
+        /// <summary>How to handle SQL commands that are not supported by the underlying database.</summary>
+        public CompatibilityMode CompatibilityMode { get; set; }
     }
 }

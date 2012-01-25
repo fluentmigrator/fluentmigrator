@@ -13,5 +13,17 @@ namespace FluentMigrator.Runner.Processors
         {
             get { return GetType().Name.Replace("ProcessorFactory", string.Empty); }
         }
+
+        /// <summary>Constructs a configured migration generator.</summary>
+        /// <typeparam name="T">The migration generator implementation type.</typeparam>
+        /// <param name="options">The options with which to configure the generator.</param>
+        protected IMigrationGenerator GetGenerator<T>(IMigrationProcessorOptions options)
+            where T : IMigrationGenerator, new()
+        {
+            return new T
+            {
+                CompatibilityMode = options.CompatibilityMode
+            };
+        }
     }
 }

@@ -22,6 +22,9 @@ namespace FluentMigrator.Runner.Generators.Base
 {
     public abstract class GeneratorBase : IMigrationGenerator
     {
+        /// <summary>How to handle SQL commands that are not supported by the underlying database.</summary>
+        public CompatibilityMode CompatibilityMode { get; set; }
+
         private readonly IColumn _column;
         private readonly IQuoter _quoter;
 

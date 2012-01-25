@@ -8,7 +8,8 @@
         {
             var factory = new PostgresDbFactory();
             var connection = factory.CreateConnection(connectionString);
-            return new PostgresProcessor(connection, new PostgresGenerator(), announcer, options, factory);
+            var generator = this.GetGenerator<PostgresGenerator>(options);
+            return new PostgresProcessor(connection, generator, announcer, options, factory);
         }
     }
 }

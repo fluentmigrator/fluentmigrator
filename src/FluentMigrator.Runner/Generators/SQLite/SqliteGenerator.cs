@@ -33,47 +33,47 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
         public override string Generate(AlterColumnExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sqlite does not support alter column");
+            return this.CompatibilityMode.GetNotSupported("SQLite does not support altering column.");
         }
 
         public override string Generate(RenameColumnExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sqlite does not support renaming of columns");
+            return this.CompatibilityMode.GetNotSupported("SQLite does not support renaming columns.");
         }
 
         public override string Generate(DeleteColumnExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sqlite does not support deleting of columns");
+            return this.CompatibilityMode.GetNotSupported("SQLite does not support deleting columns.");
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sqlite does not support altering of default constraints");
+            return this.CompatibilityMode.GetNotSupported("SQLite does not support default constraints.");
         }
 
         public override string Generate(CreateForeignKeyExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Forign keys are not supported in Sqlite");
+            return this.CompatibilityMode.GetNotSupported("SQLite does not support foreign keys.");
         }
 
         public override string Generate(DeleteForeignKeyExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Forign keys are not supported in Sqlite");
+            return this.CompatibilityMode.GetNotSupported("SQLite does not support foreign keys.");
         }
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sequences are not supported in Sqlite");
+            return this.CompatibilityMode.GetNotSupported("SQLite does not support sequences.");
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sequences are not supported in Sqlite");
+            return this.CompatibilityMode.GetNotSupported("SQLite does not support sequences.");
         }
 
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Default constraints are not supported");
+            return this.CompatibilityMode.GetNotSupported("SQLite does not support default constraints.");
         }
     }
 }

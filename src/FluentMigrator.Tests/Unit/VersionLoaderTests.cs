@@ -20,6 +20,19 @@ namespace FluentMigrator.Tests.Unit
         {
             get { return 30; }
         }
+
+        /// <summary>Whether to throw a <see cref="FluentMigrator.Runner.Generators.DatabaseOperationNotSupportedException"/> when a SQL command is not supported by the underlying database type.</summary>
+        public bool StrictCompatibility
+        {
+            get { return false; }
+        }
+
+        /// <summary>How to handle SQL commands that are not supported by the underlying database.</summary>
+        public CompatibilityMode CompatibilityMode
+        {
+            get { return CompatibilityMode.Loose; }
+        }
+
     }
 
     [TestFixture]

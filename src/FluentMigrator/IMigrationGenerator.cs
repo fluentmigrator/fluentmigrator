@@ -22,6 +22,9 @@ namespace FluentMigrator
 {
     public interface IMigrationGenerator
     {
+        /// <summary>How to handle SQL commands that are not supported by the underlying database.</summary>
+        CompatibilityMode CompatibilityMode { get; set; }
+        
         string Generate(CreateSchemaExpression expression);
         string Generate(DeleteSchemaExpression expression);
         string Generate(CreateTableExpression expression);

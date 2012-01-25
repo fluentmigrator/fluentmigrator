@@ -8,7 +8,8 @@
         {
             var factory = new SqliteDbFactory();
             var connection = factory.CreateConnection(connectionString);
-            return new SqliteProcessor(connection, new SqliteGenerator(), announcer, options, factory);
+            var generator = this.GetGenerator<SqliteGenerator>(options);
+            return new SqliteProcessor(connection, generator, announcer, options, factory);
         }
     }
 }

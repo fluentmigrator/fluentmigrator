@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using FluentMigrator.Runner.Generators.Jet;
 using NUnit.Framework;
 using NUnit.Should;

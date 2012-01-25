@@ -63,7 +63,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Default constraints are not supported");
+            return this.CompatibilityMode.GetNotSupported("Oracle does not support default constraints.");
         }
     }
 }

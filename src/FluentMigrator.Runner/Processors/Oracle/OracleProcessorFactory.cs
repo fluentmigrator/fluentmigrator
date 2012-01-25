@@ -8,7 +8,8 @@ namespace FluentMigrator.Runner.Processors.Oracle
         {
             var factory = new OracleDbFactory();
             var connection = factory.CreateConnection(connectionString);
-            return new OracleProcessor(connection, new OracleGenerator(), announcer, options, factory);
+            var generator = this.GetGenerator<OracleGenerator>(options);
+            return new OracleProcessor(connection, generator, announcer, options, factory);
         }
     }
 }
