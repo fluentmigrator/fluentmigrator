@@ -12,32 +12,32 @@ namespace FluentMigrator.Runner.Generators.Jet
 
         public override string Generate(RenameTableExpression expression)
         {
-            return this.UnsupportedCommand("MySQL does not support renaming tables.");
+            return this.CompatibilityMode.GetNotSupported("MySQL does not support renaming tables.");
         }
 
         public override string Generate(RenameColumnExpression expression)
         {
-            return this.UnsupportedCommand("MySQL does not support renaming columns.");
+            return this.CompatibilityMode.GetNotSupported("MySQL does not support renaming columns.");
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
-            return this.UnsupportedCommand("MySQL does not support altering default constraints.");
+            return this.CompatibilityMode.GetNotSupported("MySQL does not support altering default constraints.");
         }
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            return this.UnsupportedCommand("MySQL does not support sequences.");
+            return this.CompatibilityMode.GetNotSupported("MySQL does not support sequences.");
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            return this.UnsupportedCommand("MySQL does not support sequences.");
+            return this.CompatibilityMode.GetNotSupported("MySQL does not support sequences.");
         }
 
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
-            return this.UnsupportedCommand("MySQL does not support default constraints.");
+            return this.CompatibilityMode.GetNotSupported("MySQL does not support default constraints.");
         }
     }
 }

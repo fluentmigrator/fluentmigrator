@@ -20,10 +20,10 @@ namespace FluentMigrator.Runner.Processors
         protected IMigrationGenerator GetGenerator<T>(IMigrationProcessorOptions options)
             where T : IMigrationGenerator, new()
         {
-            IMigrationGenerator generator = new T();
-            generator.StrictCompatibility = options.StrictCompatibility;
-            generator.EmulateCompatibility = options.EmulateCompatibility;
-            return generator;
+            return new T
+            {
+                CompatibilityMode = options.CompatibilityMode
+            };
         }
     }
 }

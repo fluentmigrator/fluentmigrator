@@ -81,7 +81,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         [Test]
         public void CanDeleteSchemaInStrictMode()
         {
-            _generator.StrictCompatibility = true;
+            _generator.CompatibilityMode = CompatibilityMode.Strict;
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new DeleteSchemaExpression()));
         }
     }

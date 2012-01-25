@@ -43,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         [Test]
         public void CanRenameColumnInStrictMode()
         {
-            _generator.StrictCompatibility = true;
+            _generator.CompatibilityMode = CompatibilityMode.Strict;
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(GeneratorTestHelper.GetRenameColumnExpression()));
         }
 
@@ -67,7 +67,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         public void CanAlterColumnInStrictMode()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
-            _generator.StrictCompatibility = true;
+            _generator.CompatibilityMode = CompatibilityMode.Strict;
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(expression));
         }
 
@@ -82,7 +82,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         [Test]
         public void CanCreateForeignKeyInStrictMode()
         {
-            _generator.StrictCompatibility = true;
+            _generator.CompatibilityMode = CompatibilityMode.Strict;
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(GeneratorTestHelper.GetCreateForeignKeyExpression()));
         }
 
@@ -97,7 +97,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         [Test]
         public void CanCreateMulitColumnForeignKeyInStrictMode()
         {
-            _generator.StrictCompatibility = true;
+            _generator.CompatibilityMode = CompatibilityMode.Strict;
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression()));
         }
 
@@ -122,7 +122,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         [Test]
         public void CanAlterSchemaInStrictMode()
         {
-            _generator.StrictCompatibility = true;
+            _generator.CompatibilityMode = CompatibilityMode.Strict;
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new CreateSchemaExpression()));
         }
     }

@@ -1,5 +1,4 @@
-﻿using System.Data;
-using FluentMigrator.Runner.Generators.Oracle;
+﻿using FluentMigrator.Runner.Generators.Oracle;
 
 namespace FluentMigrator.Runner.Processors.Oracle
 {

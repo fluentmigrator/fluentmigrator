@@ -72,7 +72,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         public void CanRenameColumnInStrictMode()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
-            _generator.StrictCompatibility = true;
+            _generator.CompatibilityMode = CompatibilityMode.Strict;
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(expression));
         }
 
@@ -88,7 +88,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         public void CanRenameTableInStrictMode()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
-            _generator.StrictCompatibility = true;
+            _generator.CompatibilityMode = CompatibilityMode.Strict;
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(expression));
         }
 
@@ -123,7 +123,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         [Test]
         public void CanAlterSchemaInStrictMode()
         {
-            _generator.StrictCompatibility = true;
+            _generator.CompatibilityMode = CompatibilityMode.Strict;
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new CreateSchemaExpression()));
         }
 

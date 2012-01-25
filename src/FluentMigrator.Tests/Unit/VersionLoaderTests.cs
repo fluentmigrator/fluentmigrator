@@ -27,11 +27,10 @@ namespace FluentMigrator.Tests.Unit
             get { return false; }
         }
 
-        /// <summary>Whether to imitate database support for some SQL commands that are not supported by the underlying database type.</summary>
-        /// <remarks>For example, schema support can be emulated by prefixing the schema name to the table name (<c>`schema`.`table`</c> => <c>`schema_table`</c>).</remarks>
-        public bool EmulateCompatibility
+        /// <summary>How to handle SQL commands that are not supported by the underlying database.</summary>
+        public CompatibilityMode CompatibilityMode
         {
-            get { return false; }
+            get { return CompatibilityMode.Loose; }
         }
 
     }

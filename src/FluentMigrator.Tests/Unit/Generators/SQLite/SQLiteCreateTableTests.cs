@@ -153,7 +153,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         [Test]
         public void CanCreateSchemaInStrictMode()
         {
-            _generator.StrictCompatibility = true;
+            _generator.CompatibilityMode = CompatibilityMode.Strict;
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new CreateSchemaExpression()));
         }
     }
