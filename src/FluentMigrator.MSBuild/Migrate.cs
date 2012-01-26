@@ -69,6 +69,8 @@ namespace FluentMigrator.MSBuild
 
         public string WorkingDirectory { get; set; }
 
+        public int Timeout { get; set; }
+
         public string Profile { get; set; }
 
         public override bool Execute()
@@ -104,7 +106,8 @@ namespace FluentMigrator.MSBuild
                 Version = Version,
                 Steps = Steps,
                 WorkingDirectory = WorkingDirectory,
-                Profile = Profile
+                Profile = Profile,
+                Timeout = Timeout
             };
 
             Log.LogCommandLine(MessageImportance.Low, "Executing Migration Runner");
