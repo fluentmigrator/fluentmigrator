@@ -16,8 +16,8 @@
 //
 #endregion
 
-using System;
 using System.Collections.Generic;
+using System.Data;
 using FluentMigrator.Builders.Create.ForeignKey;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
@@ -152,5 +152,35 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 			foreignKeyMock.VerifyAll();
 			expressionMock.VerifyAll();
 		}
+
+        [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
+        public void CallingOnUpdateSetsOnUpdateToSpecifiedRule(Rule rule) 
+        {
+            var expression = new CreateForeignKeyExpression();
+            var builder = new CreateForeignKeyExpressionBuilder(expression);
+            builder.OnUpdate(rule);
+            Assert.That(expression.ForeignKey.OnUpdate, Is.EqualTo(rule));
+            Assert.That(expression.ForeignKey.OnDelete, Is.EqualTo(Rule.None));
+        }
+
+        [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
+        public void CallingOnDeleteSetsOnDeleteToSpecifiedRule(Rule rule) 
+        {
+            var expression = new CreateForeignKeyExpression();
+            var builder = new CreateForeignKeyExpressionBuilder(expression);
+            builder.OnDelete(rule);
+            Assert.That(expression.ForeignKey.OnUpdate, Is.EqualTo(Rule.None));
+            Assert.That(expression.ForeignKey.OnDelete, Is.EqualTo(rule));
+        }
+
+        [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
+        public void CallingOnDeleteOrUpdateSetsBothOnDeleteAndOnUpdateToSpecifiedRule(Rule rule) 
+        {
+            var expression = new CreateForeignKeyExpression();
+            var builder = new CreateForeignKeyExpressionBuilder(expression);
+            builder.OnDeleteOrUpdate(rule);
+            Assert.That(expression.ForeignKey.OnUpdate, Is.EqualTo(rule));
+            Assert.That(expression.ForeignKey.OnDelete, Is.EqualTo(rule));
+        }
 	}
 }

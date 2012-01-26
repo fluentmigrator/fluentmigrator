@@ -397,6 +397,33 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             expressionMock.VerifyAll();
         }
 
+        [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
+        public void CallingOnUpdateSetsOnUpdateOnForeignKeyExpression(Rule rule) 
+        {
+            var builder = new CreateTableExpressionBuilder(null, null) { CurrentForeignKey = new ForeignKeyDefinition() };
+            builder.OnUpdate(rule);
+            Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(rule));
+            Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(Rule.None));
+        }
+
+        [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
+        public void CallingOnDeleteSetsOnDeleteOnForeignKeyExpression(Rule rule) 
+        {
+            var builder = new CreateTableExpressionBuilder(null, null) { CurrentForeignKey = new ForeignKeyDefinition() };
+            builder.OnDelete(rule);
+            Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(Rule.None));
+            Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(rule));
+        }
+
+        [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
+        public void CallingOnDeleteOrUpdateSetsOnUpdateAndOnDeleteOnForeignKeyExpression(Rule rule) 
+        {
+            var builder = new CreateTableExpressionBuilder(null, null) { CurrentForeignKey = new ForeignKeyDefinition() };
+            builder.OnDeleteOrUpdate(rule);
+            Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(rule));
+            Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(rule));
+        }
+
 		[Test]
 		public void CallingWithColumnAddsNewColumnToExpression()
 		{

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
-using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Postgres;
 using NUnit.Framework;
 using NUnit.Should;
@@ -327,50 +326,48 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             sql.ShouldBe("ALTER TABLE \"public\".\"TestForeignTable\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"Column3\",\"Column4\") REFERENCES \"wibble\".\"TestPrimaryTable\" (\"Column1\",\"Column2\")");
         }
 
-        [Test]
-        public void CanCreateForeignKeyWithDeleteCascade()
+        [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
+        public void CanCreateForeignKeyWithOnUpdateOptions(Rule rule, string output) 
         {
-            var expression = new CreateForeignKeyExpression();
-            expression.ForeignKey.Name = "FK_Test";
-            expression.ForeignKey.PrimaryTable = "TestPrimaryTable";
-            expression.ForeignKey.ForeignTable = "TestForeignTable";
-            expression.ForeignKey.PrimaryColumns = new[] { "Column1", "Column2" };
-            expression.ForeignKey.ForeignColumns = new[] { "Column3", "Column4" };
+            var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
+            expression.ForeignKey.OnUpdate = rule;
+            var sql = generator.Generate(expression);
+            sql.ShouldBe(
+                string.Format("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\") ON UPDATE {0}", output));
+        }
+
+        [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
+        public void CanCreateForeignKeyWithOnDeleteOptions(Rule rule, string output) 
+        {
+            var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
+            expression.ForeignKey.OnDelete = rule;
+            var sql = generator.Generate(expression);
+            sql.ShouldBe(
+                string.Format(
+                    "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\") ON DELETE {0}",
+                    output));
+        }
+
+        [Test]
+        public void CanCreateForeignKeyWithOnDeleteAndOnUpdateOptions() 
+        {
+            var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
             expression.ForeignKey.OnDelete = Rule.Cascade;
-
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"public\".\"TestForeignTable\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"Column3\",\"Column4\") REFERENCES \"public\".\"TestPrimaryTable\" (\"Column1\",\"Column2\") ON DELETE CASCADE");
+            expression.ForeignKey.OnUpdate = Rule.SetDefault;
+            var sql = generator.Generate(expression);
+            sql.ShouldBe(
+                "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\") ON DELETE CASCADE ON UPDATE SET DEFAULT");
         }
 
         [Test]
-        public void CanCreateForeignKeyWithUpdateSetNull()
+        public void CanCreateForeignKeyWithMultipleColumns() 
         {
-            var expression = new CreateForeignKeyExpression();
-            expression.ForeignKey.Name = "FK_Test";
-            expression.ForeignKey.PrimaryTable = "TestPrimaryTable";
-            expression.ForeignKey.ForeignTable = "TestForeignTable";
+            var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
             expression.ForeignKey.PrimaryColumns = new[] { "Column1", "Column2" };
             expression.ForeignKey.ForeignColumns = new[] { "Column3", "Column4" };
-            expression.ForeignKey.OnUpdate = Rule.SetNull;
 
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"public\".\"TestForeignTable\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"Column3\",\"Column4\") REFERENCES \"public\".\"TestPrimaryTable\" (\"Column1\",\"Column2\") ON UPDATE SET NULL");
-        }
-
-        [Test]
-        public void CanCreateForeignKeyWithUpdateAndDelete()
-        {
-            var expression = new CreateForeignKeyExpression();
-            expression.ForeignKey.Name = "FK_Test";
-            expression.ForeignKey.PrimaryTable = "TestPrimaryTable";
-            expression.ForeignKey.ForeignTable = "TestForeignTable";
-            expression.ForeignKey.PrimaryColumns = new[] { "Column1", "Column2" };
-            expression.ForeignKey.ForeignColumns = new[] { "Column3", "Column4" };
-            expression.ForeignKey.OnUpdate = Rule.SetNull;
-            expression.ForeignKey.OnDelete = Rule.SetDefault;
-
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"public\".\"TestForeignTable\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"Column3\",\"Column4\") REFERENCES \"public\".\"TestPrimaryTable\" (\"Column1\",\"Column2\") ON DELETE SET DEFAULT ON UPDATE SET NULL");
+            sql.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"Column3\",\"Column4\") REFERENCES \"public\".\"TestTable2\" (\"Column1\",\"Column2\")");
         }
 
 		[Test]

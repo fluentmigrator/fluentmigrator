@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using NUnit.Framework;
-using FluentMigrator.Runner.Generators.SqlServer;
-using NUnit.Should;
 using System.Data;
-using FluentMigrator.Model;
 using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Generators;
+using FluentMigrator.Model;
+using FluentMigrator.Runner.Generators.SqlServer;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer
 {
@@ -85,6 +81,37 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             sql.ShouldBe(
                 "ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [dbo].[TestTable2] ([TestColumn2], [TestColumn4])");
 
+        }
+
+        [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
+        public void CanCreateForeignKeyWithOnUpdateOptions(Rule rule, string output) 
+        {
+            var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
+            expression.ForeignKey.OnUpdate = rule;
+            var sql = generator.Generate(expression);
+            sql.ShouldBe(
+                string.Format("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2]) ON UPDATE {0}", output));
+        }
+
+        [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
+        public void CanCreateForeignKeyWithOnDeleteOptions(Rule rule, string output) 
+        {
+            var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
+            expression.ForeignKey.OnDelete = rule;
+            var sql = generator.Generate(expression);
+            sql.ShouldBe(
+                string.Format("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2]) ON DELETE {0}", output));
+        }
+
+        [Test]
+        public void CanCreateForeignKeyWithOnDeleteAndOnUpdateOptions() 
+        {
+            var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
+            expression.ForeignKey.OnDelete = Rule.Cascade;
+            expression.ForeignKey.OnUpdate = Rule.SetDefault;
+            var sql = generator.Generate(expression);
+            sql.ShouldBe(
+                "ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2]) ON DELETE CASCADE ON UPDATE SET DEFAULT");
         }
 
         [Test]
