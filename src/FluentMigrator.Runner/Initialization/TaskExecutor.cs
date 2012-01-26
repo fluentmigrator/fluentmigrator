@@ -97,7 +97,8 @@ namespace FluentMigrator.Runner.Initialization
             {
                 PreviewOnly = RunnerContext.PreviewOnly,
                 Timeout = RunnerContext.Timeout,
-                CompatibilityMode = RunnerContext.CompatibilityMode
+                StrictCompatibility = RunnerContext.StrictCompatibility,
+                EmulateCompatibility = RunnerContext.EmulateCompatibility
             });
 
             return processor;

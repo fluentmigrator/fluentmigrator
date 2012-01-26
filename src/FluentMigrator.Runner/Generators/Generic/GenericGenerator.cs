@@ -231,7 +231,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(InsertDataExpression expression)
         {
-            if (this.CompatibilityMode.HasFlag(CompatibilityMode.Strict))
+            if (this.StrictCompatibility)
             {
                 List<string> unsupportedFeatures = expression.AdditionalFeatures.Keys.Where(x => !IsAdditionalFeatureSupported(x)).ToList();
 
@@ -240,7 +240,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                     string errorMessage =
                         string.Format("The following database specific additional features are not supported in strict mode [{0}]",
                                       expression.AdditionalFeatures.Keys.Aggregate((x, y) => x + ", " + y));
-                    return this.CompatibilityMode.GetNotSupported(errorMessage);
+                    return this.UnsupportedCommand(errorMessage);
                 }
             }
 
@@ -317,17 +317,17 @@ namespace FluentMigrator.Runner.Generators.Generic
         //All Schema method throw by default as only Sql server 2005 and up supports them.
         public override string Generate(CreateSchemaExpression expression)
         {
-            return this.CompatibilityMode.GetNotSupported("This database does not support schemas.");
+            return this.UnsupportedCommand("This database does not support schemas.");
         }
 
         public override string Generate(DeleteSchemaExpression expression)
         {
-            return this.CompatibilityMode.GetNotSupported("This database does not support schemas.");
+            return this.UnsupportedCommand("This database does not support schemas.");
         }
 
         public override string Generate(AlterSchemaExpression expression)
         {
-            return this.CompatibilityMode.GetNotSupported("This database does not support schemas.");
+            return this.UnsupportedCommand("This database does not support schemas.");
         }
 
         public override string Generate(CreateSequenceExpression expression)
@@ -377,7 +377,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             return result.ToString();
         }
 
-        /// <summary>Get the name of a table. If <see cref="GeneratorBase.CompatibilityMode"/> includes <see cref="CompatibilityMode.Emulate"/>, the table name is prefixed with the schema name.</summary>
+        /// <summary>Get the name of a table. If <see cref="GeneratorBase.EmulateCompatibility"/> is <c>true</c>, the table name is prefixed with the schema name.</summary>
         /// <param name="schema">The name of the database schema.</param>
         /// <param name="table">The name of the table.</param>
         protected virtual string GenerateTableName(string schema, string table)
@@ -389,10 +389,10 @@ namespace FluentMigrator.Runner.Generators.Generic
             // handle schema
             if (!string.IsNullOrEmpty(schema))
             {
-                if (this.CompatibilityMode.HasFlag(CompatibilityMode.Emulate))
+                if (this.EmulateCompatibility)
                     table = schema + "_" + table;
                 else
-                    this.CompatibilityMode.GetNotSupported("This database does not support schemas.");
+                    this.UnsupportedCommand("This database does not support schemas.");
             }
             return table;
         }

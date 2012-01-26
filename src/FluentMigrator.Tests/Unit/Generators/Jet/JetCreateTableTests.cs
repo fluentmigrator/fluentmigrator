@@ -168,7 +168,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         [Test]
         public void CanCreateSchemaInStrictMode()
         {
-            _generator.CompatibilityMode = CompatibilityMode.Strict;
+            _generator.StrictCompatibility = true;
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new CreateSchemaExpression()));
         }
     }

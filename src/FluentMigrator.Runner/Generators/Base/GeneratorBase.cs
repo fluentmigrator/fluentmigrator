@@ -22,8 +22,12 @@ namespace FluentMigrator.Runner.Generators.Base
 {
     public abstract class GeneratorBase : IMigrationGenerator
     {
-        /// <summary>How to handle SQL commands that are not supported by the underlying database.</summary>
-        public CompatibilityMode CompatibilityMode { get; set; }
+        /// <summary>Whether to throw a <see cref="DatabaseOperationNotSupportedException"/> when a SQL command is not supported by the underlying database type.</summary>
+        public bool StrictCompatibility { get; set; }
+
+        /// <summary>Whether to imitate database support for some SQL commands that are not supported by the underlying database type.</summary>
+        /// <remarks>For example, schema support can be emulated by prefixing the schema name to the table name (<c>`schema`.`table`</c> => <c>`schema_table`</c>).</remarks>
+        public bool EmulateCompatibility { get; set; }
 
         private readonly IColumn _column;
         private readonly IQuoter _quoter;
@@ -78,6 +82,16 @@ namespace FluentMigrator.Runner.Generators.Base
         protected IQuoter Quoter
         {
             get { return _quoter; }
+        }
+
+        /// <summary>Generate a blank string for an unsupported SQL command, or throw an exception if the generator is in strict compatibility mode.</summary>
+        /// <param name="message">The exception message describing the incompatibility.</param>
+        /// <exception cref="DatabaseOperationNotSupportedException">The SQL command is not supported by the underlying database, and the generator is in strict compatibility mode.</exception>
+        protected string UnsupportedCommand(string message)
+        {
+            if (this.StrictCompatibility)
+                throw new DatabaseOperationNotSupportedException(message);
+            return string.Empty;
         }
     }
 }

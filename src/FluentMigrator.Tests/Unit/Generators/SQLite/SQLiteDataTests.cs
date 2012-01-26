@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
             expression.AdditionalFeatures.Add(SqlServerExtensions.IdentityInsert, true);
-            generator.CompatibilityMode = CompatibilityMode.Loose;
+            generator.StrictCompatibility = false;
             string sql = generator.Generate(expression);
 
             string expected = "INSERT INTO 'TestTable1' ('Id', 'Name', 'Website') VALUES (1, 'Just''in', 'codethinked.com');";
@@ -49,7 +49,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
             expression.AdditionalFeatures.Add(SqlServerExtensions.IdentityInsert, true);
-            generator.CompatibilityMode = CompatibilityMode.Strict;
+            generator.StrictCompatibility = true;
             Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(expression));
         }
 

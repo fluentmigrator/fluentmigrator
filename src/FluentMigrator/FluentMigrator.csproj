@@ -188,7 +188,6 @@
     <Compile Include="Builders\Update\IUpdateWhereSyntax.cs" />
     <Compile Include="Builders\Update\UpdateExpressionRoot.cs" />
     <Compile Include="Builders\Update\IUpdateExpressionRoot.cs" />
-    <Compile Include="CompatibilityMode.cs" />
     <Compile Include="Expressions\AlterColumnExpression.cs" />
     <Compile Include="Expressions\AlterDefaultConstraintExpression.cs" />
     <Compile Include="Expressions\AlterTableExpression.cs" />

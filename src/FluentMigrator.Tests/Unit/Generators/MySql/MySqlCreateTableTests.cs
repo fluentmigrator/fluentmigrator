@@ -162,7 +162,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         [Test]
         public void CanCreateSchemaInStrictMode()
         {
-            _generator.CompatibilityMode = CompatibilityMode.Strict;
+            _generator.StrictCompatibility = true;
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new CreateSchemaExpression()));
         }
     }
