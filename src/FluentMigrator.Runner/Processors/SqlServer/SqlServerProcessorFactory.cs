@@ -8,8 +8,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             var factory = new SqlServerDbFactory();
             var connection = factory.CreateConnection(connectionString);
-            var generator = this.GetGenerator<SqlServer2008Generator>(options);
-            return new SqlServerProcessor(connection, generator, announcer, options, factory);
+            return new SqlServerProcessor(connection, new SqlServer2008Generator(), announcer, options, factory);
         }
 
         public override bool IsForProvider(string provider)

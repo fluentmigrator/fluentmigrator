@@ -37,12 +37,5 @@ namespace FluentMigrator.Runner.Initialization
 
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         object ApplicationContext { get; set; }
-
-        /// <summary>Whether to throw an exception when a SQL command is not supported by the underlying database type.</summary>
-        bool StrictCompatibility { get; set; }
-
-        /// <summary>Whether to imitate database support for some SQL commands that are not supported by the underlying database type.</summary>
-        /// <remarks>For example, schema support can be emulated by prefixing the schema name to the table name (<c>`schema`.`table`</c> => <c>`schema_table`</c>).</remarks>
-        bool EmulateCompatibility { get; set; }
     }
 }
