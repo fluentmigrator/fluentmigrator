@@ -11,9 +11,13 @@ namespace FluentMigrator.Runner.Generators.Generic
 {
     public abstract class GenericGenerator : GeneratorBase
     {
+        public CompatabilityMode compatabilityMode;
+
         public GenericGenerator(IColumn column, IQuoter quoter)
             : base(column, quoter)
-        { }
+        {
+            compatabilityMode = CompatabilityMode.LOOSE;
+        }
 
         public virtual string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
         public virtual string DropTable { get { return "DROP TABLE {0}"; } }
@@ -50,59 +54,55 @@ namespace FluentMigrator.Runner.Generators.Generic
             return string.Empty;
         }
 
-        /// <summary>Outputs a create table string</summary>
-        /// <param name="expression">The expression to generate.</param>
+        /// <summary>
+        /// Outputs a create table string
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <returns></returns>
         public override string Generate(CreateTableExpression expression)
         {
-            if (string.IsNullOrEmpty(expression.TableName))
-                throw new ArgumentNullException("expression", "expression.TableName cannot be empty");
-            if (expression.Columns.Count == 0)
-                throw new ArgumentException("You must specifiy at least one column");
+            if (string.IsNullOrEmpty(expression.TableName)) throw new ArgumentNullException("expression", "expression.TableName cannot be empty");
+            if (expression.Columns.Count == 0) throw new ArgumentException("You must specifiy at least one column");
 
-            string table = this.GenerateTableName(expression.SchemaName, expression.TableName);
-            return string.Format(CreateTable, Quoter.QuoteTableName(table), Column.Generate(expression.Columns, table));
+            string quotedTableName = Quoter.QuoteTableName(expression.TableName);
+
+            return string.Format(CreateTable, quotedTableName, Column.Generate(expression.Columns, quotedTableName));
         }
 
         public override string Generate(DeleteTableExpression expression)
         {
-            string table = this.GenerateTableName(expression.SchemaName, expression.TableName);
-            return String.Format(DropTable, Quoter.QuoteTableName(table));
+            return String.Format(DropTable, Quoter.QuoteTableName(expression.TableName));
         }
 
         public override string Generate(RenameTableExpression expression)
         {
-            string oldName = this.GenerateTableName(expression.SchemaName, expression.OldName);
-            string newName = this.GenerateTableName(expression.SchemaName, expression.NewName);
-            return String.Format(RenameTable, Quoter.QuoteTableName(oldName), Quoter.QuoteTableName(newName));
+            return String.Format(RenameTable, Quoter.QuoteTableName(expression.OldName), Quoter.QuoteTableName(expression.NewName));
         }
 
         public override string Generate(CreateColumnExpression expression)
         {
-            string table = this.GenerateTableName(expression.SchemaName, expression.TableName);
-            return String.Format(AddColumn, Quoter.QuoteTableName(table), Column.Generate(expression.Column));
+            return String.Format(AddColumn, Quoter.QuoteTableName(expression.TableName), Column.Generate(expression.Column));
         }
 
 
         public override string Generate(AlterColumnExpression expression)
         {
-            string table = this.GenerateTableName(expression.SchemaName, expression.TableName);
-            return String.Format(AlterColumn, Quoter.QuoteTableName(table), Column.Generate(expression.Column));
+            return String.Format(AlterColumn, Quoter.QuoteTableName(expression.TableName), Column.Generate(expression.Column));
         }
 
         public override string Generate(DeleteColumnExpression expression)
         {
-            string table = this.GenerateTableName(expression.SchemaName, expression.TableName);
-            return String.Format(DropColumn, Quoter.QuoteTableName(table), Quoter.QuoteColumnName(expression.ColumnName));
+            return String.Format(DropColumn, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.ColumnName));
         }
 
         public override string Generate(RenameColumnExpression expression)
         {
-            string table = this.GenerateTableName(expression.SchemaName, expression.TableName);
-            return String.Format(RenameColumn, table, expression.OldName, expression.NewName);
+            return String.Format(RenameColumn, expression.TableName, expression.OldName, expression.NewName);
         }
 
         public override string Generate(CreateIndexExpression expression)
         {
+
             string[] indexColumns = new string[expression.Index.Columns.Count];
             IndexColumnDefinition columnDef;
 
@@ -120,19 +120,17 @@ namespace FluentMigrator.Runner.Generators.Generic
                 }
             }
 
-            string table = this.GenerateTableName(expression.Index.SchemaName, expression.Index.TableName);
             return String.Format(CreateIndex
                 , GetUniqueString(expression)
                 , GetClusterTypeString(expression)
                 , Quoter.QuoteIndexName(expression.Index.Name)
-                , Quoter.QuoteTableName(table)
+                , Quoter.QuoteTableName(expression.Index.TableName)
                 , String.Join(", ", indexColumns));
         }
 
         public override string Generate(DeleteIndexExpression expression)
         {
-            string table = this.GenerateTableName(expression.Index.SchemaName, expression.Index.TableName);
-            return String.Format(DropIndex, Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(table));
+            return String.Format(DropIndex, Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName));
         }
 
         public override string Generate(CreateForeignKeyExpression expression)
@@ -157,14 +155,12 @@ namespace FluentMigrator.Runner.Generators.Generic
             {
                 foreignColumns.Add(Quoter.QuoteColumnName(column));
             }
-            string primaryTable = this.GenerateTableName(expression.ForeignKey.PrimaryTableSchema, expression.ForeignKey.PrimaryTable);
-            string foreignTable = this.GenerateTableName(expression.ForeignKey.ForeignTableSchema, expression.ForeignKey.ForeignTable);
             return string.Format(
                 CreateForeignKeyConstraint,
-                Quoter.QuoteTableName(foreignTable),
+                Quoter.QuoteTableName(expression.ForeignKey.ForeignTable),
                 Quoter.QuoteColumnName(keyName),
                 String.Join(", ", foreignColumns.ToArray()),
-                Quoter.QuoteTableName(primaryTable),
+                Quoter.QuoteTableName(expression.ForeignKey.PrimaryTable),
                 String.Join(", ", primaryColumns.ToArray()),
                 FormatCascade("DELETE", expression.ForeignKey.OnDelete),
                 FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)
@@ -173,6 +169,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(CreateConstraintExpression expression)
         {
+
             var constraintType = (expression.Constraint.IsPrimaryKeyConstraint) ? "PRIMARY KEY" : "UNIQUE";
 
             string[] columns = new string[expression.Constraint.Columns.Count];
@@ -182,8 +179,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                 columns[i] = Quoter.QuoteColumnName(expression.Constraint.Columns.ElementAt(i));
             }
 
-            string table = this.GenerateTableName(expression.Constraint.SchemaName, expression.Constraint.TableName);
-            return string.Format(CreateConstraint, Quoter.QuoteTableName(table),
+            return string.Format(CreateConstraint, Quoter.QuoteTableName(expression.Constraint.TableName),
                 Quoter.Quote(expression.Constraint.ConstraintName),
                 constraintType,
                 String.Join(", ", columns));
@@ -191,8 +187,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(DeleteConstraintExpression expression)
         {
-            string table = this.GenerateTableName(expression.Constraint.SchemaName, expression.Constraint.TableName);
-            return string.Format(DeleteConstraint, Quoter.QuoteTableName(table), Quoter.Quote(expression.Constraint.ConstraintName));
+            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName), Quoter.Quote(expression.Constraint.ConstraintName));
         }
 
         public virtual string GenerateForeignKeyName(CreateForeignKeyExpression expression)
@@ -202,8 +197,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(DeleteForeignKeyExpression expression)
         {
-            string foreignTable = this.GenerateTableName(expression.ForeignKey.ForeignTableSchema, expression.ForeignKey.ForeignTable);
-            return string.Format(DeleteConstraint, Quoter.QuoteTableName(foreignTable), Quoter.QuoteColumnName(expression.ForeignKey.Name));
+            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.ForeignKey.ForeignTable), Quoter.QuoteColumnName(expression.ForeignKey.Name));
         }
 
 
@@ -231,7 +225,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(InsertDataExpression expression)
         {
-            if (this.StrictCompatibility)
+            if (compatabilityMode == CompatabilityMode.STRICT)
             {
                 List<string> unsupportedFeatures = expression.AdditionalFeatures.Keys.Where(x => !IsAdditionalFeatureSupported(x)).ToList();
 
@@ -240,7 +234,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                     string errorMessage =
                         string.Format("The following database specific additional features are not supported in strict mode [{0}]",
                                       expression.AdditionalFeatures.Keys.Aggregate((x, y) => x + ", " + y));
-                    return this.UnsupportedCommand(errorMessage);
+                    return compatabilityMode.HandleCompatabilty(errorMessage);
                 }
             }
 
@@ -258,10 +252,9 @@ namespace FluentMigrator.Runner.Generators.Generic
                     columnValues.Add(Quoter.QuoteValue(item.Value));
                 }
 
-                string table = this.GenerateTableName(expression.SchemaName, expression.TableName);
                 string columns = String.Join(", ", columnNames.ToArray());
                 string values = String.Join(", ", columnValues.ToArray());
-                insertStrings.Add(String.Format(InsertData, Quoter.QuoteTableName(table), columns, values));
+                insertStrings.Add(String.Format(InsertData, Quoter.QuoteTableName(expression.TableName), columns, values));
             }
             return String.Join("; ", insertStrings.ToArray());
         }
@@ -282,8 +275,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                 whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value)));
             }
 
-            string table = this.GenerateTableName(expression.SchemaName, expression.TableName);
-            return String.Format(UpdateData, Quoter.QuoteTableName(table), String.Join(", ", updateItems.ToArray()), String.Join(" AND ", whereClauses.ToArray()));
+            return String.Format(UpdateData, Quoter.QuoteTableName(expression.TableName), String.Join(", ", updateItems.ToArray()), String.Join(" AND ", whereClauses.ToArray()));
         }
 
         public override string Generate(DeleteDataExpression expression)
@@ -305,8 +297,7 @@ namespace FluentMigrator.Runner.Generators.Generic
                         whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value)));
                     }
 
-                    string table = this.GenerateTableName(expression.SchemaName, expression.TableName);
-                    deleteItems.Add(string.Format(DeleteData, Quoter.QuoteTableName(table), String.Join(" AND ", whereClauses.ToArray())));
+                    deleteItems.Add(string.Format(DeleteData, Quoter.QuoteTableName(expression.TableName), String.Join(" AND ", whereClauses.ToArray())));
                 }
             }
 
@@ -317,17 +308,18 @@ namespace FluentMigrator.Runner.Generators.Generic
         //All Schema method throw by default as only Sql server 2005 and up supports them.
         public override string Generate(CreateSchemaExpression expression)
         {
-            return this.UnsupportedCommand("This database does not support schemas.");
+            return compatabilityMode.HandleCompatabilty("Schemas are not supported");
+
         }
 
         public override string Generate(DeleteSchemaExpression expression)
         {
-            return this.UnsupportedCommand("This database does not support schemas.");
+            return compatabilityMode.HandleCompatabilty("Schemas are not supported");
         }
 
         public override string Generate(AlterSchemaExpression expression)
         {
-            return this.UnsupportedCommand("This database does not support schemas.");
+            return compatabilityMode.HandleCompatabilty("Schemas are not supported");
         }
 
         public override string Generate(CreateSequenceExpression expression)
@@ -377,24 +369,5 @@ namespace FluentMigrator.Runner.Generators.Generic
             return result.ToString();
         }
 
-        /// <summary>Get the name of a table. If <see cref="GeneratorBase.EmulateCompatibility"/> is <c>true</c>, the table name is prefixed with the schema name.</summary>
-        /// <param name="schema">The name of the database schema.</param>
-        /// <param name="table">The name of the table.</param>
-        protected virtual string GenerateTableName(string schema, string table)
-        {
-            // validate
-            if (string.IsNullOrEmpty(table))
-                throw new ArgumentNullException("table");
-
-            // handle schema
-            if (!string.IsNullOrEmpty(schema))
-            {
-                if (this.EmulateCompatibility)
-                    table = schema + "_" + table;
-                else
-                    this.UnsupportedCommand("This database does not support schemas.");
-            }
-            return table;
-        }
     }
 }

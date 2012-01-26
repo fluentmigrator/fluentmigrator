@@ -37,7 +37,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         public void CanDropForeignKeyInStrictMode()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
-            _generator.StrictCompatibility = true;
+            _generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(expression));
         }
 
@@ -68,7 +68,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         [Test]
         public void CanDeleteSchemaInStrictMode()
         {
-            _generator.StrictCompatibility = true;
+            _generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new DeleteSchemaExpression()));
         }
     }

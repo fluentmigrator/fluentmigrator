@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
             expression.AdditionalFeatures.Add(SqlServerExtensions.IdentityInsert, true);
-            generator.StrictCompatibility = true;
+            generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
             var sql = generator.Generate(expression);
 
             var expected = "SET IDENTITY_INSERT [TestTable1] ON;";

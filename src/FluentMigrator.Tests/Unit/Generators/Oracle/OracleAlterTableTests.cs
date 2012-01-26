@@ -88,7 +88,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public void CanAlterSchemaInStrictMode()
         {
-            generator.StrictCompatibility = true;
+            generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
             Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(new CreateSchemaExpression()));
         }
 

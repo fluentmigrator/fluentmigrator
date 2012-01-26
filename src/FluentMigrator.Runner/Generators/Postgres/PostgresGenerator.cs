@@ -9,8 +9,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
 {
     public class PostgresGenerator : GenericGenerator
     {
-        public PostgresGenerator()
-            : base(new PostgresColumn(), new PostgresQuoter()) { }
+        public PostgresGenerator() : base(new PostgresColumn(), new PostgresQuoter()) { }
 
         public override string Generate(CreateSchemaExpression expression)
         {
@@ -193,7 +192,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
-            return this.UnsupportedCommand("PostgreSQL does not support default constraints.");
+            return compatabilityMode.HandleCompatabilty("Default constraints are not supported");
         }
 
         protected string GetColumnList(IEnumerable<string> columns)
