@@ -16,11 +16,12 @@
 //
 #endregion
 
-namespace FluentMigrator.Builders.Create.Table
+namespace FluentMigrator.Builders.Create.Column
 {
-    public interface ICreateTableColumnOptionOrWithColumnSyntax :
-        IColumnOptionSyntax<ICreateTableColumnOptionOrWithColumnSyntax,ICreateTableColumnOptionOrForeignKeyCascadeOrWithColumnSyntax>, 
-        ICreateTableWithColumnSyntax
-    {
+    public interface ICreateColumnOptionOrForeignKeyCascadeSyntax :
+        ICreateColumnOptionSyntax,
+        IForeignKeyCascadeSyntax<ICreateColumnOptionSyntax,ICreateColumnOptionOrForeignKeyCascadeSyntax>
+	{
+        
     }
 }
