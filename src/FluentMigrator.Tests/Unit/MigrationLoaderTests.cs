@@ -24,7 +24,9 @@ using System.Collections.Generic;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Tests.Integration.Migrations;
+using FluentMigrator.Tests.Unit.TaggingTestFakes;
 using FluentMigrator.VersionTableInfo;
+using Moq;
 using NUnit.Framework;
 using NUnit.Should;
 using System.Linq;
@@ -39,7 +41,7 @@ namespace FluentMigrator.Tests.Unit
 		{
 			var conventions = new MigrationConventions();
 			var asm = Assembly.GetExecutingAssembly();
-			var loader = new MigrationLoader( conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1");
+			var loader = new MigrationLoader( conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1", null);
 			
 			SortedList<long, IMigration> migrationList = loader.Migrations;
 
@@ -57,7 +59,7 @@ namespace FluentMigrator.Tests.Unit
 		{
 			var conventions = new MigrationConventions();
 			var asm = Assembly.GetExecutingAssembly();
-			var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1");
+			var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1", null);
 
 			var migrationList = loader.FindMigrations();
 			migrationList.Select(x => x.Type).ShouldNotContain(typeof(VersionedMigration));
@@ -69,7 +71,7 @@ namespace FluentMigrator.Tests.Unit
 		{
 			var conventions = new MigrationConventions();
 			var asm = Assembly.GetExecutingAssembly();
-			var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Nested");
+			var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Nested", null);
 
 			loader.LoadNestedNamespaces.ShouldBe(false);
 		}
@@ -112,6 +114,70 @@ namespace FluentMigrator.Tests.Unit
 
 			CollectionAssert.AreEquivalent(expected, actual);
 		}
+
+        [Test]
+        public void DoesFindMigrationsThatHaveMatchingTags()
+        {
+            var asm = Assembly.GetExecutingAssembly();
+            var migrationType = typeof(TaggedMigraion);
+            var tagsToMatch = new[] { "UK", "Production" };
+
+            var conventionsMock = new Mock<IMigrationConventions>();
+            conventionsMock.SetupGet(m => m.GetMetadataForMigration).Returns(DefaultMigrationConventions.GetMetadataForMigration);
+            conventionsMock.SetupGet(m => m.TypeIsMigration).Returns(t => true);
+            conventionsMock.SetupGet(m => m.TypeHasTags).Returns(t => migrationType == t);
+            conventionsMock.SetupGet(m => m.TypeHasMatchingTags).Returns((type, tags) => (migrationType == type && tagsToMatch == tags));
+
+            var loader = new MigrationLoader(conventionsMock.Object, asm, migrationType.Namespace, tagsToMatch);
+
+            var expected = new List<Type> { typeof(UntaggedMigration), migrationType };
+
+            var actual = loader.FindMigrations().Select(m => m.Type).ToList();
+
+            CollectionAssert.AreEquivalent(expected, actual);
+        }
+
+        [Test]
+        public void DoesNotFindMigrationsThatDoNotHaveMatchingTags()
+        {
+            var asm = Assembly.GetExecutingAssembly();
+            var migrationType = typeof(TaggedMigraion);
+            var tagsToMatch = new[] { "UK", "Production" };
+
+            var conventionsMock = new Mock<IMigrationConventions>();
+            conventionsMock.SetupGet(m => m.GetMetadataForMigration).Returns(DefaultMigrationConventions.GetMetadataForMigration);
+            conventionsMock.SetupGet(m => m.TypeIsMigration).Returns(t => true);
+            conventionsMock.SetupGet(m => m.TypeHasTags).Returns(t => migrationType == t);
+            conventionsMock.SetupGet(m => m.TypeHasMatchingTags).Returns((type, tags) => false);
+
+            var loader = new MigrationLoader(conventionsMock.Object, asm, migrationType.Namespace, tagsToMatch);
+
+            var expected = new List<Type> { typeof(UntaggedMigration) };
+
+            var actual = loader.FindMigrations().Select(m => m.Type).ToList();
+
+            CollectionAssert.AreEquivalent(expected, actual);
+        }
 	}
+    
+    namespace TaggingTestFakes
+    {
+        [Tags("UK", "IE", "QA", "Production")]
+        [Migration(123)]
+        public class TaggedMigraion : Migration
+        {
+            public override void Up() { }
+
+            public override void Down() { }
+        }    
+
+        [Migration(567)]
+        public class UntaggedMigration : Migration
+        {
+            public override void Up() { }
+
+            public override void Down() { }
+        }
+    }
 }
 
