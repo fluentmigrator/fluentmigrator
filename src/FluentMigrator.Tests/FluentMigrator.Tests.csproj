@@ -146,6 +146,18 @@
   <ItemGroup>
     <Compile Include="Helpers\PostgresTestTable.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
+    <Compile Include="Integration\Migrations\Tagged\1_TenantATable.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Integration\Migrations\Tagged\2_TenantBTable.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Integration\Migrations\Tagged\3_NormalTable.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Integration\Migrations\Tagged\4_TenantAandBTable.cs">
+      <SubType>Code</SubType>
+    </Compile>
     <Compile Include="Integration\Migrations\TestEmptyMigration.cs" />
     <Compile Include="Unit\Builders\Create\CreateSequenceExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Delete\DeleteConstriantTest.cs" />

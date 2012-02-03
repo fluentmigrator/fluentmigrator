@@ -241,7 +241,6 @@
     <Compile Include="ProfileAttribute.cs" />
     <Compile Include="SystemMethods.cs" />
     <Compile Include="TagsAttribute.cs" />
-    <Compile Include="TagsToMatch.cs" />
     <Compile Include="VersionTableInfo\DefaultVersionTableMetaData.cs" />
     <Compile Include="VersionTableInfo\IVersionTableMetaData.cs" />
     <Compile Include="MigrationTraitAttribute.cs" />

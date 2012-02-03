@@ -29,6 +29,7 @@ using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Sqlite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Integration.Migrations;
+using FluentMigrator.Tests.Integration.Migrations.Tagged;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
@@ -481,6 +482,84 @@ namespace FluentMigrator.Tests.Integration
             }
         }
 
+        [Test]
+        public void MigrateUpWithTaggedMigrationsShouldOnlyApplyMatchedMigrations()
+        {
+            ExecuteWithSupportedProcessors(processor =>
+            {
+                var assembly = typeof(TenantATable).Assembly;
+
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                {
+                    Namespace = typeof(TenantATable).Namespace,
+                    Tags = new[] { "TenantA" }
+                };
+
+                var runner = new MigrationRunner(assembly, runnerContext, processor);
+                runner.MigrateUp();
+
+                processor.TableExists(null, "TenantATable").ShouldBeTrue();
+                processor.TableExists(null, "NormalTable").ShouldBeTrue();
+                processor.TableExists(null, "TenantBTable").ShouldBeFalse();
+                processor.TableExists(null, "TenantAandBTable").ShouldBeTrue();
+            });
+        }
+
+        [Test]
+        public void MigrateUpWithTaggedMigrationsAndUsingMultipleTagsShouldOnlyApplyMatchedMigrations()
+        {
+            ExecuteWithSupportedProcessors(processor =>
+            {
+                var assembly = typeof(TenantATable).Assembly;
+
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                {
+                    Namespace = typeof(TenantATable).Namespace,
+                    Tags = new[] { "TenantA", "TenantB" }
+                };
+
+                var runner = new MigrationRunner(assembly, runnerContext, processor);
+                runner.MigrateUp();
+
+                processor.TableExists(null, "TenantATable").ShouldBeFalse();
+                processor.TableExists(null, "NormalTable").ShouldBeTrue();
+                processor.TableExists(null, "TenantBTable").ShouldBeFalse();
+                processor.TableExists(null, "TenantAandBTable").ShouldBeTrue();
+            });
+        }
+
+        [Test]
+        public void MigrateDownWithDifferentTagsToMigrateUpShouldApplyMatchedMigrations()
+        {
+            ExecuteWithSupportedProcessors(processor =>
+            {
+                var assembly = typeof(TenantATable).Assembly;
+
+                var migrationsNamespace = typeof(TenantATable).Namespace;
+
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                {
+                    Namespace = migrationsNamespace,
+                    Tags = new[] { "TenantA" }
+                };
+
+                new MigrationRunner(assembly, runnerContext, processor).MigrateUp();
+
+                processor.TableExists(null, "TenantATable").ShouldBeTrue();
+                processor.TableExists(null, "NormalTable").ShouldBeTrue();
+                processor.TableExists(null, "TenantBTable").ShouldBeFalse();
+                processor.TableExists(null, "TenantAandBTable").ShouldBeTrue();
+
+                runnerContext.Tags = new[] { "TenantB" };
+
+                new MigrationRunner(assembly, runnerContext, processor).MigrateDown(0);
+
+                processor.TableExists(null, "TenantATable").ShouldBeTrue();
+                processor.TableExists(null, "NormalTable").ShouldBeFalse();
+                processor.TableExists(null, "TenantBTable").ShouldBeFalse();
+                processor.TableExists(null, "TenantAandBTable").ShouldBeFalse();
+            });
+        }
 
         private static MigrationRunner SetupMigrationRunner(IMigrationProcessor processor)
         {
