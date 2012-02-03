@@ -146,6 +146,13 @@
   <ItemGroup>
     <Compile Include="Helpers\PostgresTestTable.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
+    <Compile Include="Integration\Migrations\InvalidRollback\1_ValidMigration.cs" />
+    <Compile Include="Integration\Migrations\InvalidRollback\2_InvalidRollback.cs" />
+    <Compile Include="Integration\Migrations\InvalidRollback\3_ValidMigration2.cs" />
+    <Compile Include="Integration\Migrations\Tagged\1_TenantATable.cs" />
+    <Compile Include="Integration\Migrations\Tagged\2_TenantBTable.cs" />
+    <Compile Include="Integration\Migrations\Tagged\3_NormalTable.cs" />
+    <Compile Include="Integration\Migrations\Tagged\4_TenantAandBTable.cs" />
     <Compile Include="Integration\Migrations\TestEmptyMigration.cs" />
     <Compile Include="Unit\Builders\Create\CreateSequenceExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Delete\DeleteConstriantTest.cs" />

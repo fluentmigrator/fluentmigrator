@@ -17,6 +17,8 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
@@ -121,6 +123,18 @@ namespace FluentMigrator.Infrastructure
                 sb.Append("_" + column);
             }
             return sb.ToString();
+        }
+
+        public static bool TypeHasTags(Type type)
+        {
+            return type.GetOneAttribute<TagsAttribute>() != null;
+        }
+
+        public static bool TypeHasMatchingTags(Type type, IEnumerable<string> tagsToMatch)
+        {
+            var tags = type.GetAllAttributes<TagsAttribute>().SelectMany(x => x.TagNames).ToArray();
+
+            return tags.Any() && tagsToMatch.All(t => tags.Any(t.Contains));
         }
     }
 }

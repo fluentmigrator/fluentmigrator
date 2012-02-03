@@ -132,7 +132,113 @@ namespace FluentMigrator.Tests.Unit
 			defaultWorkingDirectory.ShouldNotBeNull();
 			defaultWorkingDirectory.Contains("bin").ShouldBeTrue();
 		}
+
+        [Test]
+        public void TypeHasTagsReturnTrueIfTypeHasTagsAttribute()
+        {
+            DefaultMigrationConventions.TypeHasTags(typeof(TaggedWithUk))
+                .ShouldBeTrue();
+        }
+
+        [Test]
+        public void TypeHasTagsReturnFalseIfTypeDoesNotHaveTagsAttribute()
+        {
+            DefaultMigrationConventions.TypeHasTags(typeof(HasNoTagsFake))
+                .ShouldBeFalse();
+        }
+
+        public class TypeHasMatchingTags
+        {
+            [Test]
+            [Category("Tagging")]
+            public void WhenTypeHasTagAttributeWithNoTagNamesReturnsFalse()
+            {
+                DefaultMigrationConventions.TypeHasMatchingTags(typeof(HasTagAttributeWithNoTagNames), new string[] { })
+                    .ShouldBeFalse();
+            }
+
+            [Test]
+            [Category("Tagging")]
+            public void WhenTypeHasOneTagThatDoesNotMatchSingleThenTagReturnsFalse()
+            {
+                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "IE" })
+                    .ShouldBeFalse();
+            }
+
+            [Test]
+            [Category("Tagging")]
+            public void WhenTypeHasOneTagThatDoesMatchSingleTagThenReturnsTrue()
+            {
+                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "UK" })
+                    .ShouldBeTrue();
+            }
+
+            [Test]
+            [Category("Tagging")]
+            public void WhenTypeHasOneTagThatDoesMatchMultipleTagsThenReturnsFalse()
+            {
+                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "UK", "Production" })
+                    .ShouldBeFalse();
+            }
+
+            [Test]
+            [Category("Tagging")]
+            public void WhenTypeHasTagsInTwoAttributeThatDoesMatchSingleTagThenReturnsTrue()
+            {
+                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributes), new[] { "UK" })
+                    .ShouldBeTrue();
+            }
+
+            [Test]
+            [Category("Tagging")]
+            public void WhenTypeHasTagsInTwoAttributesThatDoesMatchMultipleTagsThenReturnsTrue()
+            {
+                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributes), new[] { "UK", "Production" })
+                    .ShouldBeTrue();
+            }
+
+            [Test]
+            [Category("Tagging")]
+            public void WhenTypeHasTagsInOneAttributeThatDoesMatchMultipleTagsThenReturnsTrue()
+            {
+                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInOneTagsAttribute), new[] { "UK", "Production" })
+                    .ShouldBeTrue();
+            }
+
+            [Test]
+            [Category("Tagging")]
+            public void WhenTypeHasTagsInTwoAttributesThatDontNotMatchMultipleTagsThenReturnsFalse()
+            {
+                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributes), new[] { "UK", "IE" })
+                    .ShouldBeFalse();
+            }
+        }
 	}
+
+    [Tags("BE", "UK", "Staging", "Production")]
+    public class TaggedWithBeAndUkAndProductionAndStagingInOneTagsAttribute
+    {
+    }
+
+    [Tags("BE", "UK")]
+    [Tags("Staging", "Production")]
+    public class TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributes
+    {
+    }
+
+    [Tags("UK")]
+    public class TaggedWithUk
+    {
+    }
+
+    [Tags]
+    public class HasTagAttributeWithNoTagNames
+    {
+    }
+
+    public class HasNoTagsFake
+    {
+    }
 
 	[Migration(123)]
 	internal class DefaultConventionMigrationFake : Migration
