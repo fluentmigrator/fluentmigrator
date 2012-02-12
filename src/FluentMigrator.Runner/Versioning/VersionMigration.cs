@@ -65,6 +65,28 @@ namespace FluentMigrator.Runner.Versioning
         }
     }
 
+    public class VersionUniqueMigration : ForwardOnlyMigration
+    {
+        private readonly IVersionTableMetaData versionTableMeta;
+
+        public VersionUniqueMigration(IVersionTableMetaData versionTableMeta)
+        {
+            this.versionTableMeta = versionTableMeta;
+        }
+
+        public override void Up()
+        {
+            Create.Index("UC_Version")
+                .OnTable(versionTableMeta.TableName)
+                .InSchema(versionTableMeta.SchemaName)
+                .WithOptions().Clustered()
+                .OnColumn(versionTableMeta.ColumnName);
+
+            Alter.Table(versionTableMeta.TableName).InSchema(versionTableMeta.SchemaName).AddColumn("AppliedOn").AsDateTime().Nullable();
+        }
+
+    }
+
     internal static class DateTimeExtensions
     {
         public static string ToISO8601(this DateTime dateTime)
