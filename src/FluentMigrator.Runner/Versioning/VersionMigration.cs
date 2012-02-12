@@ -79,6 +79,7 @@ namespace FluentMigrator.Runner.Versioning
             Create.Index("UC_Version")
                 .OnTable(versionTableMeta.TableName)
                 .InSchema(versionTableMeta.SchemaName)
+                .WithOptions().Unique()
                 .WithOptions().Clustered()
                 .OnColumn(versionTableMeta.ColumnName);
 
