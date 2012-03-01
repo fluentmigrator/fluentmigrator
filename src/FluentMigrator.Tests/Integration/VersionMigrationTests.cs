@@ -20,6 +20,7 @@ using System.Reflection;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.Sqlite;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Tests.Unit;
@@ -53,7 +54,6 @@ namespace FluentMigrator.Tests.Integration
                 });
         }
 
-
         [Test]
         public void CanUseCustomVersionInfo()
         {
@@ -83,8 +83,7 @@ namespace FluentMigrator.Tests.Integration
 
                 runner.Down(new VersionSchemaMigration(tableMetaData));
                 processor.SchemaExists(tableMetaData.SchemaName).ShouldBeFalse();
-            }, true, typeof(SqliteProcessor));
-
+            }, true, typeof(SqliteProcessor), typeof(MySqlProcessor));
         }
 
         [Test]
@@ -108,6 +107,5 @@ namespace FluentMigrator.Tests.Integration
                 processor.TableExists(null, tableMetaData.TableName).ShouldBeFalse();
             });
         }
-
     }
 }
