@@ -53,21 +53,21 @@ namespace FluentMigrator.Tests.Unit
 		public void CanAnnounceAndPadWithEquals()
 		{
 			_announcer.Heading("Test");
-			Output.ShouldBe("-- Test ======================================================================" + Environment.NewLine + Environment.NewLine);
+			Output.ShouldBe("/* Test ====================================================================== */" + Environment.NewLine + Environment.NewLine);
 		}
 
 		[Test]
 		public void CanSay()
 		{
 			_announcer.Say("Create table");
-			Output.ShouldBe("-- Create table" + Environment.NewLine);
+            Output.ShouldBe("/* Create table */" + Environment.NewLine);
 		}
 
 		[Test]
 		public void CanSayTimeSpan()
 		{
 			_announcer.ElapsedTime(new TimeSpan(0, 0, 5));
-			Output.ShouldBe("-- -> 5s" + Environment.NewLine + Environment.NewLine);
+			Output.ShouldBe("/* -> 5s */" + Environment.NewLine + Environment.NewLine);
 		}
 
 		[Test]

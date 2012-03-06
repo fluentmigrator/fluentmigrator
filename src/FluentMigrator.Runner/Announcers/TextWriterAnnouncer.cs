@@ -33,23 +33,25 @@ namespace FluentMigrator.Runner.Announcers
         public TextWriterAnnouncer(Action<string> write)
             : base(write)
         {
-            NonSqlPrefix = "-- ";
+            NonSqlPrefix = "/* ";
+			NonSqlWrapper = sql => string.Format("{0}{1} */", NonSqlPrefix, sql);
         }
 
 
         public string NonSqlPrefix { get; set; }
 
+        public Func<string, string> NonSqlWrapper { get; set; }
+
         #region IAnnouncer Members
 
         public override void Heading(string message)
         {
-            var value = NonSqlPrefix + message + " ";
-            Write(value.PadRight(78, '=') + Environment.NewLine + Environment.NewLine);
+            Write(NonSqlWrapper((message + " ").PadRight(75, '=')) + Environment.NewLine + Environment.NewLine);
         }
 
         public override void Say(string message)
         {
-            Info(NonSqlPrefix + message);
+			Info(NonSqlWrapper(message));
         }
 
         public override void Sql(string sql)
@@ -74,8 +76,7 @@ namespace FluentMigrator.Runner.Announcers
 
         public override void Error(string message)
         {
-            Write(NonSqlPrefix + "ERROR: ");
-            Write(message);
+            Write(NonSqlWrapper("ERROR: " + message));
             Write(Environment.NewLine);
         }
 
