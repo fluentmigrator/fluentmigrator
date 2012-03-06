@@ -24,57 +24,57 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit
 {
-	[TestFixture]
-	public class AnnouncerTests
-	{
-		private TextWriterAnnouncer _announcer;
-		private StringWriter _stringWriter;
+    [TestFixture]
+    public class AnnouncerTests
+    {
+        private TextWriterAnnouncer _announcer;
+        private StringWriter _stringWriter;
 
-		[SetUp]
-		public void SetUp()
-		{
-			_stringWriter = new StringWriter();
-			_announcer = new TextWriterAnnouncer(_stringWriter)
-							{
-								ShowElapsedTime = true,
-								ShowSql = true
-							};
-		}
+        [SetUp]
+        public void SetUp()
+        {
+            _stringWriter = new StringWriter();
+            _announcer = new TextWriterAnnouncer(_stringWriter)
+                            {
+                                ShowElapsedTime = true,
+                                ShowSql = true
+                            };
+        }
 
-		public string Output
-		{
-			get
-			{
-				return _stringWriter.GetStringBuilder().ToString();
-			}
-		}
+        public string Output
+        {
+            get
+            {
+                return _stringWriter.GetStringBuilder().ToString();
+            }
+        }
 
-		[Test]
-		public void CanAnnounceAndPadWithEquals()
-		{
-			_announcer.Heading("Test");
-			Output.ShouldBe("/* Test ====================================================================== */" + Environment.NewLine + Environment.NewLine);
-		}
+        [Test]
+        public void CanAnnounceAndPadWithEquals()
+        {
+            _announcer.Heading("Test");
+            Output.ShouldBe("/* Test ====================================================================== */" + Environment.NewLine + Environment.NewLine);
+        }
 
-		[Test]
-		public void CanSay()
-		{
-			_announcer.Say("Create table");
+        [Test]
+        public void CanSay()
+        {
+            _announcer.Say("Create table");
             Output.ShouldBe("/* Create table */" + Environment.NewLine);
-		}
+        }
 
-		[Test]
-		public void CanSayTimeSpan()
-		{
-			_announcer.ElapsedTime(new TimeSpan(0, 0, 5));
-			Output.ShouldBe("/* -> 5s */" + Environment.NewLine + Environment.NewLine);
-		}
+        [Test]
+        public void CanSayTimeSpan()
+        {
+            _announcer.ElapsedTime(new TimeSpan(0, 0, 5));
+            Output.ShouldBe("/* -> 5s */" + Environment.NewLine + Environment.NewLine);
+        }
 
-		[Test]
-		public void CanSaySql()
-		{
-			_announcer.Sql("DELETE Blah");
-			Output.ShouldBe("DELETE Blah" + Environment.NewLine);
-		}
-	}
+        [Test]
+        public void CanSaySql()
+        {
+            _announcer.Sql("DELETE Blah");
+            Output.ShouldBe("DELETE Blah" + Environment.NewLine);
+        }
+    }
 }

@@ -34,7 +34,7 @@ namespace FluentMigrator.Runner.Announcers
             : base(write)
         {
             NonSqlPrefix = "/* ";
-			NonSqlWrapper = sql => string.Format("{0}{1} */", NonSqlPrefix, sql);
+            NonSqlWrapper = sql => string.Format("{0}{1} */", NonSqlPrefix, sql);
         }
 
 
@@ -51,7 +51,7 @@ namespace FluentMigrator.Runner.Announcers
 
         public override void Say(string message)
         {
-			Info(NonSqlWrapper(message));
+            Info(NonSqlWrapper(message));
         }
 
         public override void Sql(string sql)
