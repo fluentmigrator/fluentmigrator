@@ -134,7 +134,7 @@ namespace FluentMigrator.Infrastructure
         {
             var tags = type.GetAllAttributes<TagsAttribute>().SelectMany(x => x.TagNames).ToArray();
 
-            return tags.Any() && tagsToMatch.All(t => tags.Any(t.Contains));
+            return tags.Any() && tagsToMatch.All(t => tags.Any(t.Equals));
         }
     }
 }

@@ -173,6 +173,14 @@ namespace FluentMigrator.Tests.Unit
                     .ShouldBeTrue();
             }
 
+			[Test]
+			[Category("Tagging")]
+			public void WhenTypeHasOneTagThatPartiallyMatchesTagThenReturnsFalse()
+			{
+				DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "UK2" })
+					.ShouldBeFalse();
+			}
+
             [Test]
             [Category("Tagging")]
             public void WhenTypeHasOneTagThatDoesMatchMultipleTagsThenReturnsFalse()
