@@ -55,7 +55,8 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
-            return Read("PRAGMA table_info([{0}])", tableName).Tables[0].Select(string.Format("Name='{0}'", columnName.Replace("'", "''"))).Length > 0;
+            var dataSet = Read("PRAGMA table_info([{0}])", tableName);
+            return dataSet.Tables.Count > 0 && dataSet.Tables[0].Select(string.Format("Name='{0}'", columnName.Replace("'", "''"))).Length > 0;
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)

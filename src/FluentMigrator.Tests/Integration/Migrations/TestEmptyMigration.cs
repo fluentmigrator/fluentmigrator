@@ -1,4 +1,5 @@
 #region License
+
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -14,18 +15,17 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
 #endregion
 
-using FluentMigrator.Infrastructure;
-
-namespace FluentMigrator
+namespace FluentMigrator.Tests.Integration.Migrations
 {
-    public interface IMigration
+    /// <summary>A migration class that deliberately does nothing.</summary>
+    /// <remarks>This is intended for unit testing the migration class itself, rather than the database migration.</remarks>
+    [Migration(3)]
+    public class TestEmptyMigration : Migration
     {
-        /// <summary>The arbitrary application context passed to the task runner.</summary>
-        object ApplicationContext { get; }
-
-        void GetUpExpressions(IMigrationContext context);
-        void GetDownExpressions(IMigrationContext context);
+        public override void Up() { }
+        public override void Down() { }
     }
 }

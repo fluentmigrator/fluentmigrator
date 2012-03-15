@@ -124,16 +124,19 @@
     </Compile>
     <Compile Include="Builders\Alter\AlterExpressionRoot.cs" />
     <Compile Include="Builders\Alter\Column\AlterColumnExpressionBuilder.cs" />
+    <Compile Include="Builders\Alter\Column\IAlterColumnOptionOrForeignKeyCascadeSyntax.cs" />
     <Compile Include="Builders\Alter\Column\IAlterColumnAsTypeOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Alter\Column\IAlterColumnAsTypeSyntax.cs" />
     <Compile Include="Builders\Alter\Column\IAlterColumnOnTableSyntax.cs" />
     <Compile Include="Builders\Alter\Column\IAlterColumnOptionSyntax.cs" />
     <Compile Include="Builders\Alter\IAlterExpressionRoot.cs" />
     <Compile Include="Builders\Alter\Table\AlterTableExpressionBuilder.cs" />
+    <Compile Include="Builders\Alter\Table\IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax.cs" />
     <Compile Include="Builders\Alter\Table\IAlterTableAddColumnOrAlterColumnOrSchemaSyntax.cs" />
     <Compile Include="Builders\Alter\Table\IAlterTableAddColumOrAlterColumnSyntax.cs" />
     <Compile Include="Builders\Alter\Table\IAlterTableColumnAsTypeSyntax.cs" />
     <Compile Include="Builders\Alter\Table\IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax.cs" />
+    <Compile Include="Builders\Create\Column\ICreateColumnOptionOrForeignKeyCascadeSyntax.cs" />
     <Compile Include="Builders\Create\Column\ICreateColumnAsTypeOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Create\Constraint\CreateConstraintExpressionBuilder.cs" />
     <Compile Include="Builders\Create\Constraint\ICreateConstraintColumnsSyntax.cs" />
@@ -149,6 +152,7 @@
     <Compile Include="Builders\Create\Sequence\CreateSequenceExpressionBuilder.cs" />
     <Compile Include="Builders\Create\Sequence\ICreateSequenceInSchemaSyntax.cs" />
     <Compile Include="Builders\Create\Sequence\ICreateSequenceSyntax.cs" />
+    <Compile Include="Builders\Create\Table\ICreateTableColumnOptionOrForeignKeyCascadeOrWithColumnSyntax.cs" />
     <Compile Include="Builders\Create\Table\ICreateTableWithColumnOrSchemaSyntax.cs" />
     <Compile Include="Builders\Delete\Constraint\DeleteConstraintExpressionBuilder.cs" />
     <Compile Include="Builders\Delete\Constraint\IDeleteConstraintOnTableSyntax.cs" />
@@ -173,6 +177,7 @@
     <Compile Include="Builders\IfDatabase\IfDatabaseExpressionRoot.cs" />
     <Compile Include="Builders\IfDatabase\IIfDatabaseExpressionRoot.cs" />
     <Compile Include="Builders\IfDatabase\NullIfDatabaseProcessor.cs" />
+    <Compile Include="Builders\IForeignKeyCascadeSyntax.cs" />
     <Compile Include="Builders\IInSchemaSyntax.cs" />
     <Compile Include="Builders\Insert\IInsertDataAdditionalFeatures.cs" />
     <Compile Include="Builders\Insert\IInsertDataOrInSchemaSyntax.cs" />
@@ -205,6 +210,9 @@
     <Compile Include="Expressions\UpdateDataExpression.cs" />
     <Compile Include="ForwardOnlyMigration.cs" />
     <Compile Include="IDbFactoryLoader.cs" />
+    <Compile Include="Infrastructure\IMigrationMetadata.cs" />
+    <Compile Include="Infrastructure\MigrationWithMetaDataAdapter.cs" />
+    <Compile Include="MigrationBase.cs" />
     <Compile Include="Model\ConstraintDefinition.cs" />
     <Compile Include="Model\DeletionDataDefinition.cs" />
     <Compile Include="Model\InsertionDataDefinition.cs" />

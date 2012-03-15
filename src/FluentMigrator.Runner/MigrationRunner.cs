@@ -32,6 +32,10 @@ namespace FluentMigrator.Runner
         private IAnnouncer _announcer;
         private IStopWatch _stopWatch;
         private bool _alreadyOutputPreviewOnlyModeWarning;
+
+        /// <summary>The arbitrary application context passed to the task runner.</summary>
+        public object ApplicationContext { get; private set; }
+
         public bool SilentlyFail { get; set; }
 
         public IMigrationProcessor Processor { get; private set; }
@@ -46,6 +50,7 @@ namespace FluentMigrator.Runner
             _announcer = runnerContext.Announcer;
             Processor = processor;
             _stopWatch = runnerContext.StopWatch;
+            ApplicationContext = runnerContext.ApplicationContext;
 
             SilentlyFail = false;
             CaughtExceptions = null;
@@ -273,39 +278,51 @@ namespace FluentMigrator.Runner
             get { return _migrationAssembly; }
         }
 
+        private string GetMigrationName(IMigration migration)
+        {
+            if (migration == null) throw new ArgumentNullException("migration");
+
+            IMigrationMetadata metadata = migration as IMigrationMetadata;
+            if (metadata != null)
+            {
+                return string.Format("{0}: {1}", metadata.Version, metadata.Type.Name);
+            }
+            return migration.GetType().Name;
+        }
+
         public void Up(IMigration migration)
         {
-            var name = migration.GetType().Name;
-            _announcer.Heading(name + ": migrating");
+            var name = GetMigrationName(migration);
+            _announcer.Heading(string.Format("{0} migrating", name));
 
             CaughtExceptions = new List<Exception>();
 
-            var context = new MigrationContext(Conventions, Processor, MigrationAssembly);
+            var context = new MigrationContext(Conventions, Processor, MigrationAssembly, ApplicationContext);
             migration.GetUpExpressions(context);
 
             _stopWatch.Start();
             ExecuteExpressions(context.Expressions);
             _stopWatch.Stop();
 
-            _announcer.Say(name + ": migrated");
+            _announcer.Say(string.Format("{0} migrated", name));
             _announcer.ElapsedTime(_stopWatch.ElapsedTime());
         }
 
         public void Down(IMigration migration)
         {
-            var name = migration.GetType().Name;
-            _announcer.Heading(name + ": reverting");
+            var name = GetMigrationName(migration);
+            _announcer.Heading(string.Format("{0} reverting", name));
 
             CaughtExceptions = new List<Exception>();
 
-            var context = new MigrationContext(Conventions, Processor, MigrationAssembly);
+            var context = new MigrationContext(Conventions, Processor, MigrationAssembly, ApplicationContext);
             migration.GetDownExpressions(context);
 
             _stopWatch.Start();
             ExecuteExpressions(context.Expressions);
             _stopWatch.Stop();
 
-            _announcer.Say(name + ": reverted");
+            _announcer.Say(string.Format("{0} reverted", name));
             _announcer.ElapsedTime(_stopWatch.ElapsedTime());
         }
 
