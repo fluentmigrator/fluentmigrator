@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Text;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
-using System.Linq;
-using System.Data;
 
 namespace FluentMigrator.Runner.Generators.Generic
 {
@@ -66,6 +66,9 @@ namespace FluentMigrator.Runner.Generators.Generic
 
             string quotedTableName = Quoter.QuoteTableName(expression.TableName);
 
+            string errors = ValidateAdditionalFeatureCompatibility(expression.Columns.SelectMany(x => x.AdditionalFeatures));
+            if (!string.IsNullOrEmpty(errors)) return errors;
+
             return string.Format(CreateTable, quotedTableName, Column.Generate(expression.Columns, quotedTableName));
         }
 
@@ -79,14 +82,20 @@ namespace FluentMigrator.Runner.Generators.Generic
             return String.Format(RenameTable, Quoter.QuoteTableName(expression.OldName), Quoter.QuoteTableName(expression.NewName));
         }
 
-        public override string Generate(CreateColumnExpression expression)
+        public override string Generate(CreateColumnExpression expression) 
         {
+            string errors = ValidateAdditionalFeatureCompatibility(expression.Column.AdditionalFeatures);
+            if (!string.IsNullOrEmpty(errors)) return errors;
+
             return String.Format(AddColumn, Quoter.QuoteTableName(expression.TableName), Column.Generate(expression.Column));
         }
 
 
         public override string Generate(AlterColumnExpression expression)
         {
+            string errors = ValidateAdditionalFeatureCompatibility(expression.Column.AdditionalFeatures);
+            if (!string.IsNullOrEmpty(errors)) return errors;
+
             return String.Format(AlterColumn, Quoter.QuoteTableName(expression.TableName), Column.Generate(expression.Column));
         }
 
@@ -225,18 +234,8 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(InsertDataExpression expression)
         {
-            if (compatabilityMode == CompatabilityMode.STRICT)
-            {
-                List<string> unsupportedFeatures = expression.AdditionalFeatures.Keys.Where(x => !IsAdditionalFeatureSupported(x)).ToList();
-
-                if (unsupportedFeatures.Any())
-                {
-                    string errorMessage =
-                        string.Format("The following database specific additional features are not supported in strict mode [{0}]",
-                                      expression.AdditionalFeatures.Keys.Aggregate((x, y) => x + ", " + y));
-                    return compatabilityMode.HandleCompatabilty(errorMessage);
-                }
-            }
+            string errors = ValidateAdditionalFeatureCompatibility(expression.AdditionalFeatures);
+            if (!string.IsNullOrEmpty(errors)) return errors;
 
             List<string> columnNames = new List<string>();
             List<string> columnValues = new List<string>();
@@ -257,6 +256,25 @@ namespace FluentMigrator.Runner.Generators.Generic
                 insertStrings.Add(String.Format(InsertData, Quoter.QuoteTableName(expression.TableName), columns, values));
             }
             return String.Join("; ", insertStrings.ToArray());
+        }
+
+        private string ValidateAdditionalFeatureCompatibility(IEnumerable<KeyValuePair<string, object>> features)
+        {
+            if (compatabilityMode == CompatabilityMode.STRICT) {
+                List<string> unsupportedFeatures =
+                    features.Where(x => !IsAdditionalFeatureSupported(x.Key)).Select(x => x.Key).ToList();
+
+                if (unsupportedFeatures.Any()) {
+                    string errorMessage =
+                        string.Format(
+                            "The following database specific additional features are not supported in strict mode [{0}]",
+                            unsupportedFeatures.Aggregate((x, y) => x + ", " + y));
+                    {
+                        return compatabilityMode.HandleCompatabilty(errorMessage);
+                    }
+                }
+            }
+            return string.Empty;
         }
 
         public override string Generate(UpdateDataExpression expression)

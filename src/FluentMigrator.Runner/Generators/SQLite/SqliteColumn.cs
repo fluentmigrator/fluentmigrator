@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace FluentMigrator.Runner.Generators.SQLite
 {

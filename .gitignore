@@ -25,3 +25,6 @@ src/FluentMigrator.Tests/FluentMigrator.VisualState.xml
 examplecommand.txt
 *.crunchproject.local.xml
 *.crunchsolution.local.xml
+*.ncrunchproject
+*.ncrunchsolution
+*.crunchproject.cache
