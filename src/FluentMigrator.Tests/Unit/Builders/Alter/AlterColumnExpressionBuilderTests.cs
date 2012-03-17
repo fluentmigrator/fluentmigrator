@@ -25,8 +25,10 @@ using FluentMigrator.Builders.Alter.Column;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Extensions;
 using Moq;
 using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Builders.Alter
 {
@@ -343,6 +345,26 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
         public void CallingIdentitySetsIsIdentityToTrue()
         {
             VerifyColumnProperty(c => c.IsIdentity = true, b => b.Identity());
+        }
+
+        [Test]
+        public void CallingSeededIdentitySetsAdditionalProperties() 
+        {
+            var contextMock = new Mock<IMigrationContext>();
+
+            var columnMock = new Mock<ColumnDefinition>();
+            columnMock.SetupGet(x => x.Name).Returns("BaconId");
+
+            var expressionMock = new Mock<AlterColumnExpression>();
+            expressionMock.SetupGet(x => x.Column).Returns(columnMock.Object);
+
+            var builder = new AlterColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
+            builder.Identity(23, 44);
+
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(SqlServerExtensions.IdentitySeed, 23));
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(SqlServerExtensions.IdentityIncrement, 44));
         }
 
         [Test]

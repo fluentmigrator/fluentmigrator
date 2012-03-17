@@ -334,7 +334,7 @@ namespace FluentMigrator.Builders.Alter.Table
             return this;
         }
 
-        protected override ColumnDefinition GetColumnForType()
+        public override ColumnDefinition GetColumnForType()
         {
             return CurrentColumn;
         }
