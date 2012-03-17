@@ -27,4 +27,4 @@ examplecommand.txt
 *.crunchsolution.local.xml
 *.ncrunchproject
 *.ncrunchsolution
-*.crunchproject.cache
+*.crunchsolution.cache
