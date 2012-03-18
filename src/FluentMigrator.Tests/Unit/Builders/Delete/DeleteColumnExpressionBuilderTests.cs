@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System.Collections.Generic;
+using System.Linq;
 using FluentMigrator.Builders.Delete.Column;
 using FluentMigrator.Expressions;
 using Moq;
@@ -35,6 +37,29 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             builder.FromTable("Bacon");
 
             expressionMock.VerifySet(x => x.TableName = "Bacon");
+        }
+
+        [Test]
+        public void CallingColumnAddsColumnNameToList() 
+        {
+            var expressionMock = new Mock<DeleteColumnExpression>();
+            expressionMock.Object.ColumnNames = new List<string> {"Cheese"};
+
+            var builder = new DeleteColumnExpressionBuilder(expressionMock.Object);
+            builder.Column("Bacon");
+            
+            Assert.That(expressionMock.Object.ColumnNames.ElementAt(1), Is.EqualTo("Bacon"));
+        }
+
+        [Test]
+        public void CallingInSchemaSetsSchemaOnExpression() 
+        {
+            var expressionMock = new Mock<DeleteColumnExpression>();
+
+            var builder = new DeleteColumnExpressionBuilder(expressionMock.Object);
+            builder.InSchema("Bacon");
+
+            expressionMock.VerifySet(x => x.SchemaName = "Bacon");
         }
     }
 }

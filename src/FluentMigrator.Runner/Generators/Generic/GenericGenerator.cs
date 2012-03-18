@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 using System.Text;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
-using System.Linq;
-using System.Data;
 
 namespace FluentMigrator.Runner.Generators.Generic
 {
@@ -92,7 +92,13 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(DeleteColumnExpression expression)
         {
-            return String.Format(DropColumn, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.ColumnName));
+            StringBuilder builder = new StringBuilder();
+            foreach (string columnName in expression.ColumnNames) 
+            {
+                if (expression.ColumnNames.First() != columnName) builder.AppendLine(";");
+                builder.AppendFormat(DropColumn, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(columnName));
+            }
+            return builder.ToString();
         }
 
         public override string Generate(RenameColumnExpression expression)

@@ -26,6 +26,14 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
+        public void CanDropMultipleColumns()
+        {
+            var expression = GeneratorTestHelper.GetDeleteColumnExpression(new string[] {"TestColumn1", "TestColumn2"});
+            string sql = _generator.Generate(expression);
+            sql.ShouldBe(String.Empty); //because sqlite doesnt support removing columns
+        }
+
+        [Test]
         public override void CanDropForeignKey()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();

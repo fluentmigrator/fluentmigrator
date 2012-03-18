@@ -34,6 +34,12 @@ namespace FluentMigrator.Builders.Delete.Column
             return this;
         }
 
+        public IDeleteColumnFromTableSyntax Column(string columnName) 
+        {
+            Expression.ColumnNames.Add(columnName);
+            return this;
+        }
+
         public void InSchema(string schemaName)
         {
             Expression.SchemaName = schemaName;
