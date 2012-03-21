@@ -49,6 +49,8 @@ namespace FluentMigrator.MSBuild
         [Required]
         public string Connection { get; set; }
 
+        public string ConnectionStringConfigPath { get; set; }
+
         public string Target { get { return migrationAssembly; } set { migrationAssembly = value; } }
 
         public string MigrationAssembly { get { return migrationAssembly; } set { migrationAssembly = value; } }
@@ -72,6 +74,8 @@ namespace FluentMigrator.MSBuild
         public int Timeout { get; set; }
 
         public string Profile { get; set; }
+
+        public bool PreviewOnly { get; set; }
 
         public override bool Execute()
         {
@@ -99,15 +103,16 @@ namespace FluentMigrator.MSBuild
             {
                 Database = databaseType,
                 Connection = Connection,
+                ConnectionStringConfigPath = ConnectionStringConfigPath,
                 Target = Target,
-                PreviewOnly = false,
+                PreviewOnly = PreviewOnly,
                 Namespace = Namespace,
                 Task = Task,
                 Version = Version,
                 Steps = Steps,
                 WorkingDirectory = WorkingDirectory,
                 Profile = Profile,
-                Timeout = Timeout
+                Timeout = Timeout,
             };
 
             Log.LogCommandLine(MessageImportance.Low, "Executing Migration Runner");
