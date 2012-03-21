@@ -93,8 +93,8 @@ namespace FluentMigrator.MSBuild
             }
 
 
-            Log.LogCommandLine(MessageImportance.Low, "Creating Context");
-            var announcer = new BaseAnnouncer(msg => Log.LogCommandLine(MessageImportance.Normal, msg))
+            Log.LogMessage(MessageImportance.Low, "Creating Context");
+            var announcer = new BaseAnnouncer(msg => Log.LogMessage(MessageImportance.Normal, msg))
             {
                 ShowElapsedTime = Verbose,
                 ShowSql = Verbose
@@ -115,7 +115,7 @@ namespace FluentMigrator.MSBuild
                 Timeout = Timeout,
             };
 
-            Log.LogCommandLine(MessageImportance.Low, "Executing Migration Runner");
+            Log.LogMessage(MessageImportance.Low, "Executing Migration Runner");
             try
             {
                 new TaskExecutor(runnerContext).Execute();
