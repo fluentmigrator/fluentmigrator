@@ -41,7 +41,6 @@ end
 
 def prepare_tools_package
   output_directory_tools = './packages/FluentMigrator.Tools/tools/'
-  output_directory_content = './packages/FluentMigrator.Tools/content/'
   
   FileUtils.mkdir_p output_directory_tools
 
