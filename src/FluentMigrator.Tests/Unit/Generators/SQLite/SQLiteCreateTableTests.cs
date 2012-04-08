@@ -21,7 +21,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             string sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL, 'TestColumn2' INTEGER NOT NULL)");
+            sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT, 'TestColumn2' INTEGER)");
         }
 
         [Test]
@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
             var sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL, 'TestColumn2' INTEGER NOT NULL, PRIMARY KEY ('TestColumn1'))");
+            sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT, 'TestColumn2' INTEGER, PRIMARY KEY ('TestColumn1'))");
         }
 
         [Test]
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             //Should work. I think from the docs
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
             string sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL, 'TestColumn2' INTEGER NOT NULL, CONSTRAINT 'TestKey' PRIMARY KEY ('TestColumn1'))");
+            sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT, 'TestColumn2' INTEGER, CONSTRAINT 'TestKey' PRIMARY KEY ('TestColumn1'))");
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             //Should work. I think from the docs
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumNamedPrimaryKeyExpression();
             string sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL, 'TestColumn2' INTEGER NOT NULL, CONSTRAINT 'TestKey' PRIMARY KEY ('TestColumn1', 'TestColumn2'))");
+            sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT, 'TestColumn2' INTEGER, CONSTRAINT 'TestKey' PRIMARY KEY ('TestColumn1', 'TestColumn2'))");
         }
 
         [Test]
@@ -64,13 +64,13 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Columns[0].IsPrimaryKey = true;
 
             var sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 'TestColumn2' INTEGER NOT NULL)");
+            sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' INTEGER PRIMARY KEY AUTOINCREMENT, 'TestColumn2' INTEGER)");
         }
 
         [Test]
-        public override void CanCreateTableWithNullableField()
+        public override void CanCreateTableWithNonNullableField()
         {
-            var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
+            var expression = GeneratorTestHelper.GetCreateTableWithNonNullableColumn();
 
             var result = _generator.Generate(expression);
 
@@ -86,7 +86,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var result = _generator.Generate(expression);
 
             result.ShouldBe(
-                "CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL DEFAULT 'Default', 'TestColumn2' INTEGER NOT NULL DEFAULT 0)");
+                "CREATE TABLE 'TestTable1' ('TestColumn1' TEXT DEFAULT 'Default', 'TestColumn2' INTEGER DEFAULT 0)");
         }
 
         [Test]
@@ -98,7 +98,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var result = _generator.Generate(expression);
 
             result.ShouldBe(
-                "CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL DEFAULT NULL, 'TestColumn2' INTEGER NOT NULL DEFAULT 0)");
+                "CREATE TABLE 'TestTable1' ('TestColumn1' TEXT DEFAULT NULL, 'TestColumn2' INTEGER DEFAULT 0)");
         }
 
         [Test]
@@ -122,7 +122,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
             var result = _generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT NOT NULL, 'TestColumn2' INTEGER NOT NULL, PRIMARY KEY ('TestColumn1', 'TestColumn2'))");
+            result.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' TEXT, 'TestColumn2' INTEGER, PRIMARY KEY ('TestColumn1', 'TestColumn2'))");
         }
 
         [Test]

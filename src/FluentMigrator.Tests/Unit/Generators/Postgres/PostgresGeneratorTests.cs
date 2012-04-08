@@ -41,7 +41,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             string tableName = "NewTable";
             CreateTableExpression expression = GetCreateTableExpression(tableName);
             string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text NOT NULL, \"ColumnName2\" integer NOT NULL)");
+            sql.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text, \"ColumnName2\" integer)");
         }
 
         [Test]
@@ -51,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             CreateTableExpression expression = GetCreateTableExpression(tableName);
             expression.SchemaName = "wibble";
             string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"wibble\".\"NewTable\" (\"ColumnName1\" text NOT NULL, \"ColumnName2\" integer NOT NULL)");
+            sql.ShouldBe("CREATE TABLE \"wibble\".\"NewTable\" (\"ColumnName1\" text, \"ColumnName2\" integer)");
         }
 
         [Test]
@@ -61,7 +61,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             CreateTableExpression expression = GetCreateTableExpression(tableName);
             expression.Columns[0].IsPrimaryKey = true;
             string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text NOT NULL, \"ColumnName2\" integer NOT NULL, PRIMARY KEY (\"ColumnName1\"))");
+            sql.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text, \"ColumnName2\" integer, PRIMARY KEY (\"ColumnName1\"))");
         }
 
         [Test]
@@ -72,7 +72,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             expression.Columns[0].IsPrimaryKey = true;
             expression.Columns[0].PrimaryKeyName = "PK_NewTable";
             string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text NOT NULL, \"ColumnName2\" integer NOT NULL, CONSTRAINT \"PK_NewTable\" PRIMARY KEY (\"ColumnName1\"))");
+            sql.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text, \"ColumnName2\" integer, CONSTRAINT \"PK_NewTable\" PRIMARY KEY (\"ColumnName1\"))");
         }
 
         [Test]
@@ -82,7 +82,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             CreateTableExpression expression = GetCreateTableExpression(tableName);
             expression.Columns[0].DefaultValue = "abc";
             string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text NOT NULL DEFAULT 'abc', \"ColumnName2\" integer NOT NULL)");
+            sql.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text DEFAULT 'abc', \"ColumnName2\" integer)");
         }
 
         [Test]
@@ -92,7 +92,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             CreateTableExpression expression = GetCreateTableExpression(tableName);
             expression.Columns[0].DefaultValue = true;
             string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text NOT NULL DEFAULT true, \"ColumnName2\" integer NOT NULL)");
+            sql.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text DEFAULT true, \"ColumnName2\" integer)");
         }
 
         [Test]
@@ -103,7 +103,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             expression.Columns[0].DefaultValue = null;
             var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text NOT NULL DEFAULT NULL, \"ColumnName2\" integer NOT NULL)");
+                "CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text DEFAULT NULL, \"ColumnName2\" integer)");
 
         }
 
@@ -115,7 +115,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             expression.Columns[0].IsPrimaryKey = true;
             expression.Columns[1].IsPrimaryKey = true;
             string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text NOT NULL, \"ColumnName2\" integer NOT NULL, PRIMARY KEY (\"ColumnName1\",\"ColumnName2\"))");
+            sql.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text, \"ColumnName2\" integer, PRIMARY KEY (\"ColumnName1\",\"ColumnName2\"))");
         }
 
         [Test]
@@ -127,7 +127,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             expression.Columns[0].PrimaryKeyName = "wibble";
             expression.Columns[1].IsPrimaryKey = true;
             string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text NOT NULL, \"ColumnName2\" integer NOT NULL, CONSTRAINT \"wibble\" PRIMARY KEY (\"ColumnName1\",\"ColumnName2\"))");
+            sql.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" text, \"ColumnName2\" integer, CONSTRAINT \"wibble\" PRIMARY KEY (\"ColumnName1\",\"ColumnName2\"))");
         }
 
         [Test]
@@ -178,7 +178,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             expression.TableName = tableName;
 
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"public\".\"NewTable\" ADD \"NewColumn\" varchar(5) NOT NULL");
+            sql.ShouldBe("ALTER TABLE \"public\".\"NewTable\" ADD \"NewColumn\" varchar(5)");
         }
 
         [Test]
@@ -196,7 +196,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             expression.TableName = tableName;
 
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"public\".\"NewTable\" ADD \"id\" serial NOT NULL");
+            sql.ShouldBe("ALTER TABLE \"public\".\"NewTable\" ADD \"id\" serial");
         }
 
         [Test]
@@ -214,7 +214,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             expression.TableName = tableName;
 
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"public\".\"NewTable\" ADD \"id\" bigserial NOT NULL");
+            sql.ShouldBe("ALTER TABLE \"public\".\"NewTable\" ADD \"id\" bigserial");
         }
 
         [Test]
@@ -233,7 +233,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             expression.TableName = tableName;
 
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"public\".\"NewTable\" ADD \"NewColumn\" decimal(2,19) NOT NULL");
+            sql.ShouldBe("ALTER TABLE \"public\".\"NewTable\" ADD \"NewColumn\" decimal(2,19)");
         }
 
         [Test]

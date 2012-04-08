@@ -23,7 +23,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
 
             var sql = _generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` VARCHAR(5) NOT NULL");
+            sql.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` VARCHAR(5)");
         }
 
         [Test]
@@ -32,7 +32,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
 
             var sql = _generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` DECIMAL(19,2) NOT NULL");
+            sql.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` DECIMAL(19,2)");
         }
 
         [Test]
@@ -118,7 +118,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
 
             var sql = _generator.Generate(expression);
 
-            sql.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` INTEGER NOT NULL AUTO_INCREMENT");
+            sql.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` INTEGER AUTO_INCREMENT");
         }
 
         [Test]

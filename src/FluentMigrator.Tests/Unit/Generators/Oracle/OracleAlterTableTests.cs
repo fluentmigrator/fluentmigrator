@@ -22,7 +22,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NVARCHAR2(5) NOT NULL");
+            sql.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NVARCHAR2(5)");
         }
 
         [Test]
@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NUMBER(19,2) NOT NULL");
+            sql.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NUMBER(19,2)");
         }
 
         [Test]

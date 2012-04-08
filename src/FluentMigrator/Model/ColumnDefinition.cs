@@ -28,6 +28,7 @@ namespace FluentMigrator.Model
         public ColumnDefinition()
         {
             DefaultValue = new UndefinedDefaultValue();
+            IsNullable = true;
         }
 
         public virtual string Name { get; set; }

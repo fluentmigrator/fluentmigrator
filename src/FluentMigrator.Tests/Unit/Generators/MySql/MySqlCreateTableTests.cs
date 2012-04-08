@@ -21,7 +21,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             var sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL, `TestColumn2` INTEGER NOT NULL) ENGINE = INNODB");
+            sql.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255), `TestColumn2` INTEGER) ENGINE = INNODB");
         }
 
         [Test]
@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             expression.Columns[1].CustomType = "[timestamp]";
             var sql = _generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL, `TestColumn2` [timestamp] NOT NULL, PRIMARY KEY (`TestColumn1`)) ENGINE = INNODB");
+                "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255), `TestColumn2` [timestamp], PRIMARY KEY (`TestColumn1`)) ENGINE = INNODB");
         }
 
         [Test]
@@ -43,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
 
             var sql = _generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL, `TestColumn2` INTEGER NOT NULL, PRIMARY KEY (`TestColumn1`)) ENGINE = INNODB");
+                "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255), `TestColumn2` INTEGER, PRIMARY KEY (`TestColumn1`)) ENGINE = INNODB");
         }
 
         [Test]
@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
 
             string sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL, `TestColumn2` INTEGER NOT NULL, CONSTRAINT `TestKey` PRIMARY KEY (`TestColumn1`)) ENGINE = INNODB");
+            sql.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255), `TestColumn2` INTEGER, CONSTRAINT `TestKey` PRIMARY KEY (`TestColumn1`)) ENGINE = INNODB");
         }
 
         [Test]
@@ -60,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumNamedPrimaryKeyExpression();
             string sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL, `TestColumn2` INTEGER NOT NULL, CONSTRAINT `TestKey` PRIMARY KEY (`TestColumn1`, `TestColumn2`)) ENGINE = INNODB");
+            sql.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255), `TestColumn2` INTEGER, CONSTRAINT `TestKey` PRIMARY KEY (`TestColumn1`, `TestColumn2`)) ENGINE = INNODB");
         }
 
         [Test]
@@ -70,13 +70,13 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
 
             var sql = _generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE `TestTable1` (`TestColumn1` INTEGER NOT NULL AUTO_INCREMENT, `TestColumn2` INTEGER NOT NULL) ENGINE = INNODB");
+                "CREATE TABLE `TestTable1` (`TestColumn1` INTEGER AUTO_INCREMENT, `TestColumn2` INTEGER) ENGINE = INNODB");
         }
 
         [Test]
-        public override void CanCreateTableWithNullableField()
+        public override void CanCreateTableWithNonNullableField()
         {
-            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            var expression = GeneratorTestHelper.GetCreateTableWithNonNullableColumn();
             expression.Columns[0].IsNullable = true;
             var sql = _generator.Generate(expression);
             sql.ShouldBe(
@@ -91,7 +91,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             expression.Columns[1].DefaultValue = 0;
             var sql = _generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL DEFAULT 'Default', `TestColumn2` INTEGER NOT NULL DEFAULT 0) ENGINE = INNODB");
+                "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) DEFAULT 'Default', `TestColumn2` INTEGER DEFAULT 0) ENGINE = INNODB");
         }
 
         [Test]
@@ -103,7 +103,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             var result = _generator.Generate(expression);
 
             result.ShouldBe(
-                "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL DEFAULT NULL, `TestColumn2` INTEGER NOT NULL DEFAULT 0) ENGINE = INNODB");
+                "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) DEFAULT NULL, `TestColumn2` INTEGER DEFAULT 0) ENGINE = INNODB");
         }
 
         [Test]
@@ -148,7 +148,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             var result = _generator.Generate(expression);
 
             result.ShouldBe(
-                "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) NOT NULL, `TestColumn2` INTEGER NOT NULL, PRIMARY KEY (`TestColumn1`, `TestColumn2`)) ENGINE = INNODB");
+                "CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255), `TestColumn2` INTEGER, PRIMARY KEY (`TestColumn1`, `TestColumn2`)) ENGINE = INNODB");
         }
 
         [Test]

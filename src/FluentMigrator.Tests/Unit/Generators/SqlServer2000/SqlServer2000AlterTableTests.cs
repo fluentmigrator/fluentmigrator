@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
             var sql = _generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL");
+            sql.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] NVARCHAR(5)");
         }
 
         [Test]
@@ -39,7 +39,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             };
             var expression = new CreateColumnExpression { TableName = "TestTable1", Column = column };
             var sql = _generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL DEFAULT GetDate()");
+            sql.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] NVARCHAR(5) DEFAULT GetDate()");
         }
 
         [Test]
@@ -47,7 +47,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
             var sql = _generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] DECIMAL(19,2) NOT NULL");
+            sql.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] DECIMAL(19,2)");
         }
 
         [Test]

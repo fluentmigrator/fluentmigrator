@@ -29,7 +29,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             var sql = generator.Generate(expression);
 
             sql.ShouldBe(
-                "CREATE TABLE [dbo].[TestTable1] ([TestColumn1] DATETIMEOFFSET NOT NULL, [TestColumn2] DATETIME2 NOT NULL, [TestColumn3] DATE NOT NULL, [TestColumn4] TIME NOT NULL)");
+                "CREATE TABLE [dbo].[TestTable1] ([TestColumn1] DATETIMEOFFSET, [TestColumn2] DATETIME2, [TestColumn3] DATE, [TestColumn4] TIME)");
         }
     }
 }
