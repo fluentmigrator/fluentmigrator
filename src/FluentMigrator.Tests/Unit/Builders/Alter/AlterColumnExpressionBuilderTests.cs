@@ -1,3 +1,21 @@
+#region License
+// 
+// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -7,8 +25,10 @@ using FluentMigrator.Builders.Alter.Column;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Extensions;
 using Moq;
 using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Builders.Alter
 {
@@ -328,6 +348,26 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
         }
 
         [Test]
+        public void CallingSeededIdentitySetsAdditionalProperties() 
+        {
+            var contextMock = new Mock<IMigrationContext>();
+
+            var columnMock = new Mock<ColumnDefinition>();
+            columnMock.SetupGet(x => x.Name).Returns("BaconId");
+
+            var expressionMock = new Mock<AlterColumnExpression>();
+            expressionMock.SetupGet(x => x.Column).Returns(columnMock.Object);
+
+            var builder = new AlterColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
+            builder.Identity(23, 44);
+
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(SqlServerExtensions.IdentitySeed, 23));
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(SqlServerExtensions.IdentityIncrement, 44));
+        }
+
+        [Test]
         public void CallingIndexedAddsIndexExpressionToContext()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -458,6 +498,33 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
                                                  )));
 
             contextMock.VerifyGet(x => x.Expressions);
+        }
+
+        [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
+        public void CallingOnUpdateSetsOnUpdateOnForeignKeyExpression(Rule rule)
+        {
+            var builder = new AlterColumnExpressionBuilder(null, null) { CurrentForeignKey = new ForeignKeyDefinition() };
+            builder.OnUpdate(rule);
+            Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(rule));
+            Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(Rule.None));
+        }
+
+        [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
+        public void CallingOnDeleteSetsOnDeleteOnForeignKeyExpression(Rule rule)
+        {
+            var builder = new AlterColumnExpressionBuilder(null, null) { CurrentForeignKey = new ForeignKeyDefinition() };
+            builder.OnDelete(rule);
+            Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(Rule.None));
+            Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(rule));
+        }
+
+        [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
+        public void CallingOnDeleteOrUpdateSetsOnUpdateAndOnDeleteOnForeignKeyExpression(Rule rule)
+        {
+            var builder = new AlterColumnExpressionBuilder(null, null) { CurrentForeignKey = new ForeignKeyDefinition() };
+            builder.OnDeleteOrUpdate(rule);
+            Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(rule));
+            Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(rule));
         }
 
         [Test]

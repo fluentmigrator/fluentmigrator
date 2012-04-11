@@ -17,6 +17,8 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Extensions;
@@ -162,7 +164,14 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override bool IsAdditionalFeatureSupported(string feature)
         {
-            return (feature == SqlServerExtensions.IdentityInsert);
+            return _supportedAdditionalFeatures.Any(x => x == feature);
         }
+
+        private readonly IEnumerable<string> _supportedAdditionalFeatures = new List<string> 
+        { 
+            SqlServerExtensions.IdentityInsert,
+            SqlServerExtensions.IdentitySeed, 
+            SqlServerExtensions.IdentityIncrement
+        };
     }
 }

@@ -25,8 +25,10 @@ using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Extensions;
 using Moq;
 using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
@@ -270,6 +272,24 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         public void CallingIdentitySetsIsIdentityToTrue()
         {
             VerifyColumnProperty(c => c.IsIdentity = true, b => b.Identity());
+        }
+
+        [Test]
+        public void CallingIdentityWithSeededIdentitySetsAdditionalProperties() 
+        {
+            var contextMock = new Mock<IMigrationContext>();
+
+            var columnMock = new Mock<ColumnDefinition>();
+
+            var expressionMock = new Mock<CreateTableExpression>();
+            var builder = new CreateTableExpressionBuilder(expressionMock.Object, contextMock.Object);
+            builder.CurrentColumn = columnMock.Object;
+            builder.Identity(12, 44);
+
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(SqlServerExtensions.IdentitySeed, 12));
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(SqlServerExtensions.IdentityIncrement, 44));
         }
 
         [Test]
@@ -526,6 +546,33 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
                                                 )));
 
             contextMock.VerifyGet(x => x.Expressions);
+        }
+
+        [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
+        public void CallingOnUpdateSetsOnUpdateOnForeignKeyExpression(Rule rule) 
+        {
+            var builder = new CreateTableExpressionBuilder(null, null) { CurrentForeignKey = new ForeignKeyDefinition() };
+            builder.OnUpdate(rule);
+            Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(rule));
+            Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(Rule.None));
+        }
+
+        [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
+        public void CallingOnDeleteSetsOnDeleteOnForeignKeyExpression(Rule rule) 
+        {
+            var builder = new CreateTableExpressionBuilder(null, null) { CurrentForeignKey = new ForeignKeyDefinition() };
+            builder.OnDelete(rule);
+            Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(Rule.None));
+            Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(rule));
+        }
+
+        [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
+        public void CallingOnDeleteOrUpdateSetsOnUpdateAndOnDeleteOnForeignKeyExpression(Rule rule) 
+        {
+            var builder = new CreateTableExpressionBuilder(null, null) { CurrentForeignKey = new ForeignKeyDefinition() };
+            builder.OnDeleteOrUpdate(rule);
+            Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(rule));
+            Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(rule));
         }
 
         [Test]

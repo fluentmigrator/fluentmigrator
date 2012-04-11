@@ -19,11 +19,12 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Insert
 {
-    public class InsertDataExpressionBuilder : IInsertDataOrInSchemaSyntax, IInsertDataAdditionalFeatures
+    public class InsertDataExpressionBuilder : IInsertDataOrInSchemaSyntax, ISupportAdditionalFeatures
     {
         private readonly InsertDataExpression _expression;
 
@@ -38,7 +39,7 @@ namespace FluentMigrator.Builders.Insert
             return this;
         }
 
-        IInsertDataSyntax IInsertDataAdditionalFeatures.AddAdditionalFeature(string feature, object value)
+        void ISupportAdditionalFeatures.AddAdditionalFeature(string feature, object value)
         {
             if (!_expression.AdditionalFeatures.ContainsKey(feature))
             {
@@ -48,7 +49,6 @@ namespace FluentMigrator.Builders.Insert
             {
                 _expression.AdditionalFeatures[feature] = value;
             }
-            return this;
         }
 
         public IInsertDataSyntax InSchema(string schemaName)

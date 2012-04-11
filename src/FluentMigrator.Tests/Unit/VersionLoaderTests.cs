@@ -121,9 +121,9 @@ namespace FluentMigrator.Tests.Unit
             processor.Setup(p => p.Process(It.Is<InsertDataExpression>(expression =>
                                                                        expression.SchemaName == loader.VersionTableMetaData.SchemaName
                                                                        && expression.TableName == loader.VersionTableMetaData.TableName
-                                                                       && expression.Rows.All(
+                                                                       && expression.Rows.Any(
                                                                            definition =>
-                                                                           definition.All(
+                                                                           definition.Any(
                                                                                pair =>
                                                                                pair.Key == loader.VersionTableMetaData.ColumnName && pair.Value.Equals(1L))))))
                 .Verifiable();

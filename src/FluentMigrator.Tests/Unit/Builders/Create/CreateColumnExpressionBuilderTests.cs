@@ -25,8 +25,10 @@ using FluentMigrator.Builders.Create.Column;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Extensions;
 using Moq;
 using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
@@ -298,6 +300,26 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [Test]
+        public void CallingSeededIdentitySetsAdditionalProperties() 
+        {
+            var contextMock = new Mock<IMigrationContext>();
+
+            var columnMock = new Mock<ColumnDefinition>();
+            columnMock.SetupGet(x => x.Name).Returns("BaconId");
+
+            var expressionMock = new Mock<CreateColumnExpression>();
+            expressionMock.SetupGet(x => x.Column).Returns(columnMock.Object);
+
+            var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
+            builder.Identity(23, 44);
+
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(SqlServerExtensions.IdentitySeed, 23));
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(SqlServerExtensions.IdentityIncrement, 44));
+        }
+
+        [Test]
         public void CallingIndexedSetsIsIndexedToTrue()
         {
             VerifyColumnProperty(c => c.IsIndexed = true, b => b.Indexed());
@@ -548,6 +570,33 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
                         fk.ForeignKey.ForeignColumns.Contains("BaconId") &&
                         fk.ForeignKey.ForeignColumns.Count == 1
                                                 )));
+        }
+
+        [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
+        public void CallingOnUpdateSetsOnUpdateOnForeignKeyExpression(Rule rule) 
+        {
+            var builder = new CreateColumnExpressionBuilder(null, null) {CurrentForeignKey = new ForeignKeyDefinition()};
+            builder.OnUpdate(rule);
+            Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(rule));
+            Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(Rule.None));
+        }
+
+        [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
+        public void CallingOnDeleteSetsOnDeleteOnForeignKeyExpression(Rule rule) 
+        {
+            var builder = new CreateColumnExpressionBuilder(null, null) { CurrentForeignKey = new ForeignKeyDefinition() };
+            builder.OnDelete(rule);
+            Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(Rule.None));
+            Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(rule));
+        }
+
+        [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
+        public void CallingOnDeleteOrUpdateSetsOnUpdateAndOnDeleteOnForeignKeyExpression(Rule rule) 
+        {
+            var builder = new CreateColumnExpressionBuilder(null, null) { CurrentForeignKey = new ForeignKeyDefinition() };
+            builder.OnDeleteOrUpdate(rule);
+            Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(rule));
+            Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(rule));
         }
 
         private void VerifyColumnProperty(Action<ColumnDefinition> columnExpression, Action<CreateColumnExpressionBuilder> callToTest)
