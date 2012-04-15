@@ -109,5 +109,28 @@ namespace FluentMigrator.Tests.Integration
             });
         }
 
+        [Test]
+        public void VersionTableIsRemovedWhenAllMigrationsAreRolledBack()
+        {
+            ExecuteWithSupportedProcessors(processor =>
+            {
+                var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), 
+                    new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                        {
+                            Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3"
+                        }, processor);
+
+                IVersionTableMetaData tableMetaData = new TestVersionTableMetaData();
+
+                runner.MigrateUp();
+
+                processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName).ShouldBeTrue();
+
+                runner.RollbackToVersion(0);
+
+                processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName).ShouldBeFalse();
+            });
+        }
+
     }
 }
