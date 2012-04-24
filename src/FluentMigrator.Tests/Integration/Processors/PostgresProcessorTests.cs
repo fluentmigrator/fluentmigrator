@@ -17,6 +17,8 @@
 #endregion
 
 using System.Data;
+using System.IO;
+using FluentMigrator.Builders.Execute;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Processors;
@@ -431,6 +433,58 @@ namespace FluentMigrator.Tests.Integration.Processors
                 ds.Tables[0].Rows.Count.ShouldBe(3);
                 ds.Tables[0].Rows[2][0].ShouldBe(2);
             }
+        }
+
+        [Test]
+        public void CallingProcessWithPerformDBOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
+        {
+            var output = new StringWriter();
+
+            var connection = new NpgsqlConnection(IntegrationTestOptions.Postgres.ConnectionString);
+
+            var processor = new PostgresProcessor(
+                connection,
+                new PostgresGenerator(),
+                new TextWriterAnnouncer(output),
+                new ProcessorOptions { PreviewOnly = true },
+                new PostgresDbFactory());
+
+            bool tableExists;
+
+            try
+            {
+                var expression =
+                    new PerformDBOperationExpression
+                    {
+                        Operation = (con, trans) =>
+                        {
+                            var command = con.CreateCommand();
+                            command.CommandText = "CREATE TABLE processtesttable (test int NULL) ";
+                            command.Transaction = trans;
+
+                            command.ExecuteNonQuery();
+                        }
+                    };
+
+                processor.Process(expression);
+
+                var com = connection.CreateCommand();
+                com.CommandText = "";
+
+                tableExists = processor.TableExists("public", "processtesttable");
+            }
+            finally
+            {
+                processor.RollbackTransaction();
+            }
+
+            tableExists.ShouldBeFalse();
+
+            output.ToString().ShouldBe(
+@"-- Beginning Transaction
+-- Performing DB Operation
+-- Rolling back transaction
+");
         }
     }
 }
