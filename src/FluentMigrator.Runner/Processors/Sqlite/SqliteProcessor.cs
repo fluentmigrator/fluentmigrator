@@ -101,6 +101,11 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
         public override void Process(PerformDBOperationExpression expression)
         {
+            Announcer.Say("Performing DB Operation");
+
+            if (Options.PreviewOnly)
+                return;
+
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
             if (expression.Operation != null)

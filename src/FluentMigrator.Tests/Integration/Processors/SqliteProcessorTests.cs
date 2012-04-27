@@ -17,7 +17,9 @@
 #endregion
 
 using System.Data;
-using System.Data.Common;
+using System.Data.SQLite;
+using System.IO;
+using FluentMigrator.Builders.Execute;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Announcers;
@@ -33,10 +35,10 @@ namespace FluentMigrator.Tests.Integration.Processors
     [TestFixture]
     public class SqliteProcessorTests
     {
-        private IDbConnection connection;
-        private SqliteProcessor processor;
+        private IDbConnection _connection;
+        private SqliteProcessor _processor;
         private Mock<ColumnDefinition> column;
-        private IDbCommand command;
+        private IDbCommand _command;
         private string columnName;
         private string tableName;
         private string tableNameThanMustBeEscaped;
@@ -46,12 +48,12 @@ namespace FluentMigrator.Tests.Integration.Processors
         {
             // This connection used in the tests
             var factory = new SqliteDbFactory();
-            connection = factory.CreateConnection("Data Source=:memory:;Version=3;New=True;");
-            connection.Open();
-            command = connection.CreateCommand();
+            _connection = factory.CreateConnection("Data Source=:memory:;Version=3;New=True;");
+            _connection.Open();
+            _command = _connection.CreateCommand();
 
             // SUT
-            processor = new SqliteProcessor(connection, new SqliteGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), factory);
+            _processor = new SqliteProcessor(_connection, new SqliteGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), factory);
 
             column = new Mock<ColumnDefinition>();
             tableName = "NewTable";
@@ -77,11 +79,11 @@ namespace FluentMigrator.Tests.Integration.Processors
             var expression = new CreateTableExpression { TableName = tableName };
             expression.Columns.Add(column);
 
-            using (command)
+            using (_command)
             {
-                processor.Process(expression);
-                command.CommandText = string.Format("SELECT name FROM sqlite_master WHERE type='table' and name='{0}'", tableName);
-                command.ExecuteReader().Read().ShouldBeTrue();
+                _processor.Process(expression);
+                _command.CommandText = string.Format("SELECT name FROM sqlite_master WHERE type='table' and name='{0}'", tableName);
+                _command.ExecuteReader().Read().ShouldBeTrue();
             }
         }
 
@@ -91,11 +93,11 @@ namespace FluentMigrator.Tests.Integration.Processors
             var expression = new CreateTableExpression { TableName = tableName };
             expression.Columns.Add(column.Object);
 
-            using (command)
+            using (_command)
             {
-                processor.Process(expression);
-                command.CommandText = string.Format("SELECT name FROM sqlite_master WHERE type='table' and name='{0}'", tableName);
-                command.ExecuteReader().Read().ShouldBeTrue();
+                _processor.Process(expression);
+                _command.CommandText = string.Format("SELECT name FROM sqlite_master WHERE type='table' and name='{0}'", tableName);
+                _command.ExecuteReader().Read().ShouldBeTrue();
             }
         }
 
@@ -104,7 +106,7 @@ namespace FluentMigrator.Tests.Integration.Processors
         {
             var expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
             expression.Columns.Add(column.Object);
-            processor.Process(expression);
+            _processor.Process(expression);
         }
 
         [Test]
@@ -112,8 +114,8 @@ namespace FluentMigrator.Tests.Integration.Processors
         {
             var expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
             expression.Columns.Add(column.Object);
-            processor.Process(expression);
-            processor.ReadTableData(null, tableNameThanMustBeEscaped).Tables.Count.ShouldBe(1);
+            _processor.Process(expression);
+            _processor.ReadTableData(null, tableNameThanMustBeEscaped).Tables.Count.ShouldBe(1);
         }
 
         [Test]
@@ -121,8 +123,8 @@ namespace FluentMigrator.Tests.Integration.Processors
         {
             var expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
             expression.Columns.Add(column.Object);
-            processor.Process(expression);
-            processor.TableExists(null, tableNameThanMustBeEscaped).ShouldBeTrue();
+            _processor.Process(expression);
+            _processor.TableExists(null, tableNameThanMustBeEscaped).ShouldBeTrue();
         }
 
         [Test]
@@ -132,8 +134,56 @@ namespace FluentMigrator.Tests.Integration.Processors
 
             var expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
             expression.Columns.Add(new ColumnDefinition() { Name = "123ColumnName", Type = DbType.AnsiString, IsNullable = true });
-            processor.Process(expression);
-            processor.ColumnExists(null, tableNameThanMustBeEscaped, columnName).ShouldBeTrue();
+            _processor.Process(expression);
+            _processor.ColumnExists(null, tableNameThanMustBeEscaped, columnName).ShouldBeTrue();
+        }
+
+        [Test]
+        public void CallingProcessWithPerformDBOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
+        {
+            var output = new StringWriter();
+
+            var connection = new SQLiteConnection(IntegrationTestOptions.SqlLite.ConnectionString);
+
+            var processor = new SqliteProcessor(
+                connection,
+                new SqliteGenerator(),
+                new TextWriterAnnouncer(output),
+                new ProcessorOptions { PreviewOnly = true },
+                new SqliteDbFactory());
+
+            bool tableExists;
+
+            try
+            {
+                var expression =
+                    new PerformDBOperationExpression
+                    {
+                        Operation = (con, trans) =>
+                        {
+                            var command = con.CreateCommand();
+                            command.CommandText = "CREATE TABLE ProcessTestTable (test int NULL) ";
+                            command.Transaction = trans;
+
+                            command.ExecuteNonQuery();
+                        }
+                    };
+
+                processor.Process(expression);
+
+                tableExists = processor.TableExists("", "ProcessTestTable");
+            }
+            finally
+            {
+                processor.RollbackTransaction();
+
+            }
+
+            tableExists.ShouldBeFalse();
+
+            output.ToString().ShouldBe(
+@"-- Performing DB Operation
+");
         }
     }
 }
