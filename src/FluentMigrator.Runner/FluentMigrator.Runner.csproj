@@ -127,9 +127,11 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="Announcers\BaseAnnouncer.cs" />
+    <Compile Include="Announcers\Announcer.cs" />
+    <Compile Include="AnnouncerExtensions.cs" />
     <Compile Include="Announcers\CompositeAnnouncer.cs" />
     <Compile Include="Announcers\NullAnnouncer.cs" />
+    <Compile Include="Announcers\ConsoleAnnouncer.cs" />
     <Compile Include="Announcers\TextWriterAnnouncer.cs" />
     <Compile Include="CompatabilityMode.cs" />
     <Compile Include="Extensions\SqlServerExtensions.cs" />
