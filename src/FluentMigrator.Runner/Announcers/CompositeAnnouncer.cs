@@ -1,22 +1,33 @@
-﻿using System;
+﻿#region License
+
+// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#endregion
+
+using System;
 using System.Collections.Generic;
 
 namespace FluentMigrator.Runner.Announcers
 {
-    public class CompositeAnnouncer : IAnnouncer, IFormattingAnnouncer
+    public class CompositeAnnouncer : IAnnouncer
     {
-        private readonly IEnumerable<IAnnouncer> _announcers;
+        private readonly IEnumerable<IAnnouncer> announcers;
 
-        public CompositeAnnouncer(IEnumerable<IAnnouncer> announcers)
+        public CompositeAnnouncer(params IAnnouncer[] announcers)
         {
-            _announcers = announcers;
-        }
-
-        #region IAnnouncer Members
-
-        public void Dispose()
-        {
-            Each(a => a.Dispose());
+            this.announcers = announcers ?? new IAnnouncer[] {};
         }
 
         public void Heading(string message)
@@ -27,16 +38,6 @@ namespace FluentMigrator.Runner.Announcers
         public void Say(string message)
         {
             Each(a => a.Say(message));
-        }
-
-        public void Heading(string message, params object[] args)
-        {
-            Heading(string.Format(message, args));
-        }
-
-        public void Say(string message, params object[] args)
-        {
-            Say(string.Format(message, args));
         }
 
         public void Sql(string sql)
@@ -54,17 +55,15 @@ namespace FluentMigrator.Runner.Announcers
             Each(a => a.Error(message));
         }
 
-        public void Error(string message, params object[] args)
+        public void Write(string message, bool escaped)
         {
-            Error(string.Format(message, args));
+            Each(a => a.Write(message, escaped));
         }
 
-        #endregion
-
-        private void Each(Action<IAnnouncer> predicate)
+        private void Each(Action<IAnnouncer> action)
         {
-            foreach (var announcer in _announcers)
-                predicate(announcer);
+            foreach (var announcer in announcers)
+                action(announcer);
         }
     }
 }
