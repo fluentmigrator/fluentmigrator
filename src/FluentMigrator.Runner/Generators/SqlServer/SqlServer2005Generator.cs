@@ -238,26 +238,20 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return String.Format(DropIndex, Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteSchemaName(expression.Index.SchemaName), Quoter.QuoteTableName(expression.Index.TableName));
         }
 
-        public override string Generate(DeleteColumnExpression expression)
+        protected override void BuildDelete(DeleteColumnExpression expression, string columnName, StringBuilder builder) 
         {
-            // before we drop a column, we have to drop any default value constraints in SQL Server
-            var builder = new StringBuilder();
-
-            builder.AppendLine(Generate(new DeleteDefaultConstraintExpression
-            {
-                ColumnName = expression.ColumnName,
-                SchemaName = expression.SchemaName,
-                TableName = expression.TableName
-            }));
+            builder.AppendLine(Generate(new DeleteDefaultConstraintExpression {
+                                                                                  ColumnName = columnName,
+                                                                                  SchemaName = expression.SchemaName,
+                                                                                  TableName = expression.TableName
+                                                                              }));
 
             builder.AppendLine();
 
-            builder.Append(String.Format("-- now we can finally drop column\r\nALTER TABLE {2}.{0} DROP COLUMN {1};",
-               Quoter.QuoteTableName(expression.TableName),
-               Quoter.QuoteColumnName(expression.ColumnName),
-               Quoter.QuoteSchemaName(expression.SchemaName)));
-
-            return builder.ToString();
+            builder.AppendLine(String.Format("-- now we can finally drop column\r\nALTER TABLE {2}.{0} DROP COLUMN {1};",
+                                         Quoter.QuoteTableName(expression.TableName),
+                                         Quoter.QuoteColumnName(columnName),
+                                         Quoter.QuoteSchemaName(expression.SchemaName)));
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
