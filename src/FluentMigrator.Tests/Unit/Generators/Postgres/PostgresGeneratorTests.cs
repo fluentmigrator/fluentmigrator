@@ -157,10 +157,23 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
             var expression = new DeleteColumnExpression();
             expression.TableName = tableName;
-            expression.ColumnName = columnName;
+            expression.ColumnNames.Add(columnName);
 
             string sql = generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE \"public\".\"NewTable\" DROP COLUMN \"NewColumn\"");
+        }
+
+        [Test]
+        public void CanDropMultipleColumns()
+        {
+            var expression = new DeleteColumnExpression();
+            expression.TableName = "NewTable";
+            expression.ColumnNames.Add("NewColumn");
+            expression.ColumnNames.Add("OtherColumn");
+
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("ALTER TABLE \"public\".\"NewTable\" DROP COLUMN \"NewColumn\";\r\n" + 
+                "ALTER TABLE \"public\".\"NewTable\" DROP COLUMN \"OtherColumn\"");
         }
 
         [Test]

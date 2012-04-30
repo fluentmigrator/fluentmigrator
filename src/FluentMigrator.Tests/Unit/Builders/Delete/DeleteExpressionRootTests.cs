@@ -17,6 +17,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Linq;
 using FluentMigrator.Builders.Delete;
 using FluentMigrator.Builders.Delete.Column;
 using FluentMigrator.Builders.Delete.ForeignKey;
@@ -57,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             var root = new DeleteExpressionRoot(contextMock.Object);
             root.Column("Bacon");
 
-            collectionMock.Verify(x => x.Add(It.Is<DeleteColumnExpression>(e => e.ColumnName.Equals("Bacon"))));
+            collectionMock.Verify(x => x.Add(It.Is<DeleteColumnExpression>(e => e.ColumnNames.ElementAt(0).Equals("Bacon"))));
             contextMock.VerifyGet(x => x.Expressions);
         }
 

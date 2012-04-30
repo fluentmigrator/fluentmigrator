@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Linq;
 using System.Text;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Extensions;
@@ -67,20 +68,28 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             // before we drop a column, we have to drop any default value constraints in SQL Server
             var builder = new StringBuilder();
 
-            builder.AppendLine(Generate(new DeleteDefaultConstraintExpression
-                                            {
-                                                ColumnName = expression.ColumnName,
-                                                SchemaName = expression.SchemaName,
-                                                TableName = expression.TableName
-                                            }));
+            foreach (string column in expression.ColumnNames) 
+            {
+                if (expression.ColumnNames.First() != column) builder.AppendLine("GO");
+                BuildDelete(expression, column, builder);  
+            }
+            
+            return builder.ToString();
+        }
+
+        protected virtual void BuildDelete(DeleteColumnExpression expression, string columnName, StringBuilder builder) 
+        {
+            builder.AppendLine(Generate(new DeleteDefaultConstraintExpression {
+                                                                                  ColumnName = columnName,
+                                                                                  SchemaName = expression.SchemaName,
+                                                                                  TableName = expression.TableName
+                                                                              }));
 
             builder.AppendLine();
 
-            builder.Append(String.Format("-- now we can finally drop column\r\nALTER TABLE {0} DROP COLUMN {1};",
-                Quoter.QuoteTableName(expression.TableName),
-                Quoter.QuoteColumnName(expression.ColumnName)));
-
-            return builder.ToString();
+            builder.AppendLine(String.Format("-- now we can finally drop column\r\nALTER TABLE {0} DROP COLUMN {1};",
+                                         Quoter.QuoteTableName(expression.TableName),
+                                         Quoter.QuoteColumnName(columnName)));
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
