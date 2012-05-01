@@ -14,7 +14,7 @@ namespace FluentMigrator.Builders
         {
         }
 
-        protected abstract ColumnDefinition GetColumnForType();
+        public abstract ColumnDefinition GetColumnForType();
 
         private ColumnDefinition Column
         {
