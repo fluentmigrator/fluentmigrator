@@ -147,6 +147,8 @@
     <Compile Include="Helpers\PostgresTestTable.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
     <Compile Include="Integration\Migrations\TestEmptyMigration.cs" />
+    <Compile Include="Unit\AnnouncerExtensionsTests.cs" />
+    <Compile Include="Unit\Announcers\AnnouncerTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateSequenceExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Delete\DeleteConstriantTest.cs" />
     <Compile Include="Unit\Builders\Delete\DeleteDataExpressionTests.cs" />
@@ -174,7 +176,7 @@
     <Compile Include="Integration\SchemaDump\SchemaDumpTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaTestWriter.cs" />
     <Compile Include="Integration\VersionMigrationTests.cs" />
-    <Compile Include="Unit\AnnouncerTests.cs" />
+    <Compile Include="Unit\Announcers\TextWriterAnnouncerTests.cs" />
     <Compile Include="Unit\AssemblyLoader\AssemblyLoaderTests.cs" />
     <Compile Include="Unit\Builders\Alter\AlterExpressionRootTests.cs" />
     <Compile Include="Unit\Builders\Alter\AlterColumnExpressionBuilderTests.cs" />

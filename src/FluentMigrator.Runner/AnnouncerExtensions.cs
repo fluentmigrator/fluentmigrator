@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -16,17 +16,23 @@
 
 #endregion
 
-using System;
-
 namespace FluentMigrator.Runner
 {
-    public interface IAnnouncer
+    public static class AnnouncerExtensions
     {
-        void Heading(string message);
-        void Say(string message);
-        void Sql(string sql);
-        void ElapsedTime(TimeSpan timeSpan);
-        void Error(string message);
-        void Write(string message, bool escaped);
+        public static void Heading(this IAnnouncer announcer, string message, params object[] args)
+        {
+            announcer.Heading(string.Format(message, args));
+        }
+
+        public static void Say(this IAnnouncer announcer, string message, params object[] args)
+        {
+            announcer.Say(string.Format(message, args));
+        }
+
+        public static void Error(this IAnnouncer announcer, string message, params object[] args)
+        {
+            announcer.Error(string.Format(message, args));
+        }
     }
 }

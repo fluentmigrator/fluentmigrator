@@ -94,7 +94,7 @@ namespace FluentMigrator.MSBuild
 
 
             Log.LogMessage(MessageImportance.Low, "Creating Context");
-            var announcer = new BaseAnnouncer(msg => Log.LogMessage(MessageImportance.Normal, msg))
+            var announcer = new TextWriterAnnouncer(msg => Log.LogMessage(MessageImportance.Normal, msg))
             {
                 ShowElapsedTime = Verbose,
                 ShowSql = Verbose
@@ -122,12 +122,12 @@ namespace FluentMigrator.MSBuild
             }
             catch (ProcessorFactoryNotFoundException ex)
             {
-                announcer.Error("While executing migrations the following error was encountered: {0}", ex.Message);
+                Log.LogError("While executing migrations the following error was encountered: {0}", ex.Message);
                 return false;
             }
             catch (Exception ex)
             {
-                announcer.Error("While executing migrations the following error was encountered: {0}, {1}", ex.Message, ex.StackTrace);
+                Log.LogError("While executing migrations the following error was encountered: {0}, {1}", ex.Message, ex.StackTrace);
                 return false;
             }
 
