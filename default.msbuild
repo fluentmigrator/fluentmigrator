@@ -42,10 +42,10 @@
 	
 	
 	<Choose>
-		<When Condition="'$(Version)'=='v4.0'">
+		<When Condition="'$(Version)'=='v3.5'">
 		<ItemGroup>
 			<ConfigFileToDelete Include="$(OutputDir)\console-$(Platform)-$(Version)\Migrate.exe.config" />
-			<ConfigFileToRename Include="$(OutputDir)\console-$(Platform)-$(Version)\app.40.config" />
+			<ConfigFileToRename Include="$(OutputDir)\console-$(Platform)-$(Version)\app.35.config" />
 		</ItemGroup>
 		</When>
 		<Otherwise>
@@ -89,7 +89,7 @@
 	<Target Name="_ReplaceAppConfigWithCorrectVersion" DependsOnTargets="_CopyToDistDir">
 			<Delete Files="@(ConfigFileToDelete)" />
 			<Copy SourceFiles="@(ConfigFileToRename )" DestinationFiles="$(OutputDir)\console-$(Platform)-$(Version)\Migrate.exe.config" />
-			<Delete Files="$(OutputDir)\console-$(Platform)-$(Version)\app.40.config" />
+			<Delete Files="$(OutputDir)\console-$(Platform)-$(Version)\app.35.config" />
 	</Target>
 		
 	<Target Name="_BuildForFlavor" DependsOnTargets="_ReplaceAppConfigWithCorrectVersion">

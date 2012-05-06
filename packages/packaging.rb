@@ -36,7 +36,7 @@ end
 def prepare_tools
   output_directory_tools = './packages/FluentMigrator/tools/'
   FileUtils.mkdir_p output_directory_tools
-  cp_r FileList["dist/console-v3.5-x86/*"], output_directory_tools
+  cp_r FileList["dist/console-v4.0-x86/*"], output_directory_tools
 end
 
 def prepare_tools_package
