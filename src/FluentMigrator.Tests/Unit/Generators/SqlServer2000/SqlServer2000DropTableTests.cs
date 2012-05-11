@@ -39,7 +39,53 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
                         "SET @sql = N'ALTER TABLE [TestTable1] DROP CONSTRAINT ' + @default;\r\n" +
                         "EXEC sp_executesql @sql;\r\n\r\n" +
                         "-- now we can finally drop column\r\n" +
-                        "ALTER TABLE [TestTable1] DROP COLUMN [TestColumn1];";
+                        "ALTER TABLE [TestTable1] DROP COLUMN [TestColumn1];\r\n";
+
+            sql.ShouldBe(expected);
+        }
+
+        [Test]
+        public void CanDropMultipleColumns()
+        {
+            //This does not work if it is a primary key
+            var expression = GeneratorTestHelper.GetDeleteColumnExpression(new [] {"TestColumn1", "TestColumn2"});
+            var sql = _generator.Generate(expression);
+
+            const string expected = "DECLARE @default sysname, @sql nvarchar(4000);\r\n\r\n" +
+                        "-- get name of default constraint\r\n" +
+                        "SELECT @default = name\r\n" +
+                        "FROM sys.default_constraints\r\n" +
+                        "WHERE parent_object_id = object_id('[TestTable1]')\r\n" + "" +
+                        "AND type = 'D'\r\n" + "" +
+                        "AND parent_column_id = (\r\n" + "" +
+                        "SELECT column_id\r\n" +
+                        "FROM sys.columns\r\n" +
+                        "WHERE object_id = object_id('[TestTable1]')\r\n" +
+                        "AND name = 'TestColumn1'\r\n" +
+                        ");\r\n\r\n" +
+                        "-- create alter table command to drop contraint as string and run it\r\n" +
+                        "SET @sql = N'ALTER TABLE [TestTable1] DROP CONSTRAINT ' + @default;\r\n" +
+                        "EXEC sp_executesql @sql;\r\n\r\n" +
+                        "-- now we can finally drop column\r\n" +
+                        "ALTER TABLE [TestTable1] DROP COLUMN [TestColumn1];\r\n" +
+                        "GO\r\n" +
+                        "DECLARE @default sysname, @sql nvarchar(4000);\r\n\r\n" +
+                        "-- get name of default constraint\r\n" +
+                        "SELECT @default = name\r\n" +
+                        "FROM sys.default_constraints\r\n" +
+                        "WHERE parent_object_id = object_id('[TestTable1]')\r\n" + "" +
+                        "AND type = 'D'\r\n" + "" +
+                        "AND parent_column_id = (\r\n" + "" +
+                        "SELECT column_id\r\n" +
+                        "FROM sys.columns\r\n" +
+                        "WHERE object_id = object_id('[TestTable1]')\r\n" +
+                        "AND name = 'TestColumn2'\r\n" +
+                        ");\r\n\r\n" +
+                        "-- create alter table command to drop contraint as string and run it\r\n" +
+                        "SET @sql = N'ALTER TABLE [TestTable1] DROP CONSTRAINT ' + @default;\r\n" +
+                        "EXEC sp_executesql @sql;\r\n\r\n" +
+                        "-- now we can finally drop column\r\n" +
+                        "ALTER TABLE [TestTable1] DROP COLUMN [TestColumn2];\r\n";
 
             sql.ShouldBe(expected);
         }

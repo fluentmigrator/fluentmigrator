@@ -277,7 +277,7 @@ namespace FluentMigrator.Builders.Create.Column
             return this;
         }
 
-        protected override ColumnDefinition GetColumnForType()
+        public override ColumnDefinition GetColumnForType()
         {
             return Expression.Column;
         }

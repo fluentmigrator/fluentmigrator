@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ErrorIsReturnedWhenColumnNameIsNull()
         {
-            var expression = new DeleteColumnExpression { ColumnName = null };
+            var expression = new DeleteColumnExpression { ColumnNames = {null} };
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }
@@ -63,15 +63,23 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ErrorIsReturnedWhenColumnNameIsEmptyString()
         {
-            var expression = new DeleteColumnExpression { ColumnName = String.Empty };
+            var expression = new DeleteColumnExpression { ColumnNames = {String.Empty} };
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }
 
         [Test]
+        public void ErrorIsReturnedWhenColumnIsSpecifiedMultipleTimes() 
+        {
+            var expression = new DeleteColumnExpression { ColumnNames = { "Bacon", "Bacon" } };
+            var errors = ValidationHelper.CollectErrors(expression);
+            errors.ShouldContain(ErrorMessages.ColumnNamesMustBeUnique);
+        }
+
+        [Test]
         public void ErrorIsNotReturnedWhenColumnNameIsNotNullEmptyString()
         {
-            var expression = new DeleteColumnExpression { ColumnName = "Bacon" };
+            var expression = new DeleteColumnExpression { ColumnNames = {"Bacon"} };
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldNotContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }
@@ -86,7 +94,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ToStringIsDescriptive()
         {
-            var expression = new DeleteColumnExpression { TableName = "Test", ColumnName = "Bacon" };
+            var expression = new DeleteColumnExpression { TableName = "Test", ColumnNames = {"Bacon"} };
             expression.ToString().ShouldBe("DeleteColumn Test Bacon");
         }
     }

@@ -59,7 +59,7 @@ namespace FluentMigrator.Expressions
                     {
                         SchemaName = SchemaName,
                         TableName = TableName,
-                        ColumnName = Column.Name
+                        ColumnNames = {Column.Name}
                     };
         }
 

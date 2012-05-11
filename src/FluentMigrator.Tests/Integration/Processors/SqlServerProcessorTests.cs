@@ -17,13 +17,15 @@
 #endregion
 
 using System.Data.SqlClient;
+using System.IO;
+using FluentMigrator.Builders.Execute;
 using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
 using NUnit.Should;
-using FluentMigrator.Runner.Generators.SqlServer;
 
 namespace FluentMigrator.Tests.Integration.Processors
 {
@@ -110,6 +112,56 @@ namespace FluentMigrator.Tests.Integration.Processors
         {
             using (var table = new SqlServerTestTable(Processor, "test_schema", "id int"))
                 Processor.ColumnExists("test_schema", table.Name, "DoesNotExist").ShouldBeFalse();
+        }
+
+        [Test]
+        public void CallingProcessWithPerformDBOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
+        {
+            var output = new StringWriter();
+
+            var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
+
+            var processor = new SqlServerProcessor(
+                connection,
+                new SqlServer2008Generator(),
+                new TextWriterAnnouncer(output),
+                new ProcessorOptions { PreviewOnly = true },
+                new SqlServerDbFactory());
+
+            bool tableExists;
+
+            try
+            {
+                var expression =
+                    new PerformDBOperationExpression
+                    {
+                        Operation = (con, trans) =>
+                        {
+                            var command = con.CreateCommand();
+                            command.CommandText = "CREATE TABLE ProcessTestTable (test int NULL) ";
+                            command.Transaction = trans;
+
+                            command.ExecuteNonQuery();
+                        }
+                    };
+
+                processor.Process(expression);
+
+                tableExists = processor.TableExists("", "ProcessTestTable");
+            }
+            finally
+            {
+                processor.RollbackTransaction();
+
+            }
+
+            tableExists.ShouldBeFalse();
+
+            output.ToString().ShouldBe(
+@"/* Beginning Transaction */
+/* Performing DB Operation */
+/* Rolling back transaction */
+");
         }
     }
 }

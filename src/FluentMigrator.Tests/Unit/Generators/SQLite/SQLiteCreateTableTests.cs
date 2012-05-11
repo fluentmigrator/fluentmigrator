@@ -1,4 +1,6 @@
 ﻿using FluentMigrator.Expressions;
+using FluentMigrator.Runner;
+using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.SQLite;
 using NUnit.Framework;
@@ -155,6 +157,30 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             _generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new CreateSchemaExpression()));
+        }
+
+        [Test]
+        public void CanCreateTableWithSeededIdentityAndLooseCompatibility()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
+            expression.Columns[0].IsPrimaryKey = true;
+            expression.Columns[0].AdditionalFeatures.Add(SqlServerExtensions.IdentitySeed, 3);
+            expression.Columns[0].AdditionalFeatures.Add(SqlServerExtensions.IdentityIncrement, 3);
+            _generator.compatabilityMode = CompatabilityMode.LOOSE;
+            var sql = _generator.Generate(expression);
+            sql.ShouldBe("CREATE TABLE 'TestTable1' ('TestColumn1' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, 'TestColumn2' INTEGER NOT NULL)");
+        }
+
+        [Test]
+        public void CanNotCreateTableWithSeededIdentityAndStrictCompatibility()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
+            expression.Columns[0].IsPrimaryKey = true;
+            expression.Columns[0].AdditionalFeatures.Add(SqlServerExtensions.IdentitySeed, 3);
+            expression.Columns[0].AdditionalFeatures.Add(SqlServerExtensions.IdentityIncrement, 3);
+            _generator.compatabilityMode = CompatabilityMode.STRICT;
+
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(expression));
         }
     }
 }

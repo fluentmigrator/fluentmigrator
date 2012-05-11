@@ -18,6 +18,7 @@
 
 using System;
 using System.Data;
+using System.Linq;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
@@ -75,7 +76,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var expression = new CreateColumnExpression { TableName = "Bacon", Column = { Name = "BaconId" } };
             var reverse = expression.Reverse() as DeleteColumnExpression;
             reverse.TableName.ShouldBe("Bacon");
-            reverse.ColumnName.ShouldBe("BaconId");
+            reverse.ColumnNames.ElementAt(0).ShouldBe("BaconId");
         }
 
         [Test]
