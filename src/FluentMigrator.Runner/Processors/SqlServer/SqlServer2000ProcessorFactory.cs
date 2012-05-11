@@ -21,15 +21,15 @@
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-	using Generators.SqlServer;
+    using Generators.SqlServer;
 
-	public class SqlServer2000ProcessorFactory : MigrationProcessorFactory
-	{
-		public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
-		{
-			var factory = new SqlServerDbFactory();
-			var connection = factory.CreateConnection(connectionString);
-			return new SqlServerProcessor(connection, new SqlServer2000Generator(), announcer, options, factory);
-		}
-	}
+    public class SqlServer2000ProcessorFactory : MigrationProcessorFactory
+    {
+        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
+        {
+            var factory = new SqlServerDbFactory();
+            var connection = factory.CreateConnection(connectionString);
+            return new SqlServer2000Processor(connection, new SqlServer2000Generator(), announcer, options, factory);
+        }
+    }
 }

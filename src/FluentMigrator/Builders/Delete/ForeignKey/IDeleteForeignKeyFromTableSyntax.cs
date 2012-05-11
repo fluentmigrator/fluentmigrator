@@ -20,8 +20,8 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Delete.ForeignKey
 {
-	public interface IDeleteForeignKeyFromTableSyntax : IFluentSyntax
-	{
-		IDeleteForeignKeyForeignColumnOrInSchemaSyntax FromTable(string foreignTableName);
-	}
+    public interface IDeleteForeignKeyFromTableSyntax : IFluentSyntax
+    {
+        IDeleteForeignKeyForeignColumnOrInSchemaSyntax FromTable(string foreignTableName);
+    }
 }

@@ -20,10 +20,10 @@ using System;
 
 namespace FluentMigrator
 {
-	[AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
-	public class MigrationAttribute : Attribute
-	{
-		public long Version { get; private set; }
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    public class MigrationAttribute : Attribute
+    {
+        public long Version { get; private set; }
         public string Group { get; private set; }
 
 		public MigrationAttribute(long version) : this("", version) { }

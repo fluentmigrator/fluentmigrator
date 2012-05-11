@@ -21,47 +21,53 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-	public class InsertDataExpression : IMigrationExpression
-	{
-		private readonly List<InsertionDataDefinition> _rows = new List<InsertionDataDefinition>();
-		public string SchemaName { get; set; }
-		public string TableName { get; set; }
+    public class InsertDataExpression : IMigrationExpression
+    {
+        private readonly List<InsertionDataDefinition> _rows = new List<InsertionDataDefinition>();
+        public string SchemaName { get; set; }
+        public string TableName { get; set; }
+        public readonly Dictionary<string, object> _additionalFeatures = new Dictionary<string, object>();
 
-		public List<InsertionDataDefinition> Rows
-		{
-			get { return _rows; }
-		}
+        public List<InsertionDataDefinition> Rows
+        {
+            get { return _rows; }
+        }
 
-		public void CollectValidationErrors(ICollection<string> errors)
-		{
-		}
+        public IDictionary<string, object> AdditionalFeatures
+        {
+            get { return _additionalFeatures; }
+        }
 
-		public void ExecuteWith(IMigrationProcessor processor)
-		{
-			processor.Process(this);
-		}
+        public void CollectValidationErrors(ICollection<string> errors)
+        {
+        }
 
-		public IMigrationExpression Reverse()
-		{
-			var expression = new DeleteDataExpression
-								{
-									SchemaName = SchemaName,
-									TableName = TableName
-								};
+        public void ExecuteWith(IMigrationProcessor processor)
+        {
+            processor.Process(this);
+        }
 
-			foreach (var row in Rows)
-			{
-				var dataDefinition = new DeletionDataDefinition();
-				dataDefinition.AddRange(row);
+        public IMigrationExpression Reverse()
+        {
+            var expression = new DeleteDataExpression
+                                {
+                                    SchemaName = SchemaName,
+                                    TableName = TableName
+                                };
 
-				expression.Rows.Add(dataDefinition);
-			}
+            foreach (var row in Rows)
+            {
+                var dataDefinition = new DeletionDataDefinition();
+                dataDefinition.AddRange(row);
 
-			return expression;
-		}
+                expression.Rows.Add(dataDefinition);
+            }
 
-		public void ApplyConventions(IMigrationConventions conventions)
-		{
-		}
-	}
+            return expression;
+        }
+
+        public void ApplyConventions(IMigrationConventions conventions)
+        {
+        }
+    }
 }

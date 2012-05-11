@@ -20,8 +20,8 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Rename.Table
 {
-	public interface IRenameTableToSyntax : IFluentSyntax
-	{
-		IInSchemaSyntax To(string name);
-	}
+    public interface IRenameTableToSyntax : IFluentSyntax
+    {
+        IInSchemaSyntax To(string name);
+    }
 }

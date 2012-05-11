@@ -76,19 +76,19 @@ namespace FluentMigrator.Builders.Create.Index
             return this;
         }
 
-        public ICreateIndexOptionsSyntax Unique()
+        public ICreateIndexOnColumnSyntax Unique()
         {
             Expression.Index.IsUnique = true;
             return this;
         }
 
-        public ICreateIndexOptionsSyntax NonClustered()
+        public ICreateIndexOnColumnSyntax NonClustered()
         {
             Expression.Index.IsClustered = false;
             return this;
         }
 
-        public ICreateIndexOptionsSyntax Clustered()
+        public ICreateIndexOnColumnSyntax Clustered()
         {
             Expression.Index.IsClustered = true;
             return this;

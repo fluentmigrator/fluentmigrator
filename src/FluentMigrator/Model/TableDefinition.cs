@@ -19,20 +19,20 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 
-namespace FluentMigrator.Model {
+namespace FluentMigrator.Model
+{
     public class TableDefinition : ICloneable, ICanBeConventional, ICanBeValidated
     {
         public TableDefinition()
-		{
+        {
             Columns = new List<ColumnDefinition>();
             ForeignKeys = new List<ForeignKeyDefinition>();
             Indexes = new List<IndexDefinition>();
-		}
+        }
 
         public virtual string Name { get; set; }
         public virtual string SchemaName { get; set; }
@@ -40,12 +40,12 @@ namespace FluentMigrator.Model {
         public virtual ICollection<ForeignKeyDefinition> ForeignKeys { get; set; }
         public virtual ICollection<IndexDefinition> Indexes { get; set; }
 
-        public void ApplyConventions(IMigrationConventions conventions) 
+        public void ApplyConventions(IMigrationConventions conventions)
         {
             throw new NotImplementedException();
         }
 
-        public void CollectValidationErrors(ICollection<string> errors) 
+        public void CollectValidationErrors(ICollection<string> errors)
         {
             if (String.IsNullOrEmpty(Name))
                 errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
@@ -60,7 +60,7 @@ namespace FluentMigrator.Model {
                 fk.CollectValidationErrors(errors);
         }
 
-        public object Clone() 
+        public object Clone()
         {
             return new TableDefinition
             {

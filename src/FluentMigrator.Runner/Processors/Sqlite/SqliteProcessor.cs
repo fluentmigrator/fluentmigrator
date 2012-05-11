@@ -29,14 +29,14 @@ namespace FluentMigrator.Runner.Processors.Sqlite
     public class SqliteProcessor : ProcessorBase
     {
         private readonly DbFactoryBase factory;
-        public DbConnection Connection { get; set; }
+        public IDbConnection Connection { get; set; }
 
         public override string DatabaseType
         {
             get { return "Sqlite"; }
         }
 
-        public SqliteProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, DbFactoryBase factory)
+        public SqliteProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, DbFactoryBase factory)
             : base(generator, announcer, options)
         {
             this.factory = factory;
@@ -55,7 +55,8 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
-            return Read("PRAGMA table_info([{0}])", tableName).Tables[0].Select(string.Format("Name='{0}'", columnName.Replace("'", "''"))).Length > 0;
+            var dataSet = Read("PRAGMA table_info([{0}])", tableName);
+            return dataSet.Tables.Count > 0 && dataSet.Tables[0].Select(string.Format("Name='{0}'", columnName.Replace("'", "''"))).Length > 0;
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
@@ -100,6 +101,11 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
         public override void Process(PerformDBOperationExpression expression)
         {
+            Announcer.Say("Performing DB Operation");
+
+            if (Options.PreviewOnly)
+                return;
+
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
             if (expression.Operation != null)
@@ -183,8 +189,8 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
             var ds = new DataSet();
             using (var command = factory.CreateCommand(String.Format(template, args), Connection))
-            using (var adapter = factory.CreateDataAdapter(command))
             {
+                var adapter = factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
                 return ds;
             }

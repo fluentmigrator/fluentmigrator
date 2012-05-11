@@ -20,44 +20,52 @@ using System;
 using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Model;
 using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
 using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
-	[TestFixture]
-	public class AlterColumnExpressionTests
-	{
-		[Test]
-		public void ErrorIsReturnedWhenOldNameIsNull()
-		{
-			var expression = new AlterColumnExpression { TableName = null };
-			var errors = ValidationHelper.CollectErrors(expression);
-			errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
-		}
+    [TestFixture]
+    public class AlterColumnExpressionTests
+    {
+        [Test]
+        public void ModificationTypeShouldBeSetToAlter()
+        {
+            var expression = new CreateColumnExpression();
+            Assert.AreEqual(ColumnModificationType.Create, expression.Column.ModificationType);
+        }
 
-		[Test]
-		public void ErrorIsReturnedWhenOldNameIsEmptyString()
-		{
+        [Test]
+        public void ErrorIsReturnedWhenOldNameIsNull()
+        {
+            var expression = new AlterColumnExpression { TableName = null };
+            var errors = ValidationHelper.CollectErrors(expression);
+            errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
+        }
+
+        [Test]
+        public void ErrorIsReturnedWhenOldNameIsEmptyString()
+        {
             var expression = new AlterColumnExpression { TableName = String.Empty };
-			var errors = ValidationHelper.CollectErrors(expression);
-			errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
-		}
+            var errors = ValidationHelper.CollectErrors(expression);
+            errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
+        }
 
-		[Test]
-		public void ErrorIsNotReturnedWhenOldNameIsNotNullEmptyString()
-		{
+        [Test]
+        public void ErrorIsNotReturnedWhenOldNameIsNotNullEmptyString()
+        {
             var expression = new AlterColumnExpression { TableName = "Bacon" };
-			var errors = ValidationHelper.CollectErrors(expression);
-			errors.ShouldNotContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
-		}
+            var errors = ValidationHelper.CollectErrors(expression);
+            errors.ShouldNotContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
+        }
 
-		[Test]
-		public void ToStringIsDescriptive()
-		{
+        [Test]
+        public void ToStringIsDescriptive()
+        {
             var expression = new AlterColumnExpression { TableName = "Bacon", Column = { Name = "BaconId", Type = DbType.Int32 } };
-			expression.ToString().ShouldBe("AlterColumn Bacon BaconId Int32");	
-		}
-	}
+            expression.ToString().ShouldBe("AlterColumn Bacon BaconId Int32");
+        }
+    }
 }

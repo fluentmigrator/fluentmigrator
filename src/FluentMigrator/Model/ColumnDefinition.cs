@@ -23,50 +23,86 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Model
 {
-	public class ColumnDefinition : ICloneable, ICanBeConventional, ICanBeValidated
-	{
-		public ColumnDefinition()
-		{
-			DefaultValue = new UndefinedDefaultValue();
-		}
+    public class ColumnDefinition : ICloneable, ICanBeConventional, ICanBeValidated, ISupportAdditionalFeatures
+    {
+        public ColumnDefinition()
+        {
+            DefaultValue = new UndefinedDefaultValue();
+        }
 
-		public virtual string Name { get; set; }
-		public virtual DbType? Type { get; set; }
-		public virtual int Size { get; set; }
-		public virtual int Precision { get; set; }
-		public virtual string CustomType { get; set; }
-		public virtual object DefaultValue { get; set; }
-		public virtual bool IsForeignKey { get; set; }
-		public virtual bool IsIdentity { get; set; }
-		public virtual bool IsIndexed { get; set; }
-		public virtual bool IsPrimaryKey { get; set; }
-		public virtual string PrimaryKeyName { get; set; }
-		public virtual bool IsNullable { get; set; }
-		public virtual bool IsUnique { get; set; }
-		public virtual string TableName { get; set; }
+        public readonly Dictionary<string, object> _additionalFeatures = new Dictionary<string, object>();
 
-		public void ApplyConventions(IMigrationConventions conventions)
-		{
-			if ( String.IsNullOrEmpty( PrimaryKeyName ) )
-				PrimaryKeyName = conventions.GetPrimaryKeyName(TableName);
-		}
+        public virtual string Name { get; set; }
+        public virtual DbType? Type { get; set; }
+        public virtual int Size { get; set; }
+        public virtual int Precision { get; set; }
+        public virtual string CustomType { get; set; }
+        public virtual object DefaultValue { get; set; }
+        public virtual bool IsForeignKey { get; set; }
+        public virtual bool IsIdentity { get; set; }
+        public virtual bool IsIndexed { get; set; }
+        public virtual bool IsPrimaryKey { get; set; }
+        public virtual string PrimaryKeyName { get; set; }
+        public virtual bool IsNullable { get; set; }
+        public virtual bool IsUnique { get; set; }
+        public virtual string TableName { get; set; }
+        public virtual ColumnModificationType ModificationType { get; set; }
 
-		public virtual void CollectValidationErrors(ICollection<string> errors)
-		{
-			if (String.IsNullOrEmpty(Name))
-				errors.Add(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
+        public void ApplyConventions(IMigrationConventions conventions)
+        {
+            if (String.IsNullOrEmpty(PrimaryKeyName))
+                PrimaryKeyName = conventions.GetPrimaryKeyName(TableName);
+        }
 
-			if (Type == null && CustomType == null)
-				errors.Add(ErrorMessages.ColumnTypeMustBeDefined);
-		}
+        public virtual void CollectValidationErrors(ICollection<string> errors)
+        {
+            if (String.IsNullOrEmpty(Name))
+                errors.Add(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
 
-		public object Clone()
-		{
-			return MemberwiseClone();
-		}
+            if (Type == null && CustomType == null)
+                errors.Add(ErrorMessages.ColumnTypeMustBeDefined);
+        }
 
-		public class UndefinedDefaultValue
-		{
-		}
-	}
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
+
+        public class UndefinedDefaultValue
+        {
+        }
+
+        public IDictionary<string, object> AdditionalFeatures 
+        {
+            get { return _additionalFeatures; }
+        }
+
+        void ISupportAdditionalFeatures.AddAdditionalFeature(string feature, object value) 
+        {
+            if (!AdditionalFeatures.ContainsKey(feature)) {
+                AdditionalFeatures.Add(feature, value);
+            }
+            else {
+                AdditionalFeatures[feature] = value;
+            }
+        }
+
+        public T GetAdditionalFeature<T>(string key, T defaultValue) 
+        {
+            if (AdditionalFeatures.ContainsKey(key)) {
+                object value = AdditionalFeatures[key];
+                if (value is T)
+                {
+                    return (T)value;
+                }
+            }
+
+            return defaultValue;
+        }
+    }
+
+    public enum ColumnModificationType {
+        Create,
+        Alter
+    }
 }

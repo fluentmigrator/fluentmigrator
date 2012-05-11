@@ -22,10 +22,10 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Alter
 {
-	public interface IAlterExpressionRoot : IFluentSyntax
-	{
-		//void Schema(string schemaName);
+    public interface IAlterExpressionRoot : IFluentSyntax
+    {
+        //void Schema(string schemaName);
         IAlterTableAddColumnOrAlterColumnOrSchemaSyntax Table(string tableName);
-		IAlterColumnOnTableSyntax Column(string columnName);
-	}
+        IAlterColumnOnTableSyntax Column(string columnName);
+    }
 }

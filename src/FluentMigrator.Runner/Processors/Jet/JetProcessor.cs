@@ -7,7 +7,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 {
     public class JetProcessor : ProcessorBase
     {
-    	private OleDbConnection Connection { get; set; }
+        private OleDbConnection Connection { get; set; }
 
         public override string DatabaseType
         {
@@ -22,6 +22,11 @@ namespace FluentMigrator.Runner.Processors.Jet
 
         public override void Process(PerformDBOperationExpression expression)
         {
+            Announcer.Say("Performing DB Operation");
+
+            if (Options.PreviewOnly)
+                return;
+			
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
             if (expression.Operation != null)
@@ -121,7 +126,7 @@ namespace FluentMigrator.Runner.Processors.Jet
         {
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
-            var restrict = new[] { null, null, indexName, null, null, tableName };
+            var restrict = new[] { null, null, indexName, null, tableName };
             using (var indexes = Connection.GetOleDbSchemaTable(OleDbSchemaGuid.Indexes, restrict))
             {
                 return indexes.Rows.Count > 0;

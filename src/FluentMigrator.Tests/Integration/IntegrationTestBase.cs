@@ -34,32 +34,35 @@ using FluentMigrator.Runner.Generators.MySql;
 
 namespace FluentMigrator.Tests.Integration
 {
-	public class IntegrationTestBase
-	{
-		public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test)
-		{
-			ExecuteWithSupportedProcessors(test, true);
-		}
+    public class IntegrationTestBase
+    {
+        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test)
+        {
+            ExecuteWithSupportedProcessors(test, true);
+        }
 
-		public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback)
-		{
-			ExecuteWithSupportedProcessors(test, tryRollback, new Type[] { });
-		}
+        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback)
+        {
+            ExecuteWithSupportedProcessors(test, tryRollback, new Type[] { });
+        }
 
-		public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback, params Type[] exceptProcessors)
-		{
-			if (exceptProcessors.Count(t => typeof(SqlServerProcessor).IsAssignableFrom(t)) == 0)
-			{
+        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback, params Type[] exceptProcessors)
+        {
+            if (exceptProcessors.Count(t => typeof(SqlServerProcessor).IsAssignableFrom(t)) == 0)
+            {
                 ExecuteWithSqlServer2005(test, tryRollback);
                 ExecuteWithSqlServer2008(test, tryRollback);
-			}
-			if (exceptProcessors.Count(t => typeof(SqliteProcessor).IsAssignableFrom(t)) == 0)
-				ExecuteWithSqlite(test, IntegrationTestOptions.SqlLite);
-			if (exceptProcessors.Count(t => typeof(MySqlProcessor).IsAssignableFrom(t)) == 0)
-				ExecuteWithMySql(test, IntegrationTestOptions.MySql);
-			if (exceptProcessors.Count(t => typeof(PostgresProcessor).IsAssignableFrom(t)) == 0)
-				ExecuteWithPostgres(test, IntegrationTestOptions.Postgres, tryRollback);
-		}
+            }
+            
+            if (exceptProcessors.Count(t => typeof(SqliteProcessor).IsAssignableFrom(t)) == 0)
+                ExecuteWithSqlite(test, IntegrationTestOptions.SqlLite);
+
+            if (exceptProcessors.Count(t => typeof(MySqlProcessor).IsAssignableFrom(t)) == 0)
+                ExecuteWithMySql(test, IntegrationTestOptions.MySql);
+
+            if (exceptProcessors.Count(t => typeof(PostgresProcessor).IsAssignableFrom(t)) == 0)
+                ExecuteWithPostgres(test, IntegrationTestOptions.Postgres, tryRollback);
+        }
 
         protected static void ExecuteWithSqlServer2008(Action<IMigrationProcessor> test, bool tryRollback)
         {
@@ -105,45 +108,50 @@ namespace FluentMigrator.Tests.Integration
             }
         }
 
-		protected static void ExecuteWithSqlite(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
-		{
-			if (!serverOptions.IsEnabled)
-				return;
+        protected static void ExecuteWithSqlite(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
+        {
+            if (!serverOptions.IsEnabled)
+                return;
 
-			var announcer = new TextWriterAnnouncer(System.Console.Out);
-			announcer.Heading("Testing Migration against SQLite");
+            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            announcer.Heading("Testing Migration against SQLite");
 
-		    var factory = new SqliteDbFactory();
-            using (var connection =  factory.CreateConnection(serverOptions.ConnectionString))
-			{
-			    var processor = new SqliteProcessor(connection, new SqliteGenerator(), announcer, new ProcessorOptions(), factory);
-				test(processor);
-			}
-		}
+            var factory = new SqliteDbFactory();
+            using (var connection = factory.CreateConnection(serverOptions.ConnectionString))
+            {
+                var processor = new SqliteProcessor(connection, new SqliteGenerator(), announcer, new ProcessorOptions(), factory);
+                test(processor);
+            }
+        }
 
-		protected static void ExecuteWithPostgres(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions, Boolean tryRollback)
-		{
-			if (!serverOptions.IsEnabled)
-				return;
-			var connection = new NpgsqlConnection(serverOptions.ConnectionString);
-			var processor = new PostgresProcessor(connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new PostgresDbFactory());
-			test(processor);
+        protected static void ExecuteWithPostgres(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions, Boolean tryRollback)
+        {
+            if (!serverOptions.IsEnabled)
+                return;
+            var connection = new NpgsqlConnection(serverOptions.ConnectionString);
+            var processor = new PostgresProcessor(connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new PostgresDbFactory());
+            
+            test(processor);
 
-		}
+            if (!processor.WasCommitted)
+            {
+                processor.RollbackTransaction();
+            }
+        }
 
-		protected static void ExecuteWithMySql(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
-		{
-			if (!serverOptions.IsEnabled)
-				return;
+        protected static void ExecuteWithMySql(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
+        {
+            if (!serverOptions.IsEnabled)
+                return;
 
-			var announcer = new TextWriterAnnouncer(System.Console.Out);
-			announcer.Heading("Testing Migration against MySQL Server");
+            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            announcer.Heading("Testing Migration against MySQL Server");
 
-			using (var connection = new MySqlConnection(serverOptions.ConnectionString))
-			{
-				var processor = new MySqlProcessor(connection, new MySqlGenerator(), announcer, new ProcessorOptions(), new MySqlDbFactory());
-				test(processor);
-			}
-		}
-	}
+            using (var connection = new MySqlConnection(serverOptions.ConnectionString))
+            {
+                var processor = new MySqlProcessor(connection, new MySqlGenerator(), announcer, new ProcessorOptions(), new MySqlDbFactory());
+                test(processor);
+            }
+        }
+    }
 }

@@ -24,52 +24,52 @@ using FluentMigrator.Infrastructure.Extensions;
 
 namespace FluentMigrator.Model
 {
-	public class IndexDefinition : ICloneable, ICanBeConventional, ICanBeValidated
-	{
-		public virtual string Name { get; set; }
-		public virtual string SchemaName { get; set; }
-		public virtual string TableName { get; set; }
-		public virtual bool IsUnique { get; set; }
-		public bool IsClustered { get; set; }
-		public virtual ICollection<IndexColumnDefinition> Columns { get; set; }
+    public class IndexDefinition : ICloneable, ICanBeConventional, ICanBeValidated
+    {
+        public virtual string Name { get; set; }
+        public virtual string SchemaName { get; set; }
+        public virtual string TableName { get; set; }
+        public virtual bool IsUnique { get; set; }
+        public bool IsClustered { get; set; }
+        public virtual ICollection<IndexColumnDefinition> Columns { get; set; }
 
-		public IndexDefinition()
-		{
-			Columns = new List<IndexColumnDefinition>();
-		}
+        public IndexDefinition()
+        {
+            Columns = new List<IndexColumnDefinition>();
+        }
 
-		public void ApplyConventions(IMigrationConventions conventions)
-		{
-			if (String.IsNullOrEmpty(Name))
-				Name = conventions.GetIndexName(this);
-		}
+        public virtual void ApplyConventions(IMigrationConventions conventions)
+        {
+            if (String.IsNullOrEmpty(Name))
+                Name = conventions.GetIndexName(this);
+        }
 
-		public virtual void CollectValidationErrors(ICollection<string> errors)
-		{
-			if (String.IsNullOrEmpty(Name))
-				errors.Add(ErrorMessages.IndexNameCannotBeNullOrEmpty);
+        public virtual void CollectValidationErrors(ICollection<string> errors)
+        {
+            if (String.IsNullOrEmpty(Name))
+                errors.Add(ErrorMessages.IndexNameCannotBeNullOrEmpty);
 
-			if (String.IsNullOrEmpty(TableName))
-				errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
+            if (String.IsNullOrEmpty(TableName))
+                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
 
-			if (Columns.Count == 0)
-				errors.Add(ErrorMessages.IndexMustHaveOneOrMoreColumns);
+            if (Columns.Count == 0)
+                errors.Add(ErrorMessages.IndexMustHaveOneOrMoreColumns);
 
-			foreach (IndexColumnDefinition column in Columns)
-				column.CollectValidationErrors(errors);
-		}
+            foreach (IndexColumnDefinition column in Columns)
+                column.CollectValidationErrors(errors);
+        }
 
-		public object Clone()
-		{
-			return new IndexDefinition
-			{
-				Name = Name,
-				SchemaName = SchemaName,
-				TableName = TableName,
-				IsUnique = IsUnique,
-				IsClustered = IsClustered,
-				Columns = Columns.CloneAll().ToList()
-			};
-		}
-	}
+        public object Clone()
+        {
+            return new IndexDefinition
+            {
+                Name = Name,
+                SchemaName = SchemaName,
+                TableName = TableName,
+                IsUnique = IsUnique,
+                IsClustered = IsClustered,
+                Columns = Columns.CloneAll().ToList()
+            };
+        }
+    }
 }

@@ -17,63 +17,67 @@
 #endregion
 
 using FluentMigrator.Builders.Delete.Column;
+using FluentMigrator.Builders.Delete.Constraint;
+using FluentMigrator.Builders.Delete.DefaultConstraint;
 using FluentMigrator.Builders.Delete.ForeignKey;
+using FluentMigrator.Builders.Delete.Index;
+using FluentMigrator.Builders.Delete.Sequence;
 using FluentMigrator.Builders.Delete.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
-using FluentMigrator.Builders.Delete.Index;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Delete
 {
-	public class DeleteExpressionRoot : IDeleteExpressionRoot
-	{
-		private readonly IMigrationContext _context;
+    public class DeleteExpressionRoot : IDeleteExpressionRoot
+    {
+        private readonly IMigrationContext _context;
 
-		public DeleteExpressionRoot(IMigrationContext context)
-		{
-			_context = context;
-		}
+        public DeleteExpressionRoot(IMigrationContext context)
+        {
+            _context = context;
+        }
 
-		public void Schema(string schemaName)
-		{
-			var expression = new DeleteSchemaExpression { SchemaName = schemaName };
-			_context.Expressions.Add(expression);
-		}
+        public void Schema(string schemaName)
+        {
+            var expression = new DeleteSchemaExpression {SchemaName = schemaName};
+            _context.Expressions.Add(expression);
+        }
 
-		public IInSchemaSyntax Table(string tableName)
-		{
-			var expression = new DeleteTableExpression { TableName = tableName };
-			_context.Expressions.Add(expression);
-			return new DeleteTableExpressionBuilder(expression);
-		}
+        public IInSchemaSyntax Table(string tableName)
+        {
+            var expression = new DeleteTableExpression {TableName = tableName};
+            _context.Expressions.Add(expression);
+            return new DeleteTableExpressionBuilder(expression);
+        }
 
-		public IDeleteColumnFromTableSyntax Column(string columnName)
-		{
-			var expression = new DeleteColumnExpression { ColumnName = columnName };
-			_context.Expressions.Add(expression);
-			return new DeleteColumnExpressionBuilder(expression);
-		}
+        public IDeleteColumnFromTableSyntax Column(string columnName)
+        {
+            var expression = new DeleteColumnExpression {ColumnNames = {columnName}};
+            _context.Expressions.Add(expression);
+            return new DeleteColumnExpressionBuilder(expression);
+        }
 
-		public IDeleteForeignKeyFromTableSyntax ForeignKey()
-		{
-			var expression = new DeleteForeignKeyExpression();
-			_context.Expressions.Add(expression);
-			return new DeleteForeignKeyExpressionBuilder(expression);
-		}
+        public IDeleteForeignKeyFromTableSyntax ForeignKey()
+        {
+            var expression = new DeleteForeignKeyExpression();
+            _context.Expressions.Add(expression);
+            return new DeleteForeignKeyExpressionBuilder(expression);
+        }
 
-		public IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName)
-		{
-			var expression = new DeleteForeignKeyExpression { ForeignKey = { Name = foreignKeyName } };
-			_context.Expressions.Add(expression);
-			return new DeleteForeignKeyExpressionBuilder(expression);
-		}
+        public IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName)
+        {
+            var expression = new DeleteForeignKeyExpression {ForeignKey = {Name = foreignKeyName}};
+            _context.Expressions.Add(expression);
+            return new DeleteForeignKeyExpressionBuilder(expression);
+        }
 
-		public IDeleteDataOrInSchemaSyntax FromTable(string tableName)
-		{
-			var expression = new DeleteDataExpression { TableName = tableName };
-			_context.Expressions.Add(expression);
-			return new DeleteDataExpressionBuilder(expression);
-		}
+        public IDeleteDataOrInSchemaSyntax FromTable(string tableName)
+        {
+            var expression = new DeleteDataExpression {TableName = tableName};
+            _context.Expressions.Add(expression);
+            return new DeleteDataExpressionBuilder(expression);
+        }
 
         public IDeleteIndexForTableSyntax Index(string indexName)
         {
@@ -89,5 +93,35 @@ namespace FluentMigrator.Builders.Delete
             _context.Expressions.Add(expression);
             return new DeleteIndexExpressionBuilder(expression);
         }
-	}
+
+        public IInSchemaSyntax Sequence(string sequenceName)
+        {
+            var expression = new DeleteSequenceExpression {SequenceName = sequenceName};
+            _context.Expressions.Add(expression);
+            return new DeleteSequenceExpressionBuilder(expression);
+        }
+
+        public IDeleteConstraintOnTableSyntax PrimaryKey(string primaryKeyName)
+        {
+            var expression = new DeleteConstraintExpression(ConstraintType.PrimaryKey);
+            expression.Constraint.ConstraintName = primaryKeyName;
+            _context.Expressions.Add(expression);
+            return new DeleteConstraintExpressionBuilder(expression);
+        }
+
+        public IDeleteConstraintOnTableSyntax UniqueConstraint(string constraintName)
+        {
+            var expression = new DeleteConstraintExpression(ConstraintType.Unique);
+            expression.Constraint.ConstraintName = constraintName;
+            _context.Expressions.Add(expression);
+            return new DeleteConstraintExpressionBuilder(expression);
+        }
+
+        public IDeleteDefaultConstraintOnTableSyntax DefaultConstraint()
+        {
+            var expression = new DeleteDefaultConstraintExpression();
+            _context.Expressions.Add(expression);
+            return new DeleteDefaultConstraintExpressionBuilder(expression);
+        }
+    }
 }

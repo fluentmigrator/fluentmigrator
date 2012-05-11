@@ -23,34 +23,34 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-	public class AlterColumnExpression : MigrationExpressionBase
-	{
-		public virtual string SchemaName { get; set; }
-		public virtual string TableName { get; set; }
-		public virtual ColumnDefinition Column { get; set; }
+    public class AlterColumnExpression : MigrationExpressionBase
+    {
+        public virtual string SchemaName { get; set; }
+        public virtual string TableName { get; set; }
+        public virtual ColumnDefinition Column { get; set; }
 
-		public AlterColumnExpression()
-		{
-			Column = new ColumnDefinition();
-		}
+        public AlterColumnExpression()
+        {
+            Column = new ColumnDefinition() { ModificationType = ColumnModificationType.Alter };
+        }
 
-		public override void CollectValidationErrors(ICollection<string> errors)
-		{
-			if (String.IsNullOrEmpty(TableName))
-				errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
+        public override void CollectValidationErrors(ICollection<string> errors)
+        {
+            if (String.IsNullOrEmpty(TableName))
+                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
 
-			Column.CollectValidationErrors(errors);
-		}
+            Column.CollectValidationErrors(errors);
+        }
 
-		public override void ExecuteWith(IMigrationProcessor processor)
-		{
-			Column.TableName = TableName;
-			processor.Process(this);
-		}
+        public override void ExecuteWith(IMigrationProcessor processor)
+        {
+            Column.TableName = TableName;
+            processor.Process(this);
+        }
 
-		public override string ToString()
-		{
-			return base.ToString() + TableName + " " + Column.Name + " " + Column.Type ?? Column.CustomType;
-		}
-	}
+        public override string ToString()
+        {
+            return base.ToString() + TableName + " " + Column.Name + " " + Column.Type ?? Column.CustomType;
+        }
+    }
 }

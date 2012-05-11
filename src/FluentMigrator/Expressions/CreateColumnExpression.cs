@@ -23,49 +23,49 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-	public class CreateColumnExpression : MigrationExpressionBase
-	{
-		public virtual string SchemaName { get; set; }
-		public virtual string TableName { get; set; }
-		public virtual ColumnDefinition Column { get; set; }
+    public class CreateColumnExpression : MigrationExpressionBase
+    {
+        public virtual string SchemaName { get; set; }
+        public virtual string TableName { get; set; }
+        public virtual ColumnDefinition Column { get; set; }
 
-		public CreateColumnExpression()
-		{
-			Column = new ColumnDefinition();
-		}
+        public CreateColumnExpression()
+        {
+            Column = new ColumnDefinition { ModificationType = ColumnModificationType.Create};
+        }
 
-		public override void ApplyConventions( IMigrationConventions conventions )
-		{
-			Column.ApplyConventions(conventions);
-		}
+        public override void ApplyConventions(IMigrationConventions conventions)
+        {
+            Column.ApplyConventions(conventions);
+        }
 
-		public override void CollectValidationErrors(ICollection<string> errors)
-		{
-			if (String.IsNullOrEmpty(TableName))
-				errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
+        public override void CollectValidationErrors(ICollection<string> errors)
+        {
+            if (String.IsNullOrEmpty(TableName))
+                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
 
-			Column.CollectValidationErrors(errors);
-		}
+            Column.CollectValidationErrors(errors);
+        }
 
-		public override void ExecuteWith(IMigrationProcessor processor)
-		{
-			Column.TableName = TableName;
-			processor.Process(this);
-		}
+        public override void ExecuteWith(IMigrationProcessor processor)
+        {
+            Column.TableName = TableName;
+            processor.Process(this);
+        }
 
-		public override IMigrationExpression Reverse()
-		{
-			return new DeleteColumnExpression
-					{
-						SchemaName = SchemaName,
-						TableName = TableName,
-						ColumnName = Column.Name
-					};
-		}
+        public override IMigrationExpression Reverse()
+        {
+            return new DeleteColumnExpression
+                    {
+                        SchemaName = SchemaName,
+                        TableName = TableName,
+                        ColumnNames = {Column.Name}
+                    };
+        }
 
-		public override string ToString()
-		{
-			return base.ToString() + TableName + " " + Column.Name + " " + Column.Type ?? Column.CustomType;
-		}
-	}
+        public override string ToString()
+        {
+            return base.ToString() + TableName + " " + Column.Name + " " + Column.Type ?? Column.CustomType;
+        }
+    }
 }

@@ -18,9 +18,10 @@
 
 namespace FluentMigrator.Builders.Delete
 {
-	public interface IDeleteDataSyntax
-	{
-		IDeleteDataSyntax Row(object dataAsAnonymousType);
-		void AllRows();
-	}
+    public interface IDeleteDataSyntax
+    {
+        IDeleteDataSyntax Row(object dataAsAnonymousType);
+        void AllRows();
+        void IsNull(string columnName);
+    }
 }

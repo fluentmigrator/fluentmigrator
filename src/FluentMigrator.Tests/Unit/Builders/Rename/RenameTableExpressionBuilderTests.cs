@@ -23,19 +23,18 @@ using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Builders.Rename
 {
-	[TestFixture]
-	public class RenameTableExpressionBuilderTests
-	{
-		[Test]
-		public void CallingToSetsNewName()
-		{
-			var expressionMock = new Mock<RenameTableExpression>();
-			expressionMock.VerifySet(x => x.NewName = "Bacon", Times.AtMostOnce());
+    [TestFixture]
+    public class RenameTableExpressionBuilderTests
+    {
+        [Test]
+        public void CallingToSetsNewName()
+        {
+            var expressionMock = new Mock<RenameTableExpression>();
 
-			var builder = new RenameTableExpressionBuilder(expressionMock.Object);
-			builder.To("Bacon");
+            var builder = new RenameTableExpressionBuilder(expressionMock.Object);
+            builder.To("Bacon");
 
-			expressionMock.VerifyAll();
-		}
-	}
+            expressionMock.VerifySet(x => x.NewName = "Bacon");
+        }
+    }
 }

@@ -23,3 +23,8 @@ src/*.vs10x
 *.vs10x
 src/FluentMigrator.Tests/FluentMigrator.VisualState.xml
 examplecommand.txt
+*.crunchproject.local.xml
+*.crunchsolution.local.xml
+*.ncrunchproject
+*.ncrunchsolution
+*.crunchsolution.cache

@@ -1,6 +1,4 @@
-﻿
-
-using System.Globalization;
+﻿using System.Globalization;
 
 namespace FluentMigrator.Runner.Generators.Generic
 {
@@ -175,6 +173,14 @@ namespace FluentMigrator.Runner.Generators.Generic
         public virtual string QuoteSchemaName(string schemaName)
         {
             return IsQuoted(schemaName) ? schemaName : Quote(schemaName);
+        }
+
+        /// <summary>
+        /// Quotes a Sequence name
+        /// </summary>
+        public virtual string QuoteSequenceName(string sequenceName)
+        {
+            return IsQuoted(sequenceName) ? sequenceName : Quote(sequenceName);
         }
 
         /// <summary>

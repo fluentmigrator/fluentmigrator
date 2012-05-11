@@ -27,6 +27,7 @@ namespace FluentMigrator.Runner
             VersionMigration = new VersionMigration(VersionTableMetaData);
             GroupVersionMigration = new VersionGroupMigration(VersionTableMetaData);
             VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
+            VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
 
             LoadVersionInfo();
         }
@@ -40,6 +41,7 @@ namespace FluentMigrator.Runner
         private IMigrationConventions Conventions { get; set; }
         private IMigrationProcessor Processor { get; set; }
         private IMigration VersionMigration { get; set; }
+        private IMigration VersionUniqueMigration { get; set; }
         private IMigration GroupVersionMigration { get; set; }
         private string Group { get; set; }
 
@@ -67,10 +69,12 @@ namespace FluentMigrator.Runner
 
         protected virtual InsertionDataDefinition CreateVersionInfoInsertionData( long version )
         {
-            return new InsertionDataDefinition { 
-                new KeyValuePair<string, object>( VersionTableMetaData.ColumnName, version ),
-                new KeyValuePair<string, object>( VersionTableMetaData.GroupName, Group )
-            };
+            return new InsertionDataDefinition
+                       {
+                           new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version),
+                           new KeyValuePair<string, object>("AppliedOn", DateTime.UtcNow),
+                           new KeyValuePair<string, object>(VersionTableMetaData.GroupName, Group)
+                       };
         }
 
         public IVersionInfo VersionInfo
@@ -112,22 +116,23 @@ namespace FluentMigrator.Runner
             }
         }
 
+        public bool AlreadyMadeVersionUnique
+        {
+            get
+            {
+                return Processor.ColumnExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName, "AppliedOn");
+            }
+        }
+
         public void LoadVersionInfo()
         {
-            if (Processor.Options.PreviewOnly)
-            {
-                if (!AlreadyCreatedVersionTable)
-                    Runner.Up(VersionMigration);
-
-                if (!AlreadyAppliedGroupMigration)                
-                    Runner.Up(GroupVersionMigration);
-                
-                VersionInfo = new VersionInfo();
-                return;
-            }
+            bool tableCreated = false;
 
             if (!AlreadyCreatedVersionSchema)
                 Runner.Up(VersionSchemaMigration);
+
+            if (!AlreadyAppliedGroupMigration)                
+                Runner.Up(GroupVersionMigration);
 
             if (!AlreadyCreatedVersionTable)
                 Runner.Up(VersionMigration);
@@ -135,14 +140,19 @@ namespace FluentMigrator.Runner
             if (!AlreadyAppliedGroupMigration)
             {
                 Runner.Up(GroupVersionMigration);
-                _versionInfo = new VersionInfo();
-                return;
+                tableCreated = true;
             }
 
-            var dataSet = Processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
+            if (!AlreadyMadeVersionUnique)
+                Runner.Up(VersionUniqueMigration);
+            
             _versionInfo = new VersionInfo();
 
-            foreach ( DataRow row in dataSet.Tables[ 0 ].Rows )
+            if (tableCreated) return;
+
+            var dataSet = Processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
+
+            foreach (DataRow row in dataSet.Tables[0].Rows)
             {
                 if ( string.Equals( row[ VersionTableMetaData.GroupName ], Group ) )
                     _versionInfo.AddAppliedMigration( long.Parse( row[ VersionTableMetaData.ColumnName ].ToString() ) );
@@ -165,10 +175,10 @@ namespace FluentMigrator.Runner
         {
             var expression = new DeleteDataExpression { TableName = VersionTableMetaData.TableName, SchemaName = VersionTableMetaData.SchemaName };
             expression.Rows.Add(new DeletionDataDefinition
-									{
-										new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version),
-										new KeyValuePair<string, object>(VersionTableMetaData.GroupName, Group)
-									});
+                                    {
+                                        new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version),
+                                        new KeyValuePair<string, object>(VersionTableMetaData.GroupName, Group)
+                                    });
             expression.ExecuteWith(Processor);
         }
     }

@@ -19,39 +19,52 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Insert
 {
-	public class InsertDataExpressionBuilder : IInsertDataOrInSchemaSyntax
-	{
-		private readonly InsertDataExpression _expression;
+    public class InsertDataExpressionBuilder : IInsertDataOrInSchemaSyntax, ISupportAdditionalFeatures
+    {
+        private readonly InsertDataExpression _expression;
 
-		public InsertDataExpressionBuilder(InsertDataExpression expression)
-		{
-			_expression = expression;
-		}
+        public InsertDataExpressionBuilder(InsertDataExpression expression)
+        {
+            _expression = expression;
+        }
 
-		public IInsertDataSyntax Row(object dataAsAnonymousType)
-		{
-			_expression.Rows.Add(GetData(dataAsAnonymousType));
-			return this;
-		}
+        public IInsertDataSyntax Row(object dataAsAnonymousType)
+        {
+            _expression.Rows.Add(GetData(dataAsAnonymousType));
+            return this;
+        }
 
-		public IInsertDataSyntax InSchema(string schemaName)
-		{
-			_expression.SchemaName = schemaName;
-			return this;
-		}
+        void ISupportAdditionalFeatures.AddAdditionalFeature(string feature, object value)
+        {
+            if (!_expression.AdditionalFeatures.ContainsKey(feature))
+            {
+                _expression.AdditionalFeatures.Add(feature, value);
+            }
+            else
+            {
+                _expression.AdditionalFeatures[feature] = value;
+            }
+        }
 
-		private static InsertionDataDefinition GetData(object dataAsAnonymousType)
-		{
-			var data = new InsertionDataDefinition();
-			var properties = TypeDescriptor.GetProperties(dataAsAnonymousType);
+        public IInsertDataSyntax InSchema(string schemaName)
+        {
+            _expression.SchemaName = schemaName;
+            return this;
+        }
 
-			foreach (PropertyDescriptor property in properties)
-				data.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(dataAsAnonymousType)));
-			return data;
-		}
-	}
+        private static InsertionDataDefinition GetData(object dataAsAnonymousType)
+        {
+            var data = new InsertionDataDefinition();
+            var properties = TypeDescriptor.GetProperties(dataAsAnonymousType);
+
+            foreach (PropertyDescriptor property in properties)
+                data.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(dataAsAnonymousType)));
+            return data;
+        }
+    }
 }

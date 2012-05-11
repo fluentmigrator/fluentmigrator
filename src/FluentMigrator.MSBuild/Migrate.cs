@@ -22,7 +22,6 @@ using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using System;
 using System.Reflection;
-using System.IO;
 
 namespace FluentMigrator.MSBuild
 {
@@ -50,6 +49,8 @@ namespace FluentMigrator.MSBuild
         [Required]
         public string Connection { get; set; }
 
+        public string ConnectionStringConfigPath { get; set; }
+
         public string Target { get { return migrationAssembly; } set { migrationAssembly = value; } }
 
         public string MigrationAssembly { get { return migrationAssembly; } set { migrationAssembly = value; } }
@@ -70,11 +71,15 @@ namespace FluentMigrator.MSBuild
 
         public string WorkingDirectory { get; set; }
 
+        public int Timeout { get; set; }
+
         public string Profile { get; set; }
+
+        public bool PreviewOnly { get; set; }
 
         public override bool Execute()
         {
-            
+
             if (string.IsNullOrEmpty(databaseType))
             {
                 Log.LogError("You must specific a database type. i.e. mysql or sqlserver");
@@ -88,8 +93,8 @@ namespace FluentMigrator.MSBuild
             }
 
 
-            Log.LogCommandLine(MessageImportance.Low, "Creating Context");
-            var announcer = new BaseAnnouncer(msg => Log.LogCommandLine(MessageImportance.Normal, msg))
+            Log.LogMessage(MessageImportance.Low, "Creating Context");
+            var announcer = new BaseAnnouncer(msg => Log.LogMessage(MessageImportance.Normal, msg))
             {
                 ShowElapsedTime = Verbose,
                 ShowSql = Verbose
@@ -98,24 +103,31 @@ namespace FluentMigrator.MSBuild
             {
                 Database = databaseType,
                 Connection = Connection,
+                ConnectionStringConfigPath = ConnectionStringConfigPath,
                 Target = Target,
-                PreviewOnly = false,
+                PreviewOnly = PreviewOnly,
                 Namespace = Namespace,
                 Task = Task,
                 Version = Version,
                 Steps = Steps,
                 WorkingDirectory = WorkingDirectory,
-                Profile = Profile 
+                Profile = Profile,
+                Timeout = Timeout,
             };
 
-            Log.LogCommandLine(MessageImportance.Low, "Executing Migration Runner");
+            Log.LogMessage(MessageImportance.Low, "Executing Migration Runner");
             try
             {
                 new TaskExecutor(runnerContext).Execute();
             }
-            catch (Exception ex)
+            catch (ProcessorFactoryNotFoundException ex)
             {
                 announcer.Error("While executing migrations the following error was encountered: {0}", ex.Message);
+                return false;
+            }
+            catch (Exception ex)
+            {
+                announcer.Error("While executing migrations the following error was encountered: {0}, {1}", ex.Message, ex.StackTrace);
                 return false;
             }
 

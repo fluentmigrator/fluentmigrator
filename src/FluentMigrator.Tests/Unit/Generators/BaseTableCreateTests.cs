@@ -1,13 +1,5 @@
-﻿
-namespace FluentMigrator.Tests.Unit.Generators
+﻿namespace FluentMigrator.Tests.Unit.Generators
 {
-
-
-    using System.Collections.Generic;
-    using System.Data;
-    using FluentMigrator.Expressions;
-    using FluentMigrator.Model;
-
     public abstract class BaseTableCreateTests : GeneratorTestBase
     {
         //Create Tests
@@ -30,13 +22,5 @@ namespace FluentMigrator.Tests.Unit.Generators
         public abstract void CanCreateMultiColumnUniqueIndex();
 
         public abstract void CanCreateSchema();
-
-        
-
-       
-
-        
-
-       
     }
 }

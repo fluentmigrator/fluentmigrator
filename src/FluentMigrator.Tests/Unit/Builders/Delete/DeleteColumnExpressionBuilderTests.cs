@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System.Collections.Generic;
+using System.Linq;
 using FluentMigrator.Builders.Delete.Column;
 using FluentMigrator.Expressions;
 using Moq;
@@ -23,19 +25,41 @@ using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
-	[TestFixture]
-	public class DeleteColumnExpressionBuilderTests
-	{
-		[Test]
-		public void CallingFromTableSetsTableName()
-		{
-			var expressionMock = new Mock<DeleteColumnExpression>();
-            expressionMock.VerifySet(x => x.TableName = "Bacon", Times.AtMostOnce());
+    [TestFixture]
+    public class DeleteColumnExpressionBuilderTests
+    {
+        [Test]
+        public void CallingFromTableSetsTableName()
+        {
+            var expressionMock = new Mock<DeleteColumnExpression>();
 
-			var builder = new DeleteColumnExpressionBuilder(expressionMock.Object);
-			builder.FromTable("Bacon");
+            var builder = new DeleteColumnExpressionBuilder(expressionMock.Object);
+            builder.FromTable("Bacon");
 
-			expressionMock.VerifyAll();
-		}
-	}
+            expressionMock.VerifySet(x => x.TableName = "Bacon");
+        }
+
+        [Test]
+        public void CallingColumnAddsColumnNameToList() 
+        {
+            var expressionMock = new Mock<DeleteColumnExpression>();
+            expressionMock.Object.ColumnNames = new List<string> {"Cheese"};
+
+            var builder = new DeleteColumnExpressionBuilder(expressionMock.Object);
+            builder.Column("Bacon");
+            
+            Assert.That(expressionMock.Object.ColumnNames.ElementAt(1), Is.EqualTo("Bacon"));
+        }
+
+        [Test]
+        public void CallingInSchemaSetsSchemaOnExpression() 
+        {
+            var expressionMock = new Mock<DeleteColumnExpression>();
+
+            var builder = new DeleteColumnExpressionBuilder(expressionMock.Object);
+            builder.InSchema("Bacon");
+
+            expressionMock.VerifySet(x => x.SchemaName = "Bacon");
+        }
+    }
 }

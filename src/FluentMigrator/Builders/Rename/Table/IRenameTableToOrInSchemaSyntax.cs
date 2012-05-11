@@ -18,8 +18,8 @@
 
 namespace FluentMigrator.Builders.Rename.Table
 {
-	public interface IRenameTableToOrInSchemaSyntax : IRenameTableToSyntax
-	{
-		IRenameTableToSyntax InSchema(string schemaName);
-	}
+    public interface IRenameTableToOrInSchemaSyntax : IRenameTableToSyntax
+    {
+        IRenameTableToSyntax InSchema(string schemaName);
+    }
 }

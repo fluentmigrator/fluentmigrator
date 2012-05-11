@@ -1,10 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
-using System.Data;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {
@@ -23,14 +21,13 @@ namespace FluentMigrator.Tests.Unit.Generators
             CreateTableExpression expression = new CreateTableExpression() { TableName = TestTableName1, };
             expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, Type = DbType.String });
             expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, Type = DbType.Int32 });
-
             return expression;
         }
 
         public static CreateTableExpression GetCreateTableWithDefaultValue()
         {
             CreateTableExpression expression = new CreateTableExpression() { TableName = TestTableName1, };
-            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, Type = DbType.String, DefaultValue = "Default", TableName=TestTableName1 });
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, Type = DbType.String, DefaultValue = "Default", TableName = TestTableName1 });
             expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, Type = DbType.Int32, DefaultValue = 0, TableName = TestTableName1 });
             return expression;
         }
@@ -46,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         public static CreateTableExpression GetCreateTableWithNamedPrimaryKeyExpression()
         {
             var expression = new CreateTableExpression { TableName = TestTableName1 };
-            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, IsPrimaryKey = true, PrimaryKeyName="TestKey", Type = DbType.String });
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, IsPrimaryKey = true, PrimaryKeyName = "TestKey", Type = DbType.String });
             expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, Type = DbType.Int32 });
             return expression;
         }
@@ -109,7 +106,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         public static CreateIndexExpression GetCreateUniqueIndexExpression()
         {
             var expression = new CreateIndexExpression();
-            expression.Index.Name =  TestIndexName;
+            expression.Index.Name = TestIndexName;
             expression.Index.TableName = TestTableName1;
             expression.Index.IsUnique = true;
             expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Ascending, Name = TestColumnName1 });
@@ -132,17 +129,17 @@ namespace FluentMigrator.Tests.Unit.Generators
             var expression = new InsertDataExpression();
             expression.TableName = TestTableName1;
             expression.Rows.Add(new InsertionDataDefinition
-									{
-										new KeyValuePair<string, object>("Id", 1),
-										new KeyValuePair<string, object>("Name", "Just'in"),
-										new KeyValuePair<string, object>("Website", "codethinked.com")
-									});
+                                    {
+                                        new KeyValuePair<string, object>("Id", 1),
+                                        new KeyValuePair<string, object>("Name", "Just'in"),
+                                        new KeyValuePair<string, object>("Website", "codethinked.com")
+                                    });
             expression.Rows.Add(new InsertionDataDefinition
-									{
-										new KeyValuePair<string, object>("Id", 2),
-										new KeyValuePair<string, object>("Name", @"Na\te"),
-										new KeyValuePair<string, object>("Website", "kohari.org")
-									});
+                                    {
+                                        new KeyValuePair<string, object>("Id", 2),
+                                        new KeyValuePair<string, object>("Name", @"Na\te"),
+                                        new KeyValuePair<string, object>("Website", "kohari.org")
+                                    });
 
             return expression;
         }
@@ -153,16 +150,16 @@ namespace FluentMigrator.Tests.Unit.Generators
             expression.TableName = TestTableName1;
 
             expression.Set = new List<KeyValuePair<string, object>>
-								 {
-									 new KeyValuePair<string, object>("Name", "Just'in"),
-									 new KeyValuePair<string, object>("Age", 25)
-								 };
+                                 {
+                                     new KeyValuePair<string, object>("Name", "Just'in"),
+                                     new KeyValuePair<string, object>("Age", 25)
+                                 };
 
             expression.Where = new List<KeyValuePair<string, object>>
-								   {
-									   new KeyValuePair<string, object>("Id", 9),
-									   new KeyValuePair<string, object>("Homepage", null)
-								   };
+                                   {
+                                       new KeyValuePair<string, object>("Id", 9),
+                                       new KeyValuePair<string, object>("Homepage", null)
+                                   };
             return expression;
         }
 
@@ -179,10 +176,10 @@ namespace FluentMigrator.Tests.Unit.Generators
             var expression = new DeleteDataExpression();
             expression.TableName = TestTableName1;
             expression.Rows.Add(new DeletionDataDefinition
-									{
-										new KeyValuePair<string, object>("Name", "Just'in"),
-										new KeyValuePair<string, object>("Website", null)
-									});
+                                    {
+                                        new KeyValuePair<string, object>("Name", "Just'in"),
+                                        new KeyValuePair<string, object>("Website", null)
+                                    });
 
             return expression;
         }
@@ -192,14 +189,14 @@ namespace FluentMigrator.Tests.Unit.Generators
             var expression = new DeleteDataExpression();
             expression.TableName = TestTableName1;
             expression.Rows.Add(new DeletionDataDefinition
-									{
-										new KeyValuePair<string, object>("Name", "Just'in"),
-										new KeyValuePair<string, object>("Website", null)
-									});
+                                    {
+                                        new KeyValuePair<string, object>("Name", "Just'in"),
+                                        new KeyValuePair<string, object>("Website", null)
+                                    });
             expression.Rows.Add(new DeletionDataDefinition
-									{
-										new KeyValuePair<string, object>("Website", "github.com")
-									});
+                                    {
+                                        new KeyValuePair<string, object>("Website", "github.com")
+                                    });
 
             return expression;
         }
@@ -259,6 +256,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             expression.Column.Type = DbType.String;
             expression.Column.Size = 20;
             expression.Column.IsNullable = false;
+            expression.Column.ModificationType = ColumnModificationType.Alter;
 
             return expression;
         }
@@ -294,12 +292,17 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         public static DeleteColumnExpression GetDeleteColumnExpression()
         {
-            return new DeleteColumnExpression { TableName = TestTableName1, ColumnName = TestColumnName1 };
+            return GetDeleteColumnExpression(new [] {TestColumnName1});
+        }
+
+        public static DeleteColumnExpression GetDeleteColumnExpression(string[] columns)
+        {
+            return new DeleteColumnExpression { TableName = TestTableName1, ColumnNames = columns };
         }
 
         public static DeleteIndexExpression GetDeleteIndexExpression()
         {
-            IndexDefinition indexDefinition = new IndexDefinition { Name = TestIndexName, TableName=TestTableName1 };
+            IndexDefinition indexDefinition = new IndexDefinition { Name = TestIndexName, TableName = TestTableName1 };
             return new DeleteIndexExpression { Index = indexDefinition };
         }
 
@@ -311,6 +314,108 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static DeleteConstraintExpression GetDeletePrimaryKeyExpression()
+        {
+            var expression = new DeleteConstraintExpression(ConstraintType.PrimaryKey);
+            expression.Constraint.TableName = TestTableName1;
+            expression.Constraint.ConstraintName = "TESTPRIMARYKEY";
+            return expression;
+        }
 
+        public static DeleteConstraintExpression GetDeleteUniqueConstraintExpression()
+        {
+            var expression = new DeleteConstraintExpression(ConstraintType.Unique);
+            expression.Constraint.TableName = TestTableName1;
+            expression.Constraint.ConstraintName = "TESTUNIQUECONSTRAINT";
+            return expression;
+        }
+
+
+        public static CreateConstraintExpression GetCreatePrimaryKeyExpression()
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
+            expression.Constraint.TableName = TestTableName1;
+            expression.Constraint.Columns.Add(TestColumnName1);
+            expression.ApplyConventions(new MigrationConventions());
+            return expression;
+        }
+
+        public static CreateConstraintExpression GetCreateNamedPrimaryKeyExpression()
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
+            expression.Constraint.TableName = TestTableName1;
+            expression.Constraint.Columns.Add(TestColumnName1);
+            expression.Constraint.ConstraintName = "TESTPRIMARYKEY";
+            return expression;
+        }
+
+        public static CreateConstraintExpression GetCreateMultiColumnPrimaryKeyExpression()
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
+            expression.Constraint.TableName = TestTableName1;
+            expression.Constraint.Columns.Add(TestColumnName1);
+            expression.Constraint.Columns.Add(TestColumnName2);
+            expression.ApplyConventions(new MigrationConventions());
+            return expression;
+        }
+
+        public static CreateConstraintExpression GetCreateMultiColumnNamedPrimaryKeyExpression()
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
+            expression.Constraint.TableName = TestTableName1;
+            expression.Constraint.Columns.Add(TestColumnName1);
+            expression.Constraint.Columns.Add(TestColumnName2);
+            expression.Constraint.ConstraintName = "TESTPRIMARYKEY";
+            return expression;
+        }
+
+        public static CreateConstraintExpression GetCreateUniqueConstraintExpression()
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.Unique);
+            expression.Constraint.TableName = TestTableName1;
+            expression.Constraint.Columns.Add(TestColumnName1);
+            expression.ApplyConventions(new MigrationConventions());
+            return expression;
+        }
+
+        public static CreateConstraintExpression GetCreateNamedUniqueConstraintExpression()
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.Unique);
+            expression.Constraint.TableName = TestTableName1;
+            expression.Constraint.Columns.Add(TestColumnName1);
+            expression.Constraint.ConstraintName = "TESTUNIQUECONSTRAINT";
+            return expression;
+        }
+
+        public static CreateConstraintExpression GetCreateMultiColumnUniqueConstraintExpression()
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.Unique);
+            expression.Constraint.TableName = TestTableName1;
+            expression.Constraint.Columns.Add(TestColumnName1);
+            expression.Constraint.Columns.Add(TestColumnName2);
+            expression.ApplyConventions(new MigrationConventions());
+            return expression;
+        }
+
+        public static CreateConstraintExpression GetCreateMultiColumnNamedUniqueConstraintExpression()
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.Unique);
+            expression.Constraint.TableName = TestTableName1;
+            expression.Constraint.Columns.Add(TestColumnName1);
+            expression.Constraint.Columns.Add(TestColumnName2);
+            expression.Constraint.ConstraintName = "TESTUNIQUECONSTRAINT";
+            return expression;
+        }
+
+        public static AlterDefaultConstraintExpression GetAlterDefaultConstraintExpression()
+        {
+            var expression = new AlterDefaultConstraintExpression
+                                 {
+                                     ColumnName = TestColumnName1,
+                                     DefaultValue = 1,
+                                     TableName = TestTableName1
+                                 };
+            return expression;
+        }
     }
 }

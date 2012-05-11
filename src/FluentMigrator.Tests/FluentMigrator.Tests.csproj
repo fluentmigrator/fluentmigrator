@@ -146,6 +146,12 @@
   <ItemGroup>
     <Compile Include="Helpers\PostgresTestTable.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
+    <Compile Include="Integration\Migrations\TestEmptyMigration.cs" />
+    <Compile Include="Unit\Builders\Create\CreateSequenceExpressionBuilderTests.cs" />
+    <Compile Include="Unit\Builders\Delete\DeleteConstriantTest.cs" />
+    <Compile Include="Unit\Builders\Delete\DeleteDataExpressionTests.cs" />
+    <Compile Include="Unit\Builders\Delete\DeleteDefaultConstraintExpressionBuilderTests.cs" />
+    <Compile Include="Unit\Builders\Delete\DeleteSequenceExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\IfDatabase\IfDatabaseExpressionRootTests.cs" />
     <Compile Include="Integration\Migrations\Nested\Group1\AnotherFromGroup1.cs" />
     <Compile Include="Integration\Migrations\Nested\Group1\FromGroup1.cs" />
@@ -188,6 +194,10 @@
     <Compile Include="Unit\Builders\Create\CreateTableExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateColumnExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Schema\SchemaExpressionRootTest.cs" />
+    <Compile Include="Unit\Definitions\IndexDefinitionTests.cs" />
+    <Compile Include="Unit\Expressions\DeleteDefaultConstraintExpressionTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000GeneratorTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005GeneratorTests.cs" />
     <Compile Include="Unit\Initialization\ConnectionStringManagerTests.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -258,6 +268,7 @@
     <Compile Include="Integration\Migrations\TestMigration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Unit\MigrationRunnerTests.cs" />
+    <Compile Include="Unit\MigrationWithMetaDataAdapterTests.cs" />
     <Compile Include="Unit\ProfileLoaderTests.cs" />
     <Compile Include="Unit\Runners\Migrations\1_User.cs" />
     <Compile Include="Unit\Runners\Migrations\2_UserEmail.cs" />

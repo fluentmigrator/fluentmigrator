@@ -18,33 +18,42 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
-	public class DeleteColumnExpression : MigrationExpressionBase
-	{
-		public virtual string SchemaName { get; set; }
-		public virtual string TableName { get; set; }
-		public virtual string ColumnName { get; set; }
+    public class DeleteColumnExpression : MigrationExpressionBase
+    {
+        public DeleteColumnExpression()
+        {
+            ColumnNames = new List<string>();
+        }
 
-		public override void CollectValidationErrors(ICollection<string> errors)
-		{
-			if (String.IsNullOrEmpty(TableName))
-				errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
+        public virtual string SchemaName { get; set; }
+        public virtual string TableName { get; set; }
+        public ICollection<string> ColumnNames { get; set; }
 
-			if (String.IsNullOrEmpty(ColumnName))
-				errors.Add(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
-		}
+        public override void CollectValidationErrors(ICollection<string> errors)
+        {
+            if (String.IsNullOrEmpty(TableName))
+                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
 
-		public override void ExecuteWith(IMigrationProcessor processor)
-		{
-			processor.Process(this);
-		}
+            if (ColumnNames == null || !ColumnNames.Any() || ColumnNames.Any(string.IsNullOrEmpty))
+                errors.Add(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
 
-		public override string ToString()
-		{
-			return base.ToString() + TableName + " " + ColumnName;
-		}
-	}
+            if (ColumnNames != null && ColumnNames.GroupBy(x => x).Any(x => x.Count() > 1))
+                errors.Add(ErrorMessages.ColumnNamesMustBeUnique);
+        }
+
+        public override void ExecuteWith(IMigrationProcessor processor)
+        {
+            processor.Process(this);
+        }
+
+        public override string ToString()
+        {
+            return base.ToString() + TableName + " " + ColumnNames.Aggregate((a, b) => a + ", " + b);
+        }
+    }
 }

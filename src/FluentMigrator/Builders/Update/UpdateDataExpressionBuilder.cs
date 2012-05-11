@@ -18,24 +18,22 @@
 
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
-using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Update
 {
-	public class UpdateDataExpressionBuilder : IUpdateSetOrInSchemaSyntax,
-		IUpdateWhereSyntax
-	{
-	    private readonly UpdateDataExpression _expression;
-		private readonly IMigrationContext _context;
+    public class UpdateDataExpressionBuilder : IUpdateSetOrInSchemaSyntax,
+        IUpdateWhereSyntax
+    {
+        private readonly UpdateDataExpression _expression;
+        private readonly IMigrationContext _context;
 
-		public UpdateDataExpressionBuilder( UpdateDataExpression expression, IMigrationContext context )
-		{
-			_context = context;
-		    _expression = expression;
-		}
+        public UpdateDataExpressionBuilder(UpdateDataExpression expression, IMigrationContext context)
+        {
+            _context = context;
+            _expression = expression;
+        }
 
         public IUpdateSetSyntax InSchema(string schemaName)
         {

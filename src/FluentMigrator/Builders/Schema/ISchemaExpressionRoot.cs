@@ -22,9 +22,9 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Schema
 {
-	public interface ISchemaExpressionRoot : IFluentSyntax
-	{
-		ISchemaTableSyntax Table(string tableName);
-		ISchemaSchemaSyntax Schema(string schemaName);
-	}
+    public interface ISchemaExpressionRoot : IFluentSyntax
+    {
+        ISchemaTableSyntax Table(string tableName);
+        ISchemaSchemaSyntax Schema(string schemaName);
+    }
 }

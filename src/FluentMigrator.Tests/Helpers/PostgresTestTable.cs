@@ -16,7 +16,7 @@ namespace FluentMigrator.Tests.Helpers
         public string NameWithSchema { get; set; }
         public NpgsqlTransaction Transaction { get; private set; }
 
-        public PostgresTestTable(PostgresProcessor processor, string schemaName, params string[] columnDefinitions) 
+        public PostgresTestTable(PostgresProcessor processor, string schemaName, params string[] columnDefinitions)
         {
             _schemaName = schemaName;
             Name = "\"Table" + Guid.NewGuid().ToString("N") + "\"";
@@ -27,16 +27,16 @@ namespace FluentMigrator.Tests.Helpers
         public PostgresTestTable(string schemaName, string tableName, PostgresProcessor processor, params string[] columnDefinitions)
         {
             _schemaName = schemaName;
-            
+
             Name = quoter.QuoteTableName(tableName);
             Init(processor, columnDefinitions);
         }
 
         private void Init(PostgresProcessor processor, IEnumerable<string> columnDefinitions)
-        {      
-            Connection = (NpgsqlConnection) processor.Connection;
-            Transaction = (NpgsqlTransaction) processor.Transaction;
-                
+        {
+            Connection = (NpgsqlConnection)processor.Connection;
+            Transaction = (NpgsqlTransaction)processor.Transaction;
+
             NameWithSchema = string.IsNullOrEmpty(_schemaName) ? Name : string.Format("\"{0}\".{1}", _schemaName, Name);
             Create(columnDefinitions);
         }
@@ -50,8 +50,8 @@ namespace FluentMigrator.Tests.Helpers
         {
             var sb = new StringBuilder();
 
-			if(!string.IsNullOrEmpty(_schemaName))
-				sb.AppendFormat("CREATE SCHEMA \"{0}\";",_schemaName);
+            if (!string.IsNullOrEmpty(_schemaName))
+                sb.AppendFormat("CREATE SCHEMA \"{0}\";", _schemaName);
 
             sb.Append("CREATE TABLE ");
 
@@ -74,10 +74,10 @@ namespace FluentMigrator.Tests.Helpers
 
         public void Drop()
         {
-        	var sb = new StringBuilder();
-        	sb.AppendFormat("DROP TABLE {0}", NameWithSchema);
-			if (!string.IsNullOrEmpty(_schemaName))
-				sb.AppendFormat(";DROP SCHEMA \"{0}\"", _schemaName);
+            var sb = new StringBuilder();
+            sb.AppendFormat("DROP TABLE {0}", NameWithSchema);
+            if (!string.IsNullOrEmpty(_schemaName))
+                sb.AppendFormat(";DROP SCHEMA \"{0}\"", _schemaName);
 
             using (var command = new NpgsqlCommand(sb.ToString(), Connection, Transaction))
                 command.ExecuteNonQuery();

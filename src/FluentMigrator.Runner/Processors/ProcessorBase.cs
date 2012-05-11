@@ -27,6 +27,7 @@ namespace FluentMigrator.Runner.Processors
         protected readonly IAnnouncer Announcer;
         public IMigrationProcessorOptions Options { get; private set; }
         public abstract string DatabaseType { get; }
+        public bool WasCommitted { get; protected set; }
 
         protected ProcessorBase(IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
@@ -128,6 +129,31 @@ namespace FluentMigrator.Runner.Processors
         public abstract void Process(PerformDBOperationExpression expression);
 
         public void Process(AlterSchemaExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
+
+        public void Process(CreateSequenceExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
+
+        public void Process(DeleteSequenceExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
+
+        public virtual void Process(CreateConstraintExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
+
+        public virtual void Process(DeleteConstraintExpression expression)
+        {
+            Process(Generator.Generate(expression));
+        }
+
+        public void Process(DeleteDefaultConstraintExpression expression)
         {
             Process(Generator.Generate(expression));
         }

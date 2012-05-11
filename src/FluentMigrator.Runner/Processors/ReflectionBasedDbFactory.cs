@@ -16,7 +16,7 @@ namespace FluentMigrator.Runner.Processors
 
         protected override DbProviderFactory CreateFactory()
         {
-            return (DbProviderFactory) AppDomain.CurrentDomain.CreateInstanceAndUnwrap(assemblyName, dbProviderFactoryTypeName);
+            return (DbProviderFactory)AppDomain.CurrentDomain.CreateInstanceAndUnwrap(assemblyName, dbProviderFactoryTypeName);
         }
     }
 }

@@ -1,72 +1,73 @@
 namespace FluentMigrator.Runner.Processors
 {
+    using System.Data;
     using System.Data.Common;
 
-	public abstract class DbFactoryBase : IDbFactory
-	{
-		private volatile DbProviderFactory factory;
-	    private readonly object @lock = new object();
+    public abstract class DbFactoryBase : IDbFactory
+    {
+        private volatile DbProviderFactory factory;
+        private readonly object @lock = new object();
 
-		protected DbFactoryBase(DbProviderFactory factory)
-		{
-			this.factory = factory;
-		}
+        protected DbFactoryBase(DbProviderFactory factory)
+        {
+            this.factory = factory;
+        }
 
-	    protected DbFactoryBase()
-	    {
-	    }
+        protected DbFactoryBase()
+        {
+        }
 
-	    private DbProviderFactory Factory
-	    {
-	        get
-	        {
-	            if (factory == null)
-	            {
-	                lock (@lock)
-	                {
-	                    if (factory == null)
-	                    {
-	                        factory = CreateFactory();
-	                    }
-	                }
-	            }
-	            return factory;
-	        }
-	    }
+        private DbProviderFactory Factory
+        {
+            get
+            {
+                if (factory == null)
+                {
+                    lock (@lock)
+                    {
+                        if (factory == null)
+                        {
+                            factory = CreateFactory();
+                        }
+                    }
+                }
+                return factory;
+            }
+        }
 
-	    protected abstract DbProviderFactory CreateFactory();
+        protected abstract DbProviderFactory CreateFactory();
 
-	    #region IDbFactory Members
+        #region IDbFactory Members
 
-		public DbConnection CreateConnection(string connectionString)
-		{
-			DbConnection connection = Factory.CreateConnection();
-			connection.ConnectionString = connectionString;
-			return connection;
-		}
+        public IDbConnection CreateConnection(string connectionString)
+        {
+            var connection = Factory.CreateConnection();
+            connection.ConnectionString = connectionString;
+            return connection;
+        }
 
-		public DbCommand CreateCommand(string commandText, DbConnection connection, DbTransaction transaction)
-		{
-			DbCommand command = connection.CreateCommand();
-			command.CommandText = commandText;
-			command.Transaction = transaction;
-			return command;
-		}
+        public IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction)
+        {
+            var command = connection.CreateCommand();
+            command.CommandText = commandText;
+            command.Transaction = transaction;
+            return command;
+        }
 
-		public DbDataAdapter CreateDataAdapter(DbCommand command)
-		{
-			DbDataAdapter dataAdapter = Factory.CreateDataAdapter();
-			dataAdapter.SelectCommand = command;
-			return dataAdapter;
-		}
+        public IDbDataAdapter CreateDataAdapter(IDbCommand command)
+        {
+            IDbDataAdapter dataAdapter = Factory.CreateDataAdapter();
+            dataAdapter.SelectCommand = command;
+            return dataAdapter;
+        }
 
-		public DbCommand CreateCommand(string commandText, DbConnection connection)
-		{
-			DbCommand command = connection.CreateCommand();
-			command.CommandText = commandText;
-			return command;
-		}
+        public IDbCommand CreateCommand(string commandText, IDbConnection connection)
+        {
+            var command = connection.CreateCommand();
+            command.CommandText = commandText;
+            return command;
+        }
 
-		#endregion
-	}
+        #endregion
+    }
 }

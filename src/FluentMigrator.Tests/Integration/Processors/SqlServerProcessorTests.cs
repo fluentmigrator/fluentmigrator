@@ -17,68 +17,69 @@
 #endregion
 
 using System.Data.SqlClient;
+using System.IO;
+using FluentMigrator.Builders.Execute;
 using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
 using NUnit.Should;
-using FluentMigrator.Runner.Generators.SqlServer;
 
 namespace FluentMigrator.Tests.Integration.Processors
 {
-	[TestFixture]
-	public class SqlServerProcessorTests
-	{
-		public SqlConnection Connection { get; set; }
-		public SqlServerProcessor Processor { get; set; }
+    [TestFixture]
+    public class SqlServerProcessorTests
+    {
+        public SqlConnection Connection { get; set; }
+        public SqlServerProcessor Processor { get; set; }
 
-		[SetUp]
-		public void SetUp()
-		{
-			Connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
-			Processor = new SqlServerProcessor(Connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
-		}
+        [SetUp]
+        public void SetUp()
+        {
+            Connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
+            Processor = new SqlServerProcessor(Connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
+        }
 
-		[TearDown]
-		public void TearDown()
-		{
-			Processor.CommitTransaction();
-		}
+        [TearDown]
+        public void TearDown()
+        {
+            Processor.CommitTransaction();
+        }
 
-		[Test]
-		public void CallingTableExistsReturnsTrueIfTableExists()
-		{
-			using (var table = new SqlServerTestTable(Processor, null, "id int"))
-				Processor.TableExists(null, table.Name).ShouldBeTrue();
-		}
+        [Test]
+        public void CallingTableExistsReturnsTrueIfTableExists()
+        {
+            using (var table = new SqlServerTestTable(Processor, null, "id int"))
+                Processor.TableExists(null, table.Name).ShouldBeTrue();
+        }
 
-		[Test]
-		public void CallingTableExistsReturnsFalseIfTableDoesNotExist()
-		{
-			Processor.TableExists(null, "DoesNotExist").ShouldBeFalse();
-		}
+        [Test]
+        public void CallingTableExistsReturnsFalseIfTableDoesNotExist()
+        {
+            Processor.TableExists(null, "DoesNotExist").ShouldBeFalse();
+        }
 
-		[Test]
-		public void CallingColumnExistsReturnsTrueIfColumnExists()
-		{
-			using (var table = new SqlServerTestTable(Processor, null, "id int"))
-				Processor.ColumnExists(null, table.Name, "id").ShouldBeTrue();
-		}
+        [Test]
+        public void CallingColumnExistsReturnsTrueIfColumnExists()
+        {
+            using (var table = new SqlServerTestTable(Processor, null, "id int"))
+                Processor.ColumnExists(null, table.Name, "id").ShouldBeTrue();
+        }
 
-		[Test]
-		public void CallingColumnExistsReturnsFalseIfTableDoesNotExist()
-		{
-			Processor.ColumnExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
-		}
+        [Test]
+        public void CallingColumnExistsReturnsFalseIfTableDoesNotExist()
+        {
+            Processor.ColumnExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
+        }
 
-		[Test]
-		public void CallingColumnExistsReturnsFalseIfColumnDoesNotExist()
-		{
-			using (var table = new SqlServerTestTable(Processor, null, "id int"))
-				Processor.ColumnExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
-		}
+        [Test]
+        public void CallingColumnExistsReturnsFalseIfColumnDoesNotExist()
+        {
+            using (var table = new SqlServerTestTable(Processor, null, "id int"))
+                Processor.ColumnExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
+        }
 
         [Test]
         public void CallingTableExistsReturnsTrueIfTableExistsWithSchema()
@@ -112,5 +113,55 @@ namespace FluentMigrator.Tests.Integration.Processors
             using (var table = new SqlServerTestTable(Processor, "test_schema", "id int"))
                 Processor.ColumnExists("test_schema", table.Name, "DoesNotExist").ShouldBeFalse();
         }
-	}
+
+        [Test]
+        public void CallingProcessWithPerformDBOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
+        {
+            var output = new StringWriter();
+
+            var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
+
+            var processor = new SqlServerProcessor(
+                connection,
+                new SqlServer2008Generator(),
+                new TextWriterAnnouncer(output),
+                new ProcessorOptions { PreviewOnly = true },
+                new SqlServerDbFactory());
+
+            bool tableExists;
+
+            try
+            {
+                var expression =
+                    new PerformDBOperationExpression
+                    {
+                        Operation = (con, trans) =>
+                        {
+                            var command = con.CreateCommand();
+                            command.CommandText = "CREATE TABLE ProcessTestTable (test int NULL) ";
+                            command.Transaction = trans;
+
+                            command.ExecuteNonQuery();
+                        }
+                    };
+
+                processor.Process(expression);
+
+                tableExists = processor.TableExists("", "ProcessTestTable");
+            }
+            finally
+            {
+                processor.RollbackTransaction();
+
+            }
+
+            tableExists.ShouldBeFalse();
+
+            output.ToString().ShouldBe(
+@"/* Beginning Transaction */
+/* Performing DB Operation */
+/* Rolling back transaction */
+");
+        }
+    }
 }

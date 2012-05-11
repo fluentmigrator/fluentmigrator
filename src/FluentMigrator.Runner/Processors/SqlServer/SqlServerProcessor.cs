@@ -24,37 +24,34 @@ using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-	using System.Data.Common;
-
-	public sealed class SqlServerProcessor : ProcessorBase
+    public sealed class SqlServerProcessor : ProcessorBase
     {
-		private readonly IDbFactory factory;
-		public DbConnection Connection { get; private set; }
-        public DbTransaction Transaction { get; private set; }
-        public bool WasCommitted { get; private set; }
-
+        private readonly IDbFactory factory;
+        public IDbConnection Connection { get; private set; }
+        public IDbTransaction Transaction { get; private set; }
+        
         public override string DatabaseType
         {
             get { return "SqlServer"; }
         }
 
-        public SqlServerProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public SqlServerProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(generator, announcer, options)
         {
-        	this.factory = factory;
-        	Connection = connection;
+            this.factory = factory;
+            Connection = connection;
             connection.Open();
             BeginTransaction();
         }
 
-		private static string SafeSchemaName(string schemaName)
+        private static string SafeSchemaName(string schemaName)
         {
             return string.IsNullOrEmpty(schemaName) ? "dbo" : FormatSqlEscape(schemaName);
         }
 
         public override bool SchemaExists(string schemaName)
         {
-            return Exists("SELECT * FROM SYS.SCHEMAS WHERE NAME = '{0}'", SafeSchemaName(schemaName));
+            return Exists("SELECT * FROM sys.schemas WHERE NAME = '{0}'", SafeSchemaName(schemaName));
         }
 
         public override bool TableExists(string schemaName, string tableName)
@@ -113,8 +110,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             var ds = new DataSet();
             using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
-            using (var adapter = factory.CreateDataAdapter(command))
             {
+                var adapter = factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
                 return ds;
             }
@@ -232,16 +229,20 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
         }
 
-
         public override void Process(PerformDBOperationExpression expression)
         {
+            Announcer.Say("Performing DB Operation");
+
+            if (Options.PreviewOnly)
+                return;
+			
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
             if (expression.Operation != null)
                 expression.Operation(Connection, Transaction);
         }
 
-		private static string FormatSqlEscape(string sql)
+        private static string FormatSqlEscape(string sql)
         {
             return sql.Replace("'", "''");
         }

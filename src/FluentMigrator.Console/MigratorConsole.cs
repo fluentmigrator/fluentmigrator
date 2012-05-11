@@ -198,7 +198,6 @@ namespace FluentMigrator.Console
                     Group = "";  // Should get this from the VersionTableMetadata...
                 }
                 if (string.IsNullOrEmpty(ProcessorType) ||
-                    string.IsNullOrEmpty(Connection) ||
                     string.IsNullOrEmpty(TargetAssembly))
                 {
                     DisplayHelp(optionSet);
@@ -224,8 +223,8 @@ namespace FluentMigrator.Console
             }
             catch (Exception ex)
             {
-                System.Console.WriteLine("!! An error has occurred.  The error is:");
-                System.Console.WriteLine(ex);
+                System.Console.Error.WriteLine("!! An error has occurred.  The error is:");
+                System.Console.Error.WriteLine(ex);
                 Environment.ExitCode = 1;
             }
         }
@@ -255,10 +254,10 @@ namespace FluentMigrator.Console
                                             ShowSql = Verbose
                                         };
                 var announcer = new CompositeAnnouncer(new[]
-								{
-									consoleAnnouncer,
-									fileAnnouncer
-								});
+                                {
+                                    consoleAnnouncer,
+                                    fileAnnouncer
+                                });
 
                 ExecuteMigrations(announcer);
             }

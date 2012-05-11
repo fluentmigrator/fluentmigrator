@@ -24,7 +24,8 @@ namespace FluentMigrator.Runner.Initialization
 
         public IAnnouncer Announcer
         {
-            get; private set;
+            get;
+            private set;
         }
 
         public IStopWatch StopWatch
@@ -32,5 +33,8 @@ namespace FluentMigrator.Runner.Initialization
             get;
             private set;
         }
+
+        /// <summary>The arbitrary application context passed to the task runner.</summary>
+        public object ApplicationContext { get; set; }
     }
 }

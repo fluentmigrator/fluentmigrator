@@ -21,9 +21,9 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Rename
 {
-	public interface IRenameExpressionRoot : IFluentSyntax
-	{
-		IRenameTableToOrInSchemaSyntax Table(string oldName);
-		IRenameColumnTableSyntax Column(string oldName);
-	}
+    public interface IRenameExpressionRoot : IFluentSyntax
+    {
+        IRenameTableToOrInSchemaSyntax Table(string oldName);
+        IRenameColumnTableSyntax Column(string oldName);
+    }
 }

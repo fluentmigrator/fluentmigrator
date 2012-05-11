@@ -22,27 +22,27 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
-	public class ExecuteSqlStatementExpression : MigrationExpressionBase
-	{
-		public virtual string SqlStatement { get; set;}
+    public class ExecuteSqlStatementExpression : MigrationExpressionBase
+    {
+        public virtual string SqlStatement { get; set; }
 
-		public override void ExecuteWith(IMigrationProcessor processor)
-		{
+        public override void ExecuteWith(IMigrationProcessor processor)
+        {
             // since all the Processors are using String.Format() in their Execute method
             //  we need to escape the brackets with double brackets or else it throws an incorrect format error on the String.Format call
             var sqlText = SqlStatement.Replace("{", "{{").Replace("}", "}}");
             processor.Execute(sqlText);
-		}
+        }
 
-		public override void CollectValidationErrors(ICollection<string> errors)
-		{
-			if (String.IsNullOrEmpty(SqlStatement))
-				errors.Add(ErrorMessages.SqlStatementCannotBeNullOrEmpty);
-		}
+        public override void CollectValidationErrors(ICollection<string> errors)
+        {
+            if (String.IsNullOrEmpty(SqlStatement))
+                errors.Add(ErrorMessages.SqlStatementCannotBeNullOrEmpty);
+        }
 
-		public override string ToString()
-		{
-			return base.ToString() + SqlStatement;
-		}
-	}
+        public override string ToString()
+        {
+            return base.ToString() + SqlStatement;
+        }
+    }
 }

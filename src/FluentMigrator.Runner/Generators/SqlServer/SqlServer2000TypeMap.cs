@@ -1,10 +1,8 @@
-﻿
+﻿using System.Data;
+using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
-
-    using System.Data;
-    using FluentMigrator.Runner.Generators.Base;
 
     internal class SqlServer2000TypeMap : TypeMapBase
     {

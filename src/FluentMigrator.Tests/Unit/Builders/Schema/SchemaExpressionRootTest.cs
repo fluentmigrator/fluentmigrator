@@ -24,68 +24,63 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Builders.Schema
 {
-	[TestFixture]
-	public class SchemaExpressionRootTest
-	{
-		private Mock<IQuerySchema> _querySchemaMock;
-		private Mock<IMigrationContext> _migrationContextMock;
-		private string _testColumn;
-		private string _testTable;
-		private string _testSchema;
-		private SchemaExpressionRoot _builder;
+    [TestFixture]
+    public class SchemaExpressionRootTest
+    {
+        private Mock<IQuerySchema> _querySchemaMock;
+        private Mock<IMigrationContext> _migrationContextMock;
+        private string _testColumn;
+        private string _testTable;
+        private string _testSchema;
+        private SchemaExpressionRoot _builder;
 
-		[SetUp]
-		public void SetUp()
-		{
-			_migrationContextMock = new Mock<IMigrationContext>();
-			_querySchemaMock = new Mock<IQuerySchema>();
-		    _testSchema = "testSchema";
-			_testTable = "testTable";
-			_testColumn = "testColumn";
+        [SetUp]
+        public void SetUp()
+        {
+            _migrationContextMock = new Mock<IMigrationContext>();
+            _querySchemaMock = new Mock<IQuerySchema>();
+            _testSchema = "testSchema";
+            _testTable = "testTable";
+            _testColumn = "testColumn";
 
-			_migrationContextMock.Setup(x => x.QuerySchema).Returns(_querySchemaMock.Object);
-            _migrationContextMock.Verify(x => x.QuerySchema, Times.AtMostOnce());
-			_builder = new SchemaExpressionRoot(_migrationContextMock.Object);
-		}
+            _migrationContextMock.Setup(x => x.QuerySchema).Returns(_querySchemaMock.Object);
+            _builder = new SchemaExpressionRoot(_migrationContextMock.Object);
+        }
 
-		[Test]
-		public void TestTableExists()
-		{
+        [Test]
+        public void TestTableExists()
+        {
             _querySchemaMock.Setup(x => x.TableExists(null, _testTable)).Returns(true);
-			_querySchemaMock.Verify(x => x.TableExists(null, _testTable), Times.AtMostOnce());
 
-			_builder.Table(_testTable).Exists().ShouldBeTrue();
-			_migrationContextMock.VerifyAll();
-		}
+            _builder.Table(_testTable).Exists().ShouldBeTrue();
+            _querySchemaMock.Verify(x => x.TableExists(null, _testTable));
+        }
 
-		[Test]
-		public void TestColumnExists()
-		{
+        [Test]
+        public void TestColumnExists()
+        {
             _querySchemaMock.Setup(x => x.ColumnExists(null, _testTable, _testColumn)).Returns(true);
-			_querySchemaMock.Verify(x => x.ColumnExists(null, _testTable, _testColumn), Times.AtMostOnce());
 
-			_builder.Table(_testTable).Column(_testColumn).Exists().ShouldBeTrue();
-			_migrationContextMock.VerifyAll();
-		}
+            _builder.Table(_testTable).Column(_testColumn).Exists().ShouldBeTrue();
+            _querySchemaMock.Verify(x => x.ColumnExists(null, _testTable, _testColumn));
+        }
 
         [Test]
         public void TestTableExistsWithSchema()
         {
             _querySchemaMock.Setup(x => x.TableExists(_testSchema, _testTable)).Returns(true);
-            _querySchemaMock.Verify(x => x.TableExists(_testSchema, _testTable), Times.AtMostOnce());
 
             _builder.Schema(_testSchema).Table(_testTable).Exists().ShouldBeTrue();
-            _migrationContextMock.VerifyAll();
+            _querySchemaMock.Verify(x => x.TableExists(_testSchema, _testTable));
         }
 
         [Test]
         public void TestColumnExistsWithSchema()
         {
             _querySchemaMock.Setup(x => x.ColumnExists(_testSchema, _testTable, _testColumn)).Returns(true);
-            _querySchemaMock.Verify(x => x.ColumnExists(_testSchema, _testTable, _testColumn), Times.AtMostOnce());
 
             _builder.Schema(_testSchema).Table(_testTable).Column(_testColumn).Exists().ShouldBeTrue();
-            _migrationContextMock.VerifyAll();
+            _querySchemaMock.Verify(x => x.ColumnExists(_testSchema, _testTable, _testColumn));
         }
-	}
+    }
 }

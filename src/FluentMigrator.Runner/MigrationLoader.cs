@@ -24,80 +24,80 @@ using System.Linq;
 
 namespace FluentMigrator.Runner
 {
-	public class MigrationLoader : IMigrationLoader
-	{
-		public IMigrationConventions Conventions { get; private set; }
-		public Assembly Assembly { get; private set; }
-		public string Namespace { get; private set; }
-		public bool LoadNestedNamespaces { get; private set; }
-		public SortedList<long, IMigration> Migrations { get; private set; }
+    public class MigrationLoader : IMigrationLoader
+    {
+        public IMigrationConventions Conventions { get; private set; }
+        public Assembly Assembly { get; private set; }
+        public string Namespace { get; private set; }
+        public bool LoadNestedNamespaces { get; private set; }
+        public SortedList<long, IMigration> Migrations { get; private set; }
         public string Group { get; set; }
 
         public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace)
             : this(conventions, assembly, @namespace, "") { }
 
-		public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, string group)
-		{
-			Conventions = conventions;
-			Assembly = assembly;
-			Namespace = @namespace;
+        public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, string group)
+        {
+            Conventions = conventions;
+            Assembly = assembly;
+            Namespace = @namespace;
             Group = group;
 
-			Initialize();
-		}
+            Initialize();
+        }
 
         public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, bool loadNestedNamespaces)
             : this(conventions, assembly, @namespace, "", loadNestedNamespaces) { }
 
-		public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, string group, bool loadNestedNamespaces)
-		{
-			Conventions = conventions;
-			Assembly = assembly;
-			Namespace = @namespace;
+        public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, string group, bool loadNestedNamespaces)
+        {
+            Conventions = conventions;
+            Assembly = assembly;
+            Namespace = @namespace;
             Group = group;
-			LoadNestedNamespaces = loadNestedNamespaces;
+            LoadNestedNamespaces = loadNestedNamespaces;
 
-			Initialize();
-		}
+            Initialize();
+        }
 
-		private void Initialize()
-		{
-			Migrations = new SortedList<long, IMigration>();
+        private void Initialize()
+        {
+            Migrations = new SortedList<long, IMigration>();
 
-			IEnumerable<MigrationMetadata> migrationList = FindMigrations();
+            IEnumerable<MigrationMetadata> migrationList = FindMigrations();
 
-			if (migrationList == null)
-				return;
+            if (migrationList == null)
+                return;
 
             // Only keep migrations from the selected group
-			foreach (var migrationMetadata in migrationList.Where(x => x.Group.Equals(Group)))
-			{
-				if (Migrations.ContainsKey(migrationMetadata.Version))
-					throw new Exception(String.Format("Duplicate migration version {0}.", migrationMetadata.Version));
+            foreach (var migrationMetadata in migrationList.Where(x => x.Group.Equals(Group)))
+            {
+                if (Migrations.ContainsKey(migrationMetadata.Version))
+                    throw new Exception(String.Format("Duplicate migration version {0}.", migrationMetadata.Version));
 
-				var migration = migrationMetadata.Type.Assembly.CreateInstance(migrationMetadata.Type.FullName);
-				Migrations.Add(migrationMetadata.Version, migration as IMigration);
-			}
-		}
+                var migration = (IMigration)migrationMetadata.Type.Assembly.CreateInstance(migrationMetadata.Type.FullName);
+                Migrations.Add(migrationMetadata.Version, new MigrationWithMetaDataAdapter(migration, migrationMetadata));
+            }
+        }
 
-		public IEnumerable<MigrationMetadata> FindMigrations()
-		{
-			IEnumerable<Type> matchedTypes = Assembly.GetExportedTypes().Where(t => Conventions.TypeIsMigration(t));
+        public IEnumerable<MigrationMetadata> FindMigrations()
+        {
+            IEnumerable<Type> matchedTypes = Assembly.GetExportedTypes().Where(t => Conventions.TypeIsMigration(t));
 
-			if (!string.IsNullOrEmpty(Namespace))
-			{
-				Func<Type, bool> shouldInclude = t => t.Namespace == Namespace;
-				if (LoadNestedNamespaces)
-				{
-					string matchNested = Namespace + ".";
-					shouldInclude = t => t.Namespace == Namespace || t.Namespace.StartsWith(matchNested);
-				}
+            if (!string.IsNullOrEmpty(Namespace))
+            {
+                Func<Type, bool> shouldInclude = t => t.Namespace == Namespace;
+                if (LoadNestedNamespaces)
+                {
+                    string matchNested = Namespace + ".";
+                    shouldInclude = t => t.Namespace == Namespace || t.Namespace.StartsWith(matchNested);
+                }
 
-				matchedTypes = matchedTypes.Where(shouldInclude);
-			}
+                matchedTypes = matchedTypes.Where(shouldInclude);
+            }
 
-			foreach (Type type in matchedTypes)
-				yield return Conventions.GetMetadataForMigration(type);
-		}
-	}
+            foreach (Type type in matchedTypes)
+                yield return Conventions.GetMetadataForMigration(type);
+        }
+    }
 }

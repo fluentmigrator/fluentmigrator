@@ -6,27 +6,27 @@ using FluentMigrator.Runner.Generators.Postgres;
 
 namespace FluentMigrator.Runner.Processors.Postgres
 {
-	using System.Data.Common;
-
-	public class PostgresProcessor : ProcessorBase
+    public class PostgresProcessor : ProcessorBase
     {
-		private readonly IDbFactory factory;
-		readonly PostgresQuoter quoter = new PostgresQuoter();
-        public DbConnection Connection { get; private set; }
-        public DbTransaction Transaction { get; private set; }
+        private readonly IDbFactory factory;
+        readonly PostgresQuoter quoter = new PostgresQuoter();
+        public IDbConnection Connection { get; private set; }
+        public IDbTransaction Transaction { get; private set; }
 
-		public override string DatabaseType
+        public override string DatabaseType
         {
             get { return "Postgres"; }
         }
 
-        public PostgresProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public PostgresProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(generator, announcer, options)
         {
-        	this.factory = factory;
-        	Connection = connection;
+            this.factory = factory;
+            Connection = connection;
             connection.Open();
-            Transaction = connection.BeginTransaction();
+
+            Announcer.Say("Beginning Transaction");
+            Transaction = Connection.BeginTransaction();
         }
 
         public override void Execute(string template, params object[] args)
@@ -69,9 +69,9 @@ namespace FluentMigrator.Runner.Processors.Postgres
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
             var ds = new DataSet();
-			using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
-			using (var adapter = factory.CreateDataAdapter(command))
+            using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             {
+                var adapter = factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
                 return ds;
             }
@@ -82,7 +82,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
-			using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
+            using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -99,7 +99,8 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
             Announcer.Say("Committing Transaction");
             Transaction.Commit();
-        	if (Connection.State != ConnectionState.Closed)
+            WasCommitted = true;
+            if (Connection.State != ConnectionState.Closed)
             {
                 Connection.Close();
             }
@@ -109,7 +110,8 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
             Announcer.Say("Rolling back transaction");
             Transaction.Rollback();
-        	if (Connection.State != ConnectionState.Closed)
+            WasCommitted = true;
+            if (Connection.State != ConnectionState.Closed)
             {
                 Connection.Close();
             }
@@ -148,23 +150,28 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
         public override void Process(PerformDBOperationExpression expression)
         {
+            Announcer.Say("Performing DB Operation");
+
+            if (Options.PreviewOnly)
+                return;
+			
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
             if (expression.Operation != null)
                 expression.Operation(Connection, Transaction);
         }
 
-		private string FormatToSafeSchemaName(string schemaName)
+        private string FormatToSafeSchemaName(string schemaName)
         {
             return FormatSqlEscape(quoter.UnQuoteSchemaName(schemaName));
         }
 
-		private string FormatToSafeName(string sqlName)
+        private string FormatToSafeName(string sqlName)
         {
             return FormatSqlEscape(quoter.UnQuote(sqlName));
         }
 
-		private static string FormatSqlEscape(string sql)
+        private static string FormatSqlEscape(string sql)
         {
             return sql.Replace("'", "''");
         }

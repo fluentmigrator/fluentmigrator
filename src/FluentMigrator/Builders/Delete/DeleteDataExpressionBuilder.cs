@@ -23,40 +23,48 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Delete
 {
-	public class DeleteDataExpressionBuilder : IDeleteDataOrInSchemaSyntax
-	{
-		private readonly DeleteDataExpression _expression;
+    public class DeleteDataExpressionBuilder : IDeleteDataOrInSchemaSyntax
+    {
+        private readonly DeleteDataExpression _expression;
 
-		public DeleteDataExpressionBuilder(DeleteDataExpression expression)
-		{
-			_expression = expression;
-		}
+        public DeleteDataExpressionBuilder(DeleteDataExpression expression)
+        {
+            _expression = expression;
+        }
 
-		public IDeleteDataSyntax Row(object dataAsAnonymousType)
-		{
-			_expression.Rows.Add(GetData(dataAsAnonymousType));
-			return this;
-		}
+        public void IsNull(string columnName)
+        {
+            _expression.Rows.Add(new DeletionDataDefinition
+                                    {
+                                        new KeyValuePair<string, object>(columnName, null)
+                                    });
+        }
 
-		public IDeleteDataSyntax InSchema(string schemaName)
-		{
-			_expression.SchemaName = schemaName;
-			return this;
-		}
+        public IDeleteDataSyntax Row(object dataAsAnonymousType)
+        {
+            _expression.Rows.Add(GetData(dataAsAnonymousType));
+            return this;
+        }
 
-		public void AllRows()
-		{
-			_expression.IsAllRows = true;
-		}
+        public IDeleteDataSyntax InSchema(string schemaName)
+        {
+            _expression.SchemaName = schemaName;
+            return this;
+        }
 
-		private static DeletionDataDefinition GetData(object dataAsAnonymousType)
-		{
-			var data = new DeletionDataDefinition();
-			var properties = TypeDescriptor.GetProperties(dataAsAnonymousType);
+        public void AllRows()
+        {
+            _expression.IsAllRows = true;
+        }
 
-			foreach (PropertyDescriptor property in properties)
-				data.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(dataAsAnonymousType)));
-			return data;
-		}
-	}
+        private static DeletionDataDefinition GetData(object dataAsAnonymousType)
+        {
+            var data = new DeletionDataDefinition();
+            var properties = TypeDescriptor.GetProperties(dataAsAnonymousType);
+
+            foreach (PropertyDescriptor property in properties)
+                data.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(dataAsAnonymousType)));
+            return data;
+        }
+    }
 }

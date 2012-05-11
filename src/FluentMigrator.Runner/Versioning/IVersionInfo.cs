@@ -1,5 +1,4 @@
-﻿using System;
-namespace FluentMigrator.Runner.Versioning
+﻿namespace FluentMigrator.Runner.Versioning
 {
     public interface IVersionInfo
     {

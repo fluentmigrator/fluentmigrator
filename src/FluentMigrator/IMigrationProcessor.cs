@@ -17,46 +17,51 @@
 #endregion
 
 using System.Data;
-using System.Collections.Generic;
 using FluentMigrator.Builders.Execute;
-using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
-using FluentMigrator.Model;
 
 namespace FluentMigrator
 {
-	public interface IMigrationProcessor : IQuerySchema
-	{
-		IMigrationProcessorOptions Options { get; }
+    public interface IMigrationProcessor : IQuerySchema
+    {
+        IMigrationProcessorOptions Options { get; }
 
-		void Execute(string template, params object[] args);
+        void Execute(string template, params object[] args);
         DataSet ReadTableData(string schemaName, string tableName);
-		DataSet Read(string template, params object[] args);
-		bool Exists(string template, params object[] args);
+        DataSet Read(string template, params object[] args);
+        bool Exists(string template, params object[] args);
 
-		void BeginTransaction();
-		void CommitTransaction();
-		void RollbackTransaction();
+        void BeginTransaction();
+        void CommitTransaction();
+        void RollbackTransaction();
 
-		void Process(CreateSchemaExpression expression);
-		void Process(DeleteSchemaExpression expression);
-	    void Process(AlterTableExpression expression);
-		void Process(AlterColumnExpression expression);
-		void Process(CreateTableExpression expression);
-		void Process(CreateColumnExpression expression);
-		void Process(DeleteTableExpression expression);
-		void Process(DeleteColumnExpression expression);
-		void Process(CreateForeignKeyExpression expression);
-		void Process(DeleteForeignKeyExpression expression);
-		void Process(CreateIndexExpression expression);
-		void Process(DeleteIndexExpression expression);
-		void Process(RenameTableExpression expression);
-		void Process(RenameColumnExpression expression);
-		void Process(InsertDataExpression expression);
-		void Process(AlterDefaultConstraintExpression expression);
-		void Process(PerformDBOperationExpression expression);
-		void Process(DeleteDataExpression expression);
+        void Process(CreateSchemaExpression expression);
+        void Process(DeleteSchemaExpression expression);
+        void Process(AlterTableExpression expression);
+        void Process(AlterColumnExpression expression);
+        void Process(CreateTableExpression expression);
+        void Process(CreateColumnExpression expression);
+        void Process(DeleteTableExpression expression);
+        void Process(DeleteColumnExpression expression);
+        void Process(CreateForeignKeyExpression expression);
+        void Process(DeleteForeignKeyExpression expression);
+        void Process(CreateIndexExpression expression);
+        void Process(DeleteIndexExpression expression);
+        void Process(RenameTableExpression expression);
+        void Process(RenameColumnExpression expression);
+        void Process(InsertDataExpression expression);
+        void Process(AlterDefaultConstraintExpression expression);
+        void Process(PerformDBOperationExpression expression);
+        void Process(DeleteDataExpression expression);
         void Process(UpdateDataExpression expression);
-        void Process( AlterSchemaExpression expression );
-	}
+        void Process(AlterSchemaExpression expression);
+
+        void Process(CreateSequenceExpression expression);
+
+        void Process(DeleteSequenceExpression expression);
+
+        void Process(CreateConstraintExpression expression);
+        void Process(DeleteConstraintExpression expression);
+        void Process(DeleteDefaultConstraintExpression expression);
+    }
 }

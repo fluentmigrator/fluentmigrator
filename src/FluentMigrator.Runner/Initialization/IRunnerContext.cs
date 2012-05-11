@@ -35,6 +35,8 @@ namespace FluentMigrator.Runner.Initialization
         IStopWatch StopWatch { get; }
         int Timeout { get; set; }
         string ConnectionStringConfigPath { get; set; }
-        //IMigrationProcessor Processor { get; }
+
+        /// <summary>The arbitrary application context passed to the task runner.</summary>
+        object ApplicationContext { get; set; }
     }
 }

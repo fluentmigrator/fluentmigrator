@@ -17,9 +17,7 @@
 #endregion
 
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -30,8 +28,6 @@ using FluentMigrator.Tests.Integration.Migrations;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
-using FluentMigrator.Runner.Versioning;
-using System.Data;
 
 namespace FluentMigrator.Tests.Unit
 {
@@ -48,10 +44,12 @@ namespace FluentMigrator.Tests.Unit
         private Mock<IRunnerContext> _runnerContextMock;
         private SortedList<long, IMigration> _migrationList;
         private TestVersionLoader _fakeVersionLoader;
+        private int _applicationContext;
 
         [SetUp]
         public void SetUp()
         {
+            _applicationContext = new Random().Next();
             _migrationList = new SortedList<long, IMigration>();
             _runnerContextMock = new Mock<IRunnerContext>(MockBehavior.Loose);
             _processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
@@ -74,6 +72,7 @@ namespace FluentMigrator.Tests.Unit
             _runnerContextMock.SetupGet(x => x.Target).Returns(Assembly.GetExecutingAssembly().ToString());
             _runnerContextMock.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
             _runnerContextMock.SetupGet(x => x.Database).Returns("sqlserver");
+            _runnerContextMock.SetupGet(x => x.ApplicationContext).Returns(_applicationContext);
 
             _migrationLoaderMock.SetupGet(x => x.Migrations).Returns(_migrationList);
 
@@ -107,6 +106,19 @@ namespace FluentMigrator.Tests.Unit
             }
 
             _fakeVersionLoader.LoadVersionInfo();
+        }
+
+        /// <summary>Unit test which ensures that the application context is correctly propagated down to each migration class.</summary>
+        [Test(Description = "Ensure that the application context is correctly propagated down to each migration class.")]
+        public void CanPassApplicationContext()
+        {
+            IMigration migration = new TestEmptyMigration();
+            _runner.Up(migration);
+
+            Assert.AreEqual(_applicationContext, _runnerContextMock.Object.ApplicationContext, "The runner context does not have the expected application context.");
+            Assert.AreEqual(_applicationContext, _runner.ApplicationContext, "The MigrationRunner does not have the expected application context.");
+            Assert.AreEqual(_applicationContext, migration.ApplicationContext, "The migration does not have the expected application context.");
+            _announcer.VerifyAll();
         }
 
         [Test]
@@ -280,6 +292,66 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        public void RollbackToVersionShouldShouldLimitMigrationsToNamespace()
+        {
+            const long fakeMigration1 = 2011010101;
+            const long fakeMigration2 = 2011010102;
+            const long fakeMigration3 = 2011010103;
+
+            LoadVersionData(fakeMigration1,fakeMigration3);
+
+            _fakeVersionLoader.Versions.Add(fakeMigration2);
+            _fakeVersionLoader.LoadVersionInfo();
+
+            _runner.RollbackToVersion(2011010101);
+            
+            _fakeVersionLoader.Versions.ShouldContain(fakeMigration1);
+            _fakeVersionLoader.Versions.ShouldContain(fakeMigration2);
+            _fakeVersionLoader.Versions.ShouldNotContain(fakeMigration3);
+        }
+
+        [Test]
+        public void RollbackToVersionZeroShouldShouldLimitMigrationsToNamespace()
+        {
+            const long fakeMigration1 = 2011010101;
+            const long fakeMigration2 = 2011010102;
+            const long fakeMigration3 = 2011010103;
+
+            LoadVersionData(fakeMigration1, fakeMigration2, fakeMigration3);
+
+            _runner.MigrationLoader.Migrations.Remove(fakeMigration1);
+            _runner.MigrationLoader.Migrations.Remove(fakeMigration2);
+            _fakeVersionLoader.LoadVersionInfo();
+
+            _runner.RollbackToVersion(0);
+
+            _fakeVersionLoader.Versions.ShouldContain(fakeMigration1);
+            _fakeVersionLoader.Versions.ShouldContain(fakeMigration2);
+            _fakeVersionLoader.Versions.ShouldNotContain(fakeMigration3);
+        }
+
+        [Test]
+        public void RollbackShouldLimitMigrationsToNamespace()
+        {
+            const long fakeMigration1 = 2011010101;
+            const long fakeMigration2 = 2011010102;
+            const long fakeMigration3 = 2011010103;
+
+            LoadVersionData(fakeMigration1, fakeMigration3);
+
+            _fakeVersionLoader.Versions.Add(fakeMigration2);
+            _fakeVersionLoader.LoadVersionInfo();
+
+            _runner.Rollback(2);
+
+            _fakeVersionLoader.Versions.ShouldNotContain(fakeMigration1);
+            _fakeVersionLoader.Versions.ShouldContain(fakeMigration2);
+            _fakeVersionLoader.Versions.ShouldNotContain(fakeMigration3);
+
+            _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();
+        }
+
+        [Test]
         public void RollbackToVersionShouldLoadVersionInfoIfVersionGreaterThanZero()
         {
             var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
@@ -343,6 +415,12 @@ namespace FluentMigrator.Tests.Unit
 
         private class MigrationThatDoesNotInheritFromMigrationBaseClass : IMigration
         {
+            /// <summary>The arbitrary application context passed to the task runner.</summary>
+            public object ApplicationContext
+            {
+                get { throw new NotImplementedException(); }
+            }
+
             public void GetUpExpressions(IMigrationContext context)
             {
                 throw new NotImplementedException();

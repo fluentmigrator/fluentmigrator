@@ -17,20 +17,23 @@
 #endregion
 
 using FluentMigrator.Builders.Delete.Column;
+using FluentMigrator.Builders.Delete.DefaultConstraint;
 using FluentMigrator.Builders.Delete.ForeignKey;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Builders.Delete.Index;
+using FluentMigrator.Builders.Delete.Constraint;
 
 namespace FluentMigrator.Builders.Delete
 {
-	public interface IDeleteExpressionRoot : IFluentSyntax
-	{
-		void Schema(string schemaName);
-		IInSchemaSyntax Table(string tableName);
-		IDeleteColumnFromTableSyntax Column(string columnName);
-		IDeleteForeignKeyFromTableSyntax ForeignKey();
-		IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName);
-		IDeleteDataOrInSchemaSyntax FromTable(string tableName);
+    public interface IDeleteExpressionRoot : IFluentSyntax
+    {
+        void Schema(string schemaName);
+        IInSchemaSyntax Table(string tableName);
+        IDeleteColumnFromTableSyntax Column(string columnName);
+        IDeleteForeignKeyFromTableSyntax ForeignKey();
+        IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName);
+        IDeleteDataOrInSchemaSyntax FromTable(string tableName);
+
         /// <summary>
         /// Deletes an index
         /// </summary>
@@ -42,5 +45,23 @@ namespace FluentMigrator.Builders.Delete
         /// </summary>
         /// <returns></returns>
         IDeleteIndexForTableSyntax Index();
+
+        IInSchemaSyntax Sequence(string sequenceName);
+
+        /// <summary>
+        /// Deletes a named Primary Key from a table
+        /// </summary>
+        /// <param name="primaryKeyName"></param>
+        /// <returns></returns>
+        IDeleteConstraintOnTableSyntax PrimaryKey(string primaryKeyName);
+
+        /// <summary>
+        /// Deletes a named Unique Constraint From a table
+        /// </summary>
+        /// <param name="constraintName"></param>
+        /// <returns></returns>
+        IDeleteConstraintOnTableSyntax UniqueConstraint(string constraintName);
+
+        IDeleteDefaultConstraintOnTableSyntax DefaultConstraint();
     }
 }

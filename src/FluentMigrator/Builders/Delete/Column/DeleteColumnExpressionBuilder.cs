@@ -20,23 +20,29 @@ using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Builders.Delete.Column
 {
-	public class DeleteColumnExpressionBuilder : ExpressionBuilderBase<DeleteColumnExpression>,
-		IDeleteColumnFromTableSyntax, IInSchemaSyntax
-	{
-		public DeleteColumnExpressionBuilder(DeleteColumnExpression expression)
-			: base(expression)
-		{
-		}
+    public class DeleteColumnExpressionBuilder : ExpressionBuilderBase<DeleteColumnExpression>,
+        IDeleteColumnFromTableSyntax, IInSchemaSyntax
+    {
+        public DeleteColumnExpressionBuilder(DeleteColumnExpression expression)
+            : base(expression)
+        {
+        }
 
-		public IInSchemaSyntax FromTable(string tableName)
-		{
-			Expression.TableName = tableName;
-			return this;
-		}
+        public IInSchemaSyntax FromTable(string tableName)
+        {
+            Expression.TableName = tableName;
+            return this;
+        }
 
-		public void InSchema(string schemaName)
-		{
-			Expression.SchemaName = schemaName;
-		}
-	}
+        public IDeleteColumnFromTableSyntax Column(string columnName) 
+        {
+            Expression.ColumnNames.Add(columnName);
+            return this;
+        }
+
+        public void InSchema(string schemaName)
+        {
+            Expression.SchemaName = schemaName;
+        }
+    }
 }

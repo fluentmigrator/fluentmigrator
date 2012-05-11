@@ -18,8 +18,8 @@
 
 namespace FluentMigrator.Builders.Rename.Column
 {
-	public interface IRenameColumnToOrInSchemaSyntax : IRenameColumnToSyntax
-	{
-		IRenameColumnToSyntax InSchema(string schemaName);
-	}
+    public interface IRenameColumnToOrInSchemaSyntax : IRenameColumnToSyntax
+    {
+        IRenameColumnToSyntax InSchema(string schemaName);
+    }
 }
