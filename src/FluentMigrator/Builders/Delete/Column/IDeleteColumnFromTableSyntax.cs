@@ -23,5 +23,6 @@ namespace FluentMigrator.Builders.Delete.Column
     public interface IDeleteColumnFromTableSyntax : IFluentSyntax
     {
         IInSchemaSyntax FromTable(string tableName);
+        IDeleteColumnFromTableSyntax Column(string columnName);
     }
 }

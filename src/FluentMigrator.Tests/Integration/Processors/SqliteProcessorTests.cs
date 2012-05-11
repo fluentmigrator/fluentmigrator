@@ -182,7 +182,7 @@ namespace FluentMigrator.Tests.Integration.Processors
             tableExists.ShouldBeFalse();
 
             output.ToString().ShouldBe(
-@"-- Performing DB Operation
+@"/* Performing DB Operation */
 ");
         }
     }

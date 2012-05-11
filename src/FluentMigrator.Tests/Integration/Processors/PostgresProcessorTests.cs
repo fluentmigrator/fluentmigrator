@@ -481,9 +481,9 @@ namespace FluentMigrator.Tests.Integration.Processors
             tableExists.ShouldBeFalse();
 
             output.ToString().ShouldBe(
-@"-- Beginning Transaction
--- Performing DB Operation
--- Rolling back transaction
+@"/* Beginning Transaction */
+/* Performing DB Operation */
+/* Rolling back transaction */
 ");
         }
     }

@@ -262,7 +262,7 @@ namespace FluentMigrator.Builders.Create.Table
             return this;
         }
 
-        protected override ColumnDefinition GetColumnForType()
+        public override ColumnDefinition GetColumnForType()
         {
             return CurrentColumn;
         }

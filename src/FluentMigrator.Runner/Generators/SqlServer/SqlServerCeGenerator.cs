@@ -18,6 +18,7 @@
 #endregion
 
 using System;
+using System.Linq;
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
@@ -56,7 +57,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
             // Limited functionality in CE, for now will just drop the column.. no DECLARE support!
             const string sql = @"ALTER TABLE {0} DROP COLUMN {1};";
-            return String.Format(sql, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.ColumnName));
+            return String.Format(sql, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.ColumnNames.ElementAt(0)));
         }
 
         public override string Generate(DeleteIndexExpression expression)

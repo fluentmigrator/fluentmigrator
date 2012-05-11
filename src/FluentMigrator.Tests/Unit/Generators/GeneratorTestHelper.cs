@@ -292,7 +292,12 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         public static DeleteColumnExpression GetDeleteColumnExpression()
         {
-            return new DeleteColumnExpression { TableName = TestTableName1, ColumnName = TestColumnName1 };
+            return GetDeleteColumnExpression(new [] {TestColumnName1});
+        }
+
+        public static DeleteColumnExpression GetDeleteColumnExpression(string[] columns)
+        {
+            return new DeleteColumnExpression { TableName = TestTableName1, ColumnNames = columns };
         }
 
         public static DeleteIndexExpression GetDeleteIndexExpression()

@@ -1,4 +1,5 @@
 ﻿using FluentMigrator.Model;
+using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
@@ -25,7 +26,14 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         protected override string FormatIdentity(ColumnDefinition column)
         {
-            return column.IsIdentity ? "IDENTITY(1,1)" : string.Empty;
+            return column.IsIdentity ? GetIdentityString(column) : string.Empty;
+        }
+
+        private static string GetIdentityString(ColumnDefinition column) 
+        {
+            return string.Format("IDENTITY({0},{1})",
+                column.GetAdditionalFeature(SqlServerExtensions.IdentitySeed, 1),
+                column.GetAdditionalFeature(SqlServerExtensions.IdentityIncrement, 1));
         }
 
         protected override string FormatSystemMethods(SystemMethods systemMethod)
