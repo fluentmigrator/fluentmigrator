@@ -87,10 +87,10 @@ namespace FluentMigrator.Infrastructure
             return typeof(IVersionTableMetaData).IsAssignableFrom(type) && type.HasAttribute<VersionTableMetaDataAttribute>();
         }
 
-        public static MigrationMetadata GetMetadataForMigration(Type type)
-        {
+		public static MigrationMetadata GetMetadataForMigration(Type type)
+		{
             var migrationAttribute = type.GetOneAttribute<MigrationAttribute>();
-            var metadata = new MigrationMetadata { Type = type, Version = migrationAttribute.Version };
+			var metadata = new MigrationMetadata { Type = type, Version = migrationAttribute.Version, Group = migrationAttribute.Group };
 
             foreach (MigrationTraitAttribute traitAttribute in type.GetAllAttributes<MigrationTraitAttribute>())
                 metadata.AddTrait(traitAttribute.Name, traitAttribute.Value);

@@ -12,15 +12,20 @@ namespace FluentMigrator.Runner
 {
     public class VersionLoader : IVersionLoader
     {
-        public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions)
+        public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions) :
+            this(runner, assembly, conventions, "") { }
+
+        public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions, string group)
         {
             Runner = runner;
             Processor = runner.Processor;
             Assembly = assembly;
+            Group = group;
 
             Conventions = conventions;
             VersionTableMetaData = GetVersionTableMetaData();
             VersionMigration = new VersionMigration(VersionTableMetaData);
+            GroupVersionMigration = new VersionGroupMigration(VersionTableMetaData);
             VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
             VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
 
@@ -37,6 +42,8 @@ namespace FluentMigrator.Runner
         private IMigrationProcessor Processor { get; set; }
         private IMigration VersionMigration { get; set; }
         private IMigration VersionUniqueMigration { get; set; }
+        private IMigration GroupVersionMigration { get; set; }
+        private string Group { get; set; }
 
         public void UpdateVersionInfo(long version)
         {
@@ -59,12 +66,14 @@ namespace FluentMigrator.Runner
             return (IVersionTableMetaData)Activator.CreateInstance(matchedType);
         }
 
-        protected virtual InsertionDataDefinition CreateVersionInfoInsertionData(long version)
+
+        protected virtual InsertionDataDefinition CreateVersionInfoInsertionData( long version )
         {
             return new InsertionDataDefinition
                        {
                            new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version),
-                           new KeyValuePair<string, object>("AppliedOn", DateTime.UtcNow)
+                           new KeyValuePair<string, object>("AppliedOn", DateTime.UtcNow),
+                           new KeyValuePair<string, object>(VersionTableMetaData.GroupName, Group)
                        };
         }
 
@@ -99,6 +108,14 @@ namespace FluentMigrator.Runner
             }
         }
 
+        public bool AlreadyAppliedGroupMigration
+        {
+            get
+            {
+                return Processor.ColumnExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName, VersionTableMetaData.GroupName);
+            }
+        }
+
         public bool AlreadyMadeVersionUnique
         {
             get
@@ -114,9 +131,15 @@ namespace FluentMigrator.Runner
             if (!AlreadyCreatedVersionSchema)
                 Runner.Up(VersionSchemaMigration);
 
+            if (!AlreadyAppliedGroupMigration)                
+                Runner.Up(GroupVersionMigration);
+
             if (!AlreadyCreatedVersionTable)
-            {
                 Runner.Up(VersionMigration);
+
+            if (!AlreadyAppliedGroupMigration)
+            {
+                Runner.Up(GroupVersionMigration);
                 tableCreated = true;
             }
 
@@ -131,7 +154,8 @@ namespace FluentMigrator.Runner
 
             foreach (DataRow row in dataSet.Tables[0].Rows)
             {
-                _versionInfo.AddAppliedMigration(long.Parse(row[0].ToString()));
+                if ( string.Equals( row[ VersionTableMetaData.GroupName ], Group ) )
+                    _versionInfo.AddAppliedMigration( long.Parse( row[ VersionTableMetaData.ColumnName ].ToString() ) );
             }
         }
 
@@ -152,7 +176,8 @@ namespace FluentMigrator.Runner
             var expression = new DeleteDataExpression { TableName = VersionTableMetaData.TableName, SchemaName = VersionTableMetaData.SchemaName };
             expression.Rows.Add(new DeletionDataDefinition
                                     {
-                                        new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version)
+                                        new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version),
+                                        new KeyValuePair<string, object>(VersionTableMetaData.GroupName, Group)
                                     });
             expression.ExecuteWith(Processor);
         }

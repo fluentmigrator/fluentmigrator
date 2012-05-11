@@ -43,6 +43,31 @@ namespace FluentMigrator.Runner.Versioning
         }
     }
 
+    /// <summary>
+    /// Migration to extend the Version table to include a group name column.  All existing
+    /// migrations are placed under the default group.
+    /// </summary>
+    public class VersionGroupMigration : Migration
+    {
+        private IVersionTableMetaData _versionTableMetaData;
+
+        public VersionGroupMigration(IVersionTableMetaData versionTableMetaData)
+		{
+			_versionTableMetaData = versionTableMetaData;
+		}
+
+		public override void Up()
+		{
+            Alter.Table(_versionTableMetaData.TableName)
+                .AddColumn(_versionTableMetaData.GroupName).AsString().NotNullable().WithDefaultValue(_versionTableMetaData.DefaultGroupName);
+		}
+
+		public override void Down()
+		{
+            Delete.Column(_versionTableMetaData.GroupName).FromTable(_versionTableMetaData.TableName);
+		}
+    }
+
     public class VersionSchemaMigration : Migration
     {
         private IVersionTableMetaData _versionTableMetaData;

@@ -14,6 +14,7 @@ namespace FluentMigrator.Runner.Initialization
         public bool PreviewOnly { get; set; }
         public string Namespace { get; set; }
         public string Task { get; set; }
+        public string Group { get; set; }
         public long Version { get; set; }
         public int Steps { get; set; }
         public string WorkingDirectory { get; set; }

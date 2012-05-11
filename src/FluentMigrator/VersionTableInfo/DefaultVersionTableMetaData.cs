@@ -30,9 +30,19 @@ namespace FluentMigrator.VersionTableInfo
             get { return "VersionInfo"; }
         }
 
-        public string ColumnName
+		public string ColumnName
+		{
+			get { return "Version";}
+		}
+
+        public string GroupName
         {
-            get { return "Version"; }
+            get { return "GroupName"; }
         }
-    }
+
+        public string DefaultGroupName
+        {
+            get { return ""; }
+        }
+	}
 }
