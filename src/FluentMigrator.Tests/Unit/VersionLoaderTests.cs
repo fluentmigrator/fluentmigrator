@@ -72,7 +72,8 @@ namespace FluentMigrator.Tests.Unit
                                                                            definition =>
                                                                            definition.All(
                                                                                pair =>
-                                                                               pair.Key == loader.VersionTableMetaData.ColumnName && pair.Value.Equals(1L))))))
+                                                                               (pair.Key == loader.VersionTableMetaData.GroupName && pair.Value.Equals("")) ||
+                                                                               (pair.Key == loader.VersionTableMetaData.ColumnName && pair.Value.Equals(1L)))))))
                 .Verifiable();
 
             loader.DeleteVersion(1);
@@ -125,7 +126,8 @@ namespace FluentMigrator.Tests.Unit
                                                                            definition =>
                                                                            definition.Any(
                                                                                pair =>
-                                                                               pair.Key == loader.VersionTableMetaData.ColumnName && pair.Value.Equals(1L))))))
+                                                                               (pair.Key == loader.VersionTableMetaData.ColumnName && pair.Value.Equals(1L)) ||
+                                                                               (pair.Key == loader.VersionTableMetaData.GroupName && pair.Value.Equals("")))))))
                 .Verifiable();
 
             loader.UpdateVersionInfo(1);
