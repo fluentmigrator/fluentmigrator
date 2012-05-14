@@ -24,7 +24,9 @@ namespace FluentMigrator.Runner.Processors.Postgres
             this.factory = factory;
             Connection = connection;
             connection.Open();
-            Transaction = connection.BeginTransaction();
+
+            Announcer.Say("Beginning Transaction");
+            Transaction = Connection.BeginTransaction();
         }
 
         public override void Execute(string template, params object[] args)
@@ -97,6 +99,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
             Announcer.Say("Committing Transaction");
             Transaction.Commit();
+            WasCommitted = true;
             if (Connection.State != ConnectionState.Closed)
             {
                 Connection.Close();
@@ -107,6 +110,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
             Announcer.Say("Rolling back transaction");
             Transaction.Rollback();
+            WasCommitted = true;
             if (Connection.State != ConnectionState.Closed)
             {
                 Connection.Close();
@@ -146,6 +150,11 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
         public override void Process(PerformDBOperationExpression expression)
         {
+            Announcer.Say("Performing DB Operation");
+
+            if (Options.PreviewOnly)
+                return;
+			
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
             if (expression.Operation != null)

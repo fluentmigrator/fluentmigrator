@@ -26,64 +26,64 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Runners
 {
-	[TestFixture]
-	public class MigratorConsoleTests
-	{
-		string database = "Sqlite";
-		string connection = "Data Source=:memory:;Version=3;New=True;";
-		string target = "FluentMigrator.Tests.dll";
+    [TestFixture]
+    public class MigratorConsoleTests
+    {
+        string database = "Sqlite";
+        string connection = "Data Source=:memory:;Version=3;New=True;";
+        string target = "FluentMigrator.Tests.dll";
 
-		[Test]
-		public void MustInitializeConsoleWithDatabaseArgument()
-		{
-			new MigratorConsole("/connection", connection);
-			Assert.That(Environment.ExitCode == 1);
-		}
+        [Test]
+        public void MustInitializeConsoleWithDatabaseArgument()
+        {
+            new MigratorConsole("/connection", connection);
+            Assert.That(Environment.ExitCode == 1);
+        }
 
-		[Test]
-		public void MustInitializeConsoleWithConnectionArgument()
-		{
-			new MigratorConsole("/db", database);
-			Assert.That(Environment.ExitCode == 1);
-		}
+        [Test]
+        public void MustInitializeConsoleWithConnectionArgument()
+        {
+            new MigratorConsole("/db", database);
+            Assert.That(Environment.ExitCode == 1);
+        }
 
-		[Test]
-		public void CanInitMigratorConsoleWithValidArguments()
-		{
-			var console = new MigratorConsole(
-				"/db", database,
-				"/connection", connection,
-				"/target", target,
-				"/namespace", "FluentMigrator.Tests.Integration.Migrations",
-				"/task", "migrate:up",
-				"/version", "1");
+        [Test]
+        public void CanInitMigratorConsoleWithValidArguments()
+        {
+            var console = new MigratorConsole(
+                "/db", database,
+                "/connection", connection,
+                "/target", target,
+                "/namespace", "FluentMigrator.Tests.Integration.Migrations",
+                "/task", "migrate:up",
+                "/version", "1");
 
-			console.Connection.ShouldBe(connection);
-			console.Namespace.ShouldBe("FluentMigrator.Tests.Integration.Migrations");
-			console.Task.ShouldBe("migrate:up");
-			console.Version.ShouldBe(1);
-		}
+            console.Connection.ShouldBe(connection);
+            console.Namespace.ShouldBe("FluentMigrator.Tests.Integration.Migrations");
+            console.Task.ShouldBe("migrate:up");
+            console.Version.ShouldBe(1);
+        }
 
-		[Test]
-		public void FileAnnouncerHasOutputToDefaultOutputFile()
-		{
-			var outputFileName = target + ".sql";
+        [Test]
+        public void FileAnnouncerHasOutputToDefaultOutputFile()
+        {
+            var outputFileName = target + ".sql";
             if (File.Exists(outputFileName)) File.Delete(outputFileName);
 
-			Assert.IsFalse(File.Exists(outputFileName));
+            Assert.IsFalse(File.Exists(outputFileName));
 
-			new MigratorConsole(
-				"/db", database,
-				"/connection", connection,
-				"/target", target,
-				"/output",
-				"/namespace", "FluentMigrator.Tests.Unit.Runners.Migrations",
-				"/task", "migrate:up",
-				"/version", "0");
+            new MigratorConsole(
+                "/db", database,
+                "/connection", connection,
+                "/target", target,
+                "/output",
+                "/namespace", "FluentMigrator.Tests.Unit.Runners.Migrations",
+                "/task", "migrate:up",
+                "/version", "0");
 
-			Assert.IsTrue(File.Exists(outputFileName));
-			File.Delete(outputFileName);
-		}
+            Assert.IsTrue(File.Exists(outputFileName));
+            File.Delete(outputFileName);
+        }
 
         [Test]
         public void FileAnnouncerHasOutputToSpecifiedOutputFile()
@@ -108,94 +108,94 @@ namespace FluentMigrator.Tests.Unit.Runners
         }
 
 
-		[Test]
-		public void ConsoleAnnouncerHasOutput()
-		{
-			var sb = new StringBuilder();
-			var stringWriter = new StringWriter(sb);
-			new MigratorConsole(
-				stringWriter,
-				"/db", database,
-				"/connection", connection,
-				"/target", target,
-				"/namespace", "FluentMigrator.Tests.Unit.Runners.Migrations",
-				"/task", "migrate:up",
-				"/version", "0");
+        [Test]
+        public void ConsoleAnnouncerHasOutput()
+        {
+            var sb = new StringBuilder();
+            var stringWriter = new StringWriter(sb);
+            new MigratorConsole(
+                stringWriter,
+                "/db", database,
+                "/connection", connection,
+                "/target", target,
+                "/namespace", "FluentMigrator.Tests.Unit.Runners.Migrations",
+                "/task", "migrate:up",
+                "/version", "0");
 
-			var output = sb.ToString();
-			Assert.AreNotEqual(0, output.Length);
-		}
+            var output = sb.ToString();
+            Assert.AreNotEqual(0, output.Length);
+        }
 
-		[Test, Ignore("implement this test")]
-		public void OrderOfConsoleArgumentsShouldNotMatter()
-		{
-		}
+        [Test, Ignore("implement this test")]
+        public void OrderOfConsoleArgumentsShouldNotMatter()
+        {
+        }
 
-		[Test]
-		public void ConsoleAnnouncerHasOutputEvenIfMarkedAsPreviewOnly()
-		{
-			var sb = new StringBuilder();
-			var stringWriter = new StringWriter(sb);
-			new MigratorConsole(
-				stringWriter,
-				"/db", database,
-				"/connection", connection,
-				"/target", target,
-				"/namespace", "FluentMigrator.Tests.Unit.Runners.Migrations",
-				"/verbose",
-				
-				
-				"/task", "migrate:up",
-				"/preview");
+        [Test]
+        public void ConsoleAnnouncerHasOutputEvenIfMarkedAsPreviewOnly()
+        {
+            var sb = new StringBuilder();
+            var stringWriter = new StringWriter(sb);
+            new MigratorConsole(
+                stringWriter,
+                "/db", database,
+                "/connection", connection,
+                "/target", target,
+                "/namespace", "FluentMigrator.Tests.Unit.Runners.Migrations",
+                "/verbose",
+                
+                
+                "/task", "migrate:up",
+                "/preview");
 
-			var output = sb.ToString();
-			Assert.That( output.Contains( "PREVIEW-ONLY MODE" ) );
-			Assert.AreNotEqual(0, output.Length);
-		}
+            var output = sb.ToString();
+            Assert.That( output.Contains( "PREVIEW-ONLY MODE" ) );
+            Assert.AreNotEqual(0, output.Length);
+        }
 
-		[Test]
-		public void ConsoleAnnouncerHasMoreOutputWhenVerbose()
-		{
-			var sbNonVerbose = new StringBuilder();
-			var stringWriterNonVerbose = new StringWriter(sbNonVerbose);
-			new MigratorConsole(
-				stringWriterNonVerbose,
-				"/db", database,
-				"/connection", connection,
-				"/target", target,
-				"/namespace", "FluentMigrator.Tests.Integration.Migrations",
-				"/task", "migrate:up",
-				"/version", "1");
+        [Test]
+        public void ConsoleAnnouncerHasMoreOutputWhenVerbose()
+        {
+            var sbNonVerbose = new StringBuilder();
+            var stringWriterNonVerbose = new StringWriter(sbNonVerbose);
+            new MigratorConsole(
+                stringWriterNonVerbose,
+                "/db", database,
+                "/connection", connection,
+                "/target", target,
+                "/namespace", "FluentMigrator.Tests.Integration.Migrations",
+                "/task", "migrate:up",
+                "/version", "1");
 
-			var sbVerbose = new StringBuilder();
-			var stringWriterVerbose = new StringWriter(sbVerbose);
-			new MigratorConsole(
-				stringWriterVerbose,
-				"/db", database,
-				"/connection", connection,
-				"/verbose", "1",
-				"/target", target,
-				"/namespace", "FluentMigrator.Tests.Integration.Migrations",
-				"/task", "migrate:up",
-				"/version", "1");
+            var sbVerbose = new StringBuilder();
+            var stringWriterVerbose = new StringWriter(sbVerbose);
+            new MigratorConsole(
+                stringWriterVerbose,
+                "/db", database,
+                "/connection", connection,
+                "/verbose", "1",
+                "/target", target,
+                "/namespace", "FluentMigrator.Tests.Integration.Migrations",
+                "/task", "migrate:up",
+                "/version", "1");
 
-			Assert.Greater(sbVerbose.ToString().Length, sbNonVerbose.ToString().Length);
-		}
+            Assert.Greater(sbVerbose.ToString().Length, sbNonVerbose.ToString().Length);
+        }
 
         [Test]
         public void TagsPassedToRunnerContextOnExecuteMigrations()
         {
             var sbVerbose = new StringBuilder();
-			var stringWriterVerbose = new StringWriter(sbVerbose);
+            var stringWriterVerbose = new StringWriter(sbVerbose);
 
             var migratorConsole = new MigratorConsole(stringWriterVerbose,
                 "/db", database,
-				"/connection", connection,
-				"/verbose", "1",
-				"/target", target,
-				"/namespace", "FluentMigrator.Tests.Integration.Migrations",
-				"/task", "migrate:up",
-				"/version", "1",
+                "/connection", connection,
+                "/verbose", "1",
+                "/target", target,
+                "/namespace", "FluentMigrator.Tests.Integration.Migrations",
+                "/task", "migrate:up",
+                "/version", "1",
                 "/tag", "uk",
                 "/tag", "production");
 
@@ -203,5 +203,5 @@ namespace FluentMigrator.Tests.Unit.Runners
 
             CollectionAssert.AreEquivalent(expectedTags, migratorConsole.RunnerContext.Tags);   
         }
-	}
+    }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
@@ -44,7 +45,15 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         public override string Generate(DeleteColumnExpression expression)
         {
-            return string.Format("ALTER TABLE {0}.{1} DROP COLUMN {2}", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.ColumnName));
+            StringBuilder builder = new StringBuilder();
+            foreach (string columnName in expression.ColumnNames) {
+                if (expression.ColumnNames.First() != columnName) builder.AppendLine(";");
+                builder.AppendFormat("ALTER TABLE {0}.{1} DROP COLUMN {2}", 
+                    Quoter.QuoteSchemaName(expression.SchemaName), 
+                    Quoter.QuoteTableName(expression.TableName), 
+                    Quoter.QuoteColumnName(columnName));
+            }
+            return builder.ToString();
         }
 
         public override string Generate(CreateForeignKeyExpression expression)

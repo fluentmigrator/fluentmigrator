@@ -23,12 +23,14 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Model
 {
-    public class ColumnDefinition : ICloneable, ICanBeConventional, ICanBeValidated
+    public class ColumnDefinition : ICloneable, ICanBeConventional, ICanBeValidated, ISupportAdditionalFeatures
     {
         public ColumnDefinition()
         {
             DefaultValue = new UndefinedDefaultValue();
         }
+
+        public readonly Dictionary<string, object> _additionalFeatures = new Dictionary<string, object>();
 
         public virtual string Name { get; set; }
         public virtual DbType? Type { get; set; }
@@ -68,6 +70,34 @@ namespace FluentMigrator.Model
 
         public class UndefinedDefaultValue
         {
+        }
+
+        public IDictionary<string, object> AdditionalFeatures 
+        {
+            get { return _additionalFeatures; }
+        }
+
+        void ISupportAdditionalFeatures.AddAdditionalFeature(string feature, object value) 
+        {
+            if (!AdditionalFeatures.ContainsKey(feature)) {
+                AdditionalFeatures.Add(feature, value);
+            }
+            else {
+                AdditionalFeatures[feature] = value;
+            }
+        }
+
+        public T GetAdditionalFeature<T>(string key, T defaultValue) 
+        {
+            if (AdditionalFeatures.ContainsKey(key)) {
+                object value = AdditionalFeatures[key];
+                if (value is T)
+                {
+                    return (T)value;
+                }
+            }
+
+            return defaultValue;
         }
     }
 

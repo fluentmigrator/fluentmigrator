@@ -222,8 +222,8 @@ namespace FluentMigrator.Console
             }
             catch (Exception ex)
             {
-                System.Console.WriteLine("!! An error has occurred.  The error is:");
-                System.Console.WriteLine(ex);
+                System.Console.Error.WriteLine("!! An error has occurred.  The error is:");
+                System.Console.Error.WriteLine(ex);
                 Environment.ExitCode = 1;
             }
         }

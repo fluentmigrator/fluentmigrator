@@ -29,8 +29,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         private readonly IDbFactory factory;
         public IDbConnection Connection { get; private set; }
         public IDbTransaction Transaction { get; private set; }
-        public bool WasCommitted { get; private set; }
-
+        
         public override string DatabaseType
         {
             get { return "SqlServer"; }
@@ -230,9 +229,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
         }
 
-
         public override void Process(PerformDBOperationExpression expression)
         {
+            Announcer.Say("Performing DB Operation");
+
+            if (Options.PreviewOnly)
+                return;
+			
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
             if (expression.Operation != null)

@@ -25,6 +25,14 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
+        public void CanDropMultipleColumns()
+        {
+            var expression = GeneratorTestHelper.GetDeleteColumnExpression(new string[] {"TestColumn1", "TestColumn2"});
+            string sql = _generator.Generate(expression);
+            sql.ShouldBe("ALTER TABLE TestTable1 DROP COLUMN TestColumn1;\r\nALTER TABLE TestTable1 DROP COLUMN TestColumn2");
+        }
+
+        [Test]
         public override void CanDropForeignKey()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();

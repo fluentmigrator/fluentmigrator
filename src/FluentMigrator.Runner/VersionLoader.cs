@@ -22,6 +22,7 @@ namespace FluentMigrator.Runner
             VersionTableMetaData = GetVersionTableMetaData();
             VersionMigration = new VersionMigration(VersionTableMetaData);
             VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
+            VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
 
             LoadVersionInfo();
         }
@@ -35,6 +36,7 @@ namespace FluentMigrator.Runner
         private IMigrationConventions Conventions { get; set; }
         private IMigrationProcessor Processor { get; set; }
         private IMigration VersionMigration { get; set; }
+        private IMigration VersionUniqueMigration { get; set; }
 
         public void UpdateVersionInfo(long version)
         {
@@ -59,7 +61,11 @@ namespace FluentMigrator.Runner
 
         protected virtual InsertionDataDefinition CreateVersionInfoInsertionData(long version)
         {
-            return new InsertionDataDefinition { new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version) };
+            return new InsertionDataDefinition
+                       {
+                           new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version),
+                           new KeyValuePair<string, object>("AppliedOn", DateTime.UtcNow)
+                       };
         }
 
         public IVersionInfo VersionInfo
@@ -93,19 +99,33 @@ namespace FluentMigrator.Runner
             }
         }
 
+        public bool AlreadyMadeVersionUnique
+        {
+            get
+            {
+                return Processor.ColumnExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName, "AppliedOn");
+            }
+        }
+
         public void LoadVersionInfo()
         {
+            bool tableCreated = false;
+
             if (!AlreadyCreatedVersionSchema)
                 Runner.Up(VersionSchemaMigration);
 
             if (!AlreadyCreatedVersionTable)
             {
                 Runner.Up(VersionMigration);
-                _versionInfo = new VersionInfo();
-                return;
+                tableCreated = true;
             }
 
+            if (!AlreadyMadeVersionUnique)
+                Runner.Up(VersionUniqueMigration);
+            
             _versionInfo = new VersionInfo();
+
+            if (tableCreated) return;
 
             var dataSet = Processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
 

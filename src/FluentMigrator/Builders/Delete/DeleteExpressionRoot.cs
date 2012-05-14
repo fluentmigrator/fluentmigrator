@@ -17,6 +17,7 @@
 #endregion
 
 using FluentMigrator.Builders.Delete.Column;
+using FluentMigrator.Builders.Delete.Constraint;
 using FluentMigrator.Builders.Delete.DefaultConstraint;
 using FluentMigrator.Builders.Delete.ForeignKey;
 using FluentMigrator.Builders.Delete.Index;
@@ -24,7 +25,6 @@ using FluentMigrator.Builders.Delete.Sequence;
 using FluentMigrator.Builders.Delete.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
-using FluentMigrator.Builders.Delete.Constraint;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Delete
@@ -53,7 +53,7 @@ namespace FluentMigrator.Builders.Delete
 
         public IDeleteColumnFromTableSyntax Column(string columnName)
         {
-            var expression = new DeleteColumnExpression {ColumnName = columnName};
+            var expression = new DeleteColumnExpression {ColumnNames = {columnName}};
             _context.Expressions.Add(expression);
             return new DeleteColumnExpressionBuilder(expression);
         }

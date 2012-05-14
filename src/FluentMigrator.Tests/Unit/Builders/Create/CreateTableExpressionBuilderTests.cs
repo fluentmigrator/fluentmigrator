@@ -25,8 +25,10 @@ using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Extensions;
 using Moq;
 using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
@@ -270,6 +272,24 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         public void CallingIdentitySetsIsIdentityToTrue()
         {
             VerifyColumnProperty(c => c.IsIdentity = true, b => b.Identity());
+        }
+
+        [Test]
+        public void CallingIdentityWithSeededIdentitySetsAdditionalProperties() 
+        {
+            var contextMock = new Mock<IMigrationContext>();
+
+            var columnMock = new Mock<ColumnDefinition>();
+
+            var expressionMock = new Mock<CreateTableExpression>();
+            var builder = new CreateTableExpressionBuilder(expressionMock.Object, contextMock.Object);
+            builder.CurrentColumn = columnMock.Object;
+            builder.Identity(12, 44);
+
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(SqlServerExtensions.IdentitySeed, 12));
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(SqlServerExtensions.IdentityIncrement, 44));
         }
 
         [Test]
