@@ -72,22 +72,33 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanSilentlyFail()
         {
-            var processorOptions = new Mock<IMigrationProcessorOptions>();
-            processorOptions.SetupGet(x => x.PreviewOnly).Returns(false);
+            try
+            {
+                var processorOptions = new Mock<IMigrationProcessorOptions>();
+                processorOptions.SetupGet(x => x.PreviewOnly).Returns(false);
 
-            var processor = new Mock<IMigrationProcessor>();
-            processor.Setup(x => x.Process(It.IsAny<CreateForeignKeyExpression>())).Throws(new Exception("Error"));
-            processor.Setup(x => x.Process(It.IsAny<DeleteForeignKeyExpression>())).Throws(new Exception("Error"));
-            processor.Setup(x => x.Options).Returns(processorOptions.Object);
+                var processor = new Mock<IMigrationProcessor>();
+                processor.Setup(x => x.Process(It.IsAny<CreateForeignKeyExpression>())).Throws(new Exception("Error"));
+                processor.Setup(x => x.Process(It.IsAny<DeleteForeignKeyExpression>())).Throws(new Exception("Error"));
+                processor.Setup(x => x.Options).Returns(processorOptions.Object);
 
-            var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor.Object) { SilentlyFail = true };
+                var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor.Object) { SilentlyFail = true };
 
-            runner.Up(new TestForeignKeySilentFailure());
+                runner.Up(new TestForeignKeySilentFailure());
 
-            runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
+                runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
 
-            runner.Down(new TestForeignKeySilentFailure());
-            runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
+                runner.Down(new TestForeignKeySilentFailure());
+                runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
+            }
+            finally
+            {
+                ExecuteWithSupportedProcessors(processor =>
+                {
+                    MigrationRunner testRunner = SetupMigrationRunner(processor);
+                    testRunner.RollbackToVersion(0);
+                }, false);
+            }
         }
 
         [Test]
@@ -369,15 +380,26 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanMigrateASpecificVersion()
         {
-            ExecuteWithSupportedProcessors(processor =>
+            try
             {
-                MigrationRunner runner = SetupMigrationRunner(processor);
+                ExecuteWithSupportedProcessors(processor =>
+                {
+                    MigrationRunner runner = SetupMigrationRunner(processor);
 
-                runner.MigrateUp(1);
+                    runner.MigrateUp(1);
 
-                runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
-                processor.TableExists(null, "Users").ShouldBeTrue();
-            });
+                    runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
+                    processor.TableExists(null, "Users").ShouldBeTrue();
+                });
+            }
+            finally
+            {
+                ExecuteWithSupportedProcessors(processor =>
+                {
+                    MigrationRunner testRunner = SetupMigrationRunner(processor);
+                    testRunner.RollbackToVersion(0);
+                }, false);
+            }
         }
 
         [Test]
@@ -496,7 +518,7 @@ namespace FluentMigrator.Tests.Integration
                 };
 
                 var runner = new MigrationRunner(assembly, runnerContext, processor);
-                runner.MigrateUp();
+                runner.MigrateUp(false);
 
                 processor.TableExists(null, "TenantATable").ShouldBeTrue();
                 processor.TableExists(null, "NormalTable").ShouldBeTrue();
@@ -519,7 +541,7 @@ namespace FluentMigrator.Tests.Integration
                 };
 
                 var runner = new MigrationRunner(assembly, runnerContext, processor);
-                runner.MigrateUp();
+                runner.MigrateUp(false);
 
                 processor.TableExists(null, "TenantATable").ShouldBeFalse();
                 processor.TableExists(null, "NormalTable").ShouldBeTrue();
@@ -543,7 +565,7 @@ namespace FluentMigrator.Tests.Integration
                     Tags = new[] { "TenantA" }
                 };
 
-                new MigrationRunner(assembly, runnerContext, processor).MigrateUp();
+                new MigrationRunner(assembly, runnerContext, processor).MigrateUp(false);
 
                 processor.TableExists(null, "TenantATable").ShouldBeTrue();
                 processor.TableExists(null, "NormalTable").ShouldBeTrue();
@@ -552,7 +574,7 @@ namespace FluentMigrator.Tests.Integration
 
                 runnerContext.Tags = new[] { "TenantB" };
 
-                new MigrationRunner(assembly, runnerContext, processor).MigrateDown(0);
+                new MigrationRunner(assembly, runnerContext, processor).MigrateDown(0, false);
 
                 processor.TableExists(null, "TenantATable").ShouldBeTrue();
                 processor.TableExists(null, "NormalTable").ShouldBeFalse();
