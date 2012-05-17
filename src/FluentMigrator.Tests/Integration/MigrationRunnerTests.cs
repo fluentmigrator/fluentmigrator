@@ -19,7 +19,10 @@
 
 using System;
 using System.Data.SqlClient;
+using System.IO;
 using System.Reflection;
+using System.Text;
+using System.Text.RegularExpressions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
@@ -29,6 +32,7 @@ using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Sqlite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Integration.Migrations;
+using FluentMigrator.Tests.Unit;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
@@ -481,6 +485,45 @@ namespace FluentMigrator.Tests.Integration
             }
         }
 
+        [Test]
+        public void VersionInfoOnlyCreatedOnceInPreviewMode()
+        {
+            if (!IntegrationTestOptions.SqlServer2008.IsEnabled)
+                return;
+
+            var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
+            var processorOptions = new ProcessorOptions { PreviewOnly = true };
+
+            var outputSql = new StringWriter();
+            var announcer = new TextWriterAnnouncer(outputSql){ ShowSql = true };
+
+            var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), announcer, processorOptions, new SqlServerDbFactory());
+
+            try
+            {
+                var asm = typeof(MigrationRunnerTests).Assembly;
+                var runnerContext = new RunnerContext(announcer)
+                {
+                    Namespace = "FluentMigrator.Tests.Integration.Migrations",
+                    PreviewOnly = true
+                };
+                
+                var runner = new MigrationRunner(asm, runnerContext, processor);
+                runner.MigrateUp(1, false);
+
+                processor.CommitTransaction();
+
+                var schemaAndTableName = string.Format("\\[{0}\\]\\.\\[{1}\\]", new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME);
+
+                var regex = new Regex("CREATE TABLE " + schemaAndTableName + "");
+                
+                regex.Matches(outputSql.ToString()).Count.ShouldBe(1);
+            }
+            finally
+            {
+                CleanupTestSqlServerDatabase(connection, processor);
+            }
+        }
 
         private static MigrationRunner SetupMigrationRunner(IMigrationProcessor processor)
         {
