@@ -132,5 +132,24 @@ namespace FluentMigrator.Tests.Unit
 
             processor.VerifyAll();
         }
+
+        [Test]
+        public void VersionInfoCreationMigrationsOnlyRunOnceEvenIfProcessorExistenceChecksReturnFalse()
+        {
+            var conventions = new MigrationConventions();
+            var processor = new Mock<IMigrationProcessor>();
+            var runner = new Mock<IMigrationRunner>();
+            var asm = Assembly.GetExecutingAssembly();
+
+            runner.SetupGet(r => r.Processor).Returns(processor.Object);
+
+            processor.Setup(p => p.TableExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME)).Returns(false);
+
+            var loader = new VersionLoader(runner.Object, asm, conventions);
+
+            loader.LoadVersionInfo();
+
+            runner.Verify(r => r.Up(loader.VersionMigration), Times.Once());
+        }
     }
 }
