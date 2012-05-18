@@ -606,7 +606,7 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
-        public void VersionInfoOnlyCreatedOnceInPreviewMode()
+        public void VersionInfoCreationScriptsOnlyGeneratedOnceInPreviewMode()
         {
             if (!IntegrationTestOptions.SqlServer2008.IsEnabled)
                 return;
@@ -635,9 +635,18 @@ namespace FluentMigrator.Tests.Integration
 
                 var schemaAndTableName = string.Format("\\[{0}\\]\\.\\[{1}\\]", new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME);
 
-                var regex = new Regex("CREATE TABLE " + schemaAndTableName + "");
+                var outputSqlString = outputSql.ToString();
+
+                var createTableMatches = new Regex("CREATE TABLE " + schemaAndTableName).Matches(outputSqlString).Count;
+                var createIndexMatches = new Regex("CREATE UNIQUE CLUSTERED INDEX \\[UC_Version\\] ON " + schemaAndTableName).Matches(outputSqlString).Count;
+                var alterTableMatches = new Regex("ALTER TABLE " + schemaAndTableName).Matches(outputSqlString).Count;
+
+                System.Console.WriteLine(outputSqlString);
+
+                createTableMatches.ShouldBe(1);
+                alterTableMatches.ShouldBe(1);
+                createIndexMatches.ShouldBe(1);
                 
-                regex.Matches(outputSql.ToString()).Count.ShouldBe(1);
             }
             finally
             {

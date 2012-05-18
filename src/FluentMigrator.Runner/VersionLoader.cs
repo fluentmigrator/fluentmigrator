@@ -12,7 +12,8 @@ namespace FluentMigrator.Runner
 {
     public class VersionLoader : IVersionLoader
     {
-        private bool _tableCreated = false;
+        private bool _versionMigrationRun;
+        private bool _versionUniqueMigrationRun;
         
         public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions)
         {
@@ -38,7 +39,7 @@ namespace FluentMigrator.Runner
         private IMigrationConventions Conventions { get; set; }
         private IMigrationProcessor Processor { get; set; }
         public IMigration VersionMigration { get; private set; }
-        private IMigration VersionUniqueMigration { get; set; }
+        public IMigration VersionUniqueMigration { get; private set; }
 
         public void UpdateVersionInfo(long version)
         {
@@ -114,15 +115,18 @@ namespace FluentMigrator.Runner
             if (!AlreadyCreatedVersionSchema)
                 Runner.Up(VersionSchemaMigration);
 
-            if (!(AlreadyCreatedVersionTable || _tableCreated))
+            if (!(AlreadyCreatedVersionTable || _versionMigrationRun))
             {
                 Runner.Up(VersionMigration);
-                _tableCreated = true;
+                _versionMigrationRun = true;
             }
 
-            if (!AlreadyMadeVersionUnique)
+            if (!(AlreadyMadeVersionUnique || _versionUniqueMigrationRun))
+            {
                 Runner.Up(VersionUniqueMigration);
-            
+                _versionUniqueMigrationRun = true;
+            }
+
             _versionInfo = new VersionInfo();
 
             if (!AlreadyCreatedVersionTable) return;

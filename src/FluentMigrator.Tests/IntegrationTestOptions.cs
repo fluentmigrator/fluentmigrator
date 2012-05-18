@@ -13,7 +13,7 @@ namespace FluentMigrator.Tests
         public static DatabaseServerOptions SqlServer2008 = new DatabaseServerOptions
             {
                 ConnectionString = @"server=.\SQLEXPRESS;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator",
-                IsEnabled = false
+                IsEnabled = true
             };
 
         public static DatabaseServerOptions SqlLite = new DatabaseServerOptions
