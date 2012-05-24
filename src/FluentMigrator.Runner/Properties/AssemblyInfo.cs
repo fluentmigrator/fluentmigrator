@@ -18,6 +18,8 @@
 
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Security;
 
 [assembly: AssemblyTitle("FluentMigrator")]
 [assembly: AssemblyDescription("FluentMigrator")]
+[assembly: AllowPartiallyTrustedCallers]
