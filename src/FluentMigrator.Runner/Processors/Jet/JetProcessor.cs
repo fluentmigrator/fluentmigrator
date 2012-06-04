@@ -96,7 +96,14 @@ namespace FluentMigrator.Runner.Processors.Jet
             var restrict = new object[] { null, null, tableName, "TABLE" };
             using (var tables = Connection.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, restrict))
             {
-                return tables.Rows.Count > 0;
+                for (int i = 0; i < tables.Rows.Count; i++) {
+                    var name = tables.Rows[i].ItemArray[2].ToString();
+                    if (name == tableName)
+                    {
+                        return true;
+                    }
+                }
+                return false;
             }
         }
 
@@ -107,7 +114,14 @@ namespace FluentMigrator.Runner.Processors.Jet
             var restrict = new[] { null, null, tableName, null };
             using (var columns = Connection.GetOleDbSchemaTable(OleDbSchemaGuid.Columns, restrict))
             {
-                return columns.Rows.Count > 0;
+                for (int i = 0; i < columns.Rows.Count; i++) {
+                    var name = columns.Rows[i].ItemArray[3].ToString();
+                    if (name == columnName)
+                    {
+                        return true;
+                    }
+                }
+                return false;
             }
         }
 
