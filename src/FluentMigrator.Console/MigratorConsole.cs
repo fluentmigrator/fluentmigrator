@@ -30,6 +30,7 @@ namespace FluentMigrator.Console
     public class MigratorConsole
     {
         private readonly ConsoleAnnouncer consoleAnnouncer = new ConsoleAnnouncer();
+        public string ApplicationContext;
         public string Connection;
         public string ConnectionStringConfigPath;
         public string Namespace;
@@ -135,6 +136,11 @@ namespace FluentMigrator.Console
                                             "profile=",
                                             "The profile to run after executing migrations.",
                                             v => { Profile = v; }
+                                            },
+                                        {
+                                            "context=|c=",
+                                            "Set ApplicationContext to the given string.",
+                                            var => { ApplicationContext = var; }
                                             },
                                         {
                                             "timeout=",
@@ -263,6 +269,7 @@ namespace FluentMigrator.Console
                 Profile = Profile,
                 Timeout = Timeout,
                 ConnectionStringConfigPath = ConnectionStringConfigPath,
+                ApplicationContext = ApplicationContext,
                 Tags = Tags
             };
 
