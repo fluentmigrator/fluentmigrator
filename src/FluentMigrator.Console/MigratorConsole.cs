@@ -162,7 +162,7 @@ namespace FluentMigrator.Console
                         v => { Profile = v; }
                     },
                     {
-                        "context=|c=",
+                        "context=",
                         "Set ApplicationContext to the given string.",
                         var => { ApplicationContext = var; }
                     },
