@@ -55,15 +55,13 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         public override bool TableExists(string schemaName, string tableName)
         {
-            if (schemaName == null)
-                throw new ArgumentNullException("schemaName");
             if (tableName == null)
                 throw new ArgumentNullException("tableName");
 
             if (tableName.Length == 0)
                 return false;
 
-            if (schemaName.Length == 0)
+            if (string.IsNullOrEmpty(schemaName))
                 return Exists("SELECT 1 FROM USER_TABLES WHERE TABLE_NAME = '{0}'", tableName.ToUpper());
 
             return Exists("SELECT 1 FROM ALL_TABLES WHERE OWNER = '{0}' AND TABLE_NAME = '{1}'", schemaName.ToUpper(), tableName.ToUpper());
@@ -71,8 +69,6 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
-            if (schemaName == null)
-                throw new ArgumentNullException("schemaName");
             if (tableName == null)
                 throw new ArgumentNullException("tableName");
             if (columnName == null)
@@ -89,8 +85,6 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
-            if (schemaName == null)
-                throw new ArgumentNullException("schemaName");
             if (tableName == null)
                 throw new ArgumentNullException("tableName");
             if (constraintName == null)
@@ -101,7 +95,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             if (constraintName.Length == 0)
                 return false;
 
-            if (schemaName.Length == 0)
+            if (String.IsNullOrEmpty(schemaName))
                 return Exists("SELECT 1 FROM USER_CONSTRAINTS WHERE CONSTRAINT_NAME = '{0}'", constraintName.ToUpper());
 
             return Exists("SELECT 1 FROM ALL_CONSTRAINTS WHERE OWNER = '{0}' AND CONSTRAINT_NAME = '{1}'", schemaName.ToUpper(), constraintName.ToUpper());
@@ -109,8 +103,6 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
-            if (schemaName == null)
-                throw new ArgumentNullException("schemaName");
             if (tableName == null)
                 throw new ArgumentNullException("tableName");
             if (indexName == null)
@@ -121,7 +113,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             if (indexName.Length == 0)
                 return false;
 
-            if (schemaName.Length == 0)
+            if (String.IsNullOrEmpty(schemaName))
                 return Exists("SELECT 1 FROM USER_INDEXES WHERE INDEX_NAME = '{0}'", indexName.ToUpper());
 
             return Exists("SELECT 1 FROM ALL_INDEXES WHERE OWNER = '{0}' AND INDEX_NAME = '{1}'", schemaName.ToUpper(), indexName.ToUpper());
@@ -158,12 +150,10 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
-            if (schemaName == null)
-                throw new ArgumentNullException("schemaName");
             if (tableName == null)
                 throw new ArgumentNullException("tableName");
 
-            if (schemaName.Length == 0)
+            if (String.IsNullOrEmpty(schemaName))
                 return Read("SELECT * FROM {0}", tableName.ToUpper());
 
             return Read("SELECT * FROM {0}.{1}", schemaName.ToUpper(), tableName.ToUpper());
