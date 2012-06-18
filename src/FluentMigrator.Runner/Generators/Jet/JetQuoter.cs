@@ -1,4 +1,5 @@
-﻿using FluentMigrator.Runner.Generators.Generic;
+﻿using System;
+using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.Jet
 {
@@ -11,5 +12,10 @@ namespace FluentMigrator.Runner.Generators.Jet
         public override string CloseQuoteEscapeString { get { return string.Empty; } }
 
         public override string OpenQuoteEscapeString { get { return string.Empty; } }
+
+        public override string FormatDateTime(DateTime value)
+        {
+            return ValueQuote + (value).ToString("YYYY-MM-DD HH:mm:ss") + ValueQuote;
+        }
     }
 }
