@@ -15,7 +15,7 @@ namespace FluentMigrator.Runner.Generators.Jet
 
         public override string FormatDateTime(DateTime value)
         {
-            return ValueQuote + (value).ToString("MM/dd/yyyy HH:mm:ss") + ValueQuote;
+            return ValueQuote + (value).ToString("YYYY-MM-DD HH:mm:ss") + ValueQuote;
         }
     }
 }
