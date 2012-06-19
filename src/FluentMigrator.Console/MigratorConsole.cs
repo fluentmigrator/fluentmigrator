@@ -42,6 +42,7 @@ namespace FluentMigrator.Console
         public string TargetAssembly;
         public string WorkingDirectory;
         public string Profile;
+        public string ApplicationContext;
         public int Timeout;
         public bool ShowHelp;
         public string ConnectionStringConfigPath;
@@ -161,6 +162,11 @@ namespace FluentMigrator.Console
                         v => { Profile = v; }
                     },
                     {
+                        "context=",
+                        "Set ApplicationContext to the given string.",
+                        var => { ApplicationContext = var; }
+                    },
+                    {
                         "timeout=",
                         "Overrides the default SqlCommand timeout of 30 seconds.",
                         v => { Timeout = int.Parse(v); }
@@ -269,6 +275,7 @@ namespace FluentMigrator.Console
                 Profile = Profile,
                 Timeout = Timeout,
                 ConnectionStringConfigPath = ConnectionStringConfigPath,
+                ApplicationContext = ApplicationContext,
             };
 
             new TaskExecutor(runnerContext).Execute();
