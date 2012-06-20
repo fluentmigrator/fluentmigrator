@@ -113,7 +113,7 @@ namespace FluentMigrator.Runner
                 if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
                 VersionLoader.LoadVersionInfo();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
                 throw;

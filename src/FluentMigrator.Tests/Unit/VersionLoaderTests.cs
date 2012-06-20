@@ -132,5 +132,43 @@ namespace FluentMigrator.Tests.Unit
 
             processor.VerifyAll();
         }
+
+        [Test]
+        public void VersionMigrationOnlyRunOnceEvenIfExistenceChecksReturnFalse()
+        {
+            var conventions = new MigrationConventions();
+            var processor = new Mock<IMigrationProcessor>();
+            var runner = new Mock<IMigrationRunner>();
+            var asm = Assembly.GetExecutingAssembly();
+
+            runner.SetupGet(r => r.Processor).Returns(processor.Object);
+
+            processor.Setup(p => p.TableExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME)).Returns(false);
+
+            var loader = new VersionLoader(runner.Object, asm, conventions);
+
+            loader.LoadVersionInfo();
+
+            runner.Verify(r => r.Up(loader.VersionMigration), Times.Once());
+        }
+
+        [Test]
+        public void VersionUniqueMigrationOnlyRunOnceEvenIfExistenceChecksReturnFalse()
+        {
+            var conventions = new MigrationConventions();
+            var processor = new Mock<IMigrationProcessor>();
+            var runner = new Mock<IMigrationRunner>();
+            var asm = Assembly.GetExecutingAssembly();
+
+            runner.SetupGet(r => r.Processor).Returns(processor.Object);
+
+            processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME, "AppliedOn")).Returns(false);
+
+            var loader = new VersionLoader(runner.Object, asm, conventions);
+
+            loader.LoadVersionInfo();
+
+            runner.Verify(r => r.Up(loader.VersionUniqueMigration), Times.Once());
+        }
     }
 }

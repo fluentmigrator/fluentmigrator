@@ -12,6 +12,9 @@ namespace FluentMigrator.Runner
 {
     public class VersionLoader : IVersionLoader
     {
+        private bool _versionMigrationRun;
+        private bool _versionUniqueMigrationRun;
+        
         public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions)
         {
             Runner = runner;
@@ -35,8 +38,8 @@ namespace FluentMigrator.Runner
         public IVersionTableMetaData VersionTableMetaData { get; private set; }
         private IMigrationConventions Conventions { get; set; }
         private IMigrationProcessor Processor { get; set; }
-        private IMigration VersionMigration { get; set; }
-        private IMigration VersionUniqueMigration { get; set; }
+        public IMigration VersionMigration { get; private set; }
+        public IMigration VersionUniqueMigration { get; private set; }
 
         public void UpdateVersionInfo(long version)
         {
@@ -109,26 +112,27 @@ namespace FluentMigrator.Runner
 
         public void LoadVersionInfo()
         {
-            bool tableCreated = false;
-
             if (!AlreadyCreatedVersionSchema)
                 Runner.Up(VersionSchemaMigration);
 
-            if (!AlreadyCreatedVersionTable)
+            if (!(AlreadyCreatedVersionTable || _versionMigrationRun))
             {
                 Runner.Up(VersionMigration);
-                tableCreated = true;
+                _versionMigrationRun = true;
             }
 
-            if (!AlreadyMadeVersionUnique)
+            if (!(AlreadyMadeVersionUnique || _versionUniqueMigrationRun))
+            {
                 Runner.Up(VersionUniqueMigration);
-            
+                _versionUniqueMigrationRun = true;
+            }
+
             _versionInfo = new VersionInfo();
 
-            if (tableCreated) return;
+            if (!AlreadyCreatedVersionTable) return;
 
             var dataSet = Processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
-
+            
             foreach (DataRow row in dataSet.Tables[0].Rows)
             {
                 _versionInfo.AddAppliedMigration(long.Parse(row[0].ToString()));
