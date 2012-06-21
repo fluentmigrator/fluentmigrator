@@ -163,6 +163,22 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static UpdateDataExpression GetUpdateDataExpressionWithAllRows()
+        {
+            var expression = new UpdateDataExpression();
+            expression.TableName = TestTableName1;
+
+            expression.Set = new List<KeyValuePair<string, object>>
+                                 {
+                                     new KeyValuePair<string, object>("Name", "Just'in"),
+                                     new KeyValuePair<string, object>("Age", 25)
+                                 };
+
+            expression.IsAllRows = true;
+
+            return expression;
+        }
+
         public static InsertDataExpression GetInsertGUIDExpression()
         {
             var expression = new InsertDataExpression { TableName = TestTableName1 };
