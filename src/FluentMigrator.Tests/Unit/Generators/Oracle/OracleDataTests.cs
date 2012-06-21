@@ -80,5 +80,14 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var sql = generator.Generate(expression);
             sql.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE Id = 9 AND Homepage IS NULL");
         }
+
+        [Test]
+        public void CanUpdateDataForAllRows()
+        {
+            var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
+
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE 1 = 1");
+        }
     }
 }
