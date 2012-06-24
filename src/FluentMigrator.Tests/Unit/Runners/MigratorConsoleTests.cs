@@ -181,5 +181,27 @@ namespace FluentMigrator.Tests.Unit.Runners
 
             Assert.Greater(sbVerbose.ToString().Length, sbNonVerbose.ToString().Length);
         }
+
+        [Test]
+        public void TagsPassedToRunnerContextOnExecuteMigrations()
+        {
+            var sbVerbose = new StringBuilder();
+            var stringWriterVerbose = new StringWriter(sbVerbose);
+
+            var migratorConsole = new MigratorConsole(stringWriterVerbose,
+                "/db", database,
+                "/connection", connection,
+                "/verbose", "1",
+                "/target", target,
+                "/namespace", "FluentMigrator.Tests.Integration.Migrations",
+                "/task", "migrate:up",
+                "/version", "1",
+                "/tag", "uk",
+                "/tag", "production");
+
+            var expectedTags = new string[] { "uk", "production" };
+
+            CollectionAssert.AreEquivalent(expectedTags, migratorConsole.RunnerContext.Tags);   
+        }
     }
 }
