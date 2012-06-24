@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
@@ -45,6 +46,9 @@ namespace FluentMigrator.Console
         public int Timeout;
         public bool ShowHelp;
         public string ConnectionStringConfigPath;
+        public List<string> Tags = new List<string>();
+
+        public RunnerContext RunnerContext { get; private set;}
 
         static void DisplayHelp(OptionSet p)
         {
@@ -166,6 +170,11 @@ namespace FluentMigrator.Console
                         v => { Timeout = int.Parse(v); }
                     },
                     {
+					   	"tag=",
+						"Filters the migrations to be run by tag.",
+						v => { Tags.Add(v); }
+					},
+                    {
                         "help|h|?",
                         "Displays this help menu.",
                         v => { ShowHelp = true; }
@@ -255,7 +264,7 @@ namespace FluentMigrator.Console
 
         private void ExecuteMigrations(IAnnouncer announcer)
         {
-            var runnerContext = new RunnerContext(announcer)
+            RunnerContext = new RunnerContext(announcer)
             {
                 Database = ProcessorType,
                 Connection = Connection,
@@ -269,9 +278,10 @@ namespace FluentMigrator.Console
                 Profile = Profile,
                 Timeout = Timeout,
                 ConnectionStringConfigPath = ConnectionStringConfigPath,
+                Tags = Tags
             };
 
-            new TaskExecutor(runnerContext).Execute();
+            new TaskExecutor(RunnerContext).Execute();
         }
     }
 }
