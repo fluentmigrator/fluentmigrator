@@ -185,10 +185,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         [Test]
         public void TagsPassedToRunnerContextOnExecuteMigrations()
         {
-            var sbVerbose = new StringBuilder();
-            var stringWriterVerbose = new StringWriter(sbVerbose);
-
-            var migratorConsole = new MigratorConsole(stringWriterVerbose,
+            var migratorConsole = new MigratorConsole(
                 "/db", database,
                 "/connection", connection,
                 "/verbose", "1",
