@@ -35,9 +35,9 @@ namespace FluentMigrator.VersionTableInfo
             get { return "Version"; }
         }
 
-		public string UniqueIndexName
-		{
-			get { return "UC_Version"; }
-		}
+        public string UniqueIndexName
+        {
+            get { return "UC_Version"; }
+        }
     }
 }
