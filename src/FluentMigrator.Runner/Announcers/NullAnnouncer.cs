@@ -1,47 +1,27 @@
-﻿using System;
+﻿#region License
+
+// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+// http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+#endregion
 
 namespace FluentMigrator.Runner.Announcers
 {
-    public class NullAnnouncer : IAnnouncer, IFormattingAnnouncer
+    public class NullAnnouncer : Announcer
     {
-        #region IAnnouncer Members
-
-        public void Dispose()
+        public override void Write(string message, bool escaped)
         {
         }
-
-        public void Heading(string message)
-        {
-        }
-
-        public void Say(string message)
-        {
-        }
-
-        public void Heading(string message, params object[] args)
-        {
-        }
-
-        public void Say(string message, params object[] args)
-        {
-        }
-
-        public void Sql(string sql)
-        {
-        }
-
-        public void ElapsedTime(TimeSpan timeSpan)
-        {
-        }
-
-        public void Error(string message)
-        {
-        }
-
-        public void Error(string message, params object[] args)
-        {
-        }
-
-        #endregion
     }
 }

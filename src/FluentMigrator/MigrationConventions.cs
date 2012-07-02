@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 
@@ -33,6 +34,8 @@ namespace FluentMigrator
         public Func<Type, MigrationMetadata> GetMetadataForMigration { get; set; }
         public Func<string> GetWorkingDirectory { get; set; }
         public Func<Model.ConstraintDefinition, string> GetConstraintName { get; set; }
+        public Func<Type, bool> TypeHasTags { get; set; }
+        public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags { get; set; }
 
         public MigrationConventions()
         {
@@ -45,6 +48,8 @@ namespace FluentMigrator
             GetMetadataForMigration = DefaultMigrationConventions.GetMetadataForMigration;
             GetWorkingDirectory = DefaultMigrationConventions.GetWorkingDirectory;
             GetConstraintName = DefaultMigrationConventions.GetConstraintName;
+            TypeHasTags = DefaultMigrationConventions.TypeHasTags;
+            TypeHasMatchingTags = DefaultMigrationConventions.TypeHasMatchingTags;
         }
     }
 }
