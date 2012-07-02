@@ -31,21 +31,25 @@ namespace FluentMigrator.Runner
         public string Namespace { get; private set; }
         public bool LoadNestedNamespaces { get; private set; }
         public SortedList<long, IMigration> Migrations { get; private set; }
+        public IEnumerable<string> TagsToMatch { get; set; }
 
-        public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace)
+        public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, IEnumerable<string> tagsToMatch)
         {
             Conventions = conventions;
             Assembly = assembly;
             Namespace = @namespace;
+            TagsToMatch = tagsToMatch ?? new string[] { };
 
             Initialize();
         }
+        
         public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, bool loadNestedNamespaces)
         {
             Conventions = conventions;
             Assembly = assembly;
             Namespace = @namespace;
             LoadNestedNamespaces = loadNestedNamespaces;
+            TagsToMatch = new string[]{};
 
             Initialize();
         }
@@ -71,7 +75,8 @@ namespace FluentMigrator.Runner
 
         public IEnumerable<MigrationMetadata> FindMigrations()
         {
-            IEnumerable<Type> matchedTypes = Assembly.GetExportedTypes().Where(t => Conventions.TypeIsMigration(t));
+            IEnumerable<Type> matchedTypes = Assembly.GetExportedTypes().Where(t => Conventions.TypeIsMigration(t)
+                && (Conventions.TypeHasMatchingTags(t, TagsToMatch) || !Conventions.TypeHasTags(t)));
 
             if (!string.IsNullOrEmpty(Namespace))
             {

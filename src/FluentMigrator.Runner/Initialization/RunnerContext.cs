@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace FluentMigrator.Runner.Initialization
 {
     public class RunnerContext : IRunnerContext
@@ -20,6 +22,7 @@ namespace FluentMigrator.Runner.Initialization
         public string Profile { get; set; }
         public int Timeout { get; set; }
         public string ConnectionStringConfigPath { get; set; }
+        public IEnumerable<string> Tags { get; set; }
 
         public IAnnouncer Announcer
         {
