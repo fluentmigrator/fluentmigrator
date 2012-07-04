@@ -294,11 +294,18 @@ namespace FluentMigrator.Runner.Generators.Generic
                 updateItems.Add(string.Format("{0} = {1}", Quoter.QuoteColumnName(item.Key), Quoter.QuoteValue(item.Value)));
             }
 
-            foreach (var item in expression.Where)
+            if(expression.IsAllRows)
             {
-                whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value)));
+                whereClauses.Add("1 = 1");
             }
-
+            else
+            {
+                foreach (var item in expression.Where)
+                {
+                    whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key),
+                                                   item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value)));
+                }
+            }
             return String.Format(UpdateData, Quoter.QuoteTableName(expression.TableName), String.Join(", ", updateItems.ToArray()), String.Join(" AND ", whereClauses.ToArray()));
         }
 

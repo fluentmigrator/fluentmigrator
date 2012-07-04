@@ -112,6 +112,15 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
+        public void CanUpdateDataForAllRows()
+        {
+            var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
+
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("UPDATE [dbo].[TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE 1 = 1");
+        }
+
+        [Test]
         public void CanInsertDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();

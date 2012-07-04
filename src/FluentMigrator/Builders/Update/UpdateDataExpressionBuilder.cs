@@ -52,6 +52,11 @@ namespace FluentMigrator.Builders.Update
             _expression.Where = GetData(dataAsAnonymousType);
         }
 
+        public void AllRows()
+        {
+            _expression.IsAllRows = true;
+        }
+
         private static List<KeyValuePair<string, object>> GetData(object dataAsAnonymousType)
         {
             var data = new List<KeyValuePair<string, object>>();
