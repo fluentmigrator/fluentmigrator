@@ -134,6 +134,25 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        public void VersionSchemaMigrationOnlyRunOnceEvenIfExistenceChecksReturnFalse()
+        {
+            var conventions = new MigrationConventions();
+            var processor = new Mock<IMigrationProcessor>();
+            var runner = new Mock<IMigrationRunner>();
+            var asm = Assembly.GetExecutingAssembly();
+
+            runner.SetupGet(r => r.Processor).Returns(processor.Object);
+
+            processor.Setup(p => p.SchemaExists(It.IsAny<string>())).Returns(false);
+
+            var loader = new VersionLoader(runner.Object, asm, conventions);
+
+            loader.LoadVersionInfo();
+
+            runner.Verify(r => r.Up(loader.VersionSchemaMigration), Times.Once());
+        }
+
+        [Test]
         public void VersionMigrationOnlyRunOnceEvenIfExistenceChecksReturnFalse()
         {
             var conventions = new MigrationConventions();

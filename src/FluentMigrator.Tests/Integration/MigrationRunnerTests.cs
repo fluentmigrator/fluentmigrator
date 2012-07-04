@@ -633,16 +633,19 @@ namespace FluentMigrator.Tests.Integration
 
                 processor.CommitTransaction();
 
-                var schemaAndTableName = string.Format("\\[{0}\\]\\.\\[{1}\\]", new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME);
+                string schemaName = new TestVersionTableMetaData().SchemaName;
+                var schemaAndTableName = string.Format("\\[{0}\\]\\.\\[{1}\\]", schemaName, TestVersionTableMetaData.TABLENAME);
 
                 var outputSqlString = outputSql.ToString();
 
+                var createSchemaMatches = new Regex(string.Format("CREATE SCHEMA \\[{0}\\]", schemaName)).Matches(outputSqlString).Count;
                 var createTableMatches = new Regex("CREATE TABLE " + schemaAndTableName).Matches(outputSqlString).Count;
                 var createIndexMatches = new Regex("CREATE UNIQUE CLUSTERED INDEX \\[UC_Version\\] ON " + schemaAndTableName).Matches(outputSqlString).Count;
                 var alterTableMatches = new Regex("ALTER TABLE " + schemaAndTableName).Matches(outputSqlString).Count;
 
                 System.Console.WriteLine(outputSqlString);
 
+                createSchemaMatches.ShouldBe(1);
                 createTableMatches.ShouldBe(1);
                 alterTableMatches.ShouldBe(1);
                 createIndexMatches.ShouldBe(1);
