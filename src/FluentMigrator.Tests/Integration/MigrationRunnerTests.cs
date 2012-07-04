@@ -21,7 +21,6 @@ using System;
 using System.Data.SqlClient;
 using System.IO;
 using System.Reflection;
-using System.Text;
 using System.Text.RegularExpressions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
@@ -640,7 +639,7 @@ namespace FluentMigrator.Tests.Integration
 
                 var createSchemaMatches = new Regex(string.Format("CREATE SCHEMA \\[{0}\\]", schemaName)).Matches(outputSqlString).Count;
                 var createTableMatches = new Regex("CREATE TABLE " + schemaAndTableName).Matches(outputSqlString).Count;
-                var createIndexMatches = new Regex("CREATE UNIQUE CLUSTERED INDEX \\[UC_Version\\] ON " + schemaAndTableName).Matches(outputSqlString).Count;
+                var createIndexMatches = new Regex("CREATE UNIQUE CLUSTERED INDEX \\[" + TestVersionTableMetaData.UNIQUEINDEXNAME + "\\] ON " + schemaAndTableName).Matches(outputSqlString).Count;
                 var alterTableMatches = new Regex("ALTER TABLE " + schemaAndTableName).Matches(outputSqlString).Count;
 
                 System.Console.WriteLine(outputSqlString);
