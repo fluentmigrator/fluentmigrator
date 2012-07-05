@@ -181,9 +181,7 @@ namespace FluentMigrator.Tests.Integration.Processors
 
             tableExists.ShouldBeFalse();
 
-            output.ToString().ShouldBe(
-@"/* Performing DB Operation */
-");
+            Assert.That(output.ToString(), Is.StringContaining(@"/* Performing DB Operation */"));
         }
     }
 }

@@ -157,11 +157,10 @@ namespace FluentMigrator.Tests.Integration.Processors
 
             tableExists.ShouldBeFalse();
 
-            output.ToString().ShouldBe(
-@"/* Beginning Transaction */
-/* Performing DB Operation */
-/* Rolling back transaction */
-");
+            string fmOutput = output.ToString();
+            Assert.That(fmOutput, Is.StringContaining("/* Beginning Transaction */"));
+            Assert.That(fmOutput, Is.StringContaining("/* Performing DB Operation */"));
+            Assert.That(fmOutput, Is.StringContaining("/* Rolling back transaction */"));
         }
     }
 }
