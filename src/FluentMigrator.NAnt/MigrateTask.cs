@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.IO;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
@@ -58,26 +59,52 @@ namespace FluentMigrator.NAnt
         [TaskAttribute("timeout")]
         public int Timeout { get; set; }
 
+        [TaskAttribute("output")]
+        public bool Output { get; set; }
+
+        [TaskAttribute("outputfilename")]
+        public string OutputFilename { get; set; }
+
+        [TaskAttribute("preview")]
+        public bool Preview { get; set; }
+
         protected override void ExecuteTask()
         {
-            var announcer = new ConsoleAnnouncer
+            IAnnouncer announcer = new ConsoleAnnouncer
                                 {
                                     ShowElapsedTime = Verbose,
                                     ShowSql = Verbose
                                 };
+
+            StreamWriter outputWriter = null;
+            if (Output)
+            {
+                if (string.IsNullOrEmpty(OutputFilename))
+                    OutputFilename = Path.GetFileName(Target) + ".sql";
+
+                outputWriter = new StreamWriter(OutputFilename);
+                var fileAnnouncer = new TextWriterAnnouncer(outputWriter)
+                {
+                    ShowElapsedTime = false,
+                    ShowSql = true
+                };
+
+                announcer = new CompositeAnnouncer(announcer, fileAnnouncer);
+            }
+
             var runnerContext = new RunnerContext(announcer)
                                     {
                                         Database = Database,
                                         Connection = Connection,
                                         Target = Target,
-                                        PreviewOnly = false,
+                                        PreviewOnly = Preview,
                                         Namespace = Namespace,
                                         Task = Task,
                                         Version = Version,
                                         Steps = Steps,
                                         WorkingDirectory = WorkingDirectory,
                                         Profile = Profile,
-                                        Timeout = Timeout
+                                        Timeout = Timeout,
                                     };
 
             try
@@ -91,6 +118,11 @@ namespace FluentMigrator.NAnt
             catch (Exception e)
             {
                 announcer.Error("While executing migrations the following error was encountered: {0}, {1}", e.Message, e.StackTrace);
+            }
+            finally
+            {
+                if (outputWriter != null)
+                    outputWriter.Dispose();
             }
         }
     }
