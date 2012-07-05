@@ -376,7 +376,8 @@ namespace FluentMigrator.Tests.Integration
                 runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
                 runner.VersionLoader.VersionInfo.HasAppliedMigration(2).ShouldBeTrue();
                 runner.VersionLoader.VersionInfo.HasAppliedMigration(3).ShouldBeTrue();
-                runner.VersionLoader.VersionInfo.Latest().ShouldBe(3);
+                runner.VersionLoader.VersionInfo.HasAppliedMigration(4).ShouldBeTrue();
+                runner.VersionLoader.VersionInfo.Latest().ShouldBe(4);
 
                 runner.RollbackToVersion(0, false);
             });
