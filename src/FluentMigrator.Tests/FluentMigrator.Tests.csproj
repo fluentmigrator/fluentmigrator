@@ -292,6 +292,7 @@
     <Compile Include="Unit\Runners\MigratorConsoleTests.cs" />
     <Compile Include="Unit\Runners\ProcessorFactoryTests.cs" />
     <Compile Include="Integration\Migrations\VersionedMigration.cs" />
+    <Compile Include="Unit\Runners\TagsExtensionsTests.cs" />
     <Compile Include="Unit\StopWatchTests.cs" />
     <Compile Include="Unit\TaskExecutorTests.cs" />
     <Compile Include="Unit\TestVersionLoader.cs" />

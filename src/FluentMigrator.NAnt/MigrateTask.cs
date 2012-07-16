@@ -19,6 +19,7 @@
 using System;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Initialization;
 using NAnt.Core;
 using NAnt.Core.Attributes;
@@ -58,6 +59,9 @@ namespace FluentMigrator.NAnt
         [TaskAttribute("profile")]
         public string Profile { get; set; }
 
+        [TaskAttribute("tags")]
+        public string Tags { get; set; }
+
         [TaskAttribute("timeout")]
         public int Timeout { get; set; }
 
@@ -81,6 +85,7 @@ namespace FluentMigrator.NAnt
                                         Steps = Steps,
                                         WorkingDirectory = WorkingDirectory,
                                         Profile = Profile,
+                                        Tags = Tags.ToTags(),
                                         Timeout = Timeout
                                     };
 

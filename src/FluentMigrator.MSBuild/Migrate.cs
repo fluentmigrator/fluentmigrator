@@ -17,6 +17,7 @@
 #endregion
 
 using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Initialization;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
@@ -79,6 +80,8 @@ namespace FluentMigrator.MSBuild
 
         public bool PreviewOnly { get; set; }
 
+        public string Tags { get; set; }
+
         public override bool Execute()
         {
 
@@ -115,6 +118,7 @@ namespace FluentMigrator.MSBuild
                 Steps = Steps,
                 WorkingDirectory = WorkingDirectory,
                 Profile = Profile,
+                Tags = Tags.ToTags(),
                 Timeout = Timeout
             };
 
