@@ -28,6 +28,9 @@ namespace FluentMigrator.NAnt
     [TaskName("migrate")]
     public class MigrateTask : Task
     {
+        [TaskAttribute("context")]
+        public string ApplicationContext { get; set; }
+
         [TaskAttribute("database")]
         public string Database { get; set; }
 
@@ -67,6 +70,7 @@ namespace FluentMigrator.NAnt
                                 };
             var runnerContext = new RunnerContext(announcer)
                                     {
+                                        ApplicationContext = ApplicationContext,
                                         Database = Database,
                                         Connection = Connection,
                                         Target = Target,

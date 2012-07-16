@@ -46,6 +46,8 @@ namespace FluentMigrator.MSBuild
         private string databaseType;
         private string migrationAssembly;
 
+        public string ApplicationContext { get; set; }
+        
         [Required]
         public string Connection { get; set; }
 
@@ -101,6 +103,7 @@ namespace FluentMigrator.MSBuild
             };
             var runnerContext = new RunnerContext(announcer)
             {
+                ApplicationContext = ApplicationContext,
                 Database = databaseType,
                 Connection = Connection,
                 ConnectionStringConfigPath = ConnectionStringConfigPath,
@@ -112,7 +115,7 @@ namespace FluentMigrator.MSBuild
                 Steps = Steps,
                 WorkingDirectory = WorkingDirectory,
                 Profile = Profile,
-                Timeout = Timeout,
+                Timeout = Timeout
             };
 
             Log.LogMessage(MessageImportance.Low, "Executing Migration Runner");
