@@ -17,15 +17,12 @@
 #endregion
 
 using System;
-using System.CodeDom;
-using System.CodeDom.Compiler;
 using System.Reflection;
 using System.Collections.Generic;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Tests.Integration.Migrations;
 using FluentMigrator.Tests.Unit.TaggingTestFakes;
-using FluentMigrator.VersionTableInfo;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
@@ -33,87 +30,87 @@ using System.Linq;
 
 namespace FluentMigrator.Tests.Unit
 {
-	[TestFixture]
-	public class MigrationLoaderTests
-	{
-		[Test]
-		public void CanFindMigrationsInAssembly()
-		{
-			var conventions = new MigrationConventions();
-			var asm = Assembly.GetExecutingAssembly();
-			var loader = new MigrationLoader( conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1", null);
-			
-			SortedList<long, IMigration> migrationList = loader.Migrations;
+    [TestFixture]
+    public class MigrationLoaderTests
+    {
+        [Test]
+        public void CanFindMigrationsInAssembly()
+        {
+            var conventions = new MigrationConventions();
+            var asm = Assembly.GetExecutingAssembly();
+            var loader = new MigrationLoader( conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1", null);
+            
+            SortedList<long, IMigration> migrationList = loader.Migrations;
 
-			//if this works, there will be at least one migration class because i've included on in this code file
-			var en = migrationList.GetEnumerator();
-			int count = 0;
-			while (en.MoveNext())
-				count++;
+            //if this works, there will be at least one migration class because i've included on in this code file
+            var en = migrationList.GetEnumerator();
+            int count = 0;
+            while (en.MoveNext())
+                count++;
 
-			count.ShouldBeGreaterThan(0);
-		}
+            count.ShouldBeGreaterThan(0);
+        }
 
-		[Test]
-		public void CanFindMigrationsInNamespace()
-		{
-			var conventions = new MigrationConventions();
-			var asm = Assembly.GetExecutingAssembly();
-			var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1", null);
+        [Test]
+        public void CanFindMigrationsInNamespace()
+        {
+            var conventions = new MigrationConventions();
+            var asm = Assembly.GetExecutingAssembly();
+            var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1", null);
 
-			var migrationList = loader.FindMigrations();
-			migrationList.Select(x => x.Type).ShouldNotContain(typeof(VersionedMigration));
-			migrationList.Count().ShouldBeGreaterThan(0);
-		}
+            var migrationList = loader.FindMigrations();
+            migrationList.Select(x => x.Type).ShouldNotContain(typeof(VersionedMigration));
+            migrationList.Count().ShouldBeGreaterThan(0);
+        }
 
-		[Test]
-		public void DefaultBehaviorIsToNotLoadNestedNamespaces()
-		{
-			var conventions = new MigrationConventions();
-			var asm = Assembly.GetExecutingAssembly();
-			var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Nested", null);
+        [Test]
+        public void DefaultBehaviorIsToNotLoadNestedNamespaces()
+        {
+            var conventions = new MigrationConventions();
+            var asm = Assembly.GetExecutingAssembly();
+            var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Nested", null);
 
-			loader.LoadNestedNamespaces.ShouldBe(false);
-		}
+            loader.LoadNestedNamespaces.ShouldBe(false);
+        }
 
-		[Test]
-		public void FindsMigrationsInNestedNamepsaceWhenLoadNestedNamespacesEnabled()
-		{
-			var conventions = new MigrationConventions();
-			var asm = Assembly.GetExecutingAssembly();
-			var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Nested", true);
+        [Test]
+        public void FindsMigrationsInNestedNamepsaceWhenLoadNestedNamespacesEnabled()
+        {
+            var conventions = new MigrationConventions();
+            var asm = Assembly.GetExecutingAssembly();
+            var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Nested", true);
 
-			List<Type> expected = new List<Type>()
-			{
-				typeof(Integration.Migrations.Nested.NotGrouped),
-				typeof(Integration.Migrations.Nested.Group1.FromGroup1),
-				typeof(Integration.Migrations.Nested.Group1.AnotherFromGroup1),
-				typeof(Integration.Migrations.Nested.Group2.FromGroup2),
-			};
+            List<Type> expected = new List<Type>
+                                      {
+                typeof(Integration.Migrations.Nested.NotGrouped),
+                typeof(Integration.Migrations.Nested.Group1.FromGroup1),
+                typeof(Integration.Migrations.Nested.Group1.AnotherFromGroup1),
+                typeof(Integration.Migrations.Nested.Group2.FromGroup2),
+            };
 
-			var migrationList = loader.FindMigrations();
-			List<Type> actual = migrationList.Select(m => m.Type).ToList();
+            var migrationList = loader.FindMigrations();
+            List<Type> actual = migrationList.Select(m => m.Type).ToList();
 
-			CollectionAssert.AreEquivalent(expected, actual);
-		}
+            CollectionAssert.AreEquivalent(expected, actual);
+        }
 
-		[Test]
-		public void DoesNotFindsMigrationsInNestedNamepsaceWhenLoadNestedNamespacesDisabled()
-		{
-			var conventions = new MigrationConventions();
-			var asm = Assembly.GetExecutingAssembly();
-			var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Nested", false);
+        [Test]
+        public void DoesNotFindsMigrationsInNestedNamepsaceWhenLoadNestedNamespacesDisabled()
+        {
+            var conventions = new MigrationConventions();
+            var asm = Assembly.GetExecutingAssembly();
+            var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Nested", false);
 
-			List<Type> expected = new List<Type>()
-			{
-				typeof(Integration.Migrations.Nested.NotGrouped),
-			};
+            List<Type> expected = new List<Type>
+                                      {
+                typeof(Integration.Migrations.Nested.NotGrouped),
+            };
 
-			var migrationList = loader.FindMigrations();
-			List<Type> actual = migrationList.Select(m => m.Type).ToList();
+            var migrationList = loader.FindMigrations();
+            List<Type> actual = migrationList.Select(m => m.Type).ToList();
 
-			CollectionAssert.AreEquivalent(expected, actual);
-		}
+            CollectionAssert.AreEquivalent(expected, actual);
+        }
 
         [Test]
         public void DoesFindMigrationsThatHaveMatchingTags()
@@ -158,7 +155,7 @@ namespace FluentMigrator.Tests.Unit
 
             CollectionAssert.AreEquivalent(expected, actual);
         }
-	}
+    }
     
     namespace TaggingTestFakes
     {
