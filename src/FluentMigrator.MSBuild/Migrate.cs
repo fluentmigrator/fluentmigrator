@@ -103,7 +103,7 @@ namespace FluentMigrator.MSBuild
                 return false;
             }
 
-            IAnnouncer announcer = new TextWriterAnnouncer(msg => Log.LogMessage(MessageImportance.Normal, msg))
+            IAnnouncer announcer = new ConsoleAnnouncer
             {
                 ShowElapsedTime = Verbose,
                 ShowSql = Verbose
