@@ -1,0 +1,149 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>FluentMigrator</name>
+    </assembly>
+    <members>
+        <member name="M:FluentMigrator.Builders.Create.Constraint.CreateConstraintExpressionBuilder.#ctor(FluentMigrator.Expressions.CreateConstraintExpression)">
+            <summary>
+            Initializes a new instance of the <see cref="T:CreateConstraintExpressionBuilder"/> class.
+            </summary>
+        </member>
+        <member name="M:FluentMigrator.Builders.Delete.Constraint.DeleteConstraintExpressionBuilder.#ctor(FluentMigrator.Expressions.DeleteConstraintExpression)">
+            <summary>
+            Initializes a new instance of the <see cref="T:CreateConstraintExpressionBuilder"/> class.
+            </summary>
+        </member>
+        <member name="T:FluentMigrator.Builders.IfDatabase.IfDatabaseExpressionRoot">
+            <summary>
+            Allows for conditional inclusion of expresions based on the migration context
+            </summary>
+        </member>
+        <member name="T:FluentMigrator.Builders.IfDatabase.IIfDatabaseExpressionRoot">
+            <summary>
+            Defines fluent expressions that can be conditionally executed
+            </summary>
+        </member>
+        <member name="F:FluentMigrator.Builders.IfDatabase.IfDatabaseExpressionRoot._context">
+            <summary>
+            The context to add expressions into
+            </summary>
+            <remarks>If the database type doe snot apply then this will be a new context that is not used by the caller</remarks>
+        </member>
+        <member name="M:FluentMigrator.Builders.IfDatabase.IfDatabaseExpressionRoot.#ctor(FluentMigrator.Infrastructure.IMigrationContext,System.String[])">
+            <summary>
+            Constricts a new instance of a <see cref="T:FluentMigrator.Builders.IfDatabase.IfDatabaseExpressionRoot"/> that will only add expressions to the provided <see cref="!:context"/> if <see cref="!:databaseType"/> matches the migration processor
+            </summary>
+            <remarks>If the database type does not apply then a <seealso cref="T:FluentMigrator.Builders.IfDatabase.NullIfDatabaseProcessor"/> will be used as a container to void any fluent expressions that would have been executed</remarks>
+            <param name="context">The context to add expressions to if the database type applies</param>
+            <param name="databaseType">The database type that the expressions relate to</param>
+        </member>
+        <member name="M:FluentMigrator.Builders.IfDatabase.IfDatabaseExpressionRoot.DatabaseTypeApplies(FluentMigrator.Infrastructure.IMigrationContext,System.String[])">
+            <summary>
+            Checks if the database type matches the name of the context migration processor
+            </summary>
+            <param name="context">The context to evaluate</param>
+            <param name="databaseType">The type to be checked</param>
+            <returns><c>True</c> if the database type applies, <c>False</c> if not</returns>
+        </member>
+        <member name="P:FluentMigrator.Builders.IfDatabase.IfDatabaseExpressionRoot.Alter">
+            <summary>
+            Alter the schema of an existing object
+            </summary>
+        </member>
+        <member name="P:FluentMigrator.Builders.IfDatabase.IfDatabaseExpressionRoot.Create">
+            <summary>
+            Create a new database object
+            </summary>
+        </member>
+        <member name="P:FluentMigrator.Builders.IfDatabase.IfDatabaseExpressionRoot.Delete">
+            <summary>
+            Delete a database object, table, or row
+            </summary>
+        </member>
+        <member name="P:FluentMigrator.Builders.IfDatabase.IfDatabaseExpressionRoot.Rename">
+            <summary>
+            Rename tables / columns
+            </summary>
+        </member>
+        <member name="P:FluentMigrator.Builders.IfDatabase.IfDatabaseExpressionRoot.Insert">
+            <summary>
+            Insert data into a table
+            </summary>
+        </member>
+        <member name="P:FluentMigrator.Builders.IfDatabase.IfDatabaseExpressionRoot.Execute">
+            <summary>
+            Execute SQL statements
+            </summary>
+        </member>
+        <member name="P:FluentMigrator.Builders.IfDatabase.IfDatabaseExpressionRoot.Update">
+            <summary>
+            Update an existing row
+            </summary>
+        </member>
+        <member name="T:FluentMigrator.Builders.IfDatabase.NullIfDatabaseProcessor">
+            <summary>
+            Provides a null implmentation of a procesor that does not do any work
+            </summary>
+        </member>
+        <member name="M:FluentMigrator.Expressions.CreateConstraintExpression.#ctor(FluentMigrator.Model.ConstraintType)">
+            <summary>
+            Initializes a new instance of the <see cref="T:CreateConstraintExpression"/> class.
+            </summary>
+        </member>
+        <member name="M:FluentMigrator.Expressions.DeleteConstraintExpression.#ctor(FluentMigrator.Model.ConstraintType)">
+            <summary>
+            Initializes a new instance of the <see cref="T:DeleteConstraintExpression"/> class.
+            </summary>
+        </member>
+        <member name="P:FluentMigrator.IMigration.ApplicationContext">
+            <summary>The arbitrary application context passed to the task runner.</summary>
+        </member>
+        <member name="P:FluentMigrator.MigrationBase.ApplicationContext">
+            <summary>The arbitrary application context passed to the task runner.</summary>
+        </member>
+        <member name="M:FluentMigrator.Model.ConstraintDefinition.#ctor(FluentMigrator.Model.ConstraintType)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ConstraintDefinition"/> class.
+            </summary>
+        </member>
+        <member name="T:FluentMigrator.TagsAttribute">
+            <summary>
+             Used to filter which migrations are run.
+            </summary>
+        </member>
+        <member name="M:FluentMigrator.Builders.Delete.IDeleteExpressionRoot.Index(System.String)">
+            <summary>
+            Deletes an index
+            </summary>
+            <param name="indexName">the name of the index</param>
+            <returns></returns>
+        </member>
+        <member name="M:FluentMigrator.Builders.Delete.IDeleteExpressionRoot.Index">
+            <summary>
+            Deletes an index, based on the naming convention in effect
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:FluentMigrator.Builders.Delete.IDeleteExpressionRoot.PrimaryKey(System.String)">
+            <summary>
+            Deletes a named Primary Key from a table
+            </summary>
+            <param name="primaryKeyName"></param>
+            <returns></returns>
+        </member>
+        <member name="M:FluentMigrator.Builders.Delete.IDeleteExpressionRoot.UniqueConstraint(System.String)">
+            <summary>
+            Deletes a named Unique Constraint From a table
+            </summary>
+            <param name="constraintName"></param>
+            <returns></returns>
+        </member>
+        <member name="P:FluentMigrator.Infrastructure.IMigrationContext.ApplicationContext">
+            <summary>The arbitrary application context passed to the task runner.</summary>
+        </member>
+        <member name="P:FluentMigrator.Infrastructure.MigrationContext.ApplicationContext">
+            <summary>The arbitrary application context passed to the task runner.</summary>
+        </member>
+    </members>
+</doc>
