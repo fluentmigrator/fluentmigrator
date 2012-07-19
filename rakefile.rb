@@ -39,7 +39,8 @@ namespace :build do
       
       desc "build the console app for target .NET Framework version ${v}"
       task "console-#{v}-#{p}" => [:release, "compile-console-#{v}-#{p}", "dist/console-#{v}-#{p}"] do
-        cp_r FileList['src/FluentMigrator.Console/bin/Release/*'], "dist/console-#{v}-#{p}"
+	    cp_r FileList['lib/Postgres/*', 'lib/MySql.Data.dll', 'lib/Oracle.DataAccess.dll', 'lib/System.Data.SQLite.dll', 'lib/SQLServerCE4/Private/*'], "dist/console-#{v}-#{p}"
+        cp_r FileList['src/FluentMigrator.Console/bin/Release/*'].exclude('src/FluentMigrator.Console/bin/Release/SQLServerCENative'), "dist/console-#{v}-#{p}"
         cp_r FileList['src/FluentMigrator.Nant/bin/Release/FluentMigrator.Nant.*'], "dist/console-#{v}-#{p}"
         cp_r FileList['src/FluentMigrator.MSBuild/bin/Release/FluentMigrator.MSBuild.*'], "dist/console-#{v}-#{p}"
 		
