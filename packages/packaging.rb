@@ -41,9 +41,14 @@ end
 
 def prepare_tools_package
   output_directory_tools = './packages/FluentMigrator.Tools/tools/'
-  
+  output_directory_content = './packages/FluentMigrator.Tools/content/'
+
+  FileUtils.mkdir_p output_directory_content
   FileUtils.mkdir_p output_directory_tools
 
+  copy_files './packages/', output_directory_tools, 'install', ['ps1']
+  copy_files './packages/', output_directory_content, 'InstallationDummyFile', ['txt']
+  
   @platforms.each do |p|
     FileUtils.mkdir_p output_directory_tools + p + '/'
     @versions.each do |v|
@@ -93,6 +98,7 @@ namespace :nuget do
      nuspec.projectUrl = "https://github.com/schambers/fluentmigrator/wiki/"
      nuspec.working_directory = "packages/FluentMigrator.Tools"
      nuspec.output_file = "FluentMigrator.Tools.nuspec"
+	 nuspec.dependency "FluentMigrator", new_version
   end
 
   @platforms = ['x86', 'AnyCPU']
