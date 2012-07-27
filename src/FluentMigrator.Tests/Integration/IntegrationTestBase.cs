@@ -31,6 +31,9 @@ using Npgsql;
 using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Generators.MySql;
+using FirebirdSql.Data.FirebirdClient;
+using FluentMigrator.Runner.Processors.Firebird;
+using FluentMigrator.Runner.Generators.Firebird;
 
 namespace FluentMigrator.Tests.Integration
 {
@@ -62,6 +65,9 @@ namespace FluentMigrator.Tests.Integration
 
             if (exceptProcessors.Count(t => typeof(PostgresProcessor).IsAssignableFrom(t)) == 0)
                 ExecuteWithPostgres(test, IntegrationTestOptions.Postgres, tryRollback);
+
+            if (exceptProcessors.Count(t => typeof(FirebirdProcessor).IsAssignableFrom(t)) == 0)
+                ExecuteWithFirebird(test, IntegrationTestOptions.Firebird);
         }
 
         protected static void ExecuteWithSqlServer2008(Action<IMigrationProcessor> test, bool tryRollback)
@@ -151,6 +157,46 @@ namespace FluentMigrator.Tests.Integration
             {
                 var processor = new MySqlProcessor(connection, new MySqlGenerator(), announcer, new ProcessorOptions(), new MySqlDbFactory());
                 test(processor);
+            }
+        }
+
+        protected static void ExecuteWithFirebird(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
+        {
+            if (!serverOptions.IsEnabled)
+                return;
+
+            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            announcer.ShowSql = true;
+            announcer.Heading("Testing Migration against Firebird Server");
+            
+            if (!System.IO.File.Exists("fbtest.fdb"))
+            {
+                FbConnection.CreateDatabase(serverOptions.ConnectionString);
+            }
+
+            using (var connection = new FbConnection(serverOptions.ConnectionString))
+            {
+                var options = FirebirdOptions.AutoCommitBehaviour();
+                var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer, new ProcessorOptions(), new PostgresDbFactory(), options);
+
+                try
+                {
+                    test(processor);
+                }
+                catch (Exception e)
+                {
+                    if(!processor.WasCommitted)
+                        processor.RollbackTransaction();
+                    throw e;
+                }
+
+
+                if (!processor.WasCommitted)
+                {
+                    processor.RollbackTransaction();
+                }
+
+                connection.Close();
             }
         }
     }
