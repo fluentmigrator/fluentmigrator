@@ -449,5 +449,28 @@ namespace FluentMigrator.Tests.Integration.Processors
             Processor.SequenceExists("", "", "DoesNotExist").ShouldBeFalse();
         }
 
+        [Test]
+        public void CanCreateTrigger()
+        {
+            using (var table = new FirebirdTestTable(Processor, null, "id int"))
+            {
+                Processor.Process(Processor.CreateTriggerExpression(table.Name, "TestTrigger", true, TriggerEvent.Insert, "as begin end"));
+                Processor.TriggerExists(String.Empty, table.Name, "TestTrigger").ShouldBeTrue();
+            }
+        }
+
+        [Test]
+        public void CanDropTrigger()
+        {
+            using (var table = new FirebirdTestTable(Processor, null, "id int"))
+            {
+                Processor.Process(Processor.CreateTriggerExpression(table.Name, "TestTrigger", true, TriggerEvent.Insert, "as begin end"));
+                Processor.TriggerExists(String.Empty, table.Name, "TestTrigger").ShouldBeTrue();
+
+                Processor.Process(Processor.DeleteTriggerExpression(table.Name, "TestTrigger"));
+                Processor.TriggerExists(String.Empty, table.Name, "TestTrigger").ShouldBeFalse();
+            }
+        }
+
     }
 }

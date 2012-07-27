@@ -84,6 +84,12 @@ namespace FluentMigrator.Runner.Processors.Firebird
             return Exists("select rdb$generator_name from rdb$generators where rdb$generator_name = '{0}'", FormatToSafeName(sequenceName));
         }
 
+        public virtual bool TriggerExists(string schemaName, string tableName, string triggerName)
+        {
+            CheckTable(tableName);
+            return Exists("select rdb$trigger_name from rdb$triggers where (rdb$relation_name = '{0}') and (rdb$trigger_name = '{1}')", FormatToSafeName(tableName), FormatToSafeName(triggerName));
+        }
+
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             CheckTable(tableName);
@@ -874,7 +880,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             {
                 string triggerSql = String.Format(@"CREATE TRIGGER {0} FOR {1} ACTIVE {2} {3} POSITION 0 
                     {4}
-                    ", triggerName, "\"" + tableName + "\"",
+                    ", quoter.Quote(triggerName), "\"" + tableName + "\"",
                      onBefore ? "before" : "after",
                      onEvent.ToString().ToLower(),
                      triggerBody
@@ -896,7 +902,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             PerformDBOperationExpression deleteTrigger = new PerformDBOperationExpression();
             deleteTrigger.Operation = (connection, transaction) =>
             {
-                string triggerSql = String.Format("DROP TRIGGER {0}", triggerName);
+                string triggerSql = String.Format("DROP TRIGGER {0}", quoter.Quote(triggerName));
                 Announcer.Sql(triggerSql);
                 using (var cmd = Factory.CreateCommand(triggerSql, connection, transaction))
                 {
