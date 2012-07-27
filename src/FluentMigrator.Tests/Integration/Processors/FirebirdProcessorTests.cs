@@ -473,5 +473,163 @@ namespace FluentMigrator.Tests.Integration.Processors
             }
         }
 
+        [Test]
+        public void IdentityCanCreateIdentityColumn()
+        {
+            using (var table = new FirebirdTestTable(Processor, null, "bogus int"))
+            {
+                Processor.Process(new CreateColumnExpression()
+                {
+                    TableName = table.Name,
+                    Column = { Name = "id", IsIdentity = true, Type = DbType.Int64 }
+                });
+                Processor.ColumnExists(String.Empty, table.Name, "id").ShouldBeTrue();
+                Processor.SequenceExists(String.Empty, table.Name, String.Format("gen_{0}_id", table.Name)).ShouldBeTrue();
+                Processor.TriggerExists(String.Empty, table.Name, String.Format("gen_id_{0}_id", table.Name)).ShouldBeTrue();
+            }
+        }
+
+        [Test]
+        public void IdentityCanDropIdentityColumn()
+        {
+            using (var table = new FirebirdTestTable(Processor, null, "bogus int"))
+            {
+                Processor.Process(new CreateColumnExpression()
+                {
+                    TableName = table.Name,
+                    Column = { Name = "id", IsIdentity = true, Type = DbType.Int64 }
+                });
+                Processor.ColumnExists(String.Empty, table.Name, "id").ShouldBeTrue();
+                Processor.SequenceExists(String.Empty, table.Name, String.Format("gen_{0}_id", table.Name)).ShouldBeTrue();
+                Processor.TriggerExists(String.Empty, table.Name, String.Format("gen_id_{0}_id", table.Name)).ShouldBeTrue();
+
+                Processor.Process(new DeleteColumnExpression()
+                {
+                    TableName = table.Name,
+                    ColumnNames = { "id" }
+                });
+                Processor.ColumnExists(String.Empty, table.Name, "id").ShouldBeFalse();
+                Processor.SequenceExists(String.Empty, table.Name, String.Format("gen_{0}_id", table.Name)).ShouldBeFalse();
+                Processor.TriggerExists(String.Empty, table.Name, String.Format("gen_id_{0}_id", table.Name)).ShouldBeFalse();
+            }
+        }
+
+        [Test]
+        public void IdentityCanAlterColumnToIdentity()
+        {
+            using (var table = new FirebirdTestTable(Processor, null, "bogus int"))
+            {
+                Processor.Process(new CreateColumnExpression()
+                {
+                    TableName = table.Name,
+                    Column = { Name = "id", IsIdentity = false, Type = DbType.Int64 }
+                });
+                Processor.ColumnExists(String.Empty, table.Name, "id").ShouldBeTrue();
+                Processor.SequenceExists(String.Empty, table.Name, String.Format("gen_{0}_id", table.Name)).ShouldBeFalse();
+                Processor.TriggerExists(String.Empty, table.Name, String.Format("gen_id_{0}_id", table.Name)).ShouldBeFalse();
+
+                Processor.Process(new AlterColumnExpression()
+                {
+                    TableName = table.Name,
+                    Column = { Name = "id", IsIdentity = true, Type = DbType.Int64 }
+                });
+                Processor.ColumnExists(String.Empty, table.Name, "id").ShouldBeTrue();
+                Processor.SequenceExists(String.Empty, table.Name, String.Format("gen_{0}_id", table.Name)).ShouldBeTrue();
+                Processor.TriggerExists(String.Empty, table.Name, String.Format("gen_id_{0}_id", table.Name)).ShouldBeTrue();
+            }
+        }
+
+        [Test]
+        public void IdentityCanAlterColumnToNotIdentity()
+        {
+            using (var table = new FirebirdTestTable(Processor, null, "bogus int"))
+            {
+                Processor.Process(new CreateColumnExpression()
+                {
+                    TableName = table.Name,
+                    Column = { Name = "id", IsIdentity = true, Type = DbType.Int64 }
+                });
+                Processor.ColumnExists(String.Empty, table.Name, "id").ShouldBeTrue();
+                Processor.SequenceExists(String.Empty, table.Name, String.Format("gen_{0}_id", table.Name)).ShouldBeTrue();
+                Processor.TriggerExists(String.Empty, table.Name, String.Format("gen_id_{0}_id", table.Name)).ShouldBeTrue();
+
+                Processor.Process(new AlterColumnExpression()
+                {
+                    TableName = table.Name,
+                    Column = { Name = "id", IsIdentity = false, Type = DbType.Int64 }
+                });
+                Processor.ColumnExists(String.Empty, table.Name, "id").ShouldBeTrue();
+                Processor.SequenceExists(String.Empty, table.Name, String.Format("gen_{0}_id", table.Name)).ShouldBeFalse();
+                Processor.TriggerExists(String.Empty, table.Name, String.Format("gen_id_{0}_id", table.Name)).ShouldBeFalse();
+            }
+        }
+
+        [Test]
+        public void IdentityCanInsert()
+        {
+            using (var table = new FirebirdTestTable(Processor, null, "bogus int"))
+            {
+                Processor.Process(new CreateColumnExpression()
+                {
+                    TableName = table.Name,
+                    Column = { Name = "id", IsIdentity = true, Type = DbType.Int64, IsPrimaryKey = true }
+                });
+
+                InsertDataExpression insert = new InsertDataExpression() { TableName = table.Name };
+                Model.InsertionDataDefinition item = new Model.InsertionDataDefinition();
+                item.Add(new System.Collections.Generic.KeyValuePair<string, object>("BOGUS", 0));
+                insert.Rows.Add(item);
+                Processor.Process(insert);
+
+                using (DataSet ds = Processor.ReadTableData(String.Empty, table.Name))
+                {
+                    ds.Tables.Count.ShouldBe(1);
+                    ds.Tables[0].Rows.Count.ShouldBe(1);
+                    ds.Tables[0].Rows[0]["BOGUS"].ShouldBe(0);
+                    ds.Tables[0].Rows[0]["id"].ShouldBe(1);
+                }
+                
+            }
+        }
+
+        [Test]
+        public void IdentityCanInsertMultiple()
+        {
+            using (var table = new FirebirdTestTable(Processor, null, "bogus int"))
+            {
+                Processor.Process(new CreateColumnExpression()
+                {
+                    TableName = table.Name,
+                    Column = { Name = "id", IsIdentity = true, Type = DbType.Int64, IsPrimaryKey = true }
+                });
+
+                InsertDataExpression insert = new InsertDataExpression() { TableName = table.Name };
+                Model.InsertionDataDefinition item = new Model.InsertionDataDefinition();
+                item.Add(new System.Collections.Generic.KeyValuePair<string, object>("BOGUS", 0));
+                insert.Rows.Add(item);
+
+                //Process 5 times = insert 5 times
+                Processor.Process(insert);
+                Processor.Process(insert);
+                Processor.Process(insert);
+                Processor.Process(insert);
+                Processor.Process(insert);
+
+                using (DataSet ds = Processor.ReadTableData(String.Empty, table.Name))
+                {
+                    ds.Tables.Count.ShouldBe(1);
+                    ds.Tables[0].Rows.Count.ShouldBe(5);
+                    ds.Tables[0].Rows[0]["BOGUS"].ShouldBe(0);
+                    ds.Tables[0].Rows[0]["id"].ShouldBe(1);
+                    ds.Tables[0].Rows[1]["id"].ShouldBe(2);
+                    ds.Tables[0].Rows[2]["id"].ShouldBe(3);
+                    ds.Tables[0].Rows[3]["id"].ShouldBe(4);
+                    ds.Tables[0].Rows[4]["id"].ShouldBe(5);
+                }
+
+            }
+        }
+
+
     }
 }

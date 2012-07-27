@@ -472,6 +472,21 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 RegisterExpression(fbExpression);
                 InternalProcess((Generator as FirebirdGenerator).GenerateSetType(expression.Column));
             }
+
+            bool identitySequenceExists = SequenceExists(String.Empty, expression.TableName, GetSequenceName(expression.TableName, expression.Column.Name));
+            
+            //Adjust identity generators
+            if (expression.Column.IsIdentity)
+            {
+                if (!identitySequenceExists)
+                    CreateSequenceForIdentity(expression.TableName, expression.Column.Name);
+            }
+            else
+            {
+                if (identitySequenceExists)
+                    DeleteSequenceForIdentity(expression.TableName, expression.Column.Name);
+            }
+            
         }
 
         public override void Process(Expressions.RenameColumnExpression expression)
@@ -488,6 +503,13 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             CheckColumn(expression.TableName, expression.ColumnNames);
             LockColumn(expression.TableName, expression.ColumnNames);
+            foreach (string columnName in expression.ColumnNames)
+            {
+                if (SequenceExists(String.Empty, expression.TableName, GetSequenceName(expression.TableName, columnName)))
+                {
+                    DeleteSequenceForIdentity(expression.TableName, columnName);
+                }
+            }
             RegisterExpression<DeleteColumnExpression>(expression);
             InternalProcess(Generator.Generate(expression));
         }
