@@ -123,10 +123,12 @@ namespace FluentMigrator.NAnt
             catch (ProcessorFactoryNotFoundException ex)
             {
                 announcer.Error("While executing migrations the following error was encountered: {0}", ex.Message);
+            	throw;
             }
             catch (Exception e)
             {
                 announcer.Error("While executing migrations the following error was encountered: {0}, {1}", e.Message, e.StackTrace);
+            	throw;
             }
             finally
             {
