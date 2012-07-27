@@ -5,15 +5,20 @@ using System.Text;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Model;
+using System.Security.Cryptography;
 
 namespace FluentMigrator.Runner.Generators.Firebird
 {
     public class FirebirdTruncator
     {
         private readonly bool enabled;
-        public FirebirdTruncator(bool enabled)
+        private readonly bool packKeyNames;
+
+        public FirebirdTruncator(bool enabled) : this(enabled, true) { }
+        public FirebirdTruncator(bool enabled, bool packKeyNames)
         {
             this.enabled = enabled;
+            this.packKeyNames = packKeyNames;
         }
         
         public void Truncate(CreateSchemaExpression expression) { }
@@ -47,7 +52,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             column.Name = Truncate(column.Name);
             column.TableName = Truncate(column.TableName);
             if (column.IsPrimaryKey)
-                column.PrimaryKeyName = Truncate(column.PrimaryKeyName);
+                column.PrimaryKeyName = packKeyNames ? Pack(column.PrimaryKeyName) : Truncate(column.PrimaryKeyName);
         }
 
         public void Truncate(CreateColumnExpression expression)
@@ -78,7 +83,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public void Truncate(IndexDefinition index)
         {
             index.TableName = Truncate(index.TableName);
-            index.Name = Truncate(index.Name);
+            index.Name = packKeyNames ? Pack(index.Name) : Truncate(index.Name);
             index.Columns.ToList().ForEach(x => x.Name = Truncate(x.Name));
         }
 
@@ -96,7 +101,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public void Truncate(ConstraintDefinition constraint)
         {
             constraint.TableName = Truncate(constraint.TableName);
-            constraint.ConstraintName = Truncate(constraint.ConstraintName);
+            constraint.ConstraintName = packKeyNames ? Pack(constraint.ConstraintName) : Truncate(constraint.ConstraintName);
             constraint.Columns = TruncateNames(constraint.Columns);
         }
 
@@ -112,7 +117,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
         public void Truncate(ForeignKeyDefinition foreignKey)
         {
-            foreignKey.Name = Truncate(foreignKey.Name);
+            foreignKey.Name = packKeyNames ? Pack(foreignKey.Name) : Truncate(foreignKey.Name);
             foreignKey.PrimaryTable = Truncate(foreignKey.PrimaryTable);
             foreignKey.PrimaryColumns = TruncateNames(foreignKey.PrimaryColumns);
             foreignKey.ForeignTable = Truncate(foreignKey.ForeignTable);
@@ -239,10 +244,38 @@ namespace FluentMigrator.Runner.Generators.Firebird
                 {
                     if (!enabled)
                         throw new ArgumentException(String.Format("Name too long: {0}", name));
+
                     return name.Substring(0, Math.Min(FirebirdOptions.MaxNameLength, name.Length));
                 }
             }
             return name;
+        }
+
+        public string Pack(string name)
+        {
+            if (!String.IsNullOrEmpty(name))
+            {
+                if (name.Length > FirebirdOptions.MaxNameLength)
+                {
+                    if (!enabled)
+                        throw new ArgumentException(String.Format("Name too long: {0}", name));
+
+                    byte[] byteHash = MD5.Create().ComputeHash(System.Text.Encoding.ASCII.GetBytes(name));
+                    string hash = Convert.ToBase64String(byteHash);
+                    StringBuilder sb = new StringBuilder(hash.Length);
+                    int hLength = hash.Length; 
+                    for (int i = 0; i < hLength; i++)
+                    {
+                        char c = hash[i];
+                        if ((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') || (c >= '0' && c <= '9'))
+                            sb.Append(c);
+                    }
+                    hash = sb.ToString();
+                    return String.Format("fk_{0}", hash.Substring(0, Math.Min(28, hash.Length)));
+                }
+            }
+            return name;
+            
         }
         #endregion
     }
