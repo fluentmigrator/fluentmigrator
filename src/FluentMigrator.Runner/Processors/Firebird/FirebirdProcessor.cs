@@ -816,8 +816,16 @@ namespace FluentMigrator.Runner.Processors.Firebird
                         message.WriteLine(sql);
                         message.WriteLine("The error was {0}", ex.Message);
 
-                        if (FBOptions.TransactionModel != FirebirdTransactionModel.None)
-                            RollbackTransaction();
+                        try
+                        {
+                            if (FBOptions.TransactionModel != FirebirdTransactionModel.None)
+                                RollbackTransaction();
+                        }
+                        catch (Exception e)
+                        {
+                            message.WriteLine("---");
+                            message.WriteLine(e.ToString());
+                        }
 
                         throw new Exception(message.ToString(), ex);
                     }
