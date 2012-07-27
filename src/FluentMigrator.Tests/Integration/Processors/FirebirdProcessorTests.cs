@@ -7,6 +7,8 @@ using NUnit.Should;
 using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Processors.Firebird;
+using System;
+using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Tests.Integration.Processors
 {
@@ -398,6 +400,53 @@ namespace FluentMigrator.Tests.Integration.Processors
                     ds.Tables[0].Rows[2][0].ShouldBe(2);
                 }
             }
+        }
+
+        [Test]
+        public void CanCreateAndDropSequenceWithExistCheck()
+        {
+            using (var table = new FirebirdTestTable(Processor, null, "id int"))
+            {
+                Processor.Process(new CreateSequenceExpression()
+                {
+                    Sequence = { Name = "Sequence" }
+                });
+
+                Processor.SequenceExists("", "", "Sequence").ShouldBeTrue();
+                
+                Processor.Process(new DeleteSequenceExpression() { SequenceName = "Sequence" });
+
+                Processor.SequenceExists("", "", "Sequence").ShouldBeFalse();
+            }
+        }
+
+        [Test]
+        public void CanAlterSequence()
+        {
+            using (var table = new FirebirdTestTable(Processor, null, "id int"))
+            {
+                Processor.Process(new CreateSequenceExpression()
+                {
+                    Sequence = { Name = "Sequence", StartWith = 6 }
+                });
+
+                using (DataSet ds = Processor.Read("SELECT GEN_ID(\"Sequence\", 1) as generated_value FROM RDB$DATABASE"))
+                {
+                    ds.Tables[0].ShouldNotBeNull();
+                    ds.Tables[0].Rows[0].ShouldNotBeNull();
+                    ds.Tables[0].Rows[0]["generated_value"].ShouldBe(7);
+                }
+
+                Processor.Process(new DeleteSequenceExpression() { SequenceName = "Sequence" });
+
+                Processor.SequenceExists(String.Empty, table.Name, "Sequence").ShouldBeFalse();
+            }
+        }
+
+        [Test]
+        public void CallingSequenceExistsReturnsFalseIfSequenceNotExist()
+        {
+            Processor.SequenceExists("", "", "DoesNotExist").ShouldBeFalse();
         }
 
     }

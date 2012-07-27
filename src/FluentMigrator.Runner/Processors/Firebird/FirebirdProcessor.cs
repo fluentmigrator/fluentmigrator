@@ -666,6 +666,10 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             RegisterExpression<CreateSequenceExpression>(expression);
             InternalProcess(Generator.Generate(expression));
+
+            if (expression.Sequence.StartWith != null)
+                InternalProcess((Generator as FirebirdGenerator).GenerateAlterSequence(expression.Sequence));
+
         }
 
         public override void Process(DeleteSequenceExpression expression)
