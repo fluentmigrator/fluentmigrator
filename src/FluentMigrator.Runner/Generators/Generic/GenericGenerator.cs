@@ -212,6 +212,9 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(DeleteForeignKeyExpression expression)
         {
+            if (expression.ForeignKey.ForeignTable == null)
+                throw new ArgumentNullException("Table name not specified, ensure you have appended the OnTable extension. Format should be Delete.ForeignKey(KeyName).OnTable(TableName)");
+
             return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.ForeignKey.ForeignTable), Quoter.QuoteColumnName(expression.ForeignKey.Name));
         }
 
