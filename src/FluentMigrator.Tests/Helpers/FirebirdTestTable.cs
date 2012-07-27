@@ -40,7 +40,8 @@ namespace FluentMigrator.Tests.Helpers
 
         public void Dispose()
         {
-            Drop();
+            if(Connection.State == System.Data.ConnectionState.Open && !processor.WasCommitted)
+                Drop();
         }
 
         public void Create(IEnumerable<string> columnDefinitions)

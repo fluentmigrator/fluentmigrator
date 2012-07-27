@@ -34,7 +34,8 @@ namespace FluentMigrator.Tests.Integration.Processors
         [TearDown]
         public void TearDown()
         {
-            Processor.CommitTransaction();
+            if (!Processor.WasCommitted)
+                Processor.CommitTransaction();
             Connection.Close();
         }
         
