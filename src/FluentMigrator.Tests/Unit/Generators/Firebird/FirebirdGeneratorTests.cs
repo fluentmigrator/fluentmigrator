@@ -481,6 +481,27 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
+        public void CanAlterSequence()
+        {
+            var expression = new CreateSequenceExpression
+            {
+                Sequence =
+                {
+                    Cache = 10,
+                    Cycle = true,
+                    Increment = 2,
+                    MaxValue = 100,
+                    MinValue = 0,
+                    Name = "Sequence",
+                    SchemaName = "Schema",
+                    StartWith = 2
+                }
+            };
+            var sql = generator.GenerateAlterSequence(expression.Sequence);
+            sql.ShouldBe("ALTER SEQUENCE \"Sequence\" RESTART WITH 2");
+        }
+
+        [Test]
         public void CanDeleteSequence()
         {
             var expression = new DeleteSequenceExpression { SchemaName = "Schema", SequenceName = "Sequence" };
