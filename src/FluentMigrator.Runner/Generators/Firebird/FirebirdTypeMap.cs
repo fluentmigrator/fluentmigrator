@@ -20,7 +20,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             SetTypeMap(DbType.AnsiString, "BLOB SUB_TYPE TEXT");
             SetTypeMap(DbType.AnsiString, "VARCHAR($size)", FirebirdMaxVarcharSize);
             SetTypeMap(DbType.Binary, "BLOB SUB_TYPE BINARY");
-            SetTypeMap(DbType.Boolean, "CHAR(1)"); //no direct boolean support
+            SetTypeMap(DbType.Boolean, "VARCHAR(10)"); //no direct boolean support
             SetTypeMap(DbType.Byte, "SMALLINT");
             SetTypeMap(DbType.Currency, "BIGINT");
             SetTypeMap(DbType.Date, "DATE");
