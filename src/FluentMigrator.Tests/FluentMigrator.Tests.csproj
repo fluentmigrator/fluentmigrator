@@ -212,6 +212,7 @@
     <Compile Include="Unit\Builders\Schema\SchemaExpressionRootTest.cs" />
     <Compile Include="Unit\Definitions\IndexDefinitionTests.cs" />
     <Compile Include="Unit\Expressions\DeleteDefaultConstraintExpressionTests.cs" />
+    <Compile Include="Unit\Generators\GenericGenerator\GenericGeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000GeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005GeneratorTests.cs" />
     <Compile Include="Unit\Initialization\ConnectionStringManagerTests.cs">
