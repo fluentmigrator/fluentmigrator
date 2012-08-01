@@ -11,7 +11,8 @@ namespace FluentMigrator.Runner
         /// <param name="runner">The migration runner used to create the version table.</param>
         /// <param name="assembly">The assembly to scan for migrations.</param>
         /// <param name="conventions">The default rules for migration mappings.</param>
-        public IVersionLoader GetVersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions)
+        /// <param name="applicationContext">The arbitrary application context passed to the task runner.</param>
+        public IVersionLoader GetVersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions, object applicationContext)
         {
             return new VersionLoader(runner, assembly, conventions);
         }
@@ -30,7 +31,8 @@ namespace FluentMigrator.Runner
         /// <param name="assembly">The assembly to scan for migrations.</param>
         /// <param name="namespace">The namespace to scan for migrations.</param>
         /// <param name="tagsToMatch">The migration tags to match, or <c>null</c> to match all tags.</param>
-        public IMigrationLoader GetMigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, IEnumerable<string> tagsToMatch)
+        /// <param name="applicationContext">The arbitrary application context passed to the task runner.</param>
+        public IMigrationLoader GetMigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, IEnumerable<string> tagsToMatch, object applicationContext)
         {
             return new MigrationLoader(conventions, assembly, @namespace, tagsToMatch);
         }

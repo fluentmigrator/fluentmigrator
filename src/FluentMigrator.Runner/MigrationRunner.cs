@@ -57,12 +57,12 @@ namespace FluentMigrator.Runner
             SilentlyFail = false;
             CaughtExceptions = null;
 
-            Conventions = runnerContext.Factory.GetMigrationConventions();
+            Conventions = runnerContext.Factory.GetMigrationConventions(ApplicationContext);
             if (!string.IsNullOrEmpty(runnerContext.WorkingDirectory))
                 Conventions.GetWorkingDirectory = () => runnerContext.WorkingDirectory;
 
-            VersionLoader = runnerContext.Factory.GetVersionLoader(this, _migrationAssembly, Conventions);
-            MigrationLoader = runnerContext.Factory.GetMigrationLoader(Conventions, _migrationAssembly, runnerContext.Namespace, runnerContext.Tags);
+            VersionLoader = runnerContext.Factory.GetVersionLoader(this, _migrationAssembly, Conventions, ApplicationContext);
+            MigrationLoader = runnerContext.Factory.GetMigrationLoader(Conventions, _migrationAssembly, runnerContext.Namespace, runnerContext.Tags, ApplicationContext);
             ProfileLoader = runnerContext.Factory.GetProfileLoader(runnerContext, this, Conventions);
         }
 

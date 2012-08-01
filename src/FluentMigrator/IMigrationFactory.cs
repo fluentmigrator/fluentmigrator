@@ -4,6 +4,7 @@ namespace FluentMigrator
     public interface IMigrationFactory
     {
         /// <summary>Get the object which defines default rules for migration mappings.</summary>
-        IMigrationConventions GetMigrationConventions();
+        /// <param name="applicationContext">The arbitrary application context passed to the task runner.</param>
+        IMigrationConventions GetMigrationConventions(object applicationContext);
     }
 }

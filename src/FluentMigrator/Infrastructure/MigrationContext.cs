@@ -48,7 +48,7 @@ namespace FluentMigrator.Infrastructure
         public MigrationContext(IMigrationFactory factory, IQuerySchema querySchema, Assembly migrationAssembly, object context)
         {
             this.Factory = factory;
-            Conventions = factory.GetMigrationConventions();
+            Conventions = factory.GetMigrationConventions(context);
             Expressions = new List<IMigrationExpression>();
             QuerySchema = querySchema;
             MigrationAssembly = migrationAssembly;
