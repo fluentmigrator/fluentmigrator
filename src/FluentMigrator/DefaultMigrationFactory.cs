@@ -23,7 +23,7 @@ namespace FluentMigrator
     {
         /// <summary>Get an object which defines default rules for migration mappings.</summary>
         /// <param name="applicationContext">The arbitrary application context passed to the task runner.</param>
-        public IMigrationConventions GetMigrationConventions(object applicationContext)
+        public virtual IMigrationConventions GetMigrationConventions(object applicationContext)
         {
             return new MigrationConventions();
         }

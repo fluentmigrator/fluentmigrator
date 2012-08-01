@@ -62,7 +62,7 @@ namespace FluentMigrator.Runner
             }
         }
 
-        public IEnumerable<MigrationMetadata> FindMigrations()
+        public virtual IEnumerable<MigrationMetadata> FindMigrations()
         {
             IEnumerable<Type> matchedTypes = Assembly.GetExportedTypes().Where(t => Conventions.TypeIsMigration(t)
                 && (Conventions.TypeHasMatchingTags(t, TagsToMatch) || !Conventions.TypeHasTags(t)));
