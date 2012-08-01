@@ -134,6 +134,7 @@
     <Compile Include="Announcers\ConsoleAnnouncer.cs" />
     <Compile Include="Announcers\TextWriterAnnouncer.cs" />
     <Compile Include="CompatabilityMode.cs" />
+    <Compile Include="DefaultRunnerFactory.cs" />
     <Compile Include="Extensions\SqlServerExtensions.cs" />
     <Compile Include="Extensions\TagsExtensions.cs" />
     <Compile Include="Generators\Base\ColumnBase.cs" />
@@ -191,6 +192,7 @@
     <Compile Include="Initialization\TaskExecutor.cs" />
     <Compile Include="Initialization\UndeterminableConnectionException.cs" />
     <Compile Include="IProfileLoader.cs" />
+    <Compile Include="IRunnerFactory.cs" />
     <Compile Include="IVersionLoader.cs" />
     <Compile Include="Processors\Jet\JetProcessor.cs" />
     <Compile Include="Processors\Jet\JetProcessorFactory.cs" />

@@ -8,6 +8,7 @@ namespace FluentMigrator.Runner.Initialization
         {
             Announcer = announcer;
             StopWatch = new StopWatch();
+            Factory = new DefaultRunnerFactory();
         }
 
         public string Database { get; set; }
@@ -38,5 +39,8 @@ namespace FluentMigrator.Runner.Initialization
 
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         public object ApplicationContext { get; set; }
+
+        /// <summary>Constructs implementations of FluentMigrator interfaces.</summary>
+        public IRunnerFactory Factory { get; set; }
     }
 }

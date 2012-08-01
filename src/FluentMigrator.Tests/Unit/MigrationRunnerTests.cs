@@ -45,10 +45,12 @@ namespace FluentMigrator.Tests.Unit
         private SortedList<long, IMigration> _migrationList;
         private TestVersionLoader _fakeVersionLoader;
         private int _applicationContext;
+        private IRunnerFactory _runnerFactory;
 
         [SetUp]
         public void SetUp()
         {
+            _runnerFactory = new DefaultRunnerFactory();
             _applicationContext = new Random().Next();
             _migrationList = new SortedList<long, IMigration>();
             _runnerContextMock = new Mock<IRunnerContext>(MockBehavior.Loose);
@@ -65,7 +67,6 @@ namespace FluentMigrator.Tests.Unit
                             };
 
             _processorMock.SetupGet(x => x.Options).Returns(options);
-
             _runnerContextMock.SetupGet(x => x.Namespace).Returns("FluentMigrator.Tests.Integration.Migrations");
             _runnerContextMock.SetupGet(x => x.Announcer).Returns(_announcer.Object);
             _runnerContextMock.SetupGet(x => x.StopWatch).Returns(_stopWatch.Object);
@@ -73,6 +74,7 @@ namespace FluentMigrator.Tests.Unit
             _runnerContextMock.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
             _runnerContextMock.SetupGet(x => x.Database).Returns("sqlserver");
             _runnerContextMock.SetupGet(x => x.ApplicationContext).Returns(_applicationContext);
+            _runnerContextMock.SetupGet(x => x.Factory).Returns(_runnerFactory);
 
             _migrationLoaderMock.SetupGet(x => x.Migrations).Returns(_migrationList);
 

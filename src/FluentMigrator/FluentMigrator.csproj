@@ -179,6 +179,8 @@
     <Compile Include="Builders\IfDatabase\NullIfDatabaseProcessor.cs" />
     <Compile Include="Builders\IForeignKeyCascadeSyntax.cs" />
     <Compile Include="Builders\IInSchemaSyntax.cs" />
+    <Compile Include="DefaultMigrationFactory.cs" />
+    <Compile Include="IMigrationFactory.cs" />
     <Compile Include="Infrastructure\ISupportAdditionalFeatures.cs" />
     <Compile Include="Builders\Insert\IInsertDataOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Insert\IInsertDataSyntax.cs" />

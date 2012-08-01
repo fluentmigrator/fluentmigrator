@@ -32,6 +32,7 @@ namespace FluentMigrator.Runner
         private IAnnouncer _announcer;
         private IStopWatch _stopWatch;
         private bool _alreadyOutputPreviewOnlyModeWarning;
+        private IMigrationFactory _migrationFactory;
 
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         public object ApplicationContext { get; private set; }
@@ -47,6 +48,7 @@ namespace FluentMigrator.Runner
         public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
         {
             _migrationAssembly = assembly;
+            _migrationFactory = runnerContext.Factory;
             _announcer = runnerContext.Announcer;
             Processor = processor;
             _stopWatch = runnerContext.StopWatch;
@@ -55,13 +57,13 @@ namespace FluentMigrator.Runner
             SilentlyFail = false;
             CaughtExceptions = null;
 
-            Conventions = new MigrationConventions();
+            Conventions = runnerContext.Factory.GetMigrationConventions();
             if (!string.IsNullOrEmpty(runnerContext.WorkingDirectory))
                 Conventions.GetWorkingDirectory = () => runnerContext.WorkingDirectory;
 
-            VersionLoader = new VersionLoader(this, _migrationAssembly, Conventions);
-            MigrationLoader = new MigrationLoader(Conventions, _migrationAssembly, runnerContext.Namespace, runnerContext.Tags);
-            ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
+            VersionLoader = runnerContext.Factory.GetVersionLoader(this, _migrationAssembly, Conventions);
+            MigrationLoader = runnerContext.Factory.GetMigrationLoader(Conventions, _migrationAssembly, runnerContext.Namespace, runnerContext.Tags);
+            ProfileLoader = runnerContext.Factory.GetProfileLoader(runnerContext, this, Conventions);
         }
 
         public IVersionLoader VersionLoader { get; set; }
@@ -297,7 +299,7 @@ namespace FluentMigrator.Runner
 
             CaughtExceptions = new List<Exception>();
 
-            var context = new MigrationContext(Conventions, Processor, MigrationAssembly, ApplicationContext);
+            var context = new MigrationContext(Conventions, Processor, MigrationAssembly, ApplicationContext) { Factory = _migrationFactory };
             migration.GetUpExpressions(context);
 
             _stopWatch.Start();
@@ -315,7 +317,7 @@ namespace FluentMigrator.Runner
 
             CaughtExceptions = new List<Exception>();
 
-            var context = new MigrationContext(Conventions, Processor, MigrationAssembly, ApplicationContext);
+            var context = new MigrationContext(Conventions, Processor, MigrationAssembly, ApplicationContext) { Factory = _migrationFactory };
             migration.GetDownExpressions(context);
 
             _stopWatch.Start();

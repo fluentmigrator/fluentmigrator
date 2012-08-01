@@ -29,6 +29,9 @@ namespace FluentMigrator.Infrastructure
         IQuerySchema QuerySchema { get; }
         Assembly MigrationAssembly { get; set; }
 
+        /// <summary>Constructs implementations of FluentMigrator interfaces.</summary>
+        IMigrationFactory Factory { get; set; }
+
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         object ApplicationContext { get; set; }
     }
