@@ -17,29 +17,42 @@ namespace FluentMigrator.Runner
         private bool _versionUniqueMigrationAlreadyRun;
         private IVersionInfo _versionInfo;
         private IVersionTableMetaData _versionTableMetaData;
+        private IMigration _versionMigration;
+        private VersionSchemaMigration _versionSchemaMigration;
+        private IMigration _versionUniqueMigration;
 
         private IMigrationConventions Conventions { get; set; }
         private IMigrationProcessor Processor { get; set; }
         protected Assembly Assembly { get; set; }
+
+        public IMigrationRunner Runner { get; set; }
+        
         public IVersionTableMetaData VersionTableMetaData
         {
             get { return _versionTableMetaData ?? (_versionTableMetaData = this.GetVersionTableMetaData()); }
         }
-        public IMigrationRunner Runner { get; set; }
-        public VersionSchemaMigration VersionSchemaMigration { get; private set; }
-        public IMigration VersionMigration { get; private set; }
-        public IMigration VersionUniqueMigration { get; private set; }
+
+        public VersionSchemaMigration VersionSchemaMigration
+        {
+            get { return _versionSchemaMigration ?? (_versionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData)); }
+        }
+
+        public IMigration VersionMigration
+        {
+            get { return _versionMigration ?? (_versionMigration = new VersionMigration(VersionTableMetaData)); }
+        }
+        
+        public IMigration VersionUniqueMigration
+        {
+            get { return _versionUniqueMigration ?? (_versionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData)); }
+        }
         
         public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions)
         {
             Runner = runner;
             Processor = runner.Processor;
             Assembly = assembly;
-
             Conventions = conventions;
-            VersionMigration = new VersionMigration(VersionTableMetaData);
-            VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
-            VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
         }
 
         public virtual void UpdateVersionInfo(long version)
