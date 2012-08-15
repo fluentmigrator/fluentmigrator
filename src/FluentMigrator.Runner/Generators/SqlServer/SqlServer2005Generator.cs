@@ -49,7 +49,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string RenameColumn { get { return "{0}.{1}', '{2}'"; } }
         public override string RenameTable { get { return "{0}', '{1}'"; } }
 
-        public override string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3}.{4} ({5})"; } }
+        public override string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3}.{4} ({5}{6}{7})"; } }
         public override string DropIndex { get { return "DROP INDEX {0} ON {1}.{2}"; } }
 
         public override string InsertData { get { return "INSERT INTO {0}.{1} ({2}) VALUES ({3})"; } }
@@ -60,6 +60,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string CreateForeignKeyConstraint { get { return "ALTER TABLE {0}.{1} ADD CONSTRAINT {2} FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8}"; } }
         public override string CreateConstraint { get { return "{0} ADD CONSTRAINT {1} {2}{3} ({4})"; } }
         public override string DeleteConstraint { get { return "{0} DROP CONSTRAINT {1}"; } }
+
+        public virtual string GetIncludeString(CreateIndexExpression column)
+        {
+            return column.Index.Includes.Count > 0 ? ") INCLUDE (" : string.Empty;
+        }
 
         public override string Generate(CreateTableExpression expression)
         {
@@ -224,13 +229,24 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 }
             }
 
+            string[] indexIncludes = new string[expression.Index.Includes.Count];
+            IndexIncludeDefinition includeDef;
+
+            for (int i = 0; i < expression.Index.Includes.Count; i++)
+            {
+                includeDef = expression.Index.Includes.ElementAt(i);
+                indexIncludes[i] = Quoter.QuoteColumnName(includeDef.Name);
+            }
+
             return String.Format(CreateIndex
                 , GetUniqueString(expression)
                 , GetClusterTypeString(expression)
                 , Quoter.QuoteIndexName(expression.Index.Name)
                 , Quoter.QuoteSchemaName(expression.Index.SchemaName)
                 , Quoter.QuoteTableName(expression.Index.TableName)
-                , String.Join(", ", indexColumns));
+                , String.Join(", ", indexColumns)
+                , GetIncludeString(expression)
+                , String.Join(", ", indexIncludes));
         }
 
         public override string Generate(DeleteIndexExpression expression)

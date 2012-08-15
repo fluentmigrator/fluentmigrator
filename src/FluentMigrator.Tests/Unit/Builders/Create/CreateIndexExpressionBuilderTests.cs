@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Extensions;
 using Moq;
 using NUnit.Framework;
 
@@ -89,6 +90,25 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             builder.Descending();
 
             columnMock.VerifySet(c => c.Direction = Direction.Descending);
+        }
+
+        [Test]
+        public void CallingIncludeAddsNewIncludeToExpression()
+        {
+            var collectionMock = new Mock<IList<IndexIncludeDefinition>>();
+
+            var indexMock = new Mock<IndexDefinition>();
+            indexMock.Setup(x => x.Includes).Returns(collectionMock.Object);
+
+            var expressionMock = new Mock<CreateIndexExpression>();
+            expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
+
+            var builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+            builder.Include("BaconId");
+
+            collectionMock.Verify(x => x.Add(It.Is<IndexIncludeDefinition>(c => c.Name.Equals("BaconId"))));
+            indexMock.VerifyGet(x => x.Includes);
+            expressionMock.VerifyGet(e => e.Index);
         }
     }
 }

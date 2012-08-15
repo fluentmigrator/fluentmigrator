@@ -13,6 +13,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         public static string TestTableName2 = "TestTable2";
         public static string TestColumnName1 = "TestColumn1";
         public static string TestColumnName2 = "TestColumn2";
+        public static string TestColumnName3 = "TestColumn3";
         public static string TestIndexName = "TestIndex";
         public static Guid TestGuid = Guid.NewGuid();
 
@@ -121,6 +122,29 @@ namespace FluentMigrator.Tests.Unit.Generators
             expression.Index.IsUnique = true;
             expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Ascending, Name = TestColumnName1 });
             expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Descending, Name = TestColumnName2 });
+            return expression;
+        }
+
+        public static CreateIndexExpression GetCreateIncludeIndexExpression()
+        {
+            var expression = new CreateIndexExpression();
+            expression.Index.Name = TestIndexName;
+            expression.Index.TableName = TestTableName1;
+            expression.Index.IsUnique = false;
+            expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Ascending, Name = TestColumnName1 });
+            expression.Index.Includes.Add(new IndexIncludeDefinition { Name = TestColumnName2 });
+            return expression;
+        }
+
+        public static CreateIndexExpression GetCreateMultiIncludeIndexExpression()
+        {
+            var expression = new CreateIndexExpression();
+            expression.Index.Name = TestIndexName;
+            expression.Index.TableName = TestTableName1;
+            expression.Index.IsUnique = false;
+            expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Ascending, Name = TestColumnName1 });
+            expression.Index.Includes.Add(new IndexIncludeDefinition { Name = TestColumnName2 });
+            expression.Index.Includes.Add(new IndexIncludeDefinition { Name = TestColumnName3 });
             return expression;
         }
 

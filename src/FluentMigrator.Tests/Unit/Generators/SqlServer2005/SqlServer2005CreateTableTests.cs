@@ -324,6 +324,40 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
+        public void CanCreateIncludeIndexWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateIncludeIndexExpression();
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2])");
+        }
+
+        [Test]
+        public void CanCreateIncludeIndexWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateIncludeIndexExpression();
+            expression.Index.SchemaName = "TestSchema";
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2])");
+        }
+
+        [Test]
+        public void CanCreateMultiIncludeIndexWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiIncludeIndexExpression();
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2], [TestColumn3])");
+        }
+
+        [Test]
+        public void CanCreateMultiIncludeIndexWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiIncludeIndexExpression();
+            expression.Index.SchemaName = "TestSchema";
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2], [TestColumn3])");
+        }
+
+        [Test]
         public void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();

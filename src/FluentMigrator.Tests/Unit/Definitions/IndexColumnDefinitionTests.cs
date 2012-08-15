@@ -58,5 +58,29 @@ namespace FluentMigrator.Tests.Unit.Definitions
             var errors = ValidationHelper.CollectErrors(column);
             errors.ShouldNotContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }
+
+        [Test]
+        public void ErrorIsReturnedWhenIncludeNameIsNull()
+        {
+            var column = new IndexIncludeDefinition { Name = null };
+            var errors = ValidationHelper.CollectErrors(column);
+            errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
+        }
+
+        [Test]
+        public void ErrorIsReturnedWhenIncludeNameIsEmptyString()
+        {
+            var column = new IndexIncludeDefinition { Name = String.Empty };
+            var errors = ValidationHelper.CollectErrors(column);
+            errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
+        }
+
+        [Test]
+        public void ErrorIsNotReturnedWhenIncludeNameIsNotNullOrEmptyString()
+        {
+            var column = new IndexIncludeDefinition { Name = "Bacon" };
+            var errors = ValidationHelper.CollectErrors(column);
+            errors.ShouldNotContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
+        }
     }
 }

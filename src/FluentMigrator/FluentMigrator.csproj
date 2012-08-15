@@ -223,6 +223,7 @@
     <Compile Include="ForwardOnlyMigration.cs" />
     <Compile Include="MigrationBase.cs" />
     <Compile Include="Model\ConstraintDefinition.cs" />
+    <Compile Include="Model\IndexIncludeDefinition.cs" />
     <Compile Include="Model\DeletionDataDefinition.cs" />
     <Compile Include="Model\InsertionDataDefinition.cs" />
     <Compile Include="Builders\Rename\Column\IRenameColumnToSyntax.cs" />
