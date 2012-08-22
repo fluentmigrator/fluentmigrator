@@ -57,5 +57,17 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var expression = new ExecuteSqlScriptExpression { SqlScript = testSqlScript };
             expression.ToString().ShouldBe("ExecuteSqlScript testscript.sql");
         }
+
+        [Test]
+        public void CanUseScriptsOnAnotherDriveToWorkingDirectory()
+        {
+            var scriptOnAnotherDrive = "z:\\" + testSqlScript;
+            var expression = new ExecuteSqlScriptExpression { SqlScript = scriptOnAnotherDrive };
+            
+            var conventions = new MigrationConventions { GetWorkingDirectory = () => "c:\\code" };
+            expression.ApplyConventions(conventions);
+            
+            expression.SqlScript.ShouldBe(scriptOnAnotherDrive);
+        }
     }
 }
