@@ -116,5 +116,32 @@ namespace FluentMigrator.Tests.Unit.Initialization
 
             Assert.That(sut.ConnectionString, Is.EqualTo("From Machine Name"));
         }
+
+        [Test]
+        [TestCase("Server=testserver;User Id=testuser;Password=testpw;Initial Catalog=testdb;")]
+        [TestCase("Server=testserver;User Id=testuser;Initial Catalog=testdb;Password=testpw")]
+        [TestCase("Server=testserver;User Id=testuser;Initial Catalog=testdb;Pwd=testpw")]
+        [TestCase("Server=testserver;User Id=testuser;Initial Catalog=testdb;password=testpw")]
+        [TestCase("Server=testserver;User Id=testuser;Initial Catalog=testdb; pwd=testpw")]
+        public void ShouldHidePasswordWhenAnnouncingConnectionString(string connectionString)
+        {
+            string configPath = GetPath("WithWrongConnectionString.config");
+            string machineConfigPath = GetPath("FromMachineConfig.config");
+
+            configManagerMock.Setup(x => x.LoadFromFile(TARGET))
+                .Returns(LoadFromFile(configPath));
+
+            configManagerMock.Setup(x => x.LoadFromMachineConfiguration())
+                .Returns(LoadFromFile(machineConfigPath));
+
+            var announced = "";
+            announcerMock.Setup(m => m.Say(It.IsAny<string>())).Callback((string announcement) => announced = announcement);
+
+            var sut = new ConnectionStringManager(configManagerMock.Object, announcerMock.Object, connectionString, null, TARGET, DATABASE);
+
+            sut.LoadConnectionString();
+
+            Assert.That(announced, Is.Not.StringContaining("testpw"));
+        }
     }
 }
