@@ -68,7 +68,7 @@ foreach(Table tbl in from t in tables where !t.Ignore select t)
 {
 #>
 			//For <#=tbl.Name#>
-			Create.Table("<#=tbl.Name#>")<#if (string.IsNullOrEmpty(tbl.Schema) == false ){#>.InSchema(<#=tbl.Schema#>)<#}#> 
+			Create.Table("<#=tbl.Name#>")<#if (string.IsNullOrEmpty(tbl.Schema) == false ){#>.InSchema("<#=tbl.Schema#>")<#}#> 
 <#
 	var ColumnList = from c in tbl.Columns where !c.Ignore select c;
 foreach(Column col in ColumnList)

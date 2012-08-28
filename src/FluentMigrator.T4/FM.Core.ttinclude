@@ -590,7 +590,7 @@ public string GetMigrationTypeFunctionForType(string type, int size,int precisio
                 sysType=  "AsDecimal("+sizeStr + precisionStr+")";
                  break;
             case "bool":
-                sysType=  "AsBool()";
+                sysType=  "AsBoolean()";
                    break;
             case "byte[]":
                 sysType=  "AsBinary("+sizeStr+")";
@@ -670,6 +670,8 @@ class SqlServerSchemaReader : SchemaReader
         foreach (var tbl in result)
         {
             tbl.Columns=LoadColumns(tbl);
+			tbl.Indices = LoadIndices(tbl.Name);
+			tbl.FKeys = LoadFKeys(tbl.Name);			
                     
             // Mark the primary key
             string PrimaryKey=GetPK(tbl.Name);
@@ -727,6 +729,18 @@ class SqlServerSchemaReader : SchemaReader
         }
     }
 
+    List<TableIndex> LoadIndices(string tableName)
+    {
+		var result=new List<TableIndex>();
+		return result;
+	}
+
+    List<FKey> LoadFKeys(string tblName)
+    {
+        var result=new List<FKey>();
+		return result;		
+	}
+	
     string GetPK(string table){
         
         string sql=@"SELECT c.name AS ColumnName
@@ -871,6 +885,8 @@ class SqlServerCeSchemaReader : SchemaReader
         foreach (var tbl in result)
         {
             tbl.Columns=LoadColumns(tbl);
+			tbl.Indices = LoadIndices(tbl.Name);
+			tbl.FKeys = LoadFKeys(tbl.Name);			
                     
             // Mark the primary key
             string PrimaryKey=GetPK(tbl.Name);
@@ -920,6 +936,18 @@ class SqlServerCeSchemaReader : SchemaReader
             return result;
         }
     }
+	
+    List<TableIndex> LoadIndices(string tableName)
+    {
+		var result=new List<TableIndex>();
+		return result;
+	}
+
+    List<FKey> LoadFKeys(string tblName)
+    {
+        var result=new List<FKey>();
+		return result;		
+	}	
 
     string GetPK(string table){
         
@@ -1059,7 +1087,9 @@ class PostGreSqlSchemaReader : SchemaReader
         foreach (var tbl in result)
         {
             tbl.Columns=LoadColumns(tbl);
-                    
+			tbl.Indices = LoadIndices(tbl.Name);
+			tbl.FKeys = LoadFKeys(tbl.Name);
+			
             // Mark the primary key
             string PrimaryKey=GetPK(tbl.Name);
             var pkColumn=tbl.Columns.SingleOrDefault(x=>x.Name.ToLower().Trim()==PrimaryKey.ToLower().Trim());
@@ -1109,6 +1139,18 @@ class PostGreSqlSchemaReader : SchemaReader
         }
     }
 
+    List<TableIndex> LoadIndices(string tableName)
+    {
+		var result=new List<TableIndex>();
+		return result;
+	}
+
+    List<FKey> LoadFKeys(string tblName)
+    {
+        var result=new List<FKey>();
+		return result;		
+	}
+	
     string GetPK(string table){
         
         string sql=@"SELECT kcu.column_name 
@@ -1362,7 +1404,9 @@ class OracleSchemaReader : SchemaReader
         foreach (var tbl in result)
         {
             tbl.Columns=LoadColumns(tbl);
-                    
+			tbl.Indices = LoadIndices(tbl.Name);
+			tbl.FKeys = LoadFKeys(tbl.Name);
+			
             // Mark the primary key
             string PrimaryKey=GetPK(tbl.Name);
             var pkColumn=tbl.Columns.SingleOrDefault(x=>x.Name.ToLower().Trim()==PrimaryKey.ToLower().Trim());
@@ -1412,7 +1456,19 @@ class OracleSchemaReader : SchemaReader
             return result;
         }
     }
+    
+	List<TableIndex> LoadIndices(string tableName)
+    {
+		var result=new List<TableIndex>();
+		return result;
+	}
 
+    List<FKey> LoadFKeys(string tblName)
+    {
+        var result=new List<FKey>();
+		return result;		
+	}
+	
     string GetPK(string table){
         
         string sql=@"select column_name from USER_CONSTRAINTS uc
@@ -1584,6 +1640,7 @@ class SqliteSchemaReader : SchemaReader
         }
     }
 
+			
     List<TableIndex> LoadIndices(string tableName)
     {
 		var result=new List<TableIndex>();
