@@ -3,17 +3,25 @@ using FluentMigrator.Builders;
 using FluentMigrator.Builders.Alter.Column;
 using FluentMigrator.Builders.Alter.Table;
 using FluentMigrator.Builders.Create.Column;
+using FluentMigrator.Builders.Create.Constraint;
 using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Runner.Extensions
 {
+    public enum SqlServerConstraintType
+    {
+        Clustered,
+        NonClustered
+    }
+
     public static class SqlServerExtensions
     {
         public const string IdentityInsert = "SqlServerIdentityInsert";
         public const string IdentitySeed = "SqlServerIdentitySeed";
         public const string IdentityIncrement = "SqlServerIdentityIncrement";
+        public const string ConstraintType = "SqlServerConstraintType";
 
         /// <summary>
         /// Inserts data using Sql Server's IDENTITY INSERT feature.
@@ -47,6 +55,26 @@ namespace FluentMigrator.Runner.Extensions
             return expression.Identity();
         }
 
+        private static void SetConstraintType(ICreateConstraintOptionsSyntax expression, SqlServerConstraintType type)
+        {
+            CreateConstraintExpressionBuilder castPrimaryKey = expression as CreateConstraintExpressionBuilder;
+            if (castPrimaryKey == null) throw new InvalidOperationException(type + " must be called on an object that implements ISupportAdditionalFeatures.");
+
+            ISupportAdditionalFeatures castExpression = castPrimaryKey.Expression.Constraint;
+
+            castExpression.AddAdditionalFeature(ConstraintType, type);
+        }
+
+        public static void Clustered(this ICreateConstraintOptionsSyntax expression)
+        {
+            SetConstraintType(expression, SqlServerConstraintType.Clustered);
+        }
+
+        public static void NonClustered(this ICreateConstraintOptionsSyntax expression)
+        {
+            SetConstraintType(expression, SqlServerConstraintType.NonClustered);
+        }
+
         private static ISupportAdditionalFeatures GetColumn<TNext, TNextFk>(IColumnOptionSyntax<TNext, TNextFk> expression) where TNext : IFluentSyntax where TNextFk : IFluentSyntax 
         {
             CreateTableExpressionBuilder cast1 = expression as CreateTableExpressionBuilder;
@@ -63,5 +91,6 @@ namespace FluentMigrator.Runner.Extensions
 
             throw new InvalidOperationException("The seeded identity method can only be called on a valid object.");
         }
+
     }
 }

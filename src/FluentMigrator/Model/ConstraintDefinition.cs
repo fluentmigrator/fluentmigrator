@@ -10,8 +10,10 @@ namespace FluentMigrator.Model
         Unique
     }
 
-    public class ConstraintDefinition : ICloneable, ICanBeConventional, ICanBeValidated
+    public class ConstraintDefinition : ICloneable, ICanBeConventional, ICanBeValidated, ISupportAdditionalFeatures
     {
+        public readonly Dictionary<string, object> _additionalFeatures = new Dictionary<string, object>();
+
         private ConstraintType constraintType;
         public bool IsPrimaryKeyConstraint { get { return ConstraintType.PrimaryKey == constraintType; } }
         public bool IsUniqueConstraint { get { return ConstraintType.Unique == constraintType; } }
@@ -71,5 +73,23 @@ namespace FluentMigrator.Model
         }
 
         #endregion
+
+
+        public IDictionary<string, object> AdditionalFeatures
+        {
+            get { return _additionalFeatures; }
+        }
+
+        void ISupportAdditionalFeatures.AddAdditionalFeature(string feature, object value)
+        {
+            if (!AdditionalFeatures.ContainsKey(feature))
+            {
+                AdditionalFeatures.Add(feature, value);
+            }
+            else
+            {
+                AdditionalFeatures[feature] = value;
+            }
+        }
     }
 }
