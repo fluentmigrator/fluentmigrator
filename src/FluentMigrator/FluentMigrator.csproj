@@ -209,6 +209,7 @@
     <Compile Include="Builders\Insert\InsertExpressionRoot.cs" />
     <Compile Include="Expressions\UpdateDataExpression.cs" />
     <Compile Include="ForwardOnlyMigration.cs" />
+    <Compile Include="IDbFactoryLoader.cs" />
     <Compile Include="Infrastructure\IMigrationMetadata.cs" />
     <Compile Include="Infrastructure\MigrationWithMetaDataAdapter.cs" />
     <Compile Include="MigrationBase.cs" />
