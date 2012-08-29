@@ -42,6 +42,9 @@ namespace FluentMigrator.Builders
         TNext AsInt16();
         TNext AsInt32();
         TNext AsInt64();
+        TNext AsUInt16();
+        TNext AsUInt32();
+        TNext AsUInt64();
         TNext AsString();
         TNext AsString(int size);
         TNext AsTime();
