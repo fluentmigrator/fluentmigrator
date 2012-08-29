@@ -18,10 +18,10 @@ namespace FluentMigrator.Model
         public bool IsPrimaryKeyConstraint { get { return ConstraintType.PrimaryKey == constraintType; } }
         public bool IsUniqueConstraint { get { return ConstraintType.Unique == constraintType; } }
 
-        public string SchemaName { get; set; }
-        public string ConstraintName { get; set; }
-        public string TableName { get; set; }
-        public ICollection<string> Columns = new HashSet<string>();
+        public virtual string SchemaName { get; set; }
+        public virtual string ConstraintName { get; set; }
+        public virtual string TableName { get; set; }
+        public virtual ICollection<string> Columns { get; set; }
 
 
         /// <summary>
@@ -30,6 +30,8 @@ namespace FluentMigrator.Model
         public ConstraintDefinition(ConstraintType type)
         {
             constraintType = type;
+
+            Columns = new HashSet<string>();
         }
 
         #region ICloneable Members
