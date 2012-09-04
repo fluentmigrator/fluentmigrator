@@ -7,7 +7,7 @@
     <property name="dir.bin" value="build" />
 	<property name="dir.sample" value="${path.base}\src\FluentMigrator.Example" />
 	<property name="path.dist" value="dist" />
-	<property name="build.platform" value="net-3.5" />
+	<property name="build.platform" value="net-4.0" />
 	<property name="build.config" value="release" />
 	<property name="major.version" value="1.0" />
 	<property name="complete.version" value="${major.version}.0.${build.number}" />
