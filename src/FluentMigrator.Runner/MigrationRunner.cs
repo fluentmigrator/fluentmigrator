@@ -393,9 +393,8 @@ namespace FluentMigrator.Runner
             return _stopWatch.ElapsedTime().Ticks;
         }
 
-    	public void CheckVersionOrdering()
+        public void CheckVersionOrder()
     	{
-
 			var unappliedVersions = MigrationLoader.Migrations.Keys.Where(v => !VersionLoader.VersionInfo.HasAppliedMigration(v) && v < VersionLoader.VersionInfo.Latest());
 
     		if (unappliedVersions.Any())

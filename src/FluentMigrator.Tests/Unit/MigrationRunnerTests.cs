@@ -387,7 +387,7 @@ namespace FluentMigrator.Tests.Unit
 			_runner.MigrationLoader.Migrations.Add(version1, mockMigration1.Object);
 			_runner.MigrationLoader.Migrations.Add(version2, mockMigration2.Object);
 
-			Assert.DoesNotThrow(() => _runner.CheckVersionOrdering());
+			Assert.DoesNotThrow(() => _runner.CheckVersionOrder());
 
 			_processorMock.Verify(m => m.CommitTransaction(), Times.Never());
 			_processorMock.Verify(m => m.RollbackTransaction(), Times.Never());
@@ -409,7 +409,7 @@ namespace FluentMigrator.Tests.Unit
 			_runner.MigrationLoader.Migrations.Add(version1, mockMigration1.Object);
 			_runner.MigrationLoader.Migrations.Add(version2, mockMigration2.Object);
 
-			Assert.DoesNotThrow(() => _runner.CheckVersionOrdering());
+			Assert.DoesNotThrow(() => _runner.CheckVersionOrder());
 
 			_processorMock.Verify(m => m.CommitTransaction(), Times.Never());
 			_processorMock.Verify(m => m.RollbackTransaction(), Times.Never());
@@ -437,7 +437,7 @@ namespace FluentMigrator.Tests.Unit
 			_runner.MigrationLoader.Migrations.Add(version3, mockMigration3.Object);
 			_runner.MigrationLoader.Migrations.Add(version4, mockMigration4.Object);
 
-			var exception = Assert.Throws<VersionOrderInvalidException>(() => _runner.CheckVersionOrdering());
+			var exception = Assert.Throws<VersionOrderInvalidException>(() => _runner.CheckVersionOrder());
 
 			exception.Message.ShouldBe("Unapplied migrations have version numbers that are less that greatest version number of applied migrations.");
 

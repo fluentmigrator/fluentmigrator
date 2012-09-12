@@ -104,6 +104,12 @@ namespace FluentMigrator.Tests.Unit
         {
             Verify(x => x.Rollback(It.Is<int>(c => c == 1)), "rollback", 0, 0);
         }
+
+        [Test]
+        public void ShouldCallCheckOrdering()
+        {
+            Verify(x => x.CheckVersionOrder(), "checkversionorder", 0, 0);
+        }
     }
 
     internal class FakeTaskExecutor : TaskExecutor
