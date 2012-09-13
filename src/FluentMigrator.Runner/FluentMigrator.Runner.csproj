@@ -141,6 +141,7 @@
     <Compile Include="Generators\Firebird\FirebirdColumn.cs" />
     <Compile Include="Generators\Firebird\FirebirdGenerator.cs" />
     <Compile Include="Generators\Firebird\FirebirdTruncator.cs" />
+    <Compile Include="MigrationAssemblyInfo.cs" />
     <Compile Include="Processors\Firebird\FirebirdProcessedExpression.cs" />
     <Compile Include="Generators\Firebird\FirebirdQuoter.cs" />
     <Compile Include="Generators\Firebird\FirebirdTypeMap.cs" />
