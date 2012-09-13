@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace FluentMigrator.Runner
@@ -5,7 +6,7 @@ namespace FluentMigrator.Runner
     public interface IMigrationRunner
     {
         IMigrationProcessor Processor { get; }
-        Assembly MigrationAssembly { get; }
+        ICollection<MigrationAssemblyInfo> MigrationAssemblies { get; }
         void Up(IMigration migration);
         void MigrateUp();
         void MigrateUp(long version);

@@ -20,7 +20,7 @@ namespace FluentMigrator.Tests.Unit
 
             _runnerContextMock.Setup(x => x.Profile).Returns(string.Empty);
 			//_runnerContextMock.VerifyGet(x => x.Profile).Returns(string.Empty);
-			_runnerMock.SetupGet(x => x.MigrationAssembly).Returns(typeof(MigrationRunnerTests).Assembly);
+			_runnerMock.SetupGet(x => x.MigrationAssemblies).Returns(new [] { new MigrationAssemblyInfo(){ Assembly = typeof(MigrationRunnerTests).Assembly }  }  );
 
 			var profileLoader = new ProfileLoader(_runnerContextMock.Object, _runnerMock.Object, _conventionsMock.Object);
 
