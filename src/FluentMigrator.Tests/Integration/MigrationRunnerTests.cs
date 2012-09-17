@@ -666,7 +666,7 @@ namespace FluentMigrator.Tests.Integration
         }
 
 		[Test]
-		public void CheckVersionOrderShouldDoNothingIfUnappliedMigrationVersionIsGreaterThanLatestAppliedMigration()
+		public void ValidateVersionOrderShouldDoNothingIfUnappliedMigrationVersionIsGreaterThanLatestAppliedMigration()
 		{
 
 			// Using SqlServer instead of SqlLite as versions not deleted from VersionInfo table when using Sqlite.
@@ -690,7 +690,7 @@ namespace FluentMigrator.Tests.Integration
 				{
 					var migrationRunner = new MigrationRunner(assembly, runnerContext2, processor);
 
-					Assert.DoesNotThrow(migrationRunner.CheckVersionOrder);
+					Assert.DoesNotThrow(migrationRunner.ValidateVersionOrder);
 				}, false, excludedProcessors);
 			}
 			finally
@@ -704,7 +704,7 @@ namespace FluentMigrator.Tests.Integration
 		}
 
 		[Test]
-		public void CheckVersionOrderShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanLatestAppliedMigration()
+        public void ValidateVersionOrderShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanLatestAppliedMigration()
 		{
 
 			// Using SqlServer instead of SqlLite as versions not deleted from VersionInfo table when using Sqlite.
@@ -728,7 +728,7 @@ namespace FluentMigrator.Tests.Integration
 				ExecuteWithSupportedProcessors(processor =>
 				{
 					var migrationRunner = new MigrationRunner(assembly, runnerContext2, processor);
-					migrationRunner.CheckVersionOrder();
+					migrationRunner.ValidateVersionOrder();
 				}, false, excludedProcessors);
 			}
             catch (VersionOrderInvalidException ex)

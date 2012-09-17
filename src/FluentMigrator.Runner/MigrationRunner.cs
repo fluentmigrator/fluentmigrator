@@ -393,7 +393,7 @@ namespace FluentMigrator.Runner
             return _stopWatch.ElapsedTime().Ticks;
         }
 
-        public void CheckVersionOrder()
+        public void ValidateVersionOrder()
     	{
             IEnumerable<KeyValuePair<long, IMigration>> unappliedVersions = MigrationLoader.Migrations.Where(kvp => MigrationVersionLessThanGreatestAppliedMigration(kvp.Key));
 

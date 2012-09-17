@@ -373,7 +373,7 @@ namespace FluentMigrator.Tests.Unit
         }
 
 		[Test]
-		public void CheckVersionOrderingShouldReturnNothingIfNoUnappliedMigrations()
+		public void ValidateVersionOrderingShouldReturnNothingIfNoUnappliedMigrations()
 		{
 			const long version1 = 2011010101;
 			const long version2 = 2011010102;
@@ -387,7 +387,7 @@ namespace FluentMigrator.Tests.Unit
 			_runner.MigrationLoader.Migrations.Add(version1, mockMigration1.Object);
 			_runner.MigrationLoader.Migrations.Add(version2, mockMigration2.Object);
 
-			Assert.DoesNotThrow(() => _runner.CheckVersionOrder());
+			Assert.DoesNotThrow(() => _runner.ValidateVersionOrder());
 
             _announcer.Verify(a => a.Say("Version ordering valid."));
 
@@ -397,7 +397,7 @@ namespace FluentMigrator.Tests.Unit
 		}
 
 		[Test]
-		public void CheckVersionOrderingShouldReturnNothingIfUnappliedMigrationVersionIsGreaterThanLatestAppliedMigration()
+        public void ValidateVersionOrderingShouldReturnNothingIfUnappliedMigrationVersionIsGreaterThanLatestAppliedMigration()
 		{
 			const long version1 = 2011010101;
 			const long version2 = 2011010102;
@@ -411,7 +411,7 @@ namespace FluentMigrator.Tests.Unit
 			_runner.MigrationLoader.Migrations.Add(version1, mockMigration1.Object);
 			_runner.MigrationLoader.Migrations.Add(version2, mockMigration2.Object);
 
-			Assert.DoesNotThrow(() => _runner.CheckVersionOrder());
+			Assert.DoesNotThrow(() => _runner.ValidateVersionOrder());
 
             _announcer.Verify(a => a.Say("Version ordering valid."));
 
@@ -421,7 +421,7 @@ namespace FluentMigrator.Tests.Unit
 		}
 
 		[Test]
-		public void CheckVersionOrderingShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanGreatestAppliedMigrationVersion()
+        public void ValidateVersionOrderingShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanGreatestAppliedMigrationVersion()
 		{
 			const long version1 = 2011010101;
 			const long version2 = 2011010102;
@@ -441,7 +441,7 @@ namespace FluentMigrator.Tests.Unit
 			_runner.MigrationLoader.Migrations.Add(version3, mockMigration3.Object);
 			_runner.MigrationLoader.Migrations.Add(version4, mockMigration4.Object);
 
-			var exception = Assert.Throws<VersionOrderInvalidException>(() => _runner.CheckVersionOrder());
+			var exception = Assert.Throws<VersionOrderInvalidException>(() => _runner.ValidateVersionOrder());
 
             exception.InvalidMigrations.ShouldBe(new[]
                                                      {
