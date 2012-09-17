@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Runner
 {
@@ -24,9 +25,16 @@ namespace FluentMigrator.Runner
         {
             get
             {
-                return InvalidMigrations.Aggregate(
-                    "Unapplied migrations have version numbers that are less than the greatest version number of applied migrations:",
-                    (current, kvp) => current + string.Format("{0}{1} - {2}", Environment.NewLine, kvp.Key, kvp.Value.GetType().Name));
+                var result = "Unapplied migrations have version numbers that are less than the greatest version number of applied migrations:";
+
+                foreach (var migration in InvalidMigrations)
+                {
+                    var value = migration.Value is MigrationWithMetaDataAdapter ? ((MigrationWithMetaDataAdapter)migration.Value).Migration : migration.Value;
+
+                    result = result + string.Format("{0}{1} - {2}", Environment.NewLine, migration.Key, value.GetType().Name);
+                }
+
+                return result;
             }
         }
     }
