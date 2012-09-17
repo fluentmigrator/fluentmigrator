@@ -19,11 +19,14 @@
 
 
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.SqlServer;
@@ -712,7 +715,7 @@ namespace FluentMigrator.Tests.Integration
 			var runnerContext1 = new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = typeof(Migrations.Interleaved.Pass2.User).Namespace };
 			var runnerContext2 = new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = typeof(Migrations.Interleaved.Pass3.User).Namespace };
 
-			Exception caughtException = null;
+            VersionOrderInvalidException caughtException = null;
 
 			try
 			{
@@ -728,7 +731,7 @@ namespace FluentMigrator.Tests.Integration
 					migrationRunner.CheckVersionOrder();
 				}, false, excludedProcessors);
 			}
-			catch (Exception ex)
+            catch (VersionOrderInvalidException ex)
 			{
 				caughtException = ex;
 			}
@@ -742,11 +745,13 @@ namespace FluentMigrator.Tests.Integration
 			}
 
 			caughtException.ShouldNotBeNull();
-			
-			System.Console.WriteLine(caughtException.GetType());
-			caughtException.ShouldBeOfType<VersionOrderInvalidException>();
 
-			((VersionOrderInvalidException)caughtException).InvalidVersions.ShouldBe(new[] { 200909060935 });
+
+            caughtException.InvalidMigrations.Count().ShouldBe(1);
+		    var keyValuePair = caughtException.InvalidMigrations.First();
+            keyValuePair.Key.ShouldBe(200909060935);
+            ((MigrationWithMetaDataAdapter)keyValuePair.Value).Migration.ShouldBeOfType<UserEmail>();
+            
 		}
 
         private static MigrationRunner SetupMigrationRunner(IMigrationProcessor processor)

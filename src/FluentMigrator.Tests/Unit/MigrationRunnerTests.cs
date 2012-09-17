@@ -389,6 +389,8 @@ namespace FluentMigrator.Tests.Unit
 
 			Assert.DoesNotThrow(() => _runner.CheckVersionOrder());
 
+            _announcer.Verify(a => a.Say("Version ordering valid."));
+
 			_processorMock.Verify(m => m.CommitTransaction(), Times.Never());
 			_processorMock.Verify(m => m.RollbackTransaction(), Times.Never());
 			_fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();		
@@ -410,6 +412,8 @@ namespace FluentMigrator.Tests.Unit
 			_runner.MigrationLoader.Migrations.Add(version2, mockMigration2.Object);
 
 			Assert.DoesNotThrow(() => _runner.CheckVersionOrder());
+
+            _announcer.Verify(a => a.Say("Version ordering valid."));
 
 			_processorMock.Verify(m => m.CommitTransaction(), Times.Never());
 			_processorMock.Verify(m => m.RollbackTransaction(), Times.Never());
@@ -439,9 +443,11 @@ namespace FluentMigrator.Tests.Unit
 
 			var exception = Assert.Throws<VersionOrderInvalidException>(() => _runner.CheckVersionOrder());
 
-			exception.Message.ShouldBe("Unapplied migrations have version numbers that are less that greatest version number of applied migrations.");
-
-			exception.InvalidVersions.ShouldBe(new[] { version2, version3 });
+            exception.InvalidMigrations.ShouldBe(new[]
+                                                     {
+                                                         new KeyValuePair<long, IMigration>(version2, mockMigration2.Object), 
+                                                         new KeyValuePair<long, IMigration>(version3, mockMigration3.Object)
+                                                     });
 
 			_processorMock.Verify(m => m.CommitTransaction(), Times.Never());
 			_processorMock.Verify(m => m.RollbackTransaction(), Times.Never());

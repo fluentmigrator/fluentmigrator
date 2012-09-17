@@ -395,12 +395,19 @@ namespace FluentMigrator.Runner
 
         public void CheckVersionOrder()
     	{
-			var unappliedVersions = MigrationLoader.Migrations.Keys.Where(v => !VersionLoader.VersionInfo.HasAppliedMigration(v) && v < VersionLoader.VersionInfo.Latest());
+            IEnumerable<KeyValuePair<long, IMigration>> unappliedVersions = MigrationLoader.Migrations.Where(kvp => MigrationVersionLessThanGreatestAppliedMigration(kvp.Key));
 
-    		if (unappliedVersions.Any())
-    		{
-    			throw new VersionOrderInvalidException(unappliedVersions);
-    		}
+            if (unappliedVersions.Any())
+            {
+                throw new VersionOrderInvalidException(unappliedVersions);
+            }
+
+            _announcer.Say("Version ordering valid.");
     	}
+
+        private bool MigrationVersionLessThanGreatestAppliedMigration(long version)
+        {
+            return !VersionLoader.VersionInfo.HasAppliedMigration(version) && version < VersionLoader.VersionInfo.Latest();
+        }
     }
 }
