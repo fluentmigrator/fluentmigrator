@@ -105,6 +105,9 @@
     <AssemblyOriginatorKeyFile>FluentMigrator.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FirebirdSql.Data.FirebirdClient">
+      <HintPath>..\..\lib\FirebirdSql.Data.FirebirdClient.dll</HintPath>
+    </Reference>
     <Reference Include="Moq, Version=3.1.416.3, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\Moq.dll</HintPath>
@@ -144,6 +147,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Helpers\FirebirdTestTable.cs" />
     <Compile Include="Helpers\PostgresTestTable.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
     <Compile Include="Integration\Migrations\Tagged\1_TenantATable.cs">
@@ -159,6 +163,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="Integration\Migrations\TestEmptyMigration.cs" />
+    <Compile Include="Integration\Processors\FirebirdProcessorTests.cs" />
     <Compile Include="Integration\Processors\MySqlProcessorTests.cs" />
     <Compile Include="Unit\AnnouncerExtensionsTests.cs" />
     <Compile Include="Unit\Announcers\AnnouncerTests.cs" />
@@ -213,6 +218,7 @@
     <Compile Include="Unit\Definitions\IndexDefinitionTests.cs" />
     <Compile Include="Unit\Expressions\DeleteDefaultConstraintExpressionTests.cs" />
     <Compile Include="Unit\Generators\GenericGenerator\GenericGeneratorTests.cs" />
+    <Compile Include="Unit\Generators\Firebird\FirebirdGeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000GeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005GeneratorTests.cs" />
     <Compile Include="Unit\Initialization\ConnectionStringManagerTests.cs">
