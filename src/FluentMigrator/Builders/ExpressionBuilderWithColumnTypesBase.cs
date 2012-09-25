@@ -140,6 +140,24 @@ namespace FluentMigrator.Builders
             Column.Type = DbType.Int64;
             return (NextT)(object)this;
         }
+        
+        public NextT AsUInt16()
+        {
+            Column.Type = DbType.UInt16;
+            return (NextT)(object)this;
+        }
+
+        public NextT AsUInt32()
+        {
+            Column.Type = DbType.UInt32;
+            return (NextT)(object)this;
+        }
+
+        public NextT AsUInt64()
+        {
+            Column.Type = DbType.UInt64;
+            return (NextT)(object)this;
+        }
 
         public NextT AsString()
         {
