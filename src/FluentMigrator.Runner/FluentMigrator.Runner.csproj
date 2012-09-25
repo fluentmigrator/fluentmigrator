@@ -139,6 +139,12 @@
     <Compile Include="Extensions\TagsExtensions.cs" />
     <Compile Include="Generators\Base\ColumnBase.cs" />
     <Compile Include="Extensions\CompatabilityModeExtension.cs" />
+    <Compile Include="Generators\Firebird\FirebirdColumn.cs" />
+    <Compile Include="Generators\Firebird\FirebirdGenerator.cs" />
+    <Compile Include="Generators\Firebird\FirebirdTruncator.cs" />
+    <Compile Include="Processors\Firebird\FirebirdProcessedExpression.cs" />
+    <Compile Include="Generators\Firebird\FirebirdQuoter.cs" />
+    <Compile Include="Generators\Firebird\FirebirdTypeMap.cs" />
     <Compile Include="Generators\Generic\GenericQuoter.cs" />
     <Compile Include="Generators\Generic\GenericGenerator.cs" />
     <Compile Include="Generators\IColumn.cs" />
@@ -194,6 +200,13 @@
     <Compile Include="IProfileLoader.cs" />
     <Compile Include="IRunnerFactory.cs" />
     <Compile Include="IVersionLoader.cs" />
+    <Compile Include="Processors\Firebird\FirebirdDbFactory.cs" />
+    <Compile Include="Processors\Firebird\FirebirdOptions.cs" />
+    <Compile Include="Processors\Firebird\FirebirdProcessor.cs" />
+    <Compile Include="Processors\Firebird\FirebirdProcessorFactory.cs" />
+    <Compile Include="Processors\Firebird\FirebirdSchemaInfo.cs" />
+    <Compile Include="Processors\Firebird\FirebirdSchemaProvider.cs" />
+    <Compile Include="Processors\Firebird\FirebirdTableSchema.cs" />
     <Compile Include="Processors\Jet\JetProcessor.cs" />
     <Compile Include="Processors\Jet\JetProcessorFactory.cs" />
     <Compile Include="Processors\MigrationProcessorFactory.cs" />

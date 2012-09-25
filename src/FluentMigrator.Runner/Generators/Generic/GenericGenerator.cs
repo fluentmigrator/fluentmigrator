@@ -112,7 +112,11 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(RenameColumnExpression expression)
         {
-            return String.Format(RenameColumn, expression.TableName, expression.OldName, expression.NewName);
+            return String.Format(RenameColumn, 
+                Quoter.QuoteTableName(expression.TableName), 
+                Quoter.QuoteColumnName(expression.OldName), 
+                Quoter.QuoteColumnName(expression.NewName)
+                );
         }
 
         public override string Generate(CreateIndexExpression expression)

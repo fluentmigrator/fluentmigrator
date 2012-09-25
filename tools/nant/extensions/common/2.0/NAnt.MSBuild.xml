@@ -1,0 +1,112 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NAnt.MSBuild</name>
+    </assembly>
+    <members>
+        <member name="T:NAnt.MSBuild.Functions.MSBuildFunctions">
+            <summary>
+            Functions to return information for MSBuild system.
+            </summary>
+        </member>
+        <member name="M:NAnt.MSBuild.Functions.MSBuildFunctions.#ctor(NAnt.Core.Project,NAnt.Core.PropertyDictionary)">
+            <exclude/>
+        </member>
+        <member name="M:NAnt.MSBuild.Functions.MSBuildFunctions.IsMsbuildProject(System.String)">
+            <summary>
+            Test whether project is VS2005 project and could be built using &lt;msbuild&gt;
+            </summary>
+            <param name="project">The name or path of the project file (csproj, vbproj, ...).</param>
+            <returns>
+            True, if it is msbuild project, False otherwise.
+            </returns>
+        </member>
+        <member name="T:NAnt.VSNet.WhidbeySolution">
+            <summary>
+            Analyses Microsoft Visual Studio .NET 2005 (Whidbey) solution files.
+            </summary>
+        </member>
+        <member name="T:NAnt.VSNet.OrcasSolution">
+            <summary>
+            Analyses Microsoft Visual Studio .NET 2008 (Orcas) solution files.
+            </summary>
+        </member>
+        <member name="T:NAnt.VSNet.RosarioSolution">
+            <summary>
+            Analyses Microsoft Visual Studio .NET 2010 (Rosario) solution files.
+            </summary>
+        </member>
+        <member name="M:NAnt.MSBuild.MSBuildProject.DetermineProductVersion(System.Xml.XmlElement)">
+            <summary>
+            Determines the version of the target msbuild file.
+            </summary>
+            <remarks>
+            <para>
+            This method identifies the msbuild version by reviewing the following tags in order:
+            </para>
+            <list type="number">
+            <item>
+            <description>&lt;ProductVersion&gt;</description>
+            </item>
+            <item>
+            <description>&lt;TargetFrameworkVersion&gt;</description>
+            </item>
+            <item>
+            <description>ToolsVersion attribute</description>
+            </item>
+            </list>
+            </remarks>
+            <param name="docElement">
+            A <see cref="T:System.Xml.XmlElement"/> representing the msbuild project file.
+            </param>
+            <returns>
+            A <see cref="T:NAnt.VSNet.ProductVersion"/> enum value indicating the msbuild project
+            file version.
+            </returns>
+            <exception cref="T:NAnt.Core.BuildException">
+            version string found in the tags listed above is not recognized.
+            </exception>
+        </member>
+        <member name="T:NAnt.MSBuild.NAntLoggerVerbosity">
+            <summary>
+            Enum indicating the level of verbosity for the NAnt logger.
+            </summary>
+        </member>
+        <member name="F:NAnt.MSBuild.NAntLoggerVerbosity.Quiet">
+            <summary>Indicates no output</summary>
+        </member>
+        <member name="F:NAnt.MSBuild.NAntLoggerVerbosity.Minimal">
+            <summary>Indicates little output</summary>
+        </member>
+        <member name="F:NAnt.MSBuild.NAntLoggerVerbosity.Normal">
+            <summary>Indicates normal output</summary>
+        </member>
+        <member name="F:NAnt.MSBuild.NAntLoggerVerbosity.Detailed">
+            <summary>Indicates detailed output</summary>
+        </member>
+        <member name="F:NAnt.MSBuild.NAntLoggerVerbosity.Diagnostic">
+            <summary>Indicates all output</summary>
+        </member>
+        <member name="T:NAnt.MSBuild.NAntLogger">
+            <summary>
+            Logger classed used for MSBuild tasks in NAnt.
+            </summary>
+        </member>
+        <member name="T:NAnt.MSBuild.NAntLogger.DummyTask">
+            <summary>Sample task used for testing.</summary>
+        </member>
+        <member name="M:NAnt.MSBuild.NAntLogger.DummyTask.#ctor(NAnt.Core.Project,System.String)">
+            <summary>
+            Sample task constructor.
+            </summary>
+            <param name="p">Project to assign task to.</param>
+            <param name="name">Sample name property.</param>
+        </member>
+        <member name="M:NAnt.MSBuild.NAntLogger.DummyTask.ExecuteTask">
+            <summary>Test method.</summary>
+        </member>
+        <member name="P:NAnt.MSBuild.NAntLogger.DummyTask.Name">
+            <summary>Gets sample name for task.</summary>
+        </member>
+    </members>
+</doc>
