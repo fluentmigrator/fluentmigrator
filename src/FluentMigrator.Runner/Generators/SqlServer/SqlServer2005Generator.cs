@@ -17,6 +17,7 @@
 #endregion
 
 using System.Text;
+using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
@@ -28,16 +29,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
     public class SqlServer2005Generator : SqlServer2000Generator
     {
+        public SqlServer2005Generator() : base(new SqlServerColumn(new SqlServer2005TypeMap())) { }
 
-        public SqlServer2005Generator()
-            : base(new SqlServerColumn(new SqlServer2005TypeMap()))
-        {
-        }
-
-        protected SqlServer2005Generator(IColumn column)
-            : base(column)
-        {
-        }
+        protected SqlServer2005Generator(IColumn column) : base(column) { }
 
         public override string CreateTable { get { return "{0} ({1})"; } }
         public override string DropTable { get { return "{0}"; } }
@@ -100,7 +94,6 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
             var deleteItems = new List<string>();
 
-
             if (expression.IsAllRows)
             {
                 deleteItems.Add(string.Format(DeleteData, Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), "1 = 1"));
@@ -110,9 +103,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 foreach (var row in expression.Rows)
                 {
                     var whereClauses = new List<string>();
-                    foreach (KeyValuePair<string, object> item in row)
+                    var columnData = evaluator.Evaluate(row);
+
+                    foreach (IDataValue item in columnData)
                     {
-                        whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value)));
+                        whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.ColumnName), item.Value == null ? "IS" : "=", Quoter.QuoteDataValue(item)));
                     }
 
                     deleteItems.Add(string.Format(DeleteData, Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), String.Join(" AND ", whereClauses.ToArray())));
@@ -141,13 +136,16 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                             "ON"));
             }
 
-            foreach (InsertionDataDefinition row in expression.Rows)
+            foreach (IDataDefinition row in expression.Rows)
             {
+                IEnumerable<IDataValue> columnData = evaluator.Evaluate(row);
+
                 columnNames.Clear();
                 columnValues.Clear();
-                foreach (KeyValuePair<string, object> item in row)
+
+                foreach (IDataValue item in columnData)
                 {
-                    columnNames.Add(Quoter.QuoteColumnName(item.Key));
+                    columnNames.Add(Quoter.QuoteColumnName(item.ColumnName));
                     columnValues.Add(Quoter.QuoteValue(item.Value));
                 }
 

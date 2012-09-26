@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
@@ -8,10 +9,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
 {
     public class OracleGenerator : GenericGenerator
     {
-        public OracleGenerator()
-            : base(new OracleColumn(), new OracleQuoter())
-        {
-        }
+        public OracleGenerator() : base(new OracleColumn(), new OracleQuoter(), new GenericEvaluator()) { }
 
         public override string AddColumn
         {
@@ -35,24 +33,18 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         public override string Generate(InsertDataExpression expression)
         {
-            var columnNames = new List<string>();
-            var columnValues = new List<string>();
             var insertStrings = new List<string>();
 
-            foreach (InsertionDataDefinition row in expression.Rows)
+            foreach (IDataDefinition row in expression.Rows)
             {
-                columnNames.Clear();
-                columnValues.Clear();
-                foreach (KeyValuePair<string, object> item in row)
-                {
-                    columnNames.Add(Quoter.QuoteColumnName(item.Key));
-                    columnValues.Add(Quoter.QuoteValue(item.Value));
-                }
+                IEnumerable<IDataValue> dataValues = evaluator.Evaluate(row).ToArray();
 
-                string columns = String.Join(", ", columnNames.ToArray());
-                string values = String.Join(", ", columnValues.ToArray());
+                string columns = String.Join(", ", dataValues.Select(dataValue => Quoter.QuoteColumnName(dataValue.ColumnName)).ToArray());
+                string values = String.Join(", ", dataValues.Select(dataValue => Quoter.QuoteDataValue(dataValue)).ToArray());
+
                 insertStrings.Add(String.Format(InsertData, Quoter.QuoteTableName(expression.TableName), columns, values));
             }
+
             return "INSERT ALL " + String.Join(" ", insertStrings.ToArray()) + " SELECT 1 FROM DUAL";
         }
 

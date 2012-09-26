@@ -19,7 +19,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
         None
 
     }
-    public class FirebirdOptions
+
+    public struct FirebirdOptions
     {
         /// <summary>
         /// Maximum internal length of names in firebird is 31 characters
@@ -44,17 +45,9 @@ namespace FluentMigrator.Runner.Processors.Firebird
         /// </summary>
         public FirebirdTransactionModel TransactionModel { get; set; }
 
-        public FirebirdOptions()
-        {
-            TransactionModel = FirebirdTransactionModel.None;
-            TruncateLongNames = false;
-            VirtualLock = false;
-            UndoEnabled = false;
-        }
-
         public static FirebirdOptions StandardBehaviour()
         {
-            return new FirebirdOptions()
+            return new FirebirdOptions
             {
                 TransactionModel = FirebirdTransactionModel.None,
                 TruncateLongNames = false,
@@ -65,7 +58,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public static FirebirdOptions CommitOnCheckFailBehaviour()
         {
-            return new FirebirdOptions()
+            return new FirebirdOptions
             {
                 TransactionModel = FirebirdTransactionModel.AutoCommitOnCheckFail,
                 TruncateLongNames = true,
@@ -76,7 +69,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public static FirebirdOptions AutoCommitBehaviour()
         {
-            return new FirebirdOptions()
+            return new FirebirdOptions
             {
                 TransactionModel = FirebirdTransactionModel.AutoCommit,
                 TruncateLongNames = true,
@@ -87,7 +80,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public static FirebirdOptions AutoCommitWithoutUndoBehaviour()
         {
-            return new FirebirdOptions()
+            return new FirebirdOptions
             {
                 TransactionModel = FirebirdTransactionModel.AutoCommit,
                 TruncateLongNames = true,

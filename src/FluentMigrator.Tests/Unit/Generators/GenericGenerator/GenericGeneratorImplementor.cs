@@ -11,7 +11,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         /// <summary>
         /// Initializes a new instance of the <see cref="T:GenericBaseImplementor"/> class.
         /// </summary>
-        public GenericGeneratorImplementor() : base(null, null)
+        public GenericGeneratorImplementor() : base(null, null, null)
         {
         }
 

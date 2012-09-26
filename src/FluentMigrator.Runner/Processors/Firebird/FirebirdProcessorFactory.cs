@@ -9,11 +9,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public FirebirdOptions FBOptions { get; set; }
 
         public FirebirdProcessorFactory() : this(FirebirdOptions.AutoCommitBehaviour()) { }
-        public FirebirdProcessorFactory(FirebirdOptions fbOptions)
-            : base()
+        public FirebirdProcessorFactory(FirebirdOptions fbOptions) : base()
         {
-            if (fbOptions == null)
-                throw new ArgumentNullException("fbOptions");
             FBOptions = fbOptions;
         }
         

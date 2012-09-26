@@ -43,7 +43,7 @@ namespace FluentMigrator.Runner
         public void UpdateVersionInfo(long version)
         {
             var dataExpression = new InsertDataExpression();
-            dataExpression.Rows.Add(CreateVersionInfoInsertionData(version));
+            dataExpression.Rows.AddRange(CreateVersionInfoInsertionData(version));
             dataExpression.TableName = VersionTableMetaData.TableName;
             dataExpression.SchemaName = VersionTableMetaData.SchemaName;
             dataExpression.ExecuteWith(Processor);
@@ -61,13 +61,13 @@ namespace FluentMigrator.Runner
             return (IVersionTableMetaData)Activator.CreateInstance(matchedType);
         }
 
-        protected virtual InsertionDataDefinition CreateVersionInfoInsertionData(long version)
+        protected virtual IEnumerable<IDataDefinition> CreateVersionInfoInsertionData(long version)
         {
-            return new InsertionDataDefinition
-                       {
-                           new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version),
-                           new KeyValuePair<string, object>("AppliedOn", DateTime.UtcNow)
-                       };
+            return new []
+            {
+                new ExplicitDataDefinition(new DataValue(VersionTableMetaData.ColumnName, version)),
+                new ExplicitDataDefinition(new DataValue("AppliedOn", DateTime.UtcNow))
+            };
         }
 
         public IVersionInfo VersionInfo
@@ -156,10 +156,7 @@ namespace FluentMigrator.Runner
         public void DeleteVersion(long version)
         {
             var expression = new DeleteDataExpression { TableName = VersionTableMetaData.TableName, SchemaName = VersionTableMetaData.SchemaName };
-            expression.Rows.Add(new DeletionDataDefinition
-                                    {
-                                        new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version)
-                                    });
+            expression.Rows.Add(new ExplicitDataDefinition(new DataValue(VersionTableMetaData.ColumnName, version)));
             expression.ExecuteWith(Processor);
         }
     }

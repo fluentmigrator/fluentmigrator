@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using FluentMigrator.Model;
 using NUnit.Framework;
 using NUnit.Should;
 using FluentMigrator.Expressions;
@@ -17,12 +18,14 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             var expressionMock = new Mock<DeleteDataExpression>();
 
             var builder = new DeleteDataExpressionBuilder(expressionMock.Object);
-            builder.Row(new { TestColumn = "TestValue" });
+            var data = new { TestColumn = "TestValue" };
+            builder.Row(data);
 
             var result = expressionMock.Object;
-            var rowobject = result.Rows.First().First();
-            rowobject.Key.ShouldBe("TestColumn");
-            rowobject.Value.ShouldBe("TestValue");
+            IDataDefinition rowobject = result.Rows.First();
+
+            Assert.IsInstanceOf<ReflectedDataDefinition>(rowobject);
+            Assert.AreEqual(data, ((ReflectedDataDefinition)rowobject).Data);
         }
 
         [Test]
@@ -35,13 +38,8 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             builder.Row(new { TestColumn2 = "TestValue2" });
 
             var result = expressionMock.Object;
-            var rowobject = result.Rows[0];
-            rowobject[0].Key.ShouldBe("TestColumn");
-            rowobject[0].Value.ShouldBe("TestValue");
 
-            rowobject = result.Rows[1];
-            rowobject[0].Key.ShouldBe("TestColumn2");
-            rowobject[0].Value.ShouldBe("TestValue2");
+            Assert.AreEqual(2, result.Rows.Count);
         }
 
         [Test]
@@ -73,14 +71,16 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
         {
             var expressionMock = new Mock<DeleteDataExpression>();
 
-
             var builder = new DeleteDataExpressionBuilder(expressionMock.Object);
             builder.IsNull("TestColumn");
 
             var result = expressionMock.Object;
-            var rowobject = result.Rows.First().First();
-            rowobject.Key.ShouldBe("TestColumn");
-            rowobject.Value.ShouldBeNull();
+            IDataDefinition rowobject = result.Rows.First();
+
+            Assert.IsInstanceOf<ExplicitDataDefinition>(rowobject);
+            ExplicitDataDefinition rowDefinition = (ExplicitDataDefinition)rowobject;
+            rowDefinition.Data.First().ColumnName.ShouldBe("TestColumn");
+            rowDefinition.Data.First().Value.ShouldBeNull();
 
         }
     }

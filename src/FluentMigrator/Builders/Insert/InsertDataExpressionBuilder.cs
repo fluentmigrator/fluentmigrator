@@ -16,8 +16,6 @@
 //
 #endregion
 
-using System.Collections.Generic;
-using System.ComponentModel;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
@@ -57,14 +55,9 @@ namespace FluentMigrator.Builders.Insert
             return this;
         }
 
-        private static InsertionDataDefinition GetData(object dataAsAnonymousType)
+        private static IDataDefinition GetData(object dataAsAnonymousType)
         {
-            var data = new InsertionDataDefinition();
-            var properties = TypeDescriptor.GetProperties(dataAsAnonymousType);
-
-            foreach (PropertyDescriptor property in properties)
-                data.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(dataAsAnonymousType)));
-            return data;
+            return new ReflectedDataDefinition(dataAsAnonymousType);
         }
     }
 }

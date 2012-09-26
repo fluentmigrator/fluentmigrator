@@ -17,8 +17,7 @@ using FluentMigrator.Runner.Generators.SqlServer;
 
 namespace FluentMigrator.Tests.Integration.SchemaDump
 {
-
-    [TestFixture]
+    [TestFixture, Category("Integration")]
     public class SchemaDumpTests
     {
         public SqlConnection Connection;

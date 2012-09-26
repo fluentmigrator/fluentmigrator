@@ -10,7 +10,7 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Integration.Processors
 {
-    [TestFixture]
+    [TestFixture, Category("Integration")]
     public class MySqlProcessorTests
     {
         protected MySqlProcessor Processor;

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Data;
 using System.IO;
 using System.Linq;
@@ -34,8 +35,6 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public FirebirdProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory, FirebirdOptions fbOptions)
             : base(generator, announcer, options)
         {
-            if (fbOptions == null)
-                throw new ArgumentNullException("fbOptions");
             FBOptions = fbOptions;
             truncator = new FirebirdTruncator(FBOptions.TruncateLongNames);
             Factory = factory;
@@ -588,11 +587,10 @@ namespace FluentMigrator.Runner.Processors.Firebird
             {
                 foreach (DataRow dr in ds.Tables[0].Rows)
                 {
-                    InsertionDataDefinition insert = new InsertionDataDefinition();
-                    for(int i = 0; i < columnCount; i++)
-                    {
-                        insert.Add(new KeyValuePair<string, object>(columns[i], dr.ItemArray[i]));
-                    }
+                    IEnumerable<IDataValue> columnValues = Enumerable.Range(0, columnCount).Select(index => new DataValue(columns[index], dr.ItemArray[index])).Cast<IDataValue>();
+
+                    ExplicitDataDefinition insert = new ExplicitDataDefinition(columnValues);
+
                     data.Rows.Add(insert);
                 }
             }
@@ -738,7 +736,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             truncator.Truncate(expression);
             CheckTable(expression.TableName);
-            expression.Rows.ForEach(x => x.ForEach(y => CheckColumn(expression.TableName, y.Key)));
+            //expression.Rows.ForEach(x => x.ForEach(y => CheckColumn(expression.TableName, y.Key)));
+
             RegisterExpression(expression, typeof(InsertDataExpression));
             InternalProcess(Generator.Generate(expression));
         }

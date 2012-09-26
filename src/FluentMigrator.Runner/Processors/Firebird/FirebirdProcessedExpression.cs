@@ -121,12 +121,14 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         protected void SetupUndoDeleteData(DeleteDataExpression expression)
         {
-            CanUndo = true;
+            CanUndo = false;
+
+            /*
             FirebirdSchemaProvider schema = new FirebirdSchemaProvider(Processor);
             FirebirdTableSchema table = schema.GetTableSchema(expression.TableName);
             using (DataSet ds = Processor.ReadTableData(String.Empty, expression.TableName))
             {
-                foreach (DeletionDataDefinition deletion in expression.Rows)
+                foreach (IDataDefinition deletion in expression.Rows)
                 {
                     InsertDataExpression insert = new InsertDataExpression() { SchemaName = String.Empty, TableName = expression.TableName };
                     foreach (DataRow dr in ds.Tables[0].Rows)
@@ -134,6 +136,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                         bool match = true;
                         if (!expression.IsAllRows)
                         {
+                            IEnumerable<KeyValuePair<string, object>> columnData = evaluator.GetData(row);
                             foreach (var where in deletion)
                             {
                                 if (dr[where.Key].ToString() != where.Value.ToString())
@@ -156,6 +159,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                     UndoExpressions.Add(insert);
                 }
             }
+            */
         }
 
         protected void SetupUndoUpdateData(UpdateDataExpression expression)
@@ -229,7 +233,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         protected void SetupUndoDeleteTable(DeleteTableExpression expression)
         {
-            CanUndo = true;
+            CanUndo = false;
+            /*
             FirebirdSchemaProvider schema = new FirebirdSchemaProvider(Processor);
             
             //Table and columns
@@ -297,8 +302,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 PerformDBOperationExpression createTrigger = Processor.CreateTriggerExpression(expression.TableName, trigger);
                 UndoExpressions.Add(createTrigger);
             }
-
-
+            */
         }
 
         protected void SetupUndoDeleteIndex(DeleteIndexExpression expression)

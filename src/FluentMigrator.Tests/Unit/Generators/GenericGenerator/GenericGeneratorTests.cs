@@ -1,10 +1,10 @@
 using System;
 using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Generic;
-using Moq;
 using NUnit.Framework;
-using FluentMigrator.Model;
+
 namespace FluentMigrator.Tests.Unit.Generators
 {
 	[TestFixture]
@@ -15,9 +15,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 		/// </summary>
 		public class MockGenerator : GenericGenerator
 		{
-
-			 public MockGenerator(IColumn column, IQuoter quoter)
-				: base(column, quoter) { }
+            public MockGenerator(IColumn column, IQuoter quoter, IEvaluator evaluator) : base(column, quoter, evaluator) { }
 
 			public override string Generate(AlterDefaultConstraintExpression expression)
 			{
@@ -40,7 +38,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 			deleteFKExpression.ForeignKey = fkDef;
 
 			// Setup empty mock object
-			var mockGenerator = new MockGenerator(null, null);
+			var mockGenerator = new MockGenerator(null, null, null);
 
 			Assert.Throws<ArgumentNullException>(() => mockGenerator.Generate(deleteFKExpression));
 		}

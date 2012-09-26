@@ -1,6 +1,9 @@
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.VersionTableInfo;
 using Moq;
@@ -65,15 +68,25 @@ namespace FluentMigrator.Tests.Unit
             var asm = Assembly.GetExecutingAssembly();
             var loader = new VersionLoader(runner.Object, asm, conventions);
 
+            Func<IDataDefinition, bool> predicate = 
+                definition =>
+                {
+                    if (definition is ExplicitDataDefinition)
+                    {
+                        IDataValue kvp = ((ExplicitDataDefinition)definition).Data.First();
+
+                        return kvp.ColumnName == loader.VersionTableMetaData.ColumnName && kvp.Value.Equals(1L);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                };
+
             processor.Setup(p => p.Process(It.Is<DeleteDataExpression>(expression =>
                                                                        expression.SchemaName == loader.VersionTableMetaData.SchemaName
                                                                        && expression.TableName == loader.VersionTableMetaData.TableName
-                                                                       && expression.Rows.All(
-                                                                           definition =>
-                                                                           definition.All(
-                                                                               pair =>
-                                                                               pair.Key == loader.VersionTableMetaData.ColumnName && pair.Value.Equals(1L))))))
-                .Verifiable();
+                                                                       && expression.Rows.All(predicate)))).Verifiable();
 
             loader.DeleteVersion(1);
 
@@ -118,14 +131,25 @@ namespace FluentMigrator.Tests.Unit
             var asm = Assembly.GetExecutingAssembly();
             var loader = new VersionLoader(runner.Object, asm, conventions);
 
+            Func<IDataDefinition, bool> predicate =
+                definition =>
+                {
+                    if (definition is ExplicitDataDefinition)
+                    {
+                        IDataValue dataValue = ((ExplicitDataDefinition)definition).Data.First();
+
+                        return dataValue.ColumnName == loader.VersionTableMetaData.ColumnName && dataValue.Value.Equals(1L);
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                };
+
             processor.Setup(p => p.Process(It.Is<InsertDataExpression>(expression =>
                                                                        expression.SchemaName == loader.VersionTableMetaData.SchemaName
                                                                        && expression.TableName == loader.VersionTableMetaData.TableName
-                                                                       && expression.Rows.Any(
-                                                                           definition =>
-                                                                           definition.Any(
-                                                                               pair =>
-                                                                               pair.Key == loader.VersionTableMetaData.ColumnName && pair.Value.Equals(1L))))))
+                                                                       && expression.Rows.Any(predicate))))
                 .Verifiable();
 
             loader.UpdateVersionInfo(1);

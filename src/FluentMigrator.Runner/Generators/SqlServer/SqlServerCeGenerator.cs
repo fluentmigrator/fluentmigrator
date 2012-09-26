@@ -25,8 +25,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 {
     public class SqlServerCeGenerator : SqlServer2005Generator
     {
-        public SqlServerCeGenerator()
-            : base(new SqlServerColumn(new SqlServerCeTypeMap()))
+        public SqlServerCeGenerator() : base(new SqlServerColumn(new SqlServerCeTypeMap()))
         {
         }
 

@@ -23,10 +23,7 @@ namespace FluentMigrator.Runner.Generators.MySql
 
     public class MySqlGenerator : GenericGenerator
     {
-        public MySqlGenerator()
-            : base(new MySqlColumn(), new MySqlQuoter())
-        {
-        }
+        public MySqlGenerator() : base(new MySqlColumn(), new MySqlQuoter(), new MySqlEvaluator()) { }
 
         public override string AlterColumn { get { return "ALTER TABLE {0} MODIFY COLUMN {1}"; } }
         public override string DeleteConstraint { get { return "ALTER TABLE {0} DROP {1}{2}"; } }

@@ -1,4 +1,7 @@
-﻿using FluentMigrator.Runner.Generators.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.MySql
 {

@@ -24,10 +24,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
 {
     public class SqliteGenerator : GenericGenerator
     {
-        public SqliteGenerator()
-            : base(new SqliteColumn(), new SqliteQuoter())
-        {
-        }
+        public SqliteGenerator() : base(new SqliteColumn(), new SqliteQuoter(), new GenericEvaluator()) { }
 
         public override string RenameTable { get { return "ALTER TABLE {0} RENAME TO {1}"; } }
 

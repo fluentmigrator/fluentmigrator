@@ -163,35 +163,11 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public void Truncate(InsertDataExpression expression)
         {
             expression.TableName = Truncate(expression.TableName);
-            List<InsertionDataDefinition> insertions = new List<InsertionDataDefinition>();
-            foreach (InsertionDataDefinition insertion in expression.Rows)
-            {
-                InsertionDataDefinition newInsertion = new InsertionDataDefinition();
-                foreach (var data in insertion)
-                {
-                    newInsertion.Add(new KeyValuePair<string, object>(Truncate(data.Key), data.Value));
-                }
-                insertions.Add(newInsertion);
-            }
-            expression.Rows.Clear();
-            expression.Rows.AddRange(insertions);
         }
 
         public void Truncate(DeleteDataExpression expression)
         {
             expression.TableName = Truncate(expression.TableName);
-            List<DeletionDataDefinition> deletions = new List<DeletionDataDefinition>();
-            foreach (DeletionDataDefinition deletion in expression.Rows)
-            {
-                DeletionDataDefinition newDeletion = new DeletionDataDefinition();
-                foreach (var data in deletion)
-                {
-                    newDeletion.Add(new KeyValuePair<string, object>(Truncate(data.Key), data.Value));
-                }
-                deletions.Add(newDeletion);
-            }
-            expression.Rows.Clear();
-            expression.Rows.AddRange(deletions);
         }
 
         public void Truncate(UpdateDataExpression expression)
