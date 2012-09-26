@@ -24,11 +24,13 @@ namespace FluentMigrator.Runner.Generators.Base
     {
         private readonly IColumn _column;
         private readonly IQuoter _quoter;
+        private readonly IEvaluator _evaluator;
 
-        public GeneratorBase(IColumn column, IQuoter quoter)
+        public GeneratorBase(IColumn column, IQuoter quoter, IEvaluator evaluator)
         {
             _column = column;
             _quoter = quoter;
+            _evaluator = evaluator;
         }
 
         public abstract string Generate(CreateSchemaExpression expression);
@@ -75,6 +77,11 @@ namespace FluentMigrator.Runner.Generators.Base
         protected IQuoter Quoter
         {
             get { return _quoter; }
+        }
+
+        protected IEvaluator evaluator
+        {
+            get { return _evaluator; }
         }
     }
 }
