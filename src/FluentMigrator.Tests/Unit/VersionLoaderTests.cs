@@ -20,6 +20,12 @@ namespace FluentMigrator.Tests.Unit
         {
             get { return 30; }
         }
+
+        public bool UseTrans
+        {
+            get { return true; } 
+            set { } 
+        }
     }
 
     [TestFixture]

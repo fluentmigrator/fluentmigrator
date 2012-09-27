@@ -29,7 +29,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         private readonly IDbFactory factory;
         public IDbConnection Connection { get; private set; }
         public IDbTransaction Transaction { get; private set; }
-        
+
         public override string DatabaseType
         {
             get { return "SqlServer"; }
@@ -119,29 +119,38 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override void BeginTransaction()
         {
-            Announcer.Say("Beginning Transaction");
-            Transaction = Connection.BeginTransaction();
+            if (Options.UseTrans)
+            {
+                Announcer.Say("Beginning Transaction");
+                Transaction = Connection.BeginTransaction();
+            }
         }
 
         public override void CommitTransaction()
         {
-            Announcer.Say("Committing Transaction");
-            Transaction.Commit();
-            WasCommitted = true;
-            if (Connection.State != ConnectionState.Closed)
+            if (Options.UseTrans)
             {
-                Connection.Close();
+                Announcer.Say("Committing Transaction");
+                Transaction.Commit();
+                WasCommitted = true;
+                if (Connection.State != ConnectionState.Closed)
+                {
+                    Connection.Close();
+                }
             }
         }
 
         public override void RollbackTransaction()
         {
-            Announcer.Say("Rolling back transaction");
-            Transaction.Rollback();
-            WasCommitted = true;
-            if (Connection.State != ConnectionState.Closed)
+            if (Options.UseTrans)
             {
-                Connection.Close();
+                Announcer.Say("Rolling back transaction");
+                Transaction.Rollback();
+                WasCommitted = true;
+                if (Connection.State != ConnectionState.Closed)
+                {
+                    Connection.Close();
+                }
             }
         }
 
@@ -158,7 +167,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             if (sql.Contains("GO"))
             {
                 ExecuteBatchNonQuery(sql);
-
             }
             else
             {
@@ -179,7 +187,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 {
                     using (var message = new StringWriter())
                     {
-                        message.WriteLine("An error occured executing the following sql:");
+                        message.WriteLine("An error occurred executing the following sql:");
                         message.WriteLine(sql);
                         message.WriteLine("The error was {0}", ex.Message);
 
@@ -236,7 +244,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             if (Options.PreviewOnly)
                 return;
-			
+
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
             if (expression.Operation != null)

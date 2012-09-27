@@ -4,5 +4,6 @@
     {
         bool PreviewOnly { get; }
         int Timeout { get; }
+        bool UseTrans { get; set; }
     }
 }
