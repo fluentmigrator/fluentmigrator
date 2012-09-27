@@ -119,35 +119,29 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override void BeginTransaction()
         {
-            if(Options.UseTrans) {
-                Announcer.Say("Beginning Transaction");
-                Transaction = Connection.BeginTransaction();
-            }
+            Announcer.Say("Beginning Transaction");
+            Transaction = Connection.BeginTransaction();
         }
 
         public override void CommitTransaction()
         {
-            if(Options.UseTrans) {
-                Announcer.Say("Committing Transaction");
-                Transaction.Commit();
-                WasCommitted = true;
-                if (Connection.State != ConnectionState.Closed)
-                {
-                    Connection.Close();
-                }
+            Announcer.Say("Committing Transaction");
+            Transaction.Commit();
+            WasCommitted = true;
+            if (Connection.State != ConnectionState.Closed)
+            {
+                Connection.Close();
             }
         }
 
         public override void RollbackTransaction()
         {
-            if(Options.UseTrans) {
-                Announcer.Say("Rolling back transaction");
-                Transaction.Rollback();
-                WasCommitted = true;
-                if (Connection.State != ConnectionState.Closed)
-                {
-                    Connection.Close();
-                }
+            Announcer.Say("Rolling back transaction");
+            Transaction.Rollback();
+            WasCommitted = true;
+            if (Connection.State != ConnectionState.Closed)
+            {
+                Connection.Close();
             }
         }
 
@@ -163,7 +157,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             if (sql.Contains("GO"))
             {
-                ExecuteBatchNonQuery(sql); 
+                ExecuteBatchNonQuery(sql);
+
             }
             else
             {
@@ -184,7 +179,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 {
                     using (var message = new StringWriter())
                     {
-                        message.WriteLine("An error occurred executing the following sql:");
+                        message.WriteLine("An error occured executing the following sql:");
                         message.WriteLine(sql);
                         message.WriteLine("The error was {0}", ex.Message);
 
@@ -210,7 +205,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                             if (!string.IsNullOrEmpty(sqlBatch))
                             {
                                 command.CommandText = sqlBatch;
-                                command.CommandTimeout = Options.Timeout;
                                 command.ExecuteNonQuery();
                                 sqlBatch = string.Empty;
                             }
@@ -225,7 +219,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 {
                     using (var message = new StringWriter())
                     {
-                        message.WriteLine("An error occurred executing the following sql:");
+                        message.WriteLine("An error occured executing the following sql:");
                         message.WriteLine(sql);
                         message.WriteLine("The error was {0}", ex.Message);
 
