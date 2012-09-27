@@ -114,12 +114,16 @@ public class TableIndex
 
 public class FKey
 {
+	public string ThisTable;
+    public string ThisColumn;
+    public string OtherTable;
+    public string OtherColumn;
+    public string OtherClass;
+
     public string ToTable;
 	public string FromColumn;
 	public string ToColumn;
 }
-
-
 
 public class Table
 {
@@ -670,8 +674,8 @@ class SqlServerSchemaReader : SchemaReader
         foreach (var tbl in result)
         {
             tbl.Columns=LoadColumns(tbl);
-			tbl.Indices = LoadIndices(tbl.Name);
-			tbl.FKeys = LoadFKeys(tbl.Name);			
+			tbl.Indices = LoadIndices(tbl);
+			tbl.FKeys = LoadFKeys(tbl);			
                     
             // Mark the primary key
             string PrimaryKey=GetPK(tbl.Name);
@@ -729,16 +733,112 @@ class SqlServerSchemaReader : SchemaReader
         }
     }
 
-    List<TableIndex> LoadIndices(string tableName)
+    List<TableIndex> LoadIndices(Table tbl)
     {
-		var result=new List<TableIndex>();
-		return result;
+		string sql = @"SELECT DISTINCT OBJECT_SCHEMA_NAME(T.[object_id],DB_ID()) AS [Schema],  
+              T.[name] AS [table_name], I.[name] AS [index_name], AC.[name] AS [column_name],  
+              I.[type_desc], I.[is_unique], I.[data_space_id], I.[ignore_dup_key], I.[is_primary_key], 
+              I.[is_unique_constraint], I.[fill_factor],    I.[is_padded], I.[is_disabled], I.[is_hypothetical], 
+              I.[allow_row_locks], I.[allow_page_locks], IC.[is_descending_key], IC.[is_included_column] 
+            FROM sys.[tables] AS T  
+              INNER JOIN sys.[indexes] I ON T.[object_id] = I.[object_id]  
+              INNER JOIN sys.[index_columns] IC ON I.[object_id] = IC.[object_id] 
+              INNER JOIN sys.[all_columns] AC ON T.[object_id] = AC.[object_id] AND IC.[column_id] = AC.[column_id] 
+            WHERE T.[is_ms_shipped] = 0 AND I.[type_desc] <> 'HEAP' 
+            AND I.is_primary_key = 0 AND T.[name] = @tableName and OBJECT_SCHEMA_NAME(T.[object_id],DB_ID()) = @schemaName";
+		
+		using (var cmd=_factory.CreateCommand())
+        {
+            cmd.Connection=_connection;
+            cmd.CommandText=sql;
+
+            var p = cmd.CreateParameter();
+            p.ParameterName = "@tableName";
+            p.Value=tbl.Name;
+            cmd.Parameters.Add(p);
+
+            p = cmd.CreateParameter();
+            p.ParameterName = "@schemaName";
+            p.Value=tbl.Schema;
+            cmd.Parameters.Add(p);
+
+			var result=new List<TableIndex>();
+
+			using (IDataReader rdr=cmd.ExecuteReader())
+            {
+				while(rdr.Read()){
+					
+					string thisTable=rdr["table_name"].ToString();
+            
+					if(tbl.Name.ToLower()==thisTable.ToLower()){
+						var indexName = rdr["index_name"].ToString();
+						if(!result.Exists(i => i.Name == indexName))
+						{
+							TableIndex index=new TableIndex();
+							index.Name= indexName;
+							index.IsUnique=rdr.GetBoolean(rdr.GetOrdinal("is_unique"));
+							index.IndexColumns = new List<IndexColumn>();
+							index.IndexColumns.Add(new IndexColumn { Name = rdr["column_name"].ToString(), IsAsc = !rdr.GetBoolean(rdr.GetOrdinal("is_descending_key"))});
+							result.Add(index);
+						}
+						else
+						{
+							result.Single(i => i.Name == indexName).IndexColumns.Add(new IndexColumn { Name = rdr["column_name"].ToString(), IsAsc = !rdr.GetBoolean(rdr.GetOrdinal("is_descending_key"))});
+						}
+					}
+            
+				}
+			}
+			return result;	
+		}	
 	}
 
-    List<FKey> LoadFKeys(string tblName)
+    List<FKey> LoadFKeys(Table tbl)
     {
-        var result=new List<FKey>();
-		return result;		
+		using (var cmd=_factory.CreateCommand())
+        {
+            cmd.Connection=_connection;
+            cmd.CommandText=FKSql;
+
+            var p = cmd.CreateParameter();
+            p.ParameterName = "@tableName";
+            p.Value=tbl.Name;
+            cmd.Parameters.Add(p);
+
+            p = cmd.CreateParameter();
+            p.ParameterName = "@schemaName";
+            p.Value=tbl.Schema;
+            cmd.Parameters.Add(p);
+
+			var result=new List<FKey>();
+
+			using (IDataReader rdr=cmd.ExecuteReader())
+            {
+				while(rdr.Read()){
+					FKey fk=new FKey();
+					string thisTable=rdr["ThisTable"].ToString();
+            
+					if(tbl.Name.ToLower()==thisTable.ToLower()){
+						fk.ThisTable=rdr["ThisTable"].ToString();
+						fk.ThisColumn=rdr["ThisColumn"].ToString();
+						fk.OtherTable=rdr["OtherTable"].ToString();
+						fk.OtherColumn=rdr["OtherColumn"].ToString();
+            
+					}else{
+						fk.ThisTable=rdr["OtherTable"].ToString();
+						fk.ThisColumn=rdr["OtherColumn"].ToString();
+						fk.OtherTable=rdr["ThisTable"].ToString();
+						fk.OtherColumn=rdr["ThisColumn"].ToString();
+          
+					}
+            
+					fk.OtherClass=Inflector.MakeSingular(CleanUp(fk.OtherTable));
+            
+					result.Add(fk);
+				}
+			}
+			return result;	
+		}	
 	}
 	
     string GetPK(string table){
@@ -847,6 +947,27 @@ class SqlServerSchemaReader : SchemaReader
         FROM  INFORMATION_SCHEMA.COLUMNS
         WHERE TABLE_NAME=@tableName AND TABLE_SCHEMA=@schemaName
         ORDER BY OrdinalPosition ASC";
+
+	const string FKSql=@"SELECT
+        ThisTable  = FK.TABLE_NAME,
+        ThisColumn = CU.COLUMN_NAME,
+        OtherTable  = PK.TABLE_NAME,
+        OtherColumn = PT.COLUMN_NAME, 
+        Constraint_Name = C.CONSTRAINT_NAME,
+        Owner = FK.TABLE_SCHEMA
+    FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS C
+    INNER JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS FK ON C.CONSTRAINT_NAME = FK.CONSTRAINT_NAME
+    INNER JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS PK ON C.UNIQUE_CONSTRAINT_NAME = PK.CONSTRAINT_NAME
+    INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE CU ON C.CONSTRAINT_NAME = CU.CONSTRAINT_NAME
+    INNER JOIN
+        (	
+            SELECT i1.TABLE_NAME, i2.COLUMN_NAME
+            FROM  INFORMATION_SCHEMA.TABLE_CONSTRAINTS i1
+            INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE i2 ON i1.CONSTRAINT_NAME = i2.CONSTRAINT_NAME
+            WHERE i1.CONSTRAINT_TYPE = 'PRIMARY KEY'
+        ) 
+    PT ON PT.TABLE_NAME = PK.TABLE_NAME
+    WHERE (FK.Table_NAME=@tableName OR PK.Table_NAME=@tableName)  AND (FK.TABLE_SCHEMA=@schemaName OR PK.TABLE_SCHEMA=@schemaName)";
       
 }
 
@@ -1691,9 +1812,9 @@ class SqliteSchemaReader : SchemaReader
                 while(rdr.Read())
                 {
                     FKey key=new FKey();
-                    key.ToTable=rdr["table"].ToString();
-					key.ToColumn=rdr["to"].ToString();
-					key.FromColumn=rdr["from"].ToString();
+                    key.OtherTable=rdr["table"].ToString();
+					key.OtherColumn=rdr["to"].ToString();
+					key.ThisColumn=rdr["from"].ToString();
                     result.Add(key);
                 }
             }
