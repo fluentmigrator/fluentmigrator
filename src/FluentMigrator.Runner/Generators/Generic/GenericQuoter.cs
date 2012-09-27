@@ -67,7 +67,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public virtual string FormatDateTime(DateTime value)
         {
-            return ValueQuote + (value).ToString("yyyy-MM-ddTHH:mm:ss") + ValueQuote;
+            return ValueQuote + (value).ToString("yyyy-MM-ddTHH:mm:ss",CultureInfo.InvariantCulture) + ValueQuote;
         }
 
         public virtual string FormatEnum(object value)
