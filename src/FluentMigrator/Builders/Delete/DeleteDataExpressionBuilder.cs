@@ -34,10 +34,7 @@ namespace FluentMigrator.Builders.Delete
 
         public void IsNull(string columnName)
         {
-            _expression.Rows.Add(new DeletionDataDefinition
-                                    {
-                                        new KeyValuePair<string, object>(columnName, null)
-                                    });
+            _expression.Rows.Add(new ExplicitDataDefinition(new DataValue(columnName)));
         }
 
         public IDeleteDataSyntax Row(object dataAsAnonymousType)
@@ -57,14 +54,9 @@ namespace FluentMigrator.Builders.Delete
             _expression.IsAllRows = true;
         }
 
-        private static DeletionDataDefinition GetData(object dataAsAnonymousType)
+        private static IDataDefinition GetData(object dataAsAnonymousType)
         {
-            var data = new DeletionDataDefinition();
-            var properties = TypeDescriptor.GetProperties(dataAsAnonymousType);
-
-            foreach (PropertyDescriptor property in properties)
-                data.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(dataAsAnonymousType)));
-            return data;
+            return new ReflectedDataDefinition(dataAsAnonymousType);
         }
     }
 }

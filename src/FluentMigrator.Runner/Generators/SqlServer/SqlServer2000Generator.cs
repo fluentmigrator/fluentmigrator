@@ -28,15 +28,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 {
     public class SqlServer2000Generator : GenericGenerator
     {
-        public SqlServer2000Generator()
-            : base(new SqlServerColumn(new SqlServer2000TypeMap()), new SqlServerQuoter())
-        {
-        }
+        public SqlServer2000Generator() : base(new SqlServerColumn(new SqlServer2000TypeMap()), new SqlServerQuoter(), new GenericEvaluator()) { }
 
-        protected SqlServer2000Generator(IColumn column)
-            : base(column, new SqlServerQuoter())
-        {
-        }
+        protected SqlServer2000Generator(IColumn column) : base(column, new SqlServerQuoter(), new GenericEvaluator()) { }
 
         public override string RenameTable { get { return "sp_rename '{0}', '{1}'"; } }
 

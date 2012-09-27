@@ -1,7 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using FluentMigrator.Expressions;
 using NUnit.Framework;
 using FluentMigrator.Runner.Generators.MySql;
 using NUnit.Should;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Tests.Unit.Generators.MySql
 {
@@ -23,6 +27,32 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
 
             var expected = @"INSERT INTO `TestTable1` (`Id`, `Name`, `Website`) VALUES (1, 'Just''in', 'codethinked.com');";
             expected += @" INSERT INTO `TestTable1` (`Id`, `Name`, `Website`) VALUES (2, 'Na\\te', 'kohari.org')";
+
+            sql.ShouldBe(expected);
+        }
+
+        [Test]
+        public void CanInsertBinaryData()
+        {
+            var expression = new InsertDataExpression
+            {
+                TableName = "TestTable1"
+            };
+
+            var row1 = new { Id = 1, Name = "Just'in", Value = Encoding.ASCII.GetBytes("Just'in") };
+            var row2 = new { Id = 1, Name = "Na\te", Value = Encoding.ASCII.GetBytes("Na\te") };
+
+            expression.Rows.AddRange(new IDataDefinition[]
+                {
+                    new ReflectedDataDefinition(row1),
+                    new ReflectedDataDefinition(row2)
+                }
+            );
+
+            var sql = generator.Generate(expression);
+            
+            var expected = @"INSERT INTO `TestTable1` (`Id`, `Name`, `Value`) VALUES (1, 'Just''in', UNHEX('4A75737427696E'));";
+            expected += @" INSERT INTO `TestTable1` (`Id`, `Name`, `Value`) VALUES (1, 'Na	e', UNHEX('4E610965'))";
 
             sql.ShouldBe(expected);
         }

@@ -23,12 +23,12 @@ namespace FluentMigrator.Expressions
 {
     public class DeleteDataExpression : IMigrationExpression
     {
-        private readonly List<DeletionDataDefinition> _rows = new List<DeletionDataDefinition>();
+        private readonly List<IDataDefinition> _rows = new List<IDataDefinition>();
         public virtual string SchemaName { get; set; }
         public string TableName { get; set; }
         public virtual bool IsAllRows { get; set; }
 
-        public List<DeletionDataDefinition> Rows
+        public List<IDataDefinition> Rows
         {
             get { return _rows; }
         }
@@ -50,13 +50,7 @@ namespace FluentMigrator.Expressions
                 TableName = TableName
             };
 
-            foreach (var row in Rows)
-            {
-                var dataDefinition = new InsertionDataDefinition();
-                dataDefinition.AddRange(row);
-
-                expression.Rows.Add(dataDefinition);
-            }
+            expression.Rows.AddRange(Rows);
 
             return expression;
         }

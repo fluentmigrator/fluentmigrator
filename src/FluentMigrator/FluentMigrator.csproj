@@ -213,8 +213,10 @@
     <Compile Include="Infrastructure\MigrationWithMetaDataAdapter.cs" />
     <Compile Include="MigrationBase.cs" />
     <Compile Include="Model\ConstraintDefinition.cs" />
-    <Compile Include="Model\DeletionDataDefinition.cs" />
-    <Compile Include="Model\InsertionDataDefinition.cs" />
+    <Compile Include="Model\DataValue.cs" />
+    <Compile Include="Model\ExplicitDataDefinition.cs" />
+    <Compile Include="Model\ReflectedDataDefinition.cs" />
+    <Compile Include="Model\IDataDefinition.cs" />
     <Compile Include="Builders\Rename\Column\IRenameColumnToSyntax.cs" />
     <Compile Include="Builders\Rename\Column\RenameColumnExpressionBuilder.cs" />
     <Compile Include="Builders\Rename\IRenameColumnTableSyntax.cs" />

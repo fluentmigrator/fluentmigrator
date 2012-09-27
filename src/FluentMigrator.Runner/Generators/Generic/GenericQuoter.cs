@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Generators.Generic
 {
@@ -23,6 +24,11 @@ namespace FluentMigrator.Runner.Generators.Generic
             if (value is decimal) { return FormatDecimal((decimal)value); }
             
             return value.ToString();
+        }
+
+        public string QuoteDataValue(IDataValue dataValue)
+        {
+            return dataValue.QuoteValue ? QuoteValue(dataValue.Value) : dataValue.Value.ToString();
         }
 
         private string FormatDecimal(decimal value)

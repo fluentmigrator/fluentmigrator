@@ -13,8 +13,6 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
         public FirebirdColumn(FirebirdOptions fbOptions) : base(new FirebirdTypeMap(), new FirebirdQuoter()) 
         {
-            if (fbOptions == null)
-                throw new ArgumentNullException("fbOptions");
             FBOptions = fbOptions;
 
             //In firebird DEFAULT clause precedes NULLABLE clause

@@ -128,18 +128,16 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             var expression = new InsertDataExpression();
             expression.TableName = TestTableName1;
-            expression.Rows.Add(new InsertionDataDefinition
-                                    {
-                                        new KeyValuePair<string, object>("Id", 1),
-                                        new KeyValuePair<string, object>("Name", "Just'in"),
-                                        new KeyValuePair<string, object>("Website", "codethinked.com")
-                                    });
-            expression.Rows.Add(new InsertionDataDefinition
-                                    {
-                                        new KeyValuePair<string, object>("Id", 2),
-                                        new KeyValuePair<string, object>("Name", @"Na\te"),
-                                        new KeyValuePair<string, object>("Website", "kohari.org")
-                                    });
+            expression.Rows.Add(new ExplicitDataDefinition(
+                                        new DataValue("Id", 1),
+                                        new DataValue("Name", "Just'in"),
+                                        new DataValue("Website", "codethinked.com")
+                                ));
+            expression.Rows.Add(new ExplicitDataDefinition(
+                                        new DataValue("Id", 2),
+                                        new DataValue("Name", @"Na\te"),
+                                        new DataValue("Website", "kohari.org")
+                                ));
 
             return expression;
         }
@@ -182,7 +180,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         public static InsertDataExpression GetInsertGUIDExpression()
         {
             var expression = new InsertDataExpression { TableName = TestTableName1 };
-            expression.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("guid", TestGuid) });
+            expression.Rows.Add(new ExplicitDataDefinition(new DataValue("guid", TestGuid)));
 
             return expression;
         }
@@ -191,11 +189,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             var expression = new DeleteDataExpression();
             expression.TableName = TestTableName1;
-            expression.Rows.Add(new DeletionDataDefinition
-                                    {
-                                        new KeyValuePair<string, object>("Name", "Just'in"),
-                                        new KeyValuePair<string, object>("Website", null)
-                                    });
+            expression.Rows.Add(new ExplicitDataDefinition(new DataValue("Name", "Just'in"), new DataValue("Website", null)));
 
             return expression;
         }
@@ -204,15 +198,8 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             var expression = new DeleteDataExpression();
             expression.TableName = TestTableName1;
-            expression.Rows.Add(new DeletionDataDefinition
-                                    {
-                                        new KeyValuePair<string, object>("Name", "Just'in"),
-                                        new KeyValuePair<string, object>("Website", null)
-                                    });
-            expression.Rows.Add(new DeletionDataDefinition
-                                    {
-                                        new KeyValuePair<string, object>("Website", "github.com")
-                                    });
+            expression.Rows.Add(new ExplicitDataDefinition(new DataValue("Name", "Just'in"), new DataValue("Website", null)));
+            expression.Rows.Add(new ExplicitDataDefinition(new DataValue("Website", "github.com")));
 
             return expression;
         }

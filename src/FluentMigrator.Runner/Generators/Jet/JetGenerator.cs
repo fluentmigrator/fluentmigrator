@@ -5,10 +5,7 @@ namespace FluentMigrator.Runner.Generators.Jet
 {
     public class JetGenerator : GenericGenerator
     {
-        public JetGenerator()
-            : base(new JetColumn(), new JetQuoter())
-        {
-        }
+        public JetGenerator() : base(new JetColumn(), new JetQuoter(), new GenericEvaluator()) { }
 
         public override string DropIndex { get { return "DROP INDEX {0} ON {1}"; } }
 

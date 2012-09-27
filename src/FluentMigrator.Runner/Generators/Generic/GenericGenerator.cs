@@ -13,8 +13,7 @@ namespace FluentMigrator.Runner.Generators.Generic
     {
         public CompatabilityMode compatabilityMode;
 
-        public GenericGenerator(IColumn column, IQuoter quoter)
-            : base(column, quoter)
+        public GenericGenerator(IColumn column, IQuoter quoter, IEvaluator evaluator) : base(column, quoter, evaluator)
         {
             compatabilityMode = CompatabilityMode.LOOSE;
         }
@@ -254,14 +253,17 @@ namespace FluentMigrator.Runner.Generators.Generic
             List<string> columnValues = new List<string>();
             List<string> insertStrings = new List<string>();
 
-            foreach (InsertionDataDefinition row in expression.Rows)
+            foreach (IDataDefinition row in expression.Rows)
             {
+                IEnumerable<IDataValue> columnData = evaluator.Evaluate(row);
+
                 columnNames.Clear();
                 columnValues.Clear();
-                foreach (KeyValuePair<string, object> item in row)
+
+                foreach (IDataValue item in columnData)
                 {
-                    columnNames.Add(Quoter.QuoteColumnName(item.Key));
-                    columnValues.Add(Quoter.QuoteValue(item.Value));
+                    columnNames.Add(Quoter.QuoteColumnName(item.ColumnName));
+                    columnValues.Add(Quoter.QuoteDataValue(item));
                 }
 
                 string columns = String.Join(", ", columnNames.ToArray());
@@ -329,10 +331,13 @@ namespace FluentMigrator.Runner.Generators.Generic
             {
                 foreach (var row in expression.Rows)
                 {
+                    IEnumerable<IDataValue> columnData = evaluator.Evaluate(row);
+
                     var whereClauses = new List<string>();
-                    foreach (KeyValuePair<string, object> item in row)
+
+                    foreach (IDataValue item in columnData)
                     {
-                        whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value)));
+                        whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.ColumnName), item.Value == null ? "IS" : "=", Quoter.QuoteDataValue(item)));
                     }
 
                     deleteItems.Add(string.Format(DeleteData, Quoter.QuoteTableName(expression.TableName), String.Join(" AND ", whereClauses.ToArray())));

@@ -10,7 +10,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
 {
     public class PostgresGenerator : GenericGenerator
     {
-        public PostgresGenerator() : base(new PostgresColumn(), new PostgresQuoter()) { }
+        public PostgresGenerator() : base(new PostgresColumn(), new PostgresQuoter(), new GenericEvaluator()) { }
 
         public override string Generate(CreateSchemaExpression expression)
         {
@@ -136,11 +136,14 @@ namespace FluentMigrator.Runner.Generators.Postgres
             var result = new StringBuilder();
             foreach (var row in expression.Rows)
             {
+                IEnumerable<IDataValue> columnValues = evaluator.Evaluate(row);
+
                 var columnNames = new List<string>();
                 var columnData = new List<object>();
-                foreach (var item in row)
+
+                foreach (var item in columnValues)
                 {
-                    columnNames.Add(item.Key);
+                    columnNames.Add(item.ColumnName);
                     columnData.Add(item.Value);
                 }
 
@@ -171,14 +174,16 @@ namespace FluentMigrator.Runner.Generators.Postgres
                     var where = String.Empty;
                     var i = 0;
 
-                    foreach (var item in row)
+                    IEnumerable<IDataValue> columnValues = evaluator.Evaluate(row);
+
+                    foreach (var item in columnValues)
                     {
                         if (i != 0)
                         {
                             where += " AND ";
                         }
 
-                        where += String.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value));
+                        where += String.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.ColumnName), item.Value == null ? "IS" : "=", Quoter.QuoteDataValue(item));
                         i++;
                     }
 

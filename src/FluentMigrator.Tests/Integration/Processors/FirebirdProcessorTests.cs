@@ -1,18 +1,19 @@
-﻿using System.Data;
+﻿using System;
+using System.Data;
+using FirebirdSql.Data.FirebirdClient;
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
 using NUnit.Should;
-using FirebirdSql.Data.FirebirdClient;
-using FluentMigrator.Runner.Generators.Firebird;
-using FluentMigrator.Runner.Processors.Firebird;
-using System;
-using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Tests.Integration.Processors
 {
-    [TestFixture]
+    [TestFixture, Category("Integration")]
     public class FirebirdProcessorTests
     {
         private readonly FirebirdQuoter quoter = new FirebirdQuoter();
@@ -576,8 +577,7 @@ namespace FluentMigrator.Tests.Integration.Processors
                 });
 
                 InsertDataExpression insert = new InsertDataExpression() { TableName = table.Name };
-                Model.InsertionDataDefinition item = new Model.InsertionDataDefinition();
-                item.Add(new System.Collections.Generic.KeyValuePair<string, object>("BOGUS", 0));
+                Model.ExplicitDataDefinition item = new Model.ExplicitDataDefinition(new DataValue("BOGUS", 0));
                 insert.Rows.Add(item);
                 Processor.Process(insert);
 
@@ -604,8 +604,7 @@ namespace FluentMigrator.Tests.Integration.Processors
                 });
 
                 InsertDataExpression insert = new InsertDataExpression() { TableName = table.Name };
-                Model.InsertionDataDefinition item = new Model.InsertionDataDefinition();
-                item.Add(new System.Collections.Generic.KeyValuePair<string, object>("BOGUS", 0));
+                Model.ExplicitDataDefinition item = new Model.ExplicitDataDefinition(new DataValue("BOGUS", 0));
                 insert.Rows.Add(item);
 
                 //Process 5 times = insert 5 times

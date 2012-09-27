@@ -138,9 +138,14 @@
     <Compile Include="Extensions\TagsExtensions.cs" />
     <Compile Include="Generators\Base\ColumnBase.cs" />
     <Compile Include="Extensions\CompatabilityModeExtension.cs" />
+    <Compile Include="Generators\Firebird\FirbirdDataProvider.cs" />
     <Compile Include="Generators\Firebird\FirebirdColumn.cs" />
     <Compile Include="Generators\Firebird\FirebirdGenerator.cs" />
     <Compile Include="Generators\Firebird\FirebirdTruncator.cs" />
+    <Compile Include="Generators\Generic\GenericEvaluator.cs" />
+    <Compile Include="Generators\IEvaluator.cs" />
+    <Compile Include="Generators\MySql\MySqlEvaluator.cs" />
+    <Compile Include="Generators\MySql\MySqlFunctions.cs" />
     <Compile Include="Processors\Firebird\FirebirdProcessedExpression.cs" />
     <Compile Include="Generators\Firebird\FirebirdQuoter.cs" />
     <Compile Include="Generators\Firebird\FirebirdTypeMap.cs" />

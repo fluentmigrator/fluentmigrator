@@ -399,18 +399,18 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         {
             var expression = new InsertDataExpression();
             expression.TableName = "TestTable";
-            expression.Rows.Add(new InsertionDataDefinition
-                                    {
-                                        new KeyValuePair<string, object>("Id", 1),
-                                        new KeyValuePair<string, object>("Name", "Just'in"),
-                                        new KeyValuePair<string, object>("Website", "codethinked.com")
-                                    });
-            expression.Rows.Add(new InsertionDataDefinition
-                                    {
-                                        new KeyValuePair<string, object>("Id", 2),
-                                        new KeyValuePair<string, object>("Name", "Na\\te"),
-                                        new KeyValuePair<string, object>("Website", "kohari.org")
-                                    });
+            expression.Rows.Add(new ExplicitDataDefinition
+                                    (
+                                        new DataValue("Id", 1),
+                                        new DataValue("Name", "Just'in"),
+                                        new DataValue("Website", "codethinked.com")
+                                    ));
+            expression.Rows.Add(new ExplicitDataDefinition
+                                    (
+                                        new DataValue("Id", 2),
+                                        new DataValue("Name", "Na\\te"),
+                                        new DataValue("Website", "kohari.org")
+                                    ));
 
             var sql = generator.Generate(expression);
 
@@ -425,7 +425,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         {
             var gid = Guid.NewGuid();
             var expression = new InsertDataExpression { TableName = "TestTable" };
-            expression.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("guid", gid) });
+            expression.Rows.Add(new ExplicitDataDefinition(new DataValue("guid", gid)));
 
             var sql = generator.Generate(expression);
 
@@ -484,11 +484,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
                 SchemaName = "public",
                 TableName = "Table1"
             };
-            expression.Rows.Add(
-                new DeletionDataDefinition
-                    {
-                        new KeyValuePair<string, object>("description", "wibble")
-                    });
+
+            expression.Rows.Add(new ExplicitDataDefinition(new DataValue("description", "wibble")));
 
             var sql = generator.Generate(expression);
             sql.ShouldBe("DELETE FROM \"public\".\"Table1\" WHERE \"description\" = 'wibble';");
@@ -503,11 +500,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
                 SchemaName = "public",
                 TableName = "Table1"
             };
-            expression.Rows.Add(
-                new DeletionDataDefinition
-                    {
-                        new KeyValuePair<string, object>("description", null)
-                    });
+
+            expression.Rows.Add(new ExplicitDataDefinition(new DataValue("description", null)));
 
             var sql = generator.Generate(expression);
             sql.ShouldBe("DELETE FROM \"public\".\"Table1\" WHERE \"description\" IS NULL;");
@@ -522,11 +516,11 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
                 SchemaName = "public",
                 TableName = "Table1"
             };
-            expression.Rows.Add(new DeletionDataDefinition
-                                    {
-                                        new KeyValuePair<string, object>("description", null),
-                                        new KeyValuePair<string, object>("id", 10)
-                                    });
+            expression.Rows.Add(new ExplicitDataDefinition
+                                    (
+                                        new DataValue("description", null),
+                                        new DataValue("id", 10)
+                                    ));
 
             var sql = generator.Generate(expression);
             sql.ShouldBe("DELETE FROM \"public\".\"Table1\" WHERE \"description\" IS NULL AND \"id\" = 10;");
