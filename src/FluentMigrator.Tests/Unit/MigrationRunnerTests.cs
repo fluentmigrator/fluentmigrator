@@ -372,6 +372,88 @@ namespace FluentMigrator.Tests.Unit
             _fakeVersionLoader.DidLoadVersionInfoGetCalled.ShouldBe(true);
         }
 
+		[Test]
+		public void ValidateVersionOrderingShouldReturnNothingIfNoUnappliedMigrations()
+		{
+			const long version1 = 2011010101;
+			const long version2 = 2011010102;
+
+			var mockMigration1 = new Mock<IMigration>();
+			var mockMigration2 = new Mock<IMigration>();
+
+			LoadVersionData(version1, version2);
+
+			_runner.MigrationLoader.Migrations.Clear();
+			_runner.MigrationLoader.Migrations.Add(version1, mockMigration1.Object);
+			_runner.MigrationLoader.Migrations.Add(version2, mockMigration2.Object);
+
+			Assert.DoesNotThrow(() => _runner.ValidateVersionOrder());
+
+            _announcer.Verify(a => a.Say("Version ordering valid."));
+
+			_processorMock.Verify(m => m.CommitTransaction(), Times.Never());
+			_processorMock.Verify(m => m.RollbackTransaction(), Times.Never());
+			_fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();		
+		}
+
+		[Test]
+        public void ValidateVersionOrderingShouldReturnNothingIfUnappliedMigrationVersionIsGreaterThanLatestAppliedMigration()
+		{
+			const long version1 = 2011010101;
+			const long version2 = 2011010102;
+
+			var mockMigration1 = new Mock<IMigration>();
+			var mockMigration2 = new Mock<IMigration>();
+
+			LoadVersionData(version1);
+
+			_runner.MigrationLoader.Migrations.Clear();
+			_runner.MigrationLoader.Migrations.Add(version1, mockMigration1.Object);
+			_runner.MigrationLoader.Migrations.Add(version2, mockMigration2.Object);
+
+			Assert.DoesNotThrow(() => _runner.ValidateVersionOrder());
+
+            _announcer.Verify(a => a.Say("Version ordering valid."));
+
+			_processorMock.Verify(m => m.CommitTransaction(), Times.Never());
+			_processorMock.Verify(m => m.RollbackTransaction(), Times.Never());
+			_fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();		
+		}
+
+		[Test]
+        public void ValidateVersionOrderingShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanGreatestAppliedMigrationVersion()
+		{
+			const long version1 = 2011010101;
+			const long version2 = 2011010102;
+			const long version3 = 2011010103;
+			const long version4 = 2011010104;
+
+			var mockMigration1 = new Mock<IMigration>();
+			var mockMigration2 = new Mock<IMigration>();
+			var mockMigration3 = new Mock<IMigration>();
+			var mockMigration4 = new Mock<IMigration>();
+			
+			LoadVersionData(version1, version4);
+
+			_runner.MigrationLoader.Migrations.Clear();
+			_runner.MigrationLoader.Migrations.Add(version1, mockMigration1.Object);
+			_runner.MigrationLoader.Migrations.Add(version2, mockMigration2.Object);
+			_runner.MigrationLoader.Migrations.Add(version3, mockMigration3.Object);
+			_runner.MigrationLoader.Migrations.Add(version4, mockMigration4.Object);
+
+			var exception = Assert.Throws<VersionOrderInvalidException>(() => _runner.ValidateVersionOrder());
+
+            exception.InvalidMigrations.ShouldBe(new[]
+                                                     {
+                                                         new KeyValuePair<long, IMigration>(version2, mockMigration2.Object), 
+                                                         new KeyValuePair<long, IMigration>(version3, mockMigration3.Object)
+                                                     });
+
+			_processorMock.Verify(m => m.CommitTransaction(), Times.Never());
+			_processorMock.Verify(m => m.RollbackTransaction(), Times.Never());
+			_fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();
+		}
+
         [Test, Ignore("Move to MigrationLoader tests")]
         public void HandlesNullMigrationList()
         {

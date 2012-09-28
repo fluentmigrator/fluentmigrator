@@ -248,6 +248,7 @@
     <Compile Include="Versioning\VersionInfo.cs" />
     <Compile Include="Versioning\VersionMigration.cs" />
     <Compile Include="VersionLoader.cs" />
+    <Compile Include="VersionOrderInvalidException.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj">
