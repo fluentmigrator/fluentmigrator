@@ -48,6 +48,7 @@ namespace FluentMigrator.Console
         public bool Verbose;
         public long Version;
         public string WorkingDirectory;
+        public bool UseTrans;
 
         public RunnerContext RunnerContext { get; private set;}
 
@@ -156,7 +157,12 @@ namespace FluentMigrator.Console
                                             "help|h|?",
                                             "Displays this help menu.",
                                             v => { ShowHelp = true; }
-                                            }
+                                            },
+                                        {
+                                            "useTrans=",
+                                            "When set to true, no transactions will be used.",
+                                            v=> { UseTrans = bool.Parse(v); }
+                                        }
                                     };
 
                 try
@@ -270,7 +276,8 @@ namespace FluentMigrator.Console
                 Timeout = Timeout,
                 ConnectionStringConfigPath = ConnectionStringConfigPath,
                 ApplicationContext = ApplicationContext,
-                Tags = Tags
+                Tags = Tags,
+                UseTrans = UseTrans
             };
 
             new TaskExecutor(RunnerContext).Execute();
