@@ -24,5 +24,10 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             : base(new SqlServerColumn(new SqlServer2008TypeMap()))
         {
         }
+
+        public SqlServer2008Generator(IColumn column)
+            :base(column)
+        {
+        }
     }
 }
