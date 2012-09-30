@@ -141,6 +141,7 @@
     <Compile Include="Generators\Firebird\FirebirdColumn.cs" />
     <Compile Include="Generators\Firebird\FirebirdGenerator.cs" />
     <Compile Include="Generators\Firebird\FirebirdTruncator.cs" />
+    <Compile Include="Generators\SqlServer\SqlServer2012Generator.cs" />
     <Compile Include="Processors\Firebird\FirebirdProcessedExpression.cs" />
     <Compile Include="Generators\Firebird\FirebirdQuoter.cs" />
     <Compile Include="Generators\Firebird\FirebirdTypeMap.cs" />
@@ -224,6 +225,7 @@
     <Compile Include="Processors\ReflectionBasedDbFactory.cs" />
     <Compile Include="Processors\Sqlite\SqliteDbFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2000Processor.cs" />
+    <Compile Include="Processors\SqlServer\SqlServer2012ProcessorFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServerCeDbFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServerDbFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServerCeProcessor.cs" />

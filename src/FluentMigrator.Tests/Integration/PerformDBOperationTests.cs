@@ -33,6 +33,7 @@ namespace FluentMigrator.Tests.Integration
             };
 
             ExecuteWithSqlServer2008(processor => processor.Process(expression), true);
+            ExecuteWithSqlServer2012(processor => processor.Process(expression), true);
         }
     }
 }

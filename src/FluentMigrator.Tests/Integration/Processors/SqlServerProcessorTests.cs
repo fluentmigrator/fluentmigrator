@@ -38,8 +38,8 @@ namespace FluentMigrator.Tests.Integration.Processors
         [SetUp]
         public void SetUp()
         {
-            Connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
-            Processor = new SqlServerProcessor(Connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
+            Connection = new SqlConnection(IntegrationTestOptions.SqlServer2012.ConnectionString);
+            Processor = new SqlServerProcessor(Connection, new SqlServer2012Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
         }
 
         [TearDown]
@@ -119,11 +119,11 @@ namespace FluentMigrator.Tests.Integration.Processors
         {
             var output = new StringWriter();
 
-            var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
+            var connection = new SqlConnection(IntegrationTestOptions.SqlServer2012.ConnectionString);
 
             var processor = new SqlServerProcessor(
                 connection,
-                new SqlServer2008Generator(),
+                new SqlServer2012Generator(),
                 new TextWriterAnnouncer(output),
                 new ProcessorOptions { PreviewOnly = true },
                 new SqlServerDbFactory());

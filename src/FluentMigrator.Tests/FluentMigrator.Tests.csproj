@@ -222,6 +222,7 @@
     <Compile Include="Unit\Generators\Postgres\PostgresDataTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000GeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005GeneratorTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2012\SqlServer2012GeneratorTests.cs" />
     <Compile Include="Unit\Initialization\ConnectionStringManagerTests.cs">
       <SubType>Code</SubType>
     </Compile>
