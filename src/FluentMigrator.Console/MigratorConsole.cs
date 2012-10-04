@@ -48,7 +48,7 @@ namespace FluentMigrator.Console
         public bool Verbose;
         public long Version;
         public string WorkingDirectory;
-        public bool UseTrans;
+        public bool UseTrans = true;
 
         public RunnerContext RunnerContext { get; private set;}
 
