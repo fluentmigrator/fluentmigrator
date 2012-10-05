@@ -63,11 +63,7 @@ namespace FluentMigrator.Runner
 
         protected virtual IEnumerable<IDataDefinition> CreateVersionInfoInsertionData(long version)
         {
-            return new []
-            {
-                new ExplicitDataDefinition(new DataValue(VersionTableMetaData.ColumnName, version)),
-                new ExplicitDataDefinition(new DataValue("AppliedOn", DateTime.UtcNow))
-            };
+            return new [] { new ExplicitDataDefinition(new DataValue(VersionTableMetaData.ColumnName, version), new DataValue("AppliedOn", DateTime.UtcNow)) };
         }
 
         public IVersionInfo VersionInfo
