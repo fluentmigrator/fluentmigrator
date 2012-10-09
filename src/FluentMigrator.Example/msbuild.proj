@@ -1,34 +1,39 @@
 <?xml version="1.0"?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Migrate">
    <PropertyGroup>
-		<MigratorTasksPath>lib</MigratorTasksPath>
+		<DatabaseType>sqlite</DatabaseType>
+		<ConnectionString>Data Source=:memory:;Version=3;New=True;</ConnectionString>
+		<!-- SqlServer2008 connection string
+		<ConnectionString>server=.\SQLEXPRESS;uid=test;pwd=test;Trusted_Connection=yes;database=FluentMigrator</ConnectionString>
+		-->
+		
+		<ExamplePath>build/FluentMigrator.Example.dll</ExamplePath>
 	</PropertyGroup>
 	
    <UsingTask TaskName="FluentMigrator.MSBuild.Migrate" 
-        AssemblyFile="lib/FluentMigrator.MSBuild.dll"/>
+        AssemblyFile="./packages/FluentMigrator.Tools.1.0.3.0/tools/AnyCPU/40/FluentMigrator.MSBuild.dll"/>
 
   <Target Name="Migrate" >
     <Message Text="Starting FluentMigrator Migration"/>
    
-	<!-- The dll must be located where dotnet assembly loader can find it (usually same folder as the fluentmigrator dlls) -->
-	<Copy SourceFiles="./build/FluentMigrator.Example.dll" DestinationFolder="$(MigratorTasksPath)"/>
-	<!-- Important: Target must be your Migrations assembly name, not your dll file name.  -->
-    <Migrate Database="sqlite"
-             Connection="Data Source=:memory:;Version=3;New=True;"
-             Target="FluentMigrator.Example">
+    <Migrate Database="$(DatabaseType)"
+             Connection="$(ConnectionString)"
+			 Verbose="true"
+			 Output="True" 
+			 OutputFilename="generated_migrate_up.sql"
+             Target="$(ExamplePath)">
     </Migrate>
   </Target>
   
   <Target Name="MigrateRollback" >
     <Message Text="Starting FluentMigrator Migration Rollback"/>
 
-	<!-- The dll must be located where dotnet assembly loader can find it (usually same folder as the fluentmigrator dlls) -->
-	<Copy SourceFiles="./build/FluentMigrator.Example.dll" DestinationFolder="$(MigratorTasksPath)"/>
-	<!-- Important: Target must be your Migrations assembly name, not your dll file name.  -->
-    <Migrate Database="postgres"
-             Connection="Server=127.0.0.1;Port=5432;Database=FluentMigrator;User Id=test;Password=test;"
-             Target="FluentMigrator.Example"
+    <Migrate Database="$(DatabaseType)"
+             Connection="$(ConnectionString)"
+             Target="$(ExamplePath)"
 			 Verbose="true"
+			 Output="True" 
+			 OutputFilename="generated_migrate_rollback.sql"
 			 Task="rollback">
     </Migrate>
   </Target>
@@ -36,12 +41,12 @@
   <Target Name="MigrateRollbackAll" >
     <Message Text="Starting FluentMigrator Migration Rollback All"/>
 
-	<!-- The dll must be located where dotnet assembly loader can find it (usually same folder as the fluentmigrator dlls) -->
-	<Copy SourceFiles="./build/FluentMigrator.Example.dll" DestinationFolder="$(MigratorTasksPath)"/>
-    <!-- Important: Target must be your Migrations assembly name, not your dll file name.  -->
-	<Migrate Database="postgres"
-             Connection="Server=127.0.0.1;Port=5432;Database=FluentMigrator;User Id=test;Password=test;"
-             Target="FluentMigrator.Example"
+	<Migrate Database="$(DatabaseType)"
+             Connection="$(ConnectionString)"
+             Target="$(ExamplePath)"
+			 Verbose="true"
+			 Output="True" 
+			 OutputFilename="generated_migrate_rollbackall.sql"
 			 Task="rollback:all">
     </Migrate>
   </Target>
