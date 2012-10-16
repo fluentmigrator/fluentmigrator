@@ -2,7 +2,10 @@
 
 namespace FluentMigrator.Builders.Create.Constraint
 {
-    public class CreateConstraintExpressionBuilder : ExpressionBuilderBase<CreateConstraintExpression>, ICreateConstraintOnTableSyntax, ICreateConstraintWithSchemaOrColumnSyntax
+    public class CreateConstraintExpressionBuilder : ExpressionBuilderBase<CreateConstraintExpression>, 
+        ICreateConstraintOnTableSyntax, 
+        ICreateConstraintWithSchemaOrColumnSyntax,
+        ICreateConstraintOptionsSyntax
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="T:CreateConstraintExpressionBuilder"/> class.
@@ -18,17 +21,19 @@ namespace FluentMigrator.Builders.Create.Constraint
             return this;
         }
 
-        public void Column(string columnName)
+        public ICreateConstraintOptionsSyntax Column(string columnName)
         {
             Expression.Constraint.Columns.Add(columnName);
+            return this;
         }
 
-        public void Columns(string[] columnNames)
+        public ICreateConstraintOptionsSyntax Columns(string[] columnNames)
         {
             foreach (var columnName in columnNames)
             {
                 Expression.Constraint.Columns.Add(columnName);
             }
+            return this;
         }
 
         public ICreateConstraintColumnsSyntax WithSchema(string schemaName)
@@ -36,7 +41,5 @@ namespace FluentMigrator.Builders.Create.Constraint
             Expression.Constraint.SchemaName = schemaName;
             return this;
         }
-
-
     }
 }

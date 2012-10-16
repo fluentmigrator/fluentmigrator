@@ -2,6 +2,7 @@
 using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
@@ -231,6 +232,28 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
+        public void CanCreateClusteredNamedPrimaryKeyConstraint()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType,
+                    SqlServerConstraintType.Clustered);
+
+            var result = _generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY CLUSTERED ([TestColumn1])");
+        }
+
+        [Test]
+        public void CanCreateNonClusteredNamedPrimaryKeyConstraint()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType,
+                    SqlServerConstraintType.NonClustered);
+
+            var result = _generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY NONCLUSTERED ([TestColumn1])");
+        }
+
+        [Test]
         public void CanCreateMultiColumnPrimaryKeyConstraint()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnPrimaryKeyExpression();
@@ -244,6 +267,28 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var expression = GeneratorTestHelper.GetCreateMultiColumnNamedPrimaryKeyExpression();
             var result = _generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY ([TestColumn1], [TestColumn2])");
+        }
+
+        [Test]
+        public void CanCreateClusteredMultiColumnNamedPrimaryKeyConstraint()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnNamedPrimaryKeyExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType,
+                    SqlServerConstraintType.Clustered);
+
+            var result = _generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY CLUSTERED ([TestColumn1], [TestColumn2])");
+        }
+
+        [Test]
+        public void CanCreateNonClusteredMultiColumnNamedPrimaryKeyConstraint()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnNamedPrimaryKeyExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType,
+                    SqlServerConstraintType.NonClustered);
+
+            var result = _generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY NONCLUSTERED ([TestColumn1], [TestColumn2])");
         }
 
         [Test]
@@ -263,6 +308,28 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
+        public void CanCreateClusteredNamedUniqueConstraint()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType,
+                    SqlServerConstraintType.Clustered);
+
+            var result = _generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE CLUSTERED ([TestColumn1])");
+        }
+
+        [Test]
+        public void CanCreateNonClusteredNamedUniqueConstraint()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType,
+                    SqlServerConstraintType.NonClustered);
+
+            var result = _generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE NONCLUSTERED ([TestColumn1])");
+        }
+
+        [Test]
         public void CanCreateMultiColumnUniqueConstraint()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
@@ -276,6 +343,28 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             var expression = GeneratorTestHelper.GetCreateMultiColumnNamedUniqueConstraintExpression();
             var result = _generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE ([TestColumn1], [TestColumn2])");
+        }
+
+        [Test]
+        public void CanCreateClusteredMultiColumnNamedUniqueConstraint()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnNamedUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType,
+                    SqlServerConstraintType.Clustered);
+
+            var result = _generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE CLUSTERED ([TestColumn1], [TestColumn2])");
+        }
+
+        [Test]
+        public void CanCreateNonClusteredMultiColumnNamedUniqueConstraint()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnNamedUniqueConstraintExpression();
+            expression.Constraint.AdditionalFeatures.Add(SqlServerExtensions.ConstraintType,
+                    SqlServerConstraintType.NonClustered);
+
+            var result = _generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE NONCLUSTERED ([TestColumn1], [TestColumn2])");
         }
     }
 }

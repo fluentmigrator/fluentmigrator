@@ -48,10 +48,37 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public virtual string IdentityInsert { get { return "SET IDENTITY_INSERT {0} {1}"; } }
 
+        public override string CreateConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} {2}{3} ({4})"; } }
+
         //Not need for the nonclusted keyword as it is the default mode
         public override string GetClusterTypeString(CreateIndexExpression column)
         {
             return column.Index.IsClustered ? "CLUSTERED " : string.Empty;
+        }
+
+        protected string GetConstraintClusteringString(CreateConstraintExpression constraint)
+        {
+            object indexType;
+
+            if (!constraint.Constraint.AdditionalFeatures.TryGetValue(
+                SqlServerExtensions.ConstraintType, out indexType)) return string.Empty;
+
+            return (indexType.Equals(SqlServerConstraintType.Clustered)) ? " CLUSTERED" : " NONCLUSTERED";
+        }
+
+        public override string Generate(CreateConstraintExpression expression)
+        {
+            var constraintType = (expression.Constraint.IsPrimaryKeyConstraint) ? "PRIMARY KEY" : "UNIQUE";
+
+            var constraintClustering = GetConstraintClusteringString(expression);
+
+            string columns = String.Join(", ", expression.Constraint.Columns.Select(x => Quoter.QuoteColumnName(x)).ToArray());
+
+            return string.Format(CreateConstraint, Quoter.QuoteTableName(expression.Constraint.TableName),
+                Quoter.Quote(expression.Constraint.ConstraintName),
+                constraintType,
+                constraintClustering,
+                columns);
         }
 
         public override string Generate(RenameTableExpression expression)
@@ -179,7 +206,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         { 
             SqlServerExtensions.IdentityInsert,
             SqlServerExtensions.IdentitySeed, 
-            SqlServerExtensions.IdentityIncrement
+            SqlServerExtensions.IdentityIncrement, 
+            SqlServerExtensions.ConstraintType
         };
     }
 }

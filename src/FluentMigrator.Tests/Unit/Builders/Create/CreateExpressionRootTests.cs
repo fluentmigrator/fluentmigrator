@@ -19,6 +19,7 @@
 using System.Collections.Generic;
 using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.Create.Column;
+using FluentMigrator.Builders.Create.Constraint;
 using FluentMigrator.Builders.Create.ForeignKey;
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Builders.Create.Table;
@@ -210,6 +211,38 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [Test]
+        public void CallingPrimaryKeyAddsCreateColumnExpressionToContextWithSpecifiedNameSet()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+
+            var root = new CreateExpressionRoot(contextMock.Object);
+            root.PrimaryKey("PK_Bacon");
+
+            collectionMock.Verify(x => x.Add(It.Is<CreateConstraintExpression>(
+                e => e.Constraint.ConstraintName.Equals("PK_Bacon")
+                     && e.Constraint.IsPrimaryKeyConstraint
+            )));
+            contextMock.VerifyGet(x => x.Expressions);
+        }
+
+        [Test]
+        public void CallingPrimaryKeyReturnsCreateColumnExpression()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+
+            var root = new CreateExpressionRoot(contextMock.Object);
+            var builder = root.PrimaryKey("PK_Bacon");
+
+            builder.ShouldBeOfType<CreateConstraintExpressionBuilder>();
+            contextMock.VerifyGet(x => x.Expressions);
+        }
+
+        [Test]
         public void CallingSequenceAddsCreateSequenceExpressionToContextWithSpecifiedNameSet()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -235,6 +268,38 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             var builder = root.Sequence("Bacon");
 
             builder.ShouldBeOfType<CreateSequenceExpressionBuilder>();
+            contextMock.VerifyGet(x => x.Expressions);
+        }
+
+        [Test]
+        public void CallingUniqueConstraintCreateColumnExpressionToContextWithSpecifiedNameSet()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+
+            var root = new CreateExpressionRoot(contextMock.Object);
+            root.UniqueConstraint("UC_Bacon");
+
+            collectionMock.Verify(x => x.Add(It.Is<CreateConstraintExpression>(
+                e => e.Constraint.ConstraintName.Equals("UC_Bacon")
+                     && e.Constraint.IsUniqueConstraint
+            )));
+            contextMock.VerifyGet(x => x.Expressions);
+        }
+
+        [Test]
+        public void CallingUniqueConstraintReturnsCreateColumnExpression()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+
+            var root = new CreateExpressionRoot(contextMock.Object);
+            var builder = root.UniqueConstraint("UC_Bacon");
+
+            builder.ShouldBeOfType<CreateConstraintExpressionBuilder>();
             contextMock.VerifyGet(x => x.Expressions);
         }
     }
