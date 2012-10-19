@@ -45,6 +45,9 @@ namespace FluentMigrator.NAnt
         [TaskAttribute("namespace")]
         public string Namespace { get; set; }
 
+        [TaskAttribute("nested")]
+        public bool NestedNamespaces { get; set; }
+
         [TaskAttribute("task")]
         public string Task { get; set; }
 
@@ -107,6 +110,7 @@ namespace FluentMigrator.NAnt
                                         Target = Target,
                                         PreviewOnly = Preview,
                                         Namespace = Namespace,
+                                        NestedNamespaces = NestedNamespaces,
                                         Task = Task,
                                         Version = Version,
                                         Steps = Steps,

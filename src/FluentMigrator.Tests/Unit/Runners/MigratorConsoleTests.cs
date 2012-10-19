@@ -40,11 +40,13 @@ namespace FluentMigrator.Tests.Unit.Runners
                 "/connection", connection,
                 "/target", target,
                 "/namespace", "FluentMigrator.Tests.Integration.Migrations",
+                "/nested",
                 "/task", "migrate:up",
                 "/version", "1");
 
             console.Connection.ShouldBe(connection);
             console.Namespace.ShouldBe("FluentMigrator.Tests.Integration.Migrations");
+            console.NestedNamespaces.ShouldBeTrue();
             console.Task.ShouldBe("migrate:up");
             console.Version.ShouldBe(1);
         }

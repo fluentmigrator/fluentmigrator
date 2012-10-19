@@ -34,6 +34,7 @@ namespace FluentMigrator.Console
         public string Connection;
         public string ConnectionStringConfigPath;
         public string Namespace;
+        public bool NestedNamespaces;
         public bool Output;
         public string OutputFilename;
         public bool PreviewOnly;
@@ -88,6 +89,12 @@ namespace FluentMigrator.Console
                                             "The namespace contains the migrations you want to run. Default is all migrations found within the Target Assembly will be run."
                                             ,
                                             v => { Namespace = v; }
+                                            },
+                                        {
+                                            "nested",
+                                            "Whether migrations in nested namespaces should be included. Used in conjunction with the namespace option."
+                                            ,
+                                            v => { NestedNamespaces = true; }
                                             },
                                         {
                                             "output|out|o",
@@ -262,6 +269,7 @@ namespace FluentMigrator.Console
                 Target = TargetAssembly,
                 PreviewOnly = PreviewOnly,
                 Namespace = Namespace,
+                NestedNamespaces = NestedNamespaces,
                 Task = Task,
                 Version = Version,
                 Steps = Steps,
