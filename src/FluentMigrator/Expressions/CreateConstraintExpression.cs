@@ -5,7 +5,7 @@ namespace FluentMigrator.Expressions
 {
     public class CreateConstraintExpression : MigrationExpressionBase
     {
-        public ConstraintDefinition Constraint { get; private set; }
+        public virtual ConstraintDefinition Constraint { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:CreateConstraintExpression"/> class.
