@@ -394,7 +394,7 @@ namespace FluentMigrator.Runner
         }
 
         public void ValidateVersionOrder()
-    	{
+        {
             IEnumerable<KeyValuePair<long, IMigration>> unappliedVersions = MigrationLoader.Migrations.Where(kvp => MigrationVersionLessThanGreatestAppliedMigration(kvp.Key));
 
             if (unappliedVersions.Any())
@@ -403,7 +403,7 @@ namespace FluentMigrator.Runner
             }
 
             _announcer.Say("Version ordering valid.");
-    	}
+        }
 
         private bool MigrationVersionLessThanGreatestAppliedMigration(long version)
         {

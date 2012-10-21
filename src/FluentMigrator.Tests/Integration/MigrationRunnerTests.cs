@@ -665,94 +665,94 @@ namespace FluentMigrator.Tests.Integration
             }
         }
 
-		[Test]
-		public void ValidateVersionOrderShouldDoNothingIfUnappliedMigrationVersionIsGreaterThanLatestAppliedMigration()
-		{
+        [Test]
+        public void ValidateVersionOrderShouldDoNothingIfUnappliedMigrationVersionIsGreaterThanLatestAppliedMigration()
+        {
 
-			// Using SqlServer instead of SqlLite as versions not deleted from VersionInfo table when using Sqlite.
-			var excludedProcessors = new[] { typeof(SqliteProcessor), typeof(MySqlProcessor), typeof(PostgresProcessor) };
+            // Using SqlServer instead of SqlLite as versions not deleted from VersionInfo table when using Sqlite.
+            var excludedProcessors = new[] { typeof(SqliteProcessor), typeof(MySqlProcessor), typeof(PostgresProcessor) };
 
-			var assembly = typeof(User).Assembly;
-			
-			var runnerContext1 = new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = typeof(Migrations.Interleaved.Pass2.User).Namespace };
-			var runnerContext2 = new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = typeof(Migrations.Interleaved.Pass3.User).Namespace };
+            var assembly = typeof(User).Assembly;
+            
+            var runnerContext1 = new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = typeof(Migrations.Interleaved.Pass2.User).Namespace };
+            var runnerContext2 = new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = typeof(Migrations.Interleaved.Pass3.User).Namespace };
 
-			try
-			{
-				ExecuteWithSupportedProcessors(processor =>
-				{
-					var migrationRunner = new MigrationRunner(assembly, runnerContext1, processor);
+            try
+            {
+                ExecuteWithSupportedProcessors(processor =>
+                {
+                    var migrationRunner = new MigrationRunner(assembly, runnerContext1, processor);
 
-					migrationRunner.MigrateUp(3);
-				}, false, excludedProcessors);
+                    migrationRunner.MigrateUp(3);
+                }, false, excludedProcessors);
 
-				ExecuteWithSupportedProcessors(processor =>
-				{
-					var migrationRunner = new MigrationRunner(assembly, runnerContext2, processor);
+                ExecuteWithSupportedProcessors(processor =>
+                {
+                    var migrationRunner = new MigrationRunner(assembly, runnerContext2, processor);
 
-					Assert.DoesNotThrow(migrationRunner.ValidateVersionOrder);
-				}, false, excludedProcessors);
-			}
-			finally
-			{
-				ExecuteWithSupportedProcessors(processor =>
-				{
-					var migrationRunner = new MigrationRunner(assembly, runnerContext2, processor);
-					migrationRunner.RollbackToVersion(0);
-				}, true, excludedProcessors);
-			}
-		}
+                    Assert.DoesNotThrow(migrationRunner.ValidateVersionOrder);
+                }, false, excludedProcessors);
+            }
+            finally
+            {
+                ExecuteWithSupportedProcessors(processor =>
+                {
+                    var migrationRunner = new MigrationRunner(assembly, runnerContext2, processor);
+                    migrationRunner.RollbackToVersion(0);
+                }, true, excludedProcessors);
+            }
+        }
 
-		[Test]
+        [Test]
         public void ValidateVersionOrderShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanLatestAppliedMigration()
-		{
+        {
 
-			// Using SqlServer instead of SqlLite as versions not deleted from VersionInfo table when using Sqlite.
-			var excludedProcessors = new[] { typeof(SqliteProcessor), typeof(MySqlProcessor), typeof(PostgresProcessor) };
+            // Using SqlServer instead of SqlLite as versions not deleted from VersionInfo table when using Sqlite.
+            var excludedProcessors = new[] { typeof(SqliteProcessor), typeof(MySqlProcessor), typeof(PostgresProcessor) };
 
-			var assembly = typeof(User).Assembly;
+            var assembly = typeof(User).Assembly;
 
-			var runnerContext1 = new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = typeof(Migrations.Interleaved.Pass2.User).Namespace };
-			var runnerContext2 = new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = typeof(Migrations.Interleaved.Pass3.User).Namespace };
+            var runnerContext1 = new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = typeof(Migrations.Interleaved.Pass2.User).Namespace };
+            var runnerContext2 = new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = typeof(Migrations.Interleaved.Pass3.User).Namespace };
 
             VersionOrderInvalidException caughtException = null;
 
-			try
-			{
-				ExecuteWithSupportedProcessors(processor =>
-				{
-					var migrationRunner = new MigrationRunner(assembly, runnerContext1, processor);
-					migrationRunner.MigrateUp();
-				}, false, excludedProcessors);
+            try
+            {
+                ExecuteWithSupportedProcessors(processor =>
+                {
+                    var migrationRunner = new MigrationRunner(assembly, runnerContext1, processor);
+                    migrationRunner.MigrateUp();
+                }, false, excludedProcessors);
 
-				ExecuteWithSupportedProcessors(processor =>
-				{
-					var migrationRunner = new MigrationRunner(assembly, runnerContext2, processor);
-					migrationRunner.ValidateVersionOrder();
-				}, false, excludedProcessors);
-			}
+                ExecuteWithSupportedProcessors(processor =>
+                {
+                    var migrationRunner = new MigrationRunner(assembly, runnerContext2, processor);
+                    migrationRunner.ValidateVersionOrder();
+                }, false, excludedProcessors);
+            }
             catch (VersionOrderInvalidException ex)
-			{
-				caughtException = ex;
-			}
-			finally
-			{
-				ExecuteWithSupportedProcessors(processor =>
-				{
-					var migrationRunner = new MigrationRunner(assembly, runnerContext2, processor);
-					migrationRunner.RollbackToVersion(0);
-				}, true, excludedProcessors);
-			}
+            {
+                caughtException = ex;
+            }
+            finally
+            {
+                ExecuteWithSupportedProcessors(processor =>
+                {
+                    var migrationRunner = new MigrationRunner(assembly, runnerContext2, processor);
+                    migrationRunner.RollbackToVersion(0);
+                }, true, excludedProcessors);
+            }
 
-			caughtException.ShouldNotBeNull();
+            caughtException.ShouldNotBeNull();
 
 
             caughtException.InvalidMigrations.Count().ShouldBe(1);
-		    var keyValuePair = caughtException.InvalidMigrations.First();
+            var keyValuePair = caughtException.InvalidMigrations.First();
             keyValuePair.Key.ShouldBe(200909060935);
             ((MigrationWithMetaDataAdapter)keyValuePair.Value).Migration.ShouldBeOfType<UserEmail>();
             
-		}
+        }
 
         private static MigrationRunner SetupMigrationRunner(IMigrationProcessor processor)
         {
