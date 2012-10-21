@@ -1,7 +1,7 @@
-#region License
-
+﻿#region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2012, Daniel Lee
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,17 +15,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-
 #endregion
 
-namespace FluentMigrator.Tests.Integration.Migrations
+using FluentMigrator.Runner.Generators.SqlServer;
+
+namespace FluentMigrator.Runner.Processors.SqlServer
 {
-    /// <summary>A migration class that deliberately does nothing.</summary>
-    /// <remarks>This is intended for unit testing the migration class itself, rather than the database migration.</remarks>
-    [Migration(3)]
-    public class TestEmptyMigration : Migration
+    public class SqlServer2012ProcessorFactory : MigrationProcessorFactory
     {
-        public override void Up() { }
-        public override void Down() { }
+        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
+        {
+            var factory = new SqlServerDbFactory();
+            var connection = factory.CreateConnection(connectionString);
+            return new SqlServerProcessor(connection, new SqlServer2012Generator(), announcer, options, factory);
+        }
     }
 }

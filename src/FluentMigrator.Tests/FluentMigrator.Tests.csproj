@@ -168,6 +168,7 @@
     <Compile Include="Unit\AnnouncerExtensionsTests.cs" />
     <Compile Include="Unit\Announcers\AnnouncerTests.cs" />
     <Compile Include="Integration\Migrations\TestUpdateAllRowsMigration.cs" />
+    <Compile Include="Unit\Builders\Create\CreateConstraintExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateSequenceExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Delete\DeleteConstriantTest.cs" />
     <Compile Include="Unit\Builders\Delete\DeleteDataExpressionTests.cs" />
@@ -219,8 +220,10 @@
     <Compile Include="Unit\Expressions\DeleteDefaultConstraintExpressionTests.cs" />
     <Compile Include="Unit\Generators\GenericGenerator\GenericGeneratorTests.cs" />
     <Compile Include="Unit\Generators\Firebird\FirebirdGeneratorTests.cs" />
+    <Compile Include="Unit\Generators\Postgres\PostgresDataTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000GeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005GeneratorTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2012\SqlServer2012GeneratorTests.cs" />
     <Compile Include="Unit\Initialization\ConnectionStringManagerTests.cs">
       <SubType>Code</SubType>
     </Compile>
@@ -267,7 +270,7 @@
     <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000AlterTableTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000CreateTableTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000Data.cs" />
-    <Compile Include="Unit\Generators\SqlServer2000\SqlServer2008GeneratorTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2008\SqlServer2008GeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2000\SqlServerCeGeneratorTests.cs" />
     <Compile Include="Unit\Generators\BaseTableAlterTests.cs" />
     <Compile Include="Unit\Generators\BaseTableCreateTests.cs" />

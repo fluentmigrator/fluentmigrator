@@ -233,7 +233,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         [Test]
         public void CanAddDecimalColumn()
         {
-            string tableName = "NewTable";
+            const string tableName = "NewTable";
 
             var columnDefinition = new ColumnDefinition();
             columnDefinition.Name = "NewColumn";
@@ -241,12 +241,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             columnDefinition.Precision = 2;
             columnDefinition.Type = DbType.Decimal;
 
-            var expression = new CreateColumnExpression();
-            expression.Column = columnDefinition;
-            expression.TableName = tableName;
+            var expression = new CreateColumnExpression {Column = columnDefinition, TableName = tableName};
 
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"public\".\"NewTable\" ADD \"NewColumn\" decimal(2,19) NOT NULL");
+            sql.ShouldBe("ALTER TABLE \"public\".\"NewTable\" ADD \"NewColumn\" decimal(19,2) NOT NULL");
         }
 
         [Test]
