@@ -309,6 +309,7 @@
     <Compile Include="Unit\TestVersionTableMetaData.cs" />
     <Compile Include="Unit\Versioning\VersionInfoTests.cs" />
     <Compile Include="Unit\VersionLoaderTests.cs" />
+    <Compile Include="Unit\VersionOrderInvalidExceptionTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.SchemaDump\FluentMigrator.SchemaDump.csproj">
