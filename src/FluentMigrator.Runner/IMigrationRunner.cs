@@ -13,5 +13,6 @@ namespace FluentMigrator.Runner
         void RollbackToVersion(long version);
         void MigrateDown(long version);
         void ValidateVersionOrder();
+        void ListVersions();
     }
 }

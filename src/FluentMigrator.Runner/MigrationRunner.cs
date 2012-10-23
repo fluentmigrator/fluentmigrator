@@ -23,6 +23,7 @@ using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Versioning;
 
 namespace FluentMigrator.Runner
 {
@@ -290,6 +291,16 @@ namespace FluentMigrator.Runner
             return migration.GetType().Name;
         }
 
+        private string GetMigrationName(long version, IMigration migration)
+        {
+            string name = GetMigrationName(migration);
+
+            if (migration is IMigrationMetadata)
+                return name;
+
+            return string.Format("{0}: {1}", version, name);
+        }
+
         public void Up(IMigration migration)
         {
             var name = GetMigrationName(migration);
@@ -403,6 +414,22 @@ namespace FluentMigrator.Runner
             }
 
             _announcer.Say("Version ordering valid.");
+        }
+
+        public void ListVersions()
+        {
+            IVersionInfo currentVersionInfo = this.VersionLoader.VersionInfo;
+            long currentVersion = currentVersionInfo.Latest();
+
+            _announcer.Heading("Migrations");
+
+            foreach(KeyValuePair<long, IMigration> migration in MigrationLoader.Migrations)
+            {
+                string migrationName = GetMigrationName(migration.Key, migration.Value);
+                _announcer.Say("{0}{1}", 
+                               migrationName, 
+                               migration.Key == currentVersion ? " (current)" : string.Empty);
+            }
         }
 
         private bool MigrationVersionLessThanGreatestAppliedMigration(long version)

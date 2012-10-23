@@ -76,6 +76,9 @@ namespace FluentMigrator.Runner.Initialization
                 case "validateversionorder":
                     Runner.ValidateVersionOrder();
                     break;
+                case "listversions":
+                    Runner.ListVersions();
+                    break;
             }
 
             RunnerContext.Announcer.Say("Task completed.");
