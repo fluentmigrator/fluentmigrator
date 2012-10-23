@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.Jet
@@ -15,7 +16,7 @@ namespace FluentMigrator.Runner.Generators.Jet
 
         public override string FormatDateTime(DateTime value)
         {
-            return ValueQuote + (value).ToString("YYYY-MM-DD HH:mm:ss") + ValueQuote;
+            return string.Format(CultureInfo.InvariantCulture, "{0}{1:yyyy-MM-dd HH:mm:ss}{0}", ValueQuote, (value));
         }
     }
 }
