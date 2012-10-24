@@ -455,7 +455,7 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        public void ListVersions()
+        public void CanListVersions()
         {
             const long version1 = 2011010101;
             const long version2 = 2011010102;
@@ -472,6 +472,7 @@ namespace FluentMigrator.Tests.Unit
             _runner.ListVersions();
 
             _announcer.Verify(a => a.Say("2011010101: IMigrationProxy"));
+            _announcer.Verify(a => a.Emphasize("2011010102: IMigrationProxy (current)"));
         }
 
         [Test, Ignore("Move to MigrationLoader tests")]
