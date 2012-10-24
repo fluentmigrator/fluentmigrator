@@ -172,6 +172,10 @@ namespace FluentMigrator.Runner.Processors
         {
         }
 
+        public virtual void CloseConnection()
+        {            
+        }
+
         public abstract System.Data.DataSet ReadTableData(string schemaName, string tableName);
         public abstract System.Data.DataSet Read(string template, params object[] args);
         public abstract bool Exists(string template, params object[] args);

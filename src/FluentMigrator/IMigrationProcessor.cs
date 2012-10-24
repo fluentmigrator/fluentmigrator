@@ -34,6 +34,7 @@ namespace FluentMigrator
         void BeginTransaction();
         void CommitTransaction();
         void RollbackTransaction();
+        void CloseConnection();
 
         void Process(CreateSchemaExpression expression);
         void Process(DeleteSchemaExpression expression);

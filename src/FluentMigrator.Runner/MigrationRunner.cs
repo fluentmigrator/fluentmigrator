@@ -95,6 +95,10 @@ namespace FluentMigrator.Runner
                 if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
                 throw;
             }
+            finally
+            {
+                if (useAutomaticTransactionManagement) { Processor.CloseConnection(); }
+            }
         }
 
         public void MigrateUp(long targetVersion)
@@ -113,10 +117,14 @@ namespace FluentMigrator.Runner
                 if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
                 VersionLoader.LoadVersionInfo();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
                 throw;
+            }
+            finally
+            {
+                if (useAutomaticTransactionManagement) { Processor.CloseConnection(); }
             }
         }
 
@@ -157,6 +165,10 @@ namespace FluentMigrator.Runner
             {
                 if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
                 throw;
+            }
+            finally
+            {
+                if (useAutomaticTransactionManagement) { Processor.CloseConnection(); }
             }
         }
 
@@ -237,6 +249,10 @@ namespace FluentMigrator.Runner
                 if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
                 throw;
             }
+            finally
+            {
+                if (useAutomaticTransactionManagement) { Processor.CloseConnection(); }
+            }
         }
 
         public void RollbackToVersion(long version)
@@ -270,6 +286,10 @@ namespace FluentMigrator.Runner
             {
                 if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
                 throw;
+            }
+            finally
+            {
+                if (useAutomaticTransactionManagement) { Processor.CloseConnection(); }
             }
         }
 
