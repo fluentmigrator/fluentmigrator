@@ -426,9 +426,15 @@ namespace FluentMigrator.Runner
             foreach(KeyValuePair<long, IMigration> migration in MigrationLoader.Migrations)
             {
                 string migrationName = GetMigrationName(migration.Key, migration.Value);
-                _announcer.Say("{0}{1}", 
-                               migrationName, 
-                               migration.Key == currentVersion ? " (current)" : string.Empty);
+                bool isCurrent = migration.Key == currentVersion;
+                string message = string.Format("{0}{1}",
+                                                migrationName,
+                                                isCurrent ? " (current)" : string.Empty);
+
+                if(isCurrent)
+                    _announcer.Emphasize(message);
+                else
+                    _announcer.Say(message);
             }
         }
 
