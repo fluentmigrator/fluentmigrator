@@ -76,8 +76,8 @@ namespace FluentMigrator.Runner.Initialization
                 case "validateversionorder":
                     Runner.ValidateVersionOrder();
                     break;
-                case "listversions":
-                    Runner.ListVersions();
+                case "listmigrations":
+                    Runner.ListMigrations();
                     break;
             }
 
