@@ -364,7 +364,14 @@ namespace FluentMigrator.Runner.Generators.Generic
         {
             var result = new StringBuilder(string.Format("CREATE SEQUENCE "));
             var seq = expression.Sequence;
-            result.AppendFormat("{0}.{1}", Quoter.QuoteSchemaName(seq.SchemaName), Quoter.QuoteSequenceName(seq.Name));
+            if (string.IsNullOrEmpty(seq.SchemaName))
+            {
+                result.AppendFormat(Quoter.QuoteSequenceName(seq.Name));
+            }
+            else
+            {
+                result.AppendFormat("{0}.{1}", Quoter.QuoteSchemaName(seq.SchemaName), Quoter.QuoteSequenceName(seq.Name));
+            }
 
             if (seq.Increment.HasValue)
             {
@@ -402,7 +409,14 @@ namespace FluentMigrator.Runner.Generators.Generic
         public override string Generate(DeleteSequenceExpression expression)
         {
             var result = new StringBuilder(string.Format("DROP SEQUENCE "));
-            result.AppendFormat("{0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteSequenceName(expression.SequenceName));
+            if (string.IsNullOrEmpty(expression.SchemaName))
+            {
+                result.AppendFormat(Quoter.QuoteSequenceName(expression.SequenceName));
+            }
+            else
+            {
+                result.AppendFormat("{0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteSequenceName(expression.SequenceName));
+            }
 
             return result.ToString();
         }
