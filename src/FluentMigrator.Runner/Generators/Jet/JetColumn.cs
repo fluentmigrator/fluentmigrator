@@ -30,7 +30,7 @@ namespace FluentMigrator.Runner.Generators.Jet
 
         protected override string FormatIdentity(ColumnDefinition column)
         {
-            //Indentity type is handled by FormartType
+            //Identity type is handled by FormatType
             return string.Empty;
         }
 
