@@ -45,6 +45,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return String.Format("sp_rename '{0}', '{1}'", expression.OldName, expression.NewName);
         }
 
+        public override string Generate(RenameColumnExpression expression)
+        {
+            throw new DatabaseOperationNotSupportedException();
+        }
+
         //All Schema method throw by default as only Sql server 2005 and up supports them.
         public override string Generate(CreateSchemaExpression expression)
         {
@@ -63,6 +68,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(DeleteColumnExpression expression)
         {
+            if (expression.ColumnNames.Count != 1)
+            {
+                throw new DatabaseOperationNotSupportedException();
+            }
+
             // Limited functionality in CE, for now will just drop the column.. no DECLARE support!
             const string sql = @"ALTER TABLE {0} DROP COLUMN {1};";
             return String.Format(sql, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.ColumnNames.ElementAt(0)));
