@@ -22,6 +22,12 @@ namespace FluentMigrator.Tests
             IsEnabled = false
         };
 
+        public static DatabaseServerOptions SqlServerCe = new DatabaseServerOptions
+            {
+                ConnectionString = @"Data Source=TestDatabase.sdf",
+                IsEnabled = false
+            };
+
         public static DatabaseServerOptions SqlLite = new DatabaseServerOptions
             {
                 ConnectionString = @"Data Source=:memory:;Version=3;New=True;",
