@@ -41,6 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DelegateTextWriter.cs" />
     <Compile Include="Models\Column.cs" />
     <Compile Include="Models\FKey.cs" />
     <Compile Include="Models\IndexColumn.cs" />
@@ -57,7 +58,7 @@
     <Compile Include="Models\Table.cs" />
     <Compile Include="Models\TableIndex.cs" />
     <Compile Include="Models\Tables.cs" />
-    <Compile Include="T4CodeGenerator.cs">
+    <Compile Include="CodeGenerator.cs">
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

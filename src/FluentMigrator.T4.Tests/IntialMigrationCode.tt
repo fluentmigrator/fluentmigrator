@@ -27,10 +27,12 @@ Todo
     ClassPrefix = "";
     ClassSuffix = "";
     IncludeViews = false;
+	
+	var generator = new CodeGenerator(ConnectionString, ProviderName, new DelegateTextWriter(x=>WriteLine(x)), s=>Warning(s));
+
 
     // Read schema
-    var tables = LoadTables();
-
+    var tables = generator.LoadTables();
 
 /*
     // Tweak Schema
@@ -74,7 +76,7 @@ foreach(Table tbl in from t in tables where !t.Ignore select t)
 foreach(Column col in ColumnList)
 {
 #>
-                .WithColumn("<#=col.Name#>").<#=GetMigrationTypeFunctionForType(col.PropertyType,col.Size,col.Precision)#><#if (col.IsPK){#>.PrimaryKey()<#}#><#if (col.IsAutoIncrement){#>.Identity()<#}#><#if (col.IsNullable){#>.Nullable()<#} else {#>.NotNullable()<#}#><#if (col.DefaultValue != null){#>.WithDefaultValue(<#= GetColumnDefaultValue(col) #>)<#}#> 
+                .WithColumn("<#=col.Name#>").<#=generator.GetMigrationTypeFunctionForType(col.PropertyType,col.Size,col.Precision)#><#if (col.IsPK){#>.PrimaryKey()<#}#><#if (col.IsAutoIncrement){#>.Identity()<#}#><#if (col.IsNullable){#>.Nullable()<#} else {#>.NotNullable()<#}#><#if (col.DefaultValue != null){#>.WithDefaultValue(<#= generator.GetColumnDefaultValue(col) #>)<#}#> 
 <#
 }
 #>
