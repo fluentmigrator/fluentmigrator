@@ -131,6 +131,20 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public void CanCreateTableWithBinaryColumnWithSize()
+        {
+            string tableName = "NewTable";
+            string columnName = "ColumnName1";
+
+            var column1 = new ColumnDefinition { Name = columnName, Type = DbType.Binary, TableName = tableName, Size = 10000 };
+
+            var expression = new CreateTableExpression { TableName = tableName };
+            expression.Columns.Add(column1);
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" bytea NOT NULL)"); // PostgreSQL does not actually use the configured size
+        }
+
+        [Test]
         public void CanDropTable()
         {
             string tableName = "NewTable";
