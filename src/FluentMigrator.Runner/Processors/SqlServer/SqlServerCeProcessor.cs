@@ -61,12 +61,12 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
-            return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_CATALOG = DB_NAME() AND TABLE_NAME = '{0}' AND CONSTRAINT_NAME = '{1}'", FormatSqlEscape(tableName), FormatSqlEscape(constraintName));
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = '{0}' AND CONSTRAINT_NAME = '{1}'", FormatSqlEscape(tableName), FormatSqlEscape(constraintName));
         }
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
-            return Exists("SELECT NULL FROM sysindexes WHERE name = '{0}'", FormatSqlEscape(indexName));
+            return Exists("SELECT NULL FROM INFORMATION_SCHEMA.INDEXES WHERE INDEX_NAME = '{0}'", FormatSqlEscape(indexName));
         }
 
         public override void Execute(string template, params object[] args)
