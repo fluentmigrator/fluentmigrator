@@ -65,6 +65,22 @@
   <ItemGroup>
     <Service Include="{508349B6-6B84-4DF5-91F0-309BEEBAD82D}" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="FM.Core.ttinclude" />
+    <None Include="IntialMigrationCode.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>IntialMigrationCode.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj">
+      <Project>{FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8}</Project>
+      <Name>FluentMigrator</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -31,8 +31,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "T4", "T4", "{268FEF49-78A8-
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.T4", "src\FluentMigrator.T4\FluentMigrator.T4.csproj", "{B08E4C78-29DD-4367-8A84-35CD76971D73}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.T4.Tests", "src\FluentMigrator.T4.Tests\FluentMigrator.T4.Tests.csproj", "{4F4978DF-FFE0-462A-B91A-EC60F93A2D2E}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		AutomatedRelease|Any CPU = AutomatedRelease|Any CPU
@@ -127,15 +125,6 @@ Global
 		{B08E4C78-29DD-4367-8A84-35CD76971D73}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B08E4C78-29DD-4367-8A84-35CD76971D73}.Release|Any CPU.Build.0 = Release|Any CPU
 		{B08E4C78-29DD-4367-8A84-35CD76971D73}.Release|x86.ActiveCfg = Release|Any CPU
-		{4F4978DF-FFE0-462A-B91A-EC60F93A2D2E}.AutomatedRelease|Any CPU.ActiveCfg = Release|Any CPU
-		{4F4978DF-FFE0-462A-B91A-EC60F93A2D2E}.AutomatedRelease|Any CPU.Build.0 = Release|Any CPU
-		{4F4978DF-FFE0-462A-B91A-EC60F93A2D2E}.AutomatedRelease|x86.ActiveCfg = Release|Any CPU
-		{4F4978DF-FFE0-462A-B91A-EC60F93A2D2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4F4978DF-FFE0-462A-B91A-EC60F93A2D2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4F4978DF-FFE0-462A-B91A-EC60F93A2D2E}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{4F4978DF-FFE0-462A-B91A-EC60F93A2D2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4F4978DF-FFE0-462A-B91A-EC60F93A2D2E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{4F4978DF-FFE0-462A-B91A-EC60F93A2D2E}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -151,6 +140,5 @@ Global
 		{268FEF49-78A8-490E-B4C8-1569AE6F0D8F} = {0088DBCC-C3AE-45DC-88A8-DF1E6B5AC5BC}
 		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413} = {61F1CBE8-A3C1-4153-84E3-4CA3E0E23ACD}
 		{B08E4C78-29DD-4367-8A84-35CD76971D73} = {268FEF49-78A8-490E-B4C8-1569AE6F0D8F}
-		{4F4978DF-FFE0-462A-B91A-EC60F93A2D2E} = {268FEF49-78A8-490E-B4C8-1569AE6F0D8F}
 	EndGlobalSection
 EndGlobal
