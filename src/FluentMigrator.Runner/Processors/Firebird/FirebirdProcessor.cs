@@ -753,7 +753,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public override void Process(Expressions.UpdateDataExpression expression)
         {
             truncator.Truncate(expression);
-            CheckColumn(expression.TableName, expression.Set.Select(x => x.Key));
+            CheckTable(expression.TableName);
+            //CheckColumn(expression.TableName, expression.Set.Select(x => x.Key));
             RegisterExpression<UpdateDataExpression>(expression);
             InternalProcess(Generator.Generate(expression));
         }

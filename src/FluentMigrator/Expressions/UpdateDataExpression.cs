@@ -19,16 +19,28 @@
 using System;
 using System.Collections.Generic;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
     public class UpdateDataExpression : MigrationExpressionBase
     {
+        private readonly List<IDataDefinition> _set = new List<IDataDefinition>();
+        private readonly List<IDataDefinition> _where = new List<IDataDefinition>();
+
         public string SchemaName { get; set; }
         public string TableName { get; set; }
 
-        public List<KeyValuePair<string, object>> Set { get; set; }
-        public List<KeyValuePair<string, object>> Where { get; set; }
+        public List<IDataDefinition> Set 
+        {
+            get { return _set; }
+        }
+
+        public List<IDataDefinition> Where 
+        {
+            get { return _where; }
+        }
+
         public bool IsAllRows { get; set; }
 
         public override void CollectValidationErrors(ICollection<string> errors)

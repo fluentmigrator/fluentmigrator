@@ -168,8 +168,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
             FirebirdTableSchema table = schema.GetTableSchema(expression.TableName);
             bool hasPrimary = table.HasPrimaryKey;
             
-            CanUndo = true;
-
+            CanUndo = false;
+            /*
             using (DataSet ds = Processor.ReadTableData(String.Empty, expression.TableName))
             {
                 foreach (DataRow dr in ds.Tables[0].Rows)
@@ -207,6 +207,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                     }
                 }
             }
+            */
         }
 
         protected void SetupUndoDeleteSequence(DeleteSequenceExpression expression)
@@ -325,8 +326,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
             FirebirdTableSchema table = schema.GetTableSchema(expression.TableName);
             bool hasPrimary = table.HasPrimaryKey;
 
-            CanUndo = true;
-
+            CanUndo = false;
+            /*
             using (DataSet ds = Processor.ReadTableData(String.Empty, expression.TableName))
             {
                 //Create columns
@@ -365,7 +366,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                     UndoExpressions.Add(update);
                 }
             }
-
+            */
         }
 
         public void AddUndoExpression(IMigrationExpression expression)

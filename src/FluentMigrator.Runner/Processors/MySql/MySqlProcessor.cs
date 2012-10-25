@@ -76,18 +76,9 @@ namespace FluentMigrator.Runner.Processors.MySql
 
         public override void Execute(string template, params object[] args)
         {
-            if(Options.PreviewOnly) 
-            {
-                return;
-            }
+            string sql = String.Format(template, args);
 
-            if (Connection.State != ConnectionState.Open) Connection.Open();
-
-            using (var command = factory.CreateCommand(String.Format(template, args), Connection))
-            {
-                command.CommandTimeout = Options.Timeout;
-                command.ExecuteNonQuery();
-            }
+            Process(sql);
         }
 
         public override bool Exists(string template, params object[] args)

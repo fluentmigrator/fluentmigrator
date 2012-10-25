@@ -81,6 +81,11 @@ namespace FluentMigrator.Runner.Generators.Generic
             return ValueQuote + value.ToString() + ValueQuote;
         }
 
+        public virtual string ComparisonFor(object value)
+        {
+            return (value == null) ? "IS" : "=";
+        }
+
         public virtual string ValueQuote { get { return "'"; } }
 
         public virtual string EscapeValueQuote { get { return ValueQuote + ValueQuote; } }

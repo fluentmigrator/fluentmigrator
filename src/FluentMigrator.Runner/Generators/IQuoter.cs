@@ -15,5 +15,7 @@ namespace FluentMigrator.Runner.Generators
         string QuoteSchemaName(string schemaName);
         string QuoteCommand(string command);
         string QuoteSequenceName(string sequenceName);
+
+        string ComparisonFor(object value);
     }
 }

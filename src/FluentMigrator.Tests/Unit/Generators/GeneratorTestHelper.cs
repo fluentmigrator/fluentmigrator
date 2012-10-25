@@ -147,17 +147,9 @@ namespace FluentMigrator.Tests.Unit.Generators
             var expression = new UpdateDataExpression();
             expression.TableName = TestTableName1;
 
-            expression.Set = new List<KeyValuePair<string, object>>
-                                 {
-                                     new KeyValuePair<string, object>("Name", "Just'in"),
-                                     new KeyValuePair<string, object>("Age", 25)
-                                 };
+            expression.Set.AddRange(new []  { new ExplicitDataDefinition(new DataValue("Name", "Just'in"), new DataValue("Age", 25)) } );
+            expression.Where.AddRange(new [] { new ExplicitDataDefinition(new DataValue("Id", 9), new DataValue("Homepage", null)) } );
 
-            expression.Where = new List<KeyValuePair<string, object>>
-                                   {
-                                       new KeyValuePair<string, object>("Id", 9),
-                                       new KeyValuePair<string, object>("Homepage", null)
-                                   };
             return expression;
         }
 
@@ -166,12 +158,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             var expression = new UpdateDataExpression();
             expression.TableName = TestTableName1;
 
-            expression.Set = new List<KeyValuePair<string, object>>
-                                 {
-                                     new KeyValuePair<string, object>("Name", "Just'in"),
-                                     new KeyValuePair<string, object>("Age", 25)
-                                 };
-
+            expression.Set.AddRange(new[] { new ExplicitDataDefinition(new DataValue("Name", "Just'in"), new DataValue("Age", 25)) });
             expression.IsAllRows = true;
 
             return expression;

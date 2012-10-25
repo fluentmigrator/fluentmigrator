@@ -58,6 +58,27 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         }
 
         [Test]
+        public void CanUpdateBinaryData()
+        {
+            var expression = new UpdateDataExpression
+            {
+                TableName = "TestTable1"
+            };
+
+            var set = new { Name = "Just'in", Value = Encoding.ASCII.GetBytes("Just'in") };
+            var where = new { Id = 1 };
+
+            expression.Set.Add(new ReflectedDataDefinition(set));
+            expression.Where.Add(new ReflectedDataDefinition(where));
+
+            var sql = generator.Generate(expression);
+
+            string expected = @"UPDATE `TestTable1` SET `Name` = 'Just''in', `Value` = UNHEX('4A75737427696E') WHERE `Id` = 1";
+
+            sql.ShouldBe(expected);
+        }
+
+        [Test]
         public override void CanDeleteData()
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();

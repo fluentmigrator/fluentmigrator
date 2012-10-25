@@ -173,23 +173,6 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public void Truncate(UpdateDataExpression expression)
         {
             expression.TableName = Truncate(expression.TableName);
-            List<KeyValuePair<string, object>> newSet = new List<KeyValuePair<string, object>>();
-            foreach (var data in expression.Set)
-            {
-                newSet.Add(new KeyValuePair<string, object>(Truncate(data.Key), data.Value));
-            }
-            expression.Set.Clear();
-            expression.Set.AddRange(newSet);
-            if (!expression.IsAllRows)
-            {
-                List<KeyValuePair<string, object>> newWhere = new List<KeyValuePair<string, object>>();
-                foreach (var data in expression.Where)
-                {
-                    newWhere.Add(new KeyValuePair<string, object>(Truncate(data.Key), data.Value));
-                }
-                expression.Where.Clear();
-                expression.Where.AddRange(newWhere);
-            }
         }
 
 

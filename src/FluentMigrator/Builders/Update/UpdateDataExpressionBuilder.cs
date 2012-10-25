@@ -20,6 +20,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Update
 {
@@ -43,28 +44,18 @@ namespace FluentMigrator.Builders.Update
 
         public IUpdateWhereSyntax Set(object dataAsAnonymousType)
         {
-            _expression.Set = GetData(dataAsAnonymousType);
+            _expression.Set.Add(new ReflectedDataDefinition(dataAsAnonymousType));
             return this;
         }
 
         public void Where(object dataAsAnonymousType)
         {
-            _expression.Where = GetData(dataAsAnonymousType);
+            _expression.Where.Add(new ReflectedDataDefinition(dataAsAnonymousType));
         }
 
         public void AllRows()
         {
             _expression.IsAllRows = true;
-        }
-
-        private static List<KeyValuePair<string, object>> GetData(object dataAsAnonymousType)
-        {
-            var data = new List<KeyValuePair<string, object>>();
-            var properties = TypeDescriptor.GetProperties(dataAsAnonymousType);
-
-            foreach (PropertyDescriptor property in properties)
-                data.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(dataAsAnonymousType)));
-            return data;
         }
     }
 }
