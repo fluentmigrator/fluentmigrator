@@ -51,7 +51,7 @@ namespace FluentMigrator.T4
                 var primaryKeyColumns = tbl.Columns.Where(c => primaryKey.Contains(c.Name.ToLowerInvariant()));
 
                 foreach (var column in primaryKeyColumns)
-                    column.IsPK = true;
+                    column.IsPrimaryKey = true;
             }
         
 

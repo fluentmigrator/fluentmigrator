@@ -22,7 +22,7 @@ namespace FluentMigrator.T4
         {
             get
             {
-                return this.Columns.Where(x => x.IsPK).ToArray();
+                return this.Columns.Where(x => x.IsPrimaryKey).ToArray();
             }
         }
 

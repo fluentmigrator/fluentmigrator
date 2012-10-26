@@ -48,7 +48,7 @@ namespace FluentMigrator.T4
                 string PrimaryKey=this.GetPK(tbl.Name);
                 var pkColumn=tbl.Columns.SingleOrDefault(x=>x.Name.ToLower().Trim()==PrimaryKey.ToLower().Trim());
                 if(pkColumn!=null)
-                    pkColumn.IsPK=true;
+                    pkColumn.IsPrimaryKey=true;
             }
         
 

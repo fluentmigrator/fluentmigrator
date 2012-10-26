@@ -55,7 +55,7 @@ namespace FluentMigrator.T4
                     col.Size=GetDatatypeSize(row["DATA_TYPE"].ToString());
                     col.Precision=GetDatatypePrecision(row["DATA_TYPE"].ToString());
                     col.IsNullable=row["IS_NULLABLE"].ToString()=="YES";
-                    col.IsPK=row["COLUMN_KEY"].ToString()=="PRI";
+                    col.IsPrimaryKey=row["COLUMN_KEY"].ToString()=="PRI";
                     col.IsAutoIncrement=row["extra"].ToString().ToLower().IndexOf("auto_increment")>=0;
 
                     item.Columns.Add(col);

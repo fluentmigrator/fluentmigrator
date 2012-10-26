@@ -68,8 +68,8 @@ namespace FluentMigrator.T4
                         col.Precision=GetDatatypePrecision(rdr["type"].ToString());
                         col.IsNullable=rdr["notnull"].ToString()=="0";
                         col.IsAutoIncrement=false;
-                        col.IsPK=rdr["pk"].ToString()!="0";
-                        if (col.IsPK)
+                        col.IsPrimaryKey=rdr["pk"].ToString()!="0";
+                        if (col.IsPrimaryKey)
                             col.IsAutoIncrement = tbl.SQL.ToUpper().Contains("AUTOINCREMENT");
                         else
                             col.IsAutoIncrement = false;					
