@@ -47,12 +47,11 @@ namespace FluentMigrator.T4
                 tbl.FKeys = this.LoadFKeys(tbl);			
                     
                 // Mark the primary key
-                string PrimaryKey=this.GetPK(tbl.Name);
-                var pkColumn=tbl.Columns.SingleOrDefault(x=>x.Name.ToLower().Trim()==PrimaryKey.ToLower().Trim());
-                if(pkColumn!=null)
-                {
-                    pkColumn.IsPK=true;
-                }
+                var primaryKey = this.GetPrimaryKey(tbl.Name);
+                var primaryKeyColumns = tbl.Columns.Where(c => primaryKey.Contains(c.Name.ToLowerInvariant()));
+
+                foreach (var column in primaryKeyColumns)
+                    column.IsPK = true;
             }
         
 
@@ -89,7 +88,7 @@ namespace FluentMigrator.T4
                         Column col=new Column();
                         col.Name=rdr["ColumnName"].ToString();
                         col.PropertyName=CleanUp(col.Name);
-                        col.PropertyType=this.GetPropertyType(rdr["DataType"].ToString());
+                        col.PropertyType=GetPropertyType(rdr["DataType"].ToString());
                         col.Size=GetDatatypeSize(rdr["DataType"].ToString());
                         col.Precision=GetDatatypePrecision(rdr["DataType"].ToString());					
                         col.IsNullable=rdr["IsNullable"].ToString()=="YES";
@@ -184,16 +183,18 @@ namespace FluentMigrator.T4
                 using (IDataReader rdr=cmd.ExecuteReader())
                 {
                     while(rdr.Read()){
-                        ForeignKey fk=new ForeignKey();
+                        var fk = new ForeignKey();
                         string thisTable=rdr["ThisTable"].ToString();
             
-                        if(tbl.Name.ToLower()==thisTable.ToLower()){
+                        if(tbl.Name.ToLower()==thisTable.ToLower())
+                        {
                             fk.ThisTable=rdr["ThisTable"].ToString();
                             fk.ThisColumn=rdr["ThisColumn"].ToString();
                             fk.OtherTable=rdr["OtherTable"].ToString();
                             fk.OtherColumn=rdr["OtherColumn"].ToString();
-            
-                        }else{
+                        }
+                        else
+                        {
                             fk.ThisTable=rdr["OtherTable"].ToString();
                             fk.ThisColumn=rdr["OtherColumn"].ToString();
                             fk.OtherTable=rdr["ThisTable"].ToString();
@@ -209,9 +210,9 @@ namespace FluentMigrator.T4
             }	
         }
 	
-        string GetPK(string table){
-        
-            string sql=@"SELECT c.name AS ColumnName
+        IList<string> GetPrimaryKey(string table)
+        {
+            const string sql = @"SELECT c.name AS ColumnName
                 FROM sys.indexes AS i 
                 INNER JOIN sys.index_columns AS ic ON i.object_id = ic.object_id AND i.index_id = ic.index_id 
                 INNER JOIN sys.objects AS o ON i.object_id = o.object_id 
@@ -228,16 +229,18 @@ namespace FluentMigrator.T4
                 p.Value=table;
                 cmd.Parameters.Add(p);
 
-                var result=cmd.ExecuteScalar();
-
-                if(result!=null)
-                    return result.ToString();    
-            }	         
-        
-            return "";
+                using (var result = cmd.ExecuteReader())
+                {
+                    var primaryKey = result
+                        .Select(c => 
+                            ((string)c["ColumnName"]).ToLowerInvariant())
+                        .ToList();
+                    return primaryKey;
+                }
+            }
         }
-    
-        string GetPropertyType(string sqlType)
+
+        static string GetPropertyType(string sqlType)
         {
             string sysType="string";
             switch (sqlType) 
@@ -337,5 +340,14 @@ namespace FluentMigrator.T4
     PT ON PT.TABLE_NAME = PK.TABLE_NAME
     WHERE (FK.Table_NAME=@tableName OR PK.Table_NAME=@tableName)  AND (FK.TABLE_SCHEMA=@schemaName OR PK.TABLE_SCHEMA=@schemaName)";
       
+    }
+
+    public static class DbReaderExtensions 
+    { 
+        public static IEnumerable<T> Select<T>(this DbDataReader reader, Func<DbDataReader, T> selector)
+        {
+            while (reader.Read())
+                yield return selector(reader);
+        }   
     }
 }

@@ -14,8 +14,8 @@ Todo
 
 1) Ability to import other DB items like Triggers/Procedures/etc..
 2) Abiity add the intial setup data
-3) Genrated FKey code does not work for SQLite. FM problem ?
-3) Generate FKey and Index code for Oracle/MSSQL/MSSQL Compact/MySQL/PGSQL
+3) Generated ForeignKey code does not work for SQLite. FM problem ?
+3) Generated ForeignKey and Index code for Oracle/MSSQL/MSSQL Compact/MySQL/PGSQL
 */
 #>
 
@@ -109,8 +109,8 @@ foreach(IndexColumn col in indx.IndexColumns)
 bool commentAlreadyWritten = false;
 foreach(Table tbl in from t in tables where !t.Ignore select t)
 {
-List<FKey> FKeyList = tbl.FKeys;
-foreach(FKey fkey in FKeyList)
+List<ForeignKey> FKeyList = tbl.FKeys;
+foreach(ForeignKey fkey in FKeyList)
 {
 #>
            <#if(commentAlreadyWritten == false) { #>//Foreign Key List <# commentAlreadyWritten = true;} #>
@@ -127,8 +127,8 @@ foreach(FKey fkey in FKeyList)
 <#
 foreach(Table tbl in from t in tables where !t.Ignore select t)
 {
-    List<FKey> FKeyList = tbl.FKeys;
-    foreach(FKey fkey in FKeyList)
+    List<ForeignKey> FKeyList = tbl.FKeys;
+    foreach(ForeignKey fkey in FKeyList)
     {
     #>
             Delete.ForeignKey().FromTable("<#=tbl.Name#>").ForeignColumn("<#=fkey.ThisColumn#>").ToTable("<#=fkey.OtherTable#>").PrimaryColumn("<#=fkey.OtherColumn#>"); 

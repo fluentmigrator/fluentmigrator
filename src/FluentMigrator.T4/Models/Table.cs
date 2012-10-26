@@ -18,11 +18,11 @@ namespace FluentMigrator.T4
         public bool Ignore;
         public string SQL;
 
-        public Column PK
+        public Column[] PK
         {
             get
             {
-                return this.Columns.SingleOrDefault(x => x.IsPK);
+                return this.Columns.Where(x => x.IsPK).ToArray();
             }
         }
 
