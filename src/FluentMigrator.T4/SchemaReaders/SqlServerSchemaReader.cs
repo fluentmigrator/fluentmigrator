@@ -162,7 +162,7 @@ namespace FluentMigrator.T4
             }	
         }
 
-        List<FKey> LoadFKeys(Table tbl)
+        List<ForeignKey> LoadFKeys(Table tbl)
         {
             using (var cmd=this._factory.CreateCommand())
             {
@@ -179,12 +179,12 @@ namespace FluentMigrator.T4
                 p.Value=tbl.Schema;
                 cmd.Parameters.Add(p);
 
-                var result=new List<FKey>();
+                var result=new List<ForeignKey>();
 
                 using (IDataReader rdr=cmd.ExecuteReader())
                 {
                     while(rdr.Read()){
-                        FKey fk=new FKey();
+                        ForeignKey fk=new ForeignKey();
                         string thisTable=rdr["ThisTable"].ToString();
             
                         if(tbl.Name.ToLower()==thisTable.ToLower()){

@@ -99,9 +99,9 @@ namespace FluentMigrator.T4
             return result;
         }
 
-        List<FKey> LoadFKeys(string tblName)
+        List<ForeignKey> LoadFKeys(string tblName)
         {
-            var result=new List<FKey>();
+            var result=new List<ForeignKey>();
             return result;		
         }
 	

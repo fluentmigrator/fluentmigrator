@@ -8,7 +8,7 @@ namespace FluentMigrator.T4
     {
         public List<Column> Columns;
         public List<TableIndex> Indices;
-        public List<FKey> FKeys;
+        public List<ForeignKey> FKeys;
         public string Name;
         public string Schema;
         public bool IsView;

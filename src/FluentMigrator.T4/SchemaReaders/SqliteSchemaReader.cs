@@ -119,19 +119,19 @@ namespace FluentMigrator.T4
             return result;
         }
 	
-        List<FKey> LoadFKeys(string tblName)
+        List<ForeignKey> LoadFKeys(string tblName)
         {
             using (var cmd=this._factory.CreateCommand())
             {
                 cmd.Connection=this._connection;
                 cmd.CommandText=String.Format(FKEY_INFO_SQL,tblName);
 
-                var result=new List<FKey>();
+                var result=new List<ForeignKey>();
                 using (IDataReader rdr=cmd.ExecuteReader())
                 {
                     while(rdr.Read())
                     {
-                        FKey key=new FKey();
+                        ForeignKey key=new ForeignKey();
                         key.OtherTable=rdr["table"].ToString();
                         key.OtherColumn=rdr["to"].ToString();
                         key.ThisColumn=rdr["from"].ToString();

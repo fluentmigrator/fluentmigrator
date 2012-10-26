@@ -43,7 +43,7 @@
   <ItemGroup>
     <Compile Include="DelegateTextWriter.cs" />
     <Compile Include="Models\Column.cs" />
-    <Compile Include="Models\FKey.cs" />
+    <Compile Include="Models\ForeignKey.cs" />
     <Compile Include="Models\IndexColumn.cs" />
     <Compile Include="Inflector.cs" />
     <Compile Include="InflectorRule.cs" />
