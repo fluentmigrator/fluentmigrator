@@ -136,5 +136,10 @@ namespace FluentMigrator.Infrastructure
 
             return tags.Any() && tagsToMatch.All(t => tags.Any(t.Equals));
         }
+
+        public static string GetDefaultSchema()
+        {
+            return null;
+        }
     }
 }

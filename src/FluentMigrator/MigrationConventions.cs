@@ -36,6 +36,7 @@ namespace FluentMigrator
         public Func<Model.ConstraintDefinition, string> GetConstraintName { get; set; }
         public Func<Type, bool> TypeHasTags { get; set; }
         public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags { get; set; }
+        public Func<string> GetDefaultSchema { get; set; }
 
         public MigrationConventions()
         {
@@ -50,6 +51,7 @@ namespace FluentMigrator
             GetConstraintName = DefaultMigrationConventions.GetConstraintName;
             TypeHasTags = DefaultMigrationConventions.TypeHasTags;
             TypeHasMatchingTags = DefaultMigrationConventions.TypeHasMatchingTags;
+            GetDefaultSchema = DefaultMigrationConventions.GetDefaultSchema;
         }
     }
 }
