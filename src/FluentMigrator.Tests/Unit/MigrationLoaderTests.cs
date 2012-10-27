@@ -78,7 +78,7 @@ namespace FluentMigrator.Tests.Unit
         {
             var conventions = new MigrationConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Nested", true);
+            var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Nested", true, null);
 
             List<Type> expected = new List<Type>
                                       {
@@ -99,7 +99,7 @@ namespace FluentMigrator.Tests.Unit
         {
             var conventions = new MigrationConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Nested", false);
+            var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Nested", false, null);
 
             List<Type> expected = new List<Type>
                                       {

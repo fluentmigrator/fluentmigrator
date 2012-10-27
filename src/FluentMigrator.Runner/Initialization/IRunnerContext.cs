@@ -27,6 +27,7 @@ namespace FluentMigrator.Runner.Initialization
         string Target { get; set; }
         bool PreviewOnly { get; set; }
         string Namespace { get; set; }
+        bool NestedNamespaces { get; set; }
         string Task { get; set; }
         long Version { get; set; }
         int Steps { get; set; }
