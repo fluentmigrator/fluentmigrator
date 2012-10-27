@@ -60,7 +60,7 @@ namespace FluentMigrator.Runner
                 Conventions.GetWorkingDirectory = () => runnerContext.WorkingDirectory;
 
             VersionLoader = new VersionLoader(this, _migrationAssembly, Conventions);
-            MigrationLoader = new MigrationLoader(Conventions, _migrationAssembly, runnerContext.Namespace, runnerContext.Tags);
+            MigrationLoader = new MigrationLoader(Conventions, _migrationAssembly, runnerContext.Namespace, runnerContext.NestedNamespaces, runnerContext.Tags);
             ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
         }
 
