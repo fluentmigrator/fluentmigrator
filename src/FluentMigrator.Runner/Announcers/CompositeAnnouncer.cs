@@ -40,6 +40,11 @@ namespace FluentMigrator.Runner.Announcers
             Each(a => a.Say(message));
         }
 
+        public void Emphasize(string message)
+        {
+            Each(a => a.Emphasize(message));
+        }
+
         public void Sql(string sql)
         {
             Each(a => a.Sql(sql));
