@@ -416,7 +416,7 @@ namespace FluentMigrator.Runner
             _announcer.Say("Version ordering valid.");
         }
 
-        public void ListVersions()
+        public void ListMigrations()
         {
             IVersionInfo currentVersionInfo = this.VersionLoader.VersionInfo;
             long currentVersion = currentVersionInfo.Latest();

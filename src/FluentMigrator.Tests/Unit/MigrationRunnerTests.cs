@@ -469,7 +469,7 @@ namespace FluentMigrator.Tests.Unit
             _runner.MigrationLoader.Migrations.Add(version1, mockMigration1.Object);
             _runner.MigrationLoader.Migrations.Add(version2, mockMigration2.Object);
 
-            _runner.ListVersions();
+            _runner.ListMigrations();
 
             _announcer.Verify(a => a.Say("2011010101: IMigrationProxy"));
             _announcer.Verify(a => a.Emphasize("2011010102: IMigrationProxy (current)"));
