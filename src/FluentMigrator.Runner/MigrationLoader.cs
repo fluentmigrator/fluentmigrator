@@ -31,7 +31,7 @@ namespace FluentMigrator.Runner
         public string Namespace { get; private set; }
         public bool LoadNestedNamespaces { get; private set; }
         public SortedList<long, IMigration> Migrations { get; private set; }
-        public IEnumerable<string> TagsToMatch { get; set; }
+        public IEnumerable<string> TagsToMatch { get; private set; }
 
         public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, IEnumerable<string> tagsToMatch)
         {
@@ -43,13 +43,13 @@ namespace FluentMigrator.Runner
             Initialize();
         }
         
-        public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, bool loadNestedNamespaces)
+        public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, bool loadNestedNamespaces, IEnumerable<string> tagsToMatch)
         {
             Conventions = conventions;
             Assembly = assembly;
             Namespace = @namespace;
             LoadNestedNamespaces = loadNestedNamespaces;
-            TagsToMatch = new string[]{};
+            TagsToMatch = tagsToMatch ?? new string[] { };
 
             Initialize();
         }

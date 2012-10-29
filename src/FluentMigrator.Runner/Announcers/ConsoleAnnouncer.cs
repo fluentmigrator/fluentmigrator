@@ -57,6 +57,13 @@ namespace FluentMigrator.Runner.Announcers
             Console.ResetColor();
         }
 
+        public override void Emphasize(string message)
+        {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            base.Say(string.Format("[+] {0}", message));
+            Console.ResetColor();
+        }
+
         public override void ElapsedTime(TimeSpan timeSpan)
         {
             Console.ResetColor();

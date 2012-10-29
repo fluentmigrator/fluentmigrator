@@ -68,6 +68,8 @@ namespace FluentMigrator.MSBuild
 
         public string Namespace { get; set; }
 
+        public bool Nested { get; set; }
+
         public string Task { get; set; }
 
         public long Version { get; set; }
@@ -136,6 +138,7 @@ namespace FluentMigrator.MSBuild
                 Target = Target,
                 PreviewOnly = PreviewOnly,
                 Namespace = Namespace,
+                NestedNamespaces = Nested,
                 Task = Task,
                 Version = Version,
                 Steps = Steps,
