@@ -205,6 +205,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                             if (!string.IsNullOrEmpty(sqlBatch))
                             {
                                 command.CommandText = sqlBatch;
+                                command.CommandTimeout = Options.Timeout;
                                 command.ExecuteNonQuery();
                                 sqlBatch = string.Empty;
                             }
@@ -219,7 +220,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 {
                     using (var message = new StringWriter())
                     {
-                        message.WriteLine("An error occured executing the following sql:");
+                        message.WriteLine("An error occurred executing the following sql:");
                         message.WriteLine(sql);
                         message.WriteLine("The error was {0}", ex.Message);
 
