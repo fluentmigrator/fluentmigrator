@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Text.RegularExpressions;
 
 namespace FluentMigrator.Runner.Initialization
 {
@@ -93,8 +94,15 @@ namespace FluentMigrator.Runner.Initialization
                 throw new UndeterminableConnectionException("Unable to resolve any connectionstring using parameters \"/connection\" and \"/configPath\"");
 
             announcer.Say(notUsingConfig
-                              ? string.Format("Using Database {0} and Connection String {1}", database, ConnectionString)
+                              ? string.Format("Using Database {0} and Connection String {1}", database, ObfuscatedConnectionString())
                               : string.Format("Using Connection {0} from Configuration file {1}", connection, configFile));
+        }
+
+        private string ObfuscatedConnectionString()
+        {
+            var endsWithSemicolon = Regex.Replace(ConnectionString, "(Password|Pwd)=[^;]+;", "$1=******;", RegexOptions.IgnoreCase);
+            var endsWithoutSemicolon = Regex.Replace(endsWithSemicolon, "(Password|Pwd)=[^;]+$", "$1=******", RegexOptions.IgnoreCase);
+            return endsWithoutSemicolon;
         }
     }
 }
