@@ -24,7 +24,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 {
     public class OracleProcessor : ProcessorBase
     {
-        private IDbConnection Connection { get; set; }
+        public IDbConnection Connection { get; private set; }
         private readonly IDbFactory _factory;
 
         public override string DatabaseType
@@ -50,7 +50,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             if (schemaName.Length == 0)
                 return false;
 
-            return Exists("SELECT 1 FROM ALL_USERS WHERE USERNAME = '{0}'", schemaName.ToUpper());
+            return Exists("SELECT 1 FROM \"ALL_USERS\" WHERE \"USERNAME\" = '{0}'", schemaName.ToUpper());
         }
 
         public override bool TableExists(string schemaName, string tableName)
@@ -62,9 +62,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 return false;
 
             if (string.IsNullOrEmpty(schemaName))
-                return Exists("SELECT 1 FROM USER_TABLES WHERE TABLE_NAME = '{0}'", tableName.ToUpper());
+                return Exists("SELECT 1 FROM \"USER_TABLES\" WHERE \"TABLE_NAME\" = '{0}'", tableName);
 
-            return Exists("SELECT 1 FROM ALL_TABLES WHERE OWNER = '{0}' AND TABLE_NAME = '{1}'", schemaName.ToUpper(), tableName.ToUpper());
+            return Exists("SELECT 1 FROM \"ALL_TABLES\" WHERE \"OWNER\" = '{0}' AND \"TABLE_NAME\" = '{1}'", schemaName.ToUpper(), tableName);
         }
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
@@ -78,9 +78,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 return false;
 
             if (string.IsNullOrEmpty(schemaName))
-                return Exists("SELECT 1 FROM USER_TAB_COLUMNS WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'", tableName.ToUpper(), columnName.ToUpper());
+                return Exists("SELECT 1 FROM \"USER_TAB_COLUMNS\" WHERE \"TABLE_NAME\" = '{0}' AND \"COLUMN_NAME\" = '{1}'", tableName, columnName);
 
-            return Exists("SELECT 1 FROM ALL_TAB_COLUMNS WHERE OWNER = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}'", schemaName.ToUpper(), tableName.ToUpper(), columnName.ToUpper());
+            return Exists("SELECT 1 FROM \"ALL_TAB_COLUMNS\" WHERE \"OWNER\" = '{0}' AND \"TABLE_NAME\" = '{1}' AND \"COLUMN_NAME\" = '{2}'", schemaName.ToUpper(), tableName, columnName);
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
@@ -96,9 +96,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 return false;
 
             if (String.IsNullOrEmpty(schemaName))
-                return Exists("SELECT 1 FROM USER_CONSTRAINTS WHERE CONSTRAINT_NAME = '{0}'", constraintName.ToUpper());
+                return Exists("SELECT 1 FROM \"USER_CONSTRAINTS\" WHERE \"CONSTRAINT_NAME\" = '{0}'", constraintName);
 
-            return Exists("SELECT 1 FROM ALL_CONSTRAINTS WHERE OWNER = '{0}' AND CONSTRAINT_NAME = '{1}'", schemaName.ToUpper(), constraintName.ToUpper());
+            return Exists("SELECT 1 FROM \"ALL_CONSTRAINTS\" WHERE \"OWNER\" = '{0}' AND \"CONSTRAINT_NAME\" = '{1}'", schemaName.ToUpper(), constraintName);
         }
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
@@ -114,23 +114,14 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 return false;
 
             if (String.IsNullOrEmpty(schemaName))
-                return Exists("SELECT 1 FROM USER_INDEXES WHERE INDEX_NAME = '{0}'", indexName.ToUpper());
+                return Exists("SELECT 1 FROM \"USER_INDEXES\" WHERE \"INDEX_NAME\" = '{0}'", indexName);
 
-            return Exists("SELECT 1 FROM ALL_INDEXES WHERE OWNER = '{0}' AND INDEX_NAME = '{1}'", schemaName.ToUpper(), indexName.ToUpper());
+            return Exists("SELECT 1 FROM \"ALL_INDEXES\" WHERE \"OWNER\" = '{0}' AND \"INDEX_NAME\" = '{1}'", schemaName.ToUpper(), indexName);
         }
 
         public override void Execute(string template, params object[] args)
         {
-            if (template == null)
-                throw new ArgumentNullException("template");
-
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
-
-            using (var command = _factory.CreateCommand(String.Format(template, args), Connection))
-            {
-                command.ExecuteNonQuery();
-            }
+            Process(string.Format(template, args));
         }
 
         public override bool Exists(string template, params object[] args)
@@ -154,9 +145,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 throw new ArgumentNullException("tableName");
 
             if (String.IsNullOrEmpty(schemaName))
-                return Read("SELECT * FROM {0}", tableName.ToUpper());
+                return Read("SELECT * FROM \"{0}\"", tableName);
 
-            return Read("SELECT * FROM {0}.{1}", schemaName.ToUpper(), tableName.ToUpper());
+            return Read("SELECT * FROM \"{0}\".\"{1}\"", schemaName, tableName);
         }
 
         public override DataSet Read(string template, params object[] args)

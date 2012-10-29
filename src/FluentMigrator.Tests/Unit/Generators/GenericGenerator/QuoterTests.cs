@@ -198,7 +198,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             //Do Nothing at the moment due to case sensitivity issues with oracle
             OracleQuoter quoter = new OracleQuoter();
-            quoter.Quote("Table\"Name").ShouldBe("Table\"Name");
+            quoter.Quote("Table\"Name").ShouldBe("\"Table\"\"Name\"");
         }
 
         [Test]
