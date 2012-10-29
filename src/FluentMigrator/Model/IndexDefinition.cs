@@ -42,6 +42,9 @@ namespace FluentMigrator.Model
         {
             if (String.IsNullOrEmpty(Name))
                 Name = conventions.GetIndexName(this);
+
+            if (String.IsNullOrEmpty(SchemaName))
+                SchemaName = conventions.GetDefaultSchema();
         }
 
         public virtual void CollectValidationErrors(ICollection<string> errors)

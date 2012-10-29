@@ -55,6 +55,9 @@ namespace FluentMigrator.Model
             if (String.IsNullOrEmpty(ConstraintName)){ 
                 ConstraintName = conventions.GetConstraintName(this);
             }
+
+            if (String.IsNullOrEmpty(SchemaName))
+                SchemaName = conventions.GetDefaultSchema();
         }
 
         #endregion

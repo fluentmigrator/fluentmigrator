@@ -229,6 +229,7 @@
     <Compile Include="Unit\Builders\Create\CreateTableExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateColumnExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Schema\SchemaExpressionRootTest.cs" />
+    <Compile Include="Unit\Definitions\ConstraintDefinitionTests.cs" />
     <Compile Include="Unit\Definitions\IndexDefinitionTests.cs" />
     <Compile Include="Unit\Expressions\AlterDefaultConstraintExpressionTests.cs" />
     <Compile Include="Unit\Expressions\AlterTableExpressionTests.cs" />
@@ -236,6 +237,8 @@
     <Compile Include="Unit\Expressions\CreateSchemaExpressionTests.cs" />
     <Compile Include="Unit\Expressions\CreateSequenceExpressionTests.cs" />
     <Compile Include="Unit\Expressions\DeleteConstraintExpressionTests.cs" />
+    <Compile Include="Unit\Definitions\SequenceDefinitionTests.cs" />
+    <Compile Include="Unit\Definitions\TableDefinitionTests.cs" />
     <Compile Include="Unit\Expressions\DeleteDefaultConstraintExpressionTests.cs" />
     <Compile Include="Unit\Expressions\DeleteSchemaExpressionTests.cs" />
     <Compile Include="Unit\Expressions\DeleteSequenceExpressionTests.cs" />

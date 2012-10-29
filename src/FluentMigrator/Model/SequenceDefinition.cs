@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using Infrastructure;
 
-    public class SequenceDefinition: ICloneable, ICanBeValidated
+    public class SequenceDefinition : ICloneable, ICanBeValidated, ICanBeConventional
     {
         public virtual string Name { get; set; }
         public virtual string SchemaName { get; set; }
@@ -39,6 +39,12 @@
         {
             if (String.IsNullOrEmpty(Name))
                 errors.Add(ErrorMessages.SequenceNameCannotBeNullOrEmpty);
+        }
+
+        public void ApplyConventions(IMigrationConventions conventions)
+        {
+            if (String.IsNullOrEmpty(SchemaName))
+                SchemaName = conventions.GetDefaultSchema();
         }
     }
 }
