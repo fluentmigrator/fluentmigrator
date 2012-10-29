@@ -16,6 +16,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             SetTypeMap(DbType.AnsiString, "varchar($size)", PostgresMaxVarcharSize);
             SetTypeMap(DbType.AnsiString, "text", int.MaxValue);
             SetTypeMap(DbType.Binary, "bytea");
+            SetTypeMap(DbType.Binary, "bytea", int.MaxValue);
             SetTypeMap(DbType.Boolean, "boolean");
             SetTypeMap(DbType.Byte, "smallint"); //no built-in support for single byte unsigned integers
             SetTypeMap(DbType.Currency, "money");

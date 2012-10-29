@@ -454,6 +454,27 @@ namespace FluentMigrator.Tests.Unit
             _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();
         }
 
+        [Test]
+        public void CanListVersions()
+        {
+            const long version1 = 2011010101;
+            const long version2 = 2011010102;
+
+            var mockMigration1 = new Mock<IMigration>();
+            var mockMigration2 = new Mock<IMigration>();
+            
+            LoadVersionData(version1, version2);
+
+            _runner.MigrationLoader.Migrations.Clear();
+            _runner.MigrationLoader.Migrations.Add(version1, mockMigration1.Object);
+            _runner.MigrationLoader.Migrations.Add(version2, mockMigration2.Object);
+
+            _runner.ListMigrations();
+
+            _announcer.Verify(a => a.Say("2011010101: IMigrationProxy"));
+            _announcer.Verify(a => a.Emphasize("2011010102: IMigrationProxy (current)"));
+        }
+
         [Test, Ignore("Move to MigrationLoader tests")]
         public void HandlesNullMigrationList()
         {

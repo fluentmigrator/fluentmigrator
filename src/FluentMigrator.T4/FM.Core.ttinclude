@@ -581,7 +581,7 @@ public string GetMigrationTypeFunctionForType(string type, int size,int precisio
 			case "int":
                 sysType= "AsInt32()";
                 break;							
-            case "Guid":
+            case "guid":
                 sysType=  "AsGuid()";
                  break;
             case "datetime":

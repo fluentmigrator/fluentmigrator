@@ -35,6 +35,11 @@ namespace FluentMigrator.Runner.Announcers
             Write(message, true);
         }
 
+        public virtual void Emphasize(string message)
+        {
+            Write(message, true);
+        }
+
         public virtual void Sql(string sql)
         {
             if (!ShowSql) return;

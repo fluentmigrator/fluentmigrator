@@ -131,6 +131,20 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public void CanCreateTableWithBinaryColumnWithSize()
+        {
+            string tableName = "NewTable";
+            string columnName = "ColumnName1";
+
+            var column1 = new ColumnDefinition { Name = columnName, Type = DbType.Binary, TableName = tableName, Size = 10000 };
+
+            var expression = new CreateTableExpression { TableName = tableName };
+            expression.Columns.Add(column1);
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE TABLE \"public\".\"NewTable\" (\"ColumnName1\" bytea NOT NULL)"); // PostgreSQL does not actually use the configured size
+        }
+
+        [Test]
         public void CanDropTable()
         {
             string tableName = "NewTable";
@@ -557,6 +571,34 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expression = new DeleteSequenceExpression { SchemaName = "Schema", SequenceName = "Sequence" };
             var sql = generator.Generate(expression);
             sql.ShouldBe("DROP SEQUENCE \"Schema\".\"Sequence\"");
+        }
+
+        [Test]
+        public void CanCreateSequenceWithoutSchema()
+        {
+            var expression = new CreateSequenceExpression
+            {
+                Sequence =
+                {
+                    Cache = 10,
+                    Cycle = true,
+                    Increment = 2,
+                    MaxValue = 100,
+                    MinValue = 0,
+                    Name = "Sequence",
+                    StartWith = 2
+                }
+            };
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE SEQUENCE \"Sequence\" INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE");
+        }
+
+        [Test]
+        public void CanDeleteSequenceWithoutSchemaName()
+        {
+            var expression = new DeleteSequenceExpression { SequenceName = "Sequence" };
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("DROP SEQUENCE \"Sequence\"");
         }
 
         private DeleteTableExpression GetDeleteTableExpression(string tableName)
