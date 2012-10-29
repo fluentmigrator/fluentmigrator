@@ -75,8 +75,7 @@ foreach(Table tbl in from t in tables where !t.Ignore select t)
     var ColumnList = from c in tbl.Columns where !c.Ignore select c;
 foreach(Column col in ColumnList)
 {
-#>
-                .WithColumn("<#=col.Name#>").<#=generator.GetMigrationTypeFunctionForType(col.PropertyType,col.Size,col.Precision)#><#if (col.IsPrimaryKey){#>.PrimaryKey()<#}#><#if (col.IsAutoIncrement){#>.Identity()<#}#><#if (col.IsNullable){#>.Nullable()<#} else {#>.NotNullable()<#}#><#if (col.DefaultValue != null){#>.WithDefaultValue(<#= generator.GetColumnDefaultValue(col) #>)<#}#> 
+#>                .WithColumn("<#=col.Name#>").<#=generator.GetMigrationTypeFunctionForType(col.PropertyType,col.Size,col.Precision)#><#if (col.IsPrimaryKey){#>.PrimaryKey()<#}#><#if (col.IsAutoIncrement){#>.Identity()<#}#><#if (col.IsNullable){#>.Nullable()<#} else {#>.NotNullable()<#}#><#if (col.DefaultValue != null){#>.WithDefaultValue(<#= generator.GetColumnDefaultValue(col) #>)<#}#> 
 <#
 }
 #>
@@ -90,12 +89,10 @@ foreach(TableIndex indx in IndexList)
 <#
 foreach(IndexColumn col in indx.IndexColumns)
 {
-#>
-                .OnColumn("<#=col.Name#>")<#if (col.IsAsc){#>.Ascending()<#}else{#>.Descending()<#}#>
+#>                .OnColumn("<#=col.Name#>")<#if (col.IsAsc){#>.Ascending()<#}else{#>.Descending()<#}#>
 <#
 }
-#><#if (indx.IsUnique){#>
-                .WithOptions().Unique()<#}#> 
+#><#if (indx.IsUnique){#>                .WithOptions().Unique()<#}#> 
             ;
                 
 <#
@@ -114,7 +111,7 @@ foreach(ForeignKey fkey in FKeyList)
 {
 #>
            <#if(commentAlreadyWritten == false) { #>//Foreign Key List <# commentAlreadyWritten = true;} #>
-            Create.ForeignKey().FromTable("<#=tbl.Name#>").ForeignColumn("<#=fkey.ThisColumn#>").ToTable("<#=fkey.OtherTable#>").PrimaryColumn("<#=fkey.OtherColumn#>")
+            Create.ForeignKey().FromTable("<#=tbl.Name#>").ForeignColumns("<#=fkey.ThisColumn#>").ToTable("<#=fkey.OtherTable#>").PrimaryColumns("<#=fkey.OtherColumn#>")
             ;
 <#
 }
@@ -131,7 +128,7 @@ foreach(Table tbl in from t in tables where !t.Ignore select t)
     foreach(ForeignKey fkey in FKeyList)
     {
     #>
-            Delete.ForeignKey().FromTable("<#=tbl.Name#>").ForeignColumn("<#=fkey.ThisColumn#>").ToTable("<#=fkey.OtherTable#>").PrimaryColumn("<#=fkey.OtherColumn#>"); 
+            Delete.ForeignKey().FromTable("<#=tbl.Name#>").ForeignColumns("<#=fkey.ThisColumn#>").ToTable("<#=fkey.OtherTable#>").PrimaryColumns("<#=fkey.OtherColumn#>"); 
     <#
     }
 }

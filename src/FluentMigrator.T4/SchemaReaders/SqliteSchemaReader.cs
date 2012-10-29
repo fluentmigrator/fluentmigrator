@@ -40,7 +40,7 @@ namespace FluentMigrator.T4
             {
                 tbl.Columns=this.LoadColumns(tbl);
                 tbl.Indices = this.LoadIndices(tbl.Name);
-                tbl.FKeys = this.LoadFKeys(tbl.Name);
+                tbl.FKeys = this.LoadForeignKeys(tbl.Name);
             }
             return result;
         }
@@ -119,7 +119,7 @@ namespace FluentMigrator.T4
             return result;
         }
 	
-        List<ForeignKey> LoadFKeys(string tblName)
+        List<ForeignKey> LoadForeignKeys(string tblName)
         {
             using (var cmd=this._factory.CreateCommand())
             {
@@ -132,9 +132,9 @@ namespace FluentMigrator.T4
                     while(rdr.Read())
                     {
                         ForeignKey key=new ForeignKey();
-                        key.OtherTable=rdr["table"].ToString();
-                        key.OtherColumn=rdr["to"].ToString();
-                        key.ThisColumn=rdr["from"].ToString();
+                        key.PrimaryTable=rdr["table"].ToString();
+                        key.PrimaryColumns=new [] { rdr["to"].ToString() };
+                        key.ForeignColumns=new [] { rdr["from"].ToString() };
                         result.Add(key);
                     }
                 }

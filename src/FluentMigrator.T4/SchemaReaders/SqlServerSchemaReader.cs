@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Data.SqlClient;
 using System.Linq;
 using System;
 
@@ -13,12 +14,12 @@ namespace FluentMigrator.T4
         {
             var result=new Tables();
         
-            this._connection=connection;
-            this._factory=factory;
+            this._connection = connection;
+            this._factory = factory;
 
-            var cmd=this._factory.CreateCommand();
-            cmd.Connection=connection;
-            cmd.CommandText=TABLE_SQL;
+            var cmd = this._factory.CreateCommand();
+            cmd.Connection = connection;
+            cmd.CommandText = TableSql;
 
             //pull the tables in a reader
             using(cmd)
@@ -28,12 +29,12 @@ namespace FluentMigrator.T4
                 {
                     while(rdr.Read())
                     {
-                        Table tbl=new Table();
-                        tbl.Name=rdr["TABLE_NAME"].ToString();
-                        tbl.Schema=rdr["TABLE_SCHEMA"].ToString();
-                        tbl.IsView=String.Compare(rdr["TABLE_TYPE"].ToString(), "View", true)==0;
-                        tbl.CleanName=CleanUp(tbl.Name);
-                        tbl.ClassName=Inflector.MakeSingular(tbl.CleanName);
+                        Table tbl = new Table();
+                        tbl.Name = rdr["TABLE_NAME"].ToString();
+                        tbl.Schema = rdr["TABLE_SCHEMA"].ToString();
+                        tbl.IsView = String.Compare(rdr["TABLE_TYPE"].ToString(), "View", true)==0;
+                        tbl.CleanName = CleanUp(tbl.Name);
+                        tbl.ClassName = Inflector.MakeSingular(tbl.CleanName);
 
                         result.Add(tbl);
                     }
@@ -42,12 +43,12 @@ namespace FluentMigrator.T4
 
             foreach (var tbl in result)
             {
-                tbl.Columns=this.LoadColumns(tbl);
+                tbl.Columns = this.LoadColumns(tbl);
                 tbl.Indices = this.LoadIndices(tbl);
-                tbl.FKeys = this.LoadFKeys(tbl);			
+                tbl.FKeys = this.LoadForeignKeys(tbl);			
                     
                 // Mark the primary key
-                var primaryKey = this.GetPrimaryKey(tbl.Name);
+                var primaryKey = this.GetPrimaryKey(tbl.Name).Select(c=>c.ToLowerInvariant());
                 var primaryKeyColumns = tbl.Columns.Where(c => primaryKey.Contains(c.Name.ToLowerInvariant()));
 
                 foreach (var column in primaryKeyColumns)
@@ -68,7 +69,7 @@ namespace FluentMigrator.T4
             using (var cmd=this._factory.CreateCommand())
             {
                 cmd.Connection=this._connection;
-                cmd.CommandText=COLUMN_SQL;
+                cmd.CommandText=ColumnSql;
 
                 var p = cmd.CreateParameter();
                 p.ParameterName = "@tableName";
@@ -161,82 +162,70 @@ namespace FluentMigrator.T4
             }	
         }
 
-        List<ForeignKey> LoadFKeys(Table tbl)
+        List<ForeignKey> LoadForeignKeys(Table tbl)
         {
-            using (var cmd=this._factory.CreateCommand())
+            using (var cmd = this._factory.CreateCommand())
             {
-                cmd.Connection=this._connection;
-                cmd.CommandText=FKSql;
+                cmd.Connection = this._connection;
+                cmd.CommandText = ForeignKeySql;
 
                 var p = cmd.CreateParameter();
                 p.ParameterName = "@tableName";
-                p.Value=tbl.Name;
+                p.Value = tbl.Name;
                 cmd.Parameters.Add(p);
 
                 p = cmd.CreateParameter();
                 p.ParameterName = "@schemaName";
-                p.Value=tbl.Schema;
+                p.Value = tbl.Schema;
                 cmd.Parameters.Add(p);
 
-                var result=new List<ForeignKey>();
+                var keys = cmd.Select(reader => new {
+                    ForeignConstraintName = reader["ForeignConstraintName"].ToString(),
+                    ForeignTableSchema	  = reader["ForeignTableSchema"].ToString(),
+                    ForeignTable	      = reader["ForeignTable"].ToString(),
+                    ForeignColumn	      = reader["ForeignColumn"].ToString(),
+                    PrimaryConstraintName = reader["PrimaryConstraintName"].ToString(),
+                    PrimaryTableSchema	  = reader["PrimaryTableSchema"].ToString(),
+                    PrimaryTable	      = reader["PrimaryTable"].ToString(),
+                    PrimaryColumn	      = reader["PrimaryColumn"].ToString(),
+                    UpdateRule	          = reader["UpdateRule"].ToString(),
+                    DeleteRule            = reader["DeleteRule"].ToString(),
+                });
 
-                using (IDataReader rdr=cmd.ExecuteReader())
-                {
-                    while(rdr.Read()){
-                        var fk = new ForeignKey();
-                        string thisTable=rdr["ThisTable"].ToString();
-            
-                        if(tbl.Name.ToLower()==thisTable.ToLower())
-                        {
-                            fk.ThisTable=rdr["ThisTable"].ToString();
-                            fk.ThisColumn=rdr["ThisColumn"].ToString();
-                            fk.OtherTable=rdr["OtherTable"].ToString();
-                            fk.OtherColumn=rdr["OtherColumn"].ToString();
-                        }
-                        else
-                        {
-                            fk.ThisTable=rdr["OtherTable"].ToString();
-                            fk.ThisColumn=rdr["OtherColumn"].ToString();
-                            fk.OtherTable=rdr["ThisTable"].ToString();
-                            fk.OtherColumn=rdr["ThisColumn"].ToString();
-                        }
-            
-                        fk.OtherClass=Inflector.MakeSingular(CleanUp(fk.OtherTable));
-            
-                        result.Add(fk);
-                    }
-                }
-                return result;	
+                return keys.GroupBy(key => new {
+                    key.ForeignConstraintName,
+                    key.ForeignTableSchema,
+                    key.ForeignTable,
+                    key.PrimaryTableSchema,
+                    key.PrimaryTable,
+                    key.UpdateRule,
+                    key.DeleteRule
+                }).Select(foreignKeyGrouping => new ForeignKey {
+                    Name = foreignKeyGrouping.Key.ForeignConstraintName,
+                    ForeignTable = foreignKeyGrouping.Key.ForeignTable,
+                    ForeignTableSchema = foreignKeyGrouping.Key.ForeignTableSchema,
+                    ForeignColumns = foreignKeyGrouping.Select(f => f.ForeignColumn).ToList(),
+                    PrimaryTable = foreignKeyGrouping.Key.PrimaryTable,
+                    PrimaryTableSchema = foreignKeyGrouping.Key.PrimaryTableSchema,
+                    PrimaryColumns = foreignKeyGrouping.Select(f => f.PrimaryColumn).ToList(),
+                    PrimaryClass = Inflector.MakeSingular(CleanUp(foreignKeyGrouping.Key.PrimaryTable))
+                }).ToList();
             }	
         }
 	
-        IList<string> GetPrimaryKey(string table)
+        IEnumerable<string> GetPrimaryKey(string table)
         {
-            const string sql = @"SELECT c.name AS ColumnName
-                FROM sys.indexes AS i 
-                INNER JOIN sys.index_columns AS ic ON i.object_id = ic.object_id AND i.index_id = ic.index_id 
-                INNER JOIN sys.objects AS o ON i.object_id = o.object_id 
-                LEFT OUTER JOIN sys.columns AS c ON ic.object_id = c.object_id AND c.column_id = ic.column_id
-                WHERE (i.type = 1) AND (o.name = @tableName)";
-
-            using (var cmd=this._factory.CreateCommand())
+            using (var cmd = this._factory.CreateCommand())
             {
-                cmd.Connection=this._connection;
-                cmd.CommandText=sql;
+                cmd.Connection = this._connection;
+                cmd.CommandText = PrimaryKeySql;
 
                 var p = cmd.CreateParameter();
                 p.ParameterName = "@tableName";
-                p.Value=table;
+                p.Value = table;
                 cmd.Parameters.Add(p);
 
-                using (var result = cmd.ExecuteReader())
-                {
-                    var primaryKey = result
-                        .Select(c => 
-                            ((string)c["ColumnName"]).ToLowerInvariant())
-                        .ToList();
-                    return primaryKey;
-                }
+                return cmd.Select(c => (string)c["ColumnName"]).ToList();
             }
         }
 
@@ -297,13 +286,18 @@ namespace FluentMigrator.T4
             return sysType;
         }
 
+        const string PrimaryKeySql = @"SELECT c.name AS ColumnName
+                FROM sys.indexes AS i 
+                INNER JOIN sys.index_columns AS ic ON i.object_id = ic.object_id AND i.index_id = ic.index_id 
+                INNER JOIN sys.objects AS o ON i.object_id = o.object_id 
+                LEFT OUTER JOIN sys.columns AS c ON ic.object_id = c.object_id AND c.column_id = ic.column_id
+                WHERE (i.type = 1) AND (o.name = @tableName)";
 
-
-        const string TABLE_SQL=@"SELECT *
+        const string TableSql=@"SELECT *
         FROM  INFORMATION_SCHEMA.TABLES
         WHERE TABLE_TYPE='BASE TABLE' OR TABLE_TYPE='VIEW'";
 
-        const string COLUMN_SQL=@"SELECT 
+        const string ColumnSql=@"SELECT 
             TABLE_CATALOG AS [Database],
             TABLE_SCHEMA AS Owner, 
             TABLE_NAME AS TableName, 
@@ -319,35 +313,46 @@ namespace FluentMigrator.T4
         WHERE TABLE_NAME=@tableName AND TABLE_SCHEMA=@schemaName
         ORDER BY OrdinalPosition ASC";
 
-        const string FKSql=@"SELECT
-        ThisTable  = FK.TABLE_NAME,
-        ThisColumn = CU.COLUMN_NAME,
-        OtherTable  = PK.TABLE_NAME,
-        OtherColumn = PT.COLUMN_NAME, 
-        Constraint_Name = C.CONSTRAINT_NAME,
-        Owner = FK.TABLE_SCHEMA
-    FROM INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS C
-    INNER JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS FK ON C.CONSTRAINT_NAME = FK.CONSTRAINT_NAME
-    INNER JOIN INFORMATION_SCHEMA.TABLE_CONSTRAINTS PK ON C.UNIQUE_CONSTRAINT_NAME = PK.CONSTRAINT_NAME
-    INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE CU ON C.CONSTRAINT_NAME = CU.CONSTRAINT_NAME
-    INNER JOIN
-        (	
-            SELECT i1.TABLE_NAME, i2.COLUMN_NAME
-            FROM  INFORMATION_SCHEMA.TABLE_CONSTRAINTS i1
-            INNER JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE i2 ON i1.CONSTRAINT_NAME = i2.CONSTRAINT_NAME
-            WHERE i1.CONSTRAINT_TYPE = 'PRIMARY KEY'
-        ) 
-    PT ON PT.TABLE_NAME = PK.TABLE_NAME
-    WHERE (FK.Table_NAME=@tableName OR PK.Table_NAME=@tableName)  AND (FK.TABLE_SCHEMA=@schemaName OR PK.TABLE_SCHEMA=@schemaName)";
-      
+        const string ForeignKeySql = @"
+        SELECT 
+            FK.CONSTRAINT_NAME AS ForeignConstraintName, 
+            FK.TABLE_SCHEMA AS ForeignTableSchema, 
+            FK.TABLE_NAME AS ForeignTable, 
+            FKC.COLUMN_NAME AS ForeignColumn, 
+            PK.CONSTRAINT_NAME AS PrimaryConstraintName, 
+            PK.TABLE_SCHEMA AS PrimaryTableSchema, 
+            PK.TABLE_NAME AS PrimaryTable, 
+            PKC.COLUMN_NAME AS PrimaryColumn, 
+            RC.UPDATE_RULE AS UpdateRule, 
+            RC.DELETE_RULE AS DeleteRule
+        FROM         
+            INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS FK INNER JOIN
+            INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS FKC ON FK.CONSTRAINT_SCHEMA = FKC.CONSTRAINT_SCHEMA AND 
+            FK.CONSTRAINT_NAME = FKC.CONSTRAINT_NAME INNER JOIN
+            INFORMATION_SCHEMA.REFERENTIAL_CONSTRAINTS AS RC ON FK.CONSTRAINT_SCHEMA = RC.CONSTRAINT_SCHEMA AND 
+            FK.CONSTRAINT_NAME = RC.CONSTRAINT_NAME INNER JOIN
+            INFORMATION_SCHEMA.TABLE_CONSTRAINTS AS PK ON RC.UNIQUE_CONSTRAINT_SCHEMA = PK.CONSTRAINT_SCHEMA AND 
+            RC.UNIQUE_CONSTRAINT_NAME = PK.CONSTRAINT_NAME INNER JOIN
+            INFORMATION_SCHEMA.KEY_COLUMN_USAGE AS PKC ON PK.CONSTRAINT_SCHEMA = PKC.CONSTRAINT_SCHEMA AND 
+            PK.CONSTRAINT_NAME = PKC.CONSTRAINT_NAME AND FKC.ORDINAL_POSITION = PKC.ORDINAL_POSITION
+        WHERE     
+            (FK.CONSTRAINT_TYPE = 'FOREIGN KEY') 
+            AND (FK.TABLE_NAME=@tableName) 
+            AND (FK.TABLE_SCHEMA=@schemaName)";
     }
 
-    public static class DbReaderExtensions 
+    public static class DbDataReaderExtensions 
     { 
         public static IEnumerable<T> Select<T>(this DbDataReader reader, Func<DbDataReader, T> selector)
         {
             while (reader.Read())
                 yield return selector(reader);
+        }
+
+        public static IEnumerable<T> Select<T>(this DbCommand command, Func<DbDataReader, T> selector)
+        {
+            using (var reader = command.ExecuteReader())
+               return reader.Select(selector).ToList();
         }   
     }
 }

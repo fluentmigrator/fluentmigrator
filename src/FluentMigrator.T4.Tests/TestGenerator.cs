@@ -21,5 +21,18 @@ namespace FluentMigrator.T4.Tests
                 Console.WriteLine(loadTable);
             }
         }
+        
+        [Test]
+        public void TestForeignKeys()
+        {
+            var connectionString = ConfigurationManager.ConnectionStrings["TestConnection"];
+            var codeGenerator = new CodeGenerator(connectionString.ConnectionString, connectionString.ProviderName, Console.Out, x => Console.WriteLine("WARNING: " + x));
+
+            var loadTables = codeGenerator.LoadTables();
+            foreach (var loadTable in loadTables)
+            {
+                Console.WriteLine(loadTable.FKeys);
+            }
+        }
     }
 }
