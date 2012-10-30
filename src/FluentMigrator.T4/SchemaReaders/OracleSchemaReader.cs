@@ -43,8 +43,8 @@ namespace FluentMigrator.T4
             foreach (var tbl in result)
             {
                 tbl.Columns=this.LoadColumns(tbl);
-                tbl.Indices = this.LoadIndices(tbl.Name);
-                tbl.FKeys = this.LoadFKeys(tbl.Name);
+                tbl.Indexes = this.LoadIndices(tbl.Name);
+                tbl.ForeignKeys = this.LoadFKeys(tbl.Name);
 			
                 // Mark the primary key
                 string PrimaryKey=this.GetPK(tbl.Name);

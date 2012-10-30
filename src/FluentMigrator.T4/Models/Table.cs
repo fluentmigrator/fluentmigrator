@@ -7,8 +7,8 @@ namespace FluentMigrator.T4
     public class Table
     {
         public List<Column> Columns;
-        public List<TableIndex> Indices;
-        public List<ForeignKey> FKeys;
+        public List<TableIndex> Indexes;
+        public List<ForeignKey> ForeignKeys;
         public string Name;
         public string Schema;
         public bool IsView;
@@ -41,7 +41,7 @@ namespace FluentMigrator.T4
 
         public TableIndex GetIndex(string indexName)
         {
-            return this.Indices.Single(x => string.Compare(x.Name, indexName, true) == 0);
+            return this.Indexes.Single(x => string.Compare(x.Name, indexName, true) == 0);
         }
     }
 }

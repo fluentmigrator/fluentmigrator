@@ -21,17 +21,17 @@ namespace FluentMigrator.T4
             warning = Warning;
         }
 
-        private string connectionString;
+        private readonly string connectionString;
 
         private readonly string providerName;
 
-        private string ClassPrefix = "";
+        private string classPrefix = "";
 
-        private string ClassSuffix = "";
+        private string classSuffix = "";
 
         private readonly string SchemaName = null;
 
-        private bool IncludeViews = false;
+        private bool includeViews = false;
 
         public bool IsTypeConvertedToLong(string columnType)
         {
@@ -100,7 +100,7 @@ namespace FluentMigrator.T4
             writer.WriteLine("//     Provider:               `{0}`", this.providerName);
             writer.WriteLine("//     Connection String:      `{0}`", ZapPassword(this.connectionString));
             writer.WriteLine("//     Schema:                 `{0}`", this.SchemaName);
-            writer.WriteLine("//     Include Views:          `{0}`", this.IncludeViews);
+            writer.WriteLine("//     Include Views:          `{0}`", this.includeViews);
             writer.WriteLine("");
 
             DbProviderFactory _factory;
@@ -128,7 +128,7 @@ namespace FluentMigrator.T4
                     conn.ConnectionString = this.connectionString;
                     conn.Open();
 
-                    SchemaReader reader = null;
+                    SchemaReader reader;
 
                     if (_factory.GetType().Name == "MySqlClientFactory")
                     {
@@ -170,10 +170,9 @@ namespace FluentMigrator.T4
                             result.RemoveAt(i);
                             continue;
                         }
-                        if (!this.IncludeViews && result[i].IsView)
+                        if (!this.includeViews && result[i].IsView)
                         {
                             result.RemoveAt(i);
-                            continue;
                         }
                     }
                     conn.Close();
@@ -181,7 +180,7 @@ namespace FluentMigrator.T4
                     var rxClean = new Regex("^(Equals|GetHashCode|GetType|ToString|repo|Save|IsNew|Insert|Update|Delete|Exists|SingleOrDefault|Single|First|FirstOrDefault|Fetch|Page|Query)$");
                     foreach (var t in result)
                     {
-                        t.ClassName = this.ClassPrefix + t.ClassName + this.ClassSuffix;
+                        t.ClassName = this.classPrefix + t.ClassName + this.classSuffix;
                         foreach (var c in t.Columns)
                         {
                             c.PropertyName = rxClean.Replace(c.PropertyName, "_$1");

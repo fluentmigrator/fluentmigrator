@@ -1,26 +1,25 @@
-﻿<#@ template language="C#" hostspecific="True" #>
-<#@ assembly name="EnvDTE" #>
-<#@ assembly name="System.Core.dll" #>
-<#@ assembly name="System.Data" #>
-<#@ assembly name="System.Xml" #>
-<#@ assembly name="System.Configuration" #>
-<#@ assembly name="System.Windows.Forms" #>
-<#@ assembly name="$(ProjectDir)$(OutDir)FluentMigrator.T4.dll" #>
-<#@ import namespace="System.Collections.Generic" #>
-<#@ import namespace="System.Data" #>
-<#@ import namespace="System.Data.SqlClient" #>
-<#@ import namespace="System.Data.Common" #>
-<#@ import namespace="System.Diagnostics" #>
-<#@ import namespace="System.Globalization" #>
-<#@ import namespace="System.IO" #>
-<#@ import namespace="System.Linq" #>
-<#@ import namespace="System.Text" #>
-<#@ import namespace="System.Text.RegularExpressions" #>
-<#@ import namespace="System.Configuration" #>
-<#@ import namespace="System.Windows.Forms" #>
-<#@ import namespace="FluentMigrator.T4" #>
+﻿<#@ template language="C#" hostspecific="True" 
+#><#@ assembly name="EnvDTE" 
+#><#@ assembly name="System.Core.dll" 
+#><#@ assembly name="System.Data" 
+#><#@ assembly name="System.Xml"
+#><#@ assembly name="System.Configuration" 
+#><#@ assembly name="System.Windows.Forms" 
+#><#@ assembly name="$(ProjectDir)$(OutDir)FluentMigrator.T4.dll"
+#><#@ import namespace="System.Collections.Generic" 
+#><#@ import namespace="System.Data"
+#><#@ import namespace="System.Data.SqlClient"
+#><#@ import namespace="System.Data.Common"
+#><#@ import namespace="System.Diagnostics"
+#><#@ import namespace="System.Globalization"
+#><#@ import namespace="System.IO"
+#><#@ import namespace="System.Linq"
+#><#@ import namespace="System.Text"
+#><#@ import namespace="System.Text.RegularExpressions"
+#><#@ import namespace="System.Configuration"
+#><#@ import namespace="System.Windows.Forms"
+#><#@ import namespace="FluentMigrator.T4" #><#+
 
-<#+
 /* 
  This T4 code is created by Guru Kathiresan - gururamnath att yahoo.com
  -----------------------------------------------------------------------------------------
@@ -95,8 +94,6 @@ bool GenerateSeperateOperations = true;
 bool GenerateCommon = true;
 bool GeneratePocos = true;
 bool TrackModifiedColumns = false;
-bool UseExtensionMethods = false;
-bool GenerateTableInfoClass = false;
 List<string> IgnoreTableList = new List<string>();
 string TableToGenerate = "";
 
@@ -229,7 +226,12 @@ public string GetDataDirectory()
 
 public string GetCurrentTimeStamp()
 {
-	return DateTime.Now.ToString("yyyyMMddhhmmss");
+    return DateTime.Now.ToString("yyyyMMddhhmmss");
+}
+
+public string Join(IEnumerable<string> list)
+{
+    return System.String.Join(",", list.Select(l=>"\""+l+"\"").ToArray());
 }
 
 

@@ -7,13 +7,12 @@ using NUnit.Framework;
 namespace FluentMigrator.T4.Tests
 {
     [TestFixture]
-    public class TestGenerator
+    public class GeneratorTests
     {
         [Test]
-        public void TestPrimaryKeys()
+        public void TestLoadPrimaryKeys()
         {
-            var connectionString = ConfigurationManager.ConnectionStrings["TestConnection"];
-            var codeGenerator = new CodeGenerator(connectionString.ConnectionString, connectionString.ProviderName, Console.Out, x => Console.WriteLine("WARNING: " + x));
+            var codeGenerator = GetCodeGenerator();
 
             var loadTables = codeGenerator.LoadTables();
             foreach (var loadTable in loadTables)
@@ -21,17 +20,23 @@ namespace FluentMigrator.T4.Tests
                 Console.WriteLine(loadTable);
             }
         }
-        
-        [Test]
-        public void TestForeignKeys()
+
+        private static CodeGenerator GetCodeGenerator()
         {
             var connectionString = ConfigurationManager.ConnectionStrings["TestConnection"];
             var codeGenerator = new CodeGenerator(connectionString.ConnectionString, connectionString.ProviderName, Console.Out, x => Console.WriteLine("WARNING: " + x));
+            return codeGenerator;
+        }
+
+        [Test]
+        public void TestLoadForeignKeys()
+        {
+            var codeGenerator = GetCodeGenerator();
 
             var loadTables = codeGenerator.LoadTables();
             foreach (var loadTable in loadTables)
             {
-                Console.WriteLine(loadTable.FKeys);
+                Console.WriteLine(loadTable.ForeignKeys);
             }
         }
     }

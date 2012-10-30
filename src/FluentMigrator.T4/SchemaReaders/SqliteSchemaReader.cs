@@ -39,8 +39,8 @@ namespace FluentMigrator.T4
             foreach (var tbl in result)
             {
                 tbl.Columns=this.LoadColumns(tbl);
-                tbl.Indices = this.LoadIndices(tbl.Name);
-                tbl.FKeys = this.LoadForeignKeys(tbl.Name);
+                tbl.Indexes = this.LoadIndices(tbl.Name);
+                tbl.ForeignKeys = this.LoadForeignKeys(tbl.Name);
             }
             return result;
         }
