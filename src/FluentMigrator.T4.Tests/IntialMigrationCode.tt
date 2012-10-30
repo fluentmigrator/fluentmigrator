@@ -92,7 +92,7 @@ foreach(IndexColumn col in indx.IndexColumns)
 }
 #><#if (indx.IsUnique){
 #>                .WithOptions().Unique()<#}#>
-			;
+            ;
 <#
 }
 #>
@@ -108,8 +108,12 @@ List<ForeignKey> FKeyList = tbl.ForeignKeys;
 foreach(ForeignKey fkey in FKeyList)
 {
 #>
-           <#if(commentAlreadyWritten == false) { #>//Foreign Key List <# commentAlreadyWritten = true;} #>
-           Create.ForeignKey("<#=fkey.Name#>").FromTable("<#=tbl.Name#>").InSchema("<#=fkey.ForeignTableSchema#>").ForeignColumns(<#=Join(fkey.ForeignColumns)#>).ToTable("<#=fkey.PrimaryTable#>").InSchema("<#=fkey.PrimaryTableSchema#>").PrimaryColumns(<#=Join(fkey.PrimaryColumns)#>);
+           <# if(commentAlreadyWritten == false) { #> //Foreign Key List <# commentAlreadyWritten = true;} #>
+           Create.<# 
+    if(!string.IsNullOrEmpty(fkey.Name)) 
+    { 
+        #>ForeignKey("<#=fkey.Name#>")<# 
+    } #>.FromTable("<#=tbl.Name#>").InSchema("<#=fkey.ForeignTableSchema#>").ForeignColumns(<#=Join(fkey.ForeignColumns)#>).ToTable("<#=fkey.PrimaryTable#>").InSchema("<#=fkey.PrimaryTableSchema#>").PrimaryColumns(<#=Join(fkey.PrimaryColumns)#>);
            <#
 }
 }
@@ -124,9 +128,16 @@ foreach(Table tbl in from t in tables where !t.Ignore select t)
     List<ForeignKey> FKeyList = tbl.ForeignKeys;
     foreach(ForeignKey fkey in FKeyList)
     {
-    #>
+        if(!string.IsNullOrEmpty(fkey.Name)){
+        #>
+            Delete.ForeignKey("<#=fkey.Name#>"); 
+        <#
+        
+        } else {
+        #>
             Delete.ForeignKey().FromTable("<#=tbl.Name#>").InSchema("<#=fkey.ForeignTableSchema#>").ForeignColumns(<#=Join(fkey.ForeignColumns)#>).ToTable("<#=fkey.PrimaryTable#>")/*.InSchema("<#=fkey.PrimaryTableSchema#>")*/.PrimaryColumns(<#=Join(fkey.PrimaryColumns)#>); 
-    <#
+        <#
+        }
     }
 }
 #>

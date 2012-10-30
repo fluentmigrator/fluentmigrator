@@ -249,8 +249,5 @@ namespace FluentMigrator.T4
         public static string ConvertUnderscoresToDashes(string underscoredWord) {
             return underscoredWord.Replace('_', '-');
         }
-        #region Nested type: InflectorRule
-
-        #endregion
     }
 }
