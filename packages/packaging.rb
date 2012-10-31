@@ -15,7 +15,7 @@ require 'fileutils'
 #  ]
 #end
 
-FLUENTMIGRATOR_VERSION = "1.0.3.0"
+FLUENTMIGRATOR_VERSION = "1.0.4.0"
 
 def to_nuget_version(v)
 	v[1] + v[3]
