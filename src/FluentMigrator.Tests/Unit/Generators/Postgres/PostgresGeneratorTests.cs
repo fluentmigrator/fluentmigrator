@@ -606,6 +606,21 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             return new DeleteTableExpression { TableName = tableName };
         }
 
+        [Test]
+        public void CanUseSystemMethodCurrentUTCDateTimeAsADefaultValueForAColumn()
+        {
+            string tableName = "NewTable";
+
+            var columnDefinition = new ColumnDefinition {Name = "NewColumn", Size = 5, Type = DbType.String, DefaultValue = SystemMethods.CurrentUTCDateTime};
+
+            var expression = new CreateColumnExpression();
+            expression.Column = columnDefinition;
+            expression.TableName = tableName;
+
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("ALTER TABLE \"public\".\"NewTable\" ADD \"NewColumn\" varchar(5) NOT NULL DEFAULT (now() at time zone 'UTC')");
+        }
+
         private CreateTableExpression GetCreateTableExpression(string tableName)
         {
             string columnName1 = "ColumnName1";

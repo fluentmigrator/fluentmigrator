@@ -44,6 +44,8 @@ namespace FluentMigrator.Runner.Generators.Postgres
                     return "uuid_generate_v4()";
                 case SystemMethods.CurrentDateTime:
                     return "now()";
+                case SystemMethods.CurrentUTCDateTime:
+                    return "(now() at time zone 'UTC')";
             }
 
             throw new NotImplementedException();
