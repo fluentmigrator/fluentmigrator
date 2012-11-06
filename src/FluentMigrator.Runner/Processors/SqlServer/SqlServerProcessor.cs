@@ -155,7 +155,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
-            if (sql.Contains("GO"))
+            if (sql.IndexOf("GO", StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 ExecuteBatchNonQuery(sql);
 
