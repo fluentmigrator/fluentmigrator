@@ -21,7 +21,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
             var sql = _generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE `TestTable1` DROP COLUMN `TestColumn1`");
+            sql.ShouldBe("ALTER TABLE `TestTable1` DROP COLUMN `TestColumn1`;");
         }
 
         [Test]
@@ -29,7 +29,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new string[] {"TestColumn1", "TestColumn2"});
             var sql = _generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE `TestTable1` DROP COLUMN `TestColumn1`;\r\nALTER TABLE `TestTable1` DROP COLUMN `TestColumn2`");
+            sql.ShouldBe("ALTER TABLE `TestTable1` DROP COLUMN `TestColumn1`;\r\nALTER TABLE `TestTable1` DROP COLUMN `TestColumn2`;");
         }
 
         [Test]
@@ -37,7 +37,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
             var sql = _generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE `TestTable1` DROP FOREIGN KEY `FK_Test`");
+            sql.ShouldBe("ALTER TABLE `TestTable1` DROP FOREIGN KEY `FK_Test`;");
         }
 
         [Test]
@@ -45,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
             var sql = _generator.Generate(expression);
-            sql.ShouldBe("DROP TABLE `TestTable1`");
+            sql.ShouldBe("DROP TABLE `TestTable1`;");
         }
 
         [Test]
@@ -53,7 +53,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
             var sql = _generator.Generate(expression);
-            sql.ShouldBe("DROP INDEX `TestIndex` ON `TestTable1`");
+            sql.ShouldBe("DROP INDEX `TestIndex` ON `TestTable1`;");
         }
 
         [Test]

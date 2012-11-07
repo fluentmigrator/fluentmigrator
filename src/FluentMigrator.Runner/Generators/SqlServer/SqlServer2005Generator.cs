@@ -96,7 +96,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             if (expression.IsAllRows)
             {
-                deleteItems.Add(string.Format(DeleteData, Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), "1 = 1"));
+                deleteItems.Add(string.Format(DeleteData, Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), "1 = 1", CommandDelimiter));
             }
             else
             {
@@ -110,7 +110,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                         whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.ColumnName), item.Value == null ? "IS" : "=", Quoter.QuoteDataValue(item)));
                     }
 
-                    deleteItems.Add(string.Format(DeleteData, Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), String.Join(" AND ", whereClauses.ToArray())));
+                    deleteItems.Add(string.Format(DeleteData, Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), String.Join(" AND ", whereClauses.ToArray()), CommandDelimiter));
                 }
             }
 
@@ -155,7 +155,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                     , Quoter.QuoteSchemaName(expression.SchemaName)
                     , Quoter.QuoteTableName(expression.TableName)
                     , columns
-                    , values));
+                    , values
+                    , CommandDelimiter));
             }
 
             if (IsUsingIdentityInsert(expression))
@@ -198,7 +199,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 Quoter.QuoteTableName(expression.ForeignKey.PrimaryTable),
                 String.Join(", ", primaryColumns.ToArray()),
                 FormatCascade("DELETE", expression.ForeignKey.OnDelete),
-                FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)
+                FormatCascade("UPDATE", expression.ForeignKey.OnUpdate),
+                CommandDelimiter
                 );
         }
 
@@ -228,12 +230,13 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 , Quoter.QuoteIndexName(expression.Index.Name)
                 , Quoter.QuoteSchemaName(expression.Index.SchemaName)
                 , Quoter.QuoteTableName(expression.Index.TableName)
-                , String.Join(", ", indexColumns));
+                , String.Join(", ", indexColumns)
+                , CommandDelimiter);
         }
 
         public override string Generate(DeleteIndexExpression expression)
         {
-            return String.Format(DropIndex, Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteSchemaName(expression.Index.SchemaName), Quoter.QuoteTableName(expression.Index.TableName));
+            return String.Format(DropIndex, Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteSchemaName(expression.Index.SchemaName), Quoter.QuoteTableName(expression.Index.TableName), CommandDelimiter);
         }
 
         protected override void BuildDelete(DeleteColumnExpression expression, string columnName, StringBuilder builder) 
@@ -309,17 +312,17 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(CreateSchemaExpression expression)
         {
-            return String.Format(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName));
+            return String.Format(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName), CommandDelimiter);
         }
 
         public override string Generate(DeleteSchemaExpression expression)
         {
-            return String.Format(DropSchema, Quoter.QuoteSchemaName(expression.SchemaName));
+            return String.Format(DropSchema, Quoter.QuoteSchemaName(expression.SchemaName), CommandDelimiter);
         }
 
         public override string Generate(AlterSchemaExpression expression)
         {
-            return String.Format(AlterSchema, Quoter.QuoteSchemaName(expression.DestinationSchemaName), Quoter.QuoteSchemaName(expression.SourceSchemaName), Quoter.QuoteTableName(expression.TableName));
+            return String.Format(AlterSchema, Quoter.QuoteSchemaName(expression.DestinationSchemaName), Quoter.QuoteSchemaName(expression.SourceSchemaName), Quoter.QuoteTableName(expression.TableName), CommandDelimiter);
         }
     }
 }

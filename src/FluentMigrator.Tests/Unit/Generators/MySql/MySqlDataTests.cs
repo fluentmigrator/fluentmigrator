@@ -25,8 +25,8 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             var expression = GeneratorTestHelper.GetInsertDataExpression();
             var sql = generator.Generate(expression);
 
-            var expected = @"INSERT INTO `TestTable1` (`Id`, `Name`, `Website`) VALUES (1, 'Just''in', 'codethinked.com');";
-            expected += @" INSERT INTO `TestTable1` (`Id`, `Name`, `Website`) VALUES (2, 'Na\\te', 'kohari.org')";
+            var expected = "INSERT INTO `TestTable1` (`Id`, `Name`, `Website`) VALUES (1, 'Just''in', 'codethinked.com');";
+            expected += "\r\nINSERT INTO `TestTable1` (`Id`, `Name`, `Website`) VALUES (2, 'Na\\\\te', 'kohari.org');";
 
             sql.ShouldBe(expected);
         }
@@ -51,8 +51,8 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
 
             var sql = generator.Generate(expression);
             
-            var expected = @"INSERT INTO `TestTable1` (`Id`, `Name`, `Value`) VALUES (1, 'Just''in', UNHEX('4A75737427696E'));";
-            expected += @" INSERT INTO `TestTable1` (`Id`, `Name`, `Value`) VALUES (1, 'Na	e', UNHEX('4E610965'))";
+            var expected = "INSERT INTO `TestTable1` (`Id`, `Name`, `Value`) VALUES (1, 'Just''in', UNHEX('4A75737427696E'));";
+            expected += "\r\nINSERT INTO `TestTable1` (`Id`, `Name`, `Value`) VALUES (1, 'Na	e', UNHEX('4E610965'));";
 
             sql.ShouldBe(expected);
         }
@@ -73,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
 
             var sql = generator.Generate(expression);
 
-            string expected = @"UPDATE `TestTable1` SET `Name` = 'Just''in', `Value` = UNHEX('4A75737427696E') WHERE `Id` = 1";
+            string expected = @"UPDATE `TestTable1` SET `Name` = 'Just''in', `Value` = UNHEX('4A75737427696E') WHERE `Id` = 1;";
 
             sql.ShouldBe(expected);
         }
@@ -85,7 +85,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
 
             var sql = generator.Generate(expression);
 
-            sql.ShouldBe("DELETE FROM `TestTable1` WHERE `Name` = 'Just''in' AND `Website` IS NULL");
+            sql.ShouldBe("DELETE FROM `TestTable1` WHERE `Name` = 'Just''in' AND `Website` IS NULL;");
         }
 
         [Test]
@@ -95,7 +95,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
 
             var sql = generator.Generate(expression);
 
-            sql.ShouldBe("DELETE FROM `TestTable1` WHERE 1 = 1");
+            sql.ShouldBe("DELETE FROM `TestTable1` WHERE 1 = 1;");
         }
 
         [Test]
@@ -105,7 +105,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
 
             var sql = generator.Generate(expression);
 
-            sql.ShouldBe("DELETE FROM `TestTable1` WHERE `Name` = 'Just''in' AND `Website` IS NULL; DELETE FROM `TestTable1` WHERE `Website` = 'github.com'");
+            sql.ShouldBe("DELETE FROM `TestTable1` WHERE `Name` = 'Just''in' AND `Website` IS NULL;\r\nDELETE FROM `TestTable1` WHERE `Website` = 'github.com';");
         }
 
         [Test]
@@ -115,7 +115,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
 
             var sql = generator.Generate(expression);
 
-            var expected = String.Format("INSERT INTO `TestTable1` (`guid`) VALUES ('{0}')", GeneratorTestHelper.TestGuid.ToString());
+            var expected = String.Format("INSERT INTO `TestTable1` (`guid`) VALUES ('{0}');", GeneratorTestHelper.TestGuid.ToString());
 
             sql.ShouldBe(expected);
         }
@@ -126,7 +126,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
 
             var sql = generator.Generate(expression);
-            sql.ShouldBe("UPDATE `TestTable1` SET `Name` = 'Just''in', `Age` = 25 WHERE `Id` = 9 AND `Homepage` IS NULL");
+            sql.ShouldBe("UPDATE `TestTable1` SET `Name` = 'Just''in', `Age` = 25 WHERE `Id` = 9 AND `Homepage` IS NULL;");
         }
 
         [Test]
@@ -135,7 +135,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
 
             var sql = generator.Generate(expression);
-            sql.ShouldBe("UPDATE `TestTable1` SET `Name` = 'Just''in', `Age` = 25 WHERE 1 = 1");
+            sql.ShouldBe("UPDATE `TestTable1` SET `Name` = 'Just''in', `Age` = 25 WHERE 1 = 1;");
         }
     }
 }

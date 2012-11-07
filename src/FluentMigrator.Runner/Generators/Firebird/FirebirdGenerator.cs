@@ -30,6 +30,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
         #region SQL Generation overrides
 
+        public override string MultilineDelimiter { get { return ";\r\n"; } }
         public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
         public override string DropColumn { get { return "ALTER TABLE {0} DROP {1}"; } }
         public override string RenameColumn { get { return "ALTER TABLE {0} ALTER COLUMN {1} TO {2}"; } }
@@ -84,7 +85,8 @@ namespace FluentMigrator.Runner.Generators.Firebird
                 , indexDirection == Direction.Ascending ? "ASC " : "DESC "
                 , Quoter.QuoteIndexName(expression.Index.Name)
                 , Quoter.QuoteTableName(expression.Index.TableName)
-                , indexColumns.ToString());
+                , indexColumns
+                , CommandDelimiter);
         }
 
         public override string Generate(AlterColumnExpression expression)
@@ -159,7 +161,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         public override string Generate(DeleteIndexExpression expression)
         {
             truncator.Truncate(expression);
-            return base.Generate(expression);
+            return String.Format(DropIndex, Quoter.QuoteIndexName(expression.Index.Name), CommandDelimiter);
         }
 
         public override string Generate(CreateConstraintExpression expression)

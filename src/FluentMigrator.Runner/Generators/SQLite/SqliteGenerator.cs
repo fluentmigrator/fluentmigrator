@@ -17,6 +17,7 @@
 //
 #endregion
 
+using System;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Generic;
 
@@ -71,6 +72,11 @@ namespace FluentMigrator.Runner.Generators.SQLite
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
             return compatabilityMode.HandleCompatabilty("Default constraints are not supported");
+        }
+
+        public override string Generate(DeleteIndexExpression expression)
+        {
+            return String.Format(DropIndex, Quoter.QuoteIndexName(expression.Index.Name), CommandDelimiter);
         }
     }
 }

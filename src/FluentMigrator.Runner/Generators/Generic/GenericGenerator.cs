@@ -18,33 +18,36 @@ namespace FluentMigrator.Runner.Generators.Generic
             compatabilityMode = CompatabilityMode.LOOSE;
         }
 
-        public virtual string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
-        public virtual string DropTable { get { return "DROP TABLE {0}"; } }
+        public virtual string CommandDelimiter { get { return string.Empty; } }
+        public virtual string MultilineDelimiter { get { return "; "; } }
 
-        public virtual string AddColumn { get { return "ALTER TABLE {0} ADD COLUMN {1}"; } }
-        public virtual string DropColumn { get { return "ALTER TABLE {0} DROP COLUMN {1}"; } }
-        public virtual string AlterColumn { get { return "ALTER TABLE {0} ALTER COLUMN {1}"; } }
-        public virtual string RenameColumn { get { return "ALTER TABLE {0} RENAME COLUMN {1} TO {2}"; } }
+        public virtual string CreateTable { get { return "CREATE TABLE {0} ({1}){2}"; } }
+        public virtual string DropTable { get { return "DROP TABLE {0}{1}"; } }
 
-        public virtual string RenameTable { get { return "RENAME TABLE {0} TO {1}"; } }
+        public virtual string AddColumn { get { return "ALTER TABLE {0} ADD COLUMN {1}{2}"; } }
+        public virtual string DropColumn { get { return "ALTER TABLE {0} DROP COLUMN {1}{2}"; } }
+        public virtual string AlterColumn { get { return "ALTER TABLE {0} ALTER COLUMN {1}{2}"; } }
+        public virtual string RenameColumn { get { return "ALTER TABLE {0} RENAME COLUMN {1} TO {2}{3}"; } }
 
-        public virtual string CreateSchema { get { return "CREATE SCHEMA {0}"; } }
-        public virtual string AlterSchema { get { return "ALTER SCHEMA {0} TRANSFER {1}.{2}"; } }
-        public virtual string DropSchema { get { return "DROP SCHEMA {0}"; } }
+        public virtual string RenameTable { get { return "RENAME TABLE {0} TO {1}{2}"; } }
 
-        public virtual string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3} ({4})"; } }
-        public virtual string DropIndex { get { return "DROP INDEX {0}"; } }
+        public virtual string CreateSchema { get { return "CREATE SCHEMA {0}{1}"; } }
+        public virtual string AlterSchema { get { return "ALTER SCHEMA {0} TRANSFER {1}.{2}{3}"; } }
+        public virtual string DropSchema { get { return "DROP SCHEMA {0}{1}"; } }
 
-        public virtual string InsertData { get { return "INSERT INTO {0} ({1}) VALUES ({2})"; } }
-        public virtual string UpdateData { get { return "UPDATE {0} SET {1} WHERE {2}"; } }
-        public virtual string DeleteData { get { return "DELETE FROM {0} WHERE {1}"; } }
+        public virtual string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3} ({4}){5}"; } }
+        public virtual string DropIndex { get { return "DROP INDEX {0}{1}" ; } }
+
+        public virtual string InsertData { get { return "INSERT INTO {0} ({1}) VALUES ({2}){3}"; } }
+        public virtual string UpdateData { get { return "UPDATE {0} SET {1} WHERE {2}{3}"; } }
+        public virtual string DeleteData { get { return "DELETE FROM {0} WHERE {1}{2}"; } }
 
         public virtual string SetData { get { return "{0} = {1}"; } }
         public virtual string BinaryExpression { get { return "{0} {1} {2}"; } }
 
-        public virtual string CreateConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})"; } }
-        public virtual string DeleteConstraint { get { return "ALTER TABLE {0} DROP CONSTRAINT {1}"; } }
-        public virtual string CreateForeignKeyConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}"; } }
+        public virtual string CreateConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3}){4}"; } }
+        public virtual string DeleteConstraint { get { return "ALTER TABLE {0} DROP CONSTRAINT {1}{2}"; } }
+        public virtual string CreateForeignKeyConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}{7}"; } }
 
         public virtual string GetUniqueString(CreateIndexExpression column)
         {
@@ -71,17 +74,17 @@ namespace FluentMigrator.Runner.Generators.Generic
             string errors = ValidateAdditionalFeatureCompatibility(expression.Columns.SelectMany(x => x.AdditionalFeatures));
             if (!string.IsNullOrEmpty(errors)) return errors;
 
-            return string.Format(CreateTable, quotedTableName, Column.Generate(expression.Columns, quotedTableName));
+            return string.Format(CreateTable, quotedTableName, Column.Generate(expression.Columns, quotedTableName), CommandDelimiter);
         }
 
         public override string Generate(DeleteTableExpression expression)
         {
-            return String.Format(DropTable, Quoter.QuoteTableName(expression.TableName));
+            return String.Format(DropTable, Quoter.QuoteTableName(expression.TableName), CommandDelimiter);
         }
 
         public override string Generate(RenameTableExpression expression)
         {
-            return String.Format(RenameTable, Quoter.QuoteTableName(expression.OldName), Quoter.QuoteTableName(expression.NewName));
+            return String.Format(RenameTable, Quoter.QuoteTableName(expression.OldName), Quoter.QuoteTableName(expression.NewName), CommandDelimiter);
         }
 
         public override string Generate(CreateColumnExpression expression) 
@@ -89,7 +92,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             string errors = ValidateAdditionalFeatureCompatibility(expression.Column.AdditionalFeatures);
             if (!string.IsNullOrEmpty(errors)) return errors;
 
-            return String.Format(AddColumn, Quoter.QuoteTableName(expression.TableName), Column.Generate(expression.Column));
+            return String.Format(AddColumn, Quoter.QuoteTableName(expression.TableName), Column.Generate(expression.Column), CommandDelimiter);
         }
 
 
@@ -98,18 +101,12 @@ namespace FluentMigrator.Runner.Generators.Generic
             string errors = ValidateAdditionalFeatureCompatibility(expression.Column.AdditionalFeatures);
             if (!string.IsNullOrEmpty(errors)) return errors;
 
-            return String.Format(AlterColumn, Quoter.QuoteTableName(expression.TableName), Column.Generate(expression.Column));
+            return String.Format(AlterColumn, Quoter.QuoteTableName(expression.TableName), Column.Generate(expression.Column), CommandDelimiter);
         }
 
         public override string Generate(DeleteColumnExpression expression)
         {
-            StringBuilder builder = new StringBuilder();
-            foreach (string columnName in expression.ColumnNames) 
-            {
-                if (expression.ColumnNames.First() != columnName) builder.AppendLine(";");
-                builder.AppendFormat(DropColumn, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(columnName));
-            }
-            return builder.ToString();
+            return string.Join(MultilineDelimiter, expression.ColumnNames.Select(columnName => String.Format(DropColumn, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(columnName), CommandDelimiter)).ToArray());
         }
 
         public override string Generate(RenameColumnExpression expression)
@@ -117,7 +114,8 @@ namespace FluentMigrator.Runner.Generators.Generic
             return String.Format(RenameColumn, 
                 Quoter.QuoteTableName(expression.TableName), 
                 Quoter.QuoteColumnName(expression.OldName), 
-                Quoter.QuoteColumnName(expression.NewName)
+                Quoter.QuoteColumnName(expression.NewName),
+                CommandDelimiter
                 );
         }
 
@@ -146,12 +144,13 @@ namespace FluentMigrator.Runner.Generators.Generic
                 , GetClusterTypeString(expression)
                 , Quoter.QuoteIndexName(expression.Index.Name)
                 , Quoter.QuoteTableName(expression.Index.TableName)
-                , String.Join(", ", indexColumns));
+                , String.Join(", ", indexColumns)
+                , CommandDelimiter);
         }
 
         public override string Generate(DeleteIndexExpression expression)
         {
-            return String.Format(DropIndex, Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName));
+            return String.Format(DropIndex, Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteTableName(expression.Index.TableName), CommandDelimiter);
         }
 
         public override string Generate(CreateForeignKeyExpression expression)
@@ -184,7 +183,8 @@ namespace FluentMigrator.Runner.Generators.Generic
                 Quoter.QuoteTableName(expression.ForeignKey.PrimaryTable),
                 String.Join(", ", primaryColumns.ToArray()),
                 FormatCascade("DELETE", expression.ForeignKey.OnDelete),
-                FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)
+                FormatCascade("UPDATE", expression.ForeignKey.OnUpdate),
+                CommandDelimiter
                 );
         }
 
@@ -203,12 +203,13 @@ namespace FluentMigrator.Runner.Generators.Generic
             return string.Format(CreateConstraint, Quoter.QuoteTableName(expression.Constraint.TableName),
                 Quoter.Quote(expression.Constraint.ConstraintName),
                 constraintType,
-                String.Join(", ", columns));
+                String.Join(", ", columns),
+                CommandDelimiter);
         }
 
         public override string Generate(DeleteConstraintExpression expression)
         {
-            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName), Quoter.Quote(expression.Constraint.ConstraintName));
+            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName), Quoter.Quote(expression.Constraint.ConstraintName), CommandDelimiter);
         }
 
         public virtual string GenerateForeignKeyName(CreateForeignKeyExpression expression)
@@ -221,7 +222,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             if (expression.ForeignKey.ForeignTable == null)
                 throw new ArgumentNullException("Table name not specified, ensure you have appended the OnTable extension. Format should be Delete.ForeignKey(KeyName).OnTable(TableName)");
 
-            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.ForeignKey.ForeignTable), Quoter.QuoteColumnName(expression.ForeignKey.Name));
+            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.ForeignKey.ForeignTable), Quoter.QuoteColumnName(expression.ForeignKey.Name), CommandDelimiter);
         }
 
 
@@ -271,9 +272,9 @@ namespace FluentMigrator.Runner.Generators.Generic
 
                 string columns = String.Join(", ", columnNames.ToArray());
                 string values = String.Join(", ", columnValues.ToArray());
-                insertStrings.Add(String.Format(InsertData, Quoter.QuoteTableName(expression.TableName), columns, values));
+                insertStrings.Add(String.Format(InsertData, Quoter.QuoteTableName(expression.TableName), columns, values, CommandDelimiter));
             }
-            return String.Join("; ", insertStrings.ToArray());
+            return String.Join(MultilineDelimiter, insertStrings.ToArray());
         }
 
         private string ValidateAdditionalFeatureCompatibility(IEnumerable<KeyValuePair<string, object>> features)
@@ -315,7 +316,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             string setClause = EvaluateSet(expression.Set);
             string whereClause = expression.IsAllRows ? "1 = 1" : EvaluateWhere(expression.Where);
 
-            return String.Format(UpdateData, Quoter.QuoteTableName(expression.TableName), setClause, whereClause);
+            return String.Format(UpdateData, Quoter.QuoteTableName(expression.TableName), setClause, whereClause, CommandDelimiter);
         }
 
         public override string Generate(DeleteDataExpression expression)
@@ -325,7 +326,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
             if (expression.IsAllRows)
             {
-                deleteItems.Add(string.Format(DeleteData, Quoter.QuoteTableName(expression.TableName), "1 = 1"));
+                deleteItems.Add(string.Format(DeleteData, Quoter.QuoteTableName(expression.TableName), "1 = 1", CommandDelimiter));
             }
             else
             {
@@ -340,11 +341,11 @@ namespace FluentMigrator.Runner.Generators.Generic
                         whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.ColumnName), item.Value == null ? "IS" : "=", Quoter.QuoteDataValue(item)));
                     }
 
-                    deleteItems.Add(string.Format(DeleteData, Quoter.QuoteTableName(expression.TableName), String.Join(" AND ", whereClauses.ToArray())));
+                    deleteItems.Add(string.Format(DeleteData, Quoter.QuoteTableName(expression.TableName), String.Join(" AND ", whereClauses.ToArray()), CommandDelimiter));
                 }
             }
 
-            return String.Join("; ", deleteItems.ToArray());
+            return String.Join(MultilineDelimiter, deleteItems.ToArray());
         }
 
 

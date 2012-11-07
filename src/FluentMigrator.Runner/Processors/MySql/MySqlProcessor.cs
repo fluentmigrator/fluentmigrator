@@ -39,6 +39,11 @@ namespace FluentMigrator.Runner.Processors.MySql
             Connection = connection;
         }
 
+        private string RemoveDelimiterSetting(string sql)
+        {
+            return sql.Replace("$$", ";").Replace("DELIMITER ;", "");
+        }
+
         public override bool SchemaExists(string schemaName)
         {
             return true;
@@ -76,7 +81,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
         public override void Execute(string template, params object[] args)
         {
-            string sql = String.Format(template, args);
+            string sql = RemoveDelimiterSetting(String.Format(template, args));
 
             Process(sql);
         }

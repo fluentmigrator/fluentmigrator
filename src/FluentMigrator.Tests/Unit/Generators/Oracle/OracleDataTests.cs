@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 
             var sql = generator.Generate(expression);
 
-            sql.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL; DELETE FROM TestTable1 WHERE Website = 'github.com'");
+            sql.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL;\r\nDELETE FROM TestTable1 WHERE Website = 'github.com'");
         }
 
         [Test]

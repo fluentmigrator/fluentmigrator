@@ -356,7 +356,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var sql = generator.Generate(expression);
 
             var expected = "INSERT INTO \"TestTable\" (\"Id\", \"Name\", \"Website\") VALUES (1, 'Just''in', 'codethinked.com');";
-            expected += " INSERT INTO \"TestTable\" (\"Id\", \"Name\", \"Website\") VALUES (2, 'Na\\te', 'kohari.org')";
+            expected += "\r\nINSERT INTO \"TestTable\" (\"Id\", \"Name\", \"Website\") VALUES (2, 'Na\\te', 'kohari.org')";
 
             sql.ShouldBe(expected);
         }

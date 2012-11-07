@@ -50,12 +50,12 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(RenameTableExpression expression)
         {
-            return String.Format(RenameTable, Quoter.QuoteTableName(Quoter.QuoteCommand(expression.OldName)), Quoter.QuoteCommand(expression.NewName));
+            return String.Format(RenameTable, Quoter.QuoteTableName(Quoter.QuoteCommand(expression.OldName)), Quoter.QuoteCommand(expression.NewName), CommandDelimiter);
         }
 
         public override string Generate(RenameColumnExpression expression)
         {
-            return String.Format(RenameColumn, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(Quoter.QuoteCommand(expression.OldName)), Quoter.QuoteCommand(expression.NewName));
+            return String.Format(RenameColumn, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(Quoter.QuoteCommand(expression.OldName)), Quoter.QuoteCommand(expression.NewName), CommandDelimiter);
         }
 
         public override string Generate(DeleteColumnExpression expression)
