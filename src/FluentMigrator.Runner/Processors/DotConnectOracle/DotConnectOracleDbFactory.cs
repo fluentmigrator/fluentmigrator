@@ -13,7 +13,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
-namespace FluentMigrator.Runner.Processors.Oracle
+namespace FluentMigrator.Runner.Processors.DotConnectOracle
 {
    
     public class DotConnectOracleDbFactory : ReflectionBasedDbFactory
