@@ -206,12 +206,15 @@
     <Compile Include="Processors\Firebird\FirebirdSchemaInfo.cs" />
     <Compile Include="Processors\Firebird\FirebirdSchemaProvider.cs" />
     <Compile Include="Processors\Firebird\FirebirdTableSchema.cs" />
+    <Compile Include="Processors\DotConnectOracle\DotConnectOracleProcessor.cs" />
+    <Compile Include="Processors\DotConnectOracle\DotConnectOracleProcessorFactory.cs" />
     <Compile Include="Processors\Jet\JetProcessor.cs" />
     <Compile Include="Processors\Jet\JetProcessorFactory.cs" />
     <Compile Include="Processors\MigrationProcessorFactory.cs" />
     <Compile Include="Processors\MySql\MySqlDbFactory.cs" />
     <Compile Include="Processors\MySql\MySqlProcessor.cs" />
     <Compile Include="Processors\MySql\MySqlProcessorFactory.cs" />
+    <Compile Include="Processors\DotConnectOracle\DotConnectOracleDbFactory.cs" />
     <Compile Include="Processors\Oracle\OracleDbFactory.cs" />
     <Compile Include="Processors\Oracle\OracleProcessor.cs" />
     <Compile Include="Processors\Oracle\OracleProcessorFactory.cs" />
@@ -336,6 +339,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
