@@ -42,7 +42,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(RenameTableExpression expression)
         {
-            return String.Format("sp_rename '{0}', '{1}'", expression.OldName, expression.NewName);
+            return String.Format("sp_rename {0}, {1}", Quoter.QuoteValue(expression.OldName), Quoter.QuoteValue(expression.NewName));
         }
 
         public override string Generate(RenameColumnExpression expression)
