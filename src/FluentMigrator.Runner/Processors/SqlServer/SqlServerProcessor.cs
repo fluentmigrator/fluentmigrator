@@ -79,7 +79,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
-            return Exists("SELECT NULL FROM sysindexes WHERE name = '{0}'", FormatSqlEscape(indexName));
+            return Exists("SELECT * FROM sys.indexes WHERE name = '{0}' and object_id=OBJECT_ID('{1}.{2}')", FormatSqlEscape(indexName), SafeSchemaName(schemaName), FormatSqlEscape(tableName));
         }
 
         public override void Execute(string template, params object[] args)
