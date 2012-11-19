@@ -150,6 +150,14 @@ namespace FluentMigrator.Runner.Generators.Generic
         }
 
         /// <summary>
+        /// Quotes a constraint name
+        /// </summary>
+        public virtual string QuoteConstraintName(string constraintName)
+        {
+            return IsQuoted(constraintName) ? constraintName : Quote(constraintName);
+        }
+
+        /// <summary>
         /// Quote an index name
         /// </summary>
         /// <param name="indexName"></param>

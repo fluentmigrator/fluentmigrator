@@ -128,6 +128,9 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\nunit.should.dll</HintPath>
     </Reference>
+    <Reference Include="Oracle.DataAccess">
+      <HintPath>..\..\lib\Oracle.DataAccess.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core">
@@ -148,6 +151,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helpers\FirebirdTestTable.cs" />
+    <Compile Include="Helpers\OracleTestTable.cs" />
     <Compile Include="Helpers\PostgresTestTable.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
     <Compile Include="Integration\Migrations\Tagged\1_TenantATable.cs">

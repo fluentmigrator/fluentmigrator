@@ -48,6 +48,13 @@ namespace FluentMigrator.Tests
                 IsEnabled = false
             };
 
+        public static DatabaseServerOptions Oracle = new DatabaseServerOptions
+        {
+            // was not able to get TNS to work
+            ConnectionString = "Data Source=XE;User Id=test;Password=test",
+            IsEnabled = false
+        };
+
         public class DatabaseServerOptions
         {
             public string ConnectionString;
