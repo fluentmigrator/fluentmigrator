@@ -335,7 +335,8 @@ namespace FluentMigrator.T4
         WHERE     
             (FK.CONSTRAINT_TYPE = 'FOREIGN KEY') 
             AND (FK.TABLE_NAME=@tableName) 
-            AND (FK.TABLE_SCHEMA=@schemaName)";
+            AND (FK.TABLE_SCHEMA=@schemaName)
+        ORDER BY ForeignConstraintName, ForeignTableSchema, ForeignTable, FKC.ORDINAL_POSITION";
     }
 
     public static class DbDataReaderExtensions 
