@@ -263,6 +263,9 @@ namespace FluentMigrator.T4
                 case "double":
                     sysType = "AsDouble()";
                     break;
+                case "float":
+                    sysType = "AsFloat()";
+                    break;
                 case "decimal":
                     sysType = "AsDecimal(" + sizeStr + precisionStr + ")";
                     break;
