@@ -107,8 +107,8 @@ namespace FluentMigrator.T4
               I.[is_unique_constraint], I.[fill_factor],    I.[is_padded], I.[is_disabled], I.[is_hypothetical], 
               I.[allow_row_locks], I.[allow_page_locks], IC.[is_descending_key], IC.[is_included_column] 
             FROM sys.[tables] AS T  
-              INNER JOIN sys.[indexes] I ON T.[object_id] = I.[object_id]  
-              INNER JOIN sys.[index_columns] IC ON I.[object_id] = IC.[object_id] 
+              INNER JOIN sys.[indexes] I ON T.[object_id] = I.[object_id] 
+              INNER JOIN sys.[index_columns] IC ON I.[object_id] = IC.[object_id] AND I.index_id = IC.index_id 
               INNER JOIN sys.[all_columns] AC ON T.[object_id] = AC.[object_id] AND IC.[column_id] = AC.[column_id] 
             WHERE T.[is_ms_shipped] = 0 AND I.[type_desc] <> 'HEAP' 
             AND I.is_primary_key = 0 AND T.[name] = @tableName and OBJECT_SCHEMA_NAME(T.[object_id],DB_ID()) = @schemaName";
