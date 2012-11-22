@@ -22,5 +22,6 @@
         public abstract void CanCreateMultiColumnUniqueIndex();
 
         public abstract void CanCreateSchema();
+
     }
 }

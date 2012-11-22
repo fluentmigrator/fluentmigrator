@@ -205,6 +205,14 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
+        public void CanCreateIndexWithIncludedColumns()
+        {
+            var expression = GeneratorTestHelper.GetCreateIncludeColumnsCreateIndexExpression();
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2])");
+        }
+
+        [Test]
         public void CanCreateMultiColumnIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();

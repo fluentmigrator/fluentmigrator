@@ -103,6 +103,17 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static CreateIndexExpression GetCreateIncludeColumnsCreateIndexExpression()
+        {
+            var expression = new CreateIndexExpression();
+            expression.Index.Name = TestIndexName;
+            expression.Index.TableName = TestTableName1;
+            expression.Index.IsUnique = false;
+            expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Ascending, Name = TestColumnName1 });
+            expression.Index.IncludeColumns.Add(new IndexColumnDefinition { Direction = Direction.Ascending, Name = TestColumnName2 });
+            return expression;
+        }
+
         public static CreateIndexExpression GetCreateUniqueIndexExpression()
         {
             var expression = new CreateIndexExpression();

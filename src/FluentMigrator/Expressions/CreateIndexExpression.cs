@@ -53,7 +53,12 @@ namespace FluentMigrator.Expressions
 
         public override string ToString()
         {
-            return base.ToString() + Index.TableName + " (" + string.Join(", ", Index.Columns.Select(x => x.Name).ToArray()) + ")";
+            string columns = " (" + string.Join(", ", Index.Columns.Select(x => x.Name).ToArray()) + ")";
+
+            if (Index.IncludeColumns.Count > 0)
+                columns += " Include (" + string.Join(", ", Index.IncludeColumns.Select(x => x.Name).ToArray()) + ")";
+
+            return base.ToString() + Index.TableName + columns;
         }
     }
 }

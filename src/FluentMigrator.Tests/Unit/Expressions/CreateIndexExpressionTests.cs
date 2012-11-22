@@ -41,5 +41,28 @@ namespace FluentMigrator.Tests.Unit.Expressions
                                 }
                 }.ToString().ShouldBe("CreateIndex Table (Name, Slug)");
         }
+
+        [Test]
+        public void ToStringContainsIncludeColumns()
+        {
+            new CreateIndexExpression
+                {
+                    Index = new IndexDefinition
+                                {
+                                    Columns = new Collection<IndexColumnDefinition>
+                                                  {
+                                                      new IndexColumnDefinition {Name = "Name"},
+                                                      new IndexColumnDefinition {Name = "Slug"}
+                                                  },
+                                    IncludeColumns = new Collection<IndexColumnDefinition>
+                                                  {
+                                                      new IndexColumnDefinition {Name = "Include"},
+                                                      new IndexColumnDefinition {Name = "Columns"}
+                                                  },
+                                    TableName = "Table",
+                                    Name = "NameIndex"
+                                }
+                }.ToString().ShouldBe("CreateIndex Table (Name, Slug) Include (Include, Columns)");
+        }
     }
 }

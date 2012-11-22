@@ -34,6 +34,8 @@ namespace FluentMigrator.Runner.Generators.Generic
         public virtual string DropSchema { get { return "DROP SCHEMA {0}"; } }
 
         public virtual string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3} ({4})"; } }
+        public virtual string IncludeColumns { get { return " INCLUDE ({0})"; } }
+
         public virtual string DropIndex { get { return "DROP INDEX {0}"; } }
 
         public virtual string InsertData { get { return "INSERT INTO {0} ({1}) VALUES ({2})"; } }
@@ -121,14 +123,11 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(CreateIndexExpression expression)
         {
-
             string[] indexColumns = new string[expression.Index.Columns.Count];
-            IndexColumnDefinition columnDef;
-
 
             for (int i = 0; i < expression.Index.Columns.Count; i++)
             {
-                columnDef = expression.Index.Columns.ElementAt(i);
+                IndexColumnDefinition columnDef = expression.Index.Columns.ElementAt(i);
                 if (columnDef.Direction == Direction.Ascending)
                 {
                     indexColumns[i] = Quoter.QuoteColumnName(columnDef.Name) + " ASC";
@@ -139,12 +138,34 @@ namespace FluentMigrator.Runner.Generators.Generic
                 }
             }
 
-            return String.Format(CreateIndex
-                , GetUniqueString(expression)
-                , GetClusterTypeString(expression)
-                , Quoter.QuoteIndexName(expression.Index.Name)
-                , Quoter.QuoteTableName(expression.Index.TableName)
-                , String.Join(", ", indexColumns));
+            return 
+                string.Concat(
+                String.Format(this.CreateIndex
+                , this.GetUniqueString(expression)
+                , this.GetClusterTypeString(expression)
+                , this.Quoter.QuoteIndexName(expression.Index.Name)
+                , this.Quoter.QuoteTableName(expression.Index.TableName)
+                , String.Join(", ", indexColumns))
+                , this.GenerateIncludeColumnsInIndexStatement(expression)
+                );
+        }
+
+        protected virtual string GenerateIncludeColumnsInIndexStatement(CreateIndexExpression expression)
+        {
+            string[] indexIncludeColumns = new string[expression.Index.IncludeColumns.Count];
+            string includeStatement = string.Empty;
+
+            if (expression.Index.IncludeColumns.Count > 0)
+            {
+                for (int i = 0; i < expression.Index.IncludeColumns.Count; i++)
+                {
+                    var columnDef = expression.Index.IncludeColumns.ElementAt(i);
+                    indexIncludeColumns[i] = this.Quoter.QuoteColumnName(columnDef.Name);
+                }
+
+                includeStatement = string.Format(this.IncludeColumns, string.Join(",", indexIncludeColumns));
+            }
+            return includeStatement;
         }
 
         public override string Generate(DeleteIndexExpression expression)
