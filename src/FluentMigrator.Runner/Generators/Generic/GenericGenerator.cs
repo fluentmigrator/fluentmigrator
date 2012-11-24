@@ -177,7 +177,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             return string.Format(
                 CreateForeignKeyConstraint,
                 Quoter.QuoteTableName(expression.ForeignKey.ForeignTable),
-                Quoter.QuoteColumnName(keyName),
+                Quoter.QuoteConstraintName(keyName),
                 String.Join(", ", foreignColumns.ToArray()),
                 Quoter.QuoteTableName(expression.ForeignKey.PrimaryTable),
                 String.Join(", ", primaryColumns.ToArray()),
@@ -199,7 +199,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             }
 
             return string.Format(CreateConstraint, Quoter.QuoteTableName(expression.Constraint.TableName),
-                Quoter.Quote(expression.Constraint.ConstraintName),
+                Quoter.QuoteConstraintName(expression.Constraint.ConstraintName),
                 constraintType,
                 String.Join(", ", columns));
         }
