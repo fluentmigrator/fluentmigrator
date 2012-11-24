@@ -5,9 +5,10 @@ using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.Jet
 {
-    public class JetProcessor : ProcessorBase
+    public sealed class JetProcessor : ProcessorBase
     {
         private OleDbConnection Connection { get; set; }
+        public OleDbTransaction Transaction { get; private set; }
 
         public override string DatabaseType
         {
@@ -18,8 +19,40 @@ namespace FluentMigrator.Runner.Processors.Jet
             : base(generator, announcer, options)
         {
             Connection = connection;
+            connection.Open(); 
+            BeginTransaction();
         }
 
+        public override void BeginTransaction()
+        {
+            Announcer.Say("Beginning Transaction");
+            Transaction = Connection.BeginTransaction();
+        }
+
+        public override void CommitTransaction()
+        {
+            Announcer.Say("Committing Transaction");
+            Transaction.Commit();
+            WasCommitted = true;
+            CloseConnection();
+        }
+
+        public override void RollbackTransaction()
+        {
+            Announcer.Say("Rolling back transaction");
+            Transaction.Rollback();
+            WasCommitted = true;
+            CloseConnection();
+        }
+
+        public override void CloseConnection()
+        {
+            if (Connection.State != ConnectionState.Closed)
+            {
+                Connection.Close();
+            }
+        }
+        
         public override void Process(PerformDBOperationExpression expression)
         {
             Announcer.Say("Performing DB Operation");
@@ -43,7 +76,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
-            using (var command = new OleDbCommand(sql, Connection))
+            using (var command = new OleDbCommand(sql, Connection, Transaction))
             {
                 try
                 {
@@ -66,7 +99,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             if (Connection.State != ConnectionState.Open) Connection.Open();
 
             var ds = new DataSet();
-            using (var command = new OleDbCommand(String.Format(template, args), Connection))
+            using (var command = new OleDbCommand(String.Format(template, args), Connection, Transaction))
             using (var adapter = new OleDbDataAdapter(command))
             {
                 adapter.Fill(ds);

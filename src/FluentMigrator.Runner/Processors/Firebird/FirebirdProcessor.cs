@@ -145,10 +145,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             Announcer.Say("Committing Transaction");
             Transaction.Commit();
             WasCommitted = true;
-            if (Connection.State != ConnectionState.Closed)
-            {
-                Connection.Close();
-            }
+            CloseConnection();
             ClearLocks();
 
         }
@@ -177,11 +174,16 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 }
             }
 
+            CloseConnection();
+            ClearLocks();
+        }
+
+        public override void CloseConnection()
+        {
             if (Connection.State != ConnectionState.Closed)
             {
                 Connection.Close();
             }
-            ClearLocks();
         }
 
         public virtual void CommitRetaining()

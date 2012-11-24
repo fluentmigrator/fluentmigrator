@@ -120,10 +120,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 transaction = null;
             }
 
-            if (connection.State != ConnectionState.Closed)
-            {
-                connection.Close();
-            }
+            CloseConnection();
         }
 
         public override void RollbackTransaction()
@@ -138,6 +135,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             transaction.Rollback();
 
+            CloseConnection();
+        }
+
+        public override void CloseConnection()
+        {
             if (connection.State != ConnectionState.Closed)
             {
                 connection.Close();

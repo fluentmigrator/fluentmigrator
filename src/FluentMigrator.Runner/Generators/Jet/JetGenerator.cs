@@ -14,27 +14,27 @@ namespace FluentMigrator.Runner.Generators.Jet
 
         public override string Generate(RenameTableExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Renaming of tables is not supporteed for MySql");
+            return compatabilityMode.HandleCompatabilty("Renaming of tables is not supported for Jet");
         }
 
         public override string Generate(RenameColumnExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Renaming of columns is not supporteed for MySql");
+            return compatabilityMode.HandleCompatabilty("Renaming of columns is not supported for Jet");
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Altering of default constraints is not supporteed for MySql");
+            return compatabilityMode.HandleCompatabilty("Altering of default constraints is not supported for Jet");
         }
 
         public override string Generate(CreateSequenceExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sequences is not supporteed for MySql");
+            return compatabilityMode.HandleCompatabilty("Sequences are not supported for Jet");
         }
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Sequences is not supporteed for MySql");
+            return compatabilityMode.HandleCompatabilty("Sequences are not supported for Jet");
         }
 
         public override string Generate(DeleteDefaultConstraintExpression expression)
