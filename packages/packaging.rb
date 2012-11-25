@@ -1,4 +1,5 @@
 require 'fileutils'
+require 'version_bumper'
 
 #Unfortunately SQLite cannot be ILMerged in because it is not 100% managed.
 #exec :ilmerge_runner_with_providers => :release do |cmd|
@@ -15,7 +16,7 @@ require 'fileutils'
 #  ]
 #end
 
-FLUENTMIGRATOR_VERSION = "1.0.5.0"
+FLUENTMIGRATOR_VERSION = bumper_version.to_s
 
 def to_nuget_version(v)
 	v[1] + v[3]
@@ -104,7 +105,7 @@ namespace :nuget do
   @platforms = ['x86', 'AnyCPU']
   @versions = ['v3.5', 'v4.0']
     
-  task :prepare_package => ['build:console', :create_spec, :create_tools_spec, :clean] do
+  task :prepare_package => ['build:solutioninfo', 'build:console', :create_spec, :create_tools_spec, :clean] do
     
     @versions.each do |v|
       prepare_lib v

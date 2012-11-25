@@ -1,4 +1,5 @@
 require 'albacore'
+require 'version_bumper'
 require './packages/packaging'
 
 task :default => [:build]
@@ -10,6 +11,16 @@ directory 'dist'
 
 namespace :build do
   
+  desc "create solutioninfo.cs file"
+  assemblyinfo :solutioninfo do |asm|
+    asm.version = bumper_version.to_s
+    asm.file_version = bumper_version.to_s
+    asm.product_name = "FluentMigrator"
+    asm.copyright = "Copyright - Sean Chambers 2008-" + Time.now.year.to_s
+    asm.custom_attributes :AssemblyConfigurationAttribute => "Debug"
+    asm.output_file = "src/SolutionInfo.cs"
+  end
+
   msbuild :debug do |msb|
     # this doesnt work for me, and it builds fine w/o it. sry if it breaks for you. -josh c
     # to josh c, Please upgrade your Albacore. --tkellogg
