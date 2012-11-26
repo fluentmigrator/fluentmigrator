@@ -23,18 +23,31 @@ using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
-    public class SqlServerCeGenerator : SqlServer2005Generator
+    public class SqlServerCeGenerator : SqlServer2000Generator
     {
         public SqlServerCeGenerator()
             : base(new SqlServerColumn(new SqlServerCeTypeMap()))
         {
         }
 
-        //I think that this would be better inheriting form the SqlServer 2000 Generator.  It seems to match it better
+        public override string GetClusterTypeString(CreateIndexExpression column)
+        {
+            return string.Empty;
+        }
+
+        protected string GetConstraintClusteringString(CreateConstraintExpression constraint)
+        {
+            return string.Empty;
+        }
 
         public override string Generate(RenameTableExpression expression)
         {
-            return String.Format("sp_rename '{0}', '{1}'", Quoter.QuoteTableName(expression.OldName), Quoter.QuoteTableName(expression.NewName));
+            return String.Format("sp_rename {0}, {1}", Quoter.QuoteValue(expression.OldName), Quoter.QuoteValue(expression.NewName));
+        }
+
+        public override string Generate(RenameColumnExpression expression)
+        {
+            throw new DatabaseOperationNotSupportedException();
         }
 
         //All Schema method throw by default as only Sql server 2005 and up supports them.
@@ -55,6 +68,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(DeleteColumnExpression expression)
         {
+            if (expression.ColumnNames.Count != 1)
+            {
+                throw new DatabaseOperationNotSupportedException();
+            }
+
             // Limited functionality in CE, for now will just drop the column.. no DECLARE support!
             const string sql = @"ALTER TABLE {0} DROP COLUMN {1};";
             return String.Format(sql, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.ColumnNames.ElementAt(0)));
@@ -63,6 +81,16 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string Generate(DeleteIndexExpression expression)
         {
             return String.Format("DROP INDEX {0}.{1}", Quoter.QuoteTableName(expression.Index.TableName), Quoter.QuoteIndexName(expression.Index.Name));
+        }
+
+        public override string Generate(AlterDefaultConstraintExpression expression)
+        {
+            throw new DatabaseOperationNotSupportedException();
+        }
+
+        public override string Generate(DeleteDefaultConstraintExpression expression)
+        {
+            throw new DatabaseOperationNotSupportedException();
         }
     }
 }
