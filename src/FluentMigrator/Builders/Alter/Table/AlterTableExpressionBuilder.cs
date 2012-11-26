@@ -102,7 +102,7 @@ namespace FluentMigrator.Builders.Alter.Table
             if (CurrentColumn.ModificationType == ColumnModificationType.Alter)
             {
                 // TODO: This is code duplication from the AlterColumnExpressionBuilder
-                // we need to do a drop constraint and then add constraint to change the defualt value
+                // we need to do a drop constraint and then add constraint to change the default value
                 var dc = new AlterDefaultConstraintExpression
                              {
                                  TableName = Expression.TableName,
