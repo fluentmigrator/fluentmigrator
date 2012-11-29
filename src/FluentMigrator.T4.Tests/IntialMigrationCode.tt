@@ -74,7 +74,7 @@ foreach(Column col in ColumnList)
 {
 #>
 
-                .WithColumn("<#=col.Name#>").<#=generator.GetMigrationTypeFunctionForType(col.PropertyType,col.Size,col.Precision)
+                .WithColumn("<#=col.Name#>").<#=generator.GetMigrationTypeFunctionForType(col)
 #><#if (col.IsPrimaryKey){#>.PrimaryKey()<#}#><#if (col.IsAutoIncrement){#>.Identity()<#}#><#if (col.IsNullable){#>.Nullable()<#} else {#>.NotNullable()<#}#><#if (col.DefaultValue != null){#>.WithDefaultValue(<#= generator.GetColumnDefaultValue(col) #>)<#}#>
 <#
 }
