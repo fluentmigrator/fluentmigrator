@@ -77,10 +77,14 @@ namespace FluentMigrator.T4
                 {
                     while(rdr.Read())
                     {
+                        var type = GetPropertyType(rdr["DataType"].ToString());
                         Column col=new Column();
                         col.Name=rdr["ColumnName"].ToString();
                         col.PropertyName=CleanUp(col.Name);
-                        col.PropertyType=GetPropertyType(rdr["DataType"].ToString());
+                        col.PropertyType=type;
+                        col.CustomType = type == null
+                            ? rdr["DataType"].ToString().ToLowerInvariant()
+                            : null;
                         col.Size=GetDatatypeSize(rdr["DataType"].ToString());
                         col.Precision=GetDatatypePrecision(rdr["DataType"].ToString());
                         col.IsNullable=rdr["IsNullable"].ToString()=="YES";

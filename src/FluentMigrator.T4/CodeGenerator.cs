@@ -301,6 +301,9 @@ namespace FluentMigrator.T4
                 case System.Data.DbType.StringFixedLength:
                     sysType = string.Format("AsFixedLengthString({0})", sizeStr);
                     break;
+                case null:
+                    sysType = string.Format("AsCustom({0})", col.CustomType);
+                    break;
                 default:
                     break;
             }
