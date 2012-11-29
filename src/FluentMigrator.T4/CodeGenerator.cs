@@ -33,20 +33,6 @@ namespace FluentMigrator.T4
 
         private bool includeViews = false;
 
-        public bool IsTypeConvertedToLong(string columnType)
-        {
-            return ((columnType == "long") || (columnType == "ulong") || (columnType == "int") || (columnType == "uint"));
-        }
-
-        public string CheckNullable(Column col)
-        {
-            string result = "";
-            if (col.IsNullable && col.PropertyType != "byte[]" && col.PropertyType != "string" && col.PropertyType != "Microsoft.SqlServer.Types.SqlGeography" && col.PropertyType != "Microsoft.SqlServer.Types.SqlGeometry")
-            {
-                result = "?";
-            }
-            return result;
-        }
 
         private static string ZapPassword(string connectionString)
         {
@@ -62,31 +48,42 @@ namespace FluentMigrator.T4
         public string GetColumnDefaultValue(Column col)
         {
             string sysType = string.Format("\"{0}\"", col.DefaultValue);
-            switch (col.PropertyType.ToLower())
+            switch (col.PropertyType)
             {
-                case "long":
-                case "int":
-                case "double":
-                case "decimal":
-                case "bool":
+                case System.Data.DbType.Currency:
+                case System.Data.DbType.Decimal:
+                case System.Data.DbType.Double:
+                case System.Data.DbType.Boolean:
+                case System.Data.DbType.Int16:
+                case System.Data.DbType.Int32:
+                case System.Data.DbType.Int64:
+                case System.Data.DbType.Single:
+                case System.Data.DbType.UInt16:
+                case System.Data.DbType.UInt32:
+                case System.Data.DbType.UInt64:
                     sysType = col.DefaultValue.Replace("'", "").Replace("\"", "");
                     break;
-                case "guid":
+                case System.Data.DbType.Guid:
                     sysType = string.Format("\"{0}\"", col.DefaultValue);
                     break;
-                case "datetime":
+                case System.Data.DbType.DateTime:
+                case System.Data.DbType.DateTime2:
+                case System.Data.DbType.Date:
+                    if (col.DefaultValue.ToLower() == "current_time"
+                        || col.DefaultValue.ToLower() == "current_date"
+                        || col.DefaultValue.ToLower() == "current_timestamp")
                     {
-                        if (col.DefaultValue.ToLower() == "current_time" || col.DefaultValue.ToLower() == "current_date" || col.DefaultValue.ToLower() == "current_timestamp")
-                        {
-                            sysType = "SystemMethods.CurrentDateTime";
-                        }
-                        else
-                        {
-                            sysType = "\"" + col.DefaultValue + "\"";
-                        }
-                        break;
+                        sysType = "SystemMethods.CurrentDateTime";
                     }
+                    else
+                    {
+                        sysType = "\"" + col.DefaultValue + "\"";
+                    }
+                    break;
+                default:
+                    break;
             }
+
             return sysType;
         }
 
@@ -241,41 +238,73 @@ namespace FluentMigrator.T4
             return null;
         }
 
-        public string GetMigrationTypeFunctionForType(string type, int size, int precision)
+        public string GetMigrationTypeFunctionForType(Column col)
         {
+            var size = col.Size;
+            var precision = col.Precision;
             string sizeStr = ((size == -1) ? "" : size.ToString());
             string precisionStr = ((precision == -1) ? "" : "," + precision.ToString());
             string sysType = "AsString(" + sizeStr + ")";
-            switch (type.ToLower())
+            switch (col.PropertyType)
             {
-                case "long":
-                    sysType = "AsInt64()";
+                case System.Data.DbType.AnsiString:
+                    sysType = string.Format("AsAnsiString({0})", sizeStr);
                     break;
-                case "int":
-                    sysType = "AsInt32()";
+                case System.Data.DbType.AnsiStringFixedLength:
+                    sysType = string.Format("AsFixedLengthAnsiString({0})", sizeStr);
                     break;
-                case "guid":
-                    sysType = "AsGuid()";
+                case System.Data.DbType.Binary:
+                    sysType = string.Format("AsBinary({0})", sizeStr);
                     break;
-                case "datetime":
-                    sysType = "AsDateTime()";
-                    break;
-                case "double":
-                    sysType = "AsDouble()";
-                    break;
-                case "float":
-                    sysType = "AsFloat()";
-                    break;
-                case "decimal":
-                    sysType = "AsDecimal(" + sizeStr + precisionStr + ")";
-                    break;
-                case "bool":
+                case System.Data.DbType.Boolean:
                     sysType = "AsBoolean()";
                     break;
-                case "byte[]":
-                    sysType = "AsBinary(" + sizeStr + ")";
+                case System.Data.DbType.Byte:
+                    sysType = "AsByte()";
+                    break;
+                case System.Data.DbType.Currency:
+                    sysType = "AsCurrency()";
+                    break;
+                case System.Data.DbType.Date:
+                    sysType = "AsDate()";
+                    break;
+                case System.Data.DbType.DateTime:
+                    sysType = "AsDateTime()";
+                    break;
+                case System.Data.DbType.Decimal:
+                    sysType = string.Format("AsDecimal({0})", sizeStr + precisionStr);
+                    break;
+                case System.Data.DbType.Double:
+                    sysType = "AsDouble()";
+                    break;
+                case System.Data.DbType.Guid:
+                    sysType = "AsGuid()";
+                    break;
+                case System.Data.DbType.Int16:
+                case System.Data.DbType.UInt16:
+                    sysType = "AsInt16()";
+                    break;
+                case System.Data.DbType.Int32:
+                case System.Data.DbType.UInt32:
+                    sysType = "AsInt32()";
+                    break;
+                case System.Data.DbType.Int64:
+                case System.Data.DbType.UInt64:
+                    sysType = "AsInt64()";
+                    break;
+                case System.Data.DbType.Single:
+                    sysType ="AsFloat()";
+                    break;
+                case System.Data.DbType.String:
+                    sysType = string.Format("AsString({0})", sizeStr);
+                    break;
+                case System.Data.DbType.StringFixedLength:
+                    sysType = string.Format("AsFixedLengthString({0})", sizeStr);
+                    break;
+                default:
                     break;
             }
+
             return sysType;
         }
     }
