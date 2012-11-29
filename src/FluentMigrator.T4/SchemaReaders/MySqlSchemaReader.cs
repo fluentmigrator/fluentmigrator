@@ -48,10 +48,14 @@ namespace FluentMigrator.T4
                 var columns = schema.Select("TABLE_NAME='" + item.Name + "'");
                 foreach (var row in columns)
                 {
+                    var type = GetPropertyType(row);
                     Column col = new Column();
                     col.Name = row["COLUMN_NAME"].ToString();
                     col.PropertyName = CleanUp(col.Name);
-                    col.PropertyType = GetPropertyType(row);
+                    col.PropertyType = type;
+                    col.CustomType = type == null 
+                        ? row["DATA_TYPE"].ToString().ToLowerInvariant() 
+                        : null;
                     col.Size = GetDatatypeSize(row["DATA_TYPE"].ToString());
                     col.Precision = GetDatatypePrecision(row["DATA_TYPE"].ToString());
                     col.IsNullable = row["IS_NULLABLE"].ToString() == "YES";
