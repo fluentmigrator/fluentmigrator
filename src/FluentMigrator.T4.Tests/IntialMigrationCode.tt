@@ -137,7 +137,7 @@ foreach(Table tbl in from t in tables where !t.Ignore select t)
     {
 if(!string.IsNullOrEmpty(fkey.Name)){
 #>
-            Delete.ForeignKey("<#=fkey.Name#>"); 
+            Delete.ForeignKey("<#=fkey.Name#>").OnTable("<#=tbl.Name#>")<#if (string.IsNullOrEmpty(tbl.Schema) == false ){#>.InSchema("<#=tbl.Schema#>")<#}#>; 
 <#
         } else {
         #>
@@ -154,7 +154,7 @@ foreach(Table tbl in from t in tables where !t.Ignore select t)
     foreach(TableIndex idx in from i in tbl.Indexes select i)
     {
 #>
-            Delete.Index("<#=idx.Name#>");
+            Delete.Index("<#=idx.Name#>").OnTable("<#=tbl.Name#>")<#if (string.IsNullOrEmpty(tbl.Schema) == false ){#>.InSchema("<#=tbl.Schema#>")<#}#>;
 <#
     }
 }
