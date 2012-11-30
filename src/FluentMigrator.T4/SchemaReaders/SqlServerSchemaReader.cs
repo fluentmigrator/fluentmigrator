@@ -95,6 +95,7 @@ namespace FluentMigrator.T4
                         col.Precision = GetDatatypePrecision(rdr["DataType"].ToString());
                         col.IsNullable = rdr["IsNullable"].ToString() == "YES";
                         col.IsAutoIncrement = ((int)rdr["IsIdentity"]) == 1;
+                        col.DefaultValue = rdr.IsDBNull(5) ? null : rdr["DefaultSetting"].ToString();
                         result.Add(col);
                     }
                 }
