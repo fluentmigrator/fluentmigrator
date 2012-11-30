@@ -83,7 +83,7 @@ namespace FluentMigrator.T4
                 {
                     while (rdr.Read())
                     {
-                        var type = GetPropertyType(rdr["DataType"].ToString()); 
+                        var type = GetPropertyType(rdr["DataType"].ToString());
                         Column col = new Column();
                         col.Name = rdr["ColumnName"].ToString();
                         col.PropertyName = CleanUp(col.Name);
@@ -91,8 +91,8 @@ namespace FluentMigrator.T4
                         col.CustomType = type == null
                             ? rdr["DataType"].ToString().ToLowerInvariant()
                             : null;
-                        col.Size = GetDatatypeSize(rdr["DataType"].ToString());
-                        col.Precision = GetDatatypePrecision(rdr["DataType"].ToString());
+                        col.Size = rdr.Get("MaxLength", -1);
+                        col.Precision = rdr.Get("Precision", -1);
                         col.IsNullable = rdr["IsNullable"].ToString() == "YES";
                         col.IsAutoIncrement = ((int)rdr["IsIdentity"]) == 1;
                         col.DefaultValue = rdr.IsDBNull(5) ? null : rdr["DefaultSetting"].ToString();
@@ -294,8 +294,8 @@ namespace FluentMigrator.T4
             ORDINAL_POSITION AS OrdinalPosition, 
             COLUMN_DEFAULT AS DefaultSetting, 
             IS_NULLABLE AS IsNullable, DATA_TYPE AS DataType, 
-            CHARACTER_MAXIMUM_LENGTH AS MaxLength, 
-            DATETIME_PRECISION AS DatePrecision,
+            ISNULL(CHARACTER_MAXIMUM_LENGTH,CAST(NUMERIC_PRECISION as Int)) AS MaxLength, 
+            NUMERIC_SCALE AS Precision,
             COLUMNPROPERTY(object_id('[' + TABLE_SCHEMA + '].[' + TABLE_NAME + ']'), COLUMN_NAME, 'IsIdentity') AS IsIdentity,
             COLUMNPROPERTY(object_id('[' + TABLE_SCHEMA + '].[' + TABLE_NAME + ']'), COLUMN_NAME, 'IsComputed') as IsComputed
         FROM  INFORMATION_SCHEMA.COLUMNS
