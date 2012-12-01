@@ -63,7 +63,7 @@ namespace FluentMigrator.T4
                 case System.Data.DbType.UInt16:
                 case System.Data.DbType.UInt32:
                 case System.Data.DbType.UInt64:
-                    sysType = col.DefaultValue.Replace("'", "").Replace("\"", "");
+                    sysType = col.DefaultValue.Replace("'", "").Replace("\"", "").CleanBracket();
                     break;
                 case System.Data.DbType.Guid:
                     if (col.DefaultValue.IsGuid(out guid))
@@ -85,7 +85,7 @@ namespace FluentMigrator.T4
                     }
                     else
                     {
-                        sysType = "\"" + col.DefaultValue + "\"";
+                        sysType = "\"" + col.DefaultValue.CleanBracket() + "\"";
                     }
                     break;
                 default:
