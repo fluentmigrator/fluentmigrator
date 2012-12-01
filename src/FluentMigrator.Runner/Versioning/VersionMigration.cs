@@ -76,7 +76,7 @@ namespace FluentMigrator.Runner.Versioning
 
         public override void Up()
         {
-            Create.Index("UC_Version")
+            Create.Index(versionTableMeta.UniqueIndexName)
                 .OnTable(versionTableMeta.TableName)
                 .InSchema(versionTableMeta.SchemaName)
                 .WithOptions().Unique()

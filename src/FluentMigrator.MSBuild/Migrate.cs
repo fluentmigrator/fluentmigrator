@@ -16,12 +16,15 @@
 //
 #endregion
 
+using System;
+using System.IO;
+using System.Reflection;
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Initialization;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
-using System;
-using System.Reflection;
 
 namespace FluentMigrator.MSBuild
 {
@@ -46,6 +49,8 @@ namespace FluentMigrator.MSBuild
         private string databaseType;
         private string migrationAssembly;
 
+        public string ApplicationContext { get; set; }
+        
         [Required]
         public string Connection { get; set; }
 
@@ -63,6 +68,8 @@ namespace FluentMigrator.MSBuild
 
         public string Namespace { get; set; }
 
+        public bool Nested { get; set; }
+
         public string Task { get; set; }
 
         public long Version { get; set; }
@@ -76,6 +83,12 @@ namespace FluentMigrator.MSBuild
         public string Profile { get; set; }
 
         public bool PreviewOnly { get; set; }
+
+        public string Tags { get; set; }
+
+        public bool Output { get; set; }
+
+        public string OutputFilename { get; set; }
 
         public override bool Execute()
         {
@@ -92,27 +105,47 @@ namespace FluentMigrator.MSBuild
                 return false;
             }
 
-
-            Log.LogMessage(MessageImportance.Low, "Creating Context");
-            var announcer = new BaseAnnouncer(msg => Log.LogMessage(MessageImportance.Normal, msg))
+            IAnnouncer announcer = new ConsoleAnnouncer
             {
                 ShowElapsedTime = Verbose,
                 ShowSql = Verbose
             };
+
+            StreamWriter outputWriter = null;
+            if (Output)
+            {
+                if (string.IsNullOrEmpty(OutputFilename))
+                    OutputFilename = Path.GetFileName(Target) + ".sql";
+
+                outputWriter = new StreamWriter(OutputFilename);
+                var fileAnnouncer = new TextWriterAnnouncer(outputWriter)
+                {
+                    ShowElapsedTime = false,
+                    ShowSql = true
+                };
+
+                announcer = new CompositeAnnouncer(announcer, fileAnnouncer);
+            }
+
+            Log.LogMessage(MessageImportance.Low, "Creating Context");
+                   
             var runnerContext = new RunnerContext(announcer)
             {
+                ApplicationContext = ApplicationContext,
                 Database = databaseType,
                 Connection = Connection,
                 ConnectionStringConfigPath = ConnectionStringConfigPath,
                 Target = Target,
                 PreviewOnly = PreviewOnly,
                 Namespace = Namespace,
+                NestedNamespaces = Nested,
                 Task = Task,
                 Version = Version,
                 Steps = Steps,
                 WorkingDirectory = WorkingDirectory,
                 Profile = Profile,
-                Timeout = Timeout,
+                Tags = Tags.ToTags(),
+                Timeout = Timeout
             };
 
             Log.LogMessage(MessageImportance.Low, "Executing Migration Runner");
@@ -122,13 +155,20 @@ namespace FluentMigrator.MSBuild
             }
             catch (ProcessorFactoryNotFoundException ex)
             {
-                announcer.Error("While executing migrations the following error was encountered: {0}", ex.Message);
+                Log.LogError("While executing migrations the following error was encountered: {0}", ex.Message);
                 return false;
             }
             catch (Exception ex)
             {
-                announcer.Error("While executing migrations the following error was encountered: {0}, {1}", ex.Message, ex.StackTrace);
+                Log.LogError("While executing migrations the following error was encountered: {0}, {1}", ex.Message, ex.StackTrace);
                 return false;
+            }
+            finally
+            {
+                if (outputWriter != null)
+                {
+                    outputWriter.Dispose();
+                }
             }
 
             return true;

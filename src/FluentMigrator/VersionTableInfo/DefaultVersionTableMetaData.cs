@@ -20,19 +20,24 @@ namespace FluentMigrator.VersionTableInfo
 {
     public class DefaultVersionTableMetaData : IVersionTableMetaData
     {
-        public string SchemaName
+        public virtual string SchemaName
         {
             get { return string.Empty; }
         }
 
-        public string TableName
+        public virtual string TableName
         {
             get { return "VersionInfo"; }
         }
 
-        public string ColumnName
+        public virtual string ColumnName
         {
             get { return "Version"; }
+        }
+
+        public virtual string UniqueIndexName
+        {
+            get { return "UC_Version"; }
         }
     }
 }

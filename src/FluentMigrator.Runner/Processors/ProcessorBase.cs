@@ -106,39 +106,39 @@ namespace FluentMigrator.Runner.Processors
             Process(Generator.Generate(expression));
         }
 
-        public void Process(InsertDataExpression expression)
+        public virtual void Process(InsertDataExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(DeleteDataExpression expression)
+        public virtual void Process(DeleteDataExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(AlterDefaultConstraintExpression expression)
+        public virtual void Process(AlterDefaultConstraintExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(UpdateDataExpression expression)
+        public virtual void Process(UpdateDataExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
         public abstract void Process(PerformDBOperationExpression expression);
 
-        public void Process(AlterSchemaExpression expression)
+        public virtual void Process(AlterSchemaExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(CreateSequenceExpression expression)
+        public virtual void Process(CreateSequenceExpression expression)
         {
             Process(Generator.Generate(expression));
         }
 
-        public void Process(DeleteSequenceExpression expression)
+        public virtual void Process(DeleteSequenceExpression expression)
         {
             Process(Generator.Generate(expression));
         }
@@ -153,7 +153,7 @@ namespace FluentMigrator.Runner.Processors
             Process(Generator.Generate(expression));
         }
 
-        public void Process(DeleteDefaultConstraintExpression expression)
+        public virtual void Process(DeleteDefaultConstraintExpression expression)
         {
             Process(Generator.Generate(expression));
         }

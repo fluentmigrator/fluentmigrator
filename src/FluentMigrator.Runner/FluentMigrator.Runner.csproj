@@ -127,14 +127,24 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>SolutionInfo.cs</Link>
     </Compile>
-    <Compile Include="Announcers\BaseAnnouncer.cs" />
+    <Compile Include="Announcers\Announcer.cs" />
+    <Compile Include="AnnouncerExtensions.cs" />
     <Compile Include="Announcers\CompositeAnnouncer.cs" />
     <Compile Include="Announcers\NullAnnouncer.cs" />
+    <Compile Include="Announcers\ConsoleAnnouncer.cs" />
     <Compile Include="Announcers\TextWriterAnnouncer.cs" />
     <Compile Include="CompatabilityMode.cs" />
     <Compile Include="Extensions\SqlServerExtensions.cs" />
+    <Compile Include="Extensions\TagsExtensions.cs" />
     <Compile Include="Generators\Base\ColumnBase.cs" />
     <Compile Include="Extensions\CompatabilityModeExtension.cs" />
+    <Compile Include="Generators\Firebird\FirebirdColumn.cs" />
+    <Compile Include="Generators\Firebird\FirebirdGenerator.cs" />
+    <Compile Include="Generators\Firebird\FirebirdTruncator.cs" />
+    <Compile Include="Generators\SqlServer\SqlServer2012Generator.cs" />
+    <Compile Include="Processors\Firebird\FirebirdProcessedExpression.cs" />
+    <Compile Include="Generators\Firebird\FirebirdQuoter.cs" />
+    <Compile Include="Generators\Firebird\FirebirdTypeMap.cs" />
     <Compile Include="Generators\Generic\GenericQuoter.cs" />
     <Compile Include="Generators\Generic\GenericGenerator.cs" />
     <Compile Include="Generators\IColumn.cs" />
@@ -189,12 +199,22 @@
     <Compile Include="Initialization\UndeterminableConnectionException.cs" />
     <Compile Include="IProfileLoader.cs" />
     <Compile Include="IVersionLoader.cs" />
+    <Compile Include="Processors\Firebird\FirebirdDbFactory.cs" />
+    <Compile Include="Processors\Firebird\FirebirdOptions.cs" />
+    <Compile Include="Processors\Firebird\FirebirdProcessor.cs" />
+    <Compile Include="Processors\Firebird\FirebirdProcessorFactory.cs" />
+    <Compile Include="Processors\Firebird\FirebirdSchemaInfo.cs" />
+    <Compile Include="Processors\Firebird\FirebirdSchemaProvider.cs" />
+    <Compile Include="Processors\Firebird\FirebirdTableSchema.cs" />
+    <Compile Include="Processors\DotConnectOracle\DotConnectOracleProcessor.cs" />
+    <Compile Include="Processors\DotConnectOracle\DotConnectOracleProcessorFactory.cs" />
     <Compile Include="Processors\Jet\JetProcessor.cs" />
     <Compile Include="Processors\Jet\JetProcessorFactory.cs" />
     <Compile Include="Processors\MigrationProcessorFactory.cs" />
     <Compile Include="Processors\MySql\MySqlDbFactory.cs" />
     <Compile Include="Processors\MySql\MySqlProcessor.cs" />
     <Compile Include="Processors\MySql\MySqlProcessorFactory.cs" />
+    <Compile Include="Processors\DotConnectOracle\DotConnectOracleDbFactory.cs" />
     <Compile Include="Processors\Oracle\OracleDbFactory.cs" />
     <Compile Include="Processors\Oracle\OracleProcessor.cs" />
     <Compile Include="Processors\Oracle\OracleProcessorFactory.cs" />
@@ -208,6 +228,7 @@
     <Compile Include="Processors\ReflectionBasedDbFactory.cs" />
     <Compile Include="Processors\Sqlite\SqliteDbFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2000Processor.cs" />
+    <Compile Include="Processors\SqlServer\SqlServer2012ProcessorFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServerCeDbFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServerDbFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServerCeProcessor.cs" />
@@ -232,6 +253,7 @@
     <Compile Include="Versioning\VersionInfo.cs" />
     <Compile Include="Versioning\VersionMigration.cs" />
     <Compile Include="VersionLoader.cs" />
+    <Compile Include="VersionOrderInvalidException.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj">
@@ -317,6 +339,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

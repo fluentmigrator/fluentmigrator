@@ -40,7 +40,7 @@ namespace FluentMigrator.Expressions
 
         public override void ApplyConventions(IMigrationConventions conventions)
         {
-            SqlScript = string.Format(@"{0}\{1}", conventions.GetWorkingDirectory(), SqlScript);
+            SqlScript = Path.Combine(conventions.GetWorkingDirectory(), SqlScript);
         }
 
         public override void CollectValidationErrors(ICollection<string> errors)

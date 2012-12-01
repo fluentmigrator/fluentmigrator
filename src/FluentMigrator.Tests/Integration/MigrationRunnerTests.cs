@@ -17,18 +17,30 @@
 //
 #endregion
 
+
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
+using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.MySql;
+using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Runner.Processors.Sqlite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Integration.Migrations;
+using FluentMigrator.Tests.Integration.Migrations.Tagged;
+using FluentMigrator.Tests.Unit;
+using FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3;
+using FluentMigrator.Tests.Integration.Migrations.Invalid;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
@@ -71,22 +83,33 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanSilentlyFail()
         {
-            var processorOptions = new Mock<IMigrationProcessorOptions>();
-            processorOptions.SetupGet(x => x.PreviewOnly).Returns(false);
+            try
+            {
+                var processorOptions = new Mock<IMigrationProcessorOptions>();
+                processorOptions.SetupGet(x => x.PreviewOnly).Returns(false);
 
-            var processor = new Mock<IMigrationProcessor>();
-            processor.Setup(x => x.Process(It.IsAny<CreateForeignKeyExpression>())).Throws(new Exception("Error"));
-            processor.Setup(x => x.Process(It.IsAny<DeleteForeignKeyExpression>())).Throws(new Exception("Error"));
-            processor.Setup(x => x.Options).Returns(processorOptions.Object);
+                var processor = new Mock<IMigrationProcessor>();
+                processor.Setup(x => x.Process(It.IsAny<CreateForeignKeyExpression>())).Throws(new Exception("Error"));
+                processor.Setup(x => x.Process(It.IsAny<DeleteForeignKeyExpression>())).Throws(new Exception("Error"));
+                processor.Setup(x => x.Options).Returns(processorOptions.Object);
 
-            var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor.Object) { SilentlyFail = true };
+                var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor.Object) { SilentlyFail = true };
 
-            runner.Up(new TestForeignKeySilentFailure());
+                runner.Up(new TestForeignKeySilentFailure());
 
-            runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
+                runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
 
-            runner.Down(new TestForeignKeySilentFailure());
-            runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
+                runner.Down(new TestForeignKeySilentFailure());
+                runner.CaughtExceptions.Count.ShouldBeGreaterThan(0);
+            }
+            finally
+            {
+                ExecuteWithSupportedProcessors(processor =>
+                {
+                    MigrationRunner testRunner = SetupMigrationRunner(processor);
+                    testRunner.RollbackToVersion(0);
+                }, false);
+            }
         }
 
         [Test]
@@ -356,12 +379,15 @@ namespace FluentMigrator.Tests.Integration
             {
                 MigrationRunner runner = SetupMigrationRunner(processor);
 
-                runner.MigrateUp();
+                runner.MigrateUp(false);
 
                 runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
                 runner.VersionLoader.VersionInfo.HasAppliedMigration(2).ShouldBeTrue();
                 runner.VersionLoader.VersionInfo.HasAppliedMigration(3).ShouldBeTrue();
-                runner.VersionLoader.VersionInfo.Latest().ShouldBe(3);
+                runner.VersionLoader.VersionInfo.HasAppliedMigration(4).ShouldBeTrue();
+                runner.VersionLoader.VersionInfo.Latest().ShouldBe(4);
+
+                runner.RollbackToVersion(0, false);
             });
         }
 
@@ -371,11 +397,17 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithSupportedProcessors(processor =>
             {
                 MigrationRunner runner = SetupMigrationRunner(processor);
+                try
+                {
+                    runner.MigrateUp(1, false);
 
-                runner.MigrateUp(1);
-
-                runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
-                processor.TableExists(null, "Users").ShouldBeTrue();
+                    runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
+                    processor.TableExists(null, "Users").ShouldBeTrue();
+                }
+                finally
+                {
+                    runner.RollbackToVersion(0, false);
+                }
             });
         }
 
@@ -388,28 +420,23 @@ namespace FluentMigrator.Tests.Integration
                 {
                     MigrationRunner runner = SetupMigrationRunner(processor);
 
-                    runner.MigrateUp(1);
+                    runner.MigrateUp(1, false);
 
                     runner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeTrue();
                     processor.TableExists(null, "Users").ShouldBeTrue();
-                }, false, typeof(SqliteProcessor));
 
-                ExecuteWithSupportedProcessors(processor =>
-                {
                     MigrationRunner testRunner = SetupMigrationRunner(processor);
-                    testRunner.MigrateDown(0);
-
+                    testRunner.MigrateDown(0, false);
                     testRunner.VersionLoader.VersionInfo.HasAppliedMigration(1).ShouldBeFalse();
                     processor.TableExists(null, "Users").ShouldBeFalse();
                 }, false, typeof(SqliteProcessor));
-
             }
             finally
             {
                 ExecuteWithSupportedProcessors(processor =>
                 {
                     MigrationRunner testRunner = SetupMigrationRunner(processor);
-                    testRunner.RollbackToVersion(0);
+                    testRunner.RollbackToVersion(0, false);
                 }, false);
             }
         }
@@ -481,6 +508,251 @@ namespace FluentMigrator.Tests.Integration
             }
         }
 
+        [Test]
+        public void MigrateUpWithTaggedMigrationsShouldOnlyApplyMatchedMigrations()
+        {
+            ExecuteWithSupportedProcessors(processor =>
+            {
+                var assembly = typeof(TenantATable).Assembly;
+
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                {
+                    Namespace = typeof(TenantATable).Namespace,
+                    Tags = new[] { "TenantA" }
+                };
+
+                var runner = new MigrationRunner(assembly, runnerContext, processor);
+
+                try
+                {
+                    runner.MigrateUp(false);
+
+                    processor.TableExists(null, "TenantATable").ShouldBeTrue();
+                    processor.TableExists(null, "NormalTable").ShouldBeTrue();
+                    processor.TableExists(null, "TenantBTable").ShouldBeFalse();
+                    processor.TableExists(null, "TenantAandBTable").ShouldBeTrue();
+                }
+                finally
+                {
+                    runner.RollbackToVersion(0);
+                }
+            });
+        }
+
+        [Test]
+        public void MigrateUpWithTaggedMigrationsAndUsingMultipleTagsShouldOnlyApplyMatchedMigrations()
+        {
+            ExecuteWithSupportedProcessors(processor =>
+            {
+                var assembly = typeof(TenantATable).Assembly;
+
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                {
+                    Namespace = typeof(TenantATable).Namespace,
+                    Tags = new[] { "TenantA", "TenantB" }
+                };
+
+                var runner = new MigrationRunner(assembly, runnerContext, processor);
+                
+                try
+                {
+                    runner.MigrateUp(false);
+
+                    processor.TableExists(null, "TenantATable").ShouldBeFalse();
+                    processor.TableExists(null, "NormalTable").ShouldBeTrue();
+                    processor.TableExists(null, "TenantBTable").ShouldBeFalse();
+                    processor.TableExists(null, "TenantAandBTable").ShouldBeTrue();
+                }
+                finally
+                {
+                    new MigrationRunner(assembly, runnerContext, processor).RollbackToVersion(0);
+                }
+            });
+        }
+
+        [Test]
+        public void MigrateDownWithDifferentTagsToMigrateUpShouldApplyMatchedMigrations()
+        {
+            var assembly = typeof(TenantATable).Assembly;
+            var migrationsNamespace = typeof(TenantATable).Namespace;
+
+            var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+            {
+                Namespace = migrationsNamespace,
+            };
+
+            // Excluded SqliteProcessor as it errors on DB cleanup (RollbackToVersion).
+            ExecuteWithSupportedProcessors(processor =>
+            {
+                try
+                {
+                    runnerContext.Tags = new[] { "TenantA" };
+                    
+                    new MigrationRunner(assembly, runnerContext, processor).MigrateUp(false);
+
+                    processor.TableExists(null, "TenantATable").ShouldBeTrue();
+                    processor.TableExists(null, "NormalTable").ShouldBeTrue();
+                    processor.TableExists(null, "TenantBTable").ShouldBeFalse();
+                    processor.TableExists(null, "TenantAandBTable").ShouldBeTrue();
+
+                    runnerContext.Tags = new[] { "TenantB" };
+
+                    new MigrationRunner(assembly, runnerContext, processor).MigrateDown(0, false);
+
+                    processor.TableExists(null, "TenantATable").ShouldBeTrue();
+                    processor.TableExists(null, "NormalTable").ShouldBeFalse();
+                    processor.TableExists(null, "TenantBTable").ShouldBeFalse();
+                    processor.TableExists(null, "TenantAandBTable").ShouldBeFalse();
+                }
+                finally
+                {
+                    runnerContext.Tags = new[] { "TenantA" };
+
+                    new MigrationRunner(assembly, runnerContext, processor).RollbackToVersion(0, false);
+                }
+            }, true, typeof(SqliteProcessor));
+        }
+
+        [Test]
+        public void VersionInfoCreationScriptsOnlyGeneratedOnceInPreviewMode()
+        {
+            if (!IntegrationTestOptions.SqlServer2008.IsEnabled)
+                return;
+
+            var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
+            var processorOptions = new ProcessorOptions { PreviewOnly = true };
+
+            var outputSql = new StringWriter();
+            var announcer = new TextWriterAnnouncer(outputSql){ ShowSql = true };
+
+            var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), announcer, processorOptions, new SqlServerDbFactory());
+
+            try
+            {
+                var asm = typeof(MigrationRunnerTests).Assembly;
+                var runnerContext = new RunnerContext(announcer)
+                {
+                    Namespace = "FluentMigrator.Tests.Integration.Migrations",
+                    PreviewOnly = true
+                };
+                
+                var runner = new MigrationRunner(asm, runnerContext, processor);
+                runner.MigrateUp(1, false);
+
+                processor.CommitTransaction();
+
+                string schemaName = new TestVersionTableMetaData().SchemaName;
+                var schemaAndTableName = string.Format("\\[{0}\\]\\.\\[{1}\\]", schemaName, TestVersionTableMetaData.TABLENAME);
+
+                var outputSqlString = outputSql.ToString();
+
+                var createSchemaMatches = new Regex(string.Format("CREATE SCHEMA \\[{0}\\]", schemaName)).Matches(outputSqlString).Count;
+                var createTableMatches = new Regex("CREATE TABLE " + schemaAndTableName).Matches(outputSqlString).Count;
+                var createIndexMatches = new Regex("CREATE UNIQUE CLUSTERED INDEX \\[" + TestVersionTableMetaData.UNIQUEINDEXNAME + "\\] ON " + schemaAndTableName).Matches(outputSqlString).Count;
+                var alterTableMatches = new Regex("ALTER TABLE " + schemaAndTableName).Matches(outputSqlString).Count;
+
+                System.Console.WriteLine(outputSqlString);
+
+                createSchemaMatches.ShouldBe(1);
+                createTableMatches.ShouldBe(1);
+                alterTableMatches.ShouldBe(1);
+                createIndexMatches.ShouldBe(1);
+                
+            }
+            finally
+            {
+                CleanupTestSqlServerDatabase(connection, processor);
+            }
+        }
+
+        [Test]
+        public void ValidateVersionOrderShouldDoNothingIfUnappliedMigrationVersionIsGreaterThanLatestAppliedMigration()
+        {
+
+            // Using SqlServer instead of SqlLite as versions not deleted from VersionInfo table when using Sqlite.
+            var excludedProcessors = new[] { typeof(SqliteProcessor), typeof(MySqlProcessor), typeof(PostgresProcessor) };
+
+            var assembly = typeof(User).Assembly;
+            
+            var runnerContext1 = new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = typeof(Migrations.Interleaved.Pass2.User).Namespace };
+            var runnerContext2 = new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = typeof(Migrations.Interleaved.Pass3.User).Namespace };
+
+            try
+            {
+                ExecuteWithSupportedProcessors(processor =>
+                {
+                    var migrationRunner = new MigrationRunner(assembly, runnerContext1, processor);
+
+                    migrationRunner.MigrateUp(3);
+                }, false, excludedProcessors);
+
+                ExecuteWithSupportedProcessors(processor =>
+                {
+                    var migrationRunner = new MigrationRunner(assembly, runnerContext2, processor);
+
+                    Assert.DoesNotThrow(migrationRunner.ValidateVersionOrder);
+                }, false, excludedProcessors);
+            }
+            finally
+            {
+                ExecuteWithSupportedProcessors(processor =>
+                {
+                    var migrationRunner = new MigrationRunner(assembly, runnerContext2, processor);
+                    migrationRunner.RollbackToVersion(0);
+                }, true, excludedProcessors);
+            }
+        }
+
+        [Test]
+        public void ValidateVersionOrderShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanLatestAppliedMigration()
+        {
+
+            // Using SqlServer instead of SqlLite as versions not deleted from VersionInfo table when using Sqlite.
+            var excludedProcessors = new[] { typeof(SqliteProcessor), typeof(MySqlProcessor), typeof(PostgresProcessor) };
+
+            var assembly = typeof(User).Assembly;
+
+            var runnerContext1 = new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = typeof(Migrations.Interleaved.Pass2.User).Namespace };
+            var runnerContext2 = new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = typeof(Migrations.Interleaved.Pass3.User).Namespace };
+
+            VersionOrderInvalidException caughtException = null;
+
+            try
+            {
+                ExecuteWithSupportedProcessors(processor =>
+                {
+                    var migrationRunner = new MigrationRunner(assembly, runnerContext1, processor);
+                    migrationRunner.MigrateUp();
+                }, false, excludedProcessors);
+
+                ExecuteWithSupportedProcessors(processor =>
+                {
+                    var migrationRunner = new MigrationRunner(assembly, runnerContext2, processor);
+                    migrationRunner.ValidateVersionOrder();
+                }, false, excludedProcessors);
+            }
+            catch (VersionOrderInvalidException ex)
+            {
+                caughtException = ex;
+            }
+            finally
+            {
+                ExecuteWithSupportedProcessors(processor =>
+                {
+                    var migrationRunner = new MigrationRunner(assembly, runnerContext2, processor);
+                    migrationRunner.RollbackToVersion(0);
+                }, true, excludedProcessors);
+            }
+
+            caughtException.ShouldNotBeNull();
+
+
+            caughtException.InvalidMigrations.Count().ShouldBe(1);
+            var keyValuePair = caughtException.InvalidMigrations.First();
+            keyValuePair.Key.ShouldBe(200909060935);
+            ((MigrationWithMetaDataAdapter)keyValuePair.Value).Migration.ShouldBeOfType<UserEmail>();
+            
+        }
 
         private static MigrationRunner SetupMigrationRunner(IMigrationProcessor processor)
         {

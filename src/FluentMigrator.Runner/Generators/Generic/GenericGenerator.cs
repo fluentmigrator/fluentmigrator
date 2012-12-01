@@ -112,7 +112,11 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(RenameColumnExpression expression)
         {
-            return String.Format(RenameColumn, expression.TableName, expression.OldName, expression.NewName);
+            return String.Format(RenameColumn, 
+                Quoter.QuoteTableName(expression.TableName), 
+                Quoter.QuoteColumnName(expression.OldName), 
+                Quoter.QuoteColumnName(expression.NewName)
+                );
         }
 
         public override string Generate(CreateIndexExpression expression)
@@ -173,7 +177,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             return string.Format(
                 CreateForeignKeyConstraint,
                 Quoter.QuoteTableName(expression.ForeignKey.ForeignTable),
-                Quoter.QuoteColumnName(keyName),
+                Quoter.QuoteConstraintName(keyName),
                 String.Join(", ", foreignColumns.ToArray()),
                 Quoter.QuoteTableName(expression.ForeignKey.PrimaryTable),
                 String.Join(", ", primaryColumns.ToArray()),
@@ -195,7 +199,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             }
 
             return string.Format(CreateConstraint, Quoter.QuoteTableName(expression.Constraint.TableName),
-                Quoter.Quote(expression.Constraint.ConstraintName),
+                Quoter.QuoteConstraintName(expression.Constraint.ConstraintName),
                 constraintType,
                 String.Join(", ", columns));
         }
@@ -212,6 +216,9 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(DeleteForeignKeyExpression expression)
         {
+            if (expression.ForeignKey.ForeignTable == null)
+                throw new ArgumentNullException("Table name not specified, ensure you have appended the OnTable extension. Format should be Delete.ForeignKey(KeyName).OnTable(TableName)");
+
             return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.ForeignKey.ForeignTable), Quoter.QuoteColumnName(expression.ForeignKey.Name));
         }
 
@@ -294,11 +301,18 @@ namespace FluentMigrator.Runner.Generators.Generic
                 updateItems.Add(string.Format("{0} = {1}", Quoter.QuoteColumnName(item.Key), Quoter.QuoteValue(item.Value)));
             }
 
-            foreach (var item in expression.Where)
+            if(expression.IsAllRows)
             {
-                whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value)));
+                whereClauses.Add("1 = 1");
             }
-
+            else
+            {
+                foreach (var item in expression.Where)
+                {
+                    whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key),
+                                                   item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value)));
+                }
+            }
             return String.Format(UpdateData, Quoter.QuoteTableName(expression.TableName), String.Join(", ", updateItems.ToArray()), String.Join(" AND ", whereClauses.ToArray()));
         }
 
@@ -350,7 +364,14 @@ namespace FluentMigrator.Runner.Generators.Generic
         {
             var result = new StringBuilder(string.Format("CREATE SEQUENCE "));
             var seq = expression.Sequence;
-            result.AppendFormat("{0}.{1}", Quoter.QuoteSchemaName(seq.SchemaName), Quoter.QuoteSequenceName(seq.Name));
+            if (string.IsNullOrEmpty(seq.SchemaName))
+            {
+                result.AppendFormat(Quoter.QuoteSequenceName(seq.Name));
+            }
+            else
+            {
+                result.AppendFormat("{0}.{1}", Quoter.QuoteSchemaName(seq.SchemaName), Quoter.QuoteSequenceName(seq.Name));
+            }
 
             if (seq.Increment.HasValue)
             {
@@ -388,7 +409,14 @@ namespace FluentMigrator.Runner.Generators.Generic
         public override string Generate(DeleteSequenceExpression expression)
         {
             var result = new StringBuilder(string.Format("DROP SEQUENCE "));
-            result.AppendFormat("{0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteSequenceName(expression.SequenceName));
+            if (string.IsNullOrEmpty(expression.SchemaName))
+            {
+                result.AppendFormat(Quoter.QuoteSequenceName(expression.SequenceName));
+            }
+            else
+            {
+                result.AppendFormat("{0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteSequenceName(expression.SequenceName));
+            }
 
             return result.ToString();
         }

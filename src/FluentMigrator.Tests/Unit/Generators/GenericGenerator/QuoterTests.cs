@@ -126,6 +126,16 @@ namespace FluentMigrator.Tests.Unit.Generators
         [Test]
         public void DateTimeIsFormattedIso8601WithQuotes()
         {
+            ChangeCulture();
+            DateTime date = new DateTime(2010, 1, 2, 18, 4, 5, 123);
+            quoter.QuoteValue(date)
+                .ShouldBe("'2010-01-02T18:04:05'");
+        } 
+        
+        [Test]
+        public void DateTimeIsFormattedIso8601WithQuotes_WithItalyAsCulture()
+        {
+            Thread.CurrentThread.CurrentCulture = new CultureInfo("it-IT");
             DateTime date = new DateTime(2010, 1, 2, 18, 4, 5, 123);
             quoter.QuoteValue(date)
                 .ShouldBe("'2010-01-02T18:04:05'");
@@ -188,7 +198,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             //Do Nothing at the moment due to case sensitivity issues with oracle
             OracleQuoter quoter = new OracleQuoter();
-            quoter.Quote("Table\"Name").ShouldBe("Table\"Name");
+            quoter.Quote("Table\"Name").ShouldBe("\"Table\"\"Name\"");
         }
 
         [Test]

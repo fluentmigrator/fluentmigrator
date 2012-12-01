@@ -23,6 +23,7 @@ using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Versioning;
 
 namespace FluentMigrator.Runner
 {
@@ -60,7 +61,7 @@ namespace FluentMigrator.Runner
                 Conventions.GetWorkingDirectory = () => runnerContext.WorkingDirectory;
 
             VersionLoader = new VersionLoader(this, _migrationAssembly, Conventions);
-            MigrationLoader = new MigrationLoader(Conventions, _migrationAssembly, runnerContext.Namespace);
+            MigrationLoader = new MigrationLoader(Conventions, _migrationAssembly, runnerContext.Namespace, runnerContext.NestedNamespaces, runnerContext.Tags);
             ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
         }
 
@@ -113,7 +114,7 @@ namespace FluentMigrator.Runner
                 if (useAutomaticTransactionManagement) { Processor.CommitTransaction(); }
                 VersionLoader.LoadVersionInfo();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 if (useAutomaticTransactionManagement) { Processor.RollbackTransaction(); }
                 throw;
@@ -290,6 +291,16 @@ namespace FluentMigrator.Runner
             return migration.GetType().Name;
         }
 
+        private string GetMigrationName(long version, IMigration migration)
+        {
+            string name = GetMigrationName(migration);
+
+            if (migration is IMigrationMetadata)
+                return name;
+
+            return string.Format("{0}: {1}", version, name);
+        }
+
         public void Up(IMigration migration)
         {
             var name = GetMigrationName(migration);
@@ -391,6 +402,45 @@ namespace FluentMigrator.Runner
             _stopWatch.Stop();
 
             return _stopWatch.ElapsedTime().Ticks;
+        }
+
+        public void ValidateVersionOrder()
+        {
+            IEnumerable<KeyValuePair<long, IMigration>> unappliedVersions = MigrationLoader.Migrations.Where(kvp => MigrationVersionLessThanGreatestAppliedMigration(kvp.Key));
+
+            if (unappliedVersions.Any())
+            {
+                throw new VersionOrderInvalidException(unappliedVersions);
+            }
+
+            _announcer.Say("Version ordering valid.");
+        }
+
+        public void ListMigrations()
+        {
+            IVersionInfo currentVersionInfo = this.VersionLoader.VersionInfo;
+            long currentVersion = currentVersionInfo.Latest();
+
+            _announcer.Heading("Migrations");
+
+            foreach(KeyValuePair<long, IMigration> migration in MigrationLoader.Migrations)
+            {
+                string migrationName = GetMigrationName(migration.Key, migration.Value);
+                bool isCurrent = migration.Key == currentVersion;
+                string message = string.Format("{0}{1}",
+                                                migrationName,
+                                                isCurrent ? " (current)" : string.Empty);
+
+                if(isCurrent)
+                    _announcer.Emphasize(message);
+                else
+                    _announcer.Say(message);
+            }
+        }
+
+        private bool MigrationVersionLessThanGreatestAppliedMigration(long version)
+        {
+            return !VersionLoader.VersionInfo.HasAppliedMigration(version) && version < VersionLoader.VersionInfo.Latest();
         }
     }
 }

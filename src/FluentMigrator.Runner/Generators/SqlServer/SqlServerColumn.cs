@@ -29,7 +29,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return column.IsIdentity ? GetIdentityString(column) : string.Empty;
         }
 
-        private static string GetIdentityString(ColumnDefinition column) 
+        private static string GetIdentityString(ColumnDefinition column)
         {
             return string.Format("IDENTITY({0},{1})",
                 column.GetAdditionalFeature(SqlServerExtensions.IdentitySeed, 1),
@@ -42,8 +42,12 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             {
                 case SystemMethods.NewGuid:
                     return "NEWID()";
+                case SystemMethods.NewSequentialId:
+                    return "NEWSEQUENTIALID()";
                 case SystemMethods.CurrentDateTime:
                     return "GETDATE()";
+                case SystemMethods.CurrentUTCDateTime:
+                    return "GETUTCDATE()";
             }
 
             return null;

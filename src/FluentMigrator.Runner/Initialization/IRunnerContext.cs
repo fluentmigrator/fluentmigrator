@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System.Collections.Generic;
+
 namespace FluentMigrator.Runner.Initialization
 {
     public interface IRunnerContext
@@ -25,6 +27,7 @@ namespace FluentMigrator.Runner.Initialization
         string Target { get; set; }
         bool PreviewOnly { get; set; }
         string Namespace { get; set; }
+        bool NestedNamespaces { get; set; }
         string Task { get; set; }
         long Version { get; set; }
         int Steps { get; set; }
@@ -34,6 +37,7 @@ namespace FluentMigrator.Runner.Initialization
         IStopWatch StopWatch { get; }
         int Timeout { get; set; }
         string ConnectionStringConfigPath { get; set; }
+        IEnumerable<string> Tags { get; set; }
 
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         object ApplicationContext { get; set; }

@@ -73,6 +73,12 @@ namespace FluentMigrator.Runner.Initialization
                 case "migrate:down":
                     Runner.MigrateDown(RunnerContext.Version);
                     break;
+                case "validateversionorder":
+                    Runner.ValidateVersionOrder();
+                    break;
+                case "listmigrations":
+                    Runner.ListMigrations();
+                    break;
             }
 
             RunnerContext.Announcer.Say("Task completed.");

@@ -12,6 +12,19 @@ namespace FluentMigrator.Runner
 {
     public class VersionLoader : IVersionLoader
     {
+        private bool _versionSchemaMigrationAlreadyRun;
+        private bool _versionMigrationAlreadyRun;
+        private bool _versionUniqueMigrationAlreadyRun;
+        private IVersionInfo _versionInfo;
+        private IMigrationConventions Conventions { get; set; }
+        private IMigrationProcessor Processor { get; set; }
+        protected Assembly Assembly { get; set; }
+        public IVersionTableMetaData VersionTableMetaData { get; private set; }
+        public IMigrationRunner Runner { get; set; }
+        public VersionSchemaMigration VersionSchemaMigration { get; private set; }
+        public IMigration VersionMigration { get; private set; }
+        public IMigration VersionUniqueMigration { get; private set; }
+        
         public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions)
         {
             Runner = runner;
@@ -27,17 +40,6 @@ namespace FluentMigrator.Runner
             LoadVersionInfo();
         }
 
-        protected VersionSchemaMigration VersionSchemaMigration { get; set; }
-
-        private IVersionInfo _versionInfo;
-        public IMigrationRunner Runner { get; set; }
-        protected Assembly Assembly { get; set; }
-        public IVersionTableMetaData VersionTableMetaData { get; private set; }
-        private IMigrationConventions Conventions { get; set; }
-        private IMigrationProcessor Processor { get; set; }
-        private IMigration VersionMigration { get; set; }
-        private IMigration VersionUniqueMigration { get; set; }
-
         public void UpdateVersionInfo(long version)
         {
             var dataExpression = new InsertDataExpression();
@@ -49,7 +51,7 @@ namespace FluentMigrator.Runner
 
         public IVersionTableMetaData GetVersionTableMetaData()
         {
-            Type matchedType = Assembly.GetExportedTypes().Where(t => Conventions.TypeIsVersionTableMetaData(t)).FirstOrDefault();
+            Type matchedType = Assembly.GetExportedTypes().FirstOrDefault(t => Conventions.TypeIsVersionTableMetaData(t));
 
             if (matchedType == null)
             {
@@ -109,26 +111,30 @@ namespace FluentMigrator.Runner
 
         public void LoadVersionInfo()
         {
-            bool tableCreated = false;
-
-            if (!AlreadyCreatedVersionSchema)
-                Runner.Up(VersionSchemaMigration);
-
-            if (!AlreadyCreatedVersionTable)
+            if (!AlreadyCreatedVersionSchema && !_versionSchemaMigrationAlreadyRun)
             {
-                Runner.Up(VersionMigration);
-                tableCreated = true;
+                Runner.Up(VersionSchemaMigration);
+                _versionSchemaMigrationAlreadyRun = true;
             }
 
-            if (!AlreadyMadeVersionUnique)
+            if (!AlreadyCreatedVersionTable && !_versionMigrationAlreadyRun)
+            {
+                Runner.Up(VersionMigration);
+                _versionMigrationAlreadyRun = true;
+            }
+
+            if (!AlreadyMadeVersionUnique && !_versionUniqueMigrationAlreadyRun)
+            {
                 Runner.Up(VersionUniqueMigration);
-            
+                _versionUniqueMigrationAlreadyRun = true;
+            }
+
             _versionInfo = new VersionInfo();
 
-            if (tableCreated) return;
+            if (!AlreadyCreatedVersionTable) return;
 
             var dataSet = Processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
-
+            
             foreach (DataRow row in dataSet.Tables[0].Rows)
             {
                 _versionInfo.AddAppliedMigration(long.Parse(row[0].ToString()));

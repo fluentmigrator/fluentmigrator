@@ -2,7 +2,7 @@
 {
     public interface ICreateConstraintColumnsSyntax
     {
-        void Column(string columnName);
-        void Columns(string[] columnNames);
+        ICreateConstraintOptionsSyntax Column(string columnName);
+        ICreateConstraintOptionsSyntax Columns(string[] columnNames);
     }
 }
