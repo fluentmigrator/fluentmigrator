@@ -51,6 +51,7 @@ namespace FluentMigrator.T4
             var guid = Guid.Empty;
             switch (col.PropertyType)
             {
+                case System.Data.DbType.Byte:
                 case System.Data.DbType.Currency:
                 case System.Data.DbType.Decimal:
                 case System.Data.DbType.Double:
