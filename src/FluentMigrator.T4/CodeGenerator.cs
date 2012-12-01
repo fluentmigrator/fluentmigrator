@@ -48,6 +48,7 @@ namespace FluentMigrator.T4
         public string GetColumnDefaultValue(Column col)
         {
             string sysType = string.Format("\"{0}\"", col.DefaultValue);
+            var guid = Guid.Empty;
             switch (col.PropertyType)
             {
                 case System.Data.DbType.Currency:
@@ -64,7 +65,13 @@ namespace FluentMigrator.T4
                     sysType = col.DefaultValue.Replace("'", "").Replace("\"", "");
                     break;
                 case System.Data.DbType.Guid:
-                    sysType = string.Format("\"{0}\"", col.DefaultValue);
+                    if (col.DefaultValue.IsGuid(out guid))
+                    {
+                        if (guid == Guid.Empty)
+                            sysType = "Guid.Empty";
+                        else
+                            sysType = string.Format("new System.Guid(\"{0}\")", guid);                        
+                    }
                     break;
                 case System.Data.DbType.DateTime:
                 case System.Data.DbType.DateTime2:
@@ -293,7 +300,7 @@ namespace FluentMigrator.T4
                     sysType = "AsInt64()";
                     break;
                 case System.Data.DbType.Single:
-                    sysType ="AsFloat()";
+                    sysType = "AsFloat()";
                     break;
                 case System.Data.DbType.String:
                     sysType = string.Format("AsString({0})", sizeStr);

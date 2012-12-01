@@ -46,6 +46,7 @@
     </Compile>
     <Compile Include="DelegateTextWriter.cs" />
     <Compile Include="Extensions\DataReaderExtension.cs" />
+    <Compile Include="Extensions\StringExtension.cs" />
     <Compile Include="Models\Column.cs" />
     <Compile Include="Models\ForeignKey.cs" />
     <Compile Include="Models\IndexColumn.cs" />
