@@ -318,5 +318,15 @@ namespace FluentMigrator.T4
 
             return sysType;
         }
+
+        public string GetUpdateDeleteRule(ForeignKey fk)
+        {
+            var sb = new System.Text.StringBuilder();
+            if (fk.UpdateRule!=System.Data.Rule.None)
+                sb.AppendFormat(".OnUpdate(System.Data.Rule.{0})", fk.UpdateRule);
+            if (fk.DeleteRule != System.Data.Rule.None)
+                sb.AppendFormat(".OnDelete(System.Data.Rule.{0})", fk.DeleteRule);            
+            return sb.ToString();
+        }
     }
 }
