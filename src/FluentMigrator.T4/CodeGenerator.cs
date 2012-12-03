@@ -262,7 +262,7 @@ namespace FluentMigrator.T4
                     sysType = string.Format("AsFixedLengthAnsiString({0})", sizeStr);
                     break;
                 case System.Data.DbType.Binary:
-                    sysType = string.Format("AsBinary({0})", sizeStr);
+                    sysType = string.Format("AsBinary({0})", size == -1 ? "Int32.MaxValue" : sizeStr);
                     break;
                 case System.Data.DbType.Boolean:
                     sysType = "AsBoolean()";
