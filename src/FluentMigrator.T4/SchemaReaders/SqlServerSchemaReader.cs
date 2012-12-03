@@ -193,8 +193,8 @@ namespace FluentMigrator.T4
                     PrimaryTableSchema = reader["PrimaryTableSchema"].ToString(),
                     PrimaryTable = reader["PrimaryTable"].ToString(),
                     PrimaryColumn = reader["PrimaryColumn"].ToString(),
-                    UpdateRule = reader["UpdateRule"].ToString(),
-                    DeleteRule = reader["DeleteRule"].ToString(),
+                    UpdateRule = DecodeRule(reader.Get<string>("UpdateRule")),
+                    DeleteRule = DecodeRule(reader.Get<string>("DeleteRule")),
                 });
 
                 return keys.GroupBy(key => new
@@ -215,7 +215,9 @@ namespace FluentMigrator.T4
                     PrimaryTable = foreignKeyGrouping.Key.PrimaryTable,
                     PrimaryTableSchema = foreignKeyGrouping.Key.PrimaryTableSchema,
                     PrimaryColumns = foreignKeyGrouping.Select(f => f.PrimaryColumn).ToList(),
-                    PrimaryClass = Inflector.MakeSingular(CleanUp(foreignKeyGrouping.Key.PrimaryTable))
+                    PrimaryClass = Inflector.MakeSingular(CleanUp(foreignKeyGrouping.Key.PrimaryTable)),
+                    UpdateRule = foreignKeyGrouping.Key.UpdateRule,
+                    DeleteRule = foreignKeyGrouping.Key.DeleteRule
                 }).ToList();
             }
         }
@@ -273,6 +275,15 @@ namespace FluentMigrator.T4
             var sysType = default(DbType?);
             _typeMap.TryGetValue(sqlType, out sysType);
             return sysType;
+        }
+
+        private static System.Data.Rule DecodeRule(string rule)
+        {
+            return new Switch<string, System.Data.Rule>(rule)
+                .Case("CASCADE", System.Data.Rule.Cascade)
+                .Case("SET NULL",System.Data.Rule.SetDefault)
+                .Case("SET DEFAULT", System.Data.Rule.SetNull)
+                .Default(System.Data.Rule.None);
         }
 
         const string PrimaryKeySql = @"SELECT c.name AS ColumnName
