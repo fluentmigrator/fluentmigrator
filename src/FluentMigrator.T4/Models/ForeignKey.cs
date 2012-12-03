@@ -23,5 +23,8 @@ namespace FluentMigrator.T4
         public ICollection<string> ForeignColumns { get; set; }
 
         public string PrimaryClass { get; set; }
+
+        public System.Data.Rule UpdateRule { get; set; }
+        public System.Data.Rule DeleteRule { get; set; }
     }
 }

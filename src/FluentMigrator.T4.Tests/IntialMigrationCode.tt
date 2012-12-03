@@ -120,7 +120,7 @@ foreach(ForeignKey fkey in FKeyList)
     if(!string.IsNullOrEmpty(fkey.Name)) 
     { 
         #>ForeignKey("<#=fkey.Name#>")<# 
-    } #>.FromTable("<#=tbl.Name#>").InSchema("<#=fkey.ForeignTableSchema#>").ForeignColumns(<#=Join(fkey.ForeignColumns)#>).ToTable("<#=fkey.PrimaryTable#>").InSchema("<#=fkey.PrimaryTableSchema#>").PrimaryColumns(<#=Join(fkey.PrimaryColumns)#>);
+    } #>.FromTable("<#=tbl.Name#>").InSchema("<#=fkey.ForeignTableSchema#>").ForeignColumns(<#=Join(fkey.ForeignColumns)#>).ToTable("<#=fkey.PrimaryTable#>").InSchema("<#=fkey.PrimaryTableSchema#>").PrimaryColumns(<#=Join(fkey.PrimaryColumns)#>)<#=generator.GetUpdateDeleteRule(fkey)#>;
         <#
 }
 }
