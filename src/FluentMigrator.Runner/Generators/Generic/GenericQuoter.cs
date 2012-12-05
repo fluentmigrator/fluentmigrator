@@ -21,8 +21,17 @@ namespace FluentMigrator.Runner.Generators.Generic
             if (value is double) {return FormatDouble((double)value);}
             if (value is float) {return FormatFloat((float)value);}
             if (value is decimal) { return FormatDecimal((decimal)value); }
-            
+            if (value is byte[]) { return FormatByteArray((byte[])value); }
             return value.ToString();
+        }
+
+        protected virtual string FormatByteArray(byte[] value)
+        {
+            var hex = new System.Text.StringBuilder((value.Length * 2)+2);
+            hex.Append("0x");
+            foreach (byte b in value)
+                hex.AppendFormat("{0:x2}", b);
+            return hex.ToString();
         }
 
         private string FormatDecimal(decimal value)
