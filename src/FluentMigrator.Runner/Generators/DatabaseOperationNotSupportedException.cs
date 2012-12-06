@@ -3,6 +3,7 @@ using System.Runtime.Serialization;
 
 namespace FluentMigrator.Runner.Generators
 {
+    [Serializable]
     public class DatabaseOperationNotSupportedException : Exception
     {
         /// <summary>
@@ -14,6 +15,6 @@ namespace FluentMigrator.Runner.Generators
 
         public DatabaseOperationNotSupportedException() : base() { }
 
-        public DatabaseOperationNotSupportedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
+        protected DatabaseOperationNotSupportedException(SerializationInfo info, StreamingContext context) : base(info, context) { }
     }
 }

@@ -31,13 +31,24 @@ namespace FluentMigrator.Runner
         public string Namespace { get; private set; }
         public bool LoadNestedNamespaces { get; set; }
         public SortedList<long, IMigration> Migrations { get; private set; }
-        public IEnumerable<string> TagsToMatch { get; set; }
+        public IEnumerable<string> TagsToMatch { get; private set; }
 
         public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, IEnumerable<string> tagsToMatch)
         {
             Conventions = conventions;
             Assembly = assembly;
             Namespace = @namespace;
+            TagsToMatch = tagsToMatch ?? new string[] { };
+
+            Initialize();
+        }
+
+        public MigrationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace, bool loadNestedNamespaces, IEnumerable<string> tagsToMatch)
+        {
+            Conventions = conventions;
+            Assembly = assembly;
+            Namespace = @namespace;
+            LoadNestedNamespaces = loadNestedNamespaces;
             TagsToMatch = tagsToMatch ?? new string[] { };
 
             Initialize();

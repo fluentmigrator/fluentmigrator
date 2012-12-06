@@ -34,6 +34,7 @@ namespace FluentMigrator.Console
         public string Connection;
         public string ConnectionStringConfigPath;
         public string Namespace;
+        public bool NestedNamespaces;
         public bool Output;
         public string OutputFilename;
         public bool PreviewOnly;
@@ -90,6 +91,12 @@ namespace FluentMigrator.Console
                                             v => { Namespace = v; }
                                             },
                                         {
+                                            "nested",
+                                            "Whether migrations in nested namespaces should be included. Used in conjunction with the namespace option."
+                                            ,
+                                            v => { NestedNamespaces = true; }
+                                            },
+                                        {
                                             "output|out|o",
                                             "Output generated SQL to a file. Default is no output. Use outputFilename to control the filename, otherwise [assemblyname].sql is the default."
                                             ,
@@ -113,7 +120,7 @@ namespace FluentMigrator.Console
                                             },
                                         {
                                             "task=|t=",
-                                            "The task you want FluentMigrator to perform. Available choices are: migrate:up, migrate (same as migrate:up), migrate:down, rollback, rollback:toversion, rollback:all. Default is 'migrate'."
+                                            "The task you want FluentMigrator to perform. Available choices are: migrate:up, migrate (same as migrate:up), migrate:down, rollback, rollback:toversion, rollback:all, validateversionorder, listmigrations. Default is 'migrate'."
                                             ,
                                             v => { Task = v; }
                                             },
@@ -262,6 +269,7 @@ namespace FluentMigrator.Console
                 Target = TargetAssembly,
                 PreviewOnly = PreviewOnly,
                 Namespace = Namespace,
+                NestedNamespaces = NestedNamespaces,
                 Task = Task,
                 Version = Version,
                 Steps = Steps,

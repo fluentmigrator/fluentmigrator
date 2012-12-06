@@ -67,6 +67,7 @@ namespace FluentMigrator.Tests.Unit
                             };
 
             _processorMock.SetupGet(x => x.Options).Returns(options);
+
             _runnerContextMock.SetupGet(x => x.Namespace).Returns("FluentMigrator.Tests.Integration.Migrations");
             _runnerContextMock.SetupGet(x => x.Announcer).Returns(_announcer.Object);
             _runnerContextMock.SetupGet(x => x.StopWatch).Returns(_stopWatch.Object);
@@ -374,45 +375,148 @@ namespace FluentMigrator.Tests.Unit
             _fakeVersionLoader.DidLoadVersionInfoGetCalled.ShouldBe(true);
         }
 
+        [Test]
+        public void ValidateVersionOrderingShouldReturnNothingIfNoUnappliedMigrations()
+        {
+            const long version1 = 2011010101;
+            const long version2 = 2011010102;
+
+            var mockMigration1 = new Mock<IMigration>();
+            var mockMigration2 = new Mock<IMigration>();
+
+            LoadVersionData(version1, version2);
+
+            _runner.MigrationLoader.Migrations.Clear();
+            _runner.MigrationLoader.Migrations.Add(version1, mockMigration1.Object);
+            _runner.MigrationLoader.Migrations.Add(version2, mockMigration2.Object);
+
+            Assert.DoesNotThrow(() => _runner.ValidateVersionOrder());
+
+            _announcer.Verify(a => a.Say("Version ordering valid."));
+
+            _processorMock.Verify(m => m.CommitTransaction(), Times.Never());
+            _processorMock.Verify(m => m.RollbackTransaction(), Times.Never());
+            _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();		
+        }
+
+        [Test]
+        public void ValidateVersionOrderingShouldReturnNothingIfUnappliedMigrationVersionIsGreaterThanLatestAppliedMigration()
+        {
+            const long version1 = 2011010101;
+            const long version2 = 2011010102;
+
+            var mockMigration1 = new Mock<IMigration>();
+            var mockMigration2 = new Mock<IMigration>();
+
+            LoadVersionData(version1);
+
+            _runner.MigrationLoader.Migrations.Clear();
+            _runner.MigrationLoader.Migrations.Add(version1, mockMigration1.Object);
+            _runner.MigrationLoader.Migrations.Add(version2, mockMigration2.Object);
+
+            Assert.DoesNotThrow(() => _runner.ValidateVersionOrder());
+
+            _announcer.Verify(a => a.Say("Version ordering valid."));
+
+            _processorMock.Verify(m => m.CommitTransaction(), Times.Never());
+            _processorMock.Verify(m => m.RollbackTransaction(), Times.Never());
+            _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();		
+        }
+
+        [Test]
+        public void ValidateVersionOrderingShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanGreatestAppliedMigrationVersion()
+        {
+            const long version1 = 2011010101;
+            const long version2 = 2011010102;
+            const long version3 = 2011010103;
+            const long version4 = 2011010104;
+
+            var mockMigration1 = new Mock<IMigration>();
+            var mockMigration2 = new Mock<IMigration>();
+            var mockMigration3 = new Mock<IMigration>();
+            var mockMigration4 = new Mock<IMigration>();
+            
+            LoadVersionData(version1, version4);
+
+            _runner.MigrationLoader.Migrations.Clear();
+            _runner.MigrationLoader.Migrations.Add(version1, mockMigration1.Object);
+            _runner.MigrationLoader.Migrations.Add(version2, mockMigration2.Object);
+            _runner.MigrationLoader.Migrations.Add(version3, mockMigration3.Object);
+            _runner.MigrationLoader.Migrations.Add(version4, mockMigration4.Object);
+
+            var exception = Assert.Throws<VersionOrderInvalidException>(() => _runner.ValidateVersionOrder());
+
+            exception.InvalidMigrations.ShouldBe(new[]
+                                                     {
+                                                         new KeyValuePair<long, IMigration>(version2, mockMigration2.Object), 
+                                                         new KeyValuePair<long, IMigration>(version3, mockMigration3.Object)
+                                                     });
+
+            _processorMock.Verify(m => m.CommitTransaction(), Times.Never());
+            _processorMock.Verify(m => m.RollbackTransaction(), Times.Never());
+            _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();
+        }
+
+        [Test]
+        public void CanListVersions()
+        {
+            const long version1 = 2011010101;
+            const long version2 = 2011010102;
+
+            var mockMigration1 = new Mock<IMigration>();
+            var mockMigration2 = new Mock<IMigration>();
+            
+            LoadVersionData(version1, version2);
+
+            _runner.MigrationLoader.Migrations.Clear();
+            _runner.MigrationLoader.Migrations.Add(version1, mockMigration1.Object);
+            _runner.MigrationLoader.Migrations.Add(version2, mockMigration2.Object);
+
+            _runner.ListMigrations();
+
+            _announcer.Verify(a => a.Say("2011010101: IMigrationProxy"));
+            _announcer.Verify(a => a.Emphasize("2011010102: IMigrationProxy (current)"));
+        }
+
         [Test, Ignore("Move to MigrationLoader tests")]
         public void HandlesNullMigrationList()
         {
             //set migrations to return empty list
-            //			var asm = Assembly.GetAssembly(typeof(MigrationVersionRunnerUnitTests));
-            //			_migrationLoaderMock.Setup(x => x.FindMigrations(asm, null)).Returns<IEnumerable<Migration>>(null);
-            //
-            //			_runner.Migrations.Count.ShouldBe(0);
-            //
-            //			_vrunner.MigrateUp();
-            //
-            //			_migrationLoaderMock.VerifyAll();
+            //var asm = Assembly.GetAssembly(typeof(MigrationVersionRunnerUnitTests));
+            //_migrationLoaderMock.Setup(x => x.FindMigrations(asm, null)).Returns<IEnumerable<Migration>>(null);
+
+            //_runner.Migrations.Count.ShouldBe(0);
+
+            //_vrunner.MigrateUp();
+
+            //_migrationLoaderMock.VerifyAll();
         }
 
         [Test, ExpectedException(typeof(Exception))]
         [Ignore("Move to migrationloader tests")]
         public void ShouldThrowExceptionIfDuplicateVersionNumbersAreLoaded()
         {
-            //			_migrationLoaderMock.Setup(x => x.FindMigrationsIn(It.IsAny<Assembly>(), null)).Returns(new List<MigrationMetadata>
-            //			                                                                         	{
-            //			                                                                         		new MigrationMetadata {Version = 1, Type = typeof(UserToRole)},
-            //			                                                                         		new MigrationMetadata {Version = 2, Type = typeof(FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass2.UserToRole)},
-            //			                                                                         		new MigrationMetadata {Version = 2, Type = typeof(FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass2.UserToRole)}
-            //			                                                                         	});
-            //
-            //			_vrunner.MigrateUp();
+            //_migrationLoaderMock.Setup(x => x.FindMigrationsIn(It.IsAny<Assembly>(), null)).Returns(new List<MigrationMetadata>
+            //                                                                                        {
+            //                                                                                            new MigrationMetadata {Version = 1, Type = typeof(UserToRole)},
+            //                                                                                            new MigrationMetadata {Version = 2, Type = typeof(FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass2.UserToRole)},
+            //                                                                                            new MigrationMetadata {Version = 2, Type = typeof(FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass2.UserToRole)}
+            //                                                                                        });
+
+            //_vrunner.MigrateUp();
         }
 
         [Test]
         [Ignore("Move to migrationloader tests")]
         public void HandlesMigrationThatDoesNotInheritFromMigrationBaseClass()
         {
-            //			_migrationLoaderMock.Setup(x => x.FindMigrationsIn(It.IsAny<Assembly>(), null)).Returns(new List<MigrationMetadata>
-            //			                                                                         	{
-            //			                                                                         		new MigrationMetadata {Version = 1, Type = typeof(MigrationThatDoesNotInheritFromMigrationBaseClass)},
-            //			                                                                         	});
-            //
-            //			_vrunner.Migrations[1].ShouldNotBeNull();
-            //			_vrunner.Migrations[1].ShouldBeOfType<MigrationThatDoesNotInheritFromMigrationBaseClass>();
+            //_migrationLoaderMock.Setup(x => x.FindMigrationsIn(It.IsAny<Assembly>(), null)).Returns(new List<MigrationMetadata>
+            //                                                                                        {
+            //                                                                                            new MigrationMetadata {Version = 1, Type = typeof(MigrationThatDoesNotInheritFromMigrationBaseClass)},
+            //                                                                                        });
+
+            //_vrunner.Migrations[1].ShouldNotBeNull();
+            //_vrunner.Migrations[1].ShouldBeOfType<MigrationThatDoesNotInheritFromMigrationBaseClass>();
         }
 
         private class MigrationThatDoesNotInheritFromMigrationBaseClass : IMigration

@@ -79,7 +79,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
-            return Exists("SELECT NULL FROM sysindexes WHERE name = '{0}'", FormatSqlEscape(indexName));
+            return Exists("SELECT * FROM sys.indexes WHERE name = '{0}' and object_id=OBJECT_ID('{1}.{2}')", FormatSqlEscape(indexName), SafeSchemaName(schemaName), FormatSqlEscape(tableName));
         }
 
         public override void Execute(string template, params object[] args)
@@ -155,7 +155,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
 
-            if (sql.Contains("GO"))
+            if (sql.IndexOf("GO", StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 ExecuteBatchNonQuery(sql);
 
@@ -205,6 +205,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                             if (!string.IsNullOrEmpty(sqlBatch))
                             {
                                 command.CommandText = sqlBatch;
+                                command.CommandTimeout = Options.Timeout;
                                 command.ExecuteNonQuery();
                                 sqlBatch = string.Empty;
                             }
@@ -219,7 +220,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 {
                     using (var message = new StringWriter())
                     {
-                        message.WriteLine("An error occured executing the following sql:");
+                        message.WriteLine("An error occurred executing the following sql:");
                         message.WriteLine(sql);
                         message.WriteLine("The error was {0}", ex.Message);
 

@@ -141,6 +141,7 @@
     <Compile Include="Builders\Create\Constraint\CreateConstraintExpressionBuilder.cs" />
     <Compile Include="Builders\Create\Constraint\ICreateConstraintColumnsSyntax.cs" />
     <Compile Include="Builders\Create\Constraint\ICreateConstraintOnTableSyntax.cs" />
+    <Compile Include="Builders\Create\Constraint\ICreateConstraintOptionsSyntax.cs" />
     <Compile Include="Builders\Create\Constraint\ICreateConstraintWithSchemaOrColumnSyntax.cs" />
     <Compile Include="Builders\Create\Constraint\ICreateConstraintWithSchemaSyntax.cs" />
     <Compile Include="Builders\Create\ForeignKey\ICreateForeignKeyPrimaryColumnOrInSchemaSyntax.cs" />

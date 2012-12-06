@@ -27,7 +27,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
     public sealed class SqlServerCeProcessor : ProcessorBase
     {
         private readonly IDbFactory factory;
-        private readonly IDbConnection connection;
+        public IDbConnection Connection { get; private set; }
         private IDbTransaction transaction;
 
         public override string DatabaseType
@@ -39,14 +39,14 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             : base(generator, announcer, options)
         {
             this.factory = factory;
-            this.connection = connection;
+            Connection = connection;
             connection.Open();
             BeginTransaction();
         }
 
         public override bool SchemaExists(string schemaName)
         {
-            return Exists("SELECT * FROM SYS.SCHEMAS WHERE NAME = '{0}'", FormatSqlEscape(schemaName));
+            return true; // SqlServerCe has no schemas
         }
 
         public override bool TableExists(string schemaName, string tableName)
@@ -61,12 +61,12 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
-            return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_CATALOG = DB_NAME() AND TABLE_NAME = '{0}' AND CONSTRAINT_NAME = '{1}'", FormatSqlEscape(tableName), FormatSqlEscape(constraintName));
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = '{0}' AND CONSTRAINT_NAME = '{1}'", FormatSqlEscape(tableName), FormatSqlEscape(constraintName));
         }
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
-            return Exists("SELECT NULL FROM sysindexes WHERE name = '{0}'", FormatSqlEscape(indexName));
+            return Exists("SELECT NULL FROM INFORMATION_SCHEMA.INDEXES WHERE INDEX_NAME = '{0}'", FormatSqlEscape(indexName));
         }
 
         public override void Execute(string template, params object[] args)
@@ -76,10 +76,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool Exists(string template, params object[] args)
         {
-            if (connection.State != ConnectionState.Open)
-                connection.Open();
+            if (Connection.State != ConnectionState.Open)
+                Connection.Open();
 
-            using (var command = factory.CreateCommand(String.Format(template, args), connection, transaction))
+            using (var command = factory.CreateCommand(String.Format(template, args), Connection, transaction))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -93,10 +93,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override DataSet Read(string template, params object[] args)
         {
-            if (connection.State != ConnectionState.Open) connection.Open();
+            if (Connection.State != ConnectionState.Open) Connection.Open();
 
             var ds = new DataSet();
-            using (var command = factory.CreateCommand(String.Format(template, args), connection, transaction))
+            using (var command = factory.CreateCommand(String.Format(template, args), Connection, transaction))
             {
                 var adapter = factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
@@ -107,7 +107,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         public override void BeginTransaction()
         {
             Announcer.Say("Beginning Transaction");
-            transaction = connection.BeginTransaction();
+            transaction = Connection.BeginTransaction();
         }
 
         public override void CommitTransaction()
@@ -120,9 +120,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 transaction = null;
             }
 
-            if (connection.State != ConnectionState.Closed)
+            if (Connection.State != ConnectionState.Closed)
             {
-                connection.Close();
+                Connection.Close();
             }
         }
 
@@ -138,9 +138,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             transaction.Rollback();
 
-            if (connection.State != ConnectionState.Closed)
+            if (Connection.State != ConnectionState.Closed)
             {
-                connection.Close();
+                Connection.Close();
             }
         }
 
@@ -151,13 +151,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
 
-            if (connection.State != ConnectionState.Open)
-                connection.Open();
+            if (Connection.State != ConnectionState.Open)
+                Connection.Open();
 
             if (transaction == null)
                 BeginTransaction();
 
-            using (var command = factory.CreateCommand(sql, connection, transaction))
+            using (var command = factory.CreateCommand(sql, Connection, transaction))
             {
                 try
                 {
@@ -180,10 +180,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            if (connection.State != ConnectionState.Open) connection.Open();
+            if (Connection.State != ConnectionState.Open) Connection.Open();
 
             if (expression.Operation != null)
-                expression.Operation(connection, transaction);
+                expression.Operation(Connection, transaction);
         }
 
         private static string FormatSqlEscape(string sql)

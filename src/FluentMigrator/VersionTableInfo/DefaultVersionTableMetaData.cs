@@ -22,25 +22,25 @@ namespace FluentMigrator.VersionTableInfo
     public class DefaultVersionTableMetaData : IVersionTableMetaData
     {
         /// <summary>The schema containing the table (<see cref="string.Empty"/> for the default root schema).</summary>
-        public string SchemaName
+        public virtual string SchemaName
         {
             get { return string.Empty; }
         }
 
         /// <summary>The name of the table.</summary>
-        public string TableName
+        public virtual string TableName
         {
             get { return "VersionInfo"; }
         }
 
         /// <summary>The name of the column containing the version number.</summary>
-        public string ColumnName
+        public virtual string ColumnName
         {
             get { return "Version"; }
         }
 
         /// <summary>The name of the unique index on the <see cref="IVersionTableMetaData.ColumnName"/>.</summary>
-        public string UniqueIndexName
+        public virtual string UniqueIndexName
         {
             get { return "UC_Version"; }
         }

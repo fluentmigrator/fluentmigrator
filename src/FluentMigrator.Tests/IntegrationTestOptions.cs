@@ -16,6 +16,18 @@ namespace FluentMigrator.Tests
                 IsEnabled = false
             };
 
+        public static DatabaseServerOptions SqlServer2012 = new DatabaseServerOptions
+        {
+            ConnectionString = @"server=.\SQLEXPRESS;uid=test;pwd=test;Trusted_Connection=yes;database=FluentMigrator",
+            IsEnabled = false
+        };
+
+        public static DatabaseServerOptions SqlServerCe = new DatabaseServerOptions
+            {
+                ConnectionString = @"Data Source=TestDatabase.sdf",
+                IsEnabled = false
+            };
+
         public static DatabaseServerOptions SqlLite = new DatabaseServerOptions
             {
                 ConnectionString = @"Data Source=:memory:;Version=3;New=True;",
@@ -41,6 +53,13 @@ namespace FluentMigrator.Tests
                     ),
                 IsEnabled = false
             };
+
+        public static DatabaseServerOptions Oracle = new DatabaseServerOptions
+        {
+            // was not able to get TNS to work
+            ConnectionString = "Data Source=XE;User Id=test;Password=test",
+            IsEnabled = false
+        };
 
         public class DatabaseServerOptions
         {
