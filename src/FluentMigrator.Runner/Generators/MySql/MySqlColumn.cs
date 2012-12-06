@@ -18,6 +18,12 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         protected override string FormatSystemMethods(SystemMethods systemMethod)
         {
+            switch (systemMethod)
+            {
+                case SystemMethods.CurrentDateTime:
+                    return "CURRENT_TIMESTAMP";
+            }
+
             throw new NotImplementedException();
         }
     }
