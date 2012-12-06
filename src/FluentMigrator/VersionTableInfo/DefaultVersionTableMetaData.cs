@@ -18,23 +18,28 @@
 
 namespace FluentMigrator.VersionTableInfo
 {
+    /// <summary>The default database conventions for the table used to store the database version, which identify a `VersionInfo` table in the default root schema.</summary>
     public class DefaultVersionTableMetaData : IVersionTableMetaData
     {
+        /// <summary>The schema containing the table (<see cref="string.Empty"/> for the default root schema).</summary>
         public virtual string SchemaName
         {
             get { return string.Empty; }
         }
 
+        /// <summary>The name of the table.</summary>
         public virtual string TableName
         {
             get { return "VersionInfo"; }
         }
 
+        /// <summary>The name of the column containing the version number.</summary>
         public virtual string ColumnName
         {
             get { return "Version"; }
         }
 
+        /// <summary>The name of the unique index on the <see cref="IVersionTableMetaData.ColumnName"/>.</summary>
         public virtual string UniqueIndexName
         {
             get { return "UC_Version"; }

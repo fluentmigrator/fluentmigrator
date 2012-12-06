@@ -18,11 +18,19 @@
 
 namespace FluentMigrator.VersionTableInfo
 {
+    /// <summary>The database conventions for the table used to store the database version.</summary>
     public interface IVersionTableMetaData
     {
+        /// <summary>The schema containing the table, or <see cref="string.Empty"/> for the default root schema.</summary>
         string SchemaName { get; }
+
+        /// <summary>The name of the table.</summary>
         string TableName { get; }
+
+        /// <summary>The name of the column containing the version number.</summary>
         string ColumnName { get; }
+
+        /// <summary>The name of the unique index on the <see cref="ColumnName"/>.</summary>
         string UniqueIndexName { get; }
     }
 }
