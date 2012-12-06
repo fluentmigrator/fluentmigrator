@@ -48,6 +48,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                     return "GETDATE()";
                 case SystemMethods.CurrentUTCDateTime:
                     return "GETUTCDATE()";
+                case SystemMethods.CurrentUser:
+                    return "CURRENT_USER";
             }
 
             return null;
