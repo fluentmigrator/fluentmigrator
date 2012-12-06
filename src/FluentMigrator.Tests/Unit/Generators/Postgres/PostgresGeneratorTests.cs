@@ -609,16 +609,27 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         [Test]
         public void CanUseSystemMethodCurrentUTCDateTimeAsADefaultValueForAColumn()
         {
-            string tableName = "NewTable";
+            const string tableName = "NewTable";
 
             var columnDefinition = new ColumnDefinition {Name = "NewColumn", Size = 5, Type = DbType.String, DefaultValue = SystemMethods.CurrentUTCDateTime};
 
-            var expression = new CreateColumnExpression();
-            expression.Column = columnDefinition;
-            expression.TableName = tableName;
+            var expression = new CreateColumnExpression {Column = columnDefinition, TableName = tableName};
 
             string sql = generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE \"public\".\"NewTable\" ADD \"NewColumn\" varchar(5) NOT NULL DEFAULT (now() at time zone 'UTC')");
+        }
+
+        [Test]
+        public void CanUseSystemMethodCurrentUserAsADefaultValueForAColumn()
+        {
+            const string tableName = "NewTable";
+
+            var columnDefinition = new ColumnDefinition { Name = "NewColumn", Size = 15, Type = DbType.String, DefaultValue = SystemMethods.CurrentUser };
+
+            var expression = new CreateColumnExpression {Column = columnDefinition, TableName = tableName};
+
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("ALTER TABLE \"public\".\"NewTable\" ADD \"NewColumn\" varchar(15) NOT NULL DEFAULT current_user");
         }
 
         private CreateTableExpression GetCreateTableExpression(string tableName)
