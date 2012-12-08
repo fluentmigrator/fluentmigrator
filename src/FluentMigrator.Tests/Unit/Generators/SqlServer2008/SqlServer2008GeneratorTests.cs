@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
@@ -31,5 +32,44 @@ namespace FluentMigrator.Tests.Unit.Generators
             sql.ShouldBe(
                 "CREATE TABLE [dbo].[TestTable1] ([TestColumn1] DATETIMEOFFSET NOT NULL, [TestColumn2] DATETIME2 NOT NULL, [TestColumn3] DATE NOT NULL, [TestColumn4] TIME NOT NULL)");
         }
+
+        [Test]
+        public void CanInsertScopeIdentity()
+        {
+            var expression = new InsertDataExpression();
+            expression.TableName = "TestTable";
+            expression.Rows.Add(new InsertionDataDefinition
+                                    {
+                                        new KeyValuePair<string, object>("Id", 1),
+                                        new KeyValuePair<string, object>("Name", RawSql.Insert("SCOPE_IDENTITY()")),
+                                        new KeyValuePair<string, object>("Website", "codethinked.com")
+                                    });
+
+            var sql = generator.Generate(expression);
+
+            var expected = "INSERT INTO [dbo].[TestTable] ([Id], [Name], [Website]) VALUES (1, SCOPE_IDENTITY(), 'codethinked.com')";
+
+            sql.ShouldBe(expected);
+        }
+
+        [Test]
+        public void CanInsertAtAtIdentity()
+        {
+            var expression = new InsertDataExpression();
+            expression.TableName = "TestTable";
+            expression.Rows.Add(new InsertionDataDefinition
+                                    {
+                                        new KeyValuePair<string, object>("Id", 1),
+                                        new KeyValuePair<string, object>("Name", RawSql.Insert("@@IDENTITY")),
+                                        new KeyValuePair<string, object>("Website", "codethinked.com")
+                                    });
+
+            var sql = generator.Generate(expression);
+
+            var expected = "INSERT INTO [dbo].[TestTable] ([Id], [Name], [Website]) VALUES (1, @@IDENTITY, 'codethinked.com')";
+
+            sql.ShouldBe(expected);
+        }
+
     }
 }
