@@ -18,5 +18,5 @@
 
 using System.Reflection;
 
-[assembly: AssemblyTitle("FluentMigrator")]
-[assembly: AssemblyDescription("FluentMigrator")]
+[assembly: AssemblyTitle("FluentMigrator.Console")]
+[assembly: AssemblyDescription("FluentMigrator console application")]
