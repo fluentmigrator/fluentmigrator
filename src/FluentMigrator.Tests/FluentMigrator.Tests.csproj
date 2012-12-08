@@ -154,6 +154,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\SolutionInfo.cs">
+      <Link>Properties\SolutionInfo.cs</Link>
+    </Compile>
     <Compile Include="Helpers\FirebirdTestTable.cs" />
     <Compile Include="Helpers\OracleTestTable.cs" />
     <Compile Include="Helpers\PostgresTestTable.cs" />
