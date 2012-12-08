@@ -148,7 +148,7 @@
       <Link>FluentMigrator.snk</Link>
     </None>
     <None Include="app.config" />
-    <Content Include="app.40.config">
+    <Content Include="app.35.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

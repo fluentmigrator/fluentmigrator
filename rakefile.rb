@@ -44,11 +44,11 @@ namespace :build do
         cp_r FileList['src/FluentMigrator.Nant/bin/Release/FluentMigrator.Nant.*'], "dist/console-#{v}-#{p}"
         cp_r FileList['src/FluentMigrator.MSBuild/bin/Release/FluentMigrator.MSBuild.*'], "dist/console-#{v}-#{p}"
 		
-        if to_nuget_version(v) == '40' then 
+        if to_nuget_version(v) == '35' then 
           File.delete("dist/console-#{v}-#{p}/Migrate.exe.config")
-          File.rename("dist/console-#{v}-#{p}/app.40.config", "dist/console-#{v}-#{p}/Migrate.exe.config")
+          File.rename("dist/console-#{v}-#{p}/app.35.config", "dist/console-#{v}-#{p}/Migrate.exe.config")
         else
-          File.delete("dist/console-#{v}-#{p}/app.40.config")
+          File.delete("dist/console-#{v}-#{p}/app.35.config")
         end
       end
       
