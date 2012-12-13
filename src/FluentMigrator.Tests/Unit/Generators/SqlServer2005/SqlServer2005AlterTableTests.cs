@@ -83,7 +83,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + @default;\r\n" +
             "EXEC sp_executesql @sql;\r\n\r\n" +
             "-- create alter table command to create new default constraint as string and run it\r\n" +
-            "ALTER TABLE [dbo].[TestTable1] WITH NOCHECK ADD CONSTRAINT DF_TestTable1_TestColumn1 DEFAULT(1) FOR [TestColumn1];";
+            "ALTER TABLE [dbo].[TestTable1] WITH NOCHECK ADD CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT(1) FOR [TestColumn1];";
 
             sql.ShouldBe(expected);
         }
@@ -111,7 +111,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
             "SET @sql = N'ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT ' + @default;\r\n" +
             "EXEC sp_executesql @sql;\r\n\r\n" +
             "-- create alter table command to create new default constraint as string and run it\r\n" +
-            "ALTER TABLE [TestSchema].[TestTable1] WITH NOCHECK ADD CONSTRAINT DF_TestTable1_TestColumn1 DEFAULT(1) FOR [TestColumn1];";
+            "ALTER TABLE [TestSchema].[TestTable1] WITH NOCHECK ADD CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT(1) FOR [TestColumn1];";
 
             sql.ShouldBe(expected);
         }
