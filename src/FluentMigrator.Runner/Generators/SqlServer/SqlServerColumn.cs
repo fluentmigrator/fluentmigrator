@@ -19,7 +19,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             var defaultValue = base.FormatDefaultValue(column);
 
             if (column.ModificationType == ColumnModificationType.Create && !string.IsNullOrEmpty(defaultValue))
-                return "CONSTRAINT " + GetDefaultConstraintName(column.TableName, column.Name) + " " + defaultValue;
+                return "CONSTRAINT " + Quoter.QuoteConstraintName(GetDefaultConstraintName(column.TableName, column.Name)) + " " + defaultValue;
 
             return string.Empty;
         }

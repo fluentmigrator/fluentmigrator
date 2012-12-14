@@ -273,7 +273,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 Quoter.QuoteColumnName(expression.ColumnName),
                 Quoter.QuoteValue(expression.DefaultValue),
                 Quoter.QuoteSchemaName(expression.SchemaName),
-                SqlServerColumn.GetDefaultConstraintName(expression.TableName, expression.ColumnName)));
+                Quoter.QuoteConstraintName(SqlServerColumn.GetDefaultConstraintName(expression.TableName, expression.ColumnName))));
 
             return builder.ToString();
         }
