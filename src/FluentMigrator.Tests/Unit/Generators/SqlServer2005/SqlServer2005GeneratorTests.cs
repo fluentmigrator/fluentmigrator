@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = new CreateColumnExpression { Column = columnDefinition, TableName = tableName };
 
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] NVARCHAR(15) NOT NULL CONSTRAINT DF__NewColumn DEFAULT CURRENT_USER");
+            sql.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] NVARCHAR(15) NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT CURRENT_USER");
         }
 
         [Test]
@@ -65,7 +65,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = new CreateColumnExpression { Column = columnDefinition, TableName = tableName };
 
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] UNIQUEIDENTIFIER NOT NULL CONSTRAINT DF__NewColumn DEFAULT NEWID()");
+            sql.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT NEWID()");
         }
 
         [Test]
@@ -78,7 +78,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = new CreateColumnExpression { Column = columnDefinition, TableName = tableName };
 
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] UNIQUEIDENTIFIER NOT NULL CONSTRAINT DF__NewColumn DEFAULT NEWSEQUENTIALID()");
+            sql.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT NEWSEQUENTIALID()");
         }
 
         [Test]
@@ -91,7 +91,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = new CreateColumnExpression { Column = columnDefinition, TableName = tableName };
 
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT DF__NewColumn DEFAULT GETDATE()");
+            sql.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT GETDATE()");
         }
 
         [Test]
@@ -104,7 +104,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = new CreateColumnExpression { Column = columnDefinition, TableName = tableName };
 
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT DF__NewColumn DEFAULT GETUTCDATE()");
+            sql.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT GETUTCDATE()");
         }
     }
 }
