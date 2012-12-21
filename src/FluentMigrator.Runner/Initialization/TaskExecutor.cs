@@ -27,12 +27,20 @@ namespace FluentMigrator.Runner.Initialization
         protected IMigrationRunner Runner { get; set; }
         private IRunnerContext RunnerContext { get; set; }
 
+        private AssemblyLoaderFactory AssemblyLoaderFactory { get; set; }
+
         public TaskExecutor(IRunnerContext runnerContext)
+            : this(runnerContext, new AssemblyLoaderFactory())
         {
-            if (runnerContext == null)
-                throw new ArgumentNullException("runnerContext", "RunnerContext cannot be null");
+        }
+
+        public TaskExecutor(IRunnerContext runnerContext, AssemblyLoaderFactory assemblyLoaderFactory)
+        {
+            if (runnerContext == null) throw new ArgumentNullException("runnerContext");
+            if (assemblyLoaderFactory == null) throw new ArgumentNullException("assemblyLoaderFactory");
 
             RunnerContext = runnerContext;
+            AssemblyLoaderFactory = assemblyLoaderFactory;
         }
 
         protected virtual void Initialize()

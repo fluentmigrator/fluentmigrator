@@ -1,4 +1,5 @@
 #region License
+
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -14,18 +15,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
 #endregion
 
 namespace FluentMigrator.Runner.Initialization.AssemblyLoader
 {
     public class AssemblyLoaderFactory
     {
-        public static IAssemblyLoader GetAssemblyLoader(string name)
+        public virtual IAssemblyLoader GetAssemblyLoader(string name)
         {
-            if (name.ToLower().Contains(".dll") || name.ToLower().Contains(".exe"))
-            {
+            var nameInLowerCase = name.ToLower();
+
+            if (nameInLowerCase.EndsWith(".dll") || nameInLowerCase.EndsWith(".exe"))
                 return new AssemblyLoaderFromFile(name);
-            }
 
             return new AssemblyLoaderFromName(name);
         }
