@@ -203,7 +203,6 @@
     <Compile Include="Integration\Migrations\Interleaved\Pass3\2_UserEmail.cs" />
     <Compile Include="Integration\Migrations\Invalid\InvalidMigration.cs" />
     <Compile Include="Integration\Migrations\Invalid\InvalidMigration2.cs" />
-    <Compile Include="Integration\Processors\FileProcessorTests.cs" />
     <Compile Include="Integration\Processors\OracleProcessorTests.cs" />
     <Compile Include="Integration\Processors\PostgresProcessorTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaDumpTests.cs" />
