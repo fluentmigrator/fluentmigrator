@@ -28,19 +28,21 @@ namespace FluentMigrator.Runner.Initialization
         private IRunnerContext RunnerContext { get; set; }
 
         private AssemblyLoaderFactory AssemblyLoaderFactory { get; set; }
+        private MigrationProcessorFactoryProvider ProcessorFactoryProvider { get; set; }
 
         public TaskExecutor(IRunnerContext runnerContext)
-            : this(runnerContext, new AssemblyLoaderFactory())
+            : this(runnerContext, new AssemblyLoaderFactory(), new MigrationProcessorFactoryProvider())
         {
         }
 
-        public TaskExecutor(IRunnerContext runnerContext, AssemblyLoaderFactory assemblyLoaderFactory)
+        public TaskExecutor(IRunnerContext runnerContext, AssemblyLoaderFactory assemblyLoaderFactory, MigrationProcessorFactoryProvider processorFactoryProvider)
         {
             if (runnerContext == null) throw new ArgumentNullException("runnerContext");
             if (assemblyLoaderFactory == null) throw new ArgumentNullException("assemblyLoaderFactory");
 
             RunnerContext = runnerContext;
             AssemblyLoaderFactory = assemblyLoaderFactory;
+            ProcessorFactoryProvider = processorFactoryProvider;
         }
 
         protected virtual void Initialize()
@@ -103,9 +105,9 @@ namespace FluentMigrator.Runner.Initialization
                 RunnerContext.Timeout = 30; // Set default timeout for command
             }
 
-            var processorFactory = ProcessorFactory.GetFactory(RunnerContext.Database);
+            var processorFactory = ProcessorFactoryProvider.GetFactory(RunnerContext.Database);
             if (processorFactory == null)
-                throw new ProcessorFactoryNotFoundException(string.Format("The provider or dbtype parameter is incorrect. Available choices are {0}: ", ProcessorFactory.ListAvailableProcessorTypes()));
+                throw new ProcessorFactoryNotFoundException(string.Format("The provider or dbtype parameter is incorrect. Available choices are {0}: ", ProcessorFactoryProvider.ListAvailableProcessorTypes()));
 
             var processor = processorFactory.Create(manager.ConnectionString, RunnerContext.Announcer, new ProcessorOptions
             {
