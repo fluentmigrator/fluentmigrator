@@ -259,5 +259,12 @@ namespace FluentMigrator.Tests.Unit.Generators
             quoter.QuoteValue(true)
                 .ShouldBe("1");
         }
+
+        [Test]
+        public void ByteArrayIsFormattedWithQuotes()
+        {
+            quoter.QuoteValue(new byte[] { 0, 254, 13, 18, 125, 17 })
+                .ShouldBe("0x00fe0d127d11");
+        }
     }
 }
