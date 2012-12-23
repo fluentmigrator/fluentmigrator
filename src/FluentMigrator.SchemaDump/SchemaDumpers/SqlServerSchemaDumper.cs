@@ -148,9 +148,9 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
                         CustomType = "", //TODO: set this property
                         DefaultValue = dr.IsNull("DefaultValue") ? "" : dr["DefaultValue"].ToString(),
                         IsForeignKey = dr["IsForeignKey"].ToString() == "1",
-                        IsIdentity = dr["IsIdentity"].ToString() == "1",
+                        IsIdentity = dr["IsIdentity"].ToString() == "True",
                         IsIndexed = dr["IsIndexed"].ToString() == "1",
-                        IsNullable = dr["IsNullable"].ToString() == "1",
+                        IsNullable = dr["IsNullable"].ToString() == "True",
                         IsPrimaryKey = dr["IsPrimaryKey"].ToString() == "1",
                         IsUnique = dr["IsUnique"].ToString() == "1",
                         Precision = int.Parse(dr["Precision"].ToString()),
