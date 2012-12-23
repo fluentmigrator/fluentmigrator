@@ -224,6 +224,11 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return compatabilityMode.HandleCompatabilty("Default constraints are not supported");
         }
 
+        public override string Generate(DeleteConstraintExpression expression)
+        {
+            return string.Format("ALTER TABLE {0}.{1} DROP CONSTRAINT {2}", Quoter.QuoteSchemaName(expression.Constraint.SchemaName), Quoter.QuoteTableName(expression.Constraint.TableName), Quoter.Quote(expression.Constraint.ConstraintName));
+        }
+
         protected string GetColumnList(IEnumerable<string> columns)
         {
             var result = "";
