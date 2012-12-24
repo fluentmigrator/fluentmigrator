@@ -162,6 +162,7 @@
     <Compile Include="Helpers\PostgresTestTable.cs" />
     <Compile Include="Helpers\SqlServerCeTestTable.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
+    <Compile Include="Integration\Migrations\MigrationWithDateStampVersioning.cs" />
     <Compile Include="Integration\Migrations\Tagged\1_TenantATable.cs">
       <SubType>Code</SubType>
     </Compile>

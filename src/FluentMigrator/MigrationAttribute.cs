@@ -29,5 +29,7 @@ namespace FluentMigrator
         {
             Version = version;
         }
+
+        public MigrationAttribute(string datetimeOfMigration) : this(Convert.ToDateTime(datetimeOfMigration).Ticks){}
     }
 }
