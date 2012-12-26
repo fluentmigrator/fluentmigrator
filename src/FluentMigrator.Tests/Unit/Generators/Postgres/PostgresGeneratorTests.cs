@@ -145,6 +145,29 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public void CanDeleteConstraint()
+        {
+            var expression = new DeleteConstraintExpression(ConstraintType.Unique);
+            expression.Constraint.TableName = "ConstraintTable";
+            expression.Constraint.ConstraintName = "Constraint";
+            
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("ALTER TABLE \"public\".\"ConstraintTable\" DROP CONSTRAINT \"Constraint\"");
+        }
+
+        [Test]
+        public void CanDeleteConstraintWithSchema()
+        {
+            var expression = new DeleteConstraintExpression(ConstraintType.Unique);
+            expression.Constraint.TableName = "ConstraintTable";
+            expression.Constraint.SchemaName = "Schema";
+            expression.Constraint.ConstraintName = "Constraint";
+
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("ALTER TABLE \"Schema\".\"ConstraintTable\" DROP CONSTRAINT \"Constraint\"");
+        }
+
+        [Test]
         public void CanDropTable()
         {
             string tableName = "NewTable";

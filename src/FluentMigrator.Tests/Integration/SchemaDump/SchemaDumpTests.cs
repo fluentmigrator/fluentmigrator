@@ -14,6 +14,7 @@ using FluentMigrator.Tests.Integration.Migrations;
 using NUnit.Framework;
 using NUnit.Should;
 using FluentMigrator.Runner.Generators.SqlServer;
+using System.Linq;
 
 namespace FluentMigrator.Tests.Integration.SchemaDump
 {
@@ -75,6 +76,33 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
                 string expectedMessage = testWriter.GetMessage(1, 1, 0, 0);
 
                 output.ShouldBe(expectedMessage);
+            }
+        }
+
+        [Test]
+        public void CanReadSchemaInfoWithIdentity()
+        {
+            using (var table = new SqlServerTestTable(Processor, null, "id int IDENTITY(1,1) NOT NULL"))
+            {
+                IList<TableDefinition> defs = SchemaDumper.ReadDbSchema();
+
+                var identityColumn = defs[0].Columns.First();
+                identityColumn.Name.ShouldBe("id");
+                identityColumn.IsNullable.ShouldBe(false);
+                identityColumn.IsIdentity.ShouldBe(true);
+            }
+        }
+
+        [Test]
+        public void CanReadSchemaInfoWithNullable()
+        {
+            using (var table = new SqlServerTestTable(Processor, null, "id int NULL"))
+            {
+                IList<TableDefinition> defs = SchemaDumper.ReadDbSchema();
+
+                var identityColumn = defs[0].Columns.First();
+                identityColumn.Name.ShouldBe("id");
+                identityColumn.IsNullable.ShouldBe(true);
             }
         }
 
