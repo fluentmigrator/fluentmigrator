@@ -16,7 +16,6 @@
 //
 #endregion
 
-using System.Reflection;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using NUnit.Framework;
 
@@ -25,21 +24,28 @@ namespace FluentMigrator.Tests.Unit.AssemblyLoader
     [TestFixture]
     public class AssemblyLoaderTests
     {
+        private AssemblyLoaderFactory assemblyLoaderFactory;
+
+        [SetUp]
+        public void Setup()
+        {
+            assemblyLoaderFactory = new AssemblyLoaderFactory();
+        }
 
         [Test]
-        public void TestLoaders()
+        public void ShouldBeAbleToLoadAssemblyByFileName()
         {
-            string filename = GetType().Assembly.Location;
-            string assemblyName = GetType().Assembly.GetName().Name;
-            IAssemblyLoader assemblyLoaderFromFile = AssemblyLoaderFactory.GetAssemblyLoader(filename);
-            Assert.IsInstanceOf(typeof(AssemblyLoaderFromFile), assemblyLoaderFromFile);
-            Assembly assemblyFromFile = assemblyLoaderFromFile.Load();
+            var assemblyLoader = assemblyLoaderFactory.GetAssemblyLoader(GetType().Assembly.Location);
+            Assert.IsInstanceOf(typeof(AssemblyLoaderFromFile), assemblyLoader);
+            Assert.AreEqual(GetType().Assembly, assemblyLoader.Load());
+        }
 
-            IAssemblyLoader assemblyLoaderFromName = AssemblyLoaderFactory.GetAssemblyLoader(assemblyName);
-            Assert.IsInstanceOf(typeof(AssemblyLoaderFromName), assemblyLoaderFromName);
-            Assembly assemblyFromName = assemblyLoaderFromName.Load();
-
-            Assert.AreEqual(assemblyFromFile.FullName, assemblyFromName.FullName);
+        [Test]
+        public void ShouldBeAbleToLoadAssemblyAssemblyName()
+        {
+            var assemblyLoader = assemblyLoaderFactory.GetAssemblyLoader(GetType().Assembly.GetName().Name);
+            Assert.IsInstanceOf(typeof(AssemblyLoaderFromName), assemblyLoader);
+            Assert.AreEqual(GetType().Assembly, assemblyLoader.Load());
         }
     }
 }
