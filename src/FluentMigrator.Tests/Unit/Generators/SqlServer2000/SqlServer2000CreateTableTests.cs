@@ -148,6 +148,14 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
+        public void CanCreateIndexWithIncludedColumns()
+        {
+            var expression = GeneratorTestHelper.GetCreateIncludeColumnsCreateIndexExpression();
+            var sql = _generator.Generate(expression);
+            sql.ShouldBe("CREATE INDEX [TestIndex] ON [TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2])");
+        }
+
+        [Test]
         public override void CanCreateUniqueIndex()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();

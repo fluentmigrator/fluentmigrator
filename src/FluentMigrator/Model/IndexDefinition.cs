@@ -32,10 +32,12 @@ namespace FluentMigrator.Model
         public virtual bool IsUnique { get; set; }
         public bool IsClustered { get; set; }
         public virtual ICollection<IndexColumnDefinition> Columns { get; set; }
+        public virtual ICollection<IndexColumnDefinition> IncludeColumns { get; set; }
 
         public IndexDefinition()
         {
             Columns = new List<IndexColumnDefinition>();
+            this.IncludeColumns = new List<IndexColumnDefinition>();
         }
 
         public virtual void ApplyConventions(IMigrationConventions conventions)

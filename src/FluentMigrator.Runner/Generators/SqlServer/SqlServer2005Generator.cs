@@ -50,6 +50,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string RenameTable { get { return "{0}', '{1}'"; } }
 
         public override string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3}.{4} ({5})"; } }
+
         public override string DropIndex { get { return "DROP INDEX {0} ON {1}.{2}"; } }
 
         public override string InsertData { get { return "INSERT INTO {0}.{1} ({2}) VALUES ({3})"; } }
@@ -206,14 +207,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(CreateIndexExpression expression)
         {
-
             string[] indexColumns = new string[expression.Index.Columns.Count];
-            IndexColumnDefinition columnDef;
-
 
             for (int i = 0; i < expression.Index.Columns.Count; i++)
             {
-                columnDef = expression.Index.Columns.ElementAt(i);
+                IndexColumnDefinition columnDef = expression.Index.Columns.ElementAt(i);
                 if (columnDef.Direction == Direction.Ascending)
                 {
                     indexColumns[i] = Quoter.QuoteColumnName(columnDef.Name) + " ASC";
@@ -224,13 +222,15 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 }
             }
 
-            return String.Format(CreateIndex
-                , GetUniqueString(expression)
-                , GetClusterTypeString(expression)
-                , Quoter.QuoteIndexName(expression.Index.Name)
-                , Quoter.QuoteSchemaName(expression.Index.SchemaName)
-                , Quoter.QuoteTableName(expression.Index.TableName)
-                , String.Join(", ", indexColumns));
+            return 
+                String.Format(CreateIndex + GenerateIncludeColumnsInIndexStatement(expression)
+                    , GetUniqueString(expression)
+                    , GetClusterTypeString(expression)
+                    , Quoter.QuoteIndexName(expression.Index.Name)
+                    , Quoter.QuoteSchemaName(expression.Index.SchemaName)
+                    , Quoter.QuoteTableName(expression.Index.TableName)
+                    , String.Join(", ", indexColumns)
+                );
         }
 
         public override string Generate(DeleteIndexExpression expression)

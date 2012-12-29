@@ -47,6 +47,13 @@ namespace FluentMigrator.Builders.Create.Index
             return this;
         }
 
+        public ICreateIndexColumnOptionsSyntax IncludeColumn(string columnName)
+        {
+            CurrentColumn = new IndexColumnDefinition { Name = columnName };
+            Expression.Index.IncludeColumns.Add(CurrentColumn);
+            return this;
+        }
+
         public ICreateIndexOptionsSyntax WithOptions()
         {
             return this;
