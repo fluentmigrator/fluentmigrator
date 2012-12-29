@@ -35,6 +35,12 @@ namespace FluentMigrator.Expressions
         {
             if (String.IsNullOrEmpty(TableName))
                 errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
+
+            if (!IsAllRows && (Where == null || Where.Count == 0)) 
+                errors.Add(ErrorMessages.UpdateDataExpressionMustSpecifyWhereClauseOrAllRows);
+
+            if (IsAllRows && Where != null && Where.Count > 0)
+                errors.Add(ErrorMessages.UpdateDataExpressionMustNotSpecifyBothWhereClauseAndAllRows);
         }
 
         public override void ExecuteWith(IMigrationProcessor processor)
