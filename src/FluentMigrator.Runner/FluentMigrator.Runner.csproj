@@ -136,6 +136,7 @@
     <Compile Include="CompatabilityMode.cs" />
     <Compile Include="Extensions\SqlServerExtensions.cs" />
     <Compile Include="Extensions\TagsExtensions.cs" />
+    <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Generators\Base\ColumnBase.cs" />
     <Compile Include="Extensions\CompatabilityModeExtension.cs" />
     <Compile Include="Generators\Firebird\FirebirdColumn.cs" />
@@ -215,13 +216,13 @@
     <Compile Include="Processors\MySql\MySqlProcessor.cs" />
     <Compile Include="Processors\MySql\MySqlProcessorFactory.cs" />
     <Compile Include="Processors\DotConnectOracle\DotConnectOracleDbFactory.cs" />
+    <Compile Include="Processors\MigrationProcessorFactoryProvider.cs" />
     <Compile Include="Processors\Oracle\OracleDbFactory.cs" />
     <Compile Include="Processors\Oracle\OracleProcessor.cs" />
     <Compile Include="Processors\Oracle\OracleProcessorFactory.cs" />
     <Compile Include="Processors\Postgres\PostgresDbFactory.cs" />
     <Compile Include="Processors\Postgres\PostgresProcessor.cs" />
     <Compile Include="Processors\Postgres\PostgresProcessorFactory.cs" />
-    <Compile Include="Processors\ProcessorFactory.cs" />
     <Compile Include="Processors\ProcessorOptions.cs" />
     <Compile Include="Processors\IDbFactory.cs" />
     <Compile Include="Processors\DbFactoryBase.cs" />
