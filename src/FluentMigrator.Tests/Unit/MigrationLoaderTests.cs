@@ -22,6 +22,8 @@ using System.Collections.Generic;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Tests.Integration.Migrations;
+using FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1;
+using FluentMigrator.Tests.Unit.DoesNotInheritFromBaseClass;
 using FluentMigrator.Tests.Unit.TaggingTestFakes;
 using Moq;
 using NUnit.Framework;
@@ -155,8 +157,86 @@ namespace FluentMigrator.Tests.Unit
 
             CollectionAssert.AreEquivalent(expected, actual);
         }
+
+        public void HandlesNotFindingMigrations()
+        {
+            var conventions = new MigrationConventions();
+            var asm = Assembly.GetExecutingAssembly();
+            var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Unit.EmptyNamespace", null);
+
+            var list = loader.FindMigrations();
+
+            Assert.That(list, Is.Not.Null);
+            Assert.That(list.Count(), Is.EqualTo(0));
+        }
+
+        [Test]
+        public void ShouldThrowExceptionIfDuplicateVersionNumbersAreLoaded()
+        {
+            var conventions = new MigrationConventions();
+            var asm = Assembly.GetExecutingAssembly();
+            Assert.Throws<Exception>(() => new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Unit.DuplicateVersionNumbers", null));
+        }
+
+        [Test]
+        public void HandlesMigrationThatDoesNotInheritFromMigrationBaseClass()
+        {
+            var conventions = new MigrationConventions();
+            var asm = Assembly.GetExecutingAssembly();
+            var loader = new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Unit.DoesNotInheritFromBaseClass", null);
+
+            Assert.That(loader.Migrations.Count(), Is.EqualTo(1));
+        }
+
     }
-    
+
+    namespace EmptyNamespace
+    {
+
+    }
+
+    namespace DoesNotInheritFromBaseClass
+    {
+        [Migration(1)]
+        public class MigrationThatDoesNotInheritFromMigrationBaseClass : IMigration
+        {
+            /// <summary>The arbitrary application context passed to the task runner.</summary>
+            public object ApplicationContext
+            {
+                get { throw new NotImplementedException(); }
+            }
+
+            public void GetUpExpressions(IMigrationContext context)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void GetDownExpressions(IMigrationContext context)
+            {
+                throw new NotImplementedException();
+            }
+        }
+    }
+
+    namespace DuplicateVersionNumbers
+    {
+        [Migration(1)]
+        public class Duplicate1 : Migration
+        {
+            public override void Up() { }
+
+            public override void Down() { }
+        }
+
+        [Migration(1)]
+        public class Duplicate2 : Migration
+        {
+            public override void Up() { }
+
+            public override void Down() { }
+        }
+    }
+
     namespace TaggingTestFakes
     {
         [Tags("UK", "IE", "QA", "Production")]
@@ -166,7 +246,7 @@ namespace FluentMigrator.Tests.Unit
             public override void Up() { }
 
             public override void Down() { }
-        }    
+        }
 
         [Migration(567)]
         public class UntaggedMigration : Migration
