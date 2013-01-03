@@ -10,12 +10,10 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Processors.Firebird
 {
-    public class FirebirdProcessor : ProcessorBase
+    public class FirebirdProcessor : GenericProcessorBase
     {
         protected readonly FirebirdTruncator truncator;
-        public IDbFactory Factory { get; private set; }
         readonly FirebirdQuoter quoter = new FirebirdQuoter();
-        public IDbConnection Connection { get; private set; }
         public IDbTransaction Transaction { get; private set; }
         public FirebirdOptions FBOptions { get; private set; }
         public new IMigrationGenerator Generator { get { return base.Generator; } }
@@ -32,16 +30,14 @@ namespace FluentMigrator.Runner.Processors.Firebird
         }
 
         public FirebirdProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory, FirebirdOptions fbOptions)
-            : base(generator, announcer, options)
+            : base(connection, factory, generator, announcer, options)
         {
             if (fbOptions == null)
                 throw new ArgumentNullException("fbOptions");
             FBOptions = fbOptions;
             truncator = new FirebirdTruncator(FBOptions.TruncateLongNames);
-            Factory = factory;
-
-            Connection = connection;
-            connection.Open();
+            
+            EnsureConnectionIsOpen();
 
             BeginTransaction();
         }
@@ -100,8 +96,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public override DataSet Read(string template, params object[] args)
         {
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
             
             //Announcer.Sql(String.Format(template,args));
 
@@ -116,8 +111,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public override bool Exists(string template, params object[] args)
         {
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
 
             using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             using (var reader = command.ExecuteReader())
@@ -145,10 +139,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             Announcer.Say("Committing Transaction");
             Transaction.Commit();
             WasCommitted = true;
-            if (Connection.State != ConnectionState.Closed)
-            {
-                Connection.Close();
-            }
+            EnsureConnectionIsClosed();
             ClearLocks();
 
         }
@@ -177,10 +168,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 }
             }
 
-            if (Connection.State != ConnectionState.Closed)
-            {
-                Connection.Close();
-            }
+            EnsureConnectionIsClosed();
             ClearLocks();
         }
 
@@ -778,8 +766,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             if (Options.PreviewOnly)
                 return;
 
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
 
             if (expression.Operation != null)
             {
@@ -798,8 +785,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
 
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
 
             using (var command = Factory.CreateCommand(sql, Connection, Transaction))
             {
