@@ -6,11 +6,9 @@ using FluentMigrator.Runner.Generators.Postgres;
 
 namespace FluentMigrator.Runner.Processors.Postgres
 {
-    public class PostgresProcessor : ProcessorBase
+    public class PostgresProcessor : GenericProcessorBase
     {
-        private readonly IDbFactory factory;
         readonly PostgresQuoter quoter = new PostgresQuoter();
-        public IDbConnection Connection { get; private set; }
         public IDbTransaction Transaction { get; private set; }
 
         public override string DatabaseType
@@ -19,13 +17,10 @@ namespace FluentMigrator.Runner.Processors.Postgres
         }
 
         public PostgresProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
-            : base(generator, announcer, options)
+            : base(connection, factory, generator, announcer, options)
         {
-            this.factory = factory;
-            Connection = connection;
-            connection.Open();
+            EnsureConnectionIsOpen();
 
-            Announcer.Say("Beginning Transaction");
             Transaction = Connection.BeginTransaction();
         }
 
@@ -66,12 +61,12 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
         public override DataSet Read(string template, params object[] args)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            EnsureConnectionIsOpen();
 
             var ds = new DataSet();
-            using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             {
-                var adapter = factory.CreateDataAdapter(command);
+                var adapter = Factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
                 return ds;
             }
@@ -79,10 +74,9 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
         public override bool Exists(string template, params object[] args)
         {
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
 
-            using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -100,10 +94,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
             Announcer.Say("Committing Transaction");
             Transaction.Commit();
             WasCommitted = true;
-            if (Connection.State != ConnectionState.Closed)
-            {
-                Connection.Close();
-            }
+            EnsureConnectionIsClosed();
         }
 
         public override void RollbackTransaction()
@@ -111,10 +102,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
             Announcer.Say("Rolling back transaction");
             Transaction.Rollback();
             WasCommitted = true;
-            if (Connection.State != ConnectionState.Closed)
-            {
-                Connection.Close();
-            }
+            EnsureConnectionIsClosed();
         }
 
         protected override void Process(string sql)
@@ -124,10 +112,9 @@ namespace FluentMigrator.Runner.Processors.Postgres
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
 
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
 
-            using (var command = factory.CreateCommand(sql, Connection, Transaction))
+            using (var command = Factory.CreateCommand(sql, Connection, Transaction))
             {
                 try
                 {
@@ -154,8 +141,8 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
             if (Options.PreviewOnly)
                 return;
-			
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+
+            EnsureConnectionIsOpen();
 
             if (expression.Operation != null)
                 expression.Operation(Connection, Transaction);
