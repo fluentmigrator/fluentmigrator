@@ -22,21 +22,16 @@ using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.MySql
 {
-    public class MySqlProcessor : ProcessorBase
+    public class MySqlProcessor : GenericProcessorBase
     {
-        private readonly IDbFactory factory;
-        private IDbConnection Connection { get; set; }
-
         public override string DatabaseType
         {
             get { return "MySql"; }
         }
 
         public MySqlProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
-            : base(generator, announcer, options)
+            : base(connection, factory, generator, announcer, options)
         {
-            this.factory = factory;
-            Connection = connection;
         }
 
         public override bool SchemaExists(string schemaName)
@@ -81,9 +76,9 @@ namespace FluentMigrator.Runner.Processors.MySql
                 return;
             }
 
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            EnsureConnectionIsOpen();
 
-            using (var command = factory.CreateCommand(String.Format(template, args), Connection))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
             {
                 command.CommandTimeout = Options.Timeout;
                 command.ExecuteNonQuery();
@@ -92,9 +87,9 @@ namespace FluentMigrator.Runner.Processors.MySql
 
         public override bool Exists(string template, params object[] args)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            EnsureConnectionIsOpen();
 
-            using (var command = factory.CreateCommand(String.Format(template, args), Connection))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
             {
                 command.CommandTimeout = Options.Timeout;
                 using (var reader = command.ExecuteReader())
@@ -118,14 +113,14 @@ namespace FluentMigrator.Runner.Processors.MySql
 
         public override DataSet Read(string template, params object[] args)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            EnsureConnectionIsOpen();
 
             var ds = new DataSet();
-            using (var command = factory.CreateCommand(String.Format(template, args), Connection))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
             {
                 command.CommandTimeout = Options.Timeout;
 
-                var adapter = factory.CreateDataAdapter(command);
+                var adapter = Factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
                 return ds;
             }
@@ -138,10 +133,9 @@ namespace FluentMigrator.Runner.Processors.MySql
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
 
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
 
-            using (var command = factory.CreateCommand(sql, Connection))
+            using (var command = Factory.CreateCommand(sql, Connection))
             {
                 command.CommandTimeout = Options.Timeout;
                 command.ExecuteNonQuery();
@@ -154,8 +148,8 @@ namespace FluentMigrator.Runner.Processors.MySql
 
             if (Options.PreviewOnly)
                 return;
-			
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            
+            EnsureConnectionIsOpen();
 
             if (expression.Operation != null)
                 expression.Operation(Connection, null);
