@@ -209,6 +209,7 @@
     <Compile Include="Processors\Firebird\FirebirdTableSchema.cs" />
     <Compile Include="Processors\DotConnectOracle\DotConnectOracleProcessor.cs" />
     <Compile Include="Processors\DotConnectOracle\DotConnectOracleProcessorFactory.cs" />
+    <Compile Include="Processors\GenericProcessorBase.cs" />
     <Compile Include="Processors\Jet\JetProcessor.cs" />
     <Compile Include="Processors\Jet\JetProcessorFactory.cs" />
     <Compile Include="Processors\MigrationProcessorFactory.cs" />
