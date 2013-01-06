@@ -474,5 +474,45 @@ namespace FluentMigrator.Tests.Unit
             _announcer.Verify(a => a.Say("2011010101: IMigrationProxy"));
             _announcer.Verify(a => a.Emphasize("2011010102: IMigrationProxy (current)"));
         }
+
+        [Test]
+        public void IfMigrationHasAnInvalidExpressionDuringUpActionShouldThrowAnExceptionAndAnnounceTheError()
+        {
+            var invalidMigration = new Mock<IMigration>();
+            var invalidExpression = new UpdateDataExpression {TableName = "Test"};
+            invalidMigration.Setup(m => m.GetUpExpressions(It.IsAny<IMigrationContext>())).Callback((IMigrationContext mc) => mc.Expressions.Add(invalidExpression));
+
+            Assert.Throws<InvalidMigrationException>(() => _runner.Up(invalidMigration.Object));
+
+            _announcer.Verify(a => a.Error(It.Is<string>(s => s.Contains("UpdateDataExpression: Update statement is missing a condition. Specify one by calling .Where() or target all rows by calling .AllRows()."))));
+        }
+
+        [Test]
+        public void IfMigrationHasAnInvalidExpressionDuringDownActionShouldThrowAnExceptionAndAnnounceTheError()
+        {
+            var invalidMigration = new Mock<IMigration>();
+            var invalidExpression = new UpdateDataExpression { TableName = "Test" };
+            invalidMigration.Setup(m => m.GetDownExpressions(It.IsAny<IMigrationContext>())).Callback((IMigrationContext mc) => mc.Expressions.Add(invalidExpression));
+
+            Assert.Throws<InvalidMigrationException>(() => _runner.Down(invalidMigration.Object));
+
+            _announcer.Verify(a => a.Error(It.Is<string>(s => s.Contains("UpdateDataExpression: Update statement is missing a condition. Specify one by calling .Where() or target all rows by calling .AllRows()."))));
+        }
+
+        [Test]
+        public void IfMigrationHasTwoInvalidExpressionsShouldAnnounceBothErrors()
+        {
+            var invalidMigration = new Mock<IMigration>();
+            var invalidExpression = new UpdateDataExpression { TableName = "Test" };
+            var secondInvalidExpression = new CreateColumnExpression();
+            invalidMigration.Setup(m => m.GetUpExpressions(It.IsAny<IMigrationContext>()))
+                .Callback((IMigrationContext mc) => { mc.Expressions.Add(invalidExpression); mc.Expressions.Add(secondInvalidExpression); });
+
+            Assert.Throws<InvalidMigrationException>(() => _runner.Up(invalidMigration.Object));
+
+            _announcer.Verify(a => a.Error(It.Is<string>(s => s.Contains("UpdateDataExpression: Update statement is missing a condition. Specify one by calling .Where() or target all rows by calling .AllRows()."))));
+            _announcer.Verify(a => a.Error(It.Is<string>(s => s.Contains("CreateColumnExpression: The table's name cannot be null or an empty string. The column's name cannot be null or an empty string. The column does not have a type defined."))));
+        }
+
     }
 }
