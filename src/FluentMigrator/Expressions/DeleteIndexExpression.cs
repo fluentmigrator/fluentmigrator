@@ -16,7 +16,9 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using System.Linq;
 
@@ -38,7 +40,11 @@ namespace FluentMigrator.Expressions
 
         public override void CollectValidationErrors(ICollection<string> errors)
         {
-            Index.CollectValidationErrors(errors);
+            if (String.IsNullOrEmpty(Index.Name))
+                errors.Add(ErrorMessages.IndexNameCannotBeNullOrEmpty);
+
+            if (String.IsNullOrEmpty(Index.TableName))
+                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
 
         public override void ExecuteWith(IMigrationProcessor processor)
