@@ -21,7 +21,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
             string sql = _generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE 'TestTable1' ADD COLUMN 'TestColumn1' TEXT NOT NULL");
+            sql.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" TEXT NOT NULL");
         }
 
         [Test]
@@ -29,7 +29,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
             string sql = _generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE 'TestTable1' ADD COLUMN 'TestColumn1' NUMERIC NOT NULL");
+            sql.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" NUMERIC NOT NULL");
         }
 
         [Test]
@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
             string sql = _generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE 'TestTable1' RENAME TO 'TestTable2'");
+            sql.ShouldBe("ALTER TABLE \"TestTable1\" RENAME TO \"TestTable2\"");
         }
 
         [Test]
@@ -108,7 +108,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Column.IsPrimaryKey = true;
 
             string sql = _generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE 'TestTable1' ADD COLUMN 'TestColumn1' INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT");
+            sql.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT");
         }
 
         [Test]
