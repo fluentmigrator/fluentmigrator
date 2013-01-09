@@ -63,6 +63,11 @@ namespace FluentMigrator.Runner.Processors.Sqlite
             return Exists("select count(*) from sqlite_master where name='{0}' and tbl_name='{1}' and type='index'", indexName, tableName);
         }
 
+        public override bool SequenceExists(string schemaName, string sequenceName)
+        {
+            return false;
+        }
+
         public override void Execute(string template, params object[] args)
         {
             Process(String.Format(template, args));

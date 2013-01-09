@@ -32,6 +32,7 @@ using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Runner.Processors.Sqlite;
@@ -754,6 +755,38 @@ namespace FluentMigrator.Tests.Integration
             
         }
 
+        [Test]
+        public void CanCreateSequence()
+        {
+            ExecuteWithSqlServer2012(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateSequence());
+                    processor.SequenceExists(null, "TestSequence");
+
+                    runner.Down(new TestCreateSequence());
+                    processor.SequenceExists(null, "TestSequence").ShouldBeFalse();
+                }, true);
+        }
+
+        [Test]
+        public void CanCreateSequenceWithSchema()
+        {
+            ExecuteWithSqlServer2012(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateSequence());
+                    processor.SequenceExists("TestSchema", "TestSequence");
+
+                    runner.Down(new TestCreateSequence());
+                    processor.SequenceExists("TestSchema", "TestSequence").ShouldBeFalse();
+                },true);
+        }
+
         private static MigrationRunner SetupMigrationRunner(IMigrationProcessor processor)
         {
             Assembly asm = typeof(MigrationRunnerTests).Assembly;
@@ -1040,6 +1073,32 @@ namespace FluentMigrator.Tests.Integration
         public override void Down()
         {
             Delete.Schema("TestSchema");
+        }
+    }
+
+    internal class TestCreateSequence : Migration
+    {
+        public override void Up()
+        {
+            Create.Sequence("TestSequence").StartWith(1).IncrementBy(1).MinValue(0).MaxValue(1000).Cycle().Cache(10);
+        }
+
+        public override void Down()
+        {
+            Delete.Sequence("TestSequence");
+        }
+    }
+
+    internal class TestCreateSequenceWithSchema : Migration
+    {
+        public override void Up()
+        {
+            Create.Sequence("TestSequence").InSchema("TestSchema").StartWith(1).IncrementBy(1).MinValue(0).MaxValue(1000).Cycle().Cache(10);
+        }
+
+        public override void Down()
+        {
+            Delete.Sequence("TestSequence").InSchema("TestSchema");
         }
     }
 

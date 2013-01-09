@@ -69,6 +69,11 @@ namespace FluentMigrator.Runner.Processors.MySql
             return Exists(sql, FormatSqlEscape(tableName), FormatSqlEscape(indexName));
         }
 
+        public override bool SequenceExists(string schemaName, string sequenceName)
+        {
+            return false;
+        }
+
         public override void Execute(string template, params object[] args)
         {
             if(Options.PreviewOnly) 

@@ -113,6 +113,11 @@ namespace FluentMigrator.Runner.Processors.Oracle
             return Exists("SELECT 1 FROM \"ALL_INDEXES\" WHERE \"OWNER\" = '{0}' AND \"INDEX_NAME\" = '{1}'", schemaName.ToUpper(), indexName);
         }
 
+        public override bool SequenceExists(string schemaName, string sequenceName)
+        {
+            return false;
+        }
+
         public override void Execute(string template, params object[] args)
         {
             Process(string.Format(template, args));
