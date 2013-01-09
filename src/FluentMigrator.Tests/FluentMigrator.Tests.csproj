@@ -159,6 +159,7 @@
     </Compile>
     <Compile Include="Helpers\FirebirdTestTable.cs" />
     <Compile Include="Helpers\OracleTestTable.cs" />
+    <Compile Include="Helpers\PostgresTestSequence.cs" />
     <Compile Include="Helpers\PostgresTestTable.cs" />
     <Compile Include="Helpers\SqlServerCeTestTable.cs" />
     <Compile Include="Helpers\SqlServerTestSequence.cs" />

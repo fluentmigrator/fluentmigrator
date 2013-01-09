@@ -774,17 +774,21 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanCreateSequenceWithSchema()
         {
+            Action<IMigrationProcessor> action = processor =>
+                                {
+                                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                                    runner.Up(new TestCreateSequence());
+                                    processor.SequenceExists("TestSchema", "TestSequence");
+
+                                    runner.Down(new TestCreateSequence());
+                                    processor.SequenceExists("TestSchema", "TestSequence").ShouldBeFalse();
+                                };
+
             ExecuteWithSqlServer2012(
-                processor =>
-                {
-                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+                action,true);
 
-                    runner.Up(new TestCreateSequence());
-                    processor.SequenceExists("TestSchema", "TestSequence");
-
-                    runner.Down(new TestCreateSequence());
-                    processor.SequenceExists("TestSchema", "TestSequence").ShouldBeFalse();
-                },true);
+            ExecuteWithPostgres(action, IntegrationTestOptions.Postgres, true);
         }
 
         private static MigrationRunner SetupMigrationRunner(IMigrationProcessor processor)
