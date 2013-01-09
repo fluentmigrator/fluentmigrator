@@ -404,6 +404,32 @@ namespace FluentMigrator.Tests.Integration.Processors
         }
 
         [Test]
+        public void CallingSequenceExistsReturnsTrueIfSequenceExists()
+        {
+            using (var sequence = new PostgresTestSequence(Processor, null, "test_sequence"))
+                Processor.SequenceExists(null, "test_sequence").ShouldBeTrue();
+        }
+
+        [Test]
+        public void CallingSequenceExistsReturnsFalseIfSequenceDoesNotExist()
+        {
+            Processor.SequenceExists(null, "DoesNotExist").ShouldBeFalse();
+        }
+
+        [Test]
+        public void CallingSequenceExistsReturnsTrueIfSequenceExistsWithSchema()
+        {
+            using (var sequence = new PostgresTestSequence(Processor, "test_schema", "test_sequence"))
+                Processor.SequenceExists("test_schema", "test_sequence").ShouldBeTrue();
+        }
+
+        [Test]
+        public void CallingSequenceExistsReturnsFalseIfSequenceDoesNotExistWithSchema()
+        {
+            Processor.SequenceExists("test_schema", "DoesNotExist").ShouldBeFalse();
+        }
+
+        [Test]
         public void CanReadDataWithSchema()
         {
             using (var table = new PostgresTestTable(Processor, "TestSchema", "id int"))

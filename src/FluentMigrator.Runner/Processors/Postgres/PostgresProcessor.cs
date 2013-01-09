@@ -61,7 +61,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
         public override bool SequenceExists(string schemaName, string sequenceName)
         {
-            throw new NotImplementedException();
+            return Exists("select * from information_schema.sequences where sequence_catalog = current_catalog and sequence_schema ='{0}' and sequence_name = '{1}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(sequenceName));
         }
 
         public override DataSet ReadTableData(string schemaName, string tableName)

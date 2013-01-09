@@ -22,7 +22,7 @@ namespace FluentMigrator.Tests.Helpers
 {
     public class SqlServerTestSequence : IDisposable
     {
-        private string _schemaName;
+        private readonly string _schemaName;
 
         private SqlConnection Connection { get; set; }
 
