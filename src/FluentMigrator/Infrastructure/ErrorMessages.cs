@@ -45,5 +45,7 @@ namespace FluentMigrator.Infrastructure
         public const string SequenceNameCannotBeNullOrEmpty = "The sequence's name cannot be null or an empty string.";
         public const string UpdateDataExpressionMustSpecifyWhereClauseOrAllRows = "Update statement is missing a condition. Specify one by calling .Where() or target all rows by calling .AllRows().";
         public const string UpdateDataExpressionMustNotSpecifyBothWhereClauseAndAllRows = "Update statement specifies both a .Where() condition and that .AllRows() should be targeted. Specify one or the other, but not both.";
+        public const string DefaultValueCannotBeNull = "The default value cannot be null.";
+        public const string ConstraintMustHaveAtLeastOneColumn = "The constraint must have at least one column specified";
     }
 }
