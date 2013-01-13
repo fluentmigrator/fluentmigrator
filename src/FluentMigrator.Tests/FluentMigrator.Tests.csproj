@@ -238,6 +238,8 @@
     <Compile Include="Unit\Expressions\CreateSequenceExpressionTests.cs" />
     <Compile Include="Unit\Expressions\DeleteConstraintExpressionTests.cs" />
     <Compile Include="Unit\Expressions\DeleteDefaultConstraintExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\DeleteSchemaExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\DeleteSequenceExpressionTests.cs" />
     <Compile Include="Unit\Expressions\UpdateDataExpressionTests.cs" />
     <Compile Include="Unit\Generators\GenericGenerator\GenericGeneratorTests.cs" />
     <Compile Include="Unit\Generators\Firebird\FirebirdGeneratorTests.cs" />
