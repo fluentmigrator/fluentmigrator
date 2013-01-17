@@ -122,9 +122,10 @@ namespace FluentMigrator.Tests.Integration
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
                     runner.Up(new TestForeignKeyNamingConvention());
-
                     processor.ConstraintExists(null, "Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeTrue();
+
                     runner.Down(new TestForeignKeyNamingConvention());
+                    processor.ConstraintExists(null, "Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeFalse();
                 }, false, typeof(SqliteProcessor));
         }
 
@@ -791,6 +792,106 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithPostgres(action, IntegrationTestOptions.Postgres, true);
         }
 
+        [Test]
+        public void CanAlterColumnWithSchema()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateSchema());
+
+                    runner.Up(new TestCreateAndDropTableMigrationWithSchema());
+                    processor.ColumnExists("TestSchema", "TestTable2", "Name2").ShouldBeTrue();
+
+                    runner.Up(new TestAlterColumnWithSchema());
+                    processor.ColumnExists("TestSchema", "TestTable2", "Name2").ShouldBeTrue();
+
+                    runner.Down(new TestAlterColumnWithSchema());
+                    processor.ColumnExists("TestSchema", "TestTable2", "Name2").ShouldBeTrue();
+
+                    runner.Down(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Down(new TestCreateSchema());
+                }, true, new[] { typeof(SqliteProcessor) });
+        }
+
+        [Test]
+        public void CanAlterTableWithSchema()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateSchema());
+
+                    runner.Up(new TestCreateAndDropTableMigrationWithSchema());
+                    processor.ColumnExists("TestSchema", "TestTable2", "NewColumn").ShouldBeFalse();
+
+                    runner.Up(new TestAlterTableWithSchema());
+                    processor.ColumnExists("TestSchema", "TestTable2", "NewColumn").ShouldBeTrue();
+
+                    runner.Down(new TestAlterTableWithSchema());
+                    processor.ColumnExists("TestSchema", "TestTable2", "NewColumn").ShouldBeFalse();
+
+                    runner.Down(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Down(new TestCreateSchema());
+                }, true, new[] { typeof(SqliteProcessor) });
+        }
+
+        [Test]
+        public void CanAlterTablesSchema()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateSchema());
+
+                    runner.Up(new TestCreateAndDropTableMigrationWithSchema());
+                    processor.TableExists("TestSchema", "TestTable").ShouldBeTrue();
+
+                    runner.Up(new TestAlterSchema());
+                    processor.TableExists("NewSchema", "TestTable").ShouldBeTrue();
+
+                    runner.Down(new TestAlterSchema());
+                    processor.TableExists("TestSchema", "TestTable").ShouldBeTrue();
+
+                    runner.Down(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Down(new TestCreateSchema());
+                }, true, new[] { typeof(SqliteProcessor) });
+        }
+
+        [Test]
+        public void CanCreateUniqueConstraint()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateSchema());
+
+                    runner.Up(new TestCreateAndDropTableMigrationWithSchema());
+                    processor.ConstraintExists("TestSchema", "TestTable2", "TestUnique").ShouldBeFalse();
+
+                    runner.Up(new TestCreateUniqueConstraint());
+                    processor.ConstraintExists("TestSchema", "TestTable2", "TestUnique").ShouldBeTrue();
+
+                    runner.Down(new TestCreateUniqueConstraint());
+                    processor.ConstraintExists("TestSchema", "TestTable2", "TestUnique").ShouldBeFalse();
+
+                    runner.Down(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Down(new TestCreateSchema());
+                }, true, new[] { typeof(SqliteProcessor), typeof(PostgresProcessor) });
+        }
+
         private static MigrationRunner SetupMigrationRunner(IMigrationProcessor processor)
         {
             Assembly asm = typeof(MigrationRunnerTests).Assembly;
@@ -1022,7 +1123,7 @@ namespace FluentMigrator.Tests.Integration
             Create.Index("ix_Name").OnTable("TestTable2").InSchema("TestSchema").OnColumn("Name").Ascending()
                 .WithOptions().NonClustered();
 
-            Create.Column("Name2").OnTable("TestTable2").InSchema("TestSchema").AsBoolean().Nullable();
+            Create.Column("Name2").OnTable("TestTable2").InSchema("TestSchema").AsString(10).Nullable();
 
             Create.ForeignKey("fk_TestTable2_TestTableId_TestTable_Id")
                 .FromTable("TestTable2").InSchema("TestSchema").ForeignColumn("TestTableId")
@@ -1106,4 +1207,57 @@ namespace FluentMigrator.Tests.Integration
         }
     }
 
+    internal class TestAlterColumnWithSchema: Migration
+    {
+        public override void Up()
+        {
+            Alter.Column("Name2").OnTable("TestTable2").InSchema("TestSchema").AsAnsiString(100).Nullable();
+        }
+
+        public override void Down()
+        {
+            Alter.Column("Name2").OnTable("TestTable2").InSchema("TestSchema").AsString(10).Nullable();
+        }
+    }
+
+    internal class TestAlterTableWithSchema : Migration
+    {
+        public override void Up()
+        {
+            Alter.Table("TestTable2").InSchema("TestSchema").AddColumn("NewColumn").AsInt32().Nullable();
+        }
+
+        public override void Down()
+        {
+            Delete.Column("NewColumn").FromTable("TestTable2").InSchema("TestSchema");
+        }
+    }
+
+    internal class TestAlterSchema : Migration
+    {
+        public override void Up()
+        {
+            Create.Schema("NewSchema");
+            Alter.Table("TestTable").InSchema("TestSchema").ToSchema("NewSchema");
+        }
+
+        public override void Down()
+        {
+            Alter.Table("TestTable").InSchema("NewSchema").ToSchema("TestSchema");
+            Delete.Schema("NewSchema");
+        }
+    }
+
+    internal class TestCreateUniqueConstraint : Migration
+    {
+        public override void Up()
+        {
+            Create.UniqueConstraint("TestUnique").OnTable("TestTable2").WithSchema("TestSchema").Column("Name");
+        }
+
+        public override void Down()
+        {
+            Delete.UniqueConstraint("TestUnique").FromTable("TestTable2").InSchema("TestSchema");
+        }
+    }
 }
