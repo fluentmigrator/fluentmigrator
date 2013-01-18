@@ -969,6 +969,30 @@ namespace FluentMigrator.Tests.Integration
                 }, true, new[] { typeof(SqliteProcessor) });
         }
 
+        [Test]
+        public void CanReverseCreateIndex()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateSchema());
+
+                    runner.Up(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Up(new TestCreateIndexWithReversing());
+                    processor.IndexExists("TestSchema", "TestTable2", "IX_TestTable2_Name2").ShouldBeTrue();
+
+                    runner.Down(new TestCreateIndexWithReversing());
+                    processor.IndexExists("TestSchema", "TestTable2", "IX_TestTable2_Name2").ShouldBeFalse();
+
+                    runner.Down(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Down(new TestCreateSchema());
+                }, true, new[] { typeof(SqliteProcessor) });
+        }
+
         private static MigrationRunner SetupMigrationRunner(IMigrationProcessor processor)
         {
             Assembly asm = typeof(MigrationRunnerTests).Assembly;
@@ -1361,6 +1385,14 @@ namespace FluentMigrator.Tests.Integration
         public override void Down()
         {
             Insert.IntoTable("TestTable").InSchema("TestSchema").Row(new { Name = "Test" });
+        }
+    }
+
+    internal class TestCreateIndexWithReversing : AutoReversingMigration
+    {
+        public override void Up()
+        {
+            Create.Index().OnTable("TestTable2").InSchema("TestSchema").OnColumn("Name2").Ascending();
         }
     }
 }
