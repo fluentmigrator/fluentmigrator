@@ -1224,7 +1224,7 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
-            Alter.Table("TestTable2").InSchema("TestSchema").AddColumn("NewColumn").AsInt32().Nullable();
+            Alter.Table("TestTable2").InSchema("TestSchema").AddColumn("NewColumn").AsInt32().WithDefaultValue(1);
         }
 
         public override void Down()
