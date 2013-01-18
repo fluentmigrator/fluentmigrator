@@ -876,15 +876,37 @@ namespace FluentMigrator.Tests.Integration
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
+                    runner.Up(new TestCreateAndDropTableMigration());
+                    processor.ConstraintExists(null, "TestTable2", "TestUnique").ShouldBeFalse();
+
+                    runner.Up(new TestCreateUniqueConstraint());
+                    processor.ConstraintExists(null, "TestTable2", "TestUnique").ShouldBeTrue();
+
+                    runner.Down(new TestCreateUniqueConstraint());
+                    processor.ConstraintExists(null, "TestTable2", "TestUnique").ShouldBeFalse();
+
+                    runner.Down(new TestCreateAndDropTableMigration());
+
+                }, true, new[] { typeof(SqliteProcessor)});
+        }
+
+        [Test]
+        public void CanCreateUniqueConstraintWithSchema()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
                     runner.Up(new TestCreateSchema());
 
                     runner.Up(new TestCreateAndDropTableMigrationWithSchema());
                     processor.ConstraintExists("TestSchema", "TestTable2", "TestUnique").ShouldBeFalse();
 
-                    runner.Up(new TestCreateUniqueConstraint());
+                    runner.Up(new TestCreateUniqueConstraintWithSchema());
                     processor.ConstraintExists("TestSchema", "TestTable2", "TestUnique").ShouldBeTrue();
 
-                    runner.Down(new TestCreateUniqueConstraint());
+                    runner.Down(new TestCreateUniqueConstraintWithSchema());
                     processor.ConstraintExists("TestSchema", "TestTable2", "TestUnique").ShouldBeFalse();
 
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
@@ -895,6 +917,24 @@ namespace FluentMigrator.Tests.Integration
 
         [Test]
         public void CanInsertData()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateAndDropTableMigration());
+                    DataSet ds = processor.ReadTableData(null, "TestTable");
+                    ds.Tables[0].Rows.Count.ShouldBe(1);
+                    ds.Tables[0].Rows[0][1].ShouldBe("Test");
+
+                    runner.Down(new TestCreateAndDropTableMigration());
+
+                }, true, new[] { typeof(SqliteProcessor) });
+        }
+
+        [Test]
+        public void CanInsertDataWithSchema()
         {
             ExecuteWithSupportedProcessors(
                 processor =>
@@ -950,15 +990,39 @@ namespace FluentMigrator.Tests.Integration
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
+                    runner.Up(new TestCreateAndDropTableMigration());
+
+                    runner.Up(new TestDeleteData());
+                    DataSet upDs = processor.ReadTableData(null, "TestTable");
+                    upDs.Tables[0].Rows.Count.ShouldBe(0);
+
+                    runner.Down(new TestDeleteData());
+                    DataSet downDs = processor.ReadTableData(null, "TestTable");
+                    downDs.Tables[0].Rows.Count.ShouldBe(1);
+                    downDs.Tables[0].Rows[0][1].ShouldBe("Test");
+
+                    runner.Down(new TestCreateAndDropTableMigration());
+
+                }, true, new[] { typeof(SqliteProcessor) });
+        }
+
+        [Test]
+        public void CanDeleteDataWithSchema()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
                     runner.Up(new TestCreateSchema());
 
                     runner.Up(new TestCreateAndDropTableMigrationWithSchema());
 
-                    runner.Up(new TestDeleteData());
+                    runner.Up(new TestDeleteDataWithSchema());
                     DataSet upDs = processor.ReadTableData("TestSchema", "TestTable");
                     upDs.Tables[0].Rows.Count.ShouldBe(0);
 
-                    runner.Down(new TestDeleteData());
+                    runner.Down(new TestDeleteDataWithSchema());
                     DataSet downDs = processor.ReadTableData("TestSchema", "TestTable");
                     downDs.Tables[0].Rows.Count.ShouldBe(1);
                     downDs.Tables[0].Rows[0][1].ShouldBe("Test");
@@ -991,6 +1055,20 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateSchema());
                 }, true, new[] { typeof(SqliteProcessor) });
+        }
+
+        [Test]
+        public void CanExecuteSql()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestExecuteSql());
+                    runner.Down(new TestExecuteSql());
+ 
+                }, true);
         }
 
         private static MigrationRunner SetupMigrationRunner(IMigrationProcessor processor)
@@ -1353,6 +1431,19 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
+            Create.UniqueConstraint("TestUnique").OnTable("TestTable2").Column("Name");
+        }
+
+        public override void Down()
+        {
+            Delete.UniqueConstraint("TestUnique").FromTable("TestTable2");
+        }
+    }
+
+    internal class TestCreateUniqueConstraintWithSchema : Migration
+    {
+        public override void Up()
+        {
             Create.UniqueConstraint("TestUnique").OnTable("TestTable2").WithSchema("TestSchema").Column("Name");
         }
 
@@ -1375,7 +1466,20 @@ namespace FluentMigrator.Tests.Integration
         }
     }
 
-    internal class TestDeleteData :Migration
+    internal class TestDeleteData : Migration
+    {
+        public override void Up()
+        {
+            Delete.FromTable("TestTable").Row(new { Name = "Test" });
+        }
+
+        public override void Down()
+        {
+            Insert.IntoTable("TestTable").Row(new { Name = "Test" });
+        }
+    }
+
+    internal class TestDeleteDataWithSchema :Migration
     {
         public override void Up()
         {
@@ -1393,6 +1497,19 @@ namespace FluentMigrator.Tests.Integration
         public override void Up()
         {
             Create.Index().OnTable("TestTable2").InSchema("TestSchema").OnColumn("Name2").Ascending();
+        }
+    }
+
+    internal class TestExecuteSql : Migration
+    {
+        public override void Up()
+        {
+            Execute.Sql("select 1");
+        }
+
+        public override void Down()
+        {
+            Execute.Sql("select 2");
         }
     }
 }
