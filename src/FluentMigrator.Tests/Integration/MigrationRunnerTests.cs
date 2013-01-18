@@ -20,6 +20,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -892,6 +893,82 @@ namespace FluentMigrator.Tests.Integration
                 }, true, new[] { typeof(SqliteProcessor), typeof(PostgresProcessor) });
         }
 
+        [Test]
+        public void CanInsertData()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateSchema());
+
+                    runner.Up(new TestCreateAndDropTableMigrationWithSchema());
+                    DataSet ds = processor.ReadTableData("TestSchema", "TestTable");
+                    ds.Tables[0].Rows.Count.ShouldBe(1);
+                    ds.Tables[0].Rows[0][1].ShouldBe("Test");
+
+                    runner.Down(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Down(new TestCreateSchema());
+                }, true, new[] { typeof(SqliteProcessor) });
+        }
+
+        [Test]
+        public void CanUpdateData()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateSchema());
+
+                    runner.Up(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Up(new TestUpdateData());
+                    DataSet upDs = processor.ReadTableData("TestSchema", "TestTable");
+                    upDs.Tables[0].Rows.Count.ShouldBe(1);
+                    upDs.Tables[0].Rows[0][1].ShouldBe("Updated");
+
+                    runner.Down(new TestUpdateData());
+                    DataSet downDs = processor.ReadTableData("TestSchema", "TestTable");
+                    downDs.Tables[0].Rows.Count.ShouldBe(1);
+                    downDs.Tables[0].Rows[0][1].ShouldBe("Test");
+
+                    runner.Down(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Down(new TestCreateSchema());
+                }, true, new[] { typeof(SqliteProcessor)});
+        }
+
+        [Test]
+        public void CanDeleteData()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateSchema());
+
+                    runner.Up(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Up(new TestDeleteData());
+                    DataSet upDs = processor.ReadTableData("TestSchema", "TestTable");
+                    upDs.Tables[0].Rows.Count.ShouldBe(0);
+
+                    runner.Down(new TestDeleteData());
+                    DataSet downDs = processor.ReadTableData("TestSchema", "TestTable");
+                    downDs.Tables[0].Rows.Count.ShouldBe(1);
+                    downDs.Tables[0].Rows[0][1].ShouldBe("Test");
+
+                    runner.Down(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Down(new TestCreateSchema());
+                }, true, new[] { typeof(SqliteProcessor) });
+        }
+
         private static MigrationRunner SetupMigrationRunner(IMigrationProcessor processor)
         {
             Assembly asm = typeof(MigrationRunnerTests).Assembly;
@@ -1258,6 +1335,32 @@ namespace FluentMigrator.Tests.Integration
         public override void Down()
         {
             Delete.UniqueConstraint("TestUnique").FromTable("TestTable2").InSchema("TestSchema");
+        }
+    }
+
+    internal class TestUpdateData : Migration
+    {
+        public override void Up()
+        {
+            Update.Table("TestTable").InSchema("TestSchema").Set(new { Name = "Updated" }).AllRows();
+        }
+
+        public override void Down()
+        {
+            Update.Table("TestTable").InSchema("TestSchema").Set(new { Name = "Test" }).AllRows();
+        }
+    }
+
+    internal class TestDeleteData :Migration
+    {
+        public override void Up()
+        {
+            Delete.FromTable("TestTable").InSchema("TestSchema").Row(new { Name = "Test"});
+        }
+
+        public override void Down()
+        {
+            Insert.IntoTable("TestTable").InSchema("TestSchema").Row(new { Name = "Test" });
         }
     }
 }
