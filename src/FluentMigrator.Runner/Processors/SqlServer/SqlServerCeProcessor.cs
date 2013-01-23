@@ -21,6 +21,8 @@ using System;
 using System.Data;
 using System.IO;
 using FluentMigrator.Builders.Execute;
+using System.Text;
+using System.Collections.Generic;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
@@ -157,26 +159,56 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             if (transaction == null)
                 BeginTransaction();
 
-            using (var command = factory.CreateCommand(sql, Connection, transaction))
+            using (var command = factory.CreateCommand("", Connection, transaction))
             {
-                try
+                foreach (string statement in SplitIntoSingleStatements(sql))
                 {
-                    command.CommandTimeout = 0; // SQL Server CE does not support non-zero command timeout values!! :/
-                    command.ExecuteNonQuery();
-                }
-                catch (Exception ex)
-                {
-                    using (var message = new StringWriter())
+                    try
                     {
-                        message.WriteLine("An error occurred executing the following sql:");
-                        message.WriteLine(sql);
-                        message.WriteLine("The error was {0}", ex.Message);
+                        command.CommandText = statement;
+                        command.CommandTimeout = 0; // SQL Server CE does not support non-zero command timeout values!! :/
+                        command.ExecuteNonQuery();
+                    }
+                    catch (Exception ex)
+                    {
+                        using (var message = new StringWriter())
+                        {
+                            message.WriteLine("An error occurred executing the following sql:");
+                            message.WriteLine(statement);
+                            message.WriteLine("The error was {0}", ex.Message);
 
-                        throw new Exception(message.ToString(), ex);
+                            throw new Exception(message.ToString(), ex);
+                        }
                     }
                 }
             }
         }
+
+        private IEnumerable<string> SplitIntoSingleStatements(string sql)
+        {
+            StringBuilder builder = null;
+            foreach (string line in sql.Split(new string[] { Environment.NewLine }, StringSplitOptions.None))
+            {
+                if (!string.IsNullOrEmpty(line.Trim()) && !(line.TrimStart().StartsWith("--")) && (!line.ToUpper().Equals("GO")))
+                {
+                    if (builder == null)
+                    {
+                        builder = new StringBuilder();
+                    }
+                    builder.AppendLine(line);
+
+                    if (line.TrimEnd().EndsWith(";"))
+                    {
+                        yield return builder.ToString();
+                        builder = null;
+                    }
+                }
+            }
+            if (builder != null)
+            {
+                yield return builder.ToString();
+            }
+        } 
 
         public override void Process(PerformDBOperationExpression expression)
         {
