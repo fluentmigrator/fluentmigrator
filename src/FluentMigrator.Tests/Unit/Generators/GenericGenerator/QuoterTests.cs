@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Globalization;
 using System.Threading;
+using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Runner.Generators.Jet;
@@ -265,6 +266,18 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             quoter.QuoteValue(new byte[] { 0, 254, 13, 18, 125, 17 })
                 .ShouldBe("0x00fe0d127d11");
+        }
+
+        [Test]
+        public void ExplicitUnicodeStringIsFormattedAsNormalString()
+        {
+            quoter.QuoteValue(new ExplicitUnicodeString("Test String")).ShouldBe("'Test String'");
+        }
+
+        [Test]
+        public void ExplicitUnicodeStringIsFormattedAsNormalStringQuotes()
+        {
+            quoter.QuoteValue(new ExplicitUnicodeString("Test ' String")).ShouldBe("'Test '' String'");
         }
     }
 }

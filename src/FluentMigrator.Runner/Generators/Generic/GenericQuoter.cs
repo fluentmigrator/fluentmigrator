@@ -1,4 +1,5 @@
 ﻿using System.Globalization;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Generators.Generic
 {
@@ -12,6 +13,11 @@ namespace FluentMigrator.Runner.Generators.Generic
 
             string stringValue = value as string;
             if (stringValue != null) { return FormatString(stringValue); }
+
+            if (value is ExplicitUnicodeString)
+            {
+                return FormatString(value.ToString());
+            }
 
             if (value is char) { return FormatChar((char)value); }
             if (value is bool) { return FormatBool((bool)value); }

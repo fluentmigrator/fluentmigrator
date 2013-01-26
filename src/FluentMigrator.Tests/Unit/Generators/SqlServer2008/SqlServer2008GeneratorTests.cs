@@ -71,5 +71,24 @@ namespace FluentMigrator.Tests.Unit.Generators
             sql.ShouldBe(expected);
         }
 
+        [Test]
+        public void ExplicitUnicodeQuotesCorrectly()
+        {
+            var expression = new InsertDataExpression();
+            expression.TableName = "TestTable";
+            expression.Rows.Add(new InsertionDataDefinition
+                                    {
+                                        new KeyValuePair<string, object>("UnicodeStringValue", new ExplicitUnicodeString("UnicodeString")),
+                                        new KeyValuePair<string, object>("StringValue", "AnsiiString")
+                                    });
+
+            var sql = generator.Generate(expression);
+
+            var expected = "INSERT INTO [dbo].[TestTable] ([UnicodeStringValue], [StringValue]) VALUES (N'UnicodeString', 'AnsiiString')";
+
+            sql.ShouldBe(expected);
+
+        }
+
     }
 }
