@@ -1,11 +1,12 @@
 ﻿using System.Collections.Generic;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
     public class DeleteConstraintExpression : MigrationExpressionBase
     {
-        public ConstraintDefinition Constraint { get; private set; }
+        public ConstraintDefinition Constraint { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:DeleteConstraintExpression"/> class.
@@ -35,7 +36,7 @@ namespace FluentMigrator.Expressions
         {
             if (string.IsNullOrEmpty(Constraint.TableName))
             {
-                errors.Add("Table name cannot be empty");
+                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
             }
         }
     }

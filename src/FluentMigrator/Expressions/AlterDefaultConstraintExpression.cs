@@ -18,6 +18,9 @@ namespace FluentMigrator.Expressions
 
             if (String.IsNullOrEmpty(ColumnName))
                 errors.Add(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
+
+            if(DefaultValue == null)
+                errors.Add(ErrorMessages.DefaultValueCannotBeNull);
         }
 
         public override void ExecuteWith(IMigrationProcessor processor)

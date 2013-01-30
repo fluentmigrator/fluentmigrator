@@ -79,6 +79,11 @@ namespace FluentMigrator.Runner.Processors.Jet
             throw new NotImplementedException();
         }
 
+        public override bool SequenceExists(string schemaName, string sequenceName)
+        {
+            return false;
+        }
+
         public override void Execute(string template, params object[] args)
         {
             Process(String.Format(template, args));

@@ -159,8 +159,10 @@
     </Compile>
     <Compile Include="Helpers\FirebirdTestTable.cs" />
     <Compile Include="Helpers\OracleTestTable.cs" />
+    <Compile Include="Helpers\PostgresTestSequence.cs" />
     <Compile Include="Helpers\PostgresTestTable.cs" />
     <Compile Include="Helpers\SqlServerCeTestTable.cs" />
+    <Compile Include="Helpers\SqlServerTestSequence.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
     <Compile Include="Integration\Migrations\Tagged\1_TenantATable.cs">
       <SubType>Code</SubType>
@@ -229,7 +231,15 @@
     <Compile Include="Unit\Builders\Create\CreateColumnExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Schema\SchemaExpressionRootTest.cs" />
     <Compile Include="Unit\Definitions\IndexDefinitionTests.cs" />
+    <Compile Include="Unit\Expressions\AlterDefaultConstraintExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\AlterTableExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\CreateConstraintExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\CreateSchemaExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\CreateSequenceExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\DeleteConstraintExpressionTests.cs" />
     <Compile Include="Unit\Expressions\DeleteDefaultConstraintExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\DeleteSchemaExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\DeleteSequenceExpressionTests.cs" />
     <Compile Include="Unit\Expressions\UpdateDataExpressionTests.cs" />
     <Compile Include="Unit\Generators\GenericGenerator\GenericGeneratorTests.cs" />
     <Compile Include="Unit\Generators\Firebird\FirebirdGeneratorTests.cs" />

@@ -69,6 +69,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             return Exists("SELECT NULL FROM INFORMATION_SCHEMA.INDEXES WHERE INDEX_NAME = '{0}'", FormatSqlEscape(indexName));
         }
 
+        public override bool SequenceExists(string schemaName, string sequenceName)
+        {
+            return false;
+        }
+
         public override void Execute(string template, params object[] args)
         {
             Process(String.Format(template, args));

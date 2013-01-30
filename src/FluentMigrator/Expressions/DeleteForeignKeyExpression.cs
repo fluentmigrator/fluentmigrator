@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using System.Linq;
 
@@ -39,7 +40,16 @@ namespace FluentMigrator.Expressions
 
         public override void CollectValidationErrors(ICollection<string> errors)
         {
-            ForeignKey.CollectValidationErrors(errors);
+            if (ForeignKey.ForeignColumns.Count > 0)
+                ForeignKey.CollectValidationErrors(errors);
+            else
+            {
+                if (String.IsNullOrEmpty(ForeignKey.Name))
+                    errors.Add(ErrorMessages.ForeignKeyNameCannotBeNullOrEmpty);
+
+                if (String.IsNullOrEmpty(ForeignKey.ForeignTable))
+                    errors.Add(ErrorMessages.ForeignTableNameCannotBeNullOrEmpty);
+            }
         }
 
         public override void ExecuteWith(IMigrationProcessor processor)
@@ -58,8 +68,8 @@ namespace FluentMigrator.Expressions
             // there isn't a way to autoreverse the type 1
             //  but we can turn the type 2 into Create.ForeignKey().FromTable() ...
 
-            // only type 1 has the specific FK Name so if it's there then we can't auto-reverse
-            if (!String.IsNullOrEmpty(ForeignKey.Name))
+            // only type 2 has foreign column(s) and primary column(s)
+            if (!ForeignKey.HasForeignAndPrimaryColumnsDefined())
             {
                 return base.Reverse();
             }

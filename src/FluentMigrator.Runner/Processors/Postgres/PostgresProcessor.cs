@@ -59,6 +59,11 @@ namespace FluentMigrator.Runner.Processors.Postgres
             return Exists("select * from pg_catalog.pg_indexes where schemaname='{0}' and tablename = '{1}' and indexname = '{2}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(tableName), FormatToSafeName(indexName));
         }
 
+        public override bool SequenceExists(string schemaName, string sequenceName)
+        {
+            return Exists("select * from information_schema.sequences where sequence_catalog = current_catalog and sequence_schema ='{0}' and sequence_name = '{1}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(sequenceName));
+        }
+
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             return Read("SELECT * FROM {0}.{1}", quoter.QuoteSchemaName(schemaName), quoter.QuoteTableName(tableName));
