@@ -47,10 +47,10 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="GeneratorTests.cs" />
-    <Compile Include="IntialMigrationCode.cs">
+    <Compile Include="InitialMigrationCode.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
-      <DependentUpon>IntialMigrationCode.tt</DependentUpon>
+      <DependentUpon>InitialMigrationCode.tt</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -69,9 +69,9 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="FM.Core.ttinclude" />
-    <None Include="IntialMigrationCode.tt">
+    <None Include="InitialMigrationCode.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>IntialMigrationCode.cs</LastGenOutput>
+      <LastGenOutput>InitialMigrationCode.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>
