@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
@@ -42,7 +43,7 @@ namespace FluentMigrator.Expressions
         public override void CollectValidationErrors(ICollection<string> errors)
         {
             if (string.IsNullOrEmpty(TableName))
-                errors.Add(String.Format("The {0} does not have a valid table name", GetType().Name));
+                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
 
             foreach (var column in Columns)
                 column.CollectValidationErrors(errors);

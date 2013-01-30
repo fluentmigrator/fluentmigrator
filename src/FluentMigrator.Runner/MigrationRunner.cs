@@ -18,8 +18,10 @@
 
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
@@ -311,6 +313,8 @@ namespace FluentMigrator.Runner
             var context = new MigrationContext(Conventions, Processor, MigrationAssembly, ApplicationContext);
             migration.GetUpExpressions(context);
 
+            ApplyConventionsToAndValidateExpressions(migration, context.Expressions);
+
             _stopWatch.Start();
             ExecuteExpressions(context.Expressions);
             _stopWatch.Stop();
@@ -330,11 +334,46 @@ namespace FluentMigrator.Runner
             migration.GetDownExpressions(context);
 
             _stopWatch.Start();
+            ApplyConventionsToAndValidateExpressions(migration, context.Expressions);
             ExecuteExpressions(context.Expressions);
             _stopWatch.Stop();
 
             _announcer.Say(string.Format("{0} reverted", name));
             _announcer.ElapsedTime(_stopWatch.ElapsedTime());
+        }
+
+        /// <summary>
+        /// Validates each migration expression that has implemented the ICanBeValidated interface.
+        /// It throws an InvalidMigrationException exception if validation fails.
+        /// </summary>
+        /// <param name="migration">The current migration being run</param>
+        /// <param name="expressions">All the expressions contained in the up or down action</param>
+        protected void ApplyConventionsToAndValidateExpressions(IMigration migration, IEnumerable<IMigrationExpression> expressions)
+        {
+            var invalidExpressions = new Dictionary<string, string>();
+            foreach (var expression in expressions)
+            {
+                expression.ApplyConventions(Conventions);
+
+                var errors = new Collection<string>();
+                expression.CollectValidationErrors(errors);
+
+                if(errors.Count > 0)
+                    invalidExpressions.Add(expression.GetType().Name, string.Join(" ", errors.ToArray()));
+            }
+
+            if (invalidExpressions.Count > 0)
+            {
+                var errorMessage = DictToString(invalidExpressions, "{0}: {1}");
+                _announcer.Error("The migration {0} contained the following Validation Error(s): {1}", migration.GetType().Name, errorMessage);
+                throw new InvalidMigrationException(migration, errorMessage);
+            }
+        }
+
+        private string DictToString<TKey, TValue>(Dictionary<TKey, TValue> items, string format)
+        {
+            format = String.IsNullOrEmpty(format) ? "{0}='{1}' " : format;
+            return items.Aggregate(new StringBuilder(), (sb, kvp) => sb.AppendFormat(format, kvp.Key, kvp.Value).AppendLine()).ToString();
         }
 
         /// <summary>
@@ -349,7 +388,6 @@ namespace FluentMigrator.Runner
             {
                 try
                 {
-                    expression.ApplyConventions(Conventions);
                     if (expression is InsertDataExpression)
                     {
                         insertTicks += Time(() => expression.ExecuteWith(Processor));

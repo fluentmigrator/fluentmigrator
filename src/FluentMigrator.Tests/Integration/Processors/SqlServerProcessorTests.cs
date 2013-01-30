@@ -115,6 +115,32 @@ namespace FluentMigrator.Tests.Integration.Processors
         }
 
         [Test]
+        public void CallingSequenceExistsReturnsTrueIfSequenceExists()
+        {
+            using (var sequence = new SqlServerTestSequence(Processor, null, "test_sequence"))
+                Processor.SequenceExists(null, "test_sequence").ShouldBeTrue();
+        }
+
+        [Test]
+        public void CallingSequenceExistsReturnsFalseIfSequenceDoesNotExist()
+        {
+            Processor.SequenceExists(null, "DoesNotExist").ShouldBeFalse();
+        }
+
+        [Test]
+        public void CallingSequenceExistsReturnsTrueIfSequenceExistsWithSchema()
+        {
+            using (var sequence = new SqlServerTestSequence(Processor, "test_schema", "test_sequence"))
+                Processor.SequenceExists("test_schema", "test_sequence").ShouldBeTrue();
+        }
+
+        [Test]
+        public void CallingSequenceExistsReturnsFalseIfSequenceDoesNotExistWithSchema()
+        {
+            Processor.SequenceExists("test_schema", "DoesNotExist").ShouldBeFalse();
+        }
+
+        [Test]
         public void CallingProcessWithPerformDBOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
         {
             var output = new StringWriter();

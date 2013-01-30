@@ -83,5 +83,10 @@ namespace FluentMigrator.Model
                 OnUpdate = OnUpdate
             };
         }
+
+        public bool HasForeignAndPrimaryColumnsDefined()
+        {
+            return ForeignColumns.Count > 0 && PrimaryColumns.Count > 0;
+        }
     }
 }
