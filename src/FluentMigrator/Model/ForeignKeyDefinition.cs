@@ -58,9 +58,6 @@ namespace FluentMigrator.Model
             if (String.IsNullOrEmpty(PrimaryTable))
                 errors.Add(ErrorMessages.PrimaryTableNameCannotBeNullOrEmpty);
 
-            if (!String.IsNullOrEmpty(ForeignTable) && !String.IsNullOrEmpty(PrimaryTable) && ForeignTable.Equals(PrimaryTable))
-                errors.Add(ErrorMessages.ForeignKeyCannotBeSelfReferential);
-
             if (ForeignColumns.Count == 0)
                 errors.Add(ErrorMessages.ForeignKeyMustHaveOneOrMoreForeignColumns);
 

@@ -93,22 +93,6 @@ namespace FluentMigrator.Tests.Unit.Definitions
         }
 
         [Test]
-        public void ErrorIsReturnedWhenPrimaryTableNameIsSameAsForeignTableName()
-        {
-            var column = new ForeignKeyDefinition { PrimaryTable = "Bacon", ForeignTable = "Bacon" };
-            var errors = ValidationHelper.CollectErrors(column);
-            errors.ShouldContain(ErrorMessages.ForeignKeyCannotBeSelfReferential);
-        }
-
-        [Test]
-        public void ErrorIsNotReturnedWhenPrimaryTableNameIsDifferentThanForeignTableName()
-        {
-            var column = new ForeignKeyDefinition { PrimaryTable = "Bacon", ForeignTable = "NotBacon" };
-            var errors = ValidationHelper.CollectErrors(column);
-            errors.ShouldNotContain(ErrorMessages.ForeignKeyCannotBeSelfReferential);
-        }
-
-        [Test]
         public void ErrorIsReturnedWhenForeignColumnsIsEmpty()
         {
             var column = new ForeignKeyDefinition { ForeignColumns = new string[0] };
