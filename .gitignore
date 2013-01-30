@@ -28,3 +28,4 @@ examplecommand.txt
 *.ncrunchproject
 *.ncrunchsolution
 *.crunchsolution.cache
+src/FluentMigrator.T4.Tests/IntialMigrationCode.cs

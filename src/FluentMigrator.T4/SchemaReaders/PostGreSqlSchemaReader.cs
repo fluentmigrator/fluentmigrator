@@ -77,10 +77,14 @@ namespace FluentMigrator.T4
                 {
                     while(rdr.Read())
                     {
+                        var type = GetPropertyType(rdr["udt_name"].ToString());
                         Column col=new Column();
                         col.Name=rdr["column_name"].ToString();
                         col.PropertyName=CleanUp(col.Name);
-                        col.PropertyType=this.GetPropertyType(rdr["udt_name"].ToString());
+                        col.PropertyType = type;
+                        col.CustomType = type == null
+                            ? rdr["udt_name"].ToString().ToLowerInvariant()
+                            : null;
                         col.Size=GetDatatypeSize(rdr["udt_name"].ToString());
                         col.Precision=GetDatatypePrecision(rdr["udt_name"].ToString());
                         col.IsNullable=rdr["is_nullable"].ToString()=="YES";
@@ -133,48 +137,48 @@ namespace FluentMigrator.T4
             return "";
         }
     
-        string GetPropertyType(string sqlType)
+        static DbType? GetPropertyType(string sqlType)
         {
             switch (sqlType)
             {
                 case "int8":
-                case "serial8":	
-                    return "long";
+                case "serial8":
+                    return DbType.Int64;
 
-                case "bool":	
-                    return "bool";
+                case "bool":
+                    return DbType.Boolean;
 
-                case "bytea	":	
-                    return "byte[]";
+                case "bytea	":
+                    return DbType.Binary;
 
-                case "float8":	
-                    return "double";
+                case "float8":
+                    return DbType.Double;
 
                 case "int4":	
-                case "serial4":	
-                    return "int";
+                case "serial4":
+                    return DbType.Int32;
 
-                case "money	":	
-                    return "decimal";
+                case "money	":
+                    return DbType.Currency;
 
-                case "numeric":	
-                    return "decimal";
+                case "numeric":
+                    return DbType.Decimal;
 
-                case "float4":	
-                    return "float";
+                case "float4":
+                    return DbType.Decimal;
 
                 case "int2":	
-                    return "short";
+                    return DbType.Int16;
 
                 case "time":
                 case "timetz":
                 case "timestamp":
                 case "timestamptz":	
                 case "date":	
-                    return "DateTime";
+                    return DbType.DateTime;
 
                 default:
-                    return "string";
+                    return DbType.String;
             }
         }
 
