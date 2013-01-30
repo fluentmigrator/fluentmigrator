@@ -13,6 +13,7 @@ using FluentMigrator.Expressions;
 namespace FluentMigrator.Tests.Integration.Processors
 {
     [TestFixture]
+    [Category("Integration")]
     public class FirebirdProcessorTests
     {
         private readonly FirebirdQuoter quoter = new FirebirdQuoter();

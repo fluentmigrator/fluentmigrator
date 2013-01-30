@@ -20,6 +20,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
 {
 
     [TestFixture]
+    [Category("Integration")]
     public class SchemaDumpTests
     {
         public SqlConnection Connection;

@@ -30,6 +30,7 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Integration.Processors
 {
     [TestFixture]
+    [Category("Integration")]
     public class SqlServerProcessorTests
     {
         public SqlConnection Connection { get; set; }

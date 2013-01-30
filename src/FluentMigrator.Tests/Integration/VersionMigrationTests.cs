@@ -31,6 +31,7 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Integration
 {
     [TestFixture]
+    [Category("Integration")]
     public class VersionMigrationTests : IntegrationTestBase
     {
         [Test]
