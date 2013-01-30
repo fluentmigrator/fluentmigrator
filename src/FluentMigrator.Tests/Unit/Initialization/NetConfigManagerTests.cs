@@ -14,7 +14,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
     {
         private static string GetPath(string relative)
         {
-            return string.Format(@"..\..\Unit\Initialization\Fixtures\{0}", relative);
+            return string.Format(@"Unit\Initialization\Fixtures\{0}", relative);
         }
 
         [Test]

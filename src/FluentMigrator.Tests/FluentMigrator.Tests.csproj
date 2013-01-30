@@ -364,11 +364,21 @@
     <None Include="testscript.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Unit\Initialization\Fixtures\FromMachineConfig.config" />
-    <None Include="Unit\Initialization\Fixtures\WithConnectionString.config" />
-    <None Include="Unit\Initialization\Fixtures\WithConnectionString.exe.config" />
-    <None Include="Unit\Initialization\Fixtures\WithNoConnectionString.exe.config" />
-    <None Include="Unit\Initialization\Fixtures\WithWrongConnectionString.config" />
+    <None Include="Unit\Initialization\Fixtures\FromMachineConfig.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Unit\Initialization\Fixtures\WithConnectionString.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Unit\Initialization\Fixtures\WithConnectionString.exe.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Unit\Initialization\Fixtures\WithNoConnectionString.exe.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Unit\Initialization\Fixtures\WithWrongConnectionString.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -401,6 +411,17 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="EmbeddedResources\B\NotUniqueResource.sql" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Unit\Initialization\Fixtures\WithConnectionString.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Unit\Initialization\Fixtures\WithNoConfig.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Unit\Initialization\Fixtures\WithNoConnectionString.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
