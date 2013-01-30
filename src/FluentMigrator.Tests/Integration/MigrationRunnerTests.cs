@@ -912,7 +912,7 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
 
                     runner.Down(new TestCreateSchema());
-                }, true, new[] { typeof(SqliteProcessor), typeof(PostgresProcessor) });
+                }, true, new[] { typeof(SqliteProcessor) });
         }
 
         [Test]
