@@ -11,8 +11,8 @@ namespace FluentMigrator.T4
         // SchemaReader.ReadSchema
         public override Tables ReadSchema(DbConnection connection, DbProviderFactory factory)
         {
-            var result=new Tables();
-        
+            var result = new Tables();
+
             this._connection = connection;
             this._factory = factory;
 
@@ -22,14 +22,14 @@ namespace FluentMigrator.T4
                 cmd.Connection = connection;
                 cmd.CommandText = TableSql;
 
-                using (var rdr=cmd.ExecuteReader())
+                using (var rdr = cmd.ExecuteReader())
                 {
-                    while(rdr.Read())
+                    while (rdr.Read())
                     {
                         Table tbl = new Table();
                         tbl.Name = rdr["TABLE_NAME"].ToString();
                         tbl.Schema = rdr["TABLE_SCHEMA"].ToString();
-                        tbl.IsView = String.Compare(rdr["TABLE_TYPE"].ToString(), "View", true)==0;
+                        tbl.IsView = String.Compare(rdr["TABLE_TYPE"].ToString(), "View", true) == 0;
                         tbl.CleanName = CleanUp(tbl.Name);
                         tbl.ClassName = Inflector.MakeSingular(tbl.CleanName);
 
@@ -42,55 +42,60 @@ namespace FluentMigrator.T4
             {
                 tbl.Columns = this.LoadColumns(tbl);
                 tbl.Indexes = this.LoadIndices(tbl);
-                tbl.ForeignKeys = this.LoadForeignKeys(tbl);			
-                    
+                tbl.ForeignKeys = this.LoadForeignKeys(tbl);
+
                 // Mark the primary key
-                var primaryKey = this.GetPrimaryKey(tbl.Name).Select(c=>c.ToLowerInvariant());
+                var primaryKey = this.GetPrimaryKey(tbl.Name).Select(c => c.ToLowerInvariant());
                 var primaryKeyColumns = tbl.Columns.Where(c => primaryKey.Contains(c.Name.ToLowerInvariant()));
 
                 foreach (var column in primaryKeyColumns)
                     column.IsPrimaryKey = true;
             }
-        
+
 
             return result;
         }
-    
+
         DbConnection _connection;
         DbProviderFactory _factory;
-    
+
 
         List<Column> LoadColumns(Table tbl)
         {
-    
-            using (var cmd=this._factory.CreateCommand())
+
+            using (var cmd = this._factory.CreateCommand())
             {
-                cmd.Connection=this._connection;
-                cmd.CommandText=ColumnSql;
+                cmd.Connection = this._connection;
+                cmd.CommandText = ColumnSql;
 
                 var p = cmd.CreateParameter();
                 p.ParameterName = "@tableName";
-                p.Value=tbl.Name;
+                p.Value = tbl.Name;
                 cmd.Parameters.Add(p);
 
                 p = cmd.CreateParameter();
                 p.ParameterName = "@schemaName";
-                p.Value=tbl.Schema;
+                p.Value = tbl.Schema;
                 cmd.Parameters.Add(p);
 
-                var result=new List<Column>();
-                using (IDataReader rdr=cmd.ExecuteReader())
+                var result = new List<Column>();
+                using (IDataReader rdr = cmd.ExecuteReader())
                 {
-                    while(rdr.Read())
+                    while (rdr.Read())
                     {
-                        Column col=new Column();
-                        col.Name=rdr["ColumnName"].ToString();
-                        col.PropertyName=CleanUp(col.Name);
-                        col.PropertyType=GetPropertyType(rdr["DataType"].ToString());
-                        col.Size=GetDatatypeSize(rdr["DataType"].ToString());
-                        col.Precision=GetDatatypePrecision(rdr["DataType"].ToString());					
-                        col.IsNullable=rdr["IsNullable"].ToString()=="YES";
-                        col.IsAutoIncrement=((int)rdr["IsIdentity"])==1;
+                        var type = GetPropertyType(rdr["DataType"].ToString());
+                        Column col = new Column();
+                        col.Name = rdr["ColumnName"].ToString();
+                        col.PropertyName = CleanUp(col.Name);
+                        col.PropertyType = type;
+                        col.CustomType = type == null
+                            ? rdr["DataType"].ToString().ToLowerInvariant()
+                            : null;
+                        col.Size = rdr.Get("MaxLength", -1);
+                        col.Precision = rdr.Get("Precision", -1);
+                        col.IsNullable = rdr["IsNullable"].ToString() == "YES";
+                        col.IsAutoIncrement = ((int)rdr["IsIdentity"]) == 1;
+                        col.DefaultValue = rdr.IsDBNull(5) ? null : rdr["DefaultSetting"].ToString();
                         result.Add(col);
                     }
                 }
@@ -107,55 +112,57 @@ namespace FluentMigrator.T4
               I.[is_unique_constraint], I.[fill_factor],    I.[is_padded], I.[is_disabled], I.[is_hypothetical], 
               I.[allow_row_locks], I.[allow_page_locks], IC.[is_descending_key], IC.[is_included_column] 
             FROM sys.[tables] AS T  
-              INNER JOIN sys.[indexes] I ON T.[object_id] = I.[object_id]  
-              INNER JOIN sys.[index_columns] IC ON I.[object_id] = IC.[object_id] 
+              INNER JOIN sys.[indexes] I ON T.[object_id] = I.[object_id] 
+              INNER JOIN sys.[index_columns] IC ON I.[object_id] = IC.[object_id] AND I.index_id = IC.index_id 
               INNER JOIN sys.[all_columns] AC ON T.[object_id] = AC.[object_id] AND IC.[column_id] = AC.[column_id] 
             WHERE T.[is_ms_shipped] = 0 AND I.[type_desc] <> 'HEAP' 
             AND I.is_primary_key = 0 AND T.[name] = @tableName and OBJECT_SCHEMA_NAME(T.[object_id],DB_ID()) = @schemaName";
 
-            using (var cmd=this._factory.CreateCommand())
+            using (var cmd = this._factory.CreateCommand())
             {
-                cmd.Connection=this._connection;
-                cmd.CommandText=sql;
+                cmd.Connection = this._connection;
+                cmd.CommandText = sql;
 
                 var p = cmd.CreateParameter();
                 p.ParameterName = "@tableName";
-                p.Value=tbl.Name;
+                p.Value = tbl.Name;
                 cmd.Parameters.Add(p);
 
                 p = cmd.CreateParameter();
                 p.ParameterName = "@schemaName";
-                p.Value=tbl.Schema;
+                p.Value = tbl.Schema;
                 cmd.Parameters.Add(p);
 
-                var result=new List<TableIndex>();
+                var result = new List<TableIndex>();
 
-                using (IDataReader rdr=cmd.ExecuteReader())
+                using (IDataReader rdr = cmd.ExecuteReader())
                 {
-                    while(rdr.Read()){
-					
-                        string thisTable=rdr["table_name"].ToString();
-            
-                        if(tbl.Name.ToLower()==thisTable.ToLower()){
+                    while (rdr.Read())
+                    {
+
+                        string thisTable = rdr["table_name"].ToString();
+
+                        if (tbl.Name.ToLower() == thisTable.ToLower())
+                        {
                             var indexName = rdr["index_name"].ToString();
-                            if(!result.Exists(i => i.Name == indexName))
+                            if (!result.Exists(i => i.Name == indexName))
                             {
-                                TableIndex index=new TableIndex();
-                                index.Name= indexName;
-                                index.IsUnique=rdr.GetBoolean(rdr.GetOrdinal("is_unique"));
+                                TableIndex index = new TableIndex();
+                                index.Name = indexName;
+                                index.IsUnique = rdr.GetBoolean(rdr.GetOrdinal("is_unique"));
                                 index.IndexColumns = new List<IndexColumn>();
-                                index.IndexColumns.Add(new IndexColumn { Name = rdr["column_name"].ToString(), IsAsc = !rdr.GetBoolean(rdr.GetOrdinal("is_descending_key"))});
+                                index.IndexColumns.Add(new IndexColumn { Name = rdr["column_name"].ToString(), IsAsc = !rdr.GetBoolean(rdr.GetOrdinal("is_descending_key")) });
                                 result.Add(index);
                             }
                             else
                             {
-                                result.Single(i => i.Name == indexName).IndexColumns.Add(new IndexColumn { Name = rdr["column_name"].ToString(), IsAsc = !rdr.GetBoolean(rdr.GetOrdinal("is_descending_key"))});
+                                result.Single(i => i.Name == indexName).IndexColumns.Add(new IndexColumn { Name = rdr["column_name"].ToString(), IsAsc = !rdr.GetBoolean(rdr.GetOrdinal("is_descending_key")) });
                             }
                         }
-            
+
                     }
                 }
-                return result;	
+                return result;
             }
         }
 
@@ -176,20 +183,22 @@ namespace FluentMigrator.T4
                 p.Value = tbl.Schema;
                 cmd.Parameters.Add(p);
 
-                var keys = cmd.Select(reader => new {
+                var keys = cmd.Select(reader => new
+                {
                     ForeignConstraintName = reader["ForeignConstraintName"].ToString(),
-                    ForeignTableSchema	  = reader["ForeignTableSchema"].ToString(),
-                    ForeignTable	      = reader["ForeignTable"].ToString(),
-                    ForeignColumn	      = reader["ForeignColumn"].ToString(),
+                    ForeignTableSchema = reader["ForeignTableSchema"].ToString(),
+                    ForeignTable = reader["ForeignTable"].ToString(),
+                    ForeignColumn = reader["ForeignColumn"].ToString(),
                     PrimaryConstraintName = reader["PrimaryConstraintName"].ToString(),
-                    PrimaryTableSchema	  = reader["PrimaryTableSchema"].ToString(),
-                    PrimaryTable	      = reader["PrimaryTable"].ToString(),
-                    PrimaryColumn	      = reader["PrimaryColumn"].ToString(),
-                    UpdateRule	          = reader["UpdateRule"].ToString(),
-                    DeleteRule            = reader["DeleteRule"].ToString(),
+                    PrimaryTableSchema = reader["PrimaryTableSchema"].ToString(),
+                    PrimaryTable = reader["PrimaryTable"].ToString(),
+                    PrimaryColumn = reader["PrimaryColumn"].ToString(),
+                    UpdateRule = DecodeRule(reader.Get<string>("UpdateRule")),
+                    DeleteRule = DecodeRule(reader.Get<string>("DeleteRule")),
                 });
 
-                return keys.GroupBy(key => new {
+                return keys.GroupBy(key => new
+                {
                     key.ForeignConstraintName,
                     key.ForeignTableSchema,
                     key.ForeignTable,
@@ -197,7 +206,8 @@ namespace FluentMigrator.T4
                     key.PrimaryTable,
                     key.UpdateRule,
                     key.DeleteRule
-                }).Select(foreignKeyGrouping => new ForeignKey {
+                }).Select(foreignKeyGrouping => new ForeignKey
+                {
                     Name = foreignKeyGrouping.Key.ForeignConstraintName,
                     ForeignTable = foreignKeyGrouping.Key.ForeignTable,
                     ForeignTableSchema = foreignKeyGrouping.Key.ForeignTableSchema,
@@ -205,11 +215,13 @@ namespace FluentMigrator.T4
                     PrimaryTable = foreignKeyGrouping.Key.PrimaryTable,
                     PrimaryTableSchema = foreignKeyGrouping.Key.PrimaryTableSchema,
                     PrimaryColumns = foreignKeyGrouping.Select(f => f.PrimaryColumn).ToList(),
-                    PrimaryClass = Inflector.MakeSingular(CleanUp(foreignKeyGrouping.Key.PrimaryTable))
+                    PrimaryClass = Inflector.MakeSingular(CleanUp(foreignKeyGrouping.Key.PrimaryTable)),
+                    UpdateRule = foreignKeyGrouping.Key.UpdateRule,
+                    DeleteRule = foreignKeyGrouping.Key.DeleteRule
                 }).ToList();
-            }	
+            }
         }
-	
+
         IEnumerable<string> GetPrimaryKey(string table)
         {
             using (var cmd = this._factory.CreateCommand())
@@ -226,61 +238,52 @@ namespace FluentMigrator.T4
             }
         }
 
-        static string GetPropertyType(string sqlType)
-        {
-            string sysType="string";
-            switch (sqlType) 
+        private static readonly IDictionary<string, DbType?> _typeMap =
+            new Dictionary<string, DbType?>()
             {
-                case "bigint":
-                    sysType = "long";
-                    break;
-                case "smallint":
-                    sysType= "short";
-                    break;
-                case "int":
-                    sysType= "int";
-                    break;
-                case "uniqueidentifier":
-                    sysType=  "Guid";
-                    break;
-                case "smalldatetime":
-                case "datetime":
-                case "date":
-                case "time":
-                    sysType=  "DateTime";
-                    break;
-                case "float":
-                    sysType="double";
-                    break;
-                case "real":
-                    sysType="float";
-                    break;
-                case "numeric":
-                case "smallmoney":
-                case "decimal":
-                case "money":
-                    sysType=  "decimal";
-                    break;
-                case "tinyint":
-                    sysType = "byte";
-                    break;
-                case "bit":
-                    sysType=  "bool";
-                    break;
-                case "image":
-                case "binary":
-                case "varbinary":
-                case "timestamp":
-                    sysType=  "byte[]";
-                    break;
-                case "geography":
-                    sysType = "Microsoft.SqlServer.Types.SqlGeography";
-                    break;
-                case "geometry":
-                    sysType = "Microsoft.SqlServer.Types.SqlGeometry";
-                    break;
-            }
+                {"bigint", DbType.Int64}
+                ,{"smallint",DbType.Int16}
+                ,{"int",DbType.Int32}
+                ,{"uniqueidentifier",DbType.Guid}
+                ,{"smalldatetime",DbType.DateTime}
+                ,{"datetime",DbType.DateTime}
+                ,{"datetime2",DbType.DateTime2}
+                ,{"date",DbType.Date}
+                ,{"time",DbType.Time}
+                ,{"float",DbType.Double}
+                ,{"real",DbType.Single}
+                ,{"numeric",DbType.Decimal}
+                ,{"smallmoney",DbType.Currency}
+                ,{"money",DbType.Currency}
+                ,{"decimal",DbType.Decimal}
+                ,{"tinyint",DbType.Byte}
+                ,{"image",DbType.Binary}
+                ,{"binary",DbType.Binary}
+                ,{"varbinary",DbType.Binary}
+                ,{"bit",DbType.Boolean}
+                ,{"datetimeoffset",DbType.DateTimeOffset}
+                ,{"char",DbType.AnsiStringFixedLength}
+                ,{"varchar",DbType.AnsiString}
+                ,{"text",DbType.AnsiString}
+                ,{"nchar",DbType.StringFixedLength}
+                ,{"nvarchar",DbType.String}
+                ,{"ntext",DbType.String}
+
+            };
+        static DbType? GetPropertyType(string sqlType)
+        {
+            var sysType = default(DbType?);
+            _typeMap.TryGetValue(sqlType, out sysType);
             return sysType;
+        }
+
+        private static System.Data.Rule DecodeRule(string rule)
+        {
+            return new Switch<string, System.Data.Rule>(rule)
+                .Case("CASCADE", System.Data.Rule.Cascade)
+                .Case("SET NULL",System.Data.Rule.SetDefault)
+                .Case("SET DEFAULT", System.Data.Rule.SetNull)
+                .Default(System.Data.Rule.None);
         }
 
         const string PrimaryKeySql = @"SELECT c.name AS ColumnName
@@ -290,11 +293,11 @@ namespace FluentMigrator.T4
                 LEFT OUTER JOIN sys.columns AS c ON ic.object_id = c.object_id AND c.column_id = ic.column_id
                 WHERE (i.type = 1) AND (o.name = @tableName)";
 
-        const string TableSql=@"SELECT *
+        const string TableSql = @"SELECT *
         FROM  INFORMATION_SCHEMA.TABLES
         WHERE TABLE_TYPE='BASE TABLE' OR TABLE_TYPE='VIEW'";
 
-        const string ColumnSql=@"SELECT 
+        const string ColumnSql = @"SELECT 
             TABLE_CATALOG AS [Database],
             TABLE_SCHEMA AS Owner, 
             TABLE_NAME AS TableName, 
@@ -302,8 +305,8 @@ namespace FluentMigrator.T4
             ORDINAL_POSITION AS OrdinalPosition, 
             COLUMN_DEFAULT AS DefaultSetting, 
             IS_NULLABLE AS IsNullable, DATA_TYPE AS DataType, 
-            CHARACTER_MAXIMUM_LENGTH AS MaxLength, 
-            DATETIME_PRECISION AS DatePrecision,
+            ISNULL(CHARACTER_MAXIMUM_LENGTH,CAST(NUMERIC_PRECISION as Int)) AS MaxLength, 
+            NUMERIC_SCALE AS Precision,
             COLUMNPROPERTY(object_id('[' + TABLE_SCHEMA + '].[' + TABLE_NAME + ']'), COLUMN_NAME, 'IsIdentity') AS IsIdentity,
             COLUMNPROPERTY(object_id('[' + TABLE_SCHEMA + '].[' + TABLE_NAME + ']'), COLUMN_NAME, 'IsComputed') as IsComputed
         FROM  INFORMATION_SCHEMA.COLUMNS
@@ -335,11 +338,12 @@ namespace FluentMigrator.T4
         WHERE     
             (FK.CONSTRAINT_TYPE = 'FOREIGN KEY') 
             AND (FK.TABLE_NAME=@tableName) 
-            AND (FK.TABLE_SCHEMA=@schemaName)";
+            AND (FK.TABLE_SCHEMA=@schemaName)
+        ORDER BY ForeignConstraintName, ForeignTableSchema, ForeignTable, FKC.ORDINAL_POSITION";
     }
 
-    public static class DbDataReaderExtensions 
-    { 
+    public static class DbDataReaderExtensions
+    {
         public static IEnumerable<T> Select<T>(this DbDataReader reader, Func<DbDataReader, T> selector)
         {
             while (reader.Read())
@@ -349,7 +353,7 @@ namespace FluentMigrator.T4
         public static IEnumerable<T> Select<T>(this DbCommand command, Func<DbDataReader, T> selector)
         {
             using (var reader = command.ExecuteReader())
-               return reader.Select(selector).ToList();
-        }   
+                return reader.Select(selector).ToList();
+        }
     }
 }
