@@ -65,12 +65,12 @@ namespace FluentMigrator.Model
         {
             if (string.IsNullOrEmpty(TableName))
             {
-                errors.Add("Table name cannot be empty");
+                errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
             }
 
             if (0 == Columns.Count)
             {
-                errors.Add("At least one column must be specified");
+                errors.Add(ErrorMessages.ConstraintMustHaveAtLeastOneColumn);
             }
         }
 

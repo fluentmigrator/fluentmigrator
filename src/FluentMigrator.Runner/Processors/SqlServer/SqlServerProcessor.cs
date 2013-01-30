@@ -82,6 +82,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             return Exists("SELECT * FROM sys.indexes WHERE name = '{0}' and object_id=OBJECT_ID('{1}.{2}')", FormatSqlEscape(indexName), SafeSchemaName(schemaName), FormatSqlEscape(tableName));
         }
 
+        public override bool SequenceExists(string schemaName, string sequenceName)
+        {
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.SEQUENCES WHERE SEQUENCE_SCHEMA = '{0}' AND SEQUENCE_NAME = '{1}'", SafeSchemaName(schemaName), FormatSqlEscape(sequenceName));
+        }
+
         public override void Execute(string template, params object[] args)
         {
             Process(String.Format(template, args));

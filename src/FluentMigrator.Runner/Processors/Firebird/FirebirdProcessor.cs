@@ -46,8 +46,12 @@ namespace FluentMigrator.Runner.Processors.Firebird
             BeginTransaction();
         }
 
-
         #region Schema checks
+
+        public override bool SequenceExists(string schemaName, string sequenceName)
+        {
+            return false;
+        }
 
         public override bool SchemaExists(string schemaName)
         {

@@ -475,64 +475,44 @@ namespace FluentMigrator.Tests.Unit
             _announcer.Verify(a => a.Emphasize("2011010102: IMigrationProxy (current)"));
         }
 
-        [Test, Ignore("Move to MigrationLoader tests")]
-        public void HandlesNullMigrationList()
+        [Test]
+        public void IfMigrationHasAnInvalidExpressionDuringUpActionShouldThrowAnExceptionAndAnnounceTheError()
         {
-            //set migrations to return empty list
-            //var asm = Assembly.GetAssembly(typeof(MigrationVersionRunnerUnitTests));
-            //_migrationLoaderMock.Setup(x => x.FindMigrations(asm, null)).Returns<IEnumerable<Migration>>(null);
+            var invalidMigration = new Mock<IMigration>();
+            var invalidExpression = new UpdateDataExpression {TableName = "Test"};
+            invalidMigration.Setup(m => m.GetUpExpressions(It.IsAny<IMigrationContext>())).Callback((IMigrationContext mc) => mc.Expressions.Add(invalidExpression));
 
-            //_runner.Migrations.Count.ShouldBe(0);
+            Assert.Throws<InvalidMigrationException>(() => _runner.Up(invalidMigration.Object));
 
-            //_vrunner.MigrateUp();
-
-            //_migrationLoaderMock.VerifyAll();
-        }
-
-        [Test, ExpectedException(typeof(Exception))]
-        [Ignore("Move to migrationloader tests")]
-        public void ShouldThrowExceptionIfDuplicateVersionNumbersAreLoaded()
-        {
-            //_migrationLoaderMock.Setup(x => x.FindMigrationsIn(It.IsAny<Assembly>(), null)).Returns(new List<MigrationMetadata>
-            //                                                                                        {
-            //                                                                                            new MigrationMetadata {Version = 1, Type = typeof(UserToRole)},
-            //                                                                                            new MigrationMetadata {Version = 2, Type = typeof(FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass2.UserToRole)},
-            //                                                                                            new MigrationMetadata {Version = 2, Type = typeof(FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass2.UserToRole)}
-            //                                                                                        });
-
-            //_vrunner.MigrateUp();
+            _announcer.Verify(a => a.Error(It.Is<string>(s => s.Contains("UpdateDataExpression: Update statement is missing a condition. Specify one by calling .Where() or target all rows by calling .AllRows()."))));
         }
 
         [Test]
-        [Ignore("Move to migrationloader tests")]
-        public void HandlesMigrationThatDoesNotInheritFromMigrationBaseClass()
+        public void IfMigrationHasAnInvalidExpressionDuringDownActionShouldThrowAnExceptionAndAnnounceTheError()
         {
-            //_migrationLoaderMock.Setup(x => x.FindMigrationsIn(It.IsAny<Assembly>(), null)).Returns(new List<MigrationMetadata>
-            //                                                                                        {
-            //                                                                                            new MigrationMetadata {Version = 1, Type = typeof(MigrationThatDoesNotInheritFromMigrationBaseClass)},
-            //                                                                                        });
+            var invalidMigration = new Mock<IMigration>();
+            var invalidExpression = new UpdateDataExpression { TableName = "Test" };
+            invalidMigration.Setup(m => m.GetDownExpressions(It.IsAny<IMigrationContext>())).Callback((IMigrationContext mc) => mc.Expressions.Add(invalidExpression));
 
-            //_vrunner.Migrations[1].ShouldNotBeNull();
-            //_vrunner.Migrations[1].ShouldBeOfType<MigrationThatDoesNotInheritFromMigrationBaseClass>();
+            Assert.Throws<InvalidMigrationException>(() => _runner.Down(invalidMigration.Object));
+
+            _announcer.Verify(a => a.Error(It.Is<string>(s => s.Contains("UpdateDataExpression: Update statement is missing a condition. Specify one by calling .Where() or target all rows by calling .AllRows()."))));
         }
 
-        private class MigrationThatDoesNotInheritFromMigrationBaseClass : IMigration
+        [Test]
+        public void IfMigrationHasTwoInvalidExpressionsShouldAnnounceBothErrors()
         {
-            /// <summary>The arbitrary application context passed to the task runner.</summary>
-            public object ApplicationContext
-            {
-                get { throw new NotImplementedException(); }
-            }
+            var invalidMigration = new Mock<IMigration>();
+            var invalidExpression = new UpdateDataExpression { TableName = "Test" };
+            var secondInvalidExpression = new CreateColumnExpression();
+            invalidMigration.Setup(m => m.GetUpExpressions(It.IsAny<IMigrationContext>()))
+                .Callback((IMigrationContext mc) => { mc.Expressions.Add(invalidExpression); mc.Expressions.Add(secondInvalidExpression); });
 
-            public void GetUpExpressions(IMigrationContext context)
-            {
-                throw new NotImplementedException();
-            }
+            Assert.Throws<InvalidMigrationException>(() => _runner.Up(invalidMigration.Object));
 
-            public void GetDownExpressions(IMigrationContext context)
-            {
-                throw new NotImplementedException();
-            }
+            _announcer.Verify(a => a.Error(It.Is<string>(s => s.Contains("UpdateDataExpression: Update statement is missing a condition. Specify one by calling .Where() or target all rows by calling .AllRows()."))));
+            _announcer.Verify(a => a.Error(It.Is<string>(s => s.Contains("CreateColumnExpression: The table's name cannot be null or an empty string. The column's name cannot be null or an empty string. The column does not have a type defined."))));
         }
+
     }
 }
