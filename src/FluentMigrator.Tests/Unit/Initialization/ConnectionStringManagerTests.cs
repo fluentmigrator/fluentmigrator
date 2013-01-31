@@ -7,7 +7,7 @@ using NUnit.Framework;
 namespace FluentMigrator.Tests.Unit.Initialization
 {
     [TestFixture]
-    internal class ConnectionStringManagerTests
+    public class ConnectionStringManagerTests
     {
         private const string TARGET = "FluentMigrator.Tests.dll";
         private const string DATABASE = "sqlserver2008";

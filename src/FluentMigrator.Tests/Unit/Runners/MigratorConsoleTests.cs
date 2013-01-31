@@ -33,6 +33,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         private string target = "FluentMigrator.Tests.dll";
 
         [Test]
+        [Category("NotWorkingOnMono")]
         public void CanInitMigratorConsoleWithValidArguments()
         {
             var console = new MigratorConsole(
