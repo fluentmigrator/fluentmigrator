@@ -91,6 +91,7 @@ namespace FluentMigrator.Runner.Initialization
                     Runner.ListMigrations();
                     break;
             }
+            Runner.Processor.Dispose();
 
             RunnerContext.Announcer.Say("Task completed.");
         }
