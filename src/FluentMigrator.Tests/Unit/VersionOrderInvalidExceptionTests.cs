@@ -31,8 +31,8 @@ namespace FluentMigrator.Tests.Unit
         {
             var migrations = new[]
                                  {
-                                     new KeyValuePair<long,IMigration>(1, new TestMigration1()),
-                                     new KeyValuePair<long,IMigration>(2, new TestMigration2())
+                                     new KeyValuePair<long,IMigrationInfo>(1, new MigrationInfo(1, false, new TestMigration1())),
+                                     new KeyValuePair<long,IMigrationInfo>(2, new MigrationInfo(2, false, new TestMigration2()))
                                  };
 
 
@@ -46,8 +46,8 @@ namespace FluentMigrator.Tests.Unit
         {
             var migrations = new[]
                                  {
-                                     new KeyValuePair<long,IMigration>(1, new TestMigration1()),
-                                     new KeyValuePair<long,IMigration>(2, new TestMigration2())
+                                     new KeyValuePair<long,IMigrationInfo>(1, new MigrationInfo(1, false, new TestMigration1())),
+                                     new KeyValuePair<long,IMigrationInfo>(2, new MigrationInfo(2, false, new TestMigration2()))
                                  };
 
             var exception = new VersionOrderInvalidException(migrations);
@@ -60,27 +60,7 @@ namespace FluentMigrator.Tests.Unit
 
             exception.Message.ShouldBe(expectedMessage);
         }
-
-        [Test]
-        public void ExceptionMessageListsInvalidMigrationsWrappedByMigrationWithMetaDataAdapter()
-        {
-            var migrations = new[]
-                                 {
-                                     new KeyValuePair<long,IMigration>(1, new MigrationWithMetaDataAdapter(new TestMigration1(), new MigrationMetadata())),
-                                     new KeyValuePair<long,IMigration>(2, new MigrationWithMetaDataAdapter(new TestMigration2(), new MigrationMetadata()))
-                                 };
-
-            var exception = new VersionOrderInvalidException(migrations);
-
-            var expectedMessage = "Unapplied migrations have version numbers that are less than the greatest version number of applied migrations:"
-                + Environment.NewLine + "1 - TestMigration1"
-                + Environment.NewLine + "2 - TestMigration2";
-
-            System.Console.WriteLine(exception.Message);
-
-            exception.Message.ShouldBe(expectedMessage);
-        }
-    }
+   }
 
 
     class TestMigration1 : Migration

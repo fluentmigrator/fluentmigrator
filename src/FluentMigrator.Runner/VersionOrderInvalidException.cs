@@ -7,16 +7,11 @@ namespace FluentMigrator.Runner
 {
     public class VersionOrderInvalidException : Exception
     {
-        public IEnumerable<KeyValuePair<long, IMigration>> InvalidMigrations { get; set; }
+        public IEnumerable<KeyValuePair<long, IMigrationInfo>> InvalidMigrations { get; set; }
 
         public IEnumerable<long> InvalidVersions { get; private set; }
 
-        public VersionOrderInvalidException(IEnumerable<long> invalidVersions)
-        {
-            InvalidVersions = invalidVersions;
-        }
-
-        public VersionOrderInvalidException(IEnumerable<KeyValuePair<long, IMigration>> invalidMigrations)
+        public VersionOrderInvalidException(IEnumerable<KeyValuePair<long, IMigrationInfo>> invalidMigrations)
         {
             InvalidMigrations = invalidMigrations;
         }
@@ -27,11 +22,9 @@ namespace FluentMigrator.Runner
             {
                 var result = "Unapplied migrations have version numbers that are less than the greatest version number of applied migrations:";
 
-                foreach (var migration in InvalidMigrations)
+                foreach (var pair in InvalidMigrations)
                 {
-                    var value = migration.Value is MigrationWithMetaDataAdapter ? ((MigrationWithMetaDataAdapter)migration.Value).Migration : migration.Value;
-
-                    result = result + string.Format("{0}{1} - {2}", Environment.NewLine, migration.Key, value.GetType().Name);
+                    result = result + string.Format("{0}{1} - {2}", Environment.NewLine, pair.Key, pair.Value.Migration.GetType().Name);
                 }
 
                 return result;

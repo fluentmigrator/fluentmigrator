@@ -355,7 +355,7 @@ namespace FluentMigrator.Tests.Integration
 
                 //runner.Processor.CommitTransaction();
 
-                runner.MigrationLoader.Migrations.ShouldNotBeNull();
+                runner.MigrationLoader.LoadMigrations().ShouldNotBeNull();
             });
         }
 
@@ -754,8 +754,7 @@ namespace FluentMigrator.Tests.Integration
             caughtException.InvalidMigrations.Count().ShouldBe(1);
             var keyValuePair = caughtException.InvalidMigrations.First();
             keyValuePair.Key.ShouldBe(200909060935);
-            ((MigrationWithMetaDataAdapter)keyValuePair.Value).Migration.ShouldBeOfType<UserEmail>();
-            
+            keyValuePair.Value.Migration.ShouldBeOfType<UserEmail>();
         }
 
         [Test]
