@@ -20,27 +20,21 @@
 using System;
 using System.Data;
 using System.Data.Common;
-
 using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.Sqlite
 {
 
-    public class SqliteProcessor : ProcessorBase
+    public class SqliteProcessor : GenericProcessorBase
     {
-        private readonly DbFactoryBase factory;
-        public IDbConnection Connection { get; set; }
-
         public override string DatabaseType
         {
             get { return "Sqlite"; }
         }
 
-        public SqliteProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, DbFactoryBase factory)
-            : base(generator, announcer, options)
+        public SqliteProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+            : base(connection, factory, generator, announcer, options)
         {
-            this.factory = factory;
-            Connection = connection;
         }
 
         public override bool SchemaExists(string schemaName)
@@ -81,9 +75,9 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
         public override bool Exists(string template, params object[] args)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            EnsureConnectionIsOpen();
 
-            using (var command = factory.CreateCommand(String.Format(template, args), Connection))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
             using (var reader = command.ExecuteReader())
             {
                 try
@@ -111,7 +105,7 @@ namespace FluentMigrator.Runner.Processors.Sqlite
             if (Options.PreviewOnly)
                 return;
 
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            EnsureConnectionIsOpen();
 
             if (expression.Operation != null)
                 expression.Operation(Connection, null);
@@ -124,8 +118,7 @@ namespace FluentMigrator.Runner.Processors.Sqlite
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
 
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
 
             if (sql.IndexOf("GO", StringComparison.OrdinalIgnoreCase) >= 0)
             {
@@ -142,7 +135,7 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
         private void ExecuteNonQuery(string sql)
         {
-            using (var command = factory.CreateCommand(sql, Connection))
+            using (var command = Factory.CreateCommand(sql, Connection))
             {
                 try
                 {
@@ -160,7 +153,7 @@ namespace FluentMigrator.Runner.Processors.Sqlite
             sql += "\nGO";   // make sure last batch is executed.
             string sqlBatch = string.Empty;
 
-            using (var command = factory.CreateCommand(sql, Connection))
+            using (var command = Factory.CreateCommand(sql, Connection))
             {
                 try
                 {
@@ -190,12 +183,12 @@ namespace FluentMigrator.Runner.Processors.Sqlite
 
         public override DataSet Read(string template, params object[] args)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            EnsureConnectionIsOpen();
 
             var ds = new DataSet();
-            using (var command = factory.CreateCommand(String.Format(template, args), Connection))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
             {
-                var adapter = factory.CreateDataAdapter(command);
+                var adapter = Factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
                 return ds;
             }

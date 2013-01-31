@@ -20,14 +20,26 @@ namespace FluentMigrator.Runner.Processors.Jet
             Connection = connection;
         }
 
+        protected void EnsureConnectionIsOpen()
+        {
+            if (Connection.State != ConnectionState.Open)
+                Connection.Open();
+        }
+
+        protected void EnsureConnectionIsClosed()
+        {
+            if (Connection.State != ConnectionState.Closed)
+                Connection.Close();
+        }
+
         public override void Process(PerformDBOperationExpression expression)
         {
             Announcer.Say("Performing DB Operation");
 
             if (Options.PreviewOnly)
                 return;
-			
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+        
+            EnsureConnectionIsOpen();
 
             if (expression.Operation != null)
                 expression.Operation(Connection, null);
@@ -40,8 +52,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
 
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
 
             using (var command = new OleDbCommand(sql, Connection))
             {
@@ -63,7 +74,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 
         public override DataSet Read(string template, params object[] args)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            EnsureConnectionIsOpen();
 
             var ds = new DataSet();
             using (var command = new OleDbCommand(String.Format(template, args), Connection))
@@ -76,7 +87,13 @@ namespace FluentMigrator.Runner.Processors.Jet
 
         public override bool Exists(string template, params object[] args)
         {
-            throw new NotImplementedException();
+            EnsureConnectionIsOpen();
+
+            using (var command = new OleDbCommand(String.Format(template, args), Connection))
+            using (var reader = command.ExecuteReader())
+            {
+                return reader.Read();
+            }
         }
 
         public override bool SequenceExists(string schemaName, string sequenceName)
@@ -96,7 +113,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 
         public override bool TableExists(string schemaName, string tableName)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            EnsureConnectionIsOpen();
 
             var restrict = new object[] { null, null, tableName, "TABLE" };
             using (var tables = Connection.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, restrict))
@@ -114,7 +131,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            EnsureConnectionIsOpen();
 
             var restrict = new[] { null, null, tableName, null };
             using (var columns = Connection.GetOleDbSchemaTable(OleDbSchemaGuid.Columns, restrict))
@@ -132,7 +149,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            EnsureConnectionIsOpen();
 
             var restrict = new[] { null, null, constraintName, null, null, tableName };
             using (var constraints = Connection.GetOleDbSchemaTable(OleDbSchemaGuid.Table_Constraints, restrict))
@@ -143,7 +160,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            EnsureConnectionIsOpen();
 
             var restrict = new[] { null, null, indexName, null, tableName };
             using (var indexes = Connection.GetOleDbSchemaTable(OleDbSchemaGuid.Indexes, restrict))

@@ -24,10 +24,8 @@ using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-    public sealed class SqlServerProcessor : ProcessorBase
+    public sealed class SqlServerProcessor : GenericProcessorBase
     {
-        private readonly IDbFactory factory;
-        public IDbConnection Connection { get; private set; }
         public IDbTransaction Transaction { get; private set; }
         
         public override string DatabaseType
@@ -36,11 +34,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         }
 
         public SqlServerProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
-            : base(generator, announcer, options)
+            : base(connection, factory, generator, announcer, options)
         {
-            this.factory = factory;
-            Connection = connection;
-            connection.Open();
+            EnsureConnectionIsOpen();
             BeginTransaction();
         }
 
@@ -94,10 +90,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool Exists(string template, params object[] args)
         {
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
 
-            using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -111,12 +106,12 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override DataSet Read(string template, params object[] args)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            EnsureConnectionIsOpen();
 
             var ds = new DataSet();
-            using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             {
-                var adapter = factory.CreateDataAdapter(command);
+                var adapter = Factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
                 return ds;
             }
@@ -133,10 +128,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             Announcer.Say("Committing Transaction");
             Transaction.Commit();
             WasCommitted = true;
-            if (Connection.State != ConnectionState.Closed)
-            {
-                Connection.Close();
-            }
+            EnsureConnectionIsClosed();
         }
 
         public override void RollbackTransaction()
@@ -144,10 +136,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             Announcer.Say("Rolling back transaction");
             Transaction.Rollback();
             WasCommitted = true;
-            if (Connection.State != ConnectionState.Closed)
-            {
-                Connection.Close();
-            }
+            EnsureConnectionIsClosed();
         }
 
         protected override void Process(string sql)
@@ -157,8 +146,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
 
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
 
             if (sql.IndexOf("GO", StringComparison.OrdinalIgnoreCase) >= 0)
             {
@@ -173,7 +161,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         private void ExecuteNonQuery(string sql)
         {
-            using (var command = factory.CreateCommand(sql, Connection, Transaction))
+            using (var command = Factory.CreateCommand(sql, Connection, Transaction))
             {
                 try
                 {
@@ -199,7 +187,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             sql += "\nGO";   // make sure last batch is executed.
             string sqlBatch = string.Empty;
 
-            using (var command = factory.CreateCommand(string.Empty, Connection, Transaction))
+            using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction))
             {
                 try
                 {
@@ -241,8 +229,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             if (Options.PreviewOnly)
                 return;
-			
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+
+            EnsureConnectionIsOpen();
 
             if (expression.Operation != null)
                 expression.Operation(Connection, Transaction);

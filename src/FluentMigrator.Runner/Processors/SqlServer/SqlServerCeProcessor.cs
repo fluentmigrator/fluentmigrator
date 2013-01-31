@@ -24,10 +24,8 @@ using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-    public sealed class SqlServerCeProcessor : ProcessorBase
+    public sealed class SqlServerCeProcessor : GenericProcessorBase
     {
-        private readonly IDbFactory factory;
-        public IDbConnection Connection { get; private set; }
         private IDbTransaction transaction;
 
         public override string DatabaseType
@@ -36,11 +34,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         }
 
         public SqlServerCeProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
-            : base(generator, announcer, options)
+            : base(connection, factory, generator, announcer, options)
         {
-            this.factory = factory;
-            Connection = connection;
-            connection.Open();
+            EnsureConnectionIsOpen();
             BeginTransaction();
         }
 
@@ -81,10 +77,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool Exists(string template, params object[] args)
         {
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
 
-            using (var command = factory.CreateCommand(String.Format(template, args), Connection, transaction))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, transaction))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -98,12 +93,12 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override DataSet Read(string template, params object[] args)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            EnsureConnectionIsOpen();
 
             var ds = new DataSet();
-            using (var command = factory.CreateCommand(String.Format(template, args), Connection, transaction))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, transaction))
             {
-                var adapter = factory.CreateDataAdapter(command);
+                var adapter = Factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
                 return ds;
             }
@@ -125,10 +120,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 transaction = null;
             }
 
-            if (Connection.State != ConnectionState.Closed)
-            {
-                Connection.Close();
-            }
+            EnsureConnectionIsClosed();
         }
 
         public override void RollbackTransaction()
@@ -143,10 +135,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             transaction.Rollback();
 
-            if (Connection.State != ConnectionState.Closed)
-            {
-                Connection.Close();
-            }
+            EnsureConnectionIsClosed();
         }
 
         protected override void Process(string sql)
@@ -156,13 +145,12 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
 
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
 
             if (transaction == null)
                 BeginTransaction();
 
-            using (var command = factory.CreateCommand(sql, Connection, transaction))
+            using (var command = Factory.CreateCommand(sql, Connection, transaction))
             {
                 try
                 {
@@ -185,7 +173,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            EnsureConnectionIsOpen();
 
             if (expression.Operation != null)
                 expression.Operation(Connection, transaction);
