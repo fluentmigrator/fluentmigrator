@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Infrastructure;
 using System.Linq;
 
@@ -66,7 +67,7 @@ namespace FluentMigrator.Runner
             foreach (var migrationMetadata in migrationList)
             {
                 if (Migrations.ContainsKey(migrationMetadata.Version))
-                    throw new Exception(String.Format("Duplicate migration version {0}.", migrationMetadata.Version));
+                    throw new DuplicateMigrationException(String.Format("Duplicate migration version {0}.", migrationMetadata.Version));
 
                 var migration = (IMigration)migrationMetadata.Type.Assembly.CreateInstance(migrationMetadata.Type.FullName);
                 Migrations.Add(migrationMetadata.Version, new MigrationWithMetaDataAdapter(migration, migrationMetadata));

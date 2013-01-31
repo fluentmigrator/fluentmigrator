@@ -180,6 +180,11 @@
     <Compile Include="Builders\IfDatabase\NullIfDatabaseProcessor.cs" />
     <Compile Include="Builders\IForeignKeyCascadeSyntax.cs" />
     <Compile Include="Builders\IInSchemaSyntax.cs" />
+    <Compile Include="Exceptions\DatabaseOperationNotSupportedException.cs" />
+    <Compile Include="Exceptions\DuplicateMigrationException.cs" />
+    <Compile Include="Exceptions\FluentMigratorException.cs" />
+    <Compile Include="Exceptions\ProcessorFactoryNotFoundException.cs" />
+    <Compile Include="Exceptions\UndeterminableConnectionException.cs" />
     <Compile Include="RawSql.cs" />
     <Compile Include="Infrastructure\ISupportAdditionalFeatures.cs" />
     <Compile Include="Builders\Insert\IInsertDataOrInSchemaSyntax.cs" />

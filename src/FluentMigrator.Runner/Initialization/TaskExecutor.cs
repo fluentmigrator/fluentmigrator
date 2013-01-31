@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Processors;
 

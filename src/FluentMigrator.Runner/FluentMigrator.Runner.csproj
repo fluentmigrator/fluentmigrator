@@ -159,7 +159,6 @@
     <Compile Include="Generators\MySql\MySqlColumn.cs" />
     <Compile Include="Generators\MySql\MySqlQuoter.cs" />
     <Compile Include="Generators\MySql\MySqlTypeMap.cs" />
-    <Compile Include="Generators\DatabaseOperationNotSupportedException.cs" />
     <Compile Include="Generators\Oracle\OracleColumn.cs" />
     <Compile Include="Generators\Oracle\OracleQuoter.cs" />
     <Compile Include="Generators\Oracle\OracleTypeMap.cs" />
@@ -195,10 +194,8 @@
     <Compile Include="Initialization\IRunnerContext.cs" />
     <Compile Include="Initialization\ConnectionStringManager.cs" />
     <Compile Include="Initialization\NetConfigManager.cs" />
-    <Compile Include="Initialization\ProcessorFactoryNotFoundException.cs" />
     <Compile Include="Initialization\RunnerContext.cs" />
     <Compile Include="Initialization\TaskExecutor.cs" />
-    <Compile Include="Initialization\UndeterminableConnectionException.cs" />
     <Compile Include="IProfileLoader.cs" />
     <Compile Include="IVersionLoader.cs" />
     <Compile Include="Processors\Firebird\FirebirdDbFactory.cs" />

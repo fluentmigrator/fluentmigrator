@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Linq.Expressions;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Tests.Integration;

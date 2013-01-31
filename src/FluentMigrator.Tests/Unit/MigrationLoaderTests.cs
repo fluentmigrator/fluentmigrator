@@ -19,6 +19,7 @@
 using System;
 using System.Reflection;
 using System.Collections.Generic;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Tests.Integration.Migrations;
@@ -175,7 +176,7 @@ namespace FluentMigrator.Tests.Unit
         {
             var conventions = new MigrationConventions();
             var asm = Assembly.GetExecutingAssembly();
-            Assert.Throws<Exception>(() => new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Unit.DuplicateVersionNumbers", null));
+            Assert.Throws<DuplicateMigrationException>(() => new MigrationLoader(conventions, asm, "FluentMigrator.Tests.Unit.DuplicateVersionNumbers", null));
         }
 
         [Test]
