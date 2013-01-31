@@ -14,7 +14,6 @@ namespace FluentMigrator.Runner.Processors.Firebird
     {
         protected readonly FirebirdTruncator truncator;
         readonly FirebirdQuoter quoter = new FirebirdQuoter();
-        public IDbTransaction Transaction { get; private set; }
         public FirebirdOptions FBOptions { get; private set; }
         public new IMigrationGenerator Generator { get { return base.Generator; } }
         public new IAnnouncer Announcer { get { return base.Announcer; } }
@@ -29,6 +28,13 @@ namespace FluentMigrator.Runner.Processors.Firebird
             get { return "Firebird"; }
         }
 
+        public override bool SupportsTransactions
+        {
+            get
+            {
+                return true;
+            }
+        }
         public FirebirdProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory, FirebirdOptions fbOptions)
             : base(connection, factory, generator, announcer, options)
         {
@@ -36,10 +42,6 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 throw new ArgumentNullException("fbOptions");
             FBOptions = fbOptions;
             truncator = new FirebirdTruncator(FBOptions.TruncateLongNames);
-            
-            EnsureConnectionIsOpen();
-
-            BeginTransaction();
         }
 
         #region Schema checks
@@ -140,6 +142,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public override void CommitTransaction()
         {
+            if (Transaction == null) return;
             Announcer.Say("Committing Transaction");
             Transaction.Commit();
             WasCommitted = true;
@@ -150,6 +153,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public override void RollbackTransaction()
         {
+            if (Transaction == null) return;
             Announcer.Say("Rolling back transaction");
             Transaction.Rollback();
             WasCommitted = true;

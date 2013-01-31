@@ -168,5 +168,10 @@ namespace FluentMigrator.Runner.Processors.Jet
                 return indexes.Rows.Count > 0;
             }
         }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            EnsureConnectionIsClosed();
+        }
     }
 }

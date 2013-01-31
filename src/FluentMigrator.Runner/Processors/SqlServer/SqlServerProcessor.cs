@@ -26,18 +26,22 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 {
     public sealed class SqlServerProcessor : GenericProcessorBase
     {
-        public IDbTransaction Transaction { get; private set; }
-        
         public override string DatabaseType
         {
             get { return "SqlServer"; }
         }
 
+        public override bool SupportsTransactions
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public SqlServerProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
-            EnsureConnectionIsOpen();
-            BeginTransaction();
         }
 
         private static string SafeSchemaName(string schemaName)
@@ -115,28 +119,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 adapter.Fill(ds);
                 return ds;
             }
-        }
-
-        public override void BeginTransaction()
-        {
-            Announcer.Say("Beginning Transaction");
-            Transaction = Connection.BeginTransaction();
-        }
-
-        public override void CommitTransaction()
-        {
-            Announcer.Say("Committing Transaction");
-            Transaction.Commit();
-            WasCommitted = true;
-            EnsureConnectionIsClosed();
-        }
-
-        public override void RollbackTransaction()
-        {
-            Announcer.Say("Rolling back transaction");
-            Transaction.Rollback();
-            WasCommitted = true;
-            EnsureConnectionIsClosed();
         }
 
         protected override void Process(string sql)

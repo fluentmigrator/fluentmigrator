@@ -9,19 +9,23 @@ namespace FluentMigrator.Runner.Processors.Postgres
     public class PostgresProcessor : GenericProcessorBase
     {
         readonly PostgresQuoter quoter = new PostgresQuoter();
-        public IDbTransaction Transaction { get; private set; }
 
         public override string DatabaseType
         {
             get { return "Postgres"; }
         }
 
+        public override bool SupportsTransactions
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public PostgresProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
-            EnsureConnectionIsOpen();
-
-            Transaction = Connection.BeginTransaction();
         }
 
         public override void Execute(string template, params object[] args)
@@ -86,28 +90,6 @@ namespace FluentMigrator.Runner.Processors.Postgres
             {
                 return reader.Read();
             }
-        }
-
-        public override void BeginTransaction()
-        {
-            Announcer.Say("Beginning Transaction");
-            Transaction = Connection.BeginTransaction();
-        }
-
-        public override void CommitTransaction()
-        {
-            Announcer.Say("Committing Transaction");
-            Transaction.Commit();
-            WasCommitted = true;
-            EnsureConnectionIsClosed();
-        }
-
-        public override void RollbackTransaction()
-        {
-            Announcer.Say("Rolling back transaction");
-            Transaction.Rollback();
-            WasCommitted = true;
-            EnsureConnectionIsClosed();
         }
 
         protected override void Process(string sql)

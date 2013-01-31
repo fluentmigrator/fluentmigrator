@@ -32,8 +32,6 @@ namespace FluentMigrator.Runner.Processors.Oracle
         public OracleProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, OracleDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
-            //oracle does not support ddl transactions
-            //this.Transaction = this.Connection.BeginTransaction();
         }
 
         public override bool SchemaExists(string schemaName)

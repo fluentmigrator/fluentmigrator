@@ -32,6 +32,12 @@ namespace FluentMigrator.Runner.Processors
 
         public IDbConnection Connection { get; protected set; }
         public IDbFactory Factory { get; protected set; }
+        public IDbTransaction Transaction { get; protected set; }
+
+        public virtual bool SupportsTransactions
+        {
+            get { return false; }
+        }
 
         protected void EnsureConnectionIsOpen()
         {
@@ -43,6 +49,42 @@ namespace FluentMigrator.Runner.Processors
         {
             if (Connection.State != ConnectionState.Closed)
                 Connection.Close();
+        }
+
+        public override void BeginTransaction()
+        {
+            if (!SupportsTransactions) return;
+
+            EnsureConnectionIsOpen();
+
+            Announcer.Say("Beginning Transaction");
+            Transaction = Connection.BeginTransaction();
+        }
+
+        public override void RollbackTransaction()
+        {
+            if (Transaction == null) return;
+
+            Announcer.Say("Rolling back transaction");
+            Transaction.Rollback();
+            WasCommitted = true;
+            Transaction = null;
+        }
+
+        public override void CommitTransaction()
+        {
+            if (Transaction == null) return;
+
+            Announcer.Say("Committing Transaction");
+            Transaction.Commit();
+            WasCommitted = true;
+            Transaction = null;
+        }
+
+        protected override void Dispose(bool isDisposing)
+        {
+            RollbackTransaction();
+            EnsureConnectionIsClosed();
         }
     }
 }

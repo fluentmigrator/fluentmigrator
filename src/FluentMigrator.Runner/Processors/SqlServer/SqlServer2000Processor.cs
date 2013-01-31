@@ -26,13 +26,17 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 {
     public sealed class SqlServer2000Processor : GenericProcessorBase
     {
-        public IDbTransaction Transaction { get; private set; }
-
         public SqlServer2000Processor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
-            EnsureConnectionIsOpen();
-            BeginTransaction();
+        }
+
+        public override bool SupportsTransactions
+        {
+            get
+            {
+                return true;
+            }
         }
 
         public override string DatabaseType
@@ -105,28 +109,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             {
                 return reader.Read();
             }
-        }
-
-        public override void BeginTransaction()
-        {
-            Announcer.Say("Beginning Transaction");
-            Transaction = Connection.BeginTransaction();
-        }
-
-        public override void CommitTransaction()
-        {
-            Announcer.Say("Committing Transaction");
-            Transaction.Commit();
-            WasCommitted = true;
-            EnsureConnectionIsClosed();
-        }
-
-        public override void RollbackTransaction()
-        {
-            Announcer.Say("Rolling back transaction");
-            Transaction.Rollback();
-            WasCommitted = true;
-            EnsureConnectionIsClosed();
         }
 
         public override void Execute(string template, params object[] args)

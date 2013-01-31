@@ -43,12 +43,14 @@ namespace FluentMigrator.Tests.Integration.Processors
         {
             Connection = new NpgsqlConnection(IntegrationTestOptions.Postgres.ConnectionString);
             Processor = new PostgresProcessor(Connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new PostgresDbFactory());
+            Connection.Open();
         }
 
         [TearDown]
         public void TearDown()
         {
             Processor.CommitTransaction();
+            Processor.Dispose();
         }
 
 

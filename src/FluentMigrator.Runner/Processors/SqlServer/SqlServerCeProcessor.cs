@@ -26,18 +26,22 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 {
     public sealed class SqlServerCeProcessor : GenericProcessorBase
     {
-        private IDbTransaction transaction;
-
         public override string DatabaseType
         {
             get { return "SqlServerCe"; }
         }
 
+        public override bool SupportsTransactions
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public SqlServerCeProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
-            EnsureConnectionIsOpen();
-            BeginTransaction();
         }
 
         public override bool SchemaExists(string schemaName)
@@ -79,7 +83,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, transaction))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -96,46 +100,12 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             EnsureConnectionIsOpen();
 
             var ds = new DataSet();
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, transaction))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             {
                 var adapter = Factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
                 return ds;
             }
-        }
-
-        public override void BeginTransaction()
-        {
-            Announcer.Say("Beginning Transaction");
-            transaction = Connection.BeginTransaction();
-        }
-
-        public override void CommitTransaction()
-        {
-            Announcer.Say("Committing Transaction");
-
-            if (transaction != null)
-            {
-                transaction.Commit();
-                transaction = null;
-            }
-
-            EnsureConnectionIsClosed();
-        }
-
-        public override void RollbackTransaction()
-        {
-            if (transaction == null)
-            {
-                Announcer.Say("No transaction was available to rollback!");
-                return;
-            }
-
-            Announcer.Say("Rolling back transaction");
-
-            transaction.Rollback();
-
-            EnsureConnectionIsClosed();
         }
 
         protected override void Process(string sql)
@@ -147,10 +117,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             EnsureConnectionIsOpen();
 
-            if (transaction == null)
-                BeginTransaction();
-
-            using (var command = Factory.CreateCommand(sql, Connection, transaction))
+            using (var command = Factory.CreateCommand(sql, Connection, Transaction))
             {
                 try
                 {
@@ -176,7 +143,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             EnsureConnectionIsOpen();
 
             if (expression.Operation != null)
-                expression.Operation(Connection, transaction);
+                expression.Operation(Connection, Transaction);
         }
 
         private static string FormatSqlEscape(string sql)

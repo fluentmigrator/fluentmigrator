@@ -41,12 +41,15 @@ namespace FluentMigrator.Tests.Integration.Processors
         {
             Connection = new SqlConnection(IntegrationTestOptions.SqlServer2012.ConnectionString);
             Processor = new SqlServerProcessor(Connection, new SqlServer2012Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
+            Connection.Open();
+            Processor.BeginTransaction();
         }
 
         [TearDown]
         public void TearDown()
         {
             Processor.CommitTransaction();
+            Processor.Dispose();
         }
 
         [Test]
@@ -185,9 +188,7 @@ namespace FluentMigrator.Tests.Integration.Processors
             tableExists.ShouldBeFalse();
 
             string fmOutput = output.ToString();
-            Assert.That(fmOutput, Is.StringContaining("/* Beginning Transaction */"));
             Assert.That(fmOutput, Is.StringContaining("/* Performing DB Operation */"));
-            Assert.That(fmOutput, Is.StringContaining("/* Rolling back transaction */"));
         }
     }
 }
