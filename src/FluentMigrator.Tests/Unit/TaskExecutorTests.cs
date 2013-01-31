@@ -35,6 +35,8 @@ namespace FluentMigrator.Tests.Unit
             dataSet.Tables.Add(new DataTable());
             processor.Setup(x => x.ReadTableData(null, It.IsAny<string>())).Returns(dataSet);
 
+            _migrationRunner.SetupGet(x => x.Processor).Returns(processor.Object);
+
             var announcer = new Mock<IAnnouncer>();
             var stopWatch = new Mock<IStopWatch>();
             var runnerContext = new Mock<IRunnerContext>();

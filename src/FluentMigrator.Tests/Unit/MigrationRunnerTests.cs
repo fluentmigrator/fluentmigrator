@@ -392,8 +392,6 @@ namespace FluentMigrator.Tests.Unit
 
             _announcer.Verify(a => a.Say("Version ordering valid."));
 
-            _processorMock.Verify(m => m.CommitTransaction(), Times.Never());
-            _processorMock.Verify(m => m.RollbackTransaction(), Times.Never());
             _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();		
         }
 
@@ -416,8 +414,6 @@ namespace FluentMigrator.Tests.Unit
 
             _announcer.Verify(a => a.Say("Version ordering valid."));
 
-            _processorMock.Verify(m => m.CommitTransaction(), Times.Never());
-            _processorMock.Verify(m => m.RollbackTransaction(), Times.Never());
             _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();		
         }
 
@@ -448,8 +444,6 @@ namespace FluentMigrator.Tests.Unit
             exception.InvalidMigrations.Any(p => p.Key == version2);
             exception.InvalidMigrations.Any(p => p.Key == version3);
 
-            _processorMock.Verify(m => m.CommitTransaction(), Times.Never());
-            _processorMock.Verify(m => m.RollbackTransaction(), Times.Never());
             _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();
         }
 

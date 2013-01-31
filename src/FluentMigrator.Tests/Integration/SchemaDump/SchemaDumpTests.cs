@@ -34,7 +34,6 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
             Processor = new SqlServerProcessor(Connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
             SchemaDumper = new SqlServerSchemaDumper(Processor, new TextWriterAnnouncer(System.Console.Out));
             Connection.Open();
-            Processor.BeginTransaction();
         }
 
         [TearDown]
@@ -129,6 +128,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
             string expectedMessage = testWriter.GetMessage(4, 10, 4, 1);
 
             runner.Down(new TestMigration());
+            runner.VersionLoader.RemoveVersionTable();
 
             //test
             output.ShouldBe(expectedMessage);

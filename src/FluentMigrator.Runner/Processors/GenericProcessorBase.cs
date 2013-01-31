@@ -53,7 +53,7 @@ namespace FluentMigrator.Runner.Processors
 
         public override void BeginTransaction()
         {
-            if (!SupportsTransactions) return;
+            if (!SupportsTransactions || Transaction != null) return;
 
             EnsureConnectionIsOpen();
 
