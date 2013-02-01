@@ -37,7 +37,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
                         "WHERE object_id = object_id('[dbo].[TestTable1]')" + Environment.NewLine +
                         "AND name = 'TestColumn1'" + Environment.NewLine +
                         ");" + Environment.NewLine + Environment.NewLine +
-                        "-- create alter table command to drop contraint as string and run it" + Environment.NewLine +
+                        "-- create alter table command to drop constraint as string and run it" + Environment.NewLine +
                         "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + @default;" + Environment.NewLine +
                         "EXEC sp_executesql @sql;" + Environment.NewLine + Environment.NewLine +
                         "-- now we can finally drop column" + Environment.NewLine +
@@ -66,7 +66,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
                         "WHERE object_id = object_id('[dbo].[TestTable1]')" + Environment.NewLine +
                         "AND name = 'TestColumn1'" + Environment.NewLine +
                         ");" + Environment.NewLine + Environment.NewLine +
-                        "-- create alter table command to drop contraint as string and run it" + Environment.NewLine +
+                        "-- create alter table command to drop constraint as string and run it" + Environment.NewLine +
                         "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + @default;" + Environment.NewLine +
                         "EXEC sp_executesql @sql;" + Environment.NewLine + Environment.NewLine +
                         "-- now we can finally drop column" + Environment.NewLine +
@@ -84,7 +84,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
                         "WHERE object_id = object_id('[dbo].[TestTable1]')" + Environment.NewLine +
                         "AND name = 'TestColumn2'" + Environment.NewLine +
                         ");" + Environment.NewLine + Environment.NewLine +
-                        "-- create alter table command to drop contraint as string and run it" + Environment.NewLine +
+                        "-- create alter table command to drop constraint as string and run it" + Environment.NewLine +
                         "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + @default;" + Environment.NewLine +
                         "EXEC sp_executesql @sql;" + Environment.NewLine + Environment.NewLine +
                         "-- now we can finally drop column" + Environment.NewLine +
@@ -139,7 +139,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
                          "WHERE object_id = object_id('[TestSchema].[TestTable1]')" + Environment.NewLine +
                          "AND name = 'TestColumn1'" + Environment.NewLine +
                          ");" + Environment.NewLine + Environment.NewLine +
-                         "-- create alter table command to drop contraint as string and run it" + Environment.NewLine +
+                         "-- create alter table command to drop constraint as string and run it" + Environment.NewLine +
                          "SET @sql = N'ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT ' + @default;" + Environment.NewLine +
                          "EXEC sp_executesql @sql;" + Environment.NewLine + Environment.NewLine +
                          "-- now we can finally drop column" + Environment.NewLine +
@@ -168,7 +168,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
                          "WHERE object_id = object_id('[TestSchema].[TestTable1]')" + Environment.NewLine +
                          "AND name = 'TestColumn1'" + Environment.NewLine +
                          ");" + Environment.NewLine + Environment.NewLine +
-                         "-- create alter table command to drop contraint as string and run it" + Environment.NewLine +
+                         "-- create alter table command to drop constraint as string and run it" + Environment.NewLine +
                          "SET @sql = N'ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT ' + @default;" + Environment.NewLine +
                          "EXEC sp_executesql @sql;" + Environment.NewLine + Environment.NewLine +
                          "-- now we can finally drop column" + Environment.NewLine +
@@ -186,7 +186,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
                          "WHERE object_id = object_id('[TestSchema].[TestTable1]')" + Environment.NewLine +
                          "AND name = 'TestColumn2'" + Environment.NewLine +
                          ");" + Environment.NewLine + Environment.NewLine +
-                         "-- create alter table command to drop contraint as string and run it" + Environment.NewLine +
+                         "-- create alter table command to drop constraint as string and run it" + Environment.NewLine +
                          "SET @sql = N'ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT ' + @default;" + Environment.NewLine +
                          "EXEC sp_executesql @sql;" + Environment.NewLine + Environment.NewLine +
                          "-- now we can finally drop column" + Environment.NewLine +

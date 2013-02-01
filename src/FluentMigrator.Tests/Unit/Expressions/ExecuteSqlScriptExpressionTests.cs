@@ -60,6 +60,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         }
 
         [Test]
+        [Category("NotWorkingOnMono")]
         public void CanUseScriptsOnAnotherDriveToWorkingDirectory()
         {
             var scriptOnAnotherDrive = "z" + Path.VolumeSeparatorChar + Path.DirectorySeparatorChar + testSqlScript;
