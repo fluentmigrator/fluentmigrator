@@ -5,7 +5,4 @@ install:
 
 script:
   - xbuild CI.proj
-
-# Run Tests
-after_script:
-  - nunit-console ./src/FluentMigrator.Tests/bin/Debug/FluentMigrator.Tests.dll /exclude=Integration,NotWorkingOnMono
+  - nunit-console ./src/FluentMigrator.Tests/bin/Debug/FluentMigrator.Tests.dll -exclude Integration,NotWorkingOnMono
