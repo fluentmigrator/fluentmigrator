@@ -4,7 +4,7 @@
   <Target Name="CI" DependsOnTargets="Build" />
 
   <Target Name="Build">
-    <MSBuild Projects="FluentMigrator (2010).sln" Properties="Configuration=Debug;Platform=x86" Targets="FluentMigrator_Tests" />
+    <MSBuild Projects="FluentMigrator (2010).sln" Properties="Configuration=Debug;Platform=x86" />
   </Target>
 
 </Project>
