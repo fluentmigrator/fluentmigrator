@@ -7,6 +7,7 @@ using NUnit.Framework;
 namespace FluentMigrator.Tests.Unit.Initialization
 {
     [TestFixture]
+    [Category("NotWorkingOnMono")]
     public class ConnectionStringManagerTests
     {
         private const string TARGET = "FluentMigrator.Tests.dll";

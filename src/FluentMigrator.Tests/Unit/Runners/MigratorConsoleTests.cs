@@ -53,6 +53,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         }
 
         [Test]
+        [Category("NotWorkingOnMono")]
         public void ConsoleAnnouncerHasMoreOutputWhenVerbose()
         {
             var sbNonVerbose = new StringBuilder();
@@ -102,6 +103,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         }
 
         [Test]
+        [Category("NotWorkingOnMono")]
         public void ConsoleAnnouncerHasOutputEvenIfMarkedAsPreviewOnly()
         {
             var sb = new StringBuilder();

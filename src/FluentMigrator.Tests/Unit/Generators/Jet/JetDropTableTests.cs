@@ -1,4 +1,5 @@
-﻿using FluentMigrator.Expressions;
+﻿using System;
+using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Jet;
 using NUnit.Framework;
@@ -31,7 +32,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new string[] { "TestColumn1", "TestColumn2" });
 
             string sql = _generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [TestTable1] DROP COLUMN [TestColumn1];\r\nALTER TABLE [TestTable1] DROP COLUMN [TestColumn2]");
+            sql.ShouldBe("ALTER TABLE [TestTable1] DROP COLUMN [TestColumn1];" + Environment.NewLine + "ALTER TABLE [TestTable1] DROP COLUMN [TestColumn2]");
         }
 
         [Test]
