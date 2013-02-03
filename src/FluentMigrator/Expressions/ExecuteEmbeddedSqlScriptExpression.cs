@@ -50,7 +50,7 @@ namespace FluentMigrator.Expressions
 Possible candidates are:
  
 {2}
-", SqlScript, MigrationAssembly.FullName, string.Join("\r\n\t", foundResources)));
+", SqlScript, MigrationAssembly.FullName, string.Join(Environment.NewLine + "\t", foundResources)));
 
             return foundResources[0];
         }

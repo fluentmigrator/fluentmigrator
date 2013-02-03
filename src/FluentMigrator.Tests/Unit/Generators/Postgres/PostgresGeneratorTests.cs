@@ -234,7 +234,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             expression.ColumnNames.Add("OtherColumn");
 
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"public\".\"NewTable\" DROP COLUMN \"NewColumn\";\r\n" + 
+            sql.ShouldBe("ALTER TABLE \"public\".\"NewTable\" DROP COLUMN \"NewColumn\";" + Environment.NewLine + 
                 "ALTER TABLE \"public\".\"NewTable\" DROP COLUMN \"OtherColumn\"");
         }
 
