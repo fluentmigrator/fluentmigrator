@@ -164,6 +164,7 @@
     <Compile Include="Helpers\SqlServerCeTestTable.cs" />
     <Compile Include="Helpers\SqlServerTestSequence.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
+    <Compile Include="Integration\Migrations\MigrationWithDateStampVersioning.cs" />
     <Compile Include="Integration\Migrations\Tagged\1_TenantATable.cs">
       <SubType>Code</SubType>
     </Compile>
