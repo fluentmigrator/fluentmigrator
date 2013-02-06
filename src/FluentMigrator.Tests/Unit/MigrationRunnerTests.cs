@@ -103,7 +103,7 @@ namespace FluentMigrator.Tests.Unit
             foreach (var version in fakeVersions)
             {
                 _fakeVersionLoader.Versions.Add(version);
-                _migrationList.Add(version,new MigrationInfo(version,false,new TestMigration()));
+                _migrationList.Add(version,new MigrationInfo(version, TransactionBehavior.Default, new TestMigration()));
             }
 
             _fakeVersionLoader.LoadVersionInfo();
@@ -385,8 +385,8 @@ namespace FluentMigrator.Tests.Unit
             LoadVersionData(version1, version2);
 
             _migrationList.Clear();
-            _migrationList.Add(version1,new MigrationInfo(version1,false,mockMigration1.Object));
-            _migrationList.Add(version2,new MigrationInfo(version2,false,mockMigration2.Object));
+            _migrationList.Add(version1,new MigrationInfo(version1, TransactionBehavior.Default, mockMigration1.Object));
+            _migrationList.Add(version2, new MigrationInfo(version2, TransactionBehavior.Default, mockMigration2.Object));
 
             Assert.DoesNotThrow(() => _runner.ValidateVersionOrder());
 
@@ -407,8 +407,8 @@ namespace FluentMigrator.Tests.Unit
             LoadVersionData(version1);
 
             _migrationList.Clear();
-            _migrationList.Add(version1, new MigrationInfo(version1, false, mockMigration1.Object));
-            _migrationList.Add(version2, new MigrationInfo(version2, false, mockMigration2.Object));
+            _migrationList.Add(version1, new MigrationInfo(version1, TransactionBehavior.Default, mockMigration1.Object));
+            _migrationList.Add(version2, new MigrationInfo(version2, TransactionBehavior.Default, mockMigration2.Object));
 
             Assert.DoesNotThrow(() => _runner.ValidateVersionOrder());
 
@@ -433,10 +433,10 @@ namespace FluentMigrator.Tests.Unit
             LoadVersionData(version1, version4);
 
             _migrationList.Clear();
-            _migrationList.Add(version1, new MigrationInfo(version1, false, mockMigration1.Object));
-            _migrationList.Add(version2, new MigrationInfo(version2, false, mockMigration2.Object));
-            _migrationList.Add(version3, new MigrationInfo(version3, false, mockMigration3.Object));
-            _migrationList.Add(version4, new MigrationInfo(version4, false, mockMigration4.Object));
+            _migrationList.Add(version1, new MigrationInfo(version1, TransactionBehavior.Default, mockMigration1.Object));
+            _migrationList.Add(version2, new MigrationInfo(version2, TransactionBehavior.Default, mockMigration2.Object));
+            _migrationList.Add(version3, new MigrationInfo(version3, TransactionBehavior.Default, mockMigration3.Object));
+            _migrationList.Add(version4, new MigrationInfo(version4, TransactionBehavior.Default, mockMigration4.Object));
 
             var exception = Assert.Throws<VersionOrderInvalidException>(() => _runner.ValidateVersionOrder());
 
@@ -459,8 +459,8 @@ namespace FluentMigrator.Tests.Unit
             LoadVersionData(version1, version2);
 
             _migrationList.Clear();
-            _migrationList.Add(version1,new MigrationInfo(version1,false,mockMigration1.Object));
-            _migrationList.Add(version2,new MigrationInfo(version2,false,mockMigration2.Object));
+            _migrationList.Add(version1, new MigrationInfo(version1, TransactionBehavior.Default, mockMigration1.Object));
+            _migrationList.Add(version2, new MigrationInfo(version2, TransactionBehavior.Default, mockMigration2.Object));
 
             _runner.ListMigrations();
 

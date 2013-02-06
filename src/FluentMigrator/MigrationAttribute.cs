@@ -26,17 +26,17 @@ namespace FluentMigrator
     public class MigrationAttribute : Attribute
     {
         public MigrationAttribute(long version)
-            : this(version, false)
+            : this(version, TransactionBehavior.Default)
         {
         }
 
-        public MigrationAttribute(long version, bool transactionless)
+        public MigrationAttribute(long version, TransactionBehavior transactionBehavior)
         {
             Version = version;
-            Transactionless = transactionless;
+            TransactionBehavior = transactionBehavior;
         }
 
         public long Version { get; private set; }
-        public bool Transactionless { get; private set; }
+        public TransactionBehavior TransactionBehavior { get; private set; }
     }
 }

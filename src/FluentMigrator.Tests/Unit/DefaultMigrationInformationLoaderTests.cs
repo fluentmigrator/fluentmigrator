@@ -200,11 +200,11 @@ namespace FluentMigrator.Tests.Unit
             list.Count().ShouldBe(2);
             
             list[0].Value.Migration.GetType().ShouldBe(typeof(DoesHandleTransactionLessMigrations.MigrationThatIsTransactionLess));
-            list[0].Value.Transactionless.ShouldBeTrue();
+            list[0].Value.TransactionBehavior.ShouldBe(TransactionBehavior.None);
             list[0].Value.Version.ShouldBe(1);
 
             list[1].Value.Migration.GetType().ShouldBe(typeof(DoesHandleTransactionLessMigrations.MigrationThatIsNotTransactionLess));
-            list[1].Value.Transactionless.ShouldBeFalse();
+            list[1].Value.TransactionBehavior.ShouldBe(TransactionBehavior.Default);
             list[1].Value.Version.ShouldBe(2);
         }
     }
@@ -216,7 +216,7 @@ namespace FluentMigrator.Tests.Unit
 
     namespace DoesHandleTransactionLessMigrations
     {
-        [Migration(1,true)]
+        [Migration(1, TransactionBehavior.None)]
         public class MigrationThatIsTransactionLess : Migration
         {
             public override void Up()

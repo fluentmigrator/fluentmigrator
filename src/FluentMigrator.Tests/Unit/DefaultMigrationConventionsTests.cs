@@ -127,11 +127,11 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        public void MigrationInfoShouldExtractTransactionless()
+        public void MigrationInfoShouldExtractTransactionBehavior()
         {
             var migration = new DefaultConventionMigrationFake();
             var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migration);
-            migrationinfo.Transactionless.ShouldBeTrue();
+            migrationinfo.TransactionBehavior.ShouldBe(TransactionBehavior.None);
         }
 
         [Test]
@@ -267,7 +267,7 @@ namespace FluentMigrator.Tests.Unit
     {
     }
 
-    [Migration(123,true)]
+    [Migration(123, TransactionBehavior.None)]
     [MigrationTrait("key", "test")]
     internal class DefaultConventionMigrationFake : Migration
     {

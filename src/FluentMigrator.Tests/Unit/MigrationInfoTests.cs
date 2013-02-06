@@ -38,50 +38,50 @@ namespace FluentMigrator.Tests.Unit
         private IMigration _migration;
         private long _expectedVersion;
 
-        private MigrationInfo Create(bool transactionless)
+        private MigrationInfo Create(TransactionBehavior behavior = TransactionBehavior.Default)
         {
-            return new MigrationInfo(_expectedVersion, transactionless, _migration);
+            return new MigrationInfo(_expectedVersion, behavior, _migration);
         }
 
         [Test]
         public void ConstructingShouldRetainMigration()
         {
-            MigrationInfo migrationinfo = Create(false);
+            MigrationInfo migrationinfo = Create();
             migrationinfo.Migration.ShouldBeSameAs(_migration);
         }
 
         [Test]
-        public void ConstructingShouldRetainTransactionlessFalse()
+        public void ConstructingShouldRetainTransactionBehaviorDefault()
         {
-            MigrationInfo migrationinfo = Create(false);
-            migrationinfo.Transactionless.ShouldBeFalse();
+            MigrationInfo migrationinfo = Create(TransactionBehavior.Default);
+            migrationinfo.TransactionBehavior.ShouldBe(TransactionBehavior.Default);
         }
 
         [Test]
-        public void ConstructingShouldRetainTransactionlessTrue()
+        public void ConstructingShouldRetainTransactionBehaviorNone()
         {
-            MigrationInfo migrationinfo = Create(true);
-            migrationinfo.Transactionless.ShouldBeTrue();
+            MigrationInfo migrationinfo = Create(TransactionBehavior.None);
+            migrationinfo.TransactionBehavior.ShouldBe(TransactionBehavior.None);
         }
 
         [Test]
         public void ConstructingShouldRetainValueOfVersion()
         {
-            MigrationInfo migrationinfo = Create(false);
+            MigrationInfo migrationinfo = Create();
             migrationinfo.Version.ShouldBe(_expectedVersion);
         }
 
         [Test]
         public void HasTraitReturnsFalseWhenTraitIsNotDefined()
         {
-            MigrationInfo migrationinfo = Create(false);
+            MigrationInfo migrationinfo = Create();
             migrationinfo.HasTrait("foo").ShouldBeFalse();
         }
 
         [Test]
         public void HasTraitReturnsTrueWhenTraitIsDefined()
         {
-            MigrationInfo migrationinfo = Create(false);
+            MigrationInfo migrationinfo = Create();
             migrationinfo.AddTrait("foo", 42);
             migrationinfo.HasTrait("foo").ShouldBeTrue();
         }
@@ -89,14 +89,14 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void TraitMethodReturnsNullForNonExistentTrait()
         {
-            MigrationInfo migrationinfo = Create(false);
+            MigrationInfo migrationinfo = Create();
             migrationinfo.Trait("foo").ShouldBeNull();
         }
 
         [Test]
         public void TraitMethodReturnsTraitValue()
         {
-            MigrationInfo migrationinfo = Create(false);
+            MigrationInfo migrationinfo = Create();
             const string value = "bar";
             migrationinfo.AddTrait("foo", value);
             migrationinfo.Trait("foo").ShouldBeSameAs(value);

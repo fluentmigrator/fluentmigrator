@@ -24,7 +24,7 @@ namespace FluentMigrator.Infrastructure
     public interface IMigrationInfo
     {
         long Version { get; }
-        bool Transactionless { get; }
+        TransactionBehavior TransactionBehavior { get; }
         IMigration Migration { get; }
         object Trait(string name);
         bool HasTrait(string name);
@@ -34,17 +34,17 @@ namespace FluentMigrator.Infrastructure
     {
         private readonly Dictionary<string, object> _traits = new Dictionary<string, object>();
 
-        public MigrationInfo(long version, bool transactionless, IMigration migration)
+        public MigrationInfo(long version, TransactionBehavior transactionBehavior, IMigration migration)
         {
             if (migration == null) throw new ArgumentNullException("migration");
 
             Version = version;
-            Transactionless = transactionless;
+            TransactionBehavior = transactionBehavior;
             Migration = migration;
         }
 
         public long Version { get; private set; }
-        public bool Transactionless { get; private set; }
+        public TransactionBehavior TransactionBehavior { get; private set; }
         public IMigration Migration { get; private set; }
 
         public object Trait(string name)
@@ -64,7 +64,8 @@ namespace FluentMigrator.Infrastructure
 
         public override string ToString()
         {
-            return string.Format("MigrationType: {0}, Transactionless: {1}", Migration.GetType(), Transactionless);
+            return string.Format("MigrationType: {0}, TransactionBehavior: {1}", Migration.GetType(),
+                                 TransactionBehavior);
         }
     }
 }

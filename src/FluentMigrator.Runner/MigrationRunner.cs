@@ -85,7 +85,7 @@ namespace FluentMigrator.Runner
 
             foreach (var pair in migrations)
             {
-                ApplyMigrationUp(pair.Value, useAutomaticTransactionManagement && !pair.Value.Transactionless);
+                ApplyMigrationUp(pair.Value, useAutomaticTransactionManagement && pair.Value.TransactionBehavior == TransactionBehavior.Default);
             }
 
             ApplyProfiles();
@@ -104,7 +104,7 @@ namespace FluentMigrator.Runner
 
             foreach (var migrationInfo in migrationInfos)
             {
-                ApplyMigrationUp(migrationInfo, useAutomaticTransactionManagement && !migrationInfo.Transactionless);
+                ApplyMigrationUp(migrationInfo, useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
             }
 
             VersionLoader.LoadVersionInfo();
@@ -140,7 +140,7 @@ namespace FluentMigrator.Runner
 
             foreach (var migrationInfo in migrationInfos)
             {
-                ApplyMigrationDown(migrationInfo, useAutomaticTransactionManagement && !migrationInfo.Transactionless);
+                ApplyMigrationDown(migrationInfo, useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
             }
 
             VersionLoader.LoadVersionInfo();
@@ -252,7 +252,7 @@ namespace FluentMigrator.Runner
 
             foreach (IMigrationInfo migrationInfo in migrationsToRollback.Take(steps))
             {
-                ApplyMigrationDown(migrationInfo, useAutomaticTransactionManagement && !migrationInfo.Transactionless);
+                ApplyMigrationDown(migrationInfo, useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
             }
 
             VersionLoader.LoadVersionInfo();
@@ -281,7 +281,7 @@ namespace FluentMigrator.Runner
             {
                 if (version >= migrationInfo.Version) continue;
 
-                ApplyMigrationDown(migrationInfo, useAutomaticTransactionManagement && !migrationInfo.Transactionless);
+                ApplyMigrationDown(migrationInfo, useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
             }
 
             VersionLoader.LoadVersionInfo();
