@@ -59,40 +59,42 @@ namespace FluentMigrator.Runner.Initialization
         {
             Initialize();
 
-            switch (RunnerContext.Task)
+            try
             {
-                case null:
-                case "":
-                case "migrate":
-                case "migrate:up":
-                    if (RunnerContext.Version != 0)
-                        Runner.MigrateUp(RunnerContext.Version);
-                    else
-                        Runner.MigrateUp();
-                    break;
-                case "rollback":
-                    if (RunnerContext.Steps == 0)
-                        RunnerContext.Steps = 1;
-                    Runner.Rollback(RunnerContext.Steps);
-                    break;
-                case "rollback:toversion":
-                    Runner.RollbackToVersion(RunnerContext.Version);
-                    break;
-                case "rollback:all":
-                    Runner.RollbackToVersion(0);
-                    break;
-                case "migrate:down":
-                    Runner.MigrateDown(RunnerContext.Version);
-                    break;
-                case "validateversionorder":
-                    Runner.ValidateVersionOrder();
-                    break;
-                case "listmigrations":
-                    Runner.ListMigrations();
-                    break;
+                switch (RunnerContext.Task)
+                {
+                    case null:
+                    case "":
+                    case "migrate":
+                    case "migrate:up":
+                        if (RunnerContext.Version != 0)
+                            Runner.MigrateUp(RunnerContext.Version);
+                        else
+                            Runner.MigrateUp();
+                        break;
+                    case "rollback":
+                        if (RunnerContext.Steps == 0)
+                            RunnerContext.Steps = 1;
+                        Runner.Rollback(RunnerContext.Steps);
+                        break;
+                    case "rollback:toversion":
+                        Runner.RollbackToVersion(RunnerContext.Version);
+                        break;
+                    case "rollback:all":
+                        Runner.RollbackToVersion(0);
+                        break;
+                    case "migrate:down":
+                        Runner.MigrateDown(RunnerContext.Version);
+                        break;
+                    case "validateversionorder":
+                        Runner.ValidateVersionOrder();
+                        break;
+                    case "listmigrations":
+                        Runner.ListMigrations();
+                        break;
+                }
             }
-            Runner.Processor.Dispose();
-
+            finally { Runner.Processor.Dispose(); }
             RunnerContext.Announcer.Say("Task completed.");
         }
 

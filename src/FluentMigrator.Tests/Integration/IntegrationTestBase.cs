@@ -154,14 +154,16 @@ namespace FluentMigrator.Tests.Integration
             var announcer = new TextWriterAnnouncer(System.Console.Out);
             announcer.Heading("Testing Migration against Postgres");
 
-            var connection = new NpgsqlConnection(serverOptions.ConnectionString);
-            var processor = new PostgresProcessor(connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new PostgresDbFactory());
-            
-            test(processor);
-
-            if (!processor.WasCommitted)
+            using (var connection = new NpgsqlConnection(serverOptions.ConnectionString))
             {
-                processor.RollbackTransaction();
+                var processor = new PostgresProcessor(connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new PostgresDbFactory());
+
+                test(processor);
+
+                if (!processor.WasCommitted)
+                {
+                    processor.RollbackTransaction();
+                }
             }
         }
 
