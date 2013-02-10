@@ -496,6 +496,24 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public void ExplicitUnicodeStringIgnoredForNonSqlServer()
+        {
+            var expression = new InsertDataExpression();
+            expression.TableName = "TestTable";
+            expression.Rows.Add(new InsertionDataDefinition
+                                    {
+                                        new KeyValuePair<string, object>("NormalString", "Just'in"),
+                                        new KeyValuePair<string, object>("UnicodeString", new ExplicitUnicodeString("codethinked'.com"))
+                                    });
+
+            var sql = generator.Generate(expression);
+
+            var expected = "INSERT INTO \"public\".\"TestTable\" (\"NormalString\",\"UnicodeString\") VALUES ('Just''in','codethinked''.com');";
+            
+            sql.ShouldBe(expected);
+        }
+
+        [Test]
         public void CanInsertGuidData()
         {
             var gid = Guid.NewGuid();
