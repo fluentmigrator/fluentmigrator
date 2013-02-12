@@ -495,6 +495,7 @@ namespace FluentMigrator.Tests.Integration.Processors
                         }
                     };
 
+                processor.BeginTransaction();
                 processor.Process(expression);
 
                 var com = connection.CreateCommand();
