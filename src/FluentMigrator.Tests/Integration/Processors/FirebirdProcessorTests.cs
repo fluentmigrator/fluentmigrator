@@ -31,7 +31,7 @@ namespace FluentMigrator.Tests.Integration.Processors
             var options = FirebirdOptions.AutoCommitBehaviour();
             Processor = new FirebirdProcessor(Connection, new FirebirdGenerator(options), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new FirebirdDbFactory(), options);
             Connection.Open();
-            Connection.BeginTransaction();
+            Processor.BeginTransaction();
         }
 
         [TearDown]
