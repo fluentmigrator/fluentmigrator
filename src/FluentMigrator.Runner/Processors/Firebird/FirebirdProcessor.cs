@@ -42,6 +42,9 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 throw new ArgumentNullException("fbOptions");
             FBOptions = fbOptions;
             truncator = new FirebirdTruncator(FBOptions.TruncateLongNames);
+            ClearLocks();
+            ClearExpressions();
+            ClearDDLFollowers();
         }
 
         #region Schema checks
@@ -133,8 +136,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public override void BeginTransaction()
         {
-            Announcer.Say("Beginning Transaction");
-            Transaction = Connection.BeginTransaction();
+            base.BeginTransaction();
             ClearLocks();
             ClearExpressions();
             ClearDDLFollowers();
@@ -142,21 +144,14 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public override void CommitTransaction()
         {
-            if (Transaction == null) return;
-            Announcer.Say("Committing Transaction");
-            Transaction.Commit();
-            WasCommitted = true;
+            base.CommitTransaction();
             EnsureConnectionIsClosed();
             ClearLocks();
-
         }
 
         public override void RollbackTransaction()
         {
-            if (Transaction == null) return;
-            Announcer.Say("Rolling back transaction");
-            Transaction.Rollback();
-            WasCommitted = true;
+            base.RollbackTransaction();
 
             if (FBOptions.UndoEnabled)
             {
@@ -809,17 +804,6 @@ namespace FluentMigrator.Runner.Processors.Firebird
                         message.WriteLine("An error occurred executing the following sql:");
                         message.WriteLine(sql);
                         message.WriteLine("The error was {0}", ex.Message);
-
-                        try
-                        {
-                            if (FBOptions.TransactionModel != FirebirdTransactionModel.None)
-                                RollbackTransaction();
-                        }
-                        catch (Exception e)
-                        {
-                            message.WriteLine("---");
-                            message.WriteLine(e.ToString());
-                        }
 
                         throw new Exception(message.ToString(), ex);
                     }

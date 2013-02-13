@@ -199,23 +199,17 @@ namespace FluentMigrator.Tests.Integration
             using (var connection = new FbConnection(serverOptions.ConnectionString))
             {
                 var options = FirebirdOptions.AutoCommitBehaviour();
-                var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer, new ProcessorOptions(), new PostgresDbFactory(), options);
+                var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer, new ProcessorOptions(), new FirebirdDbFactory(), options);
 
                 try
                 {
                     test(processor);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-                    if(!processor.WasCommitted)
+                    if (!processor.WasCommitted)
                         processor.RollbackTransaction();
-                    throw e;
-                }
-
-
-                if (!processor.WasCommitted)
-                {
-                    processor.RollbackTransaction();
+                    throw;
                 }
 
                 connection.Close();
