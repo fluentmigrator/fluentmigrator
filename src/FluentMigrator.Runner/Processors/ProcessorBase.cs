@@ -193,5 +193,12 @@ namespace FluentMigrator.Runner.Processors
         public abstract bool IndexExists(string schemaName, string tableName, string indexName);
 
         public abstract bool SequenceExists(string schemaName, string sequenceName);
+
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        protected abstract void Dispose(bool isDisposing);
     }
 }

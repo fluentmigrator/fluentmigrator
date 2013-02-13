@@ -16,13 +16,14 @@
 //
 #endregion
 
+using System;
 using System.Data;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator
 {
-    public interface IMigrationProcessor : IQuerySchema
+    public interface IMigrationProcessor : IQuerySchema, IDisposable
     {
         IMigrationProcessorOptions Options { get; }
 

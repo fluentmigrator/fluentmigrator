@@ -22,24 +22,16 @@ using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.Oracle
 {
-    public class OracleProcessor : ProcessorBase
+    public class OracleProcessor : GenericProcessorBase
     {
-        public IDbConnection Connection { get; private set; }
-        private readonly IDbFactory _factory;
-
         public override string DatabaseType
         {
             get { return "Oracle"; }
         }
 
         public OracleProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, OracleDbFactory factory)
-            : base(generator, announcer, options)
+            : base(connection, factory, generator, announcer, options)
         {
-            Connection = connection;
-            _factory = factory;
-
-            //oracle does not support ddl transactions
-            //this.Transaction = this.Connection.BeginTransaction();
         }
 
         public override bool SchemaExists(string schemaName)
@@ -134,10 +126,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
             if (template == null)
                 throw new ArgumentNullException("template");
 
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
 
-            using (var command = _factory.CreateCommand(String.Format(template, args), Connection))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -160,12 +151,12 @@ namespace FluentMigrator.Runner.Processors.Oracle
             if (template == null)
                 throw new ArgumentNullException("template");
 
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            EnsureConnectionIsOpen();
 
             var result = new DataSet();
-            using (var command = _factory.CreateCommand(String.Format(template, args), Connection))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
             {
-                var adapter = _factory.CreateDataAdapter(command);
+                var adapter = Factory.CreateDataAdapter(command);
                 adapter.Fill(result);
                 return result;
             }
@@ -173,8 +164,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
 
             if (expression.Operation != null)
                 expression.Operation(Connection, null);
@@ -187,10 +177,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
 
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
-
-            using (var command = _factory.CreateCommand(sql, Connection))
+            EnsureConnectionIsOpen();
+            
+            using (var command = Factory.CreateCommand(sql, Connection))
                 command.ExecuteNonQuery();
         }
     }

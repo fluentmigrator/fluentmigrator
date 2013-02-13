@@ -111,17 +111,35 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        public void MigrationMetadataTypePropertyMatchesDecoratedType()
+        public void MigrationInfoShouldRetainMigration()
         {
-            var metadata = DefaultMigrationConventions.GetMetadataForMigration(typeof(DefaultConventionMigrationFake));
-            metadata.Type.ShouldBe(typeof(DefaultConventionMigrationFake));
+            var migration = new DefaultConventionMigrationFake();
+            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migration);
+            migrationinfo.Migration.ShouldBeSameAs(migration);
         }
 
         [Test]
-        public void MigrationMetadataCollectsVersionFromMigrationAttribute()
+        public void MigrationInfoShouldExtractVersion()
         {
-            var metadata = DefaultMigrationConventions.GetMetadataForMigration(typeof(DefaultConventionMigrationFake));
-            metadata.Version.ShouldBe(123);
+            var migration = new DefaultConventionMigrationFake();
+            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migration);
+            migrationinfo.Version.ShouldBe(123);
+        }
+
+        [Test]
+        public void MigrationInfoShouldExtractTransactionBehavior()
+        {
+            var migration = new DefaultConventionMigrationFake();
+            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migration);
+            migrationinfo.TransactionBehavior.ShouldBe(TransactionBehavior.None);
+        }
+
+        [Test]
+        public void MigrationInfoShouldExtractTraits()
+        {
+            var migration = new DefaultConventionMigrationFake();
+            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migration);
+            migrationinfo.Trait("key").ShouldBe("test");
         }
 
         [Test]
@@ -249,7 +267,8 @@ namespace FluentMigrator.Tests.Unit
     {
     }
 
-    [Migration(123)]
+    [Migration(123, TransactionBehavior.None)]
+    [MigrationTrait("key", "test")]
     internal class DefaultConventionMigrationFake : Migration
     {
         public override void Up() { }

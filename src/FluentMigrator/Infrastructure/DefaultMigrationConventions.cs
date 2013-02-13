@@ -89,15 +89,15 @@ namespace FluentMigrator.Infrastructure
             return typeof(IVersionTableMetaData).IsAssignableFrom(type) && type.HasAttribute<VersionTableMetaDataAttribute>();
         }
 
-        public static MigrationMetadata GetMetadataForMigration(Type type)
+        public static IMigrationInfo GetMigrationInfoFor(IMigration migration)
         {
-            var migrationAttribute = type.GetOneAttribute<MigrationAttribute>();
-            var metadata = new MigrationMetadata { Type = type, Version = migrationAttribute.Version };
+            var migrationAttribute = migration.GetType().GetOneAttribute<MigrationAttribute>();
+            var migrationInfo = new MigrationInfo(migrationAttribute.Version, migrationAttribute.TransactionBehavior, migration);
 
-            foreach (MigrationTraitAttribute traitAttribute in type.GetAllAttributes<MigrationTraitAttribute>())
-                metadata.AddTrait(traitAttribute.Name, traitAttribute.Value);
+            foreach (MigrationTraitAttribute traitAttribute in migration.GetType().GetAllAttributes<MigrationTraitAttribute>())
+                migrationInfo.AddTrait(traitAttribute.Name, traitAttribute.Value);
 
-            return metadata;
+            return migrationInfo;
         }
 
         public static string GetWorkingDirectory()

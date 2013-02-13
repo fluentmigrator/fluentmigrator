@@ -1,6 +1,7 @@
 using System;
 using System.Data;
 using System.Linq.Expressions;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Tests.Integration;
@@ -33,6 +34,8 @@ namespace FluentMigrator.Tests.Unit
             var dataSet = new DataSet();
             dataSet.Tables.Add(new DataTable());
             processor.Setup(x => x.ReadTableData(null, It.IsAny<string>())).Returns(dataSet);
+
+            _migrationRunner.SetupGet(x => x.Processor).Returns(processor.Object);
 
             var announcer = new Mock<IAnnouncer>();
             var stopWatch = new Mock<IStopWatch>();
