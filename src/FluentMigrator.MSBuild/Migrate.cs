@@ -19,6 +19,7 @@
 using System;
 using System.IO;
 using System.Reflection;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Extensions;

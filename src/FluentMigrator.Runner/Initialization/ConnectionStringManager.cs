@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using FluentMigrator.Exceptions;
 
 namespace FluentMigrator.Runner.Initialization
 {

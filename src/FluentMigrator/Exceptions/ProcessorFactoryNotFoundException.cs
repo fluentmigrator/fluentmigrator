@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -17,14 +17,28 @@
 #endregion
 
 using System;
+using System.Runtime.Serialization;
 
-namespace FluentMigrator.Infrastructure
+namespace FluentMigrator.Exceptions
 {
-    public interface IMigrationMetadata
+    [Serializable]
+    public class ProcessorFactoryNotFoundException : FluentMigratorException
     {
-        Type Type { get; }
-        long Version { get; }
-        object Trait(string name);
-        bool HasTrait(string name);
+        public ProcessorFactoryNotFoundException()
+        {
+        }
+
+        public ProcessorFactoryNotFoundException(string message) : base(message)
+        {
+        }
+
+        public ProcessorFactoryNotFoundException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+        }
+
+        public ProcessorFactoryNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context)
+        {
+        }
     }
 }

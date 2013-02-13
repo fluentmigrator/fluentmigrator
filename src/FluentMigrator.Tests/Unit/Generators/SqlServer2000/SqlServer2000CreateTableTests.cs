@@ -1,8 +1,8 @@
 ﻿using System.Data;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Extensions;
-using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
 using NUnit.Should;

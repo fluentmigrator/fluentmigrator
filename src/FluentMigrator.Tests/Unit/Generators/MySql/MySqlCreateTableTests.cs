@@ -1,5 +1,5 @@
-﻿using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Generators;
+﻿using FluentMigrator.Exceptions;
+using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.MySql;
 using NUnit.Framework;
 using NUnit.Should;

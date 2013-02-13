@@ -1,6 +1,6 @@
 ﻿using System.Data;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Jet;
 using NUnit.Framework;
 using NUnit.Should;

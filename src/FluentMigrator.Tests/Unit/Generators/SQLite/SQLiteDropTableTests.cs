@@ -1,6 +1,6 @@
 ﻿using System;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.SQLite;
 using NUnit.Framework;
 using NUnit.Should;
