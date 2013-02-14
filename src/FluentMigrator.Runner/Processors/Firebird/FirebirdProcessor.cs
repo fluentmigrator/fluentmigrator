@@ -49,11 +49,6 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         #region Schema checks
 
-        public override bool SequenceExists(string schemaName, string sequenceName)
-        {
-            return false;
-        }
-
         public override bool SchemaExists(string schemaName)
         {
             //No schema support in firebird
@@ -85,9 +80,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
             return Exists("select rdb$index_name from rdb$indices where (rdb$relation_name = '{0}') and (rdb$index_name = '{1}') and (rdb$unique_flag IS NULL) and (rdb$foreign_key IS NULL)", FormatToSafeName(tableName), FormatToSafeName(indexName));
         }
 
-        public virtual bool SequenceExists(string schemaName, string tableName, string sequenceName)
+        public override bool SequenceExists(string schemaName, string sequenceName)
         {
-            CheckTable(tableName);
             return Exists("select rdb$generator_name from rdb$generators where rdb$generator_name = '{0}'", FormatToSafeName(sequenceName));
         }
 
@@ -468,7 +462,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 InternalProcess((Generator as FirebirdGenerator).GenerateSetType(expression.Column));
             }
 
-            bool identitySequenceExists = SequenceExists(String.Empty, expression.TableName, GetSequenceName(expression.TableName, expression.Column.Name));
+            bool identitySequenceExists = SequenceExists(String.Empty, GetSequenceName(expression.TableName, expression.Column.Name));
             
             //Adjust identity generators
             if (expression.Column.IsIdentity)
@@ -502,7 +496,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             LockColumn(expression.TableName, expression.ColumnNames);
             foreach (string columnName in expression.ColumnNames)
             {
-                if (SequenceExists(String.Empty, expression.TableName, GetSequenceName(expression.TableName, columnName)))
+                if (SequenceExists(String.Empty, GetSequenceName(expression.TableName, columnName)))
                 {
                     DeleteSequenceForIdentity(expression.TableName, columnName);
                 }
@@ -606,7 +600,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             TableDefinition table = schema.GetTableDefinition(expression.TableName);
             foreach (ColumnDefinition colDef in table.Columns)
             {
-                if (SequenceExists(String.Empty, expression.TableName, GetSequenceName(expression.TableName, colDef.Name)))
+                if (SequenceExists(String.Empty, GetSequenceName(expression.TableName, colDef.Name)))
                 {
                     DeleteSequenceForIdentity(expression.TableName, colDef.Name);
                 }
@@ -850,7 +844,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             CheckTable(tableName);
             LockTable(tableName);
             string sequenceName = GetSequenceName(tableName, columnName);
-            if (!SequenceExists(String.Empty, tableName, sequenceName))
+            if (!SequenceExists(String.Empty, sequenceName))
             {
                 CreateSequenceExpression sequence = new CreateSequenceExpression()
                 {
@@ -875,7 +869,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             LockTable(tableName);
             string sequenceName = GetSequenceName(tableName, columnName);
             DeleteSequenceExpression deleteSequence = null;
-            if (SequenceExists(String.Empty, tableName, sequenceName))
+            if (SequenceExists(String.Empty, sequenceName))
             {
                 deleteSequence = new DeleteSequenceExpression() { SchemaName = String.Empty, SequenceName = sequenceName };
             }
