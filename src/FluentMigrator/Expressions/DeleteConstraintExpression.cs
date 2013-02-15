@@ -26,6 +26,14 @@ namespace FluentMigrator.Expressions
             Constraint.ApplyConventions(conventions);
         }
 
+        public override IMigrationExpression Reverse()
+        {
+            return new CreateConstraintExpression(Constraint.IsPrimaryKeyConstraint ? ConstraintType.PrimaryKey : ConstraintType.Unique)
+            {
+                Constraint = this.Constraint
+            };
+        }
+
         public override string ToString()
         {
 
