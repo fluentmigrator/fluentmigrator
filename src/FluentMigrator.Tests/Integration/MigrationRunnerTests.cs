@@ -887,7 +887,7 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateAndDropTableMigration());
 
-                }, true, new[] { typeof(SqliteProcessor), typeof(FirebirdProcessor)});
+                }, true, typeof(SqliteProcessor));
         }
 
         [Test]
