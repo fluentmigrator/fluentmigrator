@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System.IO;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Tests.Helpers;
@@ -59,12 +60,13 @@ namespace FluentMigrator.Tests.Unit.Expressions
         }
 
         [Test]
+        [Category("NotWorkingOnMono")]
         public void CanUseScriptsOnAnotherDriveToWorkingDirectory()
         {
-            var scriptOnAnotherDrive = "z:\\" + testSqlScript;
+            var scriptOnAnotherDrive = "z" + Path.VolumeSeparatorChar + Path.DirectorySeparatorChar + testSqlScript;
             var expression = new ExecuteSqlScriptExpression { SqlScript = scriptOnAnotherDrive };
             
-            var conventions = new MigrationConventions { GetWorkingDirectory = () => "c:\\code" };
+            var conventions = new MigrationConventions { GetWorkingDirectory = () => "c" + Path.VolumeSeparatorChar + Path.DirectorySeparatorChar + "code" };
             expression.ApplyConventions(conventions);
             
             expression.SqlScript.ShouldBe(scriptOnAnotherDrive);

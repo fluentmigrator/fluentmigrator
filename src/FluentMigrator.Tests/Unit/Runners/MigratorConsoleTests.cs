@@ -33,6 +33,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         private string target = "FluentMigrator.Tests.dll";
 
         [Test]
+        [Category("NotWorkingOnMono")]
         public void CanInitMigratorConsoleWithValidArguments()
         {
             var console = new MigratorConsole(
@@ -52,6 +53,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         }
 
         [Test]
+        [Category("NotWorkingOnMono")]
         public void ConsoleAnnouncerHasMoreOutputWhenVerbose()
         {
             var sbNonVerbose = new StringBuilder();
@@ -101,6 +103,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         }
 
         [Test]
+        [Category("NotWorkingOnMono")]
         public void ConsoleAnnouncerHasOutputEvenIfMarkedAsPreviewOnly()
         {
             var sb = new StringBuilder();
