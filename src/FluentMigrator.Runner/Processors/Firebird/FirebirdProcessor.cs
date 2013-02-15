@@ -153,7 +153,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             base.RollbackTransaction();
 
-            if (FBOptions.UndoEnabled)
+            if (FBOptions.UndoEnabled && processedExpressions != null && processedExpressions.Count > 0)
             {
                 processedExpressions.Pop(); //the last transaction is already rolled back
 
