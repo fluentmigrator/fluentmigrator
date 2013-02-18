@@ -8,6 +8,7 @@ namespace FluentMigrator.Runner.Processors.Jet
     public class JetProcessor : ProcessorBase
     {
         private OleDbConnection Connection { get; set; }
+        public OleDbTransaction Transaction { get; protected set; }
 
         public override string DatabaseType
         {
@@ -38,7 +39,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 
             if (Options.PreviewOnly)
                 return;
-        
+
             EnsureConnectionIsOpen();
 
             if (expression.Operation != null)
@@ -54,7 +55,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 
             EnsureConnectionIsOpen();
 
-            using (var command = new OleDbCommand(sql, Connection))
+            using (var command = new OleDbCommand(sql, Connection, Transaction))
             {
                 try
                 {
@@ -77,7 +78,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             EnsureConnectionIsOpen();
 
             var ds = new DataSet();
-            using (var command = new OleDbCommand(String.Format(template, args), Connection))
+            using (var command = new OleDbCommand(String.Format(template, args), Connection, Transaction))
             using (var adapter = new OleDbDataAdapter(command))
             {
                 adapter.Fill(ds);
@@ -89,7 +90,7 @@ namespace FluentMigrator.Runner.Processors.Jet
         {
             EnsureConnectionIsOpen();
 
-            using (var command = new OleDbCommand(String.Format(template, args), Connection))
+            using (var command = new OleDbCommand(String.Format(template, args), Connection, Transaction))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -118,7 +119,8 @@ namespace FluentMigrator.Runner.Processors.Jet
             var restrict = new object[] { null, null, tableName, "TABLE" };
             using (var tables = Connection.GetOleDbSchemaTable(OleDbSchemaGuid.Tables, restrict))
             {
-                for (int i = 0; i < tables.Rows.Count; i++) {
+                for (int i = 0; i < tables.Rows.Count; i++)
+                {
                     var name = tables.Rows[i].ItemArray[2].ToString();
                     if (name == tableName)
                     {
@@ -136,7 +138,8 @@ namespace FluentMigrator.Runner.Processors.Jet
             var restrict = new[] { null, null, tableName, null };
             using (var columns = Connection.GetOleDbSchemaTable(OleDbSchemaGuid.Columns, restrict))
             {
-                for (int i = 0; i < columns.Rows.Count; i++) {
+                for (int i = 0; i < columns.Rows.Count; i++)
+                {
                     var name = columns.Rows[i].ItemArray[3].ToString();
                     if (name == columnName)
                     {
@@ -169,8 +172,44 @@ namespace FluentMigrator.Runner.Processors.Jet
             }
         }
 
+        public bool SupportsTransactions
+        {
+            get { return true; }
+        }
+
+        public override void BeginTransaction()
+        {
+            if (!SupportsTransactions || Transaction != null) return;
+
+            EnsureConnectionIsOpen();
+
+            Announcer.Say("Beginning Transaction");
+            Transaction = Connection.BeginTransaction();
+        }
+
+        public override void RollbackTransaction()
+        {
+            if (Transaction == null) return;
+
+            Announcer.Say("Rolling back transaction");
+            Transaction.Rollback();
+            WasCommitted = true;
+            Transaction = null;
+        }
+
+        public override void CommitTransaction()
+        {
+            if (Transaction == null) return;
+
+            Announcer.Say("Committing Transaction");
+            Transaction.Commit();
+            WasCommitted = true;
+            Transaction = null;
+        }
+
         protected override void Dispose(bool isDisposing)
         {
+            RollbackTransaction();
             EnsureConnectionIsClosed();
         }
     }
