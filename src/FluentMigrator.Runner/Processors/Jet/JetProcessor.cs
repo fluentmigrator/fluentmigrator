@@ -172,14 +172,9 @@ namespace FluentMigrator.Runner.Processors.Jet
             }
         }
 
-        public bool SupportsTransactions
-        {
-            get { return true; }
-        }
-
         public override void BeginTransaction()
         {
-            if (!SupportsTransactions || Transaction != null) return;
+            if (Transaction != null) return;
 
             EnsureConnectionIsOpen();
 
