@@ -1,4 +1,6 @@
-﻿namespace FluentMigrator.Runner.Generators
+﻿using FluentMigrator.Exceptions;
+
+namespace FluentMigrator.Runner.Generators
 {
     public static class CompatabilityModeExtension
     {

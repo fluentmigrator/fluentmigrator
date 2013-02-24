@@ -20,6 +20,7 @@ using System.Reflection;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.Sqlite;
 using FluentMigrator.Runner.Versioning;
@@ -31,6 +32,7 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Integration
 {
     [TestFixture]
+    [Category("Integration")]
     public class VersionMigrationTests : IntegrationTestBase
     {
         [Test]
@@ -83,7 +85,7 @@ namespace FluentMigrator.Tests.Integration
 
                 runner.Down(new VersionSchemaMigration(tableMetaData));
                 processor.SchemaExists(tableMetaData.SchemaName).ShouldBeFalse();
-            }, true, typeof(SqliteProcessor), typeof(MySqlProcessor));
+            }, true, typeof(SqliteProcessor), typeof(MySqlProcessor), typeof(FirebirdProcessor));
         }
 
         [Test]

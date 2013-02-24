@@ -4,6 +4,7 @@ using FluentMigrator.Builders.Execute;
 namespace FluentMigrator.Tests.Integration
 {
     [TestFixture]
+    [Category("Integration")]
     public class PerformDBOperationTests : IntegrationTestBase
     {
         [Test]

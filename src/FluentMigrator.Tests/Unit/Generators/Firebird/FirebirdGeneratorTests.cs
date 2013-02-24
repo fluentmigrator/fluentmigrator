@@ -149,7 +149,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.ColumnNames.Add("OtherColumn");
 
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"NewTable\" DROP \"NewColumn\";\r\n" + 
+            sql.ShouldBe("ALTER TABLE \"NewTable\" DROP \"NewColumn\";" + Environment.NewLine + 
                 "ALTER TABLE \"NewTable\" DROP \"OtherColumn\"");
         }
 

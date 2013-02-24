@@ -11,6 +11,7 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Integration.Processors
 {
     [TestFixture]
+    [Category("Integration")]
     public class OracleProcessorTests
     {
         private const string SchemaName = "test";
@@ -26,6 +27,13 @@ namespace FluentMigrator.Tests.Integration.Processors
             Connection = Factory.CreateConnection(IntegrationTestOptions.Oracle.ConnectionString);
             Quoter = new OracleQuoter();
             Processor = new OracleProcessor(Connection, new OracleGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), Factory);
+            Connection.Open();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            Processor.Dispose();
         }
 
         #region When working with Table

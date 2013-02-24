@@ -10,11 +10,12 @@ using System.Configuration;
 namespace FluentMigrator.Tests.Unit.Initialization
 {
     [TestFixture]
+    [Category("NotWorkingOnMono")]
     public class NetConfigManagerTests
     {
         private static string GetPath(string relative)
         {
-            return string.Format(@"..\..\Unit\Initialization\Fixtures\{0}", relative);
+            return string.Format(@"Unit\Initialization\Fixtures\{0}", relative);
         }
 
         [Test]

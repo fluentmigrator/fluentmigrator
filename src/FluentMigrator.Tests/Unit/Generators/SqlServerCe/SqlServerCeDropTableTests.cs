@@ -1,4 +1,5 @@
-﻿using FluentMigrator.Expressions;
+﻿using FluentMigrator.Exceptions;
+using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
 using NUnit.Should;

@@ -25,113 +25,132 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit
 {
-	[TestFixture]
-	public class DefaultMigrationConventionsTests
-	{
-		[Test]
-		public void GetPrimaryKeyNamePrefixesTableNameWithPKAndUnderscore()
-		{
-			DefaultMigrationConventions.GetPrimaryKeyName("Foo").ShouldBe("PK_Foo");
-		}
+    [TestFixture]
+    public class DefaultMigrationConventionsTests
+    {
+        [Test]
+        public void GetPrimaryKeyNamePrefixesTableNameWithPKAndUnderscore()
+        {
+            DefaultMigrationConventions.GetPrimaryKeyName("Foo").ShouldBe("PK_Foo");
+        }
 
-		[Test]
-		public void GetForeignKeyNameReturnsValidForeignKeyNameForSimpleForeignKey()
-		{
-			var foreignKey = new ForeignKeyDefinition
-			{
-				ForeignTable = "Users", ForeignColumns = new[] { "GroupId" },
-				PrimaryTable = "Groups", PrimaryColumns = new[] { "Id" }
-			};
+        [Test]
+        public void GetForeignKeyNameReturnsValidForeignKeyNameForSimpleForeignKey()
+        {
+            var foreignKey = new ForeignKeyDefinition
+            {
+                ForeignTable = "Users", ForeignColumns = new[] { "GroupId" },
+                PrimaryTable = "Groups", PrimaryColumns = new[] { "Id" }
+            };
 
-			DefaultMigrationConventions.GetForeignKeyName(foreignKey).ShouldBe("FK_Users_GroupId_Groups_Id");
-		}
+            DefaultMigrationConventions.GetForeignKeyName(foreignKey).ShouldBe("FK_Users_GroupId_Groups_Id");
+        }
 
-		[Test]
-		public void GetForeignKeyNameReturnsValidForeignKeyNameForComplexForeignKey()
-		{
-			var foreignKey = new ForeignKeyDefinition
-			{
-				ForeignTable = "Users", ForeignColumns = new[] { "ColumnA", "ColumnB" },
-				PrimaryTable = "Groups", PrimaryColumns = new[] { "ColumnC", "ColumnD" }
-			};
+        [Test]
+        public void GetForeignKeyNameReturnsValidForeignKeyNameForComplexForeignKey()
+        {
+            var foreignKey = new ForeignKeyDefinition
+            {
+                ForeignTable = "Users", ForeignColumns = new[] { "ColumnA", "ColumnB" },
+                PrimaryTable = "Groups", PrimaryColumns = new[] { "ColumnC", "ColumnD" }
+            };
 
-			DefaultMigrationConventions.GetForeignKeyName(foreignKey).ShouldBe("FK_Users_ColumnA_ColumnB_Groups_ColumnC_ColumnD");
-		}
+            DefaultMigrationConventions.GetForeignKeyName(foreignKey).ShouldBe("FK_Users_ColumnA_ColumnB_Groups_ColumnC_ColumnD");
+        }
 
-		[Test]
-		public void GetIndexNameReturnsValidIndexNameForSimpleIndex()
-		{
-			var index = new IndexDefinition
-			{
-				TableName = "Bacon",
-				Columns =
-				{
-					new IndexColumnDefinition { Name = "BaconName", Direction = Direction.Ascending }
-				}
-			};
+        [Test]
+        public void GetIndexNameReturnsValidIndexNameForSimpleIndex()
+        {
+            var index = new IndexDefinition
+            {
+                TableName = "Bacon",
+                Columns =
+                {
+                    new IndexColumnDefinition { Name = "BaconName", Direction = Direction.Ascending }
+                }
+            };
 
-			DefaultMigrationConventions.GetIndexName(index).ShouldBe("IX_Bacon_BaconName");
-		}
+            DefaultMigrationConventions.GetIndexName(index).ShouldBe("IX_Bacon_BaconName");
+        }
 
-		[Test]
-		public void GetIndexNameReturnsValidIndexNameForComplexIndex()
-		{
-			var index = new IndexDefinition
-			{
-				TableName = "Bacon",
-				Columns =
-				{
-					new IndexColumnDefinition { Name = "BaconName", Direction = Direction.Ascending },
-					new IndexColumnDefinition { Name = "BaconSpice", Direction = Direction.Descending }
-				}
-			};
+        [Test]
+        public void GetIndexNameReturnsValidIndexNameForComplexIndex()
+        {
+            var index = new IndexDefinition
+            {
+                TableName = "Bacon",
+                Columns =
+                {
+                    new IndexColumnDefinition { Name = "BaconName", Direction = Direction.Ascending },
+                    new IndexColumnDefinition { Name = "BaconSpice", Direction = Direction.Descending }
+                }
+            };
 
-			DefaultMigrationConventions.GetIndexName(index).ShouldBe("IX_Bacon_BaconName_BaconSpice");
-		}
+            DefaultMigrationConventions.GetIndexName(index).ShouldBe("IX_Bacon_BaconName_BaconSpice");
+        }
 
-		[Test]
-		public void TypeIsMigrationReturnsTrueIfTypeExtendsMigrationAndHasMigrationAttribute()
-		{
-			DefaultMigrationConventions.TypeIsMigration(typeof(DefaultConventionMigrationFake))
-				.ShouldBeTrue();
-		}
+        [Test]
+        public void TypeIsMigrationReturnsTrueIfTypeExtendsMigrationAndHasMigrationAttribute()
+        {
+            DefaultMigrationConventions.TypeIsMigration(typeof(DefaultConventionMigrationFake))
+                .ShouldBeTrue();
+        }
 
-		[Test]
-		public void TypeIsMigrationReturnsFalseIfTypeDoesNotExtendMigration()
-		{
-			DefaultMigrationConventions.TypeIsMigration(typeof(object))
-				.ShouldBeFalse();
-		}
+        [Test]
+        public void TypeIsMigrationReturnsFalseIfTypeDoesNotExtendMigration()
+        {
+            DefaultMigrationConventions.TypeIsMigration(typeof(object))
+                .ShouldBeFalse();
+        }
 
-		[Test]
-		public void TypeIsMigrationReturnsFalseIfTypeDoesNotHaveMigrationAttribute()
-		{
-			DefaultMigrationConventions.TypeIsMigration(typeof(MigrationWithoutAttributeFake))
-				.ShouldBeFalse();
-		}
+        [Test]
+        public void TypeIsMigrationReturnsFalseIfTypeDoesNotHaveMigrationAttribute()
+        {
+            DefaultMigrationConventions.TypeIsMigration(typeof(MigrationWithoutAttributeFake))
+                .ShouldBeFalse();
+        }
 
-		[Test]
-		public void MigrationMetadataTypePropertyMatchesDecoratedType()
-		{
-			var metadata = DefaultMigrationConventions.GetMetadataForMigration(typeof(DefaultConventionMigrationFake));
-			metadata.Type.ShouldBe(typeof(DefaultConventionMigrationFake));
-		}
+        [Test]
+        public void MigrationInfoShouldRetainMigration()
+        {
+            var migration = new DefaultConventionMigrationFake();
+            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migration);
+            migrationinfo.Migration.ShouldBeSameAs(migration);
+        }
 
-		[Test]
-		public void MigrationMetadataCollectsVersionFromMigrationAttribute()
-		{
-			var metadata = DefaultMigrationConventions.GetMetadataForMigration(typeof(DefaultConventionMigrationFake));
-			metadata.Version.ShouldBe(123);
-		}
+        [Test]
+        public void MigrationInfoShouldExtractVersion()
+        {
+            var migration = new DefaultConventionMigrationFake();
+            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migration);
+            migrationinfo.Version.ShouldBe(123);
+        }
 
-		[Test]
-		public void WorkingDirectoryConventionDefaultsToAssemblyFolder()
-		{
-			var defaultWorkingDirectory = DefaultMigrationConventions.GetWorkingDirectory();
+        [Test]
+        public void MigrationInfoShouldExtractTransactionBehavior()
+        {
+            var migration = new DefaultConventionMigrationFake();
+            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migration);
+            migrationinfo.TransactionBehavior.ShouldBe(TransactionBehavior.None);
+        }
 
-			defaultWorkingDirectory.ShouldNotBeNull();
-			defaultWorkingDirectory.Contains("bin").ShouldBeTrue();
-		}
+        [Test]
+        public void MigrationInfoShouldExtractTraits()
+        {
+            var migration = new DefaultConventionMigrationFake();
+            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migration);
+            migrationinfo.Trait("key").ShouldBe("test");
+        }
+
+        [Test]
+        [Category("Integration")]
+        public void WorkingDirectoryConventionDefaultsToAssemblyFolder()
+        {
+            var defaultWorkingDirectory = DefaultMigrationConventions.GetWorkingDirectory();
+
+            defaultWorkingDirectory.ShouldNotBeNull();
+            defaultWorkingDirectory.Contains("bin").ShouldBeTrue();
+        }
 
         [Test]
         public void TypeHasTagsReturnTrueIfTypeHasTagsAttribute()
@@ -173,13 +192,13 @@ namespace FluentMigrator.Tests.Unit
                     .ShouldBeTrue();
             }
 
-			[Test]
-			[Category("Tagging")]
-			public void WhenTypeHasOneTagThatPartiallyMatchesTagThenReturnsFalse()
-			{
-				DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "UK2" })
-					.ShouldBeFalse();
-			}
+            [Test]
+            [Category("Tagging")]
+            public void WhenTypeHasOneTagThatPartiallyMatchesTagThenReturnsFalse()
+            {
+                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "UK2" })
+                    .ShouldBeFalse();
+            }
 
             [Test]
             [Category("Tagging")]
@@ -221,7 +240,7 @@ namespace FluentMigrator.Tests.Unit
                     .ShouldBeFalse();
             }
         }
-	}
+    }
 
     [Tags("BE", "UK", "Staging", "Production")]
     public class TaggedWithBeAndUkAndProductionAndStagingInOneTagsAttribute
@@ -248,16 +267,17 @@ namespace FluentMigrator.Tests.Unit
     {
     }
 
-	[Migration(123)]
-	internal class DefaultConventionMigrationFake : Migration
-	{
-		public override void Up() { }
-		public override void Down() { }
-	}
+    [Migration(123, TransactionBehavior.None)]
+    [MigrationTrait("key", "test")]
+    internal class DefaultConventionMigrationFake : Migration
+    {
+        public override void Up() { }
+        public override void Down() { }
+    }
 
-	internal class MigrationWithoutAttributeFake : Migration
-	{
-		public override void Up() { }
-		public override void Down() { }
-	}
+    internal class MigrationWithoutAttributeFake : Migration
+    {
+        public override void Up() { }
+        public override void Down() { }
+    }
 }

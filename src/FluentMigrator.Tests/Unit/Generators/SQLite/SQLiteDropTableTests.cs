@@ -1,6 +1,6 @@
 ﻿using System;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.SQLite;
 using NUnit.Framework;
 using NUnit.Should;
@@ -54,7 +54,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
             string sql = _generator.Generate(expression);
-            sql.ShouldBe("DROP TABLE 'TestTable1'");
+            sql.ShouldBe("DROP TABLE \"TestTable1\"");
         }
 
         [Test]
@@ -62,7 +62,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
             string sql = _generator.Generate(expression);
-            sql.ShouldBe("DROP INDEX 'TestIndex'");
+            sql.ShouldBe("DROP INDEX \"TestIndex\"");
         }
 
         [Test]

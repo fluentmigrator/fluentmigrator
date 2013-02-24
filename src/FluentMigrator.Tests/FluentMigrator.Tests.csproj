@@ -138,16 +138,13 @@
     </Reference>
     <Reference Include="System.Data.SQLite, Version=1.0.48.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\System.Data.SQLite.DLL</HintPath>
+      <HintPath>..\..\lib\System.Data.SQLite.dll</HintPath>
     </Reference>
     <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\lib\SQLServerCE4\Private\System.Data.SqlServerCe.dll</HintPath>
     </Reference>
     <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data.DataSetExtensions">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
@@ -159,8 +156,10 @@
     </Compile>
     <Compile Include="Helpers\FirebirdTestTable.cs" />
     <Compile Include="Helpers\OracleTestTable.cs" />
+    <Compile Include="Helpers\PostgresTestSequence.cs" />
     <Compile Include="Helpers\PostgresTestTable.cs" />
     <Compile Include="Helpers\SqlServerCeTestTable.cs" />
+    <Compile Include="Helpers\SqlServerTestSequence.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
     <Compile Include="Integration\Migrations\Tagged\1_TenantATable.cs">
       <SubType>Code</SubType>
@@ -229,7 +228,15 @@
     <Compile Include="Unit\Builders\Create\CreateColumnExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Schema\SchemaExpressionRootTest.cs" />
     <Compile Include="Unit\Definitions\IndexDefinitionTests.cs" />
+    <Compile Include="Unit\Expressions\AlterDefaultConstraintExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\AlterTableExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\CreateConstraintExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\CreateSchemaExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\CreateSequenceExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\DeleteConstraintExpressionTests.cs" />
     <Compile Include="Unit\Expressions\DeleteDefaultConstraintExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\DeleteSchemaExpressionTests.cs" />
+    <Compile Include="Unit\Expressions\DeleteSequenceExpressionTests.cs" />
     <Compile Include="Unit\Expressions\UpdateDataExpressionTests.cs" />
     <Compile Include="Unit\Generators\GenericGenerator\GenericGeneratorTests.cs" />
     <Compile Include="Unit\Generators\Firebird\FirebirdGeneratorTests.cs" />
@@ -296,8 +303,8 @@
     <Compile Include="Unit\Generators\BaseTableCreateTests.cs" />
     <Compile Include="Unit\Generators\BaseTableDropTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000DropTableTests.cs" />
-    <Compile Include="Unit\MigrationLoaderTests.cs" />
-    <Compile Include="Unit\MigrationMetadataTests.cs" />
+    <Compile Include="Unit\MigrationInfoTests.cs" />
+    <Compile Include="Unit\DefaultMigrationInformationLoaderTests.cs" />
     <Compile Include="Helpers\SqlServerTestTable.cs" />
     <Compile Include="Unit\Definitions\IndexColumnDefinitionTests.cs" />
     <Compile Include="Unit\Definitions\ForeignKeyDefinitionTests.cs" />
@@ -314,7 +321,6 @@
     <Compile Include="Integration\Migrations\TestMigration.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Unit\MigrationRunnerTests.cs" />
-    <Compile Include="Unit\MigrationWithMetaDataAdapterTests.cs" />
     <Compile Include="Unit\ProfileLoaderTests.cs" />
     <Compile Include="Unit\Runners\Migrations\1_User.cs" />
     <Compile Include="Unit\Runners\Migrations\2_UserEmail.cs" />
@@ -354,11 +360,21 @@
     <None Include="testscript.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Unit\Initialization\Fixtures\FromMachineConfig.config" />
-    <None Include="Unit\Initialization\Fixtures\WithConnectionString.config" />
-    <None Include="Unit\Initialization\Fixtures\WithConnectionString.exe.config" />
-    <None Include="Unit\Initialization\Fixtures\WithNoConnectionString.exe.config" />
-    <None Include="Unit\Initialization\Fixtures\WithWrongConnectionString.config" />
+    <None Include="Unit\Initialization\Fixtures\FromMachineConfig.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Unit\Initialization\Fixtures\WithConnectionString.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Unit\Initialization\Fixtures\WithConnectionString.exe.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Unit\Initialization\Fixtures\WithNoConnectionString.exe.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="Unit\Initialization\Fixtures\WithWrongConnectionString.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -392,10 +408,21 @@
   <ItemGroup>
     <EmbeddedResource Include="EmbeddedResources\B\NotUniqueResource.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Unit\Initialization\Fixtures\WithConnectionString.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Unit\Initialization\Fixtures\WithNoConfig.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Unit\Initialization\Fixtures\WithNoConnectionString.exe">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy $(TargetDir)\SQLServerCENative\%25PROCESSOR_ARCHITECTURE%25\sqlce*.dll $(TargetDir)
-</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

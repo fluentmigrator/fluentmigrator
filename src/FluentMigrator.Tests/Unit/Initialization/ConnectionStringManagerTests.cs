@@ -7,7 +7,8 @@ using NUnit.Framework;
 namespace FluentMigrator.Tests.Unit.Initialization
 {
     [TestFixture]
-    internal class ConnectionStringManagerTests
+    [Category("NotWorkingOnMono")]
+    public class ConnectionStringManagerTests
     {
         private const string TARGET = "FluentMigrator.Tests.dll";
         private const string DATABASE = "sqlserver2008";
@@ -26,7 +27,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
 
         private static string GetPath(string relative)
         {
-            return string.Format(@"..\..\Unit\Initialization\Fixtures\{0}", relative);
+            return string.Format(@"Unit\Initialization\Fixtures\{0}", relative);
         }
 
         private static Configuration LoadFromFile(string path)

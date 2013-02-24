@@ -47,11 +47,16 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="GeneratorTests.cs" />
+    <Compile Include="InitialMigrationCode.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>InitialMigrationCode.tt</DependentUpon>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.T4\FluentMigrator.T4.csproj">
-      <Project>{b08e4c78-29dd-4367-8a84-35cd76971d73}</Project>
+      <Project>{B08E4C78-29DD-4367-8A84-35CD76971D73}</Project>
       <Name>FluentMigrator.T4</Name>
     </ProjectReference>
     <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj">
@@ -64,9 +69,9 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="FM.Core.ttinclude" />
-    <None Include="IntialMigrationCode.tt">
+    <None Include="InitialMigrationCode.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>IntialMigrationCode.cs</LastGenOutput>
+      <LastGenOutput>InitialMigrationCode.cs</LastGenOutput>
     </None>
   </ItemGroup>
   <ItemGroup>

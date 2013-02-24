@@ -6,27 +6,26 @@ using FluentMigrator.Runner.Generators.Postgres;
 
 namespace FluentMigrator.Runner.Processors.Postgres
 {
-    public class PostgresProcessor : ProcessorBase
+    public class PostgresProcessor : GenericProcessorBase
     {
-        private readonly IDbFactory factory;
         readonly PostgresQuoter quoter = new PostgresQuoter();
-        public IDbConnection Connection { get; private set; }
-        public IDbTransaction Transaction { get; private set; }
 
         public override string DatabaseType
         {
             get { return "Postgres"; }
         }
 
-        public PostgresProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
-            : base(generator, announcer, options)
+        public override bool SupportsTransactions
         {
-            this.factory = factory;
-            Connection = connection;
-            connection.Open();
+            get
+            {
+                return true;
+            }
+        }
 
-            Announcer.Say("Beginning Transaction");
-            Transaction = Connection.BeginTransaction();
+        public PostgresProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+            : base(connection, factory, generator, announcer, options)
+        {
         }
 
         public override void Execute(string template, params object[] args)
@@ -59,6 +58,11 @@ namespace FluentMigrator.Runner.Processors.Postgres
             return Exists("select * from pg_catalog.pg_indexes where schemaname='{0}' and tablename = '{1}' and indexname = '{2}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(tableName), FormatToSafeName(indexName));
         }
 
+        public override bool SequenceExists(string schemaName, string sequenceName)
+        {
+            return Exists("select * from information_schema.sequences where sequence_catalog = current_catalog and sequence_schema ='{0}' and sequence_name = '{1}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(sequenceName));
+        }
+
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             return Read("SELECT * FROM {0}.{1}", quoter.QuoteSchemaName(schemaName), quoter.QuoteTableName(tableName));
@@ -66,12 +70,12 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
         public override DataSet Read(string template, params object[] args)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            EnsureConnectionIsOpen();
 
             var ds = new DataSet();
-            using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             {
-                var adapter = factory.CreateDataAdapter(command);
+                var adapter = Factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
                 return ds;
             }
@@ -79,41 +83,12 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
         public override bool Exists(string template, params object[] args)
         {
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
 
-            using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
-            }
-        }
-
-        public override void BeginTransaction()
-        {
-            Announcer.Say("Beginning Transaction");
-            Transaction = Connection.BeginTransaction();
-        }
-
-        public override void CommitTransaction()
-        {
-            Announcer.Say("Committing Transaction");
-            Transaction.Commit();
-            WasCommitted = true;
-            if (Connection.State != ConnectionState.Closed)
-            {
-                Connection.Close();
-            }
-        }
-
-        public override void RollbackTransaction()
-        {
-            Announcer.Say("Rolling back transaction");
-            Transaction.Rollback();
-            WasCommitted = true;
-            if (Connection.State != ConnectionState.Closed)
-            {
-                Connection.Close();
             }
         }
 
@@ -124,10 +99,9 @@ namespace FluentMigrator.Runner.Processors.Postgres
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
 
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
 
-            using (var command = factory.CreateCommand(sql, Connection, Transaction))
+            using (var command = Factory.CreateCommand(sql, Connection, Transaction))
             {
                 try
                 {
@@ -154,8 +128,8 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
             if (Options.PreviewOnly)
                 return;
-			
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+
+            EnsureConnectionIsOpen();
 
             if (expression.Operation != null)
                 expression.Operation(Connection, Transaction);

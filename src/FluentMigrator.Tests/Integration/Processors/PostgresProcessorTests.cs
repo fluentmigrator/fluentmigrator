@@ -31,6 +31,7 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Integration.Processors
 {
     [TestFixture]
+    [Category("Integration")]
     public class PostgresProcessorTests
     {
         private readonly PostgresQuoter quoter = new PostgresQuoter();
@@ -42,12 +43,14 @@ namespace FluentMigrator.Tests.Integration.Processors
         {
             Connection = new NpgsqlConnection(IntegrationTestOptions.Postgres.ConnectionString);
             Processor = new PostgresProcessor(Connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new PostgresDbFactory());
+            Connection.Open();
         }
 
         [TearDown]
         public void TearDown()
         {
             Processor.CommitTransaction();
+            Processor.Dispose();
         }
 
 
@@ -404,6 +407,32 @@ namespace FluentMigrator.Tests.Integration.Processors
         }
 
         [Test]
+        public void CallingSequenceExistsReturnsTrueIfSequenceExists()
+        {
+            using (var sequence = new PostgresTestSequence(Processor, null, "test_sequence"))
+                Processor.SequenceExists(null, "test_sequence").ShouldBeTrue();
+        }
+
+        [Test]
+        public void CallingSequenceExistsReturnsFalseIfSequenceDoesNotExist()
+        {
+            Processor.SequenceExists(null, "DoesNotExist").ShouldBeFalse();
+        }
+
+        [Test]
+        public void CallingSequenceExistsReturnsTrueIfSequenceExistsWithSchema()
+        {
+            using (var sequence = new PostgresTestSequence(Processor, "test_schema", "test_sequence"))
+                Processor.SequenceExists("test_schema", "test_sequence").ShouldBeTrue();
+        }
+
+        [Test]
+        public void CallingSequenceExistsReturnsFalseIfSequenceDoesNotExistWithSchema()
+        {
+            Processor.SequenceExists("test_schema", "DoesNotExist").ShouldBeFalse();
+        }
+
+        [Test]
         public void CanReadDataWithSchema()
         {
             using (var table = new PostgresTestTable(Processor, "TestSchema", "id int"))
@@ -466,6 +495,7 @@ namespace FluentMigrator.Tests.Integration.Processors
                         }
                     };
 
+                processor.BeginTransaction();
                 processor.Process(expression);
 
                 var com = connection.CreateCommand();

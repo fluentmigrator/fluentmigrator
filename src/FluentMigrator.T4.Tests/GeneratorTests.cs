@@ -7,6 +7,7 @@ using NUnit.Framework;
 namespace FluentMigrator.T4.Tests
 {
     [TestFixture]
+    [Category("Integration")]
     public class GeneratorTests
     {
         [Test]

@@ -74,7 +74,7 @@ foreach(Column col in ColumnList)
 {
 #>
 
-                .WithColumn("<#=col.Name#>").<#=generator.GetMigrationTypeFunctionForType(col.PropertyType,col.Size,col.Precision)
+                .WithColumn("<#=col.Name#>").<#=generator.GetMigrationTypeFunctionForType(col)
 #><#if (col.IsPrimaryKey){#>.PrimaryKey()<#}#><#if (col.IsAutoIncrement){#>.Identity()<#}#><#if (col.IsNullable){#>.Nullable()<#} else {#>.NotNullable()<#}#><#if (col.DefaultValue != null){#>.WithDefaultValue(<#= generator.GetColumnDefaultValue(col) #>)<#}#>
 <#
 }
@@ -120,7 +120,7 @@ foreach(ForeignKey fkey in FKeyList)
     if(!string.IsNullOrEmpty(fkey.Name)) 
     { 
         #>ForeignKey("<#=fkey.Name#>")<# 
-    } #>.FromTable("<#=tbl.Name#>").InSchema("<#=fkey.ForeignTableSchema#>").ForeignColumns(<#=Join(fkey.ForeignColumns)#>).ToTable("<#=fkey.PrimaryTable#>").InSchema("<#=fkey.PrimaryTableSchema#>").PrimaryColumns(<#=Join(fkey.PrimaryColumns)#>);
+    } #>.FromTable("<#=tbl.Name#>").InSchema("<#=fkey.ForeignTableSchema#>").ForeignColumns(<#=Join(fkey.ForeignColumns)#>).ToTable("<#=fkey.PrimaryTable#>").InSchema("<#=fkey.PrimaryTableSchema#>").PrimaryColumns(<#=Join(fkey.PrimaryColumns)#>)<#=generator.GetUpdateDeleteRule(fkey)#>;
         <#
 }
 }
@@ -137,7 +137,7 @@ foreach(Table tbl in from t in tables where !t.Ignore select t)
     {
 if(!string.IsNullOrEmpty(fkey.Name)){
 #>
-            Delete.ForeignKey("<#=fkey.Name#>"); 
+            Delete.ForeignKey("<#=fkey.Name#>").OnTable("<#=tbl.Name#>")<#if (string.IsNullOrEmpty(tbl.Schema) == false ){#>.InSchema("<#=tbl.Schema#>")<#}#>; 
 <#
         } else {
         #>
@@ -154,7 +154,7 @@ foreach(Table tbl in from t in tables where !t.Ignore select t)
     foreach(TableIndex idx in from i in tbl.Indexes select i)
     {
 #>
-            Delete.Index("<#=idx.Name#>");
+            Delete.Index("<#=idx.Name#>").OnTable("<#=tbl.Name#>")<#if (string.IsNullOrEmpty(tbl.Schema) == false ){#>.InSchema("<#=tbl.Schema#>")<#}#>;
 <#
     }
 }

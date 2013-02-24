@@ -1,6 +1,8 @@
 using System.Collections.ObjectModel;
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+using FluentMigrator.Tests.Helpers;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
@@ -40,6 +42,33 @@ namespace FluentMigrator.Tests.Unit.Expressions
                                     Name = "NameIndex"
                                 }
                 }.ToString().ShouldBe("DeleteIndex Table (Name, Slug)");
+        }
+
+        [Test]
+        public void ErrorIsReturnedWhenNameIsNull()
+        {
+            var expression = new DeleteIndexExpression { Index = { Name = null, TableName = "test" } };
+
+            var errors = ValidationHelper.CollectErrors(expression);
+            errors.ShouldContain(ErrorMessages.IndexNameCannotBeNullOrEmpty);
+        }
+
+        [Test]
+        public void ErrorIsReturnedWhenTableNameIsNull()
+        {
+            var expression = new DeleteIndexExpression { Index = { Name = "IX", TableName = null } };
+
+            var errors = ValidationHelper.CollectErrors(expression);
+            errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
+        }
+
+        [Test]
+        public void ErrorIsNotReturnedWhenIndexNameAndTableNameAreSet()
+        {
+            var expression = new DeleteIndexExpression { Index = { Name = "IX", TableName = "test" } };
+
+            var errors = ValidationHelper.CollectErrors(expression);
+            Assert.That(errors.Count, Is.EqualTo(0));
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+﻿using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
 using NUnit.Should;
@@ -8,8 +8,6 @@ using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 {
-    using FluentMigrator.Runner.Generators;
-
     public class SqlServerCeAlterTableTests : GeneratorTestBase
     {
         protected SqlServerCeGenerator generator;

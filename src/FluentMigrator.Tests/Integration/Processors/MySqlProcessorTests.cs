@@ -11,6 +11,7 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Integration.Processors
 {
     [TestFixture]
+    [Category("Integration")]
     public class MySqlProcessorTests
     {
         protected MySqlProcessor Processor;
@@ -21,6 +22,13 @@ namespace FluentMigrator.Tests.Integration.Processors
         {
             Connection = new MySqlConnection(IntegrationTestOptions.MySql.ConnectionString);
             Processor = new MySqlProcessor(Connection, new MySqlGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new MySqlDbFactory());
+            Connection.Open();
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            Processor.Dispose();
         }
 
         [Test]

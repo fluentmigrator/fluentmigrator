@@ -7,7 +7,8 @@ namespace FluentMigrator.T4
     {
         public string Name;
         public string PropertyName;
-        public string PropertyType;
+        public System.Data.DbType? PropertyType;
+        public string CustomType { get; set; }
         public bool IsPrimaryKey;
         public bool IsNullable;
         public bool IsAutoIncrement;

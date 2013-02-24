@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Generators.SqlServer;

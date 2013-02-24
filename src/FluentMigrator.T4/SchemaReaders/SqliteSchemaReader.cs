@@ -60,10 +60,14 @@ namespace FluentMigrator.T4
                 {
                     while(rdr.Read())
                     {
+                        var type=this.GetPropertyType(rdr["type"].ToString(), (rdr["type"] == DBNull.Value ? null : rdr["type"].ToString()));
                         Column col=new Column();
                         col.Name=rdr["name"].ToString();
                         col.PropertyName=CleanUp(col.Name);
-                        col.PropertyType=this.GetPropertyType(rdr["type"].ToString(), (rdr["type"] == DBNull.Value ? null : rdr["type"].ToString()));
+                        col.PropertyType= type;
+                        col.CustomType = type == null
+                            ? rdr["type"].ToString().ToLowerInvariant()
+                            : null;
                         col.Size=GetDatatypeSize(rdr["type"].ToString());
                         col.Precision=GetDatatypePrecision(rdr["type"].ToString());
                         col.IsNullable=rdr["notnull"].ToString()=="0";
@@ -142,10 +146,11 @@ namespace FluentMigrator.T4
             }
         }
 	
+
 	
-        string GetPropertyType(string sqlType, string dataScale)
+        DbType? GetPropertyType(string sqlType, string dataScale)
         {
-            string sysType="string";
+            var sysType=default(DbType?);
             switch (sqlType.ToLower()) 
             {
                 case "integer":
@@ -154,48 +159,48 @@ namespace FluentMigrator.T4
                 case "smallint":
                 case "mediumint":
                 case "int2":
-                case "int8":				
-                    sysType= "long";
+                case "int8":
+                    sysType = DbType.Int64;
                     break;				
                 case "bigint":
                 case "unsigned big int":
-                    sysType= "long";
+                    sysType= DbType.UInt64;
                     break;
                 case "uniqueidentifier":
-                    sysType=  "Guid";
+                    sysType = DbType.Guid;
                     break;
                 case "smalldatetime":
                 case "datetime":
                 case "date":
-                    sysType=  "DateTime";
+                    sysType=  DbType.DateTime;
                     break;				
                 case "float":
                 case "double precision":
                 case "double":
-                    sysType="double";
+                    sysType = DbType.Double;
                     break;
                 case "real":
                 case "numeric":
-                case "smallmoney":
                 case "decimal":
-                case "money":
                 case "number":
-                    sysType=  "decimal";
+                    sysType = DbType.Single;
+                    break;
+                case "smallmoney":
+                case "money":
+                    sysType = DbType.Currency;
                     break;
                 case "bit":
-                    sysType=  "bool";
+                    sysType = DbType.Boolean;
                     break;
                 case "image":
                 case "binary":
                 case "varbinary":
                 case "timestamp":
-                    sysType=  "byte[]";
+                    sysType=  DbType.Binary;
                     break;
-            }
-        
+            }        
             if (sqlType == "number" && dataScale == "0")
-                return "long";
-        
+                return DbType.Int64;        
             return sysType;
         }
 

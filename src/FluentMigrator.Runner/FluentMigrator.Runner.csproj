@@ -143,6 +143,8 @@
     <Compile Include="Generators\Firebird\FirebirdGenerator.cs" />
     <Compile Include="Generators\Firebird\FirebirdTruncator.cs" />
     <Compile Include="Generators\SqlServer\SqlServer2012Generator.cs" />
+    <Compile Include="IMigrationInformationLoader.cs" />
+    <Compile Include="InvalidMigrationException.cs" />
     <Compile Include="Processors\Firebird\FirebirdProcessedExpression.cs" />
     <Compile Include="Generators\Firebird\FirebirdQuoter.cs" />
     <Compile Include="Generators\Firebird\FirebirdTypeMap.cs" />
@@ -158,7 +160,6 @@
     <Compile Include="Generators\MySql\MySqlColumn.cs" />
     <Compile Include="Generators\MySql\MySqlQuoter.cs" />
     <Compile Include="Generators\MySql\MySqlTypeMap.cs" />
-    <Compile Include="Generators\DatabaseOperationNotSupportedException.cs" />
     <Compile Include="Generators\Oracle\OracleColumn.cs" />
     <Compile Include="Generators\Oracle\OracleQuoter.cs" />
     <Compile Include="Generators\Oracle\OracleTypeMap.cs" />
@@ -194,10 +195,8 @@
     <Compile Include="Initialization\IRunnerContext.cs" />
     <Compile Include="Initialization\ConnectionStringManager.cs" />
     <Compile Include="Initialization\NetConfigManager.cs" />
-    <Compile Include="Initialization\ProcessorFactoryNotFoundException.cs" />
     <Compile Include="Initialization\RunnerContext.cs" />
     <Compile Include="Initialization\TaskExecutor.cs" />
-    <Compile Include="Initialization\UndeterminableConnectionException.cs" />
     <Compile Include="IProfileLoader.cs" />
     <Compile Include="IVersionLoader.cs" />
     <Compile Include="Processors\Firebird\FirebirdDbFactory.cs" />
@@ -209,6 +208,7 @@
     <Compile Include="Processors\Firebird\FirebirdTableSchema.cs" />
     <Compile Include="Processors\DotConnectOracle\DotConnectOracleProcessor.cs" />
     <Compile Include="Processors\DotConnectOracle\DotConnectOracleProcessorFactory.cs" />
+    <Compile Include="Processors\GenericProcessorBase.cs" />
     <Compile Include="Processors\Jet\JetProcessor.cs" />
     <Compile Include="Processors\Jet\JetProcessorFactory.cs" />
     <Compile Include="Processors\MigrationProcessorFactory.cs" />
@@ -239,8 +239,6 @@
     <Compile Include="Processors\SqlServer\SqlServerCeProcessorFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServerProcessorFactory.cs" />
     <Compile Include="Processors\IMigrationProcessorFactory.cs" />
-    <Compile Include="MigrationLoader.cs" />
-    <Compile Include="IMigrationLoader.cs" />
     <Compile Include="MigrationRunner.cs" />
     <Compile Include="Generators\SQLite\SqliteGenerator.cs" />
     <Compile Include="Processors\Sqlite\SqliteProcessorFactory.cs" />
