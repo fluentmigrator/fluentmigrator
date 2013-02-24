@@ -1,3 +1,4 @@
+using System;
 using System.Data.SqlClient;
 using System.Data.SqlServerCe;
 using System.IO;
@@ -189,6 +190,45 @@ namespace FluentMigrator.Tests.Integration.Processors
         public void CallingSchemaExistsReturnsTrueAllways()
         {
             Processor.SchemaExists("NOTUSED").ShouldBeTrue();
+        }
+
+        [Test]
+        public void CallingExecuteWithMultilineSqlShouldExecuteInBatches()
+        {
+            Processor.Execute("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL);" + Environment.NewLine +
+                              "GO"+ Environment.NewLine +
+                              "INSERT INTO TestTable1 VALUES('abc', 1);");
+
+            Processor.TableExists("NOTUSED", "TestTable1");
+
+            var dataset = Processor.ReadTableData("NOTUSED", "TestTable1");
+            dataset.Tables[0].Rows.Count.ShouldBe(1);
+        }
+
+        [Test]
+        public void CallingExecuteWithMultilineSqlAsLowercaseShouldExecuteInBatches()
+        {
+            Processor.Execute("create table [TestTable1] ([TestColumn1] nvarchar(255) not null, [TestColumn2] int not null);" + Environment.NewLine +
+                              "go" + Environment.NewLine +
+                              "insert into testtable1 values('abc', 1);");
+
+            Processor.TableExists("NOTUSED", "TestTable1");
+
+            var dataset = Processor.ReadTableData("NOTUSED", "TestTable1");
+            dataset.Tables[0].Rows.Count.ShouldBe(1);
+        }
+
+        [Test]
+        public void CallingExecuteWithMultilineSqlWithNoTrailingSemicolonShouldExecuteInBatches()
+        {
+            Processor.Execute("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL);" + Environment.NewLine +
+                              "GO" + Environment.NewLine +
+                              "INSERT INTO TestTable1 VALUES('abc', 1)");
+
+            Processor.TableExists("NOTUSED", "TestTable1");
+
+            var dataset = Processor.ReadTableData("NOTUSED", "TestTable1");
+            dataset.Tables[0].Rows.Count.ShouldBe(1);
         }
 
         private void RecreateDatabase()
