@@ -7,8 +7,8 @@
     <ProjectGuid>{4F0C1161-4533-4039-A1D2-763CEB7E1E29}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>FluentMigrator.Programmatic</RootNamespace>
-    <AssemblyName>FluentMigrator.Programmatic</AssemblyName>
+    <RootNamespace>FluentMigrator.Api</RootNamespace>
+    <AssemblyName>FluentMigrator.Api</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

@@ -33,7 +33,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.T4", "src\Fl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.T4.Tests", "src\FluentMigrator.T4.Tests\FluentMigrator.T4.Tests.csproj", "{A68E6543-6DB8-4AFF-A9B1-0F928B34EAA9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Programmatic", "src\FluentMigrator.Programmatic\FluentMigrator.Programmatic.csproj", "{4F0C1161-4533-4039-A1D2-763CEB7E1E29}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Api", "src\FluentMigrator.Api\FluentMigrator.Api.csproj", "{4F0C1161-4533-4039-A1D2-763CEB7E1E29}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

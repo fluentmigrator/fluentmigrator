@@ -26,7 +26,7 @@ using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Processors;
 
-namespace FluentMigrator.Programmatic
+namespace FluentMigrator.Api
 {
     public class MigrationsFacade : IMigrationRunner
     {
