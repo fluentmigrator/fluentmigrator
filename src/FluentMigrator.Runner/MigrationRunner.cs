@@ -21,7 +21,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
@@ -392,16 +391,10 @@ namespace FluentMigrator.Runner
 
             if (invalidExpressions.Count > 0)
             {
-                var errorMessage = DictToString(invalidExpressions, "{0}: {1}");
-                _announcer.Error("The migration {0} contained the following Validation Error(s): {1}", migration.GetType().Name, errorMessage);
-                throw new InvalidMigrationException(migration, errorMessage);
+                var ex = new InvalidMigrationException(migration, invalidExpressions);
+                _announcer.Error(ex.Message);
+                throw ex;
             }
-        }
-
-        private string DictToString<TKey, TValue>(Dictionary<TKey, TValue> items, string format)
-        {
-            format = String.IsNullOrEmpty(format) ? "{0}='{1}' " : format;
-            return items.Aggregate(new StringBuilder(), (sb, kvp) => sb.AppendFormat(format, kvp.Key, kvp.Value).AppendLine()).ToString();
         }
 
         /// <summary>
