@@ -83,6 +83,11 @@ namespace FluentMigrator.Api
         /// <summary>Version table options. By default, table is named "VersionInfo".</summary>
         public VersionTableMetaData VersionTable { get; private set; }
 
+        private IVersionLoader VersionLoader
+        {
+            get { return _versionLoader ?? (_versionLoader = new VersionLoader(this, _context.MigrationAssembly, Conventions)); }
+        }
+
         IMigrationProcessor IMigrationRunner.Processor
         {
             get { return Processor; }
@@ -228,7 +233,6 @@ namespace FluentMigrator.Api
                     PreviewOnly = _context.PreviewOnly,
                     Timeout = _context.Timeout,
                 });
-            _versionLoader = new VersionLoader(this, _context.MigrationAssembly, Conventions);
         }
 
         public QueryMigration GetQuery()
@@ -252,7 +256,7 @@ namespace FluentMigrator.Api
         {
             foreach (KeyValuePair<long, IMigrationInfo> migration in _migrationLoader.LoadMigrations())
                 ApplyMigrationUp(migration.Value);
-            _versionLoader.LoadVersionInfo();
+            VersionLoader.LoadVersionInfo();
         }
 
         /// <summary>Migrate up to a specific version.</summary>
@@ -264,7 +268,7 @@ namespace FluentMigrator.Api
 
             foreach (IMigrationInfo migration in migrations)
                 ApplyMigrationUp(migration);
-            _versionLoader.LoadVersionInfo();
+            VersionLoader.LoadVersionInfo();
         }
 
         /// <summary>Migrate down to a specific version.</summary>
@@ -277,38 +281,38 @@ namespace FluentMigrator.Api
 
             foreach (IMigrationInfo migration in migrations)
                 ApplyMigrationDown(migration);
-            _versionLoader.LoadVersionInfo();
+            VersionLoader.LoadVersionInfo();
         }
 
         /// <summary>Rollback specified number of migrations.</summary>
         public void Rollback(int steps)
         {
             IDictionary<long, IMigrationInfo> availableMigrations = _migrationLoader.LoadMigrations();
-            IEnumerable<IMigrationInfo> migrationsToRollback = _versionLoader.VersionInfo.AppliedMigrations()
+            IEnumerable<IMigrationInfo> migrationsToRollback = VersionLoader.VersionInfo.AppliedMigrations()
                 .Where(availableMigrations.ContainsKey)
                 .Select(version => availableMigrations[version])
                 .Take(steps);
 
             foreach (IMigrationInfo migration in migrationsToRollback)
                 ApplyMigrationDown(migration);
-            _versionLoader.LoadVersionInfo();
-            if (!_versionLoader.VersionInfo.AppliedMigrations().Any())
-                _versionLoader.RemoveVersionTable();
+            VersionLoader.LoadVersionInfo();
+            if (!VersionLoader.VersionInfo.AppliedMigrations().Any())
+                VersionLoader.RemoveVersionTable();
         }
 
         public void RollbackToVersion(long targetVersion)
         {
             IDictionary<long, IMigrationInfo> availableMigrations = _migrationLoader.LoadMigrations();
-            IEnumerable<IMigrationInfo> migrationsToRollback = _versionLoader.VersionInfo.AppliedMigrations()
+            IEnumerable<IMigrationInfo> migrationsToRollback = VersionLoader.VersionInfo.AppliedMigrations()
                 .Where(availableMigrations.ContainsKey)
                 .Select(appliedVersion => availableMigrations[appliedVersion])
                 .Where(migration => targetVersion < migration.Version);
 
             foreach (IMigrationInfo migration in migrationsToRollback)
                 ApplyMigrationDown(migration);
-            _versionLoader.LoadVersionInfo();
-            if (targetVersion == 0 && !_versionLoader.VersionInfo.AppliedMigrations().Any())
-                _versionLoader.RemoveVersionTable();
+            VersionLoader.LoadVersionInfo();
+            if (targetVersion == 0 && !VersionLoader.VersionInfo.AppliedMigrations().Any())
+                VersionLoader.RemoveVersionTable();
         }
 
         internal void ProcessQuery(QueryMigration migration, IMigrationContext context)
@@ -378,7 +382,7 @@ namespace FluentMigrator.Api
         /// <summary>Get all migrations. The key of KeyValuePair is wether the migration has been applied.</summary>
         public IEnumerable<KeyValuePair<bool, IMigrationInfo>> GetMigrations()
         {
-            long currentVersion = _versionLoader.VersionInfo.Latest();
+            long currentVersion = VersionLoader.VersionInfo.Latest();
             return _migrationLoader.LoadMigrations()
                 .Select(migration => new KeyValuePair<bool, IMigrationInfo>(migration.Key == currentVersion, migration.Value));
         }
@@ -421,13 +425,13 @@ namespace FluentMigrator.Api
 
         private void ApplyMigrationUp(IMigrationInfo migration)
         {
-            if (_versionLoader.VersionInfo.HasAppliedMigration(migration.Version))
+            if (VersionLoader.VersionInfo.HasAppliedMigration(migration.Version))
                 return;
 
             ApplyMigration(migration, () =>
             {
                 ExecuteMigration(migration.Migration, migration.Migration.GetUpExpressions);
-                _versionLoader.UpdateVersionInfo(migration.Version);
+                VersionLoader.UpdateVersionInfo(migration.Version);
             });
         }
 
@@ -436,7 +440,7 @@ namespace FluentMigrator.Api
             ApplyMigration(migration, () =>
             {
                 ExecuteMigration(migration.Migration, migration.Migration.GetDownExpressions);
-                _versionLoader.DeleteVersion(migration.Version);
+                VersionLoader.DeleteVersion(migration.Version);
             });
         }
 
@@ -469,19 +473,19 @@ namespace FluentMigrator.Api
         private bool IsMigrationStepNeededForUpMigration(long versionOfMigration, long targetVersion)
         {
             return versionOfMigration <= targetVersion
-                && !_versionLoader.VersionInfo.HasAppliedMigration(versionOfMigration);
+                && !VersionLoader.VersionInfo.HasAppliedMigration(versionOfMigration);
         }
 
         private bool IsMigrationStepNeededForDownMigration(long versionOfMigration, long targetVersion)
         {
             return versionOfMigration > targetVersion
-                && _versionLoader.VersionInfo.HasAppliedMigration(versionOfMigration);
+                && VersionLoader.VersionInfo.HasAppliedMigration(versionOfMigration);
         }
 
         private bool IsMigrationVersionLessThanGreatestAppliedMigration(long version)
         {
-            return !_versionLoader.VersionInfo.HasAppliedMigration(version)
-                && version < _versionLoader.VersionInfo.Latest();
+            return !VersionLoader.VersionInfo.HasAppliedMigration(version)
+                && version < VersionLoader.VersionInfo.Latest();
         }
 
         private class FacadeRunnerContext : IRunnerContext
