@@ -25,10 +25,10 @@ namespace FluentMigrator.Runner
 {
     public class InvalidMigrationException : Exception
     {
-        private readonly IMigration _migration;
+        private readonly object _migration;
         private readonly string _errors;
 
-        public InvalidMigrationException(IMigration migration, Dictionary<string, string> invalidExpressions)
+        public InvalidMigrationException(object migration, Dictionary<string, string> invalidExpressions)
         {
             _migration = migration;
             _errors = invalidExpressions.Aggregate(new StringBuilder(),

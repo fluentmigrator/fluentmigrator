@@ -42,6 +42,7 @@
     <Compile Include="MigrationConventionsBase.cs" />
     <Compile Include="Migrator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueryMigration.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.Runner\FluentMigrator.Runner.csproj">

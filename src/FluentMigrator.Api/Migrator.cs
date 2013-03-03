@@ -60,7 +60,6 @@ namespace FluentMigrator.Api
     {
         private readonly IAnnouncer _nullAnnouncer = new NullAnnouncer();
         private readonly FacadeRunnerContext _context;
-        private IMigrationProcessor _processor;
         private IVersionLoader _versionLoader;
         private IMigrationInformationLoader _migrationLoader;
 
@@ -73,24 +72,26 @@ namespace FluentMigrator.Api
 
         public void Dispose()
         {
-            _processor.Dispose();
+            Processor.Dispose();
         }
 
-        IMigrationProcessor IMigrationRunner.Processor
-        {
-            get { return _processor; }
-        }
-
-        Assembly IMigrationRunner.MigrationAssembly
-        {
-            get { return _context.MigrationAssembly; }
-        }
+        internal IMigrationProcessor Processor { get; private set; }
 
         /// <summary>Migrations conventions. Assign an object of class <see cref="MigrationConventionsBase"/> if you need to customize generation of names for schema objects or search for migration classes in assembly.</summary>
         public IMigrationConventions Conventions { get; set; }
 
         /// <summary>Version table options. By default, table is named "VersionInfo".</summary>
         public VersionTableMetaData VersionTable { get; private set; }
+
+        IMigrationProcessor IMigrationRunner.Processor
+        {
+            get { return Processor; }
+        }
+
+        public Assembly MigrationAssembly
+        {
+            get { return _context.MigrationAssembly; }
+        }
 
         public IEnumerable<string> AvailableEngines
         {
@@ -124,8 +125,8 @@ namespace FluentMigrator.Api
             set
             {
                 _context.PreviewOnly = value;
-                if (_processor != null)
-                    _processor.Options.PreviewOnly = value;
+                if (Processor != null)
+                    Processor.Options.PreviewOnly = value;
             }
         }
 
@@ -136,8 +137,8 @@ namespace FluentMigrator.Api
             set
             {
                 _context.Timeout = value;
-                if (_processor != null)
-                    _processor.Options.Timeout = value;
+                if (Processor != null)
+                    Processor.Options.Timeout = value;
             }
         }
 
@@ -221,13 +222,18 @@ namespace FluentMigrator.Api
 
         private void Connect()
         {
-            _processor = new MigrationProcessorFactoryProvider().GetFactory(_context.Database).Create(
+            Processor = new MigrationProcessorFactoryProvider().GetFactory(_context.Database).Create(
                 _context.Connection, _nullAnnouncer, new ProcessorOptions
                 {
                     PreviewOnly = _context.PreviewOnly,
                     Timeout = _context.Timeout,
                 });
             _versionLoader = new VersionLoader(this, _context.MigrationAssembly, Conventions);
+        }
+
+        public QueryMigration GetQuery()
+        {
+            return new QueryMigration(this, Processor);
         }
 
         /// <summary>Apply profile migrations. They are always run, no version checks are used. Only <see cref="Migration.Up"/> method is called. Usually profile migrations are executed after usual migrations.</summary>
@@ -305,18 +311,33 @@ namespace FluentMigrator.Api
                 _versionLoader.RemoveVersionTable();
         }
 
+        internal void ProcessQuery(QueryMigration migration, IMigrationContext context)
+        {
+            try
+            {
+                Processor.BeginTransaction();
+                ExecuteMigration(migration, context);
+                Processor.CommitTransaction();
+            }
+            catch
+            {
+                Processor.RollbackTransaction();
+                throw;
+            }
+        }
+
         /// <summary>Run the specified migration up.</summary>
         public void Up(IMigration migration)
         {
             try
             {
-                _processor.BeginTransaction();
+                Processor.BeginTransaction();
                 ExecuteMigration(migration, migration.GetUpExpressions);
-                _processor.CommitTransaction();
+                Processor.CommitTransaction();
             }
-            catch (Exception)
+            catch
             {
-                _processor.RollbackTransaction();
+                Processor.RollbackTransaction();
                 throw;
             }
         }
@@ -326,13 +347,13 @@ namespace FluentMigrator.Api
         {
             try
             {
-                _processor.BeginTransaction();
+                Processor.BeginTransaction();
                 ExecuteMigration(migration, migration.GetDownExpressions);
-                _processor.CommitTransaction();
+                Processor.CommitTransaction();
             }
-            catch (Exception)
+            catch
             {
-                _processor.RollbackTransaction();
+                Processor.RollbackTransaction();
                 throw;
             }
         }
@@ -372,20 +393,17 @@ namespace FluentMigrator.Api
             return GetMigrations().Where(m => !m.Key).Select(m => m.Value);
         }
 
-        private void ExecuteMigration(IMigration migration, Action<IMigrationContext> getExpressions)
+        private void ExecuteMigration(object migration, Action<IMigrationContext> getExpressions)
         {
-            var context = new MigrationContext(Conventions, _processor, _context.MigrationAssembly, ApplicationContext);
+            var context = new MigrationContext(Conventions, Processor, _context.MigrationAssembly, ApplicationContext);
             getExpressions(context);
-            ApplyConventionsToAndValidateExpressions(migration, context.Expressions);
-
-            foreach (IMigrationExpression expression in context.Expressions)
-                expression.ExecuteWith(_processor);
+            ExecuteMigration(migration, context);
         }
 
-        private void ApplyConventionsToAndValidateExpressions(IMigration migration, IEnumerable<IMigrationExpression> expressions)
+        private void ExecuteMigration(object migration, IMigrationContext context)
         {
             var invalidExpressions = new Dictionary<string, string>();
-            foreach (IMigrationExpression expression in expressions)
+            foreach (IMigrationExpression expression in context.Expressions)
             {
                 expression.ApplyConventions(Conventions);
                 var errors = new Collection<string>();
@@ -396,6 +414,9 @@ namespace FluentMigrator.Api
 
             if (invalidExpressions.Count > 0)
                 throw new InvalidMigrationException(migration, invalidExpressions);
+
+            foreach (IMigrationExpression expression in context.Expressions)
+                expression.ExecuteWith(Processor);
         }
 
         private void ApplyMigrationUp(IMigrationInfo migration)
@@ -425,15 +446,15 @@ namespace FluentMigrator.Api
             try
             {
                 if (useTransaction)
-                    _processor.BeginTransaction();
+                    Processor.BeginTransaction();
                 applyMigration();
                 if (useTransaction)
-                    _processor.CommitTransaction();
+                    Processor.CommitTransaction();
             }
             catch
             {
                 if (useTransaction)
-                    _processor.RollbackTransaction();
+                    Processor.RollbackTransaction();
                 throw;
             }
         }
