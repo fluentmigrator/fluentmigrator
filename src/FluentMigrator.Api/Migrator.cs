@@ -42,7 +42,8 @@ namespace FluentMigrator.Api
     /// <item><see cref="LoadMigrations(Assembly,string,bool,IEnumerable{string})"/> or
     /// <see cref="LoadMigrations(string,string,bool,IEnumerable{string})"/> to load the assembly with migrations;</item>
     /// <item><see cref="OpenConnection"/> or <see cref="OpenNamedConnection"/> to connect to the database;</item>
-    /// <item>Migration methods from <see cref="IMigrationRunner"/> interface and other;</item>
+    /// <item>Migration methods from <see cref="IMigrationRunner"/> interface and other;
+    /// alternatively, <see cref="GetQuery"/> can be used for direct manipulation;</item>
     /// <item><see cref="Dispose"/> to close the connection.</item>
     /// </list>
     /// </summary>
@@ -235,6 +236,13 @@ namespace FluentMigrator.Api
                 });
         }
 
+        /// <summary>
+        /// Get query object to use fluent syntax directly, without recording migrations history.
+        /// To apply changes, either <see cref="QueryMigration.Commit"/> or <see cref="IDisposable.Dispose"/>
+        /// (via <c>using</c> statement) must be called.
+        /// If only this query is used, and migrations are neither requested nor applied,
+        /// migrations history table (VersionInfo) is not created in the database.
+        /// </summary>
         public QueryMigration GetQuery()
         {
             return new QueryMigration(this, Processor);
