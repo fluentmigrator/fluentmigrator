@@ -56,7 +56,7 @@ namespace FluentMigrator.Api
     /// TODO: Tracing compatible with System.Diagnostics
     /// TODO: Logging timing and counters to some structures
     /// </remarks>
-    public class MigrationsFacade : IMigrationRunner, IDisposable
+    public class Migrator : IMigrationRunner, IDisposable
     {
         private readonly IAnnouncer _nullAnnouncer = new NullAnnouncer();
         private readonly FacadeRunnerContext _context;
@@ -64,7 +64,7 @@ namespace FluentMigrator.Api
         private IVersionLoader _versionLoader;
         private IMigrationInformationLoader _migrationLoader;
 
-        public MigrationsFacade()
+        public Migrator()
         {
             _context = new FacadeRunnerContext(this);
             Conventions = new MigrationConventionsBase();
@@ -465,9 +465,9 @@ namespace FluentMigrator.Api
 
         private class FacadeRunnerContext : IRunnerContext
         {
-            private readonly MigrationsFacade _facade;
+            private readonly Migrator _facade;
 
-            public FacadeRunnerContext(MigrationsFacade facade)
+            public FacadeRunnerContext(Migrator facade)
             {
                 _facade = facade;
                 StopWatch = new StopWatch();
