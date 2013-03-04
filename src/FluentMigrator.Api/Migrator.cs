@@ -153,11 +153,12 @@ namespace FluentMigrator.Api
         /// <param name="ns">Namespace to load migration classes from.</param>
         /// <param name="loadNestedNamespaces">Wether to load migration classes from nested namesapces.</param>
         /// <param name="tagsToMatch">Filter migrations by tags.</param>
-        public void LoadMigrations(string assemblyName, string ns,
+        public Migrator LoadMigrations(string assemblyName, string ns,
             bool loadNestedNamespaces, IEnumerable<string> tagsToMatch)
         {
             _context.MigrationAssemblyName = assemblyName;
             LoadMigrations(_context.MigrationAssembly, ns, loadNestedNamespaces, tagsToMatch);
+            return this;
         }
 
         /// <summary>Load migrations from an assembly.</summary>
@@ -165,17 +166,18 @@ namespace FluentMigrator.Api
         /// <param name="ns">Namespace to load migration classes from.</param>
         /// <param name="loadNestedNamespaces">Wether to load migration classes from nested namesapces.</param>
         /// <param name="tagsToMatch">Filter migrations by tags.</param>
-        public void LoadMigrations(Assembly assembly, string ns,
+        public Migrator LoadMigrations (Assembly assembly, string ns,
             bool loadNestedNamespaces, IEnumerable<string> tagsToMatch)
         {
             _context.MigrationAssembly = assembly;
             _migrationLoader = new DefaultMigrationInformationLoader(Conventions, _context.MigrationAssembly, ns, loadNestedNamespaces, tagsToMatch);
+            return this;
         }
 
         /// <summary>Connect to the database.</summary>
         /// <param name="engine">Database provider name. <see cref="AvailableEngines"/>.</param>
         /// <param name="connectionString">Connection string.</param>
-        public void OpenConnection(string engine, string connectionString)
+        public Migrator OpenConnection (string engine, string connectionString)
         {
             if (engine == null)
                 throw new ArgumentNullException("engine");
@@ -191,13 +193,14 @@ namespace FluentMigrator.Api
             _context.Database = engine;
             _context.Connection = manager.ConnectionString;
             Connect();
+            return this;
         }
 
         /// <summary>Connect to the database using a named connection from a config file.</summary>
         /// <param name="engine">Database provider name. <see cref="AvailableEngines"/>.</param>
         /// <param name="connectionStringName">Connection string name. If not specified, <see cref="Environment.MachineName"/> is used.</param>
         /// <param name="configPath">Configuration file path. ".config" extension is optional. If not specified, migration assembly name is used.</param>
-        public void OpenNamedConnection(string engine, string connectionStringName = null, string configPath = null)
+        public Migrator OpenNamedConnection (string engine, string connectionStringName = null, string configPath = null)
         {
             var manager = new ConnectionStringManager(new NetConfigManager(), _nullAnnouncer,
                 connectionStringName, configPath, _context.MigrationAssemblyName, engine);
@@ -209,12 +212,13 @@ namespace FluentMigrator.Api
             _context.Connection = manager.ConnectionString;
             _context.ConnectionStringConfigPath = configPath;
             Connect();
+            return this;
         }
 
         /// <summary>Connect to the database using a named connection from a machine config file.</summary>
         /// <param name="engine">Database provider name. <see cref="AvailableEngines"/>.</param>
         /// <param name="connectionStringName">Connection string name. If not specified, <see cref="Environment.MachineName"/> is used.</param>
-        public void OpenMachineNamedConnection(string engine, string connectionStringName = null)
+        public Migrator OpenMachineNamedConnection (string engine, string connectionStringName = null)
         {
             // TODO Other methods opening connection will fallback to machine config. Five levels of fallbacks are bad, but who cares...
             var manager = new ConnectionStringManager(new NetConfigManager(), _nullAnnouncer,
@@ -224,6 +228,7 @@ namespace FluentMigrator.Api
             _context.Database = engine;
             _context.Connection = manager.ConnectionString;
             Connect();
+            return this;
         }
 
         private void Connect()
