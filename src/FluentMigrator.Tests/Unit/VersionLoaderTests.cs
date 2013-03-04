@@ -14,11 +14,13 @@ namespace FluentMigrator.Tests.Unit
         public bool PreviewOnly
         {
             get { return false; }
+            set { }
         }
 
         public int Timeout
         {
             get { return 30; }
+            set { }
         }
     }
 
