@@ -73,7 +73,8 @@ namespace FluentMigrator.Api
 
         public void Dispose()
         {
-            Processor.Dispose();
+            if (Processor != null)
+                Processor.Dispose();
         }
 
         internal IMigrationProcessor Processor { get; private set; }
@@ -153,8 +154,8 @@ namespace FluentMigrator.Api
         /// <param name="ns">Namespace to load migration classes from.</param>
         /// <param name="loadNestedNamespaces">Wether to load migration classes from nested namesapces.</param>
         /// <param name="tagsToMatch">Filter migrations by tags.</param>
-        public Migrator LoadMigrations(string assemblyName, string ns,
-            bool loadNestedNamespaces, IEnumerable<string> tagsToMatch)
+        public Migrator LoadMigrations(string assemblyName, string ns = null,
+            bool loadNestedNamespaces = false, IEnumerable<string> tagsToMatch = null)
         {
             _context.MigrationAssemblyName = assemblyName;
             LoadMigrations(_context.MigrationAssembly, ns, loadNestedNamespaces, tagsToMatch);
@@ -166,8 +167,8 @@ namespace FluentMigrator.Api
         /// <param name="ns">Namespace to load migration classes from.</param>
         /// <param name="loadNestedNamespaces">Wether to load migration classes from nested namesapces.</param>
         /// <param name="tagsToMatch">Filter migrations by tags.</param>
-        public Migrator LoadMigrations (Assembly assembly, string ns,
-            bool loadNestedNamespaces, IEnumerable<string> tagsToMatch)
+        public Migrator LoadMigrations (Assembly assembly, string ns = null,
+            bool loadNestedNamespaces = false, IEnumerable<string> tagsToMatch = null)
         {
             _context.MigrationAssembly = assembly;
             _migrationLoader = new DefaultMigrationInformationLoader(Conventions, _context.MigrationAssembly, ns, loadNestedNamespaces, tagsToMatch);
