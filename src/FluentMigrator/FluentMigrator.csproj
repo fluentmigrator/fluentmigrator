@@ -180,6 +180,7 @@
     <Compile Include="Builders\IfDatabase\NullIfDatabaseProcessor.cs" />
     <Compile Include="Builders\IForeignKeyCascadeSyntax.cs" />
     <Compile Include="Builders\IInSchemaSyntax.cs" />
+    <Compile Include="ExplicitUnicodeString.cs" />
     <Compile Include="Exceptions\DatabaseOperationNotSupportedException.cs" />
     <Compile Include="Exceptions\DuplicateMigrationException.cs" />
     <Compile Include="Exceptions\FluentMigratorException.cs" />
