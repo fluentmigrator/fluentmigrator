@@ -145,6 +145,31 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public void CanCreateUniqueConstraint()
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.Unique);
+            expression.Constraint.TableName = "ConstraintTable";
+            expression.Constraint.ConstraintName = "Constraint";
+            expression.Constraint.Columns.Add("column1");
+
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("ALTER TABLE \"public\".\"ConstraintTable\" ADD CONSTRAINT \"Constraint\" UNIQUE (\"column1\")");
+        }
+
+        [Test]
+        public void CanCreateUniqueConstraintWithSchema()
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.Unique);
+            expression.Constraint.TableName = "ConstraintTable";
+            expression.Constraint.SchemaName = "Schema";
+            expression.Constraint.ConstraintName = "Constraint";
+            expression.Constraint.Columns.Add("column1");
+
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("ALTER TABLE \"Schema\".\"ConstraintTable\" ADD CONSTRAINT \"Constraint\" UNIQUE (\"column1\")");
+        }
+
+        [Test]
         public void CanDeleteConstraint()
         {
             var expression = new DeleteConstraintExpression(ConstraintType.Unique);
@@ -209,7 +234,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             expression.ColumnNames.Add("OtherColumn");
 
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"public\".\"NewTable\" DROP COLUMN \"NewColumn\";\r\n" + 
+            sql.ShouldBe("ALTER TABLE \"public\".\"NewTable\" DROP COLUMN \"NewColumn\";" + Environment.NewLine + 
                 "ALTER TABLE \"public\".\"NewTable\" DROP COLUMN \"OtherColumn\"");
         }
 
@@ -332,6 +357,21 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
             string sql = generator.Generate(expression);
             sql.ShouldBe("CREATE UNIQUE INDEX \"IX_TEST\" ON \"public\".\"TEST_TABLE\" (\"Column1\" ASC,\"Column2\" DESC)");
+        }
+
+        [Test]
+        public void CanCreateUniqueIndexWithSchema()
+        {
+            var expression = new CreateIndexExpression();
+            expression.Index.Name = "IX_TEST";
+            expression.Index.TableName = "TEST_TABLE";
+            expression.Index.SchemaName = "TEST_SCHEMA";
+            expression.Index.IsUnique = true;
+            expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Ascending, Name = "Column1" });
+            expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Descending, Name = "Column2" });
+
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("CREATE UNIQUE INDEX \"IX_TEST\" ON \"TEST_SCHEMA\".\"TEST_TABLE\" (\"Column1\" ASC,\"Column2\" DESC)");
         }
 
         [Test]

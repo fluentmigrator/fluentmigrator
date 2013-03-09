@@ -31,7 +31,7 @@ namespace FluentMigrator
         public Func<Type, bool> TypeIsMigration { get; set; }
         public Func<Type, bool> TypeIsProfile { get; set; }
         public Func<Type, bool> TypeIsVersionTableMetaData { get; set; }
-        public Func<Type, MigrationMetadata> GetMetadataForMigration { get; set; }
+        public Func<IMigration, IMigrationInfo> GetMigrationInfo { get; set; }
         public Func<string> GetWorkingDirectory { get; set; }
         public Func<Model.ConstraintDefinition, string> GetConstraintName { get; set; }
         public Func<Type, bool> TypeHasTags { get; set; }
@@ -45,7 +45,7 @@ namespace FluentMigrator
             TypeIsMigration = DefaultMigrationConventions.TypeIsMigration;
             TypeIsProfile = DefaultMigrationConventions.TypeIsProfile;
             TypeIsVersionTableMetaData = DefaultMigrationConventions.TypeIsVersionTableMetaData;
-            GetMetadataForMigration = DefaultMigrationConventions.GetMetadataForMigration;
+            GetMigrationInfo = DefaultMigrationConventions.GetMigrationInfoFor;
             GetWorkingDirectory = DefaultMigrationConventions.GetWorkingDirectory;
             GetConstraintName = DefaultMigrationConventions.GetConstraintName;
             TypeHasTags = DefaultMigrationConventions.TypeHasTags;

@@ -181,6 +181,12 @@
     <Compile Include="Builders\IForeignKeyCascadeSyntax.cs" />
     <Compile Include="Builders\IInSchemaSyntax.cs" />
     <Compile Include="Model\ExplicitUnicodeString.cs" />
+    <Compile Include="Exceptions\DatabaseOperationNotSupportedException.cs" />
+    <Compile Include="Exceptions\DuplicateMigrationException.cs" />
+    <Compile Include="Exceptions\FluentMigratorException.cs" />
+    <Compile Include="Exceptions\ProcessorFactoryNotFoundException.cs" />
+    <Compile Include="Exceptions\UndeterminableConnectionException.cs" />
+    <Compile Include="Infrastructure\IMigrationInfo.cs" />
     <Compile Include="RawSql.cs" />
     <Compile Include="Infrastructure\ISupportAdditionalFeatures.cs" />
     <Compile Include="Builders\Insert\IInsertDataOrInSchemaSyntax.cs" />
@@ -212,8 +218,6 @@
     <Compile Include="Builders\Insert\InsertExpressionRoot.cs" />
     <Compile Include="Expressions\UpdateDataExpression.cs" />
     <Compile Include="ForwardOnlyMigration.cs" />
-    <Compile Include="Infrastructure\IMigrationMetadata.cs" />
-    <Compile Include="Infrastructure\MigrationWithMetaDataAdapter.cs" />
     <Compile Include="MigrationBase.cs" />
     <Compile Include="Model\ConstraintDefinition.cs" />
     <Compile Include="Model\DeletionDataDefinition.cs" />
@@ -244,6 +248,7 @@
     <Compile Include="ProfileAttribute.cs" />
     <Compile Include="SystemMethods.cs" />
     <Compile Include="TagsAttribute.cs" />
+    <Compile Include="TransactionBehavior.cs" />
     <Compile Include="VersionTableInfo\DefaultVersionTableMetaData.cs" />
     <Compile Include="VersionTableInfo\IVersionTableMetaData.cs" />
     <Compile Include="MigrationTraitAttribute.cs" />
@@ -292,7 +297,6 @@
     <Compile Include="Infrastructure\ICanBeValidated.cs" />
     <Compile Include="Infrastructure\Extensions\ExtensionsForICustomAttributeProvider.cs" />
     <Compile Include="Infrastructure\DefaultMigrationConventions.cs" />
-    <Compile Include="Infrastructure\MigrationMetadata.cs" />
     <Compile Include="MigrationAttribute.cs" />
     <Compile Include="Expressions\RenameTableExpression.cs" />
     <Compile Include="Expressions\DeleteForeignKeyExpression.cs" />

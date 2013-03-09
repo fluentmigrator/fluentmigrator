@@ -33,6 +33,7 @@ using FluentMigrator.Runner.Generators.SQLite;
 namespace FluentMigrator.Tests.Integration.Processors
 {
     [TestFixture]
+    [Category("Integration")]
     public class SqliteProcessorTests
     {
         private IDbConnection _connection;

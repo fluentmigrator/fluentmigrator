@@ -18,6 +18,7 @@
 
 using System;
 using System.IO;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Extensions;

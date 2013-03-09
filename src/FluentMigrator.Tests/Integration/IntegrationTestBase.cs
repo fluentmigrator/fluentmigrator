@@ -150,14 +150,20 @@ namespace FluentMigrator.Tests.Integration
         {
             if (!serverOptions.IsEnabled)
                 return;
-            var connection = new NpgsqlConnection(serverOptions.ConnectionString);
-            var processor = new PostgresProcessor(connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new PostgresDbFactory());
-            
-            test(processor);
 
-            if (!processor.WasCommitted)
+            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            announcer.Heading("Testing Migration against Postgres");
+
+            using (var connection = new NpgsqlConnection(serverOptions.ConnectionString))
             {
-                processor.RollbackTransaction();
+                var processor = new PostgresProcessor(connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new PostgresDbFactory());
+
+                test(processor);
+
+                if (!processor.WasCommitted)
+                {
+                    processor.RollbackTransaction();
+                }
             }
         }
 
@@ -193,23 +199,17 @@ namespace FluentMigrator.Tests.Integration
             using (var connection = new FbConnection(serverOptions.ConnectionString))
             {
                 var options = FirebirdOptions.AutoCommitBehaviour();
-                var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer, new ProcessorOptions(), new PostgresDbFactory(), options);
+                var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer, new ProcessorOptions(), new FirebirdDbFactory(), options);
 
                 try
                 {
                     test(processor);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-                    if(!processor.WasCommitted)
+                    if (!processor.WasCommitted)
                         processor.RollbackTransaction();
-                    throw e;
-                }
-
-
-                if (!processor.WasCommitted)
-                {
-                    processor.RollbackTransaction();
+                    throw;
                 }
 
                 connection.Close();

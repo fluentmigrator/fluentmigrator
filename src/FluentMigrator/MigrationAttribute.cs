@@ -1,4 +1,5 @@
 #region License
+
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -14,6 +15,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
 #endregion
 
 using System;
@@ -23,11 +25,18 @@ namespace FluentMigrator
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class MigrationAttribute : Attribute
     {
-        public long Version { get; private set; }
-
         public MigrationAttribute(long version)
+            : this(version, TransactionBehavior.Default)
+        {
+        }
+
+        public MigrationAttribute(long version, TransactionBehavior transactionBehavior)
         {
             Version = version;
+            TransactionBehavior = transactionBehavior;
         }
+
+        public long Version { get; private set; }
+        public TransactionBehavior TransactionBehavior { get; private set; }
     }
 }

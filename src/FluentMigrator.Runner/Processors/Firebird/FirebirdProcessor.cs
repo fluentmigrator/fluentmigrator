@@ -10,13 +10,10 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Processors.Firebird
 {
-    public class FirebirdProcessor : ProcessorBase
+    public class FirebirdProcessor : GenericProcessorBase
     {
         protected readonly FirebirdTruncator truncator;
-        public IDbFactory Factory { get; private set; }
         readonly FirebirdQuoter quoter = new FirebirdQuoter();
-        public IDbConnection Connection { get; private set; }
-        public IDbTransaction Transaction { get; private set; }
         public FirebirdOptions FBOptions { get; private set; }
         public new IMigrationGenerator Generator { get { return base.Generator; } }
         public new IAnnouncer Announcer { get { return base.Announcer; } }
@@ -31,21 +28,24 @@ namespace FluentMigrator.Runner.Processors.Firebird
             get { return "Firebird"; }
         }
 
+        public override bool SupportsTransactions
+        {
+            get
+            {
+                return true;
+            }
+        }
         public FirebirdProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory, FirebirdOptions fbOptions)
-            : base(generator, announcer, options)
+            : base(connection, factory, generator, announcer, options)
         {
             if (fbOptions == null)
                 throw new ArgumentNullException("fbOptions");
             FBOptions = fbOptions;
             truncator = new FirebirdTruncator(FBOptions.TruncateLongNames);
-            Factory = factory;
-
-            Connection = connection;
-            connection.Open();
-
-            BeginTransaction();
+            ClearLocks();
+            ClearExpressions();
+            ClearDDLFollowers();
         }
-
 
         #region Schema checks
 
@@ -80,9 +80,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
             return Exists("select rdb$index_name from rdb$indices where (rdb$relation_name = '{0}') and (rdb$index_name = '{1}') and (rdb$unique_flag IS NULL) and (rdb$foreign_key IS NULL)", FormatToSafeName(tableName), FormatToSafeName(indexName));
         }
 
-        public virtual bool SequenceExists(string schemaName, string tableName, string sequenceName)
+        public override bool SequenceExists(string schemaName, string sequenceName)
         {
-            CheckTable(tableName);
             return Exists("select rdb$generator_name from rdb$generators where rdb$generator_name = '{0}'", FormatToSafeName(sequenceName));
         }
 
@@ -100,8 +99,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public override DataSet Read(string template, params object[] args)
         {
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
             
             //Announcer.Sql(String.Format(template,args));
 
@@ -116,8 +114,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public override bool Exists(string template, params object[] args)
         {
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
 
             using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             using (var reader = command.ExecuteReader())
@@ -133,8 +130,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public override void BeginTransaction()
         {
-            Announcer.Say("Beginning Transaction");
-            Transaction = Connection.BeginTransaction();
+            base.BeginTransaction();
             ClearLocks();
             ClearExpressions();
             ClearDDLFollowers();
@@ -142,22 +138,14 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public override void CommitTransaction()
         {
-            Announcer.Say("Committing Transaction");
-            Transaction.Commit();
-            WasCommitted = true;
-            if (Connection.State != ConnectionState.Closed)
-            {
-                Connection.Close();
-            }
+            base.CommitTransaction();
+            EnsureConnectionIsClosed();
             ClearLocks();
-
         }
 
         public override void RollbackTransaction()
         {
-            Announcer.Say("Rolling back transaction");
-            Transaction.Rollback();
-            WasCommitted = true;
+            base.RollbackTransaction();
 
             if (FBOptions.UndoEnabled)
             {
@@ -177,10 +165,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 }
             }
 
-            if (Connection.State != ConnectionState.Closed)
-            {
-                Connection.Close();
-            }
+            EnsureConnectionIsClosed();
             ClearLocks();
         }
 
@@ -477,7 +462,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 InternalProcess((Generator as FirebirdGenerator).GenerateSetType(expression.Column));
             }
 
-            bool identitySequenceExists = SequenceExists(String.Empty, expression.TableName, GetSequenceName(expression.TableName, expression.Column.Name));
+            bool identitySequenceExists = SequenceExists(String.Empty, GetSequenceName(expression.TableName, expression.Column.Name));
             
             //Adjust identity generators
             if (expression.Column.IsIdentity)
@@ -511,7 +496,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             LockColumn(expression.TableName, expression.ColumnNames);
             foreach (string columnName in expression.ColumnNames)
             {
-                if (SequenceExists(String.Empty, expression.TableName, GetSequenceName(expression.TableName, columnName)))
+                if (SequenceExists(String.Empty, GetSequenceName(expression.TableName, columnName)))
                 {
                     DeleteSequenceForIdentity(expression.TableName, columnName);
                 }
@@ -615,7 +600,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             TableDefinition table = schema.GetTableDefinition(expression.TableName);
             foreach (ColumnDefinition colDef in table.Columns)
             {
-                if (SequenceExists(String.Empty, expression.TableName, GetSequenceName(expression.TableName, colDef.Name)))
+                if (SequenceExists(String.Empty, GetSequenceName(expression.TableName, colDef.Name)))
                 {
                     DeleteSequenceForIdentity(expression.TableName, colDef.Name);
                 }
@@ -778,8 +763,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             if (Options.PreviewOnly)
                 return;
 
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
 
             if (expression.Operation != null)
             {
@@ -798,8 +782,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
 
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
 
             using (var command = Factory.CreateCommand(sql, Connection, Transaction))
             {
@@ -815,17 +798,6 @@ namespace FluentMigrator.Runner.Processors.Firebird
                         message.WriteLine("An error occurred executing the following sql:");
                         message.WriteLine(sql);
                         message.WriteLine("The error was {0}", ex.Message);
-
-                        try
-                        {
-                            if (FBOptions.TransactionModel != FirebirdTransactionModel.None)
-                                RollbackTransaction();
-                        }
-                        catch (Exception e)
-                        {
-                            message.WriteLine("---");
-                            message.WriteLine(e.ToString());
-                        }
 
                         throw new Exception(message.ToString(), ex);
                     }
@@ -872,7 +844,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             CheckTable(tableName);
             LockTable(tableName);
             string sequenceName = GetSequenceName(tableName, columnName);
-            if (!SequenceExists(String.Empty, tableName, sequenceName))
+            if (!SequenceExists(String.Empty, sequenceName))
             {
                 CreateSequenceExpression sequence = new CreateSequenceExpression()
                 {
@@ -897,7 +869,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             LockTable(tableName);
             string sequenceName = GetSequenceName(tableName, columnName);
             DeleteSequenceExpression deleteSequence = null;
-            if (SequenceExists(String.Empty, tableName, sequenceName))
+            if (SequenceExists(String.Empty, sequenceName))
             {
                 deleteSequence = new DeleteSequenceExpression() { SchemaName = String.Empty, SequenceName = sequenceName };
             }

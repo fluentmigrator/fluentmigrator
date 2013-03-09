@@ -77,10 +77,14 @@ namespace FluentMigrator.T4
                 {
                     while(rdr.Read())
                     {
+                        var type = GetPropertyType(rdr["DataType"].ToString());
                         Column col=new Column();
                         col.Name=rdr["ColumnName"].ToString();
                         col.PropertyName=CleanUp(col.Name);
-                        col.PropertyType=this.GetPropertyType(rdr["DataType"].ToString());
+                        col.PropertyType=type;
+                        col.CustomType = type == null
+                            ? rdr["DataType"].ToString().ToLowerInvariant()
+                            : null;
                         col.Size=GetDatatypeSize(rdr["DataType"].ToString());
                         col.Precision=GetDatatypePrecision(rdr["DataType"].ToString());
                         col.IsNullable=rdr["IsNullable"].ToString()=="YES";
@@ -132,55 +136,44 @@ namespace FluentMigrator.T4
         
             return "";
         }
-    
-        string GetPropertyType(string sqlType)
-        {
-            string sysType="string";
-            switch (sqlType) 
+
+        private static readonly IDictionary<string, DbType?> _typeMap =
+            new Dictionary<string, DbType?>()
             {
-                case "bigint":
-                    sysType = "long";
-                    break;
-                case "smallint":
-                    sysType= "short";
-                    break;
-                case "int":
-                    sysType= "int";
-                    break;
-                case "uniqueidentifier":
-                    sysType=  "Guid";
-                    break;
-                case "smalldatetime":
-                case "datetime":
-                case "date":
-                case "time":
-                    sysType=  "DateTime";
-                    break;
-                case "float":
-                    sysType="double";
-                    break;
-                case "real":
-                    sysType="float";
-                    break;
-                case "numeric":
-                case "smallmoney":
-                case "decimal":
-                case "money":
-                    sysType=  "decimal";
-                    break;
-                case "tinyint":
-                    sysType = "byte";
-                    break;
-                case "bit":
-                    sysType=  "bool";
-                    break;
-                case "image":
-                case "binary":
-                case "varbinary":
-                case "timestamp":
-                    sysType=  "byte[]";
-                    break;
-            }
+                {"bigint", DbType.Int64}
+                ,{"smallint",DbType.Int16}
+                ,{"int",DbType.Int32}
+                ,{"uniqueidentifier",DbType.Guid}
+                ,{"smalldatetime",DbType.DateTime}
+                ,{"datetime",DbType.DateTime}
+                ,{"datetime2",DbType.DateTime2}
+                ,{"date",DbType.Date}
+                ,{"time",DbType.Time}
+                ,{"float",DbType.Double}
+                ,{"real",DbType.Single}
+                ,{"numeric",DbType.Decimal}
+                ,{"smallmoney",DbType.Decimal}
+                ,{"decimal",DbType.Decimal}
+                ,{"money",DbType.Currency}
+                ,{"tinyint",DbType.Byte}
+                ,{"image",DbType.Binary}
+                ,{"binary",DbType.Binary}
+                ,{"varbinary",DbType.Binary}
+                ,{"bit",DbType.Boolean}
+                ,{"datetimeoffset",DbType.DateTimeOffset}
+                ,{"tinyint",DbType.Byte}
+                ,{"char",DbType.AnsiStringFixedLength}
+                ,{"varchar",DbType.AnsiString}
+                ,{"text",DbType.AnsiString}
+                ,{"nchar",DbType.StringFixedLength}
+                ,{"nvarchar",DbType.String}
+                ,{"ntext",DbType.String}
+
+            };
+        static DbType? GetPropertyType(string sqlType)
+        {
+            var sysType = default(DbType?);
+            _typeMap.TryGetValue(sqlType, out sysType);
             return sysType;
         }
 

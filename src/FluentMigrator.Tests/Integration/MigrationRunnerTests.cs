@@ -20,6 +20,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -32,6 +33,7 @@ using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Runner.Processors.Sqlite;
@@ -48,6 +50,7 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Integration
 {
     [TestFixture]
+    [Category("Integration")]
     public class MigrationRunnerTests : IntegrationTestBase
     {
         private IRunnerContext _runnerContext;
@@ -121,9 +124,10 @@ namespace FluentMigrator.Tests.Integration
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
                     runner.Up(new TestForeignKeyNamingConvention());
-
                     processor.ConstraintExists(null, "Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeTrue();
+
                     runner.Down(new TestForeignKeyNamingConvention());
+                    processor.ConstraintExists(null, "Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeFalse();
                 }, false, typeof(SqliteProcessor));
         }
 
@@ -139,7 +143,7 @@ namespace FluentMigrator.Tests.Integration
 
                     processor.ConstraintExists("TestSchema", "Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeTrue();
                     runner.Down(new TestForeignKeyNamingConventionWithSchema());
-                }, false, typeof(SqliteProcessor));
+                }, false, new []{typeof(SqliteProcessor), typeof(FirebirdProcessor)});
         }
 
         [Test]
@@ -226,7 +230,7 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateSchema());
                     //processor.CommitTransaction();
-                });
+                }, false, new[] { typeof(SqliteProcessor), typeof(FirebirdProcessor) });
         }
 
         [Test]
@@ -334,7 +338,7 @@ namespace FluentMigrator.Tests.Integration
                     processor.ColumnExists("TestSchema", "TestTable2", "Name").ShouldBeFalse();
 
                     runner.Down(new TestCreateSchema());
-                }, true, typeof(SqliteProcessor));
+                }, true, typeof(SqliteProcessor), typeof(FirebirdProcessor));
         }
 
         [Test]
@@ -351,7 +355,7 @@ namespace FluentMigrator.Tests.Integration
 
                 //runner.Processor.CommitTransaction();
 
-                runner.MigrationLoader.Migrations.ShouldNotBeNull();
+                runner.MigrationLoader.LoadMigrations().ShouldNotBeNull();
             });
         }
 
@@ -750,8 +754,321 @@ namespace FluentMigrator.Tests.Integration
             caughtException.InvalidMigrations.Count().ShouldBe(1);
             var keyValuePair = caughtException.InvalidMigrations.First();
             keyValuePair.Key.ShouldBe(200909060935);
-            ((MigrationWithMetaDataAdapter)keyValuePair.Value).Migration.ShouldBeOfType<UserEmail>();
-            
+            keyValuePair.Value.Migration.ShouldBeOfType<UserEmail>();
+        }
+
+        [Test]
+        public void CanCreateSequence()
+        {
+            ExecuteWithSqlServer2012(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateSequence());
+                    processor.SequenceExists(null, "TestSequence");
+
+                    runner.Down(new TestCreateSequence());
+                    processor.SequenceExists(null, "TestSequence").ShouldBeFalse();
+                }, true);
+        }
+
+        [Test]
+        public void CanCreateSequenceWithSchema()
+        {
+            Action<IMigrationProcessor> action = processor =>
+                                {
+                                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                                    runner.Up(new TestCreateSequence());
+                                    processor.SequenceExists("TestSchema", "TestSequence");
+
+                                    runner.Down(new TestCreateSequence());
+                                    processor.SequenceExists("TestSchema", "TestSequence").ShouldBeFalse();
+                                };
+
+            ExecuteWithSqlServer2012(
+                action,true);
+
+            ExecuteWithPostgres(action, IntegrationTestOptions.Postgres, true);
+        }
+
+        [Test]
+        public void CanAlterColumnWithSchema()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateSchema());
+
+                    runner.Up(new TestCreateAndDropTableMigrationWithSchema());
+                    processor.ColumnExists("TestSchema", "TestTable2", "Name2").ShouldBeTrue();
+
+                    runner.Up(new TestAlterColumnWithSchema());
+                    processor.ColumnExists("TestSchema", "TestTable2", "Name2").ShouldBeTrue();
+
+                    runner.Down(new TestAlterColumnWithSchema());
+                    processor.ColumnExists("TestSchema", "TestTable2", "Name2").ShouldBeTrue();
+
+                    runner.Down(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Down(new TestCreateSchema());
+                }, true, new[] { typeof(SqliteProcessor), typeof(FirebirdProcessor) });
+        }
+
+        [Test]
+        public void CanAlterTableWithSchema()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateSchema());
+
+                    runner.Up(new TestCreateAndDropTableMigrationWithSchema());
+                    processor.ColumnExists("TestSchema", "TestTable2", "NewColumn").ShouldBeFalse();
+
+                    runner.Up(new TestAlterTableWithSchema());
+                    processor.ColumnExists("TestSchema", "TestTable2", "NewColumn").ShouldBeTrue();
+
+                    runner.Down(new TestAlterTableWithSchema());
+                    processor.ColumnExists("TestSchema", "TestTable2", "NewColumn").ShouldBeFalse();
+
+                    runner.Down(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Down(new TestCreateSchema());
+                }, true, new[] { typeof(SqliteProcessor), typeof(FirebirdProcessor) });
+        }
+
+        [Test]
+        public void CanAlterTablesSchema()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateSchema());
+
+                    runner.Up(new TestCreateAndDropTableMigrationWithSchema());
+                    processor.TableExists("TestSchema", "TestTable").ShouldBeTrue();
+
+                    runner.Up(new TestAlterSchema());
+                    processor.TableExists("NewSchema", "TestTable").ShouldBeTrue();
+
+                    runner.Down(new TestAlterSchema());
+                    processor.TableExists("TestSchema", "TestTable").ShouldBeTrue();
+
+                    runner.Down(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Down(new TestCreateSchema());
+                }, true, new[] { typeof(SqliteProcessor), typeof(FirebirdProcessor) });
+        }
+
+        [Test]
+        public void CanCreateUniqueConstraint()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateAndDropTableMigration());
+                    processor.ConstraintExists(null, "TestTable2", "TestUnique").ShouldBeFalse();
+
+                    runner.Up(new TestCreateUniqueConstraint());
+                    processor.ConstraintExists(null, "TestTable2", "TestUnique").ShouldBeTrue();
+
+                    runner.Down(new TestCreateUniqueConstraint());
+                    processor.ConstraintExists(null, "TestTable2", "TestUnique").ShouldBeFalse();
+
+                    runner.Down(new TestCreateAndDropTableMigration());
+
+                }, true, new[] { typeof(SqliteProcessor), typeof(FirebirdProcessor)});
+        }
+
+        [Test]
+        public void CanCreateUniqueConstraintWithSchema()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateSchema());
+
+                    runner.Up(new TestCreateAndDropTableMigrationWithSchema());
+                    processor.ConstraintExists("TestSchema", "TestTable2", "TestUnique").ShouldBeFalse();
+
+                    runner.Up(new TestCreateUniqueConstraintWithSchema());
+                    processor.ConstraintExists("TestSchema", "TestTable2", "TestUnique").ShouldBeTrue();
+
+                    runner.Down(new TestCreateUniqueConstraintWithSchema());
+                    processor.ConstraintExists("TestSchema", "TestTable2", "TestUnique").ShouldBeFalse();
+
+                    runner.Down(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Down(new TestCreateSchema());
+                }, true, new[] { typeof(SqliteProcessor), typeof(FirebirdProcessor) });
+        }
+
+        [Test]
+        public void CanInsertData()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateAndDropTableMigration());
+                    DataSet ds = processor.ReadTableData(null, "TestTable");
+                    ds.Tables[0].Rows.Count.ShouldBe(1);
+                    ds.Tables[0].Rows[0][1].ShouldBe("Test");
+
+                    runner.Down(new TestCreateAndDropTableMigration());
+
+                }, true, new[] { typeof(SqliteProcessor) });
+        }
+
+        [Test]
+        public void CanInsertDataWithSchema()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateSchema());
+
+                    runner.Up(new TestCreateAndDropTableMigrationWithSchema());
+                    DataSet ds = processor.ReadTableData("TestSchema", "TestTable");
+                    ds.Tables[0].Rows.Count.ShouldBe(1);
+                    ds.Tables[0].Rows[0][1].ShouldBe("Test");
+
+                    runner.Down(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Down(new TestCreateSchema());
+                }, true, new[] { typeof(SqliteProcessor), typeof(FirebirdProcessor) });
+        }
+
+        [Test]
+        public void CanUpdateData()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateSchema());
+
+                    runner.Up(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Up(new TestUpdateData());
+                    DataSet upDs = processor.ReadTableData("TestSchema", "TestTable");
+                    upDs.Tables[0].Rows.Count.ShouldBe(1);
+                    upDs.Tables[0].Rows[0][1].ShouldBe("Updated");
+
+                    runner.Down(new TestUpdateData());
+                    DataSet downDs = processor.ReadTableData("TestSchema", "TestTable");
+                    downDs.Tables[0].Rows.Count.ShouldBe(1);
+                    downDs.Tables[0].Rows[0][1].ShouldBe("Test");
+
+                    runner.Down(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Down(new TestCreateSchema());
+                }, true, new[] { typeof(SqliteProcessor), typeof(FirebirdProcessor) });
+        }
+
+        [Test]
+        public void CanDeleteData()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateAndDropTableMigration());
+
+                    runner.Up(new TestDeleteData());
+                    DataSet upDs = processor.ReadTableData(null, "TestTable");
+                    upDs.Tables[0].Rows.Count.ShouldBe(0);
+
+                    runner.Down(new TestDeleteData());
+                    DataSet downDs = processor.ReadTableData(null, "TestTable");
+                    downDs.Tables[0].Rows.Count.ShouldBe(1);
+                    downDs.Tables[0].Rows[0][1].ShouldBe("Test");
+
+                    runner.Down(new TestCreateAndDropTableMigration());
+
+                }, true, new[] { typeof(SqliteProcessor) });
+        }
+
+        [Test]
+        public void CanDeleteDataWithSchema()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateSchema());
+
+                    runner.Up(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Up(new TestDeleteDataWithSchema());
+                    DataSet upDs = processor.ReadTableData("TestSchema", "TestTable");
+                    upDs.Tables[0].Rows.Count.ShouldBe(0);
+
+                    runner.Down(new TestDeleteDataWithSchema());
+                    DataSet downDs = processor.ReadTableData("TestSchema", "TestTable");
+                    downDs.Tables[0].Rows.Count.ShouldBe(1);
+                    downDs.Tables[0].Rows[0][1].ShouldBe("Test");
+
+                    runner.Down(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Down(new TestCreateSchema());
+                }, true, new[] { typeof(SqliteProcessor), typeof(FirebirdProcessor) });
+        }
+
+        [Test]
+        public void CanReverseCreateIndex()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateSchema());
+
+                    runner.Up(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Up(new TestCreateIndexWithReversing());
+                    processor.IndexExists("TestSchema", "TestTable2", "IX_TestTable2_Name2").ShouldBeTrue();
+
+                    runner.Down(new TestCreateIndexWithReversing());
+                    processor.IndexExists("TestSchema", "TestTable2", "IX_TestTable2_Name2").ShouldBeFalse();
+
+                    runner.Down(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Down(new TestCreateSchema());
+                }, true, new[] { typeof(SqliteProcessor) });
+        }
+
+        [Test]
+        public void CanExecuteSql()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestExecuteSql());
+                    runner.Down(new TestExecuteSql());
+
+                }, true, new[] { typeof(FirebirdProcessor) });
         }
 
         private static MigrationRunner SetupMigrationRunner(IMigrationProcessor processor)
@@ -985,7 +1302,7 @@ namespace FluentMigrator.Tests.Integration
             Create.Index("ix_Name").OnTable("TestTable2").InSchema("TestSchema").OnColumn("Name").Ascending()
                 .WithOptions().NonClustered();
 
-            Create.Column("Name2").OnTable("TestTable2").InSchema("TestSchema").AsBoolean().Nullable();
+            Create.Column("Name2").OnTable("TestTable2").InSchema("TestSchema").AsString(10).Nullable();
 
             Create.ForeignKey("fk_TestTable2_TestTableId_TestTable_Id")
                 .FromTable("TestTable2").InSchema("TestSchema").ForeignColumn("TestTableId")
@@ -1043,4 +1360,156 @@ namespace FluentMigrator.Tests.Integration
         }
     }
 
+    internal class TestCreateSequence : Migration
+    {
+        public override void Up()
+        {
+            Create.Sequence("TestSequence").StartWith(1).IncrementBy(1).MinValue(0).MaxValue(1000).Cycle().Cache(10);
+        }
+
+        public override void Down()
+        {
+            Delete.Sequence("TestSequence");
+        }
+    }
+
+    internal class TestCreateSequenceWithSchema : Migration
+    {
+        public override void Up()
+        {
+            Create.Sequence("TestSequence").InSchema("TestSchema").StartWith(1).IncrementBy(1).MinValue(0).MaxValue(1000).Cycle().Cache(10);
+        }
+
+        public override void Down()
+        {
+            Delete.Sequence("TestSequence").InSchema("TestSchema");
+        }
+    }
+
+    internal class TestAlterColumnWithSchema: Migration
+    {
+        public override void Up()
+        {
+            Alter.Column("Name2").OnTable("TestTable2").InSchema("TestSchema").AsAnsiString(100).Nullable();
+        }
+
+        public override void Down()
+        {
+            Alter.Column("Name2").OnTable("TestTable2").InSchema("TestSchema").AsString(10).Nullable();
+        }
+    }
+
+    internal class TestAlterTableWithSchema : Migration
+    {
+        public override void Up()
+        {
+            Alter.Table("TestTable2").InSchema("TestSchema").AddColumn("NewColumn").AsInt32().WithDefaultValue(1);
+        }
+
+        public override void Down()
+        {
+            Delete.Column("NewColumn").FromTable("TestTable2").InSchema("TestSchema");
+        }
+    }
+
+    internal class TestAlterSchema : Migration
+    {
+        public override void Up()
+        {
+            Create.Schema("NewSchema");
+            Alter.Table("TestTable").InSchema("TestSchema").ToSchema("NewSchema");
+        }
+
+        public override void Down()
+        {
+            Alter.Table("TestTable").InSchema("NewSchema").ToSchema("TestSchema");
+            Delete.Schema("NewSchema");
+        }
+    }
+
+    internal class TestCreateUniqueConstraint : Migration
+    {
+        public override void Up()
+        {
+            Create.UniqueConstraint("TestUnique").OnTable("TestTable2").Column("Name");
+        }
+
+        public override void Down()
+        {
+            Delete.UniqueConstraint("TestUnique").FromTable("TestTable2");
+        }
+    }
+
+    internal class TestCreateUniqueConstraintWithSchema : Migration
+    {
+        public override void Up()
+        {
+            Create.UniqueConstraint("TestUnique").OnTable("TestTable2").WithSchema("TestSchema").Column("Name");
+        }
+
+        public override void Down()
+        {
+            Delete.UniqueConstraint("TestUnique").FromTable("TestTable2").InSchema("TestSchema");
+        }
+    }
+
+    internal class TestUpdateData : Migration
+    {
+        public override void Up()
+        {
+            Update.Table("TestTable").InSchema("TestSchema").Set(new { Name = "Updated" }).AllRows();
+        }
+
+        public override void Down()
+        {
+            Update.Table("TestTable").InSchema("TestSchema").Set(new { Name = "Test" }).AllRows();
+        }
+    }
+
+    internal class TestDeleteData : Migration
+    {
+        public override void Up()
+        {
+            Delete.FromTable("TestTable").Row(new { Name = "Test" });
+        }
+
+        public override void Down()
+        {
+            Insert.IntoTable("TestTable").Row(new { Name = "Test" });
+        }
+    }
+
+    internal class TestDeleteDataWithSchema :Migration
+    {
+        public override void Up()
+        {
+            Delete.FromTable("TestTable").InSchema("TestSchema").Row(new { Name = "Test"});
+        }
+
+        public override void Down()
+        {
+            Insert.IntoTable("TestTable").InSchema("TestSchema").Row(new { Name = "Test" });
+        }
+    }
+
+    internal class TestCreateIndexWithReversing : AutoReversingMigration
+    {
+        public override void Up()
+        {
+            Create.Index().OnTable("TestTable2").InSchema("TestSchema").OnColumn("Name2").Ascending();
+        }
+    }
+
+    internal class TestExecuteSql : Migration
+    {
+        public override void Up()
+        {
+            Execute.Sql("select 1");
+        }
+
+        public override void Down()
+        {
+            Execute.Sql("select 2");
+        }
+    }
 }

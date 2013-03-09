@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator
 {
@@ -25,12 +26,12 @@ namespace FluentMigrator
     {
         Func<Model.ForeignKeyDefinition, string> GetForeignKeyName { get; set; }
         Func<Model.IndexDefinition, string> GetIndexName { get; set; }
-        Func<Type, Infrastructure.MigrationMetadata> GetMetadataForMigration { get; set; }
         Func<string, string> GetPrimaryKeyName { get; set; }
         Func<Type, bool> TypeIsMigration { get; set; }
         Func<Type, bool> TypeIsProfile { get; set; }
         Func<Type, bool> TypeIsVersionTableMetaData { get; set; }
         Func<string> GetWorkingDirectory { get; set; }
+        Func<IMigration,IMigrationInfo> GetMigrationInfo { get; set; }
         Func<Model.ConstraintDefinition, string> GetConstraintName { get; set; }
         Func<Type, bool> TypeHasTags { get; set; }
         Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags { get; set; }

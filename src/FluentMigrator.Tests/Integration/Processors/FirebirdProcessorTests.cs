@@ -13,6 +13,7 @@ using FluentMigrator.Expressions;
 namespace FluentMigrator.Tests.Integration.Processors
 {
     [TestFixture]
+    [Category("Integration")]
     public class FirebirdProcessorTests
     {
         private readonly FirebirdQuoter quoter = new FirebirdQuoter();
@@ -29,6 +30,8 @@ namespace FluentMigrator.Tests.Integration.Processors
             Connection = new FbConnection(IntegrationTestOptions.Firebird.ConnectionString);
             var options = FirebirdOptions.AutoCommitBehaviour();
             Processor = new FirebirdProcessor(Connection, new FirebirdGenerator(options), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new FirebirdDbFactory(), options);
+            Connection.Open();
+            Processor.BeginTransaction();
         }
 
         [TearDown]
@@ -413,11 +416,11 @@ namespace FluentMigrator.Tests.Integration.Processors
                     Sequence = { Name = "Sequence" }
                 });
 
-                Processor.SequenceExists("", "", "Sequence").ShouldBeTrue();
+                Processor.SequenceExists("", "Sequence").ShouldBeTrue();
                 
                 Processor.Process(new DeleteSequenceExpression() { SequenceName = "Sequence" });
 
-                Processor.SequenceExists("", "", "Sequence").ShouldBeFalse();
+                Processor.SequenceExists("", "Sequence").ShouldBeFalse();
             }
         }
 
@@ -440,14 +443,14 @@ namespace FluentMigrator.Tests.Integration.Processors
 
                 Processor.Process(new DeleteSequenceExpression() { SequenceName = "Sequence" });
 
-                Processor.SequenceExists(String.Empty, table.Name, "Sequence").ShouldBeFalse();
+                Processor.SequenceExists(String.Empty, "Sequence").ShouldBeFalse();
             }
         }
 
         [Test]
         public void CallingSequenceExistsReturnsFalseIfSequenceNotExist()
         {
-            Processor.SequenceExists("", "", "DoesNotExist").ShouldBeFalse();
+            Processor.SequenceExists("", "DoesNotExist").ShouldBeFalse();
         }
 
         [Test]
@@ -484,7 +487,7 @@ namespace FluentMigrator.Tests.Integration.Processors
                     Column = { Name = "id", IsIdentity = true, Type = DbType.Int64 }
                 });
                 Processor.ColumnExists(String.Empty, table.Name, "id").ShouldBeTrue();
-                Processor.SequenceExists(String.Empty, table.Name, String.Format("gen_{0}_id", table.Name)).ShouldBeTrue();
+                Processor.SequenceExists(String.Empty, String.Format("gen_{0}_id", table.Name)).ShouldBeTrue();
                 Processor.TriggerExists(String.Empty, table.Name, String.Format("gen_id_{0}_id", table.Name)).ShouldBeTrue();
             }
         }
@@ -500,7 +503,7 @@ namespace FluentMigrator.Tests.Integration.Processors
                     Column = { Name = "id", IsIdentity = true, Type = DbType.Int64 }
                 });
                 Processor.ColumnExists(String.Empty, table.Name, "id").ShouldBeTrue();
-                Processor.SequenceExists(String.Empty, table.Name, String.Format("gen_{0}_id", table.Name)).ShouldBeTrue();
+                Processor.SequenceExists(String.Empty, String.Format("gen_{0}_id", table.Name)).ShouldBeTrue();
                 Processor.TriggerExists(String.Empty, table.Name, String.Format("gen_id_{0}_id", table.Name)).ShouldBeTrue();
 
                 Processor.Process(new DeleteColumnExpression()
@@ -509,7 +512,7 @@ namespace FluentMigrator.Tests.Integration.Processors
                     ColumnNames = { "id" }
                 });
                 Processor.ColumnExists(String.Empty, table.Name, "id").ShouldBeFalse();
-                Processor.SequenceExists(String.Empty, table.Name, String.Format("gen_{0}_id", table.Name)).ShouldBeFalse();
+                Processor.SequenceExists(String.Empty, String.Format("gen_{0}_id", table.Name)).ShouldBeFalse();
                 Processor.TriggerExists(String.Empty, table.Name, String.Format("gen_id_{0}_id", table.Name)).ShouldBeFalse();
             }
         }
@@ -525,7 +528,7 @@ namespace FluentMigrator.Tests.Integration.Processors
                     Column = { Name = "id", IsIdentity = false, Type = DbType.Int64 }
                 });
                 Processor.ColumnExists(String.Empty, table.Name, "id").ShouldBeTrue();
-                Processor.SequenceExists(String.Empty, table.Name, String.Format("gen_{0}_id", table.Name)).ShouldBeFalse();
+                Processor.SequenceExists(String.Empty, String.Format("gen_{0}_id", table.Name)).ShouldBeFalse();
                 Processor.TriggerExists(String.Empty, table.Name, String.Format("gen_id_{0}_id", table.Name)).ShouldBeFalse();
 
                 Processor.Process(new AlterColumnExpression()
@@ -534,7 +537,7 @@ namespace FluentMigrator.Tests.Integration.Processors
                     Column = { Name = "id", IsIdentity = true, Type = DbType.Int64 }
                 });
                 Processor.ColumnExists(String.Empty, table.Name, "id").ShouldBeTrue();
-                Processor.SequenceExists(String.Empty, table.Name, String.Format("gen_{0}_id", table.Name)).ShouldBeTrue();
+                Processor.SequenceExists(String.Empty, String.Format("gen_{0}_id", table.Name)).ShouldBeTrue();
                 Processor.TriggerExists(String.Empty, table.Name, String.Format("gen_id_{0}_id", table.Name)).ShouldBeTrue();
             }
         }
@@ -550,7 +553,7 @@ namespace FluentMigrator.Tests.Integration.Processors
                     Column = { Name = "id", IsIdentity = true, Type = DbType.Int64 }
                 });
                 Processor.ColumnExists(String.Empty, table.Name, "id").ShouldBeTrue();
-                Processor.SequenceExists(String.Empty, table.Name, String.Format("gen_{0}_id", table.Name)).ShouldBeTrue();
+                Processor.SequenceExists(String.Empty, String.Format("gen_{0}_id", table.Name)).ShouldBeTrue();
                 Processor.TriggerExists(String.Empty, table.Name, String.Format("gen_id_{0}_id", table.Name)).ShouldBeTrue();
 
                 Processor.Process(new AlterColumnExpression()
@@ -559,7 +562,7 @@ namespace FluentMigrator.Tests.Integration.Processors
                     Column = { Name = "id", IsIdentity = false, Type = DbType.Int64 }
                 });
                 Processor.ColumnExists(String.Empty, table.Name, "id").ShouldBeTrue();
-                Processor.SequenceExists(String.Empty, table.Name, String.Format("gen_{0}_id", table.Name)).ShouldBeFalse();
+                Processor.SequenceExists(String.Empty, String.Format("gen_{0}_id", table.Name)).ShouldBeFalse();
                 Processor.TriggerExists(String.Empty, table.Name, String.Format("gen_id_{0}_id", table.Name)).ShouldBeFalse();
             }
         }

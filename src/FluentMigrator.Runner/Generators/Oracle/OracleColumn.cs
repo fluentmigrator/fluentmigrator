@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
 

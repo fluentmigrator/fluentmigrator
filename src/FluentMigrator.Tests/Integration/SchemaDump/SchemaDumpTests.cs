@@ -20,24 +20,26 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
 {
 
     [TestFixture]
+    [Category("Integration")]
     public class SchemaDumpTests
     {
         public SqlConnection Connection;
         public SqlServerProcessor Processor;
         public SqlServerSchemaDumper SchemaDumper;
 
-        public SchemaDumpTests()
+        [SetUp]
+        public void Setup()
         {
             Connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
             Processor = new SqlServerProcessor(Connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
             SchemaDumper = new SqlServerSchemaDumper(Processor, new TextWriterAnnouncer(System.Console.Out));
+            Connection.Open();
         }
 
-        [TestFixtureTearDown]
-        public void FixtureTearDown()
+        [TearDown]
+        public void TearDown()
         {
-            if (Connection != null)
-                Connection.Dispose();
+            Processor.Dispose();
         }
 
         [Test]
@@ -126,6 +128,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
             string expectedMessage = testWriter.GetMessage(4, 10, 4, 1);
 
             runner.Down(new TestMigration());
+            runner.VersionLoader.RemoveVersionTable();
 
             //test
             output.ShouldBe(expectedMessage);

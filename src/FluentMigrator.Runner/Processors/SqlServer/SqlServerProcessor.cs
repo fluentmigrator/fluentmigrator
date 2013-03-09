@@ -24,24 +24,24 @@ using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
-    public sealed class SqlServerProcessor : ProcessorBase
+    public sealed class SqlServerProcessor : GenericProcessorBase
     {
-        private readonly IDbFactory factory;
-        public IDbConnection Connection { get; private set; }
-        public IDbTransaction Transaction { get; private set; }
-        
         public override string DatabaseType
         {
             get { return "SqlServer"; }
         }
 
-        public SqlServerProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
-            : base(generator, announcer, options)
+        public override bool SupportsTransactions
         {
-            this.factory = factory;
-            Connection = connection;
-            connection.Open();
-            BeginTransaction();
+            get
+            {
+                return true;
+            }
+        }
+
+        public SqlServerProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+            : base(connection, factory, generator, announcer, options)
+        {
         }
 
         private static string SafeSchemaName(string schemaName)
@@ -82,6 +82,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             return Exists("SELECT * FROM sys.indexes WHERE name = '{0}' and object_id=OBJECT_ID('{1}.{2}')", FormatSqlEscape(indexName), SafeSchemaName(schemaName), FormatSqlEscape(tableName));
         }
 
+        public override bool SequenceExists(string schemaName, string sequenceName)
+        {
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.SEQUENCES WHERE SEQUENCE_SCHEMA = '{0}' AND SEQUENCE_NAME = '{1}'", SafeSchemaName(schemaName), FormatSqlEscape(sequenceName));
+        }
+
         public override void Execute(string template, params object[] args)
         {
             Process(String.Format(template, args));
@@ -89,10 +94,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool Exists(string template, params object[] args)
         {
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
 
-            using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -106,42 +110,14 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override DataSet Read(string template, params object[] args)
         {
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+            EnsureConnectionIsOpen();
 
             var ds = new DataSet();
-            using (var command = factory.CreateCommand(String.Format(template, args), Connection, Transaction))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             {
-                var adapter = factory.CreateDataAdapter(command);
+                var adapter = Factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
                 return ds;
-            }
-        }
-
-        public override void BeginTransaction()
-        {
-            Announcer.Say("Beginning Transaction");
-            Transaction = Connection.BeginTransaction();
-        }
-
-        public override void CommitTransaction()
-        {
-            Announcer.Say("Committing Transaction");
-            Transaction.Commit();
-            WasCommitted = true;
-            if (Connection.State != ConnectionState.Closed)
-            {
-                Connection.Close();
-            }
-        }
-
-        public override void RollbackTransaction()
-        {
-            Announcer.Say("Rolling back transaction");
-            Transaction.Rollback();
-            WasCommitted = true;
-            if (Connection.State != ConnectionState.Closed)
-            {
-                Connection.Close();
             }
         }
 
@@ -152,8 +128,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
 
-            if (Connection.State != ConnectionState.Open)
-                Connection.Open();
+            EnsureConnectionIsOpen();
 
             if (sql.IndexOf("GO", StringComparison.OrdinalIgnoreCase) >= 0)
             {
@@ -168,7 +143,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         private void ExecuteNonQuery(string sql)
         {
-            using (var command = factory.CreateCommand(sql, Connection, Transaction))
+            using (var command = Factory.CreateCommand(sql, Connection, Transaction))
             {
                 try
                 {
@@ -194,7 +169,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             sql += "\nGO";   // make sure last batch is executed.
             string sqlBatch = string.Empty;
 
-            using (var command = factory.CreateCommand(string.Empty, Connection, Transaction))
+            using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction))
             {
                 try
                 {
@@ -236,8 +211,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             if (Options.PreviewOnly)
                 return;
-			
-            if (Connection.State != ConnectionState.Open) Connection.Open();
+
+            EnsureConnectionIsOpen();
 
             if (expression.Operation != null)
                 expression.Operation(Connection, Transaction);
