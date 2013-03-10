@@ -30,6 +30,15 @@ namespace FluentMigrator.Expressions
             Constraint.ApplyConventions(conventions);
         }
 
+        public override IMigrationExpression Reverse()
+        {
+            //constraint type is private in ConstraintDefinition
+            return new DeleteConstraintExpression(Constraint.IsPrimaryKeyConstraint ? ConstraintType.PrimaryKey : ConstraintType.Unique)
+            {
+                Constraint = this.Constraint
+            };
+        }
+
         public override string ToString()
         {
 
