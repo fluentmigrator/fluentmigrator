@@ -1058,6 +1058,52 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        public void CanReverseCreateUniqueConstraint()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateAndDropTableMigration());
+
+                    runner.Up(new TestCreateUniqueConstraintWithReversing());
+                    processor.ConstraintExists(null, "TestTable2", "TestUnique").ShouldBeTrue();
+
+                    runner.Down(new TestCreateUniqueConstraintWithReversing());
+                    processor.ConstraintExists(null, "TestTable2", "TestUnique").ShouldBeFalse();
+
+                    runner.Down(new TestCreateAndDropTableMigration());
+
+                }, true, new[] { typeof(SqliteProcessor) });
+        }
+
+        [Test]
+        public void CanReverseCreateUniqueConstraintWithSchema()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestCreateSchema());
+
+                    runner.Up(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Up(new TestCreateUniqueConstraintWithSchemaWithReversing());
+                    processor.ConstraintExists("TestSchema", "TestTable2", "TestUnique").ShouldBeTrue();
+
+                    runner.Down(new TestCreateUniqueConstraintWithSchemaWithReversing());
+                    processor.ConstraintExists("TestSchema", "TestTable2", "TestUnique").ShouldBeFalse();
+
+                    runner.Down(new TestCreateAndDropTableMigrationWithSchema());
+
+                    runner.Down(new TestCreateSchema());
+
+                }, true, new[] { typeof(SqliteProcessor) });
+        }
+
+        [Test]
         public void CanExecuteSql()
         {
             ExecuteWithSupportedProcessors(
@@ -1497,6 +1543,22 @@ namespace FluentMigrator.Tests.Integration
         public override void Up()
         {
             Create.Index().OnTable("TestTable2").InSchema("TestSchema").OnColumn("Name2").Ascending();
+        }
+    }
+
+    internal class TestCreateUniqueConstraintWithReversing : AutoReversingMigration
+    {
+        public override void Up()
+        {
+            Create.UniqueConstraint("TestUnique").OnTable("TestTable2").Column("Name");
+        }
+    }
+
+    internal class TestCreateUniqueConstraintWithSchemaWithReversing : AutoReversingMigration
+    {
+        public override void Up()
+        {
+            Create.UniqueConstraint("TestUnique").OnTable("TestTable2").WithSchema("TestSchema").Column("Name");
         }
     }
 
