@@ -306,7 +306,7 @@ namespace FluentMigrator.Runner
         {
             if (migration == null) throw new ArgumentNullException("migration");
 
-            return string.Format("{0}: {1}", migration.Version, migration.Migration.GetType().Name);
+            return migration.GetName();
         }
 
         public void Up(IMigration migration)

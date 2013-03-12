@@ -28,6 +28,7 @@ namespace FluentMigrator.Infrastructure
         IMigration Migration { get; }
         object Trait(string name);
         bool HasTrait(string name);
+        string GetName();
     }
 
     public class MigrationInfo : IMigrationInfo
@@ -55,6 +56,11 @@ namespace FluentMigrator.Infrastructure
         public bool HasTrait(string name)
         {
             return _traits.ContainsKey(name);
+        }
+
+        public string GetName()
+        {
+            return string.Format("{0}: {1}", Version, Migration.GetType().Name);
         }
 
         public void AddTrait(string name, object value)
