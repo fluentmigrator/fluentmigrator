@@ -145,6 +145,7 @@
     <Compile Include="Generators\SqlServer\SqlServer2012Generator.cs" />
     <Compile Include="IMigrationInformationLoader.cs" />
     <Compile Include="IMigrationScope.cs" />
+    <Compile Include="IMigrationScopeStarter.cs" />
     <Compile Include="InvalidMigrationException.cs" />
     <Compile Include="Processors\Firebird\FirebirdProcessedExpression.cs" />
     <Compile Include="Generators\Firebird\FirebirdQuoter.cs" />

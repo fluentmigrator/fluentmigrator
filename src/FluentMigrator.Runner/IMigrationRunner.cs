@@ -2,7 +2,7 @@ using System.Reflection;
 
 namespace FluentMigrator.Runner
 {
-    public interface IMigrationRunner
+    public interface IMigrationRunner : IMigrationScopeStarter
     {
         IMigrationProcessor Processor { get; }
         Assembly MigrationAssembly { get; }

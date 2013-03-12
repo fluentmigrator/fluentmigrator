@@ -450,6 +450,11 @@ namespace FluentMigrator.Runner
         private IMigrationScope BeginMigrationScope(bool transactional = true)
         {
             if (!transactional) return new NullMigrationScope();
+            return BeginScope();
+        }
+
+        public IMigrationScope BeginScope()
+        {
             return new TransactionalMigrationScope(Processor);
         }
     }

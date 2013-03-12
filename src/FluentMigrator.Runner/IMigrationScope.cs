@@ -24,6 +24,7 @@ namespace FluentMigrator.Runner
     {
         bool IsActive { get; }
         void Complete();
+        void Cancel();
     }
 
     public class TransactionalMigrationScope : IMigrationScope
@@ -40,9 +41,7 @@ namespace FluentMigrator.Runner
 
         public void Dispose()
         {
-            if (!IsActive) return;
-            _migrationProcessor.RollbackTransaction();
-            IsActive = false;
+            Cancel();
         }
 
         public bool IsActive { get; set; }
@@ -51,6 +50,13 @@ namespace FluentMigrator.Runner
         {
             if (!IsActive) return;
             _migrationProcessor.CommitTransaction();
+            IsActive = false;
+        }
+
+        public void Cancel()
+        {
+            if (!IsActive) return;
+            _migrationProcessor.RollbackTransaction();
             IsActive = false;
         }
     }
@@ -67,6 +73,10 @@ namespace FluentMigrator.Runner
         }
 
         public void Complete()
+        {
+        }
+
+        public void Cancel()
         {
         }
     }
