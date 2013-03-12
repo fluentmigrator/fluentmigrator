@@ -27,41 +27,71 @@ namespace FluentMigrator.Runner
         void Cancel();
     }
 
-    public class TransactionalMigrationScope : IMigrationScope
+    public class TrackingMigrationScope : IMigrationScope
     {
-        private readonly IMigrationProcessor _migrationProcessor;
+        private readonly Action _disposalAction;
 
-        public TransactionalMigrationScope(IMigrationProcessor migrationProcessor)
+        public TrackingMigrationScope(Action disposalAction)
         {
-            if (migrationProcessor == null) throw new ArgumentNullException("migrationProcessor");
-            _migrationProcessor = migrationProcessor;
-            _migrationProcessor.BeginTransaction();
+            _disposalAction = disposalAction;
             IsActive = true;
         }
 
         public void Dispose()
         {
             Cancel();
+            if (_disposalAction!=null) _disposalAction.Invoke();
         }
 
-        public bool IsActive { get; set; }
+        public virtual bool IsActive { get; private set; }
 
         public void Complete()
         {
             if (!IsActive) return;
-            _migrationProcessor.CommitTransaction();
+            DoComplete();
             IsActive = false;
         }
 
         public void Cancel()
         {
             if (!IsActive) return;
-            _migrationProcessor.RollbackTransaction();
+            DoCancel();
             IsActive = false;
+        }
+
+        protected virtual void DoComplete()
+        {
+        }
+
+        protected virtual void DoCancel()
+        {
         }
     }
 
-    public class NullMigrationScope : IMigrationScope
+    public class TransactionalMigrationScope : TrackingMigrationScope
+    {
+        private readonly IMigrationProcessor _migrationProcessor;
+
+        public TransactionalMigrationScope(IMigrationProcessor migrationProcessor, Action disposalAction)
+            : base(disposalAction)
+        {
+            if (migrationProcessor == null) throw new ArgumentNullException("migrationProcessor");
+            _migrationProcessor = migrationProcessor;
+            _migrationProcessor.BeginTransaction();
+        }
+
+        protected override void DoComplete()
+        {
+            _migrationProcessor.CommitTransaction();
+        }
+
+        protected override void DoCancel()
+        {
+            _migrationProcessor.RollbackTransaction();
+        }
+    }
+
+    public class NoOpMigrationScope : IMigrationScope
     {
         public void Dispose()
         {
@@ -69,7 +99,7 @@ namespace FluentMigrator.Runner
 
         public bool IsActive
         {
-            get { return true; }
+            get { return false; }
         }
 
         public void Complete()
