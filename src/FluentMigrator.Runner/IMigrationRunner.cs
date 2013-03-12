@@ -7,6 +7,7 @@ namespace FluentMigrator.Runner
         IMigrationProcessor Processor { get; }
         Assembly MigrationAssembly { get; }
         void Up(IMigration migration);
+        void Down(IMigration migration);
         void MigrateUp();
         void MigrateUp(long version);
         void Rollback(int steps);

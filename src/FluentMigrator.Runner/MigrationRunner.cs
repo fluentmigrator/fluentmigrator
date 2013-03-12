@@ -26,6 +26,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Versioning;
+using FluentMigrator.Infrastructure.Extensions;
 
 namespace FluentMigrator.Runner
 {
@@ -169,7 +170,7 @@ namespace FluentMigrator.Runner
 
         }
 
-        private void ApplyMigrationUp(IMigrationInfo migrationInfo, bool useTransaction)
+        public virtual void ApplyMigrationUp(IMigrationInfo migrationInfo, bool useTransaction)
         {
             if (migrationInfo == null) throw new ArgumentNullException("migrationInfo");
 
@@ -179,9 +180,9 @@ namespace FluentMigrator.Runner
                 _alreadyOutputPreviewOnlyModeWarning = true;
             }
 
-            if (!VersionLoader.VersionInfo.HasAppliedMigration(migrationInfo.Version))
+            if (!migrationInfo.IsAttributed() || !VersionLoader.VersionInfo.HasAppliedMigration(migrationInfo.Version))
             {
-                var name = GetMigrationName(migrationInfo);
+                var name = migrationInfo.GetName();
                 _announcer.Heading(string.Format("{0} migrating", name));
 
                 _stopWatch.Start();
@@ -189,7 +190,7 @@ namespace FluentMigrator.Runner
                 using (IMigrationScope scope = BeginMigrationScope(useTransaction))
                 {
                     ExecuteMigration(migrationInfo.Migration, (m, c) => m.GetUpExpressions(c));
-                    VersionLoader.UpdateVersionInfo(migrationInfo.Version);
+                    if (migrationInfo.IsAttributed()) VersionLoader.UpdateVersionInfo(migrationInfo.Version);
                     
                     scope.Complete();
 
@@ -201,11 +202,11 @@ namespace FluentMigrator.Runner
             }
         }
 
-        private void ApplyMigrationDown(IMigrationInfo migrationInfo, bool useTransaction)
+        public virtual void ApplyMigrationDown(IMigrationInfo migrationInfo, bool useTransaction)
         {
             if (migrationInfo == null) throw new ArgumentNullException("migrationInfo");
 
-            var name = GetMigrationName(migrationInfo);
+            var name = migrationInfo.GetName();
             _announcer.Heading(string.Format("{0} reverting", name));
 
             _stopWatch.Start();
@@ -213,7 +214,7 @@ namespace FluentMigrator.Runner
             using (IMigrationScope scope = BeginMigrationScope(useTransaction))
             {
                 ExecuteMigration(migrationInfo.Migration, (m, c) => m.GetDownExpressions(c));
-                VersionLoader.DeleteVersion(migrationInfo.Version);
+                if (migrationInfo.IsAttributed()) VersionLoader.DeleteVersion(migrationInfo.Version);
                 
                 scope.Complete();
 
@@ -285,38 +286,11 @@ namespace FluentMigrator.Runner
             get { return _migrationAssembly; }
         }
 
-        private string GetMigrationName(IMigration migration)
-        {
-            if (migration == null) throw new ArgumentNullException("migration");
-
-            return string.Format("{0}", migration.GetType().Name);
-        }
-
-        private string GetMigrationName(IMigrationInfo migration)
-        {
-            if (migration == null) throw new ArgumentNullException("migration");
-
-            return migration.GetName();
-        }
-
         public void Up(IMigration migration)
         {
-            var name = GetMigrationName(migration);
-            _announcer.Heading(string.Format("{0} migrating", name));
+            var migrationInfoAdapter = new NonAttributedMigrationToMigrationInfoAdapter(migration);
 
-            _stopWatch.Start();
-
-            using (IMigrationScope scope = BeginMigrationScope())
-            {
-                ExecuteMigration(migration, (m, c) => m.GetUpExpressions(c));
-                
-                scope.Complete();
-
-                _stopWatch.Stop();
-
-                _announcer.Say(string.Format("{0} migrated", name));
-                _announcer.ElapsedTime(_stopWatch.ElapsedTime());
-            }
+            ApplyMigrationUp(migrationInfoAdapter, true);
         }
 
         private void ExecuteMigration(IMigration migration, Action<IMigration, IMigrationContext> getExpressions)
@@ -332,22 +306,9 @@ namespace FluentMigrator.Runner
 
         public void Down(IMigration migration)
         {
-            var name = GetMigrationName(migration);
-            _announcer.Heading(string.Format("{0} reverting", name));
+            var migrationInfoAdapter = new NonAttributedMigrationToMigrationInfoAdapter(migration);
 
-            _stopWatch.Start();
-
-            using (IMigrationScope scope = BeginMigrationScope())
-            {
-                ExecuteMigration(migration, (m, c) => m.GetDownExpressions(c));
-
-                scope.Complete();
-
-                _stopWatch.Stop();
-
-                _announcer.Say(string.Format("{0} reverted", name));
-                _announcer.ElapsedTime(_stopWatch.ElapsedTime());
-            }
+            ApplyMigrationDown(migrationInfoAdapter,true);
         }
 
         /// <summary>
@@ -468,7 +429,7 @@ namespace FluentMigrator.Runner
 
             foreach(KeyValuePair<long, IMigrationInfo> migration in MigrationLoader.LoadMigrations())
             {
-                string migrationName = GetMigrationName(migration.Value);
+                string migrationName = migration.Value.GetName();
                 bool isCurrent = migration.Key == currentVersion;
                 string message = string.Format("{0}{1}",
                                                 migrationName,
