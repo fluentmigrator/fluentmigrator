@@ -171,6 +171,8 @@ namespace FluentMigrator.Runner
 
         private void ApplyMigrationUp(IMigrationInfo migrationInfo, bool useTransaction)
         {
+            if (migrationInfo == null) throw new ArgumentNullException("migrationInfo");
+
             if (!_alreadyOutputPreviewOnlyModeWarning && Processor.Options.PreviewOnly)
             {
                 _announcer.Heading("PREVIEW-ONLY MODE");
@@ -182,55 +184,43 @@ namespace FluentMigrator.Runner
                 var name = GetMigrationName(migrationInfo);
                 _announcer.Heading(string.Format("{0} migrating", name));
 
-                try
+                _stopWatch.Start();
+
+                using (IMigrationScope scope = BeginMigrationScope(useTransaction))
                 {
-                    _stopWatch.Start();
-
-                    if (useTransaction) Processor.BeginTransaction();
-
                     ExecuteMigration(migrationInfo.Migration, (m, c) => m.GetUpExpressions(c));
                     VersionLoader.UpdateVersionInfo(migrationInfo.Version);
-
-                    if (useTransaction) Processor.CommitTransaction();
+                    
+                    scope.Complete();
 
                     _stopWatch.Stop();
 
                     _announcer.Say(string.Format("{0} migrated", name));
                     _announcer.ElapsedTime(_stopWatch.ElapsedTime());
                 }
-                catch (Exception)
-                {
-                    if (useTransaction) Processor.RollbackTransaction();
-                    throw;
-                }
             }
         }
 
         private void ApplyMigrationDown(IMigrationInfo migrationInfo, bool useTransaction)
         {
+            if (migrationInfo == null) throw new ArgumentNullException("migrationInfo");
+
             var name = GetMigrationName(migrationInfo);
             _announcer.Heading(string.Format("{0} reverting", name));
 
-            try
-            {
-                _stopWatch.Start();
+            _stopWatch.Start();
 
-                if (useTransaction) Processor.BeginTransaction();
-                
+            using (IMigrationScope scope = BeginMigrationScope(useTransaction))
+            {
                 ExecuteMigration(migrationInfo.Migration, (m, c) => m.GetDownExpressions(c));
                 VersionLoader.DeleteVersion(migrationInfo.Version);
-
-                if (useTransaction) Processor.CommitTransaction();
+                
+                scope.Complete();
 
                 _stopWatch.Stop();
 
                 _announcer.Say(string.Format("{0} reverted", name));
                 _announcer.ElapsedTime(_stopWatch.ElapsedTime());
-            }
-            catch (Exception)
-            {
-                if (useTransaction) Processor.RollbackTransaction();
-                throw;
             }
         }
 
@@ -314,23 +304,18 @@ namespace FluentMigrator.Runner
             var name = GetMigrationName(migration);
             _announcer.Heading(string.Format("{0} migrating", name));
 
-            try
-            {
-                _stopWatch.Start();
+            _stopWatch.Start();
 
-                Processor.BeginTransaction();
+            using (IMigrationScope scope = BeginMigrationScope())
+            {
                 ExecuteMigration(migration, (m, c) => m.GetUpExpressions(c));
-                Processor.CommitTransaction();
+                
+                scope.Complete();
 
                 _stopWatch.Stop();
 
                 _announcer.Say(string.Format("{0} migrated", name));
                 _announcer.ElapsedTime(_stopWatch.ElapsedTime());
-            }
-            catch (Exception)
-            {
-                Processor.RollbackTransaction();
-                throw;
             }
         }
 
@@ -350,23 +335,18 @@ namespace FluentMigrator.Runner
             var name = GetMigrationName(migration);
             _announcer.Heading(string.Format("{0} reverting", name));
 
-            try
-            {
-                _stopWatch.Start();
+            _stopWatch.Start();
 
-                Processor.BeginTransaction();
+            using (IMigrationScope scope = BeginMigrationScope())
+            {
                 ExecuteMigration(migration, (m, c) => m.GetDownExpressions(c));
-                Processor.CommitTransaction();
+
+                scope.Complete();
 
                 _stopWatch.Stop();
 
                 _announcer.Say(string.Format("{0} reverted", name));
                 _announcer.ElapsedTime(_stopWatch.ElapsedTime());
-            }
-            catch (Exception)
-            {
-                Processor.RollbackTransaction();
-                throw;
             }
         }
 
@@ -504,6 +484,12 @@ namespace FluentMigrator.Runner
         private bool MigrationVersionLessThanGreatestAppliedMigration(long version)
         {
             return !VersionLoader.VersionInfo.HasAppliedMigration(version) && version < VersionLoader.VersionInfo.Latest();
+        }
+
+        private IMigrationScope BeginMigrationScope(bool transactional = true)
+        {
+            if (!transactional) return new NullMigrationScope();
+            return new TransactionalMigrationScope(Processor);
         }
     }
 }

@@ -74,4 +74,43 @@ namespace FluentMigrator.Infrastructure
                                  TransactionBehavior);
         }
     }
+
+    /// <summary>
+    /// This adapter wraps a migration into a MigrationInfo instance, used to keep IMigration backwards compatible with new IMigrationInfo.
+    /// </summary>
+    public class NonAttributedMigrationToMigrationInfoAdapter : IMigrationInfo
+    {
+        public NonAttributedMigrationToMigrationInfoAdapter(IMigration migration)
+        {
+            if (migration == null) throw new ArgumentNullException("migration");
+            Migration = migration;
+        }
+
+        public long Version
+        {
+            get { return -1; }
+        }
+
+        public TransactionBehavior TransactionBehavior
+        {
+            get { return TransactionBehavior.Default; }
+        }
+
+        public IMigration Migration { get; private set; }
+
+        public object Trait(string name)
+        {
+            return null;
+        }
+
+        public bool HasTrait(string name)
+        {
+            return false;
+        }
+
+        public string GetName()
+        {
+            return string.Format("{0}", Migration.GetType().Name);
+        }
+    }
 }
