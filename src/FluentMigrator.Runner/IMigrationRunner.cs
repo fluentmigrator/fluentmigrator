@@ -14,5 +14,7 @@ namespace FluentMigrator.Runner
         void MigrateDown(long version);
         void ValidateVersionOrder();
         void ListMigrations();
+        IVersionLoader VersionLoader { get; }
+        IMigrationInformationLoader MigrationLoader { get; }
     }
 }

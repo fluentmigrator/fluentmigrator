@@ -38,14 +38,10 @@
     <AssemblyOriginatorKeyFile>..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="FluentMigrator.Runner, Version=1.0.0.0, Culture=neutral, PublicKeyToken=aacfc7de5acabf05, processorArchitecture=x86">
-      <HintPath>..\FluentMigrator.Runner\bin\Debug\FluentMigrator.Runner.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -56,6 +52,10 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FluentMigrator.Runner\FluentMigrator.Runner.csproj">
+      <Project>{cb468ad6-60c2-42e9-b3b0-01968ef94c65}</Project>
+      <Name>FluentMigrator.Runner</Name>
+    </ProjectReference>
     <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj">
       <Project>{FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8}</Project>
       <Name>FluentMigrator</Name>

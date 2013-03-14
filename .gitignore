@@ -15,8 +15,11 @@ db.sqlite
 *.userprefs
 packages/FluentMigrator/
 packages/FluentMigrator.Tools/
+packages/FluentMigrator.Runners/
+packages/FluentMigrator.InProc/
 _UpgradeReport_Files
 UpgradeLog.XML
+UpgradeLog.htm
 *.bak
 pulls/*.patch
 src/*.vs10x

@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 10.00
-# Visual Studio 2008
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Runner", "src\FluentMigrator.Runner\FluentMigrator.Runner.csproj", "{CB468AD6-60C2-42E9-B3B0-01968EF94C65}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Tests", "src\FluentMigrator.Tests\FluentMigrator.Tests.csproj", "{5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C}"
@@ -25,6 +25,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.SchemaDump", "src\FluentMigrator.SchemaDump\FluentMigrator.SchemaDump.csproj", "{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.InProc", "src\FluentMigrator.InProc\FluentMigrator.InProc.csproj", "{58CD12A2-8A77-4C06-A361-F9F9E8C4A31E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -111,6 +113,15 @@ Global
 		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}.Release|x86.ActiveCfg = Release|Any CPU
+		{58CD12A2-8A77-4C06-A361-F9F9E8C4A31E}.AutomatedRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{58CD12A2-8A77-4C06-A361-F9F9E8C4A31E}.AutomatedRelease|Any CPU.Build.0 = Release|Any CPU
+		{58CD12A2-8A77-4C06-A361-F9F9E8C4A31E}.AutomatedRelease|x86.ActiveCfg = Release|Any CPU
+		{58CD12A2-8A77-4C06-A361-F9F9E8C4A31E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{58CD12A2-8A77-4C06-A361-F9F9E8C4A31E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{58CD12A2-8A77-4C06-A361-F9F9E8C4A31E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{58CD12A2-8A77-4C06-A361-F9F9E8C4A31E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{58CD12A2-8A77-4C06-A361-F9F9E8C4A31E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{58CD12A2-8A77-4C06-A361-F9F9E8C4A31E}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -121,6 +132,7 @@ Global
 		{C2B629E5-9394-48DA-A9E8-4999B398F37E} = {CB10ADAF-FB42-457B-ADFE-7CF866C5DA6E}
 		{97849F97-BD7D-453B-B0CF-6CD922BB1596} = {CB10ADAF-FB42-457B-ADFE-7CF866C5DA6E}
 		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413} = {CB10ADAF-FB42-457B-ADFE-7CF866C5DA6E}
+		{58CD12A2-8A77-4C06-A361-F9F9E8C4A31E} = {CB10ADAF-FB42-457B-ADFE-7CF866C5DA6E}
 		{5DFD1A3B-7258-4C05-88F9-02A1EA3F5D9C} = {D264186F-3ED6-482D-8E1A-F41C2F83C711}
 		{FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8} = {C17FACD1-2740-44B5-8E6E-B7FF0D54CA40}
 	EndGlobalSection

@@ -18,6 +18,7 @@ using System.Reflection;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
+using System.Linq;
 
 namespace FluentMigrator.InProc {
    public class Migrator {
@@ -74,13 +75,27 @@ namespace FluentMigrator.InProc {
          RunnerContext.Announcer.Say("FluentMigrator Task Completed.");
       }
 
+      public long GetCurrentVersion()
+      {
+          Initialize();
+          Runner.VersionLoader.LoadVersionInfo();
+          return Runner.VersionLoader.VersionInfo.Latest();
+      }
+
+      public long GetNewestMigration()
+      {
+          Initialize();
+          return Runner.MigrationLoader.LoadMigrations().Last().Key;
+      }
+
       private void Initialize() {
          var processor = InitializeProcessor(MigrationsAssembly.Location);
          Runner = new MigrationRunner(MigrationsAssembly, RunnerContext, processor);
       }
+       
 
       private IMigrationProcessor InitializeProcessor(string assemblyLocation) {
-         var manager = new ConnectionStringManager(new NetConfigManager(), RunnerContext.Connection, RunnerContext.ConnectionStringConfigPath, assemblyLocation, RunnerContext.Database);
+         var manager = new ConnectionStringManager(new NetConfigManager(), RunnerContext.Announcer, RunnerContext.Connection, RunnerContext.ConnectionStringConfigPath, assemblyLocation, RunnerContext.Database);
 
          manager.LoadConnectionString();
 
@@ -88,7 +103,7 @@ namespace FluentMigrator.InProc {
             RunnerContext.Timeout = 30; // Set default timeout for command
          }
 
-         var processorFactory = ProcessorFactory.GetFactory(RunnerContext.Database);
+         var processorFactory = new MigrationProcessorFactoryProvider().GetFactory(RunnerContext.Database);
          var processor = processorFactory.Create(manager.ConnectionString, RunnerContext.Announcer, new ProcessorOptions {
             PreviewOnly = RunnerContext.PreviewOnly,
             Timeout = RunnerContext.Timeout
