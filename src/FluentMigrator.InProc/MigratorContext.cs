@@ -21,11 +21,16 @@ using FluentMigrator.Runner.Announcers;
 
 namespace FluentMigrator.InProc {
    public class MigratorContext : IMigratorContext {
-      public MigratorContext(TextWriter announcerOutput) {
+      public MigratorContext(TextWriter announcerOutput, bool verbose) {
          Announcer = new TextWriterAnnouncer(announcerOutput) {
-            ShowElapsedTime = true,
-            ShowSql = true
+            ShowElapsedTime = verbose,
+            ShowSql = verbose
          };
+      }
+
+      public MigratorContext(TextWriter announcerOutput)
+          : this(announcerOutput, true)
+      { 
       }
 
       public Assembly MigrationsAssembly { get; set; }
@@ -34,5 +39,6 @@ namespace FluentMigrator.InProc {
       public string Database { get; set; }
       public IAnnouncer Announcer { get; private set; }
       public bool PreviewOnly { get; set; }
+      public string Profile { get; set; }
    }
 }

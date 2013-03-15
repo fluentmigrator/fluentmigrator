@@ -153,6 +153,7 @@ namespace :nuget do
      nuspec.working_directory = "packages/FluentMigrator.InProc"
      nuspec.output_file = "FluentMigrator.InProc.nuspec"
 	 nuspec.dependency "FluentMigrator", new_version
+	 nuspec.dependency "FluentMigrator.Runners", new_version
   end
 
   @platforms = ['x86', 'AnyCPU']

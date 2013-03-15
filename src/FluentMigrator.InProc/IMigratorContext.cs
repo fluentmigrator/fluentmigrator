@@ -25,5 +25,6 @@ namespace FluentMigrator.InProc {
       string Database { get; set; }
       IAnnouncer Announcer { get; }
       bool PreviewOnly { get; set; }
+      string Profile { get; set; }
    }
 }

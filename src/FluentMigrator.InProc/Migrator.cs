@@ -28,6 +28,7 @@ namespace FluentMigrator.InProc {
             Connection = migratorContext.Connection;
             Database = migratorContext.Database;
             PreviewOnly = migratorContext.PreviewOnly;
+            Profile = migratorContext.Profile;
          }
       }
 
