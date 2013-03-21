@@ -222,7 +222,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         {
             truncator.Truncate(column);
             return String.Format(AlterColumnSetNullable,
-                column.IsNullable ? "1" : "NULL",
+                !column.IsNullable.HasValue || !column.IsNullable.Value  ? "NULL" : "1",
                 Quoter.QuoteValue(column.TableName),
                 Quoter.QuoteValue(column.Name)
                 );

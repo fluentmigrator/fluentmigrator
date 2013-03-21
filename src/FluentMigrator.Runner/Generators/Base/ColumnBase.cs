@@ -44,7 +44,12 @@ namespace FluentMigrator.Runner.Generators.Base
 
         protected virtual string FormatNullable(ColumnDefinition column)
         {
-            return !column.IsNullable ? "NOT NULL" : string.Empty;
+			if (column.IsNullable.HasValue && column.IsNullable.Value) {
+				return string.Empty;
+			}
+			else {
+				return "NOT NULL";
+			}
         }
 
         protected virtual string FormatDefaultValue(ColumnDefinition column)
