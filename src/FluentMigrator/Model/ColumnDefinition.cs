@@ -43,7 +43,7 @@ namespace FluentMigrator.Model
         public virtual bool IsIndexed { get; set; }
         public virtual bool IsPrimaryKey { get; set; }
         public virtual string PrimaryKeyName { get; set; }
-        public virtual bool IsNullable { get; set; }
+        public virtual bool? IsNullable { get; set; }
         public virtual bool IsUnique { get; set; }
         public virtual string TableName { get; set; }
         public virtual ColumnModificationType ModificationType { get; set; }

@@ -57,6 +57,15 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             sql.ShouldBe("ALTER TABLE \"TestTable1\" MODIFY \"TestColumn1\" NVARCHAR2(20) NOT NULL");
         }
 
+		[Test]
+		public void CanAlterColumnNoNullSettings()
+		{
+			var expression = GeneratorTestHelper.GetAlterColumnExpression();
+			expression.Column.IsNullable = null;
+			string sql = generator.Generate(expression);
+			sql.ShouldBe("ALTER TABLE \"TestTable1\" MODIFY \"TestColumn1\" NVARCHAR2(20)");
+		}
+
         [Test]
         public override void CanCreateForeignKey()
         {
