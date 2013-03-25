@@ -9,19 +9,24 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
     public class OracleCreateTableTests : BaseTableCreateTests
     {
         private OracleGenerator _generator;
+	    private OracleGenerator quotedIdentiferGenerator;
 
-        [SetUp]
+	    [SetUp]
         public void Setup()
         {
-            _generator = new OracleGenerator();
+	        _generator = new OracleGenerator();
+	        quotedIdentiferGenerator = new OracleGenerator(true);
         }
 
-        [Test]
+	    [Test]
         public override void CanCreateTable()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             string sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL)");
+            sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL)");
+
+			sql = quotedIdentiferGenerator.Generate(expression);
+			sql.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL)");
         }
 
         [Test]
@@ -37,7 +42,11 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             //CONSTRAINT constraint_name PRIMARY KEY (column1, column2, . column_n)
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
             string sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, PRIMARY KEY (\"TestColumn1\"))");
+            sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL, PRIMARY KEY (TestColumn1))");
+
+			expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
+			sql = quotedIdentiferGenerator.Generate(expression);
+			sql.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, PRIMARY KEY (\"TestColumn1\"))");
         }
 
         [Test]
@@ -45,7 +54,11 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
             string sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\"))");
+            sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL, CONSTRAINT TestKey PRIMARY KEY (TestColumn1))");
+
+			expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
+			sql = quotedIdentiferGenerator.Generate(expression);
+			sql.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\"))");
         }
 
         [Test]
@@ -53,7 +66,12 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumNamedPrimaryKeyExpression();
             string sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"))");
+            sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL, CONSTRAINT TestKey PRIMARY KEY (TestColumn1, TestColumn2))");
+
+			expression = GeneratorTestHelper.GetCreateTableWithMultiColumNamedPrimaryKeyExpression();
+			sql = quotedIdentiferGenerator.Generate(expression);
+			sql.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"))");
+
         }
 
         [Test]
@@ -68,9 +86,12 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
 
             var result = _generator.Generate(expression);
-
             result.ShouldBe(
-                "CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255), \"TestColumn2\" NUMBER(10,0) NOT NULL)");
+                "CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255), TestColumn2 NUMBER(10,0) NOT NULL)");
+
+			result = quotedIdentiferGenerator.Generate(expression);
+			result.ShouldBe(
+				"CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255), \"TestColumn2\" NUMBER(10,0) NOT NULL)");
         }
 
         [Test]
@@ -81,7 +102,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             string sql = _generator.Generate(expression);
 
             // Oracle requires the DEFAULT clause to appear before the NOT NULL clause
-            sql.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) DEFAULT 'abc' NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL)");
+            sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) DEFAULT 'abc' NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL)");
+
+			sql = quotedIdentiferGenerator.Generate(expression);
+			sql.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) DEFAULT 'abc' NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL)");
         }
 
         [Test]
@@ -95,7 +119,11 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
             string sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE INDEX \"TestIndex\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
+            sql.ShouldBe("CREATE INDEX TestIndex ON TestTable1 (TestColumn1 ASC)");
+
+			sql = quotedIdentiferGenerator.Generate(expression);
+			sql.ShouldBe("CREATE INDEX \"TestIndex\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
+			
         }
 
         [Test]
@@ -103,7 +131,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
             string sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE INDEX \"TestIndex\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" DESC)");
+            sql.ShouldBe("CREATE INDEX TestIndex ON TestTable1 (TestColumn1 ASC, TestColumn2 DESC)");
+
+			sql = quotedIdentiferGenerator.Generate(expression);
+			sql.ShouldBe("CREATE INDEX \"TestIndex\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" DESC)");
         }
 
         [Test]
@@ -111,7 +142,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
             string sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
+            sql.ShouldBe("CREATE UNIQUE INDEX TestIndex ON TestTable1 (TestColumn1 ASC)");
+
+			sql = quotedIdentiferGenerator.Generate(expression);
+			sql.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
         }
 
         [Test]
@@ -119,7 +153,12 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
             string sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" DESC)");
+            sql.ShouldBe("CREATE UNIQUE INDEX TestIndex ON TestTable1 (TestColumn1 ASC, TestColumn2 DESC)");
+
+			sql = quotedIdentiferGenerator.Generate(expression);
+			sql.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" DESC)");
+
+
         }
 
         [Test]
@@ -128,7 +167,11 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
             string sql = _generator.Generate(expression);
             // See the note in OracleColumn about why the PK should not be named
-            sql.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"))");
+            sql.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL, PRIMARY KEY (TestColumn1, TestColumn2))");
+
+			expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
+			sql = quotedIdentiferGenerator.Generate(expression);
+			sql.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR2(255) NOT NULL, \"TestColumn2\" NUMBER(10,0) NOT NULL, PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"))");
         }
 
         [Test]

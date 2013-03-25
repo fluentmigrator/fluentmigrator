@@ -8,11 +8,13 @@
     public class OracleCreateSequenceTests
     {
         private OracleGenerator generator;
+	    private OracleGenerator quotedIdentiferGenerator;
 
-        [SetUp]
+	    [SetUp]
         public void Setup()
         {
             generator = new OracleGenerator();
+			quotedIdentiferGenerator = new OracleGenerator(true);
         }
 
         [Test]
@@ -33,7 +35,10 @@
                 }
             };
             var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE SEQUENCE \"Schema\".\"Sequence\" INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE");
+            sql.ShouldBe("CREATE SEQUENCE Schema.Sequence INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE");
+
+			sql = quotedIdentiferGenerator.Generate(expression);
+			sql.ShouldBe("CREATE SEQUENCE \"Schema\".\"Sequence\" INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE");
         }
 
         [Test]
@@ -41,7 +46,10 @@
         {
             var expression = new DeleteSequenceExpression { SchemaName = "Schema", SequenceName = "Sequence" };
             var sql = generator.Generate(expression);
-            sql.ShouldBe("DROP SEQUENCE \"Schema\".\"Sequence\"");
+            sql.ShouldBe("DROP SEQUENCE Schema.Sequence");
+
+			sql = quotedIdentiferGenerator.Generate(expression);
+			sql.ShouldBe("DROP SEQUENCE \"Schema\".\"Sequence\"");
         }
 
         [Test]
@@ -61,7 +69,10 @@
                 }
             };
             var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE SEQUENCE \"Sequence\" INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE");
+            sql.ShouldBe("CREATE SEQUENCE Sequence INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE");
+
+			sql = quotedIdentiferGenerator.Generate(expression);
+			sql.ShouldBe("CREATE SEQUENCE \"Sequence\" INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE");
         }
 
         [Test]
@@ -69,7 +80,10 @@
         {
             var expression = new DeleteSequenceExpression { SequenceName = "Sequence" };
             var sql = generator.Generate(expression);
-            sql.ShouldBe("DROP SEQUENCE \"Sequence\"");
+            sql.ShouldBe("DROP SEQUENCE Sequence");
+
+			sql = quotedIdentiferGenerator.Generate(expression);
+			sql.ShouldBe("DROP SEQUENCE \"Sequence\"");
         }
     }
 }

@@ -8,24 +8,29 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
     public class OracleDataTests : BaseDataTests
     {
         private OracleGenerator generator;
+	    private OracleGenerator quotedIdentiferGenerator;
 
-        [SetUp]
+	    [SetUp]
         public void Setup()
         {
             generator = new OracleGenerator();
+			quotedIdentiferGenerator = new OracleGenerator(true);
 
         }
         [Test]
         public override void CanInsertData()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
-            string sql = generator.Generate(expression);
+            string sql = quotedIdentiferGenerator.Generate(expression);
 
             string expected = "INSERT ALL INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (1, 'Just''in', 'codethinked.com')";
             expected += " INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (2, 'Na\\te', 'kohari.org')";
             expected += " SELECT 1 FROM DUAL";
 
             sql.ShouldBe(expected);
+
+			sql = generator.Generate(expression);
+			sql.ShouldBe(expected.Replace("\"",""));
         }
 
         [Test]
@@ -34,8 +39,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
 
             var sql = generator.Generate(expression);
+            sql.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL");
 
-            sql.ShouldBe("DELETE FROM \"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL");
+			sql = quotedIdentiferGenerator.Generate(expression);
+			sql.ShouldBe("DELETE FROM \"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL");
         }
 
         [Test]
@@ -44,8 +51,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
 
             var sql = generator.Generate(expression);
+            sql.ShouldBe("DELETE FROM TestTable1 WHERE 1 = 1");
 
-            sql.ShouldBe("DELETE FROM \"TestTable1\" WHERE 1 = 1");
+			sql = quotedIdentiferGenerator.Generate(expression);
+			sql.ShouldBe("DELETE FROM \"TestTable1\" WHERE 1 = 1");
         }
 
         [Test]
@@ -54,8 +63,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
 
             var sql = generator.Generate(expression);
+            sql.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL; DELETE FROM TestTable1 WHERE Website = 'github.com'");
 
-            sql.ShouldBe("DELETE FROM \"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL; DELETE FROM \"TestTable1\" WHERE \"Website\" = 'github.com'");
+			sql = quotedIdentiferGenerator.Generate(expression);
+			sql.ShouldBe("DELETE FROM \"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL; DELETE FROM \"TestTable1\" WHERE \"Website\" = 'github.com'");
         }
 
         [Test]
@@ -66,10 +77,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 
 
             string sql = generator.Generate(expression);
+            sql.ShouldBe(String.Format("INSERT ALL INTO TestTable1 (guid) VALUES ('{0}') SELECT 1 FROM DUAL", GeneratorTestHelper.TestGuid.ToString()));
 
-            string expected = String.Format("INSERT ALL INTO \"TestTable1\" (\"guid\") VALUES ('{0}') SELECT 1 FROM DUAL", GeneratorTestHelper.TestGuid.ToString());
-
-            sql.ShouldBe(expected);
+			sql = quotedIdentiferGenerator.Generate(expression);
+			sql.ShouldBe(String.Format("INSERT ALL INTO \"TestTable1\" (\"guid\") VALUES ('{0}') SELECT 1 FROM DUAL", GeneratorTestHelper.TestGuid.ToString()));
         }
 
         [Test]
@@ -78,7 +89,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
 
             var sql = generator.Generate(expression);
-            sql.ShouldBe("UPDATE \"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL");
+            sql.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE Id = 9 AND Homepage IS NULL");
+
+			sql = quotedIdentiferGenerator.Generate(expression);
+			sql.ShouldBe("UPDATE \"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL");
         }
 
         [Test]
@@ -87,7 +101,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
 
             var sql = generator.Generate(expression);
-            sql.ShouldBe("UPDATE \"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE 1 = 1");
+            sql.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE 1 = 1");
+
+			sql = quotedIdentiferGenerator.Generate(expression);
+			sql.ShouldBe("UPDATE \"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE 1 = 1");
         }
     }
 }

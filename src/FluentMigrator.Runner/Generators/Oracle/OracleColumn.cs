@@ -11,8 +11,8 @@ namespace FluentMigrator.Runner.Generators.Oracle
     {
         private const int OracleObjectNameMaxLength = 30;
 
-        public OracleColumn()
-            : base(new OracleTypeMap(), new OracleQuoter())
+        public OracleColumn(IQuoter quoter)
+            : base(new OracleTypeMap(), quoter)
         {
             int a = ClauseOrder.IndexOf(FormatDefaultValue);
             int b = ClauseOrder.IndexOf(FormatNullable);
@@ -87,7 +87,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
                         "Oracle does not support length of primary key name greater than {0} characters. Reduce length of primary key name. ({1})",
                         OracleObjectNameMaxLength, primaryKeyName));
 
-            var result = string.Format("CONSTRAINT {0} ", Quoter.QuoteIndexName(primaryKeyName));
+            var result = string.Format("CONSTRAINT {0} ", Quoter.QuoteConstraintName(primaryKeyName));
             return result;
         }
     }

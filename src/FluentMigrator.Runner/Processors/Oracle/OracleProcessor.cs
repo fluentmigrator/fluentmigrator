@@ -19,6 +19,8 @@
 using System;
 using System.Data;
 using FluentMigrator.Builders.Execute;
+using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.Oracle;
 
 namespace FluentMigrator.Runner.Processors.Oracle
 {
@@ -34,6 +36,11 @@ namespace FluentMigrator.Runner.Processors.Oracle
         {
         }
 
+		private IQuoter Quoter
+	    {
+			get { return ((OracleGenerator)this.Generator).Quoter; }
+	    }
+
         public override bool SchemaExists(string schemaName)
         {
             if (schemaName == null)
@@ -42,7 +49,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             if (schemaName.Length == 0)
                 return false;
 
-            return Exists("SELECT 1 FROM \"ALL_USERS\" WHERE \"USERNAME\" = '{0}'", schemaName.ToUpper());
+            return Exists("SELECT 1 FROM ALL_USERS WHERE USERNAME = '{0}'", schemaName.ToUpper());
         }
 
         public override bool TableExists(string schemaName, string tableName)
@@ -54,9 +61,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 return false;
 
             if (string.IsNullOrEmpty(schemaName))
-                return Exists("SELECT 1 FROM \"USER_TABLES\" WHERE \"TABLE_NAME\" = '{0}'", FormatSqlEscape(tableName));
+				return Exists("SELECT 1 FROM USER_TABLES WHERE upper(TABLE_NAME) = '{0}'", FormatSqlEscape(tableName.ToUpper()));
 
-            return Exists("SELECT 1 FROM \"ALL_TABLES\" WHERE \"OWNER\" = '{0}' AND \"TABLE_NAME\" = '{1}'", schemaName.ToUpper(), FormatSqlEscape(tableName));
+			return Exists("SELECT 1 FROM ALL_TABLES WHERE upper(OWNER) = '{0}' AND upper(TABLE_NAME) = '{1}'", schemaName.ToUpper(), FormatSqlEscape(tableName.ToUpper()));
         }
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
@@ -70,9 +77,10 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 return false;
 
             if (string.IsNullOrEmpty(schemaName))
-                return Exists("SELECT 1 FROM \"USER_TAB_COLUMNS\" WHERE \"TABLE_NAME\" = '{0}' AND \"COLUMN_NAME\" = '{1}'", FormatSqlEscape(tableName), FormatSqlEscape(columnName));
+                return Exists("SELECT 1 FROM USER_TAB_COLUMNS WHERE upper(TABLE_NAME) = '{0}' AND upper(COLUMN_NAME) = '{1}'", FormatSqlEscape(tableName.ToUpper()), FormatSqlEscape(columnName.ToUpper()));
 
-            return Exists("SELECT 1 FROM \"ALL_TAB_COLUMNS\" WHERE \"OWNER\" = '{0}' AND \"TABLE_NAME\" = '{1}' AND \"COLUMN_NAME\" = '{2}'", schemaName.ToUpper(), FormatSqlEscape(tableName), FormatSqlEscape(columnName));
+			return Exists("SELECT 1 FROM ALL_TAB_COLUMNS WHERE upper(OWNER) = '{0}' AND upper(TABLE_NAME) = '{1}' AND upper(COLUMN_NAME) = '{2}'",
+				schemaName.ToUpper(), FormatSqlEscape(tableName.ToUpper()), FormatSqlEscape(columnName.ToUpper()));
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
@@ -88,9 +96,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 return false;
 
             if (String.IsNullOrEmpty(schemaName))
-                return Exists("SELECT 1 FROM \"USER_CONSTRAINTS\" WHERE \"CONSTRAINT_NAME\" = '{0}'",  FormatSqlEscape(constraintName));
+				return Exists("SELECT 1 FROM USER_CONSTRAINTS WHERE upper(CONSTRAINT_NAME) = '{0}'", FormatSqlEscape(constraintName.ToUpper()));
 
-            return Exists("SELECT 1 FROM \"ALL_CONSTRAINTS\" WHERE \"OWNER\" = '{0}' AND \"CONSTRAINT_NAME\" = '{1}'",  schemaName.ToUpper(),  FormatSqlEscape(constraintName));
+			return Exists("SELECT 1 FROM ALL_CONSTRAINTS WHERE upper(OWNER) = '{0}' AND upper(CONSTRAINT_NAME) = '{1}'", schemaName.ToUpper(), FormatSqlEscape(constraintName.ToUpper()));
         }
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
@@ -106,9 +114,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 return false;
 
             if (String.IsNullOrEmpty(schemaName))
-                return Exists("SELECT 1 FROM \"USER_INDEXES\" WHERE \"INDEX_NAME\" = '{0}'",  FormatSqlEscape(indexName));
+				return Exists("SELECT 1 FROM USER_INDEXES WHERE upper(INDEX_NAME) = '{0}'", FormatSqlEscape(indexName.ToUpper()));
 
-            return Exists("SELECT 1 FROM \"ALL_INDEXES\" WHERE \"OWNER\" = '{0}' AND \"INDEX_NAME\" = '{1}'",  schemaName.ToUpper(),  FormatSqlEscape(indexName));
+			return Exists("SELECT 1 FROM ALL_INDEXES WHERE upper(OWNER) = '{0}' AND upper(INDEX_NAME) = '{1}'", schemaName.ToUpper(), FormatSqlEscape(indexName.ToUpper()));
         }
 
         public override bool SequenceExists(string schemaName, string sequenceName)
@@ -133,6 +141,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
             EnsureConnectionIsOpen();
 
+			Announcer.Sql(String.Format(template, args));
             using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
             using (var reader = command.ExecuteReader())
             {
@@ -146,9 +155,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 throw new ArgumentNullException("tableName");
 
             if (String.IsNullOrEmpty(schemaName))
-                return Read("SELECT * FROM \"{0}\"", tableName);
+                return Read("SELECT * FROM {0}", Quoter.QuoteTableName(tableName));
 
-            return Read("SELECT * FROM \"{0}\".\"{1}\"", schemaName, tableName);
+            return Read("SELECT * FROM {0}.{1}", Quoter.QuoteSchemaName(schemaName), Quoter.QuoteTableName(tableName));
         }
 
         public override DataSet Read(string template, params object[] args)
