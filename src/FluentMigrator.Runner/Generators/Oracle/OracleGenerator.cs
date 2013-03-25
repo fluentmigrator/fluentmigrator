@@ -9,11 +9,21 @@ namespace FluentMigrator.Runner.Generators.Oracle
     public class OracleGenerator : GenericGenerator
     {
         public OracleGenerator()
-            : base(new OracleColumn(), new OracleQuoter())
+			: base(new OracleColumn(new OracleQuoter()), new OracleQuoter())
         {
         }
 
-        public override string AddColumn
+		public OracleGenerator(bool useQuotedIdentifiers)
+			: base(new OracleColumn(GetQuoter(useQuotedIdentifiers)), GetQuoter(useQuotedIdentifiers))
+		{
+		}
+
+	    private static IQuoter GetQuoter(bool useQuotedIdentifiers)
+	    {
+			return useQuotedIdentifiers ? (IQuoter) new OracleQuoterQuotedIdentifier() : (IQuoter) new OracleQuoter();
+	    }
+
+	    public override string AddColumn
         {
             get { return "ALTER TABLE {0} ADD {1}"; }
         }

@@ -198,7 +198,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         public void ShouldEscapeOracleObjectNames()
         {
             //Do Nothing at the moment due to case sensitivity issues with oracle
-            OracleQuoter quoter = new OracleQuoter();
+            OracleQuoterQuotedIdentifier quoter = new OracleQuoterQuotedIdentifier();
             quoter.Quote("Table\"Name").ShouldBe("\"Table\"\"Name\"");
         }
 
