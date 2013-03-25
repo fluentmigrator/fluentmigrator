@@ -206,7 +206,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(DeleteConstraintExpression expression)
         {
-            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName), Quoter.Quote(expression.Constraint.ConstraintName));
+            return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName), Quoter.QuoteConstraintName(expression.Constraint.ConstraintName));
         }
 
         public virtual string GenerateForeignKeyName(CreateForeignKeyExpression expression)

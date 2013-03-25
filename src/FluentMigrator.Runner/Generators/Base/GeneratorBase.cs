@@ -72,7 +72,7 @@ namespace FluentMigrator.Runner.Generators.Base
             get { return _column; }
         }
 
-        protected IQuoter Quoter
+        public IQuoter Quoter
         {
             get { return _quoter; }
         }
