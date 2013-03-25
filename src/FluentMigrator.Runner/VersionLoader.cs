@@ -89,7 +89,8 @@ namespace FluentMigrator.Runner
         {
             get
             {
-                return Processor.SchemaExists(VersionTableMetaData.SchemaName);
+                return string.IsNullOrEmpty(VersionTableMetaData.SchemaName) ||
+					   Processor.SchemaExists(VersionTableMetaData.SchemaName);
             }
         }
 
