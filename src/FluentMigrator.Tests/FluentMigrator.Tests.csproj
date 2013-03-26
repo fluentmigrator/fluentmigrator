@@ -179,6 +179,13 @@
     <Compile Include="Integration\Processors\JetProcessorTests.cs" />
     <Compile Include="Integration\Processors\MySqlProcessorTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCeProcessorTests.cs" />
+    <Compile Include="Integration\Processors\BaseColumnTests.cs" />
+    <Compile Include="Integration\Processors\BaseConstraintTests.cs" />
+    <Compile Include="Integration\Processors\BaseIndexTests.cs" />
+    <Compile Include="Integration\Processors\BaseSchemaExtensionsTests.cs" />
+    <Compile Include="Integration\Processors\BaseSchemaTests.cs" />
+    <Compile Include="Integration\Processors\BaseSequenceTests.cs" />
+    <Compile Include="Integration\Processors\BaseTableTests.cs" />
     <Compile Include="Unit\AnnouncerExtensionsTests.cs" />
     <Compile Include="Unit\Announcers\AnnouncerTests.cs" />
     <Compile Include="Integration\Migrations\TestUpdateAllRowsMigration.cs" />
