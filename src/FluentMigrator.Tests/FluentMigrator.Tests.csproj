@@ -189,7 +189,14 @@
     <Compile Include="Integration\Processors\Postgres\PostgresProcessorTests.cs" />
     <Compile Include="Integration\Processors\SQLite\SqliteProcessorTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeProcessorTests.cs" />
+    <Compile Include="Integration\Processors\SqlServer\SqlServerColumnTests.cs" />
+    <Compile Include="Integration\Processors\SqlServer\SqlServerConstraintTests.cs" />
+    <Compile Include="Integration\Processors\SqlServer\SqlServerIndexTests.cs" />
     <Compile Include="Integration\Processors\SqlServer\SqlServerProcessorTests.cs" />
+    <Compile Include="Integration\Processors\SqlServer\SqlServerSchemaExtensionsTests.cs" />
+    <Compile Include="Integration\Processors\SqlServer\SqlServerSchemaTests.cs" />
+    <Compile Include="Integration\Processors\SqlServer\SqlServerSequenceTests.cs" />
+    <Compile Include="Integration\Processors\SqlServer\SqlServerTableTests.cs" />
     <Compile Include="Unit\AnnouncerExtensionsTests.cs" />
     <Compile Include="Unit\Announcers\AnnouncerTests.cs" />
     <Compile Include="Integration\Migrations\TestUpdateAllRowsMigration.cs" />

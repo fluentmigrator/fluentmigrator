@@ -1,21 +1,3 @@
-#region License
-// 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//   http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-//
-#endregion
-
 using System.Data.SqlClient;
 using System.IO;
 using FluentMigrator.Builders.Execute;
@@ -53,99 +35,28 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
         }
 
         [Test]
-        public void CallingTableExistsReturnsTrueIfTableExists()
-        {
-            using (var table = new SqlServerTestTable(Processor, null, "id int"))
-                Processor.TableExists(null, table.Name).ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingTableExistsReturnsFalseIfTableDoesNotExist()
-        {
-            Processor.TableExists(null, "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingColumnExistsReturnsTrueIfColumnExists()
-        {
-            using (var table = new SqlServerTestTable(Processor, null, "id int"))
-                Processor.ColumnExists(null, table.Name, "id").ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingColumnExistsReturnsFalseIfTableDoesNotExist()
-        {
-            Processor.ColumnExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingColumnExistsReturnsFalseIfColumnDoesNotExist()
-        {
-            using (var table = new SqlServerTestTable(Processor, null, "id int"))
-                Processor.ColumnExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingTableExistsReturnsTrueIfTableExistsWithSchema()
+        public void CallingColumnExistsReturnsFalseIfColumnExistsInDifferentSchema()
         {
             using (var table = new SqlServerTestTable(Processor, "test_schema", "id int"))
-                Processor.TableExists("test_schema", table.Name).ShouldBeTrue();
+                Processor.ColumnExists("test_schema2", table.Name, "id").ShouldBeFalse();
         }
 
         [Test]
-        public void CallingTableExistsReturnsFalseIfTableDoesNotExistWithSchema()
+        public void CallingConstraintExistsReturnsFalseIfConstraintExistsInDifferentSchema()
         {
-            Processor.TableExists("test_schema", "DoesNotExist").ShouldBeFalse();
+            using (var table = new SqlServerTestTable(Processor, "test_schema", "id int", "wibble int CONSTRAINT c1 CHECK(wibble > 0)"))
+                Processor.ConstraintExists("test_schema2", table.Name, "c1").ShouldBeFalse();
         }
 
         [Test]
-        public void CallingColumnExistsReturnsTrueIfColumnExistsWithSchema()
-        {
-            using (var table = new SqlServerTestTable(Processor, "test_schema", "id int"))
-                Processor.ColumnExists("test_schema", table.Name, "id").ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingColumnExistsReturnsFalseIfTableDoesNotExistWithSchema()
-        {
-            Processor.ColumnExists("test_schema", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingColumnExistsReturnsFalseIfColumnDoesNotExistWithSchema()
+        public void CallingTableExistsReturnsFalseIfTableExistsInDifferentSchema()
         {
             using (var table = new SqlServerTestTable(Processor, "test_schema", "id int"))
-                Processor.ColumnExists("test_schema", table.Name, "DoesNotExist").ShouldBeFalse();
+                Processor.TableExists("test_schema2", table.Name).ShouldBeFalse();
         }
 
         [Test]
-        public void CallingSequenceExistsReturnsTrueIfSequenceExists()
-        {
-            using (var sequence = new SqlServerTestSequence(Processor, null, "test_sequence"))
-                Processor.SequenceExists(null, "test_sequence").ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingSequenceExistsReturnsFalseIfSequenceDoesNotExist()
-        {
-            Processor.SequenceExists(null, "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingSequenceExistsReturnsTrueIfSequenceExistsWithSchema()
-        {
-            using (var sequence = new SqlServerTestSequence(Processor, "test_schema", "test_sequence"))
-                Processor.SequenceExists("test_schema", "test_sequence").ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingSequenceExistsReturnsFalseIfSequenceDoesNotExistWithSchema()
-        {
-            Processor.SequenceExists("test_schema", "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingProcessWithPerformDBOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
+        public void CallingProcessWithPerformDbOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
         {
             var output = new StringWriter();
 
