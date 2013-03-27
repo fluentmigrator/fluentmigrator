@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.MySql;
@@ -8,7 +8,7 @@ using MySql.Data.MySqlClient;
 using NUnit.Framework;
 using NUnit.Should;
 
-namespace FluentMigrator.Tests.Integration.Processors
+namespace FluentMigrator.Tests.Integration.Processors.MySql
 {
     [TestFixture]
     [Category("Integration")]

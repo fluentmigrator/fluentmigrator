@@ -24,11 +24,11 @@ using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Tests.Helpers;
-using Npgsql;
 using NUnit.Framework;
 using NUnit.Should;
+using Npgsql;
 
-namespace FluentMigrator.Tests.Integration.Processors
+namespace FluentMigrator.Tests.Integration.Processors.Postgres
 {
     [TestFixture]
     [Category("Integration")]
@@ -107,7 +107,7 @@ namespace FluentMigrator.Tests.Integration.Processors
         }
 
         [Test]
-        public void CallingContraintExistsReturnsTrueIfConstraintExists()
+        public void CallingConstraintExistsReturnsTrueIfConstraintExists()
         {
             using (var table = new PostgresTestTable(Processor, null, "id int", "wibble int CONSTRAINT c1 CHECK(wibble > 0)"))
                 Processor.ConstraintExists(null, table.Name, "c1").ShouldBeTrue();
@@ -364,7 +364,7 @@ namespace FluentMigrator.Tests.Integration.Processors
         }
 
         [Test]
-        public void CallingContraintExistsReturnsFalseIfConstraintExistsInDifferentSchema()
+        public void CallingConstraintExistsReturnsFalseIfConstraintExistsInDifferentSchema()
         {
             using (var table = new PostgresTestTable(Processor, "TestSchema1", "id int", "wibble int CONSTRAINT c1 CHECK(wibble > 0)"))
                 Processor.ConstraintExists("TestSchema2", table.Name, "c1").ShouldBeFalse();

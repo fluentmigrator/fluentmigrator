@@ -1,8 +1,6 @@
 using System;
-using System.Data.SqlClient;
 using System.Data.SqlServerCe;
 using System.IO;
-using FluentMigrator.Builders.Execute;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Processors;
@@ -11,7 +9,7 @@ using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
 using NUnit.Should;
 
-namespace FluentMigrator.Tests.Integration.Processors
+namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
 {
 
     [TestFixture]
@@ -61,7 +59,7 @@ namespace FluentMigrator.Tests.Integration.Processors
         }
 
         [Test]
-        public void CallingConstraintExistsReturnsTrueIfConstraintExist()
+        public void CallingConstraintExistsReturnsTrueIfConstraintExists()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
             {
@@ -71,7 +69,7 @@ namespace FluentMigrator.Tests.Integration.Processors
         }
 
         [Test]
-        public void CallingIndexExistsReturnsTrueIfIndexExist()
+        public void CallingIndexExistsReturnsTrueIfIndexExists()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
             {
@@ -134,7 +132,7 @@ namespace FluentMigrator.Tests.Integration.Processors
         }
 
         [Test]
-        public void CallingConstraintExistsReturnsTrueIfConstraintExistWithSchema()
+        public void CallingConstraintExistsReturnsTrueIfConstraintExistsWithSchema()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
             {
@@ -144,7 +142,7 @@ namespace FluentMigrator.Tests.Integration.Processors
         }
 
         [Test]
-        public void CallingIndexExistsReturnsTrueIfIndexExistWithSchema()
+        public void CallingIndexExistsReturnsTrueIfIndexExistsWithSchema()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
             {

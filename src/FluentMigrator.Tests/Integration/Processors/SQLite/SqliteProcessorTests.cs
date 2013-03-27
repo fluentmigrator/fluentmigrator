@@ -23,14 +23,14 @@ using FluentMigrator.Builders.Execute;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Sqlite;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
-using FluentMigrator.Runner.Generators.SQLite;
 
-namespace FluentMigrator.Tests.Integration.Processors
+namespace FluentMigrator.Tests.Integration.Processors.SQLite
 {
     [TestFixture]
     [Category("Integration")]

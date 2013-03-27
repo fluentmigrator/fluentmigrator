@@ -10,7 +10,7 @@ using FluentMigrator.Runner.Processors.Firebird;
 using System;
 using FluentMigrator.Expressions;
 
-namespace FluentMigrator.Tests.Integration.Processors
+namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
     [TestFixture]
     [Category("Integration")]
@@ -76,7 +76,7 @@ namespace FluentMigrator.Tests.Integration.Processors
         }
 
         [Test]
-        public void CallingContraintExistsReturnsTrueIfConstraintExists()
+        public void CallingConstraintExistsReturnsTrueIfConstraintExists()
         {
             using (var table = new FirebirdTestTable(Processor, null, "id int", "wibble int CONSTRAINT c1 CHECK(wibble > 0)"))
                 Processor.ConstraintExists(null, table.Name, "C1").ShouldBeTrue();
@@ -448,7 +448,7 @@ namespace FluentMigrator.Tests.Integration.Processors
         }
 
         [Test]
-        public void CallingSequenceExistsReturnsFalseIfSequenceNotExist()
+        public void CallingSequenceExistsReturnsFalseIfSequenceDoesNotExist()
         {
             Processor.SequenceExists("", "DoesNotExist").ShouldBeFalse();
         }

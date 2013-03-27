@@ -1,14 +1,14 @@
-﻿using System.Data;
-using FluentMigrator.Runner.Processors.Oracle;
+using System.Data;
 using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators.Oracle;
-using FluentMigrator.Tests.Helpers;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.Oracle;
+using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.Oracle;
+using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
 using NUnit.Should;
 
-namespace FluentMigrator.Tests.Integration.Processors
+namespace FluentMigrator.Tests.Integration.Processors.Oracle
 {
     [TestFixture]
     [Category("Integration")]
@@ -120,7 +120,7 @@ namespace FluentMigrator.Tests.Integration.Processors
         #region When working with Constraints
 
         [Test]
-        public void CallingConstraintExistsReturnsTrueIfConstraintExist()
+        public void CallingConstraintExistsReturnsTrueIfConstraintExists()
         {
             using (var table = new OracleTestTable(Connection, Quoter, null, Quoter.QuoteColumnName("id") + " int"))
             {
@@ -150,7 +150,7 @@ namespace FluentMigrator.Tests.Integration.Processors
         }
 
         [Test]
-        public void CallingConstraintExistsReturnsTrueIfConstraintExistWithSchema()
+        public void CallingConstraintExistsReturnsTrueIfConstraintExistsWithSchema()
         {
             using (var table = new OracleTestTable(Connection, Quoter, SchemaName, Quoter.QuoteColumnName("id") + " int"))
             {
@@ -174,7 +174,7 @@ namespace FluentMigrator.Tests.Integration.Processors
         #region When working with Indexes
 
         [Test]
-        public void CallingIndexExistsReturnsTrueIfIndexExist()
+        public void CallingIndexExistsReturnsTrueIfIndexExists()
         {
             using (var table = new OracleTestTable(Connection, Quoter, null, Quoter.QuoteColumnName("id") + " int"))
             {
@@ -204,7 +204,7 @@ namespace FluentMigrator.Tests.Integration.Processors
         }
 
         [Test]
-        public void CallingIndexExistsReturnsTrueIfIndexExistWithSchema()
+        public void CallingIndexExistsReturnsTrueIfIndexExistsWithSchema()
         {
             using (var table = new OracleTestTable(Connection, Quoter, SchemaName, Quoter.QuoteColumnName("id") + " int"))
             {
