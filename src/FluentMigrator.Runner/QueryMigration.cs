@@ -31,8 +31,7 @@ namespace FluentMigrator.Runner
 {
     /// <summary>
     /// Query object for using fluent syntax directly, without recording migrations history.
-    /// Use <see cref="Migrator.GetQuery"/> to get a new query instance.
-    /// To apply changes, either call <see cref="Process"/> or <see cref="IDisposable.Dispose"/> (via <c>using</c> statement).
+    /// Use <see cref="Migrator.GetQuery"/> to get a new query instance. To apply changes call <see cref="Process"/>.
     /// </summary>
     public class QueryMigration
     {
