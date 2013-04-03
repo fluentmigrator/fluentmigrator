@@ -145,6 +145,8 @@
     <Compile Include="Generators\SqlServer\SqlServer2012Generator.cs" />
     <Compile Include="IMigrationInformationLoader.cs" />
     <Compile Include="InvalidMigrationException.cs" />
+    <Compile Include="MigrationConventionsBase.cs" />
+    <Compile Include="Migrator.cs" />
     <Compile Include="Processors\Firebird\FirebirdProcessedExpression.cs" />
     <Compile Include="Generators\Firebird\FirebirdQuoter.cs" />
     <Compile Include="Generators\Firebird\FirebirdTypeMap.cs" />
@@ -247,6 +249,7 @@
     <Compile Include="Processors\SqlServer\SqlServerProcessor.cs" />
     <Compile Include="ProfileLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="QueryMigration.cs" />
     <Compile Include="StopWatch.cs" />
     <Compile Include="Versioning\IVersionInfo.cs" />
     <Compile Include="Versioning\VersionInfo.cs" />

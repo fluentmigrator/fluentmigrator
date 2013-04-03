@@ -1,5 +1,4 @@
 ﻿#region License
-
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +12,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 #endregion
 
 using System;
@@ -29,14 +27,14 @@ using FluentMigrator.Builders.Schema;
 using FluentMigrator.Builders.Update;
 using FluentMigrator.Infrastructure;
 
-namespace FluentMigrator.Api
+namespace FluentMigrator.Runner
 {
     /// <summary>
     /// Query object for using fluent syntax directly, without recording migrations history.
     /// Use <see cref="Migrator.GetQuery"/> to get a new query instance.
-    /// To apply changes, either call <see cref="Commit"/> or <see cref="IDisposable.Dispose"/> (via <c>using</c> statement).
+    /// To apply changes, either call <see cref="Process"/> or <see cref="IDisposable.Dispose"/> (via <c>using</c> statement).
     /// </summary>
-    public class QueryMigration : IDisposable
+    public class QueryMigration
     {
         private readonly Migrator _migrator;
         private readonly IMigrationContext _context;
@@ -47,16 +45,11 @@ namespace FluentMigrator.Api
             _context = new MigrationContext(_migrator.Conventions, querySchema, _migrator.MigrationAssembly, _migrator.ApplicationContext);
         }
 
-        void IDisposable.Dispose()
-        {
-            Commit();
-        }
-
         /// <summary>Apply current expressions. Can be called multiple times.</summary>
         /// <param name="reverse">Reverse current expressions before applying them.</param>
         /// <remarks><see cref="Delete"/>, <see cref="Execute"/> and <see cref="Update"/> expressions cannot be reversed.</remarks>
         /// <exception cref="NotSupportedException">Expressions cannot be reversed.</exception>
-        public void Commit(bool reverse = false)
+        public void Process(bool reverse = false)
         {
             if (reverse)
                 _context.Expressions = _context.Expressions.Select(e => e.Reverse()).Reverse().ToList();
@@ -88,15 +81,15 @@ namespace FluentMigrator.Api
             get { return new RenameExpressionRoot(_context); }
         }
 
-        /// <summary>Delete database objects: tables, columns, indexes, primary and foreign keys, contraints.</summary>
-        /// <remarks>Cannot be automatically reversed with <c>reverse</c> argument of <see cref="Commit"/>.</remarks>
+        /// <summary>Delete database objects: tables, columns, indexes, primary and foreign keys, contraints. Delete rows from database tables.</summary>
+        /// <remarks>Cannot be automatically reversed with <c>reverse</c> argument of <see cref="Process"/>.</remarks>
         public IDeleteExpressionRoot Delete
         {
             get { return new DeleteExpressionRoot(_context); }
         }
 
         /// <summary>Execute SQL scripts on database.</summary>
-        /// <remarks>Cannot be automatically reversed with <c>reverse</c> argument of <see cref="Commit"/>.</remarks>
+        /// <remarks>Cannot be automatically reversed with <c>reverse</c> argument of <see cref="Process"/>.</remarks>
         public IExecuteExpressionRoot Execute
         {
             get { return new ExecuteExpressionRoot(_context); }
@@ -109,7 +102,7 @@ namespace FluentMigrator.Api
         }
 
         /// <summary>Update existing rows in database tables.</summary>
-        /// <remarks>Cannot be automatically reversed with <c>reverse</c> argument of <see cref="Commit"/>.</remarks>
+        /// <remarks>Cannot be automatically reversed with <c>reverse</c> argument of <see cref="Process"/>.</remarks>
         public IUpdateExpressionRoot Update
         {
             get { return new UpdateExpressionRoot(_context); }

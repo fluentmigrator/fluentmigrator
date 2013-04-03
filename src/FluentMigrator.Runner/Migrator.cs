@@ -1,5 +1,4 @@
 ﻿#region License
-
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +12,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 #endregion
 
 using System;
@@ -24,14 +22,13 @@ using System.Linq;
 using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
-using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.VersionTableInfo;
 
-namespace FluentMigrator.Api
+namespace FluentMigrator.Runner
 {
     /// <summary>
     /// Simple API for Fluent Migrations.
@@ -167,7 +164,7 @@ namespace FluentMigrator.Api
         /// <param name="ns">Namespace to load migration classes from.</param>
         /// <param name="loadNestedNamespaces">Wether to load migration classes from nested namesapces.</param>
         /// <param name="tagsToMatch">Filter migrations by tags.</param>
-        public Migrator LoadMigrations (Assembly assembly, string ns = null,
+        public Migrator LoadMigrations(Assembly assembly, string ns = null,
             bool loadNestedNamespaces = false, IEnumerable<string> tagsToMatch = null)
         {
             _context.MigrationAssembly = assembly;
@@ -178,7 +175,7 @@ namespace FluentMigrator.Api
         /// <summary>Connect to the database.</summary>
         /// <param name="engine">Database provider name. <see cref="AvailableEngines"/>.</param>
         /// <param name="connectionString">Connection string.</param>
-        public Migrator OpenConnection (string engine, string connectionString)
+        public Migrator OpenConnection(string engine, string connectionString)
         {
             if (engine == null)
                 throw new ArgumentNullException("engine");
@@ -201,7 +198,7 @@ namespace FluentMigrator.Api
         /// <param name="engine">Database provider name. <see cref="AvailableEngines"/>.</param>
         /// <param name="connectionStringName">Connection string name. If not specified, <see cref="Environment.MachineName"/> is used.</param>
         /// <param name="configPath">Configuration file path. ".config" extension is optional. If not specified, migration assembly name is used.</param>
-        public Migrator OpenNamedConnection (string engine, string connectionStringName = null, string configPath = null)
+        public Migrator OpenNamedConnection(string engine, string connectionStringName = null, string configPath = null)
         {
             var manager = new ConnectionStringManager(new NetConfigManager(), _nullAnnouncer,
                 connectionStringName, configPath, _context.MigrationAssemblyName, engine);
@@ -219,7 +216,7 @@ namespace FluentMigrator.Api
         /// <summary>Connect to the database using a named connection from a machine config file.</summary>
         /// <param name="engine">Database provider name. <see cref="AvailableEngines"/>.</param>
         /// <param name="connectionStringName">Connection string name. If not specified, <see cref="Environment.MachineName"/> is used.</param>
-        public Migrator OpenMachineNamedConnection (string engine, string connectionStringName = null)
+        public Migrator OpenMachineNamedConnection(string engine, string connectionStringName = null)
         {
             // TODO Other methods opening connection will fallback to machine config. Five levels of fallbacks are bad, but who cares...
             var manager = new ConnectionStringManager(new NetConfigManager(), _nullAnnouncer,
@@ -244,7 +241,7 @@ namespace FluentMigrator.Api
 
         /// <summary>
         /// Get query object to use fluent syntax directly, without recording migrations history.
-        /// To apply changes, either <see cref="QueryMigration.Commit"/> or <see cref="IDisposable.Dispose"/>
+        /// To apply changes, either <see cref="QueryMigration.Process"/> or <see cref="IDisposable.Dispose"/>
         /// (via <c>using</c> statement) must be called.
         /// If only this query is used, and migrations are neither requested nor applied,
         /// migrations history table (VersionInfo) is not created in the database.
