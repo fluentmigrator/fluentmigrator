@@ -25,6 +25,7 @@ namespace FluentMigrator.Runner.Initialization
         public string ConnectionStringConfigPath { get; set; }
         public IEnumerable<string> Tags { get; set; }
         public bool TransactionPerSession { get; set; }
+        public string ProviderSwitches { get; set; }
 
         public IAnnouncer Announcer
         {

@@ -36,7 +36,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
         {
         }
 
-		private IQuoter Quoter
+		public IQuoter Quoter
 	    {
 			get { return ((OracleGenerator)this.Generator).Quoter; }
 	    }

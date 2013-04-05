@@ -20,6 +20,14 @@ namespace FluentMigrator.Tests.Unit
         {
             get { return 30; }
         }
+
+        public string ProviderSwitches
+        {
+            get
+            {
+                return string.Empty;
+            }
+        }
     }
 
     [TestFixture]

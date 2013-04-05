@@ -8,7 +8,13 @@ namespace FluentMigrator.Runner.Processors.Oracle
         {
             var factory = new OracleDbFactory();
             var connection = factory.CreateConnection(connectionString);
-            return new OracleProcessor(connection, new OracleGenerator(), announcer, options, factory);
+            return new OracleProcessor(connection, new OracleGenerator(Quoted(options.ProviderSwitches)), announcer, options, factory);
+        }
+
+        private bool Quoted(string options)
+        {
+            return !string.IsNullOrEmpty(options) && 
+                options.ToUpper().Contains("QUOTEDIDENTIFIERS=TRUE");
         }
     }
 }
