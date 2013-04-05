@@ -50,6 +50,7 @@ namespace FluentMigrator.Console
         public long Version;
         public string WorkingDirectory;
         public bool TransactionPerSession;
+        public string ProviderSwitches;
 
         public RunnerContext RunnerContext { get; private set;}
 
@@ -159,6 +160,11 @@ namespace FluentMigrator.Console
                                             "tag=",
                                             "Filters the migrations to be run by tag.",
                                             v => { Tags.Add(v); }
+                                            },
+                                        {
+                                            "providerswitches=",
+                                            "Provider specific switches",
+                                            v => { ProviderSwitches = v; }
                                             },
                                         {
                                             "help|h|?",
@@ -285,7 +291,8 @@ namespace FluentMigrator.Console
                 ConnectionStringConfigPath = ConnectionStringConfigPath,
                 ApplicationContext = ApplicationContext,
                 Tags = Tags,
-                TransactionPerSession = TransactionPerSession
+                TransactionPerSession = TransactionPerSession,
+                ProviderSwitches = ProviderSwitches
             };
 
             new TaskExecutor(RunnerContext).Execute();
