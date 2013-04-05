@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -31,8 +32,8 @@ using FluentMigrator.VersionTableInfo;
 namespace FluentMigrator.Runner
 {
     /// <summary>
-    /// Simple API for Fluent Migrations.
-    /// Recommended order of calls:
+    /// Fluent API for Fluent Migrations. Facade for programmatic access to the library.
+    /// <para>Recommended order of calls:</para>
     /// <list type="number">
     /// <item><see cref="Conventions"/> (derive from <see cref="MigrationConventionsBase"/>),
     /// <see cref="VersionTable"/> and other options, if necessary;</item>
@@ -43,29 +44,27 @@ namespace FluentMigrator.Runner
     /// alternatively, <see cref="GetQuery"/> can be used for direct manipulation;</item>
     /// <item><see cref="Dispose"/> to close the connection.</item>
     /// </list>
+    /// <para>By default logs messages to <see cref="TraceSourceAnnouncer.TraceSource"/>.
+    /// To receive messages, use <see cref="TraceListener"/>.</para>
     /// </summary>
     /// <remarks>
     /// Unsupported features:
     /// <list type="number">
-    /// <item>Announcers (tracing with System.Diagnostics is planned);</item>
-    /// <item>Detailed timing and counters (log to structures?);</item>
     /// <item>Silent failing (swallowing and ignoring exceptions is a bad idea; fix your code).</item>
     /// </list>
-    /// TODO: Tracing compatible with System.Diagnostics
-    /// TODO: Logging timing and counters to some structures
     /// </remarks>
     public class Migrator : IMigrationRunner, IDisposable
     {
-        private readonly IAnnouncer _nullAnnouncer = new NullAnnouncer();
         private readonly FacadeRunnerContext _context;
         private IVersionLoader _versionLoader;
         private IMigrationInformationLoader _migrationLoader;
 
         public Migrator()
         {
-            _context = new FacadeRunnerContext(this);
+            _context = new FacadeRunnerContext();
             Conventions = new MigrationConventionsBase();
             VersionTable = new VersionTableMetaData();
+            Announcer = new TraceSourceAnnouncer();
         }
 
         public void Dispose()
@@ -122,6 +121,13 @@ namespace FluentMigrator.Runner
             set { _context.ApplicationContext = value; }
         }
 
+        /// <summary>Object for receiving log messages. Default: <see cref="TraceSourceAnnouncer"/>.</summary>
+        public IAnnouncer Announcer
+        {
+            get { return _context.Announcer; }
+            set { _context.Announcer = value; }
+        }
+
         /// <summary>Only preview migrations without actually executing them.</summary>
         public bool PreviewOnly
         {
@@ -144,6 +150,22 @@ namespace FluentMigrator.Runner
                 if (Processor != null)
                     Processor.Options.Timeout = value;
             }
+        }
+
+        /// <summary>Set announcer which receives log messages.</summary>
+        /// <param name="announcer">New announcer.</param>
+        public Migrator AnnounceTo(IAnnouncer announcer)
+        {
+            Announcer = announcer;
+            return this;
+        }
+
+        /// <summary>Add trace listener which receives log messages.</summary>
+        /// <param name="listener">New listener.</param>
+        public Migrator AnnounceTo(TraceListener listener)
+        {
+            TraceSourceAnnouncer.TraceSource.Listeners.Add(listener);
+            return this;
         }
 
         /// <summary>Load migrations from a named assembly.</summary>
@@ -182,7 +204,7 @@ namespace FluentMigrator.Runner
             if (connectionString == null)
                 throw new ArgumentNullException("connectionString");
 
-            var manager = new ConnectionStringManager(new NetConfigManager(), _nullAnnouncer,
+            var manager = new ConnectionStringManager(new NetConfigManager(), Announcer,
                 connectionString, null, null, engine);
             manager.LoadConnectionString();
             if (manager.ConnectionString != connectionString)
@@ -200,7 +222,7 @@ namespace FluentMigrator.Runner
         /// <param name="configPath">Configuration file path. ".config" extension is optional. If not specified, migration assembly name is used.</param>
         public Migrator OpenNamedConnection(string engine, string connectionStringName = null, string configPath = null)
         {
-            var manager = new ConnectionStringManager(new NetConfigManager(), _nullAnnouncer,
+            var manager = new ConnectionStringManager(new NetConfigManager(), Announcer,
                 connectionStringName, configPath, _context.MigrationAssemblyName, engine);
             manager.LoadConnectionString();
             if (manager.ConnectionString == connectionStringName)
@@ -219,7 +241,7 @@ namespace FluentMigrator.Runner
         public Migrator OpenMachineNamedConnection(string engine, string connectionStringName = null)
         {
             // TODO Other methods opening connection will fallback to machine config. Five levels of fallbacks are bad, but who cares...
-            var manager = new ConnectionStringManager(new NetConfigManager(), _nullAnnouncer,
+            var manager = new ConnectionStringManager(new NetConfigManager(), Announcer,
                 connectionStringName, null, null, engine);
             manager.LoadConnectionString();
 
@@ -232,7 +254,7 @@ namespace FluentMigrator.Runner
         private void Connect()
         {
             Processor = new MigrationProcessorFactoryProvider().GetFactory(_context.Database).Create(
-                _context.Connection, _nullAnnouncer, new ProcessorOptions
+                _context.Connection, Announcer, new ProcessorOptions
                 {
                     PreviewOnly = _context.PreviewOnly,
                     Timeout = _context.Timeout,
@@ -334,8 +356,9 @@ namespace FluentMigrator.Runner
                 ExecuteMigration(migration, context);
                 Processor.CommitTransaction();
             }
-            catch
+            catch (Exception e)
             {
+                Announcer.Error("Failed to process migration query: " + e.Message);
                 Processor.RollbackTransaction();
                 throw;
             }
@@ -344,30 +367,29 @@ namespace FluentMigrator.Runner
         /// <summary>Run the specified migration up.</summary>
         public void Up(IMigration migration)
         {
-            try
-            {
-                Processor.BeginTransaction();
-                ExecuteMigration(migration, migration.GetUpExpressions);
-                Processor.CommitTransaction();
-            }
-            catch
-            {
-                Processor.RollbackTransaction();
-                throw;
-            }
+            Run(migration, "migrating", "migrated", migration.GetUpExpressions);
         }
 
         /// <summary>Run the specified migration down.</summary>
         public void Down(IMigration migration)
         {
+            Run(migration, "reverting", "reverted", migration.GetDownExpressions);
+        }
+
+        private void Run(IMigration migration, string applyingMessage, string appliedMessage, Action<IMigrationContext> getExpressions)
+        {
+            string name = GetMigrationName(migration);
+            Announcer.Heading(string.Format("{0} {1}", name, applyingMessage));
             try
             {
                 Processor.BeginTransaction();
-                ExecuteMigration(migration, migration.GetDownExpressions);
+                ExecuteMigration(migration, getExpressions);
                 Processor.CommitTransaction();
+                Announcer.Say(string.Format("{0} {1}", name, appliedMessage));
             }
-            catch
+            catch (Exception e)
             {
+                Announcer.Error("Failed to run migration: " + e.Message);
                 Processor.RollbackTransaction();
                 throw;
             }
@@ -378,6 +400,7 @@ namespace FluentMigrator.Runner
             var unappliedVersions = GetUnappliedVersions();
             if (unappliedVersions.Any())
                 throw new VersionOrderInvalidException(unappliedVersions);
+            Announcer.Say("Version ordering valid");
         }
 
         public bool IsVersionOrderValid()
@@ -385,9 +408,17 @@ namespace FluentMigrator.Runner
             return !GetUnappliedVersions().Any();
         }
 
-        void IMigrationRunner.ListMigrations()
+        public void ListMigrations()
         {
-            // Never used, as announcer is null
+            long currentVersion = VersionLoader.VersionInfo.Latest();
+            Announcer.Heading("Migrations:");
+            foreach (KeyValuePair<long, IMigrationInfo> migration in _migrationLoader.LoadMigrations())
+            {
+                if (migration.Key == currentVersion)
+                    Announcer.Emphasize(string.Format("* {0} (current)", GetMigrationName(migration.Value)));
+                else
+                    Announcer.Say(string.Format("* {0}", GetMigrationName(migration.Value)));
+            }
         }
 
         /// <summary>Get all migrations. The key of KeyValuePair is wether the migration has been applied.</summary>
@@ -417,6 +448,25 @@ namespace FluentMigrator.Runner
 
         private void ExecuteMigration(object migration, IMigrationContext context)
         {
+            ValidateMigration(migration, context);
+
+            try
+            {
+                foreach (IMigrationExpression expression in context.Expressions)
+                {
+                    Announcer.Say(string.Format("{0} executing", expression));
+                    expression.ExecuteWith(Processor);
+                }
+            }
+            catch (Exception e)
+            {
+                Announcer.Error("Failed to execute migration: " + e.Message);
+                throw;
+            }
+        }
+
+        private void ValidateMigration(object migration, IMigrationContext context)
+        {
             var invalidExpressions = new Dictionary<string, string>();
             foreach (IMigrationExpression expression in context.Expressions)
             {
@@ -428,10 +478,11 @@ namespace FluentMigrator.Runner
             }
 
             if (invalidExpressions.Count > 0)
-                throw new InvalidMigrationException(migration, invalidExpressions);
-
-            foreach (IMigrationExpression expression in context.Expressions)
-                expression.ExecuteWith(Processor);
+            {
+                var ex = new InvalidMigrationException(migration, invalidExpressions);
+                Announcer.Error(ex.Message);
+                throw ex;
+            }
         }
 
         private void ApplyMigrationUp(IMigrationInfo migration)
@@ -439,7 +490,7 @@ namespace FluentMigrator.Runner
             if (VersionLoader.VersionInfo.HasAppliedMigration(migration.Version))
                 return;
 
-            ApplyMigration(migration, () =>
+            ApplyMigration(migration, "migrating", "migrated", () =>
             {
                 ExecuteMigration(migration.Migration, migration.Migration.GetUpExpressions);
                 VersionLoader.UpdateVersionInfo(migration.Version);
@@ -448,16 +499,18 @@ namespace FluentMigrator.Runner
 
         private void ApplyMigrationDown(IMigrationInfo migration)
         {
-            ApplyMigration(migration, () =>
+            ApplyMigration(migration, "reverting", "reverted", () =>
             {
                 ExecuteMigration(migration.Migration, migration.Migration.GetDownExpressions);
                 VersionLoader.DeleteVersion(migration.Version);
             });
         }
 
-        private void ApplyMigration(IMigrationInfo migration, Action applyMigration)
+        private void ApplyMigration(IMigrationInfo migration, string applyingMessage, string appliedMessage, Action applyMigration)
         {
             bool useTransaction = migration.TransactionBehavior == TransactionBehavior.Default;
+            string name = GetMigrationName(migration);
+            Announcer.Heading(string.Format("{0} {1}", name, applyingMessage));
             try
             {
                 if (useTransaction)
@@ -465,9 +518,11 @@ namespace FluentMigrator.Runner
                 applyMigration();
                 if (useTransaction)
                     Processor.CommitTransaction();
+                Announcer.Say(string.Format("{0} {1}", name, appliedMessage));
             }
-            catch
+            catch (Exception e)
             {
+                Announcer.Error("Failed to apply migration:" + e.Message);
                 if (useTransaction)
                     Processor.RollbackTransaction();
                 throw;
@@ -499,23 +554,26 @@ namespace FluentMigrator.Runner
                 && version < VersionLoader.VersionInfo.Latest();
         }
 
+        private static string GetMigrationName(IMigration migration)
+        {
+            return string.Format("{0}", migration.GetType().Name);
+        }
+
+        private static string GetMigrationName(IMigrationInfo migration)
+        {
+            return string.Format("{0}: {1}", migration.Version, migration.Migration.GetType().Name);
+        }
+
         private class FacadeRunnerContext : IRunnerContext
         {
-            private readonly Migrator _facade;
-
-            public FacadeRunnerContext(Migrator facade)
+            public FacadeRunnerContext()
             {
-                _facade = facade;
                 StopWatch = new StopWatch();
                 Timeout = 30;
             }
 
             public IStopWatch StopWatch { get; private set; }
-
-            public IAnnouncer Announcer
-            {
-                get { return _facade._nullAnnouncer; }
-            }
+            public IAnnouncer Announcer { get; set; }
 
             // LoadMigrations methods arguments (only assembly is set, others are never assigned)
 
