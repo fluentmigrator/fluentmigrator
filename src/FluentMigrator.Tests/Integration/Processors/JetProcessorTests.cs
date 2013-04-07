@@ -14,11 +14,13 @@
 // limitations under the License.
 #endregion
 
+using System.Data;
 using System.Data.OleDb;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.Jet;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Jet;
+using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -42,6 +44,76 @@ namespace FluentMigrator.Tests.Integration.Processors
         public void CallingTableExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.TableExists(null, "DoesNotExist").ShouldBeFalse();
+        }
+
+        [Test]
+        public void CallingTableExistsReturnsTrueIfTableExists()
+        {
+            using (var table = new JetTestTable(Processor, "id int"))
+                Processor.TableExists(null, table.Name).ShouldBeTrue();
+        }
+
+        [Test]
+        public void CallingColumnExistsReturnsTrueIfColumnExists()
+        {
+            using (var table = new JetTestTable(Processor, "id int"))
+                Processor.ColumnExists(null, table.Name, "id").ShouldBeTrue();
+        }
+
+        [Test]
+        public void CallingColumnExistsReturnsFalseIfTableDoesNotExist()
+        {
+            Processor.ColumnExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
+        }
+
+        [Test]
+        public void CallingColumnExistsReturnsFalseIfColumnDoesNotExist()
+        {
+            using (var table = new JetTestTable(Processor, "id int"))
+                Processor.ColumnExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
+        }
+
+        [Test]
+        public void CanReadData()
+        {
+            using (var table = new JetTestTable(Processor, "id int"))
+            {
+                AddTestData(table);
+
+                DataSet ds = Processor.Read("SELECT * FROM {0}", table.Name);
+
+                ds.ShouldNotBeNull();
+                ds.Tables.Count.ShouldBe(1);
+                ds.Tables[0].Rows.Count.ShouldBe(3);
+                ds.Tables[0].Rows[2][0].ShouldBe(2);
+            }
+        }
+
+        [Test]
+        public void CanReadTableData()
+        {
+            using (var table = new JetTestTable(Processor, "id int"))
+            {
+                AddTestData(table);
+
+                DataSet ds = Processor.ReadTableData(null, table.Name);
+
+                ds.ShouldNotBeNull();
+                ds.Tables.Count.ShouldBe(1);
+                ds.Tables[0].Rows.Count.ShouldBe(3);
+                ds.Tables[0].Rows[2][0].ShouldBe(2);
+            }
+        }
+
+        private void AddTestData(JetTestTable table)
+        {
+            for (int i = 0; i < 3; i++)
+            {
+                var cmd = table.Connection.CreateCommand();
+                cmd.Transaction = table.Transaction;
+                cmd.CommandText = string.Format("INSERT INTO {0} (id) VALUES ({1})", table.Name, i);
+                cmd.ExecuteNonQuery();
+            }
         }
 
         [TearDown]

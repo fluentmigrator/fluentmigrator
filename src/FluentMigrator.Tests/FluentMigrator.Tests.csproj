@@ -155,6 +155,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="Helpers\FirebirdTestTable.cs" />
+    <Compile Include="Helpers\JetTestTable.cs" />
     <Compile Include="Helpers\OracleTestTable.cs" />
     <Compile Include="Helpers\PostgresTestSequence.cs" />
     <Compile Include="Helpers\PostgresTestTable.cs" />

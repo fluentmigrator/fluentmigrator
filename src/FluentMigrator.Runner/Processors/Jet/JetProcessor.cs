@@ -7,7 +7,7 @@ namespace FluentMigrator.Runner.Processors.Jet
 {
     public class JetProcessor : ProcessorBase
     {
-        private OleDbConnection Connection { get; set; }
+        public OleDbConnection Connection { get; protected set; }
         public OleDbTransaction Transaction { get; protected set; }
 
         public override string DatabaseType
