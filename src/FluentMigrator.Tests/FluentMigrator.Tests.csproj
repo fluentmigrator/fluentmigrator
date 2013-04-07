@@ -175,6 +175,7 @@
     </Compile>
     <Compile Include="Integration\Migrations\TestEmptyMigration.cs" />
     <Compile Include="Integration\Processors\FirebirdProcessorTests.cs" />
+    <Compile Include="Integration\Processors\JetProcessorTests.cs" />
     <Compile Include="Integration\Processors\MySqlProcessorTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCeProcessorTests.cs" />
     <Compile Include="Unit\AnnouncerExtensionsTests.cs" />

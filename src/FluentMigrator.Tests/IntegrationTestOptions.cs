@@ -28,6 +28,12 @@ namespace FluentMigrator.Tests
                 IsEnabled = false
             };
 
+        public static DatabaseServerOptions Jet = new DatabaseServerOptions
+        {
+            ConnectionString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=c:\temp\FMTest.mdb;",
+            IsEnabled = false
+        };
+
         public static DatabaseServerOptions SqlLite = new DatabaseServerOptions
             {
                 ConnectionString = @"Data Source=:memory:;Version=3;New=True;",
