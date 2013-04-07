@@ -2,7 +2,7 @@
 {
     public interface IMigrationProcessorOptions
     {
-        bool PreviewOnly { get; }
-        int Timeout { get; }
+        bool PreviewOnly { get; set; }
+        int Timeout { get; set; }
     }
 }

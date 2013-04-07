@@ -1,4 +1,5 @@
 ﻿#region License
+
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -12,30 +13,31 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
 #endregion
 
 using System;
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace FluentMigrator.Runner
 {
     public class InvalidMigrationException : Exception
     {
-        private readonly IMigration _migration;
+        private readonly object _migration;
         private readonly string _errors;
 
-        public InvalidMigrationException(IMigration migration, string errors)
+        public InvalidMigrationException(object migration, Dictionary<string, string> invalidExpressions)
         {
             _migration = migration;
-            _errors = errors;
+            _errors = invalidExpressions.Aggregate(new StringBuilder(),
+                (sb, kvp) => sb.AppendFormat("{0}: {1}", kvp.Key, kvp.Value).AppendLine()).ToString();
         }
 
         public override string Message
         {
-            get
-            {
-                return string.Format("The migration {0} contained the following Validation Error(s): {1}", _migration.GetType().Name, _errors);
-            }
+            get { return string.Format("The migration {0} contained the following Validation Error(s): {1}", _migration.GetType().Name, _errors); }
         }
     }
 }

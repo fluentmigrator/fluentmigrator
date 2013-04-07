@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Extensions;
 
 namespace FluentMigrator.Runner.Processors
@@ -30,7 +31,7 @@ namespace FluentMigrator.Runner.Processors
 
         static MigrationProcessorFactoryProvider()
         {
-            Assembly assembly = typeof (IMigrationProcessorFactory).Assembly;
+            Assembly assembly = typeof(IMigrationProcessorFactory).Assembly;
 
             List<Type> types = assembly
                 .GetExportedTypes()
@@ -40,24 +41,32 @@ namespace FluentMigrator.Runner.Processors
             var availableMigrationProcessorFactories = new SortedDictionary<string, IMigrationProcessorFactory>();
             foreach (Type type in types)
             {
-                var factory = (IMigrationProcessorFactory) Activator.CreateInstance(type);
+                var factory = (IMigrationProcessorFactory)Activator.CreateInstance(type);
                 availableMigrationProcessorFactories.Add(factory.Name, factory);
             }
 
             MigrationProcessorFactories = availableMigrationProcessorFactories;
         }
 
-        public virtual IMigrationProcessorFactory GetFactory(string name)
+        public IMigrationProcessorFactory GetFactory(string name)
         {
-            return MigrationProcessorFactories
+            var factory = MigrationProcessorFactories
                 .Where(pair => pair.Key.Equals(name, StringComparison.OrdinalIgnoreCase))
                 .Select(pair => pair.Value)
                 .FirstOrDefault();
+            if (factory == null)
+                throw new ProcessorFactoryNotFoundException(string.Format("The provider or dbtype parameter is incorrect. Available choices are {0}: ", ListAvailableProcessorTypes()));
+            return factory;
         }
 
         public string ListAvailableProcessorTypes()
         {
             return string.Join(", ", MigrationProcessorFactories.Keys.ToArray());
+        }
+
+        public IEnumerable<string> ProcessorTypes
+        {
+            get { return MigrationProcessorFactories.Select(kvp => kvp.Key); }
         }
     }
 }

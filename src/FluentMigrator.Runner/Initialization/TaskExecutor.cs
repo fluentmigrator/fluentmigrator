@@ -17,7 +17,6 @@
 #endregion
 
 using System;
-using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Processors;
 
@@ -110,8 +109,6 @@ namespace FluentMigrator.Runner.Initialization
             }
 
             var processorFactory = ProcessorFactoryProvider.GetFactory(RunnerContext.Database);
-            if (processorFactory == null)
-                throw new ProcessorFactoryNotFoundException(string.Format("The provider or dbtype parameter is incorrect. Available choices are {0}: ", ProcessorFactoryProvider.ListAvailableProcessorTypes()));
 
             var processor = processorFactory.Create(manager.ConnectionString, RunnerContext.Announcer, new ProcessorOptions
             {
