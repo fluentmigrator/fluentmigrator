@@ -491,7 +491,7 @@ namespace FluentMigrator.Runner
 
         private void GuardAgainstActiveMigrationScope()
         {
-            if (HasActiveMigrationScope) throw new InvalidOperationException("The runner is allready in an active migration scope.");
+            if (HasActiveMigrationScope) throw new InvalidOperationException("The runner is already in an active migration scope.");
         }
 
         private bool HasActiveMigrationScope
