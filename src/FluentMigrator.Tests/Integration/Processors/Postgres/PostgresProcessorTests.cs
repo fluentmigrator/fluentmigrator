@@ -34,7 +34,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
     [Category("Integration")]
     public class PostgresProcessorTests
     {
-        private readonly PostgresQuoter quoter = new PostgresQuoter();
         public NpgsqlConnection Connection { get; set; }
         public PostgresProcessor Processor { get; set; }
 
@@ -53,154 +52,25 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             Processor.Dispose();
         }
 
-
         [Test]
-        public void CallingSchemaExistsReturnsTrueIfSchemaExists()
+        public void CallingColumnExistsReturnsFalseIfColumnExistsInDifferentSchema()
         {
-            Processor.SchemaExists("public").ShouldBeTrue();
+            using (var table = new PostgresTestTable(Processor, "TestSchema1", "id int"))
+                Processor.ColumnExists("TestSchema2", table.Name, "id").ShouldBeFalse();
         }
 
         [Test]
-        public void CallingSchemaExistsCanAcceptSchemaNameWithSingleQuote()
+        public void CallingConstraintExistsReturnsFalseIfConstraintExistsInDifferentSchema()
         {
-            using (new PostgresTestTable(Processor, "Test'Schema", "id int"))
-                Processor.SchemaExists("Test'Schema").ShouldBeTrue();
+            using (var table = new PostgresTestTable(Processor, "TestSchema1", "id int", "wibble int CONSTRAINT c1 CHECK(wibble > 0)"))
+                Processor.ConstraintExists("TestSchema2", table.Name, "c1").ShouldBeFalse();
         }
 
         [Test]
-        public void CallingSchemaExistsReturnsFalseIfSchemaDoesNotExist()
+        public void CallingTableExistsReturnsFalseIfTableExistsInDifferentSchema()
         {
-            Processor.SchemaExists("DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingTableExistsReturnsTrueIfTableExists()
-        {
-            using (var table = new PostgresTestTable(Processor, null, "id int"))
-                Processor.TableExists(null, table.Name).ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingTableExistsReturnsFalseIfTableDoesNotExist()
-        {
-            Processor.TableExists(null, "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingColumnExistsReturnsTrueIfColumnExists()
-        {
-            using (var table = new PostgresTestTable(Processor, null, "id int"))
-                Processor.ColumnExists(null, table.Name, "id").ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingColumnExistsReturnsFalseIfTableDoesNotExist()
-        {
-            Processor.ColumnExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingColumnExistsReturnsFalseIfColumnDoesNotExist()
-        {
-            using (var table = new PostgresTestTable(Processor, null, "id int"))
-                Processor.ColumnExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingConstraintExistsReturnsTrueIfConstraintExists()
-        {
-            using (var table = new PostgresTestTable(Processor, null, "id int", "wibble int CONSTRAINT c1 CHECK(wibble > 0)"))
-                Processor.ConstraintExists(null, table.Name, "c1").ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingConstraintExistsReturnsFalseIfTableDoesNotExist()
-        {
-            Processor.ConstraintExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingConstraintExistsReturnsFalseIfConstraintDoesNotExist()
-        {
-            using (var table = new PostgresTestTable(Processor, null, "id int"))
-                Processor.ConstraintExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingIndexExistsReturnsTrueIfIndexExists()
-        {
-            using (var table = new PostgresTestTable(Processor, null, "id int"))
-            {
-                var idxName = string.Format("\"idx_{0}\"", quoter.UnQuote(table.Name));
-
-                var cmd = table.Connection.CreateCommand();
-                cmd.Transaction = table.Transaction;
-                cmd.CommandText = string.Format("CREATE INDEX {0} ON {1} (id)", idxName, table.Name);
-                cmd.ExecuteNonQuery();
-
-                Processor.IndexExists(null, table.Name, idxName).ShouldBeTrue();
-            }
-        }
-
-        [Test]
-        public void CallingIndexExistsReturnsFalseIfTableDoesNotExist()
-        {
-            Processor.IndexExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingIndexExistsReturnsFalseIfIndexDoesNotExist()
-        {
-            using (var table = new PostgresTestTable(Processor, null, "id int"))
-                Processor.IndexExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingIndexExistsCanAcceptIndexNameWithSingleQuote()
-        {
-            using (var table = new PostgresTestTable(Processor, null, "id int"))
-            {
-                var idxName = string.Format("\"id'x_{0}\"", quoter.UnQuote(table.Name));
-
-                var cmd = table.Connection.CreateCommand();
-                cmd.Transaction = table.Transaction;
-                cmd.CommandText = string.Format("CREATE INDEX {0} ON {1} (id)", idxName, table.Name);
-                cmd.ExecuteNonQuery();
-
-                Processor.IndexExists(null, table.Name, idxName).ShouldBeTrue();
-            }
-        }
-
-        [Test]
-        public void CallingIndexExistsCanAcceptTableNameWithSingleQuote()
-        {
-            using (var table = new PostgresTestTable(null, "TestSingle'Quote", Processor, "id int"))
-            {
-                var idxName = string.Format("\"idx_{0}\"", quoter.UnQuote(table.Name));
-
-                var cmd = table.Connection.CreateCommand();
-                cmd.Transaction = table.Transaction;
-                cmd.CommandText = string.Format("CREATE INDEX {0} ON {1} (id)", idxName, table.Name);
-                cmd.ExecuteNonQuery();
-
-                Processor.IndexExists(null, table.Name, idxName).ShouldBeTrue();
-            }
-        }
-
-        [Test]
-        public void CallingIndexExistsCanAcceptSchemaNameWithSingleQuote()
-        {
-            using (var table = new PostgresTestTable(Processor, "Test'Schema", "id int"))
-            {
-                var idxName = string.Format("\"idx_{0}\"", quoter.UnQuote(table.Name));
-
-                var cmd = table.Connection.CreateCommand();
-                cmd.Transaction = table.Transaction;
-                cmd.CommandText = string.Format("CREATE INDEX {0} ON {1} (id)", idxName, table.NameWithSchema);
-                cmd.ExecuteNonQuery();
-
-                Processor.IndexExists("Test'Schema", table.Name, idxName).ShouldBeTrue();
-            }
+            using (var table = new PostgresTestTable(Processor, "TestSchema1", "id int"))
+                Processor.TableExists("TestSchema2", table.Name).ShouldBeFalse();
         }
 
         [Test]
@@ -246,191 +116,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             }
         }
 
-        [Test]
-        public void CallingTableExistsReturnsTrueIfTableExistsWithSchema()
-        {
-            using (var table = new PostgresTestTable(Processor, "TestSchema", "id int"))
-                Processor.TableExists("TestSchema", table.Name).ShouldBeTrue();
-        }
 
-        [Test]
-        public void CallingTableExistsReturnsFalseIfTableDoesNotExistWithSchema()
-        {
-            Processor.TableExists("TestSchema", "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingTableExistsReturnsFalseIfTableExistsInDifferentSchema()
-        {
-            using (var table = new PostgresTestTable(Processor, "TestSchema1", "id int"))
-                Processor.TableExists("TestSchema2", table.Name).ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingTableExistsCanAcceptTableNameWithSingleQuote()
-        {
-            using (var table = new PostgresTestTable(null, "TestSingle'Quote", Processor, "id int"))
-                Processor.TableExists(null, table.Name).ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingTableExistsCanAcceptSchemaNameWithSingleQuote()
-        {
-            using (var table = new PostgresTestTable(Processor, "Test'Schema", "id int"))
-                Processor.TableExists("Test'Schema", table.Name).ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingColumnExistsReturnsTrueIfColumnExistsWithSchema()
-        {
-            using (var table = new PostgresTestTable(Processor, "TestSchema", "id int"))
-                Processor.ColumnExists("TestSchema", table.Name, "id").ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingColumnExistsReturnsFalseIfColumnExistsInDifferentSchema()
-        {
-            using (var table = new PostgresTestTable(Processor, "TestSchema1", "id int"))
-                Processor.ColumnExists("TestSchema2", table.Name, "id").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingColumnExistsReturnsFalseIfTableDoesNotExistWithSchema()
-        {
-            Processor.ColumnExists("TestSchema", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingColumnExistsReturnsFalseIfColumnDoesNotExistWithSchema()
-        {
-            using (var table = new PostgresTestTable(Processor, "TestSchema", "id int"))
-                Processor.ColumnExists("TestSchema", table.Name, "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingColumnExistsCanAcceptColumnNameWithSingleQuote()
-        {
-            var columnNameWithSingleQuote = quoter.Quote("i'd");
-            using (var table = new PostgresTestTable(Processor, null, string.Format("{0} int", columnNameWithSingleQuote)))
-                Processor.ColumnExists(null, table.Name, "i'd").ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingColumnExistsCanAcceptTableNameWithSingleQuote()
-        {
-            using (var table = new PostgresTestTable("TestSchema", "TestSingle'Quote", Processor, "id int"))
-                Processor.ColumnExists("TestSchema", table.Name, "id").ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingColumnExistsCanAcceptSchemaNameWithSingleQuote()
-        {
-            using (var table = new PostgresTestTable("Test'Schema", "TestSingle'Quote", Processor, "id int"))
-                Processor.ColumnExists("Test'Schema", table.Name, "id").ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingConstraintExistsCanAcceptConstraintNameWithSingleQuote()
-        {
-            using (var table = new PostgresTestTable(Processor, "TestSchema", "id int", @"wibble int CONSTRAINT ""c'1"" CHECK(wibble > 0)"))
-                Processor.ConstraintExists("TestSchema", table.Name, "c'1").ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingConstraintExistsCanAcceptTableNameWithSingleQuote()
-        {
-            using (var table = new PostgresTestTable("TestSchema", "TestSingle'Quote", Processor, "id int", "wibble int CONSTRAINT c1 CHECK(wibble > 0)"))
-                Processor.ConstraintExists("TestSchema", table.Name, "c1").ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingConstraintExistsCanAcceptSchemaNameWithSingleQuote()
-        {
-            using (var table = new PostgresTestTable(Processor, "Test'Schema", "id int", "wibble int CONSTRAINT c1 CHECK(wibble > 0)"))
-                Processor.ConstraintExists("Test'Schema", table.Name, "c1").ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingConstraintExistsReturnsTrueIfConstraintExistsWithSchema()
-        {
-            using (var table = new PostgresTestTable(Processor, "TestSchema", "id int", "wibble int CONSTRAINT c1 CHECK(wibble > 0)"))
-                Processor.ConstraintExists("TestSchema", table.Name, "c1").ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingConstraintExistsReturnsFalseIfTableDoesNotExistWithSchema()
-        {
-            Processor.ConstraintExists("TestSchema", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingConstraintExistsReturnsFalseIfConstraintExistsInDifferentSchema()
-        {
-            using (var table = new PostgresTestTable(Processor, "TestSchema1", "id int", "wibble int CONSTRAINT c1 CHECK(wibble > 0)"))
-                Processor.ConstraintExists("TestSchema2", table.Name, "c1").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingConstraintExistsReturnsFalseIfConstraintDoesNotExistWithSchema()
-        {
-            using (var table = new PostgresTestTable(Processor, "TestSchema", "id int"))
-                Processor.ConstraintExists("TestSchema", table.Name, "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingIndexExistsReturnsTrueIfIndexExistsWithSchema()
-        {
-            using (var table = new PostgresTestTable(Processor, "TestSchema", "id int"))
-            {
-                var idxName = string.Format("\"idx_{0}\"", quoter.UnQuote(table.Name));
-
-                var cmd = table.Connection.CreateCommand();
-                cmd.Transaction = table.Transaction;
-                cmd.CommandText = string.Format("CREATE INDEX {0} ON {1} (id)", idxName, table.NameWithSchema);
-                cmd.ExecuteNonQuery();
-
-                Processor.IndexExists("TestSchema", table.Name, idxName).ShouldBeTrue();
-            }
-        }
-
-        [Test]
-        public void CallingIndexExistsReturnsFalseIfTableDoesNotExistWithSchema()
-        {
-            Processor.IndexExists("TestSchema", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingIndexExistsReturnsFalseIfIndexDoesNotExistWithSchema()
-        {
-            using (var table = new PostgresTestTable(Processor, "TestSchema", "id int"))
-                Processor.IndexExists("TestSchema", table.Name, "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingSequenceExistsReturnsTrueIfSequenceExists()
-        {
-            using (var sequence = new PostgresTestSequence(Processor, null, "test_sequence"))
-                Processor.SequenceExists(null, "test_sequence").ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingSequenceExistsReturnsFalseIfSequenceDoesNotExist()
-        {
-            Processor.SequenceExists(null, "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingSequenceExistsReturnsTrueIfSequenceExistsWithSchema()
-        {
-            using (var sequence = new PostgresTestSequence(Processor, "test_schema", "test_sequence"))
-                Processor.SequenceExists("test_schema", "test_sequence").ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingSequenceExistsReturnsFalseIfSequenceDoesNotExistWithSchema()
-        {
-            Processor.SequenceExists("test_schema", "DoesNotExist").ShouldBeFalse();
-        }
 
         [Test]
         public void CanReadDataWithSchema()
@@ -465,7 +151,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         }
 
         [Test]
-        public void CallingProcessWithPerformDBOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
+        public void CallingProcessWithPerformDbOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
         {
             var output = new StringWriter();
 

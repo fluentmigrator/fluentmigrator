@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Helpers
 
         }
 
-        public PostgresTestTable(string schemaName, string tableName, PostgresProcessor processor, params string[] columnDefinitions)
+        public PostgresTestTable(string tableName, PostgresProcessor processor, string schemaName, params string[] columnDefinitions)
         {
             _schemaName = schemaName;
 

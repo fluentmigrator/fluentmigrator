@@ -186,7 +186,14 @@
     <Compile Include="Integration\Processors\Jet\JetProcessorTests.cs" />
     <Compile Include="Integration\Processors\MySql\MySqlProcessorTests.cs" />
     <Compile Include="Integration\Processors\Oracle\OracleProcessorTests.cs" />
+    <Compile Include="Integration\Processors\Postgres\PostgresColumnTests.cs" />
+    <Compile Include="Integration\Processors\Postgres\PostgresConstraintTests.cs" />
+    <Compile Include="Integration\Processors\Postgres\PostgresIndexTests.cs" />
     <Compile Include="Integration\Processors\Postgres\PostgresProcessorTests.cs" />
+    <Compile Include="Integration\Processors\Postgres\PostgresSchemaExtensionsTests.cs" />
+    <Compile Include="Integration\Processors\Postgres\PostgresSchemaTests.cs" />
+    <Compile Include="Integration\Processors\Postgres\PostgresSequenceTests.cs" />
+    <Compile Include="Integration\Processors\Postgres\PostgresTableTests.cs" />
     <Compile Include="Integration\Processors\SQLite\SqliteProcessorTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeColumnTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeConstraintTests.cs" />
