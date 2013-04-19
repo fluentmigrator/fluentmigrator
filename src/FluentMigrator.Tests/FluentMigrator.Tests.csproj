@@ -188,7 +188,11 @@
     <Compile Include="Integration\Processors\Oracle\OracleProcessorTests.cs" />
     <Compile Include="Integration\Processors\Postgres\PostgresProcessorTests.cs" />
     <Compile Include="Integration\Processors\SQLite\SqliteProcessorTests.cs" />
+    <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeColumnTests.cs" />
+    <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeConstraintTests.cs" />
+    <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeIndexTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeProcessorTests.cs" />
+    <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeTableTests.cs" />
     <Compile Include="Integration\Processors\SqlServer\SqlServerColumnTests.cs" />
     <Compile Include="Integration\Processors\SqlServer\SqlServerConstraintTests.cs" />
     <Compile Include="Integration\Processors\SqlServer\SqlServerIndexTests.cs" />
