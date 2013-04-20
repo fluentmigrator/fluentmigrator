@@ -185,7 +185,12 @@
     <Compile Include="Integration\Processors\Firebird\FirebirdProcessorTests.cs" />
     <Compile Include="Integration\Processors\Jet\JetProcessorTests.cs" />
     <Compile Include="Integration\Processors\MySql\MySqlProcessorTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleColumnTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleConstraintTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleIndexTests.cs" />
     <Compile Include="Integration\Processors\Oracle\OracleProcessorTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleSchemaTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleTableTests.cs" />
     <Compile Include="Integration\Processors\Postgres\PostgresColumnTests.cs" />
     <Compile Include="Integration\Processors\Postgres\PostgresConstraintTests.cs" />
     <Compile Include="Integration\Processors\Postgres\PostgresIndexTests.cs" />

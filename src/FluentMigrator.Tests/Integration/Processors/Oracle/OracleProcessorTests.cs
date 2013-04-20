@@ -36,113 +36,41 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
             Processor.Dispose();
         }
 
-        #region When working with Table
-
         [Test]
-        public void CallingTableExistsReturnsTrueIfTableExists()
+        public void CallingColumnExistsReturnsFalseIfColumnExistsInDifferentSchema()
         {
-            using (var table = new OracleTestTable(Connection, Quoter, null, Quoter.QuoteColumnName("id") + " int"))
-                Processor.TableExists(null, table.Name).ShouldBeTrue();
+            using (var table = new OracleTestTable(Connection, SchemaName, Quoter.QuoteColumnName("id") + " int"))
+                Processor.ColumnExists("testschema", table.Name, "id").ShouldBeFalse();
         }
 
         [Test]
-        public void CallingTableExistsReturnsFalseIfTableDoesNotExist()
+        public void CallingConstraintExistsReturnsFalseIfConstraintExistsInDifferentSchema()
         {
-            Processor.TableExists(null, "DoesNotExist").ShouldBeFalse();
+            using (var table = new OracleTestTable(Connection, SchemaName, Quoter.QuoteColumnName("id") + " int"))
+            {
+                table.WithUniqueConstraintOn("id");
+                Processor.ConstraintExists("testschema", table.Name, "UC_id").ShouldBeFalse();
+            }
         }
 
         [Test]
-        public void CallingTableExistsReturnsTrueIfTableExistsWithSchema()
+        public void CallingTableExistsReturnsFalseIfTableExistsInDifferentSchema()
         {
-            using (var table = new OracleTestTable(Connection, Quoter, SchemaName, Quoter.QuoteColumnName("id") + " int"))
-                Processor.TableExists(SchemaName, table.Name).ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingTableExistsReturnsFalseIfTableDoesNotExistWithSchema()
-        {
-            Processor.TableExists(SchemaName, "DoesNotExist").ShouldBeFalse();
-        }
-
-        #endregion
-
-        #region When working with Column
-
-        [Test]
-        public void CallingColumnExistsReturnsTrueIfColumnExists()
-        {
-            using (var table = new OracleTestTable(Connection, Quoter, null, Quoter.QuoteColumnName("id") + " int"))
-                Processor.ColumnExists(null, table.Name, "id").ShouldBeTrue();
+            using (var table = new OracleTestTable(Connection, SchemaName, Quoter.QuoteColumnName("id") + " int"))
+                Processor.TableExists("testschema", table.Name).ShouldBeFalse();
         }
 
         [Test]
         public void CallingColumnExistsWithIncorrectCaseReturnsFalseIfColumnExists()
         {
-            using (var table = new OracleTestTable(Connection, Quoter, null, Quoter.QuoteColumnName("id") + " int"))
+            using (var table = new OracleTestTable(Connection, null, Quoter.QuoteColumnName("id") + " int"))
                 Processor.ColumnExists(null, table.Name, "ID").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingColumnExistsReturnsFalseIfTableDoesNotExist()
-        {
-            Processor.ColumnExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingColumnExistsReturnsFalseIfColumnDoesNotExist()
-        {
-            using (var table = new OracleTestTable(Connection, Quoter, null, Quoter.QuoteColumnName("id") + " int"))
-                Processor.ColumnExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingColumnExistsReturnsTrueIfColumnExistsWithSchema()
-        {
-            using (var table = new OracleTestTable(Connection, Quoter, SchemaName, Quoter.QuoteColumnName("id") + " int"))
-                Processor.ColumnExists(SchemaName, table.Name, "id").ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingColumnExistsReturnsFalseIfTableDoesNotExistWithSchema()
-        {
-            Processor.ColumnExists(SchemaName, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
-        }
-
-        [Test]
-        public void CallingColumnExistsReturnsFalseIfColumnDoesNotExistWithSchema()
-        {
-            using (var table = new OracleTestTable(Connection, Quoter, SchemaName, Quoter.QuoteColumnName("id") + " int"))
-                Processor.ColumnExists(SchemaName, table.Name, "DoesNotExist").ShouldBeFalse();
-        }
-
-        #endregion
-
-        #region When working with Constraints
-
-        [Test]
-        public void CallingConstraintExistsReturnsTrueIfConstraintExists()
-        {
-            using (var table = new OracleTestTable(Connection, Quoter, null, Quoter.QuoteColumnName("id") + " int"))
-            {
-                table.WithUniqueConstraintOn("id");
-                Processor.ConstraintExists(null, table.Name, "UC_id").ShouldBeTrue();
-            }
-        }
-
-        [Test]
-        public void CallingConstraintExistsReturnsFalseIfConstraintDoesNotExist()
-        {
-            using (var table = new OracleTestTable(Connection, Quoter, null, Quoter.QuoteColumnName("id") + " int"))
-            {
-                table.WithUniqueConstraintOn("id");
-                Processor.ConstraintExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
-            }
         }
 
         [Test]
         public void CallingConstraintExistsWithIncorrectCaseReturnsFalseIfConstraintExists()
         {
-            using (var table = new OracleTestTable(Connection, Quoter, null, Quoter.QuoteColumnName("id") + " int"))
+            using (var table = new OracleTestTable(Connection, null, Quoter.QuoteColumnName("id") + " int"))
             {
                 table.WithUniqueConstraintOn("id");
                 Processor.ConstraintExists(null, table.Name, "UC_ID").ShouldBeFalse();
@@ -150,53 +78,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         }
 
         [Test]
-        public void CallingConstraintExistsReturnsTrueIfConstraintExistsWithSchema()
-        {
-            using (var table = new OracleTestTable(Connection, Quoter, SchemaName, Quoter.QuoteColumnName("id") + " int"))
-            {
-                table.WithUniqueConstraintOn("id");
-                Processor.ConstraintExists(SchemaName, table.Name, "UC_id").ShouldBeTrue();
-            }
-        }
-
-        [Test]
-        public void CallingConstraintExistsReturnsFalseIfConstraintDoesNotExistWithSchema()
-        {
-            using (var table = new OracleTestTable(Connection, Quoter, SchemaName, Quoter.QuoteColumnName("id") + " int"))
-            {
-                table.WithUniqueConstraintOn("id");
-                Processor.ConstraintExists(SchemaName, table.Name, "DoesNotExist").ShouldBeFalse();
-            }
-        }
-
-        #endregion
-
-        #region When working with Indexes
-
-        [Test]
-        public void CallingIndexExistsReturnsTrueIfIndexExists()
-        {
-            using (var table = new OracleTestTable(Connection, Quoter, null, Quoter.QuoteColumnName("id") + " int"))
-            {
-                table.WithIndexOn("id");
-                Processor.IndexExists(null, table.Name, "UI_id").ShouldBeTrue();
-            }
-        }
-
-        [Test]
-        public void CallingIndexExistsReturnsFalseIfIndexDoesNotExist()
-        {
-            using (var table = new OracleTestTable(Connection, Quoter, null, Quoter.QuoteColumnName("id") + " int"))
-            {
-                table.WithIndexOn("id");
-                Processor.IndexExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
-            }
-        }
-
-        [Test]
         public void CallingIndexExistsWithIncorrectCaseReturnsFalseIfIndexExist()
         {
-            using (var table = new OracleTestTable(Connection, Quoter, null, Quoter.QuoteColumnName("id") + " int"))
+            using (var table = new OracleTestTable(Connection, null, Quoter.QuoteColumnName("id") + " int"))
             {
                 table.WithIndexOn("id");
                 Processor.IndexExists(null, table.Name, "UI_ID").ShouldBeFalse();
@@ -204,48 +88,10 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         }
 
         [Test]
-        public void CallingIndexExistsReturnsTrueIfIndexExistsWithSchema()
-        {
-            using (var table = new OracleTestTable(Connection, Quoter, SchemaName, Quoter.QuoteColumnName("id") + " int"))
-            {
-                table.WithIndexOn("id");
-                Processor.IndexExists(SchemaName, table.Name, "UI_id").ShouldBeTrue();
-            }
-        }
-
-        [Test]
-        public void CallingIndexExistsReturnsFalseIfIndexDoesNotExistWithSchema()
-        {
-            using (var table = new OracleTestTable(Connection, Quoter, SchemaName, Quoter.QuoteColumnName("id") + " int"))
-            {
-                table.WithIndexOn("id");
-                Processor.IndexExists(SchemaName, table.Name, "DoesNotExist").ShouldBeFalse();
-            }
-        }
-
-        #endregion
-
-        #region Schema
-
-        [Test]
-        public void CallingSchemaExistsReturnsTrueIfSchemaExist()
-        {
-            Processor.SchemaExists(SchemaName).ShouldBeTrue();
-        }
-
-        [Test]
-        public void CallingSchemaExistsReturnsFalseIfSchemaDoesNotExis()
-        {
-            Processor.SchemaExists("DoesNotExist").ShouldBeFalse();
-        }
-
-        #endregion
-
-        [Test]
         public void TestQuery()
         {
             string sql = "SELECT SYSDATE FROM " + Quoter.QuoteTableName("DUAL");
-            DataSet ds = new DataSet();
+            var ds = new DataSet();
             using (var command = Factory.CreateCommand(sql, Connection))
             {
                 var adapter = Factory.CreateDataAdapter(command);

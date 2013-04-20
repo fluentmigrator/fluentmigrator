@@ -54,9 +54,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 return false;
 
             if (string.IsNullOrEmpty(schemaName))
-                return Exists("SELECT 1 FROM \"USER_TABLES\" WHERE \"TABLE_NAME\" = '{0}'", tableName);
+                return Exists("SELECT 1 FROM \"USER_TABLES\" WHERE \"TABLE_NAME\" = '{0}'", FormatSqlEscape(tableName));
 
-            return Exists("SELECT 1 FROM \"ALL_TABLES\" WHERE \"OWNER\" = '{0}' AND \"TABLE_NAME\" = '{1}'", schemaName.ToUpper(), tableName);
+            return Exists("SELECT 1 FROM \"ALL_TABLES\" WHERE \"OWNER\" = '{0}' AND \"TABLE_NAME\" = '{1}'", schemaName.ToUpper(), FormatSqlEscape(tableName));
         }
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
@@ -70,9 +70,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 return false;
 
             if (string.IsNullOrEmpty(schemaName))
-                return Exists("SELECT 1 FROM \"USER_TAB_COLUMNS\" WHERE \"TABLE_NAME\" = '{0}' AND \"COLUMN_NAME\" = '{1}'", tableName, columnName);
+                return Exists("SELECT 1 FROM \"USER_TAB_COLUMNS\" WHERE \"TABLE_NAME\" = '{0}' AND \"COLUMN_NAME\" = '{1}'", FormatSqlEscape(tableName), FormatSqlEscape(columnName));
 
-            return Exists("SELECT 1 FROM \"ALL_TAB_COLUMNS\" WHERE \"OWNER\" = '{0}' AND \"TABLE_NAME\" = '{1}' AND \"COLUMN_NAME\" = '{2}'", schemaName.ToUpper(), tableName, columnName);
+            return Exists("SELECT 1 FROM \"ALL_TAB_COLUMNS\" WHERE \"OWNER\" = '{0}' AND \"TABLE_NAME\" = '{1}' AND \"COLUMN_NAME\" = '{2}'", schemaName.ToUpper(), FormatSqlEscape(tableName), FormatSqlEscape(columnName));
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
@@ -88,9 +88,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 return false;
 
             if (String.IsNullOrEmpty(schemaName))
-                return Exists("SELECT 1 FROM \"USER_CONSTRAINTS\" WHERE \"CONSTRAINT_NAME\" = '{0}'", constraintName);
+                return Exists("SELECT 1 FROM \"USER_CONSTRAINTS\" WHERE \"CONSTRAINT_NAME\" = '{0}'",  FormatSqlEscape(constraintName));
 
-            return Exists("SELECT 1 FROM \"ALL_CONSTRAINTS\" WHERE \"OWNER\" = '{0}' AND \"CONSTRAINT_NAME\" = '{1}'", schemaName.ToUpper(), constraintName);
+            return Exists("SELECT 1 FROM \"ALL_CONSTRAINTS\" WHERE \"OWNER\" = '{0}' AND \"CONSTRAINT_NAME\" = '{1}'",  schemaName.ToUpper(),  FormatSqlEscape(constraintName));
         }
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
@@ -106,9 +106,9 @@ namespace FluentMigrator.Runner.Processors.Oracle
                 return false;
 
             if (String.IsNullOrEmpty(schemaName))
-                return Exists("SELECT 1 FROM \"USER_INDEXES\" WHERE \"INDEX_NAME\" = '{0}'", indexName);
+                return Exists("SELECT 1 FROM \"USER_INDEXES\" WHERE \"INDEX_NAME\" = '{0}'",  FormatSqlEscape(indexName));
 
-            return Exists("SELECT 1 FROM \"ALL_INDEXES\" WHERE \"OWNER\" = '{0}' AND \"INDEX_NAME\" = '{1}'", schemaName.ToUpper(), indexName);
+            return Exists("SELECT 1 FROM \"ALL_INDEXES\" WHERE \"OWNER\" = '{0}' AND \"INDEX_NAME\" = '{1}'",  schemaName.ToUpper(),  FormatSqlEscape(indexName));
         }
 
         public override bool SequenceExists(string schemaName, string sequenceName)
@@ -181,6 +181,11 @@ namespace FluentMigrator.Runner.Processors.Oracle
             
             using (var command = Factory.CreateCommand(sql, Connection))
                 command.ExecuteNonQuery();
+        }
+
+        private static string FormatSqlEscape(string sql)
+        {
+            return sql.Replace("'", "''");
         }
     }
 }
