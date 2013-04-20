@@ -182,7 +182,11 @@
     <Compile Include="Integration\Processors\BaseSchemaTests.cs" />
     <Compile Include="Integration\Processors\BaseSequenceTests.cs" />
     <Compile Include="Integration\Processors\BaseTableTests.cs" />
+    <Compile Include="Integration\Processors\Firebird\FirebirdColumnTests.cs" />
+    <Compile Include="Integration\Processors\Firebird\FirebirdConstraintTests.cs" />
+    <Compile Include="Integration\Processors\Firebird\FirebirdIndexTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdProcessorTests.cs" />
+    <Compile Include="Integration\Processors\Firebird\FirebirdTableTests.cs" />
     <Compile Include="Integration\Processors\Jet\JetProcessorTests.cs" />
     <Compile Include="Integration\Processors\MySql\MySqlProcessorTests.cs" />
     <Compile Include="Integration\Processors\Oracle\OracleColumnTests.cs" />
