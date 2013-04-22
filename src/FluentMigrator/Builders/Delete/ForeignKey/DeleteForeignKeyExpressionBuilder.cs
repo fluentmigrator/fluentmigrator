@@ -24,7 +24,7 @@ namespace FluentMigrator.Builders.Delete.ForeignKey
         IDeleteForeignKeyFromTableSyntax,
         IDeleteForeignKeyForeignColumnOrInSchemaSyntax,
         IDeleteForeignKeyToTableSyntax,
-        IDeleteForeignKeyPrimaryColumnSyntax,
+        IDeleteForeignKeyPrimaryColumnOrInSchemaSyntax,
         IDeleteForeignKeyOnTableSyntax,
         IInSchemaSyntax
     {
@@ -59,7 +59,7 @@ namespace FluentMigrator.Builders.Delete.ForeignKey
             return this;
         }
 
-        public IDeleteForeignKeyPrimaryColumnSyntax ToTable(string table)
+        public IDeleteForeignKeyPrimaryColumnOrInSchemaSyntax ToTable(string table)
         {
             Expression.ForeignKey.PrimaryTable = table;
             return this;
@@ -76,6 +76,12 @@ namespace FluentMigrator.Builders.Delete.ForeignKey
                 Expression.ForeignKey.PrimaryColumns.Add(column);
         }
 
+        IDeleteForeignKeyPrimaryColumnSyntax IDeleteForeignKeyPrimaryColumnOrInSchemaSyntax.InSchema(string schema)
+        {
+            Expression.ForeignKey.PrimaryTableSchema = schema;
+            return this;
+        }
+
         IInSchemaSyntax IDeleteForeignKeyOnTableSyntax.OnTable(string foreignTableName)
         {
             Expression.ForeignKey.ForeignTable = foreignTableName;
@@ -85,6 +91,11 @@ namespace FluentMigrator.Builders.Delete.ForeignKey
         void IInSchemaSyntax.InSchema(string schemaName)
         {
             Expression.ForeignKey.ForeignTableSchema = schemaName;
+        }
+
+        IDeleteForeignKeyPrimaryColumnSyntax IDeleteForeignKeyToTableSyntax.ToTable(string table)
+        {
+            return ToTable(table);
         }
     }
 }
