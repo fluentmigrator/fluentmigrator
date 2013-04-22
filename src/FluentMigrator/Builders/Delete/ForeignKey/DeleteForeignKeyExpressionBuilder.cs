@@ -92,10 +92,5 @@ namespace FluentMigrator.Builders.Delete.ForeignKey
         {
             Expression.ForeignKey.ForeignTableSchema = schemaName;
         }
-
-        IDeleteForeignKeyPrimaryColumnSyntax IDeleteForeignKeyToTableSyntax.ToTable(string table)
-        {
-            return ToTable(table);
-        }
     }
 }
