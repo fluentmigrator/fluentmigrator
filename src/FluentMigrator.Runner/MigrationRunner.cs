@@ -189,7 +189,7 @@ namespace FluentMigrator.Runner
                     if (useTransaction) Processor.BeginTransaction();
 
                     ExecuteMigration(migrationInfo.Migration, (m, c) => m.GetUpExpressions(c));
-                    VersionLoader.UpdateVersionInfo(migrationInfo.Version);
+                    VersionLoader.UpdateVersionInfo(migrationInfo.Version, migrationInfo.Description);
 
                     if (useTransaction) Processor.CommitTransaction();
 
