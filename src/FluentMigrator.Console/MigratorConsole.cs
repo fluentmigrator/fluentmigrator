@@ -166,7 +166,7 @@ namespace FluentMigrator.Console
                                             v => { ShowHelp = true; }
                                             },
                                         {
-                                            "transaction-per-session",
+                                            "transaction-per-session|tps",
                                             "Overrides the transaction behavior of migrations, so that all migrations to be executed will run in one transaction.",
                                             v => { TransactionPerSession = true; }
                                             }
