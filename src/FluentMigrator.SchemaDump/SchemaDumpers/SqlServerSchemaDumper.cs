@@ -168,59 +168,52 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
 
         protected virtual DbType GetDbType(int typeNum)
         {
-            switch (typeNum)
+            var types = new Dictionary<int, DbType>()
             {
-                case 34: //'byte[]'
-                    return DbType.Byte;
-                case 35: //'string'
-                    return DbType.String;
-                case 36: //'System.Guid'
-                    return DbType.Guid;
-                case 48: //'byte'
-                    return DbType.Byte;
-                case 52: //'short'
-                    return DbType.Int16;
-                case 56: //'int'
-                    return DbType.Int32;
-                case 58: //'System.DateTime'
-                    return DbType.DateTime;
-                case 59: //'float'
-                    return DbType.Int64;
-                case 60: //'decimal'
-                    return DbType.Decimal;
-                case 61: //'System.DateTime'
-                    return DbType.DateTime;
-                case 62: //'double'
-                    return DbType.Double;
-                case 98: //'object'
-                    return DbType.Object;
-                case 99: //'string'
-                    return DbType.String;
-                case 104: //'bool'
-                    return DbType.Boolean;
-                case 106: //'decimal'
-                    return DbType.Decimal;
-                case 108: //'decimal'
-                    return DbType.Decimal;
-                case 122: //'decimal'
-                    return DbType.Decimal;
-                case 127: //'long'
-                    return DbType.Int64;
-                case 165: //'byte[]'
-                    return DbType.Byte;
-                case 167: //'string'
-                    return DbType.String;
-                case 173: //'byte[]'
-                    return DbType.Byte;
-                case 175: //'string'
-                    return DbType.String;
-                case 189: //'long'
-                    return DbType.Int64;
-                case 231: //'string'
-                case 239: //'string'
-                case 241: //'string'
-                default:
-                    return DbType.String;
+                {34, DbType.Binary},
+                {35, DbType.AnsiString},
+                {36, DbType.Guid},
+                {40, DbType.Date},
+                {41, DbType.Time},
+                {42, DbType.DateTime2},
+                {43, DbType.DateTimeOffset},
+                {48, DbType.Byte},
+                {52, DbType.Int16},
+                {56, DbType.Int32},
+                //{58, DbType.}, //smalldatetime
+                {59, DbType.Single},
+                {60, DbType.Currency},
+                {61, DbType.DateTime},
+                {62, DbType.Double},
+                //{98, DbType.}, //sql_variant
+                {99, DbType.String},
+                {104, DbType.Boolean},
+                {106, DbType.Decimal},
+                //{108, DbType.}, //numeric
+                //{122, DbType.}, //smallmoney
+                {127, DbType.Int64},
+                //{240, DbType.}, //hierarchyid
+                //{240, DbType.}, //geometry
+                //{240, DbType.}, //geography
+                {165, DbType.Binary},
+                {167, DbType.AnsiString},
+                {173, DbType.Binary},
+                {175, DbType.AnsiStringFixedLength},
+                //{189, DbType.}, //Timestamp
+                {231, DbType.String},
+                {239, DbType.StringFixedLength},
+                {241, DbType.Xml}
+                //{231, DbType.} //Sysname
+            };
+
+            DbType value;
+            if (types.TryGetValue(typeNum, out value))
+            {
+                return value;
+            }
+            else
+            {
+                throw new KeyNotFoundException(typeNum + " was not found!");
             }
         }
 
