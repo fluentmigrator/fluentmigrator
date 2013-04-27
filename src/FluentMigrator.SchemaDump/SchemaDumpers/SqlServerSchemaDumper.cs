@@ -107,7 +107,7 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
                 LEFT JOIN sys.default_constraints def ON c.default_object_id = def.object_id
                 LEFT JOIN sys.key_constraints pk ON t.object_id = pk.parent_object_id AND pk.type = 'PK'
                 LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu ON t.name = kcu.TABLE_NAME AND c.name = kcu.COLUMN_NAME AND pk.name = kcu.CONSTRAINT_NAME
-                ORDER BY t.name, c.name";
+                ORDER BY t.name, c.column_id";
             DataSet ds = Read(query);
             DataTable dt = ds.Tables[0];
             IList<TableDefinition> tables = new List<TableDefinition>();
