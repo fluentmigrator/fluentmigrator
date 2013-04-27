@@ -339,13 +339,13 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
                 ms = (from m in d.ForeignColumns
                       where m == dr["FK_Table"].ToString()
                       select m).ToList();
-                if (ms.Count == 0) d.ForeignColumns.Add(dr["FK_Table"].ToString());
+                if (ms.Count == 0) d.ForeignColumns.Add(dr["FK_Column"].ToString());
 
                 // Primary Columns
                 ms = (from m in d.PrimaryColumns
                       where m == dr["PK_Table"].ToString()
                       select m).ToList();
-                if (ms.Count == 0) d.PrimaryColumns.Add(dr["PK_Table"].ToString());
+                if (ms.Count == 0) d.PrimaryColumns.Add(dr["PK_Column"].ToString());
             }
 
             return keys;
