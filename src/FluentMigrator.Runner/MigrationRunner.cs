@@ -357,7 +357,7 @@ namespace FluentMigrator.Runner
                 {
                     if (expression is InsertDataExpression)
                     {
-                        insertTicks += Time(() => expression.ExecuteWith(Processor));
+                        insertTicks += _stopWatch.Time(() => expression.ExecuteWith(Processor)).Ticks;
                         insertCount++;
                     }
                     else
@@ -390,23 +390,7 @@ namespace FluentMigrator.Runner
         private void AnnounceTime(string message, Action action)
         {
             _announcer.Say(message);
-
-            _stopWatch.Start();
-            action();
-            _stopWatch.Stop();
-
-            _announcer.ElapsedTime(_stopWatch.ElapsedTime());
-        }
-
-        private long Time(Action action)
-        {
-            _stopWatch.Start();
-
-            action();
-
-            _stopWatch.Stop();
-
-            return _stopWatch.ElapsedTime().Ticks;
+            _announcer.ElapsedTime(_stopWatch.Time(action));
         }
 
         public void ValidateVersionOrder()
