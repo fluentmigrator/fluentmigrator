@@ -36,6 +36,7 @@ namespace FluentMigrator.Runner
         private IAnnouncer _announcer;
         private IStopWatch _stopWatch;
         private bool _alreadyOutputPreviewOnlyModeWarning;
+        private readonly MigrationValidator _migrationValidator;
 
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         public object ApplicationContext { get; private set; }
@@ -67,6 +68,7 @@ namespace FluentMigrator.Runner
             if (!string.IsNullOrEmpty(runnerContext.WorkingDirectory))
                 Conventions.GetWorkingDirectory = () => runnerContext.WorkingDirectory;
 
+            _migrationValidator = new MigrationValidator(_announcer, Conventions);
             VersionLoader = new VersionLoader(this, _migrationAssembly, Conventions);
             MigrationLoader = new DefaultMigrationInformationLoader(Conventions, _migrationAssembly, runnerContext.Namespace, runnerContext.NestedNamespaces, runnerContext.Tags);
             ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
@@ -328,7 +330,7 @@ namespace FluentMigrator.Runner
             
             getExpressions(migration, context);
 
-            ApplyConventionsToAndValidateExpressions(migration, context.Expressions);
+            _migrationValidator.ApplyConventionsToAndValidateExpressions(migration, context.Expressions);
             ExecuteExpressions(context.Expressions);
         }
 
@@ -339,39 +341,7 @@ namespace FluentMigrator.Runner
             ApplyMigrationDown(migrationInfoAdapter, true);
         }
 
-        /// <summary>
-        /// Validates each migration expression that has implemented the ICanBeValidated interface.
-        /// It throws an InvalidMigrationException exception if validation fails.
-        /// </summary>
-        /// <param name="migration">The current migration being run</param>
-        /// <param name="expressions">All the expressions contained in the up or down action</param>
-        protected void ApplyConventionsToAndValidateExpressions(IMigration migration, IEnumerable<IMigrationExpression> expressions)
-        {
-            var invalidExpressions = new Dictionary<string, string>();
-            foreach (var expression in expressions)
-            {
-                expression.ApplyConventions(Conventions);
-
-                var errors = new Collection<string>();
-                expression.CollectValidationErrors(errors);
-
-                if(errors.Count > 0)
-                    invalidExpressions.Add(expression.GetType().Name, string.Join(" ", errors.ToArray()));
-            }
-
-            if (invalidExpressions.Count > 0)
-            {
-                var errorMessage = DictToString(invalidExpressions, "{0}: {1}");
-                _announcer.Error("The migration {0} contained the following Validation Error(s): {1}", migration.GetType().Name, errorMessage);
-                throw new InvalidMigrationException(migration, errorMessage);
-            }
-        }
-
-        private string DictToString<TKey, TValue>(Dictionary<TKey, TValue> items, string format)
-        {
-            format = String.IsNullOrEmpty(format) ? "{0}='{1}' " : format;
-            return items.Aggregate(new StringBuilder(), (sb, kvp) => sb.AppendFormat(format, kvp.Key, kvp.Value).AppendLine()).ToString();
-        }
+       
 
         /// <summary>
         /// execute each migration expression in the expression collection
