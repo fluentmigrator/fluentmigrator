@@ -37,6 +37,7 @@ namespace FluentMigrator.Runner
         private IStopWatch _stopWatch;
         private bool _alreadyOutputPreviewOnlyModeWarning;
         private readonly MigrationValidator _migrationValidator;
+        private readonly MigrationScopeHandler _migrationScopeHandler;
 
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         public object ApplicationContext { get; private set; }
@@ -50,7 +51,17 @@ namespace FluentMigrator.Runner
         public IProfileLoader ProfileLoader { get; set; }
         public IMigrationConventions Conventions { get; private set; }
         public IList<Exception> CaughtExceptions { get; private set; }
-        public IMigrationScope CurrentScope { get; set; }
+        public IMigrationScope CurrentScope
+        {
+            get
+            {
+                return _migrationScopeHandler.CurrentScope;
+            }
+            set
+            {
+                _migrationScopeHandler.CurrentScope = value;
+            }
+        }
 
         public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
         {
@@ -68,6 +79,7 @@ namespace FluentMigrator.Runner
             if (!string.IsNullOrEmpty(runnerContext.WorkingDirectory))
                 Conventions.GetWorkingDirectory = () => runnerContext.WorkingDirectory;
 
+            _migrationScopeHandler = new MigrationScopeHandler(Processor);
             _migrationValidator = new MigrationValidator(_announcer, Conventions);
             VersionLoader = new VersionLoader(this, _migrationAssembly, Conventions);
             MigrationLoader = new DefaultMigrationInformationLoader(Conventions, _migrationAssembly, runnerContext.Namespace, runnerContext.NestedNamespaces, runnerContext.Tags);
@@ -90,7 +102,7 @@ namespace FluentMigrator.Runner
         {
             var migrations = MigrationLoader.LoadMigrations();
 
-            using (IMigrationScope scope = CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
+            using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
                 foreach (var pair in migrations)
                 {
@@ -113,7 +125,7 @@ namespace FluentMigrator.Runner
         public void MigrateUp(long targetVersion, bool useAutomaticTransactionManagement)
         {
             var migrationInfos = GetUpMigrationsToApply(targetVersion);
-            using (IMigrationScope scope = CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
+            using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
                 foreach (var migrationInfo in migrationInfos)
                 {
@@ -154,7 +166,7 @@ namespace FluentMigrator.Runner
         {
             var migrationInfos = GetDownMigrationsToApply(targetVersion);
 
-            using (IMigrationScope scope = CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
+            using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
                 foreach (var migrationInfo in migrationInfos)
                 {
@@ -207,7 +219,7 @@ namespace FluentMigrator.Runner
 
                 _stopWatch.Start();
 
-                using (IMigrationScope scope = CreateOrWrapMigrationScope(useTransaction))
+                using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useTransaction))
                 {
                     ExecuteMigration(migrationInfo.Migration, (m, c) => m.GetUpExpressions(c));
                     if (migrationInfo.IsAttributed()) VersionLoader.UpdateVersionInfo(migrationInfo.Version);
@@ -231,7 +243,7 @@ namespace FluentMigrator.Runner
 
             _stopWatch.Start();
 
-            using (IMigrationScope scope = CreateOrWrapMigrationScope(useTransaction))
+            using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useTransaction))
             {
                 ExecuteMigration(migrationInfo.Migration, (m, c) => m.GetDownExpressions(c));
                 if (migrationInfo.IsAttributed()) VersionLoader.DeleteVersion(migrationInfo.Version);
@@ -261,7 +273,7 @@ namespace FluentMigrator.Runner
                 if (availableMigrations.TryGetValue(version, out migrationInfo)) migrationsToRollback.Add(migrationInfo);
             }
 
-            using (IMigrationScope scope = CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
+            using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
                 foreach (IMigrationInfo migrationInfo in migrationsToRollback.Take(steps))
                 {
@@ -293,7 +305,7 @@ namespace FluentMigrator.Runner
                 if (availableMigrations.TryGetValue(appliedVersion, out migrationInfo)) migrationsToRollback.Add(migrationInfo);
             }
 
-            using (IMigrationScope scope = CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
+            using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
                 foreach (IMigrationInfo migrationInfo in migrationsToRollback)
                 {
@@ -429,28 +441,9 @@ namespace FluentMigrator.Runner
             return !VersionLoader.VersionInfo.HasAppliedMigration(version) && version < VersionLoader.VersionInfo.Latest();
         }
 
-        private IMigrationScope CreateOrWrapMigrationScope(bool transactional = true)
-        {
-            if (HasActiveMigrationScope) return new NoOpMigrationScope();
-            if (transactional) return BeginScope();
-            return new NoOpMigrationScope();
-        }
-
         public IMigrationScope BeginScope()
-        { 
-            GuardAgainstActiveMigrationScope();
-            CurrentScope = new TransactionalMigrationScope(Processor, ()=> CurrentScope = null);
-            return CurrentScope;
-        }
-
-        private void GuardAgainstActiveMigrationScope()
         {
-            if (HasActiveMigrationScope) throw new InvalidOperationException("The runner is already in an active migration scope.");
-        }
-
-        private bool HasActiveMigrationScope
-        {
-            get { return CurrentScope != null && CurrentScope.IsActive; }
+            return _migrationScopeHandler.BeginScope();
         }
     }
 }
