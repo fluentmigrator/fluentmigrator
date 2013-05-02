@@ -144,7 +144,11 @@
     <Compile Include="Generators\Firebird\FirebirdTruncator.cs" />
     <Compile Include="Generators\SqlServer\SqlServer2012Generator.cs" />
     <Compile Include="IMigrationInformationLoader.cs" />
+    <Compile Include="IMigrationScope.cs" />
+    <Compile Include="IMigrationScopeStarter.cs" />
     <Compile Include="InvalidMigrationException.cs" />
+    <Compile Include="MigrationScopeHandler.cs" />
+    <Compile Include="MigrationValidator.cs" />
     <Compile Include="Processors\Firebird\FirebirdProcessedExpression.cs" />
     <Compile Include="Generators\Firebird\FirebirdQuoter.cs" />
     <Compile Include="Generators\Firebird\FirebirdTypeMap.cs" />
