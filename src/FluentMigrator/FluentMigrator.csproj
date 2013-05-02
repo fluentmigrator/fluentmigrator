@@ -164,6 +164,7 @@
     <Compile Include="Builders\Delete\DeleteDataExpressionBuilder.cs" />
     <Compile Include="Builders\Delete\ForeignKey\IDeleteForeignKeyForeignColumnOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Delete\ForeignKey\IDeleteForeignKeyOnTableSyntax.cs" />
+    <Compile Include="Builders\Delete\ForeignKey\IDeleteForeignKeyPrimaryColumnOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Delete\IDeleteDataOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Delete\IDeleteDataSyntax.cs" />
     <Compile Include="Builders\Delete\Index\IDeleteIndexOnColumnOrInSchemaSyntax.cs" />
