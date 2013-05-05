@@ -159,6 +159,7 @@
     <Compile Include="Helpers\OracleTestTable.cs" />
     <Compile Include="Helpers\PostgresTestSequence.cs" />
     <Compile Include="Helpers\PostgresTestTable.cs" />
+    <Compile Include="Helpers\SqliteTestTable.cs" />
     <Compile Include="Helpers\SqlServerCeTestTable.cs" />
     <Compile Include="Helpers\SqlServerTestSequence.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
@@ -179,6 +180,7 @@
     <Compile Include="Integration\Processors\JetProcessorTests.cs" />
     <Compile Include="Integration\Processors\MySqlProcessorTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCeProcessorTests.cs" />
+    <Compile Include="Integration\SchemaDump\SQLiteSchemaDumpTests.cs" />
     <Compile Include="Unit\AnnouncerExtensionsTests.cs" />
     <Compile Include="Unit\Announcers\AnnouncerTests.cs" />
     <Compile Include="Integration\Migrations\TestUpdateAllRowsMigration.cs" />
