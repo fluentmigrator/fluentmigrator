@@ -11,8 +11,8 @@ namespace FluentMigrator.Runner.Generators.Oracle
     {
         private const int OracleObjectNameMaxLength = 30;
 
-        public OracleColumn()
-            : base(new OracleTypeMap(), new OracleQuoter())
+        public OracleColumn(IQuoter quoter)
+            : base(new OracleTypeMap(), quoter)
         {
             int a = ClauseOrder.IndexOf(FormatDefaultValue);
             int b = ClauseOrder.IndexOf(FormatNullable);
@@ -33,6 +33,28 @@ namespace FluentMigrator.Runner.Generators.Oracle
             }
             return string.Empty;
         }
+
+		protected override string FormatNullable(ColumnDefinition column)
+		{
+			//Creates always return Not Null unless is nullable is true
+			if (column.ModificationType == ColumnModificationType.Create) {
+				if (column.IsNullable.HasValue && column.IsNullable.Value) {
+					return string.Empty;
+				}
+				else {
+					return "NOT NULL";
+				}
+			}
+
+			//alter only returns "Not Null" if IsNullable is explicitly set 
+			if (column.IsNullable.HasValue) {
+				return column.IsNullable.Value ? string.Empty : "NOT NULL";
+			}
+			else {
+				return String.Empty;
+			}
+
+		}
 
         protected override string FormatSystemMethods(SystemMethods systemMethod)
         {
@@ -65,7 +87,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
                         "Oracle does not support length of primary key name greater than {0} characters. Reduce length of primary key name. ({1})",
                         OracleObjectNameMaxLength, primaryKeyName));
 
-            var result = string.Format("CONSTRAINT {0} ", Quoter.QuoteIndexName(primaryKeyName));
+            var result = string.Format("CONSTRAINT {0} ", Quoter.QuoteConstraintName(primaryKeyName));
             return result;
         }
     }
