@@ -23,7 +23,7 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
-    public class DeleteColumnExpression : MigrationExpressionBase
+    public class DeleteColumnExpression : MigrationExpressionBase, ICanBeConventional
     {
         public DeleteColumnExpression()
         {
@@ -33,6 +33,12 @@ namespace FluentMigrator.Expressions
         public virtual string SchemaName { get; set; }
         public virtual string TableName { get; set; }
         public ICollection<string> ColumnNames { get; set; }
+
+        public override void ApplyConventions(IMigrationConventions conventions)
+        {
+            if (String.IsNullOrEmpty(SchemaName))
+                SchemaName = conventions.GetDefaultSchema();
+        }
 
         public override void CollectValidationErrors(ICollection<string> errors)
         {

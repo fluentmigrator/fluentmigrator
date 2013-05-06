@@ -22,7 +22,7 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
-    public class UpdateDataExpression : MigrationExpressionBase
+    public class UpdateDataExpression : MigrationExpressionBase, ICanBeConventional
     {
         public string SchemaName { get; set; }
         public string TableName { get; set; }
@@ -30,6 +30,12 @@ namespace FluentMigrator.Expressions
         public List<KeyValuePair<string, object>> Set { get; set; }
         public List<KeyValuePair<string, object>> Where { get; set; }
         public bool IsAllRows { get; set; }
+
+        public override void ApplyConventions(IMigrationConventions conventions)
+        {
+            if (String.IsNullOrEmpty(SchemaName))
+                SchemaName = conventions.GetDefaultSchema();
+        }
 
         public override void CollectValidationErrors(ICollection<string> errors)
         {
