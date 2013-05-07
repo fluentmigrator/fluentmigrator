@@ -5,7 +5,7 @@
     using NUnit.Framework;
     using NUnit.Should;
 
-    public class OracleCreateSequenceTests
+    public class OracleSequenceTests
     {
         private OracleGenerator generator;
 	    private OracleGenerator quotedIdentiferGenerator;

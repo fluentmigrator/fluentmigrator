@@ -7,7 +7,7 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.MySql
 {
-    public class MySqlAlterTableTestscs : BaseTableAlterTests
+    public class MySqlAlterTableTests : BaseTableAlterTests
     {
         private MySqlGenerator _generator;
 

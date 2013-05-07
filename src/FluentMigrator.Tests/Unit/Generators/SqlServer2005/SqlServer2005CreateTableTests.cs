@@ -6,7 +6,7 @@ using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
 using NUnit.Should;
 
-namespace FluentMigrator.Tests.Unit.Generators.SqlServer
+namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 {
     public class SqlServer2005CreateTableTests : GeneratorTestBase
     {
