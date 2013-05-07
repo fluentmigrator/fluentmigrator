@@ -4,7 +4,7 @@ using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
 using NUnit.Should;
 
-namespace FluentMigrator.Tests.Unit.Generators.SqlServer
+namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
 {
     public class SqlServer2000Data : BaseDataTests
     {

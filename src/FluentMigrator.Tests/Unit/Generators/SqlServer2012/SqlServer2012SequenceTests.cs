@@ -25,7 +25,7 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2012
 {
     [TestFixture]
-    public class SqlServer2012GeneratorTests
+    public class SqlServer2012SequenceTests
     {
     
         private IMigrationGenerator generator;

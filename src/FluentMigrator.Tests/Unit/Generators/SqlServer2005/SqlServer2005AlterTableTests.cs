@@ -6,7 +6,7 @@ using System.Data;
 using FluentMigrator.Model;
 using FluentMigrator.Expressions;
 
-namespace FluentMigrator.Tests.Unit.Generators.SqlServer
+namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 {
     public class SqlServer2005AlterTableTests : GeneratorTestBase
     {
