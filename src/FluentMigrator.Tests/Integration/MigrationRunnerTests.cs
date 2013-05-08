@@ -780,11 +780,13 @@ namespace FluentMigrator.Tests.Integration
                                 {
                                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
-                                    runner.Up(new TestCreateSequence());
+                                    runner.Up(new TestCreateSchema());
+                                    runner.Up(new TestCreateSequenceWithSchema());
                                     processor.SequenceExists("TestSchema", "TestSequence");
 
-                                    runner.Down(new TestCreateSequence());
+                                    runner.Down(new TestCreateSequenceWithSchema());
                                     processor.SequenceExists("TestSchema", "TestSequence").ShouldBeFalse();
+                                    runner.Down(new TestCreateSchema());
                                 };
 
             ExecuteWithSqlServer2012(
