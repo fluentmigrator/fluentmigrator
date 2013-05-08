@@ -35,5 +35,7 @@ namespace FluentMigrator
         Func<Model.ConstraintDefinition, string> GetConstraintName { get; set; }
         Func<Type, bool> TypeHasTags { get; set; }
         Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags { get; set; }
+        Func<Type,string,string> GetAutoScriptUpName {get;set;}
+        Func<Type, string, string> GetAutoScriptDownName { get; set; }
     }
 }

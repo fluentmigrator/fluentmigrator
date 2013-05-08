@@ -136,5 +136,31 @@ namespace FluentMigrator.Infrastructure
 
             return tags.Any() && tagsToMatch.All(t => tags.Any(t.Equals));
         }
+
+        public static string GetAutoScriptUpName(Type type, string databaseType)
+        {
+            if (TypeIsMigration(type))
+            {
+                var version = type.GetOneAttribute<MigrationAttribute>().Version;
+                return string.Format("Scripts.Up.{0}_{1}_{2}.sql"
+                        , version
+                        , type.Name
+                        , databaseType);
+            }
+            return string.Empty;
+        }
+
+        public static string GetAutoScriptDownName(Type type, string databaseType)
+        {
+            if (TypeIsMigration(type))
+            {
+                var version = type.GetOneAttribute<MigrationAttribute>().Version;
+                return string.Format("Scripts.Down.{0}_{1}_{2}.sql"
+                        , version
+                        , type.Name
+                        , databaseType);
+            }
+            return string.Empty;
+        }
     }
 }
