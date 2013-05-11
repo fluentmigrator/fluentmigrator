@@ -170,6 +170,14 @@ namespace FluentMigrator.Tests.Unit
         {
             [Test]
             [Category("Tagging")]
+            public void WhenTypeHasTagAttributeButNoTagsPassedInReturnsFalse()
+            {
+                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithUk), new string[] { })
+                    .ShouldBeFalse();
+            }
+
+            [Test]
+            [Category("Tagging")]
             public void WhenTypeHasTagAttributeWithNoTagNamesReturnsFalse()
             {
                 DefaultMigrationConventions.TypeHasMatchingTags(typeof(HasTagAttributeWithNoTagNames), new string[] { })
