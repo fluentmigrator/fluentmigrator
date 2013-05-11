@@ -500,5 +500,29 @@ namespace FluentMigrator.Tests.Unit
             _announcer.Verify(a => a.Error(It.Is<string>(s => s.Contains("CreateColumnExpression: The table's name cannot be null or an empty string. The column's name cannot be null or an empty string. The column does not have a type defined."))));
         }
 
+        [Test]
+        public void CanLoadCustomMigrationConventions()
+        {
+            Assert.That(_runner.Conventions, Is.TypeOf<CustomMigrationConventions>());
+            Assert.That(_runner.Conventions.GetWorkingDirectory.Invoke(), Is.EqualTo("testwd"));
+        }
+
+        [Test]
+        public void CanLoadDefaultMigrationConventionsIfNoCustomConventionsAreSpecified()
+        {
+            var asm = "s".GetType().Assembly;
+            var runner = new MigrationRunner(asm, _runnerContextMock.Object, _processorMock.Object);
+            Assert.That(runner.Conventions, Is.TypeOf<MigrationConventions>());
+            Assert.That(runner.Conventions.GetDefaultSchema.Invoke(), Is.Null);
+        }
+
+    }
+
+    public class CustomMigrationConventions : MigrationConventions
+    {
+        public CustomMigrationConventions()
+        {
+            GetWorkingDirectory = () => "testwd";
+        }
     }
 }
