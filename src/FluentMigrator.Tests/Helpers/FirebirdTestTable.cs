@@ -23,7 +23,7 @@ namespace FluentMigrator.Tests.Helpers
             Init(processor, columnDefinitions);
         }
 
-        public FirebirdTestTable(string schemaName, string tableName, FirebirdProcessor processor, params string[] columnDefinitions)
+        public FirebirdTestTable(string tableName, FirebirdProcessor processor, string schemaName, params string[] columnDefinitions)
         {
             this.processor = processor;
             Name = tableName;

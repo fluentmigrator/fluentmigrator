@@ -24,7 +24,7 @@ using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
 using NUnit.Should;
 
-namespace FluentMigrator.Tests.Integration.Processors
+namespace FluentMigrator.Tests.Integration.Processors.Jet
 {
     [TestFixture]
     [Category("Integration")]

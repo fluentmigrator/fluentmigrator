@@ -17,6 +17,15 @@ namespace FluentMigrator.Tests.Helpers
         private List<string> constraints = new List<string>();
         private List<string> indexies = new List<string>();
 
+        public SqlServerCeTestTable(string table, SqlServerCeProcessor processor, params string[] columnDefinitions)
+        {
+            Connection = (SqlCeConnection)processor.Connection;
+            Quoter = new SqlServerQuoter();
+
+            Name = table;
+            Create(columnDefinitions);
+        }
+
         public SqlServerCeTestTable(SqlServerCeProcessor processor, params string[] columnDefinitions)
         {
             Connection = (SqlCeConnection)processor.Connection;
@@ -53,8 +62,13 @@ namespace FluentMigrator.Tests.Helpers
 
         public void WithUniqueConstraintOn(string column)
         {
+            WithUniqueConstraintOn(column, "UC_" + column);
+        }
+
+        public void WithUniqueConstraintOn(string column, string name)
+        {
             var sb = new StringBuilder();
-            var constraintName = Quoter.Quote("UC_" + column);
+            var constraintName = Quoter.Quote(name);
             constraints.Add(constraintName);
             sb.Append(string.Format("ALTER TABLE {0} ADD CONSTRAINT {1} UNIQUE ({2})", Quoter.QuoteTableName(Name), constraintName, column));
             using (var command = new SqlCeCommand(sb.ToString(), Connection))
@@ -63,8 +77,13 @@ namespace FluentMigrator.Tests.Helpers
 
         public void WithIndexOn(string column)
         {
+            WithIndexOn(column, "UI_" + column);
+        }
+
+        public void WithIndexOn(string column, string name)
+        {
             var sb = new StringBuilder();
-            var indexName = Quoter.QuoteIndexName("UI_" + column);
+            var indexName = Quoter.QuoteIndexName(name);
             indexies.Add(indexName);
             sb.Append(string.Format("CREATE UNIQUE INDEX {0} ON {1} ({2})", indexName, Quoter.QuoteTableName(Name), column));
             using (var command = new SqlCeCommand(sb.ToString(), Connection))
