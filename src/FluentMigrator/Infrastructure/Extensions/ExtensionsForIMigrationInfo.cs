@@ -1,5 +1,4 @@
 ﻿#region License
-
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,19 +12,14 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 #endregion
-
-namespace FluentMigrator.Infrastructure
+namespace FluentMigrator.Infrastructure.Extensions
 {
-    public interface IMigrationInfo
+    public static class ExtensionsForIMigrationInfo
     {
-        long Version { get; }
-        string Description { get; }
-        TransactionBehavior TransactionBehavior { get; }
-        IMigration Migration { get; }
-        object Trait(string name);
-        bool HasTrait(string name);
-        string GetName();
+         public static bool IsAttributed(this IMigrationInfo migrationInfo)
+         {
+             return !(migrationInfo is NonAttributedMigrationToMigrationInfoAdapter);
+         }
     }
 }

@@ -79,6 +79,12 @@ namespace FluentMigrator.NAnt
         [TaskAttribute("preview")]
         public bool Preview { get; set; }
 
+        [TaskAttribute("verbose")]
+        public bool Verbose { get; set; }
+
+        [TaskAttribute("transaction-per-session")]
+        public bool TransactionPerSession { get; set; }
+
         protected override void ExecuteTask()
         {
             IAnnouncer announcer = new ConsoleAnnouncer
@@ -118,7 +124,8 @@ namespace FluentMigrator.NAnt
                                         WorkingDirectory = WorkingDirectory,
                                         Profile = Profile,
                                         Tags = Tags.ToTags(),
-                                        Timeout = Timeout
+                                        Timeout = Timeout,
+                                        TransactionPerSession = TransactionPerSession
                                     };
 
             try

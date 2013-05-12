@@ -59,6 +59,7 @@ namespace FluentMigrator.Tests.Unit
 
             _announcer = new Mock<IAnnouncer>();
             _stopWatch = new Mock<IStopWatch>();
+            _stopWatch.Setup(x => x.Time(It.IsAny<Action>())).Returns(new TimeSpan(1)).Callback((Action a) => a.Invoke());
 
             var options = new ProcessorOptions
                             {
@@ -185,17 +186,9 @@ namespace FluentMigrator.Tests.Unit
         {
             _processorMock.Setup(x => x.Process(It.IsAny<CreateTableExpression>())).Throws(new Exception("Oops"));
 
-            _announcer.Setup(x => x.Error(It.IsRegex(containsAll("Oops"))));
-
-            try
-            {
-                _runner.Up(new TestMigration());
-            }
-            catch (Exception)
-            {
-            }
-
-            _announcer.VerifyAll();
+            var exception = Assert.Throws<Exception>(() => _runner.Up(new TestMigration()));
+            
+            Assert.That(exception.Message, Is.StringContaining("Oops"));
         }
 
         [Test]

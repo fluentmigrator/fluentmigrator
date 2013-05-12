@@ -25,6 +25,7 @@ namespace FluentMigrator.Runner
         void Start();
         void Stop();
         TimeSpan ElapsedTime();
+        TimeSpan Time(Action action);
     }
 
     public class StopWatch : IStopWatch
@@ -47,6 +48,17 @@ namespace FluentMigrator.Runner
         public TimeSpan ElapsedTime()
         {
             return _endTime - _startTime;
+        }
+
+        public TimeSpan Time(Action action)
+        {
+            Start();
+
+            action();
+
+            Stop();
+
+            return ElapsedTime();
         }
     }
 }

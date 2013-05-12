@@ -18,3 +18,11 @@ Latest build status: !http://teamcity.codebetter.com/app/rest/builds/buildType:(
 h2. Powered by
 
 <img src="http://www.jetbrains.com/img/logos/logo_resharper_small.gif" width="142" height="29" alt="ReSharper">
+
+h2. Contributors
+
+A "long list":https://github.com/schambers/fluentmigrator/wiki/ContributorList of everyone that has contributed to FluentMigrator. Thanks for all the Pull Requests!
+
+h2. License
+
+"Apache 2 License":https://github.com/schambers/fluentmigrator/blob/master/LICENSE.txt

@@ -91,6 +91,8 @@ namespace FluentMigrator.MSBuild
 
         public string OutputFilename { get; set; }
 
+        public bool TransactionPerSession { get; set; }
+
         public override bool Execute()
         {
 
@@ -146,7 +148,8 @@ namespace FluentMigrator.MSBuild
                 WorkingDirectory = WorkingDirectory,
                 Profile = Profile,
                 Tags = Tags.ToTags(),
-                Timeout = Timeout
+                Timeout = Timeout,
+                TransactionPerSession = TransactionPerSession
             };
 
             Log.LogMessage(MessageImportance.Low, "Executing Migration Runner");
