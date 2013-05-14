@@ -28,7 +28,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             string tableName = "NewTable";
             CreateTableExpression expression = GetCreateTableExpression(tableName);
             string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"NewTable\" (\"ColumnName1\" BLOB SUB_TYPE TEXT NOT NULL, \"ColumnName2\" INTEGER NOT NULL)");
+            sql.ShouldBe("CREATE TABLE \"NewTable\" (\"ColumnName1\" VARCHAR(255) CHARACTER SET UTF8 NOT NULL, \"ColumnName2\" INTEGER NOT NULL)");
         }
 
         [Test]
@@ -38,7 +38,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             CreateTableExpression expression = GetCreateTableExpression(tableName);
             expression.SchemaName = "wibble";
             string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"NewTable\" (\"ColumnName1\" BLOB SUB_TYPE TEXT NOT NULL, \"ColumnName2\" INTEGER NOT NULL)");
+            sql.ShouldBe("CREATE TABLE \"NewTable\" (\"ColumnName1\" VARCHAR(255) CHARACTER SET UTF8 NOT NULL, \"ColumnName2\" INTEGER NOT NULL)");
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             CreateTableExpression expression = GetCreateTableExpression(tableName);
             expression.Columns[0].IsPrimaryKey = true;
             string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"NewTable\" (\"ColumnName1\" BLOB SUB_TYPE TEXT NOT NULL, \"ColumnName2\" INTEGER NOT NULL, PRIMARY KEY (\"ColumnName1\"))");
+            sql.ShouldBe("CREATE TABLE \"NewTable\" (\"ColumnName1\" VARCHAR(255) CHARACTER SET UTF8 NOT NULL, \"ColumnName2\" INTEGER NOT NULL, PRIMARY KEY (\"ColumnName1\"))");
         }
 
         [Test]
@@ -59,7 +59,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.Columns[0].IsPrimaryKey = true;
             expression.Columns[0].PrimaryKeyName = "PK_NewTable";
             string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"NewTable\" (\"ColumnName1\" BLOB SUB_TYPE TEXT NOT NULL, \"ColumnName2\" INTEGER NOT NULL, CONSTRAINT \"PK_NewTable\" PRIMARY KEY (\"ColumnName1\"))");
+            sql.ShouldBe("CREATE TABLE \"NewTable\" (\"ColumnName1\" VARCHAR(255) CHARACTER SET UTF8 NOT NULL, \"ColumnName2\" INTEGER NOT NULL, CONSTRAINT \"PK_NewTable\" PRIMARY KEY (\"ColumnName1\"))");
         }
 
         [Test]
@@ -69,7 +69,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             CreateTableExpression expression = GetCreateTableExpression(tableName);
             expression.Columns[0].DefaultValue = "abc";
             string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"NewTable\" (\"ColumnName1\" BLOB SUB_TYPE TEXT DEFAULT 'abc' NOT NULL, \"ColumnName2\" INTEGER NOT NULL)");
+            sql.ShouldBe("CREATE TABLE \"NewTable\" (\"ColumnName1\" VARCHAR(255) CHARACTER SET UTF8 DEFAULT 'abc' NOT NULL, \"ColumnName2\" INTEGER NOT NULL)");
         }
 
         [Test]
@@ -80,7 +80,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.Columns[0].DefaultValue = null;
             var sql = generator.Generate(expression);
             sql.ShouldBe(
-                "CREATE TABLE \"NewTable\" (\"ColumnName1\" BLOB SUB_TYPE TEXT DEFAULT NULL NOT NULL, \"ColumnName2\" INTEGER NOT NULL)");
+                "CREATE TABLE \"NewTable\" (\"ColumnName1\" VARCHAR(255) CHARACTER SET UTF8 DEFAULT NULL NOT NULL, \"ColumnName2\" INTEGER NOT NULL)");
 
         }
 
@@ -92,7 +92,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.Columns[0].IsPrimaryKey = true;
             expression.Columns[1].IsPrimaryKey = true;
             string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"NewTable\" (\"ColumnName1\" BLOB SUB_TYPE TEXT NOT NULL, \"ColumnName2\" INTEGER NOT NULL, PRIMARY KEY (\"ColumnName1\", \"ColumnName2\"))");
+            sql.ShouldBe("CREATE TABLE \"NewTable\" (\"ColumnName1\" VARCHAR(255) CHARACTER SET UTF8 NOT NULL, \"ColumnName2\" INTEGER NOT NULL, PRIMARY KEY (\"ColumnName1\", \"ColumnName2\"))");
         }
 
         [Test]
@@ -104,7 +104,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.Columns[0].PrimaryKeyName = "wibble";
             expression.Columns[1].IsPrimaryKey = true;
             string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"NewTable\" (\"ColumnName1\" BLOB SUB_TYPE TEXT NOT NULL, \"ColumnName2\" INTEGER NOT NULL, CONSTRAINT \"wibble\" PRIMARY KEY (\"ColumnName1\", \"ColumnName2\"))");
+            sql.ShouldBe("CREATE TABLE \"NewTable\" (\"ColumnName1\" VARCHAR(255) CHARACTER SET UTF8 NOT NULL, \"ColumnName2\" INTEGER NOT NULL, CONSTRAINT \"wibble\" PRIMARY KEY (\"ColumnName1\", \"ColumnName2\"))");
         }
 
         [Test]
@@ -168,7 +168,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.TableName = tableName;
 
             string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"NewTable\" ADD \"NewColumn\" VARCHAR(5) NOT NULL");
+            sql.ShouldBe("ALTER TABLE \"NewTable\" ADD \"NewColumn\" VARCHAR(5) CHARACTER SET UTF8 NOT NULL");
         }
         
         [Test]

@@ -77,7 +77,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             CheckTable(tableName);
-            return Exists("select rdb$index_name from rdb$indices where (rdb$relation_name = '{0}') and (rdb$index_name = '{1}') and (rdb$unique_flag IS NULL) and (rdb$foreign_key IS NULL)", FormatToSafeName(tableName), FormatToSafeName(indexName));
+            return Exists("select rdb$index_name from rdb$indices where (rdb$relation_name = '{0}') and (rdb$index_name = '{1}') and (rdb$system_flag <> 1 OR rdb$system_flag IS NULL) and (rdb$foreign_key IS NULL)", FormatToSafeName(tableName), FormatToSafeName(indexName));
         }
 
         public override bool SequenceExists(string schemaName, string sequenceName)
@@ -141,10 +141,12 @@ namespace FluentMigrator.Runner.Processors.Firebird
             base.CommitTransaction();
             EnsureConnectionIsClosed();
             ClearLocks();
+            processedExpressions.Clear();
         }
 
         public override void RollbackTransaction()
         {
+           
             base.RollbackTransaction();
 
             if (FBOptions.UndoEnabled && processedExpressions != null && processedExpressions.Count > 0)
