@@ -145,6 +145,31 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public void CanCreatePrimaryKey()
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
+            expression.Constraint.TableName = "ConstraintTable";
+            expression.Constraint.ConstraintName = "PK_Name";
+            expression.Constraint.Columns.Add("column1");
+
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("ALTER TABLE \"public\".\"ConstraintTable\" ADD CONSTRAINT \"PK_Name\" PRIMARY KEY (\"column1\")");
+        }
+
+        [Test]
+        public void CanCreatePrimaryKeyWithSchema()
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
+            expression.Constraint.SchemaName = "Schema";
+            expression.Constraint.TableName = "ConstraintTable";
+            expression.Constraint.ConstraintName = "PK_Name";
+            expression.Constraint.Columns.Add("column1");
+
+            string sql = generator.Generate(expression);
+            sql.ShouldBe("ALTER TABLE \"Schema\".\"ConstraintTable\" ADD CONSTRAINT \"PK_Name\" PRIMARY KEY (\"column1\")");
+        }
+
+        [Test]
         public void CanCreateUniqueConstraint()
         {
             var expression = new CreateConstraintExpression(ConstraintType.Unique);
