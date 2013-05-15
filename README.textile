@@ -16,7 +16,6 @@ The build is generously hosted and run on the "CodeBetter TeamCity":http://codeb
 Latest build status: !http://teamcity.codebetter.com/app/rest/builds/buildType:(id:bt82)/statusIcon!:http://teamcity.codebetter.com/viewType.html?buildTypeId=bt82&guest=1
 
 Our Mono build is hosted on Travis CI.
-
 Latest Mono build status: !https://secure.travis-ci.org/schambers/fluentmigrator.png!:http://travis-ci.org/schambers/fluentmigrator
 
 h2. Powered by
