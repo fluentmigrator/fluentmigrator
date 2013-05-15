@@ -218,9 +218,6 @@
     <Compile Include="Integration\Processors\SqlServer\SqlServerSchemaTests.cs" />
     <Compile Include="Integration\Processors\SqlServer\SqlServerSequenceTests.cs" />
     <Compile Include="Integration\Processors\SqlServer\SqlServerTableTests.cs" />
-    <Compile Include="Integration\Processors\FirebirdProcessorTests.cs" />
-    <Compile Include="Integration\Processors\MySqlProcessorTests.cs" />
-    <Compile Include="Integration\Processors\SqlServerCeProcessorTests.cs" />
     <Compile Include="Integration\SchemaDump\SQLiteSchemaDumpTests.cs" />
     <Compile Include="Unit\AnnouncerExtensionsTests.cs" />
     <Compile Include="Unit\Announcers\AnnouncerTests.cs" />
