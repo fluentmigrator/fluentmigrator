@@ -80,7 +80,7 @@ namespace FluentMigrator.Runner.Extensions
         public static ICreateIndexOptionsSyntax Include(this ICreateIndexOptionsSyntax expression, string columnName)
         {
             CreateIndexExpressionBuilder castIndex = expression as CreateIndexExpressionBuilder;
-            if(castIndex == null) throw new InvalidOperationException("The seeded identity method can only be called on a valid object.");
+            if(castIndex == null) throw new InvalidOperationException("The Include method can only be called on a valid object.");
             castIndex.Expression.Index.Includes.Add(new IndexIncludeDefinition { Name = columnName }); ;
             return expression;
         }
