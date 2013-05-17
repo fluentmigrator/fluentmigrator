@@ -5,8 +5,10 @@ using FluentMigrator.Builders.Alter.Table;
 using FluentMigrator.Builders.Create.Column;
 using FluentMigrator.Builders.Create.Constraint;
 using FluentMigrator.Builders.Create.Table;
+using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Extensions
 {
@@ -73,6 +75,14 @@ namespace FluentMigrator.Runner.Extensions
         public static void NonClustered(this ICreateConstraintOptionsSyntax expression)
         {
             SetConstraintType(expression, SqlServerConstraintType.NonClustered);
+        }
+
+        public static ICreateIndexOptionsSyntax Include(this ICreateIndexOptionsSyntax expression, string columnName)
+        {
+            CreateIndexExpressionBuilder castIndex = expression as CreateIndexExpressionBuilder;
+            if(castIndex == null) throw new InvalidOperationException("The seeded identity method can only be called on a valid object.");
+            castIndex.Expression.Index.Includes.Add(new IndexIncludeDefinition { Name = columnName }); ;
+            return expression;
         }
 
         private static ISupportAdditionalFeatures GetColumn<TNext, TNextFk>(IColumnOptionSyntax<TNext, TNextFk> expression) where TNext : IFluentSyntax where TNextFk : IFluentSyntax 
