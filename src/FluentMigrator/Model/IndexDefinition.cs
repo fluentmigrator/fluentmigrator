@@ -32,10 +32,12 @@ namespace FluentMigrator.Model
         public virtual bool IsUnique { get; set; }
         public bool IsClustered { get; set; }
         public virtual ICollection<IndexColumnDefinition> Columns { get; set; }
+        public virtual ICollection<IndexIncludeDefinition> Includes { get; set; }
 
         public IndexDefinition()
         {
             Columns = new List<IndexColumnDefinition>();
+            Includes = new List<IndexIncludeDefinition>();
         }
 
         public virtual void ApplyConventions(IMigrationConventions conventions)
@@ -57,6 +59,9 @@ namespace FluentMigrator.Model
 
             foreach (IndexColumnDefinition column in Columns)
                 column.CollectValidationErrors(errors);
+
+            foreach (IndexIncludeDefinition include in Includes)
+                include.CollectValidationErrors(errors);
         }
 
         public object Clone()
@@ -68,7 +73,8 @@ namespace FluentMigrator.Model
                 TableName = TableName,
                 IsUnique = IsUnique,
                 IsClustered = IsClustered,
-                Columns = Columns.CloneAll().ToList()
+                Columns = Columns.CloneAll().ToList(),
+                Includes = Includes.CloneAll().ToList()
             };
         }
     }
