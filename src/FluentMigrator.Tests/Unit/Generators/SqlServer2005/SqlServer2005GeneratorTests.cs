@@ -93,7 +93,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
-        public void CanCreateMultiIncludeIndexWithCustomSchema()
+        public void CanCreateMultiColumnIncludeIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiIncludeIndexExpression();
             expression.Index.SchemaName = "TestSchema";
@@ -102,7 +102,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
-        public void CanCreateMultiIncludeIndexWithDefaultSchema()
+        public void CanCreateMultiColumnIncludeIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiIncludeIndexExpression();
             var sql = generator.Generate(expression);
@@ -173,7 +173,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
-        public void CanGenerateNecessaryStatementsForADeleteDefaultExpression()
+        public void CanDropDefaultExpression()
         {
             var expression = new DeleteDefaultConstraintExpression {ColumnName = "Name", SchemaName = "Personalia", TableName = "Person"};
 

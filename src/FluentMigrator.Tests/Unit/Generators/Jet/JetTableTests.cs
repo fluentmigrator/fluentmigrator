@@ -16,7 +16,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateTableWithCustomColumnType()
+        public void CanCreateTableWithCustomColumnTypeWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.Columns[1].Type = null;
@@ -28,7 +28,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateTable()
+        public void CanCreateTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
 
@@ -38,7 +38,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateTableWithDefaultValueExplicitlySetToNull()
+        public void CanCreateTableWithDefaultValueExplicitlySetToNullWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
             expression.Columns[0].DefaultValue = null;
@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateTableWithDefaultValue()
+        public void CanCreateTableWithDefaultValueWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
 
@@ -61,7 +61,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateTableWithIdentity()
+        public void CanCreateTableWithIdentityWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
             var result = _generator.Generate(expression);
@@ -71,7 +71,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateTableWithMultiColumnPrimaryKey()
+        public void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
             var result = _generator.Generate(expression);
@@ -79,7 +79,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateTableNamedMultiColumnPrimaryKey()
+        public void CanCreateTableWithNamedMultiColumnPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumNamedPrimaryKeyExpression();
             string sql = _generator.Generate(expression);
@@ -87,7 +87,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateTableNamedPrimaryKey()
+        public void CanCreateTableWithNamedPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
             string sql = _generator.Generate(expression);
@@ -95,7 +95,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateTableWithNullableField()
+        public void CanCreateTableWithNullableFieldWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
 
@@ -106,7 +106,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateTableWithPrimaryKey()
+        public void CanCreateTableWithPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
 
@@ -117,7 +117,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanDropTable()
+        public void CanDropTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
             var sql = _generator.Generate(expression);
@@ -125,7 +125,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanRenameTable()
+        public void CanRenameTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
             var result = _generator.Generate(expression);

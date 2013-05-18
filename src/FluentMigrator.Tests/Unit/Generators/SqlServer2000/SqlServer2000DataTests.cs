@@ -18,7 +18,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         }
 
         [Test]
-        public void CanDeleteDataAllRows()
+        public void CanDeleteDataForAllRowsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
 
@@ -28,7 +28,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         }
 
         [Test]
-        public void CanDeleteDataMultipleRows()
+        public void CanDeleteDataForMultipleRowsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
 
@@ -38,7 +38,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         }
 
         [Test]
-        public void CanDeleteData()
+        public void CanDeleteDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
 
@@ -48,7 +48,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         }
 
         [Test]
-        public void CanInsertData()
+        public void CanInsertDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
             var sql = generator.Generate(expression);
@@ -60,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         }
 
         [Test]
-        public void CanInsertGuidData()
+        public void CanInsertGuidDataWithDefaultSchema()
         {
 
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
@@ -73,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         }
 
         [Test]
-        public void CanUpdateDataForAllRows()
+        public void CanUpdateDataForAllDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
 
@@ -82,7 +82,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         }
 
         [Test]
-        public void CanUpdateData()
+        public void CanUpdateDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
 

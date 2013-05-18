@@ -19,7 +19,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanCreateIndex()
+        public void CanCreateIndexWithDefaultSchema()
         {
             var expression = new CreateIndexExpression();
             expression.Index.Name = "IX_TEST";
@@ -32,7 +32,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanCreateUniqueIndex()
+        public void CanCreateUniqueIndexWithDefaultSchema()
         {
             var expression = new CreateIndexExpression();
             expression.Index.Name = "IX_TEST";
@@ -46,7 +46,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanDropIndex()
+        public void CanDropIndexWithDefaultSchema()
         {
             var expression = new DeleteIndexExpression();
             expression.Index.Name = "IX_TEST";

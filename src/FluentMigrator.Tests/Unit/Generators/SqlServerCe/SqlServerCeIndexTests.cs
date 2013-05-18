@@ -16,7 +16,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanCreateIndex()
+        public void CanCreateIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
             var sql = generator.Generate(expression);
@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanCreateMultiColumnIndex()
+        public void CanCreateMultiColumnIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
             var sql = generator.Generate(expression);
@@ -32,7 +32,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanCreatUniqueMultiColumnIndex()
+        public void CanCreateMultiColumnUniqueIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
             var sql = generator.Generate(expression);
@@ -40,7 +40,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanCreateUniqueIndex()
+        public void CanCreateUniqueIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
             var sql = generator.Generate(expression);
@@ -48,7 +48,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanDropIndex()
+        public void CanDropIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
             var sql = generator.Generate(expression);

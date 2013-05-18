@@ -21,7 +21,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanCreateTableInSchema()
+        public void CanCreateTableWithCustomSchema()
         {
             string tableName = "NewTable";
             CreateTableExpression expression = GetCreateTableExpression(tableName);
@@ -31,7 +31,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanCreateTable()
+        public void CanCreateTableWithDefaultSchema()
         {
             string tableName = "NewTable";
             CreateTableExpression expression = GetCreateTableExpression(tableName);
@@ -40,7 +40,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanCreateTableWithDefaultValueExplicitlySetToNull()
+        public void CanCreateTableWithDefaultValueExplicitlySetToNullWithDefaultSchema()
         {
             string tableName = "NewTable";
             var expression = GetCreateTableExpression(tableName);
@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanCreateTableWithDefaultValue()
+        public void CanCreateTableWithDefaultValueWithDefaultSchema()
         {
             string tableName = "NewTable";
             CreateTableExpression expression = GetCreateTableExpression(tableName);
@@ -62,7 +62,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanCreateTableWithMultiColumnPrimaryKey()
+        public void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
         {
             string tableName = "NewTable";
             CreateTableExpression expression = GetCreateTableExpression(tableName);
@@ -73,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanCreateTableWithMultiColumnPrimaryKeyNamed()
+        public void CanCreateTableWithNamedMultiColumnPrimaryKeyWithDefaultSchema()
         {
             string tableName = "NewTable";
             CreateTableExpression expression = GetCreateTableExpression(tableName);
@@ -85,7 +85,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanCreateTableWithPrimaryKeyNamed()
+        public void CanCreateTableWithNamedPrimaryKeyWithDefaultSchema()
         {
             string tableName = "NewTable";
             CreateTableExpression expression = GetCreateTableExpression(tableName);
@@ -96,7 +96,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanCreateTableWithPrimaryKey()
+        public void CanCreateTableWithPrimaryKeyWithDefaultSchema()
         {
             string tableName = "NewTable";
             CreateTableExpression expression = GetCreateTableExpression(tableName);
@@ -106,7 +106,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanDropTableInSchema()
+        public void CanDropTableWithCustomSchema()
         {
             string tableName = "NewTable";
             DeleteTableExpression expression = GetDeleteTableExpression(tableName);
@@ -116,7 +116,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanDropTable()
+        public void CanDropTableWithDefaultSchema()
         {
             string tableName = "NewTable";
             DeleteTableExpression expression = GetDeleteTableExpression(tableName);
@@ -125,7 +125,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanRenameTable()
+        public void CanRenameTableWithDefaultSchema()
         {
             var expression = new RenameTableExpression();
             expression.OldName = "Table1";

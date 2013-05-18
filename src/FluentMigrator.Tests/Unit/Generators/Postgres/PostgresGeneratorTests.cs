@@ -20,7 +20,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanAddIdentityColumnForInt64()
+        public void CanCreateAutoIncrementColumnForInt64()
         {
             string tableName = "NewTable";
 

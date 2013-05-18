@@ -20,7 +20,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanDeleteAllData()
+        public void CanDeleteDataForAllRowsWithDefaultSchema()
         {
             var expression = new DeleteDataExpression
             {
@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanDeleteAllDataWithMultipleConditions()
+        public void CanDeleteDataWithDefaultSchema()
         {
             var expression = new DeleteDataExpression
             {
@@ -53,7 +53,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanInsertData()
+        public void CanInsertDataWithDefaultSchema()
         {
             var expression = new InsertDataExpression();
             expression.TableName = "TestTable";
@@ -79,7 +79,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanInsertGuidData()
+        public void CanInsertGuidDataWithDefaultSchema()
         {
             var gid = Guid.NewGuid();
             var expression = new InsertDataExpression { TableName = "TestTable" };
@@ -93,7 +93,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanUpdateDataForAllRows()
+        public void CanUpdateDataForAllDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
 
@@ -111,7 +111,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanUpdateData()
+        public void CanUpdateDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
 

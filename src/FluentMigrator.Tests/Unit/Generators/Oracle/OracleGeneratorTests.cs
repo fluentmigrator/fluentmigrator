@@ -43,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanDeleteSchemaInStrictMode()
+        public void CanDropSchemaInStrictMode()
         {
             _generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new DeleteSchemaExpression()));

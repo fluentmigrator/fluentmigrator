@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
-        public void CanCreatUniqueMultiColumnIndexWithCustomSchema()
+        public void CanCreateMultiColumnUniqueIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
             expression.Index.SchemaName = "TestSchema";
@@ -59,7 +59,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
-        public void CanCreatUniqueMultiColumnIndexWithDefaultSchema()
+        public void CanCreateMultiColumnUniqueIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
             var sql = generator.Generate(expression);
@@ -84,7 +84,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
-        public void CanDeleteIndexWithCustomSchema()
+        public void CanDropIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
             expression.Index.SchemaName = "TestSchema";
@@ -94,7 +94,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
-        public void CanDeleteIndexWithDefaultSchema()
+        public void CanDropIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
 

@@ -19,7 +19,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanCreateForeignKey()
+        public void CanCreateNamedForeignKeyWithDefaultSchema()
         {
             var expression = new CreateForeignKeyExpression();
             expression.ForeignKey.Name = "FK_Test";
@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanCreateForeignKeyToDifferentSchema()
+        public void CanCreateNamedForeignKeyWithDifferentSchemas()
         {
             var expression = new CreateForeignKeyExpression();
             expression.ForeignKey.Name = "FK_Test";
@@ -48,7 +48,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanCreateForeignKeyWithOnDeleteAndOnUpdateOptions()
+        public void CanCreateNamedForeignKeyWithOnDeleteAndOnUpdateOptions()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
             expression.ForeignKey.OnDelete = Rule.Cascade;
@@ -59,7 +59,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
-        public void CanCreateForeignKeyWithOnDeleteOptions(Rule rule, string output)
+        public void CanCreateNamedForeignKeyWithOnDeleteOptions(Rule rule, string output)
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
             expression.ForeignKey.OnDelete = rule;
@@ -71,7 +71,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
-        public void CanCreateForeignKeyWithOnUpdateOptions(Rule rule, string output)
+        public void CanCreateNamedForeignKeyWithOnUpdateOptions(Rule rule, string output)
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
             expression.ForeignKey.OnUpdate = rule;
@@ -81,7 +81,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanCreateForeignKeyWithMultipleColumns()
+        public void CanCreateNamedMultiColumnForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
             expression.ForeignKey.PrimaryColumns = new[] { "Column1", "Column2" };
@@ -92,7 +92,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanCreatePrimaryKeyWithSchema()
+        public void CanCreatePrimaryKeyConstraintWithCustomSchema()
         {
             var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
             expression.Constraint.SchemaName = "Schema";
@@ -105,7 +105,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanCreatePrimaryKey()
+        public void CanCreatePrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
             expression.Constraint.TableName = "ConstraintTable";
@@ -117,7 +117,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanCreateUniqueConstraintWithSchema()
+        public void CanCreateUniqueConstraintWithCustomSchema()
         {
             var expression = new CreateConstraintExpression(ConstraintType.Unique);
             expression.Constraint.TableName = "ConstraintTable";
@@ -130,7 +130,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanCreateUniqueConstraint()
+        public void CanCreateUniqueConstraintWithDefaultSchema()
         {
             var expression = new CreateConstraintExpression(ConstraintType.Unique);
             expression.Constraint.TableName = "ConstraintTable";
@@ -142,7 +142,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanDropForeignKey()
+        public void CanDropForeignKeyWithDefaultSchema()
         {
             var expression = new DeleteForeignKeyExpression();
             expression.ForeignKey.Name = "FK_Test";
@@ -153,7 +153,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanDeleteConstraint()
+        public void CanDropPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = new DeleteConstraintExpression(ConstraintType.Unique);
             expression.Constraint.TableName = "ConstraintTable";
@@ -164,7 +164,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanDeleteConstraintWithSchema()
+        public void CanDropUniqueConstraintWithDefaultSchema()
         {
             var expression = new DeleteConstraintExpression(ConstraintType.Unique);
             expression.Constraint.TableName = "ConstraintTable";

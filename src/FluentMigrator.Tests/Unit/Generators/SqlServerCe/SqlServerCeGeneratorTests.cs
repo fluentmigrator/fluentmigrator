@@ -32,7 +32,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanCreateClusteredIndexCreatesNonClustured()
+        public void CanCreateClusteredIndexTreatedAsNonClustered()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
             expression.Index.IsClustered = true;
@@ -41,7 +41,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanCreateClusteredMultiColumnIndexCreatesNonClustured()
+        public void CanCreateMultiColumnClusteredIndexTreatedAsNonClustered()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
             expression.Index.IsClustered = true;
@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanCreatClusteredUniqueMultiColumnIndexCreatesNonClustured()
+        public void CanCreatMultiColumnUniqueClusteredIndexTreatedAsNonClustered()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
             expression.Index.IsClustered = true;
@@ -59,7 +59,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanCreateClusteredUniqueIndexCreatesNonClustured()
+        public void CanCreateUniqueClusteredIndexTreatedAsNonClustered()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
             expression.Index.IsClustered = true;

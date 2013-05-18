@@ -17,19 +17,19 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CannotAlterASchema()
+        public void CanAlterSchema()
         {
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new AlterSchemaExpression()));
         }
 
         [Test]
-        public void CannotCreateASchema()
+        public void CanCreateSchema()
         {
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
 
         [Test]
-        public void CannotDeleteASchema()
+        public void CanDropSchema()
         {
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new DeleteSchemaExpression()));
         }

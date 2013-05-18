@@ -16,13 +16,13 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanCreateTableWithCustomColumnType()
+        public void CanCreateTableWithCustomColumnTypeWithDefaultSchema()
         {
             //Not sure what custom column types there are in sqlite so not testing
         }
 
         [Test]
-        public void CanCreateTable()
+        public void CanCreateTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             string sql = _generator.Generate(expression);
@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanCreateTableWithDefaultValueExplicitlySetToNull()
+        public void CanCreateTableWithDefaultValueExplicitlySetToNullWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
             expression.Columns[0].DefaultValue = null;
@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanCreateTableWithDefaultValue()
+        public void CanCreateTableWithDefaultValueWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
 
@@ -53,7 +53,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanCreateTableWithIdentity()
+        public void CanCreateTableWithIdentityWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
             //Have to force it to primary key for SQLite
@@ -64,7 +64,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanCreateTableWithMultiColumnPrimaryKey()
+        public void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
             var result = _generator.Generate(expression);
@@ -72,7 +72,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanCreateTableNamedMultiColumnPrimaryKey()
+        public void CanCreateTableWithNamedMultiColumnPrimaryKeyWithDefaultSchema()
         {
             //Should work. I think from the docs
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumNamedPrimaryKeyExpression();
@@ -81,7 +81,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanCreateTableNamedPrimaryKey()
+        public void CanCreateTableWithNamedPrimaryKeyWithDefaultSchema()
         {
             //Should work. I think from the docs
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
@@ -90,7 +90,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanCreateTableWithNullableField()
+        public void CanCreateTableWithNullableFieldWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
 
@@ -101,7 +101,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanCreateTableWithPrimaryKey()
+        public void CanCreateTableWithPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
             var sql = _generator.Generate(expression);
@@ -109,7 +109,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanDropTable()
+        public void CanDropTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
             string sql = _generator.Generate(expression);
@@ -117,7 +117,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanRenameTable()
+        public void CanRenameTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
             string sql = _generator.Generate(expression);

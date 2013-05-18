@@ -19,7 +19,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanCreateMultiColmnPrimaryKeyConstraint()
+        public void CanCreateMultiColumnPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnPrimaryKeyExpression();
             var result = generator.Generate(expression);
@@ -27,7 +27,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanCreateMultiColumnUniqueConstraint()
+        public void CanCreateMultiColumnUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
             var result = generator.Generate(expression);
@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanCreateForeignKey()
+        public void CanCreateNamedForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
             string sql = generator.Generate(expression);
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanCreateForeignKeyWithOnDeleteAndOnUpdateOptions()
+        public void CanCreateNamedForeignKeyWithOnDeleteAndOnUpdateOptions()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
             expression.ForeignKey.OnDelete = Rule.Cascade;
@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
-        public void CanCreateForeignKeyWithOnDeleteOptions(Rule rule, string output)
+        public void CanCreateNamedForeignKeyWithOnDeleteOptions(Rule rule, string output)
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
             expression.ForeignKey.OnDelete = rule;
@@ -65,7 +65,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
-        public void CanCreateForeignKeyWithOnUpdateOptions(Rule rule, string output)
+        public void CanCreateNamedForeignKeyWithOnUpdateOptions(Rule rule, string output)
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
             expression.ForeignKey.OnUpdate = rule;
@@ -75,7 +75,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanCreateMulitColumnForeignKey()
+        public void CanCreateNamedMultiColumnForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
             string sql = generator.Generate(expression);
@@ -83,7 +83,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanCreateMultiColmnNamedPrimaryKeyConstraint()
+        public void CanCreateNamedMultiColumnPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnNamedPrimaryKeyExpression();
             var result = generator.Generate(expression);
@@ -91,7 +91,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanCreateMultiColumnNamedUniqueConstraint()
+        public void CanCreateNamedMultiColumnUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnNamedUniqueConstraintExpression();
             var result = generator.Generate(expression);
@@ -99,7 +99,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanCreateNamedPrimaryKeyConstraint()
+        public void CanCreateNamedPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
             var result = generator.Generate(expression);
@@ -107,7 +107,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanCreateNamedUniqueConstraint()
+        public void CanCreateNamedUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
             var result = generator.Generate(expression);
@@ -115,7 +115,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanCreatePrimaryKeyConstraint()
+        public void CanCreatePrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
             var result = generator.Generate(expression);
@@ -123,7 +123,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanCreateUniqueConstraint()
+        public void CanCreateUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
             var result = generator.Generate(expression);
@@ -131,7 +131,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanDropForeignKey()
+        public void CanDropForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
             string sql = _generator.Generate(expression);
@@ -139,7 +139,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanDropPrimaryKeyConstraint()
+        public void CanDropPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
             var result = generator.Generate(expression);
@@ -147,7 +147,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanDropUniqueConstraint()
+        public void CanDropUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();
             var result = generator.Generate(expression);

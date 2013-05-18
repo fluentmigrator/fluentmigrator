@@ -20,7 +20,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanAlterColumn()
+        public void CanAlterColumnWithDefaultSchema()
         {
             var expression = new AlterColumnExpression
             {
@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanAddIdentityColumn()
+        public void CanCreateAutoIncrementColumnWithDefaultSchema()
         {
             string tableName = "NewTable";
 
@@ -51,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanAddColumn()
+        public void CanCreateColumnWithDefaultSchema()
         {
             string tableName = "NewTable";
 
@@ -69,7 +69,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanAddDecimalColumn()
+        public void CanCreateDecimalColumnWithDefaultSchema()
         {
             const string tableName = "NewTable";
 
@@ -86,7 +86,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanDropColumn()
+        public void CanDropColumnWithDefaultSchema()
         {
             string tableName = "NewTable";
             string columnName = "NewColumn";
@@ -100,7 +100,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanDropMultipleColumns()
+        public void CanDropMultipleColumnsWithDefaultSchema()
         {
             var expression = new DeleteColumnExpression();
             expression.TableName = "NewTable";
@@ -113,7 +113,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanRenameColumn()
+        public void CanRenameColumnWithDefaultSchema()
         {
             var expression = new RenameColumnExpression();
             expression.TableName = "Table1";

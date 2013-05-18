@@ -18,7 +18,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanCreateSequence()
+        public void CanCreateSequenceWithCustomSchema()
         {
             var expression = new CreateSequenceExpression
                              {
@@ -39,7 +39,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanDeleteSequence()
+        public void CanDropSequenceWithCustomSchema()
         {
             var expression = new DeleteSequenceExpression { SchemaName = "Schema", SequenceName = "Sequence" };
             var sql = generator.Generate(expression);

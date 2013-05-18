@@ -45,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
-        public void CanDeleteSchema()
+        public void CanDropSchema()
         {
             var expression = new DeleteSchemaExpression() { SchemaName = "TestSchema" };
             var sql = generator.Generate(expression);

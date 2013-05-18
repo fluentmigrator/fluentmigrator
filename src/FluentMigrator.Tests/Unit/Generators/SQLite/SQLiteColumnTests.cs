@@ -17,7 +17,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanAlterColumn()
+        public void CanAlterColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
             var result = _generator.Generate(expression);
@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanCreateAutoIncrementColumn()
+        public void CanCreateAutoIncrementColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterTableAutoIncrementColumnExpression();
             expression.Column.IsPrimaryKey = true;
@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanAddColumn()
+        public void CanCreateColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
             string sql = _generator.Generate(expression);
@@ -43,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanAddDecimalColumn()
+        public void CanCreateDecimalColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
             string sql = _generator.Generate(expression);
@@ -51,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanDropColumn()
+        public void CanDropColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
             string sql = _generator.Generate(expression);
@@ -59,7 +59,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanDropMultipleColumns()
+        public void CanDropMultipleColumnsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new string[] { "TestColumn1", "TestColumn2" });
             string sql = _generator.Generate(expression);
@@ -67,7 +67,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanRenameColumn()
+        public void CanRenameColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
             var result = _generator.Generate(expression);

@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
-        public void CanCreateClusteredMultiColumnIndexWithCustomSchema()
+        public void CanCreateMultiColumnClusteredIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
             expression.Index.SchemaName = "TestSchema";
@@ -45,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
-        public void CanCreateClusteredMultiColumnIndexWithDefaultSchema()
+        public void CanCreateMultiColumnClusteredIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
             expression.Index.IsClustered = true;
@@ -54,7 +54,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
-        public void CanCreateClusteredUniqueIndexWithCustomSchema()
+        public void CanCreateUniqueClusteredIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
             expression.Index.SchemaName = "TestSchema";
@@ -64,7 +64,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
-        public void CanCreateClusteredUniqueIndexWithDefaultSchema()
+        public void CanCreateUniqueClusteredIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
             expression.Index.IsClustered = true;
@@ -73,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
-        public void CanCreatClusteredUniqueMultiColumnIndexWithCustomSchema()
+        public void CanCreateUniqueClusteredMultiColumnIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
             expression.Index.SchemaName = "TestSchema";
@@ -83,7 +83,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
-        public void CanCreatClusteredUniqueMultiColumnIndexWithDefaultSchema()
+        public void CanCreateUniqueClusteredMultiColumnIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
             expression.Index.IsClustered = true;

@@ -16,7 +16,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanCreateTableWithCustomColumnType()
+        public void CanCreateTableWithCustomColumnTypeWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.Columns[0].IsPrimaryKey = true;
@@ -29,7 +29,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanCreateTable()
+        public void CanCreateTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
 
@@ -38,7 +38,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanCreateTableWithDefaultValueExplicitlySetToNull()
+        public void CanCreateTableWithDefaultValueExplicitlySetToNullWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.Columns[0].DefaultValue = null;
@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanCreateTableWithDefaultValue()
+        public void CanCreateTableWithDefaultValueWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
             var sql = generator.Generate(expression);
@@ -59,7 +59,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanCreateTableWithIdentity()
+        public void CanCreateTableWithIdentityWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
             var sql = generator.Generate(expression);
@@ -68,7 +68,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanCreateTableWithMultiColumnPrimaryKey()
+        public void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
             var result = generator.Generate(expression);
@@ -77,7 +77,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanCreateTableWithNullableField()
+        public void CanCreateTableWithNullableFieldWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.Columns[0].IsNullable = true;
@@ -87,7 +87,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanCreateTableWithPrimaryKey()
+        public void CanCreateTableWithPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
             var sql = generator.Generate(expression);
@@ -96,7 +96,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanDropTable()
+        public void CanDropTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
 
@@ -105,7 +105,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanRenameTable()
+        public void CanRenameTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
             var sql = generator.Generate(expression);
