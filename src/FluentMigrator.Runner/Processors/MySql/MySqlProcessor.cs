@@ -74,6 +74,12 @@ namespace FluentMigrator.Runner.Processors.MySql
             return false;
         }
 
+        public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
+        {
+            string defaultValueAsString = string.Format("%{0}%", FormatSqlEscape(defaultValue.ToString()));
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}' AND COLUMN_DEFAULT LIKE '{2}'", FormatSqlEscape(tableName), FormatSqlEscape(columnName), defaultValueAsString);
+        }
+
         public override void Execute(string template, params object[] args)
         {
             if(Options.PreviewOnly) 

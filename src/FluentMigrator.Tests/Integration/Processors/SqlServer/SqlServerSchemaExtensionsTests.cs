@@ -72,5 +72,15 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
             using (var table = new SqlServerTestTable(Processor, "test'schema", "id int"))
                 Processor.TableExists("test'schema", table.Name).ShouldBeTrue();
         }
+
+        [Test]
+        public void CallingDefaultValueExistsCanAcceptSchemaNameWithSingleQuote()
+        {
+            using (var table = new SqlServerTestTable(Processor, "test'schema", "id int"))
+            {
+                table.WithDefaultValueOn("id");
+                Processor.DefaultValueExists("test'schema", table.Name, "id", 1).ShouldBeTrue();
+            }
+        }
     }
 }

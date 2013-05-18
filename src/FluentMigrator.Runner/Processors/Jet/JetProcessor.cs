@@ -172,6 +172,11 @@ namespace FluentMigrator.Runner.Processors.Jet
             }
         }
 
+        public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
+        {
+            return false;
+        }
+
         public override void BeginTransaction()
         {
             if (Transaction != null) return;

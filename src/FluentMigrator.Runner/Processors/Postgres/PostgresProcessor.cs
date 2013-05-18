@@ -68,6 +68,12 @@ namespace FluentMigrator.Runner.Processors.Postgres
             return Read("SELECT * FROM {0}.{1}", quoter.QuoteSchemaName(schemaName), quoter.QuoteTableName(tableName));
         }
 
+        public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
+        {
+            string defaultValueAsString = string.Format("%{0}%", FormatSqlEscape(defaultValue.ToString()));
+            return Exists("select * from information_schema.columns where table_schema = '{0}' and table_name = '{1}' and column_name = '{2}' and column_default like '{3}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(tableName), FormatToSafeName(columnName), defaultValueAsString);
+        }
+
         public override DataSet Read(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
