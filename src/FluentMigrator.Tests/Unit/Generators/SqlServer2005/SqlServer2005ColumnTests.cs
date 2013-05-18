@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
-        public void CanAddColumnWithCustomSchema()
+        public void CanCreateColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
             expression.SchemaName = "TestSchema";
@@ -59,7 +59,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
-        public void CanAddColumnWithDefaultSchema()
+        public void CanCreateColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
             var sql = generator.Generate(expression);
@@ -67,7 +67,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
-        public void CanAddDecimalColumnWithCustomSchema()
+        public void CanCreateDecimalColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
             expression.SchemaName = "TestSchema";
@@ -76,7 +76,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
-        public void CanAddDecimalColumnWithDefaultSchema()
+        public void CanCreateDecimalColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
             var sql = generator.Generate(expression);

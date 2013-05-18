@@ -17,7 +17,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         }
 
         [Test]
-        public void CanAlterColumn()
+        public void CanAlterColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
 
@@ -27,7 +27,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         }
 
         [Test]
-        public void CanCreateAutoIncrementColumn()
+        public void CanCreateAutoIncrementColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
 
@@ -37,7 +37,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         }
 
         [Test]
-        public void CanAddColumn()
+        public void CanCreateColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
 
@@ -46,7 +46,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         }
 
         [Test]
-        public void CanAddDecimalColumn()
+        public void CanCreateDecimalColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
 
@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         }
 
         [Test]
-        public void CanDropColumn()
+        public void CanDropColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
             var sql = _generator.Generate(expression);
@@ -63,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         }
 
         [Test]
-        public void CanDropMultipleColumns()
+        public void CanDropMultipleColumnsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "TestColumn1", "TestColumn2" });
             var sql = _generator.Generate(expression);
@@ -71,7 +71,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         }
 
         [Test]
-        public void CanRenameColumn()
+        public void CanRenameColumnWithDefaultSchema()
         {
             // MySql does not appear to have a way to change column without re-specifying the existing column definition
             var expression = GeneratorTestHelper.GetRenameColumnExpression();

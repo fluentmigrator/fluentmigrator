@@ -17,7 +17,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         }
 
         [Test]
-        public void CanAlterColumn()
+        public void CanAlterColumnWithDefaultSchema()
         {
             //TODO: This will fail if there are any keys attached 
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
@@ -27,13 +27,13 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             sql.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL");
         }
 
-        public void CanCreateAutoIncrementColumn()
+        public void CanCreateAutoIncrementColumnWithDefaultSchema()
         {
             throw new NotImplementedException();
         }
 
         [Test]
-        public void CanAddColumn()
+        public void CanCreateColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
             var sql = _generator.Generate(expression);
@@ -41,7 +41,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         }
 
         [Test]
-        public void CanAddDecimalColumn()
+        public void CanCreateDecimalColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
             var sql = _generator.Generate(expression);
@@ -49,7 +49,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         }
 
         [Test]
-        public void CanDropColumn()
+        public void CanDropColumnWithDefaultSchema()
         {
             //This does not work if it is a primary key
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
@@ -77,7 +77,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         }
 
         [Test]
-        public void CanDropMultipleColumns()
+        public void CanDropMultipleColumnsWithDefaultSchema()
         {
             //This does not work if it is a primary key
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "TestColumn1", "TestColumn2" });
@@ -123,7 +123,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         }
 
         [Test]
-        public void CanRenameColumn()
+        public void CanRenameColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
             var sql = _generator.Generate(expression);

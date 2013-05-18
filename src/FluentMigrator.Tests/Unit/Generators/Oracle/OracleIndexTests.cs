@@ -16,7 +16,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateIndex()
+        public void CanCreateIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
             string sql = _generator.Generate(expression);
@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateMultiColumnIndex()
+        public void CanCreateMultiColumnIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
             string sql = _generator.Generate(expression);
@@ -32,7 +32,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateMultiColumnUniqueIndex()
+        public void CanCreateMultiColumnUniqueIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
             string sql = _generator.Generate(expression);
@@ -40,7 +40,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateUniqueIndex()
+        public void CanCreateUniqueIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
             string sql = _generator.Generate(expression);
@@ -48,7 +48,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanDeleteIndex()
+        public void CanDropIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
             string sql = _generator.Generate(expression);

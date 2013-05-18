@@ -16,7 +16,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanAlterColumn()
+        public void CanAlterColumnWithDefaultSchema()
         {
             //TODO: This will fail if there are any keys attached 
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanAddColumn()
+        public void CanCreateColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
             var sql = generator.Generate(expression);
@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanAddDecimalColumn()
+        public void CanCreateDecimalColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
             var sql = generator.Generate(expression);
@@ -41,7 +41,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanDropColumn()
+        public void CanDropColumnWithDefaultSchema()
         {
             //This does not work if column in used in constraint, index etc.
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();

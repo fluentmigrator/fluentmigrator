@@ -19,13 +19,13 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithCustomColumnType()
+        public void CanCreateTableWithCustomColumnTypeWithDefaultSchema()
         {
             //Do not knows any oracle custom types. Not testing for it.  If someone else knows please add a test
         }
 
         [Test]
-        public void CanCreateTable()
+        public void CanCreateTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             string sql = _generator.Generate(expression);
@@ -33,13 +33,13 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithDefaultValueExplicitlySetToNull()
+        public void CanCreateTableWithDefaultValueExplicitlySetToNullWithDefaultSchema()
         {
             //Not sure how this would work in oracle.  Someone please add a test
         }
 
         [Test]
-        public void CanCreateTableWithDefaultValue()
+        public void CanCreateTableWithDefaultValueWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.Columns[0].DefaultValue = "abc";
@@ -50,13 +50,13 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithIdentity()
+        public void CanCreateTableWithIdentityWithDefaultSchema()
         {
             Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression()));
         }
 
         [Test]
-        public void CanCreateTableWithMultiColumnPrimaryKey()
+        public void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
             string sql = _generator.Generate(expression);
@@ -65,7 +65,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableNamedMultiColumnPrimaryKey()
+        public void CanCreateTableWithNamedMultiColumnPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumNamedPrimaryKeyExpression();
             string sql = _generator.Generate(expression);
@@ -73,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableNamedPrimaryKey()
+        public void CanCreateTableWithNamedPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
             string sql = _generator.Generate(expression);
@@ -81,7 +81,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithNullableField()
+        public void CanCreateTableWithNullableFieldWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
 
@@ -92,7 +92,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithPrimaryKey()
+        public void CanCreateTableWithPrimaryKeyWithDefaultSchema()
         {
             //After a quick goolge the below tested statment should work.
             //CONSTRAINT constraint_name PRIMARY KEY (column1, column2, . column_n)
@@ -102,7 +102,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanDropTable()
+        public void CanDropTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
             string sql = _generator.Generate(expression);
@@ -110,7 +110,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanRenameTable()
+        public void CanRenameTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
             string sql = generator.Generate(expression);

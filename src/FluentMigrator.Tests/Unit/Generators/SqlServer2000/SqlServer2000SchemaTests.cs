@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         }
 
         [Test]
-        public void CanDeleteSchema()
+        public void CanDropSchema()
         {
             var expression = new DeleteSchemaExpression();
             var result = _generator.Generate(expression);

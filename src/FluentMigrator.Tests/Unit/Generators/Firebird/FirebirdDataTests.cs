@@ -21,7 +21,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanDeleteAllData()
+        public void CanDeleteDataForAllRowsWithDefaultSchema()
         {
             var expression = new DeleteDataExpression
             {
@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanDeleteAllDataWithMultipleConditions()
+        public void CanDeleteDataWithDefaultSchema()
         {
             var expression = new DeleteDataExpression
             {
@@ -54,7 +54,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanInsertData()
+        public void CanInsertDataWithDefaultSchema()
         {
             var expression = new InsertDataExpression();
             expression.TableName = "TestTable";
@@ -80,7 +80,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanInsertGuidData()
+        public void CanInsertGuidDataWithDefaultSchema()
         {
             var gid = Guid.NewGuid();
             var expression = new InsertDataExpression { TableName = "TestTable" };

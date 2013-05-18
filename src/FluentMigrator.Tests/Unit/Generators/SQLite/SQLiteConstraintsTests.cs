@@ -16,7 +16,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanCreateForeignKey()
+        public void CanCreateNamedForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
             var result = _generator.Generate(expression);
@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanCreateMulitColumnForeignKey()
+        public void CanCreateNamedMultiColumnForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
             var result = _generator.Generate(expression);
@@ -32,7 +32,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
-        public void CanDropForeignKey()
+        public void CanDropForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
             var result = _generator.Generate(expression);

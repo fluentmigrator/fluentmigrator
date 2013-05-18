@@ -19,7 +19,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanAlterColumn()
+        public void CanAlterColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
             string sql = generator.Generate(expression);
@@ -27,12 +27,12 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateAutoIncrementColumn()
+        public void CanCreateAutoIncrementColumnWithDefaultSchema()
         {
         }
 
         [Test]
-        public void CanAddColumn()
+        public void CanCreateColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
             string sql = generator.Generate(expression);
@@ -40,7 +40,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanAddDecimalColumn()
+        public void CanCreateDecimalColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
             string sql = generator.Generate(expression);
@@ -48,7 +48,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanDropColumn()
+        public void CanDropColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
             string sql = _generator.Generate(expression);
@@ -56,7 +56,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanDropMultipleColumns()
+        public void CanDropMultipleColumnsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new string[] { "TestColumn1", "TestColumn2" });
             string sql = _generator.Generate(expression);
@@ -64,7 +64,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanRenameColumn()
+        public void CanRenameColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
             string sql = generator.Generate(expression);

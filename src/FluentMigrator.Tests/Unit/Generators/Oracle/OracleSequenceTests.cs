@@ -17,7 +17,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateSequence()
+        public void CanCreateSequenceWithCustomSchema()
         {
             var expression = new CreateSequenceExpression
             {
@@ -38,7 +38,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateSequenceWithoutSchema()
+        public void CanCreateSequenceWithDefaultSchema()
         {
             var expression = new CreateSequenceExpression
             {
@@ -58,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanDeleteSequence()
+        public void CanDropSequenceWithCustomSchema()
         {
             var expression = new DeleteSequenceExpression { SchemaName = "Schema", SequenceName = "Sequence" };
             var sql = generator.Generate(expression);
@@ -66,7 +66,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanDeleteSequenceWithoutSchemaName()
+        public void CanDropSequenceWithDefaultSchema()
         {
             var expression = new DeleteSequenceExpression { SequenceName = "Sequence" };
             var sql = generator.Generate(expression);
