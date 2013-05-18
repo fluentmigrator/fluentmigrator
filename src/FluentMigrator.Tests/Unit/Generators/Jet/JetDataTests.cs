@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using FluentMigrator.Runner.Generators.Jet;
 using NUnit.Framework;
 using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.Jet
 {
-    public class JetDataTests : BaseDataTests
+    [TestFixture]
+    public class JetDataTests
     {
         protected JetGenerator generator;
 
@@ -17,7 +17,37 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public override void CanInsertData()
+        public void CanDeleteDataAllRows()
+        {
+            var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
+
+            var sql = generator.Generate(expression);
+
+            sql.ShouldBe("DELETE FROM [TestTable1] WHERE 1 = 1");
+        }
+
+        [Test]
+        public void CanDeleteDataMultipleRows()
+        {
+            var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
+
+            var sql = generator.Generate(expression);
+
+            sql.ShouldBe("DELETE FROM [TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL; DELETE FROM [TestTable1] WHERE [Website] = 'github.com'");
+        }
+
+        [Test]
+        public void CanDeleteData()
+        {
+            var expression = GeneratorTestHelper.GetDeleteDataExpression();
+
+            var sql = generator.Generate(expression);
+
+            sql.ShouldBe("DELETE FROM [TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL");
+        }
+
+        [Test]
+        public void CanInsertData()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
 
@@ -30,37 +60,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public override void CanDeleteData()
-        {
-            var expression = GeneratorTestHelper.GetDeleteDataExpression();
-
-            var sql = generator.Generate(expression);
-
-            sql.ShouldBe("DELETE FROM [TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL");
-        }
-
-        [Test]
-        public override void CanDeleteDataAllRows()
-        {
-            var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
-
-            var sql = generator.Generate(expression);
-
-            sql.ShouldBe("DELETE FROM [TestTable1] WHERE 1 = 1");
-        }
-
-        [Test]
-        public override void CanDeleteDataMultipleRows()
-        {
-            var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
-
-            var sql = generator.Generate(expression);
-
-            sql.ShouldBe("DELETE FROM [TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL; DELETE FROM [TestTable1] WHERE [Website] = 'github.com'");
-        }
-
-        [Test]
-        public override void CanInsertGuidData()
+        public void CanInsertGuidData()
         {
 
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
@@ -73,21 +73,21 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public override void CanUpdateData()
-        {
-            var expression = GeneratorTestHelper.GetUpdateDataExpression();
-
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("UPDATE [TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL");
-        }
-
-        [Test]
         public void CanUpdateDataForAllRows()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
 
             var sql = generator.Generate(expression);
             sql.ShouldBe("UPDATE [TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE 1 = 1");
+        }
+
+        [Test]
+        public void CanUpdateData()
+        {
+            var expression = GeneratorTestHelper.GetUpdateDataExpression();
+
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("UPDATE [TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL");
         }
     }
 }
