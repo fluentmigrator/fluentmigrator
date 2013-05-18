@@ -8,12 +8,13 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
 {
+    [TestFixture]
     public class SqlServer2008GeneratorTests
     {
-        private SqlServer2008Generator generator;
+        protected SqlServer2008Generator generator;
 
         [SetUp]
-        public void SetUp()
+        public void Setup()
         {
             generator = new SqlServer2008Generator();
         }
