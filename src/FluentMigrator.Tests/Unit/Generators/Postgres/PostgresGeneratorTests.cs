@@ -593,7 +593,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void CanAlterDefaultConstraint()
+        public void CanAlterDefaultConstraintToCurrentUser()
         {
             var expression = new AlterDefaultConstraintExpression
                                  {
@@ -605,6 +605,51 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
             var sql = generator.Generate(expression);
             sql.ShouldBe("ALTER TABLE \"Schema1\".\"Table1\" ALTER \"Col1\" DROP DEFAULT, ALTER \"Col1\" SET DEFAULT current_user");
+        }
+
+        [Test]
+        public void CanAlterDefaultConstraintToCurrentDate()
+        {
+            var expression = new AlterDefaultConstraintExpression
+            {
+                SchemaName = "Schema1",
+                TableName = "Table1",
+                ColumnName = "Col1",
+                DefaultValue = SystemMethods.CurrentDateTime
+            };
+
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("ALTER TABLE \"Schema1\".\"Table1\" ALTER \"Col1\" DROP DEFAULT, ALTER \"Col1\" SET DEFAULT now()");
+        }
+
+        [Test]
+        public void CanAlterDefaultConstraintToCurrentUtcDateTime()
+        {
+            var expression = new AlterDefaultConstraintExpression
+            {
+                SchemaName = "Schema1",
+                TableName = "Table1",
+                ColumnName = "Col1",
+                DefaultValue = SystemMethods.CurrentUTCDateTime
+            };
+
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("ALTER TABLE \"Schema1\".\"Table1\" ALTER \"Col1\" DROP DEFAULT, ALTER \"Col1\" SET DEFAULT (now() at time zone 'UTC')");
+        }
+
+        [Test]
+        public void CanAlterDefaultConstraintToNewGuid()
+        {
+            var expression = new AlterDefaultConstraintExpression
+            {
+                SchemaName = "Schema1",
+                TableName = "Table1",
+                ColumnName = "Col1",
+                DefaultValue = SystemMethods.NewGuid
+            };
+
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("ALTER TABLE \"Schema1\".\"Table1\" ALTER \"Col1\" DROP DEFAULT, ALTER \"Col1\" SET DEFAULT uuid_generate_v4()");
         }
 
         [Test]

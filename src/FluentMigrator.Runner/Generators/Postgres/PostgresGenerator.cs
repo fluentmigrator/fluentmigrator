@@ -222,7 +222,6 @@ namespace FluentMigrator.Runner.Generators.Postgres
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
             return string.Format("ALTER TABLE {0}.{1} ALTER {2} DROP DEFAULT", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), Quoter.Quote(expression.ColumnName));
-
         }
 
         public override string Generate(DeleteConstraintExpression expression)
