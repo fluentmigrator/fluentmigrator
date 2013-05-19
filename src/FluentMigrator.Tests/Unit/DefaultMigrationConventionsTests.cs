@@ -248,6 +248,29 @@ namespace FluentMigrator.Tests.Unit
                     .ShouldBeFalse();
             }
         }
+
+        [FluentMigrator.Migration(20130508175300)]
+        class AutoScriptMigrationFake : AutoScriptMigration { }
+
+        [Test]
+        public void GetAutoScriptUpName()
+        {
+            var type = typeof(AutoScriptMigrationFake);
+            var databaseType = "sqlserver";
+
+            DefaultMigrationConventions.GetAutoScriptUpName(type, databaseType)
+                .ShouldBe("Scripts.Up.20130508175300_AutoScriptMigrationFake_sqlserver.sql");
+        }
+
+        [Test]
+        public void GetAutoScriptDownName()
+        {
+            var type = typeof(AutoScriptMigrationFake);
+            var databaseType = "sqlserver";
+
+            DefaultMigrationConventions.GetAutoScriptDownName(type, databaseType)
+                .ShouldBe("Scripts.Down.20130508175300_AutoScriptMigrationFake_sqlserver.sql");
+        }
     }
 
     [Tags("BE", "UK", "Staging", "Production")]
