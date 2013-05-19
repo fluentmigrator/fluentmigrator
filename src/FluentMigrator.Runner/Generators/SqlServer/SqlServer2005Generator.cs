@@ -287,7 +287,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             builder.Append(String.Format("-- create alter table command to create new default constraint as string and run it" + Environment.NewLine + "ALTER TABLE {3}.{0} WITH NOCHECK ADD CONSTRAINT {4} DEFAULT({2}) FOR {1};",
                 Quoter.QuoteTableName(expression.TableName),
                 Quoter.QuoteColumnName(expression.ColumnName),
-                Quoter.QuoteValue(expression.DefaultValue),
+                ((SqlServerColumn)Column).FormatDefaultValue(expression.DefaultValue),
                 Quoter.QuoteSchemaName(expression.SchemaName),
                 Quoter.QuoteConstraintName(SqlServerColumn.GetDefaultConstraintName(expression.TableName, expression.ColumnName))));
 
