@@ -835,6 +835,8 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Up(new TestCreateAndDropTableMigrationWithSchema());
                     processor.ColumnExists("TestSchema", "TestTable2", "Name2").ShouldBeTrue();
+                    processor.DefaultValueExists("TestSchema", "TestTable", "Name", "Anonymous").ShouldBeTrue();
+
 
                     runner.Up(new TestAlterColumnWithSchema());
                     processor.ColumnExists("TestSchema", "TestTable2", "Name2").ShouldBeTrue();

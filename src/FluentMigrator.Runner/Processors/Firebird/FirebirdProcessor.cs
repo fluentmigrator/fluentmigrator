@@ -112,6 +112,11 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
         }
 
+        public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
+        {
+            return false;
+        }
+
         public override bool Exists(string template, params object[] args)
         {
             EnsureConnectionIsOpen();

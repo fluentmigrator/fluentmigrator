@@ -125,5 +125,13 @@ namespace FluentMigrator.Tests.Helpers
 
             return indexName;
         }
+
+        public void WithDefaultValueOn(string column)
+        {
+            var defaultConstraintName = string.Format("[DF_{0}_{1}]", Name, column);
+            const int defaultValue = 1;
+            using (var command = new SqlCommand(string.Format(" ALTER TABLE {0}.{1} ADD CONSTRAINT {2} DEFAULT ({3}) FOR {4}", quoter.QuoteSchemaName(schemaName), quoter.QuoteTableName(Name), defaultConstraintName, defaultValue, quoter.QuoteColumnName(column)), Connection, Transaction))
+                command.ExecuteNonQuery();
+        }
     }
 }

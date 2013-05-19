@@ -116,6 +116,11 @@ namespace FluentMigrator.Runner.Processors.Oracle
             return false;
         }
 
+        public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
+        {
+            return false;
+        }
+
         public override void Execute(string template, params object[] args)
         {
             Process(string.Format(template, args));

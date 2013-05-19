@@ -97,6 +97,20 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
             tableExists.ShouldBeFalse();
         }
 
+        [Test]
+        public void CallingDefaultValueExistsReturnsTrueWhenMatches()
+        {
+            try
+            {
+                Processor.Execute("CREATE TABLE dftesttable (test int NULL DEFAULT 1) ");
+                Processor.DefaultValueExists(null, "dftesttable", "test", 1).ShouldBeTrue();
+            }
+            finally
+            {
+                Processor.Execute("DROP TABLE dftesttable");
+            }
+        }
+
         private static MySqlProcessor SetupMySqlProcessorWithPreviewOnly(StringWriter output, MySqlConnection connection)
         {
             var processor = new MySqlProcessor(

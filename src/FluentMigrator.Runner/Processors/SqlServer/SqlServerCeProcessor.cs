@@ -76,6 +76,11 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             return false;
         }
 
+        public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
+        {
+            return false;
+        }
+
         public override void Execute(string template, params object[] args)
         {
             Process(String.Format(template, args));

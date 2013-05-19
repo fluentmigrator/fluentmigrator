@@ -30,6 +30,11 @@ namespace FluentMigrator.Builders.IfDatabase
             return false;
         }
 
+        public bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
+        {
+            return false;
+        }
+
         public string DatabaseType { get { return "Unknown"; } }
 
         public bool SchemaExists(string schemaName)

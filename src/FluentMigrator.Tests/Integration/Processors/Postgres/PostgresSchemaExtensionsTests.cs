@@ -78,5 +78,14 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
                 Processor.TableExists("Test'Schema", table.Name).ShouldBeTrue();
         }
 
+        [Test]
+        public void CallingDefaultValueExistsCanAcceptSchemaNameWithSingleQuote()
+        {
+            using (var table = new PostgresTestTable(Processor, "test'schema", "id int"))
+            {
+                table.WithDefaultValueOn("id");
+                Processor.DefaultValueExists("test'schema", table.Name, "id", 1).ShouldBeTrue();
+            }
+        }
     }
 }
