@@ -98,6 +98,11 @@ namespace FluentMigrator.Runner.Processors.Sqlite
             return Read("select * from [{0}]", tableName);
         }
 
+        public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
+        {
+            return false;
+        }
+
         public override void Process(PerformDBOperationExpression expression)
         {
             Announcer.Say("Performing DB Operation");

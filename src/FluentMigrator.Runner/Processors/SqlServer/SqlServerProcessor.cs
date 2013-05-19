@@ -87,6 +87,12 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             return Exists("SELECT * FROM INFORMATION_SCHEMA.SEQUENCES WHERE SEQUENCE_SCHEMA = '{0}' AND SEQUENCE_NAME = '{1}'", SafeSchemaName(schemaName), FormatSqlEscape(sequenceName));
         }
 
+        public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
+        {
+            string defaultValueAsString = string.Format("%{0}%", FormatSqlEscape(defaultValue.ToString()));
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}' AND COLUMN_DEFAULT LIKE '{3}'", SafeSchemaName(schemaName), FormatSqlEscape(tableName), FormatSqlEscape(columnName), defaultValueAsString);
+        }
+
         public override void Execute(string template, params object[] args)
         {
             Process(String.Format(template, args));

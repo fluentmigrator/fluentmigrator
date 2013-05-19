@@ -82,5 +82,12 @@ namespace FluentMigrator.Tests.Helpers
             using (var command = new NpgsqlCommand(sb.ToString(), Connection, Transaction))
                 command.ExecuteNonQuery();
         }
+
+        public void WithDefaultValueOn(string column)
+        {
+            const int defaultValue = 1;
+            using (var command = new NpgsqlCommand(string.Format(" ALTER TABLE {0}.{1} ALTER {2} SET DEFAULT {3}", quoter.QuoteSchemaName(_schemaName), quoter.QuoteTableName(Name), quoter.QuoteColumnName(column), defaultValue), Connection, Transaction))
+                command.ExecuteNonQuery();
+        }
     }
 }
