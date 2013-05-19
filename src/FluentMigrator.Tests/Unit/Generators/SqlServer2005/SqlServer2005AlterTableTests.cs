@@ -89,6 +89,174 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer
         }
 
         [Test]
+        public void CanAlterDefaultConstraintWithCurrentUserAsDefault()
+        {
+            var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
+            expression.DefaultValue = SystemMethods.CurrentUser;
+            var sql = generator.Generate(expression);
+
+            string expected = "DECLARE @default sysname, @sql nvarchar(max);" + Environment.NewLine + Environment.NewLine +
+            "-- get name of default constraint" + Environment.NewLine +
+            "SELECT @default = name" + Environment.NewLine +
+            "FROM sys.default_constraints" + Environment.NewLine +
+            "WHERE parent_object_id = object_id('[dbo].[TestTable1]')" + Environment.NewLine +
+            "AND type = 'D'" + Environment.NewLine +
+            "AND parent_column_id = (" + Environment.NewLine +
+            "SELECT column_id" + Environment.NewLine +
+            "FROM sys.columns" + Environment.NewLine +
+            "WHERE object_id = object_id('[dbo].[TestTable1]')" + Environment.NewLine +
+            "AND name = 'TestColumn1'" + Environment.NewLine +
+            ");" + Environment.NewLine + Environment.NewLine +
+            "-- create alter table command to drop constraint as string and run it" + Environment.NewLine +
+            "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + @default;" + Environment.NewLine +
+            "EXEC sp_executesql @sql;" + Environment.NewLine + Environment.NewLine +
+            "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
+            "ALTER TABLE [dbo].[TestTable1] WITH NOCHECK ADD CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT(CURRENT_USER) FOR [TestColumn1];";
+
+            sql.ShouldBe(expected);
+        }
+
+        [Test]
+        public void CanAlterDefaultConstraintWithCurrentDateAsDefault()
+        {
+            var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
+            expression.DefaultValue = SystemMethods.CurrentDateTime;
+            var sql = generator.Generate(expression);
+
+            string expected = "DECLARE @default sysname, @sql nvarchar(max);" + Environment.NewLine + Environment.NewLine +
+            "-- get name of default constraint" + Environment.NewLine +
+            "SELECT @default = name" + Environment.NewLine +
+            "FROM sys.default_constraints" + Environment.NewLine +
+            "WHERE parent_object_id = object_id('[dbo].[TestTable1]')" + Environment.NewLine +
+            "AND type = 'D'" + Environment.NewLine +
+            "AND parent_column_id = (" + Environment.NewLine +
+            "SELECT column_id" + Environment.NewLine +
+            "FROM sys.columns" + Environment.NewLine +
+            "WHERE object_id = object_id('[dbo].[TestTable1]')" + Environment.NewLine +
+            "AND name = 'TestColumn1'" + Environment.NewLine +
+            ");" + Environment.NewLine + Environment.NewLine +
+            "-- create alter table command to drop constraint as string and run it" + Environment.NewLine +
+            "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + @default;" + Environment.NewLine +
+            "EXEC sp_executesql @sql;" + Environment.NewLine + Environment.NewLine +
+            "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
+            "ALTER TABLE [dbo].[TestTable1] WITH NOCHECK ADD CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT(GETDATE()) FOR [TestColumn1];";
+
+            sql.ShouldBe(expected);
+        }
+
+        [Test]
+        public void CanAlterDefaultConstraintWithCurrentUtcDateAsDefault()
+        {
+            var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
+            expression.DefaultValue = SystemMethods.CurrentUTCDateTime;
+            var sql = generator.Generate(expression);
+
+            string expected = "DECLARE @default sysname, @sql nvarchar(max);" + Environment.NewLine + Environment.NewLine +
+            "-- get name of default constraint" + Environment.NewLine +
+            "SELECT @default = name" + Environment.NewLine +
+            "FROM sys.default_constraints" + Environment.NewLine +
+            "WHERE parent_object_id = object_id('[dbo].[TestTable1]')" + Environment.NewLine +
+            "AND type = 'D'" + Environment.NewLine +
+            "AND parent_column_id = (" + Environment.NewLine +
+            "SELECT column_id" + Environment.NewLine +
+            "FROM sys.columns" + Environment.NewLine +
+            "WHERE object_id = object_id('[dbo].[TestTable1]')" + Environment.NewLine +
+            "AND name = 'TestColumn1'" + Environment.NewLine +
+            ");" + Environment.NewLine + Environment.NewLine +
+            "-- create alter table command to drop constraint as string and run it" + Environment.NewLine +
+            "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + @default;" + Environment.NewLine +
+            "EXEC sp_executesql @sql;" + Environment.NewLine + Environment.NewLine +
+            "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
+            "ALTER TABLE [dbo].[TestTable1] WITH NOCHECK ADD CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT(GETUTCDATE()) FOR [TestColumn1];";
+
+            sql.ShouldBe(expected);
+        }
+
+        [Test]
+        public void CanAlterDefaultConstraintWithNewGuidAsDefault()
+        {
+            var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
+            expression.DefaultValue = SystemMethods.NewGuid;
+            var sql = generator.Generate(expression);
+
+            string expected = "DECLARE @default sysname, @sql nvarchar(max);" + Environment.NewLine + Environment.NewLine +
+            "-- get name of default constraint" + Environment.NewLine +
+            "SELECT @default = name" + Environment.NewLine +
+            "FROM sys.default_constraints" + Environment.NewLine +
+            "WHERE parent_object_id = object_id('[dbo].[TestTable1]')" + Environment.NewLine +
+            "AND type = 'D'" + Environment.NewLine +
+            "AND parent_column_id = (" + Environment.NewLine +
+            "SELECT column_id" + Environment.NewLine +
+            "FROM sys.columns" + Environment.NewLine +
+            "WHERE object_id = object_id('[dbo].[TestTable1]')" + Environment.NewLine +
+            "AND name = 'TestColumn1'" + Environment.NewLine +
+            ");" + Environment.NewLine + Environment.NewLine +
+            "-- create alter table command to drop constraint as string and run it" + Environment.NewLine +
+            "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + @default;" + Environment.NewLine +
+            "EXEC sp_executesql @sql;" + Environment.NewLine + Environment.NewLine +
+            "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
+            "ALTER TABLE [dbo].[TestTable1] WITH NOCHECK ADD CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT(NEWID()) FOR [TestColumn1];";
+
+            sql.ShouldBe(expected);
+        }
+
+        [Test]
+        public void CanAlterDefaultConstraintWithStringAsDefault()
+        {
+            var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
+            expression.DefaultValue = "TestString";
+            var sql = generator.Generate(expression);
+
+            string expected = "DECLARE @default sysname, @sql nvarchar(max);" + Environment.NewLine + Environment.NewLine +
+            "-- get name of default constraint" + Environment.NewLine +
+            "SELECT @default = name" + Environment.NewLine +
+            "FROM sys.default_constraints" + Environment.NewLine +
+            "WHERE parent_object_id = object_id('[dbo].[TestTable1]')" + Environment.NewLine +
+            "AND type = 'D'" + Environment.NewLine +
+            "AND parent_column_id = (" + Environment.NewLine +
+            "SELECT column_id" + Environment.NewLine +
+            "FROM sys.columns" + Environment.NewLine +
+            "WHERE object_id = object_id('[dbo].[TestTable1]')" + Environment.NewLine +
+            "AND name = 'TestColumn1'" + Environment.NewLine +
+            ");" + Environment.NewLine + Environment.NewLine +
+            "-- create alter table command to drop constraint as string and run it" + Environment.NewLine +
+            "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + @default;" + Environment.NewLine +
+            "EXEC sp_executesql @sql;" + Environment.NewLine + Environment.NewLine +
+            "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
+            "ALTER TABLE [dbo].[TestTable1] WITH NOCHECK ADD CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT('TestString') FOR [TestColumn1];";
+
+            sql.ShouldBe(expected);
+        }
+
+        [Test]
+        public void CanAlterDefaultConstraintWithSqlFunctionAsDefault()
+        {
+            var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
+            expression.DefaultValue = "MyTestFunction()";
+            var sql = generator.Generate(expression);
+
+            string expected = "DECLARE @default sysname, @sql nvarchar(max);" + Environment.NewLine + Environment.NewLine +
+            "-- get name of default constraint" + Environment.NewLine +
+            "SELECT @default = name" + Environment.NewLine +
+            "FROM sys.default_constraints" + Environment.NewLine +
+            "WHERE parent_object_id = object_id('[dbo].[TestTable1]')" + Environment.NewLine +
+            "AND type = 'D'" + Environment.NewLine +
+            "AND parent_column_id = (" + Environment.NewLine +
+            "SELECT column_id" + Environment.NewLine +
+            "FROM sys.columns" + Environment.NewLine +
+            "WHERE object_id = object_id('[dbo].[TestTable1]')" + Environment.NewLine +
+            "AND name = 'TestColumn1'" + Environment.NewLine +
+            ");" + Environment.NewLine + Environment.NewLine +
+            "-- create alter table command to drop constraint as string and run it" + Environment.NewLine +
+            "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + @default;" + Environment.NewLine +
+            "EXEC sp_executesql @sql;" + Environment.NewLine + Environment.NewLine +
+            "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
+            "ALTER TABLE [dbo].[TestTable1] WITH NOCHECK ADD CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT(MyTestFunction()) FOR [TestColumn1];";
+
+            sql.ShouldBe(expected);
+        }
+
+        [Test]
         public void CanAlterDefaultConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
