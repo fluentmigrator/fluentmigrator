@@ -13,7 +13,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         protected override string FormatDefaultValue(ColumnDefinition column)
         {
-            if (column.DefaultValue is string && column.DefaultValue.ToString().EndsWith("()"))
+            if (DefaultValueIsSqlFunction(column.DefaultValue))
                 return "DEFAULT " + column.DefaultValue.ToString();
 
             var defaultValue = base.FormatDefaultValue(column);
@@ -22,6 +22,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 return "CONSTRAINT " + Quoter.QuoteConstraintName(GetDefaultConstraintName(column.TableName, column.Name)) + " " + defaultValue;
 
             return string.Empty;
+        }
+
+        private static bool DefaultValueIsSqlFunction(object defaultValue)
+        {
+            return defaultValue is string && defaultValue.ToString().EndsWith("()");
         }
 
         protected override string FormatIdentity(ColumnDefinition column)
@@ -53,6 +58,17 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             }
 
             return null;
+        }
+
+        public string FormatDefaultValue(object defaultValue)
+        {
+            if (DefaultValueIsSqlFunction(defaultValue))
+                return defaultValue.ToString();
+
+            if (defaultValue is SystemMethods)
+                return FormatSystemMethods((SystemMethods)defaultValue);
+
+            return Quoter.QuoteValue(defaultValue);
         }
 
         public static string GetDefaultConstraintName(string tableName, string columnName)
