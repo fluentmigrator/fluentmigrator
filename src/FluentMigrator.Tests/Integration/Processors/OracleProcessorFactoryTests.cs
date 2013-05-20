@@ -3,12 +3,12 @@ using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Oracle;
-
 using NUnit.Framework;
 
-namespace FluentMigrator.Tests.Unit.Processors
+namespace FluentMigrator.Tests.Integration.Processors
 {
     [TestFixture]
+    [Category("Integration")]
     public class OracleProcessorFactoryTests
     {
         private OracleProcessorFactory factory;
