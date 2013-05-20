@@ -124,6 +124,16 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        public void CanPassConnectionString()
+        {
+            IMigration migration = new TestEmptyMigration();
+            _runner.Up(migration);
+
+            Assert.AreEqual(IntegrationTestOptions.SqlServer2008.ConnectionString, migration.ConnectionString, "The migration does not have the expected connection string.");
+            _announcer.VerifyAll();
+        }
+
+        [Test]
         public void CanAnnounceUp()
         {
             _announcer.Setup(x => x.Heading(It.IsRegex(containsAll("Test", "migrating"))));

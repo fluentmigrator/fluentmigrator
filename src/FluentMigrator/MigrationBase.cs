@@ -34,6 +34,12 @@ namespace FluentMigrator
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         public object ApplicationContext { get; protected set; }
 
+        /// <summary>
+        /// Connection String that is used to execute migrations.
+        /// </summary>
+        public string ConnectionString { get; protected set; }
+
+
         public abstract void Up();
         public abstract void Down();
 
@@ -49,6 +55,7 @@ namespace FluentMigrator
             {
                 _context = context;
                 ApplicationContext = context.ApplicationContext;
+                ConnectionString = context.Connection;
                 Up();
                 _context = null;
             }
@@ -60,6 +67,7 @@ namespace FluentMigrator
             {
                 _context = context;
                 ApplicationContext = context.ApplicationContext;
+                ConnectionString = context.Connection;
                 Down();
                 _context = null;
             }
