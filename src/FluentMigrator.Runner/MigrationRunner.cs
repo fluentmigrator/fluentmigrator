@@ -25,6 +25,7 @@ using System.Text;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Infrastructure.Extensions;
 
@@ -42,6 +43,8 @@ namespace FluentMigrator.Runner
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         public object ApplicationContext { get; private set; }
 
+        protected string ConnectionString { get; set; }
+
         public bool TransactionPerSession { get; private set; }
 
         public bool SilentlyFail { get; set; }
@@ -51,6 +54,7 @@ namespace FluentMigrator.Runner
         public IProfileLoader ProfileLoader { get; set; }
         public IMigrationConventions Conventions { get; private set; }
         public IList<Exception> CaughtExceptions { get; private set; }
+
         public IMigrationScope CurrentScope
         {
             get
@@ -70,6 +74,7 @@ namespace FluentMigrator.Runner
             Processor = processor;
             _stopWatch = runnerContext.StopWatch;
             ApplicationContext = runnerContext.ApplicationContext;
+            ConnectionString = runnerContext.Connection;
             TransactionPerSession = runnerContext.TransactionPerSession;
 
             SilentlyFail = false;
@@ -338,7 +343,7 @@ namespace FluentMigrator.Runner
         private void ExecuteMigration(IMigration migration, Action<IMigration, IMigrationContext> getExpressions)
         {
             CaughtExceptions = new List<Exception>();
-            var context = new MigrationContext(Conventions, Processor, MigrationAssembly, ApplicationContext);
+            var context = new MigrationContext(Conventions, Processor, MigrationAssembly, ApplicationContext, ConnectionString);
             
             getExpressions(migration, context);
 
