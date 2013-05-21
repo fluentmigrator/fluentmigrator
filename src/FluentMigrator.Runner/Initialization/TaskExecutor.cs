@@ -49,8 +49,10 @@ namespace FluentMigrator.Runner.Initialization
         protected virtual void Initialize()
         {
             var assembly = AssemblyLoaderFactory.GetAssemblyLoader(RunnerContext.Target).Load();
+            var connectionString = LoadConnectionString(assembly.Location);
+            RunnerContext.Connection = connectionString;
 
-            var processor = InitializeProcessor(assembly.Location);
+            var processor = InitializeProcessor(assembly.Location, connectionString);
 
             Runner = new MigrationRunner(assembly, RunnerContext, processor);
         }
@@ -98,12 +100,8 @@ namespace FluentMigrator.Runner.Initialization
             RunnerContext.Announcer.Say("Task completed.");
         }
 
-        private IMigrationProcessor InitializeProcessor(string assemblyLocation)
+        private IMigrationProcessor InitializeProcessor(string assemblyLocation, string connectionString)
         {
-            var manager = new ConnectionStringManager(new NetConfigManager(), RunnerContext.Announcer, RunnerContext.Connection, RunnerContext.ConnectionStringConfigPath, assemblyLocation, RunnerContext.Database);
-
-            manager.LoadConnectionString();
-
             if (RunnerContext.Timeout == 0)
             {
                 RunnerContext.Timeout = 30; // Set default timeout for command
@@ -113,13 +111,23 @@ namespace FluentMigrator.Runner.Initialization
             if (processorFactory == null)
                 throw new ProcessorFactoryNotFoundException(string.Format("The provider or dbtype parameter is incorrect. Available choices are {0}: ", ProcessorFactoryProvider.ListAvailableProcessorTypes()));
 
-            var processor = processorFactory.Create(manager.ConnectionString, RunnerContext.Announcer, new ProcessorOptions
+            var processor = processorFactory.Create(connectionString, RunnerContext.Announcer, new ProcessorOptions
             {
                 PreviewOnly = RunnerContext.PreviewOnly,
                 Timeout = RunnerContext.Timeout
             });
 
             return processor;
+        }
+
+        private string LoadConnectionString(string assemblyLocation)
+        {
+            var manager = new ConnectionStringManager(new NetConfigManager(), RunnerContext.Announcer, RunnerContext.Connection,
+                                                      RunnerContext.ConnectionStringConfigPath, assemblyLocation,
+                                                      RunnerContext.Database);
+
+            manager.LoadConnectionString();
+            return manager.ConnectionString;
         }
     }
 }
