@@ -252,6 +252,7 @@
     <Compile Include="ProfileAttribute.cs" />
     <Compile Include="SystemMethods.cs" />
     <Compile Include="TagsAttribute.cs" />
+    <Compile Include="AutoScriptMigration.cs" />
     <Compile Include="TransactionBehavior.cs" />
     <Compile Include="VersionTableInfo\DefaultVersionTableMetaData.cs" />
     <Compile Include="VersionTableInfo\IVersionTableMetaData.cs" />
