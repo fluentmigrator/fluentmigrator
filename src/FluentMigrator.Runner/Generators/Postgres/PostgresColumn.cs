@@ -22,7 +22,10 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         private string FormatAlterNullable(ColumnDefinition column)
         {
-            if (column.IsNullable)
+            if (!column.IsNullable.HasValue)
+                return "";
+
+            if (column.IsNullable.Value)
                 return "DROP NOT NULL";
 
             return "SET NOT NULL";
@@ -40,9 +43,9 @@ namespace FluentMigrator.Runner.Generators.Postgres
             var clauses = new List<string>();
             foreach (var action in AlterClauseOrder)
             {
-                string clause = string.Format("ALTER {0} {1}", Quoter.QuoteColumnName(column.Name), action(column));
-                if (!string.IsNullOrEmpty(clause))
-                    clauses.Add(clause);
+                string columnClause = action(column);
+                if (!string.IsNullOrEmpty(columnClause))
+                    clauses.Add(string.Format("ALTER {0} {1}", Quoter.QuoteColumnName(column.Name), columnClause));
             }
 
             return string.Join(", ", clauses.ToArray());
@@ -53,7 +56,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return string.Empty;
         }
 
-        public override string AddPrimaryKeyConstraint(string tableName, System.Collections.Generic.IEnumerable<ColumnDefinition> primaryKeyColumns)
+        public override string AddPrimaryKeyConstraint(string tableName, IEnumerable<ColumnDefinition> primaryKeyColumns)
         {
             string pkName = GetPrimaryKeyConstraintName(primaryKeyColumns, tableName);
 
