@@ -593,6 +593,19 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public void CanAlterColumnAndOnlySetTypeIfIsNullableNotSet()
+        {
+            var expression = new AlterColumnExpression
+            {
+                Column = new ColumnDefinition { Type = DbType.String, Name = "Col1", IsNullable = null },
+                SchemaName = "Schema1",
+                TableName = "Table1"
+            };
+            var sql = generator.Generate(expression);
+            sql.ShouldBe("ALTER TABLE \"Schema1\".\"Table1\" ALTER \"Col1\" TYPE text");
+        }
+
+        [Test]
         public void CanAlterDefaultConstraintToCurrentUser()
         {
             var expression = new AlterDefaultConstraintExpression
