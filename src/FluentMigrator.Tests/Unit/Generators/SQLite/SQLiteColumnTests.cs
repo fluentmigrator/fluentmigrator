@@ -16,12 +16,33 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
+        public void CanAlterColumnWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(string.Empty);
+        }
+
+        [Test]
         public void CanAlterColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
 
             var result = Generator.Generate(expression);
             result.ShouldBe(string.Empty);
+        }
+
+        [Test]
+        public void CanCreateAutoIncrementColumnWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetAlterTableAutoIncrementColumnExpression();
+            expression.Column.IsPrimaryKey = true;
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT");
         }
 
         [Test]
@@ -35,12 +56,32 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
+        public void CanCreateColumnWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" TEXT NOT NULL");
+        }
+
+        [Test]
         public void CanCreateColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" TEXT NOT NULL");
+        }
+
+        [Test]
+        public void CanCreateDecimalColumnWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" NUMERIC NOT NULL");
         }
 
         [Test]
@@ -53,12 +94,32 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
 
         [Test]
+        public void CanDropColumnWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteColumnExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(string.Empty);
+        }
+
+        [Test]
         public void CanDropColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty); //because sqlite doesnt support removing columns
+            result.ShouldBe(string.Empty);
+        }
+
+        [Test]
+        public void CanDropMultipleColumnsWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "TestColumn1", "TestColumn2" });
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
@@ -67,7 +128,17 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new [] { "TestColumn1", "TestColumn2" });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(string.Empty); //because sqlite doesnt support removing columns
+            result.ShouldBe(string.Empty);
+        }
+
+        [Test]
+        public void CanRenameColumnWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetRenameColumnExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
