@@ -326,6 +326,30 @@ namespace FluentMigrator.Tests.Unit.Generators
             return new AlterSchemaExpression{ DestinationSchemaName = "TestSchema2", SourceSchemaName = "TestSchema1", TableName = "TestTable" };
         }
 
+        public static CreateForeignKeyExpression GetCreateForeignKeyExpression()
+        {
+            var expression = new CreateForeignKeyExpression();
+            expression.ForeignKey.PrimaryTable = TestTableName2;
+            expression.ForeignKey.ForeignTable = TestTableName1;
+            expression.ForeignKey.PrimaryColumns = new[] { TestColumnName2 };
+            expression.ForeignKey.ForeignColumns = new[] { TestColumnName1 };
+
+            expression.ApplyConventions(new MigrationConventions());
+            return expression;
+        }
+
+        public static CreateForeignKeyExpression GetCreateMultiColumnForeignKeyExpression()
+        {
+            var expression = new CreateForeignKeyExpression();
+            expression.ForeignKey.PrimaryTable = TestTableName2;
+            expression.ForeignKey.ForeignTable = TestTableName1;
+            expression.ForeignKey.PrimaryColumns = new[] { TestColumnName2, "TestColumn4" };
+            expression.ForeignKey.ForeignColumns = new[] { TestColumnName1, "TestColumn3" };
+
+            expression.ApplyConventions(new MigrationConventions());
+            return expression;
+        }
+
         public static CreateForeignKeyExpression GetCreateNamedForeignKeyExpression()
         {
             var expression = new CreateForeignKeyExpression();
