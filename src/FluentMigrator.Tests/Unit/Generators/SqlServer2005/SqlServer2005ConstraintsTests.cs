@@ -186,6 +186,65 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanCreateForeignKeyWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
+            expression.ForeignKey.ForeignTableSchema = "TestSchema";
+            expression.ForeignKey.PrimaryTableSchema = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestTable2_TestColumn2] FOREIGN KEY ([TestColumn1]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2])");
+        }
+
+        [Test]
+        public void CanCreateForeignKeyWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestTable2_TestColumn2] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2])");
+        }
+
+        [Test]
+        public void CanCreateForeignKeyWithDifferentSchemas()
+        {
+            var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
+            expression.ForeignKey.ForeignTableSchema = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestTable2_TestColumn2] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2])");
+        }
+
+        [Test]
+        public void CanCreateMultiColumnForeignKeyWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
+            expression.ForeignKey.ForeignTableSchema = "TestSchema";
+            expression.ForeignKey.PrimaryTableSchema = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2], [TestColumn4])");
+        }
+
+        [Test]
+        public void CanCreateMultiColumnForeignKeyWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [dbo].[TestTable2] ([TestColumn2], [TestColumn4])");
+        }
+
+        [Test]
+        public void CanCreateMultiColumnForeignKeyWithDifferentSchemas()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
+            expression.ForeignKey.ForeignTableSchema = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [dbo].[TestTable2] ([TestColumn2], [TestColumn4])");
+        }
+
         public void CanCreateMultiColumnPrimaryKeyConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnPrimaryKeyExpression();
@@ -232,7 +291,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2])");
-
         }
 
         [Test]
@@ -242,7 +300,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2])");
+        }
 
+        [Test]
+        public void CanCreateNamedForeignKeyWithDifferentSchemas()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
+            expression.ForeignKey.ForeignTableSchema = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2])");
         }
 
         [Test]
@@ -294,6 +361,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [dbo].[TestTable2] ([TestColumn2], [TestColumn4])");
+        }
+
+        [Test]
+        public void CanCreateNamedMultiColumnForeignKeyWithDifferentSchemas()
+        {
+            var expression = GeneratorTestHelper.GetCreateNamedMultiColumnForeignKeyExpression();
+            expression.ForeignKey.ForeignTableSchema = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [dbo].[TestTable2] ([TestColumn2], [TestColumn4])");
         }
 
         [Test]
