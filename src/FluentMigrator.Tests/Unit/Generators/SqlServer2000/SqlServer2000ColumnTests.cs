@@ -16,6 +16,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         }
 
         [Test]
+        public void CanAlterColumnWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL");
+        }
+
+        [Test]
         public void CanAlterColumnWithDefaultSchema()
         {
             //TODO: This will fail if there are any keys attached 
@@ -25,9 +35,33 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL");
         }
 
+        [Test]
+        public void CanCreateAutoIncrementColumnWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] INT NOT NULL IDENTITY(1,1)");
+        }
+
+        [Test]
         public void CanCreateAutoIncrementColumnWithDefaultSchema()
         {
-            throw new System.NotImplementedException();
+            var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] INT NOT NULL IDENTITY(1,1)");
+        }
+
+        [Test]
+        public void CanCreateColumnWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL");
         }
 
         [Test]
@@ -40,12 +74,51 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         }
 
         [Test]
+        public void CanCreateDecimalColumnWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] DECIMAL(19,2) NOT NULL");
+        }
+
+        [Test]
         public void CanCreateDecimalColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] DECIMAL(19,2) NOT NULL");
+        }
+
+        [Test]
+        public void CanDropColumnWithCustomSchema()
+        {
+            //This does not work if it is a primary key
+            var expression = GeneratorTestHelper.GetDeleteColumnExpression();
+            expression.SchemaName = "TestSchema";
+
+            var expected = "DECLARE @default sysname, @sql nvarchar(4000);" + System.Environment.NewLine + System.Environment.NewLine +
+                        "-- get name of default constraint" + System.Environment.NewLine +
+                        "SELECT @default = name" + System.Environment.NewLine +
+                        "FROM sys.default_constraints" + System.Environment.NewLine +
+                        "WHERE parent_object_id = object_id('[TestTable1]')" + System.Environment.NewLine +
+                        "AND type = 'D'" + System.Environment.NewLine +
+                        "AND parent_column_id = (" + System.Environment.NewLine +
+                        "SELECT column_id" + System.Environment.NewLine +
+                        "FROM sys.columns" + System.Environment.NewLine +
+                        "WHERE object_id = object_id('[TestTable1]')" + System.Environment.NewLine +
+                        "AND name = 'TestColumn1'" + System.Environment.NewLine +
+                        ");" + System.Environment.NewLine + System.Environment.NewLine +
+                        "-- create alter table command to drop constraint as string and run it" + System.Environment.NewLine +
+                        "SET @sql = N'ALTER TABLE [TestTable1] DROP CONSTRAINT ' + @default;" + System.Environment.NewLine +
+                        "EXEC sp_executesql @sql;" + System.Environment.NewLine + System.Environment.NewLine +
+                        "-- now we can finally drop column" + System.Environment.NewLine +
+                        "ALTER TABLE [TestTable1] DROP COLUMN [TestColumn1];" + System.Environment.NewLine;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
         }
 
         [Test]
@@ -71,6 +144,53 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
                         "EXEC sp_executesql @sql;" + System.Environment.NewLine + System.Environment.NewLine +
                         "-- now we can finally drop column" + System.Environment.NewLine +
                         "ALTER TABLE [TestTable1] DROP COLUMN [TestColumn1];" + System.Environment.NewLine;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
+        }
+
+        [Test]
+        public void CanDropMultipleColumnsWithCustomSchema()
+        {
+            //This does not work if it is a primary key
+            var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "TestColumn1", "TestColumn2" });
+            expression.SchemaName = "TestSchema";
+
+            var expected = "DECLARE @default sysname, @sql nvarchar(4000);" + System.Environment.NewLine + System.Environment.NewLine +
+                        "-- get name of default constraint" + System.Environment.NewLine +
+                        "SELECT @default = name" + System.Environment.NewLine +
+                        "FROM sys.default_constraints" + System.Environment.NewLine +
+                        "WHERE parent_object_id = object_id('[TestTable1]')" + System.Environment.NewLine + "" +
+                        "AND type = 'D'" + System.Environment.NewLine +
+                        "AND parent_column_id = (" + System.Environment.NewLine +
+                        "SELECT column_id" + System.Environment.NewLine +
+                        "FROM sys.columns" + System.Environment.NewLine +
+                        "WHERE object_id = object_id('[TestTable1]')" + System.Environment.NewLine +
+                        "AND name = 'TestColumn1'" + System.Environment.NewLine +
+                        ");" + System.Environment.NewLine + System.Environment.NewLine +
+                        "-- create alter table command to drop constraint as string and run it" + System.Environment.NewLine +
+                        "SET @sql = N'ALTER TABLE [TestTable1] DROP CONSTRAINT ' + @default;" + System.Environment.NewLine +
+                        "EXEC sp_executesql @sql;" + System.Environment.NewLine + System.Environment.NewLine +
+                        "-- now we can finally drop column" + System.Environment.NewLine +
+                        "ALTER TABLE [TestTable1] DROP COLUMN [TestColumn1];" + System.Environment.NewLine +
+                        "GO" + System.Environment.NewLine +
+                        "DECLARE @default sysname, @sql nvarchar(4000);" + System.Environment.NewLine + System.Environment.NewLine +
+                        "-- get name of default constraint" + System.Environment.NewLine +
+                        "SELECT @default = name" + System.Environment.NewLine +
+                        "FROM sys.default_constraints" + System.Environment.NewLine +
+                        "WHERE parent_object_id = object_id('[TestTable1]')" + System.Environment.NewLine +
+                        "AND type = 'D'" + System.Environment.NewLine +
+                        "AND parent_column_id = (" + System.Environment.NewLine +
+                        "SELECT column_id" + System.Environment.NewLine +
+                        "FROM sys.columns" + System.Environment.NewLine +
+                        "WHERE object_id = object_id('[TestTable1]')" + System.Environment.NewLine +
+                        "AND name = 'TestColumn2'" + System.Environment.NewLine +
+                        ");" + System.Environment.NewLine + System.Environment.NewLine +
+                        "-- create alter table command to drop constraint as string and run it" + System.Environment.NewLine +
+                        "SET @sql = N'ALTER TABLE [TestTable1] DROP CONSTRAINT ' + @default;" + System.Environment.NewLine +
+                        "EXEC sp_executesql @sql;" + System.Environment.NewLine + System.Environment.NewLine +
+                        "-- now we can finally drop column" + System.Environment.NewLine +
+                        "ALTER TABLE [TestTable1] DROP COLUMN [TestColumn2];" + System.Environment.NewLine;
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
@@ -120,6 +240,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
+        }
+
+        [Test]
+        public void CanRenameColumnWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetRenameColumnExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("sp_rename '[TestTable1].[TestColumn1]', 'TestColumn2'");
         }
 
         [Test]

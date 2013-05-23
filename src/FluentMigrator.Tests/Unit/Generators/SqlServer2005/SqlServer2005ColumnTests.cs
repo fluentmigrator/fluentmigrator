@@ -36,14 +36,23 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL");
         }
 
+        [Test]
         public void CanCreateAutoIncrementColumnWithCustomSchema()
         {
-            throw new System.NotImplementedException();
+            var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ALTER COLUMN [TestColumn1] INT NOT NULL IDENTITY(1,1)");
         }
 
+        [Test]
         public void CanCreateAutoIncrementColumnWithDefaultSchema()
         {
-            throw new System.NotImplementedException();
+            var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ALTER COLUMN [TestColumn1] INT NOT NULL IDENTITY(1,1)");
         }
 
         [Test]
