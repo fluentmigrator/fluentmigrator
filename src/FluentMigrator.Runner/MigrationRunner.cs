@@ -25,6 +25,7 @@ using System.Text;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Infrastructure.Extensions;
 
@@ -51,6 +52,7 @@ namespace FluentMigrator.Runner
         public IProfileLoader ProfileLoader { get; set; }
         public IMigrationConventions Conventions { get; private set; }
         public IList<Exception> CaughtExceptions { get; private set; }
+
         public IMigrationScope CurrentScope
         {
             get
@@ -338,7 +340,7 @@ namespace FluentMigrator.Runner
         private void ExecuteMigration(IMigration migration, Action<IMigration, IMigrationContext> getExpressions)
         {
             CaughtExceptions = new List<Exception>();
-            var context = new MigrationContext(Conventions, Processor, MigrationAssembly, ApplicationContext);
+            var context = new MigrationContext(Conventions, Processor, MigrationAssembly, ApplicationContext, Processor.ConnectionString);
             
             getExpressions(migration, context);
 
