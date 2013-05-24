@@ -69,7 +69,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT NULL, [TestColumn2] INT NOT NULL)");
-
         }
 
         [Test]
@@ -81,7 +80,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT NULL, [TestColumn2] INT NOT NULL)");
-
         }
 
         [Test]
@@ -92,7 +90,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT 'Default', [TestColumn2] INT NOT NULL CONSTRAINT [DF_TestTable1_TestColumn2] DEFAULT 0)");
-
         }
 
         [Test]
@@ -102,7 +99,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT 'Default', [TestColumn2] INT NOT NULL CONSTRAINT [DF_TestTable1_TestColumn2] DEFAULT 0)");
-
         }
 
         [Test]
@@ -131,7 +127,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1], [TestColumn2]))");
-
         }
 
         [Test]
@@ -142,7 +137,44 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1], [TestColumn2]))");
+        }
 
+        [Test]
+        public void CanCreateTableWithNamedMultiColumnPrimaryKeyWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1], [TestColumn2]))");
+        }
+
+        [Test]
+        public void CanCreateTableWithNamedMultiColumnPrimaryKeyWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1], [TestColumn2]))");
+        }
+
+        [Test]
+        public void CanCreateTableWithNamedPrimaryKeyWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1]))");
+        }
+
+        [Test]
+        public void CanCreateTableWithNamedPrimaryKeyWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1]))");
         }
 
         [Test]

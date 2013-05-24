@@ -17,6 +17,31 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
+        public void CanCreateTableWithCustomColumnTypeWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.Columns[0].IsPrimaryKey = true;
+            expression.Columns[1].Type = null;
+            expression.Columns[1].CustomType = "[timestamp]";
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" BLOB SUB_TYPE TEXT NOT NULL, \"TestColumn2\" [timestamp] NOT NULL, PRIMARY KEY (\"TestColumn1\"))");
+        }
+
+        [Test]
+        public void CanCreateTableWithCustomColumnTypeWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.Columns[0].IsPrimaryKey = true;
+            expression.Columns[1].Type = null;
+            expression.Columns[1].CustomType = "[timestamp]";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" BLOB SUB_TYPE TEXT NOT NULL, \"TestColumn2\" [timestamp] NOT NULL, PRIMARY KEY (\"TestColumn1\"))");
+        }
+
+        [Test]
         public void CanCreateTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -36,14 +61,37 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
+        public void CanCreateTableWithDefaultValueExplicitlySetToNullWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
+            expression.Columns[0].DefaultValue = null;
+            expression.Columns[0].TableName = expression.TableName;
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" BLOB SUB_TYPE TEXT DEFAULT NULL NOT NULL, \"TestColumn2\" INTEGER DEFAULT 0 NOT NULL)");
+        }
+
+        [Test]
         public void CanCreateTableWithDefaultValueExplicitlySetToNullWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
             expression.Columns[0].DefaultValue = null;
+            expression.Columns[0].TableName = expression.TableName;
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" BLOB SUB_TYPE TEXT DEFAULT NULL NOT NULL, \"TestColumn2\" INTEGER DEFAULT 0 NOT NULL)");
 
+        }
+
+        [Test]
+        public void CanCreateTableWithDefaultValueWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" BLOB SUB_TYPE TEXT DEFAULT 'Default' NOT NULL, \"TestColumn2\" INTEGER DEFAULT 0 NOT NULL)");
         }
 
         [Test]
@@ -56,12 +104,51 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
+        public void CanCreateTableWithIdentityWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" INTEGER NOT NULL, \"TestColumn2\" INTEGER NOT NULL)");
+        }
+
+        [Test]
+        public void CanCreateTableWithIdentityWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" INTEGER NOT NULL, \"TestColumn2\" INTEGER NOT NULL)");
+        }
+
+        [Test]
+        public void CanCreateTableWithMultiColumnPrimaryKeyWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" BLOB SUB_TYPE TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"))");
+        }
+
+        [Test]
         public void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" BLOB SUB_TYPE TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"))");
+        }
+
+        [Test]
+        public void CanCreateTableWithNamedMultiColumnPrimaryKeyWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" BLOB SUB_TYPE TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"))");
         }
 
         [Test]
@@ -74,12 +161,51 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
+        public void CanCreateTableWithNamedPrimaryKeyWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" BLOB SUB_TYPE TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\"))");
+        }
+
+        [Test]
         public void CanCreateTableWithNamedPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" BLOB SUB_TYPE TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\"))");
+        }
+
+        [Test]
+        public void CanCreateTableWithNullableFieldWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" BLOB SUB_TYPE TEXT, \"TestColumn2\" INTEGER NOT NULL)");
+        }
+
+        [Test]
+        public void CanCreateTableWithNullableFieldWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" BLOB SUB_TYPE TEXT, \"TestColumn2\" INTEGER NOT NULL)");
+        }
+
+        [Test]
+        public void CanCreateTableWithPrimaryKeyWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" BLOB SUB_TYPE TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, PRIMARY KEY (\"TestColumn1\"))");
         }
 
         [Test]
@@ -108,6 +234,16 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP TABLE \"TestTable1\"");
+        }
+
+        [Test]
+        public void CanRenameTableWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetRenameTableExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
