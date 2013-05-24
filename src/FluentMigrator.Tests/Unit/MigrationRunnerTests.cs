@@ -67,6 +67,7 @@ namespace FluentMigrator.Tests.Unit
                             };
 
             _processorMock.SetupGet(x => x.Options).Returns(options);
+            _processorMock.SetupGet(x => x.ConnectionString).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
 
             _runnerContextMock.SetupGet(x => x.Namespace).Returns("FluentMigrator.Tests.Integration.Migrations");
             _runnerContextMock.SetupGet(x => x.Announcer).Returns(_announcer.Object);

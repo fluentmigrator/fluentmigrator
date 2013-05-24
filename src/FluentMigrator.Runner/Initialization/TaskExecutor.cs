@@ -50,8 +50,6 @@ namespace FluentMigrator.Runner.Initialization
         {
             var assembly = AssemblyLoaderFactory.GetAssemblyLoader(RunnerContext.Target).Load();
             var connectionString = LoadConnectionString(assembly.Location);
-            RunnerContext.Connection = connectionString;
-
             var processor = InitializeProcessor(assembly.Location, connectionString);
 
             Runner = new MigrationRunner(assembly, RunnerContext, processor);
