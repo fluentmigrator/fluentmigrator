@@ -67,6 +67,7 @@ namespace FluentMigrator.Tests.Unit
                             };
 
             _processorMock.SetupGet(x => x.Options).Returns(options);
+            _processorMock.SetupGet(x => x.ConnectionString).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
 
             _runnerContextMock.SetupGet(x => x.Namespace).Returns("FluentMigrator.Tests.Integration.Migrations");
             _runnerContextMock.SetupGet(x => x.Announcer).Returns(_announcer.Object);
@@ -120,6 +121,16 @@ namespace FluentMigrator.Tests.Unit
             Assert.AreEqual(_applicationContext, _runnerContextMock.Object.ApplicationContext, "The runner context does not have the expected application context.");
             Assert.AreEqual(_applicationContext, _runner.ApplicationContext, "The MigrationRunner does not have the expected application context.");
             Assert.AreEqual(_applicationContext, migration.ApplicationContext, "The migration does not have the expected application context.");
+            _announcer.VerifyAll();
+        }
+
+        [Test]
+        public void CanPassConnectionString()
+        {
+            IMigration migration = new TestEmptyMigration();
+            _runner.Up(migration);
+
+            Assert.AreEqual(IntegrationTestOptions.SqlServer2008.ConnectionString, migration.ConnectionString, "The migration does not have the expected connection string.");
             _announcer.VerifyAll();
         }
 

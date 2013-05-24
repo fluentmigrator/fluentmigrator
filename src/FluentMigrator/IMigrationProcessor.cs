@@ -26,6 +26,7 @@ namespace FluentMigrator
     public interface IMigrationProcessor : IQuerySchema, IDisposable
     {
         IMigrationProcessorOptions Options { get; }
+        string ConnectionString { get; }
 
         void Execute(string template, params object[] args);
         DataSet ReadTableData(string schemaName, string tableName);

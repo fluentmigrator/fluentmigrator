@@ -9,6 +9,7 @@ namespace FluentMigrator.Runner.Processors.Jet
     {
         public OleDbConnection Connection { get; protected set; }
         public OleDbTransaction Transaction { get; protected set; }
+        public override string ConnectionString { get { return Connection.ConnectionString; } }
 
         public override string DatabaseType
         {
