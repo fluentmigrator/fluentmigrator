@@ -22,15 +22,22 @@ namespace FluentMigrator.Runner.Processors
 {
     public abstract class GenericProcessorBase : ProcessorBase
     {
+        private readonly string connectionString;
+
         protected GenericProcessorBase(IDbConnection connection, IDbFactory factory
                                        , IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
             : base(generator, announcer, options)
         {
             Connection = connection;
+
+            // Prefetch connectionstring as after opening the security info could no longer be present
+            // for instance on sql server
+            connectionString = connection.ConnectionString;
+            
             Factory = factory;
         }
 
-        public override string ConnectionString { get { return Connection.ConnectionString; } }
+        public override string ConnectionString { get { return connectionString; } }
 
         public IDbConnection Connection { get; protected set; }
         public IDbFactory Factory { get; protected set; }
