@@ -43,8 +43,6 @@ namespace FluentMigrator.Runner
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         public object ApplicationContext { get; private set; }
 
-        protected string ConnectionString { get; set; }
-
         public bool TransactionPerSession { get; private set; }
 
         public bool SilentlyFail { get; set; }
@@ -74,7 +72,6 @@ namespace FluentMigrator.Runner
             Processor = processor;
             _stopWatch = runnerContext.StopWatch;
             ApplicationContext = runnerContext.ApplicationContext;
-            ConnectionString = runnerContext.Connection;
             TransactionPerSession = runnerContext.TransactionPerSession;
 
             SilentlyFail = false;
@@ -343,7 +340,7 @@ namespace FluentMigrator.Runner
         private void ExecuteMigration(IMigration migration, Action<IMigration, IMigrationContext> getExpressions)
         {
             CaughtExceptions = new List<Exception>();
-            var context = new MigrationContext(Conventions, Processor, MigrationAssembly, ApplicationContext, ConnectionString);
+            var context = new MigrationContext(Conventions, Processor, MigrationAssembly, ApplicationContext, Processor.ConnectionString);
             
             getExpressions(migration, context);
 
