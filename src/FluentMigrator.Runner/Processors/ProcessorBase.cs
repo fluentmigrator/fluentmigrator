@@ -27,6 +27,8 @@ namespace FluentMigrator.Runner.Processors
         protected readonly IAnnouncer Announcer;
         public IMigrationProcessorOptions Options { get; private set; }
 
+        public abstract string ConnectionString { get; }
+
         public abstract string DatabaseType { get; }
 
         public bool WasCommitted { get; protected set; }

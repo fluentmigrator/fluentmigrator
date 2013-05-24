@@ -32,13 +32,19 @@ namespace FluentMigrator.Infrastructure
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         public virtual object ApplicationContext { get; set; }
 
-        public MigrationContext(IMigrationConventions conventions, IQuerySchema querySchema, Assembly migrationAssembly, object context)
+        /// <summary>
+        /// Connection String from the runner.
+        /// </summary>
+        public string Connection { get; set; }
+
+        public MigrationContext(IMigrationConventions conventions, IQuerySchema querySchema, Assembly migrationAssembly, object context, string connection)
         {
             Conventions = conventions;
             Expressions = new List<IMigrationExpression>();
             QuerySchema = querySchema;
             MigrationAssembly = migrationAssembly;
             this.ApplicationContext = context;
+            this.Connection = connection;
         }
     }
 }

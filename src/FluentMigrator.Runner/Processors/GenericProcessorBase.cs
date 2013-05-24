@@ -30,6 +30,8 @@ namespace FluentMigrator.Runner.Processors
             Factory = factory;
         }
 
+        public override string ConnectionString { get { return Connection.ConnectionString; } }
+
         public IDbConnection Connection { get; protected set; }
         public IDbFactory Factory { get; protected set; }
         public IDbTransaction Transaction { get; protected set; }
