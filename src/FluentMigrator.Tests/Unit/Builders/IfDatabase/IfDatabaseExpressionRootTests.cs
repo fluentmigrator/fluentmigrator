@@ -18,6 +18,7 @@
 #endregion
 
 using System;
+using System.Data.OleDb;
 using FluentMigrator.Builders.IfDatabase;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Processors.Jet;
@@ -152,7 +153,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
         {
             // Arrange
 
-            var context = new MigrationContext(new MigrationConventions(), processor ?? new JetProcessor(null, null, null, null), GetType().Assembly, null, "");
+            var context = new MigrationContext(new MigrationConventions(), processor ?? new JetProcessor(new OleDbConnection(), null, null, null), GetType().Assembly, null, "");
 
 
             var expression = new IfDatabaseExpressionRoot(context, databaseType.ToArray());
