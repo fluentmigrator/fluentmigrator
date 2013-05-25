@@ -17,12 +17,32 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanDeleteDataForAllRowsWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DELETE FROM [TestSchema].[TestTable1] WHERE 1 = 1");
+        }
+
+        [Test]
         public void CanDeleteDataForAllRowsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DELETE FROM [dbo].[TestTable1] WHERE 1 = 1");
+        }
+
+        [Test]
+        public void CanDeleteDataForMultipleRowsWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DELETE FROM [TestSchema].[TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL; DELETE FROM [TestSchema].[TestTable1] WHERE [Website] = 'github.com'");
         }
 
         [Test]
@@ -95,6 +115,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe(System.String.Format("INSERT INTO [dbo].[TestTable1] ([guid]) VALUES ('{0}')", GeneratorTestHelper.TestGuid.ToString()));
+        }
+
+        [Test]
+        public void CanUpdateDataForAllDataWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("UPDATE [TestSchema].[TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE 1 = 1");
         }
 
         [Test]
