@@ -16,12 +16,60 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public void CanCreateIndexWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateIndexExpression();
+            expression.Index.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX \"TestIndex\" ON \"TestSchema\".\"TestTable1\" (\"TestColumn1\" ASC)");
+        }
+
+        [Test]
         public void CanCreateIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC)");
+        }
+
+        [Test]
+        public void CanCreateMultiColumnIndexWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
+            expression.Index.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX \"TestIndex\" ON \"TestSchema\".\"TestTable1\" (\"TestColumn1\" ASC,\"TestColumn2\" DESC)");
+        }
+
+        [Test]
+        public void CanCreateMultiColumnIndexWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC,\"TestColumn2\" DESC)");
+        }
+
+        [Test]
+        public void CanCreateMultiColumnUniqueIndexWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
+            expression.Index.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"TestSchema\".\"TestTable1\" (\"TestColumn1\" ASC,\"TestColumn2\" DESC)");
+        }
+
+        [Test]
+        public void CanCreateMultiColumnUniqueIndexWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC,\"TestColumn2\" DESC)");
         }
 
         [Test]
@@ -41,6 +89,16 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"public\".\"TestTable1\" (\"TestColumn1\" ASC)");
+        }
+
+        [Test]
+        public void CanDropIndexWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteIndexExpression();
+            expression.Index.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP INDEX \"TestSchema\".\"TestIndex\"");
         }
 
         [Test]
