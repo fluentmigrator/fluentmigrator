@@ -1,5 +1,4 @@
-﻿using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Generators.SqlServer;
+﻿using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -8,48 +7,39 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
     [TestFixture]
     public class SqlServer2005SchemaTests
     {
-        protected SqlServer2005Generator generator;
+        protected SqlServer2005Generator Generator;
 
         [SetUp]
         public void Setup()
         {
-            generator = new SqlServer2005Generator();
+            Generator = new SqlServer2005Generator();
         }
 
         [Test]
         public void CanAlterSchema()
         {
-            var expression = new AlterSchemaExpression
-            {
-                DestinationSchemaName = "DEST",
-                SourceSchemaName = "SOURCE",
-                TableName = "TABLE"
-            };
+            var expression = GeneratorTestHelper.GetAlterSchemaExpression();
 
-            var sql = generator.Generate(expression);
-            sql.ShouldBe(
-              "ALTER SCHEMA [DEST] TRANSFER [SOURCE].[TABLE]");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER SCHEMA [TestSchema2] TRANSFER [TestSchema1].[TestTable]");
         }
 
         [Test]
         public void CanCreateSchema()
         {
-            var expression = new CreateSchemaExpression
-            {
-                SchemaName = "TestSchema"
-            };
+            var expression = GeneratorTestHelper.GetCreateSchemaExpression();
 
-            var sql = generator.Generate(expression);
-            sql.ShouldBe(
-              "CREATE SCHEMA [TestSchema]");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE SCHEMA [TestSchema]");
         }
 
         [Test]
         public void CanDropSchema()
         {
-            var expression = new DeleteSchemaExpression() { SchemaName = "TestSchema" };
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("DROP SCHEMA [TestSchema]");
+            var expression = GeneratorTestHelper.GetDeleteSchemaExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP SCHEMA [TestSchema]");
         }
     }
 }

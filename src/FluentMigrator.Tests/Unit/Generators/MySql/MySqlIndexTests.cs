@@ -7,20 +7,21 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
     [TestFixture]
     public class MySqlIndexTests
     {
-        protected MySqlGenerator _generator;
+        protected MySqlGenerator Generator;
 
         [SetUp]
         public void Setup()
         {
-            _generator = new MySqlGenerator();
+            Generator = new MySqlGenerator();
         }
 
         [Test]
         public void CanCreateIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
-            var sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE INDEX `TestIndex` ON `TestTable1` (`TestColumn1` ASC)");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX `TestIndex` ON `TestTable1` (`TestColumn1` ASC)");
         }
 
         [Test]
@@ -28,8 +29,8 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
 
-            var sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE INDEX `TestIndex` ON `TestTable1` (`TestColumn1` ASC, `TestColumn2` DESC)");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX `TestIndex` ON `TestTable1` (`TestColumn1` ASC, `TestColumn2` DESC)");
         }
 
         [Test]
@@ -37,24 +38,26 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
 
-            var sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE UNIQUE INDEX `TestIndex` ON `TestTable1` (`TestColumn1` ASC, `TestColumn2` DESC)");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX `TestIndex` ON `TestTable1` (`TestColumn1` ASC, `TestColumn2` DESC)");
         }
 
         [Test]
         public void CanCreateUniqueIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
-            var sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE UNIQUE INDEX `TestIndex` ON `TestTable1` (`TestColumn1` ASC)");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX `TestIndex` ON `TestTable1` (`TestColumn1` ASC)");
         }
 
         [Test]
         public void CanDropIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
-            var sql = _generator.Generate(expression);
-            sql.ShouldBe("DROP INDEX `TestIndex` ON `TestTable1`");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP INDEX `TestIndex` ON `TestTable1`");
         }
     }
 }

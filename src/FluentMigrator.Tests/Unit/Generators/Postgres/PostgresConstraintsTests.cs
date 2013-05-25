@@ -1,6 +1,4 @@
 ﻿using System.Data;
-using FluentMigrator.Expressions;
-using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Postgres;
 using NUnit.Framework;
 using NUnit.Should;
@@ -10,169 +8,136 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
     [TestFixture]
     public class PostgresConstraintsTests
     {
-        protected PostgresGenerator generator;
+        protected PostgresGenerator Generator;
 
         [SetUp]
         public void Setup()
         {
-            generator = new PostgresGenerator();
+            Generator = new PostgresGenerator();
         }
 
         [Test]
         public void CanCreateNamedForeignKeyWithDefaultSchema()
         {
-            var expression = new CreateForeignKeyExpression();
-            expression.ForeignKey.Name = "FK_Test";
-            expression.ForeignKey.PrimaryTable = "TestPrimaryTable";
-            expression.ForeignKey.ForeignTable = "TestForeignTable";
-            expression.ForeignKey.PrimaryColumns = new[] { "Column1", "Column2" };
-            expression.ForeignKey.ForeignColumns = new[] { "Column3", "Column4" };
+            var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
 
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"public\".\"TestForeignTable\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"Column3\",\"Column4\") REFERENCES \"public\".\"TestPrimaryTable\" (\"Column1\",\"Column2\")");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\")");
         }
 
         [Test]
         public void CanCreateNamedForeignKeyWithDifferentSchemas()
         {
-            var expression = new CreateForeignKeyExpression();
-            expression.ForeignKey.Name = "FK_Test";
-            expression.ForeignKey.PrimaryTable = "TestPrimaryTable";
-            expression.ForeignKey.ForeignTable = "TestForeignTable";
-            expression.ForeignKey.PrimaryColumns = new[] { "Column1", "Column2" };
-            expression.ForeignKey.ForeignColumns = new[] { "Column3", "Column4" };
-            expression.ForeignKey.PrimaryTableSchema = "wibble";
+            var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
+            expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"public\".\"TestForeignTable\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"Column3\",\"Column4\") REFERENCES \"wibble\".\"TestPrimaryTable\" (\"Column1\",\"Column2\")");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\")");
         }
 
         [Test]
         public void CanCreateNamedForeignKeyWithOnDeleteAndOnUpdateOptions()
         {
-            var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
+            var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
             expression.ForeignKey.OnDelete = Rule.Cascade;
             expression.ForeignKey.OnUpdate = Rule.SetDefault;
-            var sql = generator.Generate(expression);
-            sql.ShouldBe(
-                "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\") ON DELETE CASCADE ON UPDATE SET DEFAULT");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\") ON DELETE CASCADE ON UPDATE SET DEFAULT");
         }
 
         [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
         public void CanCreateNamedForeignKeyWithOnDeleteOptions(Rule rule, string output)
         {
-            var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
+            var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
             expression.ForeignKey.OnDelete = rule;
-            var sql = generator.Generate(expression);
-            sql.ShouldBe(
-                string.Format(
-                    "ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\") ON DELETE {0}",
-                    output));
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(string.Format("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\") ON DELETE {0}", output));
         }
 
         [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
         public void CanCreateNamedForeignKeyWithOnUpdateOptions(Rule rule, string output)
         {
-            var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
+            var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
             expression.ForeignKey.OnUpdate = rule;
-            var sql = generator.Generate(expression);
-            sql.ShouldBe(
-                string.Format("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\") ON UPDATE {0}", output));
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(string.Format("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\") ON UPDATE {0}", output));
         }
 
         [Test]
         public void CanCreateNamedMultiColumnForeignKeyWithDefaultSchema()
         {
-            var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
-            expression.ForeignKey.PrimaryColumns = new[] { "Column1", "Column2" };
-            expression.ForeignKey.ForeignColumns = new[] { "Column3", "Column4" };
+            var expression = GeneratorTestHelper.GetCreateNamedMultiColumnForeignKeyExpression();
 
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"Column3\",\"Column4\") REFERENCES \"public\".\"TestTable2\" (\"Column1\",\"Column2\")");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\",\"TestColumn3\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\",\"TestColumn4\")");
         }
 
         [Test]
         public void CanCreatePrimaryKeyConstraintWithCustomSchema()
         {
-            var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
-            expression.Constraint.SchemaName = "Schema";
-            expression.Constraint.TableName = "ConstraintTable";
-            expression.Constraint.ConstraintName = "PK_Name";
-            expression.Constraint.Columns.Add("column1");
+            var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
+            expression.Constraint.SchemaName = "TestSchema";
 
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"Schema\".\"ConstraintTable\" ADD CONSTRAINT \"PK_Name\" PRIMARY KEY (\"column1\")");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1\" PRIMARY KEY (\"TestColumn1\")");
         }
 
         [Test]
         public void CanCreatePrimaryKeyConstraintWithDefaultSchema()
         {
-            var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
-            expression.Constraint.TableName = "ConstraintTable";
-            expression.Constraint.ConstraintName = "PK_Name";
-            expression.Constraint.Columns.Add("column1");
+            var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
 
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"public\".\"ConstraintTable\" ADD CONSTRAINT \"PK_Name\" PRIMARY KEY (\"column1\")");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1\" PRIMARY KEY (\"TestColumn1\")");
         }
 
         [Test]
         public void CanCreateUniqueConstraintWithCustomSchema()
         {
-            var expression = new CreateConstraintExpression(ConstraintType.Unique);
-            expression.Constraint.TableName = "ConstraintTable";
-            expression.Constraint.SchemaName = "Schema";
-            expression.Constraint.ConstraintName = "Constraint";
-            expression.Constraint.Columns.Add("column1");
+            var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
+            expression.Constraint.SchemaName = "TestSchema";
 
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"Schema\".\"ConstraintTable\" ADD CONSTRAINT \"Constraint\" UNIQUE (\"column1\")");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"UC_TestTable1_TestColumn1\" UNIQUE (\"TestColumn1\")");
         }
 
         [Test]
         public void CanCreateUniqueConstraintWithDefaultSchema()
         {
-            var expression = new CreateConstraintExpression(ConstraintType.Unique);
-            expression.Constraint.TableName = "ConstraintTable";
-            expression.Constraint.ConstraintName = "Constraint";
-            expression.Constraint.Columns.Add("column1");
+            var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
 
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"public\".\"ConstraintTable\" ADD CONSTRAINT \"Constraint\" UNIQUE (\"column1\")");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"UC_TestTable1_TestColumn1\" UNIQUE (\"TestColumn1\")");
         }
 
         [Test]
         public void CanDropForeignKeyWithDefaultSchema()
         {
-            var expression = new DeleteForeignKeyExpression();
-            expression.ForeignKey.Name = "FK_Test";
-            expression.ForeignKey.ForeignTable = "TestPrimaryTable";
+            var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
 
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"public\".\"TestPrimaryTable\" DROP CONSTRAINT \"FK_Test\"");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" DROP CONSTRAINT \"FK_Test\"");
         }
 
         [Test]
         public void CanDropPrimaryKeyConstraintWithDefaultSchema()
         {
-            var expression = new DeleteConstraintExpression(ConstraintType.Unique);
-            expression.Constraint.TableName = "ConstraintTable";
-            expression.Constraint.ConstraintName = "Constraint";
+            var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
 
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"public\".\"ConstraintTable\" DROP CONSTRAINT \"Constraint\"");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" DROP CONSTRAINT \"TESTPRIMARYKEY\"");
         }
 
         [Test]
         public void CanDropUniqueConstraintWithDefaultSchema()
         {
-            var expression = new DeleteConstraintExpression(ConstraintType.Unique);
-            expression.Constraint.TableName = "ConstraintTable";
-            expression.Constraint.SchemaName = "Schema";
-            expression.Constraint.ConstraintName = "Constraint";
+            var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();
 
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"Schema\".\"ConstraintTable\" DROP CONSTRAINT \"Constraint\"");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" DROP CONSTRAINT \"TESTUNIQUECONSTRAINT\"");
         }
     }
 }

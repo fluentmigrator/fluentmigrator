@@ -12,12 +12,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
     [TestFixture]
     public class SqlServer2005GeneratorTests
     {
-        protected IMigrationGenerator generator;
+        protected IMigrationGenerator Generator;
 
         [SetUp]
         public void Setup()
         {
-            generator = new SqlServer2008Generator();
+            Generator = new SqlServer2008Generator();
         }
 
         [Test]
@@ -25,7 +25,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
             expression.SchemaName = "TestSchema";
-            var sql = generator.Generate(expression);
 
             string expected = "DECLARE @default sysname, @sql nvarchar(max);" + Environment.NewLine + Environment.NewLine +
             "-- get name of default constraint" + Environment.NewLine +
@@ -45,14 +44,14 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
             "ALTER TABLE [TestSchema].[TestTable1] WITH NOCHECK ADD CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT(1) FOR [TestColumn1];";
 
-            sql.ShouldBe(expected);
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
         }
 
         [Test]
         public void CanAlterDefaultConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
-            var sql = generator.Generate(expression);
 
             string expected = "DECLARE @default sysname, @sql nvarchar(max);" + Environment.NewLine + Environment.NewLine +
             "-- get name of default constraint" + Environment.NewLine +
@@ -72,7 +71,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
             "ALTER TABLE [dbo].[TestTable1] WITH NOCHECK ADD CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT(1) FOR [TestColumn1];";
 
-            sql.ShouldBe(expected);
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
         }
 
         [Test]
@@ -80,16 +80,18 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetCreateIncludeIndexExpression();
             expression.Index.SchemaName = "TestSchema";
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2])");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2])");
         }
 
         [Test]
         public void CanCreateIncludeIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateIncludeIndexExpression();
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2])");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2])");
         }
 
         [Test]
@@ -97,16 +99,18 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetCreateMultiIncludeIndexExpression();
             expression.Index.SchemaName = "TestSchema";
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2], [TestColumn3])");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2], [TestColumn3])");
         }
 
         [Test]
         public void CanCreateMultiColumnIncludeIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiIncludeIndexExpression();
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2], [TestColumn3])");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2], [TestColumn3])");
         }
 
         [Test]
@@ -116,9 +120,9 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.SchemaName = "TestSchema";
             expression.Columns[0].Type = DbType.String;
             expression.Columns[0].Size = Int32.MaxValue;
-            var sql = generator.Generate(expression);
-            sql.ShouldBe(
-                "CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] NVARCHAR(MAX) NOT NULL, [TestColumn2] INT NOT NULL)");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] NVARCHAR(MAX) NOT NULL, [TestColumn2] INT NOT NULL)");
         }
 
         [Test]
@@ -127,9 +131,9 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.Columns[0].Type = DbType.String;
             expression.Columns[0].Size = Int32.MaxValue;
-            var sql = generator.Generate(expression);
-            sql.ShouldBe(
-                "CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(MAX) NOT NULL, [TestColumn2] INT NOT NULL)");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(MAX) NOT NULL, [TestColumn2] INT NOT NULL)");
         }
 
         [Test]
@@ -138,9 +142,9 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
             expression.Columns[0].AdditionalFeatures.Add(SqlServerExtensions.IdentitySeed, 45);
             expression.Columns[0].AdditionalFeatures.Add(SqlServerExtensions.IdentityIncrement, 23);
-            var sql = generator.Generate(expression);
-            sql.ShouldBe(
-                "CREATE TABLE [dbo].[TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(45,23), [TestColumn2] INT NOT NULL)");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(45,23), [TestColumn2] INT NOT NULL)");
         }
 
         [Test]
@@ -154,8 +158,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Column.Type = DbType.Xml;
             expression.SchemaName = "TestSchema";
 
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD [TestColumn1] XML NOT NULL");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD [TestColumn1] XML NOT NULL");
         }
 
         [Test]
@@ -168,8 +172,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.Column.Name = "TestColumn1";
             expression.Column.Type = DbType.Xml;
 
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] XML NOT NULL");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] XML NOT NULL");
         }
 
         [Test]
@@ -193,72 +197,95 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
                                     "SET @sql = N'ALTER TABLE [Personalia].[Person] DROP CONSTRAINT ' + @default;" + Environment.NewLine +
                                     "EXEC sp_executesql @sql;";
 
-            generator.Generate(expression).ShouldBe(expected);
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
         }
 
         [Test]
         public void CanUseSystemMethodCurrentDateTimeAsADefaultValueForAColumn()
         {
-            const string tableName = "NewTable";
+            var expression = new CreateColumnExpression
+                {
+                    Column = new ColumnDefinition
+                        {
+                            Name = "NewColumn", Type = DbType.DateTime, 
+                            DefaultValue = SystemMethods.CurrentDateTime
+                        }, 
+                    TableName = "NewTable"
+                };
 
-            var columnDefinition = new ColumnDefinition { Name = "NewColumn", Type = DbType.DateTime, DefaultValue = SystemMethods.CurrentDateTime };
-
-            var expression = new CreateColumnExpression { Column = columnDefinition, TableName = tableName };
-
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT GETDATE()");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT GETDATE()");
         }
 
         [Test]
         public void CanUseSystemMethodCurrentUserAsADefaultValueForAColumn()
         {
-            const string tableName = "NewTable";
+            var expression = new CreateColumnExpression
+                {
+                    Column = new ColumnDefinition
+                        {
+                            Name = "NewColumn", 
+                            Size = 15, 
+                            Type = DbType.String, 
+                            DefaultValue = SystemMethods.CurrentUser
+                        }, 
+                    TableName = "NewTable"
+                };
 
-            var columnDefinition = new ColumnDefinition { Name = "NewColumn", Size = 15, Type = DbType.String, DefaultValue = SystemMethods.CurrentUser };
-
-            var expression = new CreateColumnExpression { Column = columnDefinition, TableName = tableName };
-
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] NVARCHAR(15) NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT CURRENT_USER");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] NVARCHAR(15) NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT CURRENT_USER");
         }
 
         [Test]
         public void CanUseSystemMethodCurrentUTCDateTimeAsADefaultValueForAColumn()
         {
-            const string tableName = "NewTable";
+            var expression = new CreateColumnExpression
+                {
+                    Column = new ColumnDefinition
+                        {
+                            Name = "NewColumn", 
+                            Type = DbType.DateTime,
+                            DefaultValue = SystemMethods.CurrentUTCDateTime
+                        }, TableName = "NewTable"
+                };
 
-            var columnDefinition = new ColumnDefinition { Name = "NewColumn", Type = DbType.DateTime, DefaultValue = SystemMethods.CurrentUTCDateTime };
-
-            var expression = new CreateColumnExpression { Column = columnDefinition, TableName = tableName };
-
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT GETUTCDATE()");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT GETUTCDATE()");
         }
 
         [Test]
         public void CanUseSystemMethodNewGuidAsADefaultValueForAColumn()
         {
-            const string tableName = "NewTable";
+            var expression = new CreateColumnExpression
+                {
+                    Column = new ColumnDefinition
+                        {
+                            Name = "NewColumn", 
+                            Type = DbType.Guid, 
+                            DefaultValue = SystemMethods.NewGuid
+                        }, TableName = "NewTable"
+                };
 
-            var columnDefinition = new ColumnDefinition { Name = "NewColumn", Type = DbType.Guid, DefaultValue = SystemMethods.NewGuid };
-
-            var expression = new CreateColumnExpression { Column = columnDefinition, TableName = tableName };
-
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT NEWID()");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT NEWID()");
         }
 
         [Test]
         public void CanUseSystemMethodNewSequentialIdAsADefaultValueForAColumn()
         {
-            const string tableName = "NewTable";
+            var expression = new CreateColumnExpression
+                {
+                    Column = new ColumnDefinition
+                        {
+                            Name = "NewColumn", 
+                            Type = DbType.Guid, 
+                            DefaultValue = SystemMethods.NewSequentialId
+                        }, TableName = "NewTable"
+                };
 
-            var columnDefinition = new ColumnDefinition { Name = "NewColumn", Type = DbType.Guid, DefaultValue = SystemMethods.NewSequentialId };
-
-            var expression = new CreateColumnExpression { Column = columnDefinition, TableName = tableName };
-
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT NEWSEQUENTIALID()");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT NEWSEQUENTIALID()");
         }
     }
 }

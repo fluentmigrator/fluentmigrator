@@ -1,8 +1,4 @@
-﻿using System;
-using System.Data;
-using FluentMigrator.Expressions;
-using FluentMigrator.Model;
-using FluentMigrator.Runner.Processors.Firebird;
+﻿using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Generators.Firebird;
 using NUnit.Framework;
 using NUnit.Should;
@@ -12,146 +8,115 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
     [TestFixture]
     public class FirebirdTableTests
     {
-        protected FirebirdGenerator generator;
+        protected FirebirdGenerator Generator;
 
         [SetUp]
         public void Setup()
         {
-            generator = new FirebirdGenerator(FirebirdOptions.StandardBehaviour());
+            Generator = new FirebirdGenerator(FirebirdOptions.StandardBehaviour());
         }
 
         [Test]
         public void CanCreateTableWithCustomSchema()
         {
-            string tableName = "NewTable";
-            CreateTableExpression expression = GetCreateTableExpression(tableName);
-            expression.SchemaName = "wibble";
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"NewTable\" (\"ColumnName1\" BLOB SUB_TYPE TEXT NOT NULL, \"ColumnName2\" INTEGER NOT NULL)");
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" BLOB SUB_TYPE TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL)");
         }
 
         [Test]
         public void CanCreateTableWithDefaultSchema()
         {
-            string tableName = "NewTable";
-            CreateTableExpression expression = GetCreateTableExpression(tableName);
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"NewTable\" (\"ColumnName1\" BLOB SUB_TYPE TEXT NOT NULL, \"ColumnName2\" INTEGER NOT NULL)");
+            var expression = GeneratorTestHelper.GetCreateTableExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" BLOB SUB_TYPE TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL)");
         }
 
         [Test]
         public void CanCreateTableWithDefaultValueExplicitlySetToNullWithDefaultSchema()
         {
-            string tableName = "NewTable";
-            var expression = GetCreateTableExpression(tableName);
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
             expression.Columns[0].DefaultValue = null;
-            var sql = generator.Generate(expression);
-            sql.ShouldBe(
-                "CREATE TABLE \"NewTable\" (\"ColumnName1\" BLOB SUB_TYPE TEXT DEFAULT NULL NOT NULL, \"ColumnName2\" INTEGER NOT NULL)");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" BLOB SUB_TYPE TEXT DEFAULT NULL NOT NULL, \"TestColumn2\" INTEGER DEFAULT 0 NOT NULL)");
 
         }
 
         [Test]
         public void CanCreateTableWithDefaultValueWithDefaultSchema()
         {
-            string tableName = "NewTable";
-            CreateTableExpression expression = GetCreateTableExpression(tableName);
-            expression.Columns[0].DefaultValue = "abc";
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"NewTable\" (\"ColumnName1\" BLOB SUB_TYPE TEXT DEFAULT 'abc' NOT NULL, \"ColumnName2\" INTEGER NOT NULL)");
+            var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" BLOB SUB_TYPE TEXT DEFAULT 'Default' NOT NULL, \"TestColumn2\" INTEGER DEFAULT 0 NOT NULL)");
         }
 
         [Test]
         public void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
         {
-            string tableName = "NewTable";
-            CreateTableExpression expression = GetCreateTableExpression(tableName);
-            expression.Columns[0].IsPrimaryKey = true;
-            expression.Columns[1].IsPrimaryKey = true;
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"NewTable\" (\"ColumnName1\" BLOB SUB_TYPE TEXT NOT NULL, \"ColumnName2\" INTEGER NOT NULL, PRIMARY KEY (\"ColumnName1\", \"ColumnName2\"))");
+            var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" BLOB SUB_TYPE TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"))");
         }
 
         [Test]
         public void CanCreateTableWithNamedMultiColumnPrimaryKeyWithDefaultSchema()
         {
-            string tableName = "NewTable";
-            CreateTableExpression expression = GetCreateTableExpression(tableName);
-            expression.Columns[0].IsPrimaryKey = true;
-            expression.Columns[0].PrimaryKeyName = "wibble";
-            expression.Columns[1].IsPrimaryKey = true;
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"NewTable\" (\"ColumnName1\" BLOB SUB_TYPE TEXT NOT NULL, \"ColumnName2\" INTEGER NOT NULL, CONSTRAINT \"wibble\" PRIMARY KEY (\"ColumnName1\", \"ColumnName2\"))");
+            var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" BLOB SUB_TYPE TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"))");
         }
 
         [Test]
         public void CanCreateTableWithNamedPrimaryKeyWithDefaultSchema()
         {
-            string tableName = "NewTable";
-            CreateTableExpression expression = GetCreateTableExpression(tableName);
-            expression.Columns[0].IsPrimaryKey = true;
-            expression.Columns[0].PrimaryKeyName = "PK_NewTable";
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"NewTable\" (\"ColumnName1\" BLOB SUB_TYPE TEXT NOT NULL, \"ColumnName2\" INTEGER NOT NULL, CONSTRAINT \"PK_NewTable\" PRIMARY KEY (\"ColumnName1\"))");
+            var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" BLOB SUB_TYPE TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\"))");
         }
 
         [Test]
         public void CanCreateTableWithPrimaryKeyWithDefaultSchema()
         {
-            string tableName = "NewTable";
-            CreateTableExpression expression = GetCreateTableExpression(tableName);
-            expression.Columns[0].IsPrimaryKey = true;
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE \"NewTable\" (\"ColumnName1\" BLOB SUB_TYPE TEXT NOT NULL, \"ColumnName2\" INTEGER NOT NULL, PRIMARY KEY (\"ColumnName1\"))");
+            var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" BLOB SUB_TYPE TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, PRIMARY KEY (\"TestColumn1\"))");
         }
 
         [Test]
         public void CanDropTableWithCustomSchema()
         {
-            string tableName = "NewTable";
-            DeleteTableExpression expression = GetDeleteTableExpression(tableName);
-            expression.SchemaName = "wibble";
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("DROP TABLE \"NewTable\"");
+            var expression = GeneratorTestHelper.GetDeleteTableExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP TABLE \"TestTable1\"");
         }
 
         [Test]
         public void CanDropTableWithDefaultSchema()
         {
-            string tableName = "NewTable";
-            DeleteTableExpression expression = GetDeleteTableExpression(tableName);
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("DROP TABLE \"NewTable\"");
+            var expression = GeneratorTestHelper.GetDeleteTableExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP TABLE \"TestTable1\"");
         }
 
         [Test]
         public void CanRenameTableWithDefaultSchema()
         {
-            var expression = new RenameTableExpression();
-            expression.OldName = "Table1";
-            expression.NewName = "Table2";
+            var expression = GeneratorTestHelper.GetRenameTableExpression();
 
-            string sql = generator.Generate(expression);
-            sql.ShouldBe(String.Empty);
-        }
-
-        private CreateTableExpression GetCreateTableExpression(string tableName)
-        {
-            string columnName1 = "ColumnName1";
-            string columnName2 = "ColumnName2";
-
-            var column1 = new ColumnDefinition { Name = columnName1, Type = DbType.String, TableName = tableName };
-            var column2 = new ColumnDefinition { Name = columnName2, Type = DbType.Int32, TableName = tableName };
-
-            var expression = new CreateTableExpression { TableName = tableName };
-            expression.Columns.Add(column1);
-            expression.Columns.Add(column2);
-            return expression;
-        }
-
-        private DeleteTableExpression GetDeleteTableExpression(string tableName)
-        {
-            return new DeleteTableExpression { TableName = tableName };
+            var result = Generator.Generate(expression);
+            result.ShouldBe(string.Empty);
         }
     }
 }

@@ -10,35 +10,36 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
     [TestFixture]
     public class MySqlGeneratorTests
     {
-        protected MySqlGenerator _generator;
-        protected MySqlGenerator generator;
+        protected MySqlGenerator Generator;
 
         [SetUp]
         public void Setup()
         {
-            _generator = new MySqlGenerator();
-            generator = new MySqlGenerator();
+            Generator = new MySqlGenerator();
         }
 
         [Test]
         public void CanAlterSchemaInStrictMode()
         {
-            _generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new CreateSchemaExpression()));
+            Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
 
         [Test]
         public void CanCreateSchemaInStrictMode()
         {
-            _generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new CreateSchemaExpression()));
+            Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
 
         [Test]
         public void CanDropSchemaInStrictMode()
         {
-            _generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new DeleteSchemaExpression()));
+            Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new DeleteSchemaExpression()));
         }
 
         [Test]
@@ -47,9 +48,8 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             var columnDefinition = new ColumnDefinition { Name = "NewColumn", Size = 15, Type = null, CustomType = "TIMESTAMP", DefaultValue = SystemMethods.CurrentDateTime };
             var expression = new CreateColumnExpression { Column = columnDefinition, TableName = "NewTable" };
 
-            string sql = generator.Generate(expression);
-
-            sql.ShouldBe("ALTER TABLE `NewTable` ADD COLUMN `NewColumn` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE `NewTable` ADD COLUMN `NewColumn` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP");
         }
     }
 }

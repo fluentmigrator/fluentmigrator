@@ -1,5 +1,4 @@
 ﻿using FluentMigrator.Exceptions;
-using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
 
@@ -19,19 +18,19 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         [Test]
         public void CanAlterSchema()
         {
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new AlterSchemaExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(GeneratorTestHelper.GetAlterSchemaExpression()));
         }
 
         [Test]
         public void CanCreateSchema()
         {
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(GeneratorTestHelper.GetCreateSchemaExpression()));
         }
 
         [Test]
         public void CanDropSchema()
         {
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new DeleteSchemaExpression()));
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(GeneratorTestHelper.GetDeleteSchemaExpression()));
         }
     }
 }

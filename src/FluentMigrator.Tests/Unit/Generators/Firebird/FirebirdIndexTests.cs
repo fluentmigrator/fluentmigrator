@@ -1,6 +1,4 @@
-﻿using FluentMigrator.Expressions;
-using FluentMigrator.Model;
-using FluentMigrator.Runner.Processors.Firebird;
+﻿using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Generators.Firebird;
 using NUnit.Framework;
 using NUnit.Should;
@@ -10,50 +8,39 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
     [TestFixture]
     public class FirebirdIndexTests
     {
-        protected FirebirdGenerator generator;
+        protected FirebirdGenerator Generator;
 
         [SetUp]
         public void Setup()
         {
-            generator = new FirebirdGenerator(FirebirdOptions.StandardBehaviour());
+            Generator = new FirebirdGenerator(FirebirdOptions.StandardBehaviour());
         }
 
         [Test]
         public void CanCreateIndexWithDefaultSchema()
         {
-            var expression = new CreateIndexExpression();
-            expression.Index.Name = "IX_TEST";
-            expression.Index.TableName = "TEST_TABLE";
-            expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Ascending, Name = "Column1" });
-            expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Descending, Name = "Column2" });
+            var expression = GeneratorTestHelper.GetCreateIndexExpression();
 
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE ASC INDEX \"IX_TEST\" ON \"TEST_TABLE\" (\"Column1\", \"Column2\")");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE ASC INDEX \"TestIndex\" ON \"TestTable1\" (\"TestColumn1\")");
         }
 
         [Test]
         public void CanCreateUniqueIndexWithDefaultSchema()
         {
-            var expression = new CreateIndexExpression();
-            expression.Index.Name = "IX_TEST";
-            expression.Index.TableName = "TEST_TABLE";
-            expression.Index.IsUnique = true;
-            expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Ascending, Name = "Column1" });
-            expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Descending, Name = "Column2" });
+            var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
 
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE UNIQUE ASC INDEX \"IX_TEST\" ON \"TEST_TABLE\" (\"Column1\", \"Column2\")");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE ASC INDEX \"TestIndex\" ON \"TestTable1\" (\"TestColumn1\")");
         }
 
         [Test]
         public void CanDropIndexWithDefaultSchema()
         {
-            var expression = new DeleteIndexExpression();
-            expression.Index.Name = "IX_TEST";
-            expression.Index.TableName = "TEST_TABLE";
+            var expression = GeneratorTestHelper.GetDeleteIndexExpression();
 
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("DROP INDEX \"IX_TEST\"");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP INDEX \"TestIndex\"");
         }
     }
 }
