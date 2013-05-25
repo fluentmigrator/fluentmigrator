@@ -6,7 +6,7 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Unit.Generators.Firebird
 {
     [TestFixture]
-    public class FirebirdSequenceTests
+    public class FirebirdSequenceTests : BaseSequenceTests
     {
         protected FirebirdGenerator Generator;
 
@@ -17,7 +17,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanCreateSequenceWithCustomSchema()
+        public override void CanCreateSequenceWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSequenceExpression();
             expression.Sequence.SchemaName = "TestSchema";
@@ -27,7 +27,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanCreateSequenceWithDefaultSchema()
+        public override void CanCreateSequenceWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSequenceExpression();
 
@@ -36,7 +36,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanDropSequenceWithCustomSchema()
+        public override void CanDropSequenceWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSequenceExpression();
             expression.SchemaName = "TestSchema";
@@ -46,7 +46,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanDropSequenceWithDefaultSchema()
+        public override void CanDropSequenceWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSequenceExpression();
 

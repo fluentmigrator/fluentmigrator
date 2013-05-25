@@ -6,7 +6,7 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Unit.Generators.Jet
 {
     [TestFixture]
-    public class JetConstraintsTests
+    public class JetConstraintsTests : BaseConstraintsTests
     {
         protected JetGenerator Generator;
 
@@ -17,7 +17,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateForeignKeyWithCustomSchema()
+        public override void CanCreateForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
@@ -28,7 +28,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateForeignKeyWithDefaultSchema()
+        public override void CanCreateForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
 
@@ -37,7 +37,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateForeignKeyWithDifferentSchemas()
+        public override void CanCreateForeignKeyWithDifferentSchemas()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
@@ -47,7 +47,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateMultiColumnForeignKeyWithCustomSchema()
+        public override void CanCreateMultiColumnForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
@@ -58,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateMultiColumnForeignKeyWithDefaultSchema()
+        public override void CanCreateMultiColumnForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
 
@@ -67,7 +67,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateMultiColumnForeignKeyWithDifferentSchemas()
+        public override void CanCreateMultiColumnForeignKeyWithDifferentSchemas()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
@@ -77,7 +77,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateMultiColumnPrimaryKeyConstraintWithCustomSchema()
+        public override void CanCreateMultiColumnPrimaryKeyConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnPrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
@@ -87,7 +87,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateMultiColumnPrimaryKeyConstraintWithDefaultSchema()
+        public override void CanCreateMultiColumnPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnPrimaryKeyExpression();
 
@@ -96,7 +96,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateMultiColumnUniqueConstraintWithCustomSchema()
+        public override void CanCreateMultiColumnUniqueConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
             expression.Constraint.SchemaName = "TestSchema";
@@ -106,7 +106,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateMultiColumnUniqueConstraintWithDefaultSchema()
+        public override void CanCreateMultiColumnUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
 
@@ -115,7 +115,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateNamedForeignKeyWithCustomSchema()
+        public override void CanCreateNamedForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
@@ -126,7 +126,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateNamedForeignKeyWithDefaultSchema()
+        public override void CanCreateNamedForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
 
@@ -135,7 +135,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateNamedForeignKeyWithDifferentSchemas()
+        public override void CanCreateNamedForeignKeyWithDifferentSchemas()
         {
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
@@ -145,7 +145,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateNamedForeignKeyWithOnDeleteAndOnUpdateOptions()
+        public override void CanCreateNamedForeignKeyWithOnDeleteAndOnUpdateOptions()
         {
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
             expression.ForeignKey.OnDelete = Rule.Cascade;
@@ -156,7 +156,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
-        public void CanCreateNamedForeignKeyWithOnDeleteOptions(Rule rule, string output)
+        public override void CanCreateNamedForeignKeyWithOnDeleteOptions(Rule rule, string output)
         {
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
             expression.ForeignKey.OnDelete = rule;
@@ -166,7 +166,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
-        public void CanCreateNamedForeignKeyWithOnUpdateOptions(Rule rule, string output)
+        public override void CanCreateNamedForeignKeyWithOnUpdateOptions(Rule rule, string output)
         {
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
             expression.ForeignKey.OnUpdate = rule;
@@ -176,7 +176,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateNamedMultiColumnForeignKeyWithCustomSchema()
+        public override void CanCreateNamedMultiColumnForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
@@ -187,7 +187,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateNamedMultiColumnForeignKeyWithDefaultSchema()
+        public override void CanCreateNamedMultiColumnForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnForeignKeyExpression();
 
@@ -196,7 +196,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateNamedMultiColumnForeignKeyWithDifferentSchemas()
+        public override void CanCreateNamedMultiColumnForeignKeyWithDifferentSchemas()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
@@ -206,7 +206,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateNamedMultiColumnPrimaryKeyConstraintWithCustomSchema()
+        public override void CanCreateNamedMultiColumnPrimaryKeyConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnPrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
@@ -216,7 +216,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateNamedMultiColumnPrimaryKeyConstraintWithDefaultSchema()
+        public override void CanCreateNamedMultiColumnPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnPrimaryKeyExpression();
 
@@ -225,7 +225,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateNamedMultiColumnUniqueConstraintWithCustomSchema()
+        public override void CanCreateNamedMultiColumnUniqueConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
             expression.Constraint.SchemaName = "TestSchema";
@@ -235,7 +235,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateNamedMultiColumnUniqueConstraintWithDefaultSchema()
+        public override void CanCreateNamedMultiColumnUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
 
@@ -244,7 +244,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateNamedPrimaryKeyConstraintWithCustomSchema()
+        public override void CanCreateNamedPrimaryKeyConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
@@ -254,7 +254,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateNamedPrimaryKeyConstraintWithDefaultSchema()
+        public override void CanCreateNamedPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
 
@@ -263,7 +263,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateNamedUniqueConstraintWithCustomSchema()
+        public override void CanCreateNamedUniqueConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
             expression.Constraint.SchemaName = "TestSchema";
@@ -273,7 +273,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateNamedUniqueConstraintWithDefaultSchema()
+        public override void CanCreateNamedUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
 
@@ -282,7 +282,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreatePrimaryKeyConstraintWithCustomSchema()
+        public override void CanCreatePrimaryKeyConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
@@ -292,7 +292,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreatePrimaryKeyConstraintWithDefaultSchema()
+        public override void CanCreatePrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
 
@@ -301,7 +301,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateUniqueConstraintWithCustomSchema()
+        public override void CanCreateUniqueConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
             expression.Constraint.SchemaName = "TestSchema";
@@ -311,7 +311,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateUniqueConstraintWithDefaultSchema()
+        public override void CanCreateUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
 
@@ -320,7 +320,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanDropForeignKeyWithCustomSchema()
+        public override void CanDropForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
@@ -330,7 +330,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanDropForeignKeyWithDefaultSchema()
+        public override void CanDropForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
 
@@ -339,7 +339,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanDropPrimaryKeyConstraintWithCustomSchema()
+        public override void CanDropPrimaryKeyConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
@@ -349,7 +349,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanDropPrimaryKeyConstraintWithDefaultSchema()
+        public override void CanDropPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
 
@@ -358,7 +358,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanDropUniqueConstraintWithCustomSchema()
+        public override void CanDropUniqueConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();
             expression.Constraint.SchemaName = "TestSchema";
@@ -368,7 +368,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanDropUniqueConstraintWithDefaultSchema()
+        public override void CanDropUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();
 

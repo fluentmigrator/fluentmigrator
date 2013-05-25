@@ -6,7 +6,7 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Unit.Generators.Firebird
 {
     [TestFixture]
-    public class FirebirdDataTests
+    public class FirebirdDataTests : BaseDataTests
     {
         protected FirebirdGenerator Generator;
 
@@ -17,7 +17,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanDeleteDataForAllRowsWithCustomSchema()
+        public override void CanDeleteDataForAllRowsWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
             expression.SchemaName = "TestSchema";
@@ -27,7 +27,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanDeleteDataForAllRowsWithDefaultSchema()
+        public override void CanDeleteDataForAllRowsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
 
@@ -37,7 +37,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanDeleteDataForMultipleRowsWithCustomSchema()
+        public override void CanDeleteDataForMultipleRowsWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
             expression.SchemaName = "TestSchema";
@@ -47,7 +47,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanDeleteDataForMultipleRowsWithDefaultSchema()
+        public override void CanDeleteDataForMultipleRowsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
 
@@ -56,7 +56,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanDeleteDataWithCustomSchema()
+        public override void CanDeleteDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
             expression.SchemaName = "TestSchema";
@@ -66,7 +66,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanDeleteDataWithDefaultSchema()
+        public override void CanDeleteDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
 
@@ -75,7 +75,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanInsertDataWithCustomSchema()
+        public override void CanInsertDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
             expression.SchemaName = "TestSchema";
@@ -88,7 +88,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanInsertDataWithDefaultSchema()
+        public override void CanInsertDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
 
@@ -100,7 +100,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanInsertGuidDataWithCustomSchema()
+        public override void CanInsertGuidDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
             expression.SchemaName = "TestSchema";
@@ -110,7 +110,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanInsertGuidDataWithDefaultSchema()
+        public override void CanInsertGuidDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
 
@@ -119,7 +119,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanUpdateDataForAllDataWithCustomSchema()
+        public override void CanUpdateDataForAllDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
             expression.SchemaName = "TestSchema";
@@ -129,7 +129,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanUpdateDataForAllDataWithDefaultSchema()
+        public override void CanUpdateDataForAllDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
 
@@ -138,7 +138,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanUpdateDataWithCustomSchema()
+        public override void CanUpdateDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
             expression.SchemaName = "TestSchema";
@@ -148,7 +148,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
-        public void CanUpdateDataWithDefaultSchema()
+        public override void CanUpdateDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
 
