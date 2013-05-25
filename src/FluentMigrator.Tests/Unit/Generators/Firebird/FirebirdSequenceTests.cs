@@ -1,49 +1,39 @@
-﻿using NUnit.Framework;
-using NUnit.Should;
-using FluentMigrator.Runner.Processors.Firebird;
+﻿using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Generators.Firebird;
-using FluentMigrator.Expressions;
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.Firebird
 {
     [TestFixture]
     public class FirebirdSequenceTests
     {
-        protected FirebirdGenerator generator;
+        protected FirebirdGenerator Generator;
 
         [SetUp]
         public void Setup()
         {
-            generator = new FirebirdGenerator(FirebirdOptions.StandardBehaviour());
+            Generator = new FirebirdGenerator(FirebirdOptions.StandardBehaviour());
         }
 
         [Test]
         public void CanCreateSequenceWithCustomSchema()
         {
-            var expression = new CreateSequenceExpression
-                             {
-                                 Sequence =
-                                         {
-                                             Cache = 10,
-                                             Cycle = true,
-                                             Increment = 2,
-                                             MaxValue = 100,
-                                             MinValue = 0,
-                                             Name = "Sequence",
-                                             SchemaName = "Schema",
-                                             StartWith = 2
-                                         }
-                             };
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE SEQUENCE \"Sequence\"");
+            var expression = GeneratorTestHelper.GetCreateSequenceExpression();
+            expression.Sequence.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE SEQUENCE \"Sequence\"");
         }
 
         [Test]
         public void CanDropSequenceWithCustomSchema()
         {
-            var expression = new DeleteSequenceExpression { SchemaName = "Schema", SequenceName = "Sequence" };
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("DROP SEQUENCE \"Sequence\"");
+            var expression = GeneratorTestHelper.GetDeleteSequenceExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP SEQUENCE \"Sequence\"");
         }
     }
 }

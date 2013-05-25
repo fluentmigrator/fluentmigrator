@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using FluentMigrator.Expressions;
-using FluentMigrator.Model;
-using FluentMigrator.Runner.Generators.Postgres;
+﻿using FluentMigrator.Runner.Generators.Postgres;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -11,85 +7,51 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
     [TestFixture]
     public class PostgresDataTests
     {
-        protected PostgresGenerator generator;
+        protected PostgresGenerator Generator;
 
         [SetUp]
         public void Setup()
         {
-            generator = new PostgresGenerator();
+            Generator = new PostgresGenerator();
         }
 
         [Test]
         public void CanDeleteDataForAllRowsWithDefaultSchema()
         {
-            var expression = new DeleteDataExpression
-            {
-                IsAllRows = true,
-                TableName = "Table1"
-            };
+            var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
 
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("DELETE FROM \"public\".\"Table1\";");
-
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DELETE FROM \"public\".\"TestTable1\";");
         }
 
         [Test]
         public void CanDeleteDataWithDefaultSchema()
         {
-            var expression = new DeleteDataExpression
-            {
-                IsAllRows = false,
-                SchemaName = "public",
-                TableName = "Table1"
-            };
-            expression.Rows.Add(new DeletionDataDefinition
-                                    {
-                                        new KeyValuePair<string, object>("description", null),
-                                        new KeyValuePair<string, object>("id", 10)
-                                    });
+            var expression = GeneratorTestHelper.GetDeleteDataExpression();
 
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("DELETE FROM \"public\".\"Table1\" WHERE \"description\" IS NULL AND \"id\" = 10;");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DELETE FROM \"public\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL;");
         }
 
         [Test]
         public void CanInsertDataWithDefaultSchema()
         {
-            var expression = new InsertDataExpression();
-            expression.TableName = "TestTable";
-            expression.Rows.Add(new InsertionDataDefinition
-                                    {
-                                        new KeyValuePair<string, object>("Id", 1),
-                                        new KeyValuePair<string, object>("Name", "Just'in"),
-                                        new KeyValuePair<string, object>("Website", "codethinked.com")
-                                    });
-            expression.Rows.Add(new InsertionDataDefinition
-                                    {
-                                        new KeyValuePair<string, object>("Id", 2),
-                                        new KeyValuePair<string, object>("Name", "Na\\te"),
-                                        new KeyValuePair<string, object>("Website", "kohari.org")
-                                    });
+            var expression = GeneratorTestHelper.GetInsertDataExpression();
 
-            var sql = generator.Generate(expression);
+            var expected = "INSERT INTO \"public\".\"TestTable1\" (\"Id\",\"Name\",\"Website\") VALUES (1,'Just''in','codethinked.com');";
+            expected += "INSERT INTO \"public\".\"TestTable1\" (\"Id\",\"Name\",\"Website\") VALUES (2,'Na\\te','kohari.org');";
 
-            var expected = "INSERT INTO \"public\".\"TestTable\" (\"Id\",\"Name\",\"Website\") VALUES (1,'Just''in','codethinked.com');";
-            expected += "INSERT INTO \"public\".\"TestTable\" (\"Id\",\"Name\",\"Website\") VALUES (2,'Na\\te','kohari.org');";
-
-            sql.ShouldBe(expected);
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
         }
 
         [Test]
         public void CanInsertGuidDataWithDefaultSchema()
         {
-            var gid = Guid.NewGuid();
-            var expression = new InsertDataExpression { TableName = "TestTable" };
-            expression.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("guid", gid) });
+            var expression = GeneratorTestHelper.GetInsertGUIDExpression();
 
-            var sql = generator.Generate(expression);
-
-            var expected = String.Format("INSERT INTO \"public\".\"TestTable\" (\"guid\") VALUES ('{0}');", gid);
-
-            sql.ShouldBe(expected);
+            var result = Generator.Generate(expression);
+            result.ShouldBe(System.String.Format("INSERT INTO \"public\".\"TestTable1\" (\"guid\") VALUES ('{0}');", GeneratorTestHelper.TestGuid));
         }
 
         [Test]
@@ -97,8 +59,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
 
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("UPDATE \"public\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE 1 = 1");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("UPDATE \"public\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE 1 = 1");
         }
 
         [Test]
@@ -106,8 +68,9 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
             expression.SchemaName = "TestSchema";
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("UPDATE \"TestSchema\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("UPDATE \"TestSchema\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL");
         }
 
         [Test]
@@ -115,8 +78,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
 
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("UPDATE \"public\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("UPDATE \"public\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL");
         }
     }
 }

@@ -9,12 +9,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
     [TestFixture]
     public class SqlServer2005ConstraintsTests
     {
-        protected SqlServer2005Generator generator;
+        protected SqlServer2005Generator Generator;
 
         [SetUp]
         public void Setup()
         {
-            generator = new SqlServer2005Generator();
+            Generator = new SqlServer2005Generator();
         }
 
         [Test]
@@ -22,7 +22,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
             expression.DefaultValue = SystemMethods.CurrentUser;
-            var sql = generator.Generate(expression);
 
             string expected = "DECLARE @default sysname, @sql nvarchar(max);" + Environment.NewLine + Environment.NewLine +
             "-- get name of default constraint" + Environment.NewLine +
@@ -42,7 +41,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
             "ALTER TABLE [dbo].[TestTable1] WITH NOCHECK ADD CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT(CURRENT_USER) FOR [TestColumn1];";
 
-            sql.ShouldBe(expected);
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
         }
 
         [Test]
@@ -50,7 +50,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
             expression.DefaultValue = SystemMethods.CurrentDateTime;
-            var sql = generator.Generate(expression);
 
             string expected = "DECLARE @default sysname, @sql nvarchar(max);" + Environment.NewLine + Environment.NewLine +
             "-- get name of default constraint" + Environment.NewLine +
@@ -70,7 +69,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
             "ALTER TABLE [dbo].[TestTable1] WITH NOCHECK ADD CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT(GETDATE()) FOR [TestColumn1];";
 
-            sql.ShouldBe(expected);
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
         }
 
         [Test]
@@ -78,7 +78,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
             expression.DefaultValue = SystemMethods.CurrentUTCDateTime;
-            var sql = generator.Generate(expression);
 
             string expected = "DECLARE @default sysname, @sql nvarchar(max);" + Environment.NewLine + Environment.NewLine +
             "-- get name of default constraint" + Environment.NewLine +
@@ -98,7 +97,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
             "ALTER TABLE [dbo].[TestTable1] WITH NOCHECK ADD CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT(GETUTCDATE()) FOR [TestColumn1];";
 
-            sql.ShouldBe(expected);
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
         }
 
         [Test]
@@ -106,7 +106,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
             expression.DefaultValue = SystemMethods.NewGuid;
-            var sql = generator.Generate(expression);
 
             string expected = "DECLARE @default sysname, @sql nvarchar(max);" + Environment.NewLine + Environment.NewLine +
             "-- get name of default constraint" + Environment.NewLine +
@@ -126,7 +125,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
             "ALTER TABLE [dbo].[TestTable1] WITH NOCHECK ADD CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT(NEWID()) FOR [TestColumn1];";
 
-            sql.ShouldBe(expected);
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
         }
 
         [Test]
@@ -134,7 +134,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
             expression.DefaultValue = "TestString";
-            var sql = generator.Generate(expression);
 
             string expected = "DECLARE @default sysname, @sql nvarchar(max);" + Environment.NewLine + Environment.NewLine +
             "-- get name of default constraint" + Environment.NewLine +
@@ -154,7 +153,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
             "ALTER TABLE [dbo].[TestTable1] WITH NOCHECK ADD CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT('TestString') FOR [TestColumn1];";
 
-            sql.ShouldBe(expected);
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
         }
 
         [Test]
@@ -162,7 +162,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
             expression.DefaultValue = "MyTestFunction()";
-            var sql = generator.Generate(expression);
 
             string expected = "DECLARE @default sysname, @sql nvarchar(max);" + Environment.NewLine + Environment.NewLine +
             "-- get name of default constraint" + Environment.NewLine +
@@ -182,7 +181,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
             "ALTER TABLE [dbo].[TestTable1] WITH NOCHECK ADD CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT(MyTestFunction()) FOR [TestColumn1];";
 
-            sql.ShouldBe(expected);
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
         }
 
         [Test]
@@ -190,7 +190,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnPrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
-            var result = generator.Generate(expression);
+
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1_TestColumn2] PRIMARY KEY ([TestColumn1], [TestColumn2])");
         }
 
@@ -198,7 +199,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         public void CanCreateMultiColumnPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnPrimaryKeyExpression();
-            var result = generator.Generate(expression);
+
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1_TestColumn2] PRIMARY KEY ([TestColumn1], [TestColumn2])");
         }
 
@@ -207,7 +209,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
             expression.Constraint.SchemaName = "TestSchema";
-            var result = generator.Generate(expression);
+
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [UC_TestTable1_TestColumn1_TestColumn2] UNIQUE ([TestColumn1], [TestColumn2])");
         }
 
@@ -215,116 +218,119 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         public void CanCreateMultiColumnUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
-            var result = generator.Generate(expression);
+
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [UC_TestTable1_TestColumn1_TestColumn2] UNIQUE ([TestColumn1], [TestColumn2])");
         }
 
         [Test]
         public void CanCreateNamedForeignKeyWithCustomSchema()
         {
-            var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
+            var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
             expression.ForeignKey.PrimaryTableSchema = "TestSchema";
-            var sql = generator.Generate(expression);
-            sql.ShouldBe(
-                "ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2])");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2])");
 
         }
 
         [Test]
         public void CanCreateNamedForeignKeyWithDefaultSchema()
         {
-            var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
-            var sql = generator.Generate(expression);
-            sql.ShouldBe(
-                "ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2])");
+            var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2])");
 
         }
 
         [Test]
         public void CanCreateNamedForeignKeyWithOnDeleteAndOnUpdateOptions()
         {
-            var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
+            var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
             expression.ForeignKey.OnDelete = Rule.Cascade;
             expression.ForeignKey.OnUpdate = Rule.SetDefault;
-            var sql = generator.Generate(expression);
-            sql.ShouldBe(
-                "ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2]) ON DELETE CASCADE ON UPDATE SET DEFAULT");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2]) ON DELETE CASCADE ON UPDATE SET DEFAULT");
         }
 
         [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
         public void CanCreateNamedForeignKeyWithOnDeleteOptions(Rule rule, string output)
         {
-            var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
+            var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
             expression.ForeignKey.OnDelete = rule;
-            var sql = generator.Generate(expression);
-            sql.ShouldBe(
-                string.Format("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2]) ON DELETE {0}", output));
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(string.Format("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2]) ON DELETE {0}", output));
         }
 
         [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
         public void CanCreateNamedForeignKeyWithOnUpdateOptions(Rule rule, string output)
         {
-            var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
+            var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
             expression.ForeignKey.OnUpdate = rule;
-            var sql = generator.Generate(expression);
-            sql.ShouldBe(
-                string.Format("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2]) ON UPDATE {0}", output));
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(string.Format("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2]) ON UPDATE {0}", output));
         }
 
         [Test]
         public void CanCreateNamedMultiColumnForeignKeyWithCustomSchema()
         {
-            var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
+            var expression = GeneratorTestHelper.GetCreateNamedMultiColumnForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
             expression.ForeignKey.PrimaryTableSchema = "TestSchema";
-            var sql = generator.Generate(expression);
-            sql.ShouldBe(
-                "ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2], [TestColumn4])");
 
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2], [TestColumn4])");
         }
 
         [Test]
         public void CanCreateNamedMultiColumnForeignKeyWithDefaultSchema()
         {
-            var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
-            var sql = generator.Generate(expression);
-            sql.ShouldBe(
-                "ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [dbo].[TestTable2] ([TestColumn2], [TestColumn4])");
+            var expression = GeneratorTestHelper.GetCreateNamedMultiColumnForeignKeyExpression();
 
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_Test] FOREIGN KEY ([TestColumn1], [TestColumn3]) REFERENCES [dbo].[TestTable2] ([TestColumn2], [TestColumn4])");
         }
 
         [Test]
         public void CanCreateNamedMultiColumnPrimaryKeyConstraintWithCustomSchema()
         {
-            var expression = GeneratorTestHelper.GetCreateMultiColumnNamedPrimaryKeyExpression();
+            var expression = GeneratorTestHelper.GetCreateNamedMultiColumnPrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
-            var result = generator.Generate(expression);
+
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY ([TestColumn1], [TestColumn2])");
         }
 
         [Test]
         public void CanCreateNamedMultiColumnPrimaryKeyConstraintWithDefaultSchema()
         {
-            var expression = GeneratorTestHelper.GetCreateMultiColumnNamedPrimaryKeyExpression();
-            var result = generator.Generate(expression);
+            var expression = GeneratorTestHelper.GetCreateNamedMultiColumnPrimaryKeyExpression();
+
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY ([TestColumn1], [TestColumn2])");
         }
 
         [Test]
         public void CanCreateNamedMultiColumnUniqueConstraintWithCustomSchema()
         {
-            var expression = GeneratorTestHelper.GetCreateMultiColumnNamedUniqueConstraintExpression();
+            var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
             expression.Constraint.SchemaName = "TestSchema";
-            var result = generator.Generate(expression);
+
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE ([TestColumn1], [TestColumn2])");
         }
 
         [Test]
         public void CanCreateNamedMultiColumnUniqueConstraintWithDefaultSchema()
         {
-            var expression = GeneratorTestHelper.GetCreateMultiColumnNamedUniqueConstraintExpression();
-            var result = generator.Generate(expression);
+            var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
+
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE ([TestColumn1], [TestColumn2])");
         }
 
@@ -333,7 +339,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
-            var result = generator.Generate(expression);
+
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY ([TestColumn1])");
         }
 
@@ -341,7 +348,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         public void CanCreateNamedPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
-            var result = generator.Generate(expression);
+
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY ([TestColumn1])");
         }
 
@@ -350,7 +358,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
             expression.Constraint.SchemaName = "TestSchema";
-            var result = generator.Generate(expression);
+
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE ([TestColumn1])");
         }
 
@@ -358,7 +367,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         public void CanCreateNamedUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
-            var result = generator.Generate(expression);
+
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE ([TestColumn1])");
         }
 
@@ -367,7 +377,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
-            var result = generator.Generate(expression);
+
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1])");
         }
 
@@ -375,7 +386,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         public void CanCreatePrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
-            var result = generator.Generate(expression);
+
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1])");
         }
 
@@ -384,7 +396,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
             expression.Constraint.SchemaName = "TestSchema";
-            var result = generator.Generate(expression);
+
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [UC_TestTable1_TestColumn1] UNIQUE ([TestColumn1])");
         }
 
@@ -392,7 +405,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         public void CanCreateUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
-            var result = generator.Generate(expression);
+
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [UC_TestTable1_TestColumn1] UNIQUE ([TestColumn1])");
         }
 
@@ -401,16 +415,18 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT [FK_Test]");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT [FK_Test]");
         }
 
         [Test]
         public void CanDropForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [FK_Test]");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [FK_Test]");
         }
 
         [Test]
@@ -418,7 +434,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
             expression.Constraint.SchemaName = "TestSchema";
-            var result = generator.Generate(expression);
+
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT [TESTPRIMARYKEY]");
         }
 
@@ -426,7 +443,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         public void CanDropPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
-            var result = generator.Generate(expression);
+
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [TESTPRIMARYKEY]");
         }
 
@@ -435,7 +453,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();
             expression.Constraint.SchemaName = "TestSchema";
-            var result = generator.Generate(expression);
+
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT [TESTUNIQUECONSTRAINT]");
         }
 
@@ -443,7 +462,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         public void CanDropUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();
-            var result = generator.Generate(expression);
+
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [TESTUNIQUECONSTRAINT]");
         }
     }

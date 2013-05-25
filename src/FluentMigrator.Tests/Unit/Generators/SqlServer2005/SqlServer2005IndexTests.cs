@@ -7,12 +7,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
     [TestFixture]
     public class SqlServer2005IndexTests
     {
-        protected SqlServer2005Generator generator;
+        protected SqlServer2005Generator Generator;
 
         [SetUp]
         public void Setup()
         {
-            generator = new SqlServer2005Generator();
+            Generator = new SqlServer2005Generator();
         }
 
         [Test]
@@ -20,16 +20,18 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
             expression.Index.SchemaName = "TestSchema";
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC)");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC)");
         }
 
         [Test]
         public void CanCreateIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC)");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC)");
         }
 
         [Test]
@@ -37,16 +39,18 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
             expression.Index.SchemaName = "TestSchema";
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
         }
 
         [Test]
         public void CanCreateMultiColumnIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
         }
 
         [Test]
@@ -54,16 +58,18 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
             expression.Index.SchemaName = "TestSchema";
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
         }
 
         [Test]
         public void CanCreateMultiColumnUniqueIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
         }
 
         [Test]
@@ -71,16 +77,18 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
             expression.Index.SchemaName = "TestSchema";
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC)");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC)");
         }
 
         [Test]
         public void CanCreateUniqueIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC)");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC)");
         }
 
         [Test]
@@ -88,9 +96,9 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
             expression.Index.SchemaName = "TestSchema";
-            var sql = generator.Generate(expression);
 
-            sql.ShouldBe("DROP INDEX [TestIndex] ON [TestSchema].[TestTable1]");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP INDEX [TestIndex] ON [TestSchema].[TestTable1]");
         }
 
         [Test]
@@ -98,8 +106,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
 
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("DROP INDEX [TestIndex] ON [dbo].[TestTable1]");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP INDEX [TestIndex] ON [dbo].[TestTable1]");
         }
     }
 }

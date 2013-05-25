@@ -1,5 +1,4 @@
-﻿using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Generators.Postgres;
+﻿using FluentMigrator.Runner.Generators.Postgres;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -8,42 +7,39 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
     [TestFixture]
     public class PostgresSchemaTests
     {
-        protected PostgresGenerator generator;
+        protected PostgresGenerator Generator;
 
         [SetUp]
         public void Setup()
         {
-            generator = new PostgresGenerator();
+            Generator = new PostgresGenerator();
         }
 
         [Test]
         public void CanAlterSchema()
         {
-            var expression = new AlterSchemaExpression
-            {
-                DestinationSchemaName = "DEST",
-                SourceSchemaName = "SOURCE",
-                TableName = "TABLE"
-            };
+            var expression = GeneratorTestHelper.GetAlterSchemaExpression();
 
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE \"SOURCE\".\"TABLE\" SET SCHEMA \"DEST\"");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"TestSchema1\".\"TestTable\" SET SCHEMA \"TestSchema2\"");
         }
 
         [Test]
         public void CanCreateSchema()
         {
-            var expression = new CreateSchemaExpression { SchemaName = "Schema1" };
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE SCHEMA \"Schema1\"");
+            var expression = GeneratorTestHelper.GetCreateSchemaExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE SCHEMA \"TestSchema\"");
         }
 
         [Test]
         public void CanDropSchema()
         {
-            var expression = new DeleteSchemaExpression() { SchemaName = "Schema1" };
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("DROP SCHEMA \"Schema1\"");
+            var expression = GeneratorTestHelper.GetDeleteSchemaExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP SCHEMA \"TestSchema\"");
         }
     }
 }

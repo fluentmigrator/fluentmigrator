@@ -13,14 +13,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
     [TestFixture]
     public class SqlServer2000GeneratorTests
     {
-        protected SqlServer2000Generator _generator;
-        protected SqlServer2000Generator generator;
+        protected SqlServer2000Generator Generator;
 
         [SetUp]
         public void Setup()
         {
-            _generator = new SqlServer2000Generator();
-            generator = new SqlServer2000Generator();
+            Generator = new SqlServer2000Generator();
         }
 
         [Test]
@@ -30,16 +28,14 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
             expression.Column.DefaultValue = "Foo";
 
-            var sql = _generator.Generate(expression);
-
-            sql.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL");
         }
 
         [Test]
         public void CanAlterDefaultConstraint()
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
-            var sql = _generator.Generate(expression);
 
             string expected = "DECLARE @default sysname, @sql nvarchar(4000);" + Environment.NewLine + Environment.NewLine +
             "-- get name of default constraint" + Environment.NewLine +
@@ -59,20 +55,22 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
             "ALTER TABLE [TestTable1] WITH NOCHECK ADD CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT(1) FOR [TestColumn1];";
 
-            sql.ShouldBe(expected);
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
         }
 
         [Test]
         public void CanAlterSchemaInStrictMode()
         {
-            _generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new CreateSchemaExpression()));
+            Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
 
         [Test]
         public void CanAddColumnWithGetDateDefault()
         {
-            ColumnDefinition column = new ColumnDefinition
+            var column = new ColumnDefinition
             {
                 Name = "TestColumn1",
                 Type = DbType.String,
@@ -80,21 +78,23 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
                 DefaultValue = "GetDate()"
             };
             var expression = new CreateColumnExpression { TableName = "TestTable1", Column = column };
-            var sql = _generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL DEFAULT GetDate()");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL DEFAULT GetDate()");
         }
 
         [Test]
         public void CanCreateSchemaInStrictMode()
         {
-            _generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new CreateSchemaExpression()));
+            Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
 
         [Test]
         public void CanCreateTableWithGetDateDefault()
         {
-            ColumnDefinition column = new ColumnDefinition
+            var column = new ColumnDefinition
             {
                 Name = "TestColumn1",
                 Type = DbType.String,
@@ -103,8 +103,9 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             };
             var expression = new CreateTableExpression { TableName = "TestTable1" };
             expression.Columns.Add(column);
-            var sql = _generator.Generate(expression);
-            sql.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(5) NOT NULL DEFAULT GetDate())");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(5) NOT NULL DEFAULT GetDate())");
         }
 
         [Test]
@@ -113,30 +114,30 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
             expression.Columns[0].AdditionalFeatures.Add(SqlServerExtensions.IdentitySeed, 45);
             expression.Columns[0].AdditionalFeatures.Add(SqlServerExtensions.IdentityIncrement, 23);
-            var sql = _generator.Generate(expression);
-            sql.ShouldBe(
-                "CREATE TABLE [TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(45,23), [TestColumn2] INT NOT NULL)");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(45,23), [TestColumn2] INT NOT NULL)");
         }
 
         [Test]
         public void CanCreateXmlColumn()
         {
-            var expression = new CreateColumnExpression();
-            expression.TableName = "Table1";
+            var expression = new CreateColumnExpression
+                {
+                    TableName = "Table1",
+                    Column = new ColumnDefinition {Name = "MyXmlColumn", Type = DbType.Xml}
+                };
 
-            expression.Column = new ColumnDefinition();
-            expression.Column.Name = "MyXmlColumn";
-            expression.Column.Type = DbType.Xml;
-
-            var sql = _generator.Generate(expression);
-            sql.ShouldNotBeNull();
+            var result = Generator.Generate(expression);
+            result.ShouldNotBeNull();
         }
 
         [Test]
         public void CanDropSchemaInStrictMode()
         {
-            _generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new DeleteSchemaExpression()));
+            Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new DeleteSchemaExpression()));
         }
 
         [Test]
@@ -144,7 +145,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         {
             var expression = new DeleteDefaultConstraintExpression {ColumnName = "Name", SchemaName = "Personalia", TableName = "Person"};
 
-            string expected = "DECLARE @default sysname, @sql nvarchar(4000);" + Environment.NewLine + Environment.NewLine +
+            var expected = "DECLARE @default sysname, @sql nvarchar(4000);" + Environment.NewLine + Environment.NewLine +
                                     "-- get name of default constraint" + Environment.NewLine +
                                     "SELECT @default = name" + Environment.NewLine +
                                     "FROM sys.default_constraints" + Environment.NewLine +
@@ -160,7 +161,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
                                     "SET @sql = N'ALTER TABLE [Person] DROP CONSTRAINT ' + @default;" + Environment.NewLine +
                                     "EXEC sp_executesql @sql;";
 
-            generator.Generate(expression).ShouldBe(expected);
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
         }
     }
 }

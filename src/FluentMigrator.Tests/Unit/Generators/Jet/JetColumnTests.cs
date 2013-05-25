@@ -1,4 +1,3 @@
-﻿using System;
 using FluentMigrator.Runner.Generators.Jet;
 using NUnit.Framework;
 using NUnit.Should;
@@ -8,12 +7,12 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
     [TestFixture]
     public class JetColumnTests
     {
-        protected JetGenerator _generator;
+        protected JetGenerator Generator;
 
         [SetUp]
         public void Setup()
         {
-            _generator = new JetGenerator();
+            Generator = new JetGenerator();
         }
 
         [Test]
@@ -21,9 +20,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
 
-            var sql = _generator.Generate(expression);
-
-            sql.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] VARCHAR(20) NOT NULL");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] VARCHAR(20) NOT NULL");
         }
 
         [Test]
@@ -31,9 +29,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
 
-            var sql = _generator.Generate(expression);
-
-            sql.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] COUNTER NOT NULL");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] COUNTER NOT NULL");
         }
 
         [Test]
@@ -41,7 +38,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
 
-            var result = _generator.Generate(expression);
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [TestTable1] ADD COLUMN [TestColumn1] VARCHAR(5) NOT NULL");
         }
 
@@ -50,8 +47,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
 
-            var result = _generator.Generate(expression);
-
+            var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [TestTable1] ADD COLUMN [TestColumn1] DECIMAL(19,2) NOT NULL");
         }
 
@@ -60,8 +56,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
 
-            string sql = _generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [TestTable1] DROP COLUMN [TestColumn1]");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] DROP COLUMN [TestColumn1]");
         }
 
         [Test]
@@ -69,15 +65,16 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "TestColumn1", "TestColumn2" });
 
-            string sql = _generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE [TestTable1] DROP COLUMN [TestColumn1];" + Environment.NewLine + "ALTER TABLE [TestTable1] DROP COLUMN [TestColumn2]");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] DROP COLUMN [TestColumn1];" + System.Environment.NewLine + "ALTER TABLE [TestTable1] DROP COLUMN [TestColumn2]");
         }
 
         [Test]
         public void CanRenameColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
-            var result = _generator.Generate(expression);
+
+            var result = Generator.Generate(expression);
             result.ShouldBe(string.Empty);
         }
     }

@@ -34,8 +34,9 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
                     StartWith = 2
                 }
             };
-            var sql = generator.GenerateAlterSequence(expression.Sequence);
-            sql.ShouldBe("ALTER SEQUENCE \"Sequence\" RESTART WITH 2");
+
+            var result = generator.GenerateAlterSequence(expression.Sequence);
+            result.ShouldBe("ALTER SEQUENCE \"Sequence\" RESTART WITH 2");
         }
     }
 }

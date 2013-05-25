@@ -1,5 +1,4 @@
-﻿using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Generators.Postgres;
+﻿using FluentMigrator.Runner.Generators.Postgres;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -8,69 +7,50 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
     [TestFixture]
     public class PostgresSequenceTests
     {
-        protected PostgresGenerator generator;
+        protected PostgresGenerator Generator;
 
         [SetUp]
         public void Setup()
         {
-            generator = new PostgresGenerator();
+            Generator = new PostgresGenerator();
         }
 
         [Test]
         public void CanCreateSequenceWithCustomSchema()
         {
-            var expression = new CreateSequenceExpression
-            {
-                Sequence =
-                {
-                    Cache = 10,
-                    Cycle = true,
-                    Increment = 2,
-                    MaxValue = 100,
-                    MinValue = 0,
-                    Name = "Sequence",
-                    SchemaName = "Schema",
-                    StartWith = 2
-                }
-            };
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE SEQUENCE \"Schema\".\"Sequence\" INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE");
+            var expression = GeneratorTestHelper.GetCreateSequenceExpression();
+            expression.Sequence.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE SEQUENCE \"TestSchema\".\"Sequence\" INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE");
         }
 
         [Test]
         public void CanCreateSequenceWithDefaultSchema()
         {
-            var expression = new CreateSequenceExpression
-            {
-                Sequence =
-                {
-                    Cache = 10,
-                    Cycle = true,
-                    Increment = 2,
-                    MaxValue = 100,
-                    MinValue = 0,
-                    Name = "Sequence",
-                    StartWith = 2
-                }
-            };
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("CREATE SEQUENCE \"Sequence\" INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE");
+            var expression = GeneratorTestHelper.GetCreateSequenceExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE SEQUENCE \"Sequence\" INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE");
         }
 
         [Test]
         public void CanDropSequenceWithCustomSchema()
         {
-            var expression = new DeleteSequenceExpression { SchemaName = "Schema", SequenceName = "Sequence" };
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("DROP SEQUENCE \"Schema\".\"Sequence\"");
+            var expression = GeneratorTestHelper.GetDeleteSequenceExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP SEQUENCE \"TestSchema\".\"Sequence\"");
         }
 
         [Test]
         public void CanDropSequenceWithDefaultSchema()
         {
-            var expression = new DeleteSequenceExpression { SequenceName = "Sequence" };
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("DROP SEQUENCE \"Sequence\"");
+            var expression = GeneratorTestHelper.GetDeleteSequenceExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP SEQUENCE \"Sequence\"");
         }
     }
 }

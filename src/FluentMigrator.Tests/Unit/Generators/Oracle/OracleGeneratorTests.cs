@@ -9,14 +9,12 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
     [TestFixture]
     public class OracleGeneratorTests
     {
-        protected OracleGenerator generator;
-        protected OracleGenerator _generator;
+        protected OracleGenerator Generator;
 
         [SetUp]
         public void Setup()
         {
-            generator = new OracleGenerator();
-            _generator = new OracleGenerator();
+            Generator = new OracleGenerator();
         }
 
         [Test]
@@ -24,29 +22,33 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
             expression.Column.IsNullable = null;
-            string sql = generator.Generate(expression);
-            sql.ShouldBe("ALTER TABLE TestTable1 MODIFY TestColumn1 NVARCHAR2(20)");
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE TestTable1 MODIFY TestColumn1 NVARCHAR2(20)");
         }
 
         [Test]
         public void CanAlterSchemaInStrictMode()
         {
-            generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => generator.Generate(new CreateSchemaExpression()));
+            Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
 
         [Test]
         public void CanCreateSchemaInStrictMode()
         {
-            _generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new CreateSchemaExpression()));
+            Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
 
         [Test]
         public void CanDropSchemaInStrictMode()
         {
-            _generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
-            Assert.Throws<DatabaseOperationNotSupportedException>(() => _generator.Generate(new DeleteSchemaExpression()));
+            Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
+
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new DeleteSchemaExpression()));
         }
     }
 }

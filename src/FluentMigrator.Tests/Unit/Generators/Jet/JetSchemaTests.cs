@@ -1,5 +1,4 @@
-﻿using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Generators.Jet;
+﻿using FluentMigrator.Runner.Generators.Jet;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -8,35 +7,38 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
     [TestFixture]
     public class JetSchemaTests
     {
-        protected JetGenerator _generator;
+        protected JetGenerator Generator;
 
         [SetUp]
         public void Setup()
         {
-            _generator = new JetGenerator();
+            Generator = new JetGenerator();
         }
 
         [Test]
         public void CanAlterSchema()
         {
-            var expression = new AlterSchemaExpression();
-            var result = _generator.Generate(expression);
+            var expression = GeneratorTestHelper.GetAlterSchemaExpression();
+
+            var result = Generator.Generate(expression);
             result.ShouldBe(string.Empty);
         }
 
         [Test]
         public void CanCreateSchema()
         {
-            var expression = new CreateSchemaExpression() { SchemaName = "TestSchema" };
-            var result = _generator.Generate(expression);
+            var expression = GeneratorTestHelper.GetCreateSchemaExpression();
+
+            var result = Generator.Generate(expression);
             result.ShouldBe(string.Empty);
         }
 
         [Test]
         public void CanDropSchema()
         {
-            var expression = new DeleteSchemaExpression();
-            var result = _generator.Generate(expression);
+            var expression = GeneratorTestHelper.GetDeleteSchemaExpression();
+
+            var result = Generator.Generate(expression);
             result.ShouldBe(string.Empty);
         }
     }
