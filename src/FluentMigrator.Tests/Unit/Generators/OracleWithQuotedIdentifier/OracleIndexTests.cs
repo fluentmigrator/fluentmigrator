@@ -5,7 +5,7 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
 {
     [TestFixture]
-    public class OracleIndexTests
+    public class OracleIndexTests : BaseIndexTests
     {
         protected OracleGenerator Generator;
 
@@ -16,7 +16,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanCreateIndexWithCustomSchema()
+        public override void CanCreateIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
             expression.Index.SchemaName = "TestSchema";
@@ -26,7 +26,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanCreateIndexWithDefaultSchema()
+        public override void CanCreateIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
 
@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanCreateMultiColumnIndexWithCustomSchema()
+        public override void CanCreateMultiColumnIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
             expression.Index.SchemaName = "TestSchema";
@@ -45,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanCreateMultiColumnIndexWithDefaultSchema()
+        public override void CanCreateMultiColumnIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
 
@@ -54,7 +54,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanCreateMultiColumnUniqueIndexWithCustomSchema()
+        public override void CanCreateMultiColumnUniqueIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
             expression.Index.SchemaName = "TestSchema";
@@ -64,7 +64,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanCreateMultiColumnUniqueIndexWithDefaultSchema()
+        public override void CanCreateMultiColumnUniqueIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
 
@@ -73,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanCreateUniqueIndexWithCustomSchema()
+        public override void CanCreateUniqueIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
             expression.Index.SchemaName = "TestSchema";
@@ -83,7 +83,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanCreateUniqueIndexWithDefaultSchema()
+        public override void CanCreateUniqueIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
 
@@ -92,7 +92,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanDropIndexWithCustomSchema()
+        public override void CanDropIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
             expression.Index.SchemaName = "TestSchema";
@@ -102,7 +102,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
 
         [Test]
-        public void CanDropIndexWithDefaultSchema()
+        public override void CanDropIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
 

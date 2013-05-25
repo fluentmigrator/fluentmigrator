@@ -5,7 +5,7 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Unit.Generators.Jet
 {
     [TestFixture]
-    public class JetColumnTests
+    public class JetColumnTests : BaseColumnTests
     {
         protected JetGenerator Generator;
 
@@ -16,7 +16,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanAlterColumnWithCustomSchema()
+        public override void CanAlterColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
             expression.SchemaName = "TestSchema";
@@ -26,7 +26,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanAlterColumnWithDefaultSchema()
+        public override void CanAlterColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
 
@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateAutoIncrementColumnWithCustomSchema()
+        public override void CanCreateAutoIncrementColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
             expression.SchemaName = "TestSchema";
@@ -45,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateAutoIncrementColumnWithDefaultSchema()
+        public override void CanCreateAutoIncrementColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
 
@@ -54,7 +54,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateColumnWithCustomSchema()
+        public override void CanCreateColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
             expression.SchemaName = "TestSchema";
@@ -64,7 +64,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateColumnWithDefaultSchema()
+        public override void CanCreateColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
 
@@ -73,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateDecimalColumnWithCustomSchema()
+        public override void CanCreateDecimalColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
             expression.SchemaName = "TestSchema";
@@ -83,7 +83,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanCreateDecimalColumnWithDefaultSchema()
+        public override void CanCreateDecimalColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
 
@@ -92,7 +92,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanDropColumnWithCustomSchema()
+        public override void CanDropColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
             expression.SchemaName = "TestSchema";
@@ -102,7 +102,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanDropColumnWithDefaultSchema()
+        public override void CanDropColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
 
@@ -111,7 +111,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanDropMultipleColumnsWithCustomSchema()
+        public override void CanDropMultipleColumnsWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "TestColumn1", "TestColumn2" });
             expression.SchemaName = "TestSchema";
@@ -121,7 +121,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanDropMultipleColumnsWithDefaultSchema()
+        public override void CanDropMultipleColumnsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "TestColumn1", "TestColumn2" });
 
@@ -130,7 +130,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanRenameColumnWithCustomSchema()
+        public override void CanRenameColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
             expression.SchemaName = "TestSchema";
@@ -140,7 +140,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
         }
 
         [Test]
-        public void CanRenameColumnWithDefaultSchema()
+        public override void CanRenameColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
 

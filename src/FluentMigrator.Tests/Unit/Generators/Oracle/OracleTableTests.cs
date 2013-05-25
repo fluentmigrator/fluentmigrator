@@ -6,7 +6,7 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {
     [TestFixture]
-    public class OracleTableTests
+    public class OracleTableTests : BaseTableTests
     {
         protected OracleGenerator Generator;
 
@@ -17,7 +17,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithCustomColumnTypeWithCustomSchema()
+        public override void CanCreateTableWithCustomColumnTypeWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.Columns[0].IsPrimaryKey = true;
@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithCustomColumnTypeWithDefaultSchema()
+        public override void CanCreateTableWithCustomColumnTypeWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.Columns[0].IsPrimaryKey = true;
@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithCustomSchema()
+        public override void CanCreateTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.SchemaName = "TestSchema";
@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithDefaultSchema()
+        public override void CanCreateTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
 
@@ -61,7 +61,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithDefaultValueExplicitlySetToNullWithCustomSchema()
+        public override void CanCreateTableWithDefaultValueExplicitlySetToNullWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.Columns[0].DefaultValue = null;
@@ -73,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithDefaultValueExplicitlySetToNullWithDefaultSchema()
+        public override void CanCreateTableWithDefaultValueExplicitlySetToNullWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.Columns[0].DefaultValue = null;
@@ -84,7 +84,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithDefaultValueWithCustomSchema()
+        public override void CanCreateTableWithDefaultValueWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
             expression.SchemaName = "TestSchema";
@@ -94,7 +94,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithDefaultValueWithDefaultSchema()
+        public override void CanCreateTableWithDefaultValueWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
 
@@ -103,7 +103,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithIdentityWithCustomSchema()
+        public override void CanCreateTableWithIdentityWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
             expression.SchemaName = "TestSchema";
@@ -112,13 +112,13 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithIdentityWithDefaultSchema()
+        public override void CanCreateTableWithIdentityWithDefaultSchema()
         {
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression()));
         }
 
         [Test]
-        public void CanCreateTableWithMultiColumnPrimaryKeyWithCustomSchema()
+        public override void CanCreateTableWithMultiColumnPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
             expression.SchemaName = "TestSchema";
@@ -128,7 +128,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
+        public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
 
@@ -137,7 +137,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithNamedMultiColumnPrimaryKeyWithCustomSchema()
+        public override void CanCreateTableWithNamedMultiColumnPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
             expression.SchemaName = "TestSchema";
@@ -147,7 +147,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithNamedMultiColumnPrimaryKeyWithDefaultSchema()
+        public override void CanCreateTableWithNamedMultiColumnPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
 
@@ -156,7 +156,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithNamedPrimaryKeyWithCustomSchema()
+        public override void CanCreateTableWithNamedPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
             expression.SchemaName = "TestSchema";
@@ -166,7 +166,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithNamedPrimaryKeyWithDefaultSchema()
+        public override void CanCreateTableWithNamedPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
 
@@ -175,7 +175,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithNullableFieldWithCustomSchema()
+        public override void CanCreateTableWithNullableFieldWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
             expression.SchemaName = "TestSchema";
@@ -185,7 +185,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithNullableFieldWithDefaultSchema()
+        public override void CanCreateTableWithNullableFieldWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
 
@@ -194,7 +194,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithPrimaryKeyWithCustomSchema()
+        public override void CanCreateTableWithPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
             expression.SchemaName = "TestSchema";
@@ -204,7 +204,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanCreateTableWithPrimaryKeyWithDefaultSchema()
+        public override void CanCreateTableWithPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
 
@@ -213,7 +213,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanDropTableWithCustomSchema()
+        public override void CanDropTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
             expression.SchemaName = "TestSchema";
@@ -223,7 +223,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanDropTableWithDefaultSchema()
+        public override void CanDropTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
 
@@ -232,7 +232,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanRenameTableWithCustomSchema()
+        public override void CanRenameTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
             expression.SchemaName = "TestSchema";
@@ -242,7 +242,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
-        public void CanRenameTableWithDefaultSchema()
+        public override void CanRenameTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
 

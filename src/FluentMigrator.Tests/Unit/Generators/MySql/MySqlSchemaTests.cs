@@ -5,7 +5,7 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Unit.Generators.MySql
 {
     [TestFixture]
-    public class MySqlSchemaTests
+    public class MySqlSchemaTests : BaseSchemaTests
     {
         protected MySqlGenerator Generator;
 
@@ -16,7 +16,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         }
 
         [Test]
-        public void CanAlterSchema()
+        public override void CanAlterSchema()
         {
             var expression = GeneratorTestHelper.GetAlterSchemaExpression();
 
@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         }
 
         [Test]
-        public void CanCreateSchema()
+        public override void CanCreateSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSchemaExpression();
 
@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         }
 
         [Test]
-        public void CanDropSchema()
+        public override void CanDropSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSchemaExpression();
 
