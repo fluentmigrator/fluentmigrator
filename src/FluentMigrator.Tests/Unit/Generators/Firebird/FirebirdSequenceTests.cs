@@ -27,10 +27,28 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
         }
 
         [Test]
+        public void CanCreateSequenceWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateSequenceExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE SEQUENCE \"Sequence\"");
+        }
+
+        [Test]
         public void CanDropSequenceWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSequenceExpression();
             expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP SEQUENCE \"Sequence\"");
+        }
+
+        [Test]
+        public void CanDropSequenceWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteSequenceExpression();
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP SEQUENCE \"Sequence\"");
