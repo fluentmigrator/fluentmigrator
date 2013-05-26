@@ -6,16 +6,17 @@ using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
 using NUnit.Should;
 
-namespace FluentMigrator.Tests.Unit.Generators
+namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
 {
+    [TestFixture]
     public class SqlServer2008GeneratorTests
     {
-        private SqlServer2008Generator generator;
+        protected SqlServer2008Generator Generator;
 
         [SetUp]
-        public void SetUp()
+        public void Setup()
         {
-            generator = new SqlServer2008Generator();
+            Generator = new SqlServer2008Generator();
         }
 
         [Test]
@@ -25,19 +26,16 @@ namespace FluentMigrator.Tests.Unit.Generators
             expression.Columns.Add(new ColumnDefinition {TableName = "TestTable1", Name = "TestColumn1", Type = DbType.DateTimeOffset});
             expression.Columns.Add(new ColumnDefinition {TableName = "TestTable1", Name = "TestColumn2", Type = DbType.DateTime2});
             expression.Columns.Add(new ColumnDefinition {TableName = "TestTable1", Name = "TestColumn3", Type = DbType.Date});
-            expression.Columns.Add(new ColumnDefinition {TableName = "TestTable1", Name = "TestColumn4", Type = DbType.Time});
+            expression.Columns.Add(new ColumnDefinition { TableName = "TestTable1", Name = "TestColumn4", Type = DbType.Time });
 
-            var sql = generator.Generate(expression);
-
-            sql.ShouldBe(
-                "CREATE TABLE [dbo].[TestTable1] ([TestColumn1] DATETIMEOFFSET NOT NULL, [TestColumn2] DATETIME2 NOT NULL, [TestColumn3] DATE NOT NULL, [TestColumn4] TIME NOT NULL)");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] DATETIMEOFFSET NOT NULL, [TestColumn2] DATETIME2 NOT NULL, [TestColumn3] DATE NOT NULL, [TestColumn4] TIME NOT NULL)");
         }
 
         [Test]
         public void CanInsertScopeIdentity()
         {
-            var expression = new InsertDataExpression();
-            expression.TableName = "TestTable";
+            var expression = new InsertDataExpression {TableName = "TestTable"};
             expression.Rows.Add(new InsertionDataDefinition
                                     {
                                         new KeyValuePair<string, object>("Id", 1),
@@ -45,18 +43,14 @@ namespace FluentMigrator.Tests.Unit.Generators
                                         new KeyValuePair<string, object>("Website", "codethinked.com")
                                     });
 
-            var sql = generator.Generate(expression);
-
-            var expected = "INSERT INTO [dbo].[TestTable] ([Id], [Name], [Website]) VALUES (1, SCOPE_IDENTITY(), 'codethinked.com')";
-
-            sql.ShouldBe(expected);
+            var result = Generator.Generate(expression);
+            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([Id], [Name], [Website]) VALUES (1, SCOPE_IDENTITY(), 'codethinked.com')");
         }
 
         [Test]
         public void CanInsertAtAtIdentity()
         {
-            var expression = new InsertDataExpression();
-            expression.TableName = "TestTable";
+            var expression = new InsertDataExpression {TableName = "TestTable"};
             expression.Rows.Add(new InsertionDataDefinition
                                     {
                                         new KeyValuePair<string, object>("Id", 1),
@@ -64,29 +58,22 @@ namespace FluentMigrator.Tests.Unit.Generators
                                         new KeyValuePair<string, object>("Website", "codethinked.com")
                                     });
 
-            var sql = generator.Generate(expression);
-
-            var expected = "INSERT INTO [dbo].[TestTable] ([Id], [Name], [Website]) VALUES (1, @@IDENTITY, 'codethinked.com')";
-
-            sql.ShouldBe(expected);
+            var result = Generator.Generate(expression);
+            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([Id], [Name], [Website]) VALUES (1, @@IDENTITY, 'codethinked.com')");
         }
 
         [Test]
         public void ExplicitUnicodeQuotesCorrectly()
         {
-            var expression = new InsertDataExpression();
-            expression.TableName = "TestTable";
+            var expression = new InsertDataExpression {TableName = "TestTable"};
             expression.Rows.Add(new InsertionDataDefinition
                                     {
                                         new KeyValuePair<string, object>("UnicodeStringValue", new ExplicitUnicodeString("UnicodeString")),
                                         new KeyValuePair<string, object>("StringValue", "AnsiiString")
                                     });
 
-            var sql = generator.Generate(expression);
-
-            var expected = "INSERT INTO [dbo].[TestTable] ([UnicodeStringValue], [StringValue]) VALUES (N'UnicodeString', 'AnsiiString')";
-
-            sql.ShouldBe(expected);
+            var result = Generator.Generate(expression);
+            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([UnicodeStringValue], [StringValue]) VALUES (N'UnicodeString', 'AnsiiString')");
 
         }
 
