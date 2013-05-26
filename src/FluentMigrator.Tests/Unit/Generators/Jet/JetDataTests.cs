@@ -1,93 +1,157 @@
-﻿using System;
-using System.Collections.Generic;
-using FluentMigrator.Runner.Generators.Jet;
+﻿using FluentMigrator.Runner.Generators.Jet;
 using NUnit.Framework;
 using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.Jet
 {
+    [TestFixture]
     public class JetDataTests : BaseDataTests
     {
-        protected JetGenerator generator;
+        protected JetGenerator Generator;
 
         [SetUp]
         public void Setup()
         {
-            generator = new JetGenerator();
+            Generator = new JetGenerator();
         }
 
         [Test]
-        public override void CanInsertData()
+        public override void CanDeleteDataForAllRowsWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DELETE FROM [TestTable1] WHERE 1 = 1");
+        }
+
+        [Test]
+        public override void CanDeleteDataForAllRowsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DELETE FROM [TestTable1] WHERE 1 = 1");
+        }
+
+        [Test]
+        public override void CanDeleteDataForMultipleRowsWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DELETE FROM [TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL; DELETE FROM [TestTable1] WHERE [Website] = 'github.com'");
+        }
+
+        [Test]
+        public override void CanDeleteDataForMultipleRowsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DELETE FROM [TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL; DELETE FROM [TestTable1] WHERE [Website] = 'github.com'");
+        }
+
+        [Test]
+        public override void CanDeleteDataWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteDataExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DELETE FROM [TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL");
+        }
+
+        [Test]
+        public override void CanDeleteDataWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteDataExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DELETE FROM [TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL");
+        }
+
+        [Test]
+        public override void CanInsertDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
-
-            var sql = generator.Generate(expression);
+            expression.SchemaName = "TestSchema";
 
             var expected = "INSERT INTO [TestTable1] ([Id], [Name], [Website]) VALUES (1, 'Just''in', 'codethinked.com');";
             expected += @" INSERT INTO [TestTable1] ([Id], [Name], [Website]) VALUES (2, 'Na\te', 'kohari.org')";
 
-            sql.ShouldBe(expected);
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
         }
 
         [Test]
-        public override void CanDeleteData()
+        public override void CanInsertDataWithDefaultSchema()
         {
-            var expression = GeneratorTestHelper.GetDeleteDataExpression();
+            var expression = GeneratorTestHelper.GetInsertDataExpression();
 
-            var sql = generator.Generate(expression);
+            var expected = "INSERT INTO [TestTable1] ([Id], [Name], [Website]) VALUES (1, 'Just''in', 'codethinked.com');";
+            expected += @" INSERT INTO [TestTable1] ([Id], [Name], [Website]) VALUES (2, 'Na\te', 'kohari.org')";
 
-            sql.ShouldBe("DELETE FROM [TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL");
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
         }
 
         [Test]
-        public override void CanDeleteDataAllRows()
+        public override void CanInsertGuidDataWithCustomSchema()
         {
-            var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
+            var expression = GeneratorTestHelper.GetInsertGUIDExpression();
+            expression.SchemaName = "TestSchema";
 
-            var sql = generator.Generate(expression);
-
-            sql.ShouldBe("DELETE FROM [TestTable1] WHERE 1 = 1");
+            var result = Generator.Generate(expression);
+            result.ShouldBe(System.String.Format("INSERT INTO [TestTable1] ([guid]) VALUES ('{0}')", GeneratorTestHelper.TestGuid.ToString()));
         }
 
         [Test]
-        public override void CanDeleteDataMultipleRows()
+        public override void CanInsertGuidDataWithDefaultSchema()
         {
-            var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
-
-            var sql = generator.Generate(expression);
-
-            sql.ShouldBe("DELETE FROM [TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL; DELETE FROM [TestTable1] WHERE [Website] = 'github.com'");
-        }
-
-        [Test]
-        public override void CanInsertGuidData()
-        {
-
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
 
-            var sql = generator.Generate(expression);
-
-            var expected = String.Format("INSERT INTO [TestTable1] ([guid]) VALUES ('{0}')", GeneratorTestHelper.TestGuid.ToString());
-
-            sql.ShouldBe(expected);
+            var result = Generator.Generate(expression);
+            result.ShouldBe(System.String.Format("INSERT INTO [TestTable1] ([guid]) VALUES ('{0}')", GeneratorTestHelper.TestGuid.ToString()));
         }
 
         [Test]
-        public override void CanUpdateData()
+        public override void CanUpdateDataForAllDataWithCustomSchema()
         {
-            var expression = GeneratorTestHelper.GetUpdateDataExpression();
+            var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
+            expression.SchemaName = "TestSchema";
 
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("UPDATE [TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("UPDATE [TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE 1 = 1");
         }
 
         [Test]
-        public void CanUpdateDataForAllRows()
+        public override void CanUpdateDataForAllDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
 
-            var sql = generator.Generate(expression);
-            sql.ShouldBe("UPDATE [TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE 1 = 1");
+            var result = Generator.Generate(expression);
+            result.ShouldBe("UPDATE [TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE 1 = 1");
+        }
+
+        [Test]
+        public override void CanUpdateDataWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetUpdateDataExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("UPDATE [TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL");
+        }
+
+        [Test]
+        public override void CanUpdateDataWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetUpdateDataExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("UPDATE [TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL");
         }
     }
 }

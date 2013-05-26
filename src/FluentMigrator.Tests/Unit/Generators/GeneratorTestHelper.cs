@@ -49,7 +49,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
-        public static CreateTableExpression GetCreateTableWithMultiColumNamedPrimaryKeyExpression()
+        public static CreateTableExpression GetCreateTableWithNamedMultiColumnPrimaryKeyExpression()
         {
             var expression = new CreateTableExpression { TableName = TestTableName1 };
             expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, IsPrimaryKey = true, PrimaryKeyName = "TestKey", Type = DbType.String });
@@ -90,6 +90,26 @@ namespace FluentMigrator.Tests.Unit.Generators
             expression.Index.IsUnique = false;
             expression.Index.Columns.Add(new IndexColumnDefinition { Direction = Direction.Ascending, Name = TestColumnName1 });
             return expression;
+        }
+
+        public static CreateSchemaExpression GetCreateSchemaExpression()
+        {
+            return new CreateSchemaExpression { SchemaName = "TestSchema" };
+        }
+
+        public static CreateSequenceExpression GetCreateSequenceExpression()
+        {
+            return new CreateSequenceExpression {
+                Sequence = {
+                    Cache = 10,
+                    Cycle = true,
+                    Increment = 2,
+                    MaxValue = 100,
+                    MinValue = 0,
+                    Name = "Sequence",
+                    StartWith = 2
+                }
+            };
         }
 
         public static CreateIndexExpression GetCreateMultiColumnCreateIndexExpression()
@@ -301,7 +321,36 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static AlterSchemaExpression GetAlterSchemaExpression()
+        {
+            return new AlterSchemaExpression{ DestinationSchemaName = "TestSchema2", SourceSchemaName = "TestSchema1", TableName = "TestTable" };
+        }
+
         public static CreateForeignKeyExpression GetCreateForeignKeyExpression()
+        {
+            var expression = new CreateForeignKeyExpression();
+            expression.ForeignKey.PrimaryTable = TestTableName2;
+            expression.ForeignKey.ForeignTable = TestTableName1;
+            expression.ForeignKey.PrimaryColumns = new[] { TestColumnName2 };
+            expression.ForeignKey.ForeignColumns = new[] { TestColumnName1 };
+
+            expression.ApplyConventions(new MigrationConventions());
+            return expression;
+        }
+
+        public static CreateForeignKeyExpression GetCreateMultiColumnForeignKeyExpression()
+        {
+            var expression = new CreateForeignKeyExpression();
+            expression.ForeignKey.PrimaryTable = TestTableName2;
+            expression.ForeignKey.ForeignTable = TestTableName1;
+            expression.ForeignKey.PrimaryColumns = new[] { TestColumnName2, "TestColumn4" };
+            expression.ForeignKey.ForeignColumns = new[] { TestColumnName1, "TestColumn3" };
+
+            expression.ApplyConventions(new MigrationConventions());
+            return expression;
+        }
+
+        public static CreateForeignKeyExpression GetCreateNamedForeignKeyExpression()
         {
             var expression = new CreateForeignKeyExpression();
             expression.ForeignKey.Name = "FK_Test";
@@ -313,7 +362,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
-        public static CreateForeignKeyExpression GetCreateMultiColumnForeignKeyExpression()
+        public static CreateForeignKeyExpression GetCreateNamedMultiColumnForeignKeyExpression()
         {
             var expression = new CreateForeignKeyExpression();
             expression.ForeignKey.Name = "FK_Test";
@@ -362,6 +411,16 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static DeleteSchemaExpression GetDeleteSchemaExpression()
+        {
+            return new DeleteSchemaExpression { SchemaName = "TestSchema" };
+        }
+
+        public static DeleteSequenceExpression GetDeleteSequenceExpression()
+        {
+            return new DeleteSequenceExpression { SequenceName = "Sequence" };
+        }
+
         public static DeleteConstraintExpression GetDeleteUniqueConstraintExpression()
         {
             var expression = new DeleteConstraintExpression(ConstraintType.Unique);
@@ -399,7 +458,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
-        public static CreateConstraintExpression GetCreateMultiColumnNamedPrimaryKeyExpression()
+        public static CreateConstraintExpression GetCreateNamedMultiColumnPrimaryKeyExpression()
         {
             var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
             expression.Constraint.TableName = TestTableName1;
@@ -437,7 +496,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
-        public static CreateConstraintExpression GetCreateMultiColumnNamedUniqueConstraintExpression()
+        public static CreateConstraintExpression GetCreateNamedMultiColumnUniqueConstraintExpression()
         {
             var expression = new CreateConstraintExpression(ConstraintType.Unique);
             expression.Constraint.TableName = TestTableName1;
