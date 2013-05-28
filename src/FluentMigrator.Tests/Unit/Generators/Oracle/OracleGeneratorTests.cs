@@ -28,6 +28,26 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
+        public void CanAlterColumnNull()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
+            expression.Column.IsNullable = true;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE TestTable1 MODIFY TestColumn1 NVARCHAR2(20) NULL");
+        }
+
+        [Test]
+        public void CanAlterColumnNotNull()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
+            expression.Column.IsNullable = false;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE TestTable1 MODIFY TestColumn1 NVARCHAR2(20) NOT NULL");
+        }
+
+        [Test]
         public void CanAlterSchemaInStrictMode()
         {
             Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
