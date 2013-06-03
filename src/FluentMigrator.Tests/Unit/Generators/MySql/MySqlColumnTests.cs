@@ -92,6 +92,25 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         }
 
         [Test]
+        public void CanCreateCurrencyColumnWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateCurrencyColumnExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` DECIMAL(19,4) NOT NULL");
+        }
+
+        [Test]
+        public void CanCreateCurrencyColumnWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetCreateCurrencyColumnExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` DECIMAL(19,4) NOT NULL");
+        }
+
+        [Test]
         public override void CanDropColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();

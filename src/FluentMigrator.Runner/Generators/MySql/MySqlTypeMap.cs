@@ -27,7 +27,7 @@ namespace FluentMigrator.Runner.Generators.MySql
             SetTypeMap(DbType.Binary, "MEDIUMBLOB", MediumTextCapacity);
             SetTypeMap(DbType.Boolean, "TINYINT(1)");
             SetTypeMap(DbType.Byte, "TINYINT UNSIGNED");
-            SetTypeMap(DbType.Currency, "MONEY");
+            SetTypeMap(DbType.Currency, "DECIMAL(19,4)");
             SetTypeMap(DbType.Date, "DATE");
             SetTypeMap(DbType.DateTime, "DATETIME");
             SetTypeMap(DbType.Decimal, "DECIMAL(19,5)");
