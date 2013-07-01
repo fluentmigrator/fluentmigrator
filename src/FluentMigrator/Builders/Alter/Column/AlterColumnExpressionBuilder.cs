@@ -88,6 +88,12 @@ namespace FluentMigrator.Builders.Alter.Column
             return this;
         }
 
+        public IAlterColumnOptionSyntax WithColumnDescription(string description)
+        {
+            Expression.Column.ColumnDescription = description;
+            return this;
+        }
+
         public IAlterColumnOptionSyntax Identity()
         {
             Expression.Column.IsIdentity = true;

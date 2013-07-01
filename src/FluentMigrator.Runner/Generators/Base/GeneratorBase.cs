@@ -24,11 +24,13 @@ namespace FluentMigrator.Runner.Generators.Base
     {
         private readonly IColumn _column;
         private readonly IQuoter _quoter;
+        private readonly IDescriptionGenerator _descriptionGenerator;
 
-        public GeneratorBase(IColumn column, IQuoter quoter)
+        public GeneratorBase(IColumn column, IQuoter quoter, IDescriptionGenerator descriptionGenerator)
         {
             _column = column;
             _quoter = quoter;
+            _descriptionGenerator = descriptionGenerator;
         }
 
         public abstract string Generate(CreateSchemaExpression expression);
@@ -60,7 +62,7 @@ namespace FluentMigrator.Runner.Generators.Base
             return false;
         }
 
-        public string Generate(AlterTableExpression expression)
+        public virtual string Generate(AlterTableExpression expression)
         {
             // returns nothing because the individual AddColumn and AlterColumn calls
             //  create CreateColumnExpression and AlterColumnExpression respectively
@@ -75,6 +77,11 @@ namespace FluentMigrator.Runner.Generators.Base
         public IQuoter Quoter
         {
             get { return _quoter; }
+        }
+
+        protected IDescriptionGenerator DescriptionGenerator
+        {
+            get { return _descriptionGenerator; }
         }
     }
 }

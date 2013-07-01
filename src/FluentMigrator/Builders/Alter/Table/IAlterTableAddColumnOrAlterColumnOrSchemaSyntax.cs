@@ -21,5 +21,6 @@ namespace FluentMigrator.Builders.Alter.Table
     public interface IAlterTableAddColumnOrAlterColumnOrSchemaSyntax : IAlterTableAddColumnOrAlterColumnSyntax
     {
         IAlterTableAddColumnOrAlterColumnSyntax InSchema(string schemaName);
+        IAlterTableAddColumnOrAlterColumnSyntax WithDescription(string description);
     }
 }
