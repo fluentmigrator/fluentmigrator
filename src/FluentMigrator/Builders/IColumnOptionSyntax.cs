@@ -28,6 +28,8 @@ namespace FluentMigrator.Builders
     {
         TNext WithDefault(SystemMethods method);
         TNext WithDefaultValue(object value);
+        TNext WithColumnDescription(string description);
+
         TNext Identity();
         TNext Indexed();
         TNext Indexed(string indexName);

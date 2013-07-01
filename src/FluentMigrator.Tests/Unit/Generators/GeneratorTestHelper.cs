@@ -15,6 +15,9 @@ namespace FluentMigrator.Tests.Unit.Generators
         public static string TestColumnName2 = "TestColumn2";
         public static string TestColumnName3 = "TestColumn3";
         public static string TestIndexName = "TestIndex";
+        public static string TestTableDescription = "TestDescription";
+        public static string TestColumn1Description = "TestColumn1Description";
+        public static string TestColumn2Description = "TestColumn2Description";
         public static Guid TestGuid = Guid.NewGuid();
 
         public static CreateTableExpression GetCreateTableExpression()
@@ -82,6 +85,33 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static CreateTableExpression GetCreateTableWithTableDescription()
+        {
+            var expression = new CreateTableExpression { TableName = TestTableName1, TableDescription = TestTableDescription };
+
+            return expression;
+        }
+
+        public static CreateTableExpression GetCreateTableWithTableDescriptionAndColumnDescriptions()
+        {
+            var expression = new CreateTableExpression { TableName = TestTableName1, TableDescription = TestTableDescription };
+            expression.Columns.Add(new ColumnDefinition
+            {
+                Name = TestColumnName1,
+                IsNullable = true,
+                Type = DbType.String,
+                ColumnDescription = TestColumn1Description
+            });
+            expression.Columns.Add(new ColumnDefinition
+            {
+                Name = TestColumnName2,
+                Type = DbType.Int32,
+                ColumnDescription = TestColumn2Description
+            });
+
+            return expression;
+        }
+
         public static CreateIndexExpression GetCreateIndexExpression()
         {
             var expression = new CreateIndexExpression();
@@ -99,8 +129,10 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         public static CreateSequenceExpression GetCreateSequenceExpression()
         {
-            return new CreateSequenceExpression {
-                Sequence = {
+            return new CreateSequenceExpression
+            {
+                Sequence =
+                {
                     Cache = 10,
                     Cycle = true,
                     Increment = 2,
@@ -282,7 +314,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         public static CreateColumnExpression GetCreateCurrencyColumnExpression()
         {
-            ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, Type = DbType.Currency};
+            ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, Type = DbType.Currency };
             return new CreateColumnExpression { TableName = TestTableName1, Column = column };
         }
 
@@ -292,10 +324,26 @@ namespace FluentMigrator.Tests.Unit.Generators
             return new CreateColumnExpression { TableName = TestTableName1, Column = column };
         }
 
+        public static CreateColumnExpression GetCreateColumnExpressionWithDescription()
+        {
+            ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, Type = DbType.String, Size = 5, ColumnDescription = TestColumn1Description };
+            return new CreateColumnExpression { TableName = TestTableName1, Column = column };
+        }
+
         public static CreateColumnExpression GetAlterTableAutoIncrementColumnExpression()
         {
             ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, IsIdentity = true, Type = DbType.Int32 };
             return new CreateColumnExpression { TableName = TestTableName1, Column = column };
+        }
+
+        public static AlterTableExpression GetAlterTableWithDescriptionExpression()
+        {
+            return new AlterTableExpression() { TableName = TestTableName1, TableDescription = TestTableDescription };
+        }
+
+        public static AlterTableExpression GetAlterTable()
+        {
+            return new AlterTableExpression() {TableName = TestTableName1 };
         }
 
         public static AlterColumnExpression GetAlterColumnAddAutoIncrementExpression()
@@ -327,9 +375,17 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static AlterColumnExpression GetAlterColumnExpressionWithDescription()
+        {
+            var columnExpression = GetAlterColumnExpression();
+            columnExpression.Column.ColumnDescription = TestColumn1Description;
+
+            return columnExpression;
+        }
+
         public static AlterSchemaExpression GetAlterSchemaExpression()
         {
-            return new AlterSchemaExpression{ DestinationSchemaName = "TestSchema2", SourceSchemaName = "TestSchema1", TableName = "TestTable" };
+            return new AlterSchemaExpression { DestinationSchemaName = "TestSchema2", SourceSchemaName = "TestSchema1", TableName = "TestTable" };
         }
 
         public static CreateForeignKeyExpression GetCreateForeignKeyExpression()
@@ -387,7 +443,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         public static DeleteColumnExpression GetDeleteColumnExpression()
         {
-            return GetDeleteColumnExpression(new [] {TestColumnName1});
+            return GetDeleteColumnExpression(new[] { TestColumnName1 });
         }
 
         public static DeleteColumnExpression GetDeleteColumnExpression(string[] columns)

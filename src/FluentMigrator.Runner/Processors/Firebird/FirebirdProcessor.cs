@@ -7,6 +7,7 @@ using FluentMigrator.Runner.Generators.Firebird;
 using System.Collections.Generic;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Helpers;
 
 namespace FluentMigrator.Runner.Processors.Firebird
 {
@@ -100,7 +101,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public override DataSet Read(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
-            
+
             //Announcer.Sql(String.Format(template,args));
 
             var ds = new DataSet();
@@ -225,7 +226,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             return DDLCreatedTables.Contains(tableName);
         }
-        
+
         protected bool IsColumnCreated(string tableName, string columnName)
         {
             return DDLCreatedColumns.ContainsKey(tableName) && DDLCreatedColumns[tableName].Contains(columnName);
@@ -258,7 +259,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             {
                 DDLTouchedColumns.Add(tableName, new List<string>() { columnName });
             }
-            else if(!DDLTouchedColumns[tableName].Contains(columnName))
+            else if (!DDLTouchedColumns[tableName].Contains(columnName))
             {
                 DDLTouchedColumns[tableName].Add(columnName);
             }
@@ -309,12 +310,12 @@ namespace FluentMigrator.Runner.Processors.Firebird
             processedExpressions = new Stack<Stack<FirebirdProcessedExpressionBase>>();
             processedExpressions.Push(new Stack<FirebirdProcessedExpressionBase>());
         }
-        
+
         protected void RegisterExpression(IMigrationExpression expression, Type expressionType)
         {
             RegisterExpression(new FirebirdProcessedExpression(expression, expressionType, this) as FirebirdProcessedExpressionBase);
         }
-        protected void RegisterExpression<T>(T expression) where T: IMigrationExpression, new()
+        protected void RegisterExpression<T>(T expression) where T : IMigrationExpression, new()
         {
             RegisterExpression(new FirebirdProcessedExpression<T>(expression, this) as FirebirdProcessedExpressionBase);
         }
@@ -350,7 +351,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             {
                 CreateSequenceForIdentity(expression.TableName, expression.Column.Name);
             }
-            
+
             /*if (FBOptions.TransactionModel == FirebirdTransactionModel.AutoCommitOnCheckFail)
                 CommitRetaining();*/
             if (FBOptions.TransactionModel != FirebirdTransactionModel.None)
@@ -384,9 +385,9 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 RegisterExpression(fbExpression);
                 InternalProcess((Generator as FirebirdGenerator).GenerateSetNull(expression.Column));
             }
-            
+
             //Change default value
-            if(!FirebirdGenerator.DefaultValuesMatch(colDef, expression.Column))
+            if (!FirebirdGenerator.DefaultValuesMatch(colDef, expression.Column))
             {
                 IMigrationExpression defaultConstraint;
                 IMigrationExpression unsetDefaultConstraint;
@@ -448,7 +449,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
 
             //Change type
-            if(!FirebirdGenerator.ColumnTypesMatch(colDef, expression.Column))
+            if (!FirebirdGenerator.ColumnTypesMatch(colDef, expression.Column))
             {
                 PerformDBOperationExpression unSet = new PerformDBOperationExpression();
                 unSet.Operation = (connection, transaction) =>
@@ -468,7 +469,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
 
             bool identitySequenceExists = SequenceExists(String.Empty, GetSequenceName(expression.TableName, expression.Column.Name));
-            
+
             //Adjust identity generators
             if (expression.Column.IsIdentity)
             {
@@ -480,7 +481,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 if (identitySequenceExists)
                     DeleteSequenceForIdentity(expression.TableName, expression.Column.Name);
             }
-            
+
         }
 
         public override void Process(Expressions.RenameColumnExpression expression)
@@ -568,7 +569,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 Type = x.Type,
                 CustomType = x.CustomType
             }));
-            
+
             Process(createNew);
 
             int columnCount = tableDef.Columns.Count;
@@ -579,7 +580,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 foreach (DataRow dr in ds.Tables[0].Rows)
                 {
                     InsertionDataDefinition insert = new InsertionDataDefinition();
-                    for(int i = 0; i < columnCount; i++)
+                    for (int i = 0; i < columnCount; i++)
                     {
                         insert.Add(new KeyValuePair<string, object>(columns[i], dr.ItemArray[i]));
                     }
@@ -651,7 +652,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             RegisterExpression<DeleteIndexExpression>(expression);
             InternalProcess(Generator.Generate(expression));
         }
-        
+
         public override void Process(CreateSchemaExpression expression)
         {
             truncator.Truncate(expression);
@@ -721,9 +722,9 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         #endregion
 
-        
+
         #region DML expressions
-        
+
         public override void Process(Expressions.InsertDataExpression expression)
         {
             truncator.Truncate(expression);
@@ -732,7 +733,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             RegisterExpression(expression, typeof(InsertDataExpression));
             InternalProcess(Generator.Generate(expression));
         }
-        
+
         public override void Process(Expressions.DeleteDataExpression expression)
         {
             truncator.Truncate(expression);
@@ -748,7 +749,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             RegisterExpression<UpdateDataExpression>(expression);
             InternalProcess(Generator.Generate(expression));
         }
-        
+
         #endregion
 
 
@@ -774,7 +775,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             {
                 expression.Operation(Connection, Transaction);
 
-                if(FBOptions.TransactionModel == FirebirdTransactionModel.AutoCommit)
+                if (FBOptions.TransactionModel == FirebirdTransactionModel.AutoCommit)
                     CommitRetaining();
 
             }
@@ -821,17 +822,12 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         #endregion
 
-        
+
         #region Helpers
-        
+
         private string FormatToSafeName(string sqlName)
         {
-            return FormatSqlEscape(quoter.UnQuote(sqlName));
-        }
-
-        private static string FormatSqlEscape(string sql)
-        {
-            return sql.Replace("'", "''");
+            return FormatHelper.FormatSqlEscape(quoter.UnQuote(sqlName));
         }
 
         private string GetSequenceName(string tableName, string columnName)
@@ -895,9 +891,9 @@ namespace FluentMigrator.Runner.Processors.Firebird
             RegisterExpression(fbExpression);
             Process(deleteTrigger);
 
-            if(deleteSequence != null)
+            if (deleteSequence != null)
                 Process(deleteSequence);
-            
+
         }
 
         public PerformDBOperationExpression CreateTriggerExpression(string tableName, TriggerInfo trigger)
@@ -949,7 +945,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             };
             return deleteTrigger;
         }
-        
+
         #endregion
 
 

@@ -59,9 +59,15 @@ namespace FluentMigrator.Builders.Alter.Table
             _context.Expressions.Add(alterSchema);
         }
 
+        public IAlterTableAddColumnOrAlterColumnSyntax WithDescription(string description)
+        {
+            Expression.TableDescription = description;
+            return this;
+        }
+
         public IAlterTableColumnAsTypeSyntax AddColumn(string name)
         {
-            var column = new ColumnDefinition {Name = name, ModificationType = ColumnModificationType.Create};
+            var column = new ColumnDefinition { Name = name, ModificationType = ColumnModificationType.Create };
             var createColumn = new CreateColumnExpression
                                    {
                                        Column = column,
@@ -77,7 +83,7 @@ namespace FluentMigrator.Builders.Alter.Table
 
         public IAlterTableColumnAsTypeSyntax AlterColumn(string name)
         {
-            var column = new ColumnDefinition {Name = name, ModificationType = ColumnModificationType.Alter};
+            var column = new ColumnDefinition { Name = name, ModificationType = ColumnModificationType.Alter };
             var alterColumn = new AlterColumnExpression
                                   {
                                       Column = column,
@@ -115,6 +121,12 @@ namespace FluentMigrator.Builders.Alter.Table
             }
 
             CurrentColumn.DefaultValue = value;
+            return this;
+        }
+
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithColumnDescription(string description)
+        {
+            CurrentColumn.ColumnDescription = description;
             return this;
         }
 
