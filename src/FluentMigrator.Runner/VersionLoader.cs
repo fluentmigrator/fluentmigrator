@@ -25,7 +25,7 @@ namespace FluentMigrator.Runner
         public IMigration VersionMigration { get; private set; }
         public IMigration VersionUniqueMigration { get; private set; }
         
-        public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions)
+        public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions, IVersionInfo versionInfo)
         {
             Runner = runner;
             Processor = runner.Processor;
@@ -37,7 +37,7 @@ namespace FluentMigrator.Runner
             VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
             VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
 
-            LoadVersionInfo();
+            LoadVersionInfo(versionInfo);
         }
 
         public void UpdateVersionInfo(long version)
@@ -112,6 +112,16 @@ namespace FluentMigrator.Runner
 
         public void LoadVersionInfo()
         {
+            LoadVersionInfo(null);
+        }
+
+        public void LoadVersionInfo(IVersionInfo versionInfo)
+        {
+            if (versionInfo != null) 
+            {
+                _versionInfo = versionInfo;
+                return;
+            }
             if (!AlreadyCreatedVersionSchema && !_versionSchemaMigrationAlreadyRun)
             {
                 Runner.Up(VersionSchemaMigration);

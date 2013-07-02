@@ -253,6 +253,7 @@
     <Compile Include="ProfileLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="StopWatch.cs" />
+    <Compile Include="Versioning\ConnectionlessVersionInfo.cs" />
     <Compile Include="Versioning\IVersionInfo.cs" />
     <Compile Include="Versioning\VersionInfo.cs" />
     <Compile Include="Versioning\VersionMigration.cs" />

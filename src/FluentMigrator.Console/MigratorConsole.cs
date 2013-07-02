@@ -51,6 +51,7 @@ namespace FluentMigrator.Console
         public string WorkingDirectory;
         public bool TransactionPerSession;
         public string ProviderSwitches;
+        public long StartingVersion;
 
         public RunnerContext RunnerContext { get; private set;}
 
@@ -130,6 +131,11 @@ namespace FluentMigrator.Console
                                             "version=",
                                             "The specific version to migrate. Default is 0, which will run all migrations.",
                                             v => { Version = long.Parse(v); }
+                                            },
+                                        {
+                                            "startingVersion=|sv=",
+                                            "The starting version in the database.  Overrides data stored in database.",
+                                            v => { StartingVersion = long.Parse(v); }
                                             },
                                         {
                                             "verbose=",
@@ -292,7 +298,8 @@ namespace FluentMigrator.Console
                 ApplicationContext = ApplicationContext,
                 Tags = Tags,
                 TransactionPerSession = TransactionPerSession,
-                ProviderSwitches = ProviderSwitches
+                ProviderSwitches = ProviderSwitches,
+                StartingVersion = StartingVersion
             };
 
             new TaskExecutor(RunnerContext).Execute();

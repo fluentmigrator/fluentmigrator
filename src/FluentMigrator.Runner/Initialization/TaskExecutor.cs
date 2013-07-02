@@ -20,6 +20,7 @@ using System;
 using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Versioning;
 
 namespace FluentMigrator.Runner.Initialization
 {
@@ -51,8 +52,9 @@ namespace FluentMigrator.Runner.Initialization
             var assembly = AssemblyLoaderFactory.GetAssemblyLoader(RunnerContext.Target).Load();
             var connectionString = LoadConnectionString(assembly.Location);
             var processor = InitializeProcessor(assembly.Location, connectionString);
+            var versionInfo = InitializeVersionInfo(RunnerContext.StartingVersion);
 
-            Runner = new MigrationRunner(assembly, RunnerContext, processor);
+            Runner = new MigrationRunner(assembly, RunnerContext, processor, versionInfo);
         }
 
         public void Execute()
@@ -127,6 +129,11 @@ namespace FluentMigrator.Runner.Initialization
 
             manager.LoadConnectionString();
             return manager.ConnectionString;
+        }
+
+        private IVersionInfo InitializeVersionInfo(long startingVersion)
+        {
+            return startingVersion == default(long) ? null : new ConnectionlessVersionInfo(startingVersion);
         }
     }
 }

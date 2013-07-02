@@ -65,7 +65,7 @@ namespace FluentMigrator.Runner
             }
         }
 
-        public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
+        public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor, IVersionInfo versionInfo)
         {
             _migrationAssembly = assembly;
             _announcer = runnerContext.Announcer;
@@ -83,7 +83,7 @@ namespace FluentMigrator.Runner
 
             _migrationScopeHandler = new MigrationScopeHandler(Processor);
             _migrationValidator = new MigrationValidator(_announcer, Conventions);
-            VersionLoader = new VersionLoader(this, _migrationAssembly, Conventions);
+            VersionLoader = new VersionLoader(this, _migrationAssembly, Conventions, versionInfo);
             MigrationLoader = new DefaultMigrationInformationLoader(Conventions, _migrationAssembly, runnerContext.Namespace, runnerContext.NestedNamespaces, runnerContext.Tags);
             ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
         }
