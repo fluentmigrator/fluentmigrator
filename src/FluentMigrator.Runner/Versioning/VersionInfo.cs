@@ -25,6 +25,16 @@ namespace FluentMigrator.Runner.Versioning
     {
         private IList<long> _versionsApplied = new List<long>();
 
+        public VersionInfo()
+        {
+
+        }
+
+        public VersionInfo(long startingVersion)
+        {
+            AddAppliedMigration(startingVersion);
+        }
+
         public long Latest()
         {
             return _versionsApplied.OrderByDescending(x => x).FirstOrDefault();

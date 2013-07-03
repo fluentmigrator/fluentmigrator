@@ -37,7 +37,7 @@ namespace FluentMigrator.Runner
             VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
             VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
 
-            LoadVersionInfo(versionInfo);
+            LoadVersionInfo(versionInfo, null);
         }
 
         public void UpdateVersionInfo(long version)
@@ -110,16 +110,12 @@ namespace FluentMigrator.Runner
             }
         }
 
-        public void LoadVersionInfo()
-        {
-            LoadVersionInfo(null);
-        }
-
-        public void LoadVersionInfo(IVersionInfo versionInfo)
+        public void LoadVersionInfo(IVersionInfo versionInfo, IEnumerable<long> appliedMigrations)
         {
             if (versionInfo != null) 
             {
                 _versionInfo = versionInfo;
+                ApplyMigrations(appliedMigrations);
                 return;
             }
             if (!AlreadyCreatedVersionSchema && !_versionSchemaMigrationAlreadyRun)
@@ -141,7 +137,7 @@ namespace FluentMigrator.Runner
             }
 
             _versionInfo = new VersionInfo();
-
+            ApplyMigrations(appliedMigrations);
             if (!AlreadyCreatedVersionTable) return;
 
             var dataSet = Processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
@@ -150,6 +146,13 @@ namespace FluentMigrator.Runner
             {
                 _versionInfo.AddAppliedMigration(long.Parse(row[0].ToString()));
             }
+        }
+
+        private void ApplyMigrations(IEnumerable<long> appliedMigrations)
+        {
+            if (appliedMigrations != null)
+                foreach (var migration in appliedMigrations)
+                    _versionInfo.AddAppliedMigration(migration);
         }
 
         public void RemoveVersionTable()

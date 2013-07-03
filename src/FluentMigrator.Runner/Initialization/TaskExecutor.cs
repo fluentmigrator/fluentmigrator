@@ -133,7 +133,7 @@ namespace FluentMigrator.Runner.Initialization
 
         private IVersionInfo InitializeVersionInfo(long startingVersion)
         {
-            return startingVersion == default(long) ? null : new ConnectionlessVersionInfo(startingVersion);
+            return startingVersion == default(long) ? null : new VersionInfo(startingVersion);
         }
     }
 }
