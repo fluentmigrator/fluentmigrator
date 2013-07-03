@@ -473,7 +473,7 @@ namespace FluentMigrator.Tests.Integration
                 return;
 
             var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
-            var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
+            var processor = new SqlServerProcessor(() => connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), () => new SqlServerDbFactory());
 
             MigrationRunner runner = SetupMigrationRunner(processor);
             runner.MigrateUp();
@@ -496,7 +496,7 @@ namespace FluentMigrator.Tests.Integration
                 return;
 
             var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
-            var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
+            var processor = new SqlServerProcessor(() => connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), () => new SqlServerDbFactory());
 
             MigrationRunner runner = SetupMigrationRunner(processor);
             runner.MigrateUp(1);
@@ -629,7 +629,7 @@ namespace FluentMigrator.Tests.Integration
             var outputSql = new StringWriter();
             var announcer = new TextWriterAnnouncer(outputSql){ ShowSql = true };
 
-            var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), announcer, processorOptions, new SqlServerDbFactory());
+            var processor = new SqlServerProcessor(() => connection, new SqlServer2008Generator(), announcer, processorOptions, () => new SqlServerDbFactory());
 
             try
             {
@@ -1166,7 +1166,7 @@ namespace FluentMigrator.Tests.Integration
             {
                 connection.Close();
 
-                var cleanupProcessor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
+                var cleanupProcessor = new SqlServerProcessor(() => connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), () => new SqlServerDbFactory());
                 MigrationRunner cleanupRunner = SetupMigrationRunner(cleanupProcessor);
                 cleanupRunner.RollbackToVersion(0);
 

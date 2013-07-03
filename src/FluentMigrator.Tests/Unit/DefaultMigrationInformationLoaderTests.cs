@@ -256,7 +256,7 @@ namespace FluentMigrator.Tests.Unit
                 get { throw new NotImplementedException(); }
             }
 
-            public string ConnectionString { get; private set; }
+            public Func<string> ConnectionString { get; private set; }
 
             public void GetUpExpressions(IMigrationContext context)
             {

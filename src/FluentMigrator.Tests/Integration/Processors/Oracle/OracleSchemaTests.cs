@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
             Factory = new OracleDbFactory();
             Connection = Factory.CreateConnection(IntegrationTestOptions.Oracle.ConnectionString);
             Quoter = new OracleQuoter();
-            Processor = new OracleProcessor(Connection, new OracleGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), Factory);
+            Processor = new OracleProcessor(() => Connection, new OracleGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), () => Factory);
             Connection.Open();
         }
 

@@ -54,7 +54,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             _command = _connection.CreateCommand();
 
             // SUT
-            _processor = new SqliteProcessor(_connection, new SqliteGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), factory);
+            _processor = new SqliteProcessor(() => _connection, new SqliteGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), () => factory);
 
             column = new Mock<ColumnDefinition>();
             tableName = "NewTable";
@@ -147,11 +147,11 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             var connection = new SQLiteConnection(IntegrationTestOptions.SqlLite.ConnectionString);
 
             var processor = new SqliteProcessor(
-                connection,
+                () => connection,
                 new SqliteGenerator(),
                 new TextWriterAnnouncer(output),
                 new ProcessorOptions { PreviewOnly = true },
-                new SqliteDbFactory());
+                () => new SqliteDbFactory());
 
             bool tableExists;
 

@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }
             Connection = new FbConnection(IntegrationTestOptions.Firebird.ConnectionString);
             var options = FirebirdOptions.AutoCommitBehaviour();
-            Processor = new FirebirdProcessor(Connection, new FirebirdGenerator(options), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new FirebirdDbFactory(), options);
+            Processor = new FirebirdProcessor(() => Connection, new FirebirdGenerator(options), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), () => new FirebirdDbFactory(), options);
             Connection.Open();
             Processor.BeginTransaction();
         }
