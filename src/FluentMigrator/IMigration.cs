@@ -17,6 +17,7 @@
 #endregion
 
 using FluentMigrator.Infrastructure;
+using System;
 
 namespace FluentMigrator
 {
@@ -24,7 +25,7 @@ namespace FluentMigrator
     {
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         object ApplicationContext { get; }
-        string ConnectionString { get; }
+        Func<string> ConnectionString { get; }
 
         void GetUpExpressions(IMigrationContext context);
         void GetDownExpressions(IMigrationContext context);

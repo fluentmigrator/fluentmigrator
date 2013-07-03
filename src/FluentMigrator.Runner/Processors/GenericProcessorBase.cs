@@ -24,6 +24,7 @@ namespace FluentMigrator.Runner.Processors
     public abstract class GenericProcessorBase : ProcessorBase
     {
         private Func<string> connectionStringFactory;
+        private bool transactionRequested;
 
         protected GenericProcessorBase(Func<IDbConnection> connectionFactory, Func<IDbFactory> factoryFactory
                                        , IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
@@ -83,10 +84,16 @@ namespace FluentMigrator.Runner.Processors
         {
             if (Connection.State != ConnectionState.Open)
                 Connection.Open();
+            if (transactionRequested) 
+            {
+                transactionRequested = false;
+                BeginTransactionInternal();
+            }
         }
 
         protected void EnsureConnectionIsClosed()
         {
+            if (connection == null) return;
             if (Connection.State != ConnectionState.Closed)
                 Connection.Close();
         }
@@ -95,8 +102,19 @@ namespace FluentMigrator.Runner.Processors
         {
             if (!SupportsTransactions || Transaction != null) return;
 
+            if (connection == null) 
+            {
+                transactionRequested = true;
+                return;
+            }
+
             EnsureConnectionIsOpen();
 
+            BeginTransactionInternal();
+        }
+
+        private void BeginTransactionInternal()
+        {
             Announcer.Say("Beginning Transaction");
             Transaction = Connection.BeginTransaction();
         }

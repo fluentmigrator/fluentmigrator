@@ -19,6 +19,7 @@
 using System.Collections.Generic;
 using FluentMigrator.Expressions;
 using System.Reflection;
+using System;
 
 namespace FluentMigrator.Infrastructure
 {
@@ -35,9 +36,9 @@ namespace FluentMigrator.Infrastructure
         /// <summary>
         /// Connection String from the runner.
         /// </summary>
-        public string Connection { get; set; }
+        public Func<string> Connection { get; set;}
 
-        public MigrationContext(IMigrationConventions conventions, IQuerySchema querySchema, Assembly migrationAssembly, object context, string connection)
+        public MigrationContext(IMigrationConventions conventions, IQuerySchema querySchema, Assembly migrationAssembly, object context, Func<string> connection)
         {
             Conventions = conventions;
             Expressions = new List<IMigrationExpression>();

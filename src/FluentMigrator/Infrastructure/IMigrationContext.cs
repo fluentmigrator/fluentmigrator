@@ -19,6 +19,7 @@
 using System.Collections.Generic;
 using FluentMigrator.Expressions;
 using System.Reflection;
+using System;
 
 namespace FluentMigrator.Infrastructure
 {
@@ -32,6 +33,6 @@ namespace FluentMigrator.Infrastructure
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         object ApplicationContext { get; set; }
 
-        string Connection { get; set; }
+        Func<string> Connection { get; set; }
     }
 }
