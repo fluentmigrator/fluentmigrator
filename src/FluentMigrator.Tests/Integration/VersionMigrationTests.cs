@@ -40,7 +40,7 @@ namespace FluentMigrator.Tests.Integration
         {
             ExecuteWithSupportedProcessors(processor =>
                 {
-                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3" }, processor);
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3" }, processor, null);
 
                     IVersionTableMetaData tableMetaData = new DefaultVersionTableMetaData();
 
@@ -61,7 +61,7 @@ namespace FluentMigrator.Tests.Integration
         {
             ExecuteWithSupportedProcessors(processor =>
             {
-                var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3" }, processor);
+                var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3" }, processor, null);
 
                 IVersionTableMetaData tableMetaData = new TestVersionTableMetaData();
 
@@ -93,7 +93,7 @@ namespace FluentMigrator.Tests.Integration
         {
             ExecuteWithSupportedProcessors(processor =>
             {
-                var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3" }, processor);
+                var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3" }, processor, null);
 
                 IVersionTableMetaData tableMetaData = new TestVersionTableMetaData { SchemaName = null };
 

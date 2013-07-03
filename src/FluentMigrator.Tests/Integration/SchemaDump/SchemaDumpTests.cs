@@ -116,7 +116,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
                 Namespace = typeof(TestMigration).Namespace
             };
 
-            var runner = new MigrationRunner(typeof(TestMigration).Assembly, runnerContext, Processor);
+            var runner = new MigrationRunner(typeof(TestMigration).Assembly, runnerContext, Processor, null);
             runner.Up(new TestMigration());
 
             //read schema here
