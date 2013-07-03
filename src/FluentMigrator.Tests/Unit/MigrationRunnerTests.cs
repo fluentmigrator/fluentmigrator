@@ -130,7 +130,7 @@ namespace FluentMigrator.Tests.Unit
             IMigration migration = new TestEmptyMigration();
             _runner.Up(migration);
 
-            Assert.AreEqual(IntegrationTestOptions.SqlServer2008.ConnectionString, migration.ConnectionString, "The migration does not have the expected connection string.");
+            Assert.AreEqual(IntegrationTestOptions.SqlServer2008.ConnectionString, migration.ConnectionString(), "The migration does not have the expected connection string.");
             _announcer.VerifyAll();
         }
 
