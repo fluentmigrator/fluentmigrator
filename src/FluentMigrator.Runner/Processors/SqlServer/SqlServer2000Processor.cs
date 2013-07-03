@@ -26,7 +26,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 {
     public sealed class SqlServer2000Processor : GenericProcessorBase
     {
-        public SqlServer2000Processor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public SqlServer2000Processor(Func<IDbConnection> connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, Func<IDbFactory> factory)
             : base(connection, factory, generator, announcer, options)
         {
         }

@@ -18,6 +18,8 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.SqlServer;
+using System;
+using System.Data;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
@@ -25,8 +27,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
     {
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
-            var factory = new SqlServerDbFactory();
-            var connection = factory.CreateConnection(connectionString);
+            Func<IDbFactory> factory = () => new SqlServerDbFactory();
+            Func<IDbConnection> connection = () => factory().CreateConnection(connectionString);
             return new SqlServerProcessor(connection, new SqlServer2005Generator(), announcer, options, factory);
         }
     }

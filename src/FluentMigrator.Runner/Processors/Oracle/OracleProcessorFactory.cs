@@ -1,4 +1,6 @@
 ﻿using FluentMigrator.Runner.Generators.Oracle;
+using System;
+using System.Data;
 
 namespace FluentMigrator.Runner.Processors.Oracle
 {
@@ -6,8 +8,8 @@ namespace FluentMigrator.Runner.Processors.Oracle
     {
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
-            var factory = new OracleDbFactory();
-            var connection = factory.CreateConnection(connectionString);
+            Func<IDbFactory> factory = () => new OracleDbFactory();
+            Func<IDbConnection> connection = () => factory().CreateConnection(connectionString);
             return new OracleProcessor(connection, new OracleGenerator(Quoted(options.ProviderSwitches)), announcer, options, factory);
         }
 

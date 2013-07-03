@@ -29,7 +29,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             get { return "Oracle"; }
         }
 
-        public DotConnectOracleProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, DotConnectOracleDbFactory factory)
+        public DotConnectOracleProcessor(Func<IDbConnection> connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, Func<IDbFactory> factory)
             : base(connection, factory, generator, announcer, options)
         {
         }

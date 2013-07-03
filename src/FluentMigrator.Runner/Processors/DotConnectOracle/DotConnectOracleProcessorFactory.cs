@@ -1,5 +1,7 @@
 ﻿using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Processors.Oracle;
+using System;
+using System.Data;
 
 namespace FluentMigrator.Runner.Processors.DotConnectOracle
 {
@@ -7,8 +9,8 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
     {
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
-            var factory = new DotConnectOracleDbFactory();
-            var connection = factory.CreateConnection(connectionString);
+            Func<IDbFactory> factory = () => new DotConnectOracleDbFactory();
+            Func<IDbConnection> connection = () => factory().CreateConnection(connectionString);
             return new DotConnectOracleProcessor(connection, new OracleGenerator(), announcer, options, factory);
         }
     }

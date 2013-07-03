@@ -41,7 +41,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
         }
 
-        public SqlServerCeProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public SqlServerCeProcessor(Func<IDbConnection> connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, Func<IDbFactory> factory)
             : base(connection, factory, generator, announcer, options)
         {
         }

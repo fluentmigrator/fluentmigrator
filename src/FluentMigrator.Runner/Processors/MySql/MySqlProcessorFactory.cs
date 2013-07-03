@@ -1,4 +1,6 @@
 ﻿using FluentMigrator.Runner.Generators.MySql;
+using System;
+using System.Data;
 
 namespace FluentMigrator.Runner.Processors.MySql
 {
@@ -6,8 +8,8 @@ namespace FluentMigrator.Runner.Processors.MySql
     {
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
-            var factory = new MySqlDbFactory();
-            var connection = factory.CreateConnection(connectionString);
+            Func<IDbFactory> factory = () => new MySqlDbFactory();
+            Func<IDbConnection> connection = () => factory().CreateConnection(connectionString);
             return new MySqlProcessor(connection, new MySqlGenerator(), announcer, options, factory);
         }
     }

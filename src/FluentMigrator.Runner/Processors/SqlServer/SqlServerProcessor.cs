@@ -39,7 +39,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
         }
 
-        public SqlServerProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public SqlServerProcessor(Func<IDbConnection> connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, Func<IDbFactory> factory)
             : base(connection, factory, generator, announcer, options)
         {
         }

@@ -16,31 +16,62 @@
 
 #endregion
 
+using System;
 using System.Data;
 
 namespace FluentMigrator.Runner.Processors
 {
     public abstract class GenericProcessorBase : ProcessorBase
     {
-        private readonly string connectionString;
+        private Func<string> connectionStringFactory;
 
-        protected GenericProcessorBase(IDbConnection connection, IDbFactory factory
+        protected GenericProcessorBase(Func<IDbConnection> connectionFactory, Func<IDbFactory> factoryFactory
                                        , IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
             : base(generator, announcer, options)
         {
-            Connection = connection;
-
-            // Prefetch connectionstring as after opening the security info could no longer be present
-            // for instance on sql server
-            connectionString = connection.ConnectionString;
-            
-            Factory = factory;
+            this.connectionFactory = connectionFactory;
+            this._factoryFactory = factoryFactory;
+            this.connectionStringFactory = () => Connection.ConnectionString;
         }
 
-        public override string ConnectionString { get { return connectionString; } }
+        public override string ConnectionString { get { return connectionStringFactory(); } }
 
-        public IDbConnection Connection { get; protected set; }
-        public IDbFactory Factory { get; protected set; }
+        private Func<IDbConnection> connectionFactory;
+        private IDbConnection connection;
+        public IDbConnection Connection
+        {
+            get
+            {
+                if (connection == null) 
+                {
+                    connection = connectionFactory();
+                    // Prefetch connectionstring as after opening the security info could no longer be present
+                    // for instance on sql server
+                    var connectionString = connection.ConnectionString;
+                    connectionStringFactory = () => connectionString;
+                }
+                return connection;
+            }
+            protected set
+            {
+                connection = value;
+            }
+        }
+
+        private Func<IDbFactory> _factoryFactory;
+        private IDbFactory _factory;
+        public IDbFactory Factory 
+        {
+            get
+            {
+                return _factory = _factory ?? _factoryFactory();
+            }
+            protected set
+            {
+                _factory = value;
+            }
+        }
+
         public IDbTransaction Transaction { get; protected set; }
 
         public virtual bool SupportsTransactions
