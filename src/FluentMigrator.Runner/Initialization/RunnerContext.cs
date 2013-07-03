@@ -43,5 +43,7 @@ namespace FluentMigrator.Runner.Initialization
         public object ApplicationContext { get; set; }
 
         public long StartingVersion { get; set; }
+
+        public bool SuppressVersionInfo { get; set; }
     }
 }

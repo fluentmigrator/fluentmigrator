@@ -52,6 +52,7 @@ namespace FluentMigrator.Console
         public bool TransactionPerSession;
         public string ProviderSwitches;
         public long StartingVersion;
+        public bool SuppressVersionInfo;
 
         public RunnerContext RunnerContext { get; private set;}
 
@@ -136,6 +137,12 @@ namespace FluentMigrator.Console
                                             "startingVersion=|sv=",
                                             "The starting version in the database.  Overrides data stored in database.",
                                             v => { StartingVersion = long.Parse(v); }
+                                            },
+                                        {
+                                            "suppressVersionInfo",
+                                            "Suppresses updates to the VersionInfo table.  Use only if versions are managed by another runner."
+                                            ,
+                                            v => { SuppressVersionInfo = true; }
                                             },
                                         {
                                             "verbose=",
@@ -299,7 +306,8 @@ namespace FluentMigrator.Console
                 Tags = Tags,
                 TransactionPerSession = TransactionPerSession,
                 ProviderSwitches = ProviderSwitches,
-                StartingVersion = StartingVersion
+                StartingVersion = StartingVersion,
+                SuppressVersionInfo = SuppressVersionInfo
             };
 
             new TaskExecutor(RunnerContext).Execute();

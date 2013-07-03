@@ -47,5 +47,7 @@ namespace FluentMigrator.Runner.Initialization
 
         /// <summary>Overrides the Version table for database connection-less operation</summary>
         long StartingVersion { get; set; }
+
+        bool SuppressVersionInfo { get; set; }
     }
 }

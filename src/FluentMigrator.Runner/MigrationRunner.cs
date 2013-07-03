@@ -53,6 +53,7 @@ namespace FluentMigrator.Runner
         public IMigrationConventions Conventions { get; private set; }
         public IList<Exception> CaughtExceptions { get; private set; }
 
+        private bool updateVersionInfo;
         public IMigrationScope CurrentScope
         {
             get
@@ -86,6 +87,7 @@ namespace FluentMigrator.Runner
             VersionLoader = new VersionLoader(this, _migrationAssembly, Conventions, versionInfo);
             MigrationLoader = new DefaultMigrationInformationLoader(Conventions, _migrationAssembly, runnerContext.Namespace, runnerContext.NestedNamespaces, runnerContext.Tags);
             ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
+            updateVersionInfo = !runnerContext.SuppressVersionInfo;
         }
 
         public IVersionLoader VersionLoader { get; set; }
@@ -231,7 +233,7 @@ namespace FluentMigrator.Runner
                 using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useTransaction))
                 {
                     ExecuteMigration(migrationInfo.Migration, (m, c) => m.GetUpExpressions(c));
-                    if (migrationInfo.IsAttributed()) VersionLoader.UpdateVersionInfo(migrationInfo.Version);
+                    if (migrationInfo.IsAttributed() && updateVersionInfo) VersionLoader.UpdateVersionInfo(migrationInfo.Version);
                     
                     scope.Complete();
 
@@ -255,7 +257,7 @@ namespace FluentMigrator.Runner
             using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useTransaction))
             {
                 ExecuteMigration(migrationInfo.Migration, (m, c) => m.GetDownExpressions(c));
-                if (migrationInfo.IsAttributed()) VersionLoader.DeleteVersion(migrationInfo.Version);
+                if (migrationInfo.IsAttributed() && updateVersionInfo) VersionLoader.DeleteVersion(migrationInfo.Version);
                 
                 scope.Complete();
 
