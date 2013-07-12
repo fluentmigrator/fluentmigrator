@@ -20,7 +20,7 @@
 
 namespace FluentMigrator.VersionTableInfo
 {
-    public interface IVersionTableMetaDataEx
+    public interface IVersionTableMetaDataExtended
     {
         bool OwnsSchema { get; }
     }

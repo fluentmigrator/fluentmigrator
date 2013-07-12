@@ -20,7 +20,7 @@
 
 namespace FluentMigrator.VersionTableInfo
 {
-    public class DefaultVersionTableMetaData : IVersionTableMetaData, IVersionTableMetaDataEx
+    public class DefaultVersionTableMetaData : IVersionTableMetaData, IVersionTableMetaDataExtended
     {
         public virtual string SchemaName
         {

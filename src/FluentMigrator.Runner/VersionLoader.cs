@@ -114,8 +114,8 @@ namespace FluentMigrator.Runner
         {
             get
             {
-                IVersionTableMetaDataEx versionTableMetaDataEx = VersionTableMetaData as IVersionTableMetaDataEx;
-                return versionTableMetaDataEx == null || versionTableMetaDataEx.OwnsSchema;
+                IVersionTableMetaDataExtended versionTableMetaDataExtended = VersionTableMetaData as IVersionTableMetaDataExtended;
+                return versionTableMetaDataExtended == null || versionTableMetaDataExtended.OwnsSchema;
             }
         }
 
