@@ -77,6 +77,12 @@ namespace FluentMigrator.Builders
             return (NextT)(object)this;
         }
 
+        public NextT AsDateTimeOffset()
+        {
+            Column.Type = DbType.DateTimeOffset;
+            return (NextT)(object)this;
+        }
+
         public NextT AsDecimal()
         {
             Column.Type = DbType.Decimal;
