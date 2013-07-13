@@ -22,6 +22,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             SetTypeMap(DbType.Currency, "money");
             SetTypeMap(DbType.Date, "date");
             SetTypeMap(DbType.DateTime, "timestamp");
+            SetTypeMap(DbType.DateTimeOffset, "timestamptz");
             SetTypeMap(DbType.Decimal, "decimal(19,5)");
             SetTypeMap(DbType.Decimal, "decimal($size,$precision)", DecimalCapacity);
             SetTypeMap(DbType.Double, "float8");
