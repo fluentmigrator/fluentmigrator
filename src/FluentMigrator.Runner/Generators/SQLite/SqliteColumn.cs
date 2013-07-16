@@ -43,6 +43,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
         {
             switch (systemMethod)
             {
+                case SystemMethods.CurrentUTCDateTime:
                 case SystemMethods.CurrentDateTime:
                     return "CURRENT_TIMESTAMP";
             }
