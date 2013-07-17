@@ -22,6 +22,8 @@ namespace FluentMigrator.Runner
 {
     public interface IAnnouncer
     {
+        void StartMigration(long version);
+        void EndMigration();
         void Heading(string message);
         void Say(string message);
         void Emphasize(string message);

@@ -30,6 +30,16 @@ namespace FluentMigrator.Runner.Announcers
             this.announcers = announcers ?? new IAnnouncer[] {};
         }
 
+        public void StartMigration(long version)
+        {
+            Each(a => a.StartMigration(version));
+        }
+
+        public void EndMigration()
+        {
+            Each(a => a.EndMigration());
+        }
+
         public void Heading(string message)
         {
             Each(a => a.Heading(message));

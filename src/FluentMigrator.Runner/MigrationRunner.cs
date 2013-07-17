@@ -227,7 +227,7 @@ namespace FluentMigrator.Runner
             {
                 var name = migrationInfo.GetName();
                 _announcer.Heading(string.Format("{0} migrating", name));
-
+                _announcer.StartMigration(migrationInfo.Version);
                 _stopWatch.Start();
 
                 using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useTransaction))
@@ -238,7 +238,7 @@ namespace FluentMigrator.Runner
                     scope.Complete();
 
                     _stopWatch.Stop();
-
+                    _announcer.EndMigration();
                     _announcer.Say(string.Format("{0} migrated", name));
                     _announcer.ElapsedTime(_stopWatch.ElapsedTime());
                 }
@@ -251,7 +251,7 @@ namespace FluentMigrator.Runner
 
             var name = migrationInfo.GetName();
             _announcer.Heading(string.Format("{0} reverting", name));
-
+            _announcer.StartMigration(migrationInfo.Version);
             _stopWatch.Start();
 
             using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useTransaction))
@@ -262,7 +262,7 @@ namespace FluentMigrator.Runner
                 scope.Complete();
 
                 _stopWatch.Stop();
-
+                _announcer.EndMigration();
                 _announcer.Say(string.Format("{0} reverted", name));
                 _announcer.ElapsedTime(_stopWatch.ElapsedTime());
             }

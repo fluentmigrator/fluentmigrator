@@ -130,6 +130,7 @@
     <Compile Include="Announcers\Announcer.cs" />
     <Compile Include="AnnouncerExtensions.cs" />
     <Compile Include="Announcers\CompositeAnnouncer.cs" />
+    <Compile Include="Announcers\DirectoryAnnouncer.cs" />
     <Compile Include="Announcers\NullAnnouncer.cs" />
     <Compile Include="Announcers\ConsoleAnnouncer.cs" />
     <Compile Include="Announcers\TextWriterAnnouncer.cs" />
