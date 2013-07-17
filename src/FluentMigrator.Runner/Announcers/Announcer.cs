@@ -50,6 +50,11 @@ namespace FluentMigrator.Runner.Announcers
             Write(message, true);
         }
 
+        public virtual void SayTime(string message)
+        {
+            Say(message);
+        }
+
         public virtual void Emphasize(string message)
         {
             Write(message, true);

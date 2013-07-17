@@ -49,6 +49,10 @@ namespace FluentMigrator.Runner.Announcers
         {
             Each(a => a.Say(message));
         }
+        public void SayTime(string message)
+        {
+            Each(a => a.SayTime(message));
+        }
 
         public void Emphasize(string message)
         {

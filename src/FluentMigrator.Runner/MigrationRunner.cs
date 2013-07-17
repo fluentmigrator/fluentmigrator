@@ -410,7 +410,7 @@ namespace FluentMigrator.Runner
             {
                 var avg = new TimeSpan(insertTicks / insertCount);
                 var msg = string.Format("-> {0} Insert operations completed in {1} taking an average of {2}", insertCount, new TimeSpan(insertTicks), avg);
-                _announcer.Say(msg);
+                _announcer.SayTime(msg);
             }
         }
 

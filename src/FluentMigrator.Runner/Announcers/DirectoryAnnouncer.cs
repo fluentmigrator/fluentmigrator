@@ -23,6 +23,11 @@ namespace FluentMigrator.Runner.Announcers
             this.Output = (tw = GetNewWriter(version)).Write;
             base.StartMigration(version);
         }
+        public override void SayTime(string message)
+        {
+            if (!this.ShowElapsedTime) return;
+            DirectoryOutput(directory, message); // Send time to default file
+        }
 
         private TextWriter GetNewWriter(long version)
         {

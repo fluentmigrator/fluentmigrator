@@ -26,6 +26,7 @@ namespace FluentMigrator.Runner
         void EndMigration();
         void Heading(string message);
         void Say(string message);
+        void SayTime(string message);
         void Emphasize(string message);
         void Sql(string sql);
         void ElapsedTime(TimeSpan timeSpan);
