@@ -38,6 +38,7 @@ namespace FluentMigrator.Runner.Announcers
         {
             if (!currentMigrationVersion.HasValue)
                 throw new InvalidOperationException("Attempt to end migration when no migration was in process");
+            currentMigrationVersion = null;
         }
 
         public virtual void Heading(string message)
