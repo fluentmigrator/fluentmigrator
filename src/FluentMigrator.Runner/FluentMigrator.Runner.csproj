@@ -150,6 +150,9 @@
     <Compile Include="InvalidMigrationException.cs" />
     <Compile Include="MigrationScopeHandler.cs" />
     <Compile Include="MigrationValidator.cs" />
+    <Compile Include="Processors\DotConnectPostgres\DotConnectPostgresDbFactory.cs" />
+    <Compile Include="Processors\DotConnectPostgres\DotConnectPostgresProcessor.cs" />
+    <Compile Include="Processors\DotConnectPostgres\DotConnectPostgresProcessorFactory.cs" />
     <Compile Include="Processors\Firebird\FirebirdProcessedExpression.cs" />
     <Compile Include="Generators\Firebird\FirebirdQuoter.cs" />
     <Compile Include="Generators\Firebird\FirebirdTypeMap.cs" />
