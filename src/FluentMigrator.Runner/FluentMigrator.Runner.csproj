@@ -168,6 +168,9 @@
     <Compile Include="Processors\Db2\Db2DbFactory.cs" />
     <Compile Include="Processors\Db2\Db2Processor.cs" />
     <Compile Include="Processors\Db2\Db2ProcessorFactory.cs" />
+    <Compile Include="Processors\DotConnectPostgres\DotConnectPostgresDbFactory.cs" />
+    <Compile Include="Processors\DotConnectPostgres\DotConnectPostgresProcessor.cs" />
+    <Compile Include="Processors\DotConnectPostgres\DotConnectPostgresProcessorFactory.cs" />
     <Compile Include="Processors\Firebird\FirebirdProcessedExpression.cs" />
     <Compile Include="Generators\Firebird\FirebirdQuoter.cs" />
     <Compile Include="Generators\Firebird\FirebirdTypeMap.cs" />
