@@ -111,6 +111,20 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
             }
         }
 
+        [Test]
+        public void CallingReadTableDataQuotesTableName()
+        {
+            try
+            {
+                Processor.Execute("CREATE TABLE `infrastructure.version` (test int null) ");
+                Processor.ReadTableData(null, "infrastructure.version");
+            }
+            finally
+            {
+                Processor.Execute("DROP TABLE `infrastructure.version`");
+            }
+        }
+
         private static MySqlProcessor SetupMySqlProcessorWithPreviewOnly(StringWriter output, MySqlConnection connection)
         {
             var processor = new MySqlProcessor(
