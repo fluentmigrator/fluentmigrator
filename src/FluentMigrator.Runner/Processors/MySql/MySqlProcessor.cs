@@ -19,11 +19,14 @@
 using System;
 using System.Data;
 using FluentMigrator.Builders.Execute;
+using FluentMigrator.Runner.Generators.MySql;
 
 namespace FluentMigrator.Runner.Processors.MySql
 {
     public class MySqlProcessor : GenericProcessorBase
     {
+        readonly MySqlQuoter quoter = new MySqlQuoter();
+
         public override string DatabaseType
         {
             get { return "MySql"; }
@@ -119,7 +122,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
-            return Read("select * from {0}", tableName);
+            return Read("select * from {0}", quoter.QuoteTableName(tableName));
         }
 
         public override DataSet Read(string template, params object[] args)
