@@ -47,6 +47,7 @@ namespace FluentMigrator.Model
         public virtual bool IsUnique { get; set; }
         public virtual string TableName { get; set; }
         public virtual ColumnModificationType ModificationType { get; set; }
+        public virtual string ColumnDescription { get; set; }
 
         public void ApplyConventions(IMigrationConventions conventions)
         {
@@ -72,24 +73,27 @@ namespace FluentMigrator.Model
         {
         }
 
-        public IDictionary<string, object> AdditionalFeatures 
+        public IDictionary<string, object> AdditionalFeatures
         {
             get { return _additionalFeatures; }
         }
 
-        void ISupportAdditionalFeatures.AddAdditionalFeature(string feature, object value) 
+        void ISupportAdditionalFeatures.AddAdditionalFeature(string feature, object value)
         {
-            if (!AdditionalFeatures.ContainsKey(feature)) {
+            if (!AdditionalFeatures.ContainsKey(feature))
+            {
                 AdditionalFeatures.Add(feature, value);
             }
-            else {
+            else
+            {
                 AdditionalFeatures[feature] = value;
             }
         }
 
-        public T GetAdditionalFeature<T>(string key, T defaultValue) 
+        public T GetAdditionalFeature<T>(string key, T defaultValue)
         {
-            if (AdditionalFeatures.ContainsKey(key)) {
+            if (AdditionalFeatures.ContainsKey(key))
+            {
                 object value = AdditionalFeatures[key];
                 if (value is T)
                 {
@@ -101,7 +105,8 @@ namespace FluentMigrator.Model
         }
     }
 
-    public enum ColumnModificationType {
+    public enum ColumnModificationType
+    {
         Create,
         Alter
     }

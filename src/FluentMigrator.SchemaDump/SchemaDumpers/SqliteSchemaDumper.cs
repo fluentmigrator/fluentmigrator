@@ -61,12 +61,7 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
         {
             Processor.Process(expression);
         }
-
-        protected string FormatSqlEscape(string sql)
-        {
-            return sql.Replace("'", "''");
-        }
-
+        
         protected virtual IList<TableDefinition> ReadTables()
         {
             var dtTable = GetTableNamesAndDDL();
