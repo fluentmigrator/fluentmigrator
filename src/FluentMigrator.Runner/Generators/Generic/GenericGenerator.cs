@@ -13,8 +13,8 @@ namespace FluentMigrator.Runner.Generators.Generic
     {
         public CompatabilityMode compatabilityMode;
 
-        public GenericGenerator(IColumn column, IQuoter quoter)
-            : base(column, quoter)
+        public GenericGenerator(IColumn column, IQuoter quoter, IDescriptionGenerator descriptionGenerator)
+            : base(column, quoter, descriptionGenerator)
         {
             compatabilityMode = CompatabilityMode.LOOSE;
         }

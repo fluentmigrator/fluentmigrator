@@ -29,12 +29,12 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     public class SqlServer2000Generator : GenericGenerator
     {
         public SqlServer2000Generator()
-            : base(new SqlServerColumn(new SqlServer2000TypeMap()), new SqlServerQuoter())
+            : base(new SqlServerColumn(new SqlServer2000TypeMap()), new SqlServerQuoter(), new EmptyDescriptionGenerator())
         {
         }
 
-        protected SqlServer2000Generator(IColumn column)
-            : base(column, new SqlServerQuoter())
+        protected SqlServer2000Generator(IColumn column, IDescriptionGenerator descriptionGenerator)
+            : base(column, new SqlServerQuoter(), descriptionGenerator)
         {
         }
 

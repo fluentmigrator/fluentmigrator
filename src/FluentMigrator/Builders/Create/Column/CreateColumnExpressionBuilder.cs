@@ -64,6 +64,12 @@ namespace FluentMigrator.Builders.Create.Column
             return this;
         }
 
+        public ICreateColumnOptionSyntax WithColumnDescription(string description)
+        {
+            Expression.Column.ColumnDescription = description;
+            return this;
+        }
+
         public ICreateColumnOptionSyntax Identity()
         {
             Expression.Column.IsIdentity = true;

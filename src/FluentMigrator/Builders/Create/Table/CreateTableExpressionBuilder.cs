@@ -49,9 +49,15 @@ namespace FluentMigrator.Builders.Create.Table
 
         public ICreateTableColumnAsTypeSyntax WithColumn(string name)
         {
-            var column = new ColumnDefinition {Name = name, TableName = Expression.TableName, ModificationType = ColumnModificationType.Create};
+            var column = new ColumnDefinition { Name = name, TableName = Expression.TableName, ModificationType = ColumnModificationType.Create };
             Expression.Columns.Add(column);
             CurrentColumn = column;
+            return this;
+        }
+
+        public ICreateTableWithColumnSyntax WithDescription(string description)
+        {
+            Expression.TableDescription = description;
             return this;
         }
 
@@ -64,6 +70,12 @@ namespace FluentMigrator.Builders.Create.Table
         public ICreateTableColumnOptionOrWithColumnSyntax WithDefaultValue(object value)
         {
             CurrentColumn.DefaultValue = value;
+            return this;
+        }
+
+        public ICreateTableColumnOptionOrWithColumnSyntax WithColumnDescription(string description)
+        {
+            CurrentColumn.ColumnDescription = description;
             return this;
         }
 
