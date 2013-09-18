@@ -25,6 +25,7 @@
 				<attribute type="System.Reflection.AssemblyVersionAttribute" value="${complete.version}"/>
 				<attribute type="System.Reflection.AssemblyCopyrightAttribute" value="Copyright - Sean Chambers 2008-2010" />
 				<attribute type="System.Reflection.AssemblyConfigurationAttribute" value="${build.config}" />
+				<attribute type="System.CLSCompliantAttribute" value="true" />
 			</attributes>
 		</asminfo>
 	</target>
