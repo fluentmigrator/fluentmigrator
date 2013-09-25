@@ -22,6 +22,6 @@ namespace FluentMigrator.Builders.Delete.ForeignKey
 {
     public interface IDeleteForeignKeyOnTableSyntax : IFluentSyntax
     {
-        IInSchemaSyntax OnTable(string primaryTableName);
+        IInSchemaSyntax OnTable(string foreignTableName);
     }
 }
