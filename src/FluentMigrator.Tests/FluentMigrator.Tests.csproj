@@ -299,6 +299,7 @@
     <Compile Include="Unit\Generators\BaseColumnTests.cs" />
     <Compile Include="Unit\Generators\BaseConstraintsTests.cs" />
     <Compile Include="Unit\Generators\BaseDataTests.cs" />
+    <Compile Include="Unit\Generators\BaseDescriptionGeneratorTests.cs" />
     <Compile Include="Unit\Generators\BaseIndexTests.cs" />
     <Compile Include="Unit\Generators\BaseSchemaTests.cs" />
     <Compile Include="Unit\Generators\BaseSequenceTests.cs" />
@@ -338,6 +339,7 @@
     <Compile Include="Unit\Generators\Oracle\OracleColumnTests.cs" />
     <Compile Include="Unit\Generators\Oracle\OracleConstraintsTests.cs" />
     <Compile Include="Unit\Generators\Oracle\OracleDataTests.cs" />
+    <Compile Include="Unit\Generators\Oracle\OracleDescriptionGeneratorTests.cs" />
     <Compile Include="Unit\Generators\Oracle\OracleGeneratorTests.cs" />
     <Compile Include="Unit\Generators\Oracle\OracleIndexTests.cs" />
     <Compile Include="Unit\Generators\Oracle\OracleSchemaTests.cs" />
@@ -370,6 +372,7 @@
     <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005ColumnTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005ConstraintsTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005DataTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005DescriptionGeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005GeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005IndexTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005SchemaTests.cs" />

@@ -139,11 +139,17 @@
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Generators\Base\ColumnBase.cs" />
     <Compile Include="Extensions\CompatabilityModeExtension.cs" />
+    <Compile Include="Generators\EmptyDescriptionGenerator.cs" />
     <Compile Include="Generators\Firebird\FirebirdColumn.cs" />
     <Compile Include="Generators\Firebird\FirebirdGenerator.cs" />
     <Compile Include="Generators\Firebird\FirebirdTruncator.cs" />
+    <Compile Include="Generators\Generic\GenericDescriptionGenerator.cs" />
+    <Compile Include="Generators\IDescriptionGenerator.cs" />
+    <Compile Include="Generators\Oracle\OracleDescriptionGenerator.cs" />
     <Compile Include="Generators\Oracle\OracleQuoter.cs" />
+    <Compile Include="Generators\SqlServer\SqlServer2005DescriptionGenerator.cs" />
     <Compile Include="Generators\SqlServer\SqlServer2012Generator.cs" />
+    <Compile Include="Helpers\FormatHelper.cs" />
     <Compile Include="IMigrationInformationLoader.cs" />
     <Compile Include="IMigrationScope.cs" />
     <Compile Include="IMigrationScopeStarter.cs" />

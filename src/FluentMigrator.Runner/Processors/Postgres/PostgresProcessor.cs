@@ -3,6 +3,7 @@ using System.Data;
 using System.IO;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Runner.Generators.Postgres;
+using FluentMigrator.Runner.Helpers;
 
 namespace FluentMigrator.Runner.Processors.Postgres
 {
@@ -70,7 +71,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
-            string defaultValueAsString = string.Format("%{0}%", FormatSqlEscape(defaultValue.ToString()));
+            string defaultValueAsString = string.Format("%{0}%", FormatHelper.FormatSqlEscape(defaultValue.ToString()));
             return Exists("select * from information_schema.columns where table_schema = '{0}' and table_name = '{1}' and column_name = '{2}' and column_default like '{3}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(tableName), FormatToSafeName(columnName), defaultValueAsString);
         }
 
@@ -143,17 +144,12 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
         private string FormatToSafeSchemaName(string schemaName)
         {
-            return FormatSqlEscape(quoter.UnQuoteSchemaName(schemaName));
+            return FormatHelper.FormatSqlEscape(quoter.UnQuoteSchemaName(schemaName));
         }
 
         private string FormatToSafeName(string sqlName)
         {
-            return FormatSqlEscape(quoter.UnQuote(sqlName));
-        }
-
-        private static string FormatSqlEscape(string sql)
-        {
-            return sql.Replace("'", "''");
+            return FormatHelper.FormatSqlEscape(quoter.UnQuote(sqlName));
         }
     }
 }
