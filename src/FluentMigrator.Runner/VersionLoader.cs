@@ -135,10 +135,12 @@ namespace FluentMigrator.Runner
             if (!AlreadyCreatedVersionTable) return;
 
             var dataSet = Processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
-            
+
+            var versionColumn = dataSet.Tables[0].Columns["Version"];
+
             foreach (DataRow row in dataSet.Tables[0].Rows)
             {
-                _versionInfo.AddAppliedMigration(long.Parse(row[0].ToString()));
+                _versionInfo.AddAppliedMigration(long.Parse(row[versionColumn].ToString()));
             }
         }
 
