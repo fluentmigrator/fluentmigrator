@@ -105,20 +105,36 @@ namespace FluentMigrator.Runner
             MigrateUp(targetVersion, true);
         }
 
+        public void MigrateUp(bool useAutomaticTransactionManagement)
+        {
+            MigrateUp(0, useAutomaticTransactionManagement);
+        }
+
         public void MigrateUp(long targetVersion, bool useAutomaticTransactionManagement)
         {
             var migrationInfos = GetUpMigrationsToApply(targetVersion);
+            RunUpMigrations(useAutomaticTransactionManagement, migrationInfos);
+        }
+
+        private void RunUpMigrations(bool useAutomaticTransactionManagement, IEnumerable<IMigrationInfo> migrationInfos)
+        {
             using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
                 foreach (var migrationInfo in migrationInfos)
                 {
-                    ApplyMigrationUp(migrationInfo, useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
+                    ApplyMigrationUp(migrationInfo,useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
                 }
 
                 scope.Complete();
             }
 
             VersionLoader.LoadVersionInfo();
+        }
+
+        public void MigrateUpNewer()
+        {
+            var migrationInfos = GetNewerMigrations();
+            RunUpMigrations(true, migrationInfos);
         }
 
         private IEnumerable<IMigrationInfo> GetUpMigrationsToApply(long version)
@@ -129,6 +145,13 @@ namespace FluentMigrator.Runner
             return from pair in migrations
                    where IsMigrationStepNeededForUpMigration(pair.Key, maxMigrationVersion) 
                    select pair.Value;
+        }
+
+        private IEnumerable<IMigrationInfo> GetNewerMigrations()
+        {
+            var migrations = MigrationLoader.LoadMigrations();
+            long newestAppliedMigration = VersionLoader.VersionInfo.Latest();
+            return migrations.Where(m => m.Key > newestAppliedMigration).Select(m => m.Value);
         }
 
         private bool IsMigrationStepNeededForUpMigration(long versionOfMigration, long targetVersion)
