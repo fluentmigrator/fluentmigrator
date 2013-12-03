@@ -131,9 +131,9 @@ namespace FluentMigrator.Runner
             VersionLoader.LoadVersionInfo();
         }
 
-        public void MigrateUpNewer()
+        public void MigrateUpNewer(long version)
         {
-            var migrationInfos = GetNewerMigrations();
+            var migrationInfos = GetNewerMigrations(version);
             RunUpMigrations(true, migrationInfos);
         }
 
@@ -147,11 +147,12 @@ namespace FluentMigrator.Runner
                    select pair.Value;
         }
 
-        private IEnumerable<IMigrationInfo> GetNewerMigrations()
+        private IEnumerable<IMigrationInfo> GetNewerMigrations(long version)
         {
             var migrations = MigrationLoader.LoadMigrations();
             long newestAppliedMigration = VersionLoader.VersionInfo.Latest();
-            return migrations.Where(m => m.Key > newestAppliedMigration).Select(m => m.Value);
+            if (version == 0) version = long.MaxValue;
+            return migrations.Where(m => m.Key > newestAppliedMigration && m.Key <= version).Select(m => m.Value);
         }
 
         private bool IsMigrationStepNeededForUpMigration(long versionOfMigration, long targetVersion)

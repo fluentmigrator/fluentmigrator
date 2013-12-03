@@ -70,7 +70,7 @@ namespace FluentMigrator.Runner.Initialization
                         Runner.MigrateUp(RunnerContext.Version);
                         break;
                     case "migrate:newer":
-                        Runner.MigrateUpNewer();
+                        Runner.MigrateUpNewer(RunnerContext.Version);
                         break;
                     case "rollback":
                         if (RunnerContext.Steps == 0)
