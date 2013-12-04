@@ -67,7 +67,10 @@ namespace FluentMigrator.Runner.Initialization
                     case "":
                     case "migrate":
                     case "migrate:up":
-                        Runner.MigrateUp(RunnerContext.Version);
+                        if (RunnerContext.Version != 0)
+                            Runner.MigrateUp(RunnerContext.Version);
+                        else
+                            Runner.MigrateUp();
                         break;
                     case "migrate:newer":
                         Runner.MigrateUpNewer(RunnerContext.Version);
