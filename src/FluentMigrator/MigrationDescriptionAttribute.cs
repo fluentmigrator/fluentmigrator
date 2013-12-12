@@ -34,7 +34,7 @@ namespace FluentMigrator
                 throw new ArgumentNullException("resourceType");
             ResourceType = resourceType;
             if (string.IsNullOrEmpty(name) == false && char.IsLetter(name[0]) == false)
-                throw new ArgumentException("Inalid resource key name", name);
+                throw new ArgumentException("Invalid resource key name", name);
             Name = name;
         }
 
