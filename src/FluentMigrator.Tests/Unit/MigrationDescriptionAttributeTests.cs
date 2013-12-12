@@ -17,12 +17,13 @@ namespace FluentMigrator.Tests.Unit
         public void BeforeTest()
         {
             oldCulture = System.Threading.Thread.CurrentThread.CurrentCulture;
+            System.Threading.Thread.CurrentThread.CurrentUICulture = System.Globalization.CultureInfo.InvariantCulture;
         }
 
         [TearDown]
         public void AfterTest()
         {
-            System.Threading.Thread.CurrentThread.CurrentCulture = oldCulture;
+            System.Threading.Thread.CurrentThread.CurrentUICulture = oldCulture;
         }
 
         [Test]
@@ -70,7 +71,7 @@ namespace FluentMigrator.Tests.Unit
             var convention = new MigrationConventions();
             var migrationInfo = convention.GetMigrationInfo(new Migrations.WithName());
             migrationInfo.GetName()
-                .ShouldBe("20131212145340: WithName - Migration description with name.");
+                .ShouldBe("20131212150730: WithName - Migration description with name.");
         }
 
         [Test]
@@ -81,23 +82,23 @@ namespace FluentMigrator.Tests.Unit
             var migrationInfoWithName = convention.GetMigrationInfo(new Migrations.WithName());
             var migrationInfoWithoutName = convention.GetMigrationInfo(new Migrations.WithoutName());
 
-            currentThread.CurrentCulture = new System.Globalization.CultureInfo("en-US");
+            currentThread.CurrentUICulture = new System.Globalization.CultureInfo("en-US");
             migrationInfoWithName.GetName()
-                .ShouldBe("Migration description with name.");
+                .ShouldBe("20131212150730: WithName - Migration description with name.");
             migrationInfoWithoutName.GetName()
-                .ShouldBe("20131212145340: WithName - 20131212145340: WithoutName - Test migration description without name argument.");
+                .ShouldBe("20131212145340: WithoutName - Test migration description without name argument.");
 
-            currentThread.CurrentCulture = new System.Globalization.CultureInfo("de-DE");
+            currentThread.CurrentUICulture = new System.Globalization.CultureInfo("de-DE");
             migrationInfoWithName.GetName()
-                .ShouldBe("Migration Beschreibung mit dem name-Argument.");
+                .ShouldBe("20131212150730: WithName - Migration Beschreibung mit dem name-Argument.");
             migrationInfoWithoutName.GetName()
-                .ShouldBe("20131212145340: WithName - 20131212145340: WithoutName - Test-Migration ohne Durch Beschreibung des Themas Namen.");
+                .ShouldBe("20131212145340: WithoutName - Test-Migration ohne Durch Beschreibung des Themas Namen.");
 
-            currentThread.CurrentCulture = new System.Globalization.CultureInfo("it-IT");
+            currentThread.CurrentUICulture = new System.Globalization.CultureInfo("it-IT");
             migrationInfoWithName.GetName()
-                .ShouldBe("Migration description con l'argomento name.");
+                .ShouldBe("20131212150730: WithName - Migration description con l'argomento name.");
             migrationInfoWithoutName.GetName()
-                .ShouldBe("20131212145340: WithName - 20131212145340: WithoutName - Test migration description senza passaggio dell'argomento name .");
+                .ShouldBe("20131212145340: WithoutName - Test migration description senza passaggio dell'argomento name .");
         }
     }
 
