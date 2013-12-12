@@ -59,7 +59,7 @@ namespace FluentMigrator.Infrastructure
                 var name = string.IsNullOrEmpty(da.Name)
                     ? string.Format("V{0}", Version)
                     : da.Name;
-                var property = type.GetProperty(name, BindingFlags.Public | BindingFlags.Static | BindingFlags.NonPublic);
+                var property = resourceType.GetProperty(name, BindingFlags.Public | BindingFlags.Static | BindingFlags.NonPublic);
                 //TODO: throw exception when property is null or invalid return type??
                 if (property != null && property.PropertyType == typeof(string))
                 {
