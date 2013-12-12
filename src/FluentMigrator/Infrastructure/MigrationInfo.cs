@@ -17,6 +17,8 @@
 #endregion
 using System;
 using System.Collections.Generic;
+using System.Reflection;
+using FluentMigrator.Infrastructure.Extensions;
 
 namespace FluentMigrator.Infrastructure
 {
@@ -49,7 +51,22 @@ namespace FluentMigrator.Infrastructure
 
         public string GetName()
         {
-            return string.Format("{0}: {1}", Version, Migration.GetType().Name);
+            var type = Migration.GetType();
+            if (type.HasAttribute<MigrationDescriptionAttribute>())
+            {
+                var da = type.GetOneAttribute<MigrationDescriptionAttribute>();
+                var resourceType = da.ResourceType;
+                var name = string.IsNullOrEmpty(da.Name)
+                    ? string.Format("V{0}", Version)
+                    : da.Name;
+                var property = type.GetProperty(name, BindingFlags.Public | BindingFlags.Static | BindingFlags.NonPublic);
+                //TODO: throw exception when property is null or invalid return type??
+                if (property != null && property.PropertyType == typeof(string))
+                {
+                    return string.Format("{0}: {1} - {2}", Version, type.Name, property.GetValue(null, null));
+                }
+            }
+            return string.Format("{0}: {1}", Version, type.Name);
         }
 
         public void AddTrait(string name, object value)
