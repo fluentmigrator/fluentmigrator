@@ -124,7 +124,7 @@ namespace FluentMigrator.Runner
         {
             get
             {
-                return Processor.ColumnExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName, "Description");
+                return Processor.ColumnExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName, VersionTableMetaData.DescriptionColumnName);
             }
         }
 

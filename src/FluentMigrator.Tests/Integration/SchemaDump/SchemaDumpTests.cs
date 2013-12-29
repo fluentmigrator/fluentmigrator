@@ -124,7 +124,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
 
             var testWriter = new SchemaTestWriter();
             var output = GetOutput(testWriter, defs);
-            string expectedMessage = testWriter.GetMessage(4, 10, 4, 1);
+            string expectedMessage = testWriter.GetMessage(4, 11, 4, 1);
 
             runner.Down(new TestMigration());
             runner.VersionLoader.RemoveVersionTable();
