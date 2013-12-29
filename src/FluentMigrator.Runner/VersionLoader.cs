@@ -162,7 +162,7 @@ namespace FluentMigrator.Runner
             
             foreach (DataRow row in dataSet.Tables[0].Rows)
             {
-                _versionInfo.AddAppliedMigration(long.Parse(row[0].ToString()));
+                _versionInfo.AddAppliedMigration(long.Parse(row[VersionTableMetaData.ColumnName].ToString()));
             }
         }
 
