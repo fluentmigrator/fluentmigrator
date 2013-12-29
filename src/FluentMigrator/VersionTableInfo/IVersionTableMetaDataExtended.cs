@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
@@ -20,31 +20,8 @@
 
 namespace FluentMigrator.VersionTableInfo
 {
-    public class DefaultVersionTableMetaData : IVersionTableMetaData, IVersionTableMetaDataExtended
+    public interface IVersionTableMetaDataExtended
     {
-        public virtual string SchemaName
-        {
-            get { return string.Empty; }
-        }
-
-        public virtual string TableName
-        {
-            get { return "VersionInfo"; }
-        }
-
-        public virtual string ColumnName
-        {
-            get { return "Version"; }
-        }
-
-        public virtual string UniqueIndexName
-        {
-            get { return "UC_Version"; }
-        }
-
-        public virtual bool OwnsSchema
-        {
-            get { return true; }
-        }
+        bool OwnsSchema { get; }
     }
 }
