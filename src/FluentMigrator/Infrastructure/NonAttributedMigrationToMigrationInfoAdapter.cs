@@ -30,6 +30,8 @@ namespace FluentMigrator.Infrastructure
             Migration = migration;
         }
 
+        public string Description { get; private set; }
+
         public long Version
         {
             get { return -1; }
