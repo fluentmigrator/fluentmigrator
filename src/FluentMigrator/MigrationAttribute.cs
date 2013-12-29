@@ -30,13 +30,25 @@ namespace FluentMigrator
         {
         }
 
+        public MigrationAttribute(long version, string description)
+            : this(version, TransactionBehavior.Default, description)
+        {
+        }
+
         public MigrationAttribute(long version, TransactionBehavior transactionBehavior)
+            : this(version, transactionBehavior, null)
+        {
+        }
+
+        public MigrationAttribute(long version, TransactionBehavior transactionBehavior, string description)
         {
             Version = version;
             TransactionBehavior = transactionBehavior;
+            Description = description;
         }
 
         public long Version { get; private set; }
         public TransactionBehavior TransactionBehavior { get; private set; }
+        public string Description { get; private set; }
     }
 }

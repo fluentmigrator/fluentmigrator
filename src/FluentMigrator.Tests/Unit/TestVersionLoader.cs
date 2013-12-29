@@ -59,6 +59,11 @@ namespace FluentMigrator.Tests.Unit
 
         public void UpdateVersionInfo(long version)
         {
+            UpdateVersionInfo(version, null);
+        }
+
+        public void UpdateVersionInfo(long version, string description)
+        {
             this.Versions.Add(version);
 
             this.DidUpdateVersionInfoGetCalled = true;
