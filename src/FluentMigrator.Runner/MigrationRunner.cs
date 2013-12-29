@@ -97,26 +97,7 @@ namespace FluentMigrator.Runner
 
         public void MigrateUp()
         {
-            MigrateUp(true);
-        }
-
-        public void MigrateUp(bool useAutomaticTransactionManagement)
-        {
-            var migrations = MigrationLoader.LoadMigrations();
-
-            using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
-            {
-                foreach (var pair in migrations)
-                {
-                    ApplyMigrationUp(pair.Value, useAutomaticTransactionManagement && pair.Value.TransactionBehavior == TransactionBehavior.Default);
-                }
-
-                ApplyProfiles();
-
-                scope.Complete();
-            }
-
-            VersionLoader.LoadVersionInfo();
+            MigrateUp(0, true);
         }
 
         public void MigrateUp(long targetVersion)
@@ -124,14 +105,24 @@ namespace FluentMigrator.Runner
             MigrateUp(targetVersion, true);
         }
 
+        public void MigrateUp(bool useAutomaticTransactionManagement)
+        {
+            MigrateUp(0, useAutomaticTransactionManagement);
+        }
+
         public void MigrateUp(long targetVersion, bool useAutomaticTransactionManagement)
         {
             var migrationInfos = GetUpMigrationsToApply(targetVersion);
+            RunUpMigrations(useAutomaticTransactionManagement, migrationInfos);
+        }
+
+        private void RunUpMigrations(bool useAutomaticTransactionManagement, IEnumerable<IMigrationInfo> migrationInfos)
+        {
             using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
                 foreach (var migrationInfo in migrationInfos)
                 {
-                    ApplyMigrationUp(migrationInfo, useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
+                    ApplyMigrationUp(migrationInfo,useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
                 }
 
                 scope.Complete();
@@ -140,13 +131,28 @@ namespace FluentMigrator.Runner
             VersionLoader.LoadVersionInfo();
         }
 
+        public void MigrateUpNewer(long version)
+        {
+            var migrationInfos = GetNewerMigrations(version);
+            RunUpMigrations(true, migrationInfos);
+        }
+
         private IEnumerable<IMigrationInfo> GetUpMigrationsToApply(long version)
         {
             var migrations = MigrationLoader.LoadMigrations();
+            long maxMigrationVersion = version == 0 ? migrations.Keys.Max() : version;
 
-            return from pair in migrations 
-                   where IsMigrationStepNeededForUpMigration(pair.Key, version) 
+            return from pair in migrations
+                   where IsMigrationStepNeededForUpMigration(pair.Key, maxMigrationVersion) 
                    select pair.Value;
+        }
+
+        private IEnumerable<IMigrationInfo> GetNewerMigrations(long version)
+        {
+            var migrations = MigrationLoader.LoadMigrations();
+            long newestAppliedMigration = VersionLoader.VersionInfo.Latest();
+            if (version == 0) version = long.MaxValue;
+            return migrations.Where(m => m.Key > newestAppliedMigration && m.Key <= version).Select(m => m.Value);
         }
 
         private bool IsMigrationStepNeededForUpMigration(long versionOfMigration, long targetVersion)
