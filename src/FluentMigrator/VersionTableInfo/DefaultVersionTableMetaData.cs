@@ -15,6 +15,7 @@
 // limitations under the License.
 //
 #endregion
+using System;
 
 namespace FluentMigrator.VersionTableInfo
 {
@@ -24,20 +25,25 @@ namespace FluentMigrator.VersionTableInfo
         {
             get { return string.Empty; }
         }
-
+  
         public virtual string TableName
         {
             get { return "VersionInfo"; }
         }
-
+  
         public virtual string ColumnName
         {
             get { return "Version"; }
         }
-
+  
         public virtual string UniqueIndexName
         {
             get { return "UC_Version"; }
+        }
+  
+        public string DescriptionColumnName
+        {
+            get { return "Description"; }
         }
     }
 }

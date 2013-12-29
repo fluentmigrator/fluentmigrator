@@ -659,7 +659,7 @@ namespace FluentMigrator.Tests.Integration
 
                 createSchemaMatches.ShouldBe(1);
                 createTableMatches.ShouldBe(1);
-                alterTableMatches.ShouldBe(1);
+                alterTableMatches.ShouldBe(2);
                 createIndexMatches.ShouldBe(1);
                 
             }
