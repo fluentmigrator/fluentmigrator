@@ -16,12 +16,15 @@
 
 #endregion
 
+using System;
+
 namespace FluentMigrator
 {
     public abstract class ForwardOnlyMigration : Migration
     {
         public override sealed void Down()
         {
+            throw new InvalidOperationException("Only forward migration is supported");
         }
     }
 }
