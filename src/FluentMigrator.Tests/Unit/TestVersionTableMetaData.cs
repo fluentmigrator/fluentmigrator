@@ -22,7 +22,7 @@ using FluentMigrator.VersionTableInfo;
 namespace FluentMigrator.Tests.Unit
 {
 	[VersionTableMetaData]
-	public class TestVersionTableMetaData : IVersionTableMetaData
+	public class TestVersionTableMetaData : IVersionTableMetaData, IVersionTableMetaDataExtended
 	{
 		public const string TABLENAME = "testVersionTableName";
 		public const string COLUMNNAME = "testColumnName";
@@ -32,6 +32,7 @@ namespace FluentMigrator.Tests.Unit
 		public TestVersionTableMetaData()
 		{
 			SchemaName = "testSchemaName";
+            OwnsSchema = true;
 		}
 
 		public string SchemaName { get; set; }
@@ -55,6 +56,8 @@ namespace FluentMigrator.Tests.Unit
         {
             get { return DESCRIPTIONCOLUMNNAME; }
         }
-    }
+
+	    public bool OwnsSchema { get; set; }
+	}
 }
 
