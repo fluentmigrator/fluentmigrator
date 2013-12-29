@@ -128,6 +128,15 @@ namespace FluentMigrator.Runner
             }
         }
 
+        public bool OwnsVersionSchema
+        {
+            get
+            {
+                IVersionTableMetaDataExtended versionTableMetaDataExtended = VersionTableMetaData as IVersionTableMetaDataExtended;
+                return versionTableMetaDataExtended == null || versionTableMetaDataExtended.OwnsSchema;
+            }
+        }
+
         public void LoadVersionInfo()
         {
             if (!AlreadyCreatedVersionSchema && !_versionSchemaMigrationAlreadyRun)
@@ -171,7 +180,7 @@ namespace FluentMigrator.Runner
             var expression = new DeleteTableExpression { TableName = VersionTableMetaData.TableName, SchemaName = VersionTableMetaData.SchemaName };
             expression.ExecuteWith(Processor);
 
-            if (!string.IsNullOrEmpty(VersionTableMetaData.SchemaName))
+            if (OwnsVersionSchema && !string.IsNullOrEmpty(VersionTableMetaData.SchemaName))
             {
                 var schemaExpression = new DeleteSchemaExpression { SchemaName = VersionTableMetaData.SchemaName };
                 schemaExpression.ExecuteWith(Processor);
