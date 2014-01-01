@@ -100,7 +100,7 @@ namespace FluentMigrator.Runner.Versioning
         public override void Up()
         {
             Alter.Table(versionTableMeta.TableName).InSchema(versionTableMeta.SchemaName)
-                .AddColumn(versionTableMeta.DescriptionColumnName).AsString(int.MaxValue).Nullable();
+                .AddColumn(versionTableMeta.DescriptionColumnName).AsString(1024).Nullable();
         }
 
         public override void Down()
