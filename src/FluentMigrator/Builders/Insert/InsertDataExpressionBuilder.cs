@@ -35,7 +35,19 @@ namespace FluentMigrator.Builders.Insert
 
         public IInsertDataSyntax Row(object dataAsAnonymousType)
         {
-            _expression.Rows.Add(GetData(dataAsAnonymousType));
+            IDictionary<string, object> data = ExtractData(dataAsAnonymousType);
+
+            return Row(data);
+        }
+
+        public IInsertDataSyntax Row(IDictionary<string, object> data)
+        {
+            var dataDefinition = new InsertionDataDefinition();
+
+            dataDefinition.AddRange(data);
+
+            _expression.Rows.Add(dataDefinition);
+
             return this;
         }
 
@@ -57,13 +69,17 @@ namespace FluentMigrator.Builders.Insert
             return this;
         }
 
-        private static InsertionDataDefinition GetData(object dataAsAnonymousType)
+        private static IDictionary<string, object> ExtractData(object dataAsAnonymousType)
         {
-            var data = new InsertionDataDefinition();
-            var properties = TypeDescriptor.GetProperties(dataAsAnonymousType);
+            var data = new Dictionary<string, object>();
+
+            PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(dataAsAnonymousType);
 
             foreach (PropertyDescriptor property in properties)
-                data.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(dataAsAnonymousType)));
+            {
+                data.Add(property.Name, property.GetValue(dataAsAnonymousType));
+            }
+
             return data;
         }
     }
