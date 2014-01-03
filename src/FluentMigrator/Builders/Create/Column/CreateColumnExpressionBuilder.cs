@@ -28,7 +28,8 @@ namespace FluentMigrator.Builders.Create.Column
     public class CreateColumnExpressionBuilder : ExpressionBuilderWithColumnTypesBase<CreateColumnExpression, ICreateColumnOptionSyntax>,
                                                  ICreateColumnOnTableSyntax,
                                                  ICreateColumnAsTypeOrInSchemaSyntax,
-                                                 ICreateColumnOptionOrForeignKeyCascadeSyntax
+                                                 ICreateColumnOptionOrForeignKeyCascadeSyntax,
+                                                 IColumnExpressionBuilder
     {
         private readonly IMigrationContext _context;
 
@@ -36,9 +37,11 @@ namespace FluentMigrator.Builders.Create.Column
             : base(expression)
         {
             _context = context;
+            ColumnHelper = new ColumnExpressionBuilderHelper(this, context);
         }
 
         public ForeignKeyDefinition CurrentForeignKey { get; set; }
+        public ColumnExpressionBuilderHelper ColumnHelper { get; set; }
 
         public ICreateColumnAsTypeOrInSchemaSyntax OnTable(string name)
         {
@@ -61,6 +64,12 @@ namespace FluentMigrator.Builders.Create.Column
         public ICreateColumnOptionSyntax WithDefaultValue(object value)
         {
             Expression.Column.DefaultValue = value;
+            return this;
+        }
+
+        public ICreateColumnOptionSyntax DefaultExistingRowsTo(object value)
+        {
+            ColumnHelper.SetExistingRowDefaultValue(value);
             return this;
         }
 
@@ -120,13 +129,13 @@ namespace FluentMigrator.Builders.Create.Column
 
         public ICreateColumnOptionSyntax Nullable()
         {
-            Expression.Column.IsNullable = true;
+            ColumnHelper.SetNullable(true);
             return this;
         }
 
         public ICreateColumnOptionSyntax NotNullable()
         {
-            Expression.Column.IsNullable = false;
+           ColumnHelper.SetNullable(false);
             return this;
         }
 
@@ -286,6 +295,30 @@ namespace FluentMigrator.Builders.Create.Column
         public override ColumnDefinition GetColumnForType()
         {
             return Expression.Column;
+        }
+
+        string IColumnExpressionBuilder.SchemaName
+        {
+           get
+           {
+              return Expression.SchemaName;
+           }
+        }
+
+        string IColumnExpressionBuilder.TableName
+        {
+           get
+           {
+              return Expression.TableName;
+           }
+        }
+
+        ColumnDefinition IColumnExpressionBuilder.Column
+        {
+           get
+           {
+              return Expression.Column;
+           }
         }
     }
 }

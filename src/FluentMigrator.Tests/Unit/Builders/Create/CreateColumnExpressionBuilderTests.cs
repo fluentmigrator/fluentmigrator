@@ -29,6 +29,7 @@ using FluentMigrator.Runner.Extensions;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
+using FluentMigrator.Builders;
 
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
@@ -396,18 +397,6 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [Test]
-        public void CallingNullableSetsIsNullableToTrue()
-        {
-            VerifyColumnProperty(c => c.IsNullable = true, b => b.Nullable());
-        }
-
-        [Test]
-        public void CallingNotNullableSetsIsNullableToFalse()
-        {
-            VerifyColumnProperty(c => c.IsNullable = false, b => b.NotNullable());
-        }
-
-        [Test]
         public void CallingUniqueSetsIsUniqueToTrue()
         {
             VerifyColumnProperty(c => c.IsUnique = true, b => b.Unique());
@@ -597,6 +586,78 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             builder.OnDeleteOrUpdate(rule);
             Assert.That(builder.CurrentForeignKey.OnUpdate, Is.EqualTo(rule));
             Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(rule));
+        }
+
+        [Test]
+        public void ColumnHelperSetOnCreation()
+        {
+            var expressionMock = new Mock<CreateColumnExpression>();
+            var contextMock = new Mock<IMigrationContext>();
+
+            var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
+
+            Assert.IsNotNull(builder.ColumnHelper);
+        }
+
+        [Test]
+        public void IColumnExpressionBuilder_UsesExpressionColumnSchemaAndTableName()
+        {
+            var expressionMock = new Mock<CreateColumnExpression>();
+            var contextMock = new Mock<IMigrationContext>();
+            expressionMock.SetupGet(n => n.SchemaName).Returns("Fred");
+            expressionMock.SetupGet(n => n.TableName).Returns("Flinstone");
+
+            var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
+            var builderAsInterface = (IColumnExpressionBuilder)builder;
+
+            Assert.AreEqual("Fred", builderAsInterface.SchemaName);
+            Assert.AreEqual("Flinstone", builderAsInterface.TableName);
+        }
+
+        [Test]
+        public void IColumnExpressionBuilder_UsesExpressionColumn()
+        {
+            var expressionMock = new Mock<CreateColumnExpression>();
+            var contextMock = new Mock<IMigrationContext>();
+            var curColumn = new Mock<ColumnDefinition>().Object;
+            expressionMock.SetupGet(n => n.Column).Returns(curColumn);
+
+            var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
+            var builderAsInterface = (IColumnExpressionBuilder)builder;
+
+            Assert.AreSame(curColumn, builderAsInterface.Column);
+        }
+
+        [Test]
+        public void NullableUsesHelper()
+        {
+            VerifyColumnHelperCall(c => c.Nullable(), h => h.SetNullable(true));
+        }
+
+        [Test]
+        public void NotNullableUsesHelper()
+        {
+            VerifyColumnHelperCall(c => c.NotNullable(), h => h.SetNullable(false));
+        }
+
+        [Test]
+        public void ExistingRowDefaultsUsesHelper()
+        {
+            VerifyColumnHelperCall(c => c.DefaultExistingRowsTo("test"), h => h.SetExistingRowDefaultValue("test"));
+        }
+
+        private void VerifyColumnHelperCall(Action<CreateColumnExpressionBuilder> callToTest, System.Linq.Expressions.Expression<Action<ColumnExpressionBuilderHelper>> expectedHelperAction)
+        {
+            var expressionMock = new Mock<CreateColumnExpression>();
+            var contextMock = new Mock<IMigrationContext>();
+            var helperMock = new Mock<ColumnExpressionBuilderHelper>();
+
+            var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
+            builder.ColumnHelper = helperMock.Object;
+
+            callToTest(builder);
+
+            helperMock.Verify(expectedHelperAction);
         }
 
         private void VerifyColumnProperty(Action<ColumnDefinition> columnExpression, Action<CreateColumnExpressionBuilder> callToTest)

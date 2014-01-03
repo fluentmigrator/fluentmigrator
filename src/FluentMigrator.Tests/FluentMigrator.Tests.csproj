@@ -185,6 +185,7 @@
     <Compile Include="Integration\Migrations\Tagged\4_TenantAandBTable.cs" />
     <Compile Include="Integration\Migrations\TestEmptyMigration.cs" />
     <Compile Include="Integration\Migrations\TestMigration.cs" />
+    <Compile Include="Integration\Migrations\TestSetExistingRowValuesMigration.cs" />
     <Compile Include="Integration\Migrations\TestUpdateAllRowsMigration.cs" />
     <Compile Include="Integration\Migrations\VersionedMigration.cs" />
     <Compile Include="Integration\PerformDBOperationTests.cs" />
@@ -242,6 +243,7 @@
     <Compile Include="Unit\Builders\Alter\AlterColumnExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Alter\AlterExpressionRootTests.cs" />
     <Compile Include="Unit\Builders\Alter\AlterTableExpressionBuilderTests.cs" />
+    <Compile Include="Unit\Builders\ColumnExpressionBuilderHelperTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateColumnExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateConstraintExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateExpressionRootTests.cs" />

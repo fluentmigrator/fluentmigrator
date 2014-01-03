@@ -389,7 +389,8 @@ namespace FluentMigrator.Tests.Integration
                 runner.VersionLoader.VersionInfo.HasAppliedMigration(2).ShouldBeTrue();
                 runner.VersionLoader.VersionInfo.HasAppliedMigration(3).ShouldBeTrue();
                 runner.VersionLoader.VersionInfo.HasAppliedMigration(4).ShouldBeTrue();
-                runner.VersionLoader.VersionInfo.Latest().ShouldBe(4);
+                runner.VersionLoader.VersionInfo.HasAppliedMigration(5).ShouldBeTrue();
+                runner.VersionLoader.VersionInfo.Latest().ShouldBe(5);
 
                 runner.RollbackToVersion(0, false);
             });
@@ -659,7 +660,7 @@ namespace FluentMigrator.Tests.Integration
 
                 createSchemaMatches.ShouldBe(1);
                 createTableMatches.ShouldBe(1);
-                alterTableMatches.ShouldBe(2);
+                alterTableMatches.ShouldBe(1);
                 createIndexMatches.ShouldBe(1);
                 
             }

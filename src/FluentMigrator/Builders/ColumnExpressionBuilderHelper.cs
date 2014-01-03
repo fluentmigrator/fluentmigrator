@@ -1,0 +1,147 @@
+﻿using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
+using FluentMigrator.Model;
+using System;
+using System.Collections.Generic;
+
+namespace FluentMigrator.Builders
+{
+    /// <summary>
+    /// This class provides a common location for logic pertaining to setting and maintaining 
+    /// expressions for expression builders which manipulate the the ColumnDefinition.
+    /// </summary>
+    /// <remarks>
+    /// This is a support class for the migrator framework and is not intended for external use.
+    /// TODO: make this internal, and the change assmebly info so InternalsVisibleTo is set for the test assemblies.
+    /// </remarks>
+    public class ColumnExpressionBuilderHelper
+    {
+        /// <summary>
+        /// For each distinct column which has an existing row default, an instance of this
+        /// will be stored in the _expressionsByColumn.
+        /// </summary>
+        private class ExistingRowData
+        {
+            public UpdateDataExpression SetExistingRowExpression;
+            public AlterColumnExpression SetColumnNotNullableExpression;
+        }
+
+        private IColumnExpressionBuilder _builder;
+        private IMigrationContext _context;
+        private Dictionary<ColumnDefinition, ExistingRowData> _existingRowDataByColumn { get; set; }
+
+        /// <summary>
+        /// For easy mockability only.
+        /// </summary>
+        protected ColumnExpressionBuilderHelper() { }
+
+        public ColumnExpressionBuilderHelper(IColumnExpressionBuilder builder, IMigrationContext context)
+        {
+            _builder = builder;
+            _context = context;
+            _existingRowDataByColumn = new Dictionary<ColumnDefinition, ExistingRowData>();
+        }
+
+        /// <summary>
+        /// Either updates the IsNullable flag on the column, or creates/removes the SetNotNull expression, depending
+        /// on whether the column has an existing row default value.
+        /// </summary>
+        public virtual void SetNullable(bool isNullable)
+        {
+            var column = _builder.Column;
+            ExistingRowData exRowExpr;
+            if (_existingRowDataByColumn.TryGetValue(column, out exRowExpr))
+            {
+                if (exRowExpr.SetExistingRowExpression != null)
+                {
+                    if (isNullable)
+                    {
+                        //Remove additional expression to set column to not null.
+                        _context.Expressions.Remove(exRowExpr.SetColumnNotNullableExpression);
+                        exRowExpr.SetColumnNotNullableExpression = null;
+                    }
+                    else
+                    {
+                        //Add expression to set column to not null.
+                        //If it already exists, just leave it.
+                        if (exRowExpr.SetColumnNotNullableExpression == null)
+                        {
+                            //stuff that matters shouldn't change at this point, so we're free to make a
+                            //copy of the col def.
+                            //TODO: make a SetColumnNotNullExpression, which just takes the bare minimum.
+                            ColumnDefinition notNullColDef = new ColumnDefinition
+                            {
+                                ModificationType = ColumnModificationType.Alter,
+                                TableName = column.TableName,
+                                Name = column.Name,
+                                Type = column.Type,
+                                CustomType = column.CustomType,
+                                IsNullable = false,
+                            };
+
+                            exRowExpr.SetColumnNotNullableExpression = new AlterColumnExpression
+                            {
+                                Column = notNullColDef,
+                                TableName = _builder.TableName,
+                                SchemaName = _builder.SchemaName
+                            };
+
+                            _context.Expressions.Add(exRowExpr.SetColumnNotNullableExpression);
+                        }
+                    }
+
+                    //Setting column explicitly to nullable, as the actual nullable value
+                    //will be set by the SetColumnNotNullableExpression after the column is created and populated.
+                    column.IsNullable = true;
+                    return;
+                }
+            }
+
+            //At this point, we know there's no existing row expression, so just pass it onto the 
+            //underlying column.
+            column.IsNullable = isNullable;
+        }
+
+        /// <summary>
+        /// Adds the existing row default value.  If the column has a value for IsNullable, this will also
+        /// call SetNullable to create the expression, and will then set the column IsNullable to false.
+        /// </summary>
+        public virtual void SetExistingRowDefaultValue(object existingRowDefaultValue)
+        {
+            //TODO: validate that 'value' isn't set to null for non nullable columns.  If set to
+            //null, maybe just remove the expressions?.. not sure of best way to handle this.
+
+            var column = _builder.Column;
+            if (column.ModificationType == ColumnModificationType.Create)
+            {
+                //ensure an UpdateDataExpression is created and cached for this column
+
+                ExistingRowData exRowExpr;
+                if (!_existingRowDataByColumn.TryGetValue(column, out exRowExpr))
+                {
+                    exRowExpr = new ExistingRowData();
+                    _existingRowDataByColumn.Add(column, exRowExpr);
+                }
+
+                if (exRowExpr.SetExistingRowExpression == null)
+                {
+                    exRowExpr.SetExistingRowExpression = new UpdateDataExpression
+                    {
+                        TableName = _builder.TableName,
+                        SchemaName = _builder.SchemaName,
+                        IsAllRows = true,
+                    };
+                    _context.Expressions.Add(exRowExpr.SetExistingRowExpression);
+
+                    //Call SetNullable, to ensure that not-null columns are correctly set to 
+                    //not null after existing rows have data populated.
+                    SetNullable(column.IsNullable ?? true);
+                }
+
+                exRowExpr.SetExistingRowExpression.Set = new List<KeyValuePair<string, object>>  {
+                   new KeyValuePair<string, object>(column.Name, existingRowDefaultValue)
+                };
+            }
+        }
+    }
+}

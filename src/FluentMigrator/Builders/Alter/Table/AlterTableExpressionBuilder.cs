@@ -28,7 +28,8 @@ namespace FluentMigrator.Builders.Alter.Table
     public class AlterTableExpressionBuilder : ExpressionBuilderWithColumnTypesBase<AlterTableExpression, IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax>,
                                                IAlterTableAddColumnOrAlterColumnOrSchemaSyntax,
                                                IAlterTableColumnAsTypeSyntax,
-                                               IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax
+                                               IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax,
+                                               IColumnExpressionBuilder
     {
         private readonly IMigrationContext _context;
 
@@ -36,10 +37,12 @@ namespace FluentMigrator.Builders.Alter.Table
             : base(expression)
         {
             _context = context;
+            ColumnHelper = new ColumnExpressionBuilderHelper(this, context);
         }
 
         public ColumnDefinition CurrentColumn { get; set; }
         public ForeignKeyDefinition CurrentForeignKey { get; set; }
+        public ColumnExpressionBuilderHelper ColumnHelper { get; set; }
 
         public IAlterTableAddColumnOrAlterColumnSyntax InSchema(string schemaName)
         {
@@ -124,6 +127,12 @@ namespace FluentMigrator.Builders.Alter.Table
             return this;
         }
 
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax DefaultExistingRowsTo(object value)
+        {
+           ColumnHelper.SetExistingRowDefaultValue(value);
+           return this;
+        }
+
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithColumnDescription(string description)
         {
             CurrentColumn.ColumnDescription = description;
@@ -180,13 +189,13 @@ namespace FluentMigrator.Builders.Alter.Table
 
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax Nullable()
         {
-            CurrentColumn.IsNullable = true;
+            ColumnHelper.SetNullable(true);
             return this;
         }
 
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax NotNullable()
         {
-            CurrentColumn.IsNullable = false;
+            ColumnHelper.SetNullable(false);
             return this;
         }
 
@@ -349,6 +358,30 @@ namespace FluentMigrator.Builders.Alter.Table
         public override ColumnDefinition GetColumnForType()
         {
             return CurrentColumn;
+        }
+
+        string IColumnExpressionBuilder.SchemaName
+        {
+           get
+           {
+              return Expression.SchemaName;
+           }
+        }
+
+        string IColumnExpressionBuilder.TableName
+        {
+           get
+           {
+              return Expression.TableName;
+           }
+        }
+
+        ColumnDefinition IColumnExpressionBuilder.Column
+        {
+           get
+           {
+              return CurrentColumn;
+           }
         }
     }
 }
