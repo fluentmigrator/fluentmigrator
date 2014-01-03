@@ -29,6 +29,7 @@ using FluentMigrator.Runner.Extensions;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
+using FluentMigrator.Builders;
 
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
@@ -367,83 +368,27 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [Test]
-        public void CallingNullableSetsIsNullableToTrue()
+        public void NullableUsesHelper()
         {
-            VerifyColumnProperty(c => c.IsNullable = true, b => b.Nullable());
+            VerifyColumnHelperCall(c => c.Nullable(), h => h.SetNullable(true));
         }
 
         [Test]
-        public void CallingNotNullableSetsIsNullableToFalse()
+        public void NotNullableUsesHelper()
         {
-            VerifyColumnProperty(c => c.IsNullable = false, b => b.NotNullable());
+            VerifyColumnHelperCall(c => c.NotNullable(), h => h.SetNullable(false));
         }
 
         [Test]
-        public void CallingUniqueSetsIsUniqueToTrue()
+        public void UniqueUsesHelper()
         {
-            VerifyColumnProperty(c => c.IsUnique = true, b => b.Unique());
+            VerifyColumnHelperCall(c => c.Unique(), h => h.Unique(null));
         }
 
         [Test]
-        public void CallingUniqueAddsIndexExpressionToContext()
+        public void NamedUniqueUsesHelper()
         {
-            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-
-            var contextMock = new Mock<IMigrationContext>();
-            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
-
-            var columnMock = new Mock<ColumnDefinition>();
-            columnMock.SetupGet(x => x.Name).Returns("BaconId");
-
-            var expressionMock = new Mock<CreateTableExpression>();
-            expressionMock.SetupGet(x => x.SchemaName).Returns("Eggs");
-            expressionMock.SetupGet(x => x.TableName).Returns("Bacon");
-
-            var builder = new CreateTableExpressionBuilder(expressionMock.Object, contextMock.Object) { CurrentColumn = columnMock.Object };
-
-            builder.Unique();
-
-            collectionMock.Verify(x => x.Add(It.Is<CreateIndexExpression>(
-                ix => ix.Index.Name == null
-                      && ix.Index.TableName == "Bacon"
-                      && ix.Index.SchemaName == "Eggs"
-                      && ix.Index.IsUnique
-                      && !ix.Index.IsClustered
-                      && ix.Index.Columns.All(c => c.Name == "BaconId")
-                                                 )));
-
-            contextMock.VerifyGet(x => x.Expressions);
-        }
-
-        [Test]
-        public void CallingUniqueNamedAddsIndexExpressionToContext()
-        {
-            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-
-            var contextMock = new Mock<IMigrationContext>();
-            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
-
-            var columnMock = new Mock<ColumnDefinition>();
-            columnMock.SetupGet(x => x.Name).Returns("BaconId");
-
-            var expressionMock = new Mock<CreateTableExpression>();
-            expressionMock.SetupGet(x => x.SchemaName).Returns("Eggs");
-            expressionMock.SetupGet(x => x.TableName).Returns("Bacon");
-
-            var builder = new CreateTableExpressionBuilder(expressionMock.Object, contextMock.Object) { CurrentColumn = columnMock.Object };
-
-            builder.Unique("IX_Bacon_BaconId");
-
-            collectionMock.Verify(x => x.Add(It.Is<CreateIndexExpression>(
-                ix => ix.Index.Name == "IX_Bacon_BaconId"
-                      && ix.Index.TableName == "Bacon"
-                      && ix.Index.SchemaName == "Eggs"
-                      && ix.Index.IsUnique
-                      && !ix.Index.IsClustered
-                      && ix.Index.Columns.All(c => c.Name == "BaconId")
-                                                 )));
-
-            contextMock.VerifyGet(x => x.Expressions);
+            VerifyColumnHelperCall(c => c.Unique("asdf"), h => h.Unique("asdf"));
         }
 
         [Test]
@@ -592,6 +537,62 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
             collectionMock.Verify(x => x.Add(It.Is<ColumnDefinition>(c => c.Name.Equals(name))));
             expressionMock.VerifyGet(e => e.Columns);
+        }
+
+        [Test]
+        public void ColumnHelperSetOnCreation()
+        {
+            var expressionMock = new Mock<CreateTableExpression>();
+            var contextMock = new Mock<IMigrationContext>();
+
+            var builder = new CreateTableExpressionBuilder(expressionMock.Object, contextMock.Object);
+
+            Assert.IsNotNull(builder.ColumnHelper);
+        }
+
+        [Test]
+        public void IColumnExpressionBuilder_UsesExpressionSchemaAndTableName()
+        {
+            var expressionMock = new Mock<CreateTableExpression>();
+            var contextMock = new Mock<IMigrationContext>();
+            expressionMock.SetupGet(n => n.SchemaName).Returns("Fred");
+            expressionMock.SetupGet(n => n.TableName).Returns("Flinstone");
+
+            var builder = new CreateTableExpressionBuilder(expressionMock.Object, contextMock.Object);
+            var builderAsInterface = (IColumnExpressionBuilder)builder;
+
+            Assert.AreEqual("Fred", builderAsInterface.SchemaName);
+            Assert.AreEqual("Flinstone", builderAsInterface.TableName);
+        }
+
+        [Test]
+        public void IColumnExpressionBuilder_UsesCurrentColumn()
+        {
+            var expressionMock = new Mock<CreateTableExpression>();
+            var contextMock = new Mock<IMigrationContext>();
+
+            var builder = new CreateTableExpressionBuilder(expressionMock.Object, contextMock.Object);
+
+            var curColumn = new Mock<ColumnDefinition>().Object;
+            builder.CurrentColumn = curColumn;
+
+            var builderAsInterface = (IColumnExpressionBuilder)builder;
+
+            Assert.AreSame(curColumn, builderAsInterface.Column);
+        }
+
+        private void VerifyColumnHelperCall(Action<CreateTableExpressionBuilder> callToTest, System.Linq.Expressions.Expression<Action<ColumnExpressionBuilderHelper>> expectedHelperAction)
+        {
+            var expressionMock = new Mock<CreateTableExpression>();
+            var contextMock = new Mock<IMigrationContext>();
+            var helperMock = new Mock<ColumnExpressionBuilderHelper>();
+
+            var builder = new CreateTableExpressionBuilder(expressionMock.Object, contextMock.Object);
+            builder.ColumnHelper = helperMock.Object;
+
+            callToTest(builder);
+
+            helperMock.Verify(expectedHelperAction);
         }
 
         private void VerifyColumnProperty(Action<ColumnDefinition> columnExpression, Action<CreateTableExpressionBuilder> callToTest)

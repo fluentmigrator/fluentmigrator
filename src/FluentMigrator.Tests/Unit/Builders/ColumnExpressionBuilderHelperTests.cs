@@ -6,6 +6,7 @@ using Moq;
 using NUnit.Framework;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace FluentMigrator.Tests.Unit.Builders
 {
@@ -114,6 +115,7 @@ namespace FluentMigrator.Tests.Unit.Builders
             Assert.IsInstanceOf<UpdateDataExpression>(addedExpressions[0]);
             Assert.IsInstanceOf<AlterColumnExpression>(addedExpressions[1]);
 
+            //TODO: refactor to use same method of checking as "CallingUniqueAddsIndexExpressionToContext" test does.
             AlterColumnExpression alterColExpr = (AlterColumnExpression)addedExpressions[1];
             Assert.AreNotSame(builderMock.Object.Column, alterColExpr.Column);
             Assert.AreEqual("Fred", alterColExpr.SchemaName);
@@ -149,6 +151,65 @@ namespace FluentMigrator.Tests.Unit.Builders
         public void SetExistingRowDefault_SettingNullableRemovesAlterColumn()
         {
             throw new NotImplementedException();
+        }
+
+        
+        [Test]
+        public void SetNullable_ToTrue()
+        {
+            VerifyColumnModification(h => h.SetNullable(true), c => c.IsNullable = true);
+        }
+
+        [Test]
+        public void SetNullable_ToFalse()
+        {
+            VerifyColumnModification(h => h.SetNullable(false), c => c.IsNullable = false);
+        }
+
+        [Test]
+        public void CallingUniqueSetsIsUniqueToTrue()
+        {
+            VerifyColumnModification(h => h.Unique(null), c => c.IsUnique = true);
+        }
+
+        [Test]
+        public void CallingUniqueAddsIndexExpressionToContext()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+            var builderMock = new Mock<IColumnExpressionBuilder>();
+            var contextMock = new Mock<IMigrationContext>();
+            builderMock.SetupGet(n => n.Column.ModificationType).Returns(ColumnModificationType.Create);
+            builderMock.SetupGet(n => n.Column.Name).Returns("BaconId");
+            builderMock.SetupGet(n => n.SchemaName).Returns("Eggs");
+            builderMock.SetupGet(n => n.TableName).Returns("Bacon");
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+
+            var helper = new ColumnExpressionBuilderHelper(builderMock.Object, contextMock.Object);
+            helper.Unique("IX_Bacon_BaconId");
+
+            collectionMock.Verify(x => x.Add(It.Is<CreateIndexExpression>(
+                ix => ix.Index.Name == "IX_Bacon_BaconId"
+                      && ix.Index.TableName == "Bacon"
+                      && ix.Index.SchemaName == "Eggs"
+                      && ix.Index.IsUnique
+                      && !ix.Index.IsClustered
+                      && ix.Index.Columns.All(c => c.Name == "BaconId")
+                                                 )));
+
+            contextMock.VerifyGet(x => x.Expressions);
+        }
+        
+        private void VerifyColumnModification(Action<ColumnExpressionBuilderHelper> helperCall, Action<ColumnDefinition> expectedAction)
+        {
+            var builderMock = new Mock<IColumnExpressionBuilder>();
+            var contextMock = new Mock<IMigrationContext>();
+            builderMock.SetupGet(n => n.Column.ModificationType).Returns(ColumnModificationType.Create);
+
+            var helper = new ColumnExpressionBuilderHelper(builderMock.Object, contextMock.Object);
+
+            helper.SetNullable(false);
+
+            builderMock.VerifySet(n => n.Column.IsNullable = false);
         }
     }
 }

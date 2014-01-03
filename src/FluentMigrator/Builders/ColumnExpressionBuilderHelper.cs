@@ -143,5 +143,29 @@ namespace FluentMigrator.Builders
                 };
             }
         }
+
+        public virtual void Unique(string indexName)
+        {
+            var column = _builder.Column;
+            column.IsUnique = true;
+
+            var index = new CreateIndexExpression
+            {
+                Index = new IndexDefinition
+                {
+                    Name = indexName,
+                    SchemaName = _builder.SchemaName,
+                    TableName = _builder.TableName,
+                    IsUnique = true
+                }
+            };
+
+            index.Index.Columns.Add(new IndexColumnDefinition
+            {
+                Name = _builder.Column.Name
+            });
+
+            _context.Expressions.Add(index);
+        }
     }
 }

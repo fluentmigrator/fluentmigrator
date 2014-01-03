@@ -201,31 +201,13 @@ namespace FluentMigrator.Builders.Alter.Table
 
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax Unique()
         {
-            return Unique(null);
+            ColumnHelper.Unique(null);
+            return this;
         }
 
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax Unique(string indexName)
         {
-            CurrentColumn.IsUnique = true;
-
-            var index = new CreateIndexExpression
-                            {
-                                Index = new IndexDefinition
-                                            {
-                                                Name = indexName,
-                                                SchemaName = Expression.SchemaName,
-                                                TableName = Expression.TableName,
-                                                IsUnique = true
-                                            }
-                            };
-
-            index.Index.Columns.Add(new IndexColumnDefinition
-                                        {
-                                            Name = CurrentColumn.Name
-                                        });
-
-            _context.Expressions.Add(index);
-
+            ColumnHelper.Unique(indexName);
             return this;
         }
 

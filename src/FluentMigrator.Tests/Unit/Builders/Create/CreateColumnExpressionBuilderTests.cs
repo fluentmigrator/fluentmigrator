@@ -397,76 +397,6 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [Test]
-        public void CallingUniqueSetsIsUniqueToTrue()
-        {
-            VerifyColumnProperty(c => c.IsUnique = true, b => b.Unique());
-        }
-
-        [Test]
-        public void CallingUniqueAddsIndexExpressionToContext()
-        {
-            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-
-            var contextMock = new Mock<IMigrationContext>();
-            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
-
-            var columnMock = new Mock<ColumnDefinition>();
-            columnMock.SetupGet(x => x.Name).Returns("BaconId");
-
-            var expressionMock = new Mock<CreateColumnExpression>();
-            expressionMock.SetupGet(x => x.SchemaName).Returns("Eggs");
-            expressionMock.SetupGet(x => x.TableName).Returns("Bacon");
-            expressionMock.SetupGet(x => x.Column).Returns(columnMock.Object);
-
-            var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
-
-            builder.Unique();
-
-            collectionMock.Verify(x => x.Add(It.Is<CreateIndexExpression>(
-                ix => ix.Index.Name == null
-                      && ix.Index.TableName == "Bacon"
-                      && ix.Index.SchemaName == "Eggs"
-                      && ix.Index.IsUnique
-                      && !ix.Index.IsClustered
-                      && ix.Index.Columns.All(c => c.Name == "BaconId")
-                                                 )));
-
-            contextMock.VerifyGet(x => x.Expressions);
-        }
-
-        [Test]
-        public void CallingUniqueNamedAddsIndexExpressionToContext()
-        {
-            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-
-            var contextMock = new Mock<IMigrationContext>();
-            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
-
-            var columnMock = new Mock<ColumnDefinition>();
-            columnMock.SetupGet(x => x.Name).Returns("BaconId");
-
-            var expressionMock = new Mock<CreateColumnExpression>();
-            expressionMock.SetupGet(x => x.SchemaName).Returns("Eggs");
-            expressionMock.SetupGet(x => x.TableName).Returns("Bacon");
-            expressionMock.SetupGet(x => x.Column).Returns(columnMock.Object);
-
-            var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
-
-            builder.Unique("IX_Bacon_BaconId");
-
-            collectionMock.Verify(x => x.Add(It.Is<CreateIndexExpression>(
-                ix => ix.Index.Name == "IX_Bacon_BaconId"
-                      && ix.Index.TableName == "Bacon"
-                      && ix.Index.SchemaName == "Eggs"
-                      && ix.Index.IsUnique
-                      && !ix.Index.IsClustered
-                      && ix.Index.Columns.All(c => c.Name == "BaconId")
-                                                 )));
-
-            contextMock.VerifyGet(x => x.Expressions);
-        }
-
-        [Test]
         public void CallingReferencesAddsNewForeignKeyExpressionToContext()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -638,6 +568,18 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         public void NotNullableUsesHelper()
         {
             VerifyColumnHelperCall(c => c.NotNullable(), h => h.SetNullable(false));
+        }
+
+        [Test]
+        public void UniqueUsesHelper()
+        {
+            VerifyColumnHelperCall(c => c.Unique(), h => h.Unique(null));
+        }
+
+        [Test]
+        public void NamedUniqueUsesHelper()
+        {
+            VerifyColumnHelperCall(c => c.Unique("asdf"), h => h.Unique("asdf"));
         }
 
         [Test]
