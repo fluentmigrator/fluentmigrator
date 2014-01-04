@@ -44,7 +44,7 @@ namespace FluentMigrator.Builders
 
         /// <summary>
         /// Either updates the IsNullable flag on the column, or creates/removes the SetNotNull expression, depending
-        /// on whether the column has an existing row default value.
+        /// on whether the column has a 'Set existing rows' expression.
         /// </summary>
         public virtual void SetNullable(bool isNullable)
         {
@@ -157,6 +157,28 @@ namespace FluentMigrator.Builders
                     SchemaName = _builder.SchemaName,
                     TableName = _builder.TableName,
                     IsUnique = true
+                }
+            };
+
+            index.Index.Columns.Add(new IndexColumnDefinition
+            {
+                Name = _builder.Column.Name
+            });
+
+            _context.Expressions.Add(index);
+        }
+
+        public virtual void Indexed(string indexName)
+        {
+            _builder.Column.IsIndexed = true;
+
+            var index = new CreateIndexExpression
+            {
+                Index = new IndexDefinition
+                {
+                    Name = indexName,
+                    SchemaName = _builder.SchemaName,
+                    TableName = _builder.TableName
                 }
             };
 

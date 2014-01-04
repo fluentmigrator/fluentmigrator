@@ -152,25 +152,7 @@ namespace FluentMigrator.Builders.Alter.Table
 
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax Indexed(string indexName)
         {
-            CurrentColumn.IsIndexed = true;
-
-            var index = new CreateIndexExpression
-                            {
-                                Index = new IndexDefinition
-                                            {
-                                                Name = indexName,
-                                                SchemaName = Expression.SchemaName,
-                                                TableName = Expression.TableName
-                                            }
-                            };
-
-            index.Index.Columns.Add(new IndexColumnDefinition
-                                        {
-                                            Name = CurrentColumn.Name
-                                        });
-
-            _context.Expressions.Add(index);
-
+            ColumnHelper.Indexed(indexName);
             return this;
         }
 

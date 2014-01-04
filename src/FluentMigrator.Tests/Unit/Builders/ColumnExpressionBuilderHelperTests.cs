@@ -198,7 +198,40 @@ namespace FluentMigrator.Tests.Unit.Builders
 
             contextMock.VerifyGet(x => x.Expressions);
         }
-        
+
+        [Test]
+        public void CallingIndexedNamedAddsIndexExpressionToContext()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+            var builderMock = new Mock<IColumnExpressionBuilder>();
+            var contextMock = new Mock<IMigrationContext>();
+            builderMock.SetupGet(n => n.Column.ModificationType).Returns(ColumnModificationType.Create);
+            builderMock.SetupGet(n => n.Column.Name).Returns("BaconId");
+            builderMock.SetupGet(n => n.SchemaName).Returns("Eggs");
+            builderMock.SetupGet(n => n.TableName).Returns("Bacon");
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+
+            var helper = new ColumnExpressionBuilderHelper(builderMock.Object, contextMock.Object);
+            helper.Indexed("IX_Bacon_BaconId");
+
+            collectionMock.Verify(x => x.Add(It.Is<CreateIndexExpression>(
+                ix => ix.Index.Name == "IX_Bacon_BaconId"
+                      && ix.Index.TableName == "Bacon"
+                      && ix.Index.SchemaName == "Eggs"
+                      && !ix.Index.IsUnique
+                      && !ix.Index.IsClustered
+                      && ix.Index.Columns.All(c => c.Name == "BaconId")
+                                                 )));
+
+            contextMock.VerifyGet(x => x.Expressions);
+        }
+
+        [Test]
+        public void CallingIndexedSetsIsIndexedToTrue()
+        {
+            VerifyColumnModification(h => h.Indexed(null), c => c.IsIndexed = true);
+        }
+
         private void VerifyColumnModification(Action<ColumnExpressionBuilderHelper> helperCall, Action<ColumnDefinition> expectedAction)
         {
             var builderMock = new Mock<IColumnExpressionBuilder>();
