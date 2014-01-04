@@ -127,9 +127,9 @@ namespace FluentMigrator.Builders.Alter.Table
             return this;
         }
 
-        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax DefaultExistingRowsTo(object value)
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax SetExistingRowsTo(object value)
         {
-           ColumnHelper.SetExistingRowDefaultValue(value);
+           ColumnHelper.SetExistingRowsTo(value);
            return this;
         }
 

@@ -26,6 +26,6 @@ namespace FluentMigrator.Builders.Alter.Table
         /// <summary>
         /// The value to set against existing rows for the new column.  Only used for creating columns, not altering them.
         /// </summary>
-        IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax DefaultExistingRowsTo(object value);
+        IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax SetExistingRowsTo(object value);
     }
 }

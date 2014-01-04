@@ -67,9 +67,9 @@ namespace FluentMigrator.Builders.Create.Column
             return this;
         }
 
-        public ICreateColumnOptionSyntax DefaultExistingRowsTo(object value)
+        public ICreateColumnOptionSyntax SetExistingRowsTo(object value)
         {
-            ColumnHelper.SetExistingRowDefaultValue(value);
+            ColumnHelper.SetExistingRowsTo(value);
             return this;
         }
 

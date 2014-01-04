@@ -14,7 +14,7 @@ namespace FluentMigrator.Tests.Unit.Builders
     public class ColumnExpressionBuilderHelperTests
     {
         [Test]
-        public void SetNotNullable_SetsColumnIfNoExistingRowDefault()
+        public void SetNotNullable_SetsColumnIfNotSettingExistingRowValues()
         {
             var builderMock = new Mock<IColumnExpressionBuilder>();
             var contextMock = new Mock<IMigrationContext>();
@@ -28,7 +28,7 @@ namespace FluentMigrator.Tests.Unit.Builders
         }
 
         [Test]
-        public void SetNotNullable_DoesntSetIfExistingRowDefault()
+        public void SetNotNullable_DoesntSetIfSettingExistingRowValues()
         {
             var builderMock = new Mock<IColumnExpressionBuilder>();
             var contextMock = new Mock<IMigrationContext>();
@@ -37,14 +37,14 @@ namespace FluentMigrator.Tests.Unit.Builders
 
             var helper = new ColumnExpressionBuilderHelper(builderMock.Object, contextMock.Object);
 
-            helper.SetExistingRowDefaultValue("test");
+            helper.SetExistingRowsTo("test");
             helper.SetNullable(false);
 
             builderMock.VerifySet(n => n.Column.IsNullable = false, Times.Never());
         }
 
         [Test]
-        public void SetExistingRowDefault_AddsAllRowsExpression()
+        public void SetExistingRows_AddsAllRowsExpression()
         {
             var builderMock = new Mock<IColumnExpressionBuilder>();
             var contextMock = new Mock<IMigrationContext>();
@@ -60,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Builders
 
             var helper = new ColumnExpressionBuilderHelper(builderMock.Object, contextMock.Object);
 
-            helper.SetExistingRowDefaultValue(5);
+            helper.SetExistingRowsTo(5);
 
             contextMock.Verify(n => n.Expressions.Add(It.IsAny<IMigrationExpression>()), Times.Once());
 
@@ -77,7 +77,7 @@ namespace FluentMigrator.Tests.Unit.Builders
         }
 
         [Test]
-        public void SetExistingRowDefault_IgnoredIfAlterColumn()
+        public void SetExistingRows_IgnoredIfAlterColumn()
         {
             var builderMock = new Mock<IColumnExpressionBuilder>();
             var contextMock = new Mock<IMigrationContext>();
@@ -86,13 +86,13 @@ namespace FluentMigrator.Tests.Unit.Builders
 
             var helper = new ColumnExpressionBuilderHelper(builderMock.Object, contextMock.Object);
 
-            helper.SetExistingRowDefaultValue("test");
+            helper.SetExistingRowsTo("test");
 
             contextMock.Verify(n => n.Expressions.Add(It.IsAny<IMigrationExpression>()), Times.Never());
         }
 
         [Test]
-        public void SetExistingRowDefault_AfterNotNullableAddsAlterColumnExpression()
+        public void SetExistingRows_AfterNotNullableAddsAlterColumnExpression()
         {
             var builderMock = new Mock<IColumnExpressionBuilder>();
             var contextMock = new Mock<IMigrationContext>();
@@ -109,7 +109,7 @@ namespace FluentMigrator.Tests.Unit.Builders
             var helper = new ColumnExpressionBuilderHelper(builderMock.Object, contextMock.Object);
 
             helper.SetNullable(false);
-            helper.SetExistingRowDefaultValue(5);
+            helper.SetExistingRowsTo(5);
 
             Assert.AreEqual(2, addedExpressions.Count);
             Assert.IsInstanceOf<UpdateDataExpression>(addedExpressions[0]);
@@ -129,7 +129,7 @@ namespace FluentMigrator.Tests.Unit.Builders
         }
 
         [Test]
-        public void SetExistingRowDefault_AfterNotNullableSetsOriginalColumnNullable()
+        public void SetExistingRows_AfterNotNullableSetsOriginalColumnNullable()
         {
             var builderMock = new Mock<IColumnExpressionBuilder>();
             var contextMock = new Mock<IMigrationContext>();
@@ -140,15 +140,15 @@ namespace FluentMigrator.Tests.Unit.Builders
             var helper = new ColumnExpressionBuilderHelper(builderMock.Object, contextMock.Object);
 
             helper.SetNullable(false);
-            helper.SetExistingRowDefaultValue(5);
+            helper.SetExistingRowsTo(5);
 
             //Check that column is nullable.  This is because a later alter column statement will mark it non nullable.
             builderMock.VerifySet(n => n.Column.IsNullable = true);
         }
 
         //Will this ever happen?  It should handle it, but need to test that if users goes
-        // .Nullable().ExistingRowsDefaultTo(5).NotNullable() it will be handled.
-        public void SetExistingRowDefault_SettingNullableRemovesAlterColumn()
+        // .Nullable().SetExistingRowsTo(5).NotNullable() it will be handled.
+        public void SetExistingRows_SettingNullableRemovesAlterColumn()
         {
             throw new NotImplementedException();
         }

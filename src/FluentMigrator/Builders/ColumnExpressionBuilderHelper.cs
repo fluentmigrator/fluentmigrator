@@ -20,15 +20,15 @@ namespace FluentMigrator.Builders
         /// For each distinct column which has an existing row default, an instance of this
         /// will be stored in the _expressionsByColumn.
         /// </summary>
-        private class ExistingRowData
+        private class ExistingRowsData
         {
-            public UpdateDataExpression SetExistingRowExpression;
+            public UpdateDataExpression SetExistingRowsExpression;
             public AlterColumnExpression SetColumnNotNullableExpression;
         }
 
         private IColumnExpressionBuilder _builder;
         private IMigrationContext _context;
-        private Dictionary<ColumnDefinition, ExistingRowData> _existingRowDataByColumn { get; set; }
+        private Dictionary<ColumnDefinition, ExistingRowsData> _existingRowsDataByColumn { get; set; }
 
         /// <summary>
         /// For easy mockability only.
@@ -39,7 +39,7 @@ namespace FluentMigrator.Builders
         {
             _builder = builder;
             _context = context;
-            _existingRowDataByColumn = new Dictionary<ColumnDefinition, ExistingRowData>();
+            _existingRowsDataByColumn = new Dictionary<ColumnDefinition, ExistingRowsData>();
         }
 
         /// <summary>
@@ -49,10 +49,10 @@ namespace FluentMigrator.Builders
         public virtual void SetNullable(bool isNullable)
         {
             var column = _builder.Column;
-            ExistingRowData exRowExpr;
-            if (_existingRowDataByColumn.TryGetValue(column, out exRowExpr))
+            ExistingRowsData exRowExpr;
+            if (_existingRowsDataByColumn.TryGetValue(column, out exRowExpr))
             {
-                if (exRowExpr.SetExistingRowExpression != null)
+                if (exRowExpr.SetExistingRowsExpression != null)
                 {
                     if (isNullable)
                     {
@@ -106,7 +106,7 @@ namespace FluentMigrator.Builders
         /// Adds the existing row default value.  If the column has a value for IsNullable, this will also
         /// call SetNullable to create the expression, and will then set the column IsNullable to false.
         /// </summary>
-        public virtual void SetExistingRowDefaultValue(object existingRowDefaultValue)
+        public virtual void SetExistingRowsTo(object existingRowValue)
         {
             //TODO: validate that 'value' isn't set to null for non nullable columns.  If set to
             //null, maybe just remove the expressions?.. not sure of best way to handle this.
@@ -116,30 +116,30 @@ namespace FluentMigrator.Builders
             {
                 //ensure an UpdateDataExpression is created and cached for this column
 
-                ExistingRowData exRowExpr;
-                if (!_existingRowDataByColumn.TryGetValue(column, out exRowExpr))
+                ExistingRowsData exRowExpr;
+                if (!_existingRowsDataByColumn.TryGetValue(column, out exRowExpr))
                 {
-                    exRowExpr = new ExistingRowData();
-                    _existingRowDataByColumn.Add(column, exRowExpr);
+                    exRowExpr = new ExistingRowsData();
+                    _existingRowsDataByColumn.Add(column, exRowExpr);
                 }
 
-                if (exRowExpr.SetExistingRowExpression == null)
+                if (exRowExpr.SetExistingRowsExpression == null)
                 {
-                    exRowExpr.SetExistingRowExpression = new UpdateDataExpression
+                    exRowExpr.SetExistingRowsExpression = new UpdateDataExpression
                     {
                         TableName = _builder.TableName,
                         SchemaName = _builder.SchemaName,
                         IsAllRows = true,
                     };
-                    _context.Expressions.Add(exRowExpr.SetExistingRowExpression);
+                    _context.Expressions.Add(exRowExpr.SetExistingRowsExpression);
 
                     //Call SetNullable, to ensure that not-null columns are correctly set to 
                     //not null after existing rows have data populated.
                     SetNullable(column.IsNullable ?? true);
                 }
 
-                exRowExpr.SetExistingRowExpression.Set = new List<KeyValuePair<string, object>>  {
-                   new KeyValuePair<string, object>(column.Name, existingRowDefaultValue)
+                exRowExpr.SetExistingRowsExpression.Set = new List<KeyValuePair<string, object>>  {
+                   new KeyValuePair<string, object>(column.Name, existingRowValue)
                 };
             }
         }

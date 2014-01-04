@@ -28,7 +28,6 @@ namespace FluentMigrator.Model
         public ColumnDefinition()
         {
             DefaultValue = new UndefinedDefaultValue();
-            ExistingRowDefaultValue = new UndefinedDefaultValue();
         }
 
         public readonly Dictionary<string, object> _additionalFeatures = new Dictionary<string, object>();
@@ -49,12 +48,6 @@ namespace FluentMigrator.Model
         public virtual string TableName { get; set; }
         public virtual ColumnModificationType ModificationType { get; set; }
         public virtual string ColumnDescription { get; set; }
-        /// <summary>
-        /// Only used if this is a 'create' type col def.  If this is not an
-        /// UndefinedDefaultValue, the column will have it's values set to this
-        /// after creation.
-        /// </summary>
-        public virtual object ExistingRowDefaultValue { get; set; }
 
         public void ApplyConventions(IMigrationConventions conventions)
         {

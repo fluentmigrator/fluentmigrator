@@ -583,9 +583,9 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [Test]
-        public void ExistingRowDefaultsUsesHelper()
+        public void SetExistingRowsUsesHelper()
         {
-            VerifyColumnHelperCall(c => c.DefaultExistingRowsTo("test"), h => h.SetExistingRowDefaultValue("test"));
+            VerifyColumnHelperCall(c => c.SetExistingRowsTo("test"), h => h.SetExistingRowsTo("test"));
         }
 
         private void VerifyColumnHelperCall(Action<CreateColumnExpressionBuilder> callToTest, System.Linq.Expressions.Expression<Action<ColumnExpressionBuilderHelper>> expectedHelperAction)

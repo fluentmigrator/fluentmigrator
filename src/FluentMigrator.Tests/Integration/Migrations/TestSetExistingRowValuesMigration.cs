@@ -11,7 +11,7 @@ namespace FluentMigrator.Tests.Integration.Migrations
              .AddColumn("LastLoginDate")
              .AsDateTime()
              .NotNullable()
-             .DefaultExistingRowsTo(DateTime.Today);
+             .SetExistingRowsTo(DateTime.Today);
       }
 
       public override void Down()

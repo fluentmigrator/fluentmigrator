@@ -23,6 +23,6 @@ namespace FluentMigrator.Builders.Create.Column
         /// <summary>
         /// The value to set against existing rows for the new column.
         /// </summary>
-        ICreateColumnOptionSyntax DefaultExistingRowsTo(object value);
+        ICreateColumnOptionSyntax SetExistingRowsTo(object value);
     }
 }
