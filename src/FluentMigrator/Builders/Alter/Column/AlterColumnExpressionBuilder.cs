@@ -164,25 +164,7 @@ namespace FluentMigrator.Builders.Alter.Column
         public IAlterColumnOptionOrForeignKeyCascadeSyntax ForeignKey(string foreignKeyName, string primaryTableSchema, string primaryTableName,
                                                                       string primaryColumnName)
         {
-            Expression.Column.IsForeignKey = true;
-
-            var fk = new CreateForeignKeyExpression
-                         {
-                             ForeignKey = new ForeignKeyDefinition
-                                              {
-                                                  Name = foreignKeyName,
-                                                  PrimaryTable = primaryTableName,
-                                                  PrimaryTableSchema = primaryTableSchema,
-                                                  ForeignTable = Expression.TableName,
-                                                  ForeignTableSchema = Expression.SchemaName
-                                              }
-                         };
-
-            fk.ForeignKey.PrimaryColumns.Add(primaryColumnName);
-            fk.ForeignKey.ForeignColumns.Add(Expression.Column.Name);
-
-            _context.Expressions.Add(fk);
-            CurrentForeignKey = fk.ForeignKey;
+            CurrentForeignKey = ColumnHelper.ForeignKey(foreignKeyName, primaryTableSchema, primaryTableName, primaryColumnName);
             return this;
         }
 
@@ -199,23 +181,7 @@ namespace FluentMigrator.Builders.Alter.Column
         public IAlterColumnOptionOrForeignKeyCascadeSyntax ReferencedBy(string foreignKeyName, string foreignTableSchema, string foreignTableName,
                                                                         string foreignColumnName)
         {
-            var fk = new CreateForeignKeyExpression
-                         {
-                             ForeignKey = new ForeignKeyDefinition
-                                              {
-                                                  Name = foreignKeyName,
-                                                  PrimaryTable = Expression.TableName,
-                                                  PrimaryTableSchema = Expression.SchemaName,
-                                                  ForeignTable = foreignTableName,
-                                                  ForeignTableSchema = foreignTableSchema
-                                              }
-                         };
-
-            fk.ForeignKey.PrimaryColumns.Add(Expression.Column.Name);
-            fk.ForeignKey.ForeignColumns.Add(foreignColumnName);
-
-            _context.Expressions.Add(fk);
-            CurrentForeignKey = fk.ForeignKey;
+            CurrentForeignKey = ColumnHelper.ReferencedBy(foreignKeyName, foreignTableSchema, foreignTableName, foreignColumnName);
             return this;
         }
 
@@ -235,23 +201,8 @@ namespace FluentMigrator.Builders.Alter.Column
         public IAlterColumnOptionSyntax References(string foreignKeyName, string foreignTableSchema, string foreignTableName,
                                                    IEnumerable<string> foreignColumnNames)
         {
-            var fk = new CreateForeignKeyExpression
-                         {
-                             ForeignKey = new ForeignKeyDefinition
-                                              {
-                                                  Name = foreignKeyName,
-                                                  PrimaryTable = Expression.TableName,
-                                                  PrimaryTableSchema = Expression.SchemaName,
-                                                  ForeignTable = foreignTableName,
-                                                  ForeignTableSchema = foreignTableSchema
-                                              }
-                         };
-
-            fk.ForeignKey.PrimaryColumns.Add(Expression.Column.Name);
-            foreach (var foreignColumnName in foreignColumnNames)
-                fk.ForeignKey.ForeignColumns.Add(foreignColumnName);
-
-            _context.Expressions.Add(fk);
+            //When this method is removed, remove ColumnHelper.References as well.
+            ColumnHelper.References(foreignKeyName, foreignTableSchema, foreignTableName, foreignColumnNames);
             return this;
         }
 

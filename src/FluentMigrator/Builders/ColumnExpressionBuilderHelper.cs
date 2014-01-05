@@ -189,5 +189,77 @@ namespace FluentMigrator.Builders
 
             _context.Expressions.Add(index);
         }
+
+        public virtual ForeignKeyDefinition ForeignKey(string foreignKeyName, string primaryTableSchema, 
+            string primaryTableName, string primaryColumnName)
+        {
+            _builder.Column.IsForeignKey = true;
+
+            var fk = new CreateForeignKeyExpression
+            {
+                ForeignKey = new ForeignKeyDefinition
+                {
+                    Name = foreignKeyName,
+                    PrimaryTable = primaryTableName,
+                    PrimaryTableSchema = primaryTableSchema,
+                    ForeignTable = _builder.TableName,
+                    ForeignTableSchema = _builder.SchemaName
+                }
+            };
+
+            fk.ForeignKey.PrimaryColumns.Add(primaryColumnName);
+            fk.ForeignKey.ForeignColumns.Add(_builder.Column.Name);
+
+            _context.Expressions.Add(fk);
+            return fk.ForeignKey;  
+        }
+
+        //Can this be merged with ForeignKey()?  essentially they're just doing the same thing in reverse to each other.
+        public virtual ForeignKeyDefinition ReferencedBy(string foreignKeyName, string foreignTableSchema, 
+            string foreignTableName, string foreignColumnName)
+        {
+            var fk = new CreateForeignKeyExpression
+            {
+                ForeignKey = new ForeignKeyDefinition
+                {
+                    Name = foreignKeyName,
+                    PrimaryTable = _builder.TableName,
+                    PrimaryTableSchema = _builder.SchemaName,
+                    ForeignTable = foreignTableName,
+                    ForeignTableSchema = foreignTableSchema
+                }
+            };
+
+            fk.ForeignKey.PrimaryColumns.Add(_builder.Column.Name);
+            fk.ForeignKey.ForeignColumns.Add(foreignColumnName);
+
+            _context.Expressions.Add(fk);
+            return fk.ForeignKey;
+        }
+
+        /// <summary>
+        /// Supports the Obsolete 'References' fluent command.  Remove this when that command is removed.
+        /// </summary>
+        public virtual void References(string foreignKeyName, string foreignTableSchema, string foreignTableName,
+                                                   IEnumerable<string> foreignColumnNames)
+        {
+            var fk = new CreateForeignKeyExpression
+            {
+                ForeignKey = new ForeignKeyDefinition
+                {
+                    Name = foreignKeyName,
+                    PrimaryTable = _builder.TableName,
+                    PrimaryTableSchema = _builder.SchemaName,
+                    ForeignTable = foreignTableName,
+                    ForeignTableSchema = foreignTableSchema
+                }
+            };
+
+            fk.ForeignKey.PrimaryColumns.Add(_builder.Column.Name);
+            foreach (var foreignColumnName in foreignColumnNames)
+                fk.ForeignKey.ForeignColumns.Add(foreignColumnName);
+
+            _context.Expressions.Add(fk);
+        }
     }
 }

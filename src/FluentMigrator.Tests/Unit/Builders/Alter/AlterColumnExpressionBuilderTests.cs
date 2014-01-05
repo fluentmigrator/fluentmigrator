@@ -305,44 +305,6 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
         }
 
         [Test]
-        public void CallingForeignKeyAddsNewForeignKeyExpressionToContext()
-        {
-            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-
-            var contextMock = new Mock<IMigrationContext>();
-            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
-
-            var columnMock = new Mock<ColumnDefinition>();
-            columnMock.SetupGet(x => x.Name).Returns("BaconId");
-
-            var expressionMock = new Mock<AlterColumnExpression>();
-            expressionMock.SetupGet(x => x.TableName).Returns("Bacon");
-            expressionMock.SetupGet(x => x.Column).Returns(columnMock.Object);
-
-            var builder = new AlterColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
-
-            builder.ForeignKey("fk_foo", "FooTable", "BarColumn");
-
-            collectionMock.Verify(x => x.Add(It.Is<CreateForeignKeyExpression>(
-                fk => fk.ForeignKey.Name == "fk_foo" &&
-                      fk.ForeignKey.PrimaryTable == "FooTable" &&
-                      fk.ForeignKey.PrimaryColumns.Contains("BarColumn") &&
-                      fk.ForeignKey.PrimaryColumns.Count == 1 &&
-                      fk.ForeignKey.ForeignTable == "Bacon" &&
-                      fk.ForeignKey.ForeignColumns.Contains("BaconId") &&
-                      fk.ForeignKey.ForeignColumns.Count == 1
-                                                 )));
-
-            contextMock.VerifyGet(x => x.Expressions);
-        }
-
-        [Test]
-        public void CallingForeignKeySetsIsForeignKeyToTrue()
-        {
-            VerifyColumnProperty(c => c.IsForeignKey = true, b => b.ForeignKey());
-        }
-
-        [Test]
         public void CallingIdentitySetsIsIdentityToTrue()
         {
             VerifyColumnProperty(c => c.IsIdentity = true, b => b.Identity());
@@ -405,6 +367,40 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
         }
 
         [Test]
+        public void CallingReferencedByCallsHelper()
+        {
+            VerifyColumnHelperCall(c => c.ReferencedBy("fkn", "fts", "ftn", "fcn"), h => h.ReferencedBy("fkn", "fts", "ftn", "fcn"));
+        }
+
+        [Test]
+        public void CallingReferencedBySetsCurrentFK()
+        {
+            var foriegnKeyDef = new ForeignKeyDefinition();
+            VerifyColumnHelperWithSetup(
+                c => c.ReferencedBy("fkn", "fts", "ftn", "fcn"), //Call to test
+                hm => hm.Setup(n => n.ReferencedBy("fkn", "fts", "ftn", "fcn")).Returns(foriegnKeyDef), //helper setup
+                (hm, builder) => Assert.AreSame(foriegnKeyDef, builder.CurrentForeignKey) //helper verification
+            );
+        }
+
+        [Test]
+        public void CallingForeignKeyCallsHelper()
+        {
+            VerifyColumnHelperCall(c => c.ForeignKey("fkn", "pts", "ptn", "pcn"), h => h.ForeignKey("fkn", "pts", "ptn", "pcn"));
+        }
+
+        [Test]
+        public void CallingForeignKeySetsCurrentFK()
+        {
+            var foriegnKeyDef = new ForeignKeyDefinition();
+            VerifyColumnHelperWithSetup(
+                c => c.ForeignKey("fkn", "pts", "ptn", "pcn"), //Call to test
+                hm => hm.Setup(n => n.ForeignKey("fkn", "pts", "ptn", "pcn")).Returns(foriegnKeyDef), //helper setup
+                (hm, builder) => Assert.AreSame(foriegnKeyDef, builder.CurrentForeignKey) //helper verification
+            );
+        }
+
+        [Test]
         public void CallingOnTableSetsTableName()
         {
             var expressionMock = new Mock<AlterColumnExpression>();
@@ -421,38 +417,6 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
         public void CallingPrimaryKeySetsIsPrimaryKeyToTrue()
         {
             VerifyColumnProperty(c => c.IsPrimaryKey = true, b => b.PrimaryKey());
-        }
-
-        [Test]
-        public void CallingReferencedByAddsNewForeignKeyExpressionToContext()
-        {
-            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-
-            var contextMock = new Mock<IMigrationContext>();
-            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
-
-            var columnMock = new Mock<ColumnDefinition>();
-            columnMock.SetupGet(x => x.Name).Returns("BaconId");
-
-            var expressionMock = new Mock<AlterColumnExpression>();
-            expressionMock.SetupGet(x => x.TableName).Returns("Bacon");
-            expressionMock.SetupGet(x => x.Column).Returns(columnMock.Object);
-
-            var builder = new AlterColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
-
-            builder.ReferencedBy("fk_foo", "FooTable", "BarColumn");
-
-            collectionMock.Verify(x => x.Add(It.Is<CreateForeignKeyExpression>(
-                fk => fk.ForeignKey.Name == "fk_foo" &&
-                      fk.ForeignKey.ForeignTable == "FooTable" &&
-                      fk.ForeignKey.ForeignColumns.Contains("BarColumn") &&
-                      fk.ForeignKey.ForeignColumns.Count == 1 &&
-                      fk.ForeignKey.PrimaryTable == "Bacon" &&
-                      fk.ForeignKey.PrimaryColumns.Contains("BaconId") &&
-                      fk.ForeignKey.PrimaryColumns.Count == 1
-                                                 )));
-
-            contextMock.VerifyGet(x => x.Expressions);
         }
 
         [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
@@ -574,16 +538,27 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
 
         private void VerifyColumnHelperCall(Action<AlterColumnExpressionBuilder> callToTest, System.Linq.Expressions.Expression<Action<ColumnExpressionBuilderHelper>> expectedHelperAction)
         {
+            VerifyColumnHelperWithSetup(callToTest, null, (hm, builder) => hm.Verify(expectedHelperAction));
+        }
+
+        private void VerifyColumnHelperWithSetup(
+            Action<AlterColumnExpressionBuilder> callToTest,
+            Action<Mock<ColumnExpressionBuilderHelper>> helperSetup,
+            Action<Mock<ColumnExpressionBuilderHelper>, AlterColumnExpressionBuilder> helperVerify)
+        {
             var expressionMock = new Mock<AlterColumnExpression>();
             var contextMock = new Mock<IMigrationContext>();
             var helperMock = new Mock<ColumnExpressionBuilderHelper>();
+
+            if (helperSetup != null)
+                helperSetup(helperMock);
 
             var builder = new AlterColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
             builder.ColumnHelper = helperMock.Object;
 
             callToTest(builder);
 
-            helperMock.Verify(expectedHelperAction);
+            helperVerify(helperMock, builder);
         }
     }
 }

@@ -175,61 +175,140 @@ namespace FluentMigrator.Tests.Unit.Builders
         [Test]
         public void CallingUniqueAddsIndexExpressionToContext()
         {
-            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-            var builderMock = new Mock<IColumnExpressionBuilder>();
-            var contextMock = new Mock<IMigrationContext>();
-            builderMock.SetupGet(n => n.Column.ModificationType).Returns(ColumnModificationType.Create);
-            builderMock.SetupGet(n => n.Column.Name).Returns("BaconId");
-            builderMock.SetupGet(n => n.SchemaName).Returns("Eggs");
-            builderMock.SetupGet(n => n.TableName).Returns("Bacon");
-            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
-
-            var helper = new ColumnExpressionBuilderHelper(builderMock.Object, contextMock.Object);
-            helper.Unique("IX_Bacon_BaconId");
-
-            collectionMock.Verify(x => x.Add(It.Is<CreateIndexExpression>(
-                ix => ix.Index.Name == "IX_Bacon_BaconId"
-                      && ix.Index.TableName == "Bacon"
-                      && ix.Index.SchemaName == "Eggs"
-                      && ix.Index.IsUnique
-                      && !ix.Index.IsClustered
-                      && ix.Index.Columns.All(c => c.Name == "BaconId")
-                                                 )));
-
-            contextMock.VerifyGet(x => x.Expressions);
+            VerifyActionAddsExpression(
+                h => h.Unique("IX_Bacon_BaconId"), 
+                collectionMock => collectionMock.Verify(x => x.Add(It.Is<CreateIndexExpression>(
+                    ix => ix.Index.Name == "IX_Bacon_BaconId"
+                          && ix.Index.TableName == "Bacon"
+                          && ix.Index.SchemaName == "Eggs"
+                          && ix.Index.IsUnique
+                          && !ix.Index.IsClustered
+                          && ix.Index.Columns.All(c => c.Name == "BaconId")
+                    )))
+            );
         }
 
         [Test]
         public void CallingIndexedNamedAddsIndexExpressionToContext()
         {
-            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-            var builderMock = new Mock<IColumnExpressionBuilder>();
-            var contextMock = new Mock<IMigrationContext>();
-            builderMock.SetupGet(n => n.Column.ModificationType).Returns(ColumnModificationType.Create);
-            builderMock.SetupGet(n => n.Column.Name).Returns("BaconId");
-            builderMock.SetupGet(n => n.SchemaName).Returns("Eggs");
-            builderMock.SetupGet(n => n.TableName).Returns("Bacon");
-            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
-
-            var helper = new ColumnExpressionBuilderHelper(builderMock.Object, contextMock.Object);
-            helper.Indexed("IX_Bacon_BaconId");
-
-            collectionMock.Verify(x => x.Add(It.Is<CreateIndexExpression>(
-                ix => ix.Index.Name == "IX_Bacon_BaconId"
-                      && ix.Index.TableName == "Bacon"
-                      && ix.Index.SchemaName == "Eggs"
-                      && !ix.Index.IsUnique
-                      && !ix.Index.IsClustered
-                      && ix.Index.Columns.All(c => c.Name == "BaconId")
-                                                 )));
-
-            contextMock.VerifyGet(x => x.Expressions);
+            VerifyActionAddsExpression(
+                h => h.Indexed("IX_Bacon_BaconId"),
+                collectionMock => collectionMock.Verify(x => x.Add(It.Is<CreateIndexExpression>(
+                    ix => ix.Index.Name == "IX_Bacon_BaconId"
+                          && ix.Index.TableName == "Bacon"
+                          && ix.Index.SchemaName == "Eggs"
+                          && !ix.Index.IsUnique
+                          && !ix.Index.IsClustered
+                          && ix.Index.Columns.All(c => c.Name == "BaconId")
+                    )))
+            );
         }
 
         [Test]
         public void CallingIndexedSetsIsIndexedToTrue()
         {
             VerifyColumnModification(h => h.Indexed(null), c => c.IsIndexed = true);
+        }
+
+        [Test]
+        public void CallingReferencesAddsNewForeignKeyExpressionToContext()
+        {
+            VerifyActionAddsExpression(
+                h => h.References("fk_foo", "FooSchema", "FooTable", new[] { "BarColumn" }),
+                collectionMock => collectionMock.Verify(x => x.Add(It.Is<CreateForeignKeyExpression>(
+                    fk => fk.ForeignKey.Name == "fk_foo" &&
+                            fk.ForeignKey.ForeignTableSchema == "FooSchema" &&
+                            fk.ForeignKey.ForeignTable == "FooTable" &&
+                            fk.ForeignKey.ForeignColumns.Contains("BarColumn") &&
+                            fk.ForeignKey.ForeignColumns.Count == 1 &&
+                            fk.ForeignKey.PrimaryTable == "Bacon" &&
+                            fk.ForeignKey.PrimaryColumns.Contains("BaconId") &&
+                            fk.ForeignKey.PrimaryColumns.Count == 1
+                    )))
+            );
+        }
+
+        [Test]
+        public void CallingReferencedByAddsNewForeignKeyExpressionToContext()
+        {
+            VerifyActionAddsExpression(
+                h => h.ReferencedBy("fk_foo", "FooSchema", "FooTable", "BarColumn"),
+                collectionMock => collectionMock.Verify(x => x.Add(It.Is<CreateForeignKeyExpression>(
+                    fk => fk.ForeignKey.Name == "fk_foo" &&
+                            fk.ForeignKey.ForeignTableSchema == "FooSchema" &&
+                            fk.ForeignKey.ForeignTable == "FooTable" &&
+                            fk.ForeignKey.ForeignColumns.Contains("BarColumn") &&
+                            fk.ForeignKey.ForeignColumns.Count == 1 &&
+                            fk.ForeignKey.PrimaryTable == "Bacon" &&
+                            fk.ForeignKey.PrimaryColumns.Contains("BaconId") &&
+                            fk.ForeignKey.PrimaryColumns.Count == 1
+                    )))
+            );
+        }
+
+        [Test]
+        public void CallingReferencedBySetsIsFK()
+        {
+            VerifyColumnModification(h => h.ReferencedBy("fk_foo", "FooSchema", "FooTable", "BarColumn"), c => c.IsForeignKey = true);
+        }
+
+        [Test]
+        public void CallingReferencedByReturnsFKDefinition()
+        {
+            CreateForeignKeyExpression addedExpr = null;
+            var builderMock = new Mock<IColumnExpressionBuilder>();
+            var contextMock = new Mock<IMigrationContext>();
+            builderMock.SetupGet(n => n.Column.Name).Returns("BaconId");
+            builderMock.SetupGet(n => n.SchemaName).Returns("Eggs");
+            builderMock.SetupGet(n => n.TableName).Returns("Bacon");
+            contextMock
+                .Setup(x => x.Expressions.Add(It.IsAny<IMigrationExpression>()))
+                .Callback((IMigrationExpression ex) => addedExpr = ex as CreateForeignKeyExpression);
+
+            var helper = new ColumnExpressionBuilderHelper(builderMock.Object, contextMock.Object);
+            var def = helper.ReferencedBy("fk_foo", "FooSchema", "FooTable", "BarColumn");
+
+            Assert.IsNotNull(def);
+            Assert.AreSame(def, addedExpr.ForeignKey);
+        }
+
+        [Test]
+        public void CallingForeignKeyAddsNewForeignKeyExpressionToContext()
+        {
+            VerifyActionAddsExpression(
+                h => h.ForeignKey("fk_foo", "FooSchema", "FooTable", "BarColumn"),
+                collectionMock => collectionMock.Verify(x => x.Add(It.Is<CreateForeignKeyExpression>(
+                    fk => fk.ForeignKey.Name == "fk_foo" &&
+                            fk.ForeignKey.ForeignTableSchema == "Eggs" &&
+                            fk.ForeignKey.ForeignTable == "Bacon" &&
+                            fk.ForeignKey.ForeignColumns.Contains("BaconId") &&
+                            fk.ForeignKey.ForeignColumns.Count == 1 &&
+                            fk.ForeignKey.PrimaryTableSchema == "FooSchema" &&
+                            fk.ForeignKey.PrimaryTable == "FooTable" &&
+                            fk.ForeignKey.PrimaryColumns.Contains("BarColumn") &&
+                            fk.ForeignKey.PrimaryColumns.Count == 1
+                    )))
+            );
+        }
+
+        [Test]
+        public void CallingForeignKeyReturnsFKDefinition()
+        {
+            CreateForeignKeyExpression addedExpr = null;
+            var builderMock = new Mock<IColumnExpressionBuilder>();
+            var contextMock = new Mock<IMigrationContext>();
+            builderMock.SetupGet(n => n.Column.Name).Returns("BaconId");
+            builderMock.SetupGet(n => n.SchemaName).Returns("Eggs");
+            builderMock.SetupGet(n => n.TableName).Returns("Bacon");
+            contextMock
+                .Setup(x => x.Expressions.Add(It.IsAny<IMigrationExpression>()))
+                .Callback((IMigrationExpression ex) => addedExpr = ex as CreateForeignKeyExpression);
+
+            var helper = new ColumnExpressionBuilderHelper(builderMock.Object, contextMock.Object);
+            var def = helper.ForeignKey("fk_foo", "FooSchema", "FooTable", "BarColumn");
+
+            Assert.IsNotNull(def);
+            Assert.AreSame(def, addedExpr.ForeignKey);
         }
 
         private void VerifyColumnModification(Action<ColumnExpressionBuilderHelper> helperCall, Action<ColumnDefinition> expectedAction)
@@ -243,6 +322,28 @@ namespace FluentMigrator.Tests.Unit.Builders
             helper.SetNullable(false);
 
             builderMock.VerifySet(n => n.Column.IsNullable = false);
+        }
+
+        /// <summary>
+        /// Sets up mocks to call the helper with a schema of 'Eggs', Table of 'Bacon' and column name of 'BaconId'.
+        /// </summary>
+        private void VerifyActionAddsExpression(Action<ColumnExpressionBuilderHelper> helperCall, 
+            Action<Mock<ICollection<IMigrationExpression>>> verifyCollectionMock)
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+            var builderMock = new Mock<IColumnExpressionBuilder>();
+            var contextMock = new Mock<IMigrationContext>();
+            builderMock.SetupGet(n => n.Column.Name).Returns("BaconId");
+            builderMock.SetupGet(n => n.SchemaName).Returns("Eggs");
+            builderMock.SetupGet(n => n.TableName).Returns("Bacon");
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+
+            var helper = new ColumnExpressionBuilderHelper(builderMock.Object, contextMock.Object);
+            helperCall(helper);
+
+            contextMock.VerifyGet(x => x.Expressions);
+
+            verifyCollectionMock(collectionMock);
         }
     }
 }
