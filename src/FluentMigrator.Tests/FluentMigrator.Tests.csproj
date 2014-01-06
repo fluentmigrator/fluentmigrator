@@ -235,6 +235,11 @@
     <Compile Include="Integration\SchemaDump\SchemaTestWriter.cs" />
     <Compile Include="Integration\VersionMigrationTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Unit\AnnouncerExtensionsTests.cs" />
     <Compile Include="Unit\Announcers\AnnouncerTests.cs" />
     <Compile Include="Unit\Announcers\TextWriterAnnouncerTests.cs" />
@@ -388,6 +393,7 @@
     <Compile Include="Unit\Generators\SqlServerCe\SqlServerCeTableTests.cs" />
     <Compile Include="Unit\Initialization\ConnectionStringManagerTests.cs" />
     <Compile Include="Unit\Initialization\NetConfigManagerTests.cs" />
+    <Compile Include="Unit\MigrationDescriptionAttributeTests.cs" />
     <Compile Include="Unit\MigrationInfoTests.cs" />
     <Compile Include="Unit\MigrationRunnerTests.cs" />
     <Compile Include="Unit\ProfileLoaderTests.cs" />
@@ -464,6 +470,13 @@
   <ItemGroup>
     <EmbeddedResource Include="EmbeddedResources\Embeddedtestscript.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Properties\Resources.de-DE.resx" />
+    <EmbeddedResource Include="Properties\Resources.en.resx" />
+    <EmbeddedResource Include="Properties\Resources.it-IT.resx" />
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
