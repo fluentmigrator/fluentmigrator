@@ -1,11 +1,12 @@
 using System.Reflection;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Runner
 {
     public interface IMigrationRunner : IMigrationScopeStarter
     {
         IMigrationProcessor Processor { get; }
-        Assembly MigrationAssembly { get; }
+        IAssemblyCollection MigrationAssembly { get; }
         void Up(IMigration migration);
         void Down(IMigration migration);
         void MigrateUp();

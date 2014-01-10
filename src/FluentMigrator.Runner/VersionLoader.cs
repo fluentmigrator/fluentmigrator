@@ -7,6 +7,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.VersionTableInfo;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Runner
 {
@@ -19,15 +20,20 @@ namespace FluentMigrator.Runner
         private IVersionInfo _versionInfo;
         private IMigrationConventions Conventions { get; set; }
         private IMigrationProcessor Processor { get; set; }
-        protected Assembly Assembly { get; set; }
+        protected IAssemblyCollection Assembly { get; set; }
         public IVersionTableMetaData VersionTableMetaData { get; private set; }
         public IMigrationRunner Runner { get; set; }
         public VersionSchemaMigration VersionSchemaMigration { get; private set; }
         public IMigration VersionMigration { get; private set; }
         public IMigration VersionUniqueMigration { get; private set; }
         public IMigration VersionDescriptionMigration { get; private set; }
-        
+
         public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions)
+          : this(runner, new SingleAssembly(assembly), conventions)
+        {
+        }
+
+        public VersionLoader(IMigrationRunner runner, IAssemblyCollection assembly, IMigrationConventions conventions)
         {
             Runner = runner;
             Processor = runner.Processor;

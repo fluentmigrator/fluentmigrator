@@ -21,6 +21,8 @@ using System.Collections.Generic;
 using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using System.Runtime.CompilerServices;
+using System.Reflection;
 
 namespace FluentMigrator.Builders.Execute
 {
@@ -51,11 +53,10 @@ namespace FluentMigrator.Builders.Execute
             _context.Expressions.Add(expression);
         }
 
+        [MethodImpl(MethodImplOptions.NoInlining)]
         public void EmbeddedScript(string EmbeddedSqlScriptName)
         {
-
-            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = EmbeddedSqlScriptName, MigrationAssembly = _context.MigrationAssembly };
-
+            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = EmbeddedSqlScriptName, MigrationAssembly = Assembly.GetCallingAssembly() };
             _context.Expressions.Add(expression);
         }
     }

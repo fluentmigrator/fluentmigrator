@@ -20,6 +20,7 @@ using System;
 using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Runner.Initialization
 {
@@ -52,7 +53,7 @@ namespace FluentMigrator.Runner.Initialization
             var connectionString = LoadConnectionString(assembly.Location);
             var processor = InitializeProcessor(assembly.Location, connectionString);
 
-            Runner = new MigrationRunner(assembly, RunnerContext, processor);
+            Runner = new MigrationRunner(new SingleAssembly(assembly), RunnerContext, processor);
         }
 
         public void Execute()

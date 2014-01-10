@@ -35,12 +35,26 @@ namespace FluentMigrator.Runner
     public class DefaultMigrationInformationLoader : IMigrationInformationLoader
     {
         public DefaultMigrationInformationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace,
+                                                   IEnumerable<string> tagsToMatch)
+          : this(conventions, new SingleAssembly(assembly), @namespace, false, tagsToMatch)
+        {
+        }
+
+        
+
+        public DefaultMigrationInformationLoader(IMigrationConventions conventions, IAssemblyCollection assembly, string @namespace,
                                                  IEnumerable<string> tagsToMatch)
             : this(conventions, assembly, @namespace, false, tagsToMatch)
         {
         }
 
         public DefaultMigrationInformationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace,
+                                                  bool loadNestedNamespaces, IEnumerable<string> tagsToMatch)
+            : this(conventions, new SingleAssembly(assembly), @namespace, loadNestedNamespaces, tagsToMatch)
+        {
+        }
+
+        public DefaultMigrationInformationLoader(IMigrationConventions conventions, IAssemblyCollection assembly, string @namespace,
                                                  bool loadNestedNamespaces, IEnumerable<string> tagsToMatch)
         {
             Conventions = conventions;
@@ -51,7 +65,7 @@ namespace FluentMigrator.Runner
         }
 
         public IMigrationConventions Conventions { get; private set; }
-        public Assembly Assembly { get; private set; }
+        public IAssemblyCollection Assembly { get; private set; }
         public string Namespace { get; private set; }
         public bool LoadNestedNamespaces { get; private set; }
         public IEnumerable<string> TagsToMatch { get; private set; }

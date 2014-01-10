@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Runner
 {
@@ -19,7 +20,7 @@ namespace FluentMigrator.Runner
             Initialize();
         }
 
-        private Assembly Assembly { get; set; }
+        private IAssemblyCollection Assembly { get; set; }
         private string Profile { get; set; }
         protected IMigrationConventions Conventions { get; set; }
         private IMigrationRunner Runner { get; set; }
@@ -34,7 +35,7 @@ namespace FluentMigrator.Runner
                 _profiles = FindProfilesIn(Assembly, Profile);
         }
 
-        public IEnumerable<IMigration> FindProfilesIn(Assembly assembly, string profile)
+        public IEnumerable<IMigration> FindProfilesIn(IAssemblyCollection assembly, string profile)
         {
             IEnumerable<Type> matchedTypes = assembly.GetExportedTypes()
                 .Where(t => Conventions.TypeIsProfile(t) && t.GetOneAttribute<ProfileAttribute>().ProfileName.ToLower() == profile.ToLower());

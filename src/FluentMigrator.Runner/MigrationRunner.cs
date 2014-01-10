@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner
 {
     public class MigrationRunner : IMigrationRunner
     {
-        private Assembly _migrationAssembly;
+        private IAssemblyCollection _migrationAssembly;
         private IAnnouncer _announcer;
         private IStopWatch _stopWatch;
         private bool _alreadyOutputPreviewOnlyModeWarning;
@@ -66,6 +66,12 @@ namespace FluentMigrator.Runner
         }
 
         public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
+          : this(new SingleAssembly(assembly), runnerContext, processor)
+        {
+
+        }
+
+        public MigrationRunner(IAssemblyCollection assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
         {
             _migrationAssembly = assembly;
             _announcer = runnerContext.Announcer;
@@ -329,7 +335,7 @@ namespace FluentMigrator.Runner
                 VersionLoader.RemoveVersionTable();
         }
 
-        public Assembly MigrationAssembly
+        public IAssemblyCollection MigrationAssembly
         {
             get { return _migrationAssembly; }
         }
