@@ -13,14 +13,14 @@ namespace FluentMigrator.Runner
         public ProfileLoader(IRunnerContext runnerContext, IMigrationRunner runner, IMigrationConventions conventions)
         {
             Runner = runner;
-            Assembly = runner.MigrationAssembly;
+            Assemblies = runner.MigrationAssemblies;
             Profile = runnerContext.Profile;
             Conventions = conventions;
 
             Initialize();
         }
 
-        private IAssemblyCollection Assembly { get; set; }
+        private IAssemblyCollection Assemblies { get; set; }
         private string Profile { get; set; }
         protected IMigrationConventions Conventions { get; set; }
         private IMigrationRunner Runner { get; set; }
@@ -32,12 +32,12 @@ namespace FluentMigrator.Runner
             _profiles = new List<IMigration>();
 
             if (!string.IsNullOrEmpty(Profile))
-                _profiles = FindProfilesIn(Assembly, Profile);
+                _profiles = FindProfilesIn(Assemblies, Profile);
         }
 
-        public IEnumerable<IMigration> FindProfilesIn(IAssemblyCollection assembly, string profile)
+        public IEnumerable<IMigration> FindProfilesIn(IAssemblyCollection assemblies, string profile)
         {
-            IEnumerable<Type> matchedTypes = assembly.GetExportedTypes()
+            IEnumerable<Type> matchedTypes = assemblies.GetExportedTypes()
                 .Where(t => Conventions.TypeIsProfile(t) && t.GetOneAttribute<ProfileAttribute>().ProfileName.ToLower() == profile.ToLower());
 
             foreach (Type type in matchedTypes)

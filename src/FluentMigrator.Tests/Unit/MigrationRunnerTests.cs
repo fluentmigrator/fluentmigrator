@@ -235,7 +235,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void LoadsCorrectCallingAssembly()
         {
-            var asm = _runner.MigrationAssembly.Assemblies.Single();
+            var asm = _runner.MigrationAssemblies.Assemblies.Single();
             asm.ShouldBe(Assembly.GetAssembly(typeof(MigrationRunnerTests)));
         }
 

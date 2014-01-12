@@ -7,6 +7,6 @@ namespace FluentMigrator.Runner
     public interface IProfileLoader
     {
         void ApplyProfiles();
-        IEnumerable<IMigration> FindProfilesIn(IAssemblyCollection assembly, string profile);
+        IEnumerable<IMigration> FindProfilesIn(IAssemblyCollection assemblies, string profile);
     }
 }

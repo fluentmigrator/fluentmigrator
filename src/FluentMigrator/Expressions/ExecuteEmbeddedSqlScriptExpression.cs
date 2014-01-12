@@ -11,7 +11,7 @@ namespace FluentMigrator.Expressions
     {
         public string SqlScript { get; set; }
 
-        public IAssemblyCollection MigrationAssembly { get; set; }
+        public IAssemblyCollection MigrationAssemblies { get; set; }
 
         public override void ExecuteWith(IMigrationProcessor processor)
         {
@@ -35,7 +35,7 @@ namespace FluentMigrator.Expressions
 
         private ManifestResourceNameWithAssembly GetQualifiedResourcePath()
         {
-            var resources = MigrationAssembly.GetManifestResourceNames();
+            var resources = MigrationAssemblies.GetManifestResourceNames();
 
             //resource full name is in format `namespace.resourceName`
             var sqlScriptParts = SqlScript.Split('.').Reverse().ToArray();
@@ -49,7 +49,7 @@ namespace FluentMigrator.Expressions
             var foundResources = resources.Where(isNameMatch).ToArray();
 
             if (foundResources.Length == 0)
-                throw new InvalidOperationException(string.Format("Could not find resource named {0} in assemblies {1}", SqlScript, string.Join(", ", MigrationAssembly.Assemblies.Select(a => a.FullName).ToArray())));
+                throw new InvalidOperationException(string.Format("Could not find resource named {0} in assemblies {1}", SqlScript, string.Join(", ", MigrationAssemblies.Assemblies.Select(a => a.FullName).ToArray())));
 
             if (foundResources.Length > 1)
                 throw new InvalidOperationException(string.Format(@"Could not find unique resource named {0} in assemblies {1}.
@@ -58,7 +58,7 @@ Possible candidates are:
 {2}
 ",
  SqlScript,
- string.Join(", ", MigrationAssembly.Assemblies.Select(a => a.FullName).ToArray()),
+ string.Join(", ", MigrationAssemblies.Assemblies.Select(a => a.FullName).ToArray()),
  string.Join(Environment.NewLine + "\t", foundResources.Select(r => r.Name).ToArray())));
 
             return foundResources[0];
