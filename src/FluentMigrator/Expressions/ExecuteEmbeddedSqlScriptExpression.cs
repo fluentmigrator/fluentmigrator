@@ -11,19 +11,21 @@ namespace FluentMigrator.Expressions
     {
         public string SqlScript { get; set; }
 
-        public Assembly MigrationAssembly { get; set; }
+        public IAssemblyCollection MigrationAssembly { get; set; }
 
         public override void ExecuteWith(IMigrationProcessor processor)
         {
 
             string sqlText;
-            string embeddedResourceName = GetQualifiedResourcePath();
+            var embeddedResourceNameWithAssembly = GetQualifiedResourcePath();
 
-            using (var stream = MigrationAssembly.GetManifestResourceStream(embeddedResourceName))
+            using (var stream = embeddedResourceNameWithAssembly
+                .Assembly.GetManifestResourceStream(embeddedResourceNameWithAssembly.Name))
             using (var reader = new StreamReader(stream))
             {
                 sqlText = reader.ReadToEnd();
             }
+
 
             // since all the Processors are using String.Format() in their Execute method
             //  we need to escape the brackets with double brackets or else it throws an incorrect format error on the String.Format call
@@ -31,26 +33,33 @@ namespace FluentMigrator.Expressions
             processor.Execute(sqlText);
         }
 
-        private string GetQualifiedResourcePath()
+        private ManifestResourceNameWithAssembly GetQualifiedResourcePath()
         {
             var resources = MigrationAssembly.GetManifestResourceNames();
 
             //resource full name is in format `namespace.resourceName`
             var sqlScriptParts = SqlScript.Split('.').Reverse().ToArray();
-            Func<string, bool> isNameMatch = x => x.Split('.').Reverse().Take(sqlScriptParts.Length).SequenceEqual(sqlScriptParts, StringComparer.InvariantCultureIgnoreCase);
+            Func<ManifestResourceNameWithAssembly, bool> isNameMatch = x =>
+                x.Name.Split('.')
+                .Reverse()
+                .Take(sqlScriptParts.Length)
+                .SequenceEqual(sqlScriptParts, StringComparer.InvariantCultureIgnoreCase);
 
             string result = null;
             var foundResources = resources.Where(isNameMatch).ToArray();
 
             if (foundResources.Length == 0)
-                throw new InvalidOperationException(string.Format("Could not find resource named {0} in assembly {1}", SqlScript, MigrationAssembly.FullName));
+                throw new InvalidOperationException(string.Format("Could not find resource named {0} in assemblies {1}", SqlScript, string.Join(", ", MigrationAssembly.Assemblies.Select(a => a.FullName).ToArray())));
 
             if (foundResources.Length > 1)
-                throw new InvalidOperationException(string.Format(@"Could not find unique resource named {0} in assembly {1}.
+                throw new InvalidOperationException(string.Format(@"Could not find unique resource named {0} in assemblies {1}.
 Possible candidates are:
  
 {2}
-", SqlScript, MigrationAssembly.FullName, string.Join(Environment.NewLine + "\t", foundResources)));
+",
+ SqlScript,
+ string.Join(", ", MigrationAssembly.Assemblies.Select(a => a.FullName).ToArray()),
+ string.Join(Environment.NewLine + "\t", foundResources.Select(r => r.Name).ToArray())));
 
             return foundResources[0];
         }

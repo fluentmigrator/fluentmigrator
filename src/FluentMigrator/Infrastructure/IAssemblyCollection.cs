@@ -22,6 +22,38 @@ namespace FluentMigrator.Infrastructure
         /// </summary>
         /// <returns></returns>
         Type[] GetExportedTypes();
+
+        /// <summary>
+        /// Gets a array of resources defined in each of the assemblies that are 
+        /// contained in this collection, plus which assembly it is defined in.
+        /// </summary>
+        /// <returns>An array of value pairs of resource name plus assembly.</returns>
+        ManifestResourceNameWithAssembly[] GetManifestResourceNames();
+    }
+
+    /// <summary>
+    /// Combines a ManifestResourceName with the assembly it belongs to
+    /// </summary>
+    public class ManifestResourceNameWithAssembly
+    {
+        public ManifestResourceNameWithAssembly(string name, Assembly assembly)
+        {
+            if (name == null)
+            {
+                throw new ArgumentNullException("name");
+            }
+
+            if (assembly == null)
+            {
+                throw new ArgumentNullException("assembly");
+            }
+
+            Name = name;
+            Assembly = assembly;
+        }
+
+        public Assembly Assembly { get; set; }
+        public string Name { get; set; }
     }
 
     /// <summary>
@@ -50,6 +82,11 @@ namespace FluentMigrator.Infrastructure
         {
             get { return new[] { _assembly }; }
         }
+
+        public ManifestResourceNameWithAssembly[] GetManifestResourceNames()
+        {
+            return _assembly.GetManifestResourceNames().Select(name => new ManifestResourceNameWithAssembly(name, _assembly)).ToArray();
+        }
     }
 
     public class AssemblyCollection : IAssemblyCollection
@@ -74,6 +111,12 @@ namespace FluentMigrator.Infrastructure
         public Assembly[] Assemblies
         {
             get { return _assemblies.ToArray(); }
+        }
+
+        public ManifestResourceNameWithAssembly[] GetManifestResourceNames()
+        {
+            return _assemblies.SelectMany(a => a.GetManifestResourceNames().Select(name =>
+                new ManifestResourceNameWithAssembly(name, a))).ToArray();
         }
     }
 
