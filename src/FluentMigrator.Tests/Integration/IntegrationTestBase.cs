@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using FluentMigrator.Runner.Announcers;
@@ -39,6 +40,8 @@ namespace FluentMigrator.Tests.Integration
 {
     public class IntegrationTestBase
     {
+        public const string AlternateDatabaseKey = "Alt";
+
         public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test)
         {
             ExecuteWithSupportedProcessors(test, true);
@@ -69,6 +72,9 @@ namespace FluentMigrator.Tests.Integration
 
             if (exceptProcessors.Count(t => typeof(FirebirdProcessor).IsAssignableFrom(t)) == 0)
                 ExecuteWithFirebird(test, IntegrationTestOptions.Firebird);
+
+            if (exceptProcessors.Count(t => typeof(MultiDatabaseMigrationProcessor).IsAssignableFrom(t)) == 0)
+                ExecuteWithMultiDatabase(test);
         }
 
         protected static void ExecuteWithSqlServer2012(Action<IMigrationProcessor> test, bool tryRollback)
@@ -213,6 +219,31 @@ namespace FluentMigrator.Tests.Integration
                 }
 
                 connection.Close();
+            }
+        }
+
+        protected static void ExecuteWithMultiDatabase(Action<IMigrationProcessor> test)
+        {
+            var serverOptions = IntegrationTestOptions.SqlServer2008;
+            if (!serverOptions.IsEnabled)
+                return;
+
+            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            announcer.Heading("Testing Migration against MultiDatabase processor (with SQL 2008 generator)");
+            var generator = new SqlServer2008Generator();
+
+            var connectionString1 = serverOptions.ConnectionString;
+            var connectionString2 = new SqlConnectionStringBuilder(connectionString1);
+            connectionString2.InitialCatalog += "2";
+
+            using (var connection1 = new SqlConnection(connectionString1))
+            using (var connection2 = new SqlConnection(connectionString2.ToString())) 
+            {
+                var processor1 = new SqlServerProcessor(connection1, generator, announcer, new ProcessorOptions(), new SqlServerDbFactory());
+                var processor2 = new SqlServerProcessor(connection2, generator, announcer, new ProcessorOptions(), new SqlServerDbFactory());
+
+                var multiProcessor = new MultiDatabaseMigrationProcessor(processor1, new Dictionary<string, IMigrationProcessor> { { AlternateDatabaseKey, processor2 } });
+                test(multiProcessor);
             }
         }
     }

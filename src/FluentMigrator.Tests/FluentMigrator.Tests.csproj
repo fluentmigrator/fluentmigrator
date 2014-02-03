@@ -242,6 +242,7 @@
     <Compile Include="Unit\Builders\Alter\AlterColumnExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Alter\AlterExpressionRootTests.cs" />
     <Compile Include="Unit\Builders\Alter\AlterTableExpressionBuilderTests.cs" />
+    <Compile Include="Unit\Builders\InDatabase\InDatabaseExpressionRootTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateColumnExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateConstraintExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateExpressionRootTests.cs" />
@@ -487,6 +488,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

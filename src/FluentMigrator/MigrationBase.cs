@@ -18,6 +18,7 @@
 
 using FluentMigrator.Builders.Alter;
 using FluentMigrator.Builders.Create;
+using FluentMigrator.Builders.InDatabase;
 using FluentMigrator.Builders.IfDatabase;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Builders.Rename;
@@ -101,6 +102,14 @@ namespace FluentMigrator
         public IIfDatabaseExpressionRoot IfDatabase(params string[] databaseType)
         {
             return new IfDatabaseExpressionRoot(_context, databaseType);
+        }
+
+        /// <summary>
+        /// Provides a way to execute parts of migration in context of a different database.
+        /// </summary>
+        public IInDatabaseExpressionRoot InDatabase(string databaseKey)
+        {
+            return new InDatabaseExpressionRoot(_context, databaseKey);
         }
     }
 }

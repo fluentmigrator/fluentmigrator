@@ -136,6 +136,9 @@
     <Compile Include="Builders\Alter\Table\IAlterTableAddColumOrAlterColumnSyntax.cs" />
     <Compile Include="Builders\Alter\Table\IAlterTableColumnAsTypeSyntax.cs" />
     <Compile Include="Builders\Alter\Table\IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax.cs" />
+    <Compile Include="Builders\InDatabase\AlternateDatabaseMigrationContext.cs" />
+    <Compile Include="Builders\InDatabase\InDatabaseExpressionRoot.cs" />
+    <Compile Include="Builders\InDatabase\IInDatabaseExpressionRoot.cs" />
     <Compile Include="Builders\Create\Column\ICreateColumnOptionOrForeignKeyCascadeSyntax.cs" />
     <Compile Include="Builders\Create\Column\ICreateColumnAsTypeOrInSchemaSyntax.cs" />
     <Compile Include="Builders\Create\Constraint\CreateConstraintExpressionBuilder.cs" />
@@ -186,6 +189,7 @@
     <Compile Include="Exceptions\FluentMigratorException.cs" />
     <Compile Include="Exceptions\ProcessorFactoryNotFoundException.cs" />
     <Compile Include="Exceptions\UndeterminableConnectionException.cs" />
+    <Compile Include="IMultiDatabaseMigrationProcessor.cs" />
     <Compile Include="Infrastructure\Extensions\ExtensionsForIMigrationInfo.cs" />
     <Compile Include="Infrastructure\IMigrationInfo.cs" />
     <Compile Include="Infrastructure\MigrationInfo.cs" />
