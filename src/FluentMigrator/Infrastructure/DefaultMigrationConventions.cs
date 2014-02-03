@@ -79,6 +79,15 @@ namespace FluentMigrator.Infrastructure
             return typeof(IMigration).IsAssignableFrom(type) && type.HasAttribute<MigrationAttribute>();
         }
 
+        public static MigrationStage? GetMaintenanceStage(Type type) 
+        {
+            if (!typeof(IMigration).IsAssignableFrom(type))
+                return null;
+            
+            var attribute = type.GetOneAttribute<MaintenanceAttribute>();
+            return attribute != null ? attribute.Stage : (MigrationStage?)null;
+        }
+
         public static bool TypeIsProfile(Type type)
         {
             return typeof(IMigration).IsAssignableFrom(type) && type.HasAttribute<ProfileAttribute>();

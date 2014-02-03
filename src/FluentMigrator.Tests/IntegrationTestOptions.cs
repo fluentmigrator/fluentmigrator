@@ -12,8 +12,8 @@ namespace FluentMigrator.Tests
 
         public static DatabaseServerOptions SqlServer2008 = new DatabaseServerOptions
             {
-                ConnectionString = @"server=.\SQLEXPRESS;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator",
-                IsEnabled = false
+                ConnectionString = @"server=.;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator",
+                IsEnabled = true
             };
 
         public static DatabaseServerOptions SqlServer2012 = new DatabaseServerOptions

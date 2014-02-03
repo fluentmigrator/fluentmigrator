@@ -50,6 +50,7 @@ namespace FluentMigrator.Runner
         public IMigrationProcessor Processor { get; private set; }
         public IMigrationInformationLoader MigrationLoader { get; set; }
         public IProfileLoader ProfileLoader { get; set; }
+        public IMaintenanceLoader MaintenanceLoader { get; set; }
         public IMigrationConventions Conventions { get; private set; }
         public IList<Exception> CaughtExceptions { get; private set; }
 
@@ -86,6 +87,7 @@ namespace FluentMigrator.Runner
             VersionLoader = new VersionLoader(this, _migrationAssembly, Conventions);
             MigrationLoader = new DefaultMigrationInformationLoader(Conventions, _migrationAssembly, runnerContext.Namespace, runnerContext.NestedNamespaces, runnerContext.Tags);
             ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
+            MaintenanceLoader = new MaintenanceLoader(this, Conventions);
         }
 
         public IVersionLoader VersionLoader { get; set; }
@@ -93,6 +95,11 @@ namespace FluentMigrator.Runner
         public void ApplyProfiles()
         {
             ProfileLoader.ApplyProfiles();
+        }
+
+        public void ApplyMaintenance(MigrationStage stage)
+        {
+            MaintenanceLoader.ApplyMaintenance(stage);
         }
 
         public void MigrateUp()
@@ -106,12 +113,20 @@ namespace FluentMigrator.Runner
 
             using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
+                ApplyMaintenance(MigrationStage.BeforeAll);
+
                 foreach (var pair in migrations)
                 {
+                    ApplyMaintenance(MigrationStage.BeforeEach);
                     ApplyMigrationUp(pair.Value, useAutomaticTransactionManagement && pair.Value.TransactionBehavior == TransactionBehavior.Default);
+                    ApplyMaintenance(MigrationStage.AfterEach);
                 }
 
+                ApplyMaintenance(MigrationStage.BeforeProfiles);
+
                 ApplyProfiles();
+
+                ApplyMaintenance(MigrationStage.AfterAll);
 
                 scope.Complete();
             }
