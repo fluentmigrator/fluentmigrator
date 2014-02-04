@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var expression = new ExecuteSqlStatementExpression() { SqlStatement = "INSERT INTO BLAH" };
 
             var processor = new Mock<IMigrationProcessor>();
-            processor.Setup(x => x.Execute(expression.SqlStatement)).Verifiable();
+            processor.Setup(x => x.Process(expression.SqlStatement, expression)).Verifiable();
 
             expression.ExecuteWith(processor.Object);
             processor.Verify();

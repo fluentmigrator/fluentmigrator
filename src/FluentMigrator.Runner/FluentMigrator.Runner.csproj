@@ -223,6 +223,7 @@
     <Compile Include="Processors\Jet\JetProcessor.cs" />
     <Compile Include="Processors\Jet\JetProcessorFactory.cs" />
     <Compile Include="Processors\MigrationProcessorFactory.cs" />
+    <Compile Include="Processors\MultiDatabaseMigrationProcessor.cs" />
     <Compile Include="Processors\MySql\MySqlDbFactory.cs" />
     <Compile Include="Processors\MySql\MySqlProcessor.cs" />
     <Compile Include="Processors\MySql\MySqlProcessorFactory.cs" />

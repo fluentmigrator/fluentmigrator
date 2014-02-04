@@ -1149,6 +1149,42 @@ namespace FluentMigrator.Tests.Integration
                 }, true, new[] { typeof(FirebirdProcessor) });
         }
 
+        [Test]
+        public void CanMigrateMultipleDatabases() {
+            ExecuteWithMultiDatabase(
+                processor => {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+                    var multi = (IMultiDatabaseMigrationProcessor)processor;
+
+                    runner.Up(new TestMultiDatabase());
+                    processor.TableExists("TestSchema", "TestTable1").ShouldBeTrue();
+                    multi.GetProcessorByDatabaseKey(AlternateDatabaseKey).TableExists("TestSchema", "TestTable2").ShouldBeTrue();
+
+                    runner.Down(new TestMultiDatabase());
+                    processor.TableExists("TestSchema", "TestTable1").ShouldBeFalse();
+                    multi.GetProcessorByDatabaseKey(AlternateDatabaseKey).TableExists("TestSchema", "TestTable2").ShouldBeFalse();
+                }, true
+            );
+        }
+
+        [Test]
+        public void CanExecuteSqlOnMultipleDatabases() {
+            ExecuteWithMultiDatabase(
+                processor => {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+                    var multi = (IMultiDatabaseMigrationProcessor)processor;
+
+                    runner.Up(new TestMultiDatabaseWithExecute());
+                    processor.TableExists("TestSchema", "TestTable1").ShouldBeTrue();
+                    multi.GetProcessorByDatabaseKey(AlternateDatabaseKey).TableExists("TestSchema", "TestTable2").ShouldBeTrue();
+
+                    runner.Down(new TestMultiDatabaseWithExecute());
+                    processor.TableExists("TestSchema", "TestTable1").ShouldBeFalse();
+                    multi.GetProcessorByDatabaseKey(AlternateDatabaseKey).TableExists("TestSchema", "TestTable2").ShouldBeFalse();
+                }, true
+            );
+        }
+
         private static MigrationRunner SetupMigrationRunner(IMigrationProcessor processor)
         {
             Assembly asm = typeof(MigrationRunnerTests).Assembly;
@@ -1604,6 +1640,62 @@ namespace FluentMigrator.Tests.Integration
         public override void Down()
         {
             Execute.Sql("select 2");
+        }
+    }
+
+    internal class TestMultiDatabase : Migration {
+        public override void Up() {
+            Create.Schema("TestSchema");
+            Create.Table("TestTable1").InSchema("TestSchema").WithColumn("Id").AsInt32();
+
+            InDatabase(IntegrationTestBase.AlternateDatabaseKey)
+                .Create.Schema("TestSchema");
+
+            InDatabase(IntegrationTestBase.AlternateDatabaseKey)
+                .Create.Table("TestTable2").InSchema("TestSchema").WithColumn("Id").AsInt32();
+        }
+
+        public override void Down() {
+            Delete.Table("TestTable1").InSchema("TestSchema");
+            Delete.Schema("TestSchema");
+
+            InDatabase(IntegrationTestBase.AlternateDatabaseKey)
+                .Delete.Table("TestTable2").InSchema("TestSchema");
+
+            InDatabase(IntegrationTestBase.AlternateDatabaseKey)
+                .Delete.Schema("TestSchema");
+        }
+    }
+
+    internal class TestMultiDatabaseWithExecute : Migration {
+        public override void Up() {
+            IfDatabase("SqlServer").Execute.Sql(@"
+                CREATE SCHEMA TestSchema
+                GO                
+                CREATE TABLE TestSchema.TestTable1 (Id int)
+            ");
+
+            InDatabase(IntegrationTestBase.AlternateDatabaseKey)
+                .IfDatabase("SqlServer")
+                .Execute.Sql(@"
+                    CREATE SCHEMA TestSchema
+                    GO                
+                    CREATE TABLE TestSchema.TestTable2 (Id int)
+                ");
+        }
+
+        public override void Down() {
+            IfDatabase("SqlServer").Execute.Sql(@"           
+                DROP TABLE TestSchema.TestTable1
+                DROP SCHEMA TestSchema
+            ");
+
+            InDatabase(IntegrationTestBase.AlternateDatabaseKey)
+                .IfDatabase("SqlServer")
+                .Execute.Sql(@"
+                    DROP TABLE TestSchema.TestTable2
+                    DROP SCHEMA TestSchema
+                ");
         }
     }
 }

@@ -36,7 +36,7 @@ namespace FluentMigrator
         void BeginTransaction();
         void CommitTransaction();
         void RollbackTransaction();
-
+        
         void Process(CreateSchemaExpression expression);
         void Process(DeleteSchemaExpression expression);
         void Process(AlterTableExpression expression);
@@ -65,5 +65,7 @@ namespace FluentMigrator
         void Process(CreateConstraintExpression expression);
         void Process(DeleteConstraintExpression expression);
         void Process(DeleteDefaultConstraintExpression expression);
+
+        void Process(string sql, IMigrationExpression expression);
     }
 }
