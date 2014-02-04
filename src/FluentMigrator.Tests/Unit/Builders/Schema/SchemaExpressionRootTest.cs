@@ -30,6 +30,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
         private Mock<IQuerySchema> _querySchemaMock;
         private Mock<IMigrationContext> _migrationContextMock;
         private string _testColumn;
+        private string _testConstraint;
         private string _testTable;
         private string _testSchema;
         private SchemaExpressionRoot _builder;
@@ -42,6 +43,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
             _testSchema = "testSchema";
             _testTable = "testTable";
             _testColumn = "testColumn";
+            _testConstraint = "testConstraint";
 
             _migrationContextMock.Setup(x => x.QuerySchema).Returns(_querySchemaMock.Object);
             _builder = new SchemaExpressionRoot(_migrationContextMock.Object);
@@ -54,6 +56,15 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
 
             _builder.Table(_testTable).Exists().ShouldBeTrue();
             _querySchemaMock.Verify(x => x.TableExists(null, _testTable));
+        }
+
+        [Test]
+        public void TestConstraintExists()
+        {
+            _querySchemaMock.Setup(x => x.ConstraintExists(null, _testTable, _testConstraint)).Returns(true);
+
+            _builder.Table(_testTable).Constraint(_testConstraint).Exists().ShouldBeTrue();
+            _querySchemaMock.Verify(x => x.ConstraintExists(null, _testTable, _testConstraint));
         }
 
         [Test]
@@ -81,6 +92,15 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
 
             _builder.Schema(_testSchema).Table(_testTable).Column(_testColumn).Exists().ShouldBeTrue();
             _querySchemaMock.Verify(x => x.ColumnExists(_testSchema, _testTable, _testColumn));
+        }
+
+        [Test]
+        public void TestConstraintExistsWithSchema()
+        {
+            _querySchemaMock.Setup(x => x.ConstraintExists(_testSchema, _testTable, _testConstraint)).Returns(true);
+
+            _builder.Schema(_testSchema).Table(_testTable).Constraint(_testConstraint).Exists().ShouldBeTrue();
+            _querySchemaMock.Verify(x => x.ConstraintExists(_testSchema, _testTable, _testConstraint));
         }
     }
 }
