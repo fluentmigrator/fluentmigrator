@@ -74,7 +74,7 @@ namespace FluentMigrator.Tests.Integration
                 ExecuteWithFirebird(test, IntegrationTestOptions.Firebird);
 
             if (exceptProcessors.Count(t => typeof(MultiDatabaseMigrationProcessor).IsAssignableFrom(t)) == 0)
-                ExecuteWithMultiDatabase(test);
+                ExecuteWithMultiDatabase(test, false);
         }
 
         protected static void ExecuteWithSqlServer2012(Action<IMigrationProcessor> test, bool tryRollback)
@@ -222,7 +222,7 @@ namespace FluentMigrator.Tests.Integration
             }
         }
 
-        protected static void ExecuteWithMultiDatabase(Action<IMigrationProcessor> test)
+        protected static void ExecuteWithMultiDatabase(Action<IMigrationProcessor> test, bool rollback)
         {
             var serverOptions = IntegrationTestOptions.SqlServer2008;
             if (!serverOptions.IsEnabled)
@@ -243,7 +243,16 @@ namespace FluentMigrator.Tests.Integration
                 var processor2 = new SqlServerProcessor(connection2, generator, announcer, new ProcessorOptions(), new SqlServerDbFactory());
 
                 var multiProcessor = new MultiDatabaseMigrationProcessor(processor1, new Dictionary<string, IMigrationProcessor> { { AlternateDatabaseKey, processor2 } });
-                test(multiProcessor);
+                if (rollback)
+                    multiProcessor.BeginTransaction();
+
+                try {
+                    test(multiProcessor);
+                }
+                finally {
+                    if (rollback)
+                        multiProcessor.RollbackTransaction();
+                }
             }
         }
     }

@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = testSqlScript, MigrationAssembly = Assembly.GetExecutingAssembly() };
 
             var processor = new Mock<IMigrationProcessor>();
-            processor.Setup(x => x.Execute(scriptContents)).Verifiable();
+            processor.Setup(x => x.Process(scriptContents, expression)).Verifiable();
 
             expression.ExecuteWith(processor.Object);
             processor.Verify();
@@ -41,7 +41,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         {
             var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = testSqlScript.ToUpper(), MigrationAssembly = Assembly.GetExecutingAssembly() };
             var processor = new Mock<IMigrationProcessor>();
-            processor.Setup(x => x.Execute(scriptContents)).Verifiable();
+            processor.Setup(x => x.Process(scriptContents, expression)).Verifiable();
 
             expression.ExecuteWith(processor.Object);
             processor.Verify();
@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         {
             var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = "InitialSchema.sql", MigrationAssembly = Assembly.GetExecutingAssembly() };
             var processor = new Mock<IMigrationProcessor>();
-            processor.Setup(x => x.Execute("InitialSchema")).Verifiable();
+            processor.Setup(x => x.Process("InitialSchema", expression)).Verifiable();
 
             expression.ExecuteWith(processor.Object);
             processor.Verify();
@@ -63,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         {
             var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = "FluentMigrator.Tests.EmbeddedResources.InitialSchema.sql", MigrationAssembly = Assembly.GetExecutingAssembly() };
             var processor = new Mock<IMigrationProcessor>();
-            processor.Setup(x => x.Execute("InitialSchema")).Verifiable();
+            processor.Setup(x => x.Process("InitialSchema", expression)).Verifiable();
 
             expression.ExecuteWith(processor.Object);
             processor.Verify();
@@ -76,7 +76,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var processor = new Mock<IMigrationProcessor>();
 
             Assert.Throws<InvalidOperationException>(() => expression.ExecuteWith(processor.Object));
-            processor.Verify(x => x.Execute("NotUniqueResource"), Times.Never());
+            processor.Verify(x => x.Process("NotUniqueResource", expression), Times.Never());
         }
 
         [Test]

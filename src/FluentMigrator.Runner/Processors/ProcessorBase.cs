@@ -40,6 +40,11 @@ namespace FluentMigrator.Runner.Processors
             Options = options;
         }
 
+        public virtual void Process(string sql, IMigrationExpression expression)
+        {
+            Process(sql);
+        }
+
         public virtual void Process(CreateSchemaExpression expression)
         {
             Process(Generator.Generate(expression));

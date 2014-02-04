@@ -1163,7 +1163,25 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestMultiDatabase());
                     processor.TableExists("TestSchema", "TestTable1").ShouldBeFalse();
                     multi.GetProcessorByDatabaseKey(AlternateDatabaseKey).TableExists("TestSchema", "TestTable2").ShouldBeFalse();
-                }
+                }, true
+            );
+        }
+
+        [Test]
+        public void CanExecuteSqlOnMultipleDatabases() {
+            ExecuteWithMultiDatabase(
+                processor => {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+                    var multi = (IMultiDatabaseMigrationProcessor)processor;
+
+                    runner.Up(new TestMultiDatabaseWithExecute());
+                    processor.TableExists("TestSchema", "TestTable1").ShouldBeTrue();
+                    multi.GetProcessorByDatabaseKey(AlternateDatabaseKey).TableExists("TestSchema", "TestTable2").ShouldBeTrue();
+
+                    runner.Down(new TestMultiDatabaseWithExecute());
+                    processor.TableExists("TestSchema", "TestTable1").ShouldBeFalse();
+                    multi.GetProcessorByDatabaseKey(AlternateDatabaseKey).TableExists("TestSchema", "TestTable2").ShouldBeFalse();
+                }, true
             );
         }
 
@@ -1646,6 +1664,38 @@ namespace FluentMigrator.Tests.Integration
 
             InDatabase(IntegrationTestBase.AlternateDatabaseKey)
                 .Delete.Schema("TestSchema");
+        }
+    }
+
+    internal class TestMultiDatabaseWithExecute : Migration {
+        public override void Up() {
+            IfDatabase("SqlServer").Execute.Sql(@"
+                CREATE SCHEMA TestSchema
+                GO                
+                CREATE TABLE TestSchema.TestTable1 (Id int)
+            ");
+
+            InDatabase(IntegrationTestBase.AlternateDatabaseKey)
+                .IfDatabase("SqlServer")
+                .Execute.Sql(@"
+                    CREATE SCHEMA TestSchema
+                    GO                
+                    CREATE TABLE TestSchema.TestTable2 (Id int)
+                ");
+        }
+
+        public override void Down() {
+            IfDatabase("SqlServer").Execute.Sql(@"           
+                DROP TABLE TestSchema.TestTable1
+                DROP SCHEMA TestSchema
+            ");
+
+            InDatabase(IntegrationTestBase.AlternateDatabaseKey)
+                .IfDatabase("SqlServer")
+                .Execute.Sql(@"
+                    DROP TABLE TestSchema.TestTable2
+                    DROP SCHEMA TestSchema
+                ");
         }
     }
 }

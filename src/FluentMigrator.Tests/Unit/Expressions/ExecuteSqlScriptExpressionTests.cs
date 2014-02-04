@@ -46,7 +46,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var expression = new ExecuteSqlScriptExpression { SqlScript = testSqlScript };
 
             var processor = new Mock<IMigrationProcessor>();
-            processor.Setup(x => x.Execute(scriptContents)).Verifiable();
+            processor.Setup(x => x.Process(scriptContents, expression)).Verifiable();
 
             expression.ExecuteWith(processor.Object);
             processor.Verify();

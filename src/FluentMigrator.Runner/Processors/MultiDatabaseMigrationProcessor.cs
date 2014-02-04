@@ -251,6 +251,11 @@ namespace FluentMigrator.Runner.Processors {
             GetProcessor(expression).Process(expression);
         }
 
+        public void Process(string sql, IMigrationExpression expression)
+        {
+            GetProcessor(expression).Process(sql, expression);
+        }
+
         public void AssignDatabaseKey(IMigrationExpression expression, string databaseKey)
         {
             if (!_otherProcessors.ContainsKey(databaseKey))

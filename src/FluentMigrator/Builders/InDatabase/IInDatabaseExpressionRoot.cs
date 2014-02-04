@@ -17,11 +17,11 @@
 //
 #endregion
 
-
 using FluentMigrator.Builders.Alter;
 using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.Delete;
 using FluentMigrator.Builders.Execute;
+using FluentMigrator.Builders.IfDatabase;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Builders.Rename;
 using FluentMigrator.Builders.Schema;
@@ -49,5 +49,7 @@ namespace FluentMigrator.Builders.InDatabase
         ISchemaExpressionRoot Schema { get; }
 
         IUpdateExpressionRoot Update { get; }
+
+        IIfDatabaseExpressionRoot IfDatabase(params string[] databaseType);
     }
 }
