@@ -1,0 +1,34 @@
+﻿using FluentMigrator.VersionTableInfo;
+
+namespace Migrations
+{
+    /// <summary>
+    /// You can override table and field names to comply with local naming standard
+    /// </summary>
+    /// <remarks>
+    /// Reference: https://github.com/schambers/fluentmigrator/wiki/Create-custom-metadata-for-the-VersionInfo-table
+    /// </remarks>
+    [VersionTableMetaData]
+    public class VersionTable : DefaultVersionTableMetaData
+    {
+        public override string TableName
+        {
+            get { return "tblVersionInfo"; }
+        }
+
+        public override string ColumnName
+        {
+            get { return "fldVersion"; }
+        }
+
+        public override string UniqueIndexName
+        {
+            get { return "fldUC_Version"; }
+        }
+
+        public override string DescriptionColumnName
+        {
+            get { return "fldDescription"; }
+        }
+    }
+}

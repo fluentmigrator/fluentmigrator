@@ -119,18 +119,6 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             }
         }
 
-        private void BeginBlock()
-        {
-            WriteLine("{");
-            indent++;
-        }
-
-        private void EndBlock()
-        {
-            indent--;
-            WriteLine("}");
-        }
-        
         private void BeginBuffer()
         {
             if (sb != null) nestedBuffers.Push(sb);
@@ -195,7 +183,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
                     WriteLine("using System.Linq;");
                     WriteLine("using System.Web;");
                     WriteLine("using FluentMigrator;");
-                    WriteLine("using AMPRO.Migrations.FM_Extensions;");
+                    WriteLine("using Migrations.FM_Extensions;");
 
                     WriteLine(String.Empty);
                     WriteLine("namespace {0}.{1}", options.NameSpace, dirName.Replace("\\", "."));
@@ -347,7 +335,6 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             {
                 WriteLine("DeleteType(\"{0}\");", name);
             }
-
         }
         #endregion
 
