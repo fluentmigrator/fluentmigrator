@@ -128,7 +128,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             EnsureConnectionIsOpen();
 
             var ds = new DataSet();
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
+            var sql = String.Format(template, args);
+            Announcer.Sql(sql);
+            using (var command = Factory.CreateCommand(sql, Connection, Transaction))
             {
                 var adapter = Factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
@@ -148,7 +150,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             if (sql.IndexOf("GO", StringComparison.OrdinalIgnoreCase) >= 0)
             {
                 ExecuteBatchNonQuery(sql);
-
             }
             else
             {
