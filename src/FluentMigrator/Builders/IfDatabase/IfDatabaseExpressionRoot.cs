@@ -43,7 +43,7 @@ namespace FluentMigrator.Builders.IfDatabase
         private readonly IMigrationContext _context;
 
         /// <summary>
-        /// Constricts a new instance of a <see cref="IfDatabaseExpressionRoot"/> that will only add expressions to the provided <see cref="context"/> if <see cref="databaseType"/> matches the migration processor
+        /// Constricts a new instance of a <see cref="IfDatabaseExpressionRoot"/> that will only add expressions to the provided <paramref name="context"/> if <paramref name="databaseType"/> matches the migration processor
         /// </summary>
         /// <remarks>If the database type does not apply then a <seealso cref="NullIfDatabaseProcessor"/> will be used as a container to void any fluent expressions that would have been executed</remarks>
         /// <param name="context">The context to add expressions to if the database type applies</param>
