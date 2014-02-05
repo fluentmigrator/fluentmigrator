@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>CommandLineParser</id>
+    <version>1.9.71</version>
+    <title>Command Line Parser Library</title>
+    <authors>Giacomo Stelluti Scala</authors>
+    <owners>Giacomo Stelluti Scala</owners>
+    <licenseUrl>https://raw.github.com/gsscoder/commandline/master/doc/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/gsscoder/commandline</projectUrl>
+    <iconUrl>https://github.com/gsscoder/commandline/raw/master/art/CommandLine.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>The Command Line Parser Library offers to CLR applications a clean and concise API for manipulating command line arguments and related tasks.</description>
+    <releaseNotes />
+    <copyright>Copyright (c) 2005 - 2013 Giacomo Stelluti Scala</copyright>
+    <tags>command line argument option parser parsing library syntax shell</tags>
+  </metadata>
+</package>
