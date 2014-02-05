@@ -298,7 +298,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
         /// Ordering used to create or drop tables and foriegn keys.
         /// </summary>
         /// <returns></returns>
-        public IDictionary<string, int> TableFkDependencyOrder(bool ascending)
+        public IDictionary<string, int> TablesInForeignKeyOrder(bool ascending)
         {
             // Computes a dependency depth (Ordinal).
             // Level 0 = Depends on NO table FKs.
@@ -367,7 +367,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
         /// <param name="ascending"></param>
         /// <returns>Mapping from ObjectName -> Ordering. Lower numbered objects should be declared first.</returns>
         /// <remarks>Object's schema name is not (yet) included in the dictionary key.</remarks>
-        public IDictionary<string, int> ScriptDependencyOrder(bool ascending)
+        public IDictionary<string, int> ScriptsInDependencyOrder(bool ascending)
         {
             const string query = @"WITH TablesCTE(ObjType, SchemaName, ObjectName, ObjectID, Ordinal) AS
                 (
@@ -477,13 +477,13 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
                             Name = row["ColumnName"].ToString(),
                             CustomType = "", //TODO: set this property
                             DefaultValue = GetColumnDefault(row),
-                            IsForeignKey = row["IsForeignKey"].ToString() == "1",
-                            IsIdentity = row["IsIdentity"].ToString() == "True",
-                            //IsIndexed = row["IsIndexed"].ToString() == "1",
+                            IsForeignKey = Convert.ToBoolean(row["IsForeignKey"]),
+                            IsIdentity = Convert.ToBoolean(row["IsIdentity"]),
+                            //IsIndexed = Convert.ToBoolean(row["IsIndexed"]),
                             //IndexName = row["IndexName"].ToString(),
-                            IsNullable = row["IsNullable"].ToString() == "True",
-                            //IsPrimaryKey = row["IsPrimaryKey"].ToString() == "1",
-                            //IsUnique = row["IsUnique"].ToString() == "1",
+                            IsNullable = Convert.ToBoolean(row["IsNullable"]),
+                            //IsPrimaryKey = Convert.ToBoolean(row["IsPrimaryKey"]),
+                            //IsUnique = Convert.ToBoolean(row["IsUnique"]),
                             Precision = int.Parse(row["Precision"].ToString()),
                             PrimaryKeyName = row.IsNull("PrimaryKeyName") ? "" : row["PrimaryKeyName"].ToString(),
                             TableName = row["Table"].ToString(),
@@ -531,7 +531,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
                     group new IndexColumnDefinition
                         {
                             Name = row["column_name"].ToString(), 
-                            Direction = row["is_descending_key"].ToString() == "1" ? Direction.Descending : Direction.Ascending
+                            Direction = Convert.ToBoolean(row["is_descending_key"]) ? Direction.Descending : Direction.Ascending
                         } 
                     by new
                         {
@@ -539,8 +539,8 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
                             TableName = row["table_name"].ToString(), 
                             IndexName = row["index_name"].ToString(),
                             IsClustered = row["type_desc"].ToString() == "CLUSTERED",
-                            IsUnique = row["is_unique"].ToString() == "1",
-                            IsPrimary = row["is_primary_key"].ToString() == "1"
+                            IsUnique = Convert.ToBoolean(row["is_unique"]),
+                            IsPrimary = Convert.ToBoolean(row["is_primary_key"])
                         } into g
                     select new IndexDefinition 
                         {
