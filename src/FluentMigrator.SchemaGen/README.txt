@@ -19,7 +19,11 @@ Notes:
  * Added a few additional properties to the FM schema model to support code generation.
  * Several FM projects are set to x86 to ensure that Jet 4.0 driver will load.
 
-Planned refactoring / fixes ...
+Known Issues ...
+
+ * Currently ignores SchemaName when comparing table, index names etc. 
+
+ * Should replace CommandLineParser lib with the one used by FluentMigrator.Console
 
  * FmDiffMigrationWriter - generates schema differences. 
      - Still some bugs to sort out (not yet generating PrimaryKeys properly). 
@@ -27,4 +31,6 @@ Planned refactoring / fixes ...
 
  * FmInitialMigrationWriter + FmSchemaWriterBase 
      - Generates a schema for single database as one class but can probably now be all replaced by the code in 
-	   FmDiffMigrationWriter as I think it can cover both cases by simulating an empty database.
+	   FmDiffMigrationWriter as it can cover both cases by simulating an empty database.
+
+

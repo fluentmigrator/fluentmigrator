@@ -21,30 +21,49 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
+using System.Data.SqlClient;
+using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.SchemaGen.Extensions;
 
 
 namespace FluentMigrator.SchemaGen.SchemaReaders
 {
-
+    /// <summary>
+    /// Reads a SQL Server 2008 database schema.  
+    /// </summary>
+    /// <remarks>
+    /// Does not use SMO API.
+    /// 
+    /// <see cref="ScriptsInDependencyOrder"/>() is probably the only method that breaks for SQL Server 2005
+    /// and at the time of writing this remark, it's not yet used.
+    /// </remarks>
     public class SqlServerSchemaReader : IDbSchemaReader
     {
+        private readonly IDbConnection connection;
         private readonly IOptions options;
+        private readonly DbProviderFactory factory;
 
-        public IAnnouncer Announcer { get; set; }
-        public SqlServerProcessor Processor { get; set; }
+        //public IAnnouncer Announcer { get; set; }
+        //public SqlServerProcessor Processor { get; set; }
 
-        public SqlServerSchemaReader(SqlServerProcessor processor, IAnnouncer announcer, IOptions options)
+        public SqlServerSchemaReader(IDbConnection connection, IOptions options)
         {
+            if (connection == null) throw new ArgumentNullException("connection");
+            if (options == null) throw new ArgumentNullException("options");
+            Debug.Assert(connection.State == ConnectionState.Open);
+            this.connection = connection;
             this.options = options;
-            this.Announcer = announcer;
-            this.Processor = processor;
+            this.factory = SqlClientFactory.Instance;
+            //this.Announcer = announcer;
+            //this.Processor = processor;
         }
 
         #region Mapping Tables
@@ -185,24 +204,24 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
             }
         }
 
-        public virtual void Execute(string template, params object[] args)
+        public DataSet Read(string template, params object[] args)
         {
-            Processor.Execute(template, args);
-        }
-
-        public virtual bool Exists(string template, params object[] args)
-        {
-            return Processor.Exists(template, args);
+            var ds = new DataSet();
+            var sql = String.Format(template, args);
+            //Announcer.Sql(sql);
+            using (IDbCommand cmd = connection.CreateCommand())
+            {
+                cmd.CommandText = sql;
+                IDbDataAdapter adapter = factory.CreateDataAdapter();
+                adapter.SelectCommand = cmd;
+                adapter.Fill(ds);
+                return ds;
+            }
         }
 
         public virtual DataSet ReadTableData(string tableName)
         {
-            return Processor.Read("SELECT * FROM [{0}]", tableName);
-        }
-
-        public virtual DataSet Read(string template, params object[] args)
-        {
-            return Processor.Read(template, args);
+            return Read("SELECT * FROM [{0}]", tableName);
         }
 
         #region Table name filtering
@@ -254,27 +273,27 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
 
         public IEnumerable<string> TableNames
         {
-            get { return ApplyTableFilter(GetNameList("select name from sys.tables where type = 'U' order by name")); }
+            get { return ApplyTableFilter(GetNameList("SELECT name FROM sys.tables WHERE type = 'U' ORDER BY name")); }
         }
 
         public IEnumerable<string> UserDefinedDataTypes
         {
-            get { return GetNameList("select name from sys.procedures where Left(name, 3) NOT IN ('sp_', 'xp_', 'ms_', 'dt_') order by name"); }
+            get { return GetNameList("SELECT name FROM sys.procedures WHERE LEFT(name, 3) NOT IN ('sp_', 'xp_', 'ms_', 'dt_') ORDER BY name"); }
         }
 
         public IEnumerable<string> UserDefinedFunctions
         {
-            get { return GetNameList("SELECT specific_name as name FROM information_schema.routines WHERE routine_type = 'FUNCTION' and not specific_name like 'zz%' order by name"); }
+            get { return GetNameList("SELECT specific_name AS name FROM information_schema.routines WHERE routine_type = 'FUNCTION' ORDER BY name"); }
         }
 
         public IEnumerable<string> StoredProcedures
         {
-            get { return GetNameList("SELECT specific_name as name FROM information_schema.routines WHERE routine_type = 'PROCEDURE' AND Left(specific_name, 3) NOT IN ('sp_', 'xp_', 'ms_', 'dt_') order by name"); }
+            get { return GetNameList("SELECT specific_name AS name FROM information_schema.routines WHERE routine_type = 'PROCEDURE' AND Left(specific_name, 3) NOT IN ('sp_', 'xp_', 'ms_', 'dt_') ORDER BY name"); }
         }
 
         public IEnumerable<string> Views
         {
-            get { return GetNameList("select table_name as name FROM information_schema.views WHERE NOT table_name like 'zz%' order by name"); }
+            get { return GetNameList("SELECT table_name AS name FROM information_schema.views ORDER BY name"); }
         }
 
         private IEnumerable<string> GetNameList(string query)
@@ -347,7 +366,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
 
             #endregion
 
-            using (DataSet ds = Processor.Read(query, ascending ? "ASC" : "DESC"))
+            using (DataSet ds = Read(query, ascending ? "ASC" : "DESC"))
             using (DataTable dt = ds.Tables[0])
             {
                 return (from row in dt.Rows.Cast<DataRow>()
@@ -366,7 +385,10 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
         /// </summary>
         /// <param name="ascending"></param>
         /// <returns>Mapping from ObjectName -> Ordering. Lower numbered objects should be declared first.</returns>
-        /// <remarks>Object's schema name is not (yet) included in the dictionary key.</remarks>
+        /// <remarks>
+        /// Object's schema name is not (yet) included in the dictionary key.
+        /// Uses sys.sql_expression_dependencies view that requires SQL Server 2008
+        /// </remarks>
         public IDictionary<string, int> ScriptsInDependencyOrder(bool ascending)
         {
             const string query = @"WITH TablesCTE(ObjType, SchemaName, ObjectName, ObjectID, Ordinal) AS
@@ -398,7 +420,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
                         ON t.ObjectID = tt.ObjectID AND t.Ordinal = tt.Ordinal
                 ORDER BY tt.Ordinal {0}, t.ObjType, t.SchemaName {0}, t.ObjectName {0}, t.ObjectID";
 
-            using (DataSet ds = Processor.Read(query, ascending ? "ASC" : "DESC"))
+            using (DataSet ds = Read(query, ascending ? "ASC" : "DESC"))
             using (DataTable dt = ds.Tables[0])
             {
                 return (from row in dt.Rows.Cast<DataRow>()

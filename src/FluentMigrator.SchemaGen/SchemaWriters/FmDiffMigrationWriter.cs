@@ -18,7 +18,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         private readonly IOptions options;
         private readonly IDbSchemaReader db1;
         private readonly IDbSchemaReader db2;
-        private int order = 0;
+        private int step = 0;
 
         private static int indent = 0;
         private static StreamWriter writer;
@@ -160,10 +160,14 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             }
         }
 
+        #endregion
+
+        #region Emit Classes
+
         protected void WriteClass(string dirName, string className, Action upMethod, Action downMethod = null)
         {
             // Prefix class with zero filled order number.
-            className = string.Format("M{0,4:D4}0_{1}", ++order, className);
+            className = string.Format("M{0,4:D4}0_{1}", ++step, className);
 
             string fullDirName = Path.Combine(options.BaseDirectory, dirName);
             new DirectoryInfo(fullDirName).Create();
@@ -174,7 +178,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             try
             {
                 using (var fs = new FileStream(classPath, FileMode.Create))
-                using (var writer1 = new StreamWriter(fs))   
+                using (var writer1 = new StreamWriter(fs))
                 {
                     writer = writer1; // assigns class 'writer' variable
 
@@ -190,7 +194,11 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
                     using (new Block()) // namespace {}
                     {
-                        WriteLine("[MigrationVersion({0})]", options.MigrationVersion.Replace(".", ", ") + ", " + order);
+                        WriteLine("[MigrationVersion({0})]", options.MigrationVersion.Replace(".", ", ") + ", " + step);
+                        if (!string.IsNullOrEmpty(options.Tags))
+                        {
+                            WriteLine("[Tags(\"{0}\")]", options.Tags.Replace(",", "\", \""));
+                        }
                         WriteLine("public class {0} : {1}", className, downMethod == null ? "AutoReversingMigrationExt" : "MigrationExt");
                         using (new Block()) // class {}
                         {
@@ -234,71 +242,38 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
         public void WriteMigrations()
         {
+            // TODO: Create new user defined DataTypes
+
+            // Create/Update All tables/columns/indexes/foreign keys
+            CreateUpdateTables();
+
+            // TODO: Drop/Create new or modified scripts (SPs/Views/Functions)
+            // CreateUpdateScripts();
+
             // Drop tables in order of their FK dependency.
             WriteClass("Common", "DropTables", DropTables, CantUndo);
 
-            WriteClass("Common", "DropCode", DropCode, CantUndo);
-
-            CreateUpdateTables();
-
-            // Per table
-            // Add new columns
-            //  Placeholder to migrate data
-            // Remove old columns
-            // Drop old indexes - Do this for each table
-
             // Drop old SPs/Views/Functions
+            WriteClass("Common", "DropScripts", DropScripts, CantUndo);
 
-            // Drop old DataTypes
+            // TODO: Drop old user defined DataTypes
+            // WriteClass("Data", "LoadSeedData", LoadSeedData, DropSeedData);
 
-            // Create new DataTypes
+            // TODO: Load/Update Seed Data
+            // WriteClass("Data", "LoadSeedData", LoadSeedData, DropSeedData);
 
-            // Create new Tables
+            // TODO: Load/Update Demo Data (if tagged "Demo")
+            // WriteClass("Data", "LoadDemoData", LoadDemoData, DropDemoData);
 
-            // Drop old tables (OR may need to be renamed for manual rollback or data migration)
-
-            // Alter tables 
-            // Remove columns  (some will be renamed but that's up to the code reviewer)
-            // Add columns               
-
-            // Drop/Create new/modified Indexes
-
-            // Drop/create new/modified FKs
-
-            // Drop/Create new/modified SPs/Views/Functions 
-
-            // Load Seed Data
-
-            // Load Demo Data (if tagged "Demo")
-
-            //foreach (TableDefinition table in newTables)
-            //{
-            //    CreateTable(table);
-            //}
-
-            //// Create foreign keys AFTER the tables.
-            //foreach (TableDefinition table in tables)
-            //{
-            //    if (table.ForeignKeys.Any())
-            //    {
-            //        output.Write("{0}#region UP Table Foreign Keys {1}.{2}", Indent0, table.SchemaName, table.Name);
-            //        foreach (var fk in table.ForeignKeys)
-            //        {
-            //            CreateForeignKey(fk);
-            //        }
-            //        output.WriteLine("{0}#endregion", Indent0);
-            //    }
-            //}
-
-            //output.WriteLine("\t\t}\n"); //end method
-
+            // TODO: Load/Update Test Data (if tagged "Test")
+            // WriteClass("Test", "LoadTestData", LoadTestData, DropTestData);
         }
 
         #region Drop Tables and Code
         private void DropTables()
         {
             // TODO: Currently ignoring Schema name for table objects.
-            var db1FkOrder = db1.TableFkDependencyOrder(false); // descending order
+            var db1FkOrder = db1.TablesInForeignKeyOrder(false); // descending order
 
             var removedTableNames = db1.TableNames.Except(db2.TableNames).ToList();
             removedTableNames = removedTableNames.OrderBy(t => -db1FkOrder[t]).ToList();
@@ -314,7 +289,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             }
         }
 
-        private void DropCode()
+        private void DropScripts()
         {
             foreach (var name in db1.StoredProcedures.Except(db2.StoredProcedures))
             {
@@ -345,7 +320,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
             // TODO: Currently ignoring Schema name for table objects.
 
-            var db2FkOrder = db2.TableFkDependencyOrder(true);
+            var db2FkOrder = db2.TablesInForeignKeyOrder(true);
             var db2TablesInFkOrder = db2.Tables.OrderBy(tableDef => db2FkOrder[tableDef.Name]);
 
             foreach (TableDefinition table in db2TablesInFkOrder)
@@ -377,9 +352,6 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
         private void CreateTable(TableDefinition table)
         {
-            //ColumnDefinition pkCol = table.Columns.FirstOrDefault(col => col.IsPrimaryKey);
-            //bool hasClusteredPkIndex = table.Indexes.Any(index => index.IsClustered && index.IsUnique && index.Columns.All(col => col.Name == pkCol.Name));
-
             WriteLine("Create.Table(\"{1}\").InSchema(\"{0}\")", table.SchemaName, table.Name);
             
             using (new Indenter())
@@ -425,9 +397,13 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         /// <param name="newTable"></param>
         private void UpdateTable(TableDefinition oldTable, TableDefinition newTable)
         {
-            // Strategy to detect differences is to generate FluentMigration API code 
-            // for each named column, index and foreign key and then detect changes 
-            // in EITHER the object name lists OR generated code for an object.
+            // Strategy is to compute generated FluentMigration API code 
+            // for each table related object (columns, indexes and foreign keys) 
+            // and then detect changes in EITHER the list of object names 
+            // OR the code for objects of matching name.
+
+            // We only emit code if there are actual changes so we can detect 
+            // when there are NO changes and then not emit the class.
 
             // Columns
             IDictionary<string, string> oldCols = oldTable.Columns.ToDictionary(col => col.Name, GetColumnCode);
@@ -442,8 +418,10 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             IDictionary<string, string> newIndexes = GetNonColumnIndexes(newTable).ToDictionary(index => index.Name, GetCreateIndexCode);
             
             // Updated indexes are removed and added
-            var addedIndexCode = oldIndexes.GetAdded(newIndexes).Concat(oldIndexes.GetUpdated(newIndexes));
-            var removedIndexNames = oldIndexes.GetRemovedKeys(newIndexes).Concat(oldIndexes.GetUpdatedKeys(newIndexes));
+            var addedIndexCode = oldIndexes.GetAdded(newIndexes);
+            var updatedIndexesCode = oldIndexes.GetUpdated(newIndexes);
+            var removeUpdatedIndexesCode = oldIndexes.GetUpdatedKeys(newIndexes).Select(indexName => GetRemoveIndexCode(oldTable, indexName));
+            var removedIndexNames = oldIndexes.GetRemovedKeys(newIndexes);
             var removedIndexCode = removedIndexNames.Select(indexName => GetRemoveIndexCode(oldTable, indexName));
 
             // Foreign Keys
@@ -455,13 +433,20 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             var removedFkNames = oldFKs.GetRemovedKeys(newFKs).Concat(oldFKs.GetUpdatedKeys(newFKs));
             var removedFkCode = removedFkNames.Select(fkName => GetRemoveFKCode(oldTable, fkName));
 
-            // Only Write lines if there are actual changes so we can detect when there are NO changes.
+            // Keep old indexes and columns as long as possible as they may be needed when 
+            // developer adds custom code to migrate the data.
 
             AlterTable(newTable, addedColsCode);    // Added new columns
             WriteChanges(addedIndexCode);           // Added Indexes
             WriteChanges(addedFkCode);              // Added foreign keys
 
-            AlterTable(newTable, updatedColsCode);  // Updated columns
+            WriteChanges(removeUpdatedIndexesCode); // Remove updated indexes
+
+            AlterTable(newTable, updatedColsCode);  // Updated columns (including column indexes)
+
+            WriteChanges(updatedIndexesCode);       // Add updated indexes
+
+            // Note: The developer may add custom data migration code here
 
             WriteChanges(removedFkCode);            // Removed foreign keys
             WriteChanges(removedIndexCode);         // Removed Indexes

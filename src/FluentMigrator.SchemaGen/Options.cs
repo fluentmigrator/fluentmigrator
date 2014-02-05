@@ -10,23 +10,20 @@ namespace FluentMigrator.SchemaGen
         string DbName2 { get; set; }
 
         string BaseDirectory { get; set; }
-
         string NameSpace { get; set; }
-
-        string ClassName { get; set; }
-
         string MigrationVersion { get; set; }
+        string Tags { get; set; }
 
         bool AutoReversingMigration { get; set; }
-
         bool UseDeprecatedTypes { get; set; }
-
         string IncludeTables { get; set; }
-
         string ExcludeTables { get; set; }
     }
 
-    class Options : IOptions
+    /// <summary>
+    /// Used by CommandLineParser from NuGet
+    /// </summary>
+    internal class Options : IOptions
     {
         [Option("db", Required = false, HelpText = "SQL Server database name if generating initial database code.")]
         public string DbName { get; set; }
@@ -36,6 +33,20 @@ namespace FluentMigrator.SchemaGen
 
         [Option("db2", Required = false, HelpText = "2nd SQL Server database name if generating migration code.")]
         public string DbName2 { get; set; }
+
+        
+        [Option("dir", DefaultValue = ".", HelpText = "class directory")]
+        public string BaseDirectory { get; set; }
+
+        [Option("ns", Required = true, HelpText = "C# class namespace.")]
+        public string NameSpace { get; set; }
+
+        [Option("version", DefaultValue = "1.0", HelpText = "Database schema version.  Example: \"1.0\"")]
+        public string MigrationVersion { get; set; }
+
+        [Option("tags", DefaultValue = "", HelpText = "Example: --tags abc,def Adds [Tags(\"tag1\", \"def\")] attribute to all generated C# classes.")]
+        public string Tags { get; set; }
+
 
         [Option("auto-reversing", DefaultValue = true, HelpText = "Derive class from AutoReversingMigration.")]
         public bool AutoReversingMigration { get; set; }
@@ -48,19 +59,8 @@ namespace FluentMigrator.SchemaGen
 
         [Option("exclude-tables", DefaultValue = null, HelpText = "Comma separated list of table names to exclude. Use \"prefix*\"  to exclude tables with prefix.")]
         public string ExcludeTables { get; set; }
-
-        [Option("dir", DefaultValue = ".", HelpText = "class directory")]
-        public string BaseDirectory { get; set; }
-
-        [Option("ns", Required = true, HelpText = "C# class namespace.")]
-        public string NameSpace { get; set; }
-
-        [Option("class", Required = false, HelpText = "C# class name.")]
-        public string ClassName { get; set; }
-
-        [Option("version", DefaultValue = "1.0", HelpText = "Database schema version.  Example: \"1.0\"")]
-        public string MigrationVersion { get; set; }
-
+        
+        
         [ParserState]
         public IParserState LastParserState { get; set; }
 
