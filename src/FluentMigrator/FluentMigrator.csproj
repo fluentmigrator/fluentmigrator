@@ -255,7 +255,6 @@
     <Compile Include="TagsAttribute.cs" />
     <Compile Include="AutoScriptMigration.cs" />
     <Compile Include="TransactionBehavior.cs" />
-    <Compile Include="VersionTable.cs" />
     <Compile Include="VersionTableInfo\DefaultVersionTableMetaData.cs" />
     <Compile Include="VersionTableInfo\IVersionTableMetaData.cs" />
     <Compile Include="MigrationTraitAttribute.cs" />

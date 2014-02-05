@@ -59,7 +59,7 @@ namespace FluentMigrator.SchemaGen
                         cnn.Open();
 
                         var processor = new SqlServerProcessor(cnn, generator, announcer, processorOptions, factory);
-                        IDbSchemaReader reader = new SqlServerSchemaReader(processor, announcer);
+                        IDbSchemaReader reader = new SqlServerSchemaReader(processor, announcer, options);
 
                         IMigrationWriter migrationWriter = new FmInitialMigrationWriter(options, reader);
                         migrationWriter.WriteMigrations();
@@ -74,10 +74,10 @@ namespace FluentMigrator.SchemaGen
                         cnn2.Open();
 
                         var processor1 = new SqlServerProcessor(cnn1, generator, announcer, processorOptions, factory);
-                        IDbSchemaReader reader1 = new SqlServerSchemaReader(processor1, announcer);
+                        IDbSchemaReader reader1 = new SqlServerSchemaReader(processor1, announcer, options);
 
                         var processor2 = new SqlServerProcessor(cnn2, generator, announcer, processorOptions, factory);
-                        IDbSchemaReader reader2 = new SqlServerSchemaReader(processor2, announcer);
+                        IDbSchemaReader reader2 = new SqlServerSchemaReader(processor2, announcer, options);
 
                         IMigrationWriter writer1 = new FmDiffMigrationWriter(options, reader1, reader2);
 

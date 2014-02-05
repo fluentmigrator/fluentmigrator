@@ -50,7 +50,6 @@
     <Compile Include="Extensions\SwitchExtensions.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="SchemaReaders\DbTypeSizes.cs" />
-    <Content Include="SchemaWriters\DatabaseObjects.cs.txt" />
     <Compile Include="SchemaWriters\FmDiffMigrationWriter.cs" />
     <Compile Include="SchemaWriters\FmInitialMigrationWriter.cs" />
     <Compile Include="Program.cs" />

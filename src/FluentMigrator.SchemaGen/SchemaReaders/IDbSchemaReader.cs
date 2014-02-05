@@ -10,7 +10,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
         IDictionary<string, int> TableFkDependencyOrder(bool ascending);
 
         IEnumerable<TableDefinition> Tables { get; }
-        IEnumerable<TableDefinition> GetTables(IEnumerable<string> tableNames);
+        IEnumerable<TableDefinition> GetTables(IEnumerable<string> tableNames = null);
 
         IEnumerable<string> TableNames { get; }
         IEnumerable<string> UserDefinedDataTypes { get; }

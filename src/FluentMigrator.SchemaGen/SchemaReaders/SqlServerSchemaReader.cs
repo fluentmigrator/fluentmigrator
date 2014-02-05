@@ -17,10 +17,12 @@
 //
 #endregion
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Text.RegularExpressions;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
@@ -33,6 +35,18 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
 
     public class SqlServerSchemaReader : IDbSchemaReader
     {
+        private readonly IOptions options;
+
+        public IAnnouncer Announcer { get; set; }
+        public SqlServerProcessor Processor { get; set; }
+
+        public SqlServerSchemaReader(SqlServerProcessor processor, IAnnouncer announcer, IOptions options)
+        {
+            this.options = options;
+            this.Announcer = announcer;
+            this.Processor = processor;
+        }
+
         #region Mapping Tables
         private enum SqlServerType
         {
@@ -171,15 +185,6 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
             }
         }
 
-        public IAnnouncer Announcer { get; set; }
-        public SqlServerProcessor Processor { get; set; }
-
-        public SqlServerSchemaReader(SqlServerProcessor processor, IAnnouncer announcer)
-        {
-            Announcer = announcer;
-            Processor = processor;
-        }
-
         public virtual void Execute(string template, params object[] args)
         {
             Processor.Execute(template, args);
@@ -200,22 +205,56 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
             return Processor.Read(template, args);
         }
 
-        //public virtual void Process(PerformDBOperationExpression expression)
-        //{
-        //    Processor.Process(expression);
-        //}
-
-
-        public IEnumerable<TableDefinition> Tables { get { return ReadTables(); } }
-
-        public IEnumerable<TableDefinition> GetTables(IEnumerable<string> tableNames)
+        #region Table name filtering
+        private Regex MapFilter(string filter)
         {
-            return ReadTables(tableNames);
+            string[] patterns = (from pat in filter.Split(',') select "^" + pat.Replace(".", "\\.").Replace("*", ".*") + "$").ToArray();
+            return new Regex(String.Join("|", patterns));
+        }
+
+        protected IEnumerable<TableDefinition> ApplyTableFilter(IEnumerable<TableDefinition> tables)
+        {
+            if (options.IncludeTables != null)
+            {
+                var pattern = MapFilter(options.IncludeTables);
+                tables = tables.Where(table => pattern.IsMatch(table.Name));
+            }
+
+            if (options.ExcludeTables != null)
+            {
+                var pattern = MapFilter(options.ExcludeTables);
+                tables = tables.Where(table => !pattern.IsMatch(table.Name));
+            }
+
+            return tables;
+        }
+
+        protected IEnumerable<string> ApplyTableFilter(IEnumerable<string> tableNames)
+        {
+            if (options.IncludeTables != null)
+            {
+                var pattern = MapFilter(options.IncludeTables);
+                tableNames = tableNames.Where(name => pattern.IsMatch(name));
+            }
+
+            if (options.ExcludeTables != null)
+            {
+                var pattern = MapFilter(options.ExcludeTables);
+                tableNames = tableNames.Where(name => !pattern.IsMatch(name));
+            }
+
+            return tableNames;
+        }
+        #endregion
+
+        public IEnumerable<TableDefinition> Tables
+        {
+            get { return GetTables(); }
         }
 
         public IEnumerable<string> TableNames
         {
-            get { return GetNameList("select name from sys.tables where type = 'U' order by name"); }
+            get { return ApplyTableFilter(GetNameList("select name from sys.tables where type = 'U' order by name")); }
         }
 
         public IEnumerable<string> UserDefinedDataTypes
@@ -373,7 +412,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
             }
         }
 
-        private IEnumerable<TableDefinition> ReadTables(IEnumerable<string> tableNames = null)
+        public IEnumerable<TableDefinition> GetTables(IEnumerable<string> tableNames = null)
         {
             IEnumerable<TableDefinition> tables = ReadTableDefs();
 
@@ -463,6 +502,9 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
                             SchemaName = g.Key.SchemaName,
                             Name = g.Key.TableName,
                         };
+
+                // TODO: Not very efficient if there are large numbers of tables. Should alter the SQL query instead.
+                tables = ApplyTableFilter(tables);
 
                 return tables.ToList();
             }

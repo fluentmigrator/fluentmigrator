@@ -34,8 +34,6 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             this.options = options;
             this.db1 = db1;
             this.db2 = db2;
-            //this.tables1 = ApplyTableFilter(tables1);
-            //this.tables2 = ApplyTableFilter(tables2);
         }
 
         #region Helpers
@@ -440,7 +438,9 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         /// <param name="newTable"></param>
         private void UpdateTable(TableDefinition oldTable, TableDefinition newTable)
         {
-            // Strategy is to generate FluentMigration API code for each named column, index and foreign key and then detect changes to names OR generated code.
+            // Strategy to detect differences is to generate FluentMigration API code 
+            // for each named column, index and foreign key and then detect changes 
+            // in EITHER the object name lists OR generated code for an object.
 
             // Columns
             IDictionary<string, string> oldCols = oldTable.Columns.ToDictionary(col => col.Name, GetColumnCode);

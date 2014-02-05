@@ -30,7 +30,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             return new Regex(String.Join("|", patterns));
         }
 
-        public IEnumerable<TableDefinition> ApplyTableFilter(IEnumerable<TableDefinition> tables)
+        protected IEnumerable<TableDefinition> ApplyTableFilter(IEnumerable<TableDefinition> tables)
         {
             if (options.IncludeTables != null)
             {

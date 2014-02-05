@@ -10,6 +10,5 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         /// Generates a Fluent Migrator C# class (or classes).
         /// </summary>
         void WriteMigrations();
-
     }
 }
