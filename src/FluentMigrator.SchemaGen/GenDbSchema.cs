@@ -26,6 +26,7 @@ namespace FluentMigrator.SchemaGen
         {
             try
             {
+                // Generate migration classes for the whole schema of a single database.
                 if (options.DbName != null)
                 {
                     using (IDbConnection cnn = GetDbConnection(options.DbName))
@@ -37,9 +38,10 @@ namespace FluentMigrator.SchemaGen
                         IDbSchemaReader reader2 = new SqlServerSchemaReader(cnn, options);
 
                         IMigrationWriter migrationWriter = new FmDiffMigrationWriter(options, reader1, reader2);
-                        migrationWriter.WriteMigrations();
+                        migrationWriter.WriteMigrationClasses();
                     }
                 }
+                // Generate migration classes based on differences between two databases.
                 else if (options.DbName1 != null && options.DbName2 != null)
                 {
                     using (IDbConnection cnn1 = GetDbConnection(options.DbName1))
@@ -53,7 +55,7 @@ namespace FluentMigrator.SchemaGen
 
                         IMigrationWriter writer1 = new FmDiffMigrationWriter(options, reader1, reader2);
 
-                        writer1.WriteMigrations();
+                        writer1.WriteMigrationClasses();
                     }
                 }
                 else

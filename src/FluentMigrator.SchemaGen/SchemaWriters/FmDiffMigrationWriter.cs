@@ -70,7 +70,8 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
         private static void WriteLine(string line)
         {
-            Indent();
+            if (line.Length > 0) Indent();
+
             if (sb == null)
             {
                 writer.WriteLine(line);
@@ -216,16 +217,16 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
                     using (new Block()) // namespace {}
                     {
                         WriteLine("[MigrationVersion({0})]", options.MigrationVersion.Replace(".", ", ") + ", " + step);
+                        
                         if (!string.IsNullOrEmpty(options.Tags))
                         {
                             WriteLine("[Tags(\"{0}\")]", options.Tags.Replace(",", "\", \""));
                         }
+                       
                         WriteLine("public class {0} : {1}", className, downMethod == null ? "AutoReversingMigrationExt" : "MigrationExt");
                         using (new Block()) // class {}
                         {
-                            // Need to split into lines so indenting works 
-                            string[] upMethodLines = upMethodCode.Replace(Environment.NewLine, "\n").Split('\n');
-
+                            string[] upMethodLines = SplitCodeLines(upMethodCode);
                             WriteMethod("Up", () => WriteLines(upMethodLines));
 
                             if (downMethod != null)
@@ -247,6 +248,23 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             }
         }
 
+        private string[] SplitCodeLines(string codeText)
+        {
+            // Trim extra leading / trailing blank lines.
+            if (codeText.StartsWith(Environment.NewLine))
+            {
+                codeText = codeText.Substring(Environment.NewLine.Length);
+            }
+
+            if (codeText.EndsWith(Environment.NewLine))
+            {
+                codeText = codeText.Substring(0, codeText.Length - Environment.NewLine.Length);
+            }
+
+            // Need to split into lines so indenting works 
+            return codeText.Replace(Environment.NewLine, "\n").Split('\n');
+        }
+
         private void WriteMethod(string name, Action body)
         {
             WriteLine();
@@ -264,7 +282,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
         #endregion
 
-        public void WriteMigrations()
+        public void WriteMigrationClasses()
         {
             // TODO: Create new user defined DataTypes
 

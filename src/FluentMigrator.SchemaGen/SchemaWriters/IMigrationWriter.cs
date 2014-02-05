@@ -7,8 +7,8 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
     public interface IMigrationWriter
     {
         /// <summary>
-        /// Generates a Fluent Migrator C# class (or classes).
+        /// Generates Fluent Migrator C# classes
         /// </summary>
-        void WriteMigrations();
+        void WriteMigrationClasses();
     }
 }
