@@ -53,12 +53,10 @@
     <Compile Include="SchemaReaders\DbTypeSizes.cs" />
     <Compile Include="SchemaReaders\EmptyDbSchemaReader.cs" />
     <Compile Include="SchemaWriters\FmDiffMigrationWriter.cs" />
-    <Content Include="SchemaWriters\FmInitialMigrationWriter.cs.txt" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SchemaReaders\IDbSchemaReader.cs" />
     <Compile Include="SchemaReaders\SqlServerSchemaReader.cs" />
-    <Content Include="SchemaWriters\FmSchemaWriterBase.cs.txt" />
     <Compile Include="SchemaWriters\IMigrationWriter.cs" />
   </ItemGroup>
   <ItemGroup>

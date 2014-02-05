@@ -36,7 +36,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             this.db2 = db2;
         }
 
-        #region Helpers
+        #region WriteLine/Indent/Block/Buffer Helpers
 
         private static void Indent()
         {
@@ -56,7 +56,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             }
         }
 
-        private void WriteLine()
+        private static void WriteLine()
         {
             if (sb == null)
             {
@@ -95,7 +95,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             }
         }
 
-        private void WriteLines(IEnumerable<string> lines)
+        private static void WriteLines(IEnumerable<string> lines)
         {
             foreach (string line in lines)
             {
@@ -103,7 +103,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             }
         }
 
-        private void WriteLines(IEnumerable<string> lines, string appendLastLine = null)
+        private static void WriteLines(IEnumerable<string> lines, string appendLastLine)
         {
             var lineArr = lines.ToArray();
             for (int i = 0; i < lineArr.Length; i++)
@@ -119,16 +119,21 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             }
         }
 
-        private void BeginBuffer()
+        /// <summary>
+        /// Returns the lines output by <paramref name="action"/>.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns></returns>
+        private string Buffer(Action action)
         {
             if (sb != null) nestedBuffers.Push(sb);
             sb = new StringBuilder();
-        }
 
-        private string EndBuffer()
-        {
+            action();
+
             string result = sb.ToString();
             sb = nestedBuffers.Count == 0 ? null : nestedBuffers.Pop();
+
             return result;
         }
 
@@ -164,8 +169,24 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
         #region Emit Classes
 
+        /// <summary>
+        /// Writes a Migrator class.
+        /// Only creates the class file if the <paramref name="upMethod"/> emits code.
+        /// </summary>
+        /// <param name="dirName">Project subdirectory (included in namespace)</param>
+        /// <param name="className">Migration class name</param>
+        /// <param name="upMethod">Action to emit Up() method code</param>
+        /// <param name="downMethod">
+        /// Optional Action to emit Down() method code.
+        /// If null, the class inherits from AutoReversingMigrationExt, otherwise it inherits from MigrationExt.
+        /// These are project classes that inherit from AutoReversingMigration and Migration.
+        /// </param>
         protected void WriteClass(string dirName, string className, Action upMethod, Action downMethod = null)
         {
+            // If no code is generated for an Up() method => No class is emitted
+            string upMethodCode = Buffer(upMethod);
+            if (upMethodCode.Length == 0) return;
+
             // Prefix class with zero filled order number.
             className = string.Format("M{0,4:D4}0_{1}", ++step, className);
 
@@ -202,7 +223,10 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
                         WriteLine("public class {0} : {1}", className, downMethod == null ? "AutoReversingMigrationExt" : "MigrationExt");
                         using (new Block()) // class {}
                         {
-                            WriteMethod("Up", upMethod);
+                            // Need to split into lines so indenting works 
+                            string[] upMethodLines = upMethodCode.Replace(Environment.NewLine, "\n").Split('\n');
+
+                            WriteMethod("Up", () => WriteLines(upMethodLines));
 
                             if (downMethod != null)
                             {
@@ -330,17 +354,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
                 if (db1Tables.ContainsKey(newTable.Name))
                 {
                     TableDefinition oldTable = db1Tables[newTable.Name];
-
-                    // Only generate a Table update class if there are detected changes.
-                    BeginBuffer();
-                    UpdateTable(oldTable, newTable);
-                    string updates = EndBuffer();
-
-                    if (updates.Length > 0)
-                    {
-                        string[] lines = updates.Replace(Environment.NewLine, "\n").Split('\n');
-                        WriteClass("Common", "Update_" + table.Name, () => WriteLines(lines));
-                    }
+                    WriteClass("Common", "Update_" + table.Name, () => UpdateTable(oldTable, newTable));
                 }
                 else
                 {
@@ -442,9 +456,9 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
             WriteChanges(removeUpdatedIndexesCode); // Remove updated indexes
 
-            AlterTable(newTable, updatedColsCode);  // Updated columns (including column indexes)
+            AlterTable(newTable, updatedColsCode);  // Updated columns (including 1 column indexes)
 
-            WriteChanges(updatedIndexesCode);       // Add updated indexes
+            WriteChanges(updatedIndexesCode);       // Add updated indexes (excluding 1 column indexes)
 
             // Note: The developer may add custom data migration code here
 
@@ -737,8 +751,12 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
         protected string GetCreateForeignKeyCode(ForeignKeyDefinition fk)
         {
-            BeginBuffer();
+            string result = Buffer(() => DoGetCreateForeignKeyCode(fk));
+            return result.Substring(0, result.Length - Environment.NewLine.Length) + ";";
+        }
 
+        private void DoGetCreateForeignKeyCode(ForeignKeyDefinition fk)
+        {
             //Create.ForeignKey("fk_TestTable2_TestTableId_TestTable_Id")
             //    .FromTable("TestTable2").ForeignColumn("TestTableId")
             //    .ToTable("TestTable").PrimaryColumn("Id");
@@ -793,9 +811,6 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
                     }
                 }
             }
-
-            string result = EndBuffer();
-            return result.Substring(0, result.Length-Environment.NewLine.Length) + ";";
         }
 
         #endregion
