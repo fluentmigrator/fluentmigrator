@@ -13,3 +13,7 @@ Fluent Migrator API Refs:
 
 Libs:
    PM> Install-Package CommandLineParser
+
+TODO:
+  * Unit Tests :) 
+  * 
