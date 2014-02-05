@@ -13,6 +13,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         protected override string FormatDefaultValue(ColumnDefinition column)
         {
+            if (!column.IsIdentity)
+            {
             if (DefaultValueIsSqlFunction(column.DefaultValue))
                 return "DEFAULT " + column.DefaultValue.ToString();
 
@@ -20,6 +22,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             if (column.ModificationType == ColumnModificationType.Create && !string.IsNullOrEmpty(defaultValue))
                 return "CONSTRAINT " + Quoter.QuoteConstraintName(GetDefaultConstraintName(column.TableName, column.Name)) + " " + defaultValue;
+            }
 
             return string.Empty;
         }
