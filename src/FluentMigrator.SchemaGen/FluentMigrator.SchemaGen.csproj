@@ -36,6 +36,8 @@
     <Reference Include="CommandLine">
       <HintPath>..\..\packages\CommandLineParser.1.9.71\lib\net35\CommandLine.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Build.Framework" />
+    <Reference Include="Microsoft.Build.Utilities.v3.5" />
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -48,7 +50,8 @@
     <Compile Include="Extensions\DictionaryDiffExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\SwitchExtensions.cs" />
-    <Compile Include="GenDbSchema.cs" />
+    <Compile Include="CodeGenFmClasses.cs" />
+    <Compile Include="MSBuild\FmCodeGen.cs" />
     <Compile Include="Options.cs" />
     <Compile Include="SchemaReaders\DbTypeSizes.cs" />
     <Compile Include="SchemaReaders\EmptyDbSchemaReader.cs" />
@@ -67,10 +70,6 @@
     <Content Include="README.txt" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FluentMigrator.Runner\FluentMigrator.Runner.csproj">
-      <Project>{cb468ad6-60c2-42e9-b3b0-01968ef94c65}</Project>
-      <Name>FluentMigrator.Runner</Name>
-    </ProjectReference>
     <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj">
       <Project>{fd9410f9-6fea-47f7-a78e-b4f6fb0539b8}</Project>
       <Name>FluentMigrator</Name>

@@ -1,4 +1,22 @@
-﻿using System;
+﻿#region Apache 2.0 License
+// 
+// Copyright (c) 2014, Tony O'Hagan <tony@ohagan.name>
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
@@ -18,7 +36,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         private readonly IOptions options;
         private readonly IDbSchemaReader db1;
         private readonly IDbSchemaReader db2;
-        private int step = 0;
+        private int step = 1;
 
         private static int indent = 0;
         private static StreamWriter writer;
@@ -189,9 +207,14 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             if (upMethodCode.Length == 0) return;
 
             // Prefix class with zero filled order number.
-            className = string.Format("M{0,4:D4}0_{1}", ++step, className);
+            className = string.Format("M{0,4:D4}0_{1}", step, className);
 
-            string fullDirName = Path.Combine(options.BaseDirectory, dirName);
+            string fullDirName = options.BaseDirectory;
+            if (!string.IsNullOrEmpty(dirName))
+            {
+                fullDirName = Path.Combine(options.BaseDirectory, dirName);
+            }
+
             new DirectoryInfo(fullDirName).Create();
 
             string classPath = Path.Combine(fullDirName, className + ".cs");
@@ -212,7 +235,13 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
                     WriteLine("using Migrations.FM_Extensions;");
 
                     WriteLine(String.Empty);
-                    WriteLine("namespace {0}.{1}", options.NameSpace, dirName.Replace("\\", "."));
+
+                    string ns = options.NameSpace;
+                    if (!string.IsNullOrEmpty(dirName))
+                    {
+                        ns = ns + "." + dirName.Replace("\\", ".");
+                    }
+                    WriteLine("namespace {0}", ns);
 
                     using (new Block()) // namespace {}
                     {
@@ -235,6 +264,8 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
                             }
                         }
                     }
+
+                    step++;
 
                     writer.Flush();
                     writer = null;
@@ -284,6 +315,10 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
         public void WriteMigrationClasses()
         {
+            step = options.StepStart;
+            WriteClass("", "PreChecks", () => 
+                WriteLine("// Sets initial version to " + options.MigrationVersion + "." + step));
+
             // TODO: Create new user defined DataTypes
 
             // Create/Update All tables/columns/indexes/foreign keys
@@ -293,10 +328,10 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             // CreateUpdateScripts();
 
             // Drop tables in order of their FK dependency.
-            WriteClass("Common", "DropTables", DropTables, CantUndo);
+            WriteClass("", "DropTables", DropTables, CantUndo);
 
             // Drop old SPs/Views/Functions
-            WriteClass("Common", "DropScripts", DropScripts, CantUndo);
+            WriteClass("", "DropScripts", DropScripts, CantUndo);
 
             // TODO: Drop old user defined DataTypes
             // WriteClass("Data", "LoadSeedData", LoadSeedData, DropSeedData);
@@ -309,6 +344,16 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
             // TODO: Load/Update Test Data (if tagged "Test")
             // WriteClass("Test", "LoadTestData", LoadTestData, DropTestData);
+
+            if (options.StepEnd != -1)
+            {
+                // The assigned range of step numbers exceeded the upper limit.
+                if (step > options.StepEnd) throw new Exception("Last step number exceeded the StepEnd option.");
+                step = options.StepEnd;
+            }
+
+            WriteClass("", "PostChecks", () => 
+                WriteLine("// Sets final version to " + options.MigrationVersion + "." + step));
         }
 
         #region Drop Tables and Code
@@ -372,11 +417,11 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
                 if (db1Tables.ContainsKey(newTable.Name))
                 {
                     TableDefinition oldTable = db1Tables[newTable.Name];
-                    WriteClass("Common", "Update_" + table.Name, () => UpdateTable(oldTable, newTable));
+                    WriteClass("", "Update_" + table.Name, () => UpdateTable(oldTable, newTable));
                 }
                 else
                 {
-                    WriteClass("Common", "Create_" + table.Name, () => CreateTable(newTable));
+                    WriteClass("", "Create_" + table.Name, () => CreateTable(newTable));
                 }
             }
 

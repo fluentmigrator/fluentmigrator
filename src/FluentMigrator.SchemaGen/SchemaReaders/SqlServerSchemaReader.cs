@@ -1,7 +1,6 @@
-#region License
+#region Apache License
 // 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// Copyright (c) 2010, Nathan Brown
+// Copyright (c) 2014, Tony O'Hagan <tony@ohagan.name>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,11 +25,7 @@ using System.Data.SqlClient;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
-using FluentMigrator.Builders.Execute;
 using FluentMigrator.Model;
-using FluentMigrator.Runner;
-using FluentMigrator.Runner.Processors;
-using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.SchemaGen.Extensions;
 
 
