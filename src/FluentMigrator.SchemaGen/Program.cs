@@ -53,7 +53,7 @@ namespace FluentMigrator.SchemaGen
                     options.Db1 = GetDbConnectionString(options.Db1);
                     options.Db2 = GetDbConnectionString(options.Db2);
 
-                    new CodeGenFmClasses(options).Execute();
+                    new CodeGenFmClasses(options).GenClasses();
                 }
                 catch (Exception ex)
                 {

@@ -9,6 +9,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         /// <summary>
         /// Generates Fluent Migrator C# classes
         /// </summary>
-        void WriteMigrationClasses();
+        /// <returns>The paths of generated classes</returns>
+        IEnumerable<string> WriteMigrationClasses();
     }
 }

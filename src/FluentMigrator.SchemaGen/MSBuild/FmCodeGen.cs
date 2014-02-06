@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
@@ -16,9 +17,15 @@ namespace FluentMigrator.SchemaGen.MSBuild
         public string Db1 { get; set; }
         public string Db2 { get; set; }
 
+        [Required]
         public string BaseDirectory { get; set; }
+
+        [Required]
         public string NameSpace { get; set; }
+
+        [Required]
         public string MigrationVersion { get; set; }
+        
         public int StepStart { get; set; }
         public int StepEnd { get; set; }
         public string Tags { get; set; }
@@ -26,6 +33,9 @@ namespace FluentMigrator.SchemaGen.MSBuild
         public string IncludeTables { get; set; }
         public string ExcludeTables { get; set; }
         #endregion
+
+        [Output]
+        public ITaskItem[] OutputClassFiles { get; private set; }
 
         public FmCodeGen()
         {
@@ -48,7 +58,10 @@ namespace FluentMigrator.SchemaGen.MSBuild
 
             try
             {
-                new CodeGenFmClasses(this).Execute();
+                var engine = new CodeGenFmClasses(this);
+                OutputClassFiles = (from classPath in engine.GenClasses() 
+                                    select new TaskItem(classPath) as ITaskItem)
+                                    .ToArray(); 
                 return true;
             }
             catch (Exception ex)

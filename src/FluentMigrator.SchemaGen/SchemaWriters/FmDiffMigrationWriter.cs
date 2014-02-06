@@ -38,6 +38,8 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         private readonly IDbSchemaReader db2;
         private int step = 1;
 
+        IList<string> classPaths = new List<string>();
+
         private static int indent = 0;
         private static StreamWriter writer;
         private static StringBuilder sb;
@@ -220,6 +222,8 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             string classPath = Path.Combine(fullDirName, className + ".cs");
             Console.WriteLine(classPath);
 
+            classPaths.Add(classPath);
+
             try
             {
                 using (var fs = new FileStream(classPath, FileMode.Create))
@@ -313,7 +317,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
         #endregion
 
-        public void WriteMigrationClasses()
+        public IEnumerable<string> WriteMigrationClasses()
         {
             step = options.StepStart;
             WriteClass("", "PreChecks", () => 
@@ -354,6 +358,8 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
             WriteClass("", "PostChecks", () => 
                 WriteLine("// Sets final version to " + options.MigrationVersion + "." + step));
+
+            return classPaths;
         }
 
         #region Drop Tables and Code
@@ -773,6 +779,8 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         {
             var sb = new StringBuilder();
 
+            sb.AppendLine();
+
             //Create.Index("ix_Name").OnTable("TestTable2").OnColumn("Name").Ascending().WithOptions().NonClustered();
             sb.AppendFormat("Create.Index(\"{0}\").OnTable(\"{1}\")", index.Name, index.TableName);
 
@@ -824,6 +832,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             //    .FromTable("TestTable2").ForeignColumn("TestTableId")
             //    .ToTable("TestTable").PrimaryColumn("Id");
 
+            WriteLine();
             WriteLine("Create.ForeignKey(\"{0}\")", fk.Name);
             using (new Indenter())
             {

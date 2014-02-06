@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -20,7 +21,7 @@ namespace FluentMigrator.SchemaGen
             this.options = options;
         }
 
-        public void Execute()
+        public IEnumerable<string> GenClasses()
         {
             // Generate migration classes for the whole schema of a single database.
             if (options.Db != null)
@@ -34,7 +35,7 @@ namespace FluentMigrator.SchemaGen
                     IDbSchemaReader reader2 = new SqlServerSchemaReader(cnn, options);
 
                     IMigrationWriter migrationWriter = new FmDiffMigrationWriter(options, reader1, reader2);
-                    migrationWriter.WriteMigrationClasses();
+                    return migrationWriter.WriteMigrationClasses();
                 }
             }
                 // Generate migration classes based on differences between two databases.
@@ -51,7 +52,7 @@ namespace FluentMigrator.SchemaGen
 
                     IMigrationWriter writer1 = new FmDiffMigrationWriter(options, reader1, reader2);
 
-                    writer1.WriteMigrationClasses();
+                    return writer1.WriteMigrationClasses();
                 }
             }
             else
