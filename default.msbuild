@@ -22,20 +22,20 @@
 		<Configuration Condition="$(Configuration)==''">Release</Configuration>
 	</PropertyGroup>
   
-	<!-- Deletes the output folders from pervious builds for a clean build -->
+	<!-- Deletes the output folders from previous builds for a clean build -->
 	<Target Name="_Clean" Condition="Exists($(OutputDir))">
 		<Message Text="Removing old build Files" />
 		<RemoveDir Directories="$(OutputDir)"  />
 	</Target>
 	
-	<!-- Generate the diffent combinations of platforms and version -->
+	<!-- Generate the different combinations of platforms and version -->
 	<Target Name="_GenerateDeploymentMatrix" DependsOnTargets="_Clean">
 		<CreateItem Include="@(Platform)" AdditionalMetadata="Version=%(Version.Identity)">
 			<Output ItemName="CompileTarget" TaskParameter="Include"/>
 		</CreateItem>
 	</Target>
 	
-	<!-- Default Target for kicking of the build process -->
+	<!-- Default Target for kicking off the build process -->
 	<Target Name="Build" DependsOnTargets="_GenerateDeploymentMatrix">
 		<MSBuild Projects="$(MSBuildProjectFile)" Targets="_BuildForFlavor" Properties="Platform=%(CompileTarget.Identity);Version=%(CompileTarget.Version);" />
 	</Target>
