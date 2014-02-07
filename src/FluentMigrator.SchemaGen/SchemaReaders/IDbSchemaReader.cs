@@ -11,10 +11,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
         IDictionary<string, int> TablesInForeignKeyOrder(bool ascending);
         IDictionary<string, int> ScriptsInDependencyOrder(bool ascending);
 
-        IEnumerable<TableDefinition> Tables { get; }
-        IEnumerable<TableDefinition> GetTables(IEnumerable<string> tableNames = null);
-
-        IEnumerable<string> TableNames { get; }
+        IDictionary<string, TableDefinition> Tables { get; }
 
         IEnumerable<string> UserDefinedDataTypes { get; }
         IEnumerable<string> UserDefinedFunctions { get; }

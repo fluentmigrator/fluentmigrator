@@ -23,9 +23,9 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
             return new Dictionary<string, int>();
         }
 
-        public IEnumerable<TableDefinition> Tables
+        public IDictionary<string, TableDefinition> Tables
         {
-            get { return new TableDefinition[]{}; }
+            get { return new Dictionary<string, TableDefinition>(); }
         }
 
         public IEnumerable<TableDefinition> GetTables(IEnumerable<string> tableNames = null)

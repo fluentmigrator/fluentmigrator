@@ -45,6 +45,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
         private readonly IDbConnection connection;
         private readonly IOptions options;
         private readonly DbProviderFactory factory;
+        private IDictionary<string, TableDefinition> tables;
 
         //public IAnnouncer Announcer { get; set; }
         //public SqlServerProcessor Processor { get; set; }
@@ -199,8 +200,11 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
             }
         }
 
+
         public DataSet Read(string template, params object[] args)
         {
+            // TODO: Replace DataSet with a reader and return IEnumerable<DataRow>
+
             var ds = new DataSet();
             var sql = String.Format(template, args);
             //Announcer.Sql(sql);
@@ -261,9 +265,18 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
         }
         #endregion
 
-        public IEnumerable<TableDefinition> Tables
+        public IDictionary<string, TableDefinition> Tables
         {
-            get { return GetTables(); }
+            get
+            {
+                if (tables == null)
+                {
+                    this.tables = GetTables().ToDictionary(table => table.Name);
+                    // TODO: Added SchemaName to all dictionaries 
+                    // this.tables = GetTables().ToDictionary(table => (table.SchemaName ?? "dbo") + "." + table.Name);
+                }
+                return tables;
+            }
         }
 
         public IEnumerable<string> TableNames
@@ -454,6 +467,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
                                                     select col).First();
 
                     tableColumn.IsIndexed = true;
+                    tableColumn.IndexName = index.Name;
                     tableColumn.IsPrimaryKey = index.IsPrimary;
                     tableColumn.IsUnique = index.IsUnique;
                 }

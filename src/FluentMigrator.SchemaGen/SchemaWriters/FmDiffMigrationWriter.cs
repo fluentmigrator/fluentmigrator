@@ -38,6 +38,8 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         private readonly IDbSchemaReader db2;
         private int step = 1;
 
+        private IDictionary<string, bool> tablesCompleted = new Dictionary<string, bool>();
+
         IList<string> classPaths = new List<string>();
 
         private static int indent = 0;
@@ -368,10 +370,10 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             // TODO: Currently ignoring Schema name for table objects.
             var db1FkOrder = db1.TablesInForeignKeyOrder(false); // descending order
 
-            var removedTableNames = db1.TableNames.Except(db2.TableNames).ToList();
+            var removedTableNames = db1.Tables.Keys.Except(db2.Tables.Keys).ToList();
             removedTableNames = removedTableNames.OrderBy(t => -db1FkOrder[t]).ToList();
 
-            foreach (TableDefinition table in db1.GetTables(removedTableNames))
+            foreach (TableDefinition table in removedTableNames.Select(name => db1.Tables[name]))
             {
                 foreach (ForeignKeyDefinition fk in table.ForeignKeys)
                 {
@@ -409,12 +411,12 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         #region Create / Update Tables
         private void CreateUpdateTables()
         {
-            var db1Tables = db1.Tables.ToDictionary(tbl => tbl.Name);
+            var db1Tables = db1.Tables;
 
             // TODO: Currently ignoring Schema name for table objects.
 
             var db2FkOrder = db2.TablesInForeignKeyOrder(true);
-            var db2TablesInFkOrder = db2.Tables.OrderBy(tableDef => db2FkOrder[tableDef.Name]);
+            var db2TablesInFkOrder = db2.Tables.Values.OrderBy(tableDef => db2FkOrder[tableDef.Name]);
 
             foreach (TableDefinition table in db2TablesInFkOrder)
             {
@@ -430,7 +432,6 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
                     WriteClass("", "Create_" + table.Name, () => CreateTable(newTable));
                 }
             }
-
         }
 
         private void CreateTable(TableDefinition table)
@@ -480,6 +481,9 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         /// <param name="newTable"></param>
         private void UpdateTable(TableDefinition oldTable, TableDefinition newTable)
         {
+            if (tablesCompleted.ContainsKey(newTable.Name)) return;
+            tablesCompleted[newTable.Name] = true;
+
             // Strategy is to compute generated FluentMigration API code 
             // for each table related object (columns, indexes and foreign keys) 
             // and then detect changes in EITHER the list of object names 
@@ -490,11 +494,11 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
             // Columns
             IDictionary<string, string> oldCols = oldTable.Columns.ToDictionary(col => col.Name, GetColumnCode);
-            IDictionary<string, string> newCol = newTable.Columns.ToDictionary(col => col.Name, GetColumnCode);
+            IDictionary<string, string> newCols = newTable.Columns.ToDictionary(col => col.Name, GetColumnCode);
 
-            var addedColsCode = oldCols.GetAdded(newCol).Select(colCode => colCode.Replace("WithColumn", "AddColumn"));
-            var updatedColsCode = oldCols.GetUpdated(newCol).Select(colCode => colCode.Replace("WithColumn", "AlterColumn"));
-            var removedColsCode = oldCols.GetRemovedKeys(newCol).Select(colName => GetRemoveColumnCode(newTable, colName) );
+            var addedColsCode = oldCols.GetAdded(newCols).Select(colCode => colCode.Replace("WithColumn", "AddColumn"));
+            var updatedColsCode = oldCols.GetUpdated(newCols).Select(colCode => colCode.Replace("WithColumn", "AlterColumn"));
+            var removedColsCode = oldCols.GetRemovedNames(newCols).Select(colName => GetRemoveColumnCode(newTable, colName) );
 
             // Indexes
             IDictionary<string, string> oldIndexes = GetNonColumnIndexes(oldTable).ToDictionary(index => index.Name, GetCreateIndexCode);
@@ -502,38 +506,46 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             
             // Updated indexes are removed and added
             var addedIndexCode = oldIndexes.GetAdded(newIndexes);
-            var updatedIndexesCode = oldIndexes.GetUpdated(newIndexes);
-            var removeUpdatedIndexesCode = oldIndexes.GetUpdatedKeys(newIndexes).Select(indexName => GetRemoveIndexCode(oldTable, indexName));
-            var removedIndexNames = oldIndexes.GetRemovedKeys(newIndexes);
+            var addUpdatedIndexesCode = oldIndexes.GetUpdated(newIndexes);
+            var removeUpdatedIndexesCode = oldIndexes.GetUpdatedNames(newIndexes).Select(indexName => GetRemoveIndexCode(oldTable, indexName));
+            var removedIndexNames = oldIndexes.GetRemovedNames(newIndexes);
             var removedIndexCode = removedIndexNames.Select(indexName => GetRemoveIndexCode(oldTable, indexName));
 
             // Foreign Keys
             IDictionary<string, string> oldFKs = oldTable.ForeignKeys.ToDictionary(fk => fk.Name, GetCreateForeignKeyCode);
             IDictionary<string, string> newFKs = newTable.ForeignKeys.ToDictionary(fk => fk.Name, GetCreateForeignKeyCode);
-            
+
             // Updated foreign keys are removed and added
-            var addedFkCode = oldFKs.GetAdded(newFKs).Concat(oldFKs.GetUpdated(newFKs));
-            var removedFkNames = oldFKs.GetRemovedKeys(newFKs).Concat(oldFKs.GetUpdatedKeys(newFKs));
+            var updatedFkNames = oldFKs.GetUpdatedNames(newFKs);
+            var removeUpdatedFkCode = updatedFkNames.Select(fkName => GetRemoveFKCode(oldTable, fkName));
+            var addUpdatedFkCode = oldFKs.GetUpdated(newFKs);
+
+            var addedFkCode = oldFKs.GetAdded(newFKs);
+            var removedFkNames = oldFKs.GetRemovedNames(newFKs);
             var removedFkCode = removedFkNames.Select(fkName => GetRemoveFKCode(oldTable, fkName));
 
-            // Keep old indexes and columns as long as possible as they may be needed when 
-            // developer adds custom code to migrate the data.
+            // Keep old indexes and columns as long as possible as they may be needed 
+            // when the developer adds custom code to migrate the data from old to new.
 
-            AlterTable(newTable, addedColsCode);    // Added new columns
-            WriteChanges(addedIndexCode);           // Added Indexes
-            WriteChanges(addedFkCode);              // Added foreign keys
+            AlterTable(newTable, addedColsCode);    // Add NEW columns
 
-            WriteChanges(removeUpdatedIndexesCode); // Remove updated indexes
+            WriteChanges(addedIndexCode);           // Add NEW Indexes
+            WriteChanges(addedFkCode);              // Adde NEW foreign keys
+
+            WriteChanges(removeUpdatedIndexesCode); // Remove UPDATED indexes
+            WriteChanges(removeUpdatedFkCode);      // Remove UPDATED foreign keys
+            
+            WriteChanges(removedFkCode);            // Remove OLD foreign keys
 
             AlterTable(newTable, updatedColsCode);  // Updated columns (including 1 column indexes)
 
-            WriteChanges(updatedIndexesCode);       // Add updated indexes (excluding 1 column indexes)
+            WriteChanges(addUpdatedFkCode);         // Add UPDATED foreign keys
+            WriteChanges(addUpdatedIndexesCode);    // Add UPDATED indexes (excluding 1 column indexes)
 
             // Note: The developer may add custom data migration code here
 
-            WriteChanges(removedFkCode);            // Removed foreign keys
-            WriteChanges(removedIndexCode);         // Removed Indexes
-            WriteChanges(removedColsCode);          // Removed new columns
+            WriteChanges(removedIndexCode);         // Remove OLD Indexes
+            WriteChanges(removedColsCode);          // Remove OLD columns
         }
 
         private void AlterTable(TableDefinition table, IEnumerable<string> codeChanges)
