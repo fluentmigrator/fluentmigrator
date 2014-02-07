@@ -181,7 +181,7 @@ namespace FluentMigrator.Runner.Processors.Sqlite
                 }
                 catch (DbException ex)
                 {
-                    throw new Exception(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
+                    ThrowSqlException(command.CommandText, ex);
                 }
             }
         }

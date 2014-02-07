@@ -139,7 +139,18 @@ namespace FluentMigrator.NAnt
             }
             catch (Exception e)
             {
-                announcer.Error("While executing migrations the following error was encountered: {0}, {1}", e.Message, e.StackTrace);
+                string msg = e.Message;
+                
+                // Inner messages are frequently useful for diagnosing SQL exceptions.
+                if (e.InnerException != null)
+                {
+                    msg += "\n" + e.InnerException.Message;
+                    if (e.InnerException.InnerException != null)
+                    {
+                        msg += "\n" + e.InnerException.InnerException.Message;
+                    }
+                }
+                announcer.Error("While executing migrations the following error was encountered: {0}, {1}", msg, e.StackTrace);
             	throw;
             }
             finally

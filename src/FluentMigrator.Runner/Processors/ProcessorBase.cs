@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System;
+using System.IO;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Expressions;
 
@@ -197,6 +199,28 @@ namespace FluentMigrator.Runner.Processors
         public abstract bool SequenceExists(string schemaName, string sequenceName);
 
         public abstract bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue);
+
+        protected virtual void ThrowSqlException(string sql, Exception ex)
+        {
+            using (var message = new StringWriter())
+            {
+                message.WriteLine("An error occured executing the following sql:");
+                message.WriteLine(sql);
+                message.WriteLine("The error was {0}", ex.Message);
+
+                // Inner messages are frequently useful for diagnosing SQL exceptions.
+                if (ex.InnerException != null)
+                {
+                    message.WriteLine(ex.InnerException.Message);
+                    if (ex.InnerException.InnerException != null)
+                    {
+                        message.WriteLine(ex.InnerException.InnerException.Message);
+                    }
+                }
+
+                throw new Exception(message.ToString(), ex);
+            }
+        }
 
         public void Dispose()
         {

@@ -216,9 +216,21 @@ namespace FluentMigrator.Console
                 else
                     ExecuteMigrations();
             }
-            catch (Exception ex)
+            catch (Exception e)
             {
-                consoleAnnouncer.Error(ex.ToString());
+                string msg = e.Message;
+
+                // Inner messages are frequently useful for diagnosing SQL exceptions.
+                if (e.InnerException != null)
+                {
+                    msg += "\n" + e.InnerException.Message;
+                    if (e.InnerException.InnerException != null)
+                    {
+                        msg += "\n" + e.InnerException.InnerException.Message;
+                    }
+                }
+
+                consoleAnnouncer.Error(msg);
                 Environment.ExitCode = 1;
             }
 

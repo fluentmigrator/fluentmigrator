@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.IO;
 using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Processors;
@@ -94,7 +95,31 @@ namespace FluentMigrator.Runner.Initialization
                         break;
                 }
             }
-            finally { Runner.Processor.Dispose(); }
+            catch (Exception ex)
+            {
+                using (var message = new StringWriter())
+                {
+                    message.WriteLine(ex.Message);
+
+                    // Inner messages are frequently useful for diagnosing SQL exceptions.
+                    if (ex.InnerException != null)
+                    {
+                        message.WriteLine(ex.InnerException.Message);
+                        if (ex.InnerException.InnerException != null)
+                        {
+                            message.WriteLine(ex.InnerException.InnerException.Message);
+                        }
+                    }
+                    message.Write(ex.StackTrace);
+
+                    throw new Exception(message.ToString(), ex);
+                }
+            }
+            finally
+            {
+                Runner.Processor.Dispose();
+            }
+
             RunnerContext.Announcer.Say("Task completed.");
         }
 

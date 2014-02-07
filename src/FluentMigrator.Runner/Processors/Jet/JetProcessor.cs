@@ -69,7 +69,7 @@ namespace FluentMigrator.Runner.Processors.Jet
                 }
                 catch (OleDbException ex)
                 {
-                    throw new Exception(string.Format("Exception while processing \"{0}\"", sql), ex);
+                    ThrowSqlException(sql, ex);
                 }
             }
         }

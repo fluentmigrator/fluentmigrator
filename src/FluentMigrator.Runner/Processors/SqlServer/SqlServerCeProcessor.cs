@@ -140,14 +140,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                     }
                     catch (Exception ex)
                     {
-                        using (var message = new StringWriter())
-                        {
-                            message.WriteLine("An error occurred executing the following sql:");
-                            message.WriteLine(statement);
-                            message.WriteLine("The error was {0}", ex.Message);
-
-                            throw new Exception(message.ToString(), ex);
-                        }
+                        ThrowSqlException(statement, ex);
                     }
                 }
             }
