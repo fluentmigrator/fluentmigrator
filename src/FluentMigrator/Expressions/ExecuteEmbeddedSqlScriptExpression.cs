@@ -39,7 +39,6 @@ namespace FluentMigrator.Expressions
             var sqlScriptParts = SqlScript.Split('.').Reverse().ToArray();
             Func<string, bool> isNameMatch = x => x.Split('.').Reverse().Take(sqlScriptParts.Length).SequenceEqual(sqlScriptParts, StringComparer.InvariantCultureIgnoreCase);
 
-            string result = null;
             var foundResources = resources.Where(isNameMatch).ToArray();
 
             if (foundResources.Length == 0)

@@ -56,7 +56,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return column.Index.IsClustered ? "CLUSTERED " : string.Empty;
         }
 
-        protected string GetConstraintClusteringString(CreateConstraintExpression constraint)
+        protected virtual string GetConstraintClusteringString(CreateConstraintExpression constraint)
         {
             object indexType;
 

@@ -30,7 +30,7 @@ namespace FluentMigrator.Model
             DefaultValue = new UndefinedDefaultValue();
         }
 
-        public readonly Dictionary<string, object> _additionalFeatures = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> _additionalFeatures = new Dictionary<string, object>();
 
         public virtual string Name { get; set; }
         public virtual DbType? Type { get; set; }

@@ -26,7 +26,7 @@ namespace FluentMigrator.Expressions
         private readonly List<InsertionDataDefinition> _rows = new List<InsertionDataDefinition>();
         public string SchemaName { get; set; }
         public string TableName { get; set; }
-        public readonly Dictionary<string, object> _additionalFeatures = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> _additionalFeatures = new Dictionary<string, object>();
 
         public List<InsertionDataDefinition> Rows
         {

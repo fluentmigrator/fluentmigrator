@@ -36,7 +36,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return string.Empty;
         }
 
-        protected string GetConstraintClusteringString(CreateConstraintExpression constraint)
+        protected override string GetConstraintClusteringString(CreateConstraintExpression constraint)
         {
             return string.Empty;
         }
