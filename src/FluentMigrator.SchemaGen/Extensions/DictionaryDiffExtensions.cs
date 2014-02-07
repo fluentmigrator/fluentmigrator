@@ -32,7 +32,7 @@ namespace FluentMigrator.SchemaGen.Extensions
         /// <param name="dict1"></param>
         /// <param name="dict2"></param>
         /// <returns></returns>
-        public static IEnumerable<string> GetRemovedKeys<T>(this IDictionary<string, T> dict1, IDictionary<string, T> dict2)
+        public static IEnumerable<string> GetRemovedNames<T>(this IDictionary<string, T> dict1, IDictionary<string, T> dict2)
         {
             var keys1 = dict1.Keys.OrderBy(k => k);
             var keys2 = dict2.Keys.OrderBy(k => k);
@@ -64,7 +64,7 @@ namespace FluentMigrator.SchemaGen.Extensions
         /// <param name="dict1"></param>
         /// <param name="dict2"></param>
         /// <returns></returns>
-        public static IEnumerable<string> GetAddedKeys<T>(this IDictionary<string, T> dict1, IDictionary<string, T> dict2)
+        public static IEnumerable<string> GetAddedNames<T>(this IDictionary<string, T> dict1, IDictionary<string, T> dict2)
         {
             var keys1 = dict1.Keys.OrderBy(k => k);
             var keys2 = dict2.Keys.OrderBy(k => k);
@@ -98,7 +98,7 @@ namespace FluentMigrator.SchemaGen.Extensions
         /// <param name="dict1"></param>
         /// <param name="dict2"></param>
         /// <returns></returns>
-        public static IEnumerable<string> GetUpdatedKeys<T>(this IDictionary<string, T> dict1, IDictionary<string, T> dict2)
+        public static IEnumerable<string> GetUpdatedNames<T>(this IDictionary<string, T> dict1, IDictionary<string, T> dict2)
             where T : IEquatable<T>
         {
             var keys1 = dict1.Keys.OrderBy(k => k);
@@ -132,7 +132,7 @@ namespace FluentMigrator.SchemaGen.Extensions
         /// <param name="dict1"></param>
         /// <param name="dict2"></param>
         /// <returns></returns>
-        public static IEnumerable<string> GetRetainedKeys<T>(this IDictionary<string, T> dict1, IDictionary<string, T> dict2)
+        public static IEnumerable<string> GetRetainedNames<T>(this IDictionary<string, T> dict1, IDictionary<string, T> dict2)
         {
             var keys1 = dict1.Keys.OrderBy(k => k);
             var keys2 = dict2.Keys.OrderBy(k => k);
