@@ -1,10 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 namespace FluentMigrator.SchemaGen.Extensions
 {
     static class StringExtensions
     {
+        public static string StringJoin(this IEnumerable<string> seq, string delim = ", ")
+        {
+            return string.Join(delim, seq.ToArray());
+        }
+
+
         //  using System.Text.RegularExpressions;
 
         /// <summary>

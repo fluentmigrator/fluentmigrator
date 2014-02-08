@@ -271,6 +271,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
             {
                 if (tables == null)
                 {
+                    Console.WriteLine("Loading table schema ...");
                     this.tables = GetTables().ToDictionary(table => table.Name);
                     // TODO: Added SchemaName to all dictionaries 
                     // this.tables = GetTables().ToDictionary(table => (table.SchemaName ?? "dbo") + "." + table.Name);
@@ -442,38 +443,37 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
             }
         }
 
-        public IEnumerable<TableDefinition> GetTables(IEnumerable<string> tableNames = null)
+        public IEnumerable<TableDefinition> GetTables()
         {
-            IEnumerable<TableDefinition> tables = ReadTableDefs();
-
-            if (tableNames != null) tables = tables.Where(table => tableNames.Contains(table.Name));
-
-            foreach (TableDefinition table in tables)
+            foreach (TableDefinition table in ReadTableDefs())
             {
                 table.Indexes = ReadIndexes(table.SchemaName, table.Name);
                 table.ForeignKeys = ReadForeignKeys(table.SchemaName, table.Name);
 
-                var singleColumnAscIndexes = (from index in table.Indexes 
-                                              where index.Columns.Count() == 1 
-                                                 && index.Columns.First().Direction == Direction.Ascending 
-                                              select index);
-
-                foreach (IndexDefinition index in singleColumnAscIndexes)
+                foreach (IndexDefinition index in table.Indexes)
                 {
-                    IndexColumnDefinition indexColumn = index.Columns.First();
+                    if (index.Columns.Count() == 1 && index.Columns.First().Direction == Direction.Ascending)
+                    {
+                        IndexColumnDefinition indexColumn = index.Columns.First();
 
-                    ColumnDefinition tableColumn = (from col in table.Columns
-                                                    where col.Name == indexColumn.Name
-                                                    select col).First();
+                        ColumnDefinition tableColumn = (table.Columns.Where(col => col.Name == indexColumn.Name)).First();
 
-                    tableColumn.IsIndexed = true;
-                    tableColumn.IndexName = index.Name;
-                    tableColumn.IsPrimaryKey = index.IsPrimary;
-                    tableColumn.IsUnique = index.IsUnique;
+                        tableColumn.IsIndexed = true;
+                        tableColumn.IsPrimaryKey = index.IsPrimary;
+                        tableColumn.IsUnique = index.IsUnique;
+                        if (index.IsPrimary)
+                        {
+                            tableColumn.PrimaryKeyName = index.Name;
+                        }
+                        else
+                        {
+                            tableColumn.IndexName = index.Name;
+                        }
+                    }
                 }
-            }
 
-            return tables;
+                yield return table;
+            }
         }
 
         protected virtual IList<TableDefinition> ReadTableDefs()

@@ -453,7 +453,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
             var nonColIndexes = GetNonColumnIndexes(table);
 
-            WriteLines(nonColIndexes.Select(GetCreateIndexCode));
+            WriteLines(nonColIndexes.Select(index => GetCreateIndexCode(table, index)));
             WriteLines(table.ForeignKeys.Select(GetCreateForeignKeyCode));
         }
 
@@ -466,8 +466,10 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         {
             // Names of indexes declared as as part of table column definition
             var colIndexNames = from col in table.Columns
-                                where col.IsPrimaryKey || col.IsUnique || col.IsIndexed
+                                where col.IsIndexed 
                                 select col.IsPrimaryKey ? col.PrimaryKeyName : col.IndexName;
+
+            // Debug.WriteLine("GetNonColumnIndexes(): " + table.Name + ": " + colIndexNames.StringJoin());
 
             // Remaining indexes undeclared
             return from index in table.Indexes where !colIndexNames.Contains(index.Name) select index;
@@ -492,6 +494,9 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             // We only emit code if there are actual changes so we can detect 
             // when there are NO changes and then not emit the class.
 
+            // TODO: If a column is updated but it's part of a foreign key relationship, need to drop/create the FK and alter the columns in both tables.
+            // TODO: MSAccess appears to create indexes when a FK is created => so we need to conditionally create these indexes. 
+
             // Columns
             IDictionary<string, string> oldCols = oldTable.Columns.ToDictionary(col => col.Name, GetColumnCode);
             IDictionary<string, string> newCols = newTable.Columns.ToDictionary(col => col.Name, GetColumnCode);
@@ -501,13 +506,14 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             var removedColsCode = oldCols.GetRemovedNames(newCols).Select(colName => GetRemoveColumnCode(newTable, colName) );
 
             // Indexes
-            IDictionary<string, string> oldIndexes = GetNonColumnIndexes(oldTable).ToDictionary(index => index.Name, GetCreateIndexCode);
-            IDictionary<string, string> newIndexes = GetNonColumnIndexes(newTable).ToDictionary(index => index.Name, GetCreateIndexCode);
+            IDictionary<string, string> oldIndexes = GetNonColumnIndexes(oldTable).ToDictionary(index => index.Name, index => GetCreateIndexCode(oldTable, index));
+            IDictionary<string, string> newIndexes = GetNonColumnIndexes(newTable).ToDictionary(index => index.Name, index => GetCreateIndexCode(newTable, index));
             
             // Updated indexes are removed and added
-            var addedIndexCode = oldIndexes.GetAdded(newIndexes);
             var addUpdatedIndexesCode = oldIndexes.GetUpdated(newIndexes);
             var removeUpdatedIndexesCode = oldIndexes.GetUpdatedNames(newIndexes).Select(indexName => GetRemoveIndexCode(oldTable, indexName));
+ 
+            var addedIndexCode = oldIndexes.GetAdded(newIndexes);
             var removedIndexNames = oldIndexes.GetRemovedNames(newIndexes);
             var removedIndexCode = removedIndexNames.Select(indexName => GetRemoveIndexCode(oldTable, indexName));
 
@@ -530,7 +536,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             AlterTable(newTable, addedColsCode);    // Add NEW columns
 
             WriteChanges(addedIndexCode);           // Add NEW Indexes
-            WriteChanges(addedFkCode);              // Adde NEW foreign keys
+            WriteChanges(addedFkCode);              // Add NEW foreign keys
 
             WriteChanges(removeUpdatedIndexesCode); // Remove UPDATED indexes
             WriteChanges(removeUpdatedFkCode);      // Remove UPDATED foreign keys
@@ -787,11 +793,23 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             return string.Format("Delete.Index(\"{0}\").OnTable(\"{1}\");", indexName, table.Name);
         }
 
-        private string GetCreateIndexCode(IndexDefinition index)
+        private IEnumerable<ForeignKeyDefinition> FindForeignKeysWithColumns(IEnumerable<ForeignKeyDefinition> fks, IEnumerable<IndexColumnDefinition> cols)
+        {
+            string[] colNames = cols.Select(col => col.Name).ToArray();
+            return fks.Where(fk => fk.ForeignColumns.SequenceEqual(colNames));
+        }
+
+        private string GetCreateIndexCode(TableDefinition table, IndexDefinition index)
         {
             var sb = new StringBuilder();
 
             sb.AppendLine();
+
+            if (table.ForeignKeys.Any())
+            {
+                bool isFkIndex = FindForeignKeysWithColumns(table.ForeignKeys, index.Columns).Any();
+                if (isFkIndex) sb.Append("IfDatabase(\"sqlserver\").");
+            }
 
             //Create.Index("ix_Name").OnTable("TestTable2").OnColumn("Name").Ascending().WithOptions().NonClustered();
             sb.AppendFormat("Create.Index(\"{0}\").OnTable(\"{1}\")", index.Name, index.TableName);
