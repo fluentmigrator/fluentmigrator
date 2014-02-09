@@ -55,6 +55,10 @@ namespace FluentMigrator.SchemaGen
 
                     new CodeGenFmClasses(options).GenClasses();
                 }
+                catch (DatabaseArgumentException)
+                {
+                    Console.WriteLine("Specificy EITHER --db OR --db1 and --db2 options.");
+                }
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);

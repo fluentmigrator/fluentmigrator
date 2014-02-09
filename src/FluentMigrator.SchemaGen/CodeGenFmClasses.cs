@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -38,7 +37,7 @@ namespace FluentMigrator.SchemaGen
                     return migrationWriter.WriteMigrationClasses();
                 }
             }
-                // Generate migration classes based on differences between two databases.
+            // Generate migration classes based on differences between two databases.
             else if (options.Db1 != null && options.Db2 != null)
             {
                 using (IDbConnection cnn1 = new SqlConnection(options.Db1))
@@ -57,7 +56,7 @@ namespace FluentMigrator.SchemaGen
             }
             else
             {
-                throw new Exception("Specificy EITHER --db OR --db1 and --db2 options.");
+                throw new DatabaseArgumentException("Must specificy EITHER Db OR Db1 and Db2 properties.");
             }
         }
 
