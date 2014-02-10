@@ -469,12 +469,9 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
                                 where col.IsIndexed 
                                 select col.IsPrimaryKey ? col.PrimaryKeyName : col.IndexName;
 
-            // Debug.WriteLine("GetNonColumnIndexes(): " + table.Name + ": " + colIndexNames.StringJoin());
-
             // Remaining indexes undeclared
             return from index in table.Indexes where !colIndexNames.Contains(index.Name) select index;
         }
-
 
         /// <summary>
         /// Generate code based on changes to table columns, indexes and foreign keys

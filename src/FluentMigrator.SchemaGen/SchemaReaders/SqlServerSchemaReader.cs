@@ -452,22 +452,27 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
 
                 foreach (IndexDefinition index in table.Indexes)
                 {
-                    if (index.Columns.Count() == 1 && index.Columns.First().Direction == Direction.Ascending)
+                    if (index.IsPrimary)  // Now only declaring Primary keys on the column
                     {
-                        IndexColumnDefinition indexColumn = index.Columns.First();
-
-                        ColumnDefinition tableColumn = (table.Columns.Where(col => col.Name == indexColumn.Name)).First();
-
-                        tableColumn.IsIndexed = true;
-                        tableColumn.IsPrimaryKey = index.IsPrimary;
-                        tableColumn.IsUnique = index.IsUnique;
-                        if (index.IsPrimary)
+                        if (index.Columns.Count() == 1 && index.Columns.First().Direction == Direction.Ascending)
                         {
-                            tableColumn.PrimaryKeyName = index.Name;
-                        }
-                        else
-                        {
-                            tableColumn.IndexName = index.Name;
+                            IndexColumnDefinition indexColumn = index.Columns.First();
+
+                            ColumnDefinition tableColumn =
+                                (table.Columns.Where(col => col.Name == indexColumn.Name)).First();
+
+                            tableColumn.IsIndexed = true;
+                            tableColumn.IsPrimaryKey = index.IsPrimary;
+                            tableColumn.IsUnique = index.IsUnique;
+                            if (index.IsPrimary)
+                            {
+                                tableColumn.PrimaryKeyName = index.Name;
+                            }
+                            else
+                            {
+                                tableColumn.IndexName = index.Name;
+                            }
+
                         }
                     }
                 }
