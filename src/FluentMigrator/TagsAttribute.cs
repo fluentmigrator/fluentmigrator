@@ -10,6 +10,11 @@ namespace FluentMigrator
     {
         public string[] TagNames { get; private set; }
 
+
+        public TagsAttribute()  // Added only to remove a compiler warning
+        {
+        }
+
         public TagsAttribute(params string[] tagNames)
         {
             TagNames = tagNames;
