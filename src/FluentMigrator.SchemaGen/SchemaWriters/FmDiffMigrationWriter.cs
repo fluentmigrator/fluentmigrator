@@ -823,7 +823,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
             foreach (var col in index.Columns)
             {
-                sb.AppendFormat(".OnColumn(\"{0}\")", col.Name);
+                sb.AppendFormat("\n\t.OnColumn(\"{0}\")", col.Name);
                 sb.AppendFormat(".{0}()", col.Direction.ToString());
             }
 
