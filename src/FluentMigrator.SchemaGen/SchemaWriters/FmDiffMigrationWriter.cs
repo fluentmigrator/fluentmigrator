@@ -729,7 +729,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         public string GetColumnDefaultValue(ColumnDefinition col)
         {
             string sysType = null;
-            string defValue = col.DefaultValue.ToString();
+            string defValue = col.DefaultValue.ToString().CleanBracket().ToUpper().Trim();
 
             var guid = Guid.Empty;
             switch (col.Type)
@@ -750,32 +750,55 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
                     break;
 
                 case DbType.Guid:
-                    if (defValue.IsGuid(out guid))
+                    if (defValue == "NEWID()")
+                    {
+                        sysType = "SystemMethods.NewGuid";
+                    } else if (defValue == "NEWSEQUENTIALID()")
+                    {
+                        sysType = "SystemMethods.NewSequentialId";
+                    }
+                    else if (defValue.IsGuid(out guid))
                     {
                         if (guid == Guid.Empty)
+                        {
                             sysType = "Guid.Empty";
+                        }
                         else
+                        {
                             sysType = string.Format("new System.Guid(\"{0}\")", guid);
+                        }
                     }
                     break;
 
                 case DbType.DateTime:
                 case DbType.DateTime2:
                 case DbType.Date:
-                    if (defValue.ToLower() == "current_time"
-                        || defValue.ToLower() == "current_date"
-                        || defValue.ToLower() == "current_timestamp")
+                    if (defValue == "CURRENT_TIME"
+                        || defValue == "CURRENT_DATE"
+                        || defValue == "CURRENT_TIMESTAMP"
+                        || defValue == "GETDATE()")
                     {
                         sysType = "SystemMethods.CurrentDateTime";
                     }
+                    else if (defValue == "GETUTCDATE()")
+                    {
+                        sysType = "SystemMethods.CurrentUTCDateTime";
+                    }
                     else
                     {
-                        sysType = "\"" + defValue.CleanBracket() + "\"";
+                        sysType = "\"" + defValue + "\"";
                     }
                     break;
 
                 default:
-                    sysType = string.Format("\"{0}\"", col.DefaultValue);
+                    if (defValue == "CURRENT_USER")
+                    {
+                        sysType = "SystemMethods.CurrentUser";
+                    }
+                    else
+                    {
+                        sysType = string.Format("\"{0}\"", col.DefaultValue);
+                    }
                     break;
             }
 
