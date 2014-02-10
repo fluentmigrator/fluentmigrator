@@ -36,6 +36,14 @@ namespace FluentMigrator.Runner.Generators.Jet
 
         protected override string FormatSystemMethods(SystemMethods systemMethod)
         {
+            switch (systemMethod)
+            {
+                case SystemMethods.CurrentDateTime:
+                    return "Now()";
+                case SystemMethods.CurrentUser:
+                    return "CurrentUser()";
+            }
+
             throw new NotImplementedException();
         }
     }
