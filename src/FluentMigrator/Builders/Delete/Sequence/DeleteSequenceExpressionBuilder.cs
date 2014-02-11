@@ -1,4 +1,4 @@
-﻿namespace FluentMigrator.Builders.Delete.Sequence
+namespace FluentMigrator.Builders.Delete.Sequence
 {
     using Expressions;
 

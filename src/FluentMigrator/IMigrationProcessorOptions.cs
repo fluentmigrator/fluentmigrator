@@ -1,4 +1,4 @@
-﻿namespace FluentMigrator
+namespace FluentMigrator
 {
     public interface IMigrationProcessorOptions
     {

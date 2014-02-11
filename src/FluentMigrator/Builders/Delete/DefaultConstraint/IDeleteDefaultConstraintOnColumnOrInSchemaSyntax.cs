@@ -1,4 +1,4 @@
-﻿namespace FluentMigrator.Builders.Delete.DefaultConstraint
+namespace FluentMigrator.Builders.Delete.DefaultConstraint
 {
     public interface IDeleteDefaultConstraintOnColumnOrInSchemaSyntax : IDeleteDefaultConstraintOnColumnSyntax
     {

@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Create.ForeignKey

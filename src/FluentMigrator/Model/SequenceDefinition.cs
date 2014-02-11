@@ -1,4 +1,4 @@
-﻿namespace FluentMigrator.Model
+namespace FluentMigrator.Model
 {
     using System;
     using System.Collections.Generic;
