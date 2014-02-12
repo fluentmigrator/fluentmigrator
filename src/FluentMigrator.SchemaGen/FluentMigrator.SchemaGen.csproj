@@ -90,7 +90,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Debug.txt" />
-    <Content Include="README.txt" />
+    <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.Runner\FluentMigrator.Runner.csproj">
