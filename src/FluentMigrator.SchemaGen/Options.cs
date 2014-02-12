@@ -82,16 +82,16 @@ namespace FluentMigrator.SchemaGen
         [Option("step-end", DefaultValue = -1, HelpText = "Last step number. Adds a final Migration class just to set the step value. Useful when merging migration classes in one DLL or ensuring that Install and Upgrade migrations reach a matching step number.")]
         public int StepEnd { get; set; }
 
-        [Option("tags", DefaultValue = "", HelpText = "Example: --tags abc,def Adds [Tags(\"tag1\", \"def\")] attribute to all generated C# classes.")]
+        [Option("tags", DefaultValue = "", HelpText = "Example: --tags abc,def Adds [Tags(\"abc\", \"def\")] attribute to all generated C# classes.")]
         public string Tags { get; set; }
 
         [Option("use-deprecated-types", DefaultValue = false, HelpText = "Use deprecated types TEXT, NTEXT and IMAGE normalled converted to VARCHAR(MAX), NVARCHAR(MAX) and VARBINARY(MAX).")]
         public bool UseDeprecatedTypes { get; set; }
 
-        [Option("include-tables", DefaultValue = null, HelpText = "Comma separated list of table names to include. Use \"prefix*\"  to include tables with prefix.")]
+        [Option("include-tables", DefaultValue = null, HelpText = "Comma separated list of table names to include. Use \"prefix*\" to include tables with prefix.")]
         public string IncludeTables { get; set; }
 
-        [Option("exclude-tables", DefaultValue = null, HelpText = "Comma separated list of table names to exclude. Use \"prefix*\"  to exclude tables with prefix.")]
+        [Option("exclude-tables", DefaultValue = null, HelpText = "Comma separated list of table names to exclude. Use \"prefix*\" to exclude tables with prefix.")]
         public string ExcludeTables { get; set; }
 
         [Option("show-old-schema", DefaultValue = false, HelpText = "Shows old schema code from Db1 as comments. Very useful to understand the changes.")]
@@ -106,13 +106,13 @@ namespace FluentMigrator.SchemaGen
         [Option("set-not-null-default", DefaultValue = false, HelpText = "When a column NULL -> NOT NULL and has a default value, runs SQL to set the new default on all NULL values")]
         public bool SetNotNullDefault { get; set; }
 
-        [Option("sql-dir", DefaultValue = null, HelpText = "SQL script file directory (Default is 'SQL').")]
+        [Option("sql-dir", DefaultValue = null, HelpText = "Import SQL script directory (Default is 'SQL').")]
         public string SqlDirectory { get; set; }
 
-        [Option("pre-scripts", DefaultValue = null, HelpText = "If true, generates Pre schema change SQL scripts.")]
+        [Option("pre-scripts", DefaultValue = true, HelpText = "If true, imports Pre schema change SQL scripts.")]
         public bool PreScripts { get; set; }
 
-        [Option("post-scripts", DefaultValue = null, HelpText = "If true, generates Post schema change SQL scripts.")]
+        [Option("post-scripts", DefaultValue = true, HelpText = "If true, import Post schema change SQL scripts.")]
         public bool PostScripts { get; set; }
 
         [ParserState]
