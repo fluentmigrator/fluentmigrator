@@ -1,29 +1,32 @@
 Overview
 --------
-This app generates a set of C# Migration classes based on a SQL Server database using the Fluent Migrator API.
+This app generates a set of C# Migration classes based on a SQL Server database using the [Fluent Migrator API](https://github.com/schambers/fluentmigrator/wiki).
+
 It can be used to generate migrations for a new database **install** OR an **upgrade** between two database versions.
 
-Generated classes are intended to be added a C# project that outputs a DLL that is executed by a Fluent Migrator Runner (e.g. Migrate.exe, NAnt or MSBuild tasks).
+Generated classes are intended to be added a C# project that outputs a DLL that is executed by a [Fluent Migrator Runner](https://github.com/schambers/fluentmigrator/wiki/Migration-Runners).
 
-  * https://github.com/schambers/fluentmigrator/wiki/Migration-Runners
-
-Features:
----------
-
-  * Generates a **full** or **upgrade** schema migration (tables, indexes, foreign keys) based on existing SQL Server 2008+ databases.
-    * Generated schema can then be used to install / upgrade other database types supported by Fluent Migrator.
+Main Features:
+--------------
+  * Generates a **full** Install migration (tables, indexes, foreign keys) based on an existing database.
+  * OR Generates an **upgrade** schema migration based on the differences between two database.
+    * Reads schema from SQL Server 2008+
+    * Generated migrations can then be used to install / upgrade other database types supported by Fluent Migrator.
     * Can select included and excluded tables by name or pattern.
+  * Schema migrations are [auto reversing](https://github.com/schambers/fluentmigrator/wiki/Auto-Reversing-Migrations) unless objects are deleted.
   * Generates a class per table ordered by FK dependency constraints. 
   * Import and embed SQL scripts to perform: 
     * Pre/Post processing.
     * Views, Stored Procedures, Functions
     * Seed Data, Demo Data, Test Data.
     * Per table data migrations.
-  * Specify output directory, class namespace, Fluent Migrator [Tag] attrtibutes.
-    * Additional support classes are added in a generated project DLL.
+  * Specify output directory, class namespace, Fluent Migrator [Tag] attributes (applied to all classes).
+    * Some additional support classes are required for in a generated project DLL.
     * Uses a MigrationVersion() class that defines the product version.
-  * Generated migration class are each number based on a migration version: major.minor.patch.step 
-    * You supply the product version: major.minor.patch  (e.g. "3.1.2")
+  * Generated classes inherit from local project classes: MigratorExt and AutoReversingMigrationExt 
+    * All you to customise inherited behaviour.
+  * Generated migration class are each number based on a migration version: **Major.Minor.Patch.Step** 
+    * You supply the product version: **Major.Minor.Patch**  (e.g. **3.1.2**)
     * The step is generated and defines the execution order of the migration classes.
     * You can optionally define first and last step numbers.
 	  * Useful when sequencing merging sets of generated classes or ensuring that Install and Upgrade migrations both reach a matching step final number.
@@ -32,7 +35,9 @@ Features:
   * Includes several minor enhancements and fixes to Fluent Migrator API.
 
 Schema Upgrade Features:
-  * Optionally generates "drop table" and "drop script" classes.
+-----------------------
+  * Optionally generates "drop table" migration that removes tables and related foreign keys in dependency order.
+  * Optionally generates "drop script" migration that removes functions/views/stored procedures .  
   * Optionally include as comments the definition of objects being deleted. Very useful in diagnosing changes.
   * When a NULL-able table field becomes NOT NULL, optionally emits SQL to set NULL values to the column's DEFAULT value (if defined).
   * Per Table: Can import SQL scripts to be executed after new columns / indexes are added but before old columns are removed.
