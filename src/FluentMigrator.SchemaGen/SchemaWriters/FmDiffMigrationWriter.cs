@@ -67,6 +67,11 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             this.db2 = db2;
         }
 
+        public bool IsInstall
+        {
+            get { return db1 is EmptyDbSchemaReader; }
+        }
+
         #region WriteLine/Indent/Block/Buffer Helpers
 
         private static void Indent()
@@ -224,9 +229,9 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
         private void EmbedSql(string sqlStatement)
         {
-            Regex lineDelim = new Regex("$");
-            var lines = lineDelim.Split(sqlStatement);
+            var lines = sqlStatement.Replace("\r", "").Split('\n').Where(line => line.Trim().Length > 0).ToArray();
 
+            StringBuilder sb = new StringBuilder();
             for (int i = 0; i < lines.Length; i++)
             {
                 string line = lines[i];
@@ -236,26 +241,28 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
                 if (i == 0)
                 {
-                    line = "Execute.Sql(@\"" + line;
+                    sb.Append("Execute.Sql(@\"" + line);
                 }
                 else
                 {
-                    line = "\t" + line;
+                    sb.Append("\t" + line);
                 }
 
                 if (i == lines.Length - 1)
                 {
-                    line += "\");";
+                    sb.Append("\");");
                 }
 
-                WriteLine(line);
+                sb.AppendLine();
             }
+
+            WriteLine(sb.ToString());
         }
 
         private void EmbedSqlFile(FileInfo sqlFile)
         {
             string allLines = File.ReadAllText(sqlFile.FullName);
-            Regex goStatement = new Regex("^ *GO *$");
+            Regex goStatement = new Regex("\\s+GO\\s+|^GO\\s+", RegexOptions.Multiline);
 
             foreach (var sqlStatment in goStatement.Split(allLines))
             {
@@ -277,14 +284,15 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
         private string GetSqlDirectoryPath(string subfolder)
         {
-            return Path.Combine(options.SqlDirectory ?? "SQL", options.MigrationVersion);
+            string path = Path.Combine(options.SqlDirectory ?? "SQL", options.MigrationVersion);
+            return Path.Combine(path, subfolder);
         }
 
-        private void MigrateData(string tableName)
+        private void MigrateData(string schemaSqlFolder, string tableName)
         {
             if (options.SqlDirectory != null)
             {
-                string sqlDirPath = GetSqlDirectoryPath("MigrateData");
+                string sqlDirPath = GetSqlDirectoryPath(schemaSqlFolder);
                 string sqlFilePath = Path.Combine(sqlDirPath, tableName + ".sql");
 
                 var sqlFile = new FileInfo(sqlFilePath);
@@ -441,17 +449,15 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
             // TODO: Create new user defined DataTypes
 
+            WriteSqlScriptClass("01_Pre");
+
             // Create/Update All tables/columns/indexes/foreign keys
-            CreateUpdateTables();
+            CreateUpdateTables(IsInstall ? "02_Install" : "03_Upgrade");
 
             // TODO: Drop/Create new or modified scripts (SPs/Views/Functions)
             // CreateUpdateScripts();
 
-            WriteSqlScriptClass("Views");
-            WriteSqlScriptClass("Stored Procedures");
-            WriteSqlScriptClass("Seed Data");
-            WriteSqlScriptClass("Demo Data", "Load demo data", "Demo");
-            WriteSqlScriptClass("Test Data", "Load test data", "Test");
+            WriteSqlScriptClass("04_Post");
 
             if (options.DropTables)
             {
@@ -464,6 +470,14 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
                 // Drop old SPs/Views/Functions
                 WriteClass("", "DropScripts", DropScripts, CantUndo);
             }
+
+            WriteSqlScriptClass("05_Functions");
+            WriteSqlScriptClass("06_Views");
+            WriteSqlScriptClass("07_SPs");
+
+            WriteSqlScriptClass("10_SeedData");
+            WriteSqlScriptClass("11_DemoData", "Demo");
+            WriteSqlScriptClass("12_TestData", "Test");
 
             // TODO: Drop old user defined DataTypes
             // WriteClass("Data", "LoadSeedData", LoadSeedData, DropSeedData);
@@ -486,7 +500,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             return classPaths;
         }
 
-        private void WriteSqlScriptClass(string subfolder, string commment = null, string tags = null)
+        private void WriteSqlScriptClass(string subfolder, string tags = null)
         {
             var sqlDir = new DirectoryInfo(GetSqlDirectoryPath(subfolder));
             if (!sqlDir.Exists)
@@ -497,8 +511,6 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
             Action upMethod = () =>
                 {
-                    if (commment != null) WriteComment(commment);
-
                     if (options.SqlDirectory != null)
                     {
                         EmbedSqlDirectory(sqlDir);
@@ -553,7 +565,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         #endregion
 
         #region Create / Update Tables
-        private void CreateUpdateTables()
+        private void CreateUpdateTables(string schemaSqlFolder)
         {
             var db1Tables = db1.Tables;
 
@@ -569,7 +581,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
                 if (db1Tables.ContainsKey(newTable.Name))
                 {
                     TableDefinition oldTable = db1Tables[newTable.Name];
-                    WriteClass("", "Update_" + table.Name, () => UpdateTable(oldTable, newTable));
+                    WriteClass("", "Update_" + table.Name, () => UpdateTable(oldTable, newTable, schemaSqlFolder));
                 }
                 else
                 {
@@ -622,7 +634,8 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         /// </summary>
         /// <param name="oldTable"></param>
         /// <param name="newTable"></param>
-        private void UpdateTable(TableDefinition oldTable, TableDefinition newTable)
+        /// <param name="schemaSqlFolder"></param>
+        private void UpdateTable(TableDefinition oldTable, TableDefinition newTable, string schemaSqlFolder)
         {
             if (tablesCompleted.ContainsKey(newTable.Name)) return;
             tablesCompleted[newTable.Name] = true;
@@ -700,7 +713,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             ShowOldCode(updatedColsOldCode);        // Show old definition of updated columns
             AlterTable(newTable, updatedColsCode);  // Updated columns (including 1 column indexes)
 
-            MigrateData(newTable.Name);             // Run data migration SQL
+            MigrateData(schemaSqlFolder, newTable.Name);             // Run data migration SQL
 
             WriteChanges(newUpdatedFkCode);         // Add UPDATED foreign keys
             WriteChanges(newUpdatedIndexCode);      // Add UPDATED indexes (excluding 1 column indexes)
