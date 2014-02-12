@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using FluentMigrator.Runner;
 using FluentMigrator.SchemaGen.SchemaReaders;
 using FluentMigrator.SchemaGen.SchemaWriters;
 
@@ -13,10 +14,12 @@ namespace FluentMigrator.SchemaGen
     /// </summary>
     public class CodeGenFmClasses
     {
+        private readonly IAnnouncer announcer;
         private readonly IOptions options;
 
-        public CodeGenFmClasses(IOptions options)
+        public CodeGenFmClasses(IOptions options, IAnnouncer announcer)
         {
+            this.announcer = announcer;
             this.options = options;
         }
 
@@ -33,7 +36,7 @@ namespace FluentMigrator.SchemaGen
                     IDbSchemaReader reader1 = new EmptyDbSchemaReader();
                     IDbSchemaReader reader2 = new SqlServerSchemaReader(cnn, options);
 
-                    IMigrationWriter migrationWriter = new FmDiffMigrationWriter(options, reader1, reader2);
+                    IMigrationWriter migrationWriter = new FmDiffMigrationWriter(options, announcer, reader1, reader2);
                     return migrationWriter.WriteMigrationClasses();
                 }
             }
@@ -49,7 +52,7 @@ namespace FluentMigrator.SchemaGen
                     IDbSchemaReader reader1 = new SqlServerSchemaReader(cnn1, options);
                     IDbSchemaReader reader2 = new SqlServerSchemaReader(cnn2, options);
 
-                    IMigrationWriter writer1 = new FmDiffMigrationWriter(options, reader1, reader2);
+                    IMigrationWriter writer1 = new FmDiffMigrationWriter(options, announcer, reader1, reader2);
 
                     return writer1.WriteMigrationClasses();
                 }

@@ -20,6 +20,7 @@ using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using FluentMigrator.Runner.Announcers;
 
 namespace FluentMigrator.SchemaGen
 {
@@ -53,7 +54,9 @@ namespace FluentMigrator.SchemaGen
                     options.Db1 = GetDbConnectionString(options.Db1);
                     options.Db2 = GetDbConnectionString(options.Db2);
 
-                    new CodeGenFmClasses(options).GenClasses();
+                    var announcer = new ConsoleAnnouncer();
+
+                    new CodeGenFmClasses(options, announcer).GenClasses();
                 }
                 catch (DatabaseArgumentException)
                 {
@@ -63,12 +66,13 @@ namespace FluentMigrator.SchemaGen
                 {
                     Console.WriteLine(ex.Message);
                     if (ex.InnerException != null) Console.WriteLine(ex.InnerException.Message);
-                    //Console.WriteLine("Press any key to continue.");
-                    //Console.ReadKey();
+                    Console.WriteLine("Press any key to continue.");
+                    Console.ReadKey();
                     Environment.Exit(1);
                 }
-
             }
+            Console.WriteLine("Press any key to continue.");
+            Console.ReadKey();
         }
     }
 }

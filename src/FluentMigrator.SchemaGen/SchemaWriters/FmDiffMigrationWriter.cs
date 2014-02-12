@@ -22,7 +22,9 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using FluentMigrator.Model;
+using FluentMigrator.Runner;
 using FluentMigrator.SchemaGen.Extensions;
 using FluentMigrator.SchemaGen.SchemaReaders;
 
@@ -34,26 +36,33 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
     public class FmDiffMigrationWriter : IMigrationWriter
     {
         private readonly IOptions options;
+        private readonly IAnnouncer announcer;
         private readonly IDbSchemaReader db1;
         private readonly IDbSchemaReader db2;
         private int step = 1;
 
-        private IDictionary<string, bool> tablesCompleted = new Dictionary<string, bool>();
+        private readonly IDictionary<string, bool> tablesCompleted = new Dictionary<string, bool>();
 
-        IList<string> classPaths = new List<string>();
+        private readonly IList<string> classPaths = new List<string>();
 
         private static int indent = 0;
         private static StreamWriter writer;
         private static StringBuilder sb;
         private static readonly Stack<StringBuilder> nestedBuffers = new Stack<StringBuilder>();
 
-        public FmDiffMigrationWriter(IOptions options, IDbSchemaReader db1, IDbSchemaReader db2)
+        public FmDiffMigrationWriter(IOptions options, IAnnouncer announcer, IDbSchemaReader db1, IDbSchemaReader db2)
         {
+            if (options == null) throw new ArgumentNullException("options");
+            if (announcer == null) throw new ArgumentNullException("announcer");
+            if (db1 == null) throw new ArgumentNullException("db1");
+            if (db2 == null) throw new ArgumentNullException("db2");
+
             indent = 0;
             writer = null;
             sb = null;
 
             this.options = options;
+            this.announcer = announcer;
             this.db1 = db1;
             this.db2 = db2;
         }
@@ -126,6 +135,27 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             }
         }
 
+        private static void WriteComment(string line)
+        {
+            WriteLine("/* {0} */", line);
+        }
+
+        private static void WriteComments(IEnumerable<string> lines)
+        {
+            foreach (string line in lines)
+            {
+                WriteComment(line);
+            }
+        }
+
+        private void ShowOldCode(IEnumerable<string> oldCode)
+        {
+            if (options.ShowOldCode)
+            {
+                WriteComments(oldCode);
+            }
+        }
+
         private static void WriteLines(IEnumerable<string> lines, string appendLastLine)
         {
             var lineArr = lines.ToArray();
@@ -190,6 +220,87 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
         #endregion
 
+        #region Embed or Execute external SQL scripts
+
+        private void EmbedSql(string sqlStatement)
+        {
+            Regex lineDelim = new Regex("$");
+            var lines = lineDelim.Split(sqlStatement);
+
+            for (int i = 0; i < lines.Length; i++)
+            {
+                string line = lines[i];
+                if (line.Trim() == "") continue;
+
+                line = line.Replace("\"", "\\\"");
+
+                if (i == 0)
+                {
+                    line = "Execute.Sql(@\"" + line;
+                }
+                else
+                {
+                    line = "\t" + line;
+                }
+
+                if (i == lines.Length - 1)
+                {
+                    line += "\");";
+                }
+
+                WriteLine(line);
+            }
+        }
+
+        private void EmbedSqlFile(FileInfo sqlFile)
+        {
+            string allLines = File.ReadAllText(sqlFile.FullName);
+            Regex goStatement = new Regex("^ *GO *$");
+
+            foreach (var sqlStatment in goStatement.Split(allLines))
+            {
+                EmbedSql(sqlStatment);
+            }
+        }
+
+        private void EmbedSqlDirectory(DirectoryInfo sqlDirectory)
+        {
+            foreach (var sqlFile in sqlDirectory.GetFiles("*.sql", SearchOption.AllDirectories).OrderBy(file => file.FullName))
+            {
+                if (sqlFile.Length > 0)
+                {
+                    WriteComment(sqlFile.FullName.Replace(Environment.CurrentDirectory + "\\", ""));
+                    EmbedSqlFile(sqlFile);                    
+                }
+            }
+        }
+
+        private string GetSqlDirectoryPath(string subfolder)
+        {
+            return Path.Combine(options.SqlDirectory ?? "SQL", options.MigrationVersion);
+        }
+
+        private void MigrateData(string tableName)
+        {
+            if (options.SqlDirectory != null)
+            {
+                string sqlDirPath = GetSqlDirectoryPath("MigrateData");
+                string sqlFilePath = Path.Combine(sqlDirPath, tableName + ".sql");
+
+                var sqlFile = new FileInfo(sqlFilePath);
+
+                if (!sqlFile.Exists)
+                {
+                    announcer.Say("{0}: Data migration SQL script not found.", sqlFile.FullName);
+                    return;
+                }
+
+                EmbedSqlFile(sqlFile);
+            }
+        }
+
+        #endregion
+
         #region Emit Classes
 
         /// <summary>
@@ -204,7 +315,8 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         /// If null, the class inherits from AutoReversingMigrationExt, otherwise it inherits from MigrationExt.
         /// These are project classes that inherit from AutoReversingMigration and Migration.
         /// </param>
-        protected void WriteClass(string dirName, string className, Action upMethod, Action downMethod = null)
+        /// <param name="addTags">Additional FluentMigrator Tags applied to the class</param> 
+        protected void WriteClass(string dirName, string className, Action upMethod, Action downMethod = null, string addTags = null)
         {
             // If no code is generated for an Up() method => No class is emitted
             string upMethodCode = Buffer(upMethod);
@@ -213,10 +325,10 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             // Prefix class with zero filled order number.
             className = string.Format("M{0,4:D4}0_{1}", step, className);
 
-            string fullDirName = options.BaseDirectory;
+            string fullDirName = options.OutputDirectory;
             if (!string.IsNullOrEmpty(dirName))
             {
-                fullDirName = Path.Combine(options.BaseDirectory, dirName);
+                fullDirName = Path.Combine(options.OutputDirectory, dirName);
             }
 
             new DirectoryInfo(fullDirName).Create();
@@ -252,10 +364,11 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
                     using (new Block()) // namespace {}
                     {
                         WriteLine("[MigrationVersion({0})]", options.MigrationVersion.Replace(".", ", ") + ", " + step);
-                        
-                        if (!string.IsNullOrEmpty(options.Tags))
+
+                        string tags = options.Tags ?? "" + addTags ?? "";
+                        if (!string.IsNullOrEmpty(tags))
                         {
-                            WriteLine("[Tags(\"{0}\")]", options.Tags.Replace(",", "\", \""));
+                            WriteLine("[Tags(\"{0}\")]", tags.Replace(",", "\", \""));
                         }
                        
                         WriteLine("public class {0} : {1}", className, downMethod == null ? "AutoReversingMigrationExt" : "MigrationExt");
@@ -319,11 +432,12 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
         #endregion
 
+        // Main Entry point
         public IEnumerable<string> WriteMigrationClasses()
         {
             step = options.StepStart;
-            WriteClass("", "PreChecks", () => 
-                WriteLine("// Sets initial version to " + options.MigrationVersion + "." + step));
+
+            WriteClass("", "Initial", () => WriteComment("Sets initial version to " + options.MigrationVersion + "." + step));
 
             // TODO: Create new user defined DataTypes
 
@@ -333,16 +447,25 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             // TODO: Drop/Create new or modified scripts (SPs/Views/Functions)
             // CreateUpdateScripts();
 
-            // Drop tables in order of their FK dependency.
-            WriteClass("", "DropTables", DropTables, CantUndo);
+            WriteSqlScriptClass("Views");
+            WriteSqlScriptClass("Stored Procedures");
+            WriteSqlScriptClass("Seed Data");
+            WriteSqlScriptClass("Demo Data", "Load demo data", "Demo");
+            WriteSqlScriptClass("Test Data", "Load test data", "Test");
 
-            // Drop old SPs/Views/Functions
-            WriteClass("", "DropScripts", DropScripts, CantUndo);
+            if (options.DropTables)
+            {
+                // Drop tables in order of their FK dependency.
+                WriteClass("", "DropTables", DropTables, CantUndo);
+            }
+
+            if (options.DropScripts)
+            {
+                // Drop old SPs/Views/Functions
+                WriteClass("", "DropScripts", DropScripts, CantUndo);
+            }
 
             // TODO: Drop old user defined DataTypes
-            // WriteClass("Data", "LoadSeedData", LoadSeedData, DropSeedData);
-
-            // TODO: Load/Update Seed Data
             // WriteClass("Data", "LoadSeedData", LoadSeedData, DropSeedData);
 
             // TODO: Load/Update Demo Data (if tagged "Demo")
@@ -358,10 +481,31 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
                 step = options.StepEnd;
             }
 
-            WriteClass("", "PostChecks", () => 
-                WriteLine("// Sets final version to " + options.MigrationVersion + "." + step));
+            WriteClass("", "Final", () => WriteComment("Sets final version to " + options.MigrationVersion + "." + step));
 
             return classPaths;
+        }
+
+        private void WriteSqlScriptClass(string subfolder, string commment = null, string tags = null)
+        {
+            var sqlDir = new DirectoryInfo(GetSqlDirectoryPath(subfolder));
+            if (!sqlDir.Exists)
+            {
+                announcer.Say(sqlDir.FullName + ": Did not find SQL script folder");
+                return;
+            }
+
+            Action upMethod = () =>
+                {
+                    if (commment != null) WriteComment(commment);
+
+                    if (options.SqlDirectory != null)
+                    {
+                        EmbedSqlDirectory(sqlDir);
+                    }
+                };
+
+            WriteClass("", subfolder.Replace(" ",""), upMethod, CantUndo, tags);
         }
 
         #region Drop Tables and Code
@@ -499,19 +643,23 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             IDictionary<string, string> newCols = newTable.Columns.ToDictionary(col => col.Name, GetColumnCode);
 
             var addedColsCode = oldCols.GetAdded(newCols).Select(colCode => colCode.Replace("WithColumn", "AddColumn"));
+            var updatedColsOldCode = newCols.GetUpdated(oldCols);
             var updatedColsCode = oldCols.GetUpdated(newCols).Select(colCode => colCode.Replace("WithColumn", "AlterColumn"));
+            var removedColsDefCode = oldCols.GetRemoved(newCols);
             var removedColsCode = oldCols.GetRemovedNames(newCols).Select(colName => GetRemoveColumnCode(newTable, colName) );
 
-            // Indexes
+            // Indexes 
             IDictionary<string, string> oldIndexes = GetNonColumnIndexes(oldTable).ToDictionary(index => index.Name, index => GetCreateIndexCode(oldTable, index));
             IDictionary<string, string> newIndexes = GetNonColumnIndexes(newTable).ToDictionary(index => index.Name, index => GetCreateIndexCode(newTable, index));
             
             // Updated indexes are removed and added
-            var addUpdatedIndexesCode = oldIndexes.GetUpdated(newIndexes);
+            var oldUpdatedIndexDefCode = newIndexes.GetUpdated(oldIndexes);
+            var newUpdatedIndexCode = oldIndexes.GetUpdated(newIndexes);
             var removeUpdatedIndexesCode = oldIndexes.GetUpdatedNames(newIndexes).Select(indexName => GetRemoveIndexCode(oldTable, indexName));
  
             var addedIndexCode = oldIndexes.GetAdded(newIndexes);
             var removedIndexNames = oldIndexes.GetRemovedNames(newIndexes);
+            var removedIndexOldDefCode = oldIndexes.GetRemoved(newIndexes);
             var removedIndexCode = removedIndexNames.Select(indexName => GetRemoveIndexCode(oldTable, indexName));
 
             // Foreign Keys
@@ -521,10 +669,12 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             // Updated foreign keys are removed and added
             var updatedFkNames = oldFKs.GetUpdatedNames(newFKs);
             var removeUpdatedFkCode = updatedFkNames.Select(fkName => GetRemoveFKCode(oldTable, fkName));
-            var addUpdatedFkCode = oldFKs.GetUpdated(newFKs);
+            var oldUpdatedFkDefCode = newFKs.GetUpdated(oldFKs);
+            var newUpdatedFkCode = oldFKs.GetUpdated(newFKs);
 
             var addedFkCode = oldFKs.GetAdded(newFKs);
             var removedFkNames = oldFKs.GetRemovedNames(newFKs);
+            var removedFkDefCode = oldFKs.GetRemoved(newFKs);
             var removedFkCode = removedFkNames.Select(fkName => GetRemoveFKCode(oldTable, fkName));
 
             // Keep old indexes and columns as long as possible as they may be needed 
@@ -535,19 +685,29 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             WriteChanges(addedIndexCode);           // Add NEW Indexes
             WriteChanges(addedFkCode);              // Add NEW foreign keys
 
+            ShowOldCode(oldUpdatedIndexDefCode);    // Show old version of updated indexes definitions as comments.
             WriteChanges(removeUpdatedIndexesCode); // Remove UPDATED indexes
+
+            ShowOldCode(oldUpdatedFkDefCode);       // Show old version of UPDATED foreign keys as comments
             WriteChanges(removeUpdatedFkCode);      // Remove UPDATED foreign keys
-            
+
+            ShowOldCode(removedFkDefCode);          // Show old code of removed FKs
             WriteChanges(removedFkCode);            // Remove OLD foreign keys
 
+            ShowOldCode(updatedColsOldCode);        // Show old definition of updated columns
             AlterTable(newTable, updatedColsCode);  // Updated columns (including 1 column indexes)
 
-            WriteChanges(addUpdatedFkCode);         // Add UPDATED foreign keys
-            WriteChanges(addUpdatedIndexesCode);    // Add UPDATED indexes (excluding 1 column indexes)
+            MigrateData(newTable.Name);             // Run data migration SQL
+
+            WriteChanges(newUpdatedFkCode);         // Add UPDATED foreign keys
+            WriteChanges(newUpdatedIndexCode);      // Add UPDATED indexes (excluding 1 column indexes)
 
             // Note: The developer may add custom data migration code here
 
+            ShowOldCode(removedIndexOldDefCode);    // Comments showing OLD index definitions.
             WriteChanges(removedIndexCode);         // Remove OLD Indexes
+
+            ShowOldCode(removedColsDefCode);        // Comments showing OLD column definitions.
             WriteChanges(removedColsCode);          // Remove OLD columns
         }
 
@@ -887,34 +1047,38 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             using (new Indenter())
             {
                 // From Table
-                WriteLine(".FromTable(\"{0}\")", fk.ForeignTable);
+                string fromTable = string.Format(".FromTable(\"{0}\")", fk.ForeignTable);
 
                 using (new Indenter())
                 {
                     if (fk.ForeignColumns.Count == 1)
                     {
-                        WriteLine(".ForeignColumn(\"{0}\")", fk.ForeignColumns.First());
+                        fromTable += string.Format(".ForeignColumn(\"{0}\")", fk.ForeignColumns.First());
                     }
                     else
                     {
-                        WriteLine("ForeignColumns({0})", ToStringArray(fk.ForeignColumns));
+                        fromTable += string.Format("ForeignColumns({0})", ToStringArray(fk.ForeignColumns));
                     }
                 }
 
+                WriteLine(fromTable);
+
                 // To Table
-                WriteLine(".ToTable(\"{0}\")", fk.PrimaryTable);
+                string toTable = string.Format(".ToTable(\"{0}\")", fk.PrimaryTable);
 
                 using (new Indenter())
                 {
                     if (fk.PrimaryColumns.Count == 1)
                     {
-                        WriteLine(".PrimaryColumn(\"{0}\")", fk.PrimaryColumns.First());
+                        toTable += string.Format(".PrimaryColumn(\"{0}\")", fk.PrimaryColumns.First());
                     }
                     else
                     {
-                        WriteLine(".PrimaryColumns({0})", ToStringArray(fk.PrimaryColumns));
+                        toTable += string.Format(".PrimaryColumns({0})", ToStringArray(fk.PrimaryColumns));
                     }
                 }
+
+                WriteLine(toTable);
 
                 if (fk.OnDelete != Rule.None && fk.OnDelete == fk.OnUpdate)
                 {

@@ -26,20 +26,26 @@ namespace FluentMigrator.SchemaGen
         /// <summary>
         /// Connection Strings 
         /// </summary>
-        string Db { get; set; }
-        string Db1 { get; set; }
-        string Db2 { get; set; }
+        string Db { get; }
+        string Db1 { get; }
+        string Db2 { get; }
 
-        string BaseDirectory { get; set; }
-        string NameSpace { get; set; }
-        string MigrationVersion { get; set; }
-        int StepStart { get; set; }
-        int StepEnd { get; set; }
-        string Tags { get; set; }
+        string OutputDirectory { get; }
+        string NameSpace { get; }
+        string MigrationVersion { get; }
+        int StepStart { get; }
+        int StepEnd { get; }
+        string Tags { get; }
 
-        bool UseDeprecatedTypes { get; set; }
-        string IncludeTables { get; set; }
-        string ExcludeTables { get; set; }
+        string IncludeTables { get; }
+        string ExcludeTables { get; }
+
+        string SqlDirectory { get; }
+
+        bool UseDeprecatedTypes { get; }
+        bool ShowOldCode { get; }
+        bool DropScripts { get; }
+        bool DropTables { get; }
     }
 
     /// <summary>
@@ -58,12 +64,12 @@ namespace FluentMigrator.SchemaGen
 
         
         [Option("dir", DefaultValue = ".", HelpText = "class directory")]
-        public string BaseDirectory { get; set; }
+        public string OutputDirectory { get; set; }
 
         [Option("ns", Required = true, HelpText = "C# class namespace.")]
         public string NameSpace { get; set; }
 
-        [Option("version", DefaultValue = "1.0", HelpText = "Database schema version.  Example: \"1.0\"")]
+        [Option("version", DefaultValue = "1.0.0", HelpText = "Database schema version.  Example: \"3.1.1\"")]
         public string MigrationVersion { get; set; }
 
         [Option("step-start", DefaultValue = 1, HelpText = "First step number. Appended to Version number")]
@@ -83,8 +89,20 @@ namespace FluentMigrator.SchemaGen
 
         [Option("exclude-tables", DefaultValue = null, HelpText = "Comma separated list of table names to exclude. Use \"prefix*\"  to exclude tables with prefix.")]
         public string ExcludeTables { get; set; }
-        
-        
+
+        [Option("show-old-schema", DefaultValue = false, HelpText = "Shows old schema code from Db1 as comments. Very useful to understand the changes.")]
+        public bool ShowOldCode { get; set; }
+
+        [Option("drop-scripts", DefaultValue = false, HelpText = "Generates a class to drop user defined types, functions, stored procedures and views in Db1 but removed from Db2.")]
+        public bool DropScripts { get; set; }
+
+        [Option("drop-tables", DefaultValue = false, HelpText = "Generates a class to drop tables that were in Db1 but removed from Db2.")]
+        public bool DropTables { get; set; }
+
+        [Option("sql-dir", DefaultValue = null, HelpText = "If set, Adds Sql.Execute() statements from SQL script files. Turn on to discover the expected subfolders.")]
+        public string SqlDirectory { get; set; }
+
+
         [ParserState]
         public IParserState LastParserState { get; set; }
 

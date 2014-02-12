@@ -226,7 +226,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
         #region Table name filtering
         private Regex MapFilter(string filter)
         {
-            string[] patterns = (from pat in filter.Split(',') select "^" + pat.Replace(".", "\\.").Replace("*", ".*") + "$").ToArray();
+            string[] patterns = (from pat in filter.Split(';') select "^" + pat.Replace(".", "\\.").Replace("*", ".*") + "$").ToArray();
             return new Regex(String.Join("|", patterns));
         }
 
