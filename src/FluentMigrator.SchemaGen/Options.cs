@@ -42,6 +42,9 @@ namespace FluentMigrator.SchemaGen
 
         string SqlDirectory { get; }
 
+        bool PreScripts { get; }
+        bool PostScripts { get; }
+
         bool UseDeprecatedTypes { get; }
         bool ShowOldCode { get; }
         bool DropScripts { get; }
@@ -103,9 +106,14 @@ namespace FluentMigrator.SchemaGen
         [Option("set-not-null-default", DefaultValue = false, HelpText = "When a column NULL -> NOT NULL and has a default value, runs SQL to set the new default on all NULL values")]
         public bool SetNotNullDefault { get; private set; }
 
-        [Option("sql-dir", DefaultValue = null, HelpText = "If set, Adds Sql.Execute() statements from SQL script files. Turn on to discover the expected subfolders.")]
+        [Option("sql-dir", DefaultValue = null, HelpText = "SQL script file directory (Default is 'SQL').")]
         public string SqlDirectory { get; set; }
 
+        [Option("pre-scripts", DefaultValue = null, HelpText = "If true, generates Pre schema change SQL scripts.")]
+        public bool PreScripts { get; set; }
+
+        [Option("post-scripts", DefaultValue = null, HelpText = "If true, generates Post schema change SQL scripts.")]
+        public bool PostScripts { get; set; }
 
         [ParserState]
         public IParserState LastParserState { get; set; }

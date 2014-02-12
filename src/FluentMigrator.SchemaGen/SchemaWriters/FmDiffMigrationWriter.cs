@@ -237,7 +237,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
                 string line = lines[i];
                 if (line.Trim() == "") continue;
 
-                line = line.Replace("\"", "\\\"");
+                line = line.Replace("\"", "\"\"");  // " -> "" since we're using @" "
 
                 if (i == 0)
                 {
@@ -449,7 +449,10 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
             // TODO: Create new user defined DataTypes
 
-            WriteSqlScriptClass("01_Pre");
+            if (options.PreScripts)
+            {
+                WriteSqlScriptClass("01_Pre");
+            }
 
             // Create/Update All tables/columns/indexes/foreign keys
             CreateUpdateTables(IsInstall ? "02_Install" : "03_Upgrade");
@@ -457,7 +460,11 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             // TODO: Drop/Create new or modified scripts (SPs/Views/Functions)
             // CreateUpdateScripts();
 
-            WriteSqlScriptClass("04_Post");
+
+            if (options.PostScripts)
+            {
+                WriteSqlScriptClass("04_Post");
+            }
 
             if (options.DropTables)
             {
@@ -471,13 +478,16 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
                 WriteClass("", "DropScripts", DropScripts, CantUndo);
             }
 
-            WriteSqlScriptClass("05_Functions");
-            WriteSqlScriptClass("06_Views");
-            WriteSqlScriptClass("07_SPs");
+            if (options.PostScripts)
+            {
+                WriteSqlScriptClass("05_Functions");
+                WriteSqlScriptClass("06_Views");
+                WriteSqlScriptClass("07_SPs");
 
-            WriteSqlScriptClass("10_SeedData");
-            WriteSqlScriptClass("11_DemoData", "Demo");
-            WriteSqlScriptClass("12_TestData", "Test");
+                WriteSqlScriptClass("10_SeedData");
+                WriteSqlScriptClass("11_DemoData", "Demo");
+                WriteSqlScriptClass("12_TestData", "Test");
+            }
 
             // TODO: Drop old user defined DataTypes
             // WriteClass("Data", "LoadSeedData", LoadSeedData, DropSeedData);
