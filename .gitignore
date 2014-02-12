@@ -29,3 +29,5 @@ examplecommand.txt
 *.ncrunchsolution
 *.crunchsolution.cache
 src/FluentMigrator.T4.Tests/IntialMigrationCode.cs
+/src/FluentMigrator.SchemaGen/codegen_tests.msbuild
+/src/FluentMigrator.SchemaGen/Debug.txt
