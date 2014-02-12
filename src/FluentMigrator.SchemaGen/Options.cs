@@ -46,6 +46,7 @@ namespace FluentMigrator.SchemaGen
         bool ShowOldCode { get; }
         bool DropScripts { get; }
         bool DropTables { get; }
+        bool SetNotNullDefault { get; }
     }
 
     /// <summary>
@@ -98,6 +99,9 @@ namespace FluentMigrator.SchemaGen
 
         [Option("drop-tables", DefaultValue = false, HelpText = "Generates a class to drop tables that were in Db1 but removed from Db2.")]
         public bool DropTables { get; set; }
+
+        [Option("set-not-null-default", DefaultValue = false, HelpText = "When a column NULL -> NOT NULL and has a default value, runs SQL to set the new default on all NULL values")]
+        public bool SetNotNullDefault { get; private set; }
 
         [Option("sql-dir", DefaultValue = null, HelpText = "If set, Adds Sql.Execute() statements from SQL script files. Turn on to discover the expected subfolders.")]
         public string SqlDirectory { get; set; }

@@ -646,7 +646,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             var updatedColsOldCode = newCols.GetUpdated(oldCols);
             var updatedColsCode = oldCols.GetUpdated(newCols).Select(colCode => colCode.Replace("WithColumn", "AlterColumn"));
             var removedColsDefCode = oldCols.GetRemoved(newCols);
-            var removedColsCode = oldCols.GetRemovedNames(newCols).Select(colName => GetRemoveColumnCode(newTable, colName) );
+            var removedColsCode = oldCols.GetRemovedNames(newCols).Select(colName => GetRemoveColumnCode(newTable, colName));
 
             // Indexes 
             IDictionary<string, string> oldIndexes = GetNonColumnIndexes(oldTable).ToDictionary(index => index.Name, index => GetCreateIndexCode(oldTable, index));
@@ -677,8 +677,11 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             var removedFkDefCode = oldFKs.GetRemoved(newFKs);
             var removedFkCode = removedFkNames.Select(fkName => GetRemoveFKCode(oldTable, fkName));
 
-            // Keep old indexes and columns as long as possible as they may be needed 
-            // when the developer adds custom code to migrate the data from old to new.
+            // We keep old indexes and columns as long as possible as they may be needed 
+            // when the developer adds custom code to in MigrateData() to migrate the data from old to new schema.
+
+            // When a column becomes NOT NULL and has a DEFAULT value, this emits SQL to set the default on all NULL column values.
+            SetDefaultsIfNotNull(oldTable, newTable, oldCols.GetUpdatedNames(newCols));
 
             AlterTable(newTable, addedColsCode);    // Add NEW columns
 
@@ -737,6 +740,32 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         #endregion
 
         #region Column
+
+        /// <summary>
+        /// When a column NULL -> NOT NULL and has a default value, this emits SQL to set the default on all NULL column values
+        /// </summary>
+        /// <param name="oldTable"></param>
+        /// <param name="newTable"></param>
+        /// <param name="updatedColNames"></param>
+        private void SetDefaultsIfNotNull(TableDefinition oldTable, TableDefinition newTable, IEnumerable<string> updatedColNames)
+        {
+            if (options.SetNotNullDefault)
+            {
+                // When a column NULL -> NOT NULL and has a default value, this emits SQL to set the default on all NULL column values
+                foreach (string colName in updatedColNames)
+                {
+                    ColumnDefinition oldCol = oldTable.Columns.First(col => col.Name == colName);
+                    ColumnDefinition newCol = newTable.Columns.First(col => col.Name == colName);
+
+                    if (oldCol.IsNullable == true && newCol.IsNullable == false && newCol.DefaultValue != null)
+                    {
+                        EmbedSql(string.Format("UPDATE {0}.{1} SET {2} = {3} WHERE {2} IS NULL",
+                                                   newTable.SchemaName, newTable.Name, 
+                                                   newCol.Name, GetColumnDefaultValue(newCol)));
+                    }
+                }
+            }
+        }
 
         private string GetRemoveColumnCode(TableDefinition table, string colName)
         {
@@ -962,7 +991,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
                     break;
             }
 
-            return sysType;
+            return sysType.Replace("'", "''");
         }
         #endregion
 
