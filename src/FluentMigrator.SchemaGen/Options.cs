@@ -76,10 +76,10 @@ namespace FluentMigrator.SchemaGen
         [Option("version", DefaultValue = "1.0.0", HelpText = "Database schema version.  Example: \"3.1.1\"")]
         public string MigrationVersion { get; set; }
 
-        [Option("step-start", DefaultValue = 1, HelpText = "First step number. Appended to Version number")]
+        [Option("step-start", DefaultValue = 1, HelpText = "First step number. Appended to version number")]
         public int StepStart { get; set; }
 
-        [Option("step-end", DefaultValue = -1, HelpText = "Last step number. Adds a final Migration class just to set the step value.")]
+        [Option("step-end", DefaultValue = -1, HelpText = "Last step number. Adds a final Migration class just to set the step value. Useful when merging migration classes in one DLL or ensuring that Install and Upgrade migrations reach a matching step number.")]
         public int StepEnd { get; set; }
 
         [Option("tags", DefaultValue = "", HelpText = "Example: --tags abc,def Adds [Tags(\"tag1\", \"def\")] attribute to all generated C# classes.")]
@@ -104,7 +104,7 @@ namespace FluentMigrator.SchemaGen
         public bool DropTables { get; set; }
 
         [Option("set-not-null-default", DefaultValue = false, HelpText = "When a column NULL -> NOT NULL and has a default value, runs SQL to set the new default on all NULL values")]
-        public bool SetNotNullDefault { get; private set; }
+        public bool SetNotNullDefault { get; set; }
 
         [Option("sql-dir", DefaultValue = null, HelpText = "SQL script file directory (Default is 'SQL').")]
         public string SqlDirectory { get; set; }

@@ -323,7 +323,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
         }
 
         /// <summary>
-        /// Ordering used to create or drop tables and foriegn keys.
+        /// Ordering used to create or drop tables and foreign keys.
         /// </summary>
         /// <returns></returns>
         public IDictionary<string, int> TablesInForeignKeyOrder(bool ascending)
