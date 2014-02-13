@@ -41,6 +41,7 @@ namespace FluentMigrator.SchemaGen
         string ExcludeTables { get; }
 
         string SqlDirectory { get; }
+        bool EmbedSql { get; }
 
         bool PreScripts { get; }
         bool PostScripts { get; }
@@ -50,6 +51,8 @@ namespace FluentMigrator.SchemaGen
         bool DropScripts { get; }
         bool DropTables { get; }
         bool SetNotNullDefault { get; }
+
+
     }
 
     /// <summary>
@@ -108,6 +111,9 @@ namespace FluentMigrator.SchemaGen
 
         [Option("sql-dir", DefaultValue = null, HelpText = "Import SQL script directory (Default is 'SQL').")]
         public string SqlDirectory { get; set; }
+
+        [Option("embed-sql", DefaultValue = true, HelpText = "If true, embeds SQL scripts into the migration class. Otherwise, links to the SQL file path. Tip: Set to false during development, then true when deploying or when building for a specific database type.")]
+        public bool EmbedSql { get; set; }
 
         [Option("pre-scripts", DefaultValue = true, HelpText = "If true, imports Pre schema change SQL scripts.")]
         public bool PreScripts { get; set; }

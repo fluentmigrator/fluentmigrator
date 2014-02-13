@@ -41,8 +41,6 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         private readonly IDbSchemaReader db2;
         private int step = 1;
 
-        private readonly IDictionary<string, bool> tablesCompleted = new Dictionary<string, bool>();
-
         private readonly IList<string> classPaths = new List<string>();
 
         private static int indent = 0;
@@ -227,6 +225,16 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
         #region Embed or Execute external SQL scripts
 
+        private string GetRelativePath(FileInfo file)
+        {
+            return file.FullName.Replace(Environment.CurrentDirectory + "\\", "");
+        }
+
+        private string GetRelativePath(DirectoryInfo dir)
+        {
+            return dir.FullName.Replace(Environment.CurrentDirectory + "\\", "");
+        }
+
         private void EmbedSql(string sqlStatement)
         {
             var lines = sqlStatement.Replace("\r", "").Split('\n').Where(line => line.Trim().Length > 0).ToArray();
@@ -259,26 +267,44 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             WriteLine(sb.ToString());
         }
 
-        private void EmbedSqlFile(FileInfo sqlFile)
+        private void ExecuteSqlFile(FileInfo sqlFile)
         {
-            string allLines = File.ReadAllText(sqlFile.FullName);
-            Regex goStatement = new Regex("\\s+GO\\s+|^GO\\s+", RegexOptions.Multiline);
-
-            foreach (var sqlStatment in goStatement.Split(allLines))
+            if (options.EmbedSql)
             {
-                EmbedSql(sqlStatment);
+
+                string allLines = File.ReadAllText(sqlFile.FullName);
+                Regex goStatement = new Regex("\\s+GO\\s+|^GO\\s+", RegexOptions.Multiline);
+
+                WriteComment(GetRelativePath(sqlFile));
+
+                foreach (var sqlStatment in goStatement.Split(allLines))
+                {
+                    EmbedSql(sqlStatment);
+                }
+            }
+            else
+            {
+                WriteLine("Execute.Script(\"{0}\");", GetRelativePath(sqlFile).Replace("\\", "\\\\"));   
             }
         }
 
-        private void EmbedSqlDirectory(DirectoryInfo sqlDirectory)
+        private void ExecuteSqlDirectory(DirectoryInfo sqlDirectory)
         {
-            foreach (var sqlFile in sqlDirectory.GetFiles("*.sql", SearchOption.AllDirectories).OrderBy(file => file.FullName))
+            if (options.EmbedSql)
             {
-                if (sqlFile.Length > 0)
+                foreach (var sqlFile in sqlDirectory.GetFiles("*.sql", SearchOption.AllDirectories).OrderBy(file => file.FullName))
                 {
-                    WriteComment(sqlFile.FullName.Replace(Environment.CurrentDirectory + "\\", ""));
-                    EmbedSqlFile(sqlFile);                    
+                    if (sqlFile.Length > 0)
+                    {
+                        WriteComment(GetRelativePath(sqlFile));
+                        ExecuteSqlFile(sqlFile);
+                    }
                 }
+            }
+            else
+            {
+                // Runs MigrationExt.ExecuteScriptDirectory
+                WriteLine("ExecuteScriptDirectory(\"{0}\");", GetRelativePath(sqlDirectory).Replace("\\", "\\\\"));
             }
         }
 
@@ -303,7 +329,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
                     return;
                 }
 
-                EmbedSqlFile(sqlFile);
+                ExecuteSqlFile(sqlFile);
             }
         }
 
@@ -523,7 +549,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
                 {
                     if (options.SqlDirectory != null)
                     {
-                        EmbedSqlDirectory(sqlDir);
+                        ExecuteSqlDirectory(sqlDir);
                     }
                 };
 
@@ -647,9 +673,6 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         /// <param name="schemaSqlFolder"></param>
         private void UpdateTable(TableDefinition oldTable, TableDefinition newTable, string schemaSqlFolder)
         {
-            if (tablesCompleted.ContainsKey(newTable.Name)) return;
-            tablesCompleted[newTable.Name] = true;
-
             // Strategy is to compute generated FluentMigration API code 
             // for each table related object (columns, indexes and foreign keys) 
             // and then detect changes in EITHER the list of object names 
@@ -808,7 +831,8 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
             if (column.IsPrimaryKey)
             {
-                sb.AppendFormat(".PrimaryKey(\"{0}\")", column.PrimaryKeyName);
+                //sb.AppendFormat(".PrimaryKey(\"{0}\")", column.PrimaryKeyName);
+                sb.AppendFormat(".PrimaryKey()");
             }
             else if (column.IsUnique)
             {

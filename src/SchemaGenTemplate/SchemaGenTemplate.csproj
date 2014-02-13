@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{48233884-9B66-4BC8-A350-2A126D6E0E7F}</ProjectGuid>
+    <ProjectGuid>{869ED5E7-503E-4887-821A-73DF7A32563B}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Migrations</RootNamespace>
@@ -42,13 +42,12 @@
     <Compile Include="FM_Extensions\AutoReversingMigrationExt.cs" />
     <Compile Include="FM_Extensions\MigrationExt.cs" />
     <Compile Include="FM_Extensions\MigrationVersionAttribute.cs" />
-    <Compile Include="FM_Extensions\SqlFileFilter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Content Include="VersionTable.cs.txt" />
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
-    <ProjectReference Include="..\..\FluentMigrator\src\FluentMigrator\FluentMigrator.csproj">
+    <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj">
       <Project>{fd9410f9-6fea-47f7-a78e-b4f6fb0539b8}</Project>
       <Name>FluentMigrator</Name>
     </ProjectReference>
