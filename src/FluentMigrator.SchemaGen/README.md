@@ -42,9 +42,17 @@ See the [Options.cs](Options.cs) file for details of command line and MSBuild ta
 Known Issues:
 ------------
  
- * Currently ignores the Schema Name when comparing most schema objects etc.
- * When a field type is altered, we currently don't cope with the cases where this field is part of a foriegn key relation (requires FK to be dropped and two or more tables altered together).
- * There are many complex cases that this generator will not cater for. The goal is to cover the most common cases. The rest needs your input!
+ * There are many complex cases that this generator will not ever cater for. 
+   * The goal is to cover the most common cases. The rest invariably needs your knowledge of the schema and data relationships!
+   * Example: Migrating recusive data relationships.
+
+ * Currently ignores the Schema Name when comparing schema objects. Should be easy to fix. Many parts of the code already support it.
+ * When a field type is altered, we currently don't handle the case where this field is part of a foriegn key relation.
+   * Requires one or more FKs to be dropped and two or more tables altered together before FKs are recreated.
+ * Currently emits IfDatabase("sqlserver") conditions for foreign key indexes. 
+   * This really should be IfNotDatabase("jet") but IfNotDatabase() is not yet implemented in FluentMigrator.
+   * In my case I'm generating code for SQL Server and Jet (MS-Access).
+ * Needs some example MSBuild scripts, Unit Tests and some code refactoring to split up FmDiffMigrationWriter into smaller component classes.
 
 Required Libs:
 -------------
