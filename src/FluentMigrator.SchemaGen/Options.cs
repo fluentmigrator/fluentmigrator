@@ -47,7 +47,7 @@ namespace FluentMigrator.SchemaGen
         bool PostScripts { get; }
 
         bool UseDeprecatedTypes { get; }
-        bool ShowOldCode { get; }
+        bool ShowChanges { get; }
         bool DropScripts { get; }
         bool DropTables { get; }
         bool SetNotNullDefault { get; }
@@ -95,8 +95,8 @@ namespace FluentMigrator.SchemaGen
         [Option("exclude-tables", DefaultValue = null, HelpText = "Comma separated list of table names to exclude. Use \"prefix*\" to exclude tables with prefix.")]
         public string ExcludeTables { get; set; }
 
-        [Option("show-old-schema", DefaultValue = false, HelpText = "Shows old schema code from Db1 as comments. Very useful to understand the changes.")]
-        public bool ShowOldCode { get; set; }
+        [Option("show-changes", DefaultValue = false, HelpText = "Identifies schema changes as comments including old object definitions and object renaming.")]
+        public bool ShowChanges { get; set; }
 
         [Option("drop-scripts", DefaultValue = false, HelpText = "Generates a class to drop user defined types, functions, stored procedures and views in Db1 but removed from Db2.")]
         public bool DropScripts { get; set; }

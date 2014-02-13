@@ -46,7 +46,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         private static int _indent = 0;
         private static StreamWriter _writer;
         private static StringBuilder _sb;
-        private static Stack<StringBuilder> _nestedBuffers = new Stack<StringBuilder>();
+        private static readonly Stack<StringBuilder> _nestedBuffers = new Stack<StringBuilder>();
 
         public FmDiffMigrationWriter(IOptions options, IAnnouncer announcer, IDbSchemaReader db1, IDbSchemaReader db2)
         {
@@ -153,7 +153,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
         private void ShowOldCode(IEnumerable<string> oldCode)
         {
-            if (options.ShowOldCode)
+            if (options.ShowChanges)
             {
                 WriteComments(oldCode);
             }
@@ -727,6 +727,14 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             var removedIndexOldDefCode = oldIndexes.GetRemoved(newIndexes);
             var removedIndexCode = removedIndexNames.Select(indexName => GetRemoveIndexCode(oldTable, indexName));
 
+            if (options.ShowChanges)
+            {
+                // Show renamed indexes as comments
+                var oldIndexDefs = oldTable.Indexes.ToDictionary(index => index.Name, GetCreateIndexDefCode);
+                var newIndexDefs = newTable.Indexes.ToDictionary(index => index.Name, GetCreateIndexDefCode);
+                ShowRenaming("Index", oldIndexDefs, newIndexDefs);
+            }
+
             // Foreign Keys
             IDictionary<string, string> oldFKs = oldTable.ForeignKeys.ToDictionary(fk => fk.Name, GetCreateForeignKeyCode);
             IDictionary<string, string> newFKs = newTable.ForeignKeys.ToDictionary(fk => fk.Name, GetCreateForeignKeyCode);
@@ -741,6 +749,14 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             var removedFkNames = oldFKs.GetRemovedNames(newFKs);
             var removedFkDefCode = oldFKs.GetRemoved(newFKs);
             var removedFkCode = removedFkNames.Select(fkName => GetRemoveFKCode(oldTable, fkName));
+
+            if (options.ShowChanges)
+            {
+                // Show renamed Foreign Keys as comments
+                var oldFkDefs = oldTable.ForeignKeys.ToDictionary(fk => fk.Name, GetForeignKeyDefCode);
+                var newFkDefs = newTable.ForeignKeys.ToDictionary(fk => fk.Name, GetForeignKeyDefCode);
+                ShowRenaming("Foreign Key", oldFkDefs, newFkDefs);
+            }
 
             // We keep old indexes and columns as long as possible as they may be needed 
             // when the developer adds custom code to in MigrateData() to migrate the data from old to new schema.
@@ -778,6 +794,23 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
             ShowOldCode(removedColsDefCode);        // Comments showing OLD column definitions.
             WriteChanges(removedColsCode);          // Remove OLD columns
+        }
+
+        /// <summary>
+        /// Report renamed objects.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="title"></param>
+        /// <param name="oldObjects"></param>
+        /// <param name="newObjects"></param>
+        private void ShowRenaming<T>(string title, IDictionary<string, T> oldObjects, IDictionary<string, T> newObjects)
+        {
+            foreach (var rename in oldObjects.GetRenamed(newObjects))
+            {
+                string msg = string.Format("Renamed {0}: {1} -> {2}", title, rename.Key, rename.Value);
+                WriteComment(msg);
+                Console.WriteLine(msg);
+            }
         }
 
         private void AlterTable(TableDefinition table, IEnumerable<string> codeChanges)
@@ -1090,6 +1123,12 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             //Create.Index("ix_Name").OnTable("TestTable2").OnColumn("Name").Ascending().WithOptions().NonClustered();
             sb.AppendFormat("Create.Index(\"{0}\").OnTable(\"{1}\")", index.Name, index.TableName);
 
+            return sb.ToString() + GetCreateIndexDefCode(index);
+        }
+
+        private string GetCreateIndexDefCode(IndexDefinition index)
+        {
+            var sb = new StringBuilder();
             if (index.IsUnique)
             {
                 sb.AppendFormat(".WithOptions().Unique()");
@@ -1128,71 +1167,73 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
         protected string GetCreateForeignKeyCode(ForeignKeyDefinition fk)
         {
-            string result = Buffer(() => DoGetCreateForeignKeyCode(fk));
-            return result.Substring(0, result.Length - Environment.NewLine.Length) + ";";
+            return string.Format("Create.ForeignKey(\"{0}\")\r\n\t{1};", fk.Name, GetForeignKeyDefCode(fk));
         }
 
-        private void DoGetCreateForeignKeyCode(ForeignKeyDefinition fk)
+        private string GetForeignKeyDefCode(ForeignKeyDefinition fk)
         {
             //Create.ForeignKey("fk_TestTable2_TestTableId_TestTable_Id")
             //    .FromTable("TestTable2").ForeignColumn("TestTableId")
             //    .ToTable("TestTable").PrimaryColumn("Id");
 
-            WriteLine();
-            WriteLine("Create.ForeignKey(\"{0}\")", fk.Name);
+            var sb = new StringBuilder();
+
+            // From Table
+            string fromTable = string.Format(".FromTable(\"{0}\")", fk.ForeignTable);
+
             using (new Indenter())
             {
-                // From Table
-                string fromTable = string.Format(".FromTable(\"{0}\")", fk.ForeignTable);
-
-                using (new Indenter())
+                if (fk.ForeignColumns.Count == 1)
                 {
-                    if (fk.ForeignColumns.Count == 1)
-                    {
-                        fromTable += string.Format(".ForeignColumn(\"{0}\")", fk.ForeignColumns.First());
-                    }
-                    else
-                    {
-                        fromTable += string.Format("ForeignColumns({0})", ToStringArray(fk.ForeignColumns));
-                    }
-                }
-
-                WriteLine(fromTable);
-
-                // To Table
-                string toTable = string.Format(".ToTable(\"{0}\")", fk.PrimaryTable);
-
-                using (new Indenter())
-                {
-                    if (fk.PrimaryColumns.Count == 1)
-                    {
-                        toTable += string.Format(".PrimaryColumn(\"{0}\")", fk.PrimaryColumns.First());
-                    }
-                    else
-                    {
-                        toTable += string.Format(".PrimaryColumns({0})", ToStringArray(fk.PrimaryColumns));
-                    }
-                }
-
-                WriteLine(toTable);
-
-                if (fk.OnDelete != Rule.None && fk.OnDelete == fk.OnUpdate)
-                {
-                    WriteLine(".OnDeleteOrUpdate(System.Data.Rule.{0})", fk.OnDelete);
+                    fromTable += string.Format(".ForeignColumn(\"{0}\")", fk.ForeignColumns.First());
                 }
                 else
                 {
-                    if (fk.OnDelete != Rule.None)
-                    {
-                        WriteLine(".OnDelete(System.Data.Rule.{0})", fk.OnDelete);
-                    }
-
-                    if (fk.OnUpdate != Rule.None)
-                    {
-                        WriteLine(".OnUpdate(System.Data.Rule.{0})", fk.OnUpdate);
-                    }
+                    fromTable += string.Format("ForeignColumns({0})", ToStringArray(fk.ForeignColumns));
                 }
             }
+
+            sb.AppendLine("\t" + fromTable);
+
+            // To Table
+            string toTable = string.Format(".ToTable(\"{0}\")", fk.PrimaryTable);
+
+            using (new Indenter())
+            {
+                if (fk.PrimaryColumns.Count == 1)
+                {
+                    toTable += string.Format(".PrimaryColumn(\"{0}\")", fk.PrimaryColumns.First());
+                }
+                else
+                {
+                    toTable += string.Format(".PrimaryColumns({0})", ToStringArray(fk.PrimaryColumns));
+                }
+            }
+
+            sb.AppendLine("\t" + toTable);
+
+            string rule = "";
+
+            if (fk.OnDelete != Rule.None && fk.OnDelete == fk.OnUpdate)
+            {
+                rule += string.Format(".OnDeleteOrUpdate(System.Data.Rule.{0})", fk.OnDelete);
+            }
+            else
+            {
+                if (fk.OnDelete != Rule.None)
+                {
+                    rule += string.Format(".OnDelete(System.Data.Rule.{0})", fk.OnDelete);
+                }
+
+                if (fk.OnUpdate != Rule.None)
+                {
+                    rule += string.Format(".OnUpdate(System.Data.Rule.{0})", fk.OnUpdate);
+                }
+            }
+
+            if (rule.Length > 0) sb.AppendLine("\t" + rule);
+
+            return sb.ToString().Trim();
         }
 
         #endregion

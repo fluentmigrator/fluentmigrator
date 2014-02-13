@@ -140,5 +140,22 @@ namespace FluentMigrator.SchemaGen.Extensions
             return from key in keys1.Intersect(keys2)
                    select key;
         }
+
+        /// <summary>
+        /// Return a list of the names of objects having matching <paramref name="T"/> values.
+        /// If values in <paramref name="dict1"/> (or <paramref name="dict2"/>) are non unique then it may report multiple renames for the same object.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="dict1"></param>
+        /// <param name="dict2"></param>
+        /// <returns>Object name pairs of rename objects</returns>
+        public static IEnumerable<KeyValuePair<string, string>> GetRenamed<T>(this IDictionary<string, T> dict1, IDictionary<string, T> dict2)
+        {
+            return from kvp1 in dict1
+                from kvp2 in dict2
+                where kvp1.Key != kvp2.Key && kvp1.Value.Equals(kvp2.Value)
+                select new KeyValuePair<string, string>(kvp1.Key, kvp2.Key);
+        }
+
     }
 }

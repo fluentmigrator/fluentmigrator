@@ -35,7 +35,9 @@ Features:
 Schema Upgrade Features:
 -----------------------
   * Optionally generates "drop table" and "drop script" classes.
-  * Optionally include as comments the definition of objects being deleted. Very useful in diagnosing changes.
+  * Adds comments showing changes including: 
+    * Renamed/Duplicate indexes and foreign keys (same definition)
+    * Previous definition of deleted and updated columns, indexes and foreign keys.
   * When a NULL-able table field becomes NOT NULL, optionally emits SQL to set NULL values to the column's DEFAULT value (if defined).
   * Per Table: Can import SQL scripts to be executed after new columns / indexes are added but before old columns are removed.
 
