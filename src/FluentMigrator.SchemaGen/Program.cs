@@ -45,6 +45,7 @@ namespace FluentMigrator.SchemaGen
 
         private static void Main(string[] args)
         {
+            int exit = 0;
             var options = new Options();
             if (CommandLine.Parser.Default.ParseArguments(args, options))
             {
@@ -61,18 +62,22 @@ namespace FluentMigrator.SchemaGen
                 catch (DatabaseArgumentException)
                 {
                     Console.WriteLine("Specificy EITHER --db OR --db1 and --db2 options.");
+                    exit = 1;
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
-                    if (ex.InnerException != null) Console.WriteLine(ex.InnerException.Message);
-                    Console.WriteLine("Press any key to continue.");
-                    Console.ReadKey();
-                    Environment.Exit(1);
+                    for (; ex != null; ex = ex.InnerException)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                    exit = 2;
                 }
             }
+#if DEBUG
             Console.WriteLine("Press any key to continue.");
             Console.ReadKey();
+#endif
+            Environment.Exit(exit);
         }
     }
 }
