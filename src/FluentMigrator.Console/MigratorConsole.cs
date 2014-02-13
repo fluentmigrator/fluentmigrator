@@ -278,7 +278,7 @@ namespace FluentMigrator.Console
             {
                 Database = ProcessorType,
                 Connection = Connection,
-                Target = TargetAssembly,
+                Targets = new string[] {TargetAssembly},
                 PreviewOnly = PreviewOnly,
                 Namespace = Namespace,
                 NestedNamespaces = NestedNamespaces,

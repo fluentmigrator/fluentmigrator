@@ -114,7 +114,7 @@ namespace FluentMigrator.NAnt
                                         ApplicationContext = ApplicationContext,
                                         Database = Database,
                                         Connection = Connection,
-                                        Target = Target,
+                                        Targets = new string[] {Target},
                                         PreviewOnly = Preview,
                                         Namespace = Namespace,
                                         NestedNamespaces = NestedNamespaces,
