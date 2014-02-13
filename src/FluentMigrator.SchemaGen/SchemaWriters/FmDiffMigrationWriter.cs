@@ -43,10 +43,10 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
         private readonly IList<string> classPaths = new List<string>();
 
-        private static int indent = 0;
-        private static StreamWriter writer;
-        private static StringBuilder sb;
-        private static readonly Stack<StringBuilder> nestedBuffers = new Stack<StringBuilder>();
+        private static int _indent = 0;
+        private static StreamWriter _writer;
+        private static StringBuilder _sb;
+        private static Stack<StringBuilder> _nestedBuffers = new Stack<StringBuilder>();
 
         public FmDiffMigrationWriter(IOptions options, IAnnouncer announcer, IDbSchemaReader db1, IDbSchemaReader db2)
         {
@@ -55,9 +55,9 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             if (db1 == null) throw new ArgumentNullException("db1");
             if (db2 == null) throw new ArgumentNullException("db2");
 
-            indent = 0;
-            writer = null;
-            sb = null;
+            _indent = 0;
+            _writer = null;
+            _sb = null;
 
             this.options = options;
             this.announcer = announcer;
@@ -74,31 +74,31 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
         private static void Indent()
         {
-            if (sb == null)
+            if (_sb == null)
             {
-                for (int i = 0; i < indent; i++)
+                for (int i = 0; i < _indent; i++)
                 {
-                    writer.Write("    ");
+                    _writer.Write("    ");
                 }
             }
             else
             {
-                for (int i = 0; i < indent; i++)
+                for (int i = 0; i < _indent; i++)
                 {
-                    sb.Append("    ");
+                    _sb.Append("    ");
                 }
             }
         }
 
         private static void WriteLine()
         {
-            if (sb == null)
+            if (_sb == null)
             {
-                writer.WriteLine();
+                _writer.WriteLine();
             }
             else
             {
-                sb.AppendLine();
+                _sb.AppendLine();
             }
         }
 
@@ -106,27 +106,27 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         {
             if (line.Length > 0) Indent();
 
-            if (sb == null)
+            if (_sb == null)
             {
-                writer.WriteLine(line);
+                _writer.WriteLine(line);
             }
             else
             {
-                sb.AppendLine(line);
+                _sb.AppendLine(line);
             }
         }
 
         private static void WriteLine(string format, params object[] args)
         {
             Indent();
-            if (sb == null)
+            if (_sb == null)
             {
-                writer.WriteLine(format, args);
+                _writer.WriteLine(format, args);
             }
             else
             {
-                sb.AppendFormat(format, args);
-                sb.AppendLine();
+                _sb.AppendFormat(format, args);
+                _sb.AppendLine();
             }
         }
 
@@ -182,13 +182,13 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         /// <returns></returns>
         private string Buffer(Action action)
         {
-            if (sb != null) nestedBuffers.Push(sb);
-            sb = new StringBuilder();
+            if (_sb != null) _nestedBuffers.Push(_sb);
+            _sb = new StringBuilder();
 
             action();
 
-            string result = sb.ToString();
-            sb = nestedBuffers.Count == 0 ? null : nestedBuffers.Pop();
+            string result = _sb.ToString();
+            _sb = _nestedBuffers.Count == 0 ? null : _nestedBuffers.Pop();
 
             return result;
         }
@@ -197,12 +197,12 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         {
             protected internal Indenter()
             {
-                indent++;
+                _indent++;
             }
 
             public void Dispose()
             {
-                indent--;
+                _indent--;
             }
         }
 
@@ -211,12 +211,12 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             protected internal Block()
             {
                 WriteLine("{");
-                indent++;
+                _indent++;
             }
 
             public void Dispose()
             {
-                indent--;
+                _indent--;
                 WriteLine("}");
             }
         }
@@ -395,7 +395,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
                 using (var fs = new FileStream(classPath, FileMode.Create))
                 using (var writer1 = new StreamWriter(fs))
                 {
-                    writer = writer1; // assigns class 'writer' variable
+                    _writer = writer1; // assigns class 'writer' variable
 
                     WriteLine("using System;");
                     WriteLine("using System.Collections.Generic;");
@@ -439,8 +439,8 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
                     step++;
 
-                    writer.Flush();
-                    writer = null;
+                    _writer.Flush();
+                    _writer = null;
                 }
             }
             catch (Exception ex)
