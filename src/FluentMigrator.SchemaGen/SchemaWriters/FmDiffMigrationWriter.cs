@@ -138,9 +138,9 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             }
         }
 
-        private static void WriteComment(string line)
+        private static void WriteComment(string comment)
         {
-            WriteLine("/* {0} */", line);
+            WriteLine("/* {0} */", comment.Trim());
         }
 
         private static void WriteComments(IEnumerable<string> lines)
@@ -337,6 +337,24 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
         #region Emit Classes
 
+
+        private long GetMigrationNumber(int major, int minor, int patch, int step)
+        {
+            return ((((major * 100L) + minor) * 100L) + patch) * 1000L + step;
+        }
+
+        private long GetMigrationNumber(string version, int step)
+        {
+            // Can throw exceptions if version format is invalid.
+            int[] parts = version.Split('.').Select(int.Parse).ToArray();
+
+            int major = parts.Length >= 1 ? parts[0] : 0;
+            int minor = parts.Length >= 2 ? parts[1] : 0;
+            int patch = parts.Length >= 3 ? parts[2] : 0;
+
+            return GetMigrationNumber(major, minor, patch, step);
+        }
+
         /// <summary>
         /// Writes a Migrator class.
         /// Only creates the class file if the <paramref name="upMethod"/> emits code.
@@ -397,6 +415,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
                     using (new Block()) // namespace {}
                     {
+                        WriteComment("Migration Number: " + GetMigrationNumber(options.MigrationVersion, step));
                         WriteLine("[MigrationVersion({0})]", options.MigrationVersion.Replace(".", ", ") + ", " + step);
 
                         string tags = options.Tags ?? "" + addTags ?? "";
@@ -732,6 +751,10 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             AlterTable(newTable, addedColsCode);    // Add NEW columns
 
             WriteChanges(addedIndexCode);           // Add NEW Indexes
+
+            ShowOldCode(removedFkDefCode);          // Show old code of removed FKs
+            WriteChanges(removedFkCode);            // Remove OLD foreign keys
+
             WriteChanges(addedFkCode);              // Add NEW foreign keys
 
             ShowOldCode(oldUpdatedIndexDefCode);    // Show old version of updated indexes definitions as comments.
@@ -740,13 +763,10 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             ShowOldCode(oldUpdatedFkDefCode);       // Show old version of UPDATED foreign keys as comments
             WriteChanges(removeUpdatedFkCode);      // Remove UPDATED foreign keys
 
-            ShowOldCode(removedFkDefCode);          // Show old code of removed FKs
-            WriteChanges(removedFkCode);            // Remove OLD foreign keys
-
             ShowOldCode(updatedColsOldCode);        // Show old definition of updated columns
             AlterTable(newTable, updatedColsCode);  // Updated columns (including 1 column indexes)
 
-            MigrateData(schemaSqlFolder, newTable.Name);             // Run data migration SQL
+            MigrateData(schemaSqlFolder, newTable.Name);   // Run data migration SQL
 
             WriteChanges(newUpdatedFkCode);         // Add UPDATED foreign keys
             WriteChanges(newUpdatedIndexCode);      // Add UPDATED indexes (excluding 1 column indexes)

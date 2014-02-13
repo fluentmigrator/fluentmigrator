@@ -18,6 +18,8 @@ Features:
     * You supply the major.minor.patch  (e.g. "3.1.2")
     * The step is generated and defines the execution order of the classes.
     * You can optionally start/end step number to support merging sets of generated classes.
+    * Shows internal migration number as a comment. 
+      * Useful when debugging to run a migration up to a previous migration number and then test the failing SQL.
   * Import and embed SQL scripts to perform: 
     * Pre/Post processing.
     * Views, Stored Procedures, Functions

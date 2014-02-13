@@ -51,8 +51,6 @@ namespace FluentMigrator.SchemaGen
         bool DropScripts { get; }
         bool DropTables { get; }
         bool SetNotNullDefault { get; }
-
-
     }
 
     /// <summary>
