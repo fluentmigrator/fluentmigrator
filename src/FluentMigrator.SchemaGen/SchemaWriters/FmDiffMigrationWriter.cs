@@ -337,24 +337,6 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
         #region Emit Classes
 
-
-        private long GetMigrationNumber(int major, int minor, int patch, int step)
-        {
-            return ((((major * 100L) + minor) * 100L) + patch) * 1000L + step;
-        }
-
-        private long GetMigrationNumber(string version, int step)
-        {
-            // Can throw exceptions if version format is invalid.
-            int[] parts = version.Split('.').Select(int.Parse).ToArray();
-
-            int major = parts.Length >= 1 ? parts[0] : 0;
-            int minor = parts.Length >= 2 ? parts[1] : 0;
-            int patch = parts.Length >= 3 ? parts[2] : 0;
-
-            return GetMigrationNumber(major, minor, patch, step);
-        }
-
         /// <summary>
         /// Writes a Migrator class.
         /// Only creates the class file if the <paramref name="upMethod"/> emits code.
@@ -375,7 +357,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             if (upMethodCode.Length == 0) return;
 
             // Prefix class with zero filled order number.
-            className = string.Format("M{0,4:D4}0_{1}", step, className);
+            className = string.Format("M{0,4:D4}_{1}", step, className);
 
             string fullDirName = options.OutputDirectory;
             if (!string.IsNullOrEmpty(dirName))
@@ -415,8 +397,9 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
                     using (new Block()) // namespace {}
                     {
-                        WriteComment("Migration Number: " + GetMigrationNumber(options.MigrationVersion, step));
-                        WriteLine("[MigrationVersion({0})]", options.MigrationVersion.Replace(".", ", ") + ", " + step);
+                        WriteLine("[MigrationVersion({0})] // {1}",
+                            options.MigrationVersion.Replace(".", ", ") + ", " + step,
+                            GetMigrationNumber(options.MigrationVersion, step));
 
                         string tags = options.Tags ?? "" + addTags ?? "";
                         if (!string.IsNullOrEmpty(tags))
@@ -451,6 +434,38 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             }
         }
 
+        private void WriteMethod(string name, Action body)
+        {
+            WriteLine();
+            WriteLine("public override void {0}()", name);
+            using (new Block())
+            {
+                body();
+            }
+        }
+
+        private void CantUndo()
+        {
+            WriteLine("throw new Exception(\"Cannot undo this database upgrade\");");
+        }
+
+        private long GetMigrationNumber(int major, int minor, int patch, int step)
+        {
+            return ((((major * 100L) + minor) * 100L) + patch) * 1000L + step;
+        }
+
+        private long GetMigrationNumber(string version, int step)
+        {
+            // Can throw exceptions if version format is invalid.
+            int[] parts = version.Split('.').Select(int.Parse).ToArray();
+
+            int major = parts.Length >= 1 ? parts[0] : 0;
+            int minor = parts.Length >= 2 ? parts[1] : 0;
+            int patch = parts.Length >= 3 ? parts[2] : 0;
+
+            return GetMigrationNumber(major, minor, patch, step);
+        }
+
         private string[] SplitCodeLines(string codeText)
         {
             // Trim extra leading / trailing blank lines.
@@ -466,21 +481,6 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
             // Need to split into lines so indenting works 
             return codeText.Replace(Environment.NewLine, "\n").Split('\n');
-        }
-
-        private void WriteMethod(string name, Action body)
-        {
-            WriteLine();
-            WriteLine("public override void {0}()", name);
-            using (new Block())
-            {
-                body();
-            }
-        }
-
-        private void CantUndo()
-        {
-            WriteLine("throw new Exception(\"Cannot undo this database upgrade\");");
         }
 
         #endregion
@@ -701,7 +701,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             // when there are NO changes and then not emit the class.
 
             // TODO: If a column is updated but it's part of a foreign key relationship, need to drop/create the FK and alter the columns in both tables.
-            // TODO: MSAccess appears to create indexes when a FK is created => so we need to conditionally create these indexes. 
+            // This can cascade to multiple tables so it needs a recursive tree search to find the affected tables that must be updated together.
 
             // Columns
             IDictionary<string, string> oldCols = oldTable.Columns.ToDictionary(col => col.Name, GetColumnCode);
@@ -709,6 +709,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
             var addedColsCode = oldCols.GetAdded(newCols).Select(colCode => colCode.Replace("WithColumn", "AddColumn"));
             var updatedColsOldCode = newCols.GetUpdated(oldCols);
+            var updatedColNames = newCols.GetUpdatedNames(oldCols).ToArray();
             var updatedColsCode = oldCols.GetUpdated(newCols).Select(colCode => colCode.Replace("WithColumn", "AlterColumn"));
             var removedColsDefCode = oldCols.GetRemoved(newCols);
             var removedColsCode = oldCols.GetRemovedNames(newCols).Select(colName => GetRemoveColumnCode(newTable, colName));
@@ -719,8 +720,13 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             
             // Updated indexes are removed and added
             var oldUpdatedIndexDefCode = newIndexes.GetUpdated(oldIndexes);
-            var newUpdatedIndexCode = oldIndexes.GetUpdated(newIndexes);
-            var removeUpdatedIndexesCode = oldIndexes.GetUpdatedNames(newIndexes).Select(indexName => GetRemoveIndexCode(oldTable, indexName));
+            var updatedIndexNames = oldIndexes.GetUpdatedNames(newIndexes);
+            // Include indexes that contain updated columns
+            string [] colAffectedIndexes = FindIndexesContainingUpdatedColumnNames(newTable.Indexes, updatedColNames).ToArray();
+            string[] updatedIndexNames1 = updatedIndexNames.Union(colAffectedIndexes).Distinct().ToArray();
+
+            var removeUpdatedIndexesCode = updatedIndexNames1.Select(indexName => GetRemoveIndexCode(oldTable, indexName));
+            var newUpdatedIndexCode = updatedIndexNames1.Select(indexName => newIndexes[indexName]);
  
             var addedIndexCode = oldIndexes.GetAdded(newIndexes);
             var removedIndexNames = oldIndexes.GetRemovedNames(newIndexes);
@@ -764,33 +770,33 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             // When a column becomes NOT NULL and has a DEFAULT value, this emits SQL to set the default on all NULL column values.
             SetDefaultsIfNotNull(oldTable, newTable, oldCols.GetUpdatedNames(newCols));
 
-            AlterTable(newTable, addedColsCode);    // Add NEW columns
-
-            WriteChanges(addedIndexCode);           // Add NEW Indexes
-
             ShowOldCode(removedFkDefCode);          // Show old code of removed FKs
             WriteChanges(removedFkCode);            // Remove OLD foreign keys
-
-            WriteChanges(addedFkCode);              // Add NEW foreign keys
-
-            ShowOldCode(oldUpdatedIndexDefCode);    // Show old version of updated indexes definitions as comments.
-            WriteChanges(removeUpdatedIndexesCode); // Remove UPDATED indexes
 
             ShowOldCode(oldUpdatedFkDefCode);       // Show old version of UPDATED foreign keys as comments
             WriteChanges(removeUpdatedFkCode);      // Remove UPDATED foreign keys
 
-            ShowOldCode(updatedColsOldCode);        // Show old definition of updated columns
-            AlterTable(newTable, updatedColsCode);  // Updated columns (including 1 column indexes)
-
-            MigrateData(schemaSqlFolder, newTable.Name);   // Run data migration SQL
-
-            WriteChanges(newUpdatedFkCode);         // Add UPDATED foreign keys
-            WriteChanges(newUpdatedIndexCode);      // Add UPDATED indexes (excluding 1 column indexes)
-
-            // Note: The developer may add custom data migration code here
+            ShowOldCode(oldUpdatedIndexDefCode);    // Show old version of updated indexes definitions as comments.
+            WriteChanges(removeUpdatedIndexesCode); // Remove UPDATED indexes
 
             ShowOldCode(removedIndexOldDefCode);    // Comments showing OLD index definitions.
             WriteChanges(removedIndexCode);         // Remove OLD Indexes
+
+            ShowOldCode(updatedColsOldCode);        // Show old definition of updated columns
+            AlterTable(newTable, updatedColsCode);  // Updated columns (including 1 column indexes)
+
+            AlterTable(newTable, addedColsCode);    // Add NEW columns
+
+            WriteChanges(addedIndexCode);           // Add NEW Indexes
+
+            WriteChanges(addedFkCode);              // Add NEW foreign keys
+
+            // Note: The developer may inject custom data migration code here
+            // We preserve old columns and indexes for this phase.
+            MigrateData(schemaSqlFolder, newTable.Name);   // Run data migration SQL 
+
+            WriteChanges(newUpdatedFkCode);         // Add UPDATED foreign keys
+            WriteChanges(newUpdatedIndexCode);      // Add UPDATED indexes (excluding 1 column indexes)
 
             ShowOldCode(removedColsDefCode);        // Comments showing OLD column definitions.
             WriteChanges(removedColsCode);          // Remove OLD columns
@@ -1126,6 +1132,20 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             return sb.ToString() + GetCreateIndexDefCode(index);
         }
 
+        /// <summary>
+        /// Indexes containing updated columns need to marked as 'updated' so they are dropped & recreated either side of the column update.
+        /// </summary>
+        /// <param name="indexes"></param>
+        /// <param name="updatedColNames"></param>
+        /// <returns></returns>
+        private IEnumerable<string> FindIndexesContainingUpdatedColumnNames(IEnumerable<IndexDefinition> indexes, IEnumerable<string> updatedColNames)
+        {
+             return from index in indexes
+                let colNames = index.Columns.Select(col => col.Name)
+                where colNames.Any(updatedColNames.Contains)
+                select index.Name;
+        }
+
         private string GetCreateIndexDefCode(IndexDefinition index)
         {
             var sb = new StringBuilder();
@@ -1234,6 +1254,20 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             if (rule.Length > 0) sb.AppendLine("\t" + rule);
 
             return sb.ToString().Trim();
+        }
+
+        /// <summary>
+        /// Indexes containing updated columns need to marked as 'updated' so they are dropped & recreated either side of the column update.
+        /// </summary>
+        /// <param name="fks"></param>
+        /// <param name="updatedColNames"></param>
+        /// <returns></returns>
+        private IEnumerable<ForeignKeyDefinition> FindFKsContainingUpdatedColumnNames(IEnumerable<ForeignKeyDefinition> fks, IEnumerable<string> updatedColNames)
+        {
+            return from fk in fks
+                let colNames = fk.ForeignColumns
+                where colNames.Any(updatedColNames.Contains)
+                select fk;
         }
 
         #endregion
