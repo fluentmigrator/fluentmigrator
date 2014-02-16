@@ -19,8 +19,13 @@ namespace FluentMigrator.Tests.Integration.Processors
         [SetUp]
         public void SetUp()
         {
+            if (!IntegrationTestOptions.Oracle.IsEnabled)
+            {
+                Assert.Ignore("Oracle integration tests disabled in config. Tests ignored.");
+            }
+
             factory = new OracleProcessorFactory();
-            connectionString = "Data Source=localhost/XE;User Id=Something;Password=Something";
+            connectionString = IntegrationTestOptions.Oracle.ConnectionString;
             announcer = new NullAnnouncer();
             options = new ProcessorOptions();
         }
