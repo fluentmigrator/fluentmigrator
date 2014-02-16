@@ -8,7 +8,8 @@ namespace FluentMigrator.Runner.Generators.Firebird
         private const int DecimalCapacity = 19;
         private const int FirebirdMaxVarcharSize = 32765;
         private const int FirebirdMaxCharSize = 32767;
-        private const int FirebirdMaxTextSize = 1073741823;
+        // http://www.firebirdsql.org/en/firebird-technical-specifications/
+        private const int FirebirdMaxTextSize = int.MaxValue;  // up to 32GB
 
         protected override void SetupTypeMaps()
         {
