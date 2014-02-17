@@ -443,6 +443,12 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
             }
         }
 
+        private IEnumerable<ForeignKeyDefinition> FindForeignKeysWithColumns(IEnumerable<ForeignKeyDefinition> fks, IEnumerable<IndexColumnDefinition> cols)
+        {
+            string[] colNames = cols.Select(col => col.Name).ToArray();
+            return fks.Where(fk => fk.ForeignColumns.SequenceEqual(colNames));
+        }
+
         public IEnumerable<TableDefinition> GetTables()
         {
             foreach (TableDefinition table in ReadTableDefs())
@@ -450,6 +456,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
                 table.Indexes = ReadIndexes(table.SchemaName, table.Name);
                 table.ForeignKeys = ReadForeignKeys(table.SchemaName, table.Name);
 
+                // transfer index properties to table columns
                 foreach (IndexDefinition index in table.Indexes)
                 {
                     if (index.IsPrimary)  // Now only declaring Primary keys on the column
@@ -473,6 +480,13 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
                                 tableColumn.IndexName = index.Name;
                             }
 
+                        }
+                    } else
+                    {
+                        if (table.ForeignKeys.Any())
+                        {
+                            // Added property to FM API
+                            index.IsFkIndex = FindForeignKeysWithColumns(table.ForeignKeys, index.Columns).Any();
                         }
                     }
                 }
