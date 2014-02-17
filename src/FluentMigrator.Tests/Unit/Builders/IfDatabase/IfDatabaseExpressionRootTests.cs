@@ -154,9 +154,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             // Arrange
 
             var context = new MigrationContext(new MigrationConventions(), processor ?? new JetProcessor(new OleDbConnection(), null, null, null), GetType().Assembly, null, "");
-
-
-            var expression = new IfDatabaseExpressionRoot(context, databaseType.ToArray());
+            var expression = new IfDatabaseExpressionRoot(context, false, databaseType.ToArray());
 
             // Act
             if (fluentExpression == null || fluentExpression.Length == 0)

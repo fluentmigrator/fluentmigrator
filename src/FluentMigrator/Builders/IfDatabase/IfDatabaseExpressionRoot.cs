@@ -47,12 +47,13 @@ namespace FluentMigrator.Builders.IfDatabase
         /// </summary>
         /// <remarks>If the database type does not apply then a <seealso cref="NullIfDatabaseProcessor"/> will be used as a container to void any fluent expressions that would have been executed</remarks>
         /// <param name="context">The context to add expressions to if the database type applies</param>
+        /// <param name="conditionValue">Condition value</param>
         /// <param name="databaseType">The database type that the expressions relate to</param>
-        public IfDatabaseExpressionRoot(IMigrationContext context, params string[] databaseType)
+        public IfDatabaseExpressionRoot(IMigrationContext context, bool conditionValue, params string[] databaseType)
         {
             if (databaseType == null) throw new ArgumentNullException("databaseType");
 
-            _context = DatabaseTypeApplies(context, databaseType) ? context : new MigrationContext(new MigrationConventions(), new NullIfDatabaseProcessor(), context.MigrationAssembly, context.ApplicationContext, "");
+            _context = DatabaseTypeApplies(context, databaseType) == conditionValue ? context : new MigrationContext(new MigrationConventions(), new NullIfDatabaseProcessor(), context.MigrationAssembly, context.ApplicationContext, "");
         }
 
         /// <summary>

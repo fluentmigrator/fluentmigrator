@@ -100,7 +100,12 @@ namespace FluentMigrator
 
         public IIfDatabaseExpressionRoot IfDatabase(params string[] databaseType)
         {
-            return new IfDatabaseExpressionRoot(_context, databaseType);
+            return new IfDatabaseExpressionRoot(_context, true, databaseType);
+        }
+
+        public IIfDatabaseExpressionRoot IfNotDatabase(params string[] databaseType)
+        {
+            return new IfDatabaseExpressionRoot(_context, false, databaseType);
         }
     }
 }
