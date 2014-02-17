@@ -368,7 +368,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             new DirectoryInfo(fullDirName).Create();
 
             string classPath = Path.Combine(fullDirName, className + ".cs");
-            Console.WriteLine(classPath);
+            announcer.Say(classPath);
 
             classPaths.Add(classPath);
 
@@ -428,9 +428,8 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             }
             catch (Exception ex)
             {
-                Console.WriteLine(classPath + ": Failed to write class file");
-                Console.WriteLine(ex.Message);
-                if (ex.InnerException != null) Console.WriteLine(ex.InnerException.Message);
+                announcer.Error(classPath + ": Failed to write class file");
+                for (; ex != null; ex = ex.InnerException) announcer.Error(ex.Message);
             }
         }
 
@@ -725,13 +724,13 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             string [] colAffectedIndexes = FindIndexesContainingUpdatedColumnNames(newTable.Indexes, updatedColNames).ToArray();
             string[] updatedIndexNames1 = updatedIndexNames.Union(colAffectedIndexes).Distinct().ToArray();
 
-            var removeUpdatedIndexesCode = updatedIndexNames1.Select(indexName => GetRemoveIndexCode(oldTable, indexName));
+            var removeUpdatedIndexesCode = updatedIndexNames1.Select(indexName => GetDeleteIndexCode(oldTable, indexName));
             var newUpdatedIndexCode = updatedIndexNames1.Select(indexName => newIndexes[indexName]);
  
             var addedIndexCode = oldIndexes.GetAdded(newIndexes);
             var removedIndexNames = oldIndexes.GetRemovedNames(newIndexes);
             var removedIndexOldDefCode = oldIndexes.GetRemoved(newIndexes);
-            var removedIndexCode = removedIndexNames.Select(indexName => GetRemoveIndexCode(oldTable, indexName));
+            var removedIndexCode = removedIndexNames.Select(indexName => GetDeleteIndexCode(oldTable, indexName));
 
             if (options.ShowChanges)
             {
@@ -815,7 +814,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             {
                 string msg = string.Format("Renamed {0}: {1} -> {2}", title, rename.Key, rename.Value);
                 WriteComment(msg);
-                Console.WriteLine(msg);
+                announcer.Emphasize(msg);
             }
         }
 
@@ -1103,7 +1102,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
 
         #region Index 
 
-        private string GetRemoveIndexCode(TableDefinition table, string indexName)
+        private string GetDeleteIndexCode(TableDefinition table, string indexName)
         {
             return string.Format("Delete.Index(\"{0}\").OnTable(\"{1}\");", indexName, table.Name);
         }
@@ -1123,7 +1122,7 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             if (table.ForeignKeys.Any())
             {
                 bool isFkIndex = FindForeignKeysWithColumns(table.ForeignKeys, index.Columns).Any();
-                if (isFkIndex) sb.Append("IfDatabase(\"sqlserver\").");
+                if (isFkIndex) sb.Append("IfNotDatabase(\"jet\").");
             }
 
             //Create.Index("ix_Name").OnTable("TestTable2").OnColumn("Name").Ascending().WithOptions().NonClustered();

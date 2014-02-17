@@ -47,6 +47,8 @@ namespace FluentMigrator.SchemaGen
         {
             int exit = 0;
             var options = new Options();
+            var announcer = new ConsoleAnnouncer();
+
             if (CommandLine.Parser.Default.ParseArguments(args, options))
             {
                 try
@@ -55,21 +57,16 @@ namespace FluentMigrator.SchemaGen
                     options.Db1 = GetDbConnectionString(options.Db1);
                     options.Db2 = GetDbConnectionString(options.Db2);
 
-                    var announcer = new ConsoleAnnouncer();
-
                     new CodeGenFmClasses(options, announcer).GenClasses();
                 }
                 catch (DatabaseArgumentException)
                 {
-                    Console.WriteLine("Specificy EITHER --db OR --db1 and --db2 options.");
+                    announcer.Error("Specificy EITHER --db OR --db1 and --db2 options.");
                     exit = 1;
                 }
                 catch (Exception ex)
                 {
-                    for (; ex != null; ex = ex.InnerException)
-                    {
-                        Console.WriteLine(ex.Message);
-                    }
+                    for (; ex != null; ex = ex.InnerException) announcer.Error(ex.Message);
                     exit = 2;
                 }
             }
