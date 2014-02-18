@@ -4,6 +4,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using FluentMigrator.Model;
+using FluentMigrator.SchemaGen.Model;
 using FluentMigrator.SchemaGen.SchemaWriters;
 
 namespace FluentMigrator.SchemaGen.SchemaReaders
@@ -23,14 +24,14 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
             return new Dictionary<string, int>();
         }
 
-        public IDictionary<string, TableDefinition> Tables
+        public IDictionary<string, TableDefinitionExt> Tables
         {
-            get { return new Dictionary<string, TableDefinition>(); }
+            get { return new Dictionary<string, TableDefinitionExt>(); }
         }
 
-        public IEnumerable<TableDefinition> GetTables(IEnumerable<string> tableNames = null)
+        public IEnumerable<TableDefinitionExt> GetTables(IEnumerable<string> tableNames = null)
         {
-            return new TableDefinition[] { };
+            return new TableDefinitionExt[] { };
         }
 
         public IEnumerable<string> TableNames { get { return new string[]{}; } }

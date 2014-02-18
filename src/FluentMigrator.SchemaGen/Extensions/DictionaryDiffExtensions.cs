@@ -109,37 +109,37 @@ namespace FluentMigrator.SchemaGen.Extensions
                    select key;
         }
 
-        /// <summary>
-        /// Get key indexed values in both <paramref name="dict1"/> and <paramref name="dict2"/>.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="dict1"></param>
-        /// <param name="dict2"></param>
-        /// <returns></returns>
-        public static IEnumerable<T> GetRetained<T>(this IDictionary<string, T> dict1, IDictionary<string, T> dict2)
-        {
-            var keys1 = dict1.Keys.OrderBy(k => k);
-            var keys2 = dict2.Keys.OrderBy(k => k);
+        ///// <summary>
+        ///// Get key indexed values in both <paramref name="dict1"/> and <paramref name="dict2"/>.
+        ///// </summary>
+        ///// <typeparam name="T"></typeparam>
+        ///// <param name="dict1"></param>
+        ///// <param name="dict2"></param>
+        ///// <returns></returns>
+        //public static IEnumerable<T> GetRetained<T>(this IDictionary<string, T> dict1, IDictionary<string, T> dict2)
+        //{
+        //    var keys1 = dict1.Keys.OrderBy(k => k);
+        //    var keys2 = dict2.Keys.OrderBy(k => k);
 
-            return from key in keys1.Intersect(keys2) 
-                   select dict2[key];
-        }
+        //    return from key in keys1.Intersect(keys2) 
+        //           select dict2[key];
+        //}
 
-        /// <summary>
-        /// Get key indexed values in both <paramref name="dict1"/> and <paramref name="dict2"/>.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="dict1"></param>
-        /// <param name="dict2"></param>
-        /// <returns></returns>
-        public static IEnumerable<string> GetRetainedNames<T>(this IDictionary<string, T> dict1, IDictionary<string, T> dict2)
-        {
-            var keys1 = dict1.Keys.OrderBy(k => k);
-            var keys2 = dict2.Keys.OrderBy(k => k);
+        ///// <summary>
+        ///// Get key indexed values in both <paramref name="dict1"/> and <paramref name="dict2"/>.
+        ///// </summary>
+        ///// <typeparam name="T"></typeparam>
+        ///// <param name="dict1"></param>
+        ///// <param name="dict2"></param>
+        ///// <returns></returns>
+        //public static IEnumerable<string> GetRetainedNames<T>(this IDictionary<string, T> dict1, IDictionary<string, T> dict2)
+        //{
+        //    var keys1 = dict1.Keys.OrderBy(k => k);
+        //    var keys2 = dict2.Keys.OrderBy(k => k);
 
-            return from key in keys1.Intersect(keys2)
-                   select key;
-        }
+        //    return from key in keys1.Intersect(keys2)
+        //           select key;
+        //}
 
         /// <summary>
         /// Return a list of the names of objects having matching <paramref name="T"/> values.

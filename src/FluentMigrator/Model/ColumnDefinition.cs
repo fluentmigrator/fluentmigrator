@@ -41,7 +41,6 @@ namespace FluentMigrator.Model
         public virtual bool IsForeignKey { get; set; }
         public virtual bool IsIdentity { get; set; }
         public virtual bool IsIndexed { get; set; }
-        public virtual string IndexName { get; set; }   // SchemaGen use only.
         public virtual bool IsPrimaryKey { get; set; }
         public virtual string PrimaryKeyName { get; set; }
         public virtual bool? IsNullable { get; set; }

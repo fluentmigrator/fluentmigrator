@@ -27,6 +27,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using FluentMigrator.Model;
 using FluentMigrator.SchemaGen.Extensions;
+using FluentMigrator.SchemaGen.Model;
 
 
 namespace FluentMigrator.SchemaGen.SchemaReaders
@@ -45,7 +46,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
         private readonly IDbConnection connection;
         private readonly IOptions options;
         private readonly DbProviderFactory factory;
-        private IDictionary<string, TableDefinition> tables;
+        private IDictionary<string, TableDefinitionExt> tables;
 
         //public IAnnouncer Announcer { get; set; }
         //public SqlServerProcessor Processor { get; set; }
@@ -230,7 +231,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
             return new Regex(String.Join("|", patterns));
         }
 
-        protected IEnumerable<TableDefinition> ApplyTableFilter(IEnumerable<TableDefinition> tables)
+        protected IEnumerable<TableDefinitionExt> ApplyTableFilter(IEnumerable<TableDefinitionExt> tables)
         {
             if (options.IncludeTables != null)
             {
@@ -265,7 +266,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
         }
         #endregion
 
-        public IDictionary<string, TableDefinition> Tables
+        public IDictionary<string, TableDefinitionExt> Tables
         {
             get
             {
@@ -443,29 +444,31 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
             }
         }
 
-        private IEnumerable<ForeignKeyDefinition> FindForeignKeysWithColumns(IEnumerable<ForeignKeyDefinition> fks, IEnumerable<IndexColumnDefinition> cols)
+        private IEnumerable<ForeignKeyDefinitionExt> FindForeignKeysWithColumns(IEnumerable<ForeignKeyDefinitionExt> fks, IEnumerable<IndexColumnDefinition> cols)
         {
             string[] colNames = cols.Select(col => col.Name).ToArray();
             return fks.Where(fk => fk.ForeignColumns.SequenceEqual(colNames));
         }
 
-        public IEnumerable<TableDefinition> GetTables()
+        public IEnumerable<TableDefinitionExt> GetTables()
         {
-            foreach (TableDefinition table in ReadTableDefs())
+            foreach (TableDefinitionExt table in ReadTableDefs())
             {
                 table.Indexes = ReadIndexes(table.SchemaName, table.Name);
                 table.ForeignKeys = ReadForeignKeys(table.SchemaName, table.Name);
 
                 // transfer index properties to table columns
-                foreach (IndexDefinition index in table.Indexes)
+                foreach (IndexDefinitionExt index in table.Indexes)
                 {
+                    index.SchemaName = table.SchemaName;
+
                     if (index.IsPrimary)  // Now only declaring Primary keys on the column
                     {
                         if (index.Columns.Count() == 1 && index.Columns.First().Direction == Direction.Ascending)
                         {
                             IndexColumnDefinition indexColumn = index.Columns.First();
 
-                            ColumnDefinition tableColumn =
+                            ColumnDefinitionExt tableColumn =
                                 (table.Columns.Where(col => col.Name == indexColumn.Name)).First();
 
                             tableColumn.IsIndexed = true;
@@ -495,7 +498,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
             }
         }
 
-        protected virtual IList<TableDefinition> ReadTableDefs()
+        protected virtual IList<TableDefinitionExt> ReadTableDefs()
         {
             const string query = @"SELECT OBJECT_SCHEMA_NAME(t.[object_id],DB_ID()) AS [Schema], t.name AS [Table], 
                 c.[name] AS ColumnName,
@@ -521,8 +524,8 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
             using (DataSet ds = Read(query))
             using (DataTable dt = ds.Tables[0])
             {
-                IEnumerable<TableDefinition> tables = from row in dt.Rows.Cast<DataRow>()
-                    group new ColumnDefinition
+                IEnumerable<TableDefinitionExt> tables = from row in dt.Rows.Cast<DataRow>()
+                    group new ColumnDefinitionExt
                         {
                             Name = row["ColumnName"].ToString(),
                             CustomType = "", //TODO: set this property
@@ -546,7 +549,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
                             TableName = row["Table"].ToString(),
                             SchemaName = row["Schema"].ToString()
                         } into g
-                    select new TableDefinition 
+                    select new TableDefinitionExt 
                         {
                             Columns = g.ToList(),
                             SchemaName = g.Key.SchemaName,
@@ -560,7 +563,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
             }
         }
 
-        protected virtual IList<IndexDefinition> ReadIndexes(string schemaName, string tableName)
+        protected virtual IList<IndexDefinitionExt> ReadIndexes(string schemaName, string tableName)
         {
             const string query = @"SELECT DISTINCT OBJECT_SCHEMA_NAME(T.[object_id],DB_ID()) AS [Schema],  
               T.[name] AS [table_name], I.[name] AS [index_name], AC.[name] AS [column_name],  
@@ -577,7 +580,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
             using (DataSet ds = Read(query, schemaName, tableName))
             using (DataTable dt = ds.Tables[0])
             {
-                IEnumerable<IndexDefinition> indexes = from row in dt.Rows.Cast<DataRow>()
+                IEnumerable<IndexDefinitionExt> indexes = from row in dt.Rows.Cast<DataRow>()
                     group new IndexColumnDefinition
                         {
                             Name = row["column_name"].ToString(), 
@@ -592,7 +595,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
                             IsUnique = Convert.ToBoolean(row["is_unique"]),
                             IsPrimary = Convert.ToBoolean(row["is_primary_key"])
                         } into g
-                    select new IndexDefinition 
+                    select new IndexDefinitionExt 
                         {
                             Columns = g.ToList(),
                             SchemaName = g.Key.SchemaName,
@@ -607,7 +610,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
             }
         }
 
-        protected virtual IList<ForeignKeyDefinition> ReadForeignKeys(string schemaName, string tableName)
+        protected virtual IList<ForeignKeyDefinitionExt> ReadForeignKeys(string schemaName, string tableName)
         {
             const string query = @"SELECT 
                 FK.CONSTRAINT_NAME AS ForeignConstraintName, 
@@ -662,7 +665,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
                     key.PrimaryTable,
                     key.UpdateRule,
                     key.DeleteRule
-                }).Select(fkGroup => new ForeignKeyDefinition
+                }).Select(fkGroup => new ForeignKeyDefinitionExt
                 {
                     Name = fkGroup.Key.ForeignConstraintName,
                     ForeignTable = fkGroup.Key.ForeignTable,

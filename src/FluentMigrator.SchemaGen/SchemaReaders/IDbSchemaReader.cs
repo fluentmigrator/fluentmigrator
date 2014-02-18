@@ -2,6 +2,8 @@
 using System.Data;
 using System.Linq;
 using FluentMigrator.Model;
+using FluentMigrator.SchemaGen.Model;
+using FluentMigrator.SchemaGen.SchemaWriters;
 
 
 namespace FluentMigrator.SchemaGen.SchemaReaders
@@ -11,7 +13,7 @@ namespace FluentMigrator.SchemaGen.SchemaReaders
         IDictionary<string, int> TablesInForeignKeyOrder(bool ascending);
         IDictionary<string, int> ScriptsInDependencyOrder(bool ascending);
 
-        IDictionary<string, TableDefinition> Tables { get; }
+        IDictionary<string, TableDefinitionExt> Tables { get; }
 
         IEnumerable<string> UserDefinedDataTypes { get; }
         IEnumerable<string> UserDefinedFunctions { get; }

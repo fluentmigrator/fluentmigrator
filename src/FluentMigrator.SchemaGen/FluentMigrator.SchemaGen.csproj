@@ -74,12 +74,20 @@
     <Compile Include="Options.cs" />
     <Compile Include="SchemaReaders\DbTypeSizes.cs" />
     <Compile Include="SchemaReaders\EmptyDbSchemaReader.cs" />
+    <Compile Include="SchemaWriters\CodeLines.cs" />
+    <Compile Include="Model\ColumnDefinitionExt.cs" />
+    <Compile Include="Extensions\CodeObjectDiffExtension.cs" />
     <Compile Include="SchemaWriters\FmDiffMigrationWriter.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SchemaReaders\IDbSchemaReader.cs" />
     <Compile Include="SchemaReaders\SqlServerSchemaReader.cs" />
+    <Compile Include="Model\ForeignKeyDefinitionExt.cs" />
+    <Compile Include="Model\ICodeComparable.cs" />
     <Compile Include="SchemaWriters\IMigrationWriter.cs" />
+    <Compile Include="Model\IndexDefinitionExt.cs" />
+    <Compile Include="SchemaWriters\SqlFileWriter.cs" />
+    <Compile Include="Model\TableDefinitionExt.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

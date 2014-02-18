@@ -17,15 +17,13 @@
 #endregion
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.SchemaGen.Extensions;
+using FluentMigrator.SchemaGen.Model;
 using FluentMigrator.SchemaGen.SchemaReaders;
 
 namespace FluentMigrator.SchemaGen.SchemaWriters
@@ -39,14 +37,11 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         private readonly IAnnouncer announcer;
         private readonly IDbSchemaReader db1;
         private readonly IDbSchemaReader db2;
+        private readonly SqlFileWriter sqlFileWriter;
+
         private int step = 1;
 
         private readonly IList<string> classPaths = new List<string>();
-
-        private static int _indent = 0;
-        private static StreamWriter _writer;
-        private static StringBuilder _sb;
-        private static readonly Stack<StringBuilder> _nestedBuffers = new Stack<StringBuilder>();
 
         public FmDiffMigrationWriter(IOptions options, IAnnouncer announcer, IDbSchemaReader db1, IDbSchemaReader db2)
         {
@@ -55,12 +50,9 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             if (db1 == null) throw new ArgumentNullException("db1");
             if (db2 == null) throw new ArgumentNullException("db2");
 
-            _indent = 0;
-            _writer = null;
-            _sb = null;
-
             this.options = options;
             this.announcer = announcer;
+            this.sqlFileWriter = new SqlFileWriter(options, announcer);
             this.db1 = db1;
             this.db2 = db2;
         }
@@ -70,266 +62,23 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             get { return db1 is EmptyDbSchemaReader; }
         }
 
-        #region WriteLine/Indent/Block/Buffer Helpers
-
-        private static void Indent()
-        {
-            if (_sb == null)
-            {
-                for (int i = 0; i < _indent; i++)
-                {
-                    _writer.Write("    ");
-                }
-            }
-            else
-            {
-                for (int i = 0; i < _indent; i++)
-                {
-                    _sb.Append("    ");
-                }
-            }
-        }
-
-        private static void WriteLine()
-        {
-            if (_sb == null)
-            {
-                _writer.WriteLine();
-            }
-            else
-            {
-                _sb.AppendLine();
-            }
-        }
-
-        private static void WriteLine(string line)
-        {
-            if (line.Length > 0) Indent();
-
-            if (_sb == null)
-            {
-                _writer.WriteLine(line);
-            }
-            else
-            {
-                _sb.AppendLine(line);
-            }
-        }
-
-        private static void WriteLine(string format, params object[] args)
-        {
-            Indent();
-            if (_sb == null)
-            {
-                _writer.WriteLine(format, args);
-            }
-            else
-            {
-                _sb.AppendFormat(format, args);
-                _sb.AppendLine();
-            }
-        }
-
-        private static void WriteLines(IEnumerable<string> lines)
-        {
-            foreach (string line in lines)
-            {
-                WriteLine(line);
-            }
-        }
-
-        private static void WriteComment(string comment)
-        {
-            WriteLine("/* {0} */", comment.Trim());
-        }
-
-        private static void WriteComments(IEnumerable<string> lines)
-        {
-            foreach (string line in lines)
-            {
-                WriteComment(line);
-            }
-        }
-
-        private void ShowOldCode(IEnumerable<string> oldCode)
-        {
-            if (options.ShowChanges)
-            {
-                WriteComments(oldCode);
-            }
-        }
-
-        private static void WriteLines(IEnumerable<string> lines, string appendLastLine)
-        {
-            var lineArr = lines.ToArray();
-            for (int i = 0; i < lineArr.Length; i++)
-            {
-                if (i < lineArr.Length - 1)
-                {
-                    WriteLine(lineArr[i]);
-                }
-                else
-                {
-                    WriteLine(lineArr[i] + appendLastLine);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Returns the lines output by <paramref name="action"/>.
-        /// </summary>
-        /// <param name="action"></param>
-        /// <returns></returns>
-        private string Buffer(Action action)
-        {
-            if (_sb != null) _nestedBuffers.Push(_sb);
-            _sb = new StringBuilder();
-
-            action();
-
-            string result = _sb.ToString();
-            _sb = _nestedBuffers.Count == 0 ? null : _nestedBuffers.Pop();
-
-            return result;
-        }
-
-        protected class Indenter : IDisposable
-        {
-            protected internal Indenter()
-            {
-                _indent++;
-            }
-
-            public void Dispose()
-            {
-                _indent--;
-            }
-        }
+        #region Helpers
 
         protected class Block : IDisposable
         {
-            protected internal Block()
+            private readonly CodeLines lines;
+
+            protected internal Block(CodeLines lines)
             {
-                WriteLine("{");
-                _indent++;
+                this.lines = lines;
+                lines.WriteLine("{");
+                lines.Indent();
             }
 
             public void Dispose()
             {
-                _indent--;
-                WriteLine("}");
-            }
-        }
-
-        #endregion
-
-        #region Embed or Execute external SQL scripts
-
-        private string GetRelativePath(FileInfo file)
-        {
-            return file.FullName.Replace(Environment.CurrentDirectory + "\\", "");
-        }
-
-        private string GetRelativePath(DirectoryInfo dir)
-        {
-            return dir.FullName.Replace(Environment.CurrentDirectory + "\\", "");
-        }
-
-        private void EmbedSql(string sqlStatement)
-        {
-            var lines = sqlStatement.Replace("\r", "").Split('\n').Where(line => line.Trim().Length > 0).ToArray();
-
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < lines.Length; i++)
-            {
-                string line = lines[i];
-                if (line.Trim() == "") continue;
-
-                line = line.Replace("\"", "\"\"");  // " -> "" since we're using @" "
-
-                if (i == 0)
-                {
-                    sb.Append("Execute.Sql(@\"" + line);
-                }
-                else
-                {
-                    sb.Append("\t" + line);
-                }
-
-                if (i == lines.Length - 1)
-                {
-                    sb.Append("\");");
-                }
-
-                sb.AppendLine();
-            }
-
-            WriteLine(sb.ToString());
-        }
-
-        private void ExecuteSqlFile(FileInfo sqlFile)
-        {
-            if (options.EmbedSql)
-            {
-
-                string allLines = File.ReadAllText(sqlFile.FullName);
-                Regex goStatement = new Regex("\\s+GO\\s+|^GO\\s+", RegexOptions.Multiline);
-
-                WriteComment(GetRelativePath(sqlFile));
-
-                foreach (var sqlStatment in goStatement.Split(allLines))
-                {
-                    EmbedSql(sqlStatment);
-                }
-            }
-            else
-            {
-                WriteLine("Execute.Script(\"{0}\");", GetRelativePath(sqlFile).Replace("\\", "\\\\"));   
-            }
-        }
-
-        private void ExecuteSqlDirectory(DirectoryInfo sqlDirectory)
-        {
-            if (options.EmbedSql)
-            {
-                foreach (var sqlFile in sqlDirectory.GetFiles("*.sql", SearchOption.AllDirectories).OrderBy(file => file.FullName))
-                {
-                    if (sqlFile.Length > 0)
-                    {
-                        WriteComment(GetRelativePath(sqlFile));
-                        ExecuteSqlFile(sqlFile);
-                    }
-                }
-            }
-            else
-            {
-                // Runs MigrationExt.ExecuteScriptDirectory
-                WriteLine("ExecuteScriptDirectory(\"{0}\");", GetRelativePath(sqlDirectory).Replace("\\", "\\\\"));
-            }
-        }
-
-        private string GetSqlDirectoryPath(string subfolder)
-        {
-            string path = Path.Combine(options.SqlDirectory ?? "SQL", options.MigrationVersion);
-            return Path.Combine(path, subfolder);
-        }
-
-        private void MigrateData(string schemaSqlFolder, string tableName)
-        {
-            if (options.SqlDirectory != null)
-            {
-                string sqlDirPath = GetSqlDirectoryPath(schemaSqlFolder);
-                string sqlFilePath = Path.Combine(sqlDirPath, tableName + ".sql");
-
-                var sqlFile = new FileInfo(sqlFilePath);
-
-                if (!sqlFile.Exists)
-                {
-                    announcer.Say("{0}: Data migration SQL script not found.", sqlFile.FullName);
-                    return;
-                }
-
-                ExecuteSqlFile(sqlFile);
+                lines.Indent(-1);
+                lines.WriteLine("}");
             }
         }
 
@@ -338,158 +87,14 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         #region Emit Classes
 
         /// <summary>
-        /// Writes a Migrator class.
-        /// Only creates the class file if the <paramref name="upMethod"/> emits code.
+        /// Writes migration classes.  Main entry point for this class.
         /// </summary>
-        /// <param name="dirName">Project subdirectory (included in namespace)</param>
-        /// <param name="className">Migration class name</param>
-        /// <param name="upMethod">Action to emit Up() method code</param>
-        /// <param name="downMethod">
-        /// Optional Action to emit Down() method code.
-        /// If null, the class inherits from AutoReversingMigrationExt, otherwise it inherits from MigrationExt.
-        /// These are project classes that inherit from AutoReversingMigration and Migration.
-        /// </param>
-        /// <param name="addTags">Additional FluentMigrator Tags applied to the class</param> 
-        protected void WriteClass(string dirName, string className, Action upMethod, Action downMethod = null, string addTags = null)
-        {
-            // If no code is generated for an Up() method => No class is emitted
-            string upMethodCode = Buffer(upMethod);
-            if (upMethodCode.Length == 0) return;
-
-            // Prefix class with zero filled order number.
-            className = string.Format("M{0,4:D4}_{1}", step, className);
-
-            string fullDirName = options.OutputDirectory;
-            if (!string.IsNullOrEmpty(dirName))
-            {
-                fullDirName = Path.Combine(options.OutputDirectory, dirName);
-            }
-
-            new DirectoryInfo(fullDirName).Create();
-
-            string classPath = Path.Combine(fullDirName, className + ".cs");
-            announcer.Say(classPath);
-
-            classPaths.Add(classPath);
-
-            try
-            {
-                using (var fs = new FileStream(classPath, FileMode.Create))
-                using (var writer1 = new StreamWriter(fs))
-                {
-                    _writer = writer1; // assigns class 'writer' variable
-
-                    WriteLine("using System;");
-                    WriteLine("using System.Collections.Generic;");
-                    WriteLine("using System.Linq;");
-                    WriteLine("using System.Web;");
-                    WriteLine("using FluentMigrator;");
-                    WriteLine("using Migrations.FM_Extensions;");
-
-                    WriteLine(String.Empty);
-
-                    string ns = options.NameSpace;
-                    if (!string.IsNullOrEmpty(dirName))
-                    {
-                        ns = ns + "." + dirName.Replace("\\", ".");
-                    }
-                    WriteLine("namespace {0}", ns);
-
-                    using (new Block()) // namespace {}
-                    {
-                        WriteLine("[MigrationVersion({0})] // {1}",
-                            options.MigrationVersion.Replace(".", ", ") + ", " + step,
-                            GetMigrationNumber(options.MigrationVersion, step));
-
-                        string tags = options.Tags ?? "" + addTags ?? "";
-                        if (!string.IsNullOrEmpty(tags))
-                        {
-                            WriteLine("[Tags(\"{0}\")]", tags.Replace(",", "\", \""));
-                        }
-                       
-                        WriteLine("public class {0} : {1}", className, downMethod == null ? "AutoReversingMigrationExt" : "MigrationExt");
-                        using (new Block()) // class {}
-                        {
-                            string[] upMethodLines = SplitCodeLines(upMethodCode);
-                            WriteMethod("Up", () => WriteLines(upMethodLines));
-
-                            if (downMethod != null)
-                            {
-                                WriteMethod("Down", downMethod);
-                            }
-                        }
-                    }
-
-                    step++;
-
-                    _writer.Flush();
-                    _writer = null;
-                }
-            }
-            catch (Exception ex)
-            {
-                announcer.Error(classPath + ": Failed to write class file");
-                for (; ex != null; ex = ex.InnerException) announcer.Error(ex.Message);
-            }
-        }
-
-        private void WriteMethod(string name, Action body)
-        {
-            WriteLine();
-            WriteLine("public override void {0}()", name);
-            using (new Block())
-            {
-                body();
-            }
-        }
-
-        private void CantUndo()
-        {
-            WriteLine("throw new Exception(\"Cannot undo this database upgrade\");");
-        }
-
-        private long GetMigrationNumber(int major, int minor, int patch, int step)
-        {
-            return ((((major * 100L) + minor) * 100L) + patch) * 1000L + step;
-        }
-
-        private long GetMigrationNumber(string version, int step)
-        {
-            // Can throw exceptions if version format is invalid.
-            int[] parts = version.Split('.').Select(int.Parse).ToArray();
-
-            int major = parts.Length >= 1 ? parts[0] : 0;
-            int minor = parts.Length >= 2 ? parts[1] : 0;
-            int patch = parts.Length >= 3 ? parts[2] : 0;
-
-            return GetMigrationNumber(major, minor, patch, step);
-        }
-
-        private string[] SplitCodeLines(string codeText)
-        {
-            // Trim extra leading / trailing blank lines.
-            if (codeText.StartsWith(Environment.NewLine))
-            {
-                codeText = codeText.Substring(Environment.NewLine.Length);
-            }
-
-            if (codeText.EndsWith(Environment.NewLine))
-            {
-                codeText = codeText.Substring(0, codeText.Length - Environment.NewLine.Length);
-            }
-
-            // Need to split into lines so indenting works 
-            return codeText.Replace(Environment.NewLine, "\n").Split('\n');
-        }
-
-        #endregion
-
-        // Main Entry point
+        /// <returns>List of generated class file names</returns>
         public IEnumerable<string> WriteMigrationClasses()
         {
             step = options.StepStart;
 
-            WriteClass("", "Initial", () => WriteComment("Sets initial version to " + options.MigrationVersion + "." + step));
+            WriteClass("Initial", () => WriteComment("Sets initial version to " + options.MigrationVersion + "." + step));
 
             // TODO: Create new user defined DataTypes
 
@@ -504,7 +109,6 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             // TODO: Drop/Create new or modified scripts (SPs/Views/Functions)
             // CreateUpdateScripts();
 
-
             if (options.PostScripts)
             {
                 WriteSqlScriptClass("04_Post");
@@ -513,13 +117,13 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             if (options.DropTables)
             {
                 // Drop tables in order of their FK dependency.
-                WriteClass("", "DropTables", DropTables, CantUndo);
+                WriteClass("DropTables", DropTables, CantUndo);
             }
 
             if (options.DropScripts)
             {
                 // Drop old SPs/Views/Functions
-                WriteClass("", "DropScripts", DropScripts, CantUndo);
+                WriteClass("DropScripts", DropScripts, CantUndo);
             }
 
             if (options.PostScripts)
@@ -549,72 +153,227 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
                 step = options.StepEnd;
             }
 
-            WriteClass("", "Final", () => WriteComment("Sets final version to " + options.MigrationVersion + "." + step));
+            WriteClass("Final", () => WriteComment("Sets final version to " + options.MigrationVersion + "." + step));
 
             return classPaths;
         }
 
+        /// <summary>
+        /// Writes a Migrator class.
+        /// Only creates the class file if the <paramref name="upMethod"/> emits code.
+        /// </summary>
+        /// <param name="className">Migration class name</param>
+        /// <param name="upMethod">Action to emit Up() method code</param>
+        /// <param name="downMethod">
+        /// Optional Action to emit Down() method code.
+        /// If null, the class inherits from AutoReversingMigrationExt, otherwise it inherits from MigrationExt.
+        /// These are project classes that inherit from AutoReversingMigration and Migration.
+        /// </param>
+        /// <param name="addTags">Additional FluentMigrator Tags applied to the class</param> 
+        // Main Entry point
+        protected CodeLines WriteClass(string className, Func<CodeLines> upMethod, Func<CodeLines> downMethod = null, string addTags = null)
+        {
+            // If no code is generated for an Up() method => No class is emitted
+            var upMethodCode = upMethod();
+            if (!upMethodCode.Any()) return upMethodCode;
+
+            var codeLines = new CodeLines();
+
+            // Prefix class with zero filled order number.
+            className = string.Format("M{0,4:D4}_{1}", step, className);
+
+            string fullDirName = options.OutputDirectory;
+
+            new DirectoryInfo(fullDirName).Create();
+
+            string classPath = Path.Combine(fullDirName, className + ".cs");
+            announcer.Say(classPath);
+
+            classPaths.Add(classPath);
+
+            try
+            {
+                codeLines.WriteLine("using System;");
+                codeLines.WriteLine("using System.Collections.Generic;");
+                codeLines.WriteLine("using System.Linq;");
+                codeLines.WriteLine("using System.Web;");
+                codeLines.WriteLine("using FluentMigrator;");
+                codeLines.WriteLine("using Migrations.FM_Extensions;");
+
+                codeLines.WriteLine();
+
+                string ns = options.NameSpace;
+                codeLines.WriteLine("namespace {0}", ns);
+
+                using (new Block(codeLines)) // namespace {}
+                {
+                    codeLines.WriteLine("[MigrationVersion({0})] // {1}",
+                        options.MigrationVersion.Replace(".", ", ") + ", " + step,
+                        GetMigrationNumber(options.MigrationVersion, step));
+
+                    string tags = options.Tags ?? "" + addTags ?? "";
+                    if (!string.IsNullOrEmpty(tags))
+                    {
+                        codeLines.WriteLine("[Tags(\"{0}\")]", tags.Replace(",", "\", \""));
+                    }
+
+                    codeLines.WriteLine("public class {0} : {1}", className, downMethod == null ? "AutoReversingMigrationExt" : "MigrationExt");
+                    using (new Block(codeLines)) // class {}
+                    {
+                        codeLines.WriteLine();
+                        codeLines.WriteLine("public override void Up()");
+                        using (new Block(codeLines))
+                        {
+                            codeLines.WriteLines(upMethodCode);
+                        }
+
+                        if (downMethod != null)
+                        {
+                            codeLines.WriteLine();
+                            codeLines.WriteLine("public override void Down()");
+                            using (new Block(codeLines))
+                            {
+                                codeLines.WriteLines(downMethod());
+                            }
+                        }
+                    }
+                }
+
+                step++;
+
+                using (var fs = new FileStream(classPath, FileMode.Create))
+                using (var writer = new StreamWriter(fs))
+                {
+                    foreach (string line in codeLines)
+                    {
+                        writer.WriteLine(line);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                announcer.Error(classPath + ": Failed to write class file");
+                for (; ex != null; ex = ex.InnerException) announcer.Error(ex.Message);
+            }
+
+            return codeLines;
+        }
+
+        private CodeLines CantUndo()
+        {
+            return new CodeLines("throw new Exception(\"Cannot undo this database upgrade\");");
+        }
+
+        /// <summary>
+        /// Computes the internal migration number saved in the database in VerionInfo table.
+        /// </summary>
+        /// <param name="major">Product major version</param>
+        /// <param name="minor">Product minor version</param>
+        /// <param name="patch">Product patch version</param>
+        /// <param name="step">Step number generated by SchemaGen.</param>
+        /// <returns>Migration number saved in the database in VerionInfo table</returns>
+        private long GetMigrationNumber(int major, int minor, int patch, int step)
+        {
+            // This formula must match the one used in MigrationVersionAttribute class
+            return ((((major * 100L) + minor) * 100L) + patch) * 1000L + step;
+        }
+
+        /// <summary>
+        /// Computes the internal migration number saved in the database in VerionInfo table.
+        /// </summary>
+        /// <param name="version">major.minor.patch</param>
+        /// <param name="step"></param>
+        /// <returns>Migration number saved in the database in VerionInfo table</returns>
+        private long GetMigrationNumber(string version, int step)
+        {
+            // Can throw exceptions if version format is invalid.
+            int[] parts = version.Split('.').Select(int.Parse).ToArray();
+
+            int major = parts.Length >= 1 ? parts[0] : 0;
+            int minor = parts.Length >= 2 ? parts[1] : 0;
+            int patch = parts.Length >= 3 ? parts[2] : 0;
+
+            return GetMigrationNumber(major, minor, patch, step);
+        }
+
+        #endregion
+
+        private CodeLines WriteComment(string comment)
+        {
+           return new CodeLines("// " + comment);
+        }
+
         private void WriteSqlScriptClass(string subfolder, string tags = null)
         {
-            var sqlDir = new DirectoryInfo(GetSqlDirectoryPath(subfolder));
+            var sqlDir = new DirectoryInfo(sqlFileWriter.GetSqlDirectoryPath(subfolder));
             if (!sqlDir.Exists)
             {
                 announcer.Say(sqlDir.FullName + ": Did not find SQL script folder");
                 return;
             }
 
-            Action upMethod = () =>
+            Func<CodeLines> upMethod = () =>
                 {
+                    var lines = new CodeLines();
                     if (options.SqlDirectory != null)
                     {
-                        ExecuteSqlDirectory(sqlDir);
+                        sqlFileWriter.ExecuteSqlDirectory(lines, sqlDir);
                     }
+                    return lines;
                 };
 
-            WriteClass("", subfolder.Replace(" ",""), upMethod, CantUndo, tags);
+            WriteClass(subfolder.Replace(" ",""), upMethod, CantUndo, tags);
         }
 
-        #region Drop Tables and Code
-        private void DropTables()
+        #region Drop Tables and Scripted Objects
+        private CodeLines DropTables()
         {
+            var lines = new CodeLines();
+            
             // TODO: Currently ignoring Schema name for table objects.
             var db1FkOrder = db1.TablesInForeignKeyOrder(false); // descending order
 
             var removedTableNames = db1.Tables.Keys.Except(db2.Tables.Keys).ToList();
             removedTableNames = removedTableNames.OrderBy(t => -db1FkOrder[t]).ToList();
 
-            foreach (TableDefinition table in removedTableNames.Select(name => db1.Tables[name]))
+            foreach (TableDefinitionExt table in removedTableNames.Select(name => db1.Tables[name]))
             {
-                foreach (ForeignKeyDefinition fk in table.ForeignKeys)
+                foreach (ForeignKeyDefinitionExt fk in table.ForeignKeys)
                 {
-                    WriteLine("Delete.ForeignKey(\"{0}\").OnTable(\"{1}\").InSchema(\"{2}\");", fk.Name, fk.PrimaryTable, fk.PrimaryTableSchema);
+                    lines.WriteLine(fk.GetDeleteForeignKeyCode());
                 }
 
-                WriteLine("Delete.Table(\"{0}\").InSchema(\"{1}\");", table.Name, table.SchemaName);
+                lines.WriteLine(table.GetDeleteCode());
             }
+
+            return lines;
         }
 
-        private void DropScripts()
+        private CodeLines DropScripts()
         {
+            var lines = new CodeLines();
+
             foreach (var name in db1.StoredProcedures.Except(db2.StoredProcedures))
             {
-                WriteLine("DeleteStoredProcedure(\"{0}\");", name);
+                lines.WriteLine("DeleteStoredProcedure(\"{0}\");", name);
             }
 
             foreach (var name in db1.Views.Except(db2.Views))
             {
-                WriteLine("DeleteView(\"{0}\");", name);
+                lines.WriteLine("DeleteView(\"{0}\");", name);
             }
 
             foreach (var name in db1.UserDefinedFunctions.Except(db2.UserDefinedFunctions))
             {
-                WriteLine("DeleteFunction(\"{0}\");", name);
+                lines.WriteLine("DeleteFunction(\"{0}\");", name);
             }
 
             foreach (var name in db1.UserDefinedDataTypes.Except(db2.UserDefinedDataTypes))
             {
-                WriteLine("DeleteType(\"{0}\");", name);
+                lines.WriteLine("DeleteType(\"{0}\");", name);
             }
+
+            return lines;
         }
         #endregion
 
@@ -628,216 +387,138 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
             var db2FkOrder = db2.TablesInForeignKeyOrder(true);
             var db2TablesInFkOrder = db2.Tables.Values.OrderBy(tableDef => db2FkOrder[tableDef.Name]);
 
-            foreach (TableDefinition table in db2TablesInFkOrder)
+            foreach (TableDefinitionExt table in db2TablesInFkOrder)
             {
-                TableDefinition newTable = table;
+                TableDefinitionExt newTable = table;
 
                 if (db1Tables.ContainsKey(newTable.Name))
                 {
-                    TableDefinition oldTable = db1Tables[newTable.Name];
-                    WriteClass("", "Update_" + table.Name, () => UpdateTable(oldTable, newTable, schemaSqlFolder));
+                    TableDefinitionExt oldTable = db1Tables[newTable.Name];
+                    WriteClass("Update_" + table.Name, () => UpdateTable(oldTable, newTable, schemaSqlFolder));
                 }
                 else
                 {
-                    WriteClass("", "Create_" + table.Name, () => CreateTable(newTable));
+                    WriteClass("Create_" + table.Name, () => newTable.GetCreateCode());
                 }
             }
-        }
-
-        private void CreateTable(TableDefinition table)
-        {
-            WriteLine("Create.Table(\"{1}\").InSchema(\"{0}\")", table.SchemaName, table.Name);
-            
-            using (new Indenter())
-            {
-                foreach (ColumnDefinition column in table.Columns)
-                {
-                    string colCode = GetColumnCode(column);
-                    if (table.Columns.Last() == column) colCode += ";";
-
-                    WriteLine(colCode);
-                }
-            }
-
-            WriteLine();
-
-            var nonColIndexes = GetNonColumnIndexes(table);
-
-            WriteLines(nonColIndexes.Select(index => GetCreateIndexCode(table, index)));
-            WriteLines(table.ForeignKeys.Select(GetCreateForeignKeyCode));
         }
 
         /// <summary>
         /// Gets the set of tables indexes that are not declared as part of a table column definition
         /// </summary>
-        /// <param name="table"></param>
-        /// <returns></returns>
-        private IEnumerable<IndexDefinition> GetNonColumnIndexes(TableDefinition table)
-        {
-            // Names of indexes declared as as part of table column definition
-            var colIndexNames = from col in table.Columns
-                                where col.IsIndexed 
-                                select col.IsPrimaryKey ? col.PrimaryKeyName : col.IndexName;
-
-            // Remaining indexes undeclared
-            return from index in table.Indexes where !colIndexNames.Contains(index.Name) select index;
-        }
-
         /// <summary>
         /// Generate code based on changes to table columns, indexes and foreign keys
         /// </summary>
         /// <param name="oldTable"></param>
         /// <param name="newTable"></param>
         /// <param name="schemaSqlFolder"></param>
-        private void UpdateTable(TableDefinition oldTable, TableDefinition newTable, string schemaSqlFolder)
+        private CodeLines UpdateTable(TableDefinitionExt oldTable, TableDefinitionExt newTable, string schemaSqlFolder)
         {
-            // Strategy is to compute generated FluentMigration API code 
-            // for each table related object (columns, indexes and foreign keys) 
-            // and then detect changes in EITHER the list of object names 
-            // OR the code for objects of matching name.
+            var lines = new CodeLines();
 
-            // We only emit code if there are actual changes so we can detect 
-            // when there are NO changes and then not emit the class.
+            // Identify indexes containing fields that have changed type so they get included as Updated indexes.
+            var colsDiff = new ModelDiff<ColumnDefinitionExt>(oldTable.Columns, newTable.Columns);
+            var updatedCols = colsDiff.GetUpdatedNew();
+            foreach (var index in FindTypeChangedIndexes(newTable.Indexes, updatedCols))
+            {
+                index.TypeChanged = true;
+            }
 
-            // TODO: If a column is updated but it's part of a foreign key relationship, need to drop/create the FK and alter the columns in both tables.
-            // This can cascade to multiple tables so it needs a recursive tree search to find the affected tables that must be updated together.
+            // GetNonColumnIndexes(): Single column Primary indexes are declared with the column and not explicitly named (so we exclude them from the comparison)
+            var ixDiff = new ModelDiff<IndexDefinitionExt>(oldTable.GetNonColumnIndexes(), newTable.GetNonColumnIndexes());
 
-            // Columns
-            IDictionary<string, string> oldCols = oldTable.Columns.ToDictionary(col => col.Name, GetColumnCode);
-            IDictionary<string, string> newCols = newTable.Columns.ToDictionary(col => col.Name, GetColumnCode);
-
-            var addedColsCode = oldCols.GetAdded(newCols).Select(colCode => colCode.Replace("WithColumn", "AddColumn"));
-            var updatedColsOldCode = newCols.GetUpdated(oldCols);
-            var updatedColNames = newCols.GetUpdatedNames(oldCols).ToArray();
-            var updatedColsCode = oldCols.GetUpdated(newCols).Select(colCode => colCode.Replace("WithColumn", "AlterColumn"));
-            var removedColsDefCode = oldCols.GetRemoved(newCols);
-            var removedColsCode = oldCols.GetRemovedNames(newCols).Select(colName => GetRemoveColumnCode(newTable, colName));
-
-            // Indexes 
-            IDictionary<string, string> oldIndexes = GetNonColumnIndexes(oldTable).ToDictionary(index => index.Name, index => GetCreateIndexCode(oldTable, index));
-            IDictionary<string, string> newIndexes = GetNonColumnIndexes(newTable).ToDictionary(index => index.Name, index => GetCreateIndexCode(newTable, index));
-            
-            // Updated indexes are removed and added
-            var oldUpdatedIndexDefCode = newIndexes.GetUpdated(oldIndexes);
-            var updatedIndexNames = oldIndexes.GetUpdatedNames(newIndexes);
-            // Include indexes that contain updated columns
-            string [] colAffectedIndexes = FindIndexesContainingUpdatedColumnNames(newTable.Indexes, updatedColNames).ToArray();
-            string[] updatedIndexNames1 = updatedIndexNames.Union(colAffectedIndexes).Distinct().ToArray();
-
-            var removeUpdatedIndexesCode = updatedIndexNames1.Select(indexName => GetDeleteIndexCode(oldTable, indexName));
-            var newUpdatedIndexCode = updatedIndexNames1.Select(indexName => newIndexes[indexName]);
- 
-            var addedIndexCode = oldIndexes.GetAdded(newIndexes);
-            var removedIndexNames = oldIndexes.GetRemovedNames(newIndexes);
-            var removedIndexOldDefCode = oldIndexes.GetRemoved(newIndexes);
-            var removedIndexCode = removedIndexNames.Select(indexName => GetDeleteIndexCode(oldTable, indexName));
+            var fkDiff = new ModelDiff<ForeignKeyDefinitionExt>(oldTable.ForeignKeys, newTable.ForeignKeys);
 
             if (options.ShowChanges)
             {
-                // Show renamed indexes as comments
-                var oldIndexDefs = oldTable.Indexes.ToDictionary(index => index.Name, GetCreateIndexDefCode);
-                var newIndexDefs = newTable.Indexes.ToDictionary(index => index.Name, GetCreateIndexDefCode);
-                ShowRenaming("Index", oldIndexDefs, newIndexDefs);
+                // Show renamed Indexes and Foreign Keys as comments
+                ShowRenamedObjects(lines, "Index", ixDiff.GetRenamed());               
+                ShowRenamedObjects(lines, "Foreign Key", fkDiff.GetRenamed());
             }
-
-            // Foreign Keys
-            IDictionary<string, string> oldFKs = oldTable.ForeignKeys.ToDictionary(fk => fk.Name, GetCreateForeignKeyCode);
-            IDictionary<string, string> newFKs = newTable.ForeignKeys.ToDictionary(fk => fk.Name, GetCreateForeignKeyCode);
-
-            // Updated foreign keys are removed and added
-            var updatedFkNames = oldFKs.GetUpdatedNames(newFKs);
-            var removeUpdatedFkCode = updatedFkNames.Select(fkName => GetRemoveFKCode(oldTable, fkName));
-            var oldUpdatedFkDefCode = newFKs.GetUpdated(oldFKs);
-            var newUpdatedFkCode = oldFKs.GetUpdated(newFKs);
-
-            var addedFkCode = oldFKs.GetAdded(newFKs);
-            var removedFkNames = oldFKs.GetRemovedNames(newFKs);
-            var removedFkDefCode = oldFKs.GetRemoved(newFKs);
-            var removedFkCode = removedFkNames.Select(fkName => GetRemoveFKCode(oldTable, fkName));
-
-            if (options.ShowChanges)
-            {
-                // Show renamed Foreign Keys as comments
-                var oldFkDefs = oldTable.ForeignKeys.ToDictionary(fk => fk.Name, GetForeignKeyDefCode);
-                var newFkDefs = newTable.ForeignKeys.ToDictionary(fk => fk.Name, GetForeignKeyDefCode);
-                ShowRenaming("Foreign Key", oldFkDefs, newFkDefs);
-            }
-
-            // We keep old indexes and columns as long as possible as they may be needed 
-            // when the developer adds custom code to in MigrateData() to migrate the data from old to new schema.
 
             // When a column becomes NOT NULL and has a DEFAULT value, this emits SQL to set the default on all NULL column values.
-            SetDefaultsIfNotNull(oldTable, newTable, oldCols.GetUpdatedNames(newCols));
+            SetDefaultsIfNotNull(lines, colsDiff);
 
-            ShowOldCode(removedFkDefCode);          // Show old code of removed FKs
-            WriteChanges(removedFkCode);            // Remove OLD foreign keys
+            RemoveObjects(lines, fkDiff.GetRemovedOrUpdated().Cast<ICodeComparable>()); // Remove OLD / UPDATED foriegn keys.
+            RemoveObjects(lines, ixDiff.GetRemovedOrUpdated().Cast<ICodeComparable>()); // Remove OLD / UPDATED indexes.
 
-            ShowOldCode(oldUpdatedFkDefCode);       // Show old version of UPDATED foreign keys as comments
-            WriteChanges(removeUpdatedFkCode);      // Remove UPDATED foreign keys
+            var updatedColOldCode = colsDiff.GetUpdatedOld().Select(col => col.CreateCode); // Show old col defn as comments
+            var updatedColsCode = colsDiff.GetUpdatedNew().Select(colCode => colCode.CreateCode.Replace("WithColumn", "AlterColumn")); 
 
-            ShowOldCode(oldUpdatedIndexDefCode);    // Show old version of updated indexes definitions as comments.
-            WriteChanges(removeUpdatedIndexesCode); // Remove UPDATED indexes
+            newTable.GetAlterTableCode(lines, updatedColsCode, updatedColOldCode);   // UPDATED columns (including 1 column indexes)
 
-            ShowOldCode(removedIndexOldDefCode);    // Comments showing OLD index definitions.
-            WriteChanges(removedIndexCode);         // Remove OLD Indexes
+            var addedColsCode = colsDiff.GetAdded().Select(colCode => colCode.CreateCode.Replace("WithColumn", "AddColumn"));
+            newTable.GetAlterTableCode(lines, addedColsCode);                       // Add NEW columns
 
-            ShowOldCode(updatedColsOldCode);        // Show old definition of updated columns
-            AlterTable(newTable, updatedColsCode);  // Updated columns (including 1 column indexes)
-
-            AlterTable(newTable, addedColsCode);    // Add NEW columns
-
-            WriteChanges(addedIndexCode);           // Add NEW Indexes
-
-            WriteChanges(addedFkCode);              // Add NEW foreign keys
+            AddObjects(lines, ixDiff.GetAdded().Cast<ICodeComparable>());           // Add NEW Indexes
+            AddObjects(lines, fkDiff.GetAdded().Cast<ICodeComparable>());           // Add NEW foreign keys
 
             // Note: The developer may inject custom data migration code here
             // We preserve old columns and indexes for this phase.
-            MigrateData(schemaSqlFolder, newTable.Name);   // Run data migration SQL 
+            sqlFileWriter.MigrateData(lines, schemaSqlFolder, newTable.Name);       // Run data migration SQL 
 
-            WriteChanges(newUpdatedFkCode);         // Add UPDATED foreign keys
-            WriteChanges(newUpdatedIndexCode);      // Add UPDATED indexes (excluding 1 column indexes)
+            AddObjects(lines, fkDiff.GetUpdatedNew().Cast<ICodeComparable>());      // Add UPDATED foreign keys
+            AddObjects(lines, ixDiff.GetUpdatedNew().Cast<ICodeComparable>());      // Add UPDATED indexes (excluding 1 column indexes)
 
-            ShowOldCode(removedColsDefCode);        // Comments showing OLD column definitions.
-            WriteChanges(removedColsCode);          // Remove OLD columns
+            RemoveObjects(lines, colsDiff.GetRemoved().Cast<ICodeComparable>());    // Remove OLD columns (kept for DataMigration).
+
+            return lines;
+        }
+
+        private IEnumerable<IndexDefinitionExt> FindTypeChangedIndexes(IEnumerable<IndexDefinitionExt> indexes, IEnumerable<ColumnDefinitionExt> updatedCols)
+        {
+            var updatedColNames = updatedCols.Select(col => col.Name);
+
+            // Find indexes containing columns where the type has column has changed
+            return from index in indexes
+                   let colNames = index.Columns.Select(col => col.Name)
+                   where colNames.Any(updatedColNames.Contains)
+                   select index;
         }
 
         /// <summary>
         /// Report renamed objects.
         /// </summary>
         /// <typeparam name="T"></typeparam>
+        /// <param name="lines"></param>
         /// <param name="title"></param>
-        /// <param name="oldObjects"></param>
-        /// <param name="newObjects"></param>
-        private void ShowRenaming<T>(string title, IDictionary<string, T> oldObjects, IDictionary<string, T> newObjects)
+        /// <param name="renamed"></param>
+        private void ShowRenamedObjects(CodeLines lines, string title, IEnumerable<KeyValuePair<string, string>> renamed)
         {
-            foreach (var rename in oldObjects.GetRenamed(newObjects))
+            foreach (var rename in renamed)
             {
                 string msg = string.Format("Renamed {0}: {1} -> {2}", title, rename.Key, rename.Value);
-                WriteComment(msg);
+                lines.WriteComment(msg);
                 announcer.Emphasize(msg);
             }
         }
 
-        private void AlterTable(TableDefinition table, IEnumerable<string> codeChanges)
+        private void AddObjects(CodeLines lines, IEnumerable<ICodeComparable> objs)
         {
-            var changes = codeChanges.ToList();
-            if (changes.Any())
+            bool isFirst = true;
+            foreach (var obj in objs)
             {
-                WriteLine("Alter.Table(\"{0}\").InSchema(\"{1}\")", table.Name, table.SchemaName);
-                using (new Indenter())
+                if (isFirst)
                 {
-                    WriteLines(changes, ";");
+                    isFirst = false;
+                    lines.WriteLine();
                 }
+
+                lines.WriteSplitLine(obj.CreateCode);
             }
         }
 
-        private void WriteChanges(IEnumerable<string> codeChanges)
+        private void RemoveObjects(CodeLines lines, IEnumerable<ICodeComparable> objs)
         {
-            var changes = codeChanges.ToList();
-            if (changes.Any())
+            foreach (var obj in objs)
             {
-                WriteLine();
-                WriteLines(changes);
+                lines.WriteLine();
+                if (options.ShowChanges)
+                {
+                    // Show old definition of object as a comment
+                    lines.WriteComment(obj.CreateCode);
+                }
+                lines.WriteLine(obj.DeleteCode);
             }
         }
 
@@ -848,425 +529,24 @@ namespace FluentMigrator.SchemaGen.SchemaWriters
         /// <summary>
         /// When a column NULL -> NOT NULL and has a default value, this emits SQL to set the default on all NULL column values
         /// </summary>
-        /// <param name="oldTable"></param>
-        /// <param name="newTable"></param>
-        /// <param name="updatedColNames"></param>
-        private void SetDefaultsIfNotNull(TableDefinition oldTable, TableDefinition newTable, IEnumerable<string> updatedColNames)
+        /// <param name="lines"></param>
+        /// <param name="colsDiff"></param>
+        private void SetDefaultsIfNotNull(CodeLines lines,  ModelDiff<ColumnDefinitionExt> colsDiff)
         {
             if (options.SetNotNullDefault)
             {
                 // When a column NULL -> NOT NULL and has a default value, this emits SQL to set the default on all NULL column values
-                foreach (string colName in updatedColNames)
+                foreach (ColumnDefinitionExt newCol in colsDiff.GetUpdatedNew())
                 {
-                    ColumnDefinition oldCol = oldTable.Columns.First(col => col.Name == colName);
-                    ColumnDefinition newCol = newTable.Columns.First(col => col.Name == colName);
-
+                    ColumnDefinitionExt oldCol = colsDiff.GetOldObject(newCol.Name);
                     if (oldCol.IsNullable == true && newCol.IsNullable == false && newCol.DefaultValue != null)
                     {
-                        EmbedSql(string.Format("UPDATE {0}.{1} SET {2} = {3} WHERE {2} IS NULL",
-                                                   newTable.SchemaName, newTable.Name, 
-                                                   newCol.Name, GetColumnDefaultValue(newCol)));
+                        lines.WriteLines(sqlFileWriter.EmbedSql(string.Format("UPDATE {0}.{1} SET {2} = {3} WHERE {2} IS NULL",
+                            newCol.SchemaName, newCol.TableName, 
+                            newCol.Name, newCol.GetColumnDefaultValue())));
                     }
                 }
             }
-        }
-
-        private string GetRemoveColumnCode(TableDefinition table, string colName)
-        {
-            return string.Format("Delete.Column(\"{0}\").FromTable(\"{1}\").InSchema(\"{2}\");", colName, table.Name, table.SchemaName);
-        }
-
-        private string GetColumnCode(ColumnDefinition column)
-        {
-            var sb = new StringBuilder();
-
-            sb.AppendFormat(".WithColumn(\"{0}\").{1}", column.Name, GetMigrationTypeFunctionForType(column));
-
-            if (column.IsIdentity) 
-            {
-                sb.Append(".Identity()");
-            }
-
-            if (column.IsPrimaryKey)
-            {
-                //sb.AppendFormat(".PrimaryKey(\"{0}\")", column.PrimaryKeyName);
-                sb.AppendFormat(".PrimaryKey()");
-            }
-            else if (column.IsUnique)
-            {
-                sb.AppendFormat(".Unique(\"{0}\")", column.IndexName);
-            }
-            else if (column.IsIndexed)
-            {
-                sb.AppendFormat(".Indexed(\"{0}\")", column.IndexName);
-            }
-
-            if (column.IsNullable.HasValue)
-            {
-                sb.Append(column.IsNullable.Value ? ".Nullable()" : ".NotNullable()");
-            }
-
-            if (column.DefaultValue != null && !column.IsIdentity)
-            {
-                sb.AppendFormat(".WithDefaultValue({0})", GetColumnDefaultValue(column));
-            }
-
-            //if (lastColumn) sb.Append(";");
-            return sb.ToString();
-        }
-
-        private string GetMigrationTypeSize(DbType? type, int size)
-        {
-            if (size == -1) return "int.MaxValue";
-
-            if (type == DbType.Binary && size == DbTypeSizes.ImageCapacity) return "DbTypeSizes.ImageCapacity";              // IMAGE fields
-            if (type == DbType.AnsiString && size == DbTypeSizes.AnsiTextCapacity) return "DbTypeSizes.AnsiTextCapacity";    // TEXT fields
-            if (type == DbType.String && size == DbTypeSizes.UnicodeTextCapacity) return "DbTypeSizes.UnicodeTextCapacity";  // NTEXT fields
-
-            return size.ToString();
-        }
-
-        public string GetMigrationTypeFunctionForType(ColumnDefinition col)
-        {
-            var precision = col.Precision;
-            string sizeStr = GetMigrationTypeSize(col.Type, col.Size);
-            string precisionStr = (precision == -1) ? "" : "," + precision.ToString();
-            string sysType = "AsString(" + sizeStr + ")";
-
-            switch (col.Type)
-            {
-                case DbType.AnsiString:
-                    if (options.UseDeprecatedTypes && col.Size == DbTypeSizes.AnsiTextCapacity)
-                    {
-                        sysType = "AsCustom(\"TEXT\")";
-                    }
-                    else
-                    {
-                        sysType = string.Format("AsAnsiString({0})", sizeStr);
-                    }
-                    break;
-                case DbType.AnsiStringFixedLength:
-                    sysType = string.Format("AsFixedLengthAnsiString({0})", sizeStr);
-                    break;
-                case DbType.String:
-                    if (options.UseDeprecatedTypes && col.Size == DbTypeSizes.UnicodeTextCapacity)
-                    {
-                        sysType = "AsCustom(\"NTEXT\")";
-                    }
-                    else
-                    {
-                        sysType = string.Format("AsString({0})", sizeStr);
-                    }
-                    break;
-                case DbType.StringFixedLength:
-                    sysType = string.Format("AsFixedLengthString({0})", sizeStr);
-                    break;
-                case DbType.Binary:
-                    if (options.UseDeprecatedTypes && col.Size == DbTypeSizes.ImageCapacity)
-                    {
-                        sysType = "AsCustom(\"IMAGE\")";
-                    }
-                    else
-                    {
-                        sysType = string.Format("AsBinary({0})", sizeStr);
-                    }
-                    break;
-                case DbType.Boolean:
-                    sysType = "AsBoolean()";
-                    break;
-                case DbType.Byte:
-                    sysType = "AsByte()";
-                    break;
-                case DbType.Currency:
-                    sysType = "AsCurrency()";
-                    break;
-                case DbType.Date:
-                    sysType = "AsDate()";
-                    break;
-                case DbType.DateTime:
-                    sysType = "AsDateTime()";
-                    break;
-                case DbType.Decimal:
-                    sysType = string.Format("AsDecimal({0})", sizeStr + precisionStr);
-                    break;
-                case DbType.Double:
-                    sysType = "AsDouble()";
-                    break;
-                case DbType.Guid:
-                    sysType = "AsGuid()";
-                    break;
-                case DbType.Int16:
-                case DbType.UInt16:
-                    sysType = "AsInt16()";
-                    break;
-                case DbType.Int32:
-                case DbType.UInt32:
-                    sysType = "AsInt32()";
-                    break;
-                case DbType.Int64:
-                case DbType.UInt64:
-                    sysType = "AsInt64()";
-                    break;
-                case DbType.Single:
-                    sysType = "AsFloat()";
-                    break;
-                case null:
-                    sysType = string.Format("AsCustom({0})", col.CustomType);
-                    break;
-                default:
-                    break;
-            }
-
-            return sysType;
-        }
-
-        public string GetColumnDefaultValue(ColumnDefinition col)
-        {
-            string sysType = null;
-            string defValue = col.DefaultValue.ToString().CleanBracket().ToUpper().Trim();
-
-            var guid = Guid.Empty;
-            switch (col.Type)
-            {
-                case DbType.Boolean:
-                case DbType.Byte:
-                case DbType.Currency:
-                case DbType.Decimal:
-                case DbType.Double:
-                case DbType.Int16:
-                case DbType.Int32:
-                case DbType.Int64:
-                case DbType.Single:
-                case DbType.UInt16:
-                case DbType.UInt32:
-                case DbType.UInt64:
-                    sysType = defValue.Replace("'", "").Replace("\"", "").CleanBracket();
-                    break;
-
-                case DbType.Guid:
-                    if (defValue == "NEWID()")
-                    {
-                        sysType = "SystemMethods.NewGuid";
-                    } else if (defValue == "NEWSEQUENTIALID()")
-                    {
-                        sysType = "SystemMethods.NewSequentialId";
-                    }
-                    else if (defValue.IsGuid(out guid))
-                    {
-                        if (guid == Guid.Empty)
-                        {
-                            sysType = "Guid.Empty";
-                        }
-                        else
-                        {
-                            sysType = string.Format("new System.Guid(\"{0}\")", guid);
-                        }
-                    }
-                    break;
-
-                case DbType.DateTime:
-                case DbType.DateTime2:
-                case DbType.Date:
-                    if (defValue == "CURRENT_TIME"
-                        || defValue == "CURRENT_DATE"
-                        || defValue == "CURRENT_TIMESTAMP"
-                        || defValue == "GETDATE()")
-                    {
-                        sysType = "SystemMethods.CurrentDateTime";
-                    }
-                    else if (defValue == "GETUTCDATE()")
-                    {
-                        sysType = "SystemMethods.CurrentUTCDateTime";
-                    }
-                    else
-                    {
-                        sysType = "\"" + defValue + "\"";
-                    }
-                    break;
-
-                default:
-                    if (defValue == "CURRENT_USER")
-                    {
-                        sysType = "SystemMethods.CurrentUser";
-                    }
-                    else
-                    {
-                        sysType = string.Format("\"{0}\"", col.DefaultValue);
-                    }
-                    break;
-            }
-
-            return sysType.Replace("'", "''");
-        }
-        #endregion
-
-        #region Index 
-
-        private string GetDeleteIndexCode(TableDefinition table, string indexName)
-        {
-            return string.Format("Delete.Index(\"{0}\").OnTable(\"{1}\");", indexName, table.Name);
-        }
-
-        private IEnumerable<ForeignKeyDefinition> FindForeignKeysWithColumns(IEnumerable<ForeignKeyDefinition> fks, IEnumerable<IndexColumnDefinition> cols)
-        {
-            string[] colNames = cols.Select(col => col.Name).ToArray();
-            return fks.Where(fk => fk.ForeignColumns.SequenceEqual(colNames));
-        }
-
-        private string GetCreateIndexCode(TableDefinition table, IndexDefinition index)
-        {
-            var sb = new StringBuilder();
-
-            sb.AppendLine();
-
-            if (table.ForeignKeys.Any())
-            {
-                bool isFkIndex = FindForeignKeysWithColumns(table.ForeignKeys, index.Columns).Any();
-                if (isFkIndex) sb.Append("IfNotDatabase(\"jet\").");
-            }
-
-            //Create.Index("ix_Name").OnTable("TestTable2").OnColumn("Name").Ascending().WithOptions().NonClustered();
-            sb.AppendFormat("Create.Index(\"{0}\").OnTable(\"{1}\")", index.Name, index.TableName);
-
-            return sb.ToString() + GetCreateIndexDefCode(index);
-        }
-
-        /// <summary>
-        /// Indexes containing updated columns need to marked as 'updated' so they are dropped & recreated either side of the column update.
-        /// </summary>
-        /// <param name="indexes"></param>
-        /// <param name="updatedColNames"></param>
-        /// <returns></returns>
-        private IEnumerable<string> FindIndexesContainingUpdatedColumnNames(IEnumerable<IndexDefinition> indexes, IEnumerable<string> updatedColNames)
-        {
-             return from index in indexes
-                let colNames = index.Columns.Select(col => col.Name)
-                where colNames.Any(updatedColNames.Contains)
-                select index.Name;
-        }
-
-        private string GetCreateIndexDefCode(IndexDefinition index)
-        {
-            var sb = new StringBuilder();
-            if (index.IsUnique)
-            {
-                sb.AppendFormat(".WithOptions().Unique()");
-            }
-
-            if (index.IsClustered)
-            {
-                sb.AppendFormat(".WithOptions().Clustered()");
-            }
-
-            foreach (var col in index.Columns)
-            {
-                sb.AppendFormat("\n\t.OnColumn(\"{0}\")", col.Name);
-                sb.AppendFormat(".{0}()", col.Direction.ToString());
-            }
-
-            sb.Append(";");
-
-            return sb.ToString();
-        }
-
-        #endregion
-
-        #region Foreign Key
-
-        private string GetRemoveFKCode(TableDefinition table, string fkName)
-        {
-            return string.Format("Delete.ForeignKey(\"{0}\").OnTable(\"{1}\").InSchema(\"{2}\");", fkName, table.Name, table.SchemaName);
-        }
-
-        private string ToStringArray(IEnumerable<string> cols)
-        {
-            string strCols = String.Join(", ", cols.Select(col => '"' + col + '"').ToArray());
-            return '{' + strCols + '}';
-        }
-
-        protected string GetCreateForeignKeyCode(ForeignKeyDefinition fk)
-        {
-            return string.Format("Create.ForeignKey(\"{0}\")\r\n\t{1};", fk.Name, GetForeignKeyDefCode(fk));
-        }
-
-        private string GetForeignKeyDefCode(ForeignKeyDefinition fk)
-        {
-            //Create.ForeignKey("fk_TestTable2_TestTableId_TestTable_Id")
-            //    .FromTable("TestTable2").ForeignColumn("TestTableId")
-            //    .ToTable("TestTable").PrimaryColumn("Id");
-
-            var sb = new StringBuilder();
-
-            // From Table
-            string fromTable = string.Format(".FromTable(\"{0}\")", fk.ForeignTable);
-
-            using (new Indenter())
-            {
-                if (fk.ForeignColumns.Count == 1)
-                {
-                    fromTable += string.Format(".ForeignColumn(\"{0}\")", fk.ForeignColumns.First());
-                }
-                else
-                {
-                    fromTable += string.Format("ForeignColumns({0})", ToStringArray(fk.ForeignColumns));
-                }
-            }
-
-            sb.AppendLine("\t" + fromTable);
-
-            // To Table
-            string toTable = string.Format(".ToTable(\"{0}\")", fk.PrimaryTable);
-
-            using (new Indenter())
-            {
-                if (fk.PrimaryColumns.Count == 1)
-                {
-                    toTable += string.Format(".PrimaryColumn(\"{0}\")", fk.PrimaryColumns.First());
-                }
-                else
-                {
-                    toTable += string.Format(".PrimaryColumns({0})", ToStringArray(fk.PrimaryColumns));
-                }
-            }
-
-            sb.AppendLine("\t" + toTable);
-
-            string rule = "";
-
-            if (fk.OnDelete != Rule.None && fk.OnDelete == fk.OnUpdate)
-            {
-                rule += string.Format(".OnDeleteOrUpdate(System.Data.Rule.{0})", fk.OnDelete);
-            }
-            else
-            {
-                if (fk.OnDelete != Rule.None)
-                {
-                    rule += string.Format(".OnDelete(System.Data.Rule.{0})", fk.OnDelete);
-                }
-
-                if (fk.OnUpdate != Rule.None)
-                {
-                    rule += string.Format(".OnUpdate(System.Data.Rule.{0})", fk.OnUpdate);
-                }
-            }
-
-            if (rule.Length > 0) sb.AppendLine("\t" + rule);
-
-            return sb.ToString().Trim();
-        }
-
-        /// <summary>
-        /// Indexes containing updated columns need to marked as 'updated' so they are dropped & recreated either side of the column update.
-        /// </summary>
-        /// <param name="fks"></param>
-        /// <param name="updatedColNames"></param>
-        /// <returns></returns>
-        private IEnumerable<ForeignKeyDefinition> FindFKsContainingUpdatedColumnNames(IEnumerable<ForeignKeyDefinition> fks, IEnumerable<string> updatedColNames)
-        {
-            return from fk in fks
-                let colNames = fk.ForeignColumns
-                where colNames.Any(updatedColNames.Contains)
-                select fk;
         }
 
         #endregion

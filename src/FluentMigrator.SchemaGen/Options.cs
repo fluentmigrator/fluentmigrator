@@ -58,6 +58,14 @@ namespace FluentMigrator.SchemaGen
     /// </summary>
     internal class Options : IOptions
     {
+        private static IOptions _instance;
+
+        public static IOptions Instance
+        {
+            get { return _instance ?? (_instance = new Options()); }
+            set { _instance = value; }
+        }
+
         [Option("db", Required = false, HelpText = "SQL Server database name (or connection string) for generating full database schema.")]
         public string Db { get; set; }
 

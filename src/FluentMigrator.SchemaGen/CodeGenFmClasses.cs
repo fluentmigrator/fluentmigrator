@@ -36,8 +36,8 @@ namespace FluentMigrator.SchemaGen
                     IDbSchemaReader reader1 = new EmptyDbSchemaReader();
                     IDbSchemaReader reader2 = new SqlServerSchemaReader(cnn, options);
 
-                    IMigrationWriter migrationWriter = new FmDiffMigrationWriter(options, announcer, reader1, reader2);
-                    return migrationWriter.WriteMigrationClasses();
+                    IMigrationWriter writer = new FmDiffMigrationWriter(options, announcer, reader1, reader2);
+                    return writer.WriteMigrationClasses();
                 }
             }
             // Generate migration classes based on differences between two databases.
@@ -52,9 +52,9 @@ namespace FluentMigrator.SchemaGen
                     IDbSchemaReader reader1 = new SqlServerSchemaReader(cnn1, options);
                     IDbSchemaReader reader2 = new SqlServerSchemaReader(cnn2, options);
 
-                    IMigrationWriter writer1 = new FmDiffMigrationWriter(options, announcer, reader1, reader2);
+                    IMigrationWriter writer = new FmDiffMigrationWriter(options, announcer, reader1, reader2);
 
-                    return writer1.WriteMigrationClasses();
+                    return writer.WriteMigrationClasses();
                 }
             }
             else
