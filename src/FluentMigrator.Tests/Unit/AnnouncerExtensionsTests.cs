@@ -25,6 +25,7 @@ namespace FluentMigrator.Tests.Unit
     [TestFixture]
     public class AnnouncerExtensionsTests
     {
+        
         [SetUp]
         public void Setup()
         {
