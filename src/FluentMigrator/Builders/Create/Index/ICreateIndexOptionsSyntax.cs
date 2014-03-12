@@ -23,5 +23,6 @@ namespace FluentMigrator.Builders.Create.Index
         ICreateIndexOnColumnSyntax Unique();
         ICreateIndexOnColumnSyntax NonClustered();
         ICreateIndexOnColumnSyntax Clustered();
-    }
+		ICreateIndexOnColumnSyntax Online();
+	}
 }

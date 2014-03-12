@@ -19,7 +19,24 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             Generator = new SqlServer2008Generator();
         }
 
-        [Test]
+		[Test]
+		public void CanCreateIndexWithOnlineOption()
+		{
+			var expression = GeneratorTestHelper.GetCreateIndexExpression();
+			expression.Index.SchemaName = "TestSchema";
+
+			// Verify Online Option is used
+			expression.Index.IsOnline = true;
+			var result = Generator.Generate(expression);
+			result.ShouldBe("CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC) WITH (ONLINE=ON)");
+
+			// Verify Online Option is unused
+			expression.Index.IsOnline = false;
+			result = Generator.Generate(expression);
+			result.ShouldBe("CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC)");
+		}
+
+		[Test]
         public void CanCreateTableWithDateTimeOffsetColumn()
         {
             var expression = new CreateTableExpression {TableName = "TestTable1"};
@@ -76,6 +93,5 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             result.ShouldBe("INSERT INTO [dbo].[TestTable] ([UnicodeStringValue], [StringValue]) VALUES (N'UnicodeString', 'AnsiiString')");
 
         }
-
     }
 }

@@ -16,6 +16,8 @@
 //
 #endregion
 
+using FluentMigrator.Expressions;
+
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
     public class SqlServer2008Generator : SqlServer2005Generator
@@ -29,5 +31,14 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             :base(column, descriptionGenerator)
         {
         }
-    }
+
+		public override string Generate(CreateIndexExpression expression)
+		{
+			var result = base.Generate(expression);
+			if (expression.Index.IsOnline)
+				result += " WITH (ONLINE=ON)";
+
+			return result;
+		}
+	}
 }
