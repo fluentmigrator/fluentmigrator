@@ -1,4 +1,5 @@
 #region License
+
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -14,30 +15,42 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
 #endregion
+using System;
 
 namespace FluentMigrator.VersionTableInfo
 {
-    public class DefaultVersionTableMetaData : IVersionTableMetaData
+    public class DefaultVersionTableMetaData : IVersionTableMetaData, IVersionTableMetaDataExtended
     {
         public virtual string SchemaName
         {
             get { return string.Empty; }
         }
-
+  
         public virtual string TableName
         {
             get { return "VersionInfo"; }
         }
-
+  
         public virtual string ColumnName
         {
             get { return "Version"; }
         }
-
+  
         public virtual string UniqueIndexName
         {
             get { return "UC_Version"; }
+        }
+  
+        public string DescriptionColumnName
+        {
+            get { return "Description"; }
+        }
+
+        public virtual bool OwnsSchema
+        {
+            get { return true; }
         }
     }
 }

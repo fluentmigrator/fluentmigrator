@@ -21,6 +21,7 @@ namespace FluentMigrator.Infrastructure
     public interface IMigrationInfo
     {
         long Version { get; }
+        string Description { get; }
         TransactionBehavior TransactionBehavior { get; }
         IMigration Migration { get; }
         object Trait(string name);

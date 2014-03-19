@@ -224,7 +224,11 @@ namespace FluentMigrator.Runner
                 using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useTransaction))
                 {
                     ExecuteMigration(migrationInfo.Migration, (m, c) => m.GetUpExpressions(c));
-                    if (migrationInfo.IsAttributed()) VersionLoader.UpdateVersionInfo(migrationInfo.Version);
+                    
+                    if (migrationInfo.IsAttributed())
+                    {
+                        VersionLoader.UpdateVersionInfo(migrationInfo.Version, migrationInfo.Description ?? migrationInfo.Migration.GetType().Name);
+                    }
                     
                     scope.Complete();
 

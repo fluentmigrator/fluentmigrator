@@ -115,6 +115,30 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        public void RemoveVersionTableShouldNotRemoveSchemaIfItDidNotOwnTheSchema()
+        {
+            var processor = new Mock<IMigrationProcessor>();
+            var runner = new Mock<IMigrationRunner>();
+
+            runner.SetupGet(r => r.Processor).Returns(processor.Object);
+
+            var conventions = new MigrationConventions();
+            var asm = Assembly.GetExecutingAssembly();
+            var loader = new VersionLoader(runner.Object, asm, conventions);
+
+            ((TestVersionTableMetaData) loader.VersionTableMetaData).OwnsSchema = false;
+
+            processor.Setup(p => p.Process(It.Is<DeleteTableExpression>(expression =>
+                                                                        expression.SchemaName == loader.VersionTableMetaData.SchemaName
+                                                                        && expression.TableName == loader.VersionTableMetaData.TableName)))
+                .Verifiable();
+
+            loader.RemoveVersionTable();
+
+            processor.Verify(p => p.Process(It.IsAny<DeleteSchemaExpression>()), Times.Never());
+        }
+
+        [Test]
         public void UpdateVersionShouldExecuteInsertDataExpression()
         {
             var processor = new Mock<IMigrationProcessor>();
@@ -196,6 +220,25 @@ namespace FluentMigrator.Tests.Unit
             loader.LoadVersionInfo();
 
             runner.Verify(r => r.Up(loader.VersionUniqueMigration), Times.Once());
+        }
+
+        [Test]
+        public void VersionDescriptionMigrationOnlyRunOnceEvenIfExistenceChecksReturnFalse()
+        {
+            var conventions = new MigrationConventions();
+            var processor = new Mock<IMigrationProcessor>();
+            var runner = new Mock<IMigrationRunner>();
+            var asm = Assembly.GetExecutingAssembly();
+
+            runner.SetupGet(r => r.Processor).Returns(processor.Object);
+
+            processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME, "AppliedOn")).Returns(false);
+
+            var loader = new VersionLoader(runner.Object, asm, conventions);
+
+            loader.LoadVersionInfo();
+
+            runner.Verify(r => r.Up(loader.VersionDescriptionMigration), Times.Once());
         }
     }
 }
