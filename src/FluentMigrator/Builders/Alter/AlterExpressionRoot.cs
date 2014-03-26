@@ -32,7 +32,7 @@ namespace FluentMigrator.Builders.Alter
             _context = context;
         }
 
-        public IAlterTableAddColumnOrAlterColumnOrSchemaSyntax Table(string tableName)
+        public IAlterTableAddColumnOrAlterColumnOrSchemaOrDescriptionSyntax Table(string tableName)
         {
             var expression = new AlterTableExpression { TableName = tableName };
             _context.Expressions.Add(expression);
