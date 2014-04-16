@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FluentMigrator.Runner</RootNamespace>
     <AssemblyName>FluentMigrator.Runner</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -156,6 +156,9 @@
     <Compile Include="InvalidMigrationException.cs" />
     <Compile Include="MigrationScopeHandler.cs" />
     <Compile Include="MigrationValidator.cs" />
+    <Compile Include="Processors\OracleManaged\OracleManagedDbFactory.cs" />
+    <Compile Include="Processors\OracleManaged\OracleManagedProcessor.cs" />
+    <Compile Include="Processors\OracleManaged\OracleProcessorFactory.cs" />
     <Compile Include="Processors\Firebird\FirebirdProcessedExpression.cs" />
     <Compile Include="Generators\Firebird\FirebirdQuoter.cs" />
     <Compile Include="Generators\Firebird\FirebirdTypeMap.cs" />
