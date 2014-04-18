@@ -15,6 +15,7 @@ db.sqlite
 *.userprefs
 packages/FluentMigrator/
 packages/FluentMigrator.Tools/
+packages/FluentMigrator.Runners/
 _UpgradeReport_Files
 UpgradeLog.XML
 *.bak
