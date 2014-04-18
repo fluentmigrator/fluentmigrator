@@ -13,9 +13,10 @@ db.sqlite
 *.orig
 *.pidb
 *.userprefs
-packages/FluentMigrator/
-packages/FluentMigrator.Tools/
-packages/FluentMigrator.Runners/
+packages/FluentMigrator
+packages/FluentMigrator.Tools
+packages/FluentMigrator.Runners
+packages/FluentMigrator.Console
 _UpgradeReport_Files
 UpgradeLog.XML
 *.bak
