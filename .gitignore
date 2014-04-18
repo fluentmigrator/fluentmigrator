@@ -29,3 +29,4 @@ examplecommand.txt
 *.ncrunchsolution
 *.crunchsolution.cache
 src/FluentMigrator.T4.Tests/IntialMigrationCode.cs
+nuget/*.nupkg
