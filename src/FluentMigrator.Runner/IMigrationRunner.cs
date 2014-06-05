@@ -10,9 +10,11 @@ namespace FluentMigrator.Runner
         void Down(IMigration migration);
         void MigrateUp();
         void MigrateUp(long version);
+        void MigrateUp(long startVersion, long targetVersion);
         void Rollback(int steps);
         void RollbackToVersion(long version);
         void MigrateDown(long version);
+        void MigrateDown(long startVersion, long targetVersion);
         void ValidateVersionOrder();
         void ListMigrations();
     }
