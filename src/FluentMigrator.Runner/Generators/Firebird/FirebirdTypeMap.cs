@@ -8,6 +8,8 @@ namespace FluentMigrator.Runner.Generators.Firebird
         private const int DecimalCapacity = 19;
         private const int FirebirdMaxVarcharSize = 32765;
         private const int FirebirdMaxCharSize = 32767;
+        // http://www.firebirdsql.org/en/firebird-technical-specifications/
+        private const int FirebirdMaxTextSize = int.MaxValue;  // as close as Int32 can come to 32GB
 
         protected override void SetupTypeMaps()
         {
@@ -35,8 +37,9 @@ namespace FluentMigrator.Runner.Generators.Firebird
             SetTypeMap(DbType.Single, "FLOAT");
             SetTypeMap(DbType.StringFixedLength, "CHAR(255)");
             SetTypeMap(DbType.StringFixedLength, "CHAR($size)", FirebirdMaxCharSize);
-            SetTypeMap(DbType.String, "BLOB SUB_TYPE TEXT");
+            SetTypeMap(DbType.String, "VARCHAR(255)");
             SetTypeMap(DbType.String, "VARCHAR($size)", FirebirdMaxVarcharSize);
+            SetTypeMap(DbType.String, "BLOB SUB_TYPE TEXT", FirebirdMaxTextSize);
             SetTypeMap(DbType.Time, "TIME");
         }
     }
