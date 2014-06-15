@@ -30,6 +30,8 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
         private Mock<IQuerySchema> _querySchemaMock;
         private Mock<IMigrationContext> _migrationContextMock;
         private string _testColumn;
+        private string _testConstraint;
+        private string _testIndex;
         private string _testTable;
         private string _testSchema;
         private SchemaExpressionRoot _builder;
@@ -41,7 +43,9 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
             _querySchemaMock = new Mock<IQuerySchema>();
             _testSchema = "testSchema";
             _testTable = "testTable";
+            _testIndex = "testIndex";
             _testColumn = "testColumn";
+            _testConstraint = "testConstraint";
 
             _migrationContextMock.Setup(x => x.QuerySchema).Returns(_querySchemaMock.Object);
             _builder = new SchemaExpressionRoot(_migrationContextMock.Object);
@@ -57,12 +61,31 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
         }
 
         [Test]
+        public void TestConstraintExists()
+        {
+            _querySchemaMock.Setup(x => x.ConstraintExists(null, _testTable, _testConstraint)).Returns(true);
+
+            _builder.Table(_testTable).Constraint(_testConstraint).Exists().ShouldBeTrue();
+            _querySchemaMock.Verify(x => x.ConstraintExists(null, _testTable, _testConstraint));
+        }
+
+        [Test]
         public void TestColumnExists()
         {
             _querySchemaMock.Setup(x => x.ColumnExists(null, _testTable, _testColumn)).Returns(true);
 
             _builder.Table(_testTable).Column(_testColumn).Exists().ShouldBeTrue();
             _querySchemaMock.Verify(x => x.ColumnExists(null, _testTable, _testColumn));
+        }
+
+        [Test]
+        public void TestIndexExists()
+        {
+            _querySchemaMock.Setup(x => x.IndexExists(null, _testTable, _testIndex)).Returns(true);
+
+
+            _builder.Table(_testTable).Index(_testIndex).Exists().ShouldBeTrue();
+            _querySchemaMock.Verify(x => x.IndexExists(null, _testTable, _testIndex));
         }
 
         [Test]
@@ -81,6 +104,24 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
 
             _builder.Schema(_testSchema).Table(_testTable).Column(_testColumn).Exists().ShouldBeTrue();
             _querySchemaMock.Verify(x => x.ColumnExists(_testSchema, _testTable, _testColumn));
+        }
+
+        [Test]
+        public void TestConstraintExistsWithSchema()
+        {
+            _querySchemaMock.Setup(x => x.ConstraintExists(_testSchema, _testTable, _testConstraint)).Returns(true);
+
+            _builder.Schema(_testSchema).Table(_testTable).Constraint(_testConstraint).Exists().ShouldBeTrue();
+            _querySchemaMock.Verify(x => x.ConstraintExists(_testSchema, _testTable, _testConstraint));
+        }
+
+        [Test]
+        public void TestIndexExistsWithSchema()
+        {
+            _querySchemaMock.Setup(x => x.IndexExists(_testSchema, _testTable, _testIndex)).Returns(true);
+
+            _builder.Schema(_testSchema).Table(_testTable).Index(_testIndex).Exists().ShouldBeTrue();
+            _querySchemaMock.Verify(x => x.IndexExists(_testSchema, _testTable, _testIndex));
         }
     }
 }
