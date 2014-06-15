@@ -188,6 +188,7 @@
     <Compile Include="Exceptions\FluentMigratorException.cs" />
     <Compile Include="Exceptions\ProcessorFactoryNotFoundException.cs" />
     <Compile Include="Exceptions\UndeterminableConnectionException.cs" />
+    <Compile Include="Helpers\LazyLoader.cs" />
     <Compile Include="Infrastructure\Extensions\ExtensionsForIMigrationInfo.cs" />
     <Compile Include="Infrastructure\IMigrationInfo.cs" />
     <Compile Include="Infrastructure\MigrationInfo.cs" />
