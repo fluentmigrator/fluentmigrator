@@ -131,6 +131,7 @@
     <Compile Include="Builders\Alter\Column\IAlterColumnOptionSyntax.cs" />
     <Compile Include="Builders\Alter\IAlterExpressionRoot.cs" />
     <Compile Include="Builders\Alter\Table\AlterTableExpressionBuilder.cs" />
+    <Compile Include="Builders\Alter\Table\IAlterTableAddColumnOrAlterColumnOrSchemaOrDescriptionSyntax.cs" />
     <Compile Include="Builders\Alter\Table\IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax.cs" />
     <Compile Include="Builders\Alter\Table\IAlterTableAddColumnOrAlterColumnOrSchemaSyntax.cs" />
     <Compile Include="Builders\Alter\Table\IAlterTableAddColumOrAlterColumnSyntax.cs" />
@@ -154,6 +155,7 @@
     <Compile Include="Builders\Create\Sequence\ICreateSequenceInSchemaSyntax.cs" />
     <Compile Include="Builders\Create\Sequence\ICreateSequenceSyntax.cs" />
     <Compile Include="Builders\Create\Table\ICreateTableColumnOptionOrForeignKeyCascadeOrWithColumnSyntax.cs" />
+    <Compile Include="Builders\Create\Table\ICreateTableWithColumnOrSchemaOrDescriptionSyntax.cs" />
     <Compile Include="Builders\Create\Table\ICreateTableWithColumnOrSchemaSyntax.cs" />
     <Compile Include="Builders\Delete\Constraint\DeleteConstraintExpressionBuilder.cs" />
     <Compile Include="Builders\Delete\Constraint\IDeleteConstraintOnTableSyntax.cs" />

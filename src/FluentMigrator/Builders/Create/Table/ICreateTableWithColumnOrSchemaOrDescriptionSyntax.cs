@@ -1,6 +1,6 @@
 ﻿#region License
 // 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2014, Sean Chambers <schambers80@gmail.com>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,10 +16,10 @@
 //
 #endregion
 
-namespace FluentMigrator.Builders.Alter.Table
+namespace FluentMigrator.Builders.Create.Table
 {
-    public interface IAlterTableAddColumnOrAlterColumnOrSchemaSyntax : IAlterTableAddColumnOrAlterColumnSyntax
+    public interface ICreateTableWithColumnOrSchemaOrDescriptionSyntax : ICreateTableWithColumnOrSchemaSyntax
     {
-        IAlterTableAddColumnOrAlterColumnSyntax InSchema(string schemaName);
+        ICreateTableWithColumnOrSchemaSyntax WithDescription(string description);
     }
 }

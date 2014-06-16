@@ -26,7 +26,7 @@ using FluentMigrator.Model;
 namespace FluentMigrator.Builders.Create.Table
 {
     public class CreateTableExpressionBuilder : ExpressionBuilderWithColumnTypesBase<CreateTableExpression, ICreateTableColumnOptionOrWithColumnSyntax>,
-                                                ICreateTableWithColumnOrSchemaSyntax,
+                                                ICreateTableWithColumnOrSchemaOrDescriptionSyntax,
                                                 ICreateTableColumnAsTypeSyntax,
                                                 ICreateTableColumnOptionOrForeignKeyCascadeOrWithColumnSyntax
     {
@@ -55,7 +55,7 @@ namespace FluentMigrator.Builders.Create.Table
             return this;
         }
 
-        public ICreateTableWithColumnSyntax WithDescription(string description)
+        public ICreateTableWithColumnOrSchemaSyntax WithDescription(string description)
         {
             Expression.TableDescription = description;
             return this;

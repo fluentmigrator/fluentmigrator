@@ -18,8 +18,8 @@
 
 namespace FluentMigrator.Builders.Alter.Table
 {
-    public interface IAlterTableAddColumnOrAlterColumnOrSchemaSyntax : IAlterTableAddColumnOrAlterColumnSyntax
+    public interface IAlterTableAddColumnOrAlterColumnOrSchemaOrDescriptionSyntax : IAlterTableAddColumnOrAlterColumnOrSchemaSyntax
     {
-        IAlterTableAddColumnOrAlterColumnSyntax InSchema(string schemaName);
+        IAlterTableAddColumnOrAlterColumnOrSchemaSyntax WithDescription(string description);
     }
 }
