@@ -13,8 +13,10 @@ db.sqlite
 *.orig
 *.pidb
 *.userprefs
-packages/FluentMigrator/
-packages/FluentMigrator.Tools/
+packages/FluentMigrator
+packages/FluentMigrator.Tools
+packages/FluentMigrator.Runners
+packages/FluentMigrator.Console
 _UpgradeReport_Files
 UpgradeLog.XML
 *.bak
@@ -29,3 +31,4 @@ examplecommand.txt
 *.ncrunchsolution
 *.crunchsolution.cache
 src/FluentMigrator.T4.Tests/IntialMigrationCode.cs
+nuget/*.nupkg

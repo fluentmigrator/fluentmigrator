@@ -258,17 +258,26 @@ namespace FluentMigrator.Console
         {
             using (var sw = new StreamWriter(outputTo))
             {
-                var fileAnnouncer = new TextWriterAnnouncer(sw)
-                                        {
-                                            ShowElapsedTime = false,
-                                            ShowSql = true
-                                        };
+                var fileAnnouncer = this.ExecutingAgainstMsSql ?
+                    new TextWriterWithGoAnnouncer(sw) :
+                    new TextWriterAnnouncer(sw);
+
+                fileAnnouncer.ShowElapsedTime = false;
+                fileAnnouncer.ShowSql = true;
+
                 consoleAnnouncer.ShowElapsedTime = Verbose;
                 consoleAnnouncer.ShowSql = Verbose;
 
                 var announcer = new CompositeAnnouncer(consoleAnnouncer, fileAnnouncer);
 
                 ExecuteMigrations(announcer);
+            }
+        }
+        private bool ExecutingAgainstMsSql
+        {
+            get
+            {
+                return ProcessorType.StartsWith("SqlServer", StringComparison.InvariantCultureIgnoreCase);
             }
         }
 
