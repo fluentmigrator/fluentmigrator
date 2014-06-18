@@ -90,5 +90,12 @@ namespace FluentMigrator.Tests.Unit.Runners
             IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("Oracle");
             Assert.IsTrue(factory.GetType() == typeof(OracleProcessorFactory));
         }
+
+        [Test]
+        public void CanRetrieveOracleManagedFactoryWithArgumentString()
+        {
+            IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("OracleManaged");
+            Assert.IsTrue(factory.GetType() == typeof(OracleManagedProcessorFactory));
+        }
     }
 }

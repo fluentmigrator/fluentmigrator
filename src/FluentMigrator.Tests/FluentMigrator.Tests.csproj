@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FluentMigrator.Tests</RootNamespace>
     <AssemblyName>FluentMigrator.Tests</AssemblyName>
-    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -131,6 +131,11 @@
     <Reference Include="Oracle.DataAccess">
       <HintPath>..\..\lib\Oracle.DataAccess.dll</HintPath>
     </Reference>
+    <Reference Include="Oracle.ManagedDataAccess, Version=4.121.1.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
+      <HintPath>..\..\lib\Oracle.ManagedDataAccess.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core">
@@ -202,13 +207,27 @@
     <Compile Include="Integration\Processors\Firebird\FirebirdTableTests.cs" />
     <Compile Include="Integration\Processors\Jet\JetProcessorTests.cs" />
     <Compile Include="Integration\Processors\MySql\MySqlProcessorTests.cs" />
-    <Compile Include="Integration\Processors\OracleProcessorFactoryTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleManagedProcessorFactoryTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleProcessorFactoryTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleProcessorFactoryTestsBase.cs" />
     <Compile Include="Integration\Processors\Oracle\OracleColumnTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleColumnTestsBase.cs" />
     <Compile Include="Integration\Processors\Oracle\OracleConstraintTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleConstraintTestsBase.cs" />
     <Compile Include="Integration\Processors\Oracle\OracleIndexTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleIndexTestsBase.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleManagedColumnTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleManagedConstraintTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleManagedIndexTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleManagedProcessorTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleManagedSchemaTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleManagedTableTests.cs" />
     <Compile Include="Integration\Processors\Oracle\OracleProcessorTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleProcessorTestsBase.cs" />
     <Compile Include="Integration\Processors\Oracle\OracleSchemaTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleSchemaTestsBase.cs" />
     <Compile Include="Integration\Processors\Oracle\OracleTableTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleTableTestsBase.cs" />
     <Compile Include="Integration\Processors\Postgres\PostgresColumnTests.cs" />
     <Compile Include="Integration\Processors\Postgres\PostgresConstraintTests.cs" />
     <Compile Include="Integration\Processors\Postgres\PostgresIndexTests.cs" />
