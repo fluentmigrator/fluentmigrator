@@ -1,6 +1,6 @@
 ﻿
 
-namespace FluentMigrator.Runner.Generators
+namespace FluentMigrator.Runner.Generators.SQLite
 {
     using System.Data;
     using FluentMigrator.Runner.Generators.Base;
