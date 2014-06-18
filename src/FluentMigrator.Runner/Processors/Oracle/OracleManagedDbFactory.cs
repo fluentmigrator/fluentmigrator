@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System;
 
-namespace FluentMigrator.Runner.Processors.OracleManaged
+namespace FluentMigrator.Runner.Processors.Oracle
 {
     public class OracleManagedDbFactory : ReflectionBasedDbFactory
     {

@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             get { return "Oracle"; }
         }
 
-        public OracleProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, OracleDbFactory factory)
+        public OracleProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
         }

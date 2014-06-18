@@ -156,9 +156,8 @@
     <Compile Include="InvalidMigrationException.cs" />
     <Compile Include="MigrationScopeHandler.cs" />
     <Compile Include="MigrationValidator.cs" />
-    <Compile Include="Processors\OracleManaged\OracleManagedDbFactory.cs" />
-    <Compile Include="Processors\OracleManaged\OracleManagedProcessor.cs" />
-    <Compile Include="Processors\OracleManaged\OracleProcessorFactory.cs" />
+    <Compile Include="Processors\Oracle\OracleManagedDbFactory.cs" />
+    <Compile Include="Processors\Oracle\OracleManagedProcessorFactory.cs" />
     <Compile Include="Processors\Firebird\FirebirdProcessedExpression.cs" />
     <Compile Include="Generators\Firebird\FirebirdQuoter.cs" />
     <Compile Include="Generators\Firebird\FirebirdTypeMap.cs" />

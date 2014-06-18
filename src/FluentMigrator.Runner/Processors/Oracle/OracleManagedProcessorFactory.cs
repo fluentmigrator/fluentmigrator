@@ -4,7 +4,7 @@ using System;
 
 using FluentMigrator.Runner.Generators.Oracle;
 
-namespace FluentMigrator.Runner.Processors.OracleManaged
+namespace FluentMigrator.Runner.Processors.Oracle
 {
     public class OracleManagedProcessorFactory : MigrationProcessorFactory
     {
@@ -12,7 +12,7 @@ namespace FluentMigrator.Runner.Processors.OracleManaged
         {
             var factory = new OracleManagedDbFactory();
             var connection = factory.CreateConnection(connectionString);
-            return new OracleManagedProcessor(connection, new OracleGenerator(this.Quoted(options.ProviderSwitches)), announcer, options, factory);
+            return new OracleProcessor(connection, new OracleGenerator(this.Quoted(options.ProviderSwitches)), announcer, options, factory);
         }
 
         private bool Quoted(string options)
