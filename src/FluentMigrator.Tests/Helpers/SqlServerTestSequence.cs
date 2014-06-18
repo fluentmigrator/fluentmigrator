@@ -37,6 +37,7 @@ namespace FluentMigrator.Tests.Helpers
 
             Connection = (SqlConnection)processor.Connection;
             Transaction = (SqlTransaction)processor.Transaction;
+            Create();
         }
 
         public void Dispose()

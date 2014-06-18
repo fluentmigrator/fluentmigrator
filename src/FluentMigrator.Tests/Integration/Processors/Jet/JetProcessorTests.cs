@@ -35,11 +35,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
         [SetUp]
         public void SetUp()
         {
-            if (!IntegrationTestOptions.Jet.IsEnabled)
-            {
-                Assert.Ignore("Jet integration tests disabled in config. Tests ignored.");
-            }
-
             Connection = new OleDbConnection(IntegrationTestOptions.Jet.ConnectionString);
             Processor = new JetProcessor(Connection, new JetGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
             Connection.Open();
@@ -124,11 +119,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
         [TearDown]
         public void TearDown()
         {
-            if (!IntegrationTestOptions.Jet.IsEnabled)
-            {
-                return;
-            }
-
             Processor.CommitTransaction();
             Processor.Dispose();
         }

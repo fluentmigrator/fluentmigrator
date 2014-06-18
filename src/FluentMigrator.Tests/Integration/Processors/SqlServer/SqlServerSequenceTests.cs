@@ -19,11 +19,6 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
         [SetUp]
         public void SetUp()
         {
-            if (!IntegrationTestOptions.SqlServer2012.IsEnabled)
-            {
-                Assert.Ignore("Only MS Sql Server 2012 has support for sequences. Ignoring these tests.");
-            }
-
             Connection = new SqlConnection(IntegrationTestOptions.SqlServer2012.ConnectionString);
             Processor = new SqlServerProcessor(Connection, new SqlServer2012Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
             Connection.Open();
@@ -33,23 +28,10 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
         [TearDown]
         public void TearDown()
         {
-            if (TestHasFailed())
-            {
-                Processor.Dispose();
-                return;
-            }
-
-            if (IntegrationTestOptions.SqlServer2012.IsEnabled)
-            {
-                Processor.CommitTransaction();
-                Processor.Dispose();
-            }
+            Processor.CommitTransaction();
+            Processor.Dispose();
         }
 
-        private static bool TestHasFailed()
-        {
-            return TestContext.CurrentContext.Result.Status == TestStatus.Failed;
-        }
 
         [Test]
         public override void CallingSequenceExistsReturnsFalseIfSequenceDoesNotExist()
@@ -66,21 +48,15 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
         [Test]
         public override void CallingSequenceExistsReturnsTrueIfSequenceExists()
         {
-            using(var testSequence = new SqlServerTestSequence(Processor, null, "test_sequence"))
-            {
-                testSequence.Create();
+            using (new SqlServerTestSequence(Processor, null, "test_sequence"))
                 Processor.SequenceExists(null, "test_sequence").ShouldBeTrue();
-            }
         }
 
         [Test]
         public override void CallingSequenceExistsReturnsTrueIfSequenceExistsWithSchema()
         {
-            using (var testSequence = new SqlServerTestSequence(Processor, "test_schema", "test_sequence"))
-            {
-                testSequence.Create();
-                Processor.SequenceExists("test_schema", "test_sequence").ShouldBeTrue();                
-            }
+            using (new SqlServerTestSequence(Processor, "test_schema", "test_sequence"))
+                Processor.SequenceExists("test_schema", "test_sequence").ShouldBeTrue();
         }
     }
 }

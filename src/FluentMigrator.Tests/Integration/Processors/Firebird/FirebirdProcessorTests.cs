@@ -24,11 +24,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [SetUp]
         public void SetUp()
         {
-            if (!IntegrationTestOptions.Firebird.IsEnabled)
-            {
-                Assert.Ignore("Firebird integration tests disabled in config. Tests ignored.");
-            }
-
             if (!System.IO.File.Exists("fbtest.fdb"))
             {
                 FbConnection.CreateDatabase(IntegrationTestOptions.Firebird.ConnectionString);
@@ -44,11 +39,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [TearDown]
         public void TearDown()
         {
-            if (!IntegrationTestOptions.Firebird.IsEnabled)
-            {
-                return;
-            }
-
             if (!Processor.WasCommitted)
                 Processor.CommitTransaction();
             Connection.Close();

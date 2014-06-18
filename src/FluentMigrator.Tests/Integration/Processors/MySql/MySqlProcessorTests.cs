@@ -20,11 +20,6 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
         [SetUp]
         public void SetUp()
         {
-            if (!IntegrationTestOptions.MySql.IsEnabled)
-            {
-                Assert.Ignore("MySql integration tests disabled in config. Tests ignored.");
-            }
-
             Connection = new MySqlConnection(IntegrationTestOptions.MySql.ConnectionString);
             Processor = new MySqlProcessor(Connection, new MySqlGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new MySqlDbFactory());
             Connection.Open();
@@ -33,11 +28,6 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
         [TearDown]
         public void TearDown()
         {
-            if (!IntegrationTestOptions.MySql.IsEnabled)
-            {
-                return;
-            }
-
             Processor.Dispose();
         }
 

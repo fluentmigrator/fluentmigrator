@@ -21,11 +21,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         [SetUp]
         public void SetUp()
         {
-            if (!IntegrationTestOptions.Postgres.IsEnabled)
-            {
-                Assert.Ignore("Postgres integration tests disabled in config. Tests ignored.");
-            }
-
             Connection = new NpgsqlConnection(IntegrationTestOptions.Postgres.ConnectionString);
             Processor = new PostgresProcessor(Connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new PostgresDbFactory());
             Quoter = new PostgresQuoter();
@@ -35,11 +30,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         [TearDown]
         public void TearDown()
         {
-            if (!IntegrationTestOptions.Postgres.IsEnabled)
-            {
-                return;
-            }
-
             Processor.CommitTransaction();
             Processor.Dispose();
         }

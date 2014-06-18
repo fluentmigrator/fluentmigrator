@@ -23,11 +23,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         [SetUp]
         public void SetUp()
         {
-            if (!IntegrationTestOptions.Oracle.IsEnabled)
-            {
-                Assert.Ignore("Oracle integration tests disabled in config. Tests ignored.");
-            }
-
             Factory = new OracleDbFactory();
             Connection = Factory.CreateConnection(IntegrationTestOptions.Oracle.ConnectionString);
             Quoter = new OracleQuoter();
@@ -38,11 +33,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
         [TearDown]
         public void TearDown()
         {
-            if (!IntegrationTestOptions.Oracle.IsEnabled)
-            {
-                return;
-            }
-
             Processor.Dispose();
         }
 
