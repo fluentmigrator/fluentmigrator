@@ -61,30 +61,33 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 				this.Processor.TableExists("testschema", table.Name).ShouldBeFalse();
 		}
 
-		[Test, Ignore("cjundt [18/06/2014] Test will always fail due to upper() function in query")]
-		public void CallingColumnExistsWithIncorrectCaseReturnsFalseIfColumnExists()
+		[Test]
+		public void CallingColumnExistsWithIncorrectCaseReturnsTrueIfColumnExists()
 		{
+			//the ColumnExisits() function is'nt case sensitive
 			using (var table = new OracleTestTable(this.Connection, null, this.Factory, "id int"))
-				this.Processor.ColumnExists(null, table.Name, "Id").ShouldBeFalse();
+				this.Processor.ColumnExists(null, table.Name, "Id").ShouldBeTrue();
 		}
 
-		[Test, Ignore("cjundt [18/06/2014] Test will always fail due to upper() function in query")]
-		public void CallingConstraintExistsWithIncorrectCaseReturnsFalseIfConstraintExists()
+		[Test]
+		public void CallingConstraintExistsWithIncorrectCaseReturnsTrueIfConstraintExists()
 		{
+			//the ConstraintExists() function is'nt case sensitive
 			using (var table = new OracleTestTable(this.Connection, null, this.Factory, "id int"))
 			{
 				table.WithUniqueConstraintOn("ID", "uc_id");
-				this.Processor.ConstraintExists(null, table.Name, "Uc_Id").ShouldBeFalse();
+				this.Processor.ConstraintExists(null, table.Name, "Uc_Id").ShouldBeTrue();
 			}
 		}
 
-		[Test, Ignore("cjundt [18/06/2014] Test will always fail due to upper() function in query")]
+		[Test]
 		public void CallingIndexExistsWithIncorrectCaseReturnsFalseIfIndexExist()
 		{
+			//the IndexExists() function is'nt case sensitive
 			using (var table = new OracleTestTable(this.Connection, null, this.Factory, "id int"))
 			{
 				table.WithIndexOn("ID", "ui_id");
-				this.Processor.IndexExists(null, table.Name, "Ui_Id").ShouldBeFalse();
+				this.Processor.IndexExists(null, table.Name, "Ui_Id").ShouldBeTrue();
 			}
 		}
 
