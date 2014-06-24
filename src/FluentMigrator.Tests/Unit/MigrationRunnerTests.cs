@@ -111,6 +111,27 @@ namespace FluentMigrator.Tests.Unit
             _fakeVersionLoader.LoadVersionInfo();
         }
 
+        [Test]
+        public void ProfilesAreAppliedWhenMigrateUpIsCalledWithNoVersion()
+        {
+            _runner.MigrateUp();
+            _profileLoaderMock.Verify(x => x.ApplyProfiles(), Times.Once());
+        }
+
+        [Test]
+        public void ProfilesAreAppliedWhenMigrateUpIsCalledWithVersionParameter()
+        {
+            _runner.MigrateUp(2009010101);
+            _profileLoaderMock.Verify(x => x.ApplyProfiles(), Times.Once());
+        }
+
+        [Test]
+        public void ProfilesAreAppliedWhenMigrateDownIsCalled()
+        {
+            _runner.MigrateDown(2009010101);
+            _profileLoaderMock.Verify(x => x.ApplyProfiles(), Times.Once());
+        }
+
         /// <summary>Unit test which ensures that the application context is correctly propagated down to each migration class.</summary>
         [Test(Description = "Ensure that the application context is correctly propagated down to each migration class.")]
         public void CanPassApplicationContext()

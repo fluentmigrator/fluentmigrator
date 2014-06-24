@@ -134,6 +134,8 @@ namespace FluentMigrator.Runner
                     ApplyMigrationUp(migrationInfo, useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
                 }
 
+                ApplyProfiles();
+
                 scope.Complete();
             }
 
@@ -174,6 +176,8 @@ namespace FluentMigrator.Runner
                 {
                     ApplyMigrationDown(migrationInfo, useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
                 }
+
+                ApplyProfiles();
 
                 scope.Complete();
             }
