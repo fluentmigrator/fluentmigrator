@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System.Collections.Generic;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Extensions;
@@ -50,6 +51,25 @@ namespace FluentMigrator.Tests.Unit.Builders.Insert
 
             expression.Rows[1][1].Key.ShouldBe("Data2");
             expression.Rows[1][1].Value.ShouldBe("Row2Data2");
+        }
+
+        [Test]
+        public void RowsGetPopulatedWhenRowWithDictionaryIsCalled()
+        {
+            var values = new Dictionary<string, object>();
+            values["Data1"] = "Row1Data1";
+            values["Data2"] = "Row1Data2";
+
+            var expression = new InsertDataExpression();
+
+            new InsertDataExpressionBuilder(expression).Row(values);
+
+            expression.Rows.Count.ShouldBe(1);
+
+            expression.Rows[0][0].Key.ShouldBe("Data1");
+            expression.Rows[0][0].Value.ShouldBe("Row1Data1");
+            expression.Rows[0][1].Key.ShouldBe("Data2");
+            expression.Rows[0][1].Value.ShouldBe("Row1Data2");
         }
 
         [Test]

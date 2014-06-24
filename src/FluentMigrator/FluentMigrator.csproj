@@ -131,6 +131,7 @@
     <Compile Include="Builders\Alter\Column\IAlterColumnOptionSyntax.cs" />
     <Compile Include="Builders\Alter\IAlterExpressionRoot.cs" />
     <Compile Include="Builders\Alter\Table\AlterTableExpressionBuilder.cs" />
+    <Compile Include="Builders\Alter\Table\IAlterTableAddColumnOrAlterColumnOrSchemaOrDescriptionSyntax.cs" />
     <Compile Include="Builders\Alter\Table\IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax.cs" />
     <Compile Include="Builders\Alter\Table\IAlterTableAddColumnOrAlterColumnOrSchemaSyntax.cs" />
     <Compile Include="Builders\Alter\Table\IAlterTableAddColumOrAlterColumnSyntax.cs" />
@@ -154,6 +155,7 @@
     <Compile Include="Builders\Create\Sequence\ICreateSequenceInSchemaSyntax.cs" />
     <Compile Include="Builders\Create\Sequence\ICreateSequenceSyntax.cs" />
     <Compile Include="Builders\Create\Table\ICreateTableColumnOptionOrForeignKeyCascadeOrWithColumnSyntax.cs" />
+    <Compile Include="Builders\Create\Table\ICreateTableWithColumnOrSchemaOrDescriptionSyntax.cs" />
     <Compile Include="Builders\Create\Table\ICreateTableWithColumnOrSchemaSyntax.cs" />
     <Compile Include="Builders\Delete\Constraint\DeleteConstraintExpressionBuilder.cs" />
     <Compile Include="Builders\Delete\Constraint\IDeleteConstraintOnTableSyntax.cs" />
@@ -180,12 +182,15 @@
     <Compile Include="Builders\IfDatabase\NullIfDatabaseProcessor.cs" />
     <Compile Include="Builders\IForeignKeyCascadeSyntax.cs" />
     <Compile Include="Builders\IInSchemaSyntax.cs" />
+    <Compile Include="Builders\Schema\Constraint\ISchemaConstraintSyntax.cs" />
+    <Compile Include="Builders\Schema\Constraint\SchemaConstraintQuery.cs" />
     <Compile Include="ExplicitUnicodeString.cs" />
     <Compile Include="Exceptions\DatabaseOperationNotSupportedException.cs" />
     <Compile Include="Exceptions\DuplicateMigrationException.cs" />
     <Compile Include="Exceptions\FluentMigratorException.cs" />
     <Compile Include="Exceptions\ProcessorFactoryNotFoundException.cs" />
     <Compile Include="Exceptions\UndeterminableConnectionException.cs" />
+    <Compile Include="Helpers\LazyLoader.cs" />
     <Compile Include="Infrastructure\Extensions\ExtensionsForIMigrationInfo.cs" />
     <Compile Include="Infrastructure\IMigrationInfo.cs" />
     <Compile Include="Infrastructure\MigrationInfo.cs" />

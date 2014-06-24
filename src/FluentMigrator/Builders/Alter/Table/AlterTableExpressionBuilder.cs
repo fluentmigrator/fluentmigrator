@@ -26,7 +26,7 @@ using FluentMigrator.Model;
 namespace FluentMigrator.Builders.Alter.Table
 {
     public class AlterTableExpressionBuilder : ExpressionBuilderWithColumnTypesBase<AlterTableExpression, IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax>,
-                                               IAlterTableAddColumnOrAlterColumnOrSchemaSyntax,
+                                               IAlterTableAddColumnOrAlterColumnOrSchemaOrDescriptionSyntax,
                                                IAlterTableColumnAsTypeSyntax,
                                                IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax
     {
@@ -59,7 +59,7 @@ namespace FluentMigrator.Builders.Alter.Table
             _context.Expressions.Add(alterSchema);
         }
 
-        public IAlterTableAddColumnOrAlterColumnSyntax WithDescription(string description)
+        public IAlterTableAddColumnOrAlterColumnOrSchemaSyntax WithDescription(string description)
         {
             Expression.TableDescription = description;
             return this;

@@ -148,5 +148,36 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"TestTable1\" ALTER COLUMN \"TestColumn1\" TO \"TestColumn2\"");
         }
+
+        [Test]
+        public virtual void CanCreateDefaultString()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpression();
+            expression.Column.Size = 0;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD \"TestColumn1\" VARCHAR(255) NOT NULL");
+        }
+
+        [Test]
+        public virtual void CanCreateSizedString()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpression();
+            expression.Column.Size = 10;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD \"TestColumn1\" VARCHAR(10) NOT NULL");
+        }
+
+        [Test]
+        public virtual void CanCreateText()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpression();
+            expression.Column.Size = 1048576;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD \"TestColumn1\" BLOB SUB_TYPE TEXT NOT NULL");
+        }
+
     }
 }

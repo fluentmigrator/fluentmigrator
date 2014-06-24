@@ -24,6 +24,7 @@ namespace FluentMigrator.Builders.Alter.Table
     {
         IAlterTableColumnAsTypeSyntax AddColumn(string name);
         IAlterTableColumnAsTypeSyntax AlterColumn(string name);
+
         void ToSchema(string name);
     }
 }

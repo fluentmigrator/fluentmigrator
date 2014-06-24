@@ -60,14 +60,11 @@ namespace FluentMigrator.Runner
         {
             var migrationInfos = new SortedList<long, IMigrationInfo>();
 
-            IEnumerable<IMigration> migrationList = FindMigrations();
+            var migrationTypes = FindMigrationTypes();
 
-            if (migrationList == null)
-                return migrationInfos;
-
-            foreach (IMigration migration in migrationList)
+            foreach (var migrationType in migrationTypes)
             {
-                IMigrationInfo migrationInfo = Conventions.GetMigrationInfo(migration);
+                IMigrationInfo migrationInfo = Conventions.GetMigrationInfo(migrationType);
                 if (migrationInfos.ContainsKey(migrationInfo.Version))
                     throw new DuplicateMigrationException(String.Format("Duplicate migration version {0}.",
                                                                         migrationInfo.Version));
@@ -77,7 +74,7 @@ namespace FluentMigrator.Runner
             return migrationInfos;
         }
 
-        private IEnumerable<IMigration> FindMigrations()
+        private IEnumerable<Type> FindMigrationTypes()
         {
             IEnumerable<Type> matchedTypes = Assembly.GetExportedTypes()
                                                      .Where(t => Conventions.TypeIsMigration(t)
@@ -97,9 +94,7 @@ namespace FluentMigrator.Runner
                 matchedTypes = matchedTypes.Where(shouldInclude);
             }
 
-            return
-                matchedTypes.Select(
-                    matchedType => (IMigration) matchedType.Assembly.CreateInstance(matchedType.FullName));
+            return matchedTypes;
         }
     }
 }

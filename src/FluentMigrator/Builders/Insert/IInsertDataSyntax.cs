@@ -16,10 +16,13 @@
 //
 #endregion
 
+using System.Collections.Generic;
+
 namespace FluentMigrator.Builders.Insert
 {
     public interface IInsertDataSyntax
     {
         IInsertDataSyntax Row(object dataAsAnonymousType);
+        IInsertDataSyntax Row(IDictionary<string, object> data);
     }
 }

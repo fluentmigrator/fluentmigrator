@@ -53,7 +53,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             SetTypeMap(DbType.Guid, "RAW(16)");
             SetTypeMap(DbType.Int16, "NUMBER(5,0)");
             SetTypeMap(DbType.Int32, "NUMBER(10,0)");
-            SetTypeMap(DbType.Int64, "NUMBER(20,0)");
+            SetTypeMap(DbType.Int64, "NUMBER(19,0)");
             SetTypeMap(DbType.Single, "FLOAT(24)");
             SetTypeMap(DbType.StringFixedLength, "NCHAR(255)");
             SetTypeMap(DbType.StringFixedLength, "NCHAR($size)", UnicodeStringCapacity);
