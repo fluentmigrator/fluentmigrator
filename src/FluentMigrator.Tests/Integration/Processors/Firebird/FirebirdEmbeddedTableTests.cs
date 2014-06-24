@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -100,7 +101,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
                 using (var connection = new FbConnection(connectionString))
                 {
-                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext);
+                    FirebirdProcessor processor;
+                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
                     runner.Up(new CreateTableMigration());
                     //---------------Assert Precondition----------------
                     connection.Open();
@@ -129,12 +131,12 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }
         }
 
-        private static MigrationRunner CreateFirebirdEmbeddedRunnerFor(FbConnection connection, RunnerContext runnerContext)
+        private static MigrationRunner CreateFirebirdEmbeddedRunnerFor(FbConnection connection, RunnerContext runnerContext, out FirebirdProcessor processor)
         {
             var announcer = new TextWriterAnnouncer(System.Console.Out);
             announcer.ShowSql = true;
             var options = FirebirdOptions.AutoCommitBehaviour();
-            var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
+            processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
                 new ProcessorOptions(), new FirebirdDbFactory(), options);
             var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
             return runner;
@@ -192,6 +194,90 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 }
             }
             return result.ToArray();
+        }
+
+        public class MigrationWhichCreatesTableWithTextBlob : Migration
+        {
+            public override void Up()
+            {
+                Create.Table("TheTable")
+                    .WithColumn("TheColumn").AsString(int.MaxValue);
+            }
+
+            public override void Down()
+            {
+            }
+        }
+
+        public class MigrationWhichRenamesTableWithTextBlob : Migration
+        {
+            public override void Up()
+            {
+                Rename.Table("TheTable").To("TheNewTable");
+            }
+
+            public override void Down()
+            {
+            }
+        }
+
+        [Test]
+        public void RenamingTable_WhenTableHasTextBlobs_ShouldCreateNewTableWithTextBlobsNotBinaryBlobs()
+        {
+            var tempResources = WriteOutFirebirdEmbeddedLibrariesToCurrentWorkingDirectory();
+            var tempFile = Path.GetTempFileName();
+            using (var deleter = new AutoDeleter(tempFile))
+            {
+                File.Delete(tempFile);  // Firebird will b0rk if it has to create a database where a file already exists
+                deleter.Add(tempResources);
+                var connectionString = GetConnectionStringToTempDatabaseAt(tempFile);
+
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                                            {
+                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
+                                            };
+
+
+                using (var connection = new FbConnection(connectionString))
+                {
+                    FirebirdProcessor processor;
+                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    runner.Up(new MigrationWhichCreatesTableWithTextBlob());
+                    //---------------Assert Precondition----------------
+                    var fieldName = "TheColumn";
+                    var tableName = "TheTable";
+                    var expectedFieldType = 261;
+                    var expectedFieldSubType = 1;
+                    AssertThatFieldHasCorrectTypeAndSubType(fieldName, tableName, connection, expectedFieldType, expectedFieldSubType);
+                    //---------------Execute Test ----------------------
+                    runner.Up(new MigrationWhichRenamesTableWithTextBlob());
+                    //---------------Test Result -----------------------
+                    tableName = "TheNewTable";
+                    AssertThatFieldHasCorrectTypeAndSubType(fieldName, tableName, connection, expectedFieldType, expectedFieldSubType);
+                }
+            }
+        }
+
+        private static void AssertThatFieldHasCorrectTypeAndSubType(string fieldName, string tableName, FbConnection connection,
+            int expectedFieldType, int expectedFieldSubType)
+        {
+            connection.Open();
+            var sql =
+                "select \"RDB$FIELD_TYPE\" fieldType, \"RDB$FIELD_SUB_TYPE\" subType from \"RDB$RELATION_FIELDS\" rf " +
+                "inner join \"RDB$FIELDS\" f on rf.\"RDB$FIELD_SOURCE\" = f.\"RDB$FIELD_NAME\" where rf.\"RDB$FIELD_NAME\" = '" +
+                fieldName + "' " +
+                "and rf.\"RDB$RELATION_NAME\" = '" + tableName + "'";
+            using (var cmd = new FbCommand(sql, connection))
+            {
+                using (var reader = cmd.ExecuteReader())
+                {
+                    Assert.IsTrue(reader.Read(), "Unable to query schema for table '" + tableName + "'");
+                    var fieldType = reader["fieldType"];
+                    var fieldSubType = reader["subType"];
+                    Assert.AreEqual(expectedFieldType, fieldType, "Field type mismatch");
+                    Assert.AreEqual(expectedFieldSubType, fieldSubType, "Field subtype mismatch");
+                }
+            }
         }
     }
 }
