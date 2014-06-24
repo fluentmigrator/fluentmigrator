@@ -26,6 +26,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
@@ -258,6 +259,7 @@ namespace FluentMigrator.Tests.Integration
                     //processor.CommitTransaction();
                 });
         }
+
 
         [Test]
         public void CanRenameTableWithSchema()
@@ -1284,6 +1286,7 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
+            Insert.IntoTable("TestTable2").Row(new {Id = 1, TestTableId = 1});
             Rename.Table("TestTable2").To("TestTable'3");
         }
     }

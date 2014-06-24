@@ -197,6 +197,12 @@
     <Compile Include="Integration\Processors\BaseTableTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdColumnTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdConstraintTests.cs" />
+    <Compile Include="Integration\Processors\Firebird\FirebirdEmbeddedLibraries.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FirebirdEmbeddedLibraries.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Integration\Processors\Firebird\FirebirdEmbeddedTableTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdIndexTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdProcessorTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdTableTests.cs" />
@@ -426,6 +432,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="FluentMigrator.snk" />
+    <None Include="Resources\aliases.conf" />
+    <None Include="Resources\firebird.conf" />
+    <None Include="Resources\firebird.msg" />
     <None Include="testscript.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -466,6 +475,10 @@
     <EmbeddedResource Include="EmbeddedResources\Embeddedtestscript.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Processors\Firebird\FirebirdEmbeddedLibraries.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>FirebirdEmbeddedLibraries.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="EmbeddedResources\DropInitialSchema.sql" />
@@ -478,6 +491,13 @@
     <EmbeddedResource Include="EmbeddedResources\B\NotUniqueResource.sql" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\fbembed.dll" />
+    <None Include="Resources\ib_util.dll" />
+    <None Include="Resources\icudt30.dll" />
+    <None Include="Resources\icuin30.dll" />
+    <None Include="Resources\icuuc30.dll" />
+    <None Include="Resources\msvcp80.dll" />
+    <None Include="Resources\msvcr80.dll" />
     <Content Include="Unit\Initialization\Fixtures\WithConnectionString.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

@@ -575,6 +575,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
             int columnCount = tableDef.Columns.Count;
             string[] columns = tableDef.Columns.Select(x => x.Name).ToArray();
             InsertDataExpression data = new InsertDataExpression();
+            data.TableName = tableDef.Name;
+            data.SchemaName = tableDef.SchemaName;
             using (DataSet ds = ReadTableData(String.Empty, expression.OldName))
             {
                 foreach (DataRow dr in ds.Tables[0].Rows)
