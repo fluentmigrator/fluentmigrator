@@ -1,4 +1,5 @@
-﻿using FirebirdSql.Data.FirebirdClient;
+﻿using System.Data;
+using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.Firebird;
@@ -14,6 +15,7 @@ using System.Reflection;
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
     [TestFixture]
+    //[Category("Integration")]
     public class FirebirdEmbeddedTableTests
     {
         public class AutoDeleter: IDisposable
@@ -165,28 +167,45 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
         private string[] WriteOutFirebirdEmbeddedLibrariesToCurrentWorkingDirectory()
         {
+            switch (Environment.OSVersion.Platform)
+            {
+		case PlatformID.Unix:
+		    return new string[] { };
+                case PlatformID.Win32NT:
+                case PlatformID.Win32S:
+                case PlatformID.Win32Windows:
+                    return WriteOutFirebirdEmbeddedLibraries();
+                default:
+                    throw new PlatformUnsupportedException(Environment.OSVersion.Platform);
+            }
+        }
+
+        private string[] WriteOutFirebirdEmbeddedLibraries()
+        {
             var result = new List<string>();
             lock (this)
             {
                 var blobs = new[]
-                {
-                    new EmbeddedLibraryResource("aliases.conf", FirebirdEmbeddedLibraries.aliases),
-                    new EmbeddedLibraryResource("fbembed.dll", FirebirdEmbeddedLibraries.fbembed),
-                    new EmbeddedLibraryResource("firebird.conf", FirebirdEmbeddedLibraries.firebird_conf),
-                    new EmbeddedLibraryResource("firebird.msg", FirebirdEmbeddedLibraries.firebird_msg),
-                    new EmbeddedLibraryResource("ib_util.dll", FirebirdEmbeddedLibraries.ib_util),
-                    new EmbeddedLibraryResource("icudt30.dll", FirebirdEmbeddedLibraries.icudt30),
-                    new EmbeddedLibraryResource("icuin30.dll", FirebirdEmbeddedLibraries.icuin30),
-                    new EmbeddedLibraryResource("icuuc30.dll", FirebirdEmbeddedLibraries.icuuc30),
-                    new EmbeddedLibraryResource("msvcp80.dll", FirebirdEmbeddedLibraries.msvcp80),
-                    new EmbeddedLibraryResource("msvcr80.dll", FirebirdEmbeddedLibraries.msvcp80)
-                };
+                            {
+                                new EmbeddedLibraryResource("aliases.conf", FirebirdEmbeddedLibrariesForWindows.aliases),
+                                new EmbeddedLibraryResource("fbembed.dll", FirebirdEmbeddedLibrariesForWindows.fbembed),
+                                new EmbeddedLibraryResource("firebird.conf", FirebirdEmbeddedLibrariesForWindows.firebird_conf),
+                                new EmbeddedLibraryResource("firebird.msg", FirebirdEmbeddedLibrariesForWindows.firebird_msg),
+                                new EmbeddedLibraryResource("ib_util.dll", FirebirdEmbeddedLibrariesForWindows.ib_util),
+                                new EmbeddedLibraryResource("icudt30.dll", FirebirdEmbeddedLibrariesForWindows.icudt30),
+                                new EmbeddedLibraryResource("icuin30.dll", FirebirdEmbeddedLibrariesForWindows.icuin30),
+                                new EmbeddedLibraryResource("icuuc30.dll", FirebirdEmbeddedLibrariesForWindows.icuuc30),
+                                new EmbeddedLibraryResource("msvcp80.dll", FirebirdEmbeddedLibrariesForWindows.msvcp80),
+                                new EmbeddedLibraryResource("msvcr80.dll", FirebirdEmbeddedLibrariesForWindows.msvcp80)
+                            };
                 foreach (var blob in blobs)
                 {
-                    if (!File.Exists(blob.Name))
+                    var path = Path.Combine(Environment.CurrentDirectory, blob.Name);
+                    if (!File.Exists(path))
                     {
-                        File.WriteAllBytes(blob.Name, blob.Data);
-                        result.Add(Path.Combine(Environment.CurrentDirectory, blob.Name));
+                        System.Console.WriteLine("-- " + path);
+                        File.WriteAllBytes(path, blob.Data);
+                        result.Add(path);
                     }
                 }
             }
@@ -275,6 +294,15 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     Assert.AreEqual(expectedFieldSubType, fieldSubType, "Field subtype mismatch");
                 }
             }
+        }
+    }
+
+    public class PlatformUnsupportedException : Exception
+    {
+        public PlatformID PlatFormID { get; private set; }
+        public PlatformUnsupportedException(PlatformID platformID): base("The current platform is not supported: " + platformID.ToString())
+        {
+            PlatFormID = platformID;
         }
     }
 }
