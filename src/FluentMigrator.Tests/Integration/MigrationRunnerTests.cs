@@ -19,16 +19,13 @@
 
 
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
-using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Expressions;
-using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.SqlServer;
@@ -43,7 +40,6 @@ using FluentMigrator.Tests.Integration.Migrations;
 using FluentMigrator.Tests.Integration.Migrations.Tagged;
 using FluentMigrator.Tests.Unit;
 using FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3;
-using FluentMigrator.Tests.Integration.Migrations.Invalid;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
