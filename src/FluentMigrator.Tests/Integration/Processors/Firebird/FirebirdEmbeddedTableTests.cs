@@ -1,4 +1,6 @@
 ﻿using System.Data;
+using System.Diagnostics;
+using System.Threading;
 using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
@@ -148,8 +150,10 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             builder.UserID = "sysdba";
             builder.Password = "masterkey";
             builder.Database = tempFile;
+            builder.Pooling = false;
             var connectionString = builder.ConnectionString;
-            FbConnection.CreateDatabase(connectionString);
+            if (!File.Exists(tempFile))
+                FbConnection.CreateDatabase(connectionString);
             return connectionString;
         }
 
@@ -271,6 +275,162 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     tableName = "TheNewTable";
                     AssertThatFieldHasCorrectTypeAndSubType(fieldName, tableName, connection, expectedFieldType, expectedFieldSubType);
                 }
+            }
+        }
+
+        public class MigrationWhichCreatesTwoRelatedTables : Migration
+        {
+            public const string ForeignKeyName = "FK_table2_table1";
+            public override void Up()
+            {
+                Create.Table("table1")
+                        .WithColumn("id").AsInt32().PrimaryKey().Identity();
+                Create.Table("table2")
+                        .WithColumn("table1_id").AsInt32();
+                Create.ForeignKey(ForeignKeyName)
+                        .FromTable("table2").ForeignColumn("table1_id")
+                        .ToTable("table1").PrimaryColumn("id"); 
+            }
+
+            public override void Down()
+            {
+            }
+        }
+
+        public class MigrationWhichAltersTableWithFK : Migration
+        {
+            public override void Up()
+            {
+                Alter.Table("table1").AddColumn("Value").AsDouble().Nullable();
+            }
+
+            public override void Down()
+            {
+            }
+        }
+
+
+
+        [Test]
+        public void AlterTable_MigrationRequiresAutomaticDelete_AndProcessorHasUndoDisabled_ShouldNotThrow()
+        {
+            // this test was originally created to investigate an issue with foreign key names but in the process,
+            // I found that FirebirdProcessor.CreateSequenceForIdentity doesn't respect FBOptions.UndoEnabled. Since
+            // Undo isn't implemented for Firebird, a migration runner always has to turn it off, but even with it off,
+            // the migrations below will fail unless CreateSequenceForIdentity is appropriately altered
+            var tempResources = WriteOutFirebirdEmbeddedLibrariesToCurrentWorkingDirectory();
+            var tempFile = Path.GetTempFileName();
+            using (var deleter = new AutoDeleter(tempFile))
+            {
+                File.Delete(tempFile);
+                deleter.Add(tempResources);
+                var connectionString = GetConnectionStringToTempDatabaseAt(tempFile);
+
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                                            {
+                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
+                                            };
+
+
+                try
+                {
+                    using (var connection = new FbConnection(connectionString))
+                    {
+                        FirebirdProcessor processor;
+                        var announcer = new TextWriterAnnouncer(System.Console.Out);
+                        announcer.ShowSql = true;
+                        var options = FirebirdOptions.AutoCommitBehaviour();
+                        options.TruncateLongNames = false;
+                        processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
+                            new ProcessorOptions(), new FirebirdDbFactory(), options);
+                        processor.FBOptions.UndoEnabled = false;
+                        var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
+                        runner.Up(new MigrationWhichCreatesTwoRelatedTables());
+                        processor.CommitTransaction();
+                        FbConnection.ClearPool(connection);
+                    }
+                    //---------------Assert Precondition----------------
+                    Assert.IsTrue(ForeignKeyExists(connectionString, MigrationWhichCreatesTwoRelatedTables.ForeignKeyName),
+                        "Foreign key does not exist after first migration");
+                    using (var connection = new FbConnection(connectionString))
+                    {
+                        FirebirdProcessor processor;
+                        var announcer = new TextWriterAnnouncer(System.Console.Out);
+                        announcer.ShowSql = true;
+                        var options = FirebirdOptions.AutoCommitBehaviour();
+                        processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
+                            new ProcessorOptions(), new FirebirdDbFactory(), options);
+                        processor.FBOptions.UndoEnabled = false;
+                        var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
+                        runner.Up(new MigrationWhichAltersTableWithFK());
+                        processor.CommitTransaction();
+
+                    }
+                    Assert.IsTrue(ForeignKeyExists(connectionString, MigrationWhichCreatesTwoRelatedTables.ForeignKeyName),
+                        "Foreign key does not exist after second migration");
+
+                }
+                catch (Exception ex)
+                {
+                    try { File.Copy(tempFile, "C:\\tmp\\fm_tests.fdb", true); }
+                    catch { }
+                    throw ex;
+
+                }
+            }
+        }
+
+        private bool ForeignKeyExists(string connectionString, string withName)
+        {
+            using (var connection = new FbConnection(connectionString))
+            {
+                connection.Open();
+                var keyQuery = String.Format(@"
+SELECT rc.RDB$CONSTRAINT_NAME AS constraint_name,
+i.RDB$RELATION_NAME AS table_name,
+s.RDB$FIELD_NAME AS field_name,
+i.RDB$DESCRIPTION AS description,
+rc.RDB$DEFERRABLE AS is_deferrable,
+rc.RDB$INITIALLY_DEFERRED AS is_deferred,
+refc.RDB$UPDATE_RULE AS on_update,
+refc.RDB$DELETE_RULE AS on_delete,
+refc.RDB$MATCH_OPTION AS match_type,
+i2.RDB$RELATION_NAME AS references_table,
+s2.RDB$FIELD_NAME AS references_field,
+(s.RDB$FIELD_POSITION + 1) AS field_position
+FROM RDB$INDEX_SEGMENTS s
+LEFT JOIN RDB$INDICES i ON i.RDB$INDEX_NAME = s.RDB$INDEX_NAME
+LEFT JOIN RDB$RELATION_CONSTRAINTS rc ON rc.RDB$INDEX_NAME = s.RDB$INDEX_NAME
+LEFT JOIN RDB$REF_CONSTRAINTS refc ON rc.RDB$CONSTRAINT_NAME = refc.RDB$CONSTRAINT_NAME
+LEFT JOIN RDB$RELATION_CONSTRAINTS rc2 ON rc2.RDB$CONSTRAINT_NAME = refc.RDB$CONST_NAME_UQ
+LEFT JOIN RDB$INDICES i2 ON i2.RDB$INDEX_NAME = rc2.RDB$INDEX_NAME
+LEFT JOIN RDB$INDEX_SEGMENTS s2 ON i2.RDB$INDEX_NAME = s2.RDB$INDEX_NAME
+WHERE rc.RDB$CONSTRAINT_TYPE = 'FOREIGN KEY'
+ORDER BY s.RDB$FIELD_POSITION", MigrationWhichCreatesTwoRelatedTables.ForeignKeyName);
+                var cmd = connection.CreateCommand();
+                cmd.CommandText = keyQuery;
+                var result = false;
+                using (var rdr = cmd.ExecuteReader())
+                {
+                    while (rdr.Read())
+                    {
+                        try
+                        {
+                            var constraintName = rdr["CONSTRAINT_NAME"];
+                            if (constraintName == null) continue;
+                            if (constraintName is DBNull) continue;
+                            if (constraintName.ToString().Trim() == withName)
+                            {
+                                result = true;
+                                break;
+                            }
+                        }
+                        catch { }
+                    }
+                }
+                connection.Close();
+                FbConnection.ClearPool(connection);
+                return result;
             }
         }
 

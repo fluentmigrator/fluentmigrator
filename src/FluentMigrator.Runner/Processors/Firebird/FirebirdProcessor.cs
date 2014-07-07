@@ -861,7 +861,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
             PerformDBOperationExpression createTrigger = CreateTriggerExpression(tableName, triggerName, true, TriggerEvent.Insert, trigger);
             PerformDBOperationExpression deleteTrigger = DeleteTriggerExpression(tableName, triggerName);
             FirebirdProcessedExpressionBase fbExpression = new FirebirdProcessedExpression(createTrigger, typeof(PerformDBOperationExpression), this);
-            fbExpression.AddUndoExpression(deleteTrigger);
+            if (this.FBOptions.UndoEnabled)
+                fbExpression.AddUndoExpression(deleteTrigger);
             RegisterExpression(fbExpression);
             Process(createTrigger);
         }
