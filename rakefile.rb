@@ -54,6 +54,7 @@ namespace :build do
         cp_r FileList['src/FluentMigrator.Console/bin/Release/*'].exclude('src/FluentMigrator.Console/bin/Release/SQLServerCENative'), "dist/console-#{v}-#{p}"
         cp_r FileList['src/FluentMigrator.Nant/bin/Release/FluentMigrator.Nant.*'], "dist/console-#{v}-#{p}"
         cp_r FileList['src/FluentMigrator.MSBuild/bin/Release/FluentMigrator.MSBuild.*'], "dist/console-#{v}-#{p}"
+		cp_r FileList['src/FluentMigrator.InProc/bin/Release/FluentMigrator.InProc.*'], "dist/console-#{v}-#{p}"
 		
         if to_nuget_version(v) == '35' then 
           File.delete("dist/console-#{v}-#{p}/Migrate.exe.config")
