@@ -18,7 +18,7 @@
 
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Oracle;
-using FluentMigrator.Runner.Processors.Sqlite;
+using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using NUnit.Framework;
 

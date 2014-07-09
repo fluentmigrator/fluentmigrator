@@ -238,7 +238,7 @@
     <Compile Include="Processors\IDbFactory.cs" />
     <Compile Include="Processors\DbFactoryBase.cs" />
     <Compile Include="Processors\ReflectionBasedDbFactory.cs" />
-    <Compile Include="Processors\Sqlite\SqliteDbFactory.cs" />
+    <Compile Include="Processors\SQLite\SqliteDbFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2000Processor.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2012ProcessorFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServerCeDbFactory.cs" />
@@ -252,9 +252,9 @@
     <Compile Include="Processors\IMigrationProcessorFactory.cs" />
     <Compile Include="MigrationRunner.cs" />
     <Compile Include="Generators\SQLite\SqliteGenerator.cs" />
-    <Compile Include="Processors\Sqlite\SqliteProcessorFactory.cs" />
+    <Compile Include="Processors\SQLite\SqliteProcessorFactory.cs" />
     <Compile Include="Processors\ProcessorBase.cs" />
-    <Compile Include="Processors\Sqlite\SqliteProcessor.cs" />
+    <Compile Include="Processors\SQLite\SqliteProcessor.cs" />
     <Compile Include="Processors\SqlServer\SqlServerProcessor.cs" />
     <Compile Include="ProfileLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

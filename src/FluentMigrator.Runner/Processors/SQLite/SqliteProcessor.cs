@@ -22,7 +22,7 @@ using System.Data;
 using System.Data.Common;
 using FluentMigrator.Builders.Execute;
 
-namespace FluentMigrator.Runner.Processors.Sqlite
+namespace FluentMigrator.Runner.Processors.SQLite
 {
 
     public class SqliteProcessor : GenericProcessorBase
