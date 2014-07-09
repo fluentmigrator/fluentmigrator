@@ -34,8 +34,8 @@ def prepare_lib(version)
   copy_files "./dist/console-#{version}-AnyCPU/", output_directory_lib, 'FluentMigrator', ['dll', 'pdb', 'xml'] 
 end
 
-def prepare_runners(version)
-  output_directory_lib = "./packages/FluentMigrator.Runners/lib/#{to_nuget_version(version)}/"
+def prepare_runner(version)
+  output_directory_lib = "./packages/FluentMigrator.Runner/lib/#{to_nuget_version(version)}/"
   FileUtils.mkdir_p output_directory_lib
   copy_files "./dist/console-#{version}-AnyCPU/", output_directory_lib, 'FluentMigrator.Runner', ['dll', 'pdb'] 
 end
@@ -73,8 +73,8 @@ namespace :nuget do
 	
     FileUtils.rm_rf './packages/FluentMigrator.Tools/tools/'
 	
-	FileUtils.rm_rf './packages/FluentMigrator.Runners/tools/'
-    FileUtils.rm_rf './packages/FluentMigratorRunners/lib/'
+	FileUtils.rm_rf './packages/FluentMigrator.Runner/tools/'
+    FileUtils.rm_rf './packages/FluentMigratorRunner/lib/'
   end
   
   desc "create the FluentMigrator nuspec file"
@@ -112,21 +112,21 @@ namespace :nuget do
 	 nuspec.dependency "FluentMigrator", new_version
   end
   
-  desc "create the FluentMigrator Runners nuspec file"
+  desc "create the FluentMigrator Runner nuspec file"
   nuspec :create_runner_spec do |nuspec|
      version = "#{ENV['version']}"
      new_version = version.length == 7 ? version : FLUENTMIGRATOR_VERSION
-     nuspec.id = "FluentMigrator.Runners"
+     nuspec.id = "FluentMigrator.Runner"
      nuspec.version = new_version
      nuspec.authors = "Josh Coffman"
      nuspec.owners = "Sean Chambers"
      nuspec.description = "FluentMigrator is a database migration framework for .NET written in C#. The basic idea is that you can create migrations which are simply classes that derive from the Migration base class and have a Migration attribute with a unique version number attached to them. Upon executing FluentMigrator, you tell it which version to migrate to and it will run all necessary migrations in order to bring your database up to that version.
   In addition to forward migration support, FluentMigrator also supports different ways to execute the migrations along with selective migrations called profiles and executing arbitrary SQL."
-     nuspec.title = "Fluent Migrator Runners"
+     nuspec.title = "Fluent Migrator Runner"
      nuspec.language = "en-US"
      nuspec.projectUrl = "https://github.com/schambers/fluentmigrator/wiki/"
-     nuspec.working_directory = "packages/FluentMigrator.Runners"
-     nuspec.output_file = "FluentMigrator.Runners.nuspec"
+     nuspec.working_directory = "packages/FluentMigrator.Runner"
+     nuspec.output_file = "FluentMigrator.Runner.nuspec"
 	 nuspec.dependency "FluentMigrator", new_version
   end
 
@@ -137,7 +137,7 @@ namespace :nuget do
     
     @versions.each do |v|
       prepare_lib v
-	  prepare_runners v
+	    prepare_runner v
     end
     
     prepare_tools
@@ -149,7 +149,7 @@ namespace :nuget do
   task :package => :prepare_package do
     nuget_pack('packages/FluentMigrator/', 'packages/FluentMigrator/FluentMigrator.nuspec')
     nuget_pack('packages/FluentMigrator.Tools/', 'packages/FluentMigrator.Tools/FluentMigrator.Tools.nuspec')   
-	nuget_pack('packages/FluentMigrator.Runners/', 'packages/FluentMigrator.Runners/FluentMigrator.Runners.nuspec')   
+	  nuget_pack('packages/FluentMigrator.Runner/', 'packages/FluentMigrator.Runner/FluentMigrator.Runner.nuspec')   
   end
   
   def nuget_pack(base_folder, nuspec_path)
