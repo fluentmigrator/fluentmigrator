@@ -727,13 +727,20 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         #region DML expressions
 
+
         public override void Process(Expressions.InsertDataExpression expression)
         {
             truncator.Truncate(expression);
             CheckTable(expression.TableName);
             expression.Rows.ForEach(x => x.ForEach(y => CheckColumn(expression.TableName, y.Key)));
             RegisterExpression(expression, typeof(InsertDataExpression));
-            InternalProcess(Generator.Generate(expression));
+            var subExpression = new InsertDataExpression() { SchemaName = expression.SchemaName, TableName = expression.TableName };
+            foreach (var row in expression.Rows)
+            {
+                subExpression.Rows.Clear();
+                subExpression.Rows.Add(row);
+                InternalProcess(Generator.Generate(subExpression));
+            }
         }
 
         public override void Process(Expressions.DeleteDataExpression expression)
@@ -741,7 +748,25 @@ namespace FluentMigrator.Runner.Processors.Firebird
             truncator.Truncate(expression);
             CheckTable(expression.TableName);
             RegisterExpression(expression, typeof(DeleteDataExpression));
-            InternalProcess(Generator.Generate(expression));
+            var subExpression = new DeleteDataExpression()
+            {
+                SchemaName = expression.SchemaName,
+                TableName = expression.TableName,
+                IsAllRows = expression.IsAllRows
+            };
+            if (expression.IsAllRows)
+            {
+                InternalProcess(Generator.Generate(expression));
+            }
+            else
+            {
+                foreach (var row in expression.Rows)
+                {
+                    subExpression.Rows.Clear();
+                    subExpression.Rows.Add(row);
+                    InternalProcess(Generator.Generate(subExpression));
+                }
+            }
         }
 
         public override void Process(Expressions.UpdateDataExpression expression)
@@ -751,6 +776,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             RegisterExpression<UpdateDataExpression>(expression);
             InternalProcess(Generator.Generate(expression));
         }
+
 
         #endregion
 
@@ -764,8 +790,6 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            //RegisterExpression<PerformDBOperationExpression>(expression);
-
             Announcer.Say("Performing DB Operation");
 
             if (Options.PreviewOnly)

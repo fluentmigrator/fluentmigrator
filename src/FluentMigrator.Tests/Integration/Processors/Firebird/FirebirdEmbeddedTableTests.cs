@@ -1,5 +1,6 @@
 ﻿using System.Data;
 using System.Diagnostics;
+using System.Linq;
 using System.Threading;
 using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Runner;
@@ -17,11 +18,11 @@ using System.Reflection;
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
     [TestFixture]
-    //[Category("Integration")]
     public class FirebirdEmbeddedTableTests
     {
         public class AutoDeleter: IDisposable
         {
+            public IEnumerable<string> FileNames { get { return _fileNames; } }
             private List<string> _fileNames;
 
             public AutoDeleter(params string[] fileNames)
@@ -61,12 +62,31 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             {
                 Create.Table("TheTable")
                     .WithColumn("Id").AsInt32().PrimaryKey()
-                    .WithColumn("Name").AsString(100).Nullable();
-                Insert.IntoTable("TheTable").Row(new {Id = 1});
+                    .WithColumn("Name").AsString(100).Nullable()
+                    .WithColumn("SomeValue").AsInt32().Nullable();
             }
 
             public override void Down()
             {
+            }
+        }
+
+        public class AddDataMigration : Migration
+        {
+            private readonly int _id;
+
+            public AddDataMigration(int id = 1)
+            {
+                _id = id;
+            }
+            public override void Up()
+            {
+                Insert.IntoTable("TheTable").Row(new { Id = _id, SomeValue = _id });
+            }
+
+            public override void Down()
+            {
+                Delete.FromTable("TheTable").Row(new { Id = _id });
             }
         }
 
@@ -105,6 +125,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     FirebirdProcessor processor;
                     var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
                     runner.Up(new CreateTableMigration());
+                    runner.Up(new AddDataMigration());
                     //---------------Assert Precondition----------------
                     connection.Open();
                     using (var cmd = new FbCommand("select * from \"TheTable\"", connection))
@@ -129,6 +150,470 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     //---------------Test Result -----------------------
                     Assert.IsNull(thrown);
                 }
+            }
+        }
+
+        [Test]
+        public void RenameTable_WhenOriginalTableContainsMultipleRows_ShouldNotFailToMigrate()
+        {
+            //---------------Set up test pack-------------------
+            var tempResources = WriteOutFirebirdEmbeddedLibrariesToCurrentWorkingDirectory();
+            var tempFile = Path.GetTempFileName();
+            using (var deleter = new AutoDeleter(tempFile))
+            {
+                File.Delete(tempFile);  // Firebird will b0rk if it has to create a database where a file already exists
+                deleter.Add(tempResources);
+                var connectionString = GetConnectionStringToTempDatabaseAt(tempFile);
+
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                                            {
+                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
+                                            };
+
+
+                using (var connection = new FbConnection(connectionString))
+                {
+                    FirebirdProcessor processor;
+                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    runner.Up(new CreateTableMigration());
+                    runner.Up(new AddDataMigration(1));
+                    runner.Up(new AddDataMigration(2));
+                    runner.Up(new AddDataMigration(3));
+                    //---------------Assert Precondition----------------
+                    connection.Open();
+                    using (var cmd = new FbCommand("select count(*) as \"TheCount\" from \"TheTable\"", connection))
+                    {
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            Assert.IsTrue(reader.Read());
+                            Assert.AreEqual(3, Convert.ToInt32(reader["TheCount"]));
+                        }
+                    }
+                    //---------------Execute Test ----------------------
+                    Exception thrown = null;
+                    try
+                    {
+                        runner.Up(new RenameTableMigration());
+                    }
+                    catch (Exception ex)
+                    {
+                        thrown = ex;
+                    }
+
+                    //---------------Test Result -----------------------
+                    Assert.IsNull(thrown);
+                }
+            }
+        }
+
+        private AutoDeleter GetFreshTempFileForDB()
+        {
+            var tempResources = WriteOutFirebirdEmbeddedLibraries();
+            var tempFile = Path.GetTempFileName();
+            var deleter = new AutoDeleter(tempFile);
+            File.Delete(tempFile);
+            deleter.Add(tempResources);
+            return deleter;
+        }
+
+        private class DeleteDataMigration : Migration
+        {
+            private int[] _ids;
+
+            public DeleteDataMigration(params int[] forIds)
+            {
+                _ids = forIds;
+            }
+            public override void Up()
+            {
+                var start = Delete.FromTable("TheTable").Row(new { Id = _ids.First() });
+                foreach (var id in _ids.Skip(1))
+                    start.Row(new { Id = id });
+            }
+
+            public override void Down()
+            {
+            }
+        }
+
+        [Test]
+        public void OneMigrationWithOneDelete_ShouldDeleteAffectedRow()
+        {
+            //---------------Set up test pack-------------------
+            using (var deleter = GetFreshTempFileForDB())
+            {
+                var connectionString = GetConnectionStringToTempDatabaseAt(deleter.FileNames.First());
+
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                                            {
+                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
+                                            };
+
+
+                using (var connection = new FbConnection(connectionString))
+                {
+                    FirebirdProcessor processor;
+                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    runner.Up(new CreateTableMigration());
+                    runner.Up(new AddDataMigration(1));
+                    runner.Up(new AddDataMigration(2));
+                    runner.Up(new AddDataMigration(3));
+                    //---------------Assert Precondition----------------
+                    connection.Open();
+                    const string countSql = "select count(*) as \"TheCount\" from \"TheTable\"";
+                    using (var cmd = new FbCommand(countSql, connection))
+                    {
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            Assert.IsTrue(reader.Read());
+                            Assert.AreEqual(3, Convert.ToInt32(reader["TheCount"]));
+                        }
+                    }
+                    //---------------Execute Test ----------------------
+                    Exception thrown = null;
+                    try
+                    {
+                        runner.Up(new DeleteDataMigration(1));
+                        processor.CommitTransaction();
+                        using (var cmd = new FbCommand(countSql, connection))
+                        {
+                            connection.Open();
+                            using (var reader = cmd.ExecuteReader())
+                            {
+                                Assert.IsTrue(reader.Read());
+                                Assert.AreEqual(2, Convert.ToInt32(reader["TheCount"]));
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        thrown = ex;
+                    }
+
+
+                    //---------------Test Result -----------------------
+                    Assert.IsNull(thrown);
+                }
+            }
+        }
+
+        [Test]
+        public void OneMigrationWithMultipleDeletes_ShouldDeleteAffectedRow()
+        {
+            //---------------Set up test pack-------------------
+            using (var deleter = GetFreshTempFileForDB())
+            {
+                var connectionString = GetConnectionStringToTempDatabaseAt(deleter.FileNames.First());
+
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                                            {
+                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
+                                            };
+
+
+                using (var connection = new FbConnection(connectionString))
+                {
+                    FirebirdProcessor processor;
+                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    runner.Up(new CreateTableMigration());
+                    runner.Up(new AddDataMigration(1));
+                    runner.Up(new AddDataMigration(2));
+                    runner.Up(new AddDataMigration(3));
+                    //---------------Assert Precondition----------------
+                    connection.Open();
+                    const string countSql = "select count(*) as \"TheCount\" from \"TheTable\"";
+                    using (var cmd = new FbCommand(countSql, connection))
+                    {
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            Assert.IsTrue(reader.Read());
+                            Assert.AreEqual(3, Convert.ToInt32(reader["TheCount"]));
+                        }
+                    }
+                    //---------------Execute Test ----------------------
+                    Exception thrown = null;
+                    try
+                    {
+                        runner.Up(new DeleteDataMigration(1, 2));
+                        processor.CommitTransaction();
+                        using (var cmd = new FbCommand(countSql, connection))
+                        {
+                            connection.Open();
+                            using (var reader = cmd.ExecuteReader())
+                            {
+                                Assert.IsTrue(reader.Read());
+                                Assert.AreEqual(1, Convert.ToInt32(reader["TheCount"]));
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        thrown = ex;
+                    }
+
+
+                    //---------------Test Result -----------------------
+                    Assert.IsNull(thrown);
+                }
+            }
+        }
+
+        private class DeleteAllRowsMigration : Migration
+        {
+            public override void Up()
+            {
+                Delete.FromTable("TheTable").AllRows();
+            }
+
+            public override void Down()
+            {
+            }
+        }
+        
+        [Test]
+        public void MigrationWithcAllRowsDelete_ShouldDeleteAllRows()
+        {
+            //---------------Set up test pack-------------------
+            using (var deleter = GetFreshTempFileForDB())
+            {
+                var connectionString = GetConnectionStringToTempDatabaseAt(deleter.FileNames.First());
+
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                                            {
+                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
+                                            };
+
+
+                using (var connection = new FbConnection(connectionString))
+                {
+                    FirebirdProcessor processor;
+                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    runner.Up(new CreateTableMigration());
+                    runner.Up(new AddDataMigration(1));
+                    runner.Up(new AddDataMigration(2));
+                    runner.Up(new AddDataMigration(3));
+                    //---------------Assert Precondition----------------
+                    connection.Open();
+                    const string countSql = "select count(*) as \"TheCount\" from \"TheTable\"";
+                    using (var cmd = new FbCommand(countSql, connection))
+                    {
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            Assert.IsTrue(reader.Read());
+                            Assert.AreEqual(3, Convert.ToInt32(reader["TheCount"]));
+                        }
+                    }
+                    //---------------Execute Test ----------------------
+                    Exception thrown = null;
+                    try
+                    {
+                        runner.Up(new DeleteAllRowsMigration());
+                        processor.CommitTransaction();
+                        using (var cmd = new FbCommand(countSql, connection))
+                        {
+                            connection.Open();
+                            using (var reader = cmd.ExecuteReader())
+                            {
+                                Assert.IsTrue(reader.Read());
+                                Assert.AreEqual(0, Convert.ToInt32(reader["TheCount"]));
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        thrown = ex;
+                    }
+
+
+                    //---------------Test Result -----------------------
+                    Assert.IsNull(thrown);
+                }
+            }
+        }
+
+        [Test]
+        public void OneMigrationWithOneSpecificUpdate_ShouldUpdateAffectedRow()
+        {
+            //---------------Set up test pack-------------------
+            using (var deleter = GetFreshTempFileForDB())
+            {
+                var connectionString = GetConnectionStringToTempDatabaseAt(deleter.FileNames.First());
+
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                                            {
+                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
+                                            };
+
+
+                using (var connection = new FbConnection(connectionString))
+                {
+                    FirebirdProcessor processor;
+                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    runner.Up(new CreateTableMigration());
+                    runner.Up(new AddDataMigration(1));
+                    runner.Up(new AddDataMigration(2));
+                    runner.Up(new AddDataMigration(3));
+                    //---------------Assert Precondition----------------
+                    connection.Open();
+                    const string countSql = "select count(*) as \"TheCount\" from \"TheTable\" where \"Id\" = {0}";
+                    Assert.AreEqual(1, CountRowsWith(countSql, 1, connection));
+                    //---------------Execute Test ----------------------
+                    Exception thrown = null;
+                    try
+                    {
+                        runner.Up(new UpdateMigration(4, 1));
+                        processor.CommitTransaction();
+                        Assert.AreEqual(1, CountRowsWith(countSql, 4, connection));
+                    }
+                    catch (Exception ex)
+                    {
+                        thrown = ex;
+                    }
+
+
+                    //---------------Test Result -----------------------
+                    Assert.IsNull(thrown);
+                }
+            }
+        }
+
+        [Test]
+        public void TwoMigrationsWithSpecificUpdates_ShouldUpdateAffectedRows()
+        {
+            //---------------Set up test pack-------------------
+            using (var deleter = GetFreshTempFileForDB())
+            {
+                var connectionString = GetConnectionStringToTempDatabaseAt(deleter.FileNames.First());
+
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                                            {
+                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
+                                            };
+
+
+                using (var connection = new FbConnection(connectionString))
+                {
+                    FirebirdProcessor processor;
+                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    runner.Up(new CreateTableMigration());
+                    runner.Up(new AddDataMigration(1));
+                    runner.Up(new AddDataMigration(2));
+                    runner.Up(new AddDataMigration(3));
+                    //---------------Assert Precondition----------------
+                    connection.Open();
+                    const string countSql = "select count(*) as \"TheCount\" from \"TheTable\" where \"Id\" = {0}";
+                    using (var cmd = new FbCommand(String.Format(countSql, 1), connection))
+                    {
+                        using (var reader = cmd.ExecuteReader())
+                        {
+                            Assert.IsTrue(reader.Read());
+                            Assert.AreEqual(1, Convert.ToInt32(reader["TheCount"]));
+                        }
+                    }
+                    //---------------Execute Test ----------------------
+                    Exception thrown = null;
+                    try
+                    {
+                        runner.Up(new UpdateMigration(4, 1));
+                        runner.Up(new UpdateMigration(5, 2));
+                        processor.CommitTransaction();
+                        Assert.AreEqual(1, CountRowsWith(countSql, 4, connection));
+                        Assert.AreEqual(1, CountRowsWith(countSql, 5, connection));
+                    }
+                    catch (Exception ex)
+                    {
+                        thrown = ex;
+                    }
+
+
+                    //---------------Test Result -----------------------
+                    Assert.IsNull(thrown);
+                }
+            }
+        }
+
+        [Test]
+        public void OneMigrationWithOneBlanketUpdate_ShouldUpdateAffectedRow()
+        {
+            //---------------Set up test pack-------------------
+            using (var deleter = GetFreshTempFileForDB())
+            {
+                var connectionString = GetConnectionStringToTempDatabaseAt(deleter.FileNames.First());
+
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                                            {
+                                                Namespace = "FluentMigrator.Tests.Integration.Migrations"
+                                            };
+
+
+                using (var connection = new FbConnection(connectionString))
+                {
+                    FirebirdProcessor processor;
+                    var runner = CreateFirebirdEmbeddedRunnerFor(connection, runnerContext, out processor);
+                    runner.Up(new CreateTableMigration());
+                    runner.Up(new AddDataMigration(1));
+                    runner.Up(new AddDataMigration(2));
+                    runner.Up(new AddDataMigration(3));
+                    //---------------Assert Precondition----------------
+                    connection.Open();
+                    const string countSql = "select count(*) as \"TheCount\" from \"TheTable\" where \"SomeValue\" = {0}";
+                    Assert.AreEqual(1, CountRowsWith(countSql, 1, connection));
+                    Assert.AreEqual(1, CountRowsWith(countSql, 2, connection));
+                    Assert.AreEqual(1, CountRowsWith(countSql, 3, connection));
+                    //---------------Execute Test ----------------------
+                    Exception thrown = null;
+                    try
+                    {
+                        runner.Up(new UpdateMigration(4));
+                        processor.CommitTransaction();
+                        Assert.AreEqual(3, CountRowsWith(countSql, 4, connection));
+                    }
+                    catch (Exception ex)
+                    {
+                        thrown = ex;
+                    }
+
+
+                    //---------------Test Result -----------------------
+                    Assert.IsNull(thrown);
+                }
+            }
+        }
+
+        private static int CountRowsWith(string countSql, int toCheck, FbConnection connection)
+        {
+            using (var cmd = new FbCommand(string.Format(countSql, toCheck), connection))
+            {
+                if (connection.State != ConnectionState.Open)
+                    connection.Open();
+                using (var reader = cmd.ExecuteReader())
+                {
+                    Assert.IsTrue(reader.Read());
+                    return Convert.ToInt32(reader["TheCount"]);
+                }
+            }
+        }
+
+        private class UpdateMigration : Migration
+        {
+            private int? _from;
+            private int _to;
+
+            public UpdateMigration(int to, int? from = null)
+            {
+                _from = from;
+                _to = to;
+            }
+            public override void Up()
+            {
+                if (_from.HasValue)
+                    Update.Table("TheTable").Set(new { Id = _to, Name = "foo" }).Where(new { Id = _from.Value });
+                else
+                    Update.Table("TheTable").Set(new { SomeValue = _to }).AllRows();
+            }
+
+            public override void Down()
+            {
             }
         }
 
