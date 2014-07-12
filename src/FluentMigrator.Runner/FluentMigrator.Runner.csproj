@@ -133,6 +133,7 @@
     <Compile Include="Announcers\NullAnnouncer.cs" />
     <Compile Include="Announcers\ConsoleAnnouncer.cs" />
     <Compile Include="Announcers\TextWriterAnnouncer.cs" />
+    <Compile Include="Announcers\TextWriterWithGoAnnouncer.cs" />
     <Compile Include="CompatabilityMode.cs" />
     <Compile Include="Extensions\SqlServerExtensions.cs" />
     <Compile Include="Extensions\TagsExtensions.cs" />
