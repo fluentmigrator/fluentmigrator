@@ -147,6 +147,7 @@ namespace :nuget do
   end
 
   task :package => :prepare_package do
+    FileUtils.mkdir_p 'nuget/'
     nuget_pack('packages/FluentMigrator/', 'packages/FluentMigrator/FluentMigrator.nuspec')
     nuget_pack('packages/FluentMigrator.Tools/', 'packages/FluentMigrator.Tools/FluentMigrator.Tools.nuspec')   
 	  nuget_pack('packages/FluentMigrator.Runner/', 'packages/FluentMigrator.Runner/FluentMigrator.Runner.nuspec')   
