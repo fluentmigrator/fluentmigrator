@@ -165,6 +165,7 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="Helpers\Db2TestTable.cs" />
     <Compile Include="Helpers\FirebirdTestTable.cs" />
     <Compile Include="Helpers\JetTestTable.cs" />
     <Compile Include="Helpers\OracleTestTable.cs" />
@@ -207,6 +208,12 @@
     <Compile Include="Integration\Processors\BaseSchemaTests.cs" />
     <Compile Include="Integration\Processors\BaseSequenceTests.cs" />
     <Compile Include="Integration\Processors\BaseTableTests.cs" />
+    <Compile Include="Integration\Processors\Db2\Db2ColumnTests.cs" />
+    <Compile Include="Integration\Processors\Db2\Db2ConstraintTests.cs" />
+    <Compile Include="Integration\Processors\Db2\Db2IndexTests.cs" />
+    <Compile Include="Integration\Processors\Db2\Db2ProcessorTests.cs" />
+    <Compile Include="Integration\Processors\Db2\Db2SchemaTests.cs" />
+    <Compile Include="Integration\Processors\Db2\Db2TableTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdColumnTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdConstraintTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdEmbeddedLibrariesForWindows.Designer.cs">
