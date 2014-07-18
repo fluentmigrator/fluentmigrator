@@ -340,6 +340,14 @@
     <Compile Include="Unit\Generators\BaseSequenceTests.cs" />
     <Compile Include="Unit\Generators\BaseSqlServerClusteredTests.cs" />
     <Compile Include="Unit\Generators\BaseTableTests.cs" />
+    <Compile Include="Unit\Generators\Db2\Db2ColumnTests.cs" />
+    <Compile Include="Unit\Generators\Db2\Db2ConstraintTests.cs" />
+    <Compile Include="Unit\Generators\Db2\Db2DataTests.cs" />
+    <Compile Include="Unit\Generators\Db2\Db2GeneratorTests.cs" />
+    <Compile Include="Unit\Generators\Db2\Db2IndexTests.cs" />
+    <Compile Include="Unit\Generators\Db2\Db2SchemaTests.cs" />
+    <Compile Include="Unit\Generators\Db2\Db2SequenceTests.cs" />
+    <Compile Include="Unit\Generators\Db2\Db2TableTests.cs" />
     <Compile Include="Unit\Generators\Firebird\FirebirdColumnTests.cs" />
     <Compile Include="Unit\Generators\Firebird\FirebirdConstraintsTests.cs" />
     <Compile Include="Unit\Generators\Firebird\FirebirdDataTests.cs" />
