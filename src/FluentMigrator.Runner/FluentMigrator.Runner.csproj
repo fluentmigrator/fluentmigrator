@@ -140,6 +140,10 @@
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Generators\Base\ColumnBase.cs" />
     <Compile Include="Extensions\CompatabilityModeExtension.cs" />
+    <Compile Include="Generators\Db2\Db2Column.cs" />
+    <Compile Include="Generators\Db2\Db2Generator.cs" />
+    <Compile Include="Generators\Db2\Db2Quoter.cs" />
+    <Compile Include="Generators\Db2\Db2TypeMap.cs" />
     <Compile Include="Generators\EmptyDescriptionGenerator.cs" />
     <Compile Include="Generators\Firebird\FirebirdColumn.cs" />
     <Compile Include="Generators\Firebird\FirebirdGenerator.cs" />
