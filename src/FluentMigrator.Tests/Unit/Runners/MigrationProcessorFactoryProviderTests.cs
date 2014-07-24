@@ -17,6 +17,7 @@
 #endregion
 
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.DotConnectOracle;
 using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
@@ -89,6 +90,13 @@ namespace FluentMigrator.Tests.Unit.Runners
         {
             IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("Oracle");
             Assert.IsTrue(factory.GetType() == typeof(OracleProcessorFactory));
+        }
+
+        [Test]
+        public void CanRetrieveDotConnectOracleFactoryWithArgumentString()
+        {
+            IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("DotConnectOracle");
+            Assert.IsTrue(factory.GetType() == typeof(DotConnectOracleProcessorFactory));
         }
     }
 }
