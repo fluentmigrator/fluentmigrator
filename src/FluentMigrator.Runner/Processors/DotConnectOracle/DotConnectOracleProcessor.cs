@@ -123,15 +123,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
 
         public override void Execute(string template, params object[] args)
         {
-            if (template == null)
-                throw new ArgumentNullException("template");
-
-            EnsureConnectionIsOpen();
-
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
-            {
-                command.ExecuteNonQuery();
-            }
+            Process(string.Format(template, args));
         }
 
         public override bool Exists(string template, params object[] args)
@@ -192,8 +184,11 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(sql, Connection))
-                command.ExecuteNonQuery();
+            var oracleScript = AppDomain.CurrentDomain.CreateInstanceAndUnwrap("DevArt.Data.Oracle", "Devart.Data.Oracle.OracleScript");
+            var oracleScriptType = oracleScript.GetType();
+            oracleScriptType.GetProperty("Connection", typeof(IDbConnection)).SetValue(oracleScript, Connection, null);
+            oracleScriptType.GetProperty("ScriptText").SetValue(oracleScript, sql, null);
+            oracleScriptType.GetMethod("Execute").Invoke(oracleScript, new object[] { });
         }
     }
 }
