@@ -1,4 +1,4 @@
-﻿namespace FluentMigrator.Infrastructure
+namespace FluentMigrator.Infrastructure
 {
     public interface ISupportAdditionalFeatures
     {

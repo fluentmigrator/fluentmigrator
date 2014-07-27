@@ -1,4 +1,4 @@
-﻿namespace FluentMigrator.Expressions
+namespace FluentMigrator.Expressions
 {
     using System.Collections.Generic;
     using Model;

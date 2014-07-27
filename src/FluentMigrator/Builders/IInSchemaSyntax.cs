@@ -1,4 +1,4 @@
-﻿namespace FluentMigrator.Builders
+namespace FluentMigrator.Builders
 {
     public interface IInSchemaSyntax
     {

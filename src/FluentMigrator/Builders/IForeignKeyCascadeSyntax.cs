@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Infrastructure;
+using FluentMigrator.Infrastructure;
 using System.Data;
 
 namespace FluentMigrator.Builders
