@@ -27,7 +27,7 @@ namespace FluentMigrator.Builders.Create.Constraint
             return this;
         }
 
-        public ICreateConstraintOptionsSyntax Columns(string[] columnNames)
+        public ICreateConstraintOptionsSyntax Columns(params string[] columnNames)
         {
             foreach (var columnName in columnNames)
             {
