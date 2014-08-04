@@ -110,7 +110,12 @@ namespace FluentMigrator.Runner.Processors.Firebird
             switch (FieldType)
             {
                 case 261:
-                    return "BLOB";
+                    if (FieldSubType.HasValue)
+                    {
+                        return "BLOB sub_type " + FieldSubType.Value.ToString();
+                    }
+                    else
+                        return "BLOB";
                 case 14:
                     return "CHAR";
                 case 40:

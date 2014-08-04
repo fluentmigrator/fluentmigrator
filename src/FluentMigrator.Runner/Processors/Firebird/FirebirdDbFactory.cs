@@ -24,5 +24,6 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
             return (DbProviderFactory)field.GetValue(null);
         }
+
     }
 }

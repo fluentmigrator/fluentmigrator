@@ -64,6 +64,7 @@
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -75,6 +76,8 @@
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
+    <Optimize>false</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -86,6 +89,7 @@
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AutomatedRelease|x86' ">
     <OutputPath>bin\x86\AutomatedRelease\</OutputPath>
@@ -97,9 +101,7 @@
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>FluentMigrator.snk</AssemblyOriginatorKeyFile>
@@ -108,24 +110,32 @@
     <Reference Include="FirebirdSql.Data.FirebirdClient">
       <HintPath>..\..\lib\FirebirdSql.Data.FirebirdClient.dll</HintPath>
     </Reference>
-    <Reference Include="Moq, Version=3.1.416.3, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Oracle.DataAccess">
+      <HintPath>..\..\lib\Oracle.DataAccess.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Xml.Linq">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+    <Reference Include="Moq">
       <HintPath>..\..\lib\Moq.dll</HintPath>
     </Reference>
-    <Reference Include="MySql.Data, Version=1.0.10.1, Culture=neutral, PublicKeyToken=c5687fc88969c44d">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="MySql.Data">
       <HintPath>..\..\lib\MySql.Data.dll</HintPath>
     </Reference>
-    <Reference Include="Npgsql, Version=2.0.11.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="Npgsql">
       <HintPath>..\..\lib\Postgres\Npgsql.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.framework, Version=2.5.9.10320, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="nunit.framework">
       <HintPath>..\..\lib\nunit.framework.dll</HintPath>
     </Reference>
-    <Reference Include="nunit.should, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="nunit.should">
       <HintPath>..\..\lib\nunit.should.dll</HintPath>
     </Reference>
     <Reference Include="Oracle.DataAccess">
@@ -143,17 +153,13 @@
     </Reference>
     <Reference Include="System.Data.SQLite, Version=1.0.48.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
       <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="System.Data.SQLite">
       <HintPath>..\..\lib\System.Data.SQLite.dll</HintPath>
     </Reference>
-    <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="System.Data.SqlServerCe">
       <HintPath>..\..\lib\SQLServerCE4\Private\System.Data.SqlServerCe.dll</HintPath>
     </Reference>
-    <Reference Include="System.Xml.Linq">
-      <RequiredTargetFramework>3.5</RequiredTargetFramework>
-    </Reference>
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SolutionInfo.cs">
@@ -203,6 +209,12 @@
     <Compile Include="Integration\Processors\BaseTableTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdColumnTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdConstraintTests.cs" />
+    <Compile Include="Integration\Processors\Firebird\FirebirdEmbeddedLibrariesForWindows.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FirebirdEmbeddedLibrariesForWindows.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Integration\Processors\Firebird\FirebirdEmbeddedTableTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdIndexTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdProcessorTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdTableTests.cs" />
@@ -448,6 +460,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="FluentMigrator.snk" />
+    <None Include="Resources\aliases.conf" />
+    <None Include="Resources\firebird.conf" />
+    <None Include="Resources\firebird.msg" />
     <None Include="testscript.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -488,6 +503,10 @@
     <EmbeddedResource Include="EmbeddedResources\Embeddedtestscript.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Processors\Firebird\FirebirdEmbeddedLibrariesForWindows.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>FirebirdEmbeddedLibrariesForWindows.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="EmbeddedResources\DropInitialSchema.sql" />
@@ -500,6 +519,13 @@
     <EmbeddedResource Include="EmbeddedResources\B\NotUniqueResource.sql" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\fbembed.dll" />
+    <None Include="Resources\ib_util.dll" />
+    <None Include="Resources\icudt30.dll" />
+    <None Include="Resources\icuin30.dll" />
+    <None Include="Resources\icuuc30.dll" />
+    <None Include="Resources\msvcp80.dll" />
+    <None Include="Resources\msvcr80.dll" />
     <Content Include="Unit\Initialization\Fixtures\WithConnectionString.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
