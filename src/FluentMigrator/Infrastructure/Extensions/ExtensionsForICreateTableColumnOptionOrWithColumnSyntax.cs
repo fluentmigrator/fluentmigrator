@@ -6,7 +6,7 @@ namespace FluentMigrator
 {
     public static class ExtensionsForICreateTableColumnOptionOrWithColumnSyntax
     {
-        internal static ICreateTableColumnOptionOrWithColumnSyntax AsVarcharString(
+        public static ICreateTableColumnOptionOrWithColumnSyntax AsVarcharString(
             this ICreateTableColumnAsTypeSyntax columnTypeSyntax,
             int size,
             bool nullable = false)
