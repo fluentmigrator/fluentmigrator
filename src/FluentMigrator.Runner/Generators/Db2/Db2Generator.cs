@@ -23,8 +23,9 @@
 
         public override string Generate(Expressions.AlterDefaultConstraintExpression expression)
         {
-            return string.Format("ALTER TABLE {0} ALTER COLUMN {1} SET DEFAULT {2}",
-                QuoteSchemaAndTable(expression.SchemaName, expression.TableName),
+            return string.Format(
+                "ALTER TABLE {0} ALTER COLUMN {1} SET DEFAULT {2}",
+                this.QuoteSchemaAndTable(expression.SchemaName, expression.TableName),
                 Quoter.QuoteColumnName(expression.ColumnName),
                 ((Db2Column)Column).FormatAlterDefaultValue(expression.ColumnName, expression.DefaultValue));
         }
@@ -33,42 +34,42 @@
         {
             return string.Format(
                 "ALTER TABLE {0} ALTER COLUMN {1} DROP DEFAULT",
-                QuoteSchemaAndTable(expression.SchemaName, expression.TableName),
-                Quoter.QuoteColumnName(expression.ColumnName)
-            );
+                this.QuoteSchemaAndTable(expression.SchemaName, expression.TableName),
+                Quoter.QuoteColumnName(expression.ColumnName));
         }
 
         public override string Generate(Expressions.RenameTableExpression expression)
         {
-            return string.Format("RENAME TABLE {0} TO {1}",
-                QuoteSchemaAndTable(expression.SchemaName, expression.OldName),
-                Quoter.QuoteTableName(expression.NewName)
-                );
+            return string.Format(
+                "RENAME TABLE {0} TO {1}",
+                this.QuoteSchemaAndTable(expression.SchemaName, expression.OldName),
+                Quoter.QuoteTableName(expression.NewName));
         }
 
         public override string Generate(Expressions.DeleteColumnExpression expression)
         {
             var builder = new StringBuilder();
-            if (expression.ColumnNames.Count > 0 && !string.IsNullOrEmpty(expression.ColumnNames.First()))
+            if (expression.ColumnNames.Count == 0 || string.IsNullOrEmpty(expression.ColumnNames.First()))
             {
-                builder.AppendFormat("ALTER TABLE {0}", QuoteSchemaAndTable(expression.SchemaName, expression.TableName));
-                foreach (var column in expression.ColumnNames)
-                {
-                    builder.AppendFormat(" DROP COLUMN {0}", Quoter.QuoteColumnName(column));
-                }
-
-                return builder.ToString();
+                return string.Empty;
             }
 
-            return string.Empty;
+            builder.AppendFormat("ALTER TABLE {0}", this.QuoteSchemaAndTable(expression.SchemaName, expression.TableName));
+            foreach (var column in expression.ColumnNames)
+            {
+                builder.AppendFormat(" DROP COLUMN {0}", this.Quoter.QuoteColumnName(column));
+            }
+
+            return builder.ToString();
         }
 
         public override string Generate(Expressions.CreateColumnExpression expression)
         {
             expression.Column.AdditionalFeatures.Add(new KeyValuePair<string, object>("IsCreateColumn", true));
 
-            return string.Format("ALTER TABLE {0} ADD COLUMN {1}",
-                QuoteSchemaAndTable(expression.SchemaName, expression.TableName),
+            return string.Format(
+                "ALTER TABLE {0} ADD COLUMN {1}",
+                this.QuoteSchemaAndTable(expression.SchemaName, expression.TableName),
                 Column.Generate(expression.Column));
         }
 
@@ -100,13 +101,12 @@
 
             return string.Format(
                 "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}",
-                QuoteSchemaAndTable(expression.ForeignKey.ForeignTableSchema, expression.ForeignKey.ForeignTable),
+                this.QuoteSchemaAndTable(expression.ForeignKey.ForeignTableSchema, expression.ForeignKey.ForeignTable),
                 keyWithSchema,
                 foreignColumns,
-                QuoteSchemaAndTable(expression.ForeignKey.PrimaryTableSchema, expression.ForeignKey.PrimaryTable),
+                this.QuoteSchemaAndTable(expression.ForeignKey.PrimaryTableSchema, expression.ForeignKey.PrimaryTable),
                 primaryColumns,
-                FormatCascade("DELETE", expression.ForeignKey.OnDelete)
-                );
+                this.FormatCascade("DELETE", expression.ForeignKey.OnDelete));
         }
 
         public override string Generate(Expressions.CreateConstraintExpression expression)
@@ -119,8 +119,9 @@
             var quotedNames = expression.Constraint.Columns.Select(q => Quoter.QuoteColumnName(q));
             var columnList = string.Join(", ", quotedNames.ToArray<string>());
 
-            return string.Format("ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})",
-                QuoteSchemaAndTable(expression.Constraint.SchemaName, expression.Constraint.TableName),
+            return string.Format(
+                "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})",
+                this.QuoteSchemaAndTable(expression.Constraint.SchemaName, expression.Constraint.TableName),
                 constraintName,
                 constraintType,
                 columnList);
@@ -140,12 +141,12 @@
                 return item.AppendFormat("{0}{1}{2}", accumulator, Quoter.QuoteColumnName(itemToo.Name), direction);
             });
 
-            return string.Format("CREATE {0}INDEX {1} ON {2} ({3})",
+            return string.Format(
+                "CREATE {0}INDEX {1} ON {2} ({3})",
                 expression.Index.IsUnique ? "UNIQUE " : string.Empty,
                 indexWithSchema,
-                QuoteSchemaAndTable(expression.Index.SchemaName, expression.Index.TableName),
-                columnList
-                );
+                this.QuoteSchemaAndTable(expression.Index.SchemaName, expression.Index.TableName),
+                columnList);
         }
 
         public override string Generate(Expressions.CreateSchemaExpression expression)
@@ -155,7 +156,7 @@
 
         public override string Generate(Expressions.DeleteTableExpression expression)
         {
-            return string.Format("DROP TABLE {0}", QuoteSchemaAndTable(expression.SchemaName, expression.TableName));
+            return string.Format("DROP TABLE {0}", this.QuoteSchemaAndTable(expression.SchemaName, expression.TableName));
         }
 
         public override string Generate(Expressions.DeleteIndexExpression expression)
@@ -178,10 +179,10 @@
                 ? Quoter.QuoteConstraintName(expression.Constraint.ConstraintName)
                 : Quoter.QuoteSchemaName(expression.Constraint.SchemaName) + "." + Quoter.QuoteConstraintName(expression.Constraint.ConstraintName);
 
-            return string.Format("ALTER TABLE {0} DROP CONSTRAINT {1}",
-                QuoteSchemaAndTable(expression.Constraint.SchemaName, expression.Constraint.TableName),
-                constraintName
-                );
+            return string.Format(
+                "ALTER TABLE {0} DROP CONSTRAINT {1}",
+                this.QuoteSchemaAndTable(expression.Constraint.SchemaName, expression.Constraint.TableName),
+                constraintName);
         }
 
         public override string Generate(Expressions.DeleteForeignKeyExpression expression)
@@ -190,17 +191,17 @@
                 ? Quoter.QuoteConstraintName(expression.ForeignKey.Name)
                 : Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema) + "." + Quoter.QuoteConstraintName(expression.ForeignKey.Name);
 
-            return string.Format("ALTER TABLE {0} DROP FOREIGN KEY {1}",
-                QuoteSchemaAndTable(expression.ForeignKey.ForeignTableSchema, expression.ForeignKey.ForeignTable),
-                constraintName
-                );
+            return string.Format(
+                "ALTER TABLE {0} DROP FOREIGN KEY {1}",
+                this.QuoteSchemaAndTable(expression.ForeignKey.ForeignTableSchema, expression.ForeignKey.ForeignTable),
+                constraintName);
         }
 
         public override string Generate(Expressions.DeleteDataExpression expression)
         {
             if (expression.IsAllRows)
             {
-                return string.Format("DELETE FROM {0}", QuoteSchemaAndTable(expression.SchemaName, expression.TableName));
+                return string.Format("DELETE FROM {0}", this.QuoteSchemaAndTable(expression.SchemaName, expression.TableName));
             }
             else
             {
@@ -250,10 +251,9 @@
                 sb.AppendFormat(
                     "{0}INSERT INTO {1} ({2}) VALUES ({3})",
                     separator,
-                    QuoteSchemaAndTable(expression.SchemaName, expression.TableName),
+                    this.QuoteSchemaAndTable(expression.SchemaName, expression.TableName),
                     columnList,
-                    dataList
-                );
+                    dataList);
             }
 
             return sb.ToString();
@@ -269,7 +269,7 @@
 
             if (expression.IsAllRows)
             {
-                return String.Format("UPDATE {0} SET {1}", QuoteSchemaAndTable(expression.SchemaName, expression.TableName), updateClauses);
+                return string.Format("UPDATE {0} SET {1}", this.QuoteSchemaAndTable(expression.SchemaName, expression.TableName), updateClauses);
             }
 
             var whereClauses = expression.Where.Aggregate(new StringBuilder(), (acc, rowVal) =>
@@ -280,19 +280,20 @@
                 return acc.AppendFormat("{0}{1} {2} {3}", accumulator, Quoter.QuoteColumnName(rowVal.Key), clauseOperator, Quoter.QuoteValue(rowVal.Value));
             });
 
-            return String.Format("UPDATE {0} SET {1} WHERE {2}", QuoteSchemaAndTable(expression.SchemaName, expression.TableName), updateClauses, whereClauses);
+            return string.Format("UPDATE {0} SET {1} WHERE {2}", this.QuoteSchemaAndTable(expression.SchemaName, expression.TableName), updateClauses, whereClauses);
         }
 
         public override string Generate(Expressions.CreateTableExpression expression)
         {
-            return string.Format("CREATE TABLE {0} ({1})", QuoteSchemaAndTable(expression.SchemaName, expression.TableName), Column.Generate(expression.Columns, expression.TableName));
+            return string.Format("CREATE TABLE {0} ({1})", this.QuoteSchemaAndTable(expression.SchemaName, expression.TableName), Column.Generate(expression.Columns, expression.TableName));
         }
 
         public override string Generate(Expressions.AlterColumnExpression expression)
         {
             try
             {
-                return string.Format("ALTER TABLE {0} {1}", QuoteSchemaAndTable(expression.SchemaName, expression.TableName), ((Db2Column)Column).GenerateAlterClause(expression.Column));
+                // throws an exception of an attempt is made to alter an identity column, as it is not supported by most version of DB2.
+                return string.Format("ALTER TABLE {0} {1}", this.QuoteSchemaAndTable(expression.SchemaName, expression.TableName), ((Db2Column)Column).GenerateAlterClause(expression.Column));
             }
             catch (NotSupportedException e)
             {
@@ -307,6 +308,7 @@
 
         private string QuoteSchemaAndTable(string schemaName, string tableName)
         {
+            // appends a schema, if provided. If not, the provider will use the schema specified in the connection string.
             return !string.IsNullOrEmpty(schemaName) ? Quoter.QuoteSchemaName(schemaName) + "." + Quoter.QuoteTableName(tableName) : Quoter.QuoteTableName(tableName);
         }
 

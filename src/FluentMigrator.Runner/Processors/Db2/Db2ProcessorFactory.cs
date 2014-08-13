@@ -1,10 +1,5 @@
 ﻿namespace FluentMigrator.Runner.Processors.DB2
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
     using FluentMigrator.Runner.Generators.DB2;
 
     public class Db2ProcessorFactory : MigrationProcessorFactory

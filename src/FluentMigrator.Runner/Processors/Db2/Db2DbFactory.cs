@@ -1,18 +1,21 @@
 ﻿namespace FluentMigrator.Runner.Processors.DB2
 {
     using System;
-    using System.Collections.Generic;
     using System.Data.Common;
-    using System.Linq;
     using System.Reflection;
-    using System.Text;
 
     public class Db2DbFactory : ReflectionBasedDbFactory
     {
+        #region Constructors
+
         public Db2DbFactory()
             : base("IBM.Data.DB2.iSeries", "IBM.Data.DB2.iSeries.iDB2Factory")
         {
         }
+
+        #endregion Constructors
+
+        #region Methods
 
         protected override DbProviderFactory CreateFactory()
         {
@@ -27,5 +30,7 @@
 
             return (DbProviderFactory)field.GetValue(null);
         }
+
+        #endregion Methods
     }
 }
