@@ -24,7 +24,7 @@ namespace FluentMigrator.Runner.Initialization
     {
         string Database { get; set; }
         string Connection { get; set; }
-        string Target { get; set; }
+        string[] Targets { get; set; }
         bool PreviewOnly { get; set; }
         string Namespace { get; set; }
         bool NestedNamespaces { get; set; }

@@ -48,7 +48,6 @@ namespace FluentMigrator.MSBuild
         }
 
         private string databaseType;
-        private string migrationAssembly;
 
         public string ApplicationContext { get; set; }
         
@@ -57,9 +56,10 @@ namespace FluentMigrator.MSBuild
 
         public string ConnectionStringConfigPath { get; set; }
 
-        public string Target { get { return migrationAssembly; } set { migrationAssembly = value; } }
+        public string Target { get { return (Targets != null && Targets.Length == 1) ? Targets[0] : string.Empty; } set { Targets = new string[] { value }; } }
 
-        public string MigrationAssembly { get { return migrationAssembly; } set { migrationAssembly = value; } }
+        public string[] Targets { get; set; }
+        public string MigrationAssembly { get { return (Targets != null && Targets.Length == 1) ? Targets[0] : string.Empty; } set { Targets = new string[] {value}; } }
 
         public string Database { get { return databaseType; } set { databaseType = value; } }
 
@@ -98,13 +98,13 @@ namespace FluentMigrator.MSBuild
 
             if (string.IsNullOrEmpty(databaseType))
             {
-                Log.LogError("You must specific a database type. i.e. mysql or sqlserver");
+                Log.LogError("You must specify a database type. i.e. mysql or sqlserver");
                 return false;
             }
 
-            if (string.IsNullOrEmpty(migrationAssembly))
+            if (Targets == null || Targets.Length == 0)
             {
-                Log.LogError("You must specific a migration assembly");
+                Log.LogError("You must specify a migration assemblies ");
                 return false;
             }
 
@@ -138,7 +138,7 @@ namespace FluentMigrator.MSBuild
                 Database = databaseType,
                 Connection = Connection,
                 ConnectionStringConfigPath = ConnectionStringConfigPath,
-                Target = Target,
+                Targets = Targets,
                 PreviewOnly = PreviewOnly,
                 Namespace = Namespace,
                 NestedNamespaces = Nested,
