@@ -31,7 +31,7 @@ namespace FluentMigrator
         public Func<Type, bool> TypeIsMigration { get; set; }
         public Func<Type, bool> TypeIsProfile { get; set; }
         public Func<Type, bool> TypeIsVersionTableMetaData { get; set; }
-        public Func<IMigration, IMigrationInfo> GetMigrationInfo { get; set; }
+        public Func<Type, IMigrationInfo> GetMigrationInfo { get; set; }
         public Func<string> GetWorkingDirectory { get; set; }
         public Func<Model.ConstraintDefinition, string> GetConstraintName { get; set; }
         public Func<Type, bool> TypeHasTags { get; set; }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Configuration;
+using System.Text.RegularExpressions;
 using FluentMigrator.Exceptions;
 
 namespace FluentMigrator.Runner.Initialization
@@ -19,6 +20,7 @@ namespace FluentMigrator.Runner.Initialization
         private string connection;
         private Func<string> machineNameProvider = () => Environment.MachineName;
         private bool notUsingConfig;
+        private static readonly Regex matchPwd = new Regex("(PWD=|PASSWORD=)([^;]*);", RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         public ConnectionStringManager(INetConfigManager configManager, IAnnouncer announcer, string connection, string configPath, string assemblyLocation,
                                        string database)
@@ -94,7 +96,7 @@ namespace FluentMigrator.Runner.Initialization
                 throw new UndeterminableConnectionException("Unable to resolve any connectionstring using parameters \"/connection\" and \"/configPath\"");
 
             announcer.Say(notUsingConfig
-                              ? string.Format("Using Database {0} and Connection String {1}", database, ConnectionString)
+                              ? string.Format("Using Database {0} and Connection String {1}", database, matchPwd.Replace(ConnectionString,"$1********;"))
                               : string.Format("Using Connection {0} from Configuration file {1}", connection, configFile));
         }
     }

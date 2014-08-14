@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -21,6 +21,5 @@ namespace FluentMigrator.Builders.Alter.Table
     public interface IAlterTableAddColumnOrAlterColumnOrSchemaSyntax : IAlterTableAddColumnOrAlterColumnSyntax
     {
         IAlterTableAddColumnOrAlterColumnSyntax InSchema(string schemaName);
-        IAlterTableAddColumnOrAlterColumnSyntax WithDescription(string description);
     }
 }

@@ -1,3 +1,5 @@
+using System.Linq;
+using System.Text.RegularExpressions;
 using FluentMigrator.Runner.Helpers;
 
 #region License
@@ -33,7 +35,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             get { return "Oracle"; }
         }
 
-        public OracleProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, OracleDbFactory factory)
+        public OracleProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
         }
@@ -198,8 +200,15 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(sql, Connection))
-                command.ExecuteNonQuery();
+            var batches = Regex.Split(sql, @"^\s*;\s*$", RegexOptions.Multiline)
+                .Select(x => x.Trim())
+                .Where(x => !string.IsNullOrEmpty(x));
+
+            foreach (var batch in batches)
+            {
+                using (var command = Factory.CreateCommand(batch, Connection))
+                    command.ExecuteNonQuery();
+            }
         }
     }
 }

@@ -78,8 +78,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetInsertDataExpression();
             expression.SchemaName = "TestSchema";
 
-            var expected = "INSERT ALL INTO TestTable1 (Id, Name, Website) VALUES (1, 'Just''in', 'codethinked.com')";
-            expected += " INTO TestTable1 (Id, Name, Website) VALUES (2, 'Na\\te', 'kohari.org')";
+            var expected = "INSERT ALL INTO TestSchema.TestTable1 (Id, Name, Website) VALUES (1, 'Just''in', 'codethinked.com')";
+            expected += " INTO TestSchema.TestTable1 (Id, Name, Website) VALUES (2, 'Na\\te', 'kohari.org')";
             expected += " SELECT 1 FROM DUAL";
 
             var result = Generator.Generate(expression);
@@ -107,7 +107,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(System.String.Format("INSERT ALL INTO TestTable1 (guid) VALUES ('{0}') SELECT 1 FROM DUAL", GeneratorTestHelper.TestGuid.ToString()));
+            result.ShouldBe(System.String.Format("INSERT ALL INTO TestSchema.TestTable1 (guid) VALUES ('{0}') SELECT 1 FROM DUAL", GeneratorTestHelper.TestGuid.ToString()));
         }
 
         [Test]

@@ -54,6 +54,7 @@ namespace FluentMigrator.Tests
 
         public static DatabaseServerOptions Firebird = new DatabaseServerOptions
             {
+                // Set ServerType=1 if you are using fbembed.dll
                 ConnectionString = String.Format("ServerType=0;User=SYSDBA;Password=masterkey;Database={0};Datasource=127.0.0.1;Port=3050;",
                     System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "fbtest.fdb")
                     ),
@@ -63,7 +64,7 @@ namespace FluentMigrator.Tests
         public static DatabaseServerOptions Oracle = new DatabaseServerOptions
         {
             // was not able to get TNS to work
-            ConnectionString = "Data Source=XE;User Id=test;Password=test",
+            ConnectionString = "Data Source=(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521)) ) (CONNECT_DATA = (SERVICE_NAME = XE) ) );User ID=test;Password=test;",
             IsEnabled = false
         };
 

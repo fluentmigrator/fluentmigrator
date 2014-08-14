@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -25,7 +25,7 @@ namespace FluentMigrator.Builders.Alter
     public interface IAlterExpressionRoot : IFluentSyntax
     {
         //void Schema(string schemaName);
-        IAlterTableAddColumnOrAlterColumnOrSchemaSyntax Table(string tableName);
+        IAlterTableAddColumnOrAlterColumnOrSchemaOrDescriptionSyntax Table(string tableName);
         IAlterColumnOnTableSyntax Column(string columnName);
     }
 }

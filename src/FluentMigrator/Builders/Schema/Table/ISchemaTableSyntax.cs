@@ -17,6 +17,7 @@
 #endregion
 
 using FluentMigrator.Builders.Schema.Column;
+using FluentMigrator.Builders.Schema.Constraint;
 using FluentMigrator.Builders.Schema.Index;
 
 namespace FluentMigrator.Builders.Schema.Table
@@ -26,5 +27,6 @@ namespace FluentMigrator.Builders.Schema.Table
         bool Exists();
         ISchemaColumnSyntax Column(string column);
         ISchemaIndexSyntax Index(string indexName);
+        ISchemaConstraintSyntax Constraint(string constrainName);
     }
 }

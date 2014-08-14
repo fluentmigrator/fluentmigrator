@@ -18,7 +18,7 @@
 
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Oracle;
-using FluentMigrator.Runner.Processors.Sqlite;
+using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using NUnit.Framework;
 
@@ -89,6 +89,13 @@ namespace FluentMigrator.Tests.Unit.Runners
         {
             IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("Oracle");
             Assert.IsTrue(factory.GetType() == typeof(OracleProcessorFactory));
+        }
+
+        [Test]
+        public void CanRetrieveOracleManagedFactoryWithArgumentString()
+        {
+            IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("OracleManaged");
+            Assert.IsTrue(factory.GetType() == typeof(OracleManagedProcessorFactory));
         }
     }
 }

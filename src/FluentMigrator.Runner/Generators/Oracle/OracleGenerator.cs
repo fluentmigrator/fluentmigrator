@@ -11,6 +11,8 @@ namespace FluentMigrator.Runner.Generators.Oracle
 {
     public class OracleGenerator : GenericGenerator
     {
+
+        
         public OracleGenerator()
             : base(new OracleColumn(new OracleQuoter()), new OracleQuoter(), new OracleDescriptionGenerator())
         {
@@ -24,6 +26,65 @@ namespace FluentMigrator.Runner.Generators.Oracle
         private static IQuoter GetQuoter(bool useQuotedIdentifiers)
         {
             return useQuotedIdentifiers ? (IQuoter)new OracleQuoterQuotedIdentifier() : (IQuoter)new OracleQuoter();
+        }
+
+
+        public override string DropTable
+        {
+            get
+            {
+                return "DROP TABLE {0}";
+            }
+        }
+        public override string Generate(DeleteTableExpression expression)
+        {
+            return String.Format(DropTable, ExpandTableName(Quoter.QuoteTableName(expression.SchemaName),Quoter.QuoteTableName(expression.TableName)));
+        }
+
+        public override string Generate(CreateSequenceExpression expression)
+        {
+            var result = new StringBuilder(string.Format("CREATE SEQUENCE "));
+            var seq = expression.Sequence;
+            if (string.IsNullOrEmpty(seq.SchemaName))
+            {
+                result.AppendFormat(Quoter.QuoteSequenceName(seq.Name));
+            }
+            else
+            {
+                result.AppendFormat("{0}.{1}", Quoter.QuoteSchemaName(seq.SchemaName), Quoter.QuoteSequenceName(seq.Name));
+            }
+
+            if (seq.Increment.HasValue)
+            {
+                result.AppendFormat(" INCREMENT BY {0}", seq.Increment);
+            }
+
+            if (seq.MinValue.HasValue)
+            {
+                result.AppendFormat(" MINVALUE {0}", seq.MinValue);
+            }
+
+            if (seq.MaxValue.HasValue)
+            {
+                result.AppendFormat(" MAXVALUE {0}", seq.MaxValue);
+            }
+
+            if (seq.StartWith.HasValue)
+            {
+                result.AppendFormat(" START WITH {0}", seq.StartWith);
+            }
+
+            if (seq.Cache.HasValue)
+            {
+                result.AppendFormat(" CACHE {0}", seq.Cache);
+            }
+
+            if (seq.Cycle)
+            {
+                result.Append(" CYCLE");
+            }
+
+            return result.ToString();
         }
 
         public override string AddColumn
@@ -46,15 +107,29 @@ namespace FluentMigrator.Runner.Generators.Oracle
             get { return "INTO {0} ({1}) VALUES ({2})"; }
         }
 
+        private string ExpandTableName(string schema, string table)
+        { 
+            return String.IsNullOrEmpty(schema) ? table : String.Concat(schema,".",table);
+        }
+
+         private string innerGenerate(CreateTableExpression expression)
+        {
+            var tableName = Quoter.QuoteTableName(expression.TableName);
+            var schemaName = Quoter.QuoteSchemaName(expression.SchemaName);
+             
+            return string.Format("CREATE TABLE {0} ({1})",ExpandTableName(schemaName,tableName), Column.Generate(expression.Columns, tableName));
+        }
+
+
         public override string Generate(CreateTableExpression expression)
         {
             var descriptionStatements = DescriptionGenerator.GenerateDescriptionStatements(expression);
             var statements = descriptionStatements as string[] ?? descriptionStatements.ToArray();
 
             if (!statements.Any())
-                return base.Generate(expression);
+                return innerGenerate(expression);
 
-            var wrappedCreateTableStatement = WrapStatementInExecuteImmediateBlock(base.Generate(expression));
+            var wrappedCreateTableStatement = WrapStatementInExecuteImmediateBlock(innerGenerate(expression));
             var createTableWithDescriptionsBuilder = new StringBuilder(wrappedCreateTableStatement);
 
             foreach (var descriptionStatement in statements)
@@ -127,7 +202,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
                 string columns = String.Join(", ", columnNames.ToArray());
                 string values = String.Join(", ", columnValues.ToArray());
-                insertStrings.Add(String.Format(InsertData, Quoter.QuoteTableName(expression.TableName), columns, values));
+                insertStrings.Add(String.Format(InsertData, ExpandTableName(Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName)), columns, values));
             }
             return "INSERT ALL " + String.Join(" ", insertStrings.ToArray()) + " SELECT 1 FROM DUAL";
         }

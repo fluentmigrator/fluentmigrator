@@ -10,12 +10,6 @@ namespace FluentMigrator.Tests.Unit.Initialization
     [Category("NotWorkingOnMono")]
     public class ConnectionStringManagerTests
     {
-        private const string TARGET = "FluentMigrator.Tests.dll";
-        private const string DATABASE = "sqlserver2008";
-        private const string CONNECTION_NAME = "Test.Connection";
-        private Mock<IAnnouncer> announcerMock;
-        private Mock<INetConfigManager> configManagerMock;
-
         [SetUp]
         public void Setup()
         {
@@ -24,6 +18,12 @@ namespace FluentMigrator.Tests.Unit.Initialization
 
             configManagerMock = new Mock<INetConfigManager>(MockBehavior.Strict);
         }
+
+        private const string TARGET = "FluentMigrator.Tests.dll";
+        private const string DATABASE = "sqlserver2008";
+        private const string CONNECTION_NAME = "Test.Connection";
+        private Mock<IAnnouncer> announcerMock;
+        private Mock<INetConfigManager> configManagerMock;
 
         private static string GetPath(string relative)
         {
@@ -38,22 +38,37 @@ namespace FluentMigrator.Tests.Unit.Initialization
         }
 
         [Test]
-        public void ShouldUseAsConnectionStringIfNoConnectionMatchesAndNoMatchInMachineConfig()
+        public void ShouldLoadMachineNameConnectionFromSpecifiedConfigIfNoConnectionNameSpecified()
+        {
+            string configPath = GetPath("WithConnectionString.config");
+            var sut = new ConnectionStringManager(configManagerMock.Object, announcerMock.Object, null, configPath, TARGET, DATABASE);
+            configManagerMock.Setup(m => m.LoadFromFile(configPath))
+                             .Returns(LoadFromFile(configPath));
+            sut.MachineNameProvider = () => "MACHINENAME";
+
+            sut.LoadConnectionString();
+
+            Assert.That(sut.ConnectionString, Is.EqualTo("From Machine Name"));
+        }
+
+        [Test]
+        public void ShouldLoadNamedConnectionFromMachineConfigIfTargetAssemblyConfigHasNoMatch()
         {
             string configPath = GetPath("WithWrongConnectionString.config");
             string machineConfigPath = GetPath("FromMachineConfig.config");
 
             configManagerMock.Setup(x => x.LoadFromFile(TARGET))
-                .Returns(LoadFromFile(configPath));
+                             .Returns(LoadFromFile(configPath));
 
             configManagerMock.Setup(x => x.LoadFromMachineConfiguration())
-                .Returns(LoadFromFile(machineConfigPath));
+                             .Returns(LoadFromFile(machineConfigPath));
 
-            var sut = new ConnectionStringManager(configManagerMock.Object, announcerMock.Object, "This is a connection string", null, TARGET, DATABASE);
-            
+            var sut = new ConnectionStringManager(configManagerMock.Object, announcerMock.Object, CONNECTION_NAME, null, TARGET, DATABASE);
             sut.LoadConnectionString();
 
-            Assert.That(sut.ConnectionString, Is.EqualTo("This is a connection string"));
+            configManagerMock.VerifyAll();
+
+            Assert.That(sut.ConnectionString, Is.EqualTo("From Machine Config"));
         }
 
         [Test]
@@ -62,7 +77,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             string configPath = GetPath("WithConnectionString.config");
             var sut = new ConnectionStringManager(configManagerMock.Object, announcerMock.Object, CONNECTION_NAME, configPath, TARGET, DATABASE);
             configManagerMock.Setup(m => m.LoadFromFile(configPath))
-                .Returns(LoadFromFile(configPath));
+                             .Returns(LoadFromFile(configPath));
 
             sut.LoadConnectionString();
 
@@ -75,7 +90,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             string configPath = GetPath("WithConnectionString.exe.config");
 
             configManagerMock.Setup(x => x.LoadFromFile(TARGET))
-                .Returns(LoadFromFile(configPath));
+                             .Returns(LoadFromFile(configPath));
 
             var sut = new ConnectionStringManager(configManagerMock.Object, announcerMock.Object, CONNECTION_NAME, null, TARGET, DATABASE);
 
@@ -85,37 +100,43 @@ namespace FluentMigrator.Tests.Unit.Initialization
         }
 
         [Test]
-        public void ShouldLoadNamedConnectionFromMachineConfigIfTargetAssemblyConfigHasNoMatch()
+        public void ShouldObfuscatePasswordOfConnectionString()
         {
             string configPath = GetPath("WithWrongConnectionString.config");
             string machineConfigPath = GetPath("FromMachineConfig.config");
 
             configManagerMock.Setup(x => x.LoadFromFile(TARGET))
-                .Returns(LoadFromFile(configPath));
+                             .Returns(LoadFromFile(configPath));
 
             configManagerMock.Setup(x => x.LoadFromMachineConfiguration())
-                .Returns(LoadFromFile(machineConfigPath));
+                             .Returns(LoadFromFile(machineConfigPath));
 
-            var sut = new ConnectionStringManager(configManagerMock.Object, announcerMock.Object, CONNECTION_NAME, null, TARGET, DATABASE);
+            var sut = new ConnectionStringManager(configManagerMock.Object, announcerMock.Object,
+                                                  @"server=.\SQLEXPRESS;uid=test;pwd=test;Trusted_Connection=yes;database=FluentMigrator", null, TARGET,
+                                                  DATABASE);
+
             sut.LoadConnectionString();
 
-            configManagerMock.VerifyAll();
-
-            Assert.That(sut.ConnectionString, Is.EqualTo("From Machine Config"));
+            announcerMock.Verify(a => a.Say(@"Using Database sqlserver2008 and Connection String server=.\SQLEXPRESS;uid=test;pwd=********;Trusted_Connection=yes;database=FluentMigrator"), Times.Once());
         }
 
         [Test]
-        public void ShouldLoadMachineNameConnectionFromSpecifiedConfigIfNoConnectionNameSpecified()
+        public void ShouldUseAsConnectionStringIfNoConnectionMatchesAndNoMatchInMachineConfig()
         {
-            string configPath = GetPath("WithConnectionString.config");
-            var sut = new ConnectionStringManager(configManagerMock.Object, announcerMock.Object, null, configPath, TARGET, DATABASE);
-            configManagerMock.Setup(m => m.LoadFromFile(configPath))
-                .Returns(LoadFromFile(configPath));
-            sut.MachineNameProvider = () => "MACHINENAME";
+            string configPath = GetPath("WithWrongConnectionString.config");
+            string machineConfigPath = GetPath("FromMachineConfig.config");
+
+            configManagerMock.Setup(x => x.LoadFromFile(TARGET))
+                             .Returns(LoadFromFile(configPath));
+
+            configManagerMock.Setup(x => x.LoadFromMachineConfiguration())
+                             .Returns(LoadFromFile(machineConfigPath));
+
+            var sut = new ConnectionStringManager(configManagerMock.Object, announcerMock.Object, "This is a connection string", null, TARGET, DATABASE);
 
             sut.LoadConnectionString();
 
-            Assert.That(sut.ConnectionString, Is.EqualTo("From Machine Name"));
+            Assert.That(sut.ConnectionString, Is.EqualTo("This is a connection string"));
         }
     }
 }

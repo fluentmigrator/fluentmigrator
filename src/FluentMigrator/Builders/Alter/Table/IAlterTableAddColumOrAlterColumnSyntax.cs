@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -24,6 +24,7 @@ namespace FluentMigrator.Builders.Alter.Table
     {
         IAlterTableColumnAsTypeSyntax AddColumn(string name);
         IAlterTableColumnAsTypeSyntax AlterColumn(string name);
+
         void ToSchema(string name);
     }
 }

@@ -575,6 +575,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
             int columnCount = tableDef.Columns.Count;
             string[] columns = tableDef.Columns.Select(x => x.Name).ToArray();
             InsertDataExpression data = new InsertDataExpression();
+            data.TableName = tableDef.Name;
+            data.SchemaName = tableDef.SchemaName;
             using (DataSet ds = ReadTableData(String.Empty, expression.OldName))
             {
                 foreach (DataRow dr in ds.Tables[0].Rows)
@@ -725,13 +727,20 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         #region DML expressions
 
+
         public override void Process(Expressions.InsertDataExpression expression)
         {
             truncator.Truncate(expression);
             CheckTable(expression.TableName);
             expression.Rows.ForEach(x => x.ForEach(y => CheckColumn(expression.TableName, y.Key)));
             RegisterExpression(expression, typeof(InsertDataExpression));
-            InternalProcess(Generator.Generate(expression));
+            var subExpression = new InsertDataExpression() { SchemaName = expression.SchemaName, TableName = expression.TableName };
+            foreach (var row in expression.Rows)
+            {
+                subExpression.Rows.Clear();
+                subExpression.Rows.Add(row);
+                InternalProcess(Generator.Generate(subExpression));
+            }
         }
 
         public override void Process(Expressions.DeleteDataExpression expression)
@@ -739,7 +748,25 @@ namespace FluentMigrator.Runner.Processors.Firebird
             truncator.Truncate(expression);
             CheckTable(expression.TableName);
             RegisterExpression(expression, typeof(DeleteDataExpression));
-            InternalProcess(Generator.Generate(expression));
+            var subExpression = new DeleteDataExpression()
+            {
+                SchemaName = expression.SchemaName,
+                TableName = expression.TableName,
+                IsAllRows = expression.IsAllRows
+            };
+            if (expression.IsAllRows)
+            {
+                InternalProcess(Generator.Generate(expression));
+            }
+            else
+            {
+                foreach (var row in expression.Rows)
+                {
+                    subExpression.Rows.Clear();
+                    subExpression.Rows.Add(row);
+                    InternalProcess(Generator.Generate(subExpression));
+                }
+            }
         }
 
         public override void Process(Expressions.UpdateDataExpression expression)
@@ -749,6 +776,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             RegisterExpression<UpdateDataExpression>(expression);
             InternalProcess(Generator.Generate(expression));
         }
+
 
         #endregion
 
@@ -762,8 +790,6 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public override void Process(PerformDBOperationExpression expression)
         {
-            //RegisterExpression<PerformDBOperationExpression>(expression);
-
             Announcer.Say("Performing DB Operation");
 
             if (Options.PreviewOnly)
@@ -859,7 +885,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
             PerformDBOperationExpression createTrigger = CreateTriggerExpression(tableName, triggerName, true, TriggerEvent.Insert, trigger);
             PerformDBOperationExpression deleteTrigger = DeleteTriggerExpression(tableName, triggerName);
             FirebirdProcessedExpressionBase fbExpression = new FirebirdProcessedExpression(createTrigger, typeof(PerformDBOperationExpression), this);
-            fbExpression.AddUndoExpression(deleteTrigger);
+            if (this.FBOptions.UndoEnabled)
+                fbExpression.AddUndoExpression(deleteTrigger);
             RegisterExpression(fbExpression);
             Process(createTrigger);
         }

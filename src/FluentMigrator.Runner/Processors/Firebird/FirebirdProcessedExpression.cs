@@ -189,7 +189,13 @@ namespace FluentMigrator.Runner.Processors.Firebird
                     }
                     if (match)
                     {
-                        UpdateDataExpression update = new UpdateDataExpression() { SchemaName = String.Empty, TableName = expression.TableName, IsAllRows = false };
+                        UpdateDataExpression update = new UpdateDataExpression() 
+                        { 
+                            SchemaName = expression.SchemaName, 
+                            TableName = expression.TableName, 
+                            IsAllRows = false,
+                            Set = new List<KeyValuePair<string, object>>()
+                        };
                         foreach (var set in expression.Set)
                         {
                             update.Set.Add(new KeyValuePair<string, object>(set.Key, dr[set.Key]));
@@ -197,7 +203,11 @@ namespace FluentMigrator.Runner.Processors.Firebird
                         foreach (ColumnDefinition colDef in table.Definition.Columns)
                         {
                             if (colDef.IsPrimaryKey)
+                            {
+                                if (update.Where == null)
+                                    update.Where = new List<KeyValuePair<string, object>>();
                                 update.Where.Add(new KeyValuePair<string, object>(colDef.Name, dr[colDef.Name]));
+                            }
                         }
                         UndoExpressions.Add(update);
                     }
