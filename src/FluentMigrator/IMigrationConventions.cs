@@ -29,6 +29,7 @@ namespace FluentMigrator
         Func<string, string> GetPrimaryKeyName { get; set; }
         Func<Type, bool> TypeIsMigration { get; set; }
         Func<Type, bool> TypeIsProfile { get; set; }
+        Func<Type, MigrationStage?> GetMaintenanceStage { get; set; }
         Func<Type, bool> TypeIsVersionTableMetaData { get; set; }
         Func<string> GetWorkingDirectory { get; set; }
         Func<Type, IMigrationInfo> GetMigrationInfo { get; set; }

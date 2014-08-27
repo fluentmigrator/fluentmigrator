@@ -135,6 +135,8 @@
     <Compile Include="Announcers\TextWriterAnnouncer.cs" />
     <Compile Include="Announcers\TextWriterWithGoAnnouncer.cs" />
     <Compile Include="CompatabilityMode.cs" />
+    <Compile Include="MaintenanceLoader.cs" />
+    <Compile Include="IMaintenanceLoader.cs" />
     <Compile Include="Extensions\SqlServerExtensions.cs" />
     <Compile Include="Extensions\TagsExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
