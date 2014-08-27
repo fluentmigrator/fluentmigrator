@@ -358,7 +358,13 @@ namespace FluentMigrator.Runner.Processors.Firebird
                         CanUndo = false;
                         return;
                     }
-                    UpdateDataExpression update = new UpdateDataExpression() { TableName = expression.TableName, IsAllRows = false };
+                    UpdateDataExpression update = new UpdateDataExpression() 
+                    { 
+                        TableName = expression.TableName, 
+                        IsAllRows = false, 
+                        Set = new List<KeyValuePair<string, object>>(),
+                        Where = new List<KeyValuePair<string, object>>()
+                    };
                     foreach (string columnName in expression.ColumnNames)
                     {
                         update.Set.Add(new KeyValuePair<string, object>(columnName, dr[columnName]));
