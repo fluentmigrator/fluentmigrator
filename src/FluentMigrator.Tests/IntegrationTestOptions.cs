@@ -68,6 +68,12 @@ namespace FluentMigrator.Tests
             IsEnabled = false
         };
 
+        public static DatabaseServerOptions Db2 = new DatabaseServerOptions
+        {
+            ConnectionString = "Database=;UserID=TEST;DataSource=;Password=Testing;DefaultCollection=TEST;DataCompression=True;ConnectTimeout=60;",
+            IsEnabled = false
+        };
+
         public class DatabaseServerOptions
         {
             public string ConnectionString;
