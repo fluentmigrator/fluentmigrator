@@ -52,6 +52,12 @@ namespace FluentMigrator.Tests
                 IsEnabled = false
             };
 
+        public static DatabaseServerOptions DotConnectPostgres = new DatabaseServerOptions
+        {
+            ConnectionString = "User ID=test;Password=test;Host=127.0.0.1;Port=5432;Database=FluentMigrator;Pooling=true;Min Pool Size=0;Max Pool Size=100;Connection Lifetime=0;",            
+            IsEnabled = false
+        };
+
         public static DatabaseServerOptions Firebird = new DatabaseServerOptions
             {
                 // Set ServerType=1 if you are using fbembed.dll
