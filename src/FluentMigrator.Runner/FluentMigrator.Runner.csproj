@@ -135,11 +135,17 @@
     <Compile Include="Announcers\TextWriterAnnouncer.cs" />
     <Compile Include="Announcers\TextWriterWithGoAnnouncer.cs" />
     <Compile Include="CompatabilityMode.cs" />
+    <Compile Include="MaintenanceLoader.cs" />
+    <Compile Include="IMaintenanceLoader.cs" />
     <Compile Include="Extensions\SqlServerExtensions.cs" />
     <Compile Include="Extensions\TagsExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Generators\Base\ColumnBase.cs" />
     <Compile Include="Extensions\CompatabilityModeExtension.cs" />
+    <Compile Include="Generators\Db2\Db2Column.cs" />
+    <Compile Include="Generators\Db2\Db2Generator.cs" />
+    <Compile Include="Generators\Db2\Db2Quoter.cs" />
+    <Compile Include="Generators\Db2\Db2TypeMap.cs" />
     <Compile Include="Generators\EmptyDescriptionGenerator.cs" />
     <Compile Include="Generators\Firebird\FirebirdColumn.cs" />
     <Compile Include="Generators\Firebird\FirebirdGenerator.cs" />
@@ -159,6 +165,9 @@
     <Compile Include="MigrationValidator.cs" />
     <Compile Include="Processors\Oracle\OracleManagedDbFactory.cs" />
     <Compile Include="Processors\Oracle\OracleManagedProcessorFactory.cs" />
+    <Compile Include="Processors\Db2\Db2DbFactory.cs" />
+    <Compile Include="Processors\Db2\Db2Processor.cs" />
+    <Compile Include="Processors\Db2\Db2ProcessorFactory.cs" />
     <Compile Include="Processors\Firebird\FirebirdProcessedExpression.cs" />
     <Compile Include="Generators\Firebird\FirebirdQuoter.cs" />
     <Compile Include="Generators\Firebird\FirebirdTypeMap.cs" />
