@@ -98,8 +98,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
 
-            var expected = "INSERT INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (1, 'Just''in', 'codethinked.com');";
-            expected += " INSERT INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (2, 'Na\\te', 'kohari.org');";
+            var expected = "INSERT INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (1, 'Just''in', 'codethinked.com')";
+            expected += " INSERT INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (2, 'Na\\te', 'kohari.org')";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
@@ -114,7 +114,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(System.String.Format("INSERT INTO \"TestSchema\".\"TestTable1\" (\"guid\") VALUES ('{0}');", GeneratorTestHelper.TestGuid));
+            result.ShouldBe(System.String.Format("INSERT INTO \"TestSchema\".\"TestTable1\" (\"guid\") VALUES ('{0}')", GeneratorTestHelper.TestGuid));
         }
 
         [Test]
@@ -123,7 +123,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(System.String.Format("INSERT INTO \"TestTable1\" (\"guid\") VALUES ('{0}');", GeneratorTestHelper.TestGuid));
+            result.ShouldBe(System.String.Format("INSERT INTO \"TestTable1\" (\"guid\") VALUES ('{0}')", GeneratorTestHelper.TestGuid));
         }
 
         [Test]

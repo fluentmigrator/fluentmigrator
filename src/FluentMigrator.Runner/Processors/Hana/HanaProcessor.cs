@@ -16,6 +16,11 @@ namespace FluentMigrator.Runner.Processors.Hana
             get { return "Hana"; }
         }
 
+        public override bool SupportsTransactions
+        {
+            get { return true; }
+        }
+
         public HanaProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
