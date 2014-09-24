@@ -115,7 +115,10 @@ namespace FluentMigrator.Runner.Processors.Hana
 
             EnsureConnectionIsOpen();
 
-            Announcer.Sql(String.Format(template, args));
+            var querySql = String.Format(template, args);
+
+            Announcer.Sql(string.Format("{0};", querySql));
+
             using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
             using (var reader = command.ExecuteReader())
             {
@@ -173,8 +176,8 @@ namespace FluentMigrator.Runner.Processors.Hana
             EnsureConnectionIsOpen();
 
             var batches = Regex.Split(sql, @"^\s*;\s*$", RegexOptions.Multiline)
-                .Select(x => x.Trim())
-                .Where(x => !string.IsNullOrEmpty(x));
+                .Where(x => !string.IsNullOrEmpty(x))
+                .Select(x => x.Trim().Replace(";", ""));
 
             foreach (var batch in batches)
             {

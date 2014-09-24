@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             var expression = GeneratorTestHelper.GetCreateSequenceExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE SEQUENCE \"Sequence\" INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE");
+            result.ShouldBe("CREATE SEQUENCE \"Sequence\" INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE;");
         }
 
         [Test]
@@ -54,7 +54,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             var expression = GeneratorTestHelper.GetDeleteSequenceExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP SEQUENCE \"Sequence\"");
+            result.ShouldBe("DROP SEQUENCE \"Sequence\";");
         }
     }
 }
