@@ -23,7 +23,7 @@ namespace FluentMigrator.Runner.Generators.Hana
 {
     internal class HanaTypeMap : TypeMapBase
     {
-        public const int AnsiStringCapacity = 2000;
+        public const int AnsiStringCapacity = 5000;
         public const int AnsiTextCapacity = 2147483647;
         public const int UnicodeStringCapacity = 2000;
         public const int UnicodeTextCapacity = int.MaxValue;
@@ -39,11 +39,11 @@ namespace FluentMigrator.Runner.Generators.Hana
             SetTypeMap(DbType.AnsiString, "VARCHAR(255)");
             SetTypeMap(DbType.AnsiString, "VARCHAR($size)", AnsiStringCapacity);
             SetTypeMap(DbType.AnsiString, "TEXT", AnsiTextCapacity);
-            SetTypeMap(DbType.Binary, "VARBINARY(8000)");
+            SetTypeMap(DbType.Binary, "VARBINARY(5000)");
             SetTypeMap(DbType.Binary, "VARBINARY($size)", AnsiStringCapacity);
             SetTypeMap(DbType.Binary, "VARBINARY(MAX)", int.MaxValue);
             SetTypeMap(DbType.Binary, "VARBINARY($size)", ImageCapacity);
-            SetTypeMap(DbType.Boolean, "BIT");
+            SetTypeMap(DbType.Boolean, "TINYINT");
             SetTypeMap(DbType.Byte, "TINYINT");
             SetTypeMap(DbType.Currency, "MONEY");
             SetTypeMap(DbType.Date, "DATETIME");
