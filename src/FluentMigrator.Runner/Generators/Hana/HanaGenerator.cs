@@ -105,7 +105,7 @@ namespace FluentMigrator.Runner.Generators.Hana
 
         public override string Generate(InsertDataExpression expression)
         {
-            return string.Format("{0};", base.Generate(expression));
+            return base.Generate(expression).Replace(";","");
         }
 
         private string InnerGenerate(CreateTableExpression expression)
