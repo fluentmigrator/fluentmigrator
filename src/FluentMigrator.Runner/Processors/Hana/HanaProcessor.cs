@@ -177,13 +177,18 @@ namespace FluentMigrator.Runner.Processors.Hana
 
             var batches = Regex.Split(sql, @"^\s*;\s*$", RegexOptions.Multiline)
                 .Where(x => !string.IsNullOrEmpty(x))
-                .Select(x => x.Trim().Replace(";", ""));
+                .Select(c => c.Trim());
 
             foreach (var batch in batches)
             {
-                using (var command = Factory.CreateCommand(batch, Connection))
+                var batchCommand = batch.EndsWith(";") 
+                    ? batch.Remove(batch.Length - 1) 
+                    : batch;
+
+                using (var command = Factory.CreateCommand(batchCommand, Connection))
                     command.ExecuteNonQuery();
             }
         }
+
     }
 }
