@@ -39,10 +39,9 @@ namespace FluentMigrator.Runner.Generators.Hana
             SetTypeMap(DbType.AnsiString, "VARCHAR(255)");
             SetTypeMap(DbType.AnsiString, "VARCHAR($size)", AnsiStringCapacity);
             SetTypeMap(DbType.AnsiString, "TEXT", AnsiTextCapacity);
-            SetTypeMap(DbType.Binary, "VARBINARY(5000)");
-            SetTypeMap(DbType.Binary, "VARBINARY($size)", AnsiStringCapacity);
-            SetTypeMap(DbType.Binary, "VARBINARY(MAX)", int.MaxValue);
+            SetTypeMap(DbType.Binary, "BLOB");
             SetTypeMap(DbType.Binary, "VARBINARY($size)", ImageCapacity);
+            SetTypeMap(DbType.Object, "BLOB");
             SetTypeMap(DbType.Boolean, "TINYINT");
             SetTypeMap(DbType.Byte, "TINYINT");
             SetTypeMap(DbType.Currency, "MONEY");
