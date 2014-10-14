@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Expressions;
+using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Builders.Create.Constraint
 {
@@ -27,7 +27,7 @@ namespace FluentMigrator.Builders.Create.Constraint
             return this;
         }
 
-        public ICreateConstraintOptionsSyntax Columns(string[] columnNames)
+        public ICreateConstraintOptionsSyntax Columns(params string[] columnNames)
         {
             foreach (var columnName in columnNames)
             {

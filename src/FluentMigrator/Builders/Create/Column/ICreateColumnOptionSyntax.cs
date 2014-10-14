@@ -20,5 +20,9 @@ namespace FluentMigrator.Builders.Create.Column
 {
     public interface ICreateColumnOptionSyntax : IColumnOptionSyntax<ICreateColumnOptionSyntax,ICreateColumnOptionOrForeignKeyCascadeSyntax>
     {
+        /// <summary>
+        /// The value to set against existing rows for the new column.
+        /// </summary>
+        ICreateColumnOptionSyntax SetExistingRowsTo(object value);
     }
 }

@@ -22,7 +22,7 @@ using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.MySql;
-using FluentMigrator.Runner.Processors.Sqlite;
+using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Tests.Unit;
 using FluentMigrator.VersionTableInfo;

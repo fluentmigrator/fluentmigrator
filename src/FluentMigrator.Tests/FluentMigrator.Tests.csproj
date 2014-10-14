@@ -64,6 +64,7 @@
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <DebugSymbols>true</DebugSymbols>
@@ -75,6 +76,8 @@
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
+    <Optimize>false</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -86,6 +89,7 @@
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'AutomatedRelease|x86' ">
     <OutputPath>bin\x86\AutomatedRelease\</OutputPath>
@@ -97,9 +101,7 @@
     <CodeAnalysisModuleSuppressionsFile>GlobalSuppressions.cs</CodeAnalysisModuleSuppressionsFile>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
-  </PropertyGroup>
-  <PropertyGroup>
-    <SignAssembly>false</SignAssembly>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>FluentMigrator.snk</AssemblyOriginatorKeyFile>
@@ -110,26 +112,6 @@
     <Reference Include="FirebirdSql.Data.FirebirdClient">
       <HintPath>..\..\lib\FirebirdSql.Data.FirebirdClient.dll</HintPath>
     </Reference>
-    <Reference Include="Moq, Version=3.1.416.3, Culture=neutral, PublicKeyToken=69f491c39445e920, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Moq.dll</HintPath>
-    </Reference>
-    <Reference Include="MySql.Data, Version=1.0.10.1, Culture=neutral, PublicKeyToken=c5687fc88969c44d">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\MySql.Data.dll</HintPath>
-    </Reference>
-    <Reference Include="Npgsql, Version=2.0.11.0, Culture=neutral, PublicKeyToken=5d8b90d52f46fda7, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\Postgres\Npgsql.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.framework, Version=2.5.9.10320, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\nunit.framework.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.should, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\nunit.should.dll</HintPath>
-    </Reference>
     <Reference Include="Oracle.DataAccess">
       <HintPath>..\..\lib\Oracle.DataAccess.dll</HintPath>
     </Reference>
@@ -138,24 +120,54 @@
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
-    <Reference Include="System.Data.SQLite, Version=1.0.48.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\System.Data.SQLite.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Data.SqlServerCe, Version=4.0.0.0, Culture=neutral, PublicKeyToken=89845dcd8080cc91, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\SQLServerCE4\Private\System.Data.SqlServerCe.dll</HintPath>
-    </Reference>
     <Reference Include="System.Xml.Linq">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="Moq">
+      <HintPath>..\..\lib\Moq.dll</HintPath>
+    </Reference>
+    <Reference Include="MySql.Data">
+      <HintPath>..\..\lib\MySql.Data.dll</HintPath>
+    </Reference>
+    <Reference Include="Npgsql">
+      <HintPath>..\..\lib\Postgres\Npgsql.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.framework">
+      <HintPath>..\..\lib\nunit.framework.dll</HintPath>
+    </Reference>
+    <Reference Include="nunit.should">
+      <HintPath>..\..\lib\nunit.should.dll</HintPath>
+    </Reference>
+    <Reference Include="Oracle.DataAccess">
+      <HintPath>..\..\lib\Oracle.DataAccess.dll</HintPath>
+    </Reference>
+    <Reference Include="Oracle.ManagedDataAccess, Version=4.121.1.0, Culture=neutral, PublicKeyToken=89b483f429c47342, processorArchitecture=MSIL">
+      <HintPath>..\..\lib\Oracle.ManagedDataAccess.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Core">
+      <RequiredTargetFramework>3.5</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="System.Data.SQLite, Version=1.0.48.0, Culture=neutral, PublicKeyToken=db937bc2d44ff139, processorArchitecture=x86">
+      <SpecificVersion>False</SpecificVersion>
+    </Reference>
+    <Reference Include="System.Data.SQLite">
+      <HintPath>..\..\lib\System.Data.SQLite.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Data.SqlServerCe">
+      <HintPath>..\..\lib\SQLServerCE4\Private\System.Data.SqlServerCe.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="Helpers\Db2TestTable.cs" />
     <Compile Include="Helpers\DotConnectPostgresTestSequence.cs" />
     <Compile Include="Helpers\DotConnectPostgreTestTable.cs" />
     <Compile Include="Helpers\FirebirdTestTable.cs" />
@@ -189,6 +201,7 @@
     <Compile Include="Integration\Migrations\Tagged\4_TenantAandBTable.cs" />
     <Compile Include="Integration\Migrations\TestEmptyMigration.cs" />
     <Compile Include="Integration\Migrations\TestMigration.cs" />
+    <Compile Include="Integration\Migrations\TestSetExistingRowValuesMigration.cs" />
     <Compile Include="Integration\Migrations\TestUpdateAllRowsMigration.cs" />
     <Compile Include="Integration\Migrations\VersionedMigration.cs" />
     <Compile Include="Integration\PerformDBOperationTests.cs" />
@@ -199,6 +212,12 @@
     <Compile Include="Integration\Processors\BaseSchemaTests.cs" />
     <Compile Include="Integration\Processors\BaseSequenceTests.cs" />
     <Compile Include="Integration\Processors\BaseTableTests.cs" />
+    <Compile Include="Integration\Processors\Db2\Db2ColumnTests.cs" />
+    <Compile Include="Integration\Processors\Db2\Db2ConstraintTests.cs" />
+    <Compile Include="Integration\Processors\Db2\Db2IndexTests.cs" />
+    <Compile Include="Integration\Processors\Db2\Db2ProcessorTests.cs" />
+    <Compile Include="Integration\Processors\Db2\Db2SchemaTests.cs" />
+    <Compile Include="Integration\Processors\Db2\Db2TableTests.cs" />
     <Compile Include="Integration\Processors\Postgres\PostgresColumnTests.cs" />
     <Compile Include="Integration\Processors\DotConnectPostgres\DotConnectPostgresConstraintTests.cs" />
     <Compile Include="Integration\Processors\DotConnectPostgres\DotConnectPostgresIndexTests.cs" />
@@ -209,18 +228,39 @@
     <Compile Include="Integration\Processors\DotConnectPostgres\DotConnectPostgresTableTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdColumnTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdConstraintTests.cs" />
+    <Compile Include="Integration\Processors\Firebird\FirebirdEmbeddedLibrariesForWindows.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>FirebirdEmbeddedLibrariesForWindows.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Integration\Processors\Firebird\FirebirdEmbeddedTableTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdIndexTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdProcessorTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdTableTests.cs" />
     <Compile Include="Integration\Processors\Jet\JetProcessorTests.cs" />
     <Compile Include="Integration\Processors\MySql\MySqlProcessorTests.cs" />
-    <Compile Include="Integration\Processors\OracleProcessorFactoryTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleManagedProcessorFactoryTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleProcessorFactoryTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleProcessorFactoryTestsBase.cs" />
     <Compile Include="Integration\Processors\Oracle\OracleColumnTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleColumnTestsBase.cs" />
     <Compile Include="Integration\Processors\Oracle\OracleConstraintTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleConstraintTestsBase.cs" />
     <Compile Include="Integration\Processors\Oracle\OracleIndexTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleIndexTestsBase.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleManagedColumnTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleManagedConstraintTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleManagedIndexTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleManagedProcessorTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleManagedSchemaTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleManagedTableTests.cs" />
     <Compile Include="Integration\Processors\Oracle\OracleProcessorTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleProcessorTestsBase.cs" />
     <Compile Include="Integration\Processors\Oracle\OracleSchemaTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleSchemaTestsBase.cs" />
     <Compile Include="Integration\Processors\Oracle\OracleTableTests.cs" />
+    <Compile Include="Integration\Processors\Oracle\OracleTableTestsBase.cs" />
+    <Compile Include="Integration\Processors\Postgres\PostgresColumnTests.cs" />
     <Compile Include="Integration\Processors\DotConnectPostgres\DotConnectPostgresColumnTests.cs" />
     <Compile Include="Integration\Processors\Postgres\PostgresConstraintTests.cs" />
     <Compile Include="Integration\Processors\Postgres\PostgresIndexTests.cs" />
@@ -251,10 +291,12 @@
     <Compile Include="Unit\AnnouncerExtensionsTests.cs" />
     <Compile Include="Unit\Announcers\AnnouncerTests.cs" />
     <Compile Include="Unit\Announcers\TextWriterAnnouncerTests.cs" />
+    <Compile Include="Unit\Announcers\TextWriterWithGoAnnouncerTests.cs" />
     <Compile Include="Unit\AssemblyLoader\AssemblyLoaderTests.cs" />
     <Compile Include="Unit\Builders\Alter\AlterColumnExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Alter\AlterExpressionRootTests.cs" />
     <Compile Include="Unit\Builders\Alter\AlterTableExpressionBuilderTests.cs" />
+    <Compile Include="Unit\Builders\ColumnExpressionBuilderHelperTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateColumnExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateConstraintExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Create\CreateExpressionRootTests.cs" />
@@ -318,6 +360,14 @@
     <Compile Include="Unit\Generators\BaseSequenceTests.cs" />
     <Compile Include="Unit\Generators\BaseSqlServerClusteredTests.cs" />
     <Compile Include="Unit\Generators\BaseTableTests.cs" />
+    <Compile Include="Unit\Generators\Db2\Db2ColumnTests.cs" />
+    <Compile Include="Unit\Generators\Db2\Db2ConstraintTests.cs" />
+    <Compile Include="Unit\Generators\Db2\Db2DataTests.cs" />
+    <Compile Include="Unit\Generators\Db2\Db2GeneratorTests.cs" />
+    <Compile Include="Unit\Generators\Db2\Db2IndexTests.cs" />
+    <Compile Include="Unit\Generators\Db2\Db2SchemaTests.cs" />
+    <Compile Include="Unit\Generators\Db2\Db2SequenceTests.cs" />
+    <Compile Include="Unit\Generators\Db2\Db2TableTests.cs" />
     <Compile Include="Unit\Generators\Firebird\FirebirdColumnTests.cs" />
     <Compile Include="Unit\Generators\Firebird\FirebirdConstraintsTests.cs" />
     <Compile Include="Unit\Generators\Firebird\FirebirdDataTests.cs" />
@@ -438,6 +488,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="FluentMigrator.snk" />
+    <None Include="Resources\aliases.conf" />
+    <None Include="Resources\firebird.conf" />
+    <None Include="Resources\firebird.msg" />
     <None Include="testscript.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -478,6 +531,10 @@
     <EmbeddedResource Include="EmbeddedResources\Embeddedtestscript.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </EmbeddedResource>
+    <EmbeddedResource Include="Integration\Processors\Firebird\FirebirdEmbeddedLibrariesForWindows.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>FirebirdEmbeddedLibrariesForWindows.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="EmbeddedResources\DropInitialSchema.sql" />
@@ -490,6 +547,13 @@
     <EmbeddedResource Include="EmbeddedResources\B\NotUniqueResource.sql" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Resources\fbembed.dll" />
+    <None Include="Resources\ib_util.dll" />
+    <None Include="Resources\icudt30.dll" />
+    <None Include="Resources\icuin30.dll" />
+    <None Include="Resources\icuuc30.dll" />
+    <None Include="Resources\msvcp80.dll" />
+    <None Include="Resources\msvcr80.dll" />
     <Content Include="Unit\Initialization\Fixtures\WithConnectionString.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -499,6 +563,9 @@
     <Content Include="Unit\Initialization\Fixtures\WithNoConnectionString.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

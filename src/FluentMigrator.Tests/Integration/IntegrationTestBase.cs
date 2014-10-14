@@ -24,7 +24,7 @@ using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.Postgres;
-using FluentMigrator.Runner.Processors.Sqlite;
+using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using MySql.Data.MySqlClient;
 using Npgsql;

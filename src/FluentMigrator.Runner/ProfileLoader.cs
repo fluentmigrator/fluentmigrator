@@ -37,7 +37,8 @@ namespace FluentMigrator.Runner
         public IEnumerable<IMigration> FindProfilesIn(Assembly assembly, string profile)
         {
             IEnumerable<Type> matchedTypes = assembly.GetExportedTypes()
-                .Where(t => Conventions.TypeIsProfile(t) && t.GetOneAttribute<ProfileAttribute>().ProfileName.ToLower() == profile.ToLower());
+                .Where(t => Conventions.TypeIsProfile(t) && t.GetOneAttribute<ProfileAttribute>().ProfileName.ToLower() == profile.ToLower())
+                .OrderBy(x => x.Name);
 
             foreach (Type type in matchedTypes)
             {

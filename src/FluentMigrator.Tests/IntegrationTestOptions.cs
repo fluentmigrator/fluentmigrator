@@ -70,7 +70,13 @@ namespace FluentMigrator.Tests
         public static DatabaseServerOptions Oracle = new DatabaseServerOptions
         {
             // was not able to get TNS to work
-            ConnectionString = "Data Source=XE;User Id=test;Password=test",
+            ConnectionString = "Data Source=(DESCRIPTION = (ADDRESS_LIST = (ADDRESS = (PROTOCOL = TCP)(HOST = localhost)(PORT = 1521)) ) (CONNECT_DATA = (SERVICE_NAME = XE) ) );User ID=test;Password=test;",
+            IsEnabled = false
+        };
+
+        public static DatabaseServerOptions Db2 = new DatabaseServerOptions
+        {
+            ConnectionString = "Database=;UserID=TEST;DataSource=;Password=Testing;DefaultCollection=TEST;DataCompression=True;ConnectTimeout=60;",
             IsEnabled = false
         };
 
