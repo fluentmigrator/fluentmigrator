@@ -218,7 +218,6 @@
     <Compile Include="Integration\Processors\Db2\Db2ProcessorTests.cs" />
     <Compile Include="Integration\Processors\Db2\Db2SchemaTests.cs" />
     <Compile Include="Integration\Processors\Db2\Db2TableTests.cs" />
-    <Compile Include="Integration\Processors\Postgres\PostgresColumnTests.cs" />
     <Compile Include="Integration\Processors\DotConnectPostgres\DotConnectPostgresConstraintTests.cs" />
     <Compile Include="Integration\Processors\DotConnectPostgres\DotConnectPostgresIndexTests.cs" />
     <Compile Include="Integration\Processors\DotConnectPostgres\DotConnectPostgresProcessorTests.cs" />
