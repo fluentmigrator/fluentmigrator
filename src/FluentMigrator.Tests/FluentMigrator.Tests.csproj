@@ -107,6 +107,8 @@
     <AssemblyOriginatorKeyFile>FluentMigrator.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Devart.Data, Version=5.0.1031.0, Culture=neutral, PublicKeyToken=09af7300eec23701, processorArchitecture=MSIL" />
+    <Reference Include="Devart.Data.PostgreSql, Version=7.3.239.0, Culture=neutral, PublicKeyToken=09af7300eec23701, processorArchitecture=MSIL" />
     <Reference Include="FirebirdSql.Data.FirebirdClient">
       <HintPath>..\..\lib\FirebirdSql.Data.FirebirdClient.dll</HintPath>
     </Reference>
@@ -166,6 +168,8 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="Helpers\Db2TestTable.cs" />
+    <Compile Include="Helpers\DotConnectPostgresTestSequence.cs" />
+    <Compile Include="Helpers\DotConnectPostgreTestTable.cs" />
     <Compile Include="Helpers\FirebirdTestTable.cs" />
     <Compile Include="Helpers\JetTestTable.cs" />
     <Compile Include="Helpers\OracleTestTable.cs" />
@@ -214,6 +218,13 @@
     <Compile Include="Integration\Processors\Db2\Db2ProcessorTests.cs" />
     <Compile Include="Integration\Processors\Db2\Db2SchemaTests.cs" />
     <Compile Include="Integration\Processors\Db2\Db2TableTests.cs" />
+    <Compile Include="Integration\Processors\DotConnectPostgres\DotConnectPostgresConstraintTests.cs" />
+    <Compile Include="Integration\Processors\DotConnectPostgres\DotConnectPostgresIndexTests.cs" />
+    <Compile Include="Integration\Processors\DotConnectPostgres\DotConnectPostgresProcessorTests.cs" />
+    <Compile Include="Integration\Processors\DotConnectPostgres\DotConnectPostgresSchemaExtensionsTests.cs" />
+    <Compile Include="Integration\Processors\DotConnectPostgres\DotConnectPostgresSchemaTests.cs" />
+    <Compile Include="Integration\Processors\DotConnectPostgres\DotConnectPostgresSequenceTests.cs" />
+    <Compile Include="Integration\Processors\DotConnectPostgres\DotConnectPostgresTableTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdColumnTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdConstraintTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdEmbeddedLibrariesForWindows.Designer.cs">
@@ -249,6 +260,7 @@
     <Compile Include="Integration\Processors\Oracle\OracleTableTests.cs" />
     <Compile Include="Integration\Processors\Oracle\OracleTableTestsBase.cs" />
     <Compile Include="Integration\Processors\Postgres\PostgresColumnTests.cs" />
+    <Compile Include="Integration\Processors\DotConnectPostgres\DotConnectPostgresColumnTests.cs" />
     <Compile Include="Integration\Processors\Postgres\PostgresConstraintTests.cs" />
     <Compile Include="Integration\Processors\Postgres\PostgresIndexTests.cs" />
     <Compile Include="Integration\Processors\Postgres\PostgresProcessorTests.cs" />
