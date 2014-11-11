@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -32,7 +32,7 @@ namespace FluentMigrator.Builders.Alter
             _context = context;
         }
 
-        public IAlterTableAddColumnOrAlterColumnOrSchemaSyntax Table(string tableName)
+        public IAlterTableAddColumnOrAlterColumnOrSchemaOrDescriptionSyntax Table(string tableName)
         {
             var expression = new AlterTableExpression { TableName = tableName };
             _context.Expressions.Add(expression);

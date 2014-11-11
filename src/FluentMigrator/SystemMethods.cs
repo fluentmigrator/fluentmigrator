@@ -1,4 +1,4 @@
-﻿
+
 namespace FluentMigrator
 {
     public enum SystemMethods

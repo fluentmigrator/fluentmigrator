@@ -30,7 +30,8 @@ namespace FluentMigrator.Runner
         /// <param name="expressions">All the expressions contained in the up or down action</param>
         public void ApplyConventionsToAndValidateExpressions(IMigration migration, IEnumerable<IMigrationExpression> expressions)
         {
-            var invalidExpressions = new Dictionary<string, string>();
+            var errorMessageBuilder = new StringBuilder();
+
             foreach (var expression in expressions)
             {
                 expression.ApplyConventions(_conventions);
@@ -39,21 +40,20 @@ namespace FluentMigrator.Runner
                 expression.CollectValidationErrors(errors);
 
                 if (errors.Count > 0)
-                    invalidExpressions.Add(expression.GetType().Name, string.Join(" ", errors.ToArray()));
+                    AppendError(errorMessageBuilder, expression.GetType().Name, string.Join(" ", errors.ToArray()));
             }
 
-            if (invalidExpressions.Count > 0)
+            if (errorMessageBuilder.Length > 0)
             {
-                var errorMessage = DictToString(invalidExpressions, "{0}: {1}");
+                var errorMessage = errorMessageBuilder.ToString();
                 _announcer.Error("The migration {0} contained the following Validation Error(s): {1}", migration.GetType().Name, errorMessage);
                 throw new InvalidMigrationException(migration, errorMessage);
             }
         }
 
-        private string DictToString<TKey, TValue>(Dictionary<TKey, TValue> items, string format)
+        private void AppendError(StringBuilder builder, string expressionType, string errors)
         {
-            format = String.IsNullOrEmpty(format) ? "{0}='{1}' " : format;
-            return items.Aggregate(new StringBuilder(), (sb, kvp) => sb.AppendFormat(format, kvp.Key, kvp.Value).AppendLine()).ToString();
+            builder.AppendFormat("{0}: {1}{2}", expressionType, errors, Environment.NewLine);
         }
     }
 }

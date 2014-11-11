@@ -17,6 +17,7 @@
 #endregion
 
 using FluentMigrator.Builders.Schema.Column;
+using FluentMigrator.Builders.Schema.Constraint;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Builders.Schema.Index;
 
@@ -48,6 +49,11 @@ namespace FluentMigrator.Builders.Schema.Table
         public ISchemaIndexSyntax Index(string indexName)
         {
             return new SchemaIndexQuery(_schemaName, _tableName, indexName, _context);
+        }
+
+        public ISchemaConstraintSyntax Constraint(string constraintName)
+        {
+            return new SchemaConstraintQuery(_schemaName, _tableName, constraintName, _context);
         }
 
     }

@@ -26,9 +26,10 @@ using FluentMigrator.Model;
 namespace FluentMigrator.Builders.Create.Table
 {
     public class CreateTableExpressionBuilder : ExpressionBuilderWithColumnTypesBase<CreateTableExpression, ICreateTableColumnOptionOrWithColumnSyntax>,
-                                                ICreateTableWithColumnOrSchemaSyntax,
+                                                ICreateTableWithColumnOrSchemaOrDescriptionSyntax,
                                                 ICreateTableColumnAsTypeSyntax,
-                                                ICreateTableColumnOptionOrForeignKeyCascadeOrWithColumnSyntax
+                                                ICreateTableColumnOptionOrForeignKeyCascadeOrWithColumnSyntax,
+                                                IColumnExpressionBuilder
     {
         private readonly IMigrationContext _context;
 
@@ -36,10 +37,12 @@ namespace FluentMigrator.Builders.Create.Table
             : base(expression)
         {
             _context = context;
+            ColumnHelper = new ColumnExpressionBuilderHelper(this, context);
         }
 
         public ColumnDefinition CurrentColumn { get; set; }
         public ForeignKeyDefinition CurrentForeignKey { get; set; }
+        public ColumnExpressionBuilderHelper ColumnHelper { get; set; }
 
         public ICreateTableWithColumnSyntax InSchema(string schemaName)
         {
@@ -49,9 +52,15 @@ namespace FluentMigrator.Builders.Create.Table
 
         public ICreateTableColumnAsTypeSyntax WithColumn(string name)
         {
-            var column = new ColumnDefinition {Name = name, TableName = Expression.TableName, ModificationType = ColumnModificationType.Create};
+            var column = new ColumnDefinition { Name = name, TableName = Expression.TableName, ModificationType = ColumnModificationType.Create };
             Expression.Columns.Add(column);
             CurrentColumn = column;
+            return this;
+        }
+
+        public ICreateTableWithColumnOrSchemaSyntax WithDescription(string description)
+        {
+            Expression.TableDescription = description;
             return this;
         }
 
@@ -64,6 +73,12 @@ namespace FluentMigrator.Builders.Create.Table
         public ICreateTableColumnOptionOrWithColumnSyntax WithDefaultValue(object value)
         {
             CurrentColumn.DefaultValue = value;
+            return this;
+        }
+
+        public ICreateTableColumnOptionOrWithColumnSyntax WithColumnDescription(string description)
+        {
+            CurrentColumn.ColumnDescription = description;
             return this;
         }
 
@@ -80,25 +95,7 @@ namespace FluentMigrator.Builders.Create.Table
 
         public ICreateTableColumnOptionOrWithColumnSyntax Indexed(string indexName)
         {
-            CurrentColumn.IsIndexed = true;
-
-            var index = new CreateIndexExpression
-                            {
-                                Index = new IndexDefinition
-                                            {
-                                                Name = indexName,
-                                                SchemaName = Expression.SchemaName,
-                                                TableName = Expression.TableName
-                                            }
-                            };
-
-            index.Index.Columns.Add(new IndexColumnDefinition
-                                        {
-                                            Name = CurrentColumn.Name
-                                        });
-
-            _context.Expressions.Add(index);
-
+            ColumnHelper.Indexed(indexName);
             return this;
         }
 
@@ -117,43 +114,25 @@ namespace FluentMigrator.Builders.Create.Table
 
         public ICreateTableColumnOptionOrWithColumnSyntax Nullable()
         {
-            CurrentColumn.IsNullable = true;
+            ColumnHelper.SetNullable(true);
             return this;
         }
 
         public ICreateTableColumnOptionOrWithColumnSyntax NotNullable()
         {
-            CurrentColumn.IsNullable = false;
+            ColumnHelper.SetNullable(false);
             return this;
         }
 
         public ICreateTableColumnOptionOrWithColumnSyntax Unique()
         {
-            return Unique(null);
+            ColumnHelper.Unique(null);
+            return this;
         }
 
         public ICreateTableColumnOptionOrWithColumnSyntax Unique(string indexName)
         {
-            CurrentColumn.IsUnique = true;
-
-            var index = new CreateIndexExpression
-                            {
-                                Index = new IndexDefinition
-                                            {
-                                                Name = indexName,
-                                                SchemaName = Expression.SchemaName,
-                                                TableName = Expression.TableName,
-                                                IsUnique = true
-                                            }
-                            };
-
-            index.Index.Columns.Add(new IndexColumnDefinition
-                                        {
-                                            Name = CurrentColumn.Name
-                                        });
-
-            _context.Expressions.Add(index);
-
+            ColumnHelper.Unique(indexName);
             return this;
         }
 
@@ -284,6 +263,30 @@ namespace FluentMigrator.Builders.Create.Table
             OnDelete(rule);
             OnUpdate(rule);
             return this;
+        }
+
+        string IColumnExpressionBuilder.SchemaName
+        {
+            get
+            {
+                return Expression.SchemaName;
+            }
+        }
+
+        string IColumnExpressionBuilder.TableName
+        {
+            get
+            {
+                return Expression.TableName;
+            }
+        }
+
+        ColumnDefinition IColumnExpressionBuilder.Column
+        {
+            get
+            {
+                return CurrentColumn;
+            }
         }
     }
 }

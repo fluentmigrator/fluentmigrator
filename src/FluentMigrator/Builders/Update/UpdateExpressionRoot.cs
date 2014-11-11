@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Expressions;
+using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Update

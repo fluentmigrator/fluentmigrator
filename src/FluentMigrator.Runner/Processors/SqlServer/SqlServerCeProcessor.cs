@@ -1,3 +1,5 @@
+using FluentMigrator.Runner.Helpers;
+
 #region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
@@ -53,22 +55,24 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool TableExists(string schemaName, string tableName)
         {
-            return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{0}'", FormatSqlEscape(tableName));
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = '{0}'", FormatHelper.FormatSqlEscape(tableName));
         }
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
-            return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'", FormatSqlEscape(tableName), FormatSqlEscape(columnName));
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'",
+                FormatHelper.FormatSqlEscape(tableName), FormatHelper.FormatSqlEscape(columnName));
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
-            return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = '{0}' AND CONSTRAINT_NAME = '{1}'", FormatSqlEscape(tableName), FormatSqlEscape(constraintName));
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE TABLE_NAME = '{0}' AND CONSTRAINT_NAME = '{1}'",
+                FormatHelper.FormatSqlEscape(tableName), FormatHelper.FormatSqlEscape(constraintName));
         }
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
-            return Exists("SELECT NULL FROM INFORMATION_SCHEMA.INDEXES WHERE INDEX_NAME = '{0}'", FormatSqlEscape(indexName));
+            return Exists("SELECT NULL FROM INFORMATION_SCHEMA.INDEXES WHERE INDEX_NAME = '{0}'", FormatHelper.FormatSqlEscape(indexName));
         }
 
         public override bool SequenceExists(string schemaName, string sequenceName)
@@ -173,7 +177,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             {
                 yield return builder.ToString();
             }
-        } 
+        }
 
         public override void Process(PerformDBOperationExpression expression)
         {
@@ -181,11 +185,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             if (expression.Operation != null)
                 expression.Operation(Connection, Transaction);
-        }
-
-        private static string FormatSqlEscape(string sql)
-        {
-            return sql.Replace("'", "''");
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace FluentMigrator.Builders.Create.Sequence
+namespace FluentMigrator.Builders.Create.Sequence
 {
     public interface ICreateSequenceSyntax
     {

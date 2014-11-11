@@ -1,4 +1,7 @@
-﻿using FirebirdSql.Data.FirebirdClient;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Processors;
@@ -70,5 +73,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             using (var table = new FirebirdTestTable(Processor, "TestSchema", "id int"))
                 Processor.TableExists("TestSchema", table.Name).ShouldBeTrue();
         }
+
+
     }
 }

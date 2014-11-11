@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -25,6 +25,7 @@ namespace FluentMigrator.Expressions
     {
         public virtual string SchemaName { get; set; }
         public virtual string TableName { get; set; }
+        public virtual string TableDescription { get; set; }
 
         public AlterTableExpression()
         {

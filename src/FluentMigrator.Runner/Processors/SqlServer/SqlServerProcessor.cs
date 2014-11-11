@@ -1,3 +1,5 @@
+using FluentMigrator.Runner.Helpers;
+
 #region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
@@ -46,7 +48,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         private static string SafeSchemaName(string schemaName)
         {
-            return string.IsNullOrEmpty(schemaName) ? "dbo" : FormatSqlEscape(schemaName);
+            return string.IsNullOrEmpty(schemaName) ? "dbo" : FormatHelper.FormatSqlEscape(schemaName);
         }
 
         public override bool SchemaExists(string schemaName)
@@ -58,7 +60,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             try
             {
-                return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}'", SafeSchemaName(schemaName), FormatSqlEscape(tableName));
+                return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}'", SafeSchemaName(schemaName),
+                    FormatHelper.FormatSqlEscape(tableName));
             }
             catch (Exception e)
             {
@@ -69,28 +72,34 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
-            return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}'", SafeSchemaName(schemaName), FormatSqlEscape(tableName), FormatSqlEscape(columnName));
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}'", SafeSchemaName(schemaName),
+                FormatHelper.FormatSqlEscape(tableName), FormatHelper.FormatSqlEscape(columnName));
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
-            return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_CATALOG = DB_NAME() AND TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND CONSTRAINT_NAME = '{2}'", SafeSchemaName(schemaName), FormatSqlEscape(tableName), FormatSqlEscape(constraintName));
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_CATALOG = DB_NAME() AND TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND CONSTRAINT_NAME = '{2}'", SafeSchemaName(schemaName),
+                FormatHelper.FormatSqlEscape(tableName), FormatHelper.FormatSqlEscape(constraintName));
         }
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
-            return Exists("SELECT * FROM sys.indexes WHERE name = '{0}' and object_id=OBJECT_ID('{1}.{2}')", FormatSqlEscape(indexName), SafeSchemaName(schemaName), FormatSqlEscape(tableName));
+            return Exists("SELECT * FROM sys.indexes WHERE name = '{0}' and object_id=OBJECT_ID('{1}.{2}')",
+                FormatHelper.FormatSqlEscape(indexName), SafeSchemaName(schemaName), FormatHelper.FormatSqlEscape(tableName));
         }
 
         public override bool SequenceExists(string schemaName, string sequenceName)
         {
-            return Exists("SELECT * FROM INFORMATION_SCHEMA.SEQUENCES WHERE SEQUENCE_SCHEMA = '{0}' AND SEQUENCE_NAME = '{1}'", SafeSchemaName(schemaName), FormatSqlEscape(sequenceName));
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.SEQUENCES WHERE SEQUENCE_SCHEMA = '{0}' AND SEQUENCE_NAME = '{1}'", SafeSchemaName(schemaName),
+                FormatHelper.FormatSqlEscape(sequenceName));
         }
 
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
-            string defaultValueAsString = string.Format("%{0}%", FormatSqlEscape(defaultValue.ToString()));
-            return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}' AND COLUMN_DEFAULT LIKE '{3}'", SafeSchemaName(schemaName), FormatSqlEscape(tableName), FormatSqlEscape(columnName), defaultValueAsString);
+            string defaultValueAsString = string.Format("%{0}%", FormatHelper.FormatSqlEscape(defaultValue.ToString()));
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}' AND COLUMN_DEFAULT LIKE '{3}'", SafeSchemaName(schemaName),
+                FormatHelper.FormatSqlEscape(tableName),
+                FormatHelper.FormatSqlEscape(columnName), defaultValueAsString);
         }
 
         public override void Execute(string template, params object[] args)
@@ -222,11 +231,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             if (expression.Operation != null)
                 expression.Operation(Connection, Transaction);
-        }
-
-        private static string FormatSqlEscape(string sql)
-        {
-            return sql.Replace("'", "''");
         }
     }
 }

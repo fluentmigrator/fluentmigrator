@@ -19,7 +19,6 @@
 
 
 using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.IO;
@@ -27,7 +26,6 @@ using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
 using FluentMigrator.Expressions;
-using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.SqlServer;
@@ -36,13 +34,12 @@ using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.Postgres;
-using FluentMigrator.Runner.Processors.Sqlite;
+using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Integration.Migrations;
 using FluentMigrator.Tests.Integration.Migrations.Tagged;
 using FluentMigrator.Tests.Unit;
 using FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3;
-using FluentMigrator.Tests.Integration.Migrations.Invalid;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
@@ -259,6 +256,7 @@ namespace FluentMigrator.Tests.Integration
                 });
         }
 
+
         [Test]
         public void CanRenameTableWithSchema()
         {
@@ -389,7 +387,8 @@ namespace FluentMigrator.Tests.Integration
                 runner.VersionLoader.VersionInfo.HasAppliedMigration(2).ShouldBeTrue();
                 runner.VersionLoader.VersionInfo.HasAppliedMigration(3).ShouldBeTrue();
                 runner.VersionLoader.VersionInfo.HasAppliedMigration(4).ShouldBeTrue();
-                runner.VersionLoader.VersionInfo.Latest().ShouldBe(4);
+                runner.VersionLoader.VersionInfo.HasAppliedMigration(5).ShouldBeTrue();
+                runner.VersionLoader.VersionInfo.Latest().ShouldBe(5);
 
                 runner.RollbackToVersion(0, false);
             });

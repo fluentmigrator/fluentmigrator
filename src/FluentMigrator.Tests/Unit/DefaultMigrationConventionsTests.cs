@@ -113,32 +113,32 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void MigrationInfoShouldRetainMigration()
         {
-            var migration = new DefaultConventionMigrationFake();
-            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migration);
-            migrationinfo.Migration.ShouldBeSameAs(migration);
+            var migrationType = typeof(DefaultConventionMigrationFake);
+            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migrationType);
+            migrationinfo.Migration.GetType().ShouldBeSameAs(migrationType);
         }
 
         [Test]
         public void MigrationInfoShouldExtractVersion()
         {
-            var migration = new DefaultConventionMigrationFake();
-            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migration);
+            var migrationType = typeof(DefaultConventionMigrationFake);
+            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migrationType);
             migrationinfo.Version.ShouldBe(123);
         }
 
         [Test]
         public void MigrationInfoShouldExtractTransactionBehavior()
         {
-            var migration = new DefaultConventionMigrationFake();
-            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migration);
+            var migrationType = typeof(DefaultConventionMigrationFake);
+            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migrationType);
             migrationinfo.TransactionBehavior.ShouldBe(TransactionBehavior.None);
         }
 
         [Test]
         public void MigrationInfoShouldExtractTraits()
         {
-            var migration = new DefaultConventionMigrationFake();
-            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migration);
+            var migrationType = typeof(DefaultConventionMigrationFake);
+            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migrationType);
             migrationinfo.Trait("key").ShouldBe("test");
         }
 

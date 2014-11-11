@@ -28,14 +28,13 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
     public class SqlServer2005Generator : SqlServer2000Generator
     {
-
         public SqlServer2005Generator()
-            : base(new SqlServerColumn(new SqlServer2005TypeMap()))
+            : base(new SqlServerColumn(new SqlServer2005TypeMap()), new SqlServer2005DescriptionGenerator())
         {
         }
 
-        protected SqlServer2005Generator(IColumn column)
-            : base(column)
+        protected SqlServer2005Generator(IColumn column, IDescriptionGenerator descriptionGenerator)
+            : base(column, descriptionGenerator)
         {
         }
 
@@ -68,7 +67,24 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(CreateTableExpression expression)
         {
-            return string.Format("CREATE TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            var descriptionStatements = DescriptionGenerator.GenerateDescriptionStatements(expression);
+            var createTableStatement = string.Format("CREATE TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            var descriptionStatementsArray = descriptionStatements as string[] ?? descriptionStatements.ToArray();
+
+            if (!descriptionStatementsArray.Any())
+                return createTableStatement;
+
+            return ComposeStatements(createTableStatement, descriptionStatementsArray);
+        }
+
+        public override string Generate(AlterTableExpression expression)
+        {
+            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
+
+            if (string.IsNullOrEmpty(descriptionStatement))
+                return base.Generate(expression);
+
+            return descriptionStatement;
         }
 
         public override string Generate(DeleteTableExpression expression)
@@ -78,12 +94,24 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(CreateColumnExpression expression)
         {
-            return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            var alterTableStatement = string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
+
+            if (string.IsNullOrEmpty(descriptionStatement))
+                return alterTableStatement;
+
+            return ComposeStatements(alterTableStatement, new[] { descriptionStatement });
         }
 
         public override string Generate(AlterColumnExpression expression)
         {
-            return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            var alterTableStatement = string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
+
+            if (string.IsNullOrEmpty(descriptionStatement))
+                return alterTableStatement;
+
+            return ComposeStatements(alterTableStatement, new[] { descriptionStatement });
         }
 
         public override string Generate(RenameColumnExpression expression)
@@ -176,7 +204,6 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return String.Join("; ", insertStrings.ToArray());
         }
 
-
         public override string Generate(CreateForeignKeyExpression expression)
         {
             if (expression.ForeignKey.PrimaryColumns.Count != expression.ForeignKey.ForeignColumns.Count)
@@ -254,13 +281,14 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return String.Format(DropIndex, Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteSchemaName(expression.Index.SchemaName), Quoter.QuoteTableName(expression.Index.TableName));
         }
 
-        protected override void BuildDelete(DeleteColumnExpression expression, string columnName, StringBuilder builder) 
+        protected override void BuildDelete(DeleteColumnExpression expression, string columnName, StringBuilder builder)
         {
-            builder.AppendLine(Generate(new DeleteDefaultConstraintExpression {
-                                                                                  ColumnName = columnName,
-                                                                                  SchemaName = expression.SchemaName,
-                                                                                  TableName = expression.TableName
-                                                                              }));
+            builder.AppendLine(Generate(new DeleteDefaultConstraintExpression
+            {
+                ColumnName = columnName,
+                SchemaName = expression.SchemaName,
+                TableName = expression.TableName
+            }));
 
             builder.AppendLine();
 
@@ -338,6 +366,18 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string Generate(AlterSchemaExpression expression)
         {
             return String.Format(AlterSchema, Quoter.QuoteSchemaName(expression.DestinationSchemaName), Quoter.QuoteSchemaName(expression.SourceSchemaName), Quoter.QuoteTableName(expression.TableName));
+        }
+
+        private string ComposeStatements(string ddlStatement, IEnumerable<string> otherStatements)
+        {
+            var otherStatementsArray = otherStatements.ToArray();
+
+            var statementsBuilder = new StringBuilder();
+            statementsBuilder.AppendLine(ddlStatement);
+            statementsBuilder.AppendLine("GO");
+            statementsBuilder.AppendLine(string.Join(";", otherStatementsArray));
+
+            return statementsBuilder.ToString();
         }
     }
 }

@@ -276,16 +276,17 @@ namespace FluentMigrator.Console
 
         private void ExecuteMigrations(string outputTo, string outputDir)
         {
-            consoleAnnouncer.ShowElapsedTime = Verbose;
-            consoleAnnouncer.ShowSql = Verbose;
-
             if (outputDir == null) {
                 using (var sw = new StreamWriter(outputTo)) {
-                    var fileAnnouncer = new TextWriterAnnouncer(sw)
-                                            {
-                                                ShowElapsedTime = false,
-                                                ShowSql = true
-                                            };
+                var fileAnnouncer = this.ExecutingAgainstMsSql ?
+                    new TextWriterWithGoAnnouncer(sw) :
+                    new TextWriterAnnouncer(sw);
+
+                fileAnnouncer.ShowElapsedTime = false;
+                fileAnnouncer.ShowSql = true;
+
+                consoleAnnouncer.ShowElapsedTime = Verbose;
+                consoleAnnouncer.ShowSql = Verbose;
 
                     var announcer = new CompositeAnnouncer(consoleAnnouncer, fileAnnouncer);
 
@@ -300,6 +301,15 @@ namespace FluentMigrator.Console
                 ExecuteMigrations(new CompositeAnnouncer(consoleAnnouncer, dirAnnouncer));
             }
         }
+        
+        private bool ExecutingAgainstMsSql
+        {
+            get
+            {
+                return ProcessorType.StartsWith("SqlServer", StringComparison.InvariantCultureIgnoreCase);
+            }
+        }
+
 
         private void ExecuteMigrations(IAnnouncer announcer)
         {

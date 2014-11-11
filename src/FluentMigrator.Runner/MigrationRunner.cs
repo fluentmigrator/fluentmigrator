@@ -50,6 +50,7 @@ namespace FluentMigrator.Runner
         public IMigrationProcessor Processor { get; private set; }
         public IMigrationInformationLoader MigrationLoader { get; set; }
         public IProfileLoader ProfileLoader { get; set; }
+        public IMaintenanceLoader MaintenanceLoader { get; set; }
         public IMigrationConventions Conventions { get; private set; }
         public IList<Exception> CaughtExceptions { get; private set; }
 
@@ -87,6 +88,7 @@ namespace FluentMigrator.Runner
             VersionLoader = new VersionLoader(this, _migrationAssembly, Conventions, versionInfo);
             MigrationLoader = new DefaultMigrationInformationLoader(Conventions, _migrationAssembly, runnerContext.Namespace, runnerContext.NestedNamespaces, runnerContext.Tags);
             ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
+            MaintenanceLoader = new MaintenanceLoader(this, Conventions);
             updateVersionInfo = !runnerContext.SuppressVersionInfo;
         }
 
@@ -95,6 +97,11 @@ namespace FluentMigrator.Runner
         public void ApplyProfiles()
         {
             ProfileLoader.ApplyProfiles();
+        }
+
+        public void ApplyMaintenance(MigrationStage stage)
+        {
+            MaintenanceLoader.ApplyMaintenance(stage);
         }
 
         public void MigrateUp()
@@ -109,13 +116,21 @@ namespace FluentMigrator.Runner
 
             using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
+                ApplyMaintenance(MigrationStage.BeforeAll);
+
                 foreach (var pair in migrations)
                 {
+                    ApplyMaintenance(MigrationStage.BeforeEach);
                     ApplyMigrationUp(pair.Value, useAutomaticTransactionManagement && pair.Value.TransactionBehavior == TransactionBehavior.Default);
                     appliedMigrations.Add(pair.Key);
+                    ApplyMaintenance(MigrationStage.AfterEach);
                 }
 
+                ApplyMaintenance(MigrationStage.BeforeProfiles);
+
                 ApplyProfiles();
+
+                ApplyMaintenance(MigrationStage.AfterAll);
 
                 scope.Complete();
             }
@@ -140,6 +155,8 @@ namespace FluentMigrator.Runner
                     ApplyMigrationUp(migrationInfo, useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
                     appliedMigrations.Add(migrationInfo.Version);
                 }
+
+                ApplyProfiles();
 
                 scope.Complete();
             }
@@ -183,6 +200,8 @@ namespace FluentMigrator.Runner
                     ApplyMigrationDown(migrationInfo, useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
                     appliedMigrations.Add(migrationInfo.Version);
                 }
+
+                ApplyProfiles();
 
                 scope.Complete();
             }
@@ -233,7 +252,11 @@ namespace FluentMigrator.Runner
                 using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useTransaction))
                 {
                     ExecuteMigration(migrationInfo.Migration, (m, c) => m.GetUpExpressions(c));
-                    if (migrationInfo.IsAttributed() && updateVersionInfo) VersionLoader.UpdateVersionInfo(migrationInfo.Version);
+                    
+                    if (migrationInfo.IsAttributed() && updateVersionInfo)
+                    {
+                        VersionLoader.UpdateVersionInfo(migrationInfo.Version, migrationInfo.Description ?? migrationInfo.Migration.GetType().Name);
+                    }
                     
                     scope.Complete();
 

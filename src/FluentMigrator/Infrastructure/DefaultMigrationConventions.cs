@@ -79,6 +79,15 @@ namespace FluentMigrator.Infrastructure
             return typeof(IMigration).IsAssignableFrom(type) && type.HasAttribute<MigrationAttribute>();
         }
 
+        public static MigrationStage? GetMaintenanceStage(Type type) 
+        {
+            if (!typeof(IMigration).IsAssignableFrom(type))
+                return null;
+            
+            var attribute = type.GetOneAttribute<MaintenanceAttribute>();
+            return attribute != null ? attribute.Stage : (MigrationStage?)null;
+        }
+
         public static bool TypeIsProfile(Type type)
         {
             return typeof(IMigration).IsAssignableFrom(type) && type.HasAttribute<ProfileAttribute>();
@@ -89,12 +98,13 @@ namespace FluentMigrator.Infrastructure
             return typeof(IVersionTableMetaData).IsAssignableFrom(type) && type.HasAttribute<VersionTableMetaDataAttribute>();
         }
 
-        public static IMigrationInfo GetMigrationInfoFor(IMigration migration)
+        public static IMigrationInfo GetMigrationInfoFor(Type migrationType)
         {
-            var migrationAttribute = migration.GetType().GetOneAttribute<MigrationAttribute>();
-            var migrationInfo = new MigrationInfo(migrationAttribute.Version, migrationAttribute.TransactionBehavior, migration);
+            var migrationAttribute = migrationType.GetOneAttribute<MigrationAttribute>();
+            Func<IMigration> migrationFunc = () => (IMigration)migrationType.Assembly.CreateInstance(migrationType.FullName);
+            var migrationInfo = new MigrationInfo(migrationAttribute.Version, migrationAttribute.Description, migrationAttribute.TransactionBehavior, migrationFunc);
 
-            foreach (MigrationTraitAttribute traitAttribute in migration.GetType().GetAllAttributes<MigrationTraitAttribute>())
+            foreach (MigrationTraitAttribute traitAttribute in migrationType.GetAllAttributes<MigrationTraitAttribute>())
                 migrationInfo.AddTrait(traitAttribute.Name, traitAttribute.Value);
 
             return migrationInfo;

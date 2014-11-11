@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -26,9 +26,10 @@ using FluentMigrator.Model;
 namespace FluentMigrator.Builders.Alter.Table
 {
     public class AlterTableExpressionBuilder : ExpressionBuilderWithColumnTypesBase<AlterTableExpression, IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax>,
-                                               IAlterTableAddColumnOrAlterColumnOrSchemaSyntax,
+                                               IAlterTableAddColumnOrAlterColumnOrSchemaOrDescriptionSyntax,
                                                IAlterTableColumnAsTypeSyntax,
-                                               IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax
+                                               IAlterTableColumnOptionOrAddColumnOrAlterColumnOrForeignKeyCascadeSyntax,
+                                               IColumnExpressionBuilder
     {
         private readonly IMigrationContext _context;
 
@@ -36,10 +37,12 @@ namespace FluentMigrator.Builders.Alter.Table
             : base(expression)
         {
             _context = context;
+            ColumnHelper = new ColumnExpressionBuilderHelper(this, context);
         }
 
         public ColumnDefinition CurrentColumn { get; set; }
         public ForeignKeyDefinition CurrentForeignKey { get; set; }
+        public ColumnExpressionBuilderHelper ColumnHelper { get; set; }
 
         public IAlterTableAddColumnOrAlterColumnSyntax InSchema(string schemaName)
         {
@@ -59,9 +62,15 @@ namespace FluentMigrator.Builders.Alter.Table
             _context.Expressions.Add(alterSchema);
         }
 
+        public IAlterTableAddColumnOrAlterColumnOrSchemaSyntax WithDescription(string description)
+        {
+            Expression.TableDescription = description;
+            return this;
+        }
+
         public IAlterTableColumnAsTypeSyntax AddColumn(string name)
         {
-            var column = new ColumnDefinition {Name = name, ModificationType = ColumnModificationType.Create};
+            var column = new ColumnDefinition { Name = name, ModificationType = ColumnModificationType.Create };
             var createColumn = new CreateColumnExpression
                                    {
                                        Column = column,
@@ -77,7 +86,7 @@ namespace FluentMigrator.Builders.Alter.Table
 
         public IAlterTableColumnAsTypeSyntax AlterColumn(string name)
         {
-            var column = new ColumnDefinition {Name = name, ModificationType = ColumnModificationType.Alter};
+            var column = new ColumnDefinition { Name = name, ModificationType = ColumnModificationType.Alter };
             var alterColumn = new AlterColumnExpression
                                   {
                                       Column = column,
@@ -118,6 +127,18 @@ namespace FluentMigrator.Builders.Alter.Table
             return this;
         }
 
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax SetExistingRowsTo(object value)
+        {
+           ColumnHelper.SetExistingRowsTo(value);
+           return this;
+        }
+
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithColumnDescription(string description)
+        {
+            CurrentColumn.ColumnDescription = description;
+            return this;
+        }
+
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax Identity()
         {
             CurrentColumn.IsIdentity = true;
@@ -131,25 +152,7 @@ namespace FluentMigrator.Builders.Alter.Table
 
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax Indexed(string indexName)
         {
-            CurrentColumn.IsIndexed = true;
-
-            var index = new CreateIndexExpression
-                            {
-                                Index = new IndexDefinition
-                                            {
-                                                Name = indexName,
-                                                SchemaName = Expression.SchemaName,
-                                                TableName = Expression.TableName
-                                            }
-                            };
-
-            index.Index.Columns.Add(new IndexColumnDefinition
-                                        {
-                                            Name = CurrentColumn.Name
-                                        });
-
-            _context.Expressions.Add(index);
-
+            ColumnHelper.Indexed(indexName);
             return this;
         }
 
@@ -168,43 +171,25 @@ namespace FluentMigrator.Builders.Alter.Table
 
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax Nullable()
         {
-            CurrentColumn.IsNullable = true;
+            ColumnHelper.SetNullable(true);
             return this;
         }
 
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax NotNullable()
         {
-            CurrentColumn.IsNullable = false;
+            ColumnHelper.SetNullable(false);
             return this;
         }
 
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax Unique()
         {
-            return Unique(null);
+            ColumnHelper.Unique(null);
+            return this;
         }
 
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax Unique(string indexName)
         {
-            CurrentColumn.IsUnique = true;
-
-            var index = new CreateIndexExpression
-                            {
-                                Index = new IndexDefinition
-                                            {
-                                                Name = indexName,
-                                                SchemaName = Expression.SchemaName,
-                                                TableName = Expression.TableName,
-                                                IsUnique = true
-                                            }
-                            };
-
-            index.Index.Columns.Add(new IndexColumnDefinition
-                                        {
-                                            Name = CurrentColumn.Name
-                                        });
-
-            _context.Expressions.Add(index);
-
+            ColumnHelper.Unique(indexName);
             return this;
         }
 
@@ -337,6 +322,30 @@ namespace FluentMigrator.Builders.Alter.Table
         public override ColumnDefinition GetColumnForType()
         {
             return CurrentColumn;
+        }
+
+        string IColumnExpressionBuilder.SchemaName
+        {
+           get
+           {
+              return Expression.SchemaName;
+           }
+        }
+
+        string IColumnExpressionBuilder.TableName
+        {
+           get
+           {
+              return Expression.TableName;
+           }
+        }
+
+        ColumnDefinition IColumnExpressionBuilder.Column
+        {
+           get
+           {
+              return CurrentColumn;
+           }
         }
     }
 }

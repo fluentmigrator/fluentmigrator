@@ -12,6 +12,7 @@ namespace FluentMigrator.Runner
         void RemoveVersionTable();
         IMigrationRunner Runner { get; set; }
         void UpdateVersionInfo(long version);
+        void UpdateVersionInfo(long version, string description);
         FluentMigrator.Runner.Versioning.IVersionInfo VersionInfo { get; set; }
         FluentMigrator.VersionTableInfo.IVersionTableMetaData VersionTableMetaData { get; }
     }

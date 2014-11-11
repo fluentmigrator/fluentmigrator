@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using FluentMigrator.Model;
 
@@ -58,7 +59,6 @@ namespace FluentMigrator.Runner.Processors.Firebird
                     Type = column.DBType,
                     Precision = column.Precision ?? 0,
                     Size = column.Size ?? 0
-
                 };
                 if (colDef.Type == null)
                     colDef.CustomType = column.CustomType;

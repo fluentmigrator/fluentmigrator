@@ -5,8 +5,8 @@ using System.Linq;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Processors.Sqlite;
 using System;
+using FluentMigrator.Runner.Processors.SQLite;
 
 namespace FluentMigrator.SchemaDump.SchemaDumpers
 {
@@ -61,12 +61,7 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
         {
             Processor.Process(expression);
         }
-
-        protected string FormatSqlEscape(string sql)
-        {
-            return sql.Replace("'", "''");
-        }
-
+        
         protected virtual IList<TableDefinition> ReadTables()
         {
             var dtTable = GetTableNamesAndDDL();

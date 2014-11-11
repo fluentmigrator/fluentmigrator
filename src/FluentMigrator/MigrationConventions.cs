@@ -30,8 +30,9 @@ namespace FluentMigrator
         public Func<IndexDefinition, string> GetIndexName { get; set; }
         public Func<Type, bool> TypeIsMigration { get; set; }
         public Func<Type, bool> TypeIsProfile { get; set; }
+        public Func<Type, MigrationStage?> GetMaintenanceStage { get; set; }
         public Func<Type, bool> TypeIsVersionTableMetaData { get; set; }
-        public Func<IMigration, IMigrationInfo> GetMigrationInfo { get; set; }
+        public Func<Type, IMigrationInfo> GetMigrationInfo { get; set; }
         public Func<string> GetWorkingDirectory { get; set; }
         public Func<Model.ConstraintDefinition, string> GetConstraintName { get; set; }
         public Func<Type, bool> TypeHasTags { get; set; }
@@ -46,6 +47,7 @@ namespace FluentMigrator
             GetIndexName = DefaultMigrationConventions.GetIndexName;
             TypeIsMigration = DefaultMigrationConventions.TypeIsMigration;
             TypeIsProfile = DefaultMigrationConventions.TypeIsProfile;
+            GetMaintenanceStage = DefaultMigrationConventions.GetMaintenanceStage;
             TypeIsVersionTableMetaData = DefaultMigrationConventions.TypeIsVersionTableMetaData;
             GetMigrationInfo = DefaultMigrationConventions.GetMigrationInfoFor;
             GetWorkingDirectory = DefaultMigrationConventions.GetWorkingDirectory;

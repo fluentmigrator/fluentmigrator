@@ -17,7 +17,7 @@ namespace :build do
     asm.file_version = bumper_version.to_s
     asm.product_name = "FluentMigrator"
     asm.copyright = "Copyright - Sean Chambers 2008-" + Time.now.year.to_s
-    asm.custom_attributes :AssemblyConfigurationAttribute => "Debug"
+    asm.custom_attributes :AssemblyConfigurationAttribute => "Debug", :'System.CLSCompliantAttribute' => true
     asm.output_file = "src/SolutionInfo.cs"
   end
 

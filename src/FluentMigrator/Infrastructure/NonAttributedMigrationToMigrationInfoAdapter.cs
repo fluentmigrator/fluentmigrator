@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -29,6 +29,8 @@ namespace FluentMigrator.Infrastructure
             if (migration == null) throw new ArgumentNullException("migration");
             Migration = migration;
         }
+
+        public string Description { get; private set; }
 
         public long Version
         {

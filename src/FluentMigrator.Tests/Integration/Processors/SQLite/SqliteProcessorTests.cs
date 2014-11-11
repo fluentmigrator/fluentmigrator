@@ -25,7 +25,7 @@ using FluentMigrator.Model;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.Runner.Processors;
-using FluentMigrator.Runner.Processors.Sqlite;
+using FluentMigrator.Runner.Processors.SQLite;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;

@@ -12,7 +12,7 @@ namespace FluentMigrator.Tests.Helpers
 {
     public class OracleTestTable : IDisposable
     {
-        private readonly OracleQuoter quoter = new OracleQuoter();
+        private readonly IQuoter quoter = new OracleQuoterQuotedIdentifier();
 
         private IDbConnection Connection { get; set; }
         private IDbFactory Factory { get; set; }
@@ -22,10 +22,10 @@ namespace FluentMigrator.Tests.Helpers
         public string Name { get; set; }
 
 
-        public OracleTestTable(IDbConnection connection, string schema, params string[] columnDefinitions)
+        public OracleTestTable(IDbConnection connection, string schema, IDbFactory factory, params string[] columnDefinitions)
         {
             Connection = connection;
-            Factory = new OracleDbFactory();
+            Factory = factory;
             _schema = schema;
 
             if (Connection.State != ConnectionState.Open)
@@ -35,10 +35,10 @@ namespace FluentMigrator.Tests.Helpers
             Create(columnDefinitions);
         }
 
-        public OracleTestTable(string table, IDbConnection connection, string schema, params string[] columnDefinitions)
+        public OracleTestTable(string table, IDbConnection connection, string schema, IDbFactory factory, params string[] columnDefinitions)
         {
             Connection = connection;
-            Factory = new OracleDbFactory();
+            Factory = factory;
             _schema = schema;
 
             if (Connection.State != ConnectionState.Open)
@@ -92,12 +92,11 @@ namespace FluentMigrator.Tests.Helpers
         public void WithUniqueConstraintOn(string column, string name)
         {
             var sb = new StringBuilder();
-            var constraintName = quoter.QuoteConstraintName(name);
-            constraints.Add(constraintName);
-            sb.Append(string.Format("ALTER TABLE {0} ADD CONSTRAINT {1} UNIQUE ({2})", quoter.QuoteTableName(Name), constraintName, quoter.QuoteColumnName(column)));
+            sb.Append(string.Format("ALTER TABLE {0} ADD CONSTRAINT {1} UNIQUE ({2})", quoter.QuoteTableName(Name), quoter.QuoteConstraintName(name), quoter.QuoteColumnName(column)));
             using (var command = Factory.CreateCommand(sb.ToString(), Connection))
                 command.ExecuteNonQuery();
-        }
+			constraints.Add(name);
+       }
 
         public void WithIndexOn(string column)
         {
@@ -107,24 +106,23 @@ namespace FluentMigrator.Tests.Helpers
         public void WithIndexOn(string column, string name)
         {
             var sb = new StringBuilder();
-            var indexName = quoter.QuoteIndexName(name);
-            indexies.Add(indexName);
-            sb.Append(string.Format("CREATE UNIQUE INDEX {0} ON {1} ({2})", indexName, quoter.QuoteTableName(Name), quoter.QuoteColumnName(column)));
+            sb.Append(string.Format("CREATE UNIQUE INDEX {0} ON {1} ({2})", quoter.QuoteIndexName(name), quoter.QuoteTableName(Name), quoter.QuoteColumnName(column)));
             using (var command = Factory.CreateCommand(sb.ToString(), Connection))
                 command.ExecuteNonQuery();
+            indexies.Add(name);
         }
 
         public void Drop()
         {
-            foreach(var contraint in constraints)
+            foreach(var constraint in constraints)
             {
-                using (var command = Factory.CreateCommand("ALTER TABLE " + quoter.QuoteTableName(Name) + " DROP CONSTRAINT " + contraint, Connection))
+                using (var command = Factory.CreateCommand(string.Format( "ALTER TABLE {0} DROP CONSTRAINT {1}", quoter.QuoteTableName(this.Name), quoter.QuoteConstraintName(constraint) ), Connection))
                     command.ExecuteNonQuery();
             }
 
             foreach (var index in indexies)
             {
-                using (var command = Factory.CreateCommand("DROP INDEX " + index, Connection))
+                using (var command = Factory.CreateCommand(string.Format( "DROP INDEX {0}", this.quoter.QuoteIndexName( index ) ), Connection))
                     command.ExecuteNonQuery();
             }
 

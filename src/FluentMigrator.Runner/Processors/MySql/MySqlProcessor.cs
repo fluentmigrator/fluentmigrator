@@ -1,3 +1,5 @@
+using FluentMigrator.Runner.Helpers;
+
 #region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
@@ -19,11 +21,14 @@
 using System;
 using System.Data;
 using FluentMigrator.Builders.Execute;
+using FluentMigrator.Runner.Generators.MySql;
 
 namespace FluentMigrator.Runner.Processors.MySql
 {
     public class MySqlProcessor : GenericProcessorBase
     {
+        readonly MySqlQuoter quoter = new MySqlQuoter();
+
         public override string DatabaseType
         {
             get { return "MySql"; }
@@ -42,7 +47,7 @@ namespace FluentMigrator.Runner.Processors.MySql
         public override bool TableExists(string schemaName, string tableName)
         {
             return Exists(@"select table_name from information_schema.tables 
-                            where table_schema = SCHEMA() and table_name='{0}'", FormatSqlEscape(tableName));
+                            where table_schema = SCHEMA() and table_name='{0}'", FormatHelper.FormatSqlEscape(tableName));
         }
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
@@ -50,7 +55,7 @@ namespace FluentMigrator.Runner.Processors.MySql
             const string sql = @"select column_name from information_schema.columns
                             where table_schema = SCHEMA() and table_name='{0}'
                             and column_name='{1}'";
-            return Exists(sql, FormatSqlEscape(tableName), FormatSqlEscape(columnName));
+            return Exists(sql, FormatHelper.FormatSqlEscape(tableName), FormatHelper.FormatSqlEscape(columnName));
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
@@ -58,7 +63,7 @@ namespace FluentMigrator.Runner.Processors.MySql
             const string sql = @"select constraint_name from information_schema.table_constraints
                             where table_schema = SCHEMA() and table_name='{0}'
                             and constraint_name='{1}'";
-            return Exists(sql, FormatSqlEscape(tableName), FormatSqlEscape(constraintName));
+            return Exists(sql, FormatHelper.FormatSqlEscape(tableName), FormatHelper.FormatSqlEscape(constraintName));
         }
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
@@ -66,7 +71,7 @@ namespace FluentMigrator.Runner.Processors.MySql
             const string sql = @"select index_name from information_schema.statistics
                             where table_schema = SCHEMA() and table_name='{0}'
                             and index_name='{1}'";
-            return Exists(sql, FormatSqlEscape(tableName), FormatSqlEscape(indexName));
+            return Exists(sql, FormatHelper.FormatSqlEscape(tableName), FormatHelper.FormatSqlEscape(indexName));
         }
 
         public override bool SequenceExists(string schemaName, string sequenceName)
@@ -76,13 +81,14 @@ namespace FluentMigrator.Runner.Processors.MySql
 
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
-            string defaultValueAsString = string.Format("%{0}%", FormatSqlEscape(defaultValue.ToString()));
-            return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}' AND COLUMN_DEFAULT LIKE '{2}'", FormatSqlEscape(tableName), FormatSqlEscape(columnName), defaultValueAsString);
+            string defaultValueAsString = string.Format("%{0}%", FormatHelper.FormatSqlEscape(defaultValue.ToString()));
+            return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}' AND COLUMN_DEFAULT LIKE '{2}'",
+               FormatHelper.FormatSqlEscape(tableName), FormatHelper.FormatSqlEscape(columnName), defaultValueAsString);
         }
 
         public override void Execute(string template, params object[] args)
         {
-            if(Options.PreviewOnly) 
+            if (Options.PreviewOnly)
             {
                 return;
             }
@@ -119,7 +125,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
-            return Read("select * from {0}", tableName);
+            return Read("select * from {0}", quoter.QuoteTableName(tableName));
         }
 
         public override DataSet Read(string template, params object[] args)
@@ -159,7 +165,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
             if (Options.PreviewOnly)
                 return;
-            
+
             EnsureConnectionIsOpen();
 
             if (expression.Operation != null)
@@ -184,16 +190,11 @@ SELECT CONCAT(
              CONCAT('DEFAULT ', QUOTE(COLUMN_DEFAULT), ' ')),
           UPPER(extra))
   FROM INFORMATION_SCHEMA.COLUMNS
- WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'", FormatSqlEscape(expression.TableName), FormatSqlEscape(expression.OldName));
+ WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'", FormatHelper.FormatSqlEscape(expression.TableName), FormatHelper.FormatSqlEscape(expression.OldName));
 
             var columnDefinition = Read(columnDefinitionSql).Tables[0].Rows[0].Field<string>(0);
 
             Process(Generator.Generate(expression) + columnDefinition);
-        }
-
-        private static string FormatSqlEscape(string value)
-        {
-            return value.Replace("'", "''");
         }
     }
 }
