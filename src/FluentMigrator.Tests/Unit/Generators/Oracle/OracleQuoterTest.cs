@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public void TimeSpanIsFormattedQuotes()
         {
             quoter.QuoteValue(new TimeSpan(1,2, 13, 65))
-                .ShouldBe("'1 2:14:05'");
+                .ShouldBe("'1 2:14:5.0'");
         }
     }
 }
