@@ -15,12 +15,11 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         public override string FromTimeSpan(System.TimeSpan value)
         {
-            return System.String.Format("{0}{1}:{2}:{3}.{4}{0}"
+            return System.String.Format("{0}{1:00}:{2:00}:{3:00}{0}"
                 , ValueQuote
                 , value.Hours + (value.Days * 24)
                 , value.Minutes
-                , value.Seconds
-                , value.Milliseconds);
+                , value.Seconds);
         }
     }
 }
