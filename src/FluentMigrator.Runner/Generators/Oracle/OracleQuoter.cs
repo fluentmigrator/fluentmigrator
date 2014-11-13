@@ -39,6 +39,17 @@ namespace FluentMigrator.Runner.Generators.Oracle
 		{
 			return sequenceName;
 		}
+
+        public override string FromTimeSpan(TimeSpan value)
+        {
+            return String.Format("{0}{1} {2}:{3}:{4}.{5}{0}"
+                , ValueQuote
+                , value.Days
+                , value.Hours
+                , value.Minutes
+                , value.Seconds
+                , value.Milliseconds);
+        }
     }
 
 }
