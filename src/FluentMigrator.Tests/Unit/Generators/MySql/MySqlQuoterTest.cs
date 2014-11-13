@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         public void TimeSpanIsFormattedQuotes()
         {
             quoter.QuoteValue(new TimeSpan(1,2, 13, 65))
-                .ShouldBe("`26:14:05`");
+                .ShouldBe("'26:14:05'");
         }
     }
 }
