@@ -272,7 +272,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         public void TimeSpanIsFormattedQuotes()
         {
             quoter.QuoteValue(new TimeSpan(2, 13, 65))
-                .ShouldBe("'2:14:05'");
+                .ShouldBe("'02:14:05'");
         }
 
         [Test]
