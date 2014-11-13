@@ -34,7 +34,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 			return value.ToString();
         }
 
-        protected virtual string FromTimeSpan(TimeSpan value)
+        public virtual string FromTimeSpan(TimeSpan value)
         {
             return ValueQuote + value.ToString() + ValueQuote;
         }
