@@ -378,6 +378,7 @@
     <Compile Include="Unit\Generators\MySql\MySqlIndexTests.cs" />
     <Compile Include="Unit\Generators\MySql\MySqlSchemaTests.cs" />
     <Compile Include="Unit\Generators\MySql\MySqlTableTests.cs" />
+    <Compile Include="Unit\Generators\MySql\MySqlQuoterTest.cs" />
     <Compile Include="Unit\Generators\OracleWithQuotedIdentifier\OracleColumnTests.cs" />
     <Compile Include="Unit\Generators\OracleWithQuotedIdentifier\OracleConstraintsTests.cs" />
     <Compile Include="Unit\Generators\OracleWithQuotedIdentifier\OracleDataTests.cs" />
