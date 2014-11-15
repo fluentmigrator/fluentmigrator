@@ -404,7 +404,7 @@ namespace FluentMigrator.Runner
                 }
                 catch (Exception er)
                 {
-                    _announcer.Error(er.Message);
+                    _announcer.Error(er);
 
                     //catch the error and move onto the next expression
                     if (SilentlyFail)
