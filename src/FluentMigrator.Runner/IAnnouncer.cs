@@ -28,6 +28,7 @@ namespace FluentMigrator.Runner
         void Sql(string sql);
         void ElapsedTime(TimeSpan timeSpan);
         void Error(string message);
+        void Error(Exception exception);
         void Write(string message, bool escaped);
     }
 }
