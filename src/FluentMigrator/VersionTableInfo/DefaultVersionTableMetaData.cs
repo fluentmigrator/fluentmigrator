@@ -42,7 +42,12 @@ namespace FluentMigrator.VersionTableInfo
         {
             get { return "UC_Version"; }
         }
-  
+
+        public virtual string AppliedOnColumnName
+        {
+            get { return "AppliedOn"; }
+        }
+
         public virtual string DescriptionColumnName
         {
             get { return "Description"; }

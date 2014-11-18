@@ -28,6 +28,7 @@ namespace FluentMigrator.Tests.Unit
 		public const string COLUMNNAME = "testColumnName";
 		public const string UNIQUEINDEXNAME = "testUniqueIndexName";
         public const string DESCRIPTIONCOLUMNNAME = "testDescriptionColumnName";
+	    public const string APPLIEDONCOLUMNNAME = "testAppliedOnColumnName";
 
 		public TestVersionTableMetaData()
 		{
@@ -52,7 +53,12 @@ namespace FluentMigrator.Tests.Unit
 			get { return UNIQUEINDEXNAME; }
 		}
 
-        public string DescriptionColumnName
+	    public string AppliedOnColumnName
+	    {
+	        get { return APPLIEDONCOLUMNNAME; }
+	    }
+
+	    public string DescriptionColumnName
         {
             get { return DESCRIPTIONCOLUMNNAME; }
         }
