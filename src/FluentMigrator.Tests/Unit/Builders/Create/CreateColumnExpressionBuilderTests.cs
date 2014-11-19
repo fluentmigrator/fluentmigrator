@@ -289,12 +289,6 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [Test]
-        public void CallingForeignKeySetsIsForeignKeyToTrue()
-        {
-            VerifyColumnProperty(c => c.IsForeignKey = true, b => b.ForeignKey());
-        }
-
-        [Test]
         public void CallingIdentitySetsIsIdentityToTrue()
         {
             VerifyColumnProperty(c => c.IsIdentity = true, b => b.Identity());
@@ -339,98 +333,44 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [Test]
-        public void CallingReferencesAddsNewForeignKeyExpressionToContext()
+        public void CallingReferencesCallsHelper()
         {
-            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-
-            var contextMock = new Mock<IMigrationContext>();
-            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
-
-            var columnMock = new Mock<ColumnDefinition>();
-            columnMock.SetupGet(x => x.Name).Returns("BaconId");
-
-            var expressionMock = new Mock<CreateColumnExpression>();
-            expressionMock.SetupGet(x => x.TableName).Returns("Bacon");
-            expressionMock.SetupGet(x => x.Column).Returns(columnMock.Object);
-
-            var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
-
-            builder.References("fk_foo", "FooTable", new[] { "BarColumn" });
-
-            collectionMock.Verify(x => x.Add(It.Is<CreateForeignKeyExpression>(
-                fk => fk.ForeignKey.Name == "fk_foo" &&
-                        fk.ForeignKey.ForeignTable == "FooTable" &&
-                        fk.ForeignKey.ForeignColumns.Contains("BarColumn") &&
-                        fk.ForeignKey.ForeignColumns.Count == 1 &&
-                        fk.ForeignKey.PrimaryTable == "Bacon" &&
-                        fk.ForeignKey.PrimaryColumns.Contains("BaconId") &&
-                        fk.ForeignKey.PrimaryColumns.Count == 1
-                                                )));
-
-            contextMock.VerifyGet(x => x.Expressions);
+            var fknames = new[] { "fkn1", "fkn2" };
+            VerifyColumnHelperCall(c => c.References("fkn", "ftn", fknames), h => h.References("fkn", null, "ftn", fknames));
         }
 
         [Test]
-        public void CallingReferencedByAddsNewForeignKeyExpressionToContext()
+        public void CallingReferencedByCallsHelper()
         {
-            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
-
-            var contextMock = new Mock<IMigrationContext>();
-            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
-
-            var columnMock = new Mock<ColumnDefinition>();
-            columnMock.SetupGet(x => x.Name).Returns("BaconId");
-
-            var expressionMock = new Mock<CreateColumnExpression>();
-            expressionMock.SetupGet(x => x.TableName).Returns("Bacon");
-            expressionMock.SetupGet(x => x.Column).Returns(columnMock.Object);
-
-            var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
-
-            builder.ReferencedBy("fk_foo", "FooTable", "BarColumn");
-
-            collectionMock.Verify(x => x.Add(It.Is<CreateForeignKeyExpression>(
-                fk => fk.ForeignKey.Name == "fk_foo" &&
-                        fk.ForeignKey.ForeignTable == "FooTable" &&
-                        fk.ForeignKey.ForeignColumns.Contains("BarColumn") &&
-                        fk.ForeignKey.ForeignColumns.Count == 1 &&
-                        fk.ForeignKey.PrimaryTable == "Bacon" &&
-                        fk.ForeignKey.PrimaryColumns.Contains("BaconId") &&
-                        fk.ForeignKey.PrimaryColumns.Count == 1
-                                                )));
-
-            contextMock.VerifyGet(x => x.Expressions);
+            VerifyColumnHelperCall(c => c.ReferencedBy("fkn", "fts", "ftn", "fcn"), h => h.ReferencedBy("fkn", "fts", "ftn", "fcn"));
         }
 
         [Test]
-        public void CallingForeignKeyAddsNewForeignKeyExpressionToContext()
+        public void CallingReferencedBySetsCurrentFK()
         {
-            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+            var foriegnKeyDef = new ForeignKeyDefinition();
+            VerifyColumnHelperWithSetup(
+                c => c.ReferencedBy("fkn", "fts", "ftn", "fcn"), //Call to test
+                hm => hm.Setup(n => n.ReferencedBy("fkn", "fts", "ftn", "fcn")).Returns(foriegnKeyDef), //helper setup
+                (hm, builder) => Assert.AreSame(foriegnKeyDef, builder.CurrentForeignKey) //helper verification
+            );
+        }
 
-            var contextMock = new Mock<IMigrationContext>();
-            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+        [Test]
+        public void CallingForeignKeyCallsHelper()
+        {
+            VerifyColumnHelperCall(c => c.ForeignKey("fkn", "pts", "ptn", "pcn"), h => h.ForeignKey("fkn", "pts", "ptn", "pcn"));
+        }
 
-            var columnMock = new Mock<ColumnDefinition>();
-            columnMock.SetupGet(x => x.Name).Returns("BaconId");
-
-            var expressionMock = new Mock<CreateColumnExpression>();
-            expressionMock.SetupGet(x => x.TableName).Returns("Bacon");
-            expressionMock.SetupGet(x => x.Column).Returns(columnMock.Object);
-
-            var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
-
-            builder.ForeignKey("fk_foo", "FooTable", "BarColumn");
-
-            contextMock.VerifyGet(x => x.Expressions);
-            collectionMock.Verify(x => x.Add(It.Is<CreateForeignKeyExpression>(
-                fk => fk.ForeignKey.Name == "fk_foo" &&
-                        fk.ForeignKey.PrimaryTable == "FooTable" &&
-                        fk.ForeignKey.PrimaryColumns.Contains("BarColumn") &&
-                        fk.ForeignKey.PrimaryColumns.Count == 1 &&
-                        fk.ForeignKey.ForeignTable == "Bacon" &&
-                        fk.ForeignKey.ForeignColumns.Contains("BaconId") &&
-                        fk.ForeignKey.ForeignColumns.Count == 1
-                                                )));
+        [Test]
+        public void CallingForeignKeySetsCurrentFK()
+        {
+            var foriegnKeyDef = new ForeignKeyDefinition();
+            VerifyColumnHelperWithSetup(
+                c => c.ForeignKey("fkn", "pts", "ptn", "pcn"), //Call to test
+                hm => hm.Setup(n => n.ForeignKey("fkn", "pts", "ptn", "pcn")).Returns(foriegnKeyDef), //helper setup
+                (hm, builder) => Assert.AreSame(foriegnKeyDef, builder.CurrentForeignKey) //helper verification
+            );
         }
 
         [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
@@ -532,16 +472,27 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
         private void VerifyColumnHelperCall(Action<CreateColumnExpressionBuilder> callToTest, System.Linq.Expressions.Expression<Action<ColumnExpressionBuilderHelper>> expectedHelperAction)
         {
+            VerifyColumnHelperWithSetup(callToTest, null, (hm, builder) => hm.Verify(expectedHelperAction));
+        }
+
+        private void VerifyColumnHelperWithSetup(
+            Action<CreateColumnExpressionBuilder> callToTest,
+            Action<Mock<ColumnExpressionBuilderHelper>> helperSetup,
+            Action<Mock<ColumnExpressionBuilderHelper>, CreateColumnExpressionBuilder> helperVerify)
+        {
             var expressionMock = new Mock<CreateColumnExpression>();
             var contextMock = new Mock<IMigrationContext>();
             var helperMock = new Mock<ColumnExpressionBuilderHelper>();
+
+            if (helperSetup != null)
+                helperSetup(helperMock);
 
             var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
             builder.ColumnHelper = helperMock.Object;
 
             callToTest(builder);
 
-            helperMock.Verify(expectedHelperAction);
+            helperVerify(helperMock, builder);
         }
 
         private void VerifyColumnProperty(Action<ColumnDefinition> columnExpression, Action<CreateColumnExpressionBuilder> callToTest)

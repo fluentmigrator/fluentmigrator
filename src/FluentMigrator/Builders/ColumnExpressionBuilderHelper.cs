@@ -68,17 +68,12 @@ namespace FluentMigrator.Builders
                         {
                             //stuff that matters shouldn't change at this point, so we're free to make a
                             //copy of the col def.
-                            //TODO: make a SetColumnNotNullExpression, which just takes the bare minimum.
-                            ColumnDefinition notNullColDef = new ColumnDefinition
-                            {
-                                ModificationType = ColumnModificationType.Alter,
-                                TableName = column.TableName,
-                                Name = column.Name,
-                                Type = column.Type,
-                                CustomType = column.CustomType,
-                                IsNullable = false,
-                            };
-
+                            //TODO: make a SetColumnNotNullExpression, which just takes the bare minimum, rather
+                            //than modifying column with all parameters.
+                            ColumnDefinition notNullColDef = (ColumnDefinition)column.Clone();
+                            notNullColDef.ModificationType = ColumnModificationType.Alter;
+                            notNullColDef.IsNullable = false;
+                            
                             exRowExpr.SetColumnNotNullableExpression = new AlterColumnExpression
                             {
                                 Column = notNullColDef,
@@ -188,6 +183,78 @@ namespace FluentMigrator.Builders
             });
 
             _context.Expressions.Add(index);
+        }
+
+        public virtual ForeignKeyDefinition ForeignKey(string foreignKeyName, string primaryTableSchema, 
+            string primaryTableName, string primaryColumnName)
+        {
+            _builder.Column.IsForeignKey = true;
+
+            var fk = new CreateForeignKeyExpression
+            {
+                ForeignKey = new ForeignKeyDefinition
+                {
+                    Name = foreignKeyName,
+                    PrimaryTable = primaryTableName,
+                    PrimaryTableSchema = primaryTableSchema,
+                    ForeignTable = _builder.TableName,
+                    ForeignTableSchema = _builder.SchemaName
+                }
+            };
+
+            fk.ForeignKey.PrimaryColumns.Add(primaryColumnName);
+            fk.ForeignKey.ForeignColumns.Add(_builder.Column.Name);
+
+            _context.Expressions.Add(fk);
+            return fk.ForeignKey;  
+        }
+
+        //Can this be merged with ForeignKey()?  essentially they're just doing the same thing in reverse to each other.
+        public virtual ForeignKeyDefinition ReferencedBy(string foreignKeyName, string foreignTableSchema, 
+            string foreignTableName, string foreignColumnName)
+        {
+            var fk = new CreateForeignKeyExpression
+            {
+                ForeignKey = new ForeignKeyDefinition
+                {
+                    Name = foreignKeyName,
+                    PrimaryTable = _builder.TableName,
+                    PrimaryTableSchema = _builder.SchemaName,
+                    ForeignTable = foreignTableName,
+                    ForeignTableSchema = foreignTableSchema
+                }
+            };
+
+            fk.ForeignKey.PrimaryColumns.Add(_builder.Column.Name);
+            fk.ForeignKey.ForeignColumns.Add(foreignColumnName);
+
+            _context.Expressions.Add(fk);
+            return fk.ForeignKey;
+        }
+
+        /// <summary>
+        /// Supports the Obsolete 'References' fluent command.  Remove this when that command is removed.
+        /// </summary>
+        public virtual void References(string foreignKeyName, string foreignTableSchema, string foreignTableName,
+                                                   IEnumerable<string> foreignColumnNames)
+        {
+            var fk = new CreateForeignKeyExpression
+            {
+                ForeignKey = new ForeignKeyDefinition
+                {
+                    Name = foreignKeyName,
+                    PrimaryTable = _builder.TableName,
+                    PrimaryTableSchema = _builder.SchemaName,
+                    ForeignTable = foreignTableName,
+                    ForeignTableSchema = foreignTableSchema
+                }
+            };
+
+            fk.ForeignKey.PrimaryColumns.Add(_builder.Column.Name);
+            foreach (var foreignColumnName in foreignColumnNames)
+                fk.ForeignKey.ForeignColumns.Add(foreignColumnName);
+
+            _context.Expressions.Add(fk);
         }
     }
 }
