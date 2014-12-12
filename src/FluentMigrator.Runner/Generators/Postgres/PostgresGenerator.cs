@@ -10,8 +10,18 @@ namespace FluentMigrator.Runner.Generators.Postgres
 {
     public class PostgresGenerator : GenericGenerator
     {
-        public PostgresGenerator() : base(new PostgresColumn(), new PostgresQuoter(), new EmptyDescriptionGenerator()) { }
-
+        public PostgresGenerator() : base(new PostgresColumn(), new PostgresQuoter(), new PostgresDescriptionGenerator()) { }
+        public override string Generate(AlterTableExpression expression)
+        {
+            var alterStatement = new StringBuilder();
+            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
+            alterStatement.Append(base.Generate(expression));
+            if (string.IsNullOrEmpty(descriptionStatement))
+            {
+                alterStatement.Append(descriptionStatement);
+            }
+            return alterStatement.ToString();
+        }
         public override string Generate(CreateSchemaExpression expression)
         {
             return string.Format("CREATE SCHEMA {0}", Quoter.QuoteSchemaName(expression.SchemaName));
@@ -24,18 +34,42 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         public override string Generate(CreateTableExpression expression)
         {
+            var createStatement = new StringBuilder();
             var tableName = Quoter.QuoteTableName(expression.TableName);
-            return string.Format("CREATE TABLE {0}.{1} ({2})", Quoter.QuoteSchemaName(expression.SchemaName), tableName, Column.Generate(expression.Columns, tableName));
+            createStatement.Append(string.Format("CREATE TABLE {0}.{1} ({2})", Quoter.QuoteSchemaName(expression.SchemaName), tableName, Column.Generate(expression.Columns, tableName)));
+            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatements(expression);
+            if (descriptionStatement != null)
+            {
+                createStatement.Append(";");
+                createStatement.Append(string.Join(";", descriptionStatement.ToArray()));
+            }
+            return createStatement.ToString();
         }
 
         public override string Generate(AlterColumnExpression expression)
         {
-            return String.Format("ALTER TABLE {0}.{1} {2}", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), ((PostgresColumn)Column).GenerateAlterClauses(expression.Column));
+            var alterStatement = new StringBuilder();
+            alterStatement.Append(String.Format("ALTER TABLE {0}.{1} {2}", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), ((PostgresColumn)Column).GenerateAlterClauses(expression.Column)));
+            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
+            if (string.IsNullOrEmpty(descriptionStatement))
+            {
+                alterStatement.Append(";");
+                alterStatement.Append(descriptionStatement);
+            }
+            return alterStatement.ToString();
         }
 
         public override string Generate(CreateColumnExpression expression)
         {
-            return string.Format("ALTER TABLE {0}.{1} ADD {2}", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), Column.Generate(expression.Column));
+            var createStatement = new StringBuilder();
+            createStatement.Append(string.Format("ALTER TABLE {0}.{1} ADD {2}", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), Column.Generate(expression.Column)));
+            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
+            if (!string.IsNullOrEmpty(descriptionStatement))
+            {
+                createStatement.Append(";");
+                createStatement.Append(descriptionStatement);
+            }
+            return createStatement.ToString();
         }
 
         public override string Generate(DeleteTableExpression expression)
