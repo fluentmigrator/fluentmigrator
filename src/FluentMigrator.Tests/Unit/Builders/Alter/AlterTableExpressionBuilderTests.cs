@@ -306,6 +306,44 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
         }
 
         [Test]
+        public void CallingWithDefaultOnNewColumnDoesNotAddDefaultConstraintExpression()
+        {
+            var expressions = new List<IMigrationExpression>();
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.Setup(x => x.Expressions).Returns(expressions);
+
+            var columnMock = new Mock<ColumnDefinition>();
+            columnMock.Setup(x => x.ModificationType).Returns(ColumnModificationType.Create);
+
+            var expressionMock = new Mock<AlterTableExpression>();
+
+            var builder = new AlterTableExpressionBuilder(expressionMock.Object, contextMock.Object);
+            builder.CurrentColumn = columnMock.Object;
+            builder.WithDefault(SystemMethods.CurrentDateTime);
+
+            Assert.That(expressions.Count(), Is.EqualTo(0));
+        }
+
+        [Test]
+        public void CallingWithDefaultOnAlterColumnAddsDefaultConstraintExpression()
+        {
+            var expressions = new List<IMigrationExpression>();
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.Setup(x => x.Expressions).Returns(expressions);
+
+            var columnMock = new Mock<ColumnDefinition>();
+            columnMock.Setup(x => x.ModificationType).Returns(ColumnModificationType.Alter);
+
+            var expressionMock = new Mock<AlterTableExpression>();
+
+            var builder = new AlterTableExpressionBuilder(expressionMock.Object, contextMock.Object);
+            builder.CurrentColumn = columnMock.Object;
+            builder.WithDefault(SystemMethods.CurrentDateTime);
+
+            Assert.That(expressions.Count(), Is.EqualTo(1));
+        }
+
+        [Test]
         public void CallingForeignKeySetsIsForeignKeyToTrue()
         {
             VerifyColumnProperty(c => c.IsForeignKey = true, b => b.ForeignKey());
