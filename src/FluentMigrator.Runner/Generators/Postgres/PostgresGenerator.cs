@@ -38,7 +38,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             var tableName = Quoter.QuoteTableName(expression.TableName);
             createStatement.Append(string.Format("CREATE TABLE {0}.{1} ({2})", Quoter.QuoteSchemaName(expression.SchemaName), tableName, Column.Generate(expression.Columns, tableName)));
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatements(expression);
-            if (descriptionStatement != null)
+            if (descriptionStatement != null && descriptionStatement.Any())
             {
                 createStatement.Append(";");
                 createStatement.Append(string.Join(";", descriptionStatement.ToArray()));
@@ -51,7 +51,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             var alterStatement = new StringBuilder();
             alterStatement.Append(String.Format("ALTER TABLE {0}.{1} {2}", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), ((PostgresColumn)Column).GenerateAlterClauses(expression.Column)));
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
-            if (string.IsNullOrEmpty(descriptionStatement))
+            if (!string.IsNullOrEmpty(descriptionStatement))
             {
                 alterStatement.Append(";");
                 alterStatement.Append(descriptionStatement);
