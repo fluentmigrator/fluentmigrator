@@ -269,6 +269,13 @@ namespace FluentMigrator.Tests.Unit.Generators
         }
 
         [Test]
+        public void TimeSpanIsFormattedQuotes()
+        {
+            quoter.QuoteValue(new TimeSpan(2, 13, 65))
+                .ShouldBe("'02:14:05'");
+        }
+
+        [Test]
         public void ExplicitUnicodeStringIsFormattedAsNormalString()
         {
             quoter.QuoteValue(new ExplicitUnicodeString("Test String")).ShouldBe("'Test String'");
