@@ -120,7 +120,7 @@ namespace FluentMigrator.Tests.Unit
             // Assert
             Assert.That(attribute.Description, Is.EqualTo(Description));
             Assert.That(attribute.TransactionBehavior, Is.EqualTo(TransactionBehavior.None));
-            Assert.That(attribute.Version, Is.EqualTo(630966690300000000));
+            Assert.That(attribute.Version, Is.EqualTo(20000615123030));
         }
 
         [Test]

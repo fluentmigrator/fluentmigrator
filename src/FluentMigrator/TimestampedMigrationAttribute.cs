@@ -7,16 +7,6 @@ namespace FluentMigrator
     /// </summary>
     public class TimestampedMigrationAttribute : MigrationAttribute
     {
-        private const long TicksPerDay = TicksPerHour * 24;
-
-        private const long TicksPerHour = TicksPerMinute * 60;
-
-        private const long TicksPerMillisecond = 10000;
-
-        private const long TicksPerMinute = TicksPerSecond * 60;
-
-        private const long TicksPerSecond = TicksPerMillisecond * 1000;
-
         private static readonly int[] DaysToMonth365 =
             {
                 0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365
@@ -37,7 +27,7 @@ namespace FluentMigrator
         /// <param name="minute">The minute the migration was created.</param>
         /// <param name="second">The second the migration was created.</param>
         public TimestampedMigrationAttribute(ushort year, ushort month, ushort day, ushort hour, ushort minute, ushort second)
-            : base(DateTimeToTicks(year, month, day, hour, minute, second))
+            : base(DateTimeToFormattedInt(year, month, day, hour, minute, second))
         {
         }
 
@@ -50,7 +40,7 @@ namespace FluentMigrator
         /// <param name="hour">The hour the migration was created.</param>
         /// <param name="minute">The minute the migration was created.</param>
         public TimestampedMigrationAttribute(ushort year, ushort month, ushort day, ushort hour, ushort minute)
-            : base(DateTimeToTicks(year, month, day, hour, minute, 0))
+            : base(DateTimeToFormattedInt(year, month, day, hour, minute, 0))
         {
         }
 
@@ -64,7 +54,7 @@ namespace FluentMigrator
         /// <param name="minute">The minute the migration was created.</param>
         /// <param name="description">A description for the migration.</param>
         public TimestampedMigrationAttribute(ushort year, ushort month, ushort day, ushort hour, ushort minute, string description)
-            : base(DateTimeToTicks(year, month, day, hour, minute, 0), description)
+            : base(DateTimeToFormattedInt(year, month, day, hour, minute, 0), description)
         {
         }
 
@@ -79,7 +69,7 @@ namespace FluentMigrator
         /// <param name="second">The second the migration was created.</param>
         /// <param name="description">A description for the migration.</param>
         public TimestampedMigrationAttribute(ushort year, ushort month, ushort day, ushort hour, ushort minute, ushort second, string description)
-            : base(DateTimeToTicks(year, month, day, hour, minute, second), description)
+            : base(DateTimeToFormattedInt(year, month, day, hour, minute, second), description)
         {
         }
 
@@ -93,7 +83,7 @@ namespace FluentMigrator
         /// <param name="minute">The minute the migration was created.</param>
         /// <param name="transactionBehavior">The <see cref="FluentMigrator.TransactionBehavior"/> the migration will use.</param>
         public TimestampedMigrationAttribute(ushort year, ushort month, ushort day, ushort hour, ushort minute, TransactionBehavior transactionBehavior)
-            : base(DateTimeToTicks(year, month, day, hour, minute, 0), transactionBehavior)
+            : base(DateTimeToFormattedInt(year, month, day, hour, minute, 0), transactionBehavior)
         {
         }
 
@@ -108,7 +98,7 @@ namespace FluentMigrator
         /// <param name="second">The second the migration was created.</param>
         /// <param name="transactionBehavior">The <see cref="FluentMigrator.TransactionBehavior"/> the migration will use.</param>
         public TimestampedMigrationAttribute(ushort year, ushort month, ushort day, ushort hour, ushort minute, ushort second, TransactionBehavior transactionBehavior)
-            : base(DateTimeToTicks(year, month, day, hour, minute, second), transactionBehavior)
+            : base(DateTimeToFormattedInt(year, month, day, hour, minute, second), transactionBehavior)
         {
         }
 
@@ -123,7 +113,7 @@ namespace FluentMigrator
         /// <param name="transactionBehavior">The <see cref="FluentMigrator.TransactionBehavior"/> the migration will use.</param>
         /// <param name="description">A description for the migration.</param>
         public TimestampedMigrationAttribute(ushort year, ushort month, ushort day, ushort hour, ushort minute, TransactionBehavior transactionBehavior, string description)
-            : base(DateTimeToTicks(year, month, day, hour, minute, 0), transactionBehavior, description)
+            : base(DateTimeToFormattedInt(year, month, day, hour, minute, 0), transactionBehavior, description)
         {
         }
 
@@ -139,27 +129,32 @@ namespace FluentMigrator
         /// <param name="transactionBehavior">The <see cref="FluentMigrator.TransactionBehavior"/> the migration will use.</param>
         /// <param name="description">A description for the migration.</param>
         public TimestampedMigrationAttribute(ushort year, ushort month, ushort day, ushort hour, ushort minute, ushort second, TransactionBehavior transactionBehavior, string description)
-            : base(DateTimeToTicks(year, month, day, hour, minute, second), transactionBehavior, description)
+            : base(DateTimeToFormattedInt(year, month, day, hour, minute, second), transactionBehavior, description)
         {
         }
 
-        private static long DateTimeToTicks(int year, int month, int day, int hour, int minute, int second)
-        {
-            return DateToTicks(year, month, day) + TimeToTicks(hour, minute, second);
-        }
-
-        private static long DateToTicks(int year, int month, int day)
+        private static long DateTimeToFormattedInt(int year, int month, int day, int hour, int minute, int second)
         {
             if (!IsValidDate(year, month, day))
             {
                 throw new ArgumentOutOfRangeException(null, "Year, Month, and Day parameters describe an un-representable DateTime.");
             }
 
-            var daysToMonth = GetDaysToMonth(year);
-            var yearIndex = year - 1;
-            var daysSinceTheBeginningOfTime = (yearIndex * 365) + (yearIndex / 4) - (yearIndex / 100) + (yearIndex / 400) + daysToMonth[month - 1] + day - 1;
+            if (!IsValidTime(hour, minute, second))
+            {
+                throw new ArgumentOutOfRangeException(null, "Hour, Minute, and Second parameters describe an un-representable DateTime.");
+            }
 
-            return daysSinceTheBeginningOfTime * TicksPerDay;
+            var yearAsString = Convert.ToString(year).PadLeft(4, '0');
+            var monthAsString = Convert.ToString(month).PadLeft(2, '0');
+            var dayAsString = Convert.ToString(day).PadLeft(2, '0');
+            var hourAsString = Convert.ToString(hour).PadLeft(2, '0');
+            var minuteAsString = Convert.ToString(minute).PadLeft(2, '0');
+            var secondAsString = Convert.ToString(second).PadLeft(2, '0');
+
+            var givenDateTimeAsString = yearAsString + monthAsString + dayAsString + hourAsString + minuteAsString + secondAsString;
+
+            return long.Parse(givenDateTimeAsString);
         }
 
         private static int[] GetDaysToMonth(int year)
@@ -206,17 +201,6 @@ namespace FluentMigrator
         private static bool IsValidYear(int year)
         {
             return year >= 1 && year <= 9999;
-        }
-
-        private static long TimeToTicks(int hour, int minute, int second)
-        {
-            if (!IsValidTime(hour, minute, second))
-            {
-                throw new ArgumentOutOfRangeException(null, "Hour, Minute, and Second parameters describe an un-representable DateTime.");
-            }
-
-            long totalSeconds = (hour * 3600) + (minute * 60) + second;
-            return totalSeconds * TicksPerSecond;
         }
     }
 }
