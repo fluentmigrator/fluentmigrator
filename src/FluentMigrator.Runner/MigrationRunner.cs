@@ -109,6 +109,8 @@ namespace FluentMigrator.Runner
 
         public void MigrateUp(bool useAutomaticTransactionManagement)
         {
+            VersionLoader.LoadVersionInfo();
+
             var migrations = MigrationLoader.LoadMigrations();
 
             using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
@@ -141,6 +143,8 @@ namespace FluentMigrator.Runner
 
         public void MigrateUp(long targetVersion, bool useAutomaticTransactionManagement)
         {
+            VersionLoader.LoadVersionInfo();
+
             var migrationInfos = GetUpMigrationsToApply(targetVersion);
             using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
@@ -183,6 +187,8 @@ namespace FluentMigrator.Runner
 
         public void MigrateDown(long targetVersion, bool useAutomaticTransactionManagement)
         {
+            VersionLoader.LoadVersionInfo();
+
             var migrationInfos = GetDownMigrationsToApply(targetVersion);
 
             using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
@@ -289,6 +295,8 @@ namespace FluentMigrator.Runner
 
         public void Rollback(int steps, bool useAutomaticTransactionManagement)
         {
+            VersionLoader.LoadVersionInfo();
+
             var availableMigrations = MigrationLoader.LoadMigrations();
             var migrationsToRollback = new List<IMigrationInfo>();
 
@@ -321,6 +329,8 @@ namespace FluentMigrator.Runner
 
         public void RollbackToVersion(long version, bool useAutomaticTransactionManagement)
         {
+            VersionLoader.LoadVersionInfo();
+
             var availableMigrations = MigrationLoader.LoadMigrations();
             var migrationsToRollback = new List<IMigrationInfo>();
 
