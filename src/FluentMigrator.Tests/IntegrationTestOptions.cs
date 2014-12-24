@@ -19,7 +19,7 @@ namespace FluentMigrator.Tests
         public static DatabaseServerOptions SqlServer2012 = new DatabaseServerOptions
         {
             ConnectionString = @"server=.\SQLEXPRESS;uid=test;pwd=test;Trusted_Connection=yes;database=FluentMigrator",
-            IsEnabled = false 
+            IsEnabled = true
         };
 
         public static DatabaseServerOptions SqlServerCe = new DatabaseServerOptions
@@ -48,8 +48,8 @@ namespace FluentMigrator.Tests
 
         public static DatabaseServerOptions Postgres = new DatabaseServerOptions
             {
-                ConnectionString = "Server=127.0.0.1;Port=5432;Database=FluentMigrator;User Id=test;Password=test;",
-                IsEnabled = false
+                ConnectionString = "Server=127.0.0.1;Port=5432;Database=fluentmigrator;User Id=test;Password=test;",
+                IsEnabled = true
             };
 
         public static DatabaseServerOptions Firebird = new DatabaseServerOptions

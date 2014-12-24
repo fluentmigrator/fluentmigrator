@@ -209,12 +209,22 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
-            throw new NotImplementedException();
+            return String.Format(AlterColumn, Quoter.QuoteTableName(expression.TableName), Column.Generate(new ColumnDefinition
+            {
+                ModificationType = ColumnModificationType.Alter,
+                Name = expression.ColumnName,
+                DefaultValue = expression.DefaultValue
+            }));
         }
 
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Default constraints are not supported");
+            return Generate(new AlterDefaultConstraintExpression
+            {
+                TableName = expression.TableName,
+                ColumnName = expression.ColumnName,
+                DefaultValue = null
+            });
         }
 
         private string WrapStatementInExecuteImmediateBlock(string statement)
