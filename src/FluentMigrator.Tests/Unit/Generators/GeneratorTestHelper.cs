@@ -578,5 +578,15 @@ namespace FluentMigrator.Tests.Unit.Generators
                                  };
             return expression;
         }
+
+        public static DeleteDefaultConstraintExpression GetDeleteDefaultConstraintExpression()
+        {
+            var expression = new DeleteDefaultConstraintExpression
+            {
+                ColumnName = TestColumnName1,
+                TableName = TestTableName1
+            };
+            return expression;
+        }
     }
 }
