@@ -22,6 +22,12 @@ namespace FluentMigrator.Tests
             IsEnabled = false 
         };
 
+        public static DatabaseServerOptions SqlServer2014 = new DatabaseServerOptions
+        {
+            ConnectionString = @"server=.\MSSQLSERVER2014;uid=test;pwd=test;Trusted_Connection=yes;database=FluentMigrator",
+            IsEnabled = false
+        };
+
         public static DatabaseServerOptions SqlServerCe = new DatabaseServerOptions
             {
                 ConnectionString = @"Data Source=TestDatabase.sdf",
