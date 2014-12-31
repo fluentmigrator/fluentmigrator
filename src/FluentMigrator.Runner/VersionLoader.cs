@@ -39,8 +39,6 @@ namespace FluentMigrator.Runner
             VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
             VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
             VersionDescriptionMigration = new VersionDescriptionMigration(VersionTableMetaData);
-
-            LoadVersionInfo();
         }
 
         public void UpdateVersionInfo(long version)
@@ -60,7 +58,7 @@ namespace FluentMigrator.Runner
 
         public IVersionTableMetaData GetVersionTableMetaData()
         {
-            Type matchedType = Assembly.GetExportedTypes().FirstOrDefault(t => Conventions.TypeIsVersionTableMetaData(t));
+            Type matchedType = Assembly.GetExportedTypes().FirstOrDefault(Conventions.TypeIsVersionTableMetaData);
 
             if (matchedType == null)
             {
