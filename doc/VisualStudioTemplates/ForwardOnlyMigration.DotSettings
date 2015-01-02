@@ -6,7 +6,7 @@
 namespace $NAMESPACE$&#xD;
 {&#xD;
     [Migration($MIGRATIONNUMBER$)]&#xD;
-    public class Migration$MIGRATIONNUMBER$ : ForwardOnlyMigration&#xD;
+    public class $FileName$$MIGRATIONNUMBER$ : ForwardOnlyMigration&#xD;
     {&#xD;
         public override void Up()&#xD;
         {&#xD;
@@ -16,8 +16,8 @@ namespace $NAMESPACE$&#xD;
 }</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DB3D4E16B4440942B352185ECEBEC5D3/Reformat/@EntryValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DB3D4E16B4440942B352185ECEBEC5D3/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
-	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DB3D4E16B4440942B352185ECEBEC5D3/CustomProperties/=FileName/@EntryIndexedValue">_MigrationRENAME</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DB3D4E16B4440942B352185ECEBEC5D3/CustomProperties/=Extension/@EntryIndexedValue">cs</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DB3D4E16B4440942B352185ECEBEC5D3/CustomProperties/=FileName/@EntryIndexedValue">NewForwardOnlyMIgration</s:String>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DB3D4E16B4440942B352185ECEBEC5D3/CustomProperties/=ValidateFileName/@EntryIndexedValue">True</s:String>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DB3D4E16B4440942B352185ECEBEC5D3/Applicability/=File/@EntryIndexedValue">True</s:Boolean>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DB3D4E16B4440942B352185ECEBEC5D3/Scope/=E8F0594528C33E45BBFEC6CFE851095D/@KeyIndexDefined">True</s:Boolean>
@@ -27,4 +27,7 @@ namespace $NAMESPACE$&#xD;
 	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DB3D4E16B4440942B352185ECEBEC5D3/Field/=NAMESPACE/Order/@EntryValue">0</s:Int64>
 	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DB3D4E16B4440942B352185ECEBEC5D3/Field/=MIGRATIONNUMBER/@KeyIndexDefined">True</s:Boolean>
 	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DB3D4E16B4440942B352185ECEBEC5D3/Field/=MIGRATIONNUMBER/Expression/@EntryValue">getCurrentTime("yyyyMMddHHmmss")</s:String>
-	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DB3D4E16B4440942B352185ECEBEC5D3/Field/=MIGRATIONNUMBER/Order/@EntryValue">1</s:Int64></wpf:ResourceDictionary>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DB3D4E16B4440942B352185ECEBEC5D3/Field/=MIGRATIONNUMBER/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DB3D4E16B4440942B352185ECEBEC5D3/Field/=FileName/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DB3D4E16B4440942B352185ECEBEC5D3/Field/=FileName/Expression/@EntryValue">getFileNameWithoutExtension()</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=DB3D4E16B4440942B352185ECEBEC5D3/Field/=FileName/Order/@EntryValue">2</s:Int64></wpf:ResourceDictionary>
