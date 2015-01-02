@@ -79,6 +79,7 @@ namespace :build do
 
 end
 
+desc 'run the unit tests'
 test_runner :test do |tests|
   tests.files = FileList['**/src/FluentMigrator.Tests/bin/Debug/FluentMigrator.Tests.dll'] # dll files with test
   tests.exe = "tools/NUnit/nunit-console.exe" # executable to run tests with
