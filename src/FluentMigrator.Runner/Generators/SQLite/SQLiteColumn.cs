@@ -7,10 +7,10 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.SQLite
 {
-    internal class SqliteColumn : ColumnBase
+    internal class SQLiteColumn : ColumnBase
     {
-        public SqliteColumn()
-            : base(new SqliteTypeMap(), new SqliteQuoter())
+        public SQLiteColumn()
+            : base(new SQLiteTypeMap(), new SQLiteQuoter())
         {
         }
 

@@ -5,7 +5,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
     using System.Data;
     using FluentMigrator.Runner.Generators.Base;
 
-    internal class SqliteTypeMap : TypeMapBase
+    internal class SQLiteTypeMap : TypeMapBase
     {
         public const int AnsiStringCapacity = 8000;
         public const int AnsiTextCapacity = 2147483647;

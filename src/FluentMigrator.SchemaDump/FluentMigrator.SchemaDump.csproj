@@ -45,7 +45,7 @@
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SchemaDumpers\ISchemaDumper.cs" />
-    <Compile Include="SchemaDumpers\SqliteSchemaDumper.cs" />
+    <Compile Include="SchemaDumpers\SQLiteSchemaDumper.cs" />
     <Compile Include="SchemaDumpers\SqlServerSchemaDumper.cs" />
     <Compile Include="SchemaWriters\ISchemaWriter.cs" />
     <Compile Include="SchemaWriters\SchemaWriterBase.cs" />

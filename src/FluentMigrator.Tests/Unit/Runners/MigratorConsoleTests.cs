@@ -28,24 +28,24 @@ namespace FluentMigrator.Tests.Unit.Runners
     [TestFixture]
     public class MigratorConsoleTests
     {
-        private string database = "Sqlite";
-        private string connection = "Data Source=:memory:;Version=3;New=True;";
-        private string target = "FluentMigrator.Tests.dll";
+        private const string Database = "SQLite";
+        private const string Connection = "Data Source=:memory:;Version=3;New=True;";
+        private const string Target = "FluentMigrator.Tests.dll";
 
         [Test]
         [Category("NotWorkingOnMono")]
         public void CanInitMigratorConsoleWithValidArguments()
         {
             var console = new MigratorConsole(
-                "/db", database,
-                "/connection", connection,
-                "/target", target,
+                "/db", Database,
+                "/connection", Connection,
+                "/target", Target,
                 "/namespace", "FluentMigrator.Tests.Integration.Migrations",
                 "/nested",
                 "/task", "migrate:up",
                 "/version", "1");
 
-            console.Connection.ShouldBe(connection);
+            console.Connection.ShouldBe(Connection);
             console.Namespace.ShouldBe("FluentMigrator.Tests.Integration.Migrations");
             console.NestedNamespaces.ShouldBeTrue();
             console.Task.ShouldBe("migrate:up");
@@ -61,9 +61,9 @@ namespace FluentMigrator.Tests.Unit.Runners
             System.Console.SetOut(stringWriterNonVerbose);
 
             new MigratorConsole(
-                "/db", database,
-                "/connection", connection,
-                "/target", target,
+                "/db", Database,
+                "/connection", Connection,
+                "/target", Target,
                 "/namespace", "FluentMigrator.Tests.Integration.Migrations",
                 "/task", "migrate:up",
                 "/version", "1");
@@ -73,10 +73,10 @@ namespace FluentMigrator.Tests.Unit.Runners
             System.Console.SetOut(stringWriterVerbose);
 
             new MigratorConsole(
-                "/db", database,
-                "/connection", connection,
+                "/db", Database,
+                "/connection", Connection,
                 "/verbose", "1",
-                "/target", target,
+                "/target", Target,
                 "/namespace", "FluentMigrator.Tests.Integration.Migrations",
                 "/task", "migrate:up",
                 "/version", "1");
@@ -91,9 +91,9 @@ namespace FluentMigrator.Tests.Unit.Runners
             var stringWriter = new StringWriter(sb);
             System.Console.SetOut(stringWriter);
             new MigratorConsole(
-                "/db", database,
-                "/connection", connection,
-                "/target", target,
+                "/db", Database,
+                "/connection", Connection,
+                "/target", Target,
                 "/namespace", "FluentMigrator.Tests.Unit.Runners.Migrations",
                 "/task", "migrate:up",
                 "/version", "0");
@@ -112,9 +112,9 @@ namespace FluentMigrator.Tests.Unit.Runners
             System.Console.SetOut(stringWriter);
 
             new MigratorConsole(
-                "/db", database,
-                "/connection", connection,
-                "/target", target,
+                "/db", Database,
+                "/connection", Connection,
+                "/target", Target,
                 "/namespace", "FluentMigrator.Tests.Unit.Runners.Migrations",
                 "/verbose",
                 "/task", "migrate:up",
@@ -128,15 +128,15 @@ namespace FluentMigrator.Tests.Unit.Runners
         [Test]
         public void FileAnnouncerHasOutputToDefaultOutputFile()
         {
-            var outputFileName = target + ".sql";
+            const string outputFileName = Target + ".sql";
             if (File.Exists(outputFileName)) File.Delete(outputFileName);
 
             Assert.IsFalse(File.Exists(outputFileName));
 
             new MigratorConsole(
-                "/db", database,
-                "/connection", connection,
-                "/target", target,
+                "/db", Database,
+                "/connection", Connection,
+                "/target", Target,
                 "/output",
                 "/namespace", "FluentMigrator.Tests.Unit.Runners.Migrations",
                 "/task", "migrate:up",
@@ -149,15 +149,15 @@ namespace FluentMigrator.Tests.Unit.Runners
         [Test]
         public void FileAnnouncerHasOutputToSpecifiedOutputFile()
         {
-            var outputFileName = "output.sql";
+            const string outputFileName = "output.sql";
             if (File.Exists(outputFileName)) File.Delete(outputFileName);
 
             Assert.IsFalse(File.Exists(outputFileName));
 
             new MigratorConsole(
-                "/db", database,
-                "/connection", connection,
-                "/target", target,
+                "/db", Database,
+                "/connection", Connection,
+                "/target", Target,
                 "/output",
                 "/outputFilename", outputFileName,
                 "/namespace", "FluentMigrator.Tests.Unit.Runners.Migrations",
@@ -171,14 +171,14 @@ namespace FluentMigrator.Tests.Unit.Runners
         [Test]
         public void MustInitializeConsoleWithConnectionArgument()
         {
-            new MigratorConsole("/db", database);
+            new MigratorConsole("/db", Database);
             Assert.That(Environment.ExitCode == 1);
         }
 
         [Test]
         public void MustInitializeConsoleWithDatabaseArgument()
         {
-            new MigratorConsole("/connection", connection);
+            new MigratorConsole("/connection", Connection);
             Assert.That(Environment.ExitCode == 1);
         }
 
@@ -191,10 +191,10 @@ namespace FluentMigrator.Tests.Unit.Runners
         public void TagsPassedToRunnerContextOnExecuteMigrations()
         {
             var migratorConsole = new MigratorConsole(
-                "/db", database,
-                "/connection", connection,
+                "/db", Database,
+                "/connection", Connection,
                 "/verbose", "1",
-                "/target", target,
+                "/target", Target,
                 "/namespace", "FluentMigrator.Tests.Integration.Migrations",
                 "/task", "migrate:up",
                 "/version", "1",
@@ -210,9 +210,9 @@ namespace FluentMigrator.Tests.Unit.Runners
         public void TransactionPerSessionShouldBeSetOnRunnerContextWithShortSwitch()
         {
             var console = new MigratorConsole(
-                "/db", database,
-                "/connection", connection,
-                "/target", target,
+                "/db", Database,
+                "/connection", Connection,
+                "/target", Target,
                 "/task", "migrate:up",
                 "/tps");
 
@@ -224,9 +224,9 @@ namespace FluentMigrator.Tests.Unit.Runners
         public void TransactionPerSessionShouldBeSetOnRunnerContextWithLongSwitch()
         {
             var console = new MigratorConsole(
-                "/db", database,
-                "/connection", connection,
-                "/target", target,
+                "/db", Database,
+                "/connection", Connection,
+                "/target", Target,
                 "/task", "migrate:up",
                 "/transaction-per-session");
 
@@ -238,18 +238,18 @@ namespace FluentMigrator.Tests.Unit.Runners
         public void ProviderSwitchesPassedToRunnerContextOnExecuteMigrations()
         {
             var migratorConsole = new MigratorConsole(
-                "/db", database,
-                "/connection", connection,
-                "/target", target,
+                "/db", Database,
+                "/connection", Connection,
+                "/target", Target,
                 "/output",
                 "/namespace", "FluentMigrator.Tests.Unit.Runners.Migrations",
                 "/task", "migrate:up",
                 "/version", "0",
                 "/providerswitches", "QuotedIdentifiers=true");
 
-            const string ExpectedProviderSwitces = "QuotedIdentifiers=true";
+            const string expectedProviderSwitces = "QuotedIdentifiers=true";
 
-            CollectionAssert.AreEquivalent(ExpectedProviderSwitces, migratorConsole.RunnerContext.ProviderSwitches);
+            CollectionAssert.AreEquivalent(expectedProviderSwitces, migratorConsole.RunnerContext.ProviderSwitches);
         }
     }
 }
