@@ -19,9 +19,9 @@ namespace :build do
                     assembly_file_version: bumper_version.to_s,
                     assembly_product: "FluentMigrator",
                     assembly_copyright: "Copyright - Sean Chambers 2008-" + Time.now.year.to_s,
-                    assembly_configuration_attribute: "Debug"
-
-    #asm.custom_attributes = {:'System.CLSCompliantAttribute' => true}
+                    assembly_configuration_attribute: "Debug",
+                    CLSCompliant: true
+    asm.using 'System'
   end
 
   build :debug do |msb|
