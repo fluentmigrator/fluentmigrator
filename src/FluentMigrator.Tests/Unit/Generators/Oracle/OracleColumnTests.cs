@@ -146,5 +146,60 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE TestTable1 RENAME COLUMN TestColumn1 TO TestColumn2");
         }
+
+        [Test]
+        public void CanCreateColumnWithDefaultValue()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpression();
+            expression.Column.DefaultValue = 1;
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NVARCHAR2(5) DEFAULT 1 NOT NULL");
+        }
+
+        [Test]
+        public void CanCreateColumnWithDefaultStringValue()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpression();
+            expression.Column.DefaultValue = "1";
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NVARCHAR2(5) DEFAULT '1' NOT NULL");
+        }
+
+        [Test]
+        public void CanCreateColumnWithDefaultSystemMethodNewGuid()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpression();
+            expression.Column.DefaultValue = SystemMethods.NewGuid;
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NVARCHAR2(5) DEFAULT sys_guid() NOT NULL");
+        }
+
+        [Test]
+        public void CanCreateColumnWithDefaultSystemMethodCurrentDateTime()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpression();
+            expression.Column.DefaultValue = SystemMethods.CurrentDateTime;
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NVARCHAR2(5) DEFAULT CURRENT_TIMESTAMP NOT NULL");
+        }
+
+        [Test]
+        public void CanCreateColumnWithDefaultSystemMethodCurrentUser()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpression();
+            expression.Column.DefaultValue = SystemMethods.CurrentUser;
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NVARCHAR2(5) DEFAULT USER NOT NULL");
+        }
     }
 }

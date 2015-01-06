@@ -136,6 +136,7 @@
     <Compile Include="Announcers\TextWriterWithGoAnnouncer.cs" />
     <Compile Include="CompatabilityMode.cs" />
     <Compile Include="Generators\Postgres\PostgresDescriptionGenerator.cs" />
+    <Compile Include="Generators\SqlServer\SqlServer2014Generator.cs" />
     <Compile Include="MaintenanceLoader.cs" />
     <Compile Include="IMaintenanceLoader.cs" />
     <Compile Include="Extensions\SqlServerExtensions.cs" />
@@ -254,6 +255,7 @@
     <Compile Include="Processors\SQLite\SqliteDbFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2000Processor.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2012ProcessorFactory.cs" />
+    <Compile Include="Processors\SqlServer\SqlServer2014ProcessorFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServerCeDbFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServerDbFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServerCeProcessor.cs" />

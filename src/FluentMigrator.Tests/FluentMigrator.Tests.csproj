@@ -454,6 +454,7 @@
     <Compile Include="Unit\TaskExecutorTests.cs" />
     <Compile Include="Unit\TestVersionLoader.cs" />
     <Compile Include="Unit\TestVersionTableMetaData.cs" />
+    <Compile Include="Unit\TimestampedMigrationAttributeTests.cs" />
     <Compile Include="Unit\Versioning\VersionInfoTests.cs" />
     <Compile Include="Unit\VersionLoaderTests.cs" />
     <Compile Include="Unit\VersionOrderInvalidExceptionTests.cs" />

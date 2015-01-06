@@ -102,8 +102,7 @@ namespace FluentMigrator.Builders.Alter.Table
 
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithDefault(SystemMethods method)
         {
-            CurrentColumn.DefaultValue = method;
-            return this;
+            return WithDefaultValue(method);
         }
 
         public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax WithDefaultValue(object value)
