@@ -400,6 +400,7 @@
     <Compile Include="Unit\Generators\Postgres\PostgresColumnTests.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresConstraintsTests.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresDataTests.cs" />
+    <Compile Include="Unit\Generators\Postgres\PostgresDescriptionGeneratorTest.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresGeneratorTests.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresIndexTests.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresSchemaTests.cs" />
