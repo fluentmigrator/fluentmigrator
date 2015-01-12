@@ -34,6 +34,8 @@ namespace FluentMigrator.Runner
 
     public class DefaultMigrationInformationLoader : IMigrationInformationLoader
     {
+        private SortedList<long, IMigrationInfo> _migrationInfos;
+
         public DefaultMigrationInformationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace,
                                                  IEnumerable<string> tagsToMatch)
             : this(conventions, assembly, @namespace, false, tagsToMatch)
@@ -58,20 +60,26 @@ namespace FluentMigrator.Runner
 
         public SortedList<long, IMigrationInfo> LoadMigrations()
         {
-            var migrationInfos = new SortedList<long, IMigrationInfo>();
+            if (_migrationInfos != null)
+            {
+                return _migrationInfos;
+            }
+            
+            _migrationInfos = new SortedList<long, IMigrationInfo>();
 
             var migrationTypes = FindMigrationTypes();
 
             foreach (var migrationType in migrationTypes)
             {
-                IMigrationInfo migrationInfo = Conventions.GetMigrationInfo(migrationType);
-                if (migrationInfos.ContainsKey(migrationInfo.Version))
-                    throw new DuplicateMigrationException(String.Format("Duplicate migration version {0}.",
-                                                                        migrationInfo.Version));
-                migrationInfos.Add(migrationInfo.Version, migrationInfo);
+                var migrationInfo = Conventions.GetMigrationInfo(migrationType);
+                if (_migrationInfos.ContainsKey(migrationInfo.Version))
+                {
+                    throw new DuplicateMigrationException(String.Format("Duplicate migration version {0}.", migrationInfo.Version));
+                }
+                _migrationInfos.Add(migrationInfo.Version, migrationInfo);
             }
 
-            return migrationInfos;
+            return _migrationInfos;
         }
 
         private IEnumerable<Type> FindMigrationTypes()

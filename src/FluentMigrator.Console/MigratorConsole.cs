@@ -48,6 +48,8 @@ namespace FluentMigrator.Console
         public int Timeout;
         public bool Verbose;
         public long Version;
+        public long StartVersion;
+        public bool NoConnection;
         public string WorkingDirectory;
         public bool TransactionPerSession;
         public string ProviderSwitches;
@@ -130,6 +132,16 @@ namespace FluentMigrator.Console
                                             "version=",
                                             "The specific version to migrate. Default is 0, which will run all migrations.",
                                             v => { Version = long.Parse(v); }
+                                            },
+                                         {
+                                            "startVersion=",
+                                            "The specific version to start migrating from. Only used when NoConnection is true. Default is 0",
+                                            v => { StartVersion = long.Parse(v); }
+                                            },
+                                        {
+                                            "noConnection",
+                                            "Indicates that migrations will be generated without consulting a target database. Should only be used when generating an output file. ",
+                                            v => { NoConnection = NoConnection = true; }
                                             },
                                         {
                                             "verbose=",
@@ -293,6 +305,8 @@ namespace FluentMigrator.Console
                 NestedNamespaces = NestedNamespaces,
                 Task = Task,
                 Version = Version,
+                StartVersion = StartVersion,
+                NoConnection = NoConnection,
                 Steps = Steps,
                 WorkingDirectory = WorkingDirectory,
                 Profile = Profile,
