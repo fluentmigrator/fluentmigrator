@@ -97,6 +97,12 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [Test]
+        public void CallingAsDateTimeOffsetSetsColumnDbTypeToDateTimeOffset() 
+        {
+            VerifyColumnDbType(DbType.DateTimeOffset, b => b.AsDateTimeOffset());
+        }
+
+        [Test]
         public void CallingAsDecimalSetsColumnDbTypeToDecimal()
         {
             VerifyColumnDbType(DbType.Decimal, b => b.AsDecimal());
