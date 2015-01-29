@@ -20,6 +20,8 @@
 #endregion
 
 using FluentMigrator.Runner.Generators.SqlServer;
+using System;
+using System.Data;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
@@ -27,8 +29,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
     {
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
-            var factory = new SqlServerCeDbFactory();
-            var connection = factory.CreateConnection(connectionString);
+            Func<IDbFactory> factory = () => new SqlServerCeDbFactory();
+            Func<IDbConnection> connection = () => factory().CreateConnection(connectionString);
             return new SqlServerCeProcessor(connection, new SqlServerCeGenerator(), announcer, options, factory);
         }
     }

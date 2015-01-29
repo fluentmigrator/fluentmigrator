@@ -136,7 +136,7 @@ namespace FluentMigrator.Tests.Integration
         {
             using (var connection = new SqlConnection(serverOptions.ConnectionString))
             {
-                var processor = new SqlServerProcessor(connection, generator, announcer, new ProcessorOptions(), new SqlServerDbFactory());
+                var processor = new SqlServerProcessor(() => connection, generator, announcer, new ProcessorOptions(), () => new SqlServerDbFactory());
                 test(processor);
 
                 if (tryRollback && !processor.WasCommitted)
@@ -157,7 +157,7 @@ namespace FluentMigrator.Tests.Integration
             var factory = new SqliteDbFactory();
             using (var connection = factory.CreateConnection(serverOptions.ConnectionString))
             {
-                var processor = new SqliteProcessor(connection, new SqliteGenerator(), announcer, new ProcessorOptions(), factory);
+                var processor = new SqliteProcessor(() => connection, new SqliteGenerator(), announcer, new ProcessorOptions(), () => factory);
                 test(processor);
             }
         }
@@ -172,7 +172,7 @@ namespace FluentMigrator.Tests.Integration
 
             using (var connection = new NpgsqlConnection(serverOptions.ConnectionString))
             {
-                var processor = new PostgresProcessor(connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new PostgresDbFactory());
+                var processor = new PostgresProcessor(() => connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), () => new PostgresDbFactory());
 
                 test(processor);
 
@@ -193,7 +193,7 @@ namespace FluentMigrator.Tests.Integration
 
             using (var connection = new MySqlConnection(serverOptions.ConnectionString))
             {
-                var processor = new MySqlProcessor(connection, new MySqlGenerator(), announcer, new ProcessorOptions(), new MySqlDbFactory());
+                var processor = new MySqlProcessor(() => connection, new MySqlGenerator(), announcer, new ProcessorOptions(), () => new MySqlDbFactory());
                 test(processor);
             }
         }
@@ -215,7 +215,7 @@ namespace FluentMigrator.Tests.Integration
             using (var connection = new FbConnection(serverOptions.ConnectionString))
             {
                 var options = FirebirdOptions.AutoCommitBehaviour();
-                var processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer, new ProcessorOptions(), new FirebirdDbFactory(), options);
+                var processor = new FirebirdProcessor(() => connection, new FirebirdGenerator(options), announcer, new ProcessorOptions(), () => new FirebirdDbFactory(), options);
 
                 try
                 {

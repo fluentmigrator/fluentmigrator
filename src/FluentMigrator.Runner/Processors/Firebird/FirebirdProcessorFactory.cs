@@ -2,7 +2,8 @@
 
 namespace FluentMigrator.Runner.Processors.Firebird
 {
-    using Generators.Firebird;  
+    using Generators.Firebird;
+    using System.Data;  
 
     public class FirebirdProcessorFactory : MigrationProcessorFactory
     {
@@ -19,8 +20,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
         
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
-            var factory = new FirebirdDbFactory();
-            var connection = factory.CreateConnection(connectionString);
+            Func<IDbFactory> factory = () => new FirebirdDbFactory();
+            Func<IDbConnection> connection = () => factory().CreateConnection(connectionString);
             return new FirebirdProcessor(connection, new FirebirdGenerator(FBOptions), announcer, options, factory, FBOptions);
         }
     }

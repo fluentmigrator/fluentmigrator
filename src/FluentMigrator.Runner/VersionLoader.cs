@@ -27,7 +27,7 @@ namespace FluentMigrator.Runner
         public IMigration VersionUniqueMigration { get; private set; }
         public IMigration VersionDescriptionMigration { get; private set; }
         
-        public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions)
+        public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions, IVersionInfo versionInfo)
         {
             Runner = runner;
             Processor = runner.Processor;
@@ -40,7 +40,7 @@ namespace FluentMigrator.Runner
             VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
             VersionDescriptionMigration = new VersionDescriptionMigration(VersionTableMetaData);
 
-            LoadVersionInfo();
+            LoadVersionInfo(versionInfo, null);
         }
 
         public void UpdateVersionInfo(long version)
@@ -137,8 +137,14 @@ namespace FluentMigrator.Runner
             }
         }
 
-        public void LoadVersionInfo()
+        public void LoadVersionInfo(IVersionInfo versionInfo, IEnumerable<long> appliedMigrations)
         {
+            if (versionInfo != null) 
+            {
+                _versionInfo = versionInfo;
+                ApplyMigrations(appliedMigrations);
+                return;
+            }
             if (!AlreadyCreatedVersionSchema && !_versionSchemaMigrationAlreadyRun)
             {
                 Runner.Up(VersionSchemaMigration);
@@ -164,7 +170,7 @@ namespace FluentMigrator.Runner
             }
 
             _versionInfo = new VersionInfo();
-
+            ApplyMigrations(appliedMigrations);
             if (!AlreadyCreatedVersionTable) return;
 
             var dataSet = Processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
@@ -173,6 +179,13 @@ namespace FluentMigrator.Runner
             {
                 _versionInfo.AddAppliedMigration(long.Parse(row[VersionTableMetaData.ColumnName].ToString()));
             }
+        }
+
+        private void ApplyMigrations(IEnumerable<long> appliedMigrations)
+        {
+            if (appliedMigrations != null)
+                foreach (var migration in appliedMigrations)
+                    _versionInfo.AddAppliedMigration(migration);
         }
 
         public void RemoveVersionTable()

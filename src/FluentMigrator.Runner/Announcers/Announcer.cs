@@ -25,6 +25,22 @@ namespace FluentMigrator.Runner.Announcers
         public virtual bool ShowSql { get; set; }
         public virtual bool ShowElapsedTime { get; set; }
 
+        private long? currentMigrationVersion = null;
+
+        public virtual void StartMigration(long version)
+        {
+            if (currentMigrationVersion.HasValue && currentMigrationVersion.Value != version)
+                throw new InvalidOperationException("Attempt to start migration when another migration was already in process");
+            currentMigrationVersion = version;
+        }
+
+        public virtual void EndMigration()
+        {
+            if (!currentMigrationVersion.HasValue)
+                throw new InvalidOperationException("Attempt to end migration when no migration was in process");
+            currentMigrationVersion = null;
+        }
+
         public virtual void Heading(string message)
         {
             Write(message, true);
@@ -33,6 +49,11 @@ namespace FluentMigrator.Runner.Announcers
         public virtual void Say(string message)
         {
             Write(message, true);
+        }
+
+        public virtual void SayTime(string message)
+        {
+            Say(message);
         }
 
         public virtual void Emphasize(string message)

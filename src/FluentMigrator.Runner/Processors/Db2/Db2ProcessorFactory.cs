@@ -8,8 +8,8 @@
 
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
-            var factory = new Db2DbFactory();
-            var connection = factory.CreateConnection(connectionString);
+            System.Func<IDbFactory> factory = () => new Db2DbFactory();
+            System.Func<System.Data.IDbConnection> connection = () => factory().CreateConnection(connectionString);
             return new Db2Processor(connection, new Db2Generator(), announcer, options, factory);
         }
 

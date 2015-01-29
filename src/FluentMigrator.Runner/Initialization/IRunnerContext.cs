@@ -44,5 +44,10 @@ namespace FluentMigrator.Runner.Initialization
 
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         object ApplicationContext { get; set; }
+
+        /// <summary>Overrides the Version table for database connection-less operation</summary>
+        long StartingVersion { get; set; }
+
+        bool SuppressVersionInfo { get; set; }
     }
 }

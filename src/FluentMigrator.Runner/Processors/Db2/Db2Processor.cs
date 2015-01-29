@@ -12,7 +12,7 @@
     {
         #region Constructors
 
-        public Db2Processor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public Db2Processor(System.Func<IDbConnection> connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, System.Func<IDbFactory> factory)
             : base(connection, factory, generator, announcer, options)
         {
             this.Quoter = new Db2Quoter();

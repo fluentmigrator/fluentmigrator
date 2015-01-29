@@ -41,7 +41,7 @@ namespace FluentMigrator.Tests.Unit
 
             var conventions = new MigrationConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, asm, conventions);
+            var loader = new VersionLoader(runner.Object, asm, conventions, null);
 
             var versionTableMetaData = loader.GetVersionTableMetaData();
             versionTableMetaData.ShouldBeOfType<TestVersionTableMetaData>();
@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit
 
             var conventions = new MigrationConventions();
             var asm = "s".GetType().Assembly;
-            var loader = new VersionLoader(runner.Object, asm, conventions);
+            var loader = new VersionLoader(runner.Object, asm, conventions, null);
 
             var versionTableMetaData = loader.GetVersionTableMetaData();
             versionTableMetaData.ShouldBeOfType<DefaultVersionTableMetaData>();
@@ -71,7 +71,7 @@ namespace FluentMigrator.Tests.Unit
 
             var conventions = new MigrationConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, asm, conventions);
+            var loader = new VersionLoader(runner.Object, asm, conventions, null);
 
             processor.Setup(p => p.Process(It.Is<DeleteDataExpression>(expression =>
                                                                        expression.SchemaName == loader.VersionTableMetaData.SchemaName
@@ -98,7 +98,7 @@ namespace FluentMigrator.Tests.Unit
 
             var conventions = new MigrationConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, asm, conventions);
+            var loader = new VersionLoader(runner.Object, asm, conventions, null);
 
             processor.Setup(p => p.Process(It.Is<DeleteTableExpression>(expression =>
                                                                         expression.SchemaName == loader.VersionTableMetaData.SchemaName
@@ -124,7 +124,7 @@ namespace FluentMigrator.Tests.Unit
 
             var conventions = new MigrationConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, asm, conventions);
+            var loader = new VersionLoader(runner.Object, asm, conventions, null);
 
             ((TestVersionTableMetaData) loader.VersionTableMetaData).OwnsSchema = false;
 
@@ -148,7 +148,7 @@ namespace FluentMigrator.Tests.Unit
 
             var conventions = new MigrationConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, asm, conventions);
+            var loader = new VersionLoader(runner.Object, asm, conventions, null);
 
             processor.Setup(p => p.Process(It.Is<InsertDataExpression>(expression =>
                                                                        expression.SchemaName == loader.VersionTableMetaData.SchemaName
@@ -177,9 +177,9 @@ namespace FluentMigrator.Tests.Unit
 
             processor.Setup(p => p.SchemaExists(It.IsAny<string>())).Returns(false);
 
-            var loader = new VersionLoader(runner.Object, asm, conventions);
+            var loader = new VersionLoader(runner.Object, asm, conventions, null);
 
-            loader.LoadVersionInfo();
+            loader.LoadVersionInfo(null, null);
 
             runner.Verify(r => r.Up(loader.VersionSchemaMigration), Times.Once());
         }
@@ -196,9 +196,9 @@ namespace FluentMigrator.Tests.Unit
 
             processor.Setup(p => p.TableExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME)).Returns(false);
 
-            var loader = new VersionLoader(runner.Object, asm, conventions);
+            var loader = new VersionLoader(runner.Object, asm, conventions, null);
 
-            loader.LoadVersionInfo();
+            loader.LoadVersionInfo(null, null);
 
             runner.Verify(r => r.Up(loader.VersionMigration), Times.Once());
         }
@@ -215,9 +215,9 @@ namespace FluentMigrator.Tests.Unit
 
             processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME, TestVersionTableMetaData.APPLIEDONCOLUMNNAME)).Returns(false);
 
-            var loader = new VersionLoader(runner.Object, asm, conventions);
+            var loader = new VersionLoader(runner.Object, asm, conventions, null);
 
-            loader.LoadVersionInfo();
+            loader.LoadVersionInfo(null, null);
 
             runner.Verify(r => r.Up(loader.VersionUniqueMigration), Times.Once());
         }
@@ -234,9 +234,9 @@ namespace FluentMigrator.Tests.Unit
 
             processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME, TestVersionTableMetaData.APPLIEDONCOLUMNNAME)).Returns(false);
 
-            var loader = new VersionLoader(runner.Object, asm, conventions);
+            var loader = new VersionLoader(runner.Object, asm, conventions, null);
 
-            loader.LoadVersionInfo();
+            loader.LoadVersionInfo(null, null);
 
             runner.Verify(r => r.Up(loader.VersionDescriptionMigration), Times.Once());
         }

@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Unit
             return versionTableMetaData;
         }
 
-        public void LoadVersionInfo()
+        public void LoadVersionInfo(IVersionInfo versionInfo, IEnumerable<long> appliedMigrations)
         {
             this.VersionInfo = new VersionInfo();
 

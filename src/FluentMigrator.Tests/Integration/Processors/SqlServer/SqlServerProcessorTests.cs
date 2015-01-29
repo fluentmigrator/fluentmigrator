@@ -22,7 +22,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
         public void SetUp()
         {
             Connection = new SqlConnection(IntegrationTestOptions.SqlServer2012.ConnectionString);
-            Processor = new SqlServerProcessor(Connection, new SqlServer2012Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
+            Processor = new SqlServerProcessor(() => Connection, new SqlServer2012Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), () => new SqlServerDbFactory());
             Connection.Open();
             Processor.BeginTransaction();
         }
@@ -63,11 +63,11 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
             var connection = new SqlConnection(IntegrationTestOptions.SqlServer2012.ConnectionString);
 
             var processor = new SqlServerProcessor(
-                connection,
+                () => connection,
                 new SqlServer2012Generator(),
                 new TextWriterAnnouncer(output),
                 new ProcessorOptions { PreviewOnly = true },
-                new SqlServerDbFactory());
+                () => new SqlServerDbFactory());
 
             bool tableExists;
 

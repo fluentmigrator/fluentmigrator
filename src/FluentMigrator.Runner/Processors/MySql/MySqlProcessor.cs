@@ -34,7 +34,7 @@ namespace FluentMigrator.Runner.Processors.MySql
             get { return "MySql"; }
         }
 
-        public MySqlProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public MySqlProcessor(Func<IDbConnection> connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, Func<IDbFactory> factory)
             : base(connection, factory, generator, announcer, options)
         {
         }

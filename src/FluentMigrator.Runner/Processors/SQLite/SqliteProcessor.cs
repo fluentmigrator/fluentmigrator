@@ -32,7 +32,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
             get { return "Sqlite"; }
         }
 
-        public SqliteProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public SqliteProcessor(Func<IDbConnection> connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, Func<IDbFactory> factory)
             : base(connection, factory, generator, announcer, options)
         {
         }

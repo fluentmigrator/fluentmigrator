@@ -1,6 +1,7 @@
 ﻿using FluentMigrator.Model;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Generators.Base;
+using System.Linq;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
@@ -22,6 +23,15 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 return "CONSTRAINT " + Quoter.QuoteConstraintName(GetDefaultConstraintName(column.TableName, column.Name)) + " " + defaultValue;
 
             return string.Empty;
+        }
+
+        public override string AddPrimaryKeyConstraint(string tableName, System.Collections.Generic.IEnumerable<ColumnDefinition> primaryKeyColumns)
+        {
+            string keyColumns = string.Join(", ", primaryKeyColumns.Select(x => Quoter.QuoteColumnName(x.Name)).ToArray());
+            var isNonClustered = primaryKeyColumns.All(c => c.AdditionalFeatures.ContainsKey(SqlServerExtensions.ConstraintType) && 
+                                                            (SqlServerConstraintType)c.AdditionalFeatures[SqlServerExtensions.ConstraintType] == SqlServerConstraintType.NonClustered);
+            var clusterClause = isNonClustered ? "NONCLUSTERED " : "";
+            return string.Format(", {0}PRIMARY KEY {2}({1})", GetPrimaryKeyConstraintName(primaryKeyColumns, tableName), keyColumns, clusterClause);
         }
 
         private static bool DefaultValueIsSqlFunction(object defaultValue)

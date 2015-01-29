@@ -37,6 +37,7 @@ namespace FluentMigrator.Console
         public bool NestedNamespaces;
         public bool Output;
         public string OutputFilename;
+        public string OutputDirectory;
         public bool PreviewOnly;
         public string ProcessorType;
         public string Profile;
@@ -51,6 +52,8 @@ namespace FluentMigrator.Console
         public string WorkingDirectory;
         public bool TransactionPerSession;
         public string ProviderSwitches;
+        public long StartingVersion;
+        public bool SuppressVersionInfo;
 
         public RunnerContext RunnerContext { get; private set;}
 
@@ -100,7 +103,7 @@ namespace FluentMigrator.Console
                                             },
                                         {
                                             "output|out|o",
-                                            "Output generated SQL to a file. Default is no output. Use outputFilename to control the filename, otherwise [assemblyname].sql is the default."
+                                            "Output generated SQL to a file. Default is no output. Use outputFilename/outputDirectory to control the filename, otherwise [assemblyname].sql is the default."
                                             ,
                                             v => { Output = true; }
                                             },
@@ -109,6 +112,12 @@ namespace FluentMigrator.Console
                                             "The name of the file to output the generated SQL to. The output option must be included for output to be saved to the file."
                                             ,
                                             v => { OutputFilename = v; }
+                                            },
+                                        {
+                                            "outputDirectory=|outdir=|od=",
+                                            "The name of the directory to output the generated SQL to. The output option must be included for output to be saved to the file."
+                                            ,
+                                            v => { OutputDirectory = v; }
                                             },
                                         {
                                             "preview|p",
@@ -130,6 +139,17 @@ namespace FluentMigrator.Console
                                             "version=",
                                             "The specific version to migrate. Default is 0, which will run all migrations.",
                                             v => { Version = long.Parse(v); }
+                                            },
+                                        {
+                                            "startingVersion=|sv=",
+                                            "The starting version in the database.  Overrides data stored in database.",
+                                            v => { StartingVersion = long.Parse(v); }
+                                            },
+                                        {
+                                            "suppressVersionInfo",
+                                            "Suppresses updates to the VersionInfo table.  Use only if versions are managed by another runner."
+                                            ,
+                                            v => { SuppressVersionInfo = true; }
                                             },
                                         {
                                             "verbose=",
@@ -208,10 +228,10 @@ namespace FluentMigrator.Console
 
                 if (Output)
                 {
-                    if (string.IsNullOrEmpty(OutputFilename))
+                    if (string.IsNullOrEmpty(OutputFilename) && string.IsNullOrEmpty(OutputDirectory))
                         OutputFilename = TargetAssembly + ".sql";
 
-                    ExecuteMigrations(OutputFilename);
+                    ExecuteMigrations(OutputFilename, OutputDirectory);
                 }
                 else
                     ExecuteMigrations();
@@ -254,10 +274,10 @@ namespace FluentMigrator.Console
             ExecuteMigrations(consoleAnnouncer);
         }
 
-        private void ExecuteMigrations(string outputTo)
+        private void ExecuteMigrations(string outputTo, string outputDir)
         {
-            using (var sw = new StreamWriter(outputTo))
-            {
+            if (outputDir == null) {
+                using (var sw = new StreamWriter(outputTo)) {
                 var fileAnnouncer = this.ExecutingAgainstMsSql ?
                     new TextWriterWithGoAnnouncer(sw) :
                     new TextWriterAnnouncer(sw);
@@ -268,11 +288,20 @@ namespace FluentMigrator.Console
                 consoleAnnouncer.ShowElapsedTime = Verbose;
                 consoleAnnouncer.ShowSql = Verbose;
 
-                var announcer = new CompositeAnnouncer(consoleAnnouncer, fileAnnouncer);
+                    var announcer = new CompositeAnnouncer(consoleAnnouncer, fileAnnouncer);
 
-                ExecuteMigrations(announcer);
+                    ExecuteMigrations(announcer);
+                }
+            } else {
+                var dirAnnouncer = new DirectoryAnnouncer(outputDir)
+                                        {
+                                            ShowElapsedTime = false,
+                                            ShowSql = true
+                                        };
+                ExecuteMigrations(new CompositeAnnouncer(consoleAnnouncer, dirAnnouncer));
             }
         }
+        
         private bool ExecutingAgainstMsSql
         {
             get
@@ -280,6 +309,7 @@ namespace FluentMigrator.Console
                 return ProcessorType.StartsWith("SqlServer", StringComparison.InvariantCultureIgnoreCase);
             }
         }
+
 
         private void ExecuteMigrations(IAnnouncer announcer)
         {
@@ -301,7 +331,9 @@ namespace FluentMigrator.Console
                 ApplicationContext = ApplicationContext,
                 Tags = Tags,
                 TransactionPerSession = TransactionPerSession,
-                ProviderSwitches = ProviderSwitches
+                ProviderSwitches = ProviderSwitches,
+                StartingVersion = StartingVersion,
+                SuppressVersionInfo = SuppressVersionInfo
             };
 
             new TaskExecutor(RunnerContext).Execute();

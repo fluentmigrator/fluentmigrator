@@ -51,7 +51,7 @@ namespace FluentMigrator.Expressions
 
         public override string ToString()
         {
-            return base.ToString() + SqlScript;
+            return base.ToString() + Path.GetFileName(SqlScript);
         }
     }
 }

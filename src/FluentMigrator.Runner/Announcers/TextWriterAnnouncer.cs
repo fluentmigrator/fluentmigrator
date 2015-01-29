@@ -23,34 +23,34 @@ namespace FluentMigrator.Runner.Announcers
 {
     public class TextWriterAnnouncer : Announcer
     {
-        private readonly Action<string> write;
+        protected Action<string> Output { get; set;}
 
         public TextWriterAnnouncer(TextWriter writer)
             : this(writer.Write)
         {
         }
 
-        public TextWriterAnnouncer(Action<string> write)
+        public TextWriterAnnouncer(Action<string> output)
         {
-            this.write = write;
+            this.Output = output;
         }
 
         public override void Heading(string message)
         {
             base.Heading(string.Format("{0} ", message).PadRight(75, '='));
-            write(Environment.NewLine);
+            Output(Environment.NewLine);
         }
 
         public override void ElapsedTime(TimeSpan timeSpan)
         {
             base.ElapsedTime(timeSpan);
-            write(Environment.NewLine);
+            Output(Environment.NewLine);
         }
 
         public override void Write(string message, bool escaped)
         {
-            write(escaped ? string.Format("/* {0} */", message) : message);
-            write(Environment.NewLine);
+            Output(escaped ? string.Format("/* {0} */", message) : message);
+            Output(Environment.NewLine);
         }
     }
 }

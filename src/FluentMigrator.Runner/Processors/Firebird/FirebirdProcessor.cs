@@ -36,7 +36,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 return true;
             }
         }
-        public FirebirdProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory, FirebirdOptions fbOptions)
+        public FirebirdProcessor(Func<IDbConnection> connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, Func<IDbFactory> factory, FirebirdOptions fbOptions)
             : base(connection, factory, generator, announcer, options)
         {
             if (fbOptions == null)

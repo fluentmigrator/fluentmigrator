@@ -21,7 +21,7 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
         public void SetUp()
         {
             Connection = new MySqlConnection(IntegrationTestOptions.MySql.ConnectionString);
-            Processor = new MySqlProcessor(Connection, new MySqlGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new MySqlDbFactory());
+            Processor = new MySqlProcessor(() => Connection, new MySqlGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), () => new MySqlDbFactory());
             Connection.Open();
         }
 
@@ -128,11 +128,11 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
         private static MySqlProcessor SetupMySqlProcessorWithPreviewOnly(StringWriter output, MySqlConnection connection)
         {
             var processor = new MySqlProcessor(
-                connection,
+                () => connection,
                 new MySqlGenerator(),
                 new TextWriterAnnouncer(output),
                 new ProcessorOptions {PreviewOnly = true},
-                new MySqlDbFactory());
+                () => new MySqlDbFactory());
             return processor;
         }
     }

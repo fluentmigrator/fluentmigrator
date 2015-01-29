@@ -10,8 +10,8 @@ namespace FluentMigrator.Runner.Processors.Oracle
     {
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
-            var factory = new OracleManagedDbFactory();
-            var connection = factory.CreateConnection(connectionString);
+            Func<IDbFactory> factory = () => new OracleManagedDbFactory();
+            Func<System.Data.IDbConnection> connection = () => factory().CreateConnection(connectionString);
             return new OracleProcessor(connection, new OracleGenerator(this.Quoted(options.ProviderSwitches)), announcer, options, factory);
         }
 

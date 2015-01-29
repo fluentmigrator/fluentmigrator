@@ -23,6 +23,7 @@ using FluentMigrator.Builders.Insert;
 using FluentMigrator.Builders.Rename;
 using FluentMigrator.Builders.Schema;
 using FluentMigrator.Infrastructure;
+using System;
 
 namespace FluentMigrator
 {
@@ -37,7 +38,7 @@ namespace FluentMigrator
         /// <summary>
         /// Connection String that is used to execute migrations.
         /// </summary>
-        public string ConnectionString { get; protected set; }
+        public Func<string> ConnectionString { get; protected set; }
 
 
         public abstract void Up();

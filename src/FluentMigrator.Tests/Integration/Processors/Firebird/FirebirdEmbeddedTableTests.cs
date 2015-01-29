@@ -622,9 +622,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             var announcer = new TextWriterAnnouncer(System.Console.Out);
             announcer.ShowSql = true;
             var options = FirebirdOptions.AutoCommitBehaviour();
-            processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
-                new ProcessorOptions(), new FirebirdDbFactory(), options);
-            var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
+            processor = new FirebirdProcessor(() => connection, new FirebirdGenerator(options), announcer,
+                new ProcessorOptions(), () => new FirebirdDbFactory(), options);
+            var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor, null);
             return runner;
         }
 
@@ -826,10 +826,10 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                         announcer.ShowSql = true;
                         var options = FirebirdOptions.AutoCommitBehaviour();
                         options.TruncateLongNames = false;
-                        processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
-                            new ProcessorOptions(), new FirebirdDbFactory(), options);
+                        processor = new FirebirdProcessor(() => connection, new FirebirdGenerator(options), announcer,
+                            new ProcessorOptions(), () => new FirebirdDbFactory(), options);
                         processor.FBOptions.UndoEnabled = false;
-                        var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
+                        var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor, null);
                         runner.Up(new MigrationWhichCreatesTwoRelatedTables());
                         processor.CommitTransaction();
                         FbConnection.ClearPool(connection);
@@ -843,10 +843,10 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                         var announcer = new TextWriterAnnouncer(System.Console.Out);
                         announcer.ShowSql = true;
                         var options = FirebirdOptions.AutoCommitBehaviour();
-                        processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
-                            new ProcessorOptions(), new FirebirdDbFactory(), options);
+                        processor = new FirebirdProcessor(() => connection, new FirebirdGenerator(options), announcer,
+                            new ProcessorOptions(), () => new FirebirdDbFactory(), options);
                         processor.FBOptions.UndoEnabled = false;
-                        var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor);
+                        var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), runnerContext, processor, null);
                         runner.Up(new MigrationWhichAltersTableWithFK());
                         processor.CommitTransaction();
 

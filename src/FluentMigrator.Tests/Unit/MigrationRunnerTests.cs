@@ -79,7 +79,7 @@ namespace FluentMigrator.Tests.Unit
 
             _migrationLoaderMock.Setup(x => x.LoadMigrations()).Returns(()=> _migrationList);
 
-            _runner = new MigrationRunner(Assembly.GetAssembly(typeof(MigrationRunnerTests)), _runnerContextMock.Object, _processorMock.Object)
+            _runner = new MigrationRunner(Assembly.GetAssembly(typeof(MigrationRunnerTests)), _runnerContextMock.Object, _processorMock.Object, null)
                         {
                             MigrationLoader = _migrationLoaderMock.Object,
                             ProfileLoader = _profileLoaderMock.Object,
@@ -108,7 +108,7 @@ namespace FluentMigrator.Tests.Unit
                 _migrationList.Add(version,new MigrationInfo(version, TransactionBehavior.Default, new TestMigration()));
             }
 
-            _fakeVersionLoader.LoadVersionInfo();
+            _fakeVersionLoader.LoadVersionInfo(null, null);
         }
 
         [Test]
@@ -151,7 +151,7 @@ namespace FluentMigrator.Tests.Unit
             IMigration migration = new TestEmptyMigration();
             _runner.Up(migration);
 
-            Assert.AreEqual(IntegrationTestOptions.SqlServer2008.ConnectionString, migration.ConnectionString, "The migration does not have the expected connection string.");
+            Assert.AreEqual(IntegrationTestOptions.SqlServer2008.ConnectionString, migration.ConnectionString(), "The migration does not have the expected connection string.");
             _announcer.VerifyAll();
         }
 
@@ -269,7 +269,7 @@ namespace FluentMigrator.Tests.Unit
 
             LoadVersionData(fakeMigrationVersion, fakeMigrationVersion2);
 
-            _runner.VersionLoader.LoadVersionInfo();
+            _runner.VersionLoader.LoadVersionInfo(null, null);
             _runner.Rollback(1);
 
             _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();
@@ -327,7 +327,7 @@ namespace FluentMigrator.Tests.Unit
             LoadVersionData(fakeMigration1,fakeMigration3);
 
             _fakeVersionLoader.Versions.Add(fakeMigration2);
-            _fakeVersionLoader.LoadVersionInfo();
+            _fakeVersionLoader.LoadVersionInfo(null, null);
 
             _runner.RollbackToVersion(2011010101);
             
@@ -347,7 +347,7 @@ namespace FluentMigrator.Tests.Unit
 
             _migrationList.Remove(fakeMigration1);
             _migrationList.Remove(fakeMigration2);
-            _fakeVersionLoader.LoadVersionInfo();
+            _fakeVersionLoader.LoadVersionInfo(null, null);
 
             _runner.RollbackToVersion(0);
 
@@ -366,7 +366,7 @@ namespace FluentMigrator.Tests.Unit
             LoadVersionData(fakeMigration1, fakeMigration3);
 
             _fakeVersionLoader.Versions.Add(fakeMigration2);
-            _fakeVersionLoader.LoadVersionInfo();
+            _fakeVersionLoader.LoadVersionInfo(null, null);
 
             _runner.Rollback(2);
 
