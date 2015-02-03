@@ -225,6 +225,7 @@
     <Compile Include="Integration\Processors\Firebird\FirebirdIndexTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdProcessorTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdTableTests.cs" />
+    <Compile Include="Integration\Processors\Firebird\TestDisposing.cs" />
     <Compile Include="Integration\Processors\Jet\JetProcessorTests.cs" />
     <Compile Include="Integration\Processors\MySql\MySqlProcessorTests.cs" />
     <Compile Include="Integration\Processors\Oracle\OracleManagedProcessorFactoryTests.cs" />
