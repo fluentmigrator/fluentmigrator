@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
 using FluentMigrator.Builders.Execute;
-using FluentMigrator.Runner.Generators.Firebird;
-using System.Collections.Generic;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Helpers;
 
 namespace FluentMigrator.Runner.Processors.Firebird
@@ -147,6 +147,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             base.CommitTransaction();
             EnsureConnectionIsClosed();
             ClearLocks();
+            ClearExpressions();
         }
 
         public override void RollbackTransaction()
