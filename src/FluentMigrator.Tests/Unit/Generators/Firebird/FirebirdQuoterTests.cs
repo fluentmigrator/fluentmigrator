@@ -1,11 +1,14 @@
-﻿using System.Linq;
-using FluentMigrator.Runner.Generators.Generic;
+﻿using System;
+using FluentMigrator.Runner.Generators.Firebird;
+using NUnit.Framework;
+using NUnit.Should;
 
-namespace FluentMigrator.Runner.Generators.Firebird
+namespace FluentMigrator.Tests.Unit.Generators.Firebird
 {
-    public class FirebirdQuoter : GenericQuoter
+    [TestFixture]
+    public class FirebirdQuoterTests
     {
-        private readonly string[] _keywords = new[]
+        private readonly string[] _fbKeywords = new[]
         {
             "!<", "^<", "^=", "^>", ",", ":=", "!=", "!>", "(", ")", "<", "<=", "<>", "=", ">", ">=", "||", "~<", "~=", "~>",
             "ABS", "ACCENT", "ACOS", "ACTION", "ACTIVE", "ADD", "ADMIN", "AFTER", "ALL", "ALTER", "ALWAYS", "AND", "ANY", 
@@ -39,16 +42,20 @@ namespace FluentMigrator.Runner.Generators.Firebird
             "WRITE", "YEAR", "YEARDAY"
         };
 
-        public override string Quote(string name)
+        [Test, TestCaseSource("_fbKeywords")]
+        public void Quote_ArgIsFirebirdKeyword_ArgShouldBeQuoted(string quoteArg)
         {
-            if (_keywords.Any(x => x == name.ToUpper()))
-                return base.Quote(name);
-            return name;
+            var actual = new FirebirdQuoter().Quote(quoteArg);
+            var expected = String.Format("\"{0}\"", quoteArg);
+            actual.ShouldBe(expected);
         }
 
-        public override string FormatDateTime(System.DateTime value)
+        [TestCase("one")]
+        [TestCase("silly")]
+        public void Quote_ArgIsNotAKeyWord_ArgShouldNotBeQuoted(string quoteArg)
         {
-            return ValueQuote + (value).ToString("yyyy-MM-dd HH:mm:ss") + ValueQuote;
+            var actual = new FirebirdQuoter().Quote(quoteArg);
+            actual.ShouldBe(quoteArg);
         }
     }
 }
