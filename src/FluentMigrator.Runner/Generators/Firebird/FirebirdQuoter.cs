@@ -51,5 +51,14 @@ namespace FluentMigrator.Runner.Generators.Firebird
         {
             return ValueQuote + (value).ToString("yyyy-MM-dd HH:mm:ss") + ValueQuote;
         }
+
+        public string ToFbObjectName(string objName)
+        {
+            var potentiallyQuoted = Quote(objName);
+            if (IsQuoted(potentiallyQuoted))
+                return potentiallyQuoted;
+            else
+                return objName.ToUpper();
+        }
     }
 }
