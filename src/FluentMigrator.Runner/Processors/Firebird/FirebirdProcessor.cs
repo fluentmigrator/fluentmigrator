@@ -897,7 +897,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 Process(sequence);
             }
             string triggerName = GetIdentityTriggerName(tableName, columnName);
-            string trigger = String.Format("as begin if (NEW.\"{0}\" is NULL) then NEW.\"{1}\" = GEN_ID({2}, 1); end", columnName, columnName, quoter.QuoteSequenceName(sequenceName));
+            string quotedColumn = quoter.Quote(columnName);
+            string trigger = String.Format("as begin if (NEW.{0} is NULL) then NEW.{1} = GEN_ID({2}, 1); end", quotedColumn, quotedColumn, quoter.QuoteSequenceName(sequenceName));
 
             PerformDBOperationExpression createTrigger = CreateTriggerExpression(tableName, triggerName, true, TriggerEvent.Insert, trigger);
             PerformDBOperationExpression deleteTrigger = DeleteTriggerExpression(tableName, triggerName);
