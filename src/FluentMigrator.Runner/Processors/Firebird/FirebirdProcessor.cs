@@ -867,7 +867,10 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         private string FormatToSafeName(string sqlName)
         {
-            return FormatHelper.FormatSqlEscape(quoter.UnQuote(sqlName));
+            if (quoter.IsQuoted(sqlName))
+                return FormatHelper.FormatSqlEscape(quoter.UnQuote(sqlName));
+            else
+                return FormatHelper.FormatSqlEscape(sqlName).ToUpper();
         }
 
         private string GetSequenceName(string tableName, string columnName)
