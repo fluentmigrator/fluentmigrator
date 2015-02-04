@@ -6,6 +6,7 @@ using System.Reflection;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Generators.Firebird;
 
 namespace FluentMigrator.Runner.Processors.Firebird
 {
@@ -109,14 +110,14 @@ namespace FluentMigrator.Runner.Processors.Firebird
             CanUndo = true;
             FirebirdSchemaProvider schema = new FirebirdSchemaProvider(Processor);
             FirebirdTableSchema table = schema.GetTableSchema(expression.TableName);
+            var quoter = new FirebirdQuoter();
             AlterColumnExpression alter = new AlterColumnExpression()
             {
                 SchemaName = String.Empty,
                 TableName = expression.TableName,
-                Column = table.Definition.Columns.First(x => x.Name == expression.Column.Name)
+                Column = table.Definition.Columns.First(x => x.Name == quoter.ToFbObjectName(expression.Column.Name))
             };
             UndoExpressions.Add(alter);
-            
         }
 
         protected void SetupUndoDeleteData(DeleteDataExpression expression)
