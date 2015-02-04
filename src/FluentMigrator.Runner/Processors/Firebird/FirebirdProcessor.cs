@@ -956,7 +956,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             {
                 string triggerSql = String.Format(@"CREATE TRIGGER {0} FOR {1} ACTIVE {2} {3} POSITION 0 
                     {4}
-                    ", quoter.Quote(triggerName), "\"" + tableName + "\"",
+                    ", quoter.Quote(triggerName), quoter.Quote(tableName),
                      onBefore ? "before" : "after",
                      onEvent.ToString().ToLower(),
                      triggerBody
