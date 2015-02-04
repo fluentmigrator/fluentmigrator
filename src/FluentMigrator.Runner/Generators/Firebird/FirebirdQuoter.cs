@@ -56,7 +56,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         {
             var potentiallyQuoted = Quote(objName);
             if (IsQuoted(potentiallyQuoted))
-                return potentiallyQuoted;
+                return objName;
             else
                 return objName.ToUpper();
         }
