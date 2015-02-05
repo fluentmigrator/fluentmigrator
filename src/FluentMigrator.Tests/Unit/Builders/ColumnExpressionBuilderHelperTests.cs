@@ -18,13 +18,14 @@ namespace FluentMigrator.Tests.Unit.Builders
         {
             var builderMock = new Mock<IColumnExpressionBuilder>();
             var contextMock = new Mock<IMigrationContext>();
-            builderMock.SetupGet(n => n.Column.ModificationType).Returns(ColumnModificationType.Create);
+            var columnMock = new Mock<ColumnDefinition>();
+            builderMock.SetupGet(n => n.Column).Returns(columnMock.Object);
+            columnMock.SetupGet(n => n.ModificationType).Returns(ColumnModificationType.Create);
 
             var helper = new ColumnExpressionBuilderHelper(builderMock.Object, contextMock.Object);
-
             helper.SetNullable(false);
 
-            builderMock.VerifySet(n => n.Column.IsNullable = false);
+            columnMock.VerifySet(n => n.IsNullable = false);
         }
 
         [Test]
@@ -32,7 +33,11 @@ namespace FluentMigrator.Tests.Unit.Builders
         {
             var builderMock = new Mock<IColumnExpressionBuilder>();
             var contextMock = new Mock<IMigrationContext>();
-            builderMock.SetupGet(n => n.Column.ModificationType).Returns(ColumnModificationType.Create);
+            var columnMock = new Mock<ColumnDefinition>();
+            var columnCloneMock = new Mock<ColumnDefinition>();
+            builderMock.SetupGet(n => n.Column).Returns(columnMock.Object);
+            columnMock.SetupGet(n => n.ModificationType).Returns(ColumnModificationType.Create);
+            columnMock.Setup(n => n.Clone()).Returns(columnCloneMock.Object);
             contextMock.Setup(n => n.Expressions.Add(It.IsAny<IMigrationExpression>()));
 
             var helper = new ColumnExpressionBuilderHelper(builderMock.Object, contextMock.Object);
@@ -40,7 +45,10 @@ namespace FluentMigrator.Tests.Unit.Builders
             helper.SetExistingRowsTo("test");
             helper.SetNullable(false);
 
-            builderMock.VerifySet(n => n.Column.IsNullable = false, Times.Never());
+            //The column IsNullable should NOT be set to false, instead an internal clone
+            //should have been created, which will have IsNullable set to false.
+            columnMock.VerifySet(n => n.IsNullable = false, Times.Never());
+            columnCloneMock.VerifySet(n => n.IsNullable = false, Times.Once());
         }
 
         [Test]
@@ -101,10 +109,18 @@ namespace FluentMigrator.Tests.Unit.Builders
 
             builderMock.SetupGet(n => n.SchemaName).Returns("Fred");
             builderMock.SetupGet(n => n.TableName).Returns("Flinstone");
-            builderMock.SetupGet(n => n.Column.ModificationType).Returns(ColumnModificationType.Create);
-            builderMock.SetupGet(n => n.Column.Name).Returns("ColName");
-            builderMock.SetupGet(n => n.Column.Type).Returns(System.Data.DbType.Int32);
-            builderMock.SetupGet(n => n.Column.CustomType).Returns("CustomType");
+
+            var createColColumn = new ColumnDefinition
+            {
+                ModificationType = ColumnModificationType.Create,
+                Name = "ColName",
+                Type = System.Data.DbType.String,
+                CustomType = "CustomType",
+                Size = 12,
+                Precision = 2
+            };
+
+            builderMock.SetupGet(n => n.Column).Returns(createColColumn);
 
             var helper = new ColumnExpressionBuilderHelper(builderMock.Object, contextMock.Object);
 
@@ -120,12 +136,23 @@ namespace FluentMigrator.Tests.Unit.Builders
             Assert.AreNotSame(builderMock.Object.Column, alterColExpr.Column);
             Assert.AreEqual("Fred", alterColExpr.SchemaName);
             Assert.AreEqual("Flinstone", alterColExpr.TableName);
-            
-            Assert.AreEqual(ColumnModificationType.Alter, alterColExpr.Column.ModificationType);
-            Assert.AreEqual("ColName", alterColExpr.Column.Name);
-            Assert.AreEqual(System.Data.DbType.Int32, alterColExpr.Column.Type);
-            Assert.AreEqual("CustomType", alterColExpr.Column.CustomType);
-            Assert.AreEqual(false, alterColExpr.Column.IsNullable);
+
+            //Check that the the 'alter' expression column definition is not the same instance as the
+            //create column definition.
+            Assert.IsNotNull(alterColExpr.Column);
+            var alterColColumn = alterColExpr.Column;
+            Assert.AreNotSame(createColColumn, alterColColumn);
+
+            //Check that all properties on the alter expression column have been cloned.
+            //Could also test this by mocking .clone method to return another mock etc, just doing
+            //it here tho by comparing values.
+            Assert.AreEqual(ColumnModificationType.Alter, alterColColumn.ModificationType);
+            Assert.AreEqual("ColName", alterColColumn.Name);
+            Assert.AreEqual(System.Data.DbType.String, alterColColumn.Type);
+            Assert.AreEqual("CustomType", alterColColumn.CustomType);
+            Assert.AreEqual(false, alterColColumn.IsNullable);
+            Assert.AreEqual(12, alterColColumn.Size);
+            Assert.AreEqual(2, alterColColumn.Precision);
         }
 
         [Test]
@@ -136,6 +163,7 @@ namespace FluentMigrator.Tests.Unit.Builders
             List<IMigrationExpression> addedExpressions = new List<IMigrationExpression>();
             contextMock.SetupGet(n => n.Expressions).Returns(addedExpressions);
             builderMock.SetupGet(n => n.Column.ModificationType).Returns(ColumnModificationType.Create);
+            builderMock.Setup(n => n.Column.Clone()).Returns(new ColumnDefinition());
             
             var helper = new ColumnExpressionBuilderHelper(builderMock.Object, contextMock.Object);
 

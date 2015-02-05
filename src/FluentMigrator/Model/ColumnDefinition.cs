@@ -64,7 +64,7 @@ namespace FluentMigrator.Model
                 errors.Add(ErrorMessages.ColumnTypeMustBeDefined);
         }
 
-        public object Clone()
+        public virtual object Clone()
         {
             return MemberwiseClone();
         }
