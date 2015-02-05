@@ -87,7 +87,7 @@ namespace FluentMigrator.Runner
             VersionLoader = new VersionLoader(this, _migrationAssembly, Conventions);
             MigrationLoader = new DefaultMigrationInformationLoader(Conventions, _migrationAssembly, runnerContext.Namespace, runnerContext.NestedNamespaces, runnerContext.Tags);
             ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
-            MaintenanceLoader = new MaintenanceLoader(this, Conventions);
+            MaintenanceLoader = new MaintenanceLoader(_migrationAssembly, runnerContext.Tags, Conventions);
         }
 
         public IVersionLoader VersionLoader { get; set; }
@@ -97,9 +97,13 @@ namespace FluentMigrator.Runner
             ProfileLoader.ApplyProfiles();
         }
 
-        public void ApplyMaintenance(MigrationStage stage)
+        public void ApplyMaintenance(MigrationStage stage, bool useAutomaticTransactionManagement)
         {
-            MaintenanceLoader.ApplyMaintenance(stage);
+            var maintenanceMigrations = MaintenanceLoader.LoadMaintenance(stage);
+            foreach (var maintenanceMigration in maintenanceMigrations)
+            {
+                ApplyMigrationUp(maintenanceMigration, useAutomaticTransactionManagement && maintenanceMigration.TransactionBehavior == TransactionBehavior.Default);
+            }
         }
 
         public void MigrateUp()
@@ -113,20 +117,20 @@ namespace FluentMigrator.Runner
 
             using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
-                ApplyMaintenance(MigrationStage.BeforeAll);
+                ApplyMaintenance(MigrationStage.BeforeAll, useAutomaticTransactionManagement);
 
                 foreach (var pair in migrations)
                 {
-                    ApplyMaintenance(MigrationStage.BeforeEach);
+                    ApplyMaintenance(MigrationStage.BeforeEach, useAutomaticTransactionManagement);
                     ApplyMigrationUp(pair.Value, useAutomaticTransactionManagement && pair.Value.TransactionBehavior == TransactionBehavior.Default);
-                    ApplyMaintenance(MigrationStage.AfterEach);
+                    ApplyMaintenance(MigrationStage.AfterEach, useAutomaticTransactionManagement);
                 }
 
-                ApplyMaintenance(MigrationStage.BeforeProfiles);
+                ApplyMaintenance(MigrationStage.BeforeProfiles, useAutomaticTransactionManagement);
 
                 ApplyProfiles();
 
-                ApplyMaintenance(MigrationStage.AfterAll);
+                ApplyMaintenance(MigrationStage.AfterAll, useAutomaticTransactionManagement);
 
                 scope.Complete();
             }
