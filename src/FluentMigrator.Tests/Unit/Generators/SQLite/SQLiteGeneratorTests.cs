@@ -11,12 +11,12 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
     [TestFixture]
     public class SQLiteGeneratorTests
     {
-        protected SqliteGenerator Generator;
+        protected SQLiteGenerator Generator;
 
         [SetUp]
         public void Setup()
         {
-            Generator = new SqliteGenerator();
+            Generator = new SQLiteGenerator();
         }
 
         [Test]

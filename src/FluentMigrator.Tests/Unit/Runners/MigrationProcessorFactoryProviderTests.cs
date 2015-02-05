@@ -38,8 +38,8 @@ namespace FluentMigrator.Tests.Unit.Runners
         [Test]
         public void CanRetrieveFactoryWithArgumentString()
         {
-            IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("Sqlite");
-            Assert.IsTrue(factory.GetType() == typeof(SqliteProcessorFactory));
+            IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("SQLite");
+            Assert.IsTrue(factory.GetType() == typeof(SQLiteProcessorFactory));
         }
 
         [Test]

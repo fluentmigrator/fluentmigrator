@@ -10,16 +10,16 @@ using FluentMigrator.Runner.Processors.SQLite;
 
 namespace FluentMigrator.SchemaDump.SchemaDumpers
 {
-    public class SqliteSchemaDumper : ISchemaDumper
+    public class SQLiteSchemaDumper : ISchemaDumper
     {
-        public SqliteSchemaDumper(SqliteProcessor processor, IAnnouncer announcer)
+        public SQLiteSchemaDumper(SQLiteProcessor processor, IAnnouncer announcer)
         {
             Announcer = announcer;
             Processor = processor;
         }
 
         public virtual IAnnouncer Announcer { get; set; }
-        public SqliteProcessor Processor { get; set; }
+        public SQLiteProcessor Processor { get; set; }
 
         #region ISchemaDumper Members
 

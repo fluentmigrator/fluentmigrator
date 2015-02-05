@@ -59,7 +59,7 @@ namespace FluentMigrator.Tests.Integration
                 ExecuteWithSqlServer2014(test, tryRollback);
             }
             
-            if (exceptProcessors.Count(t => typeof(SqliteProcessor).IsAssignableFrom(t)) == 0)
+            if (exceptProcessors.Count(t => typeof(SQLiteProcessor).IsAssignableFrom(t)) == 0)
                 ExecuteWithSqlite(test, IntegrationTestOptions.SqlLite);
 
             if (exceptProcessors.Count(t => typeof(MySqlProcessor).IsAssignableFrom(t)) == 0)
@@ -154,10 +154,10 @@ namespace FluentMigrator.Tests.Integration
             var announcer = new TextWriterAnnouncer(System.Console.Out);
             announcer.Heading("Testing Migration against SQLite");
 
-            var factory = new SqliteDbFactory();
+            var factory = new SQLiteDbFactory();
             using (var connection = factory.CreateConnection(serverOptions.ConnectionString))
             {
-                var processor = new SqliteProcessor(connection, new SqliteGenerator(), announcer, new ProcessorOptions(), factory);
+                var processor = new SQLiteProcessor(connection, new SQLiteGenerator(), announcer, new ProcessorOptions(), factory);
                 test(processor);
             }
         }

@@ -25,14 +25,14 @@ using FluentMigrator.Builders.Execute;
 namespace FluentMigrator.Runner.Processors.SQLite
 {
 
-    public class SqliteProcessor : GenericProcessorBase
+    public class SQLiteProcessor : GenericProcessorBase
     {
         public override string DatabaseType
         {
-            get { return "Sqlite"; }
+            get { return "SQLite"; }
         }
 
-        public SqliteProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public SQLiteProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
         }
