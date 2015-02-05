@@ -6,7 +6,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
     public class FirebirdQuoter : GenericQuoter
     {
         // see http://www.firebirdsql.org/refdocs/langrefupd25-reskeywords-full-keywords.html
-        private readonly string[] _keywords = new[]
+        private static readonly string[] _keywords = new[]
         {
             "!<", "^<", "^=", "^>", ",", ":=", "!=", "!>", "(", ")", "<", "<=", "<>", "=", ">", ">=", "||", "~<", "~=", "~>",
             "ABS", "ACCENT", "ACOS", "ACTION", "ACTIVE", "ADD", "ADMIN", "AFTER", "ALL", "ALTER", "ALWAYS", "AND", "ANY", 
