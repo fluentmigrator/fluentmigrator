@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using FluentMigrator.Expressions;
-using System.Reflection;
 using System.Data;
-using FluentMigrator.Model;
+using System.Linq;
+using System.Reflection;
 using FluentMigrator.Builders.Execute;
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Processors.Firebird
 {
@@ -22,7 +22,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             Processor = processor;
             Expression = expression;
             this.expressionType = expressionType;
-            if (processor.FBOptions.UndoEnabled)
+            if (processor.FBOptions.UndoEnabled && !processor.IsRunningOutOfMigrationScope())
                 SetupUndoExpressions();
         }
 

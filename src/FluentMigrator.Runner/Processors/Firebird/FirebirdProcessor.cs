@@ -178,6 +178,9 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public virtual void CommitRetaining()
         {
+            if (IsRunningOutOfMigrationScope())
+                return;
+
             Announcer.Say("Committing and Retaining Transaction");
 
             using (var command = Factory.CreateCommand("COMMIT RETAIN", Connection, Transaction))
@@ -192,6 +195,11 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             if (FBOptions.TransactionModel == FirebirdTransactionModel.AutoCommit)
                 CommitRetaining();
+        }
+
+        public bool IsRunningOutOfMigrationScope()
+        {
+            return Transaction == null;
         }
 
         #endregion
@@ -322,7 +330,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         }
         protected void RegisterExpression(FirebirdProcessedExpressionBase fbExpression)
         {
-            if (!FBOptions.UndoEnabled)
+            if (!FBOptions.UndoEnabled || IsRunningOutOfMigrationScope())
                 return;
 
             if (!fbExpression.CanUndo)
