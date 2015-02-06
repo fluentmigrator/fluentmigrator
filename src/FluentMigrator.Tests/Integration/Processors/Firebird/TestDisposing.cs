@@ -21,7 +21,10 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 		public void SetUp()
 		{
             if (System.IO.File.Exists("fbtest.fdb"))
+            {
+                FbConnection.ClearAllPools();
                 FbConnection.DropDatabase(IntegrationTestOptions.Firebird.ConnectionString);
+            }
 
             FbConnection.CreateDatabase(IntegrationTestOptions.Firebird.ConnectionString);
 
