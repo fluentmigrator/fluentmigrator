@@ -36,6 +36,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 return true;
             }
         }
+
         public FirebirdProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory, FirebirdOptions fbOptions)
             : base(connection, factory, generator, announcer, options)
         {
@@ -262,6 +263,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             columns.ToList().ForEach(x => LockColumn(tableName, x));
         }
+
         public void LockColumn(string tableName, string columnName)
         {
             if (!DDLTouchedColumns.ContainsKey(tableName))
@@ -293,6 +295,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             columns.ToList().ForEach(x => CheckColumn(tableName, x));
         }
+
         public void CheckColumn(string tableName, string columnName)
         {
             CheckTable(tableName);
@@ -324,10 +327,12 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             RegisterExpression(new FirebirdProcessedExpression(expression, expressionType, this) as FirebirdProcessedExpressionBase);
         }
+
         protected void RegisterExpression<T>(T expression) where T : IMigrationExpression, new()
         {
             RegisterExpression(new FirebirdProcessedExpression<T>(expression, this) as FirebirdProcessedExpressionBase);
         }
+
         protected void RegisterExpression(FirebirdProcessedExpressionBase fbExpression)
         {
             if (!FBOptions.UndoEnabled || IsRunningOutOfMigrationScope())
@@ -936,6 +941,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             return CreateTriggerExpression(tableName, trigger.Name, trigger.Before, trigger.Event, trigger.Body);
         }
+
         public PerformDBOperationExpression CreateTriggerExpression(string tableName, string triggerName, bool onBefore, TriggerEvent onEvent, string triggerBody)
         {
             tableName = truncator.Truncate(tableName);
