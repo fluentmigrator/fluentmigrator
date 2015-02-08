@@ -10,7 +10,10 @@ namespace FluentMigrator.Runner.Generators.Postgres
 {
     public class PostgresGenerator : GenericGenerator
     {
-        public PostgresGenerator() : base(new PostgresColumn(), new PostgresQuoter(), new PostgresDescriptionGenerator()) { }
+        public PostgresGenerator() : base(new PostgresColumn(), new PostgresQuoter(), new PostgresDescriptionGenerator())
+        {
+        }
+
         public override string Generate(AlterTableExpression expression)
         {
             var alterStatement = new StringBuilder();
@@ -22,6 +25,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             }
             return alterStatement.ToString();
         }
+
         public override string Generate(CreateSchemaExpression expression)
         {
             return string.Format("CREATE SCHEMA {0}", Quoter.QuoteSchemaName(expression.SchemaName));
