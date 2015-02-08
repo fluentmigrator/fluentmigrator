@@ -135,6 +135,7 @@
     <Compile Include="Announcers\TextWriterAnnouncer.cs" />
     <Compile Include="Announcers\TextWriterWithGoAnnouncer.cs" />
     <Compile Include="CompatabilityMode.cs" />
+    <Compile Include="Generators\Postgres\PostgresDescriptionGenerator.cs" />
     <Compile Include="Generators\SqlServer\SqlServer2014Generator.cs" />
     <Compile Include="MaintenanceLoader.cs" />
     <Compile Include="IMaintenanceLoader.cs" />
