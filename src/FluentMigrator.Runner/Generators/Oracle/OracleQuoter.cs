@@ -50,6 +50,10 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 , value.Seconds
                 , value.Milliseconds);
         }
-    }
 
+        public override string FormatGuid(Guid value)
+        {
+            return ValueQuote + BitConverter.ToString(value.ToByteArray()).Replace("-", string.Empty) + ValueQuote;
+        }
+    }
 }

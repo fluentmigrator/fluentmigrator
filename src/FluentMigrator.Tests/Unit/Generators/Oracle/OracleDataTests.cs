@@ -1,4 +1,5 @@
-﻿using FluentMigrator.Runner.Generators.Oracle;
+﻿using System;
+using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -107,7 +108,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(System.String.Format("INSERT ALL INTO TestSchema.TestTable1 (guid) VALUES ('{0}') SELECT 1 FROM DUAL", GeneratorTestHelper.TestGuid.ToString()));
+            result.ShouldBe(String.Format("INSERT ALL INTO TestSchema.TestTable1 (guid) VALUES ('{0}') SELECT 1 FROM DUAL", BitConverter.ToString(GeneratorTestHelper.TestGuid.ToByteArray()).Replace("-", string.Empty)));
         }
 
         [Test]
@@ -117,7 +118,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(System.String.Format("INSERT ALL INTO TestTable1 (guid) VALUES ('{0}') SELECT 1 FROM DUAL", GeneratorTestHelper.TestGuid.ToString()));
+            result.ShouldBe(String.Format("INSERT ALL INTO TestTable1 (guid) VALUES ('{0}') SELECT 1 FROM DUAL", BitConverter.ToString(GeneratorTestHelper.TestGuid.ToByteArray()).Replace("-", string.Empty)));
         }
 
         [Test]
