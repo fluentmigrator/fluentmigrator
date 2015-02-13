@@ -104,21 +104,22 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public override void CanInsertGuidDataWithCustomSchema()
         {
             //Oracle can not insert GUID data using string representation
-            var expression = GeneratorTestHelper.GetInsertGUIDExpression();
+            var expression = GeneratorTestHelper.GetInsertGUIDExpression(new Guid("7E487B79-626C-4E7D-811C-BC30AB31C564"));
+
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(String.Format("INSERT ALL INTO TestSchema.TestTable1 (guid) VALUES ('{0}') SELECT 1 FROM DUAL", BitConverter.ToString(GeneratorTestHelper.TestGuid.ToByteArray()).Replace("-", string.Empty)));
+            result.ShouldBe(String.Format("INSERT ALL INTO TestSchema.TestTable1 (guid) VALUES ('797B487E6C627D4E811CBC30AB31C564') SELECT 1 FROM DUAL"));
         }
 
         [Test]
         public override void CanInsertGuidDataWithDefaultSchema()
         {
             //Oracle can not insert GUID data using string representation
-            var expression = GeneratorTestHelper.GetInsertGUIDExpression();
+            var expression = GeneratorTestHelper.GetInsertGUIDExpression(new Guid("7E487B79-626C-4E7D-811C-BC30AB31C564"));
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(String.Format("INSERT ALL INTO TestTable1 (guid) VALUES ('{0}') SELECT 1 FROM DUAL", BitConverter.ToString(GeneratorTestHelper.TestGuid.ToByteArray()).Replace("-", string.Empty)));
+            result.ShouldBe(String.Format("INSERT ALL INTO TestTable1 (guid) VALUES ('797B487E6C627D4E811CBC30AB31C564') SELECT 1 FROM DUAL"));
         }
 
         [Test]
