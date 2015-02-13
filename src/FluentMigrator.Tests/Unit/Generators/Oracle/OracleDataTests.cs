@@ -109,7 +109,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(String.Format("INSERT ALL INTO TestSchema.TestTable1 (guid) VALUES ('797B487E6C627D4E811CBC30AB31C564') SELECT 1 FROM DUAL"));
+            result.ShouldBe("INSERT ALL INTO TestSchema.TestTable1 (guid) VALUES ('797B487E6C627D4E811CBC30AB31C564') SELECT 1 FROM DUAL");
         }
 
         [Test]
@@ -119,7 +119,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetInsertGUIDExpression(new Guid("7E487B79-626C-4E7D-811C-BC30AB31C564"));
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(String.Format("INSERT ALL INTO TestTable1 (guid) VALUES ('797B487E6C627D4E811CBC30AB31C564') SELECT 1 FROM DUAL"));
+            result.ShouldBe("INSERT ALL INTO TestTable1 (guid) VALUES ('797B487E6C627D4E811CBC30AB31C564') SELECT 1 FROM DUAL");
         }
 
         [Test]
