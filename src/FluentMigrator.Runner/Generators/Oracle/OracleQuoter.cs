@@ -53,7 +53,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         public override string FormatGuid(Guid value)
         {
-            return ValueQuote + BitConverter.ToString(value.ToByteArray()).Replace("-", string.Empty) + ValueQuote;
+            return string.Format("{0}{1}{0}", ValueQuote, BitConverter.ToString(value.ToByteArray()).Replace("-", string.Empty));
         }
     }
 }
