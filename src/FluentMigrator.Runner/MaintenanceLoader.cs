@@ -31,7 +31,8 @@ namespace FluentMigrator.Runner
         {
             _runner = runner;
             _maintenance = (
-                from type in runner.MigrationAssembly.GetExportedTypes()
+                from a in runner.MigrationAssemblies.Assemblies
+                from type in a.GetExportedTypes()
                 let stage = conventions.GetMaintenanceStage(type)
                 where stage != null
                 let migration = (IMigration)Activator.CreateInstance(type)
