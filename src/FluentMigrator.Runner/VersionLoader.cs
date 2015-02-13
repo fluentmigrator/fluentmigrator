@@ -81,7 +81,7 @@ namespace FluentMigrator.Runner
             return new InsertionDataDefinition
                        {
                            new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version),
-                           new KeyValuePair<string, object>("AppliedOn", DateTime.UtcNow),
+                           new KeyValuePair<string, object>(VersionTableMetaData.AppliedOnColumnName, DateTime.UtcNow),
                            new KeyValuePair<string, object>(VersionTableMetaData.DescriptionColumnName, description),
                        };
         }
@@ -122,7 +122,7 @@ namespace FluentMigrator.Runner
         {
             get
             {
-                return Processor.ColumnExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName, "AppliedOn");
+                return Processor.ColumnExists(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName, VersionTableMetaData.AppliedOnColumnName);
             }
         }
 

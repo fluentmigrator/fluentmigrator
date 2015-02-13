@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
 using FluentMigrator.Builders.Execute;
-using FluentMigrator.Runner.Generators.Firebird;
-using System.Collections.Generic;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Helpers;
 
 namespace FluentMigrator.Runner.Processors.Firebird
@@ -36,6 +36,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 return true;
             }
         }
+
         public FirebirdProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory, FirebirdOptions fbOptions)
             : base(connection, factory, generator, announcer, options)
         {
@@ -147,6 +148,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             base.CommitTransaction();
             EnsureConnectionIsClosed();
             ClearLocks();
+            ClearExpressions();
         }
 
         public override void RollbackTransaction()
@@ -177,6 +179,9 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public virtual void CommitRetaining()
         {
+            if (IsRunningOutOfMigrationScope())
+                return;
+
             Announcer.Say("Committing and Retaining Transaction");
 
             using (var command = Factory.CreateCommand("COMMIT RETAIN", Connection, Transaction))
@@ -191,6 +196,11 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             if (FBOptions.TransactionModel == FirebirdTransactionModel.AutoCommit)
                 CommitRetaining();
+        }
+
+        public bool IsRunningOutOfMigrationScope()
+        {
+            return Transaction == null;
         }
 
         #endregion
@@ -253,6 +263,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             columns.ToList().ForEach(x => LockColumn(tableName, x));
         }
+
         public void LockColumn(string tableName, string columnName)
         {
             if (!DDLTouchedColumns.ContainsKey(tableName))
@@ -284,6 +295,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             columns.ToList().ForEach(x => CheckColumn(tableName, x));
         }
+
         public void CheckColumn(string tableName, string columnName)
         {
             CheckTable(tableName);
@@ -315,13 +327,15 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             RegisterExpression(new FirebirdProcessedExpression(expression, expressionType, this) as FirebirdProcessedExpressionBase);
         }
+
         protected void RegisterExpression<T>(T expression) where T : IMigrationExpression, new()
         {
             RegisterExpression(new FirebirdProcessedExpression<T>(expression, this) as FirebirdProcessedExpressionBase);
         }
+
         protected void RegisterExpression(FirebirdProcessedExpressionBase fbExpression)
         {
-            if (!FBOptions.UndoEnabled)
+            if (!FBOptions.UndoEnabled || IsRunningOutOfMigrationScope())
                 return;
 
             if (!fbExpression.CanUndo)
@@ -927,6 +941,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             return CreateTriggerExpression(tableName, trigger.Name, trigger.Before, trigger.Event, trigger.Body);
         }
+
         public PerformDBOperationExpression CreateTriggerExpression(string tableName, string triggerName, bool onBefore, TriggerEvent onEvent, string triggerBody)
         {
             tableName = truncator.Truncate(tableName);

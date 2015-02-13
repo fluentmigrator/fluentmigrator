@@ -184,7 +184,7 @@ namespace FluentMigrator.Console
                 }
                 catch (OptionException e)
                 {
-                    consoleAnnouncer.Error(e.Message);
+                    consoleAnnouncer.Error(e);
                     consoleAnnouncer.Say("Try 'migrate --help' for more information.");
                     return;
                 }
@@ -218,7 +218,7 @@ namespace FluentMigrator.Console
             }
             catch (Exception ex)
             {
-                consoleAnnouncer.Error(ex.ToString());
+                consoleAnnouncer.Error(ex);
                 Environment.ExitCode = 1;
             }
 

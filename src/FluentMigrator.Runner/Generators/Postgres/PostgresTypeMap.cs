@@ -22,6 +22,8 @@ namespace FluentMigrator.Runner.Generators.Postgres
             SetTypeMap(DbType.Currency, "money");
             SetTypeMap(DbType.Date, "date");
             SetTypeMap(DbType.DateTime, "timestamp");
+            SetTypeMap(DbType.DateTime2, "timestamp"); // timestamp columns in postgres can support a larger date range.  Source: http://www.postgresql.org/docs/9.1/static/datatype-datetime.html
+            SetTypeMap(DbType.DateTimeOffset, "timestamptz");
             SetTypeMap(DbType.Decimal, "decimal(19,5)");
             SetTypeMap(DbType.Decimal, "decimal($size,$precision)", DecimalCapacity);
             SetTypeMap(DbType.Double, "float8");

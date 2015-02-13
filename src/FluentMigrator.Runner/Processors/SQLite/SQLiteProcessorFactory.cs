@@ -2,13 +2,13 @@
 
 namespace FluentMigrator.Runner.Processors.SQLite
 {
-    public class SqliteProcessorFactory : MigrationProcessorFactory
+    public class SQLiteProcessorFactory : MigrationProcessorFactory
     {
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
-            var factory = new SqliteDbFactory();
+            var factory = new SQLiteDbFactory();
             var connection = factory.CreateConnection(connectionString);
-            return new SqliteProcessor(connection, new SqliteGenerator(), announcer, options, factory);
+            return new SQLiteProcessor(connection, new SQLiteGenerator(), announcer, options, factory);
         }
     }
 }

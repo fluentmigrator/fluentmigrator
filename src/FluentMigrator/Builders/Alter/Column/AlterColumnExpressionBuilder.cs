@@ -57,25 +57,12 @@ namespace FluentMigrator.Builders.Alter.Column
 
         public IAlterColumnOptionSyntax WithDefault(SystemMethods method)
         {
-            // we need to do a drop constraint and then add constraint to change the defualt value
-            var dc = new AlterDefaultConstraintExpression
-                         {
-                             TableName = Expression.TableName,
-                             SchemaName = Expression.SchemaName,
-                             ColumnName = Expression.Column.Name,
-                             DefaultValue = method
-                         };
-
-            _context.Expressions.Add(dc);
-
-            Expression.Column.DefaultValue = method;
-
-            return this;
+            return WithDefaultValue(method);
         }
 
         public IAlterColumnOptionSyntax WithDefaultValue(object value)
         {
-            // we need to do a drop constraint and then add constraint to change the defualt value
+            // we need to do a drop constraint and then add constraint to change the default value
             var dc = new AlterDefaultConstraintExpression
                          {
                              TableName = Expression.TableName,

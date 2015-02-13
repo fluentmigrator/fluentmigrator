@@ -135,6 +135,8 @@
     <Compile Include="Announcers\TextWriterAnnouncer.cs" />
     <Compile Include="Announcers\TextWriterWithGoAnnouncer.cs" />
     <Compile Include="CompatabilityMode.cs" />
+    <Compile Include="Generators\Postgres\PostgresDescriptionGenerator.cs" />
+    <Compile Include="Generators\SqlServer\SqlServer2014Generator.cs" />
     <Compile Include="MaintenanceLoader.cs" />
     <Compile Include="IMaintenanceLoader.cs" />
     <Compile Include="Extensions\SqlServerExtensions.cs" />
@@ -190,9 +192,9 @@
     <Compile Include="Generators\Postgres\PostgresColumn.cs" />
     <Compile Include="Generators\Postgres\PostgresGenerator.cs" />
     <Compile Include="Generators\Postgres\PostgresTypeMap.cs" />
-    <Compile Include="Generators\SQLite\SqliteColumn.cs" />
-    <Compile Include="Generators\SQLite\SqliteQuoter.cs" />
-    <Compile Include="Generators\SQLite\SqliteTypeMap.cs" />
+    <Compile Include="Generators\SQLite\SQLiteColumn.cs" />
+    <Compile Include="Generators\SQLite\SQLiteQuoter.cs" />
+    <Compile Include="Generators\SQLite\SQLiteTypeMap.cs" />
     <Compile Include="Generators\SqlServer\SqlServer2000TypeMap.cs" />
     <Compile Include="Generators\SqlServer\SqlServer2005TypeMap.cs" />
     <Compile Include="Generators\SqlServer\SqlServer2008TypeMap.cs" />
@@ -250,9 +252,10 @@
     <Compile Include="Processors\IDbFactory.cs" />
     <Compile Include="Processors\DbFactoryBase.cs" />
     <Compile Include="Processors\ReflectionBasedDbFactory.cs" />
-    <Compile Include="Processors\SQLite\SqliteDbFactory.cs" />
+    <Compile Include="Processors\SQLite\SQLiteDbFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2000Processor.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2012ProcessorFactory.cs" />
+    <Compile Include="Processors\SqlServer\SqlServer2014ProcessorFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServerCeDbFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServerDbFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServerCeProcessor.cs" />
@@ -263,10 +266,10 @@
     <Compile Include="Processors\SqlServer\SqlServerProcessorFactory.cs" />
     <Compile Include="Processors\IMigrationProcessorFactory.cs" />
     <Compile Include="MigrationRunner.cs" />
-    <Compile Include="Generators\SQLite\SqliteGenerator.cs" />
-    <Compile Include="Processors\SQLite\SqliteProcessorFactory.cs" />
+    <Compile Include="Generators\SQLite\SQLiteGenerator.cs" />
+    <Compile Include="Processors\SQLite\SQLiteProcessorFactory.cs" />
     <Compile Include="Processors\ProcessorBase.cs" />
-    <Compile Include="Processors\SQLite\SqliteProcessor.cs" />
+    <Compile Include="Processors\SQLite\SQLiteProcessor.cs" />
     <Compile Include="Processors\SqlServer\SqlServerProcessor.cs" />
     <Compile Include="ProfileLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

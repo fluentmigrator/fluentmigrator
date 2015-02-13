@@ -56,6 +56,15 @@ namespace FluentMigrator.Runner.Announcers
             Write(string.Format("=> {0}s", timeSpan.TotalSeconds), true);
         }
 
+        public virtual void Error(Exception exception)
+        {
+            while (exception != null)
+            {
+                Error(exception.Message);
+                exception = exception.InnerException;
+            }
+        }
+
         public virtual void Error(string message)
         {
             Write(string.Format("!!! {0}", message), true);

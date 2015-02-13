@@ -68,16 +68,11 @@ namespace FluentMigrator.Builders
                         {
                             //stuff that matters shouldn't change at this point, so we're free to make a
                             //copy of the col def.
-                            //TODO: make a SetColumnNotNullExpression, which just takes the bare minimum.
-                            ColumnDefinition notNullColDef = new ColumnDefinition
-                            {
-                                ModificationType = ColumnModificationType.Alter,
-                                TableName = column.TableName,
-                                Name = column.Name,
-                                Type = column.Type,
-                                CustomType = column.CustomType,
-                                IsNullable = false,
-                            };
+                            //TODO: make a SetColumnNotNullExpression, which just takes the bare minimum, rather
+                            //than modifying column with all parameters.
+                            ColumnDefinition notNullColDef = (ColumnDefinition)column.Clone();
+                            notNullColDef.ModificationType = ColumnModificationType.Alter;
+                            notNullColDef.IsNullable = false;
 
                             exRowExpr.SetColumnNotNullableExpression = new AlterColumnExpression
                             {

@@ -56,9 +56,10 @@ namespace FluentMigrator.Tests.Integration
                 ExecuteWithSqlServer2005(test, tryRollback);
                 ExecuteWithSqlServer2008(test, tryRollback);
                 ExecuteWithSqlServer2012(test, tryRollback);
+                ExecuteWithSqlServer2014(test, tryRollback);
             }
             
-            if (exceptProcessors.Count(t => typeof(SqliteProcessor).IsAssignableFrom(t)) == 0)
+            if (exceptProcessors.Count(t => typeof(SQLiteProcessor).IsAssignableFrom(t)) == 0)
                 ExecuteWithSqlite(test, IntegrationTestOptions.SqlLite);
 
             if (exceptProcessors.Count(t => typeof(MySqlProcessor).IsAssignableFrom(t)) == 0)
@@ -69,6 +70,21 @@ namespace FluentMigrator.Tests.Integration
 
             if (exceptProcessors.Count(t => typeof(FirebirdProcessor).IsAssignableFrom(t)) == 0)
                 ExecuteWithFirebird(test, IntegrationTestOptions.Firebird);
+        }
+
+        protected static void ExecuteWithSqlServer2014(Action<IMigrationProcessor> test, bool tryRollback)
+        {
+
+            var serverOptions = IntegrationTestOptions.SqlServer2014;
+
+            if (!serverOptions.IsEnabled)
+                return;
+
+            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            announcer.Heading("Testing Migration against MS SQL Server 2014");
+            var generator = new SqlServer2014Generator();
+
+            ExecuteWithSqlServer(serverOptions, announcer, generator, test, tryRollback);
         }
 
         protected static void ExecuteWithSqlServer2012(Action<IMigrationProcessor> test, bool tryRollback)
@@ -138,10 +154,10 @@ namespace FluentMigrator.Tests.Integration
             var announcer = new TextWriterAnnouncer(System.Console.Out);
             announcer.Heading("Testing Migration against SQLite");
 
-            var factory = new SqliteDbFactory();
+            var factory = new SQLiteDbFactory();
             using (var connection = factory.CreateConnection(serverOptions.ConnectionString))
             {
-                var processor = new SqliteProcessor(connection, new SqliteGenerator(), announcer, new ProcessorOptions(), factory);
+                var processor = new SQLiteProcessor(connection, new SQLiteGenerator(), announcer, new ProcessorOptions(), factory);
                 test(processor);
             }
         }

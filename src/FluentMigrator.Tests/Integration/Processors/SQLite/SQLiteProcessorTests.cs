@@ -34,10 +34,10 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
 {
     [TestFixture]
     [Category("Integration")]
-    public class SqliteProcessorTests
+    public class SQLiteProcessorTests
     {
         private IDbConnection _connection;
-        private SqliteProcessor _processor;
+        private SQLiteProcessor _processor;
         private Mock<ColumnDefinition> column;
         private IDbCommand _command;
         private string columnName;
@@ -48,13 +48,13 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
         public void SetUp()
         {
             // This connection used in the tests
-            var factory = new SqliteDbFactory();
+            var factory = new SQLiteDbFactory();
             _connection = factory.CreateConnection("Data Source=:memory:;Version=3;New=True;");
             _connection.Open();
             _command = _connection.CreateCommand();
 
             // SUT
-            _processor = new SqliteProcessor(_connection, new SqliteGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), factory);
+            _processor = new SQLiteProcessor(_connection, new SQLiteGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), factory);
 
             column = new Mock<ColumnDefinition>();
             tableName = "NewTable";
@@ -146,12 +146,12 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
 
             var connection = new SQLiteConnection(IntegrationTestOptions.SqlLite.ConnectionString);
 
-            var processor = new SqliteProcessor(
+            var processor = new SQLiteProcessor(
                 connection,
-                new SqliteGenerator(),
+                new SQLiteGenerator(),
                 new TextWriterAnnouncer(output),
                 new ProcessorOptions { PreviewOnly = true },
-                new SqliteDbFactory());
+                new SQLiteDbFactory());
 
             bool tableExists;
 

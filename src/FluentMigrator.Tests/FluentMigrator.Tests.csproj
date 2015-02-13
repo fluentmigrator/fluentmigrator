@@ -171,7 +171,7 @@
     <Compile Include="Helpers\OracleTestTable.cs" />
     <Compile Include="Helpers\PostgresTestSequence.cs" />
     <Compile Include="Helpers\PostgresTestTable.cs" />
-    <Compile Include="Helpers\SqliteTestTable.cs" />
+    <Compile Include="Helpers\SQLiteTestTable.cs" />
     <Compile Include="Helpers\SqlServerCeTestTable.cs" />
     <Compile Include="Helpers\SqlServerTestSequence.cs" />
     <Compile Include="Helpers\SqlServerTestTable.cs" />
@@ -214,6 +214,8 @@
     <Compile Include="Integration\Processors\Db2\Db2ProcessorTests.cs" />
     <Compile Include="Integration\Processors\Db2\Db2SchemaTests.cs" />
     <Compile Include="Integration\Processors\Db2\Db2TableTests.cs" />
+    <Compile Include="Integration\Migrations\Firebird\FirstVersion\VersionOneSimpleTableMigration.cs" />
+    <Compile Include="Integration\Processors\Firebird\EndToEnd\TestInitialMigration.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdColumnTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdConstraintTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdEmbeddedLibrariesForWindows.Designer.cs">
@@ -225,6 +227,7 @@
     <Compile Include="Integration\Processors\Firebird\FirebirdIndexTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdProcessorTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdTableTests.cs" />
+    <Compile Include="Integration\Processors\Firebird\TestDisposing.cs" />
     <Compile Include="Integration\Processors\Jet\JetProcessorTests.cs" />
     <Compile Include="Integration\Processors\MySql\MySqlProcessorTests.cs" />
     <Compile Include="Integration\Processors\Oracle\OracleManagedProcessorFactoryTests.cs" />
@@ -256,7 +259,7 @@
     <Compile Include="Integration\Processors\Postgres\PostgresSchemaTests.cs" />
     <Compile Include="Integration\Processors\Postgres\PostgresSequenceTests.cs" />
     <Compile Include="Integration\Processors\Postgres\PostgresTableTests.cs" />
-    <Compile Include="Integration\Processors\SQLite\SqliteProcessorTests.cs" />
+    <Compile Include="Integration\Processors\SQLite\SQLiteProcessorTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeColumnTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeConstraintTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeIndexTests.cs" />
@@ -378,6 +381,7 @@
     <Compile Include="Unit\Generators\MySql\MySqlIndexTests.cs" />
     <Compile Include="Unit\Generators\MySql\MySqlSchemaTests.cs" />
     <Compile Include="Unit\Generators\MySql\MySqlTableTests.cs" />
+    <Compile Include="Unit\Generators\MySql\MySqlQuoterTest.cs" />
     <Compile Include="Unit\Generators\OracleWithQuotedIdentifier\OracleColumnTests.cs" />
     <Compile Include="Unit\Generators\OracleWithQuotedIdentifier\OracleConstraintsTests.cs" />
     <Compile Include="Unit\Generators\OracleWithQuotedIdentifier\OracleDataTests.cs" />
@@ -392,12 +396,14 @@
     <Compile Include="Unit\Generators\Oracle\OracleDescriptionGeneratorTests.cs" />
     <Compile Include="Unit\Generators\Oracle\OracleGeneratorTests.cs" />
     <Compile Include="Unit\Generators\Oracle\OracleIndexTests.cs" />
+    <Compile Include="Unit\Generators\Oracle\OracleQuoterTest.cs" />
     <Compile Include="Unit\Generators\Oracle\OracleSchemaTests.cs" />
     <Compile Include="Unit\Generators\Oracle\OracleSequenceTests.cs" />
     <Compile Include="Unit\Generators\Oracle\OracleTableTests.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresColumnTests.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresConstraintsTests.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresDataTests.cs" />
+    <Compile Include="Unit\Generators\Postgres\PostgresDescriptionGeneratorTest.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresGeneratorTests.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresIndexTests.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresSchemaTests.cs" />
@@ -451,6 +457,7 @@
     <Compile Include="Unit\TaskExecutorTests.cs" />
     <Compile Include="Unit\TestVersionLoader.cs" />
     <Compile Include="Unit\TestVersionTableMetaData.cs" />
+    <Compile Include="Unit\TimestampedMigrationAttributeTests.cs" />
     <Compile Include="Unit\Versioning\VersionInfoTests.cs" />
     <Compile Include="Unit\VersionLoaderTests.cs" />
     <Compile Include="Unit\VersionOrderInvalidExceptionTests.cs" />
@@ -554,6 +561,7 @@
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

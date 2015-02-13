@@ -59,6 +59,15 @@ namespace FluentMigrator.Runner.Announcers
         {
             Each(a => a.Error(message));
         }
+        
+        public void Error(Exception exception)
+        {
+            while (exception != null)
+            {
+                Error(exception.Message);
+                exception = exception.InnerException;
+            }
+        }
 
         public void Write(string message, bool escaped)
         {

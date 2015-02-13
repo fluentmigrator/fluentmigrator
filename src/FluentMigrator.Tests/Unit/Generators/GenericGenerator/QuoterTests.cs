@@ -212,7 +212,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         [Test]
         public void ShouldEscapeSqliteObjectNames()
         {
-            SqliteQuoter quoter = new SqliteQuoter();
+            SQLiteQuoter quoter = new SQLiteQuoter();
             quoter.Quote("Table\"Name").ShouldBe("\"Table\"\"Name\"");
         }
 
@@ -266,6 +266,13 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             quoter.QuoteValue(new byte[] { 0, 254, 13, 18, 125, 17 })
                 .ShouldBe("0x00fe0d127d11");
+        }
+
+        [Test]
+        public void TimeSpanIsFormattedQuotes()
+        {
+            quoter.QuoteValue(new TimeSpan(2, 13, 65))
+                .ShouldBe("'02:14:05'");
         }
 
         [Test]

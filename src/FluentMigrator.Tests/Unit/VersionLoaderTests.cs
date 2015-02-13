@@ -213,7 +213,7 @@ namespace FluentMigrator.Tests.Unit
 
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
 
-            processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME, "AppliedOn")).Returns(false);
+            processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME, TestVersionTableMetaData.APPLIEDONCOLUMNNAME)).Returns(false);
 
             var loader = new VersionLoader(runner.Object, asm, conventions);
 
@@ -232,7 +232,7 @@ namespace FluentMigrator.Tests.Unit
 
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
 
-            processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME, "AppliedOn")).Returns(false);
+            processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME, TestVersionTableMetaData.APPLIEDONCOLUMNNAME)).Returns(false);
 
             var loader = new VersionLoader(runner.Object, asm, conventions);
 

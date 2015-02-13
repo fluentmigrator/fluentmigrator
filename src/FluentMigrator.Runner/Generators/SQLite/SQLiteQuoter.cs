@@ -2,7 +2,7 @@
 
 namespace FluentMigrator.Runner.Generators.SQLite
 {
-    public class SqliteQuoter : GenericQuoter
+    public class SQLiteQuoter : GenericQuoter
     {
     }
 }

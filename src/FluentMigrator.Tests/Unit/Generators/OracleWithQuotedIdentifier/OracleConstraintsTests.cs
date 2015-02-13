@@ -375,5 +375,69 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"TestTable1\" DROP CONSTRAINT \"TESTUNIQUECONSTRAINT\"");
         }
+
+        [Test]
+        public void CanAlterDefaultConstraintWithValueAsDefault()
+        {
+            var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("ALTER TABLE \"TestTable1\" MODIFY \"TestColumn1\" DEFAULT 1");
+        }
+
+        [Test]
+        public void CanAlterDefaultConstraintWithStringValueAsDefault()
+        {
+            var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
+            expression.DefaultValue = "1";
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("ALTER TABLE \"TestTable1\" MODIFY \"TestColumn1\" DEFAULT '1'");
+        }
+
+        [Test]
+        public void CanAlterDefaultConstraintWithDefaultSystemMethodNewGuid()
+        {
+            var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
+            expression.DefaultValue = SystemMethods.NewGuid;
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("ALTER TABLE \"TestTable1\" MODIFY \"TestColumn1\" DEFAULT sys_guid()");
+        }
+
+        [Test]
+        public void CanAlterDefaultConstraintWithDefaultSystemMethodCurrentDateTime()
+        {
+            var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
+            expression.DefaultValue = SystemMethods.CurrentDateTime;
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("ALTER TABLE \"TestTable1\" MODIFY \"TestColumn1\" DEFAULT CURRENT_TIMESTAMP");
+        }
+
+        [Test]
+        public void CanAlterDefaultConstraintWithDefaultSystemMethodCurrentUser()
+        {
+            var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
+            expression.DefaultValue = SystemMethods.CurrentUser;
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("ALTER TABLE \"TestTable1\" MODIFY \"TestColumn1\" DEFAULT USER");
+        }
+
+        [Test]
+        public void CanRemoveDefaultConstraint()
+        {
+            var expression = GeneratorTestHelper.GetDeleteDefaultConstraintExpression();
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe("ALTER TABLE \"TestTable1\" MODIFY \"TestColumn1\" DEFAULT NULL");
+        }
     }
 }

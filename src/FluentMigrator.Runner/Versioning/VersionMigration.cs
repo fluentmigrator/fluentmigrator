@@ -83,7 +83,7 @@ namespace FluentMigrator.Runner.Versioning
                 .WithOptions().Clustered()
                 .OnColumn(versionTableMeta.ColumnName);
 
-            Alter.Table(versionTableMeta.TableName).InSchema(versionTableMeta.SchemaName).AddColumn("AppliedOn").AsDateTime().Nullable();
+            Alter.Table(versionTableMeta.TableName).InSchema(versionTableMeta.SchemaName).AddColumn(versionTableMeta.AppliedOnColumnName).AsDateTime().Nullable();
         }
 
     }

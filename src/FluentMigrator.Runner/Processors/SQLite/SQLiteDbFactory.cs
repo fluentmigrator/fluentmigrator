@@ -1,8 +1,8 @@
 namespace FluentMigrator.Runner.Processors.SQLite
 {
-    public class SqliteDbFactory : ReflectionBasedDbFactory
+    public class SQLiteDbFactory : ReflectionBasedDbFactory
     {
-        public SqliteDbFactory()
+        public SQLiteDbFactory()
             : base("System.Data.SQLite", "System.Data.SQLite.SQLiteFactory")
         {
         }
