@@ -44,15 +44,15 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public override void CallingColumnExistsCanAcceptColumnNameWithSingleQuote()
         {
-            var columnNameWithSingleQuote = Quoter.QuoteColumnName("i'd");
+            var columnNameWithSingleQuote = "\"i'd\"";
             using (var table = new FirebirdTestTable(Processor, null, string.Format("{0} int", columnNameWithSingleQuote)))
-                Processor.ColumnExists(null, table.Name, "i'd").ShouldBeTrue();
+                Processor.ColumnExists(null, table.Name, "\"i'd\"").ShouldBeTrue();
         }
 
         [Test]
         public override void CallingColumnExistsCanAcceptTableNameWithSingleQuote()
         {
-            using (var table = new FirebirdTestTable("Test'Table", Processor, null, "id int"))
+            using (var table = new FirebirdTestTable("\"Test'Table\"", Processor, null, "id int"))
                 Processor.ColumnExists(null, table.Name, "ID").ShouldBeTrue();
         }
 

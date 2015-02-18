@@ -48,12 +48,12 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             {
                 Processor.CheckTable(table.Name);
                 Processor.LockTable(table.Name);
-                var idxName = string.Format("id'x_{0}", table.Name);
+                var idxName = string.Format("\"id'x_{0}\"", table.Name);
 
                 using (var cmd = table.Connection.CreateCommand())
                 {
                     cmd.Transaction = table.Transaction;
-                    cmd.CommandText = string.Format("CREATE INDEX {0} ON {1} (id)", Quoter.QuoteIndexName(idxName), Quoter.QuoteTableName(table.Name));
+                    cmd.CommandText = string.Format("CREATE INDEX {0} ON {1} (id)", idxName, table.Name);
                     cmd.ExecuteNonQuery();
                 }
 
@@ -66,16 +66,16 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public override void CallingIndexExistsCanAcceptTableNameWithSingleQuote()
         {
-            using (var table = new FirebirdTestTable("Test'Table", Processor, null, "id int"))
+            using (var table = new FirebirdTestTable("\"Test'Table\"", Processor, null, "id int"))
             {
                 Processor.CheckTable(table.Name);
                 Processor.LockTable(table.Name);
-                var idxName = string.Format("idx_{0}", table.Name);
+                var idxName = "\"idx_Test'Table\"";
 
                 using (var cmd = table.Connection.CreateCommand())
                 {
                     cmd.Transaction = table.Transaction;
-                    cmd.CommandText = string.Format("CREATE INDEX {0} ON {1} (id)", Quoter.QuoteIndexName(idxName), Quoter.QuoteTableName(table.Name));
+                    cmd.CommandText = string.Format("CREATE INDEX {0} ON {1} (id)", idxName, table.Name);
                     cmd.ExecuteNonQuery();
                 }
 

@@ -1,7 +1,9 @@
-﻿using System.Data;
-using System.Diagnostics;
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
-using System.Threading;
+using System.Reflection;
 using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
@@ -10,10 +12,6 @@ using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 using NUnit.Framework;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Reflection;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
@@ -128,7 +126,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     runner.Up(new AddDataMigration());
                     //---------------Assert Precondition----------------
                     connection.Open();
-                    using (var cmd = new FbCommand("select * from \"TheTable\"", connection))
+                    using (var cmd = new FbCommand("select * from TheTable", connection))
                     {
                         using (var reader = cmd.ExecuteReader())
                         {
@@ -181,7 +179,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     runner.Up(new AddDataMigration(3));
                     //---------------Assert Precondition----------------
                     connection.Open();
-                    using (var cmd = new FbCommand("select count(*) as \"TheCount\" from \"TheTable\"", connection))
+                    using (var cmd = new FbCommand("select count(*) as TheCount from TheTable", connection))
                     {
                         using (var reader = cmd.ExecuteReader())
                         {
@@ -260,7 +258,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     runner.Up(new AddDataMigration(3));
                     //---------------Assert Precondition----------------
                     connection.Open();
-                    const string countSql = "select count(*) as \"TheCount\" from \"TheTable\"";
+                    const string countSql = "select count(*) as TheCount from TheTable";
                     using (var cmd = new FbCommand(countSql, connection))
                     {
                         using (var reader = cmd.ExecuteReader())
@@ -321,7 +319,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     runner.Up(new AddDataMigration(3));
                     //---------------Assert Precondition----------------
                     connection.Open();
-                    const string countSql = "select count(*) as \"TheCount\" from \"TheTable\"";
+                    const string countSql = "select count(*) as TheCount from TheTable";
                     using (var cmd = new FbCommand(countSql, connection))
                     {
                         using (var reader = cmd.ExecuteReader())
@@ -394,7 +392,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     runner.Up(new AddDataMigration(3));
                     //---------------Assert Precondition----------------
                     connection.Open();
-                    const string countSql = "select count(*) as \"TheCount\" from \"TheTable\"";
+                    const string countSql = "select count(*) as TheCount from TheTable";
                     using (var cmd = new FbCommand(countSql, connection))
                     {
                         using (var reader = cmd.ExecuteReader())
@@ -455,7 +453,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     runner.Up(new AddDataMigration(3));
                     //---------------Assert Precondition----------------
                     connection.Open();
-                    const string countSql = "select count(*) as \"TheCount\" from \"TheTable\" where \"Id\" = {0}";
+                    const string countSql = "select count(*) as TheCount from TheTable where Id = {0}";
                     Assert.AreEqual(1, CountRowsWith(countSql, 1, connection));
                     //---------------Execute Test ----------------------
                     Exception thrown = null;
@@ -501,7 +499,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     runner.Up(new AddDataMigration(3));
                     //---------------Assert Precondition----------------
                     connection.Open();
-                    const string countSql = "select count(*) as \"TheCount\" from \"TheTable\" where \"Id\" = {0}";
+                    const string countSql = "select count(*) as TheCount from TheTable where Id = {0}";
                     using (var cmd = new FbCommand(String.Format(countSql, 1), connection))
                     {
                         using (var reader = cmd.ExecuteReader())
@@ -556,7 +554,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     runner.Up(new AddDataMigration(3));
                     //---------------Assert Precondition----------------
                     connection.Open();
-                    const string countSql = "select count(*) as \"TheCount\" from \"TheTable\" where \"SomeValue\" = {0}";
+                    const string countSql = "select count(*) as TheCount from TheTable where SomeValue = {0}";
                     Assert.AreEqual(1, CountRowsWith(countSql, 1, connection));
                     Assert.AreEqual(1, CountRowsWith(countSql, 2, connection));
                     Assert.AreEqual(1, CountRowsWith(countSql, 3, connection));
@@ -799,10 +797,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void AlterTable_MigrationRequiresAutomaticDelete_AndProcessorHasUndoDisabled_ShouldNotThrow()
         {
-            // this test was originally created to investigate an issue with foreign key names but in the process,
-            // I found that FirebirdProcessor.CreateSequenceForIdentity doesn't respect FBOptions.UndoEnabled. Since
-            // Undo isn't implemented for Firebird, a migration runner always has to turn it off, but even with it off,
-            // the migrations below will fail unless CreateSequenceForIdentity is appropriately altered
             var tempResources = WriteOutFirebirdEmbeddedLibrariesToCurrentWorkingDirectory();
             var tempFile = Path.GetTempFileName();
             using (var deleter = new AutoDeleter(tempFile))
@@ -815,8 +809,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                                             {
                                                 Namespace = "FluentMigrator.Tests.Integration.Migrations"
                                             };
-
-
                 try
                 {
                     using (var connection = new FbConnection(connectionString))
@@ -904,7 +896,7 @@ ORDER BY s.RDB$FIELD_POSITION", MigrationWhichCreatesTwoRelatedTables.ForeignKey
                             var constraintName = rdr["CONSTRAINT_NAME"];
                             if (constraintName == null) continue;
                             if (constraintName is DBNull) continue;
-                            if (constraintName.ToString().Trim() == withName)
+                            if (constraintName.ToString().Trim() == withName.ToUpper())
                             {
                                 result = true;
                                 break;
@@ -924,10 +916,10 @@ ORDER BY s.RDB$FIELD_POSITION", MigrationWhichCreatesTwoRelatedTables.ForeignKey
         {
             connection.Open();
             var sql =
-                "select \"RDB$FIELD_TYPE\" fieldType, \"RDB$FIELD_SUB_TYPE\" subType from \"RDB$RELATION_FIELDS\" rf " +
-                "inner join \"RDB$FIELDS\" f on rf.\"RDB$FIELD_SOURCE\" = f.\"RDB$FIELD_NAME\" where rf.\"RDB$FIELD_NAME\" = '" +
-                fieldName + "' " +
-                "and rf.\"RDB$RELATION_NAME\" = '" + tableName + "'";
+                "select RDB$FIELD_TYPE fieldType, RDB$FIELD_SUB_TYPE subType from RDB$RELATION_FIELDS rf " +
+                "inner join RDB$FIELDS f on rf.RDB$FIELD_SOURCE = f.RDB$FIELD_NAME where rf.RDB$FIELD_NAME = '" +
+                fieldName.ToUpper() + "' " +
+                "and rf.RDB$RELATION_NAME = '" + tableName.ToUpper() + "'";
             using (var cmd = new FbCommand(sql, connection))
             {
                 using (var reader = cmd.ExecuteReader())

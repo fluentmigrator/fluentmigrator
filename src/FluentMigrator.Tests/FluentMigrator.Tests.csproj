@@ -363,6 +363,7 @@
     <Compile Include="Unit\Generators\Firebird\FirebirdDataTests.cs" />
     <Compile Include="Unit\Generators\Firebird\FirebirdGeneratorTests.cs" />
     <Compile Include="Unit\Generators\Firebird\FirebirdIndexTests.cs" />
+    <Compile Include="Unit\Generators\Firebird\FirebirdQuoterTests.cs" />
     <Compile Include="Unit\Generators\Firebird\FirebirdSequenceTests.cs" />
     <Compile Include="Unit\Generators\Firebird\FirebirdTableTests.cs" />
     <Compile Include="Unit\Generators\GeneratorTestHelper.cs" />

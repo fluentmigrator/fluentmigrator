@@ -94,7 +94,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
             return IsInDatabase(cmd =>
                 {
                     cmd.CommandText = "select rdb$relation_name from rdb$relations where (rdb$flags is not null) and (rdb$relation_name = @table)";
-                    cmd.Parameters.AddWithValue("table", candidate);
+                    cmd.Parameters.AddWithValue("table", candidate.ToUpper());
                 });
         }
 

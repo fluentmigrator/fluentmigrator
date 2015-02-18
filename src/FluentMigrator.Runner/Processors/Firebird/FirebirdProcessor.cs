@@ -378,7 +378,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             CheckColumn(expression.TableName, expression.Column.Name);
             FirebirdSchemaProvider schema = new FirebirdSchemaProvider(this);
             FirebirdTableSchema table = schema.GetTableSchema(expression.TableName);
-            ColumnDefinition colDef = table.Definition.Columns.First(x => x.Name == expression.Column.Name);
+            ColumnDefinition colDef = table.Definition.Columns.First(x => x.Name == quoter.ToFbObjectName(expression.Column.Name));
 
             //Change nullable constraint
             if (colDef.IsNullable != expression.Column.IsNullable)
@@ -867,7 +867,10 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         private string FormatToSafeName(string sqlName)
         {
-            return FormatHelper.FormatSqlEscape(quoter.UnQuote(sqlName));
+            if (quoter.IsQuoted(sqlName))
+                return FormatHelper.FormatSqlEscape(quoter.UnQuote(sqlName));
+            else
+                return FormatHelper.FormatSqlEscape(sqlName).ToUpper();
         }
 
         private string GetSequenceName(string tableName, string columnName)
@@ -894,7 +897,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 Process(sequence);
             }
             string triggerName = GetIdentityTriggerName(tableName, columnName);
-            string trigger = String.Format("as begin if (NEW.\"{0}\" is NULL) then NEW.\"{1}\" = GEN_ID({2}, 1); end", columnName, columnName, quoter.QuoteSequenceName(sequenceName));
+            string quotedColumn = quoter.Quote(columnName);
+            string trigger = String.Format("as begin if (NEW.{0} is NULL) then NEW.{1} = GEN_ID({2}, 1); end", quotedColumn, quotedColumn, quoter.QuoteSequenceName(sequenceName));
 
             PerformDBOperationExpression createTrigger = CreateTriggerExpression(tableName, triggerName, true, TriggerEvent.Insert, trigger);
             PerformDBOperationExpression deleteTrigger = DeleteTriggerExpression(tableName, triggerName);
@@ -953,7 +957,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             {
                 string triggerSql = String.Format(@"CREATE TRIGGER {0} FOR {1} ACTIVE {2} {3} POSITION 0 
                     {4}
-                    ", quoter.Quote(triggerName), "\"" + tableName + "\"",
+                    ", quoter.Quote(triggerName), quoter.Quote(tableName),
                      onBefore ? "before" : "after",
                      onEvent.ToString().ToLower(),
                      triggerBody

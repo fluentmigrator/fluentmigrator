@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using FluentMigrator.Runner.Generators.Firebird;
 
 namespace FluentMigrator.Runner.Processors.Firebird
 {
@@ -30,13 +31,17 @@ namespace FluentMigrator.Runner.Processors.Firebird
         private static readonly string query = "select rdb$relation_name from rdb$relations where rdb$relation_name = '{0}'";
 
         public string Name { get; private set; }
-        public TableInfo(DataRow drMeta, FirebirdProcessor processor)
+
+        public TableInfo(DataRow drMeta)
         {
             Name = drMeta["rdb$relation_name"].ToString().Trim();
         }
+
         public static TableInfo Read(FirebirdProcessor processor, string tableName)
         {
-            return new TableInfo(processor.Read(query, AdoHelper.FormatValue(tableName)).Tables[0].Rows[0], processor);
+            var quoter = new FirebirdQuoter();
+            var fbTableName = quoter.ToFbObjectName(tableName);
+            return new TableInfo(processor.Read(query, AdoHelper.FormatValue(fbTableName)).Tables[0].Rows[0]);
         }
     }
 
@@ -371,7 +376,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public static SequenceInfo Read(FirebirdProcessor processor, string sequenceName)
         {
-            using (DataSet ds = processor.Read(query, AdoHelper.FormatValue(sequenceName)))
+            var fbSequenceName = new FirebirdQuoter().ToFbObjectName(sequenceName);
+            using (DataSet ds = processor.Read(query, AdoHelper.FormatValue(fbSequenceName)))
             {
                 return new SequenceInfo(ds.Tables[0].Rows[0], processor);
             }
