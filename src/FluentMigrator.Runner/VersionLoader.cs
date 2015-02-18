@@ -27,14 +27,14 @@ namespace FluentMigrator.Runner
         public IMigration VersionUniqueMigration { get; private set; }
         public IMigration VersionDescriptionMigration { get; private set; }
         
-        public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions)
+        public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions, IVersionTableMetaData versionTableMetaData = null)
         {
             Runner = runner;
             Processor = runner.Processor;
             Assembly = assembly;
 
             Conventions = conventions;
-            VersionTableMetaData = GetVersionTableMetaData();
+            VersionTableMetaData = versionTableMetaData ?? GetVersionTableMetaData();
             VersionMigration = new VersionMigration(VersionTableMetaData);
             VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
             VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);

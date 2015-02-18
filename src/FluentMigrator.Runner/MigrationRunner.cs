@@ -28,6 +28,7 @@ using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.VersionTableInfo;
 
 namespace FluentMigrator.Runner
 {
@@ -66,7 +67,7 @@ namespace FluentMigrator.Runner
             }
         }
 
-        public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
+        public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor, IVersionTableMetaData versionTableMetaData = null)
         {
             _migrationAssembly = assembly;
             _announcer = runnerContext.Announcer;
@@ -84,7 +85,7 @@ namespace FluentMigrator.Runner
 
             _migrationScopeHandler = new MigrationScopeHandler(Processor);
             _migrationValidator = new MigrationValidator(_announcer, Conventions);
-            VersionLoader = new VersionLoader(this, _migrationAssembly, Conventions);
+            VersionLoader = new VersionLoader(this, _migrationAssembly, Conventions, versionTableMetaData);
             MigrationLoader = new DefaultMigrationInformationLoader(Conventions, _migrationAssembly, runnerContext.Namespace, runnerContext.NestedNamespaces, runnerContext.Tags);
             ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
             MaintenanceLoader = new MaintenanceLoader(this, Conventions);
