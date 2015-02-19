@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.Firebird
@@ -47,10 +48,10 @@ namespace FluentMigrator.Runner.Generators.Firebird
             return name;
         }
 
-        public override string FormatDateTime(System.DateTime value)
-        {
-            return ValueQuote + (value).ToString("yyyy-MM-dd HH:mm:ss") + ValueQuote;
-        }
+		public override string FormatDateTime(DateTime value)
+		{
+			return ValueQuote + (value).ToString("yyyy-MM-dd HH:mm:ss") + ValueQuote;
+		}
 
         public string ToFbObjectName(string objName)
         {
