@@ -57,5 +57,12 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var actual = new FirebirdQuoter().Quote(quoteArg);
             actual.ShouldBe(quoteArg);
         }
+
+		[Test, SetCulture("tr-TR")]
+		public void Quote_PassesTurkishTest()
+		{
+			var actual = new FirebirdQuoter().Quote("similar");
+			actual.ShouldBe("\"similar\"");
+		}
     }
 }
