@@ -136,12 +136,6 @@ namespace FluentMigrator.Builders.Create.Table
             return this;
         }
 
-        public ICreateTableColumnOptionOrWithColumnSyntax RowGuid()
-        {
-            CurrentColumn.IsRowGuid = true;
-            return this;
-        }
-
         public ICreateTableColumnOptionOrForeignKeyCascadeOrWithColumnSyntax ForeignKey(string primaryTableName, string primaryColumnName)
         {
             return ForeignKey(null, null, primaryTableName, primaryColumnName);

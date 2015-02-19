@@ -22,6 +22,5 @@ namespace FluentMigrator.Builders.Create.Table
         IColumnOptionSyntax<ICreateTableColumnOptionOrWithColumnSyntax,ICreateTableColumnOptionOrForeignKeyCascadeOrWithColumnSyntax>, 
         ICreateTableWithColumnOrSchemaOrDescriptionSyntax
     {
-        ICreateTableColumnOptionOrWithColumnSyntax RowGuid();
     }
 }

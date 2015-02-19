@@ -37,4 +37,20 @@ namespace FluentMigrator.Model
             return MemberwiseClone();
         }
     }
+
+    public class RowGuidDefinition : ICloneable, ICanBeValidated
+    {
+        public virtual string Name { get; set; }
+
+        public virtual void CollectValidationErrors( ICollection<string> errors )
+        {
+            if ( String.IsNullOrEmpty( Name ) )
+                errors.Add( ErrorMessages.ColumnNameCannotBeNullOrEmpty );
+        }
+
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
+    }
 }
