@@ -42,7 +42,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
         public override string Quote(string name)
         {
-            if (_keywords.Any(x => x == name.ToUpper()))
+            if (_keywords.Any(x => x == name.ToUpperInvariant()))
                 return base.Quote(name);
             return name;
         }
