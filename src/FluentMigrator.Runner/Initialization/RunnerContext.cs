@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 
+using FluentMigrator.VersionTableInfo;
+
 namespace FluentMigrator.Runner.Initialization
 {
     public class RunnerContext : IRunnerContext
@@ -26,6 +28,16 @@ namespace FluentMigrator.Runner.Initialization
         public IEnumerable<string> Tags { get; set; }
         public bool TransactionPerSession { get; set; }
         public string ProviderSwitches { get; set; }
+
+        /// <summary>
+        /// Gets or sets a custom version table meta data object.
+        /// </summary>
+        /// <remarks>
+        /// When this property is set its value will be used to get meta data about version table.
+        /// Use it to override default behavior of FluentMigrator to
+        /// search for a class having the VersionTableMetaData attribute.
+        /// </remarks>
+        public IVersionTableMetaData VersionTableMetaData { get; set; }
 
         public IAnnouncer Announcer
         {

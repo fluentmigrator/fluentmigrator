@@ -18,6 +18,8 @@
 
 using System.Collections.Generic;
 
+using FluentMigrator.VersionTableInfo;
+
 namespace FluentMigrator.Runner.Initialization
 {
     public interface IRunnerContext
@@ -41,6 +43,16 @@ namespace FluentMigrator.Runner.Initialization
         string ProviderSwitches { get; set; }
 
         bool TransactionPerSession { get; set; }
+
+        /// <summary>
+        /// Gets or sets a custom version table meta data object.
+        /// </summary>
+        /// <remarks>
+        /// When this property is set its value will be used to get meta data about version table.
+        /// Use it to override default behavior of FluentMigrator to
+        /// search for a class having the VersionTableMetaData attribute.
+        /// </remarks>
+        IVersionTableMetaData VersionTableMetaData { get; set; }
 
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         object ApplicationContext { get; set; }

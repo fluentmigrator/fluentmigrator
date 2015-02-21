@@ -28,6 +28,7 @@ using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.VersionTableInfo;
 
 namespace FluentMigrator.Runner
 {
@@ -53,6 +54,7 @@ namespace FluentMigrator.Runner
         public IMaintenanceLoader MaintenanceLoader { get; set; }
         public IMigrationConventions Conventions { get; private set; }
         public IList<Exception> CaughtExceptions { get; private set; }
+        public IVersionTableMetaData CustomVersionTableMetaData { get; private set; }
 
         public IMigrationScope CurrentScope
         {
@@ -74,6 +76,7 @@ namespace FluentMigrator.Runner
             _stopWatch = runnerContext.StopWatch;
             ApplicationContext = runnerContext.ApplicationContext;
             TransactionPerSession = runnerContext.TransactionPerSession;
+            CustomVersionTableMetaData = runnerContext.VersionTableMetaData;
 
             SilentlyFail = false;
             CaughtExceptions = null;

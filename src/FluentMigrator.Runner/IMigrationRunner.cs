@@ -1,11 +1,14 @@
 using System.Reflection;
 
+using FluentMigrator.VersionTableInfo;
+
 namespace FluentMigrator.Runner
 {
     public interface IMigrationRunner : IMigrationScopeStarter
     {
         IMigrationProcessor Processor { get; }
         Assembly MigrationAssembly { get; }
+        IVersionTableMetaData CustomVersionTableMetaData { get; }
         void Up(IMigration migration);
         void Down(IMigration migration);
         void MigrateUp();

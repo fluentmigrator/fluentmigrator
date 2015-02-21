@@ -54,12 +54,15 @@ namespace FluentMigrator.Runner
             dataExpression.Rows.Add(CreateVersionInfoInsertionData(version, description));
             dataExpression.TableName = VersionTableMetaData.TableName;
             dataExpression.SchemaName = VersionTableMetaData.SchemaName;
-            
+
             dataExpression.ExecuteWith(Processor);
         }
 
         public IVersionTableMetaData GetVersionTableMetaData()
         {
+            if (Runner.CustomVersionTableMetaData != null)
+                return Runner.CustomVersionTableMetaData;
+
             Type matchedType = Assembly.GetExportedTypes().FirstOrDefault(t => Conventions.TypeIsVersionTableMetaData(t));
 
             if (matchedType == null)
