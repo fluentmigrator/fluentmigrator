@@ -157,12 +157,42 @@ namespace FluentMigrator.Runner
             VersionLoader.LoadVersionInfo();
         }
 
+        public void MigrateUp(long startVersion, long targetVersion)
+        {
+            MigrateUp(startVersion, targetVersion, true);
+        }
+
+        public void MigrateUp(long startVersion, long targetVersion, bool useAutomaticTransactionManagement)
+        {
+            var migrationInfos = GetUpMigrationsToApply(startVersion, targetVersion);
+            using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
+            {
+                foreach (var migrationInfo in migrationInfos)
+                {
+                    ApplyMigrationUp(migrationInfo, useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
+                }
+
+                scope.Complete();
+            }
+
+            VersionLoader.LoadVersionInfo();
+        }
+
         private IEnumerable<IMigrationInfo> GetUpMigrationsToApply(long version)
         {
             var migrations = MigrationLoader.LoadMigrations();
 
-            return from pair in migrations 
-                   where IsMigrationStepNeededForUpMigration(pair.Key, version) 
+            return from pair in migrations
+                   where IsMigrationStepNeededForUpMigration(pair.Key, version)
+                   select pair.Value;
+        }
+
+        private IEnumerable<IMigrationInfo> GetUpMigrationsToApply(long startVersion, long targetVersion)
+        {
+            var migrations = MigrationLoader.LoadMigrations();
+
+            return from pair in migrations
+                   where pair.Key >= startVersion && pair.Key <= targetVersion
                    select pair.Value;
         }
 
@@ -200,12 +230,47 @@ namespace FluentMigrator.Runner
             VersionLoader.LoadVersionInfo();
         }
 
+        public void MigrateDown(long startVersion, long targetVersion)
+        {
+            MigrateDown(startVersion, targetVersion, true);
+        }
+
+        public void MigrateDown(long startVersion, long targetVersion, bool useAutomaticTransactionManagement)
+        {
+            var migrationInfos = GetDownMigrationsToApply(startVersion, targetVersion);
+
+            using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
+            {
+                foreach (var migrationInfo in migrationInfos)
+                {
+                    ApplyMigrationDown(migrationInfo, useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
+                }
+
+                scope.Complete();
+            }
+
+            VersionLoader.LoadVersionInfo();
+        }
+
+        private IEnumerable<IMigrationInfo> GetDownMigrationsToApply(long startVersion, long targetVersion)
+        {
+            var migrations = MigrationLoader.LoadMigrations();
+
+            var migrationsToApply = (from pair in migrations
+                                     where pair.Key <= startVersion && pair.Key >= targetVersion
+                                     select pair.Value)
+                                     .ToList();
+
+            return migrationsToApply.OrderByDescending(x => x.Version);
+        }
+
+
         private IEnumerable<IMigrationInfo> GetDownMigrationsToApply(long targetVersion)
         {
             var migrations = MigrationLoader.LoadMigrations();
 
-            var migrationsToApply = (from pair in migrations 
-                                     where IsMigrationStepNeededForDownMigration(pair.Key, targetVersion) 
+            var migrationsToApply = (from pair in migrations
+                                     where IsMigrationStepNeededForDownMigration(pair.Key, targetVersion)
                                      select pair.Value)
                                      .ToList();
 
@@ -243,12 +308,12 @@ namespace FluentMigrator.Runner
                 using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useTransaction))
                 {
                     ExecuteMigration(migrationInfo.Migration, (m, c) => m.GetUpExpressions(c));
-                    
+
                     if (migrationInfo.IsAttributed())
                     {
                         VersionLoader.UpdateVersionInfo(migrationInfo.Version, migrationInfo.Description ?? migrationInfo.Migration.GetType().Name);
                     }
-                    
+
                     scope.Complete();
 
                     _stopWatch.Stop();
@@ -272,7 +337,7 @@ namespace FluentMigrator.Runner
             {
                 ExecuteMigration(migrationInfo.Migration, (m, c) => m.GetDownExpressions(c));
                 if (migrationInfo.IsAttributed()) VersionLoader.DeleteVersion(migrationInfo.Version);
-                
+
                 scope.Complete();
 
                 _stopWatch.Stop();
@@ -304,7 +369,7 @@ namespace FluentMigrator.Runner
                 {
                     ApplyMigrationDown(migrationInfo, useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
                 }
-            
+
                 scope.Complete();
             }
 
@@ -338,7 +403,7 @@ namespace FluentMigrator.Runner
 
                     ApplyMigrationDown(migrationInfo, useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
                 }
-                
+
                 scope.Complete();
             }
 
@@ -364,7 +429,7 @@ namespace FluentMigrator.Runner
         {
             CaughtExceptions = new List<Exception>();
             var context = new MigrationContext(Conventions, Processor, MigrationAssembly, ApplicationContext, Processor.ConnectionString);
-            
+
             getExpressions(migration, context);
 
             _migrationValidator.ApplyConventionsToAndValidateExpressions(migration, context.Expressions);
@@ -378,7 +443,7 @@ namespace FluentMigrator.Runner
             ApplyMigrationDown(migrationInfoAdapter, true);
         }
 
-       
+
 
         /// <summary>
         /// execute each migration expression in the expression collection
@@ -446,7 +511,7 @@ namespace FluentMigrator.Runner
 
             _announcer.Heading("Migrations");
 
-            foreach(KeyValuePair<long, IMigrationInfo> migration in MigrationLoader.LoadMigrations())
+            foreach (KeyValuePair<long, IMigrationInfo> migration in MigrationLoader.LoadMigrations())
             {
                 string migrationName = migration.Value.GetName();
                 bool isCurrent = migration.Key == currentVersion;
@@ -454,7 +519,7 @@ namespace FluentMigrator.Runner
                                                 migrationName,
                                                 isCurrent ? " (current)" : string.Empty);
 
-                if(isCurrent)
+                if (isCurrent)
                     _announcer.Emphasize(message);
                 else
                     _announcer.Say(message);
