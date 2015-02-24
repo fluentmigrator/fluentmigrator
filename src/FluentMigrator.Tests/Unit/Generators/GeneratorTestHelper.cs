@@ -257,8 +257,13 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         public static InsertDataExpression GetInsertGUIDExpression()
         {
-            var expression = new InsertDataExpression { TableName = TestTableName1 };
-            expression.Rows.Add(new InsertionDataDefinition { new KeyValuePair<string, object>("guid", TestGuid) });
+            return GetInsertGUIDExpression(TestGuid);
+        }
+
+        public static InsertDataExpression GetInsertGUIDExpression(Guid guid)
+        {
+            var expression = new InsertDataExpression {TableName = TestTableName1};
+            expression.Rows.Add(new InsertionDataDefinition {new KeyValuePair<string, object>("guid", guid)});
 
             return expression;
         }
