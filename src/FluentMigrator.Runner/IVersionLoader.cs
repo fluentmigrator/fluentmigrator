@@ -1,3 +1,5 @@
+using FluentMigrator.Runner.Initialization;
+
 namespace FluentMigrator.Runner
 {
     public interface IVersionLoader
@@ -5,7 +7,7 @@ namespace FluentMigrator.Runner
         bool AlreadyCreatedVersionSchema { get; }
         bool AlreadyCreatedVersionTable { get; }
         void DeleteVersion(long version);
-        FluentMigrator.VersionTableInfo.IVersionTableMetaData GetVersionTableMetaData();
+        FluentMigrator.VersionTableInfo.IVersionTableMetaData GetVersionTableMetaData(IRunnerContext runnerContext);
         void LoadVersionInfo();
         void RemoveVersionTable();
         IMigrationRunner Runner { get; set; }

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Versioning;
+using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Tests.Unit
 {
@@ -29,7 +30,7 @@ namespace FluentMigrator.Tests.Unit
             this.Versions.Remove(version);
         }
 
-        public VersionTableInfo.IVersionTableMetaData GetVersionTableMetaData()
+        public VersionTableInfo.IVersionTableMetaData GetVersionTableMetaData(IRunnerContext runnerContext)
         {
             return versionTableMetaData;
         }

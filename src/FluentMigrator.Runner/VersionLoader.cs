@@ -7,6 +7,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.VersionTableInfo;
+using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Runner
 {
@@ -27,14 +28,14 @@ namespace FluentMigrator.Runner
         public IMigration VersionUniqueMigration { get; private set; }
         public IMigration VersionDescriptionMigration { get; private set; }
         
-        public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions)
+        public VersionLoader(IMigrationRunner runner, IRunnerContext runnerContext, Assembly assembly, IMigrationConventions conventions)
         {
             Runner = runner;
             Processor = runner.Processor;
             Assembly = assembly;
 
             Conventions = conventions;
-            VersionTableMetaData = GetVersionTableMetaData();
+            VersionTableMetaData = GetVersionTableMetaData(runnerContext);
             VersionMigration = new VersionMigration(VersionTableMetaData);
             VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
             VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
@@ -58,7 +59,7 @@ namespace FluentMigrator.Runner
             dataExpression.ExecuteWith(Processor);
         }
 
-        public IVersionTableMetaData GetVersionTableMetaData()
+        public IVersionTableMetaData GetVersionTableMetaData(IRunnerContext runnerContext)
         {
             Type matchedType = Assembly.GetExportedTypes().FirstOrDefault(t => Conventions.TypeIsVersionTableMetaData(t));
 
@@ -67,7 +68,11 @@ namespace FluentMigrator.Runner
                 return new DefaultVersionTableMetaData();
             }
 
-            return (IVersionTableMetaData)Activator.CreateInstance(matchedType);
+            var versionTableMetaData = (IVersionTableMetaData)Activator.CreateInstance(matchedType);
+
+            versionTableMetaData.ApplicationContext = runnerContext.ApplicationContext;
+
+            return versionTableMetaData;
         }
 
         protected virtual InsertionDataDefinition CreateVersionInfoInsertionData(long version, string description)
