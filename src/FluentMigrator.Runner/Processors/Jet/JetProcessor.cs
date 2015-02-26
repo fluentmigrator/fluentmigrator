@@ -49,7 +49,7 @@ namespace FluentMigrator.Runner.Processors.Jet
             EnsureConnectionIsOpen();
 
             if (expression.Operation != null)
-                expression.Operation(Connection, null);
+                expression.Operation(Connection, Transaction);
         }
 
         protected override void Process(string sql)
