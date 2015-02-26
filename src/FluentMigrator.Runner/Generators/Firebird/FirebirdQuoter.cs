@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.Firebird
@@ -42,12 +43,12 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
         public override string Quote(string name)
         {
-            if (_keywords.Any(x => x == name.ToUpper()))
+            if (_keywords.Any(x => x == name.ToUpperInvariant()))
                 return base.Quote(name);
             return name;
         }
 
-        public override string FormatDateTime(System.DateTime value)
+        public override string FormatDateTime(DateTime value)
         {
             return ValueQuote + (value).ToString("yyyy-MM-dd HH:mm:ss") + ValueQuote;
         }
