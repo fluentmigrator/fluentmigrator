@@ -43,7 +43,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
         public override string Quote(string name)
         {
-            if (_keywords.Any(x => x == name.ToUpperInvariant()))
+            if (_keywords.Contains(name, StringComparer.OrdinalIgnoreCase))
                 return base.Quote(name);
             return name;
         }
