@@ -18,6 +18,7 @@
 
 using System;
 using FluentMigrator.Exceptions;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Infrastructure;
@@ -65,8 +66,7 @@ namespace FluentMigrator.Runner.Initialization
 
             var assemblyCollection = new AssemblyCollection(assemblies);
 
-            var connectionString = LoadConnectionString(assemblyCollection);
-            var processor = InitializeProcessor(connectionString);
+            var processor = RunnerContext.NoConnection? InitializeConnectionlessProcessor():InitializeProcessor(assemblyCollection);
 
             Runner = new MigrationRunner(assemblyCollection, RunnerContext, processor);
         }
@@ -114,14 +114,33 @@ namespace FluentMigrator.Runner.Initialization
             RunnerContext.Announcer.Say("Task completed.");
         }
 
-        private IMigrationProcessor InitializeProcessor(string connectionString)
+        private IMigrationProcessor InitializeConnectionlessProcessor()
         {
+            var options = new ProcessorOptions
+            {
+                PreviewOnly = RunnerContext.PreviewOnly,
+                Timeout = RunnerContext.Timeout,
+                ProviderSwitches = RunnerContext.ProviderSwitches
+            };
+
+            var generator = new MigrationGeneratorFactory().GetGenerator(RunnerContext.Database);
+
+            var processor = new ConnectionlessProcessor(generator, RunnerContext, options);
+
+            return processor;
+        }
+
+        private IMigrationProcessor InitializeProcessor(IAssemblyCollection assemblyCollection)
+        {
+
             if (RunnerContext.Timeout == 0)
             {
                 RunnerContext.Timeout = 30; // Set default timeout for command
             }
 
+            var connectionString = LoadConnectionString(assemblyCollection);
             var processorFactory = ProcessorFactoryProvider.GetFactory(RunnerContext.Database);
+
             if (processorFactory == null)
                 throw new ProcessorFactoryNotFoundException(string.Format("The provider or dbtype parameter is incorrect. Available choices are {0}: ", ProcessorFactoryProvider.ListAvailableProcessorTypes()));
 

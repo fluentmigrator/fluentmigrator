@@ -90,10 +90,16 @@ namespace FluentMigrator.Runner
 
             _migrationScopeHandler = new MigrationScopeHandler(Processor);
             _migrationValidator = new MigrationValidator(_announcer, Conventions);
-            VersionLoader = new VersionLoader(this, _migrationAssemblies, Conventions);
             MigrationLoader = new DefaultMigrationInformationLoader(Conventions, _migrationAssemblies, runnerContext.Namespace, runnerContext.NestedNamespaces, runnerContext.Tags);
             ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
             MaintenanceLoader = new MaintenanceLoader(_migrationAssemblies, runnerContext.Tags, Conventions);
+
+            if (runnerContext.NoConnection){
+                VersionLoader = new ConnectionlessVersionLoader(this, _migrationAssemblies, Conventions, runnerContext.StartVersion, runnerContext.Version);
+            }
+            else{
+                VersionLoader = new VersionLoader(this, _migrationAssemblies, Conventions);
+            }
         }
 
         public IVersionLoader VersionLoader { get; set; }

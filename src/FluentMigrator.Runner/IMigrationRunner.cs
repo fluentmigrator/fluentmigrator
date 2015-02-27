@@ -6,6 +6,7 @@ namespace FluentMigrator.Runner
     public interface IMigrationRunner : IMigrationScopeStarter
     {
         IMigrationProcessor Processor { get; }
+        IMigrationInformationLoader MigrationLoader { get; set; }
         IAssemblyCollection MigrationAssemblies { get; }
         void Up(IMigration migration);
         void Down(IMigration migration);

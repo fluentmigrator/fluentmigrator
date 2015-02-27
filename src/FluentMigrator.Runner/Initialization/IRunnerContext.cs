@@ -30,6 +30,8 @@ namespace FluentMigrator.Runner.Initialization
         bool NestedNamespaces { get; set; }
         string Task { get; set; }
         long Version { get; set; }
+        long StartVersion { get; set; }
+        bool NoConnection { get; set; }
         int Steps { get; set; }
         string WorkingDirectory { get; set; }
         string Profile { get; set; }
