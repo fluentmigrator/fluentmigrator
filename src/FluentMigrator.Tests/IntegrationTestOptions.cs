@@ -80,6 +80,12 @@ namespace FluentMigrator.Tests
             IsEnabled = false
         };
 
+        public static DatabaseServerOptions Hana = new DatabaseServerOptions
+        {            
+            ConnectionString = "Server=Server:Port;UserName=UserId;Password=Password;Current Schema='\"DbName\"'",
+            IsEnabled = false
+        };
+
         public class DatabaseServerOptions
         {
             public string ConnectionString;

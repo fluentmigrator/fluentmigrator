@@ -17,6 +17,7 @@
 #endregion
 
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.Hana;
 using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
@@ -103,6 +104,13 @@ namespace FluentMigrator.Tests.Unit.Runners
         {
             IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("OracleManaged");
             Assert.IsTrue(factory.GetType() == typeof(OracleManagedProcessorFactory));
+        }
+
+        [Test]
+        public void CanRetrieveHanaFactoryWithArgumentString()
+        {
+            var factory = migrationProcessorFactoryProvider.GetFactory("Hana");
+            Assert.IsTrue(factory.GetType() == typeof(HanaProcessorFactory));
         }
     }
 }
