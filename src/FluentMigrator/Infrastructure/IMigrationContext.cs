@@ -27,7 +27,7 @@ namespace FluentMigrator.Infrastructure
         IMigrationConventions Conventions { get; }
         ICollection<IMigrationExpression> Expressions { get; set; }
         IQuerySchema QuerySchema { get; }
-        Assembly MigrationAssembly { get; set; }
+        IAssemblyCollection MigrationAssemblies { get; set; }
 
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         object ApplicationContext { get; set; }

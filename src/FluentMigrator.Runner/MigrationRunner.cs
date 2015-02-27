@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner
 {
     public class MigrationRunner : IMigrationRunner
     {
-        private Assembly _migrationAssembly;
+        private IAssemblyCollection _migrationAssemblies;
         private IAnnouncer _announcer;
         private IStopWatch _stopWatch;
         private bool _alreadyOutputPreviewOnlyModeWarning;
@@ -67,8 +67,14 @@ namespace FluentMigrator.Runner
         }
 
         public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
+          : this(new SingleAssembly(assembly), runnerContext, processor)
         {
-            _migrationAssembly = assembly;
+
+        }
+
+        public MigrationRunner(IAssemblyCollection assemblies, IRunnerContext runnerContext, IMigrationProcessor processor)
+        {
+            _migrationAssemblies = assemblies;
             _announcer = runnerContext.Announcer;
             Processor = processor;
             _stopWatch = runnerContext.StopWatch;
@@ -84,10 +90,10 @@ namespace FluentMigrator.Runner
 
             _migrationScopeHandler = new MigrationScopeHandler(Processor);
             _migrationValidator = new MigrationValidator(_announcer, Conventions);
-            VersionLoader = new VersionLoader(this, _migrationAssembly, Conventions);
-            MigrationLoader = new DefaultMigrationInformationLoader(Conventions, _migrationAssembly, runnerContext.Namespace, runnerContext.NestedNamespaces, runnerContext.Tags);
+            VersionLoader = new VersionLoader(this, _migrationAssemblies, Conventions);
+            MigrationLoader = new DefaultMigrationInformationLoader(Conventions, _migrationAssemblies, runnerContext.Namespace, runnerContext.NestedNamespaces, runnerContext.Tags);
             ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
-            MaintenanceLoader = new MaintenanceLoader(_migrationAssembly, runnerContext.Tags, Conventions);
+            MaintenanceLoader = new MaintenanceLoader(_migrationAssemblies, runnerContext.Tags, Conventions);
         }
 
         public IVersionLoader VersionLoader { get; set; }
@@ -352,9 +358,9 @@ namespace FluentMigrator.Runner
                 VersionLoader.RemoveVersionTable();
         }
 
-        public Assembly MigrationAssembly
+        public IAssemblyCollection MigrationAssemblies
         {
-            get { return _migrationAssembly; }
+            get { return _migrationAssemblies; }
         }
 
         public void Up(IMigration migration)
@@ -367,7 +373,7 @@ namespace FluentMigrator.Runner
         private void ExecuteMigration(IMigration migration, Action<IMigration, IMigrationContext> getExpressions)
         {
             CaughtExceptions = new List<Exception>();
-            var context = new MigrationContext(Conventions, Processor, MigrationAssembly, ApplicationContext, Processor.ConnectionString);
+            var context = new MigrationContext(Conventions, Processor, MigrationAssemblies, ApplicationContext, Processor.ConnectionString);
             
             getExpressions(migration, context);
 

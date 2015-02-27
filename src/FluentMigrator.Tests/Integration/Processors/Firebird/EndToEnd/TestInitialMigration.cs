@@ -82,7 +82,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
             {
                 Database = "Firebird",
                 Connection = IntegrationTestOptions.Firebird.ConnectionString,
-                Target = Assembly.GetExecutingAssembly().Location,
+                Targets = new[] { Assembly.GetExecutingAssembly().Location },
                 Namespace = "FluentMigrator.Tests.Integration.Migrations.Firebird.FirstVersion",
                 Task = task,
             };

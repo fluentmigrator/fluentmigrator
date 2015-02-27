@@ -29,11 +29,12 @@ namespace FluentMigrator.Runner
     {
         private readonly IDictionary<MigrationStage, IList<IMigration>> _maintenance;
 
-        public MaintenanceLoader(Assembly migrationAssembly, IEnumerable<string> tags, IMigrationConventions conventions)
+        public MaintenanceLoader(IAssemblyCollection assemblyCollection, IEnumerable<string> tags, IMigrationConventions conventions)
         {
             tags = tags ?? new string[] {};
             _maintenance = (
-                from type in migrationAssembly.GetExportedTypes()
+                from a in assemblyCollection.Assemblies
+                from type in a.GetExportedTypes()
                 let stage = conventions.GetMaintenanceStage(type)
                 where stage != null
                 where conventions.TypeHasMatchingTags(type, tags)

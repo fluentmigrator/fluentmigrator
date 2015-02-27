@@ -5,6 +5,7 @@ using FluentMigrator.Runner.Initialization;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Tests.Unit
 {
@@ -20,7 +21,7 @@ namespace FluentMigrator.Tests.Unit
 
             _runnerContextMock.Setup(x => x.Profile).Returns(string.Empty);
 			//_runnerContextMock.VerifyGet(x => x.Profile).Returns(string.Empty);
-			_runnerMock.SetupGet(x => x.MigrationAssembly).Returns(typeof(MigrationRunnerTests).Assembly);
+			_runnerMock.SetupGet(x => x.MigrationAssemblies).Returns(new SingleAssembly(typeof(MigrationRunnerTests).Assembly));
 
 			var profileLoader = new ProfileLoader(_runnerContextMock.Object, _runnerMock.Object, _conventionsMock.Object);
 

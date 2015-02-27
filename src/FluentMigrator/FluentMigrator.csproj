@@ -196,6 +196,7 @@
     <Compile Include="Builders\IColumnExpressionBuilder.cs" />
     <Compile Include="Builders\ColumnExpressionBuilderHelper.cs" />
     <Compile Include="Infrastructure\Extensions\ExtensionsForIMigrationInfo.cs" />
+    <Compile Include="Infrastructure\IAssemblyCollection.cs" />
     <Compile Include="Infrastructure\IMigrationInfo.cs" />
     <Compile Include="Infrastructure\MigrationInfo.cs" />
     <Compile Include="Infrastructure\NonAttributedMigrationToMigrationInfoAdapter.cs" />

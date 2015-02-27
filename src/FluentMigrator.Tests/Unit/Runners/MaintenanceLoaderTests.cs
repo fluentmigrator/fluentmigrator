@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             _migrationConventions.Setup(x => x.GetMaintenanceStage).Returns(DefaultMigrationConventions.GetMaintenanceStage);
             _migrationConventions.Setup(x => x.TypeHasMatchingTags).Returns(DefaultMigrationConventions.TypeHasMatchingTags);
 
-            _maintenanceLoader = new MaintenanceLoader(this.GetType().Assembly, _tags, _migrationConventions.Object);
+            _maintenanceLoader = new MaintenanceLoader(new SingleAssembly(GetType().Assembly), _tags, _migrationConventions.Object);
         }
 
         [Test]

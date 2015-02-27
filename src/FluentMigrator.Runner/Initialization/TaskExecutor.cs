@@ -20,6 +20,9 @@ using System;
 using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Infrastructure;
+using System.Reflection;
+using System.Collections.Generic;
 
 namespace FluentMigrator.Runner.Initialization
 {
@@ -48,11 +51,24 @@ namespace FluentMigrator.Runner.Initialization
 
         protected virtual void Initialize()
         {
-            var assembly = AssemblyLoaderFactory.GetAssemblyLoader(RunnerContext.Target).Load();
-            var connectionString = LoadConnectionString(assembly.Location);
-            var processor = InitializeProcessor(assembly.Location, connectionString);
+            List<Assembly> assemblies = new List<Assembly>();
 
-            Runner = new MigrationRunner(assembly, RunnerContext, processor);
+            foreach (var target in RunnerContext.Targets)
+            {
+                var assembly = AssemblyLoaderFactory.GetAssemblyLoader(target).Load();
+
+                if (!assemblies.Contains(assembly))
+                {
+                    assemblies.Add(assembly);
+                }
+            }
+
+            var assemblyCollection = new AssemblyCollection(assemblies);
+
+            var connectionString = LoadConnectionString(assemblyCollection);
+            var processor = InitializeProcessor(connectionString);
+
+            Runner = new MigrationRunner(assemblyCollection, RunnerContext, processor);
         }
 
         public void Execute()
@@ -98,7 +114,7 @@ namespace FluentMigrator.Runner.Initialization
             RunnerContext.Announcer.Say("Task completed.");
         }
 
-        private IMigrationProcessor InitializeProcessor(string assemblyLocation, string connectionString)
+        private IMigrationProcessor InitializeProcessor(string connectionString)
         {
             if (RunnerContext.Timeout == 0)
             {
@@ -119,10 +135,13 @@ namespace FluentMigrator.Runner.Initialization
             return processor;
         }
 
-        private string LoadConnectionString(string assemblyLocation)
+        private string LoadConnectionString(IAssemblyCollection assemblyCollection)
         {
+            var singleAssembly = (assemblyCollection != null && assemblyCollection.Assemblies != null && assemblyCollection.Assemblies.Length == 1) ? assemblyCollection.Assemblies[0] : null;
+            var singleAssemblyLocation = singleAssembly != null ? singleAssembly.Location : string.Empty;
+
             var manager = new ConnectionStringManager(new NetConfigManager(), RunnerContext.Announcer, RunnerContext.Connection,
-                                                      RunnerContext.ConnectionStringConfigPath, assemblyLocation,
+                                                      RunnerContext.ConnectionStringConfigPath, singleAssemblyLocation,
                                                       RunnerContext.Database);
 
             manager.LoadConnectionString();
