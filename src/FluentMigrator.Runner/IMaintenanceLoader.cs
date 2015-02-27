@@ -16,10 +16,13 @@
 //
 #endregion
 
+using System.Collections.Generic;
+using FluentMigrator.Infrastructure;
+
 namespace FluentMigrator.Runner
 {
     public interface IMaintenanceLoader
     {
-        void ApplyMaintenance(MigrationStage stage);
+        IList<IMigrationInfo> LoadMaintenance(MigrationStage stage);
     }
 }

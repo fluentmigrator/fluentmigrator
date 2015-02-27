@@ -470,6 +470,7 @@
     <Compile Include="Unit\MigrationInfoTests.cs" />
     <Compile Include="Unit\MigrationRunnerTests.cs" />
     <Compile Include="Unit\ProfileLoaderTests.cs" />
+    <Compile Include="Unit\Runners\MaintenanceLoaderTests.cs" />
     <Compile Include="Unit\Runners\MigrationProcessorFactoryProviderTests.cs" />
     <Compile Include="Unit\Runners\Migrations\1_User.cs" />
     <Compile Include="Unit\Runners\Migrations\2_UserEmail.cs" />

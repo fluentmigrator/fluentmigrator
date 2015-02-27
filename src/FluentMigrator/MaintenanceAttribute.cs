@@ -26,16 +26,24 @@ namespace FluentMigrator
     /// <remarks>
     /// Migration annotated with <see cref="MaintenanceAttribute" /> will be always executed
     /// when migrating the database to the latest version. The execution stage in which it would 
-    /// be executed is defined by <see cref="Stage" />.
+    /// be executed is defined by <see cref="Stage" />. The transaction behavior can also be defined
+    /// with the <see cref="TransactionBehavior"/>, which if not specified defaults to the default 
+    /// transaction behavior.
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class MaintenanceAttribute : Attribute 
     {
         public MigrationStage Stage { get; private set; }
+        public TransactionBehavior TransactionBehavior { get; private set; }
 
-        public MaintenanceAttribute(MigrationStage stage)
+        public MaintenanceAttribute(MigrationStage stage) : this(stage, TransactionBehavior.Default)
+        {
+        }
+
+        public MaintenanceAttribute(MigrationStage stage, TransactionBehavior transactionBehavior)
         {
             this.Stage = stage;
+            this.TransactionBehavior = transactionBehavior;
         }
     }
 }
