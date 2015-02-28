@@ -76,25 +76,12 @@ namespace FluentMigrator.Runner
 
         private IEnumerable<Type> FindMigrationTypes()
         {
-            IEnumerable<Type> matchedTypes = Assembly.GetExportedTypes()
-                                                     .Where(t => Conventions.TypeIsMigration(t)
-                                                                 &&
-                                                                 (Conventions.TypeHasMatchingTags(t, TagsToMatch) ||
-                                                                  !Conventions.TypeHasTags(t)));
-
-            if (!string.IsNullOrEmpty(Namespace))
-            {
-                Func<Type, bool> shouldInclude = t => t.Namespace == Namespace;
-                if (LoadNestedNamespaces)
-                {
-                    string matchNested = Namespace + ".";
-                    shouldInclude = t => t.Namespace == Namespace || t.Namespace.StartsWith(matchNested);
-                }
-
-                matchedTypes = matchedTypes.Where(shouldInclude);
-            }
-
-            return matchedTypes;
+            return TypeFinder
+                .FindTypes(Assembly, Namespace, LoadNestedNamespaces)
+                .Where(t => Conventions.TypeIsMigration(t)
+                            &&
+                            (Conventions.TypeHasMatchingTags(t, TagsToMatch) ||
+                             !Conventions.TypeHasTags(t)));
         }
     }
 }
