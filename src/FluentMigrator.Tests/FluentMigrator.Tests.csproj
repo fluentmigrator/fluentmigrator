@@ -171,6 +171,7 @@
     </Compile>
     <Compile Include="Helpers\Db2TestTable.cs" />
     <Compile Include="Helpers\FirebirdTestTable.cs" />
+    <Compile Include="Helpers\IncrementorTests.cs" />
     <Compile Include="Helpers\JetTestTable.cs" />
     <Compile Include="Helpers\OracleTestTable.cs" />
     <Compile Include="Helpers\HanaTestSequence.cs" />
