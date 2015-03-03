@@ -13,10 +13,12 @@ namespace FluentMigrator.Tests.Helpers
         public void CanCreateAnIncrementor()
         {
             // Arrange
-            Action action = () => new Incrementor(1, 1);
+            Action firstValueOnlyConstructor = () => new Incrementor(1);
+            Action firstValueWithIncrementConstructor = () => new Incrementor(1, 2);
 
             // Act and Assert
-            Assert.DoesNotThrow(action.Invoke);
+            Assert.DoesNotThrow(firstValueOnlyConstructor.Invoke);
+            Assert.DoesNotThrow(firstValueWithIncrementConstructor.Invoke);
         }
 
         [TestCase(1, 1)]

@@ -10,7 +10,7 @@
         /// </summary>
         /// <param name="firstValue">The first value that the Increment method will return.</param>
         /// <param name="increment">The value that the Increment method will increment by.</param>
-        public Incrementor(int firstValue, int increment)
+        public Incrementor(int firstValue, int increment = 1)
         {
             _increment = increment;
             _nextValue = firstValue;
