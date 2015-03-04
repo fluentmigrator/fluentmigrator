@@ -11,6 +11,18 @@ namespace FluentMigrator.Runner.Generators.Postgres
     /// </summary>
     public class PostgresDescriptionGenerator : GenericDescriptionGenerator
     {
+        private readonly IQuoter _quoter;
+
+        public PostgresDescriptionGenerator()
+        {
+            _quoter = new PostgresQuoter();
+        }
+
+        protected IQuoter Quoter
+        {
+            get { return _quoter; }
+        }
+
         #region Constants
 
         private const string TableDescriptionTemplate = "COMMENT ON TABLE {0} IS '{1}'";
@@ -22,7 +34,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
         {
             return string.IsNullOrEmpty(schemaName)
                ? tableName
-               : string.Format("{0}.{1}", schemaName, tableName);
+               : string.Format("{0}.{1}", Quoter.QuoteSchemaName(schemaName), Quoter.QuoteTableName(tableName));
         }
 
         protected override string GenerateTableDescription(
@@ -43,7 +55,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return string.Format(
                 ColumnDescriptionTemplate,
                 GetFullTableName(schemaName, tableName),
-                columnName,
+                Quoter.QuoteColumnName(columnName),
                 columnDescription.Replace("'", "''"));
         }
     }

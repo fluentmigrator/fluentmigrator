@@ -84,6 +84,8 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 case SystemMethods.NewGuid:
                     //need to run the script share/contrib/uuid-ossp.sql to install the uuid_generate4 function
                     return "uuid_generate_v4()";
+                case SystemMethods.NewSequentialId:
+                    return "uuid_generate_v1()";
                 case SystemMethods.CurrentDateTime:
                     return "now()";
                 case SystemMethods.CurrentUTCDateTime:
@@ -92,7 +94,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
                     return "current_user";
             }
 
-            throw new NotImplementedException();
+            throw new NotImplementedException(string.Format("System method {0} is not implemented.", systemMethod));
         }
 
         protected override string FormatType(ColumnDefinition column)
