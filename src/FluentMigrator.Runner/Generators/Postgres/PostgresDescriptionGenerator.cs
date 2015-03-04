@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
         private string GetFullTableName(string schemaName, string tableName)
         {
             return string.IsNullOrEmpty(schemaName)
-               ? tableName
+               ? Quoter.QuoteTableName(tableName)
                : string.Format("{0}.{1}", Quoter.QuoteSchemaName(schemaName), Quoter.QuoteTableName(tableName));
         }
 
