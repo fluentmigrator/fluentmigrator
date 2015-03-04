@@ -45,6 +45,7 @@ namespace FluentMigrator.Model
         public virtual string PrimaryKeyName { get; set; }
         public virtual bool? IsNullable { get; set; }
         public virtual bool IsUnique { get; set; }
+        public virtual bool IsRowGuid { get; set; }
         public virtual string TableName { get; set; }
         public virtual ColumnModificationType ModificationType { get; set; }
         public virtual string ColumnDescription { get; set; }

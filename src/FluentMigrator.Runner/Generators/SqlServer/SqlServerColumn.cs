@@ -41,6 +41,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 column.GetAdditionalFeature(SqlServerExtensions.IdentityIncrement, 1));
         }
 
+        protected override string FormatRowGuid( ColumnDefinition column )
+        {
+            return column.IsRowGuid ? "ROWGUIDCOL" : string.Empty;
+        }
+
         protected override string FormatSystemMethods(SystemMethods systemMethod)
         {
             switch (systemMethod)
