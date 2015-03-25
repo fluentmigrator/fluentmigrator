@@ -101,7 +101,7 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
                 LEFT JOIN sys.default_constraints def ON c.default_object_id = def.object_id
                 LEFT JOIN sys.key_constraints pk ON t.object_id = pk.parent_object_id AND pk.type = 'PK'
                 LEFT JOIN INFORMATION_SCHEMA.KEY_COLUMN_USAGE kcu ON t.name = kcu.TABLE_NAME AND c.name = kcu.COLUMN_NAME AND pk.name = kcu.CONSTRAINT_NAME
-                ORDER BY t.name, c.name";
+                ORDER BY t.name, c.column_id";
             DataSet ds = Read(query);
             DataTable dt = ds.Tables[0];
             IList<TableDefinition> tables = new List<TableDefinition>();
@@ -162,59 +162,52 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
 
         protected virtual DbType GetDbType(int typeNum)
         {
-            switch (typeNum)
+            var types = new Dictionary<int, DbType>()
             {
-                case 34: //'byte[]'
-                    return DbType.Byte;
-                case 35: //'string'
-                    return DbType.String;
-                case 36: //'System.Guid'
-                    return DbType.Guid;
-                case 48: //'byte'
-                    return DbType.Byte;
-                case 52: //'short'
-                    return DbType.Int16;
-                case 56: //'int'
-                    return DbType.Int32;
-                case 58: //'System.DateTime'
-                    return DbType.DateTime;
-                case 59: //'float'
-                    return DbType.Int64;
-                case 60: //'decimal'
-                    return DbType.Decimal;
-                case 61: //'System.DateTime'
-                    return DbType.DateTime;
-                case 62: //'double'
-                    return DbType.Double;
-                case 98: //'object'
-                    return DbType.Object;
-                case 99: //'string'
-                    return DbType.String;
-                case 104: //'bool'
-                    return DbType.Boolean;
-                case 106: //'decimal'
-                    return DbType.Decimal;
-                case 108: //'decimal'
-                    return DbType.Decimal;
-                case 122: //'decimal'
-                    return DbType.Decimal;
-                case 127: //'long'
-                    return DbType.Int64;
-                case 165: //'byte[]'
-                    return DbType.Byte;
-                case 167: //'string'
-                    return DbType.String;
-                case 173: //'byte[]'
-                    return DbType.Byte;
-                case 175: //'string'
-                    return DbType.String;
-                case 189: //'long'
-                    return DbType.Int64;
-                case 231: //'string'
-                case 239: //'string'
-                case 241: //'string'
-                default:
-                    return DbType.String;
+                {34, DbType.Binary},
+                {35, DbType.AnsiString},
+                {36, DbType.Guid},
+                {40, DbType.Date},
+                {41, DbType.Time},
+                {42, DbType.DateTime2},
+                {43, DbType.DateTimeOffset},
+                {48, DbType.Byte},
+                {52, DbType.Int16},
+                {56, DbType.Int32},
+                //{58, DbType.}, //smalldatetime
+                {59, DbType.Single},
+                {60, DbType.Currency},
+                {61, DbType.DateTime},
+                {62, DbType.Double},
+                //{98, DbType.}, //sql_variant
+                {99, DbType.String},
+                {104, DbType.Boolean},
+                {106, DbType.Decimal},
+                //{108, DbType.}, //numeric
+                //{122, DbType.}, //smallmoney
+                {127, DbType.Int64},
+                //{240, DbType.}, //hierarchyid
+                //{240, DbType.}, //geometry
+                //{240, DbType.}, //geography
+                {165, DbType.Binary},
+                {167, DbType.AnsiString},
+                {173, DbType.Binary},
+                {175, DbType.AnsiStringFixedLength},
+                //{189, DbType.}, //Timestamp
+                {231, DbType.String},
+                {239, DbType.StringFixedLength},
+                {241, DbType.Xml}
+                //{231, DbType.} //Sysname
+            };
+
+            DbType value;
+            if (types.TryGetValue(typeNum, out value))
+            {
+                return value;
+            }
+            else
+            {
+                throw new KeyNotFoundException(typeNum + " was not found!");
             }
         }
 
@@ -331,13 +324,13 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
                 ICollection<string> ms = (from m in d.ForeignColumns
                                   where m == dr["FK_Table"].ToString()
                                   select m).ToList();
-                if (ms.Count == 0) d.ForeignColumns.Add(dr["FK_Table"].ToString());
+                if (ms.Count == 0) d.ForeignColumns.Add(dr["FK_Column"].ToString());
 
                 // Primary Columns
                 ms = (from m in d.PrimaryColumns
                       where m == dr["PK_Table"].ToString()
                       select m).ToList();
-                if (ms.Count == 0) d.PrimaryColumns.Add(dr["PK_Table"].ToString());
+                if (ms.Count == 0) d.PrimaryColumns.Add(dr["PK_Column"].ToString());
             }
 
             return keys;
