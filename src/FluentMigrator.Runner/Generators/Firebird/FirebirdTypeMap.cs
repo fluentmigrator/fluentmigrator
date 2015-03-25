@@ -30,7 +30,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             SetTypeMap(DbType.Currency, "DECIMAL(18, 4)");
             SetTypeMap(DbType.Date, "DATE");
             SetTypeMap(DbType.DateTime, "TIMESTAMP");
-            SetTypeMap(DbType.Decimal, "DECIMAL(9,4)");
+            SetTypeMap(DbType.Decimal, "DECIMAL(18, 4)");
             SetTypeMap(DbType.Decimal, "DECIMAL($size, $precision)", DecimalCapacity);
             SetTypeMap(DbType.Double, "DOUBLE PRECISION"); //64 bit double precision
             SetTypeMap(DbType.Guid, "CHAR(16) CHARACTER SET OCTETS"); //no guid support, "only" uuid is supported(via gen_uuid() built-in function)
@@ -38,10 +38,10 @@ namespace FluentMigrator.Runner.Generators.Firebird
             SetTypeMap(DbType.Int32, "INTEGER");
             SetTypeMap(DbType.Int64, "BIGINT");
             SetTypeMap(DbType.Single, "FLOAT");
-            SetTypeMap(DbType.StringFixedLength, "CHAR(255) CHARACTER SET NONE"); //charset utf8 may fail at index creation, because of to small database pagesize
-            SetTypeMap(DbType.StringFixedLength, "CHAR($size) CHARACTER SET NONE", FirebirdMaxUnicodeCharSize);
-            SetTypeMap(DbType.String, "VARCHAR(255) CHARACTER SET NONE");
-            SetTypeMap(DbType.String, "VARCHAR($size) CHARACTER SET NONE", FirebirdMaxUnicodeCharSize);
+            SetTypeMap(DbType.StringFixedLength, "CHAR(255)");
+            SetTypeMap(DbType.StringFixedLength, "CHAR($size)", FirebirdMaxUnicodeCharSize);
+            SetTypeMap(DbType.String, "VARCHAR(255)");
+            SetTypeMap(DbType.String, "VARCHAR($size)", FirebirdMaxUnicodeCharSize);
             SetTypeMap(DbType.String, "BLOB SUB_TYPE TEXT", FirebirdMaxTextSize);
             SetTypeMap(DbType.Time, "TIME");
         }
