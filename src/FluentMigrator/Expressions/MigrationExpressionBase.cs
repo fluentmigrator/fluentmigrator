@@ -18,7 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace FluentMigrator.Expressions
 {
@@ -27,7 +26,6 @@ namespace FluentMigrator.Expressions
         public abstract void ExecuteWith(IMigrationProcessor processor);
         public abstract void CollectValidationErrors(ICollection<string> errors);
 
-        [DebuggerNonUserCode] //to ignore thrown exception on debug
         public virtual IMigrationExpression Reverse()
         {
             throw new NotSupportedException(String.Format("The {0} cannot be automatically reversed", GetType().Name));
