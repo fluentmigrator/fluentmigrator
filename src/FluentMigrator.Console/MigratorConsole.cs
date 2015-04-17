@@ -140,7 +140,7 @@ namespace FluentMigrator.Console
                                             },
                                         {
                                             "noConnection",
-                                            "Indicates that migrations will be generated without consulting a target database. Should only be used when generating an output file. ",
+                                            "Indicates that migrations will be generated without consulting a target database. Should only be used when generating an output file.",
                                             v => { NoConnection = NoConnection = true; }
                                             },
                                         {

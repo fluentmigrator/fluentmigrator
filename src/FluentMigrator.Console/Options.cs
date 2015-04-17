@@ -1130,7 +1130,7 @@ namespace Mono.Options
             {
                 end = GetLineEnd(start, length, description);
                 char c = description[end - 1];
-                if (char.IsWhiteSpace(c))
+                if (char.IsWhiteSpace(c) && end != description.Length)
                     --end;
                 bool writeContinuation = end != description.Length && !IsEolChar(c);
                 string line = description.Substring(start, end - start) +
