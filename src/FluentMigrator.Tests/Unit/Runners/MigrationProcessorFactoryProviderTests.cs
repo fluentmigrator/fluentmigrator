@@ -17,6 +17,7 @@
 #endregion
 
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.Hana;
 using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
@@ -38,8 +39,8 @@ namespace FluentMigrator.Tests.Unit.Runners
         [Test]
         public void CanRetrieveFactoryWithArgumentString()
         {
-            IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("Sqlite");
-            Assert.IsTrue(factory.GetType() == typeof(SqliteProcessorFactory));
+            IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("SQLite");
+            Assert.IsTrue(factory.GetType() == typeof(SQLiteProcessorFactory));
         }
 
         [Test]
@@ -71,6 +72,13 @@ namespace FluentMigrator.Tests.Unit.Runners
         }
 
         [Test]
+        public void CanRetrieveSqlServer2014FactoryWithArgumentString()
+        {
+            IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("SqlServer2014");
+            Assert.IsTrue(factory.GetType() == typeof(SqlServer2014ProcessorFactory));
+        }
+
+        [Test]
         public void RetrievesSqlServerProcessorFactoryIfArgumentIsSqlServer()
         {
             IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("SqlServer");
@@ -96,6 +104,13 @@ namespace FluentMigrator.Tests.Unit.Runners
         {
             IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("OracleManaged");
             Assert.IsTrue(factory.GetType() == typeof(OracleManagedProcessorFactory));
+        }
+
+        [Test]
+        public void CanRetrieveHanaFactoryWithArgumentString()
+        {
+            var factory = migrationProcessorFactoryProvider.GetFactory("Hana");
+            Assert.IsTrue(factory.GetType() == typeof(HanaProcessorFactory));
         }
     }
 }

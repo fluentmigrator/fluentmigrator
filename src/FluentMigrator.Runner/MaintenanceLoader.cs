@@ -19,21 +19,25 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using FluentMigrator.Infrastructure;
+using FluentMigrator.Infrastructure.Extensions;
 
 namespace FluentMigrator.Runner
 {
     public class MaintenanceLoader : IMaintenanceLoader
     {
-        private readonly IMigrationRunner _runner;
         private readonly IDictionary<MigrationStage, IList<IMigration>> _maintenance;
 
-        public MaintenanceLoader(IMigrationRunner runner, IMigrationConventions conventions)
+        public MaintenanceLoader(IAssemblyCollection assemblyCollection, IEnumerable<string> tags, IMigrationConventions conventions)
         {
-            _runner = runner;
+            tags = tags ?? new string[] {};
             _maintenance = (
-                from type in runner.MigrationAssembly.GetExportedTypes()
+                from a in assemblyCollection.Assemblies
+                from type in a.GetExportedTypes()
                 let stage = conventions.GetMaintenanceStage(type)
                 where stage != null
+                where conventions.TypeHasMatchingTags(type, tags)
                 let migration = (IMigration)Activator.CreateInstance(type)
                 group migration by stage
             ).ToDictionary(
@@ -41,17 +45,21 @@ namespace FluentMigrator.Runner
                 g => (IList<IMigration>)g.OrderBy(m => m.GetType().Name).ToArray()
             );
         }
-        
-        public void ApplyMaintenance(MigrationStage stage)
+
+        public IList<IMigrationInfo> LoadMaintenance(MigrationStage stage)
         {
             IList<IMigration> migrations;
+            IList<IMigrationInfo> migrationInfos = new List<IMigrationInfo>();
             if (!_maintenance.TryGetValue(stage, out migrations))
-                return;
+                return migrationInfos;
 
             foreach (var migration in migrations)
             {
-                _runner.Up(migration);
+                var transasctionBehavior = migration.GetType().GetOneAttribute<MaintenanceAttribute>().TransactionBehavior;
+                migrationInfos.Add(new NonAttributedMigrationToMigrationInfoAdapter(migration, transasctionBehavior));
             }
+
+            return migrationInfos;
         }
     }
 }

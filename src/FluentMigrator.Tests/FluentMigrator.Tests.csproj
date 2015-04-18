@@ -113,6 +113,10 @@
     <Reference Include="Oracle.DataAccess">
       <HintPath>..\..\lib\Oracle.DataAccess.dll</HintPath>
     </Reference>
+    <Reference Include="Sap.Data.Hana.v3.5, Version=1.0.80.0, Culture=neutral, PublicKeyToken=0326b8ea63db4bc4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\lib\Hana\Sap.Data.Hana.v3.5.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core">
@@ -169,9 +173,11 @@
     <Compile Include="Helpers\FirebirdTestTable.cs" />
     <Compile Include="Helpers\JetTestTable.cs" />
     <Compile Include="Helpers\OracleTestTable.cs" />
+    <Compile Include="Helpers\HanaTestSequence.cs" />
     <Compile Include="Helpers\PostgresTestSequence.cs" />
+    <Compile Include="Helpers\HanaTestTable.cs" />
     <Compile Include="Helpers\PostgresTestTable.cs" />
-    <Compile Include="Helpers\SqliteTestTable.cs" />
+    <Compile Include="Helpers\SQLiteTestTable.cs" />
     <Compile Include="Helpers\SqlServerCeTestTable.cs" />
     <Compile Include="Helpers\SqlServerTestSequence.cs" />
     <Compile Include="Helpers\SqlServerTestTable.cs" />
@@ -214,6 +220,8 @@
     <Compile Include="Integration\Processors\Db2\Db2ProcessorTests.cs" />
     <Compile Include="Integration\Processors\Db2\Db2SchemaTests.cs" />
     <Compile Include="Integration\Processors\Db2\Db2TableTests.cs" />
+    <Compile Include="Integration\Migrations\Firebird\FirstVersion\VersionOneSimpleTableMigration.cs" />
+    <Compile Include="Integration\Processors\Firebird\EndToEnd\TestInitialMigration.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdColumnTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdConstraintTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdEmbeddedLibrariesForWindows.Designer.cs">
@@ -225,6 +233,15 @@
     <Compile Include="Integration\Processors\Firebird\FirebirdIndexTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdProcessorTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdTableTests.cs" />
+    <Compile Include="Integration\Processors\Firebird\TestDisposing.cs" />
+    <Compile Include="Integration\Processors\Hana\HanaColumnTests.cs" />
+    <Compile Include="Integration\Processors\Hana\HanaConstraintTests.cs" />
+    <Compile Include="Integration\Processors\Hana\HanaIndexTests.cs" />
+    <Compile Include="Integration\Processors\Hana\HanaProcessorTests.cs" />
+    <Compile Include="Integration\Processors\Hana\HanaSchemaExtensionsTests.cs" />
+    <Compile Include="Integration\Processors\Hana\HanaSchemaTests.cs" />
+    <Compile Include="Integration\Processors\Hana\HanaSequenceTests.cs" />
+    <Compile Include="Integration\Processors\Hana\HanaTableTests.cs" />
     <Compile Include="Integration\Processors\Jet\JetProcessorTests.cs" />
     <Compile Include="Integration\Processors\MySql\MySqlProcessorTests.cs" />
     <Compile Include="Integration\Processors\Oracle\OracleManagedProcessorFactoryTests.cs" />
@@ -256,7 +273,7 @@
     <Compile Include="Integration\Processors\Postgres\PostgresSchemaTests.cs" />
     <Compile Include="Integration\Processors\Postgres\PostgresSequenceTests.cs" />
     <Compile Include="Integration\Processors\Postgres\PostgresTableTests.cs" />
-    <Compile Include="Integration\Processors\SQLite\SqliteProcessorTests.cs" />
+    <Compile Include="Integration\Processors\SQLite\SQLiteProcessorTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeColumnTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeConstraintTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeIndexTests.cs" />
@@ -360,10 +377,19 @@
     <Compile Include="Unit\Generators\Firebird\FirebirdDataTests.cs" />
     <Compile Include="Unit\Generators\Firebird\FirebirdGeneratorTests.cs" />
     <Compile Include="Unit\Generators\Firebird\FirebirdIndexTests.cs" />
+    <Compile Include="Unit\Generators\Firebird\FirebirdQuoterTests.cs" />
     <Compile Include="Unit\Generators\Firebird\FirebirdSequenceTests.cs" />
     <Compile Include="Unit\Generators\Firebird\FirebirdTableTests.cs" />
     <Compile Include="Unit\Generators\GeneratorTestHelper.cs" />
     <Compile Include="Unit\Generators\GenericGenerator\QuoterTests.cs" />
+    <Compile Include="Unit\Generators\Hana\HanaColumnTests.cs" />
+    <Compile Include="Unit\Generators\Hana\HanaConstraintsTests.cs" />
+    <Compile Include="Unit\Generators\Hana\HanaDataTests.cs" />
+    <Compile Include="Unit\Generators\Hana\HanaGeneratorTests.cs" />
+    <Compile Include="Unit\Generators\Hana\HanaIndexTests.cs" />
+    <Compile Include="Unit\Generators\Hana\HanaSchemaTests.cs" />
+    <Compile Include="Unit\Generators\Hana\HanaSequenceTests.cs" />
+    <Compile Include="Unit\Generators\Hana\HanaTableTests.cs" />
     <Compile Include="Unit\Generators\Jet\JetColumnTests.cs" />
     <Compile Include="Unit\Generators\Jet\JetConstraintsTests.cs" />
     <Compile Include="Unit\Generators\Jet\JetDataTests.cs" />
@@ -400,6 +426,7 @@
     <Compile Include="Unit\Generators\Postgres\PostgresColumnTests.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresConstraintsTests.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresDataTests.cs" />
+    <Compile Include="Unit\Generators\Postgres\PostgresDescriptionGeneratorTest.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresGeneratorTests.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresIndexTests.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresSchemaTests.cs" />
@@ -443,6 +470,7 @@
     <Compile Include="Unit\MigrationInfoTests.cs" />
     <Compile Include="Unit\MigrationRunnerTests.cs" />
     <Compile Include="Unit\ProfileLoaderTests.cs" />
+    <Compile Include="Unit\Runners\MaintenanceLoaderTests.cs" />
     <Compile Include="Unit\Runners\MigrationProcessorFactoryProviderTests.cs" />
     <Compile Include="Unit\Runners\Migrations\1_User.cs" />
     <Compile Include="Unit\Runners\Migrations\2_UserEmail.cs" />
@@ -453,6 +481,7 @@
     <Compile Include="Unit\TaskExecutorTests.cs" />
     <Compile Include="Unit\TestVersionLoader.cs" />
     <Compile Include="Unit\TestVersionTableMetaData.cs" />
+    <Compile Include="Unit\TimestampedMigrationAttributeTests.cs" />
     <Compile Include="Unit\Versioning\VersionInfoTests.cs" />
     <Compile Include="Unit\VersionLoaderTests.cs" />
     <Compile Include="Unit\VersionOrderInvalidExceptionTests.cs" />
@@ -556,6 +585,7 @@
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using FluentMigrator.Expressions;
-using System.Reflection;
 using System.Data;
-using FluentMigrator.Model;
+using System.Linq;
+using System.Reflection;
 using FluentMigrator.Builders.Execute;
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
+using FluentMigrator.Runner.Generators.Firebird;
 
 namespace FluentMigrator.Runner.Processors.Firebird
 {
@@ -22,7 +23,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             Processor = processor;
             Expression = expression;
             this.expressionType = expressionType;
-            if (processor.FBOptions.UndoEnabled)
+            if (processor.FBOptions.UndoEnabled && !processor.IsRunningOutOfMigrationScope())
                 SetupUndoExpressions();
         }
 
@@ -109,14 +110,14 @@ namespace FluentMigrator.Runner.Processors.Firebird
             CanUndo = true;
             FirebirdSchemaProvider schema = new FirebirdSchemaProvider(Processor);
             FirebirdTableSchema table = schema.GetTableSchema(expression.TableName);
+            var quoter = new FirebirdQuoter();
             AlterColumnExpression alter = new AlterColumnExpression()
             {
                 SchemaName = String.Empty,
                 TableName = expression.TableName,
-                Column = table.Definition.Columns.First(x => x.Name == expression.Column.Name)
+                Column = table.Definition.Columns.First(x => x.Name == quoter.ToFbObjectName(expression.Column.Name))
             };
             UndoExpressions.Add(alter);
-            
         }
 
         protected void SetupUndoDeleteData(DeleteDataExpression expression)

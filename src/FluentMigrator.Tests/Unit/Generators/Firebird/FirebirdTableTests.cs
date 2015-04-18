@@ -1,5 +1,5 @@
-﻿using FluentMigrator.Runner.Processors.Firebird;
-using FluentMigrator.Runner.Generators.Firebird;
+﻿using FluentMigrator.Runner.Generators.Firebird;
+using FluentMigrator.Runner.Processors.Firebird;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -26,7 +26,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" VARCHAR(255) NOT NULL, \"TestColumn2\" [timestamp] NOT NULL, PRIMARY KEY (\"TestColumn1\"))");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 [timestamp] NOT NULL, PRIMARY KEY (TestColumn1))");
         }
 
         [Test]
@@ -38,7 +38,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.Columns[1].CustomType = "[timestamp]";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" VARCHAR(255) NOT NULL, \"TestColumn2\" [timestamp] NOT NULL, PRIMARY KEY (\"TestColumn1\"))");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 [timestamp] NOT NULL, PRIMARY KEY (TestColumn1))");
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" VARCHAR(255) NOT NULL, \"TestColumn2\" INTEGER NOT NULL)");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 INTEGER NOT NULL)");
         }
 
         [Test]
@@ -57,7 +57,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetCreateTableExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" VARCHAR(255) NOT NULL, \"TestColumn2\" INTEGER NOT NULL)");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 INTEGER NOT NULL)");
         }
 
         [Test]
@@ -69,7 +69,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" VARCHAR(255) DEFAULT NULL NOT NULL, \"TestColumn2\" INTEGER DEFAULT 0 NOT NULL)");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) DEFAULT NULL NOT NULL, TestColumn2 INTEGER DEFAULT 0 NOT NULL)");
         }
 
         [Test]
@@ -80,7 +80,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.Columns[0].TableName = expression.TableName;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" VARCHAR(255) DEFAULT NULL NOT NULL, \"TestColumn2\" INTEGER DEFAULT 0 NOT NULL)");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) DEFAULT NULL NOT NULL, TestColumn2 INTEGER DEFAULT 0 NOT NULL)");
 
         }
 
@@ -91,7 +91,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" VARCHAR(255) DEFAULT 'Default' NOT NULL, \"TestColumn2\" INTEGER DEFAULT 0 NOT NULL)");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) DEFAULT 'Default' NOT NULL, TestColumn2 INTEGER DEFAULT 0 NOT NULL)");
         }
 
         [Test]
@@ -100,7 +100,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" VARCHAR(255) DEFAULT 'Default' NOT NULL, \"TestColumn2\" INTEGER DEFAULT 0 NOT NULL)");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) DEFAULT 'Default' NOT NULL, TestColumn2 INTEGER DEFAULT 0 NOT NULL)");
         }
 
         [Test]
@@ -110,7 +110,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" INTEGER NOT NULL, \"TestColumn2\" INTEGER NOT NULL)");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 INTEGER NOT NULL, TestColumn2 INTEGER NOT NULL)");
         }
 
         [Test]
@@ -119,7 +119,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" INTEGER NOT NULL, \"TestColumn2\" INTEGER NOT NULL)");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 INTEGER NOT NULL, TestColumn2 INTEGER NOT NULL)");
         }
 
         [Test]
@@ -129,7 +129,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" VARCHAR(255) NOT NULL, \"TestColumn2\" INTEGER NOT NULL, PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"))");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 INTEGER NOT NULL, PRIMARY KEY (TestColumn1, TestColumn2))");
         }
 
         [Test]
@@ -138,7 +138,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" VARCHAR(255) NOT NULL, \"TestColumn2\" INTEGER NOT NULL, PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"))");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 INTEGER NOT NULL, PRIMARY KEY (TestColumn1, TestColumn2))");
         }
 
         [Test]
@@ -148,7 +148,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" VARCHAR(255) NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"))");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 INTEGER NOT NULL, CONSTRAINT TestKey PRIMARY KEY (TestColumn1, TestColumn2))");
         }
 
         [Test]
@@ -157,7 +157,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" VARCHAR(255) NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"))");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 INTEGER NOT NULL, CONSTRAINT TestKey PRIMARY KEY (TestColumn1, TestColumn2))");
         }
 
         [Test]
@@ -167,7 +167,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" VARCHAR(255) NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\"))");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 INTEGER NOT NULL, CONSTRAINT TestKey PRIMARY KEY (TestColumn1))");
         }
 
         [Test]
@@ -176,7 +176,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" VARCHAR(255) NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\"))");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 INTEGER NOT NULL, CONSTRAINT TestKey PRIMARY KEY (TestColumn1))");
         }
 
         [Test]
@@ -186,7 +186,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" VARCHAR(255), \"TestColumn2\" INTEGER NOT NULL)");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255), TestColumn2 INTEGER NOT NULL)");
         }
 
         [Test]
@@ -195,7 +195,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" VARCHAR(255), \"TestColumn2\" INTEGER NOT NULL)");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255), TestColumn2 INTEGER NOT NULL)");
         }
 
         [Test]
@@ -205,7 +205,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" VARCHAR(255) NOT NULL, \"TestColumn2\" INTEGER NOT NULL, PRIMARY KEY (\"TestColumn1\"))");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 INTEGER NOT NULL, PRIMARY KEY (TestColumn1))");
         }
 
         [Test]
@@ -214,7 +214,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" VARCHAR(255) NOT NULL, \"TestColumn2\" INTEGER NOT NULL, PRIMARY KEY (\"TestColumn1\"))");
+            result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARCHAR(255) NOT NULL, TestColumn2 INTEGER NOT NULL, PRIMARY KEY (TestColumn1))");
         }
 
         [Test]
@@ -224,7 +224,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP TABLE \"TestTable1\"");
+            result.ShouldBe("DROP TABLE TestTable1");
         }
 
         [Test]
@@ -233,7 +233,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP TABLE \"TestTable1\"");
+            result.ShouldBe("DROP TABLE TestTable1");
         }
 
         [Test]

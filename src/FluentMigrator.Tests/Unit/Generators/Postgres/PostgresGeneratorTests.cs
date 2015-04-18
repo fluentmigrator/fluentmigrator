@@ -20,6 +20,20 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public void CanCreateTableWithDateTimeOffsetColumn() 
+        {
+            var tableName = "TestTable1";
+            var expression = new CreateTableExpression { TableName = tableName };
+            expression.Columns.Add(new ColumnDefinition { TableName = tableName, Name = "TestColumn1", Type = DbType.DateTimeOffset });
+            expression.Columns.Add(new ColumnDefinition { TableName = tableName, Name = "TestColumn2", Type = DbType.DateTime2 });
+            expression.Columns.Add(new ColumnDefinition { TableName = tableName, Name = "TestColumn3", Type = DbType.Date });
+            expression.Columns.Add(new ColumnDefinition { TableName = tableName, Name = "TestColumn4", Type = DbType.Time });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(string.Format("CREATE TABLE \"public\".\"{0}\" (\"TestColumn1\" timestamptz NOT NULL, \"TestColumn2\" timestamp NOT NULL, \"TestColumn3\" date NOT NULL, \"TestColumn4\" time NOT NULL)", tableName));
+        }
+
+        [Test]
         public void CanCreateAutoIncrementColumnForInt64()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();

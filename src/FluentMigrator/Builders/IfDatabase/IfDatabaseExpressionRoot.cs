@@ -52,7 +52,7 @@ namespace FluentMigrator.Builders.IfDatabase
         {
             if (databaseType == null) throw new ArgumentNullException("databaseType");
 
-            _context = DatabaseTypeApplies(context, databaseType) ? context : new MigrationContext(new MigrationConventions(), new NullIfDatabaseProcessor(), context.MigrationAssembly, context.ApplicationContext, "");
+            _context = DatabaseTypeApplies(context, databaseType) ? context : new MigrationContext(new MigrationConventions(), new NullIfDatabaseProcessor(), context.MigrationAssemblies, context.ApplicationContext, "");
         }
 
         /// <summary>

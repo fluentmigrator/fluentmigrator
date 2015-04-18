@@ -22,6 +22,12 @@ namespace FluentMigrator.Tests
             IsEnabled = false 
         };
 
+        public static DatabaseServerOptions SqlServer2014 = new DatabaseServerOptions
+        {
+            ConnectionString = @"server=.\MSSQLSERVER2014;uid=test;pwd=test;Trusted_Connection=yes;database=FluentMigrator",
+            IsEnabled = false
+        };
+
         public static DatabaseServerOptions SqlServerCe = new DatabaseServerOptions
             {
                 ConnectionString = @"Data Source=TestDatabase.sdf",
@@ -71,6 +77,12 @@ namespace FluentMigrator.Tests
         public static DatabaseServerOptions Db2 = new DatabaseServerOptions
         {
             ConnectionString = "Database=;UserID=TEST;DataSource=;Password=Testing;DefaultCollection=TEST;DataCompression=True;ConnectTimeout=60;",
+            IsEnabled = false
+        };
+
+        public static DatabaseServerOptions Hana = new DatabaseServerOptions
+        {            
+            ConnectionString = "Server=Server:Port;UserName=UserId;Password=Password;Current Schema='\"DbName\"'",
             IsEnabled = false
         };
 

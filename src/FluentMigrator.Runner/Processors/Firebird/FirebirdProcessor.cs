@@ -1,12 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
 using FluentMigrator.Builders.Execute;
-using FluentMigrator.Runner.Generators.Firebird;
-using System.Collections.Generic;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Helpers;
 
 namespace FluentMigrator.Runner.Processors.Firebird
@@ -36,6 +36,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 return true;
             }
         }
+
         public FirebirdProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory, FirebirdOptions fbOptions)
             : base(connection, factory, generator, announcer, options)
         {
@@ -147,6 +148,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             base.CommitTransaction();
             EnsureConnectionIsClosed();
             ClearLocks();
+            ClearExpressions();
         }
 
         public override void RollbackTransaction()
@@ -177,6 +179,9 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public virtual void CommitRetaining()
         {
+            if (IsRunningOutOfMigrationScope())
+                return;
+
             Announcer.Say("Committing and Retaining Transaction");
 
             using (var command = Factory.CreateCommand("COMMIT RETAIN", Connection, Transaction))
@@ -191,6 +196,11 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             if (FBOptions.TransactionModel == FirebirdTransactionModel.AutoCommit)
                 CommitRetaining();
+        }
+
+        public bool IsRunningOutOfMigrationScope()
+        {
+            return Transaction == null;
         }
 
         #endregion
@@ -253,6 +263,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             columns.ToList().ForEach(x => LockColumn(tableName, x));
         }
+
         public void LockColumn(string tableName, string columnName)
         {
             if (!DDLTouchedColumns.ContainsKey(tableName))
@@ -284,6 +295,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             columns.ToList().ForEach(x => CheckColumn(tableName, x));
         }
+
         public void CheckColumn(string tableName, string columnName)
         {
             CheckTable(tableName);
@@ -315,13 +327,15 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             RegisterExpression(new FirebirdProcessedExpression(expression, expressionType, this) as FirebirdProcessedExpressionBase);
         }
+
         protected void RegisterExpression<T>(T expression) where T : IMigrationExpression, new()
         {
             RegisterExpression(new FirebirdProcessedExpression<T>(expression, this) as FirebirdProcessedExpressionBase);
         }
+
         protected void RegisterExpression(FirebirdProcessedExpressionBase fbExpression)
         {
-            if (!FBOptions.UndoEnabled)
+            if (!FBOptions.UndoEnabled || IsRunningOutOfMigrationScope())
                 return;
 
             if (!fbExpression.CanUndo)
@@ -364,7 +378,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             CheckColumn(expression.TableName, expression.Column.Name);
             FirebirdSchemaProvider schema = new FirebirdSchemaProvider(this);
             FirebirdTableSchema table = schema.GetTableSchema(expression.TableName);
-            ColumnDefinition colDef = table.Definition.Columns.First(x => x.Name == expression.Column.Name);
+            ColumnDefinition colDef = table.Definition.Columns.First(x => x.Name == quoter.ToFbObjectName(expression.Column.Name));
 
             //Change nullable constraint
             if (colDef.IsNullable != expression.Column.IsNullable)
@@ -853,7 +867,10 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         private string FormatToSafeName(string sqlName)
         {
-            return FormatHelper.FormatSqlEscape(quoter.UnQuote(sqlName));
+            if (quoter.IsQuoted(sqlName))
+                return FormatHelper.FormatSqlEscape(quoter.UnQuote(sqlName));
+            else
+                return FormatHelper.FormatSqlEscape(sqlName).ToUpper();
         }
 
         private string GetSequenceName(string tableName, string columnName)
@@ -880,7 +897,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 Process(sequence);
             }
             string triggerName = GetIdentityTriggerName(tableName, columnName);
-            string trigger = String.Format("as begin if (NEW.\"{0}\" is NULL) then NEW.\"{1}\" = GEN_ID({2}, 1); end", columnName, columnName, quoter.QuoteSequenceName(sequenceName));
+            string quotedColumn = quoter.Quote(columnName);
+            string trigger = String.Format("as begin if (NEW.{0} is NULL) then NEW.{1} = GEN_ID({2}, 1); end", quotedColumn, quotedColumn, quoter.QuoteSequenceName(sequenceName));
 
             PerformDBOperationExpression createTrigger = CreateTriggerExpression(tableName, triggerName, true, TriggerEvent.Insert, trigger);
             PerformDBOperationExpression deleteTrigger = DeleteTriggerExpression(tableName, triggerName);
@@ -927,6 +945,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             return CreateTriggerExpression(tableName, trigger.Name, trigger.Before, trigger.Event, trigger.Body);
         }
+
         public PerformDBOperationExpression CreateTriggerExpression(string tableName, string triggerName, bool onBefore, TriggerEvent onEvent, string triggerBody)
         {
             tableName = truncator.Truncate(tableName);
@@ -938,7 +957,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             {
                 string triggerSql = String.Format(@"CREATE TRIGGER {0} FOR {1} ACTIVE {2} {3} POSITION 0 
                     {4}
-                    ", quoter.Quote(triggerName), "\"" + tableName + "\"",
+                    ", quoter.Quote(triggerName), quoter.Quote(tableName),
                      onBefore ? "before" : "after",
                      onEvent.ToString().ToLower(),
                      triggerBody

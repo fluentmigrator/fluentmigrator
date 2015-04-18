@@ -111,6 +111,13 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        public void GetMaintenanceStageReturnsCorrectStage()
+        {
+            DefaultMigrationConventions.GetMaintenanceStage(typeof (MaintenanceAfterEach))
+                .ShouldBe(MigrationStage.AfterEach);
+        }
+
+        [Test]
         public void MigrationInfoShouldRetainMigration()
         {
             var migrationType = typeof(DefaultConventionMigrationFake);
@@ -273,6 +280,7 @@ namespace FluentMigrator.Tests.Unit
         }
     }
 
+
     [Tags("BE", "UK", "Staging", "Production")]
     public class TaggedWithBeAndUkAndProductionAndStagingInOneTagsAttribute
     {
@@ -311,4 +319,12 @@ namespace FluentMigrator.Tests.Unit
         public override void Up() { }
         public override void Down() { }
     }
+
+    [Maintenance(MigrationStage.AfterEach)]
+    internal class MaintenanceAfterEach : Migration
+    {
+        public override void Up() { }
+        public override void Down() { }
+    }
+
 }

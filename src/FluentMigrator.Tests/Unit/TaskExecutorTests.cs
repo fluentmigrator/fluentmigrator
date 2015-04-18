@@ -47,7 +47,7 @@ namespace FluentMigrator.Tests.Unit
             runnerContext.SetupGet(x => x.Task).Returns(task);
             runnerContext.SetupGet(x => x.Version).Returns(version);
             runnerContext.SetupGet(x => x.Steps).Returns(steps);
-            runnerContext.SetupGet(x => x.Target).Returns(GetType().Assembly.Location);
+            runnerContext.SetupGet(x => x.Targets).Returns(new string[] { GetType().Assembly.Location });
             runnerContext.SetupGet(x => x.Profile).Returns(profile);
             runnerContext.SetupGet(x => x.Namespace).Returns("FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3");
 
@@ -63,7 +63,7 @@ namespace FluentMigrator.Tests.Unit
             var runnerContext = new Mock<IRunnerContext>();
             runnerContext.SetupGet(x => x.Database).Returns("sqlWRONG");
             runnerContext.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
-            runnerContext.SetupGet(x => x.Target).Returns(GetType().Assembly.Location);
+            runnerContext.SetupGet(x => x.Targets).Returns(new string[] { GetType().Assembly.Location });
             runnerContext.SetupGet(x => x.Announcer).Returns(new Mock<IAnnouncer>().Object);
 
             Assert.Throws<ProcessorFactoryNotFoundException>(() => new TaskExecutor(runnerContext.Object).Execute());

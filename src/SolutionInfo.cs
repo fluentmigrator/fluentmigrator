@@ -1,9 +1,11 @@
-using System.Reflection;
-using System.Runtime.InteropServices;
-[assembly: AssemblyProduct("FluentMigrator")]
-[assembly: AssemblyCopyright("Copyright - Sean Chambers 2008-2014")]
-[assembly: AssemblyVersion("1.3.1.0")]
-[assembly: AssemblyFileVersion("1.3.1.0")]
 
+using System.Reflection;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
+using System;
+[assembly: AssemblyVersion("1.5.0.0")]
+[assembly: AssemblyFileVersion("1.5.0.0")]
+[assembly: AssemblyProduct("FluentMigrator")]
+[assembly: AssemblyCopyright("Copyright - Sean Chambers 2008-2015")]
 [assembly: AssemblyConfigurationAttribute("Debug")]
-[assembly: System.CLSCompliantAttribute(true)]
+[assembly: CLSCompliant(true)]

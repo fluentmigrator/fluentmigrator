@@ -40,7 +40,7 @@ namespace FluentMigrator.Tests.Helpers
 
         public void Dispose()
         {
-            if(Connection.State == System.Data.ConnectionState.Open && !processor.WasCommitted)
+            if (Connection.State == System.Data.ConnectionState.Open && !processor.WasCommitted)
                 Drop();
         }
 
@@ -63,10 +63,10 @@ namespace FluentMigrator.Tests.Helpers
             sb.Append(")");
 
             var s = sb.ToString();
-            
+
             using (var command = new FbCommand(s, Connection, Transaction))
                 command.ExecuteNonQuery();
-            
+
             processor.AutoCommit();
 
             processor.LockTable(Name);
