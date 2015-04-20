@@ -28,7 +28,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 {
     public sealed class SqlServerProcessor : GenericProcessorBase
     {
-        private const string SCHEMA_EXISTS = 
+        private const string SCHEMA_EXISTS =
 @"SELECT CASE WHEN EXISTS (SELECT * FROM sys.schemas WHERE NAME = '{0}') 
 THEN 1 
     ELSE 0 
@@ -154,7 +154,7 @@ END";
             using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             using (var reader = command.ExecuteReader())
             {
-                return reader.Read();
+                return reader.Read() && reader.GetInt32(0) == 1;
             }
         }
 
