@@ -290,6 +290,14 @@
     <Compile Include="Versioning\VersionMigration.cs" />
     <Compile Include="VersionLoader.cs" />
     <Compile Include="VersionOrderInvalidException.cs" />
+    <Compile Include="Generators\Redshift\RedshiftGenerator.cs" />
+    <Compile Include="Generators\Redshift\RedshiftColumn.cs" />
+    <Compile Include="Generators\Redshift\RedshiftTypeMap.cs" />
+    <Compile Include="Processors\Redshift\RedshiftProcessorFactory.cs" />
+    <Compile Include="Processors\Redshift\RedshiftProcessor.cs" />
+    <Compile Include="Processors\Redshift\RedshiftDbFactory.cs" />
+    <Compile Include="Generators\Redshift\RedshiftQuoter.cs" />
+    <Compile Include="Generators\Redshift\PostgresDescriptionGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj">
@@ -389,4 +397,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Folder Include="Processors\Redshift\" />
+  </ItemGroup>
 </Project>
