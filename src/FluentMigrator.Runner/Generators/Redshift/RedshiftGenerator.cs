@@ -9,24 +9,30 @@ using FluentMigrator.Runner.Generators.PostgresBase;
 
 namespace FluentMigrator.Runner.Generators.Redshift
 {
-    public class RedshiftGenerator : PostgresBaseGenerator  
+    public class RedshiftGenerator : PostgresBaseGenerator
     {
-        public RedshiftGenerator () : base(new RedshiftColumn(), new RedshiftQuoter(), new RedshiftDescriptionGenerator())
+        public RedshiftGenerator()
+            : base(new RedshiftColumn(), new RedshiftQuoter(), new RedshiftDescriptionGenerator())
         {
         }
 
-        public override string Generate(CreateIndexExpression expression) {
-            return string.Empty;
-        }
-        public override string Generate(DeleteIndexExpression expression) {
-            return string.Empty;
-        }
-
-        public override string Generate(CreateSequenceExpression expression) {
+        public override string Generate(CreateIndexExpression expression)
+        {
             return string.Empty;
         }
 
-        public override string Generate(DeleteSequenceExpression expression) {
+        public override string Generate(DeleteIndexExpression expression)
+        {
+            return string.Empty;
+        }
+
+        public override string Generate(CreateSequenceExpression expression)
+        {
+            return string.Empty;
+        }
+
+        public override string Generate(DeleteSequenceExpression expression)
+        {
             return string.Empty;
         }
     }
