@@ -598,4 +598,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Folder Include="Unit\Generators\Redshift\" />
+  </ItemGroup>
 </Project>

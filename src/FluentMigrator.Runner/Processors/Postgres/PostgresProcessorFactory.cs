@@ -1,6 +1,6 @@
 ﻿namespace FluentMigrator.Runner.Processors.Postgres
 {
-    using Generators.Postgres;
+    using FluentMigrator.Runner.Generators.Postgres;
 
     public class PostgresProcessorFactory : MigrationProcessorFactory
     {

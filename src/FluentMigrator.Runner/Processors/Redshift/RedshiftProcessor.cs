@@ -3,7 +3,7 @@ using System.Data;
 using System.IO;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Runner.Generators.Redshift;
-using FluentMigrator.Runner.Generators.Postgres;
+using FluentMigrator.Runner.Generators.PostgresBase;
 using FluentMigrator.Runner.Helpers;
 
 namespace FluentMigrator.Runner.Processors.Redshift

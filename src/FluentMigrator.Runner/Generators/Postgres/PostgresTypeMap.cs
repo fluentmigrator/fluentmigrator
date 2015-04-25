@@ -1,9 +1,9 @@
 ﻿using System.Data;
 using FluentMigrator.Runner.Generators.Base;
 
-namespace FluentMigrator.Runner.Generators.Postgres
+namespace FluentMigrator.Runner.Generators.PostgresBase
 {
-    internal class PostgresTypeMap : TypeMapBase
+    public class PostgresTypeMap : TypeMapBase
     {
         private const int DecimalCapacity = 1000;
         private const int PostgresMaxVarcharSize = 10485760;

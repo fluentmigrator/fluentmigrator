@@ -4,7 +4,7 @@ using System.Data;
 
 namespace FluentMigrator.Runner.Generators.Base
 {
-    internal abstract class TypeMapBase : ITypeMap
+    public abstract class TypeMapBase : ITypeMap
     {
         private readonly Dictionary<DbType, SortedList<int, string>> _templates = new Dictionary<DbType, SortedList<int, string>>();
         private const string SizePlaceholder = "$size";

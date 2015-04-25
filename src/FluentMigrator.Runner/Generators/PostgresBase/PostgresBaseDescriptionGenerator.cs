@@ -3,19 +3,19 @@ using System.Collections.Generic;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Generic;
 
-namespace FluentMigrator.Runner.Generators.Redshift
+namespace FluentMigrator.Runner.Generators.PostgresBase
 {
     /// <summary>
     /// almost copied from OracleDescriptionGenerator,
     /// modified for escaping table description
     /// </summary>
-    public class RedshiftDescriptionGenerator : GenericDescriptionGenerator
+    public class PostgresBaseDescriptionGenerator : GenericDescriptionGenerator
     {
         private readonly IQuoter _quoter;
 
-        public RedshiftDescriptionGenerator()
+        public PostgresBaseDescriptionGenerator(IQuoter quoter)
         {
-            _quoter = new RedshiftQuoter();
+            _quoter = quoter;
         }
 
         protected IQuoter Quoter

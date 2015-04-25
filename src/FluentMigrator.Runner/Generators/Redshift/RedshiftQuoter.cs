@@ -1,24 +1,10 @@
-using FluentMigrator.Runner.Generators.Generic;
+using System;
+using FluentMigrator.Runner.Generators.PostgresBase;
 
-namespace FluentMigrator.Runner.Generators.Redshift
+namespace FluentMigrator.Runner.Generators.Redshift 
 {
-    public class RedshiftQuoter : GenericQuoter
+    public class RedshiftQuoter : PostgresBaseQuoter
     {
-        public override string FormatBool(bool value) { return value ? "true" : "false"; }
-
-        public override string QuoteSchemaName(string schemaName)
-        {
-            if (string.IsNullOrEmpty(schemaName))
-                schemaName = "public";
-            return base.QuoteSchemaName(schemaName);
-        }
-
-        public string UnQuoteSchemaName(string quoted)
-        {
-            if (string.IsNullOrEmpty(quoted))
-                return "public";
-
-            return UnQuote(quoted);
-        }
     }
 }
+
