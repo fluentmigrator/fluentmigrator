@@ -296,15 +296,11 @@
     <Compile Include="Processors\Redshift\RedshiftProcessor.cs" />
     <Compile Include="Processors\Redshift\RedshiftDbFactory.cs" />
     <Compile Include="Generators\Redshift\RedshiftQuoter.cs" />
-    <Compile Include="Generators\Postgres\PostgresColumn.cs" />
     <Compile Include="Generators\PostgresBase\PostgresBaseColumn.cs" />
     <Compile Include="Generators\PostgresBase\PostgresBaseGenerator.cs" />
     <Compile Include="Generators\PostgresBase\PostgresBaseQuoter.cs" />
-    <Compile Include="Generators\Postgres\PostgresQuoter.cs" />
     <Compile Include="Generators\PostgresBase\PostgresBaseDescriptionGenerator.cs" />
     <Compile Include="Generators\Postgres\PostgresDescriptionGenerator.cs" />
-    <Compile Include="Generators\Postgres\PostgresGenerator.cs" />
-    <Compile Include="Generators\Postgres\PostgresTypeMap.cs" />
     <Compile Include="Generators\Redshift\RedshiftDescriptionGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
