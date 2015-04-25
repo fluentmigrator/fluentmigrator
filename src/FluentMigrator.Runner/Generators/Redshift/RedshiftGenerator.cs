@@ -16,10 +16,18 @@ namespace FluentMigrator.Runner.Generators.Redshift
         }
 
         public override string Generate(CreateIndexExpression expression) {
-            return "";
+            return string.Empty;
         }
         public override string Generate(DeleteIndexExpression expression) {
-            return "";
+            return string.Empty;
+        }
+
+        public override string Generate(CreateSequenceExpression expression) {
+            return string.Empty;
+        }
+
+        public override string Generate(DeleteSequenceExpression expression) {
+            return string.Empty;
         }
     }
 }
