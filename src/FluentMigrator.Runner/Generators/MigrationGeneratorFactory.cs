@@ -28,7 +28,7 @@ namespace FluentMigrator.Runner.Generators
                     var factory = (IMigrationGenerator) Activator.CreateInstance(type);
                     available.Add(type.Name.Replace("Generator", ""), factory);
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
                     //can't add generators that require construtor parameters
                 }
