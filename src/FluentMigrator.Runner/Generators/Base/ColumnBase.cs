@@ -103,7 +103,7 @@ namespace FluentMigrator.Runner.Generators.Base
             //CAUTION: this must execute before we set the values of primarykey to false; Beware of yield return
             IEnumerable<ColumnDefinition> primaryKeyColumns = columns.Where(x => x.IsPrimaryKey);
 
-            if (ShouldPrimaryKeysBeAddedSeparatley(primaryKeyColumns))
+            if (ShouldPrimaryKeysBeAddedSeparately(primaryKeyColumns))
             {
                 primaryKeyString = AddPrimaryKeyConstraint(tableName, primaryKeyColumns);
                 foreach (ColumnDefinition column in columns) { column.IsPrimaryKey = false; }
@@ -112,7 +112,7 @@ namespace FluentMigrator.Runner.Generators.Base
             return String.Join(", ", columns.Select(x => Generate(x)).ToArray()) + primaryKeyString;
         }
 
-        public virtual bool ShouldPrimaryKeysBeAddedSeparatley(IEnumerable<ColumnDefinition> primaryKeyColumns)
+        public virtual bool ShouldPrimaryKeysBeAddedSeparately(IEnumerable<ColumnDefinition> primaryKeyColumns)
         {
             //By default always try to add primary keys as a separate constraint if any exist
             return primaryKeyColumns.Any(x => x.IsPrimaryKey);
