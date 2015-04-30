@@ -18,6 +18,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         public static string TestTableDescription = "TestDescription";
         public static string TestColumn1Description = "TestColumn1Description";
         public static string TestColumn2Description = "TestColumn2Description";
+        public static string TestColumnCollationName = "Latin1_General_CS_AS";
         public static Guid TestGuid = Guid.NewGuid();
 
         public static CreateTableExpression GetCreateTableExpression()
@@ -331,8 +332,16 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         public static CreateColumnExpression GetCreateColumnExpressionWithDescription()
         {
-            ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, Type = DbType.String, Size = 5, ColumnDescription = TestColumn1Description };
-            return new CreateColumnExpression { TableName = TestTableName1, Column = column };
+            CreateColumnExpression columnExpression = GetCreateColumnExpression();
+            columnExpression.Column.ColumnDescription = TestColumn1Description;
+            return columnExpression;
+        }
+
+        public static CreateColumnExpression GetCreateColumnExpressionWithCollation()
+        {
+            CreateColumnExpression columnExpression = GetCreateColumnExpression();
+            columnExpression.Column.CollationName = TestColumnCollationName;
+            return columnExpression;
         }
 
         public static CreateColumnExpression GetAlterTableAutoIncrementColumnExpression()
@@ -351,18 +360,18 @@ namespace FluentMigrator.Tests.Unit.Generators
             return new AlterTableExpression() {TableName = TestTableName1 };
         }
 
-        public static AlterColumnExpression GetAlterColumnAddAutoIncrementExpression()
-        {
-            ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, IsIdentity = true, IsPrimaryKey = true, Type = DbType.Int32 };
-            return new AlterColumnExpression { TableName = TestTableName1, Column = column };
-        }
-
         public static RenameTableExpression GetRenameTableExpression()
         {
             var expression = new RenameTableExpression();
             expression.OldName = TestTableName1;
             expression.NewName = TestTableName2;
             return expression;
+        }
+
+        public static AlterColumnExpression GetAlterColumnAddAutoIncrementExpression()
+        {
+            ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, IsIdentity = true, IsPrimaryKey = true, Type = DbType.Int32 };
+            return new AlterColumnExpression { TableName = TestTableName1, Column = column };
         }
 
         public static AlterColumnExpression GetAlterColumnExpression()
@@ -384,7 +393,13 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             var columnExpression = GetAlterColumnExpression();
             columnExpression.Column.ColumnDescription = TestColumn1Description;
+            return columnExpression;
+        }
 
+        public static AlterColumnExpression GetAlterColumnExpressionWithCollation()
+        {
+            var columnExpression = GetAlterColumnExpression();
+            columnExpression.Column.CollationName = TestColumnCollationName;
             return columnExpression;
         }
 

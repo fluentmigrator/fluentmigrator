@@ -333,5 +333,25 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
                             "GO" + Environment.NewLine +
                             "IF EXISTS (SELECT * FROM fn_listextendedproperty(N'MS_Description', N'SCHEMA', N'dbo', N'TABLE', N'TestTable1', N'Column', N'TestColumn1' )) EXEC sys.sp_dropextendedproperty @name=N'MS_Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1'" + Environment.NewLine);
         }
+
+        [Test]
+        public void CanCreateColumnWithCollation()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithCollation();
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe(@"ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5) COLLATE " + GeneratorTestHelper.TestColumnCollationName + " NOT NULL");
+        }
+
+        [Test]
+        public void CanAlterColumnWithCollation()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpressionWithCollation();
+
+            var result = Generator.Generate(expression);
+
+            result.ShouldBe(@"ALTER TABLE [dbo].[TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) COLLATE " + GeneratorTestHelper.TestColumnCollationName + " NOT NULL");
+        }
     }
 }

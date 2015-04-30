@@ -16,7 +16,7 @@ namespace FluentMigrator.Runner.Generators.Base
         {
             _typeMap = typeMap;
             _quoter = quoter;
-            ClauseOrder = new List<Func<ColumnDefinition, string>> { FormatString, FormatType, FormatNullable, FormatDefaultValue, FormatPrimaryKey, FormatIdentity };
+            ClauseOrder = new List<Func<ColumnDefinition, string>> { FormatString, FormatType, FormatCollation, FormatNullable, FormatDefaultValue, FormatPrimaryKey, FormatIdentity };
         }
 
         protected string GetTypeMap(DbType value, int size, int precision)
@@ -78,6 +78,18 @@ namespace FluentMigrator.Runner.Generators.Base
         {
             //Most Generators allow for adding primary keys as a constrint
             return string.Empty;
+        }
+
+        protected virtual string FormatCollation(ColumnDefinition column)
+        {
+            if (!string.IsNullOrEmpty(column.CollationName))
+            {
+                return "COLLATE " + column.CollationName;
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
 
         public virtual string Generate(ColumnDefinition column)
