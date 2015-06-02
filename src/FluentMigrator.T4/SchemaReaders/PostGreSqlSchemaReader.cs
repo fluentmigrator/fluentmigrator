@@ -136,8 +136,9 @@ select indlst.relname as indname,indlst.oid as indoid,indlst.indkey as indkey,tb
     where ns.nspname='{0}' and i.indisprimary = false) as indlst
   inner join (select i.indexrelid,c.oid,c.relname from pg_index as i
     inner join pg_class as c on i.indrelid=c.oid
+    where c.relname='{1}'
     ) as tbllst on indlst.oid = tbllst.indexrelid
-", schemaName);
+", schemaName, tableName);
             var colquery = @"
 select att.attrelid,att.attname,att.attnum from pg_attribute as att
     where att.attnum>0
