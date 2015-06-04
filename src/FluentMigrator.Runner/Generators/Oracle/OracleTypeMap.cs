@@ -23,23 +23,27 @@ namespace FluentMigrator.Runner.Generators.Oracle
 {
     internal class OracleTypeMap : TypeMapBase
     {
-        public const int AnsiStringCapacity = 2000;
-        public const int AnsiTextCapacity = 2147483647;
-        public const int UnicodeStringCapacity = 2000;
+        // See https://docs.oracle.com/cd/B28359_01/server.111/b28320/limits001.htm#i287903 
+        // and http://docs.oracle.com/cd/B19306_01/server.102/b14220/datatype.htm#i13446
+        // for limits in Oracle data types. 
+        public const int CharStringCapacity = 2000;    
+        public const int AnsiStringCapacity = 4000;
+        public const int AnsiTextCapacity = int.MaxValue;
+        public const int UnicodeStringCapacity = 4000;
+        public const int RawCapacity = 2000;
         public const int UnicodeTextCapacity = int.MaxValue;
-        public const int BlobCapacity = 2147483647;
+        public const int BlobCapacity = int.MaxValue;
         public const int DecimalCapacity = 38;
-        public const int XmlCapacity = 1073741823;
-
+        
         protected override void SetupTypeMaps()
         {
             SetTypeMap(DbType.AnsiStringFixedLength, "CHAR(255 CHAR)");
-            SetTypeMap(DbType.AnsiStringFixedLength, "CHAR($size CHAR)", AnsiStringCapacity);
+            SetTypeMap(DbType.AnsiStringFixedLength, "CHAR($size CHAR)", CharStringCapacity);
             SetTypeMap(DbType.AnsiString, "VARCHAR2(255 CHAR)");
             SetTypeMap(DbType.AnsiString, "VARCHAR2($size CHAR)", AnsiStringCapacity);
             SetTypeMap(DbType.AnsiString, "CLOB", AnsiTextCapacity);
             SetTypeMap(DbType.Binary, "RAW(2000)");
-            SetTypeMap(DbType.Binary, "RAW($size)", AnsiStringCapacity);
+            SetTypeMap(DbType.Binary, "RAW($size)", RawCapacity);
             SetTypeMap(DbType.Binary, "RAW(MAX)", AnsiTextCapacity);
             SetTypeMap(DbType.Binary, "BLOB", BlobCapacity);
             SetTypeMap(DbType.Boolean, "NUMBER(1,0)");
@@ -56,7 +60,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             SetTypeMap(DbType.Int64, "NUMBER(19,0)");
             SetTypeMap(DbType.Single, "FLOAT(24)");
             SetTypeMap(DbType.StringFixedLength, "NCHAR(255)");
-            SetTypeMap(DbType.StringFixedLength, "NCHAR($size)", UnicodeStringCapacity);
+            SetTypeMap(DbType.StringFixedLength, "NCHAR($size)", CharStringCapacity);
             SetTypeMap(DbType.String, "NVARCHAR2(255)");
             SetTypeMap(DbType.String, "NVARCHAR2($size)", UnicodeStringCapacity);
             SetTypeMap(DbType.String, "NCLOB", UnicodeTextCapacity);
