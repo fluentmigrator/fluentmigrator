@@ -21,19 +21,19 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Oracle
 {
-    internal class OracleTypeMap : TypeMapBase
+    public class OracleTypeMap : TypeMapBase
     {
         // See https://docs.oracle.com/cd/B28359_01/server.111/b28320/limits001.htm#i287903 
         // and http://docs.oracle.com/cd/B19306_01/server.102/b14220/datatype.htm#i13446
         // for limits in Oracle data types. 
-        public const int CharStringCapacity = 2000;    
         public const int AnsiStringCapacity = 4000;
         public const int AnsiTextCapacity = int.MaxValue;
-        public const int UnicodeStringCapacity = 4000;
-        public const int RawCapacity = 2000;
-        public const int UnicodeTextCapacity = int.MaxValue;
         public const int BlobCapacity = int.MaxValue;
+        public const int CharStringCapacity = 2000;
         public const int DecimalCapacity = 38;
+        public const int RawCapacity = 2000;
+        public const int UnicodeStringCapacity = 4000;
+        public const int UnicodeTextCapacity = int.MaxValue;
         
         protected override void SetupTypeMaps()
         {
@@ -43,8 +43,8 @@ namespace FluentMigrator.Runner.Generators.Oracle
             SetTypeMap(DbType.AnsiString, "VARCHAR2($size CHAR)", AnsiStringCapacity);
             SetTypeMap(DbType.AnsiString, "CLOB", AnsiTextCapacity);
             SetTypeMap(DbType.Binary, "RAW(2000)");
-            SetTypeMap(DbType.Binary, "RAW($size)", RawCapacity);
-            SetTypeMap(DbType.Binary, "RAW(MAX)", AnsiTextCapacity);
+            SetTypeMap(DbType.Binary, "RAW($size)", RawCapacity-1);
+            SetTypeMap(DbType.Binary, "RAW(MAX)", RawCapacity);
             SetTypeMap(DbType.Binary, "BLOB", BlobCapacity);
             SetTypeMap(DbType.Boolean, "NUMBER(1,0)");
             SetTypeMap(DbType.Byte, "NUMBER(3,0)");

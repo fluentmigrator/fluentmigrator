@@ -423,6 +423,7 @@
     <Compile Include="Unit\Generators\Oracle\OracleSchemaTests.cs" />
     <Compile Include="Unit\Generators\Oracle\OracleSequenceTests.cs" />
     <Compile Include="Unit\Generators\Oracle\OracleTableTests.cs" />
+    <Compile Include="Unit\Generators\Oracle\OracleTypeMapTests.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresColumnTests.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresConstraintsTests.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresDataTests.cs" />
