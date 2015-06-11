@@ -25,54 +25,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         // and http://docs.oracle.com/cd/B19306_01/server.102/b14220/datatype.htm#i13446
         // for limits in Oracle data types. 
         [Test]
-        public void AnsiStringCapacityIs4000()
-        {
-            OracleTypeMap.AnsiStringCapacity.ShouldBe(4000);
-        }
-
-        [Test]
-        public void AnsiTextCapacityIsIntMaxValue()
-        {
-            OracleTypeMap.AnsiTextCapacity.ShouldBe(int.MaxValue);
-        }
-
-        [Test]
-        public void BlobCapacityIsIntMaxValue()
-        {
-            OracleTypeMap.BlobCapacity.ShouldBe(int.MaxValue);
-        }
-
-        [Test]
-        public void CharStringCapacityIs2000()
-        {
-            OracleTypeMap.CharStringCapacity.ShouldBe(2000);
-        }
-
-        [Test]
-        public void DecimalCapacityIs38()
-        {
-            OracleTypeMap.DecimalCapacity.ShouldBe(38);
-        }
-
-        [Test]
-        public void RawCapacityIs2000()
-        {
-            OracleTypeMap.RawCapacity.ShouldBe(2000);
-        }
-
-        [Test]
-        public void UnicodeStringCapacityIs4000()
-        {
-            OracleTypeMap.UnicodeStringCapacity.ShouldBe(4000);
-        }
-
-        [Test]
-        public void UnicodeTextCapacityIsIntMaxValue()
-        {
-            OracleTypeMap.UnicodeTextCapacity.ShouldBe(int.MaxValue);
-        }
-
-        [Test]
         public void AnsiStringDefaultIsVarchar2_255()
         {
             _typeMap.GetTypeMap(DbType.AnsiString, 0, 0).ShouldBe("VARCHAR2(255 CHAR)");
@@ -112,14 +64,9 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public void BinaryOfSizeIsRawOfSize()
         {
-            _typeMap.GetTypeMap(DbType.Binary, 1999, 0).ShouldBe("RAW(1999)");
+            _typeMap.GetTypeMap(DbType.Binary, 2000, 0).ShouldBe("RAW(2000)");
         }
 
-        [Test]
-        public void Binary2000IsRawMax()
-        {
-            _typeMap.GetTypeMap(DbType.Binary, 2000, 0).ShouldBe("RAW(MAX)");
-        }
 
         [Test]
         public void BinaryOver2000IsBlob()

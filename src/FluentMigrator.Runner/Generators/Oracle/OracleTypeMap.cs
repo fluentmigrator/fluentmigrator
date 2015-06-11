@@ -43,8 +43,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             SetTypeMap(DbType.AnsiString, "VARCHAR2($size CHAR)", AnsiStringCapacity);
             SetTypeMap(DbType.AnsiString, "CLOB", AnsiTextCapacity);
             SetTypeMap(DbType.Binary, "RAW(2000)");
-            SetTypeMap(DbType.Binary, "RAW($size)", RawCapacity-1);
-            SetTypeMap(DbType.Binary, "RAW(MAX)", RawCapacity);
+            SetTypeMap(DbType.Binary, "RAW($size)", RawCapacity);
             SetTypeMap(DbType.Binary, "BLOB", BlobCapacity);
             SetTypeMap(DbType.Boolean, "NUMBER(1,0)");
             SetTypeMap(DbType.Byte, "NUMBER(3,0)");
