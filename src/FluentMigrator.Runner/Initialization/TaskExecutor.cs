@@ -18,8 +18,12 @@
 
 using System;
 using FluentMigrator.Exceptions;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Infrastructure;
+using System.Reflection;
+using System.Collections.Generic;
 
 namespace FluentMigrator.Runner.Initialization
 {
@@ -48,11 +52,23 @@ namespace FluentMigrator.Runner.Initialization
 
         protected virtual void Initialize()
         {
-            var assembly = AssemblyLoaderFactory.GetAssemblyLoader(RunnerContext.Target).Load();
-            var connectionString = LoadConnectionString(assembly.Location);
-            var processor = InitializeProcessor(assembly.Location, connectionString);
+            List<Assembly> assemblies = new List<Assembly>();
 
-            Runner = new MigrationRunner(assembly, RunnerContext, processor);
+            foreach (var target in RunnerContext.Targets)
+            {
+                var assembly = AssemblyLoaderFactory.GetAssemblyLoader(target).Load();
+
+                if (!assemblies.Contains(assembly))
+                {
+                    assemblies.Add(assembly);
+                }
+            }
+
+            var assemblyCollection = new AssemblyCollection(assemblies);
+
+            var processor = RunnerContext.NoConnection? InitializeConnectionlessProcessor():InitializeProcessor(assemblyCollection);
+
+            Runner = new MigrationRunner(assemblyCollection, RunnerContext, processor);
         }
 
         public void Execute()
@@ -98,14 +114,33 @@ namespace FluentMigrator.Runner.Initialization
             RunnerContext.Announcer.Say("Task completed.");
         }
 
-        private IMigrationProcessor InitializeProcessor(string assemblyLocation, string connectionString)
+        private IMigrationProcessor InitializeConnectionlessProcessor()
         {
+            var options = new ProcessorOptions
+            {
+                PreviewOnly = RunnerContext.PreviewOnly,
+                Timeout = RunnerContext.Timeout,
+                ProviderSwitches = RunnerContext.ProviderSwitches
+            };
+
+            var generator = new MigrationGeneratorFactory().GetGenerator(RunnerContext.Database);
+
+            var processor = new ConnectionlessProcessor(generator, RunnerContext, options);
+
+            return processor;
+        }
+
+        private IMigrationProcessor InitializeProcessor(IAssemblyCollection assemblyCollection)
+        {
+
             if (RunnerContext.Timeout == 0)
             {
                 RunnerContext.Timeout = 30; // Set default timeout for command
             }
 
+            var connectionString = LoadConnectionString(assemblyCollection);
             var processorFactory = ProcessorFactoryProvider.GetFactory(RunnerContext.Database);
+
             if (processorFactory == null)
                 throw new ProcessorFactoryNotFoundException(string.Format("The provider or dbtype parameter is incorrect. Available choices are {0}: ", ProcessorFactoryProvider.ListAvailableProcessorTypes()));
 
@@ -119,10 +154,13 @@ namespace FluentMigrator.Runner.Initialization
             return processor;
         }
 
-        private string LoadConnectionString(string assemblyLocation)
+        private string LoadConnectionString(IAssemblyCollection assemblyCollection)
         {
+            var singleAssembly = (assemblyCollection != null && assemblyCollection.Assemblies != null && assemblyCollection.Assemblies.Length == 1) ? assemblyCollection.Assemblies[0] : null;
+            var singleAssemblyLocation = singleAssembly != null ? singleAssembly.Location : string.Empty;
+
             var manager = new ConnectionStringManager(new NetConfigManager(), RunnerContext.Announcer, RunnerContext.Connection,
-                                                      RunnerContext.ConnectionStringConfigPath, assemblyLocation,
+                                                      RunnerContext.ConnectionStringConfigPath, singleAssemblyLocation,
                                                       RunnerContext.Database);
 
             manager.LoadConnectionString();

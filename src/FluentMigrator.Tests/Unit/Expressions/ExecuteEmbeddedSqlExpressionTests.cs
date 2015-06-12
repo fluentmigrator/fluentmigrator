@@ -27,7 +27,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ExecutesTheStatement()
         {
-            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = testSqlScript, MigrationAssembly = Assembly.GetExecutingAssembly() };
+            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = testSqlScript, MigrationAssemblies = new SingleAssembly(Assembly.GetExecutingAssembly()) };
 
             var processor = new Mock<IMigrationProcessor>();
             processor.Setup(x => x.Execute(scriptContents)).Verifiable();
@@ -39,7 +39,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ResourceFinderIsCaseInsensitive()
         {
-            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = testSqlScript.ToUpper(), MigrationAssembly = Assembly.GetExecutingAssembly() };
+            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = testSqlScript.ToUpper(), MigrationAssemblies = new SingleAssembly(Assembly.GetExecutingAssembly()) };
             var processor = new Mock<IMigrationProcessor>();
             processor.Setup(x => x.Execute(scriptContents)).Verifiable();
 
@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ResourceFinderFindFileWithFullName()
         {
-            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = "InitialSchema.sql", MigrationAssembly = Assembly.GetExecutingAssembly() };
+            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = "InitialSchema.sql", MigrationAssemblies = new SingleAssembly(Assembly.GetExecutingAssembly()) };
             var processor = new Mock<IMigrationProcessor>();
             processor.Setup(x => x.Execute("InitialSchema")).Verifiable();
 
@@ -61,7 +61,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ResourceFinderFindFileWithFullNameAndNamespace()
         {
-            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = "FluentMigrator.Tests.EmbeddedResources.InitialSchema.sql", MigrationAssembly = Assembly.GetExecutingAssembly() };
+            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = "FluentMigrator.Tests.EmbeddedResources.InitialSchema.sql", MigrationAssemblies = new SingleAssembly(Assembly.GetExecutingAssembly()) };
             var processor = new Mock<IMigrationProcessor>();
             processor.Setup(x => x.Execute("InitialSchema")).Verifiable();
 
@@ -72,7 +72,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ResourceFinderFindThrowsExceptionIfFoundMoreThenOneResource()
         {
-            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = "NotUniqueResource.sql", MigrationAssembly = Assembly.GetExecutingAssembly() };
+            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = "NotUniqueResource.sql", MigrationAssemblies = new SingleAssembly(Assembly.GetExecutingAssembly()) };
             var processor = new Mock<IMigrationProcessor>();
 
             Assert.Throws<InvalidOperationException>(() => expression.ExecuteWith(processor.Object));

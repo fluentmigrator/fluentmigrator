@@ -24,10 +24,14 @@ namespace FluentMigrator.Infrastructure
     /// </summary>
     public class NonAttributedMigrationToMigrationInfoAdapter : IMigrationInfo
     {
-        public NonAttributedMigrationToMigrationInfoAdapter(IMigration migration)
+        public NonAttributedMigrationToMigrationInfoAdapter(IMigration migration) : this(migration, TransactionBehavior.Default)
+        {}
+
+        public NonAttributedMigrationToMigrationInfoAdapter(IMigration migration, TransactionBehavior transactionBehavior)
         {
-            if (migration == null) throw new ArgumentNullException("migration");
+             if (migration == null) throw new ArgumentNullException("migration");
             Migration = migration;
+            TransactionBehavior = transactionBehavior;
         }
 
         public string Description { get; private set; }
@@ -37,10 +41,7 @@ namespace FluentMigrator.Infrastructure
             get { return -1; }
         }
 
-        public TransactionBehavior TransactionBehavior
-        {
-            get { return TransactionBehavior.Default; }
-        }
+        public TransactionBehavior TransactionBehavior { get; private set;}
 
         public IMigration Migration { get; private set; }
 

@@ -7,6 +7,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.VersionTableInfo;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Runner
@@ -20,22 +21,27 @@ namespace FluentMigrator.Runner
         private IVersionInfo _versionInfo;
         private IMigrationConventions Conventions { get; set; }
         private IMigrationProcessor Processor { get; set; }
-        protected Assembly Assembly { get; set; }
+        protected IAssemblyCollection Assemblies { get; set; }
         public IVersionTableMetaData VersionTableMetaData { get; private set; }
         public IMigrationRunner Runner { get; set; }
         public VersionSchemaMigration VersionSchemaMigration { get; private set; }
         public IMigration VersionMigration { get; private set; }
         public IMigration VersionUniqueMigration { get; private set; }
         public IMigration VersionDescriptionMigration { get; private set; }
-        
-        public VersionLoader(IMigrationRunner runner, IRunnerContext runnerContext, Assembly assembly, IMigrationConventions conventions)
+
+        public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions)
+          : this(runner, new SingleAssembly(assembly), conventions)
+        {
+        }
+
+        public VersionLoader(IMigrationRunner runner, IAssemblyCollection assemblies, IMigrationConventions conventions)
         {
             Runner = runner;
             Processor = runner.Processor;
-            Assembly = assembly;
+            Assemblies = assemblies;
 
             Conventions = conventions;
-            VersionTableMetaData = GetVersionTableMetaData(runnerContext);
+            VersionTableMetaData = GetVersionTableMetaData();
             VersionMigration = new VersionMigration(VersionTableMetaData);
             VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
             VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
@@ -59,10 +65,10 @@ namespace FluentMigrator.Runner
             dataExpression.ExecuteWith(Processor);
         }
 
-        public IVersionTableMetaData GetVersionTableMetaData(IRunnerContext runnerContext)
+        public IVersionTableMetaData GetVersionTableMetaData()
         {
-            Type matchedType = TypeFinder
-                .FindTypes(Assembly, runnerContext.Namespace, runnerContext.NestedNamespaces)
+            Type matchedType = Assemblies.GetExportedTypes()
+                .FilterByNamespace(Runner.RunnerContext.Namespace, Runner.RunnerContext.NestedNamespaces)
                 .FirstOrDefault(t => Conventions.TypeIsVersionTableMetaData(t));
 
             if (matchedType == null)
@@ -72,7 +78,7 @@ namespace FluentMigrator.Runner
 
             var versionTableMetaData = (IVersionTableMetaData)Activator.CreateInstance(matchedType);
 
-            versionTableMetaData.ApplicationContext = runnerContext.ApplicationContext;
+            versionTableMetaData.ApplicationContext = Runner.RunnerContext.ApplicationContext;
 
             return versionTableMetaData;
         }

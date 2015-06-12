@@ -6,23 +6,21 @@ using System.Reflection;
 namespace FluentMigrator.Runner
 {
     /// <summary>
-    /// Helper class simplifying searching for types in assemblies.
+    /// Advanced searching and filtration of types collections.
     /// </summary>
-    class TypeFinder
+    static class TypeFinder
     {
         /// <summary>
-        /// Enumerates all types in the specified assembly located in the specifying namespace and optionally in nested namespaces
+        /// Searches for types located in the specifying namespace and optionally in its nested namespaces.
         /// </summary>
-        /// <param name="assembly">Assembly to search for types in.</param>
+        /// <param name="types">Source types collection to search in.</param>
         /// <param name="namespace">Namespace to search types in. Set to null or empty string to search in all namespaces.</param>
         /// <param name="loadNestedNamespaces">Set to true to search for types located in nested namespaces of <paramref name="namespace"/>.
         /// This parameter is ignored if <paramref name="namespace"/> is null or empty string.
         /// </param>
-        /// <returns>Enumerable list of all types found.</returns>
-        public static IEnumerable<Type> FindTypes(Assembly assembly, string @namespace, bool loadNestedNamespaces)
+        /// <returns>Collection of types matching specified criteria.</returns>
+        public static IEnumerable<Type> FilterByNamespace(this IEnumerable<Type> types, string @namespace, bool loadNestedNamespaces)
         {
-            IEnumerable<Type> types = assembly.GetExportedTypes();
-
             if (!string.IsNullOrEmpty(@namespace))
             {
                 Func<Type, bool> shouldInclude = t => t.Namespace == @namespace;

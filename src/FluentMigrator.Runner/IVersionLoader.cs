@@ -7,7 +7,7 @@ namespace FluentMigrator.Runner
         bool AlreadyCreatedVersionSchema { get; }
         bool AlreadyCreatedVersionTable { get; }
         void DeleteVersion(long version);
-        FluentMigrator.VersionTableInfo.IVersionTableMetaData GetVersionTableMetaData(IRunnerContext runnerContext);
+        FluentMigrator.VersionTableInfo.IVersionTableMetaData GetVersionTableMetaData();
         void LoadVersionInfo();
         void RemoveVersionTable();
         IMigrationRunner Runner { get; set; }

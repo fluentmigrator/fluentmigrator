@@ -72,7 +72,7 @@ namespace FluentMigrator.Tests.Unit
             _runnerContextMock.SetupGet(x => x.Namespace).Returns("FluentMigrator.Tests.Integration.Migrations");
             _runnerContextMock.SetupGet(x => x.Announcer).Returns(_announcer.Object);
             _runnerContextMock.SetupGet(x => x.StopWatch).Returns(_stopWatch.Object);
-            _runnerContextMock.SetupGet(x => x.Target).Returns(Assembly.GetExecutingAssembly().ToString());
+            _runnerContextMock.SetupGet(x => x.Targets).Returns(new string[] { Assembly.GetExecutingAssembly().ToString()});
             _runnerContextMock.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
             _runnerContextMock.SetupGet(x => x.Database).Returns("sqlserver");
             _runnerContextMock.SetupGet(x => x.ApplicationContext).Returns(_applicationContext);
@@ -140,7 +140,7 @@ namespace FluentMigrator.Tests.Unit
             _runner.Up(migration);
 
             Assert.AreEqual(_applicationContext, _runnerContextMock.Object.ApplicationContext, "The runner context does not have the expected application context.");
-            Assert.AreEqual(_applicationContext, _runner.ApplicationContext, "The MigrationRunner does not have the expected application context.");
+            Assert.AreEqual(_applicationContext, _runner.RunnerContext.ApplicationContext, "The MigrationRunner does not have the expected application context.");
             Assert.AreEqual(_applicationContext, migration.ApplicationContext, "The migration does not have the expected application context.");
             _announcer.VerifyAll();
         }
@@ -256,7 +256,8 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void LoadsCorrectCallingAssembly()
         {
-            _runner.MigrationAssembly.ShouldBe(Assembly.GetAssembly(typeof(MigrationRunnerTests)));
+            var asm = _runner.MigrationAssemblies.Assemblies.Single();
+            asm.ShouldBe(Assembly.GetAssembly(typeof(MigrationRunnerTests)));
         }
 
         [Test]

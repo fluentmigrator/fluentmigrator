@@ -24,12 +24,14 @@ namespace FluentMigrator.Runner.Initialization
     {
         string Database { get; set; }
         string Connection { get; set; }
-        string Target { get; set; }
+        string[] Targets { get; set; }
         bool PreviewOnly { get; set; }
         string Namespace { get; set; }
         bool NestedNamespaces { get; set; }
         string Task { get; set; }
         long Version { get; set; }
+        long StartVersion { get; set; }
+        bool NoConnection { get; set; }
         int Steps { get; set; }
         string WorkingDirectory { get; set; }
         string Profile { get; set; }

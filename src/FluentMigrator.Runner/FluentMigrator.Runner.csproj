@@ -137,6 +137,11 @@
     <Compile Include="CompatabilityMode.cs" />
     <Compile Include="Generators\Postgres\PostgresDescriptionGenerator.cs" />
     <Compile Include="Generators\SqlServer\SqlServer2014Generator.cs" />
+    <Compile Include="Generators\Hana\HanaColumn.cs" />
+    <Compile Include="Generators\Hana\HanaDescriptionGenerator.cs" />
+    <Compile Include="Generators\Hana\HanaGenerator.cs" />
+    <Compile Include="Generators\Hana\HanaQuoter.cs" />
+    <Compile Include="Generators\Hana\HanaTypeMap.cs" />
     <Compile Include="MaintenanceLoader.cs" />
     <Compile Include="IMaintenanceLoader.cs" />
     <Compile Include="Extensions\SqlServerExtensions.cs" />
@@ -165,6 +170,9 @@
     <Compile Include="InvalidMigrationException.cs" />
     <Compile Include="MigrationScopeHandler.cs" />
     <Compile Include="MigrationValidator.cs" />
+    <Compile Include="Processors\Hana\HanaProcessor.cs" />
+    <Compile Include="Processors\Hana\HanaProcessorFactory.cs" />
+    <Compile Include="Processors\Hana\HanaDbFactory.cs" />
     <Compile Include="Processors\Oracle\OracleManagedDbFactory.cs" />
     <Compile Include="Processors\Oracle\OracleManagedProcessorFactory.cs" />
     <Compile Include="Processors\Db2\Db2DbFactory.cs" />
@@ -273,6 +281,9 @@
     <Compile Include="Processors\SqlServer\SqlServerProcessor.cs" />
     <Compile Include="ProfileLoader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Generators\MigrationGeneratorFactory.cs" />
+    <Compile Include="Processors\ConnectionlessProcessor.cs" />
+    <Compile Include="ConnectionlessVersionLoader.cs" />
     <Compile Include="StopWatch.cs" />
     <Compile Include="TypeFinder.cs" />
     <Compile Include="Versioning\IVersionInfo.cs" />

@@ -37,30 +37,34 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanLoadCustomVersionTableMetaData()
         {
+            var runnerContext = new Mock<IRunnerContext>();
+
             var runner = new Mock<IMigrationRunner>();
             runner.SetupGet(r => r.Processor.Options).Returns(new TestMigrationProcessorOptions());
+            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
 
-            var runnerContext = new Mock<IRunnerContext>();
             var conventions = new MigrationConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, runnerContext.Object, asm, conventions);
+            var loader = new VersionLoader(runner.Object, asm, conventions);
 
-            var versionTableMetaData = loader.GetVersionTableMetaData(runnerContext.Object);
+            var versionTableMetaData = loader.GetVersionTableMetaData();
             versionTableMetaData.ShouldBeOfType<TestVersionTableMetaData>();
         }
 
         [Test]
         public void CanLoadDefaultVersionTableMetaData()
         {
+            var runnerContext = new Mock<IRunnerContext>();
+            
             var runner = new Mock<IMigrationRunner>();
             runner.SetupGet(r => r.Processor.Options).Returns(new TestMigrationProcessorOptions());
+            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
 
-            var runnerContext = new Mock<IRunnerContext>();
             var conventions = new MigrationConventions();
             var asm = "s".GetType().Assembly;
-            var loader = new VersionLoader(runner.Object, runnerContext.Object, asm, conventions);
+            var loader = new VersionLoader(runner.Object, asm, conventions);
 
-            var versionTableMetaData = loader.GetVersionTableMetaData(runnerContext.Object);
+            var versionTableMetaData = loader.GetVersionTableMetaData();
             versionTableMetaData.ShouldBeOfType<DefaultVersionTableMetaData>();
         }
 
@@ -69,32 +73,34 @@ namespace FluentMigrator.Tests.Unit
         {
             var applicationContext = "Test context";
 
-            var runner = new Mock<IMigrationRunner>();
-            runner.SetupGet(r => r.Processor.Options).Returns(new TestMigrationProcessorOptions());
-
             var runnerContext = new Mock<IRunnerContext>();
             runnerContext.SetupGet(r => r.ApplicationContext).Returns(applicationContext);
 
+            var runner = new Mock<IMigrationRunner>();
+            runner.SetupGet(r => r.Processor.Options).Returns(new TestMigrationProcessorOptions());
+            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
+
             var conventions = new MigrationConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, runnerContext.Object, asm, conventions);
+            var loader = new VersionLoader(runner.Object, asm, conventions);
 
-            var versionTableMetaData = loader.GetVersionTableMetaData(runnerContext.Object);
+            var versionTableMetaData = loader.GetVersionTableMetaData();
             versionTableMetaData.ApplicationContext.ShouldBe(applicationContext);
         }
         
         [Test]
         public void DeleteVersionShouldExecuteDeleteDataExpression()
         {
+            var runnerContext = new Mock<IRunnerContext>();
+
             var processor = new Mock<IMigrationProcessor>();
             var runner = new Mock<IMigrationRunner>();
-
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
+            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
 
-            var runnerContext = new Mock<IRunnerContext>();
             var conventions = new MigrationConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, runnerContext.Object, asm, conventions);
+            var loader = new VersionLoader(runner.Object, asm, conventions);
 
             processor.Setup(p => p.Process(It.Is<DeleteDataExpression>(expression =>
                                                                        expression.SchemaName == loader.VersionTableMetaData.SchemaName
@@ -114,15 +120,15 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void RemoveVersionTableShouldBehaveAsExpected()
         {
+            var runnerContext = new Mock<IRunnerContext>();
             var processor = new Mock<IMigrationProcessor>();
             var runner = new Mock<IMigrationRunner>();
-
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
+            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
 
-            var runnerContext = new Mock<IRunnerContext>();
             var conventions = new MigrationConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, runnerContext.Object, asm, conventions);
+            var loader = new VersionLoader(runner.Object, asm, conventions);
 
             processor.Setup(p => p.Process(It.Is<DeleteTableExpression>(expression =>
                                                                         expression.SchemaName == loader.VersionTableMetaData.SchemaName
@@ -141,15 +147,15 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void RemoveVersionTableShouldNotRemoveSchemaIfItDidNotOwnTheSchema()
         {
+            var runnerContext = new Mock<IRunnerContext>();
             var processor = new Mock<IMigrationProcessor>();
             var runner = new Mock<IMigrationRunner>();
-
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
+            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
 
-            var runnerContext = new Mock<IRunnerContext>();
             var conventions = new MigrationConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, runnerContext.Object, asm, conventions);
+            var loader = new VersionLoader(runner.Object, asm, conventions);
 
             ((TestVersionTableMetaData) loader.VersionTableMetaData).OwnsSchema = false;
 
@@ -166,15 +172,15 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void UpdateVersionShouldExecuteInsertDataExpression()
         {
+            var runnerContext = new Mock<IRunnerContext>();
             var processor = new Mock<IMigrationProcessor>();
             var runner = new Mock<IMigrationRunner>();
-
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
+            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
 
-            var runnerContext = new Mock<IRunnerContext>();
             var conventions = new MigrationConventions();
             var asm = Assembly.GetExecutingAssembly();
-            var loader = new VersionLoader(runner.Object, runnerContext.Object, asm, conventions);
+            var loader = new VersionLoader(runner.Object, asm, conventions);
 
             processor.Setup(p => p.Process(It.Is<InsertDataExpression>(expression =>
                                                                        expression.SchemaName == loader.VersionTableMetaData.SchemaName
@@ -201,10 +207,11 @@ namespace FluentMigrator.Tests.Unit
             var asm = Assembly.GetExecutingAssembly();
 
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
+            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
 
             processor.Setup(p => p.SchemaExists(It.IsAny<string>())).Returns(false);
 
-            var loader = new VersionLoader(runner.Object, runnerContext.Object, asm, conventions);
+            var loader = new VersionLoader(runner.Object, asm, conventions);
 
             loader.LoadVersionInfo();
 
@@ -221,10 +228,11 @@ namespace FluentMigrator.Tests.Unit
             var asm = Assembly.GetExecutingAssembly();
 
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
+            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
 
             processor.Setup(p => p.TableExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME)).Returns(false);
 
-            var loader = new VersionLoader(runner.Object, runnerContext.Object, asm, conventions);
+            var loader = new VersionLoader(runner.Object, asm, conventions);
 
             loader.LoadVersionInfo();
 
@@ -241,10 +249,11 @@ namespace FluentMigrator.Tests.Unit
             var asm = Assembly.GetExecutingAssembly();
 
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
+            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
 
             processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME, TestVersionTableMetaData.APPLIEDONCOLUMNNAME)).Returns(false);
 
-            var loader = new VersionLoader(runner.Object, runnerContext.Object, asm, conventions);
+            var loader = new VersionLoader(runner.Object, asm, conventions);
 
             loader.LoadVersionInfo();
 
@@ -261,10 +270,11 @@ namespace FluentMigrator.Tests.Unit
             var asm = Assembly.GetExecutingAssembly();
 
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
+            runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
 
             processor.Setup(p => p.ColumnExists(new TestVersionTableMetaData().SchemaName, TestVersionTableMetaData.TABLENAME, TestVersionTableMetaData.APPLIEDONCOLUMNNAME)).Returns(false);
 
-            var loader = new VersionLoader(runner.Object, runnerContext.Object, asm, conventions);
+            var loader = new VersionLoader(runner.Object, asm, conventions);
 
             loader.LoadVersionInfo();
 
