@@ -30,6 +30,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
         /// Firebird only supports constraint, table, column, etc. names up to 31 characters
         /// </summary>
         public bool TruncateLongNames { get; set; }
+		
+		public bool PackKeyNames { get; set; }
 
         /// <summary>
         /// Virtually lock tables and columns touched by DDL statements in a transaction

@@ -14,7 +14,6 @@ namespace FluentMigrator.Runner.Generators.Firebird
         private readonly bool enabled;
         private readonly bool packKeyNames;
 
-        public FirebirdTruncator(bool enabled) : this(enabled, true) { }
         public FirebirdTruncator(bool enabled, bool packKeyNames)
         {
             this.enabled = enabled;
