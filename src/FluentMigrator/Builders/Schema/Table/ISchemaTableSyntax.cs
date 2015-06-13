@@ -27,6 +27,6 @@ namespace FluentMigrator.Builders.Schema.Table
         bool Exists();
         ISchemaColumnSyntax Column(string column);
         ISchemaIndexSyntax Index(string indexName);
-        ISchemaConstraintSyntax Constraint(string constrainName);
+        ISchemaConstraintSyntax Constraint(string constraintName);
     }
 }
