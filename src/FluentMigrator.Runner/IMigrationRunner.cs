@@ -1,5 +1,6 @@
 using System.Reflection;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Runner
 {
@@ -8,6 +9,7 @@ namespace FluentMigrator.Runner
         IMigrationProcessor Processor { get; }
         IMigrationInformationLoader MigrationLoader { get; set; }
         IAssemblyCollection MigrationAssemblies { get; }
+        IRunnerContext RunnerContext { get; }
         void Up(IMigration migration);
         void Down(IMigration migration);
         void MigrateUp();

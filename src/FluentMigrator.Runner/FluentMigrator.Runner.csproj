@@ -285,6 +285,7 @@
     <Compile Include="Processors\ConnectionlessProcessor.cs" />
     <Compile Include="ConnectionlessVersionLoader.cs" />
     <Compile Include="StopWatch.cs" />
+    <Compile Include="TypeFinder.cs" />
     <Compile Include="Versioning\IVersionInfo.cs" />
     <Compile Include="Versioning\VersionInfo.cs" />
     <Compile Include="Versioning\VersionMigration.cs" />
