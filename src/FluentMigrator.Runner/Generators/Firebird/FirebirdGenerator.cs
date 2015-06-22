@@ -21,13 +21,13 @@ namespace FluentMigrator.Runner.Generators.Firebird
                 throw new ArgumentNullException("fbOptions");
 
             FBOptions = fbOptions;
-            truncator = new FirebirdTruncator(FBOptions.TruncateLongNames);
+            truncator = new FirebirdTruncator(FBOptions.TruncateLongNames, FBOptions.PackKeyNames);
         }
         
         //It's kind of a hack to mess with system tables, but this is the cleanest and time-tested method to alter the nullable constraint.
         // It's even mentioned in the firebird official FAQ.
         // Currently the only drawback is that the integrity is not checked by the engine, you have to ensure it manually
-        public string AlterColumnSetNullable { get { return "UPDATE RDB$RELATION_FIELDS SET RDB$NULL_FLAG = {0} WHERE RDB$RELATION_NAME = {1} AND RDB$FIELD_NAME = {2}"; } }
+        public string AlterColumnSetNullable { get { return "UPDATE RDB$RELATION_FIELDS SET RDB$NULL_FLAG = {0} WHERE lower(rdb$relation_name) = lower({1}) AND lower(RDB$FIELD_NAME) = lower({2})"; } }
         
         public string AlterColumnSetType { get { return "ALTER TABLE {0} ALTER COLUMN {1} TYPE {2}"; } }
 
@@ -222,7 +222,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
         {
             truncator.Truncate(column);
             return String.Format(AlterColumnSetNullable,
-                !column.IsNullable.HasValue || !column.IsNullable.Value  ? "NULL" : "1",
+                !column.IsNullable.HasValue || !column.IsNullable.Value  ? "1" : "NULL",
                 Quoter.QuoteValue(column.TableName),
                 Quoter.QuoteValue(column.Name)
                 );
