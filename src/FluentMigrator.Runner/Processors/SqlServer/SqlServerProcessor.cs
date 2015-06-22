@@ -120,9 +120,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             EnsureConnectionIsOpen();
 
             using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
-            using (var reader = command.ExecuteReader())
             {
-                return reader.Read() && reader.GetInt32(0) == 1;
+                var result = command.ExecuteScalar();
+                return result != DBNull.Value && ((int)result) == 1;
             }
         }
 
