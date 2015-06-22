@@ -43,7 +43,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             if (fbOptions == null)
                 throw new ArgumentNullException("fbOptions");
             FBOptions = fbOptions;
-            truncator = new FirebirdTruncator(FBOptions.TruncateLongNames);
+            truncator = new FirebirdTruncator(FBOptions.TruncateLongNames, FBOptions.PackKeyNames);
             ClearLocks();
             ClearExpressions();
             ClearDDLFollowers();
@@ -60,37 +60,37 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public override bool TableExists(string schemaName, string tableName)
         {
             CheckTable(schemaName);
-            return Exists("select rdb$relation_name from rdb$relations where (rdb$flags IS NOT NULL) and (rdb$relation_name = '{0}')", FormatToSafeName(tableName));
+            return Exists("select rdb$relation_name from rdb$relations where (rdb$flags IS NOT NULL) and (lower(rdb$relation_name) = lower('{0}'))", FormatToSafeName(tableName));
         }
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             CheckTable(tableName);
             CheckColumn(tableName, columnName);
-            return Exists("select rdb$field_name from rdb$relation_fields where (rdb$relation_name = '{0}') and (rdb$field_name = '{1}')", FormatToSafeName(tableName), FormatToSafeName(columnName));
+            return Exists("select rdb$field_name from rdb$relation_fields where (lower(rdb$relation_name) = lower('{0}')) and (lower(rdb$field_name) = lower('{1}'))", FormatToSafeName(tableName), FormatToSafeName(columnName));
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
             CheckTable(tableName);
-            return Exists("select rdb$constraint_name from rdb$relation_constraints where (rdb$relation_name = '{0}') and (rdb$constraint_name = '{1}')", FormatToSafeName(tableName), FormatToSafeName(constraintName));
+            return Exists("select rdb$constraint_name from rdb$relation_constraints where (lower(rdb$relation_name) = lower('{0}')) and (lower(rdb$constraint_name) = lower('{1}'))", FormatToSafeName(tableName), FormatToSafeName(constraintName));
         }
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
             CheckTable(tableName);
-            return Exists("select rdb$index_name from rdb$indices where (rdb$relation_name = '{0}') and (rdb$index_name = '{1}') and (rdb$unique_flag IS NULL) and (rdb$foreign_key IS NULL)", FormatToSafeName(tableName), FormatToSafeName(indexName));
+            return Exists("select rdb$index_name from rdb$indices where (lower(rdb$relation_name) = lower('{0}')) and (lower(rdb$index_name) = lower('{1}')) and (rdb$system_flag <> 1 OR rdb$system_flag IS NULL) and (rdb$foreign_key IS NULL)", FormatToSafeName(tableName), FormatToSafeName(indexName));
         }
 
         public override bool SequenceExists(string schemaName, string sequenceName)
         {
-            return Exists("select rdb$generator_name from rdb$generators where rdb$generator_name = '{0}'", FormatToSafeName(sequenceName));
+            return Exists("select rdb$generator_name from rdb$generators where lower(rdb$generator_name) = lower('{0}')", FormatToSafeName(sequenceName));
         }
 
         public virtual bool TriggerExists(string schemaName, string tableName, string triggerName)
         {
             CheckTable(tableName);
-            return Exists("select rdb$trigger_name from rdb$triggers where (rdb$relation_name = '{0}') and (rdb$trigger_name = '{1}')", FormatToSafeName(tableName), FormatToSafeName(triggerName));
+            return Exists("select rdb$trigger_name from rdb$triggers where (lower(rdb$relation_name) = lower('{0}')) and (lower(rdb$trigger_name) = lower('{1}'))", FormatToSafeName(tableName), FormatToSafeName(triggerName));
         }
 
         public override DataSet ReadTableData(string schemaName, string tableName)
@@ -153,6 +153,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public override void RollbackTransaction()
         {
+           
             base.RollbackTransaction();
 
             if (FBOptions.UndoEnabled && processedExpressions != null && processedExpressions.Count > 0)
@@ -184,11 +185,14 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
             Announcer.Say("Committing and Retaining Transaction");
 
-            using (var command = Factory.CreateCommand("COMMIT RETAIN", Connection, Transaction))
+            CommitTransaction();
+            BeginTransaction();
+
+            /*using (var command = Factory.CreateCommand("COMMIT RETAIN", Connection, Transaction))
             {
                 command.CommandTimeout = Options.Timeout;
                 command.ExecuteNonQuery();
-            }
+            }*/
             processedExpressions.Push(new Stack<FirebirdProcessedExpressionBase>());
         }
 
@@ -344,7 +348,12 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 throw new NotSupportedException(String.Format("Expression can't be undone: {0}", fbExpression.ToString()));
             }
 
+            if (processedExpressions.Count == 0)
+            {
+                processedExpressions.Push(new Stack<FirebirdProcessedExpressionBase>());
+            }
             processedExpressions.Peek().Push(fbExpression);
+
         }
 
         #endregion
@@ -395,7 +404,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
                     }
                 };
                 FirebirdProcessedExpressionBase fbExpression = new FirebirdProcessedExpression<AlterColumnExpression>(expression, this);
-                fbExpression.AddUndoExpression(unSet);
+                if (this.FBOptions.UndoEnabled) 
+                    fbExpression.AddUndoExpression(unSet);
                 RegisterExpression(fbExpression);
                 InternalProcess((Generator as FirebirdGenerator).GenerateSetNull(expression.Column));
             }
@@ -446,7 +456,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 }
 
                 FirebirdProcessedExpressionBase fbExpression = new FirebirdProcessedExpression(defaultConstraint, defaultConstraint.GetType(), this);
-                fbExpression.AddUndoExpression(unsetDefaultConstraint);
+                if (this.FBOptions.UndoEnabled)
+                    fbExpression.AddUndoExpression(unsetDefaultConstraint);
                 RegisterExpression(fbExpression);
                 if (defaultConstraint is DeleteDefaultConstraintExpression)
                 {
@@ -477,12 +488,22 @@ namespace FluentMigrator.Runner.Processors.Firebird
                     }
                 };
                 FirebirdProcessedExpressionBase fbExpression = new FirebirdProcessedExpression<AlterColumnExpression>(expression, this);
-                fbExpression.AddUndoExpression(unSet);
+                if (this.FBOptions.UndoEnabled) 
+                    fbExpression.AddUndoExpression(unSet);
                 RegisterExpression(fbExpression);
                 InternalProcess((Generator as FirebirdGenerator).GenerateSetType(expression.Column));
             }
 
-            bool identitySequenceExists = SequenceExists(String.Empty, GetSequenceName(expression.TableName, expression.Column.Name));
+            bool identitySequenceExists;
+            try
+            {
+                identitySequenceExists = SequenceExists(String.Empty, GetSequenceName(expression.TableName, expression.Column.Name));
+            }
+            catch (ArgumentException)
+            {
+                identitySequenceExists = false;
+            }
+             
 
             //Adjust identity generators
             if (expression.Column.IsIdentity)
@@ -516,9 +537,16 @@ namespace FluentMigrator.Runner.Processors.Firebird
             LockColumn(expression.TableName, expression.ColumnNames);
             foreach (string columnName in expression.ColumnNames)
             {
-                if (SequenceExists(String.Empty, GetSequenceName(expression.TableName, columnName)))
+                try
                 {
-                    DeleteSequenceForIdentity(expression.TableName, columnName);
+                    if (SequenceExists(String.Empty, GetSequenceName(expression.TableName, columnName)))
+                    {
+                        DeleteSequenceForIdentity(expression.TableName, columnName);
+                    }
+                }
+                catch (ArgumentException)
+                {
+                    continue;
                 }
             }
             RegisterExpression<DeleteColumnExpression>(expression);
@@ -616,17 +644,6 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public override void Process(Expressions.DeleteTableExpression expression)
         {
             truncator.Truncate(expression);
-            CheckTable(expression.TableName);
-            LockTable(expression.TableName);
-            FirebirdSchemaProvider schema = new FirebirdSchemaProvider(this);
-            TableDefinition table = schema.GetTableDefinition(expression.TableName);
-            foreach (ColumnDefinition colDef in table.Columns)
-            {
-                if (SequenceExists(String.Empty, GetSequenceName(expression.TableName, colDef.Name)))
-                {
-                    DeleteSequenceForIdentity(expression.TableName, colDef.Name);
-                }
-            }
             CheckTable(expression.TableName);
             LockTable(expression.TableName);
             RegisterExpression<DeleteTableExpression>(expression);
@@ -913,7 +930,16 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             CheckTable(tableName);
             LockTable(tableName);
-            string sequenceName = GetSequenceName(tableName, columnName);
+
+            string sequenceName;
+            try{
+                sequenceName = GetSequenceName(tableName, columnName);
+            }
+            catch (ArgumentException)
+            {
+                return;
+            }
+
             DeleteSequenceExpression deleteSequence = null;
             if (SequenceExists(String.Empty, sequenceName))
             {
@@ -929,7 +955,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 if (trigger.Name.ToUpper() == triggerName.ToUpper())
                 {
                     PerformDBOperationExpression createTrigger = CreateTriggerExpression(tableName, trigger);
-                    fbExpression.AddUndoExpression(createTrigger);
+                    if (this.FBOptions.UndoEnabled)
+                        fbExpression.AddUndoExpression(createTrigger);
                     break;
                 }
             }

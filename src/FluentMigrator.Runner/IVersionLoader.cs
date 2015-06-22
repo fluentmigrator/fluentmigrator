@@ -1,3 +1,5 @@
+using FluentMigrator.Runner.Initialization;
+
 namespace FluentMigrator.Runner
 {
     public interface IVersionLoader

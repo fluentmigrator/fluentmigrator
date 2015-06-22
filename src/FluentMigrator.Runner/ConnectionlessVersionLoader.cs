@@ -72,7 +72,9 @@ namespace FluentMigrator.Runner
 
         public IVersionTableMetaData GetVersionTableMetaData()
         {
-            var matchedType = Assemblies.GetExportedTypes().FirstOrDefault(t => Conventions.TypeIsVersionTableMetaData(t));
+            var matchedType = Assemblies.GetExportedTypes()
+                .FilterByNamespace(Runner.RunnerContext.Namespace, Runner.RunnerContext.NestedNamespaces)
+                .FirstOrDefault(t => Conventions.TypeIsVersionTableMetaData(t));
 
             if (matchedType == null)
             {

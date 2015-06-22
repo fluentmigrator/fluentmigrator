@@ -8,6 +8,7 @@ using FluentMigrator.Model;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.VersionTableInfo;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Runner
 {
@@ -66,14 +67,20 @@ namespace FluentMigrator.Runner
 
         public IVersionTableMetaData GetVersionTableMetaData()
         {
-            Type matchedType = Assemblies.GetExportedTypes().FirstOrDefault(t => Conventions.TypeIsVersionTableMetaData(t));
+            Type matchedType = Assemblies.GetExportedTypes()
+                .FilterByNamespace(Runner.RunnerContext.Namespace, Runner.RunnerContext.NestedNamespaces)
+                .FirstOrDefault(t => Conventions.TypeIsVersionTableMetaData(t));
 
             if (matchedType == null)
             {
                 return new DefaultVersionTableMetaData();
             }
 
-            return (IVersionTableMetaData)Activator.CreateInstance(matchedType);
+            var versionTableMetaData = (IVersionTableMetaData)Activator.CreateInstance(matchedType);
+
+            versionTableMetaData.ApplicationContext = Runner.RunnerContext.ApplicationContext;
+
+            return versionTableMetaData;
         }
 
         protected virtual InsertionDataDefinition CreateVersionInfoInsertionData(long version, string description)

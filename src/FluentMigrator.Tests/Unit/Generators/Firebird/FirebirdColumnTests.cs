@@ -80,7 +80,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 DECIMAL(2,19) NOT NULL");
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 DECIMAL(19, 2) NOT NULL");
         }
 
         [Test]
@@ -89,7 +89,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 DECIMAL(2,19) NOT NULL");
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 DECIMAL(19, 2) NOT NULL");
         }
 
         [Test]

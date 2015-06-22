@@ -140,7 +140,7 @@ namespace FluentMigrator.Tests.Unit
             _runner.Up(migration);
 
             Assert.AreEqual(_applicationContext, _runnerContextMock.Object.ApplicationContext, "The runner context does not have the expected application context.");
-            Assert.AreEqual(_applicationContext, _runner.ApplicationContext, "The MigrationRunner does not have the expected application context.");
+            Assert.AreEqual(_applicationContext, _runner.RunnerContext.ApplicationContext, "The MigrationRunner does not have the expected application context.");
             Assert.AreEqual(_applicationContext, migration.ApplicationContext, "The migration does not have the expected application context.");
             _announcer.VerifyAll();
         }

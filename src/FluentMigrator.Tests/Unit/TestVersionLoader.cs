@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Versioning;
+using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Tests.Unit
 {

@@ -40,10 +40,10 @@ namespace FluentMigrator.Runner
         private readonly MigrationValidator _migrationValidator;
         private readonly MigrationScopeHandler _migrationScopeHandler;
 
-        /// <summary>The arbitrary application context passed to the task runner.</summary>
-        public object ApplicationContext { get; private set; }
-
-        public bool TransactionPerSession { get; private set; }
+        public bool TransactionPerSession 
+        {
+            get { return RunnerContext.TransactionPerSession; }
+        }
 
         public bool SilentlyFail { get; set; }
 
@@ -66,6 +66,8 @@ namespace FluentMigrator.Runner
             }
         }
 
+        public IRunnerContext RunnerContext { get; private set; }
+
         public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
           : this(new SingleAssembly(assembly), runnerContext, processor)
         {
@@ -78,8 +80,7 @@ namespace FluentMigrator.Runner
             _announcer = runnerContext.Announcer;
             Processor = processor;
             _stopWatch = runnerContext.StopWatch;
-            ApplicationContext = runnerContext.ApplicationContext;
-            TransactionPerSession = runnerContext.TransactionPerSession;
+            RunnerContext = runnerContext;
 
             SilentlyFail = false;
             CaughtExceptions = null;
@@ -379,7 +380,7 @@ namespace FluentMigrator.Runner
         private void ExecuteMigration(IMigration migration, Action<IMigration, IMigrationContext> getExpressions)
         {
             CaughtExceptions = new List<Exception>();
-            var context = new MigrationContext(Conventions, Processor, MigrationAssemblies, ApplicationContext, Processor.ConnectionString);
+            var context = new MigrationContext(Conventions, Processor, MigrationAssemblies, RunnerContext.ApplicationContext, Processor.ConnectionString);
             
             getExpressions(migration, context);
 

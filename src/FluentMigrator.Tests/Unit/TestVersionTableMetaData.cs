@@ -36,6 +36,8 @@ namespace FluentMigrator.Tests.Unit
             OwnsSchema = true;
 		}
 
+        public object ApplicationContext { get; set; }
+
 		public string SchemaName { get; set; }
 
         public string TableName
