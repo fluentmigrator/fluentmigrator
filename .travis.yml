@@ -1,8 +1,8 @@
 language: c
 
 install:
-  - sudo apt-get update
-  - sudo apt-get install mono-devel mono-gmcs nunit-console libfbembed2.5
+  - sudo apt-get update -qq
+  - sudo apt-get install -y mono-devel mono-gmcs nunit-console libfbembed2.5
 
 script:
   - xbuild CI.proj
