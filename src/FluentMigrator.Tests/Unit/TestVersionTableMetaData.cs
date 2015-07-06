@@ -22,7 +22,7 @@ using FluentMigrator.VersionTableInfo;
 namespace FluentMigrator.Tests.Unit
 {
 	[VersionTableMetaData]
-	public class TestVersionTableMetaData : IVersionTableMetaData, IVersionTableMetaDataExtended
+	public class TestVersionTableMetaData : IVersionTableMetaData
 	{
 		public const string TABLENAME = "testVersionTableName";
 		public const string COLUMNNAME = "testColumnName";

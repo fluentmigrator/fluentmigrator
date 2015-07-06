@@ -29,6 +29,7 @@ namespace FluentMigrator.VersionTableInfo
         /// is called. Properties can use <code>ApplicationContext</code> value to implement context-depending logic.
         /// </remarks>
         object ApplicationContext { get; set; }
+        bool OwnsSchema { get; }
         string SchemaName { get; }
         string TableName { get; }
         string ColumnName { get; }

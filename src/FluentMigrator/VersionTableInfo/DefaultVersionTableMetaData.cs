@@ -21,7 +21,7 @@ using System;
 
 namespace FluentMigrator.VersionTableInfo
 {
-    public class DefaultVersionTableMetaData : IVersionTableMetaData, IVersionTableMetaDataExtended
+    public class DefaultVersionTableMetaData : IVersionTableMetaData
     {
         /// <summary>
         /// Provides access to <code>ApplicationContext</code> object.
