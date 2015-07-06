@@ -17,7 +17,6 @@
 //
 
 #endregion
-using System;
 
 namespace FluentMigrator.VersionTableInfo
 {

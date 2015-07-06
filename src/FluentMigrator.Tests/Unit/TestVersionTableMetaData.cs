@@ -16,7 +16,6 @@
 //
 #endregion
 
-using System;
 using FluentMigrator.VersionTableInfo;
 
 namespace FluentMigrator.Tests.Unit
