@@ -18,7 +18,7 @@ require 'albacore/task_types/nugets_pack'
 #  ]
 #end
 
-FLUENTMIGRATOR_VERSION = bumper_version.to_s
+SEM_VER = [bumper_version.major, bumper_version.minor, bumper_version.revision].join('.')
 
 def to_nuget_version(v)
 	v[1] + v[3]
@@ -99,18 +99,15 @@ namespace :nuget do
   task :create_nugets => ['build:solutioninfo', 'build:console'] do
     FileUtils.mkdir_p 'nuget/'
     
-    version = "#{ENV['version']}"
-    nuget_version = version.length == 7 ? version : FLUENTMIGRATOR_VERSION
-
-    fm_nuspec = prepare_nuspec 'FluentMigrator', nuget_version, false
+    fm_nuspec = prepare_nuspec 'FluentMigrator', SEM_VER, false
     add_files_for_fluentmigrator_nuget fm_nuspec
     pack_nuget 'packages/FluentMigrator.nuspec', fm_nuspec
 
-    fmr_nuspec = prepare_nuspec 'FluentMigrator.Runner', nuget_version, true
+    fmr_nuspec = prepare_nuspec 'FluentMigrator.Runner', SEM_VER, true
     add_files_for_fluentmigrator_runner_nuget fmr_nuspec
     pack_nuget 'packages/FluentMigrator.Runner.nuspec', fmr_nuspec
 
-    fmt_nuspec = prepare_nuspec 'FluentMigrator.Tools', nuget_version, true
+    fmt_nuspec = prepare_nuspec 'FluentMigrator.Tools', SEM_VER, true
     add_files_for_fluentmigrator_tools_nuget fmt_nuspec
     pack_nuget 'packages/FluentMigrator.Tools.nuspec', fmt_nuspec
   end
