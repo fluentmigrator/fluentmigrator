@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using FluentMigrator.Infrastructure;
 
@@ -26,6 +27,7 @@ namespace FluentMigrator.Builders.Execute
     {
         void Sql(string sqlStatement);
         void Script(string pathToSqlScript);
+        void Script(string pathToSqlScript, IDictionary<string, string> tokenDictionary);
         void WithConnection(Action<IDbConnection, IDbTransaction> operation);
         void EmbeddedScript(string EmbeddedSqlScriptName);
     }

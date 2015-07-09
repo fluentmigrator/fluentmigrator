@@ -41,19 +41,19 @@ namespace FluentMigrator.Builders.Execute
 
         public void Script(string pathToSqlScript)
         {
-			Script(pathToSqlScript, new Dictionary<string, string>());
+            Script(pathToSqlScript, new Dictionary<string, string>());
         }
 
-		public void Script(string pathToSqlScript, IDictionary<string, string> tokenDictionary)
-		{
-			var expression = new ExecuteSqlScriptExpression
-			{
-				SqlScript = pathToSqlScript,
-				Parameters = tokenDictionary
-			};
+        public void Script(string pathToSqlScript, IDictionary<string, string> tokenDictionary)
+        {
+            var expression = new ExecuteSqlScriptExpression
+            {
+                SqlScript = pathToSqlScript,
+                Parameters = tokenDictionary
+            };
 
-			_context.Expressions.Add(expression);
-		}
+            _context.Expressions.Add(expression);
+        }
 
         public void WithConnection(Action<IDbConnection, IDbTransaction> operation)
         {
