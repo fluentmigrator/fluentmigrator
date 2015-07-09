@@ -34,7 +34,6 @@ namespace FluentMigrator.Tests.Unit
             _migration = Mock.Of<IMigration>();
         }
 
-        private MigrationInfo _migrationInfo;
         private IMigration _migration;
         private long _expectedVersion;
 

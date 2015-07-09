@@ -34,15 +34,18 @@ namespace FluentMigrator.Tests.Unit.Runners
 
         private Mock<IMigrationConventions> _migrationConventions;
         private MaintenanceLoader _maintenanceLoader;
+        private MaintenanceLoader _maintenanceLoaderNoTags;
 
         [SetUp]
         public void Setup()
         {
             _migrationConventions = new Mock<IMigrationConventions>();
             _migrationConventions.Setup(x => x.GetMaintenanceStage).Returns(DefaultMigrationConventions.GetMaintenanceStage);
+            _migrationConventions.Setup(x => x.TypeHasTags).Returns(DefaultMigrationConventions.TypeHasTags);
             _migrationConventions.Setup(x => x.TypeHasMatchingTags).Returns(DefaultMigrationConventions.TypeHasMatchingTags);
 
             _maintenanceLoader = new MaintenanceLoader(new SingleAssembly(GetType().Assembly), _tags, _migrationConventions.Object);
+            _maintenanceLoaderNoTags = new MaintenanceLoader(new SingleAssembly(GetType().Assembly), null, _migrationConventions.Object);
         }
 
         [Test]
@@ -55,6 +58,9 @@ namespace FluentMigrator.Tests.Unit.Runners
             foreach (var migrationInfo in migrationInfos)
             {
                 migrationInfo.Migration.ShouldNotBeNull();
+
+                // The NoTag maintenance should not be found in the tagged maintenanceLoader because it wants tagged classes
+                Assert.IsFalse(migrationInfo.Migration.GetType().Equals(typeof(MaintenanceBeforeEachNoTag)));
 
                 var maintenanceAttribute = migrationInfo.Migration.GetType().GetOneAttribute<MaintenanceAttribute>();
                 maintenanceAttribute.ShouldNotBeNull();
@@ -72,6 +78,10 @@ namespace FluentMigrator.Tests.Unit.Runners
             foreach (var migrationInfo in migrationInfos)
             {
                 migrationInfo.Migration.ShouldNotBeNull();
+
+                // The NoTag maintenance should not be found in the tagged maintenanceLoader because it wants tagged classes
+                Assert.IsFalse(migrationInfo.Migration.GetType().Equals(typeof(MaintenanceBeforeEachNoTag)));
+
                 DefaultMigrationConventions.TypeHasMatchingTags(migrationInfo.Migration.GetType(), _tags)
                     .ShouldBeTrue();
             } 
@@ -104,6 +114,33 @@ namespace FluentMigrator.Tests.Unit.Runners
                 migrationInfo.TransactionBehavior.ShouldBe(maintenanceAttribute.TransactionBehavior);
             } 
         }
+
+        [Test]
+        public void LoadsMigrationsNoTag()
+        {
+            var migrationInfos = _maintenanceLoaderNoTags.LoadMaintenance(MigrationStage.BeforeEach);
+            _migrationConventions.Verify(x => x.TypeHasMatchingTags, Times.AtLeastOnce());
+            Assert.IsNotEmpty(migrationInfos);
+
+            bool foundNoTag = false;
+            foreach (var migrationInfo in migrationInfos)
+            {
+                migrationInfo.Migration.ShouldNotBeNull();
+
+                // Both notag maintenance and tagged maintenance should be found in the notag maintenanceLoader because he doesn't care about tags
+                if (migrationInfo.Migration.GetType().Equals(typeof(MaintenanceBeforeEachNoTag)))
+                {
+                    foundNoTag = true;
+                }
+                else
+                {
+                    DefaultMigrationConventions.TypeHasMatchingTags(migrationInfo.Migration.GetType(), _tags)
+                        .ShouldBeTrue();
+                }
+            }
+
+            Assert.IsTrue(foundNoTag);
+        }
     }
 
     [Tags(MaintenanceLoaderTests.Tag1, MaintenanceLoaderTests.Tag2)]
@@ -134,6 +171,13 @@ namespace FluentMigrator.Tests.Unit.Runners
     [Tags(MaintenanceLoaderTests.Tag1)]
     [Maintenance(MigrationStage.AfterAll, TransactionBehavior.None)]
     public class MaintenanceAfterAllWithNoneTransactionBehavior : Migration
+    {
+        public override void Up() { }
+        public override void Down() { }
+    }
+
+    [Maintenance(MigrationStage.BeforeEach)]
+    public class MaintenanceBeforeEachNoTag : Migration
     {
         public override void Up() { }
         public override void Down() { }

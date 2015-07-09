@@ -257,8 +257,6 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
 
         [Test]
         public void CallingWithDefaultValueOnNewColumnDoesNotAddDefaultConstraintExpression() {
-            const int value = 42;
-
             var expressions = new List<IMigrationExpression>();
             var contextMock = new Mock<IMigrationContext>();
             contextMock.Setup(x => x.Expressions).Returns(expressions);
@@ -277,8 +275,6 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
 
         [Test]
         public void CallingWithDefaultValueOnAlterColumnAddsDefaultConstraintExpression() {
-            const int value = 42;
-
             var expressions = new List<IMigrationExpression>();
             var contextMock = new Mock<IMigrationContext>();
             contextMock.Setup(x => x.Expressions).Returns(expressions);

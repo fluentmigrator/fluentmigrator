@@ -105,6 +105,23 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             columnMock.VerifySet(c => c.Precision = expected);
         }
 
+        private void VerifyColumnCollation(string expected, Action<AlterColumnExpressionBuilder> callToTest)
+        {
+            var columnMock = new Mock<ColumnDefinition>();
+
+            var expressionMock = new Mock<AlterColumnExpression>();
+            expressionMock.SetupProperty(e => e.Column);
+
+            var expression = expressionMock.Object;
+            expression.Column = columnMock.Object;
+
+            var contextMock = new Mock<IMigrationContext>();
+
+            callToTest(new AlterColumnExpressionBuilder(expression, contextMock.Object));
+
+            columnMock.VerifySet(c => c.CollationName = expected);
+        }
+
         [Test]
         public void CallingAsAnsiStringSetsColumnDbTypeToAnsiString()
         {
@@ -284,6 +301,30 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
         public void CallingAsStringWithLengthSetsColumnDbTypeToString()
         {
             VerifyColumnDbType(DbType.String, b => b.AsString(255));
+        }
+
+        [Test]
+        public void CallingAsAnsiStringWithCollation()
+        {
+            VerifyColumnCollation(Generators.GeneratorTestHelper.TestColumnCollationName, b => b.AsAnsiString(Generators.GeneratorTestHelper.TestColumnCollationName));
+        }
+
+        [Test]
+        public void CallingAsFixedLengthAnsiStringWithCollation()
+        {
+            VerifyColumnCollation(Generators.GeneratorTestHelper.TestColumnCollationName, b => b.AsFixedLengthAnsiString(255, Generators.GeneratorTestHelper.TestColumnCollationName));
+        }
+
+        [Test]
+        public void CallingAsFixedLengthStringWithCollation()
+        {
+            VerifyColumnCollation(Generators.GeneratorTestHelper.TestColumnCollationName, b => b.AsFixedLengthString(255, Generators.GeneratorTestHelper.TestColumnCollationName));
+        }
+
+        [Test]
+        public void CallingAsStringWithCollation()
+        {
+            VerifyColumnCollation(Generators.GeneratorTestHelper.TestColumnCollationName, b => b.AsString(Generators.GeneratorTestHelper.TestColumnCollationName));
         }
 
         [Test]
