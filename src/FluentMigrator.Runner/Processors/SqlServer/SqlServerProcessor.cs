@@ -122,7 +122,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             {
                 var result = command.ExecuteScalar();
-                return result != DBNull.Value && ((int)result) == 1;
+                return DBNull.Value != result && Convert.ToInt32(result) == 1;
             }
         }
 
