@@ -21,8 +21,6 @@ using System.Collections.Generic;
 using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
-using System.Runtime.CompilerServices;
-using System.Reflection;
 
 namespace FluentMigrator.Builders.Execute
 {
@@ -43,9 +41,19 @@ namespace FluentMigrator.Builders.Execute
 
         public void Script(string pathToSqlScript)
         {
-            var expression = new ExecuteSqlScriptExpression { SqlScript = pathToSqlScript };
-            _context.Expressions.Add(expression);
+			Script(pathToSqlScript, new Dictionary<string, string>());
         }
+
+		public void Script(string pathToSqlScript, IDictionary<string, string> tokenDictionary)
+		{
+			var expression = new ExecuteSqlScriptExpression
+			{
+				SqlScript = pathToSqlScript,
+				Parameters = tokenDictionary
+			};
+
+			_context.Expressions.Add(expression);
+		}
 
         public void WithConnection(Action<IDbConnection, IDbTransaction> operation)
         {

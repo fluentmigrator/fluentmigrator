@@ -574,6 +574,9 @@
     <None Include="Resources\icuuc30.dll" />
     <None Include="Resources\msvcp80.dll" />
     <None Include="Resources\msvcr80.dll" />
+    <Content Include="testscript-withparameters.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Unit\Initialization\Fixtures\WithConnectionString.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
