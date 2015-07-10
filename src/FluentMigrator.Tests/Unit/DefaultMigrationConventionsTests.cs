@@ -164,6 +164,9 @@ namespace FluentMigrator.Tests.Unit
         {
             DefaultMigrationConventions.TypeHasTags(typeof(TaggedWithUk))
                 .ShouldBeTrue();
+
+			DefaultMigrationConventions.TypeHasTags(typeof(InheritedFromTaggedWithUk))
+				.ShouldBeTrue();
         }
 
         [Test]
@@ -296,6 +299,10 @@ namespace FluentMigrator.Tests.Unit
     public class TaggedWithUk
     {
     }
+
+	public class InheritedFromTaggedWithUk : TaggedWithUk
+	{
+	}
 
     [Tags]
     public class HasTagAttributeWithNoTagNames
