@@ -449,6 +449,8 @@
     <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000IndexTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000SchemaTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000TableTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000TypeMapTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005TypeMapTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005ClusteredTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005ColumnTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005ConstraintsTests.cs" />
