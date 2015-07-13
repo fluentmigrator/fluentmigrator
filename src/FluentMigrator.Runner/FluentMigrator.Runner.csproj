@@ -142,6 +142,7 @@
     <Compile Include="Generators\Hana\HanaGenerator.cs" />
     <Compile Include="Generators\Hana\HanaQuoter.cs" />
     <Compile Include="Generators\Hana\HanaTypeMap.cs" />
+    <Compile Include="Generators\SqlServer\SqlServerCeColumn.cs" />
     <Compile Include="MaintenanceLoader.cs" />
     <Compile Include="IMaintenanceLoader.cs" />
     <Compile Include="Extensions\SqlServerExtensions.cs" />

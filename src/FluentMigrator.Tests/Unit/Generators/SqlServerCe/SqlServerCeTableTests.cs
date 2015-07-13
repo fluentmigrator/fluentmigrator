@@ -186,7 +186,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255), [TestColumn2] INT NOT NULL)");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NULL, [TestColumn2] INT NOT NULL)");
         }
 
         [Test]
@@ -196,7 +196,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             expression.Columns[0].IsNullable = true;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255), [TestColumn2] INT NOT NULL)");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NULL, [TestColumn2] INT NOT NULL)");
         }
 
         [Test]
