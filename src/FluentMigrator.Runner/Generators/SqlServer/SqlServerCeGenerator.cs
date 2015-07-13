@@ -33,11 +33,13 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string GetClusterTypeString(CreateIndexExpression column)
         {
+            // Only nonclusterd
             return string.Empty;
         }
 
-        protected string GetConstraintClusteringString(CreateConstraintExpression constraint)
+        protected override string GetConstraintClusteringString(CreateConstraintExpression constraint)
         {
+            // Only nonclustered
             return string.Empty;
         }
 
