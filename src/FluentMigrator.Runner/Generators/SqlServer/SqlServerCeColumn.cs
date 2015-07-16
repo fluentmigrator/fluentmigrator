@@ -10,7 +10,10 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         protected override string FormatNullable(ColumnDefinition column)
         {
-            return column.IsNullable.GetValueOrDefault() ? "NULL" : "NOT NULL";
+            if (column.IsNullable.GetValueOrDefault())
+                return column.ModificationType == ColumnModificationType.Alter ? "NULL" : string.Empty;
+
+            return "NOT NULL";
         }
     }
 }
