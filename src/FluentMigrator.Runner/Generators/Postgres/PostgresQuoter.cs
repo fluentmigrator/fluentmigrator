@@ -1,3 +1,4 @@
+using System.Linq;
 using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.Postgres
@@ -11,6 +12,12 @@ namespace FluentMigrator.Runner.Generators.Postgres
             if (string.IsNullOrEmpty(schemaName))
                 schemaName = "public";
             return base.QuoteSchemaName(schemaName);
+        }
+
+        protected override string FormatByteArray(byte[] array)
+        {
+            var arrayAsHex = array.Select(b => b.ToString("X2")).ToArray();
+            return @"E'\\x" + string.Concat(arrayAsHex) + "'";
         }
 
         public string UnQuoteSchemaName(string quoted)
