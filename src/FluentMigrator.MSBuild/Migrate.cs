@@ -29,7 +29,7 @@ using Microsoft.Build.Utilities;
 
 namespace FluentMigrator.MSBuild
 {
-    public class Migrate : Task
+    public class Migrate : AppDomainIsolatedTask
     {
 
 
