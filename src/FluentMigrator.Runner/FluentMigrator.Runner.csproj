@@ -135,7 +135,6 @@
     <Compile Include="Announcers\TextWriterAnnouncer.cs" />
     <Compile Include="Announcers\TextWriterWithGoAnnouncer.cs" />
     <Compile Include="CompatabilityMode.cs" />
-    <Compile Include="Generators\Postgres\PostgresDescriptionGenerator.cs" />
     <Compile Include="Generators\SqlServer\SqlServer2014Generator.cs" />
     <Compile Include="Generators\Hana\HanaColumn.cs" />
     <Compile Include="Generators\Hana\HanaDescriptionGenerator.cs" />
@@ -291,6 +290,19 @@
     <Compile Include="Versioning\VersionMigration.cs" />
     <Compile Include="VersionLoader.cs" />
     <Compile Include="VersionOrderInvalidException.cs" />
+    <Compile Include="Generators\Redshift\RedshiftGenerator.cs" />
+    <Compile Include="Generators\Redshift\RedshiftColumn.cs" />
+    <Compile Include="Generators\Redshift\RedshiftTypeMap.cs" />
+    <Compile Include="Processors\Redshift\RedshiftProcessorFactory.cs" />
+    <Compile Include="Processors\Redshift\RedshiftProcessor.cs" />
+    <Compile Include="Processors\Redshift\RedshiftDbFactory.cs" />
+    <Compile Include="Generators\Redshift\RedshiftQuoter.cs" />
+    <Compile Include="Generators\PostgresBase\PostgresBaseColumn.cs" />
+    <Compile Include="Generators\PostgresBase\PostgresBaseGenerator.cs" />
+    <Compile Include="Generators\PostgresBase\PostgresBaseQuoter.cs" />
+    <Compile Include="Generators\PostgresBase\PostgresBaseDescriptionGenerator.cs" />
+    <Compile Include="Generators\Postgres\PostgresDescriptionGenerator.cs" />
+    <Compile Include="Generators\Redshift\RedshiftDescriptionGenerator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj">
@@ -390,4 +402,8 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Folder Include="Processors\Redshift\" />
+    <Folder Include="Generators\Postgres\" />
+  </ItemGroup>
 </Project>

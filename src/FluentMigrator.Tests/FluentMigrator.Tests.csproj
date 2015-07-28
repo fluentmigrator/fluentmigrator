@@ -489,6 +489,15 @@
     <Compile Include="Unit\Versioning\VersionInfoTests.cs" />
     <Compile Include="Unit\VersionLoaderTests.cs" />
     <Compile Include="Unit\VersionOrderInvalidExceptionTests.cs" />
+    <Compile Include="Unit\Generators\Redshift\RedshiftConstraintsTests.cs" />
+    <Compile Include="Unit\Generators\Redshift\RedshiftDataTests.cs" />
+    <Compile Include="Unit\Generators\Redshift\RedshiftDescriptionGeneratorTests.cs" />
+    <Compile Include="Unit\Generators\Redshift\RedshiftColumnTests.cs" />
+    <Compile Include="Unit\Generators\Redshift\RedshiftGeneratorTests.cs" />
+    <Compile Include="Unit\Generators\Redshift\RedshiftIndexTests.cs" />
+    <Compile Include="Unit\Generators\Redshift\RedshiftSchemaTests.cs" />
+    <Compile Include="Unit\Generators\Redshift\RedshiftSequenceTests.cs" />
+    <Compile Include="Unit\Generators\Redshift\RedshiftTableTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.SchemaDump\FluentMigrator.SchemaDump.csproj">
@@ -602,4 +611,7 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <Folder Include="Unit\Generators\Redshift\" />
+  </ItemGroup>
 </Project>
