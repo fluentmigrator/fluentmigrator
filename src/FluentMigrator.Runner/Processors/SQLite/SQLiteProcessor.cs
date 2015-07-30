@@ -96,6 +96,13 @@ namespace FluentMigrator.Runner.Processors.SQLite
             }
         }
 
+        public override string QuoteColumnNameIfRequired(string columnName)
+        {
+            if (SqliteKeywords.Keywords.Contains(columnName.ToUpper()))
+                return "\"" + columnName + "\"";
+            return columnName;
+        }
+
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             return Read("select * from [{0}]", tableName);
