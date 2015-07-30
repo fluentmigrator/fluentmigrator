@@ -122,7 +122,6 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         public override IEnumerable<ColumnInfo> GetColumnInfos(string schemaName, string tableName)
         {
-            var a = Read("PRAGMA table_info([{0}])", tableName).Tables[0];
             return
                 Read("PRAGMA table_info([{0}])", tableName).Tables[0].AsEnumerable()
                     .Select(dataRow =>
