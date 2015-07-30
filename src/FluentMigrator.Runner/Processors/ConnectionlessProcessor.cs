@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using FluentMigrator.Info;
 using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Runner.Processors
@@ -39,6 +41,21 @@ namespace FluentMigrator.Runner.Processors
         }
 
         public bool Exists(string template, params object[] args)
+        {
+            throw new NotImplementedException("Method is not supported by the connectionless processor");
+        }
+
+        public string QuoteColumnNameIfRequired(string columnName)
+        {
+            throw new NotImplementedException("Method is not supported by the connectionless processor");
+        }
+
+        public string QuoteTableNameIfRequired(string tableName)
+        {
+            throw new NotImplementedException("Method is not supported by the connectionless processor");
+        }
+
+        public string BuildSelect(string tableName, List<string> columns)
         {
             throw new NotImplementedException("Method is not supported by the connectionless processor");
         }
@@ -226,6 +243,16 @@ namespace FluentMigrator.Runner.Processors
         public string DatabaseType
         {
             get { return Context.Database; }
+        }
+
+        public IEnumerable<TableInfo> GetTableInfos(string schemaName)
+        {
+            throw new NotImplementedException("Method is not supported by the connectionless processor");
+        }
+
+        public IEnumerable<ColumnInfo> GetColumnInfos(string schemaName, string tableName)
+        {
+            throw new NotImplementedException("Method is not supported by the connectionless processor");
         }
 
         public void Dispose()

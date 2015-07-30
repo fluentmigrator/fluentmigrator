@@ -16,33 +16,22 @@
 //
 #endregion
 
-using FluentMigrator.Builders.Delete;
-using FluentMigrator.Builders.Execute;
-using FluentMigrator.Builders.Select;
-using FluentMigrator.Builders.Update;
+using FluentMigrator.Infrastructure;
 
-namespace FluentMigrator
+namespace FluentMigrator.Builders.Select
 {
-    public abstract class Migration : MigrationBase
+    public class SelectExpressionRoot : ISelectExpressionRoot
     {
-        public IDeleteExpressionRoot Delete
+        private readonly IMigrationContext _context;
+
+        public SelectExpressionRoot(IMigrationContext context)
         {
-            get { return new DeleteExpressionRoot(_context); }
+            _context = context;
         }
 
-        public IExecuteExpressionRoot Execute
+        public ISelectColumnSyntax Table(string tableName)
         {
-            get { return new ExecuteExpressionRoot(_context); }
-        }
-
-        public IUpdateExpressionRoot Update
-        {
-            get { return new UpdateExpressionRoot(_context); }
-        }
-
-        public ISelectExpressionRoot Select
-        {
-            get { return new SelectExpressionRoot(_context); }
+            return new SelectColumnSyntax(_context, tableName);
         }
     }
 }

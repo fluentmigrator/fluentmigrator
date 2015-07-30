@@ -33,7 +33,7 @@ namespace FluentMigrator.Builders.Schema.Table
         {
             _context = context;
             _schemaName = schemaName;
-            _tableName = tableName;
+            _tableName = tableName;              
         }
 
         public bool Exists()

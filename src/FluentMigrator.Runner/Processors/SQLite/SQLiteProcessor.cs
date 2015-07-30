@@ -18,9 +18,12 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
+using System.Linq;
 using FluentMigrator.Builders.Execute;
+using FluentMigrator.Info;
 
 namespace FluentMigrator.Runner.Processors.SQLite
 {
@@ -101,6 +104,47 @@ namespace FluentMigrator.Runner.Processors.SQLite
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
             return false;
+        }
+
+        public override IEnumerable<TableInfo> GetTableInfos(string schemaName)
+        {
+            return
+                Read("select name from sqlite_master where type='table'").Tables[0].AsEnumerable()
+                    .Select(dataRow => new TableInfo() { Name = dataRow.Field<string>("name")});
+        }
+
+        public override IEnumerable<ColumnInfo> GetColumnInfos(string schemaName, string tableName)
+        {
+            var a = Read("PRAGMA table_info([{0}])", tableName).Tables[0];
+            return
+                Read("PRAGMA table_info([{0}])", tableName).Tables[0].AsEnumerable()
+                    .Select(dataRow =>
+                    {
+                        var type = DbType.String;
+                        var tp = dataRow.Field<string>("type");
+                        switch (tp.ToUpper())
+                        {
+                            case "UNIQUEIDENTIFIER":
+                                type = DbType.Guid;
+                                break;
+                            case "DATETIME":
+                                type = DbType.DateTime;
+                                break;
+                            case "TEXT":
+                                type = DbType.String;
+                                break;
+                            case "INT":
+                                type = DbType.Int64;
+                                break;
+                        }
+                        return new ColumnInfo()
+                        {
+                            Name = dataRow.Field<string>("name"),
+                            NotNull = dataRow.Field<long>("notnull") == 1,
+                            DbType = type,
+                        };
+                    }
+                    );
         }
 
         public override void Process(PerformDBOperationExpression expression)

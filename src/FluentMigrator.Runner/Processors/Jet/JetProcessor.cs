@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 using FluentMigrator.Builders.Execute;
+using FluentMigrator.Info;
 
 namespace FluentMigrator.Runner.Processors.Jet
 {
@@ -181,6 +183,16 @@ namespace FluentMigrator.Runner.Processors.Jet
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
             return false;
+        }
+
+        public override IEnumerable<TableInfo> GetTableInfos(string schemaName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IEnumerable<ColumnInfo> GetColumnInfos(string schemaName, string tableName)
+        {
+            throw new NotImplementedException();
         }
 
         public override void BeginTransaction()

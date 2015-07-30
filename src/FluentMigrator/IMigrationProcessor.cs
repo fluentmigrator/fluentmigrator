@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Expressions;
@@ -32,6 +33,10 @@ namespace FluentMigrator
         DataSet ReadTableData(string schemaName, string tableName);
         DataSet Read(string template, params object[] args);
         bool Exists(string template, params object[] args);
+
+        string QuoteColumnNameIfRequired(string columnName);
+        string QuoteTableNameIfRequired(string tableName);
+        string BuildSelect(string tableName, List<string> columns);
 
         void BeginTransaction();
         void CommitTransaction();

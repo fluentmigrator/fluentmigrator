@@ -20,9 +20,11 @@ using FluentMigrator.Runner.Helpers;
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using FluentMigrator.Builders.Execute;
+using FluentMigrator.Info;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
@@ -108,6 +110,16 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             return Exists(DEFAULTVALUE_EXISTS, SafeSchemaName(schemaName),
                 FormatHelper.FormatSqlEscape(tableName),
                 FormatHelper.FormatSqlEscape(columnName), defaultValueAsString);
+        }
+
+        public override IEnumerable<TableInfo> GetTableInfos(string schemaName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IEnumerable<ColumnInfo> GetColumnInfos(string schemaName, string tableName)
+        {
+            throw new NotImplementedException();
         }
 
         public override void Execute(string template, params object[] args)

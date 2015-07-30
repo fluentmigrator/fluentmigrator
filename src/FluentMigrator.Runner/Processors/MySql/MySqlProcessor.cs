@@ -19,8 +19,10 @@ using FluentMigrator.Runner.Helpers;
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using FluentMigrator.Builders.Execute;
+using FluentMigrator.Info;
 using FluentMigrator.Runner.Generators.MySql;
 
 namespace FluentMigrator.Runner.Processors.MySql
@@ -84,6 +86,16 @@ namespace FluentMigrator.Runner.Processors.MySql
             string defaultValueAsString = string.Format("%{0}%", FormatHelper.FormatSqlEscape(defaultValue.ToString()));
             return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = SCHEMA() AND TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}' AND COLUMN_DEFAULT LIKE '{2}'",
                FormatHelper.FormatSqlEscape(tableName), FormatHelper.FormatSqlEscape(columnName), defaultValueAsString);
+        }
+
+        public override IEnumerable<TableInfo> GetTableInfos(string schemaName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IEnumerable<ColumnInfo> GetColumnInfos(string schemaName, string tableName)
+        {
+            throw new NotImplementedException();
         }
 
         public override void Execute(string template, params object[] args)

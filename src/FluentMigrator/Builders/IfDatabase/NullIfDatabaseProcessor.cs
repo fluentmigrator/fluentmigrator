@@ -17,6 +17,8 @@
 //
 #endregion
 
+using System.Collections.Generic;
+using FluentMigrator.Info;
 
 namespace FluentMigrator.Builders.IfDatabase
 {
@@ -36,7 +38,7 @@ namespace FluentMigrator.Builders.IfDatabase
         }
 
         public string DatabaseType { get { return "Unknown"; } }
-
+        
         public bool SchemaExists(string schemaName)
         {
             return false;
@@ -60,6 +62,16 @@ namespace FluentMigrator.Builders.IfDatabase
         public bool IndexExists(string schemaName, string tableName, string indexName)
         {
             return false;
+        }
+
+        public IEnumerable<TableInfo> GetTableInfos(string schemaName)
+        {
+           return new List<TableInfo>();
+        }
+
+        public IEnumerable<ColumnInfo> GetColumnInfos(string schemaName, string tableName)
+        {
+            return new List<ColumnInfo>();
         }
     }
 }
