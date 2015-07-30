@@ -112,15 +112,29 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                 FormatHelper.FormatSqlEscape(columnName), defaultValueAsString);
         }
 
+
         public override IEnumerable<TableInfo> GetTableInfos(string schemaName)
         {
-            throw new NotImplementedException();
+            return
+                Read("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}'", schemaName).Tables[0].AsEnumerable()
+                    .Select(dataRow => new TableInfo() { Name = dataRow.Field<string>("TABLE_NAME") });
         }
 
         public override IEnumerable<ColumnInfo> GetColumnInfos(string schemaName, string tableName)
         {
-            throw new NotImplementedException();
-        }
+            return
+                Read(
+                    "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}'",
+                    schemaName, tableName).Tables[0].AsEnumerable()
+                    .Select(dataRow =>
+                    {
+                        return new ColumnInfo()
+                        {
+                            Name = dataRow.Field<string>("COLUMN_NAME"),
+                        };
+                    }
+                    );
+        }       
 
         public override void Execute(string template, params object[] args)
         {
