@@ -43,6 +43,11 @@ namespace FluentMigrator.Builders.Select
             return this;
         }
 
+        public ISelectWhereSyntax Where()
+        {
+            return null;
+        }
+
         public ISelectColumnSyntax AllColumns
         {
             get

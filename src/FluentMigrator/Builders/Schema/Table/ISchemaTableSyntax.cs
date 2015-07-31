@@ -19,6 +19,7 @@
 using FluentMigrator.Builders.Schema.Column;
 using FluentMigrator.Builders.Schema.Constraint;
 using FluentMigrator.Builders.Schema.Index;
+using FluentMigrator.Info;
 
 namespace FluentMigrator.Builders.Schema.Table
 {
@@ -28,5 +29,6 @@ namespace FluentMigrator.Builders.Schema.Table
         ISchemaColumnSyntax Column(string column);
         ISchemaIndexSyntax Index(string indexName);
         ISchemaConstraintSyntax Constraint(string constraintName);
+        TableInfo Info { get; }
     }
 }

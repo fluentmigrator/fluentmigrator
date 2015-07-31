@@ -26,7 +26,7 @@ namespace FluentMigrator.Builders.Select
 
         ISelectColumnSyntax AllColumns { get; }
 
-        ISelectWhereSyntax Where { get; }
+        ISelectWhereSyntax Where();
 
         DataSet Read();
     }

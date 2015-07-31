@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System.Linq;
+using FluentMigrator.Info;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Schema.Column
@@ -38,6 +40,11 @@ namespace FluentMigrator.Builders.Schema.Column
         public bool Exists()
         {
             return _context.QuerySchema.ColumnExists(_schemaName, _tableName, _columnName);
+        }
+
+        public ColumnInfo Info
+        {
+            get { return _context.QuerySchema.GetColumnInfos(_schemaName,_tableName).FirstOrDefault(x => x.Name == _columnName); }
         }
     }
 }

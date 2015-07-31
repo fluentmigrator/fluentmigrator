@@ -16,10 +16,12 @@
 //
 #endregion
 
+using System.Linq;
 using FluentMigrator.Builders.Schema.Column;
 using FluentMigrator.Builders.Schema.Constraint;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Builders.Schema.Index;
+using FluentMigrator.Info;
 
 namespace FluentMigrator.Builders.Schema.Table
 {
@@ -56,5 +58,9 @@ namespace FluentMigrator.Builders.Schema.Table
             return new SchemaConstraintQuery(_schemaName, _tableName, constraintName, _context);
         }
 
+        public TableInfo Info
+        {
+            get { return _context.QuerySchema.GetTableInfos(_schemaName).FirstOrDefault(x => x.Name == _tableName); }
+        }
     }
 }
