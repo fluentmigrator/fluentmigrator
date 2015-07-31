@@ -16,18 +16,18 @@
 //
 #endregion
 
-using System.Data;
-
 namespace FluentMigrator.Builders.Select
 {
-    public interface ISelectColumnSyntax
+    public interface ISelectWhereColumnSyntax
     {
-        ISelectColumnSyntax Column(string name);
+        ISelectWhereSyntax IsNull();
+        ISelectWhereSyntax IsNotNull();
 
-        ISelectColumnSyntax AllColumns { get; }
-
-        ISelectWhereSyntax Where { get; }
-
-        DataSet Read();
+        ISelectWhereColumnCompareSyntax IsEqualTo();
+        ISelectWhereColumnCompareSyntax IsNotEqualTo();
+        ISelectWhereColumnCompareSyntax IsGreaterThen();
+        ISelectWhereColumnCompareSyntax IsGreaterOrEqualThen();
+        ISelectWhereColumnCompareSyntax IsLowerThen();
+        ISelectWhereColumnCompareSyntax IsLowerOrEqualThen();       
     }
 }

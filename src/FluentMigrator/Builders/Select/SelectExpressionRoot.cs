@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System.Collections.Generic;
+using System.Linq;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Select
@@ -32,6 +34,13 @@ namespace FluentMigrator.Builders.Select
         public ISelectColumnSyntax Table(string tableName)
         {
             return new SelectColumnSyntax(_context, tableName);
+        }
+
+        public IEnumerable<ISelectColumnSyntax> Tables
+        {
+            get {
+                return _context.QuerySchema.GetTableInfos(null).Select(tableInfo => new SelectColumnSyntax(_context, tableInfo.Name)).Cast<ISelectColumnSyntax>();
+            }
         }
     }
 }

@@ -16,12 +16,15 @@
 //
 #endregion
 
+using System.Collections.Generic;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Select
 {
     public interface ISelectExpressionRoot : IFluentSyntax
     {
-        ISelectColumnSyntax Table(string tableName);      
+        ISelectColumnSyntax Table(string tableName);
+
+        IEnumerable<ISelectColumnSyntax> Tables { get; }
     }
 }

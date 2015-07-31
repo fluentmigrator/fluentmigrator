@@ -122,6 +122,9 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="Builders\Select\ISelectWhereColumnCompareSyntax.cs" />
+    <Compile Include="Builders\Select\ISelectWhereColumnSyntax.cs" />
+    <Compile Include="Builders\Select\ISelectWhereSyntax.cs" />
     <Compile Include="Builders\Select\ISelectExpressionRoot.cs" />
     <Compile Include="Builders\Select\ISelectColumnSyntax.cs" />
     <Compile Include="Builders\Select\SelectColumnSyntax.cs" />
