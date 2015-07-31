@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System.Collections.Generic;
+using System.Linq;
 using FluentMigrator.Builders.Schema.Table;
 using FluentMigrator.Infrastructure;
 
@@ -40,6 +42,11 @@ namespace FluentMigrator.Builders.Schema.Schema
         public ISchemaTableSyntax Table(string tableName)
         {
             return new SchemaTableQuery(_context, _schemaName, tableName);
+        }
+
+        public IEnumerable<ISchemaTableSyntax> Tables
+        {
+            get { return _context.QuerySchema.GetTableInfos(_schemaName).Select(x => (ISchemaTableSyntax)new SchemaTableQuery(_context, _schemaName, x.Name)); }
         }
     }
 }
