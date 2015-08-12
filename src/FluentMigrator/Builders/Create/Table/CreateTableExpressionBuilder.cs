@@ -168,6 +168,7 @@ namespace FluentMigrator.Builders.Create.Table
 
             _context.Expressions.Add(fk);
             CurrentForeignKey = fk.ForeignKey;
+            CurrentColumn.ForeignKey = fk.ForeignKey;
             return this;
         }
 

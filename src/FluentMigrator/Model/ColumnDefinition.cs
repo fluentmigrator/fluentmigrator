@@ -49,6 +49,7 @@ namespace FluentMigrator.Model
         public virtual ColumnModificationType ModificationType { get; set; }
         public virtual string ColumnDescription { get; set; }
         public virtual string CollationName { get; set; }
+        public virtual ForeignKeyDefinition ForeignKey { get; set; }
 
         public void ApplyConventions(IMigrationConventions conventions)
         {

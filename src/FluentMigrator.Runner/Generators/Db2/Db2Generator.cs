@@ -81,7 +81,7 @@
             }
 
             var keyName = string.IsNullOrEmpty(expression.ForeignKey.Name)
-                ? GenerateForeignKeyName(expression)
+                ? Column.GenerateForeignKeyName(expression.ForeignKey)
                 : expression.ForeignKey.Name;
             var keyWithSchema = string.IsNullOrEmpty(expression.ForeignKey.ForeignTableSchema)
                 ? Quoter.QuoteConstraintName(keyName)
@@ -106,7 +106,7 @@
                 foreignColumns,
                 this.QuoteSchemaAndTable(expression.ForeignKey.PrimaryTableSchema, expression.ForeignKey.PrimaryTable),
                 primaryColumns,
-                this.FormatCascade("DELETE", expression.ForeignKey.OnDelete));
+                Column.FormatCascade("DELETE", expression.ForeignKey.OnDelete));
         }
 
         public override string Generate(Expressions.CreateConstraintExpression expression)
