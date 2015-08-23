@@ -77,17 +77,17 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
         }
 
         [Test]
-        public void ExplicitUnicodeStringIgnoredForNonSqlServer()
+        public void NonUnicodeStringIgnoredForNonSqlServer()
         {
             var expression = new InsertDataExpression { TableName = "TestTable" };
             expression.Rows.Add(new InsertionDataDefinition
                                     {
                                         new KeyValuePair<string, object>("NormalString", "Just'in"),
-                                        new KeyValuePair<string, object>("UnicodeString", new ExplicitUnicodeString("codethinked'.com"))
+                                        new KeyValuePair<string, object>("NonUnicodeString", new NonUnicodeString("codethinked'.com"))
                                     });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("INSERT INTO TestTable (NormalString, UnicodeString) VALUES ('Just''in', 'codethinked''.com')");
+            result.ShouldBe("INSERT INTO TestTable (NormalString, NonUnicodeString) VALUES ('Just''in', 'codethinked''.com')");
         }
 
         [Test]

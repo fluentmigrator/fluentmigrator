@@ -186,7 +186,7 @@
     <Compile Include="Builders\IInSchemaSyntax.cs" />
     <Compile Include="Builders\Schema\Constraint\ISchemaConstraintSyntax.cs" />
     <Compile Include="Builders\Schema\Constraint\SchemaConstraintQuery.cs" />
-    <Compile Include="ExplicitUnicodeString.cs" />
+    <Compile Include="NonUnicodeString.cs" />
     <Compile Include="Exceptions\DatabaseOperationNotSupportedException.cs" />
     <Compile Include="Exceptions\DuplicateMigrationException.cs" />
     <Compile Include="Exceptions\FluentMigratorException.cs" />

@@ -1,5 +1,4 @@
-﻿using System;
-using FluentMigrator.Runner.Generators.Generic;
+﻿using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.Hana
 {
@@ -11,7 +10,7 @@ namespace FluentMigrator.Runner.Generators.Hana
 
         public override string QuoteValue(object value)
         {
-            if (value != null && value is ExplicitUnicodeString)
+            if (value is string)
             {
                 return string.Format("N{0}", FormatString(value.ToString()));
             }

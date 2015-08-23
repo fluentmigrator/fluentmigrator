@@ -293,15 +293,15 @@ namespace FluentMigrator.Tests.Unit.Generators
         }
 
         [Test]
-        public void ExplicitUnicodeStringIsFormattedAsNormalString()
+        public void NonUnicodeStringIsFormattedAsNormalString()
         {
-            quoter.QuoteValue(new ExplicitUnicodeString("Test String")).ShouldBe("'Test String'");
+            quoter.QuoteValue(new NonUnicodeString("Test String")).ShouldBe("'Test String'");
         }
 
         [Test]
-        public void ExplicitUnicodeStringIsFormattedAsNormalStringQuotes()
+        public void NonUnicodeStringIsFormattedAsNormalStringQuotes()
         {
-            quoter.QuoteValue(new ExplicitUnicodeString("Test ' String")).ShouldBe("'Test '' String'");
+            quoter.QuoteValue(new NonUnicodeString("Test ' String")).ShouldBe("'Test '' String'");
         }
     }
 }

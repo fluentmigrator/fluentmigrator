@@ -1,5 +1,4 @@
-﻿using FluentMigrator.Model;
-using FluentMigrator.Runner.Generators.Generic;
+﻿using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
@@ -20,7 +19,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string QuoteValue(object value)
         {
-            if (value != null && value is ExplicitUnicodeString)
+            // in SQL Server, string literals should default to Unicode (N'some string')
+            if (value is string)
             {
                 return string.Format("N{0}", FormatString(value.ToString()));
             }

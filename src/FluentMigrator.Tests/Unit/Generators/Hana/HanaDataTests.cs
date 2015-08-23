@@ -53,8 +53,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM \"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL; " +
-                            "DELETE FROM \"TestTable1\" WHERE \"Website\" = 'github.com';");
+            result.ShouldBe("DELETE FROM \"TestTable1\" WHERE \"Name\" = N'Just''in' AND \"Website\" IS NULL; " +
+                            "DELETE FROM \"TestTable1\" WHERE \"Website\" = N'github.com';");
         }
 
         [Test]
@@ -75,7 +75,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM \"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL;");
+            result.ShouldBe("DELETE FROM \"TestTable1\" WHERE \"Name\" = N'Just''in' AND \"Website\" IS NULL;");
         }
 
         [Test]
@@ -98,8 +98,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
 
-            var expected = "INSERT INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (1, 'Just''in', 'codethinked.com');";
-            expected += " INSERT INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (2, 'Na\\te', 'kohari.org');";
+            var expected = "INSERT INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (1, N'Just''in', N'codethinked.com');";
+            expected += " INSERT INTO \"TestTable1\" (\"Id\", \"Name\", \"Website\") VALUES (2, N'Na\\te', N'kohari.org');";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
@@ -145,7 +145,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE \"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE 1 = 1;");
+            result.ShouldBe("UPDATE \"TestTable1\" SET \"Name\" = N'Just''in', \"Age\" = 25 WHERE 1 = 1;");
         }
 
         [Test]
@@ -166,7 +166,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE \"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL;");
+            result.ShouldBe("UPDATE \"TestTable1\" SET \"Name\" = N'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL;");
         }
     }
 }

@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM [TestSchema].[TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL; DELETE FROM [TestSchema].[TestTable1] WHERE [Website] = 'github.com'");
+            result.ShouldBe("DELETE FROM [TestSchema].[TestTable1] WHERE [Name] = N'Just''in' AND [Website] IS NULL; DELETE FROM [TestSchema].[TestTable1] WHERE [Website] = N'github.com'");
         }
 
         [Test]
@@ -51,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM [dbo].[TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL; DELETE FROM [dbo].[TestTable1] WHERE [Website] = 'github.com'");
+            result.ShouldBe("DELETE FROM [dbo].[TestTable1] WHERE [Name] = N'Just''in' AND [Website] IS NULL; DELETE FROM [dbo].[TestTable1] WHERE [Website] = N'github.com'");
         }
 
         [Test]
@@ -61,7 +61,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM [TestSchema].[TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL");
+            result.ShouldBe("DELETE FROM [TestSchema].[TestTable1] WHERE [Name] = N'Just''in' AND [Website] IS NULL");
         }
 
         [Test]
@@ -70,7 +70,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM [dbo].[TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL");
+            result.ShouldBe("DELETE FROM [dbo].[TestTable1] WHERE [Name] = N'Just''in' AND [Website] IS NULL");
         }
 
         [Test]
@@ -79,8 +79,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetInsertDataExpression();
             expression.SchemaName = "TestSchema";
 
-            var expected = "INSERT INTO [TestSchema].[TestTable1] ([Id], [Name], [Website]) VALUES (1, 'Just''in', 'codethinked.com');";
-            expected += @" INSERT INTO [TestSchema].[TestTable1] ([Id], [Name], [Website]) VALUES (2, 'Na\te', 'kohari.org')";
+            var expected = "INSERT INTO [TestSchema].[TestTable1] ([Id], [Name], [Website]) VALUES (1, N'Just''in', N'codethinked.com');";
+            expected += @" INSERT INTO [TestSchema].[TestTable1] ([Id], [Name], [Website]) VALUES (2, N'Na\te', N'kohari.org')";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
@@ -91,8 +91,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
 
-            var expected = "INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (1, 'Just''in', 'codethinked.com');";
-            expected += @" INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (2, 'Na\te', 'kohari.org')";
+            var expected = "INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (1, N'Just''in', N'codethinked.com');";
+            expected += @" INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (2, N'Na\te', N'kohari.org')";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
@@ -124,7 +124,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE [TestSchema].[TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE 1 = 1");
+            result.ShouldBe("UPDATE [TestSchema].[TestTable1] SET [Name] = N'Just''in', [Age] = 25 WHERE 1 = 1");
         }
 
         [Test]
@@ -133,7 +133,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE [dbo].[TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE 1 = 1");
+            result.ShouldBe("UPDATE [dbo].[TestTable1] SET [Name] = N'Just''in', [Age] = 25 WHERE 1 = 1");
         }
 
         [Test]
@@ -143,7 +143,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE [TestSchema].[TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL");
+            result.ShouldBe("UPDATE [TestSchema].[TestTable1] SET [Name] = N'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL");
         }
 
         [Test]
@@ -152,7 +152,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE [dbo].[TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL");
+            result.ShouldBe("UPDATE [dbo].[TestTable1] SET [Name] = N'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL");
         }
 
         [Test]
@@ -162,8 +162,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.AdditionalFeatures.Add(SqlServerExtensions.IdentityInsert, true);
 
             var expected = "SET IDENTITY_INSERT [dbo].[TestTable1] ON;";
-            expected += " INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (1, 'Just''in', 'codethinked.com');";
-            expected += @" INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (2, 'Na\te', 'kohari.org');";
+            expected += " INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (1, N'Just''in', N'codethinked.com');";
+            expected += @" INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (2, N'Na\te', N'kohari.org');";
             expected += " SET IDENTITY_INSERT [dbo].[TestTable1] OFF";
 
             var result = Generator.Generate(expression);
@@ -178,8 +178,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
 
             var expected = "SET IDENTITY_INSERT [dbo].[TestTable1] ON;";
-            expected += " INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (1, 'Just''in', 'codethinked.com');";
-            expected += @" INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (2, 'Na\te', 'kohari.org');";
+            expected += " INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (1, N'Just''in', N'codethinked.com');";
+            expected += @" INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (2, N'Na\te', N'kohari.org');";
             expected += " SET IDENTITY_INSERT [dbo].[TestTable1] OFF";
 
             var result = Generator.Generate(expression);
