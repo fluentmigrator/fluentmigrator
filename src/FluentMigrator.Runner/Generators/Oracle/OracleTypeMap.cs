@@ -47,7 +47,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             SetTypeMap(DbType.Binary, "BLOB", BlobCapacity);
             SetTypeMap(DbType.Boolean, "NUMBER(1,0)");
             SetTypeMap(DbType.Byte, "NUMBER(3,0)");
-            SetTypeMap(DbType.Currency, "NUMBER(19,1)");
+            SetTypeMap(DbType.Currency, "NUMBER(19,4)");
             SetTypeMap(DbType.Date, "DATE");
             SetTypeMap(DbType.DateTime, "TIMESTAMP(4)");
             SetTypeMap(DbType.Decimal, "NUMBER(19,5)");
