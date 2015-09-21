@@ -11,14 +11,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
 {
     public class FbEndToEndFixture
     {
-
-        private readonly string _migrationsNamespace;
-
-        public FbEndToEndFixture(string migrationsNamespace)
-        {
-            _migrationsNamespace = migrationsNamespace;
-        }
-
         [SetUp]
         public void SetUp()
         {
@@ -50,17 +42,17 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
             }
         }
 
-        protected void Migrate()
+        protected void Migrate(string migrationsNamespace)
         {
-            MakeTask("migrate").Execute();
+            MakeTask("migrate", migrationsNamespace).Execute();
         }
 
-        protected void Rollback()
+        protected void Rollback(string migrationsNamespace)
         {
-            MakeTask("rollback").Execute();
+            MakeTask("rollback", migrationsNamespace).Execute();
         }
 
-        protected TaskExecutor MakeTask(string task)
+        protected TaskExecutor MakeTask(string task, string migrationsNamespace)
         {
             var announcer = new TextWriterAnnouncer(System.Console.Out);
             var runnerContext = new RunnerContext(announcer)
@@ -68,7 +60,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
                 Database = "Firebird",
                 Connection = IntegrationTestOptions.Firebird.ConnectionString,
                 Targets = new[] { Assembly.GetExecutingAssembly().Location },
-                Namespace = _migrationsNamespace,
+                Namespace = migrationsNamespace,
                 Task = task
             };
             return new TaskExecutor(runnerContext);
@@ -88,8 +80,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
             return IsInDatabase(cmd =>
                 {
                     cmd.CommandText = "select rdb$field_name from rdb$relation_fields where (rdb$relation_name = @table) and (rdb$field_name = @column)";
-                    cmd.Parameters.AddWithValue("table", tableName);
-                    cmd.Parameters.AddWithValue("column", candidateColumn);
+                    cmd.Parameters.AddWithValue("table", tableName.ToUpper());
+                    cmd.Parameters.AddWithValue("column", candidateColumn.ToUpper());
                 });
         }
 

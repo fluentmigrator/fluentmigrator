@@ -1,9 +1,54 @@
-﻿using FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd.ImplicitlyCreatedFk;
+﻿using FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd.ExplicitlyCreatedFk;
+using FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd.ImplicitlyCreatedFk;
 using NUnit.Framework;
 using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
 {
+    public class TestRollbackColumnCreation : FbEndToEndFixture
+    {
+        [Test]
+        public void Rollback_ColumnCreatedOnTableWithImplicitlyCreatedFk_CreatedColumnShouldBeDropped()
+        {
+            var namespaceFilter = typeof(CreateImplicitFk).Namespace;
+            Migrate(namespaceFilter);
+
+            Rollback(namespaceFilter);
+
+            ColumnExists("table2", "silly").ShouldBe(false);
+        }
+
+        [Test]
+        public void Rollback_ColumnCreatedOnTableWithExplictlyCreatedFk_CreatedColumnShouldBeDropped()
+        {
+            var namespaceFilter = typeof(CreateExplicitFk).Namespace;
+            Migrate(namespaceFilter);
+
+            Rollback(namespaceFilter);
+
+            ColumnExists("table2", "silly").ShouldBe(false);
+        }
+
+        [Test]
+        public void Delete_ColumnCreateOnTableWithExplicitPk_ColumnShouldBeDropped()
+        {
+            Migrate(typeof(DeleteColumnOnTableWithFk.CreateExplicitFk).Namespace);
+
+            ColumnExists("table2", "silly").ShouldBe(false);
+        }
+
+        [Test]
+        public void Rollback_DeletedColumnOnTableWithExplicitFk_ColumnShouldBeRecreated()
+        {
+            var namespaceFilter = typeof(DeleteColumnOnTableWithFk.CreateExplicitFk).Namespace;
+            Migrate(namespaceFilter);
+
+            Rollback(namespaceFilter);
+
+            ColumnExists("table2", "silly").ShouldBe(true);
+        }
+    }
+
     namespace ImplicitlyCreatedFk
     {
         [Migration(1)]
@@ -14,7 +59,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
                 Execute.Sql("create table table1(id bigint primary key)");
 
                 // the foreign key "table1_fk" doesn't explictly reference "id" of table1!
-                Execute.Sql("create table table2(id bigint primary key, table1_fk bigint references table1)"); 
+                Execute.Sql("create table table2(id bigint primary key, table1_fk bigint references table1)");
             }
 
             public override void Down()
@@ -39,21 +84,78 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
         }
     }
 
-    public class TestRollbackColumnCreation : FbEndToEndFixture
+    namespace ExplicitlyCreatedFk
     {
-        public TestRollbackColumnCreation()
-            :base(typeof(CreateImplicitFk).Namespace)
-        {            
+        [Migration(1)]
+        public class CreateExplicitFk : Migration
+        {
+            public override void Up()
+            {
+                Create.Table("table1")
+                    .WithColumn("id").AsInt64().PrimaryKey();
+
+                Create.Table("table2")
+                    .WithColumn("id").AsInt64().PrimaryKey()
+                    .WithColumn("table1_fk").AsInt64().ForeignKey("table1", "id");
+            }
+
+            public override void Down()
+            {
+                Delete.Table("table2");
+                Delete.Table("table1");
+            }
         }
 
-        [Test]
-        public void Rollback_ColumnCreatedOnTableWithImplicitlyCreatedFk_CreatedColumnShouldBeDropped()
+        [Migration(2)]
+        public class CreateSillyColumnOnTable2 : Migration
         {
-            Migrate();
+            public override void Up()
+            {
+                Create.Column("silly").OnTable("table2").AsString(30);
+            }
 
-            Rollback();
+            public override void Down()
+            {
+                Delete.Column("silly").FromTable("table2");
+            }
+        }
+    }
 
-            ColumnExists("table2", "silly").ShouldBe(false);
+    namespace DeleteColumnOnTableWithFk
+    {
+        [Migration(1)]
+        public class CreateExplicitFk : Migration
+        {
+            public override void Up()
+            {
+                Create.Table("table1")
+                    .WithColumn("id").AsInt64().PrimaryKey();
+
+                Create.Table("table2")
+                    .WithColumn("id").AsInt64().PrimaryKey()
+                    .WithColumn("table1_fk").AsInt64().ForeignKey("table1", "id")
+                    .WithColumn("silly").AsString(30);
+            }
+
+            public override void Down()
+            {
+                Delete.Table("table2");
+                Delete.Table("table1");
+            }
+        }
+
+        [Migration(2)]
+        public class DeleteSillyColumnOnTable2 : Migration
+        {
+            public override void Up()
+            {
+                Delete.Column("silly").FromTable("table2");
+            }
+
+            public override void Down()
+            {
+                Create.Column("silly").OnTable("table2").AsString(30);
+            }
         }
     }
 }
