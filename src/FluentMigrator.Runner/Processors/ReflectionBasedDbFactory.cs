@@ -5,8 +5,8 @@ namespace FluentMigrator.Runner.Processors
 
     public class ReflectionBasedDbFactory : DbFactoryBase
     {
-        private readonly string assemblyName;
-        private readonly string dbProviderFactoryTypeName;
+        protected readonly string assemblyName;
+        protected readonly string dbProviderFactoryTypeName;
 
         public ReflectionBasedDbFactory(string assemblyName, string dbProviderFactoryTypeName)
         {

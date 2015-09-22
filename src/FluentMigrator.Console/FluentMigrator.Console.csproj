@@ -93,6 +93,9 @@
   <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>FluentMigrator.Console.Program</StartupObject>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core">
