@@ -1,7 +1,5 @@
 using System;
-using System.IO;
 using System.Reflection;
-using System.Threading;
 using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
@@ -14,32 +12,13 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
         [SetUp]
         public void SetUp()
         {
-            if (File.Exists("fbtest.fdb"))
-                FbConnection.DropDatabase(IntegrationTestOptions.Firebird.ConnectionString);
-            FbConnection.CreateDatabase(IntegrationTestOptions.Firebird.ConnectionString);
+            FbDatabase.CreateDatabase(IntegrationTestOptions.Firebird.ConnectionString);
         }
 
         [TearDown]
         public void TearDown()
         {
-            FbConnection.ClearAllPools();
-            // Avoid "lock time-out on wait transaction" exception
-            var retries = 5;
-            while (true)
-            {
-                try
-                {
-                    FbConnection.DropDatabase(IntegrationTestOptions.Firebird.ConnectionString);
-                    break;
-                }
-                catch
-                {
-                    if (--retries == 0)
-                        throw;
-                    else
-                        Thread.Sleep(100);
-                }
-            }
+            FbDatabase.DropDatabase(IntegrationTestOptions.Firebird.ConnectionString);
         }
 
         protected void Migrate(string migrationsNamespace)

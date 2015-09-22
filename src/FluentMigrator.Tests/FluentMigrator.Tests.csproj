@@ -223,6 +223,7 @@
     <Compile Include="Integration\Processors\Firebird\EndToEnd\FbEndToEndFixture.cs" />
     <Compile Include="Integration\Processors\Firebird\EndToEnd\TestInitialMigration.cs" />
     <Compile Include="Integration\Processors\Firebird\EndToEnd\TestRollbackColumnCreation.cs" />
+    <Compile Include="Integration\Processors\Firebird\FbDatabase.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdColumnTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdConstraintTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdEmbeddedLibrariesForWindows.Designer.cs">
