@@ -5,6 +5,8 @@ using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
 {
+    [TestFixture]
+    [Category("Integration")]
     public class TestRollbackColumnCreation : FbEndToEndFixture
     {
         [Test]
