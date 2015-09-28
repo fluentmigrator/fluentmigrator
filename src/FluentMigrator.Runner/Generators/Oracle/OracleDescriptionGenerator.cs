@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using FluentMigrator.Expressions;
-using FluentMigrator.Runner.Generators.Generic;
+﻿using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.Oracle
 {
@@ -10,6 +8,9 @@ namespace FluentMigrator.Runner.Generators.Oracle
 
         private const string TableDescriptionTemplate = "COMMENT ON TABLE {0} IS '{1}'";
         private const string ColumnDescriptionTemplate = "COMMENT ON COLUMN {0}.{1} IS '{2}'";
+
+        private const string TableDescriptionAltQuotingTemplate = "COMMENT ON TABLE {0} IS q'${1}$'";
+        private const string ColumnDescriptionAltQuotingTemplate = "COMMENT ON COLUMN {0}.{1} IS q'${2}$'";
 
         #endregion
 
@@ -26,7 +27,11 @@ namespace FluentMigrator.Runner.Generators.Oracle
             if (string.IsNullOrEmpty(tableDescription))
                 return string.Empty;
 
-            return string.Format(TableDescriptionTemplate, GetFullTableName(schemaName, tableName), tableDescription);
+            string template = (tableDescription.Contains("'")
+                ? TableDescriptionAltQuotingTemplate
+                : TableDescriptionTemplate);
+
+            return string.Format(template, GetFullTableName(schemaName, tableName), tableDescription);
         }
 
         protected override string GenerateColumnDescription(
@@ -35,8 +40,12 @@ namespace FluentMigrator.Runner.Generators.Oracle
             if (string.IsNullOrEmpty(columnDescription))
                 return string.Empty;
 
+            string template = (columnDescription.Contains("'")
+                ? ColumnDescriptionAltQuotingTemplate
+                : ColumnDescriptionTemplate);
+
             return string.Format(
-                ColumnDescriptionTemplate,
+                template,
                 GetFullTableName(schemaName, tableName),
                 columnName,
                 columnDescription);

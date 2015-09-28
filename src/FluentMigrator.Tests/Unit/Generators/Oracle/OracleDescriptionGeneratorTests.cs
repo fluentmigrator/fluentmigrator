@@ -60,5 +60,16 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 
             statement.ShouldBe("COMMENT ON COLUMN TestTable1.TestColumn1 IS 'TestColumn1Description'");
         }
+
+        [Test]
+        public void GenerateDescriptionStatementsWithSingleQuoteForCreateTableReturnTableDescriptionStatement()
+        {
+            var createTableExpression = GeneratorTestHelper.GetCreateTableWithTableDescription();
+            createTableExpression.TableDescription = "Test Description with single quote (') character here >> '";
+            var statements = descriptionGenerator.GenerateDescriptionStatements(createTableExpression);
+
+            var result = statements.First();
+            result.ShouldBe("COMMENT ON TABLE TestTable1 IS q'$Test Description with single quote (') character here >> '$'");
+        }
     }
 }
