@@ -42,6 +42,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             // Officially this is 1073741823 but we will allow the int.MaxValue Convention
             SetTypeMap(DbType.String, "NTEXT", int.MaxValue);
             SetTypeMap(DbType.Time, "DATETIME");
+            SetTypeMap(DbType.Xml, "XML");
         }
     }
 }
