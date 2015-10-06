@@ -25,7 +25,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             SetTypeMap(DbType.Boolean, "BIT");
             SetTypeMap(DbType.Byte, "TINYINT");
             SetTypeMap(DbType.Currency, "MONEY");
-            SetTypeMap(DbType.Date, "DATETIME");
+            SetTypeMap(DbType.Date, "DATE");
             SetTypeMap(DbType.DateTime, "DATETIME");
             SetTypeMap(DbType.Decimal, "DECIMAL(19,5)");
             SetTypeMap(DbType.Decimal, "DECIMAL($size,$precision)", DecimalCapacity);
