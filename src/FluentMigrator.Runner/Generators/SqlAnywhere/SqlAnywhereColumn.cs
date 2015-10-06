@@ -18,8 +18,8 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 
             var defaultValue = base.FormatDefaultValue(column);
 
-            if (column.ModificationType == ColumnModificationType.Create && !string.IsNullOrEmpty(defaultValue))
-                return "CONSTRAINT " + Quoter.QuoteConstraintName(GetDefaultConstraintName(column.TableName, column.Name)) + " " + defaultValue;
+            if (!string.IsNullOrEmpty(defaultValue))
+                return defaultValue;
 
             return string.Empty;
         }
