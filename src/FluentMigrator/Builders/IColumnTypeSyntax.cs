@@ -34,6 +34,7 @@ namespace FluentMigrator.Builders
         TNext AsCurrency();
         TNext AsDate();
         TNext AsDateTime();
+        TNext AsDateTime2();
         TNext AsDateTimeOffset();
         TNext AsDecimal();
         TNext AsDecimal(int size, int precision);

@@ -196,6 +196,11 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
         }
 
         [Test]
+        public void CallingAsDateTime2SetsColumnDbTypeToDateTime2() {
+          VerifyColumnDbType(DbType.DateTime2, b => b.AsDateTime2());
+        }
+
+        [Test]
         public void CallingAsDateTimeOffsetSetsColumnDbTypeToDateTimeOffset() 
         {
             VerifyColumnDbType(DbType.DateTimeOffset, b => b.AsDateTimeOffset());
