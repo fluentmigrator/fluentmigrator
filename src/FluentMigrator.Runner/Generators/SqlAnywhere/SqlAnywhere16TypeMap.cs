@@ -32,7 +32,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             SetTypeMap(DbType.Double, "DOUBLE PRECISION");
             SetTypeMap(DbType.Guid, "UNIQUEIDENTIFIER");
             SetTypeMap(DbType.Int16, "SMALLINT");
-            SetTypeMap(DbType.Int32, "INT");
+            SetTypeMap(DbType.Int32, "INTEGER");
             SetTypeMap(DbType.Int64, "BIGINT");
             SetTypeMap(DbType.Single, "REAL");
             SetTypeMap(DbType.StringFixedLength, "NCHAR(255)");
