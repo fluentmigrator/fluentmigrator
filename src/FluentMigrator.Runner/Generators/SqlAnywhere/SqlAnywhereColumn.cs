@@ -9,6 +9,8 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
         public SqlAnywhereColumn(ITypeMap typeMap)
             : base(typeMap, new SqlAnywhereQuoter())
         {
+            // Add UNIQUE before IDENTITY and after PRIMARY KEY
+            this.ClauseOrder.Insert(this.ClauseOrder.Count - 2, this.FormatUniqueConstraint);
         }
 
         protected override string FormatDefaultValue(ColumnDefinition column)
@@ -27,6 +29,12 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
         private static bool DefaultValueIsSqlFunction(object defaultValue)
         {
             return defaultValue is string && defaultValue.ToString().EndsWith("()");
+        }
+
+        protected virtual string FormatUniqueConstraint(ColumnDefinition column)
+        {
+            // Define unique constraints on columns in addition to creating a unique index
+            return column.IsUnique ? "UNIQUE" : string.Empty;
         }
 
         protected override string FormatIdentity(ColumnDefinition column)
