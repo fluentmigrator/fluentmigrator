@@ -252,7 +252,7 @@ namespace FluentMigrator.Console
             consoleAnnouncer.Write("             server=.\\SQLExpress;database=Foo;trusted_connection=true");
             consoleAnnouncer.Write("   ");
             consoleAnnouncer.Write("OR use a named connection string from the machine.config:");
-            consoleAnnouncer.Write("  migrate -a bin\\debug\\MyMigrations.dll -db SqlServer2008 -connectionName \"namedConnection\" -profile \"Debug\"");
+            consoleAnnouncer.Write("  migrate -a bin\\debug\\MyMigrations.dll -db SqlServer2008 -conn \"namedConnection\" -profile \"Debug\"");
             consoleAnnouncer.HorizontalRule();
             consoleAnnouncer.Write("Options:");
             p.WriteOptionDescriptions(System.Console.Out);
