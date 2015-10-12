@@ -38,13 +38,12 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
         {
         }
 
-        public override string RenameTable { get { return "sp_rename '{0}', '{1}'"; } }
-
-        public override string RenameColumn { get { return "sp_rename '{0}.{1}', '{2}'"; } }
-
         public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
 
         public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
+        public override string DropColumn { get { return "ALTER TABLE {0} DROP {1}"; } }
+        public override string AlterColumn { get { return "ALTER TABLE {0} ALTER {1}"; } }
+        public override string RenameColumn { get { return "ALTER TABLE {0} RENAME {1} TO {2}"; } }
 
         public virtual string IdentityInsert { get { return "SET IDENTITY_INSERT {0} {1}"; } }
 
