@@ -28,9 +28,10 @@
             Assembly assembly = null;
 
             if (!this.TryLoadAssemblyFromCurrentDomain("iAnywhere.Data.SQLAnywhere.v4.5", out assembly))
-                if (!this.TryLoadAssemblyFromCurrentDomain("iAnywhere.Data.SQLAnywhere.v4.0", out assembly))
-                    if (!this.TryLoadAssemblyFromCurrentDomain("iAnywhere.Data.SQLAnywhere.v3.5", out assembly))
-                        throw new FileNotFoundException("Unable to load driver for SQLAnywhere. Attempted to load iAnywhere.Data.SQLAnywhere.v4.5.dll, 4.0.dll or 3.5.dll from current app domain.");
+                if (!this.TryLoadAssemblyFromCurrentDomain("iAnywhere.Data.SQLAnywhere.EF6", out assembly))
+                    if (!this.TryLoadAssemblyFromCurrentDomain("iAnywhere.Data.SQLAnywhere.v4.0", out assembly))
+                        if (!this.TryLoadAssemblyFromCurrentDomain("iAnywhere.Data.SQLAnywhere.v3.5", out assembly))
+                            throw new FileNotFoundException("Unable to load driver for SQLAnywhere. Attempted to load iAnywhere.Data.SQLAnywhere.v4.5.dll, EF6.dll, 4.0.dll or 3.5.dll from current app domain.");
 
             return assembly;
         }
