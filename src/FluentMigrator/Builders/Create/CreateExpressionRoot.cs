@@ -37,9 +37,9 @@ namespace FluentMigrator.Builders.Create
             _context = context;
         }
 
-        public void Schema(string schemaName)
+        public void Schema(string schemaName, bool checkIfExists = false)
         {
-            var expression = new CreateSchemaExpression { SchemaName = schemaName };
+            var expression = new CreateSchemaExpression { SchemaName = schemaName, CheckIfExists = checkIfExists };
             _context.Expressions.Add(expression);
         }
 

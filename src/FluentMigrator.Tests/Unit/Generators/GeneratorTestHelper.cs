@@ -23,7 +23,15 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         public static CreateTableExpression GetCreateTableExpression()
         {
-            CreateTableExpression expression = new CreateTableExpression() { TableName = TestTableName1, };
+            CreateTableExpression expression = new CreateTableExpression() { TableName = TestTableName1 };
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, Type = DbType.String });
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, Type = DbType.Int32 });
+            return expression;
+        }
+
+        public static CreateTableExpression GetCreateTableIdempotentExpression()
+        {
+            CreateTableExpression expression = new CreateTableExpression() { TableName = TestTableName1, CheckIfExists = true };
             expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, Type = DbType.String });
             expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, Type = DbType.Int32 });
             return expression;
@@ -126,6 +134,11 @@ namespace FluentMigrator.Tests.Unit.Generators
         public static CreateSchemaExpression GetCreateSchemaExpression()
         {
             return new CreateSchemaExpression { SchemaName = "TestSchema" };
+        }
+
+        public static CreateSchemaExpression GetCreateSchemaIfNotExistsExpression()
+        {
+            return new CreateSchemaExpression { SchemaName = "TestSchema", CheckIfExists = true};
         }
 
         public static CreateSequenceExpression GetCreateSequenceExpression()

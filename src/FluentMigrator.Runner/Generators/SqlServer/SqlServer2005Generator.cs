@@ -68,7 +68,17 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string Generate(CreateTableExpression expression)
         {
             var descriptionStatements = DescriptionGenerator.GenerateDescriptionStatements(expression);
-            var createTableStatement = string.Format("CREATE TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+
+            string createTableStatement;
+            if (expression.CheckIfExists)
+            {
+                createTableStatement = string.Format("IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '[{1}]')) BEGIN CREATE TABLE {0}.{2} END", Quoter.QuoteSchemaName(expression.SchemaName), expression.TableName, base.Generate(expression));
+            }
+            else
+            {
+                createTableStatement = string.Format("CREATE TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            }
+
             var descriptionStatementsArray = descriptionStatements as string[] ?? descriptionStatements.ToArray();
 
             if (!descriptionStatementsArray.Any())
@@ -355,6 +365,14 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(CreateSchemaExpression expression)
         {
+            if (expression.CheckIfExists)
+            {
+                return string.Format(@"IF (NOT EXISTS (SELECT * FROM sys.schemas WHERE name = '{0}')) 
+                                    BEGIN
+                                        EXEC sp_executesql N'CREATE SCHEMA {0}'
+                                    END", Quoter.QuoteSchemaName(expression.SchemaName));
+            }
+
             return String.Format(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName));
         }
 

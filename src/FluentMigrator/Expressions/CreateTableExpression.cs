@@ -29,6 +29,7 @@ namespace FluentMigrator.Expressions
         public virtual string TableName { get; set; }
         public virtual IList<ColumnDefinition> Columns { get; set; }
         public virtual string TableDescription { get; set; }
+        public virtual bool CheckIfExists { get; set; }
 
         public CreateTableExpression()
         {

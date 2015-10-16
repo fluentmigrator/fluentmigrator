@@ -58,6 +58,12 @@ namespace FluentMigrator.Builders.Create.Table
             return this;
         }
 
+        public ICreateTableColumnAsTypeSyntax IfNotExists()
+        {
+            Expression.CheckIfExists = true;
+            return this;
+        }
+        
         public ICreateTableWithColumnOrSchemaSyntax WithDescription(string description)
         {
             Expression.TableDescription = description;

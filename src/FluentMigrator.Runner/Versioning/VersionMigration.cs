@@ -55,7 +55,7 @@ namespace FluentMigrator.Runner.Versioning
         public override void Up()
         {
             if (!string.IsNullOrEmpty(_versionTableMetaData.SchemaName))
-                Create.Schema(_versionTableMetaData.SchemaName);
+                Create.Schema(_versionTableMetaData.SchemaName, false);
         }
 
         public override void Down()

@@ -41,5 +41,17 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP SCHEMA [TestSchema]");
         }
+
+        [Test]
+        public void CanCreateSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetCreateSchemaIfNotExistsExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"IF (NOT EXISTS (SELECT * FROM sys.schemas WHERE name = '[TestSchema]')) 
+                                    BEGIN
+                                        CREATE SCHEMA [TestSchema]
+                                    END");
+        }
     }
 }
