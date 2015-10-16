@@ -38,6 +38,10 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
         {
         }
 
+        public override string CreateTable { get { return "{0} ({1})"; } }
+        public override string DropTable { get { return "{0}"; } }
+        public override string RenameTable { get { return "ALTER TABLE {0} RENAME {1}"; } }
+
         public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
 
         public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
@@ -47,7 +51,9 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 
         public virtual string IdentityInsert { get { return "SET IDENTITY_INSERT {0} {1}"; } }
 
+        public override string CreateForeignKeyConstraint { get { return "ALTER TABLE {0}.{1} ADD CONSTRAINT {2} FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8}"; } }
         public override string CreateConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} {2}{3} ({4})"; } }
+        public override string DeleteConstraint { get { return "{0} DROP CONSTRAINT {1}"; } }
 
         //Not need for the nonclusted keyword as it is the default mode
         public override string GetClusterTypeString(CreateIndexExpression column)
@@ -65,6 +71,23 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             return (indexType.Equals(SqlServerConstraintType.Clustered)) ? " CLUSTERED" : " NONCLUSTERED";
         }
 
+        public override string Generate(CreateTableExpression expression)
+        {
+            var descriptionStatements = DescriptionGenerator.GenerateDescriptionStatements(expression);
+            var createTableStatement = string.Format("CREATE TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            var descriptionStatementsArray = descriptionStatements as string[] ?? descriptionStatements.ToArray();
+
+            if (!descriptionStatementsArray.Any())
+                return createTableStatement;
+
+            return ComposeStatements(createTableStatement, descriptionStatementsArray);
+        }
+
+        public override string Generate(DeleteTableExpression expression)
+        {
+            return string.Format("DROP TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+        }
+
         public override string Generate(CreateConstraintExpression expression)
         {
             var constraintType = (expression.Constraint.IsPrimaryKeyConstraint) ? "PRIMARY KEY" : "UNIQUE";
@@ -73,16 +96,24 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 
             string columns = String.Join(", ", expression.Constraint.Columns.Select(x => Quoter.QuoteColumnName(x)).ToArray());
 
-            return string.Format(CreateConstraint, Quoter.QuoteTableName(expression.Constraint.TableName),
+            string schemaTableName = string.Format("{0}.{1}", Quoter.QuoteSchemaName(expression.Constraint.SchemaName), Quoter.QuoteTableName(expression.Constraint.TableName));
+
+            return string.Format(CreateConstraint, schemaTableName,
                 Quoter.Quote(expression.Constraint.ConstraintName),
                 constraintType,
                 constraintClustering,
                 columns);
         }
+        
+        public override string Generate(DeleteConstraintExpression expression)
+        {
+            return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.Constraint.SchemaName), base.Generate(expression));
+        }
 
         public override string Generate(RenameTableExpression expression)
         {
-            return String.Format(RenameTable, Quoter.QuoteTableName(Quoter.QuoteCommand(expression.OldName)), Quoter.QuoteCommand(expression.NewName));
+            string oldSchemaTableName = string.Format("{0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.OldName));
+            return String.Format(RenameTable, oldSchemaTableName, Quoter.QuoteTableName(expression.NewName));
         }
 
         public override string Generate(RenameColumnExpression expression)
@@ -143,6 +174,11 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             return builder.ToString();
         }
 
+        public override string Generate(DeleteForeignKeyExpression expression)
+        {
+            return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema), base.Generate(expression));
+        }
+
         public override string Generate(InsertDataExpression expression)
         {
             if (IsUsingIdentityInsert(expression))
@@ -163,6 +199,38 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             }
 
             return false;
+        }
+
+        public override string Generate(CreateForeignKeyExpression expression)
+        {
+            if (expression.ForeignKey.PrimaryColumns.Count != expression.ForeignKey.ForeignColumns.Count)
+            {
+                throw new ArgumentException("Number of primary columns and secondary columns must be equal");
+            }
+
+            List<string> primaryColumns = new List<string>();
+            List<string> foreignColumns = new List<string>();
+            foreach (var column in expression.ForeignKey.PrimaryColumns)
+            {
+                primaryColumns.Add(Quoter.QuoteColumnName(column));
+            }
+
+            foreach (var column in expression.ForeignKey.ForeignColumns)
+            {
+                foreignColumns.Add(Quoter.QuoteColumnName(column));
+            }
+            return string.Format(
+                CreateForeignKeyConstraint,
+                Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema),
+                Quoter.QuoteTableName(expression.ForeignKey.ForeignTable),
+                Quoter.QuoteColumnName(expression.ForeignKey.Name),
+                String.Join(", ", foreignColumns.ToArray()),
+                Quoter.QuoteSchemaName(expression.ForeignKey.PrimaryTableSchema),
+                Quoter.QuoteTableName(expression.ForeignKey.PrimaryTable),
+                String.Join(", ", primaryColumns.ToArray()),
+                FormatCascade("DELETE", expression.ForeignKey.OnDelete),
+                FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)
+                );
         }
 
         public override string Generate(CreateSequenceExpression expression)
@@ -209,5 +277,17 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             SqlServerExtensions.IdentityIncrement, 
             SqlServerExtensions.ConstraintType
         };
+
+        private string ComposeStatements(string ddlStatement, IEnumerable<string> otherStatements)
+        {
+            var otherStatementsArray = otherStatements.ToArray();
+
+            var statementsBuilder = new StringBuilder();
+            statementsBuilder.AppendLine(ddlStatement);
+            statementsBuilder.AppendLine("GO");
+            statementsBuilder.AppendLine(string.Join(";", otherStatementsArray));
+
+            return statementsBuilder.ToString();
+        }
     }
 }
