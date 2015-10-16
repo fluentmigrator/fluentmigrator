@@ -436,6 +436,9 @@
     <Compile Include="Unit\Generators\Postgres\PostgresSequenceTests.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresTableTests.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresQuoterTests.cs" />
+    <Compile Include="Unit\Generators\SqlAnywhere\SqlAnywhere16ConstraintsTests.cs" />
+    <Compile Include="Unit\Generators\SqlAnywhere\SqlAnywhere16TableTests.cs" />
+    <Compile Include="Unit\Generators\SqlAnywhere\SqlAnywhere16TypeMapTests.cs" />
     <Compile Include="Unit\Generators\SQLite\SQLiteColumnTests.cs" />
     <Compile Include="Unit\Generators\SQLite\SQLiteConstraintsTests.cs" />
     <Compile Include="Unit\Generators\SQLite\SQLiteDataTests.cs" />
