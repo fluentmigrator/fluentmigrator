@@ -56,7 +56,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string DeleteData { get { return "DELETE FROM {0}.{1} WHERE {2}"; } }
         public override string IdentityInsert { get { return "SET IDENTITY_INSERT {0}.{1} {2}"; } }
 
-        public override string CreateForeignKeyConstraint { get { return "ALTER TABLE {0}.{1} ADD CONSTRAINT {2} FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8}"; } }
+        public override string CreateForeignKeyConstraint { get { return "ALTER TABLE {0}.{1} ADD CONSTRAINT [{2}] FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8}"; } }
+
+        public string CreateForeignKeyConstraintIdempotent { get { return "IF (OBJECT_ID('{2}', 'F') IS NULL) BEGIN ALTER TABLE {0}.{1} ADD CONSTRAINT [{2}] FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8} END"; } }
         public override string CreateConstraint { get { return "{0} ADD CONSTRAINT {1} {2}{3} ({4})"; } }
         public override string DeleteConstraint { get { return "{0} DROP CONSTRAINT {1}"; } }
 
@@ -72,7 +74,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             string createTableStatement;
             if (expression.CheckIfExists)
             {
-                createTableStatement = string.Format("IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '[{1}]')) BEGIN CREATE TABLE {0}.{2} END", Quoter.QuoteSchemaName(expression.SchemaName), expression.TableName, base.Generate(expression));
+                createTableStatement = string.Format("IF (NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}')) BEGIN CREATE TABLE [{0}].{2} END", expression.SchemaName, expression.TableName, base.Generate(expression));
             }
             else
             {
@@ -104,7 +106,16 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(CreateColumnExpression expression)
         {
-            var alterTableStatement = string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            string alterTableStatement;
+            if (expression.CheckIfExists)
+            {
+                alterTableStatement = string.Format("IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'{2}' AND Object_ID = Object_ID(N'{0}.{1}')) BEGIN ALTER TABLE [{0}].{3} END", expression.SchemaName, expression.TableName, expression.Column.Name, base.Generate(expression));
+            }
+            else
+            {
+                alterTableStatement = string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            }
+
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
 
             if (string.IsNullOrEmpty(descriptionStatement))
@@ -233,10 +244,10 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 foreignColumns.Add(Quoter.QuoteColumnName(column));
             }
             return string.Format(
-                CreateForeignKeyConstraint,
+                expression.CheckIfExists ? CreateForeignKeyConstraintIdempotent : CreateForeignKeyConstraint,
                 Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema),
                 Quoter.QuoteTableName(expression.ForeignKey.ForeignTable),
-                Quoter.QuoteColumnName(expression.ForeignKey.Name),
+                expression.ForeignKey.Name,
                 String.Join(", ", foreignColumns.ToArray()),
                 Quoter.QuoteSchemaName(expression.ForeignKey.PrimaryTableSchema),
                 Quoter.QuoteTableName(expression.ForeignKey.PrimaryTable),
@@ -367,10 +378,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
             if (expression.CheckIfExists)
             {
-                return string.Format(@"IF (NOT EXISTS (SELECT * FROM sys.schemas WHERE name = '{0}')) 
-                                    BEGIN
-                                        EXEC sp_executesql N'CREATE SCHEMA {0}'
-                                    END", Quoter.QuoteSchemaName(expression.SchemaName));
+                return string.Format(@"IF (NOT EXISTS (SELECT * FROM sys.schemas WHERE name = '{0}')) BEGIN EXEC sp_executesql N'CREATE SCHEMA [{0}]' END", expression.SchemaName);
             }
 
             return String.Format(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName));

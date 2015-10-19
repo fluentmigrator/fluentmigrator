@@ -197,6 +197,17 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanCreateForeignKeyWithCustomSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetCreateForeignKeyExpressionIdempotent();
+            expression.ForeignKey.ForeignTableSchema = "TestSchema";
+            expression.ForeignKey.PrimaryTableSchema = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF (OBJECT_ID('FK_TestTable1_TestColumn1_TestTable2_TestColumn2', 'F') IS NULL) BEGIN ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestTable2_TestColumn2] FOREIGN KEY ([TestColumn1]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2]) END");
+        }
+
+        [Test]
         public override void CanCreateForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();

@@ -66,6 +66,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanCreateColumnWithCustomSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionIdempotent();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'TestColumn1' AND Object_ID = Object_ID(N'TestSchema.TestTable1')) BEGIN ALTER TABLE [TestSchema].[TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL END");
+        }
+
+        [Test]
         public override void CanCreateColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();

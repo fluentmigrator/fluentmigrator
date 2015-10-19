@@ -343,6 +343,12 @@ namespace FluentMigrator.Tests.Unit.Generators
             return new CreateColumnExpression { TableName = TestTableName1, Column = column };
         }
 
+        public static CreateColumnExpression GetCreateColumnExpressionIdempotent()
+        {
+            ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, Type = DbType.String, Size = 5 };
+            return new CreateColumnExpression { TableName = TestTableName1, Column = column, CheckIfExists = true };
+        }
+
         public static CreateColumnExpression GetCreateColumnExpressionWithDescription()
         {
             CreateColumnExpression columnExpression = GetCreateColumnExpression();
@@ -424,6 +430,18 @@ namespace FluentMigrator.Tests.Unit.Generators
         public static CreateForeignKeyExpression GetCreateForeignKeyExpression()
         {
             var expression = new CreateForeignKeyExpression();
+            expression.ForeignKey.PrimaryTable = TestTableName2;
+            expression.ForeignKey.ForeignTable = TestTableName1;
+            expression.ForeignKey.PrimaryColumns = new[] { TestColumnName2 };
+            expression.ForeignKey.ForeignColumns = new[] { TestColumnName1 };
+
+            expression.ApplyConventions(new MigrationConventions());
+            return expression;
+        }
+
+        public static CreateForeignKeyExpression GetCreateForeignKeyExpressionIdempotent()
+        {
+            var expression = new CreateForeignKeyExpression { CheckIfExists = true };
             expression.ForeignKey.PrimaryTable = TestTableName2;
             expression.ForeignKey.ForeignTable = TestTableName1;
             expression.ForeignKey.PrimaryColumns = new[] { TestColumnName2 };

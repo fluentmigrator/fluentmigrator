@@ -48,10 +48,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetCreateSchemaIfNotExistsExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(@"IF (NOT EXISTS (SELECT * FROM sys.schemas WHERE name = '[TestSchema]')) 
-                                    BEGIN
-                                        CREATE SCHEMA [TestSchema]
-                                    END");
+            result.ShouldBe(@"IF (NOT EXISTS (SELECT * FROM sys.schemas WHERE name = 'TestSchema')) BEGIN EXEC sp_executesql N'CREATE SCHEMA [TestSchema]' END");
         }
     }
 }

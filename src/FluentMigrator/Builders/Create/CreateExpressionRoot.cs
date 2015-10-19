@@ -43,30 +43,30 @@ namespace FluentMigrator.Builders.Create
             _context.Expressions.Add(expression);
         }
 
-        public ICreateTableWithColumnOrSchemaOrDescriptionSyntax Table(string tableName)
+        public ICreateTableWithColumnOrSchemaOrDescriptionSyntax Table(string tableName, bool checkIfExists = false)
         {
-            var expression = new CreateTableExpression { TableName = tableName };
+            var expression = new CreateTableExpression { TableName = tableName, CheckIfExists = checkIfExists };
             _context.Expressions.Add(expression);
             return new CreateTableExpressionBuilder(expression, _context);
         }
 
-        public ICreateColumnOnTableSyntax Column(string columnName)
+        public ICreateColumnOnTableSyntax Column(string columnName, bool checkIfExists = false)
         {
-            var expression = new CreateColumnExpression { Column = { Name = columnName } };
+            var expression = new CreateColumnExpression { Column = { Name = columnName }, CheckIfExists = checkIfExists };
             _context.Expressions.Add(expression);
             return new CreateColumnExpressionBuilder(expression, _context);
         }
 
-        public ICreateForeignKeyFromTableSyntax ForeignKey()
+        public ICreateForeignKeyFromTableSyntax ForeignKey(bool checkIfExists = false)
         {
-            var expression = new CreateForeignKeyExpression();
+            var expression = new CreateForeignKeyExpression { CheckIfExists = checkIfExists };
             _context.Expressions.Add(expression);
             return new CreateForeignKeyExpressionBuilder(expression);
         }
 
-        public ICreateForeignKeyFromTableSyntax ForeignKey(string foreignKeyName)
+        public ICreateForeignKeyFromTableSyntax ForeignKey(string foreignKeyName, bool checkIfExists = false)
         {
-            var expression = new CreateForeignKeyExpression { ForeignKey = { Name = foreignKeyName } };
+            var expression = new CreateForeignKeyExpression { ForeignKey = { Name = foreignKeyName }, CheckIfExists = checkIfExists };
             _context.Expressions.Add(expression);
             return new CreateForeignKeyExpressionBuilder(expression);
         }
