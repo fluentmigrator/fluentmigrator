@@ -56,9 +56,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string DeleteData { get { return "DELETE FROM {0}.{1} WHERE {2}"; } }
         public override string IdentityInsert { get { return "SET IDENTITY_INSERT {0}.{1} {2}"; } }
 
-        public override string CreateForeignKeyConstraint { get { return "ALTER TABLE {0}.{1} ADD CONSTRAINT [{2}] FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8}"; } }
+        public override string CreateForeignKeyConstraint { get { return "ALTER TABLE [{0}].{1} ADD CONSTRAINT [{2}] FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8}"; } }
 
-        public string CreateForeignKeyConstraintIdempotent { get { return "IF (OBJECT_ID('{2}', 'F') IS NULL) BEGIN ALTER TABLE {0}.{1} ADD CONSTRAINT [{2}] FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8} END"; } }
+        public string CreateForeignKeyConstraintIdempotent { get { return "IF (OBJECT_ID('{0}.{2}', 'F') IS NULL) BEGIN ALTER TABLE [{0}].{1} ADD CONSTRAINT [{2}] FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8} END"; } }
         public override string CreateConstraint { get { return "{0} ADD CONSTRAINT {1} {2}{3} ({4})"; } }
         public override string DeleteConstraint { get { return "{0} DROP CONSTRAINT {1}"; } }
 
@@ -245,7 +245,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             }
             return string.Format(
                 expression.CheckIfExists ? CreateForeignKeyConstraintIdempotent : CreateForeignKeyConstraint,
-                Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema),
+                expression.ForeignKey.ForeignTableSchema,
                 Quoter.QuoteTableName(expression.ForeignKey.ForeignTable),
                 expression.ForeignKey.Name,
                 String.Join(", ", foreignColumns.ToArray()),

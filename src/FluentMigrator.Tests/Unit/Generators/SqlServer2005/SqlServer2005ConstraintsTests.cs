@@ -204,7 +204,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.ForeignKey.PrimaryTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("IF (OBJECT_ID('FK_TestTable1_TestColumn1_TestTable2_TestColumn2', 'F') IS NULL) BEGIN ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestTable2_TestColumn2] FOREIGN KEY ([TestColumn1]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2]) END");
+            result.ShouldBe("IF (OBJECT_ID('TestSchema.FK_TestTable1_TestColumn1_TestTable2_TestColumn2', 'F') IS NULL) BEGIN ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestTable2_TestColumn2] FOREIGN KEY ([TestColumn1]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2]) END");
         }
 
         [Test]
