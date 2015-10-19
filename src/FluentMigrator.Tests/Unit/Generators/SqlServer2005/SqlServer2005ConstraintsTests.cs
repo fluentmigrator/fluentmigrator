@@ -509,6 +509,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanDropForeignKeyWithCustomSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetDeleteForeignKeyExpressionIdempotent();
+            expression.ForeignKey.ForeignTableSchema = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF (OBJECT_ID('TestSchema.FK_Test', 'F') IS NOT NULL) BEGIN ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT [FK_Test] END");
+        }
+
+        [Test]
         public override void CanDropForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();

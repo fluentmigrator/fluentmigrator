@@ -38,36 +38,36 @@ namespace FluentMigrator.Builders.Delete
             _context = context;
         }
 
-        public void Schema(string schemaName)
+        public void Schema(string schemaName, bool checkIfExists = false)
         {
-            var expression = new DeleteSchemaExpression {SchemaName = schemaName};
+            var expression = new DeleteSchemaExpression {SchemaName = schemaName, CheckIfExists = checkIfExists };
             _context.Expressions.Add(expression);
         }
 
-        public IInSchemaSyntax Table(string tableName)
+        public IInSchemaSyntax Table(string tableName, bool checkIfExists = false)
         {
-            var expression = new DeleteTableExpression {TableName = tableName};
+            var expression = new DeleteTableExpression {TableName = tableName, CheckIfExists = checkIfExists};
             _context.Expressions.Add(expression);
             return new DeleteTableExpressionBuilder(expression);
         }
 
-        public IDeleteColumnFromTableSyntax Column(string columnName)
+        public IDeleteColumnFromTableSyntax Column(string columnName, bool checkIfExists = false)
         {
-            var expression = new DeleteColumnExpression {ColumnNames = {columnName}};
+            var expression = new DeleteColumnExpression {ColumnNames = {columnName}, CheckIfExists = checkIfExists};
             _context.Expressions.Add(expression);
             return new DeleteColumnExpressionBuilder(expression);
         }
 
-        public IDeleteForeignKeyFromTableSyntax ForeignKey()
+        public IDeleteForeignKeyFromTableSyntax ForeignKey(bool checkIfExists = false)
         {
-            var expression = new DeleteForeignKeyExpression();
+            var expression = new DeleteForeignKeyExpression { CheckIfExists = checkIfExists };
             _context.Expressions.Add(expression);
             return new DeleteForeignKeyExpressionBuilder(expression);
         }
 
-        public IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName)
+        public IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName, bool checkIfExists = false)
         {
-            var expression = new DeleteForeignKeyExpression {ForeignKey = {Name = foreignKeyName}};
+            var expression = new DeleteForeignKeyExpression {ForeignKey = {Name = foreignKeyName}, CheckIfExists = checkIfExists};
             _context.Expressions.Add(expression);
             return new DeleteForeignKeyExpressionBuilder(expression);
         }

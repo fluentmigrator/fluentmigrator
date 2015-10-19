@@ -492,9 +492,23 @@ namespace FluentMigrator.Tests.Unit.Generators
             return new DeleteTableExpression { TableName = TestTableName1 };
         }
 
+        public static DeleteTableExpression GetDeleteTableExpressionIdempotent()
+        {
+            return new DeleteTableExpression { TableName = TestTableName1, CheckIfExists = true };
+        }
+
         public static DeleteColumnExpression GetDeleteColumnExpression()
         {
             return GetDeleteColumnExpression(new[] { TestColumnName1 });
+        }
+
+        public static DeleteColumnExpression GetDeleteColumnExpressionIdempotent()
+        {
+            var expression = GetDeleteColumnExpression(new[] { TestColumnName1 });
+            expression.CheckIfExists = true;
+            expression.SchemaName = "TestSchema";
+
+            return expression;
         }
 
         public static DeleteColumnExpression GetDeleteColumnExpression(string[] columns)
@@ -516,6 +530,15 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static DeleteForeignKeyExpression GetDeleteForeignKeyExpressionIdempotent()
+        {
+            var expression = new DeleteForeignKeyExpression();
+            expression.ForeignKey.Name = "FK_Test";
+            expression.ForeignKey.ForeignTable = TestTableName1;
+            expression.CheckIfExists = true;
+            return expression;
+        }
+
         public static DeleteConstraintExpression GetDeletePrimaryKeyExpression()
         {
             var expression = new DeleteConstraintExpression(ConstraintType.PrimaryKey);
@@ -527,6 +550,11 @@ namespace FluentMigrator.Tests.Unit.Generators
         public static DeleteSchemaExpression GetDeleteSchemaExpression()
         {
             return new DeleteSchemaExpression { SchemaName = "TestSchema" };
+        }
+
+        public static DeleteSchemaExpression GetDeleteSchemaExpressionIdempotent()
+        {
+            return new DeleteSchemaExpression { SchemaName = "TestSchema", CheckIfExists = true };
         }
 
         public static DeleteSequenceExpression GetDeleteSequenceExpression()

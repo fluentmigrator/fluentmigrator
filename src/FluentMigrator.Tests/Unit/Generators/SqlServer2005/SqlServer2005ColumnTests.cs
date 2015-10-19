@@ -161,6 +161,33 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanDropColumnWithDefaultSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetDeleteColumnExpressionIdempotent();
+
+            var expected = "DECLARE @default sysname, @sql nvarchar(max);" + System.Environment.NewLine + System.Environment.NewLine +
+                        "-- get name of default constraint" + System.Environment.NewLine +
+                        "SELECT @default = name" + System.Environment.NewLine +
+                        "FROM sys.default_constraints" + System.Environment.NewLine +
+                        "WHERE parent_object_id = object_id('[TestSchema].[TestTable1]')" + System.Environment.NewLine +
+                        "AND type = 'D'" + System.Environment.NewLine +
+                        "AND parent_column_id = (" + System.Environment.NewLine +
+                        "SELECT column_id" + System.Environment.NewLine +
+                        "FROM sys.columns" + System.Environment.NewLine +
+                        "WHERE object_id = object_id('[TestSchema].[TestTable1]')" + System.Environment.NewLine +
+                        "AND name = 'TestColumn1'" + System.Environment.NewLine +
+                        ");" + System.Environment.NewLine + System.Environment.NewLine +
+                        "-- create alter table command to drop constraint as string and run it" + System.Environment.NewLine +
+                        "SET @sql = N'ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT ' + @default;" + System.Environment.NewLine +
+                        "EXEC sp_executesql @sql;" + System.Environment.NewLine + System.Environment.NewLine +
+                        "-- now we can finally drop column" + System.Environment.NewLine +
+                        "IF EXISTS(SELECT * FROM sys.columns WHERE Name = N'TestColumn1' AND Object_ID = Object_ID(N'TestSchema.TestTable1')) BEGIN ALTER TABLE [TestSchema].[TestTable1] DROP COLUMN [TestColumn1] END" + System.Environment.NewLine;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
+        }
+
+        [Test]
         public override void CanDropMultipleColumnsWithCustomSchema()
         {
             //This does not work if it is a primary key

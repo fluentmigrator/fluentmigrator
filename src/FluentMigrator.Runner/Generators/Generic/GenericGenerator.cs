@@ -33,6 +33,8 @@ namespace FluentMigrator.Runner.Generators.Generic
         public virtual string AlterSchema { get { return "ALTER SCHEMA {0} TRANSFER {1}.{2}"; } }
         public virtual string DropSchema { get { return "DROP SCHEMA {0}"; } }
 
+        public virtual string DropSchemaIdempotent { get { return "IF (EXISTS (SELECT * FROM sys.schemas WHERE name = '{0}')) BEGIN EXEC sp_executesql N'DROP SCHEMA [{0}]' END"; } }
+
         public virtual string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3} ({4})"; } }
         public virtual string DropIndex { get { return "DROP INDEX {0}"; } }
 

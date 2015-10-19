@@ -101,6 +101,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(DeleteTableExpression expression)
         {
+            if (expression.CheckIfExists)
+            {
+                return string.Format("IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}')) BEGIN DROP TABLE [{0}].{2} END", expression.SchemaName, expression.TableName, base.Generate(expression));
+            }
+
             return string.Format("DROP TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
         }
 
@@ -178,6 +183,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(DeleteForeignKeyExpression expression)
         {
+            if (expression.CheckIfExists)
+            {
+                return string.Format("IF (OBJECT_ID('{0}.{2}', 'F') IS NOT NULL) BEGIN ALTER TABLE [{0}].{1} END", expression.ForeignKey.ForeignTableSchema, base.Generate(expression), expression.ForeignKey.Name);
+            }
+
             return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema), base.Generate(expression));
         }
 
@@ -313,10 +323,21 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             builder.AppendLine();
 
-            builder.AppendLine(String.Format("-- now we can finally drop column" + Environment.NewLine + "ALTER TABLE {2}.{0} DROP COLUMN {1};",
+            if (expression.CheckIfExists)
+            {
+                builder.AppendLine(
+                    String.Format(
+                        "-- now we can finally drop column" + Environment.NewLine +
+                        "IF EXISTS(SELECT * FROM sys.columns WHERE Name = N'{2}' AND Object_ID = Object_ID(N'{0}.{1}')) BEGIN ALTER TABLE [{0}].[{1}] DROP COLUMN [{2}] END", expression.SchemaName, expression.TableName, columnName));
+            }
+            else
+            {
+                builder.AppendLine(String.Format("-- now we can finally drop column" + Environment.NewLine + "ALTER TABLE {2}.{0} DROP COLUMN {1};",
                                          Quoter.QuoteTableName(expression.TableName),
                                          Quoter.QuoteColumnName(columnName),
                                          Quoter.QuoteSchemaName(expression.SchemaName)));
+            }
+            
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
@@ -386,7 +407,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(DeleteSchemaExpression expression)
         {
-            return String.Format(DropSchema, Quoter.QuoteSchemaName(expression.SchemaName));
+            return expression.CheckIfExists ? 
+                String.Format(DropSchemaIdempotent, expression.SchemaName) : 
+                String.Format(DropSchema, Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
         public override string Generate(AlterSchemaExpression expression)

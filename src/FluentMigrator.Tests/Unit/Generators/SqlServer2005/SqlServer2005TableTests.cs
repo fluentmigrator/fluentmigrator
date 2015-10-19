@@ -241,6 +241,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanDropTableWithCustomSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetDeleteTableExpressionIdempotent();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'TestSchema' AND TABLE_NAME = 'TestTable1')) BEGIN DROP TABLE [TestSchema].[TestTable1] END");
+        }
+
+        [Test]
         public override void CanDropTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();

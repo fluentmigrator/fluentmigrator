@@ -27,11 +27,11 @@ namespace FluentMigrator.Builders.Delete
 {
     public interface IDeleteExpressionRoot : IFluentSyntax
     {
-        void Schema(string schemaName);
-        IInSchemaSyntax Table(string tableName);
-        IDeleteColumnFromTableSyntax Column(string columnName);
-        IDeleteForeignKeyFromTableSyntax ForeignKey();
-        IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName);
+        void Schema(string schemaName, bool checkIfExists = false);
+        IInSchemaSyntax Table(string tableName, bool checkIfExists = false);
+        IDeleteColumnFromTableSyntax Column(string columnName, bool checkIfExists = false);
+        IDeleteForeignKeyFromTableSyntax ForeignKey(bool checkIfExists = false);
+        IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName, bool checkIfExists = false);
         IDeleteDataOrInSchemaSyntax FromTable(string tableName);
 
         /// <summary>
