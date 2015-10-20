@@ -289,5 +289,12 @@ namespace FluentMigrator.Builders.Alter.Column
                 return Expression.Column;
             }
         }
+
+        public IAlterColumnAsTypeSyntax CheckIfExists()
+        {
+            Expression.CheckIfExists = true;
+
+            return this;
+        }
     }
 }

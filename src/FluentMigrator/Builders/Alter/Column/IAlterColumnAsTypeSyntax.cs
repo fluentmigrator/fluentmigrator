@@ -20,5 +20,6 @@ namespace FluentMigrator.Builders.Alter.Column
 {
     public interface IAlterColumnAsTypeSyntax : IColumnTypeSyntax<IAlterColumnOptionSyntax>
     {
+        IAlterColumnAsTypeSyntax CheckIfExists();
     }
 }

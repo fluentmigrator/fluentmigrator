@@ -408,6 +408,14 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static AlterColumnExpression GetAlterColumnExpressionIdempotent()
+        {
+            var expression = GetAlterColumnExpression();
+            expression.CheckIfExists = true;
+
+            return expression;
+        }
+
         public static AlterColumnExpression GetAlterColumnExpressionWithDescription()
         {
             var columnExpression = GetAlterColumnExpression();

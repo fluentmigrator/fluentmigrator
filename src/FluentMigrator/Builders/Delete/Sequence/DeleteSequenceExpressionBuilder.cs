@@ -19,7 +19,7 @@ namespace FluentMigrator.Builders.Delete.Sequence
 
         public IInSchemaSyntax CheckIfExists()
         {
-            throw new NotImplementedException();
+            return this;
         }
     }
 }

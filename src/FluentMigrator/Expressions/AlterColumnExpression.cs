@@ -28,6 +28,7 @@ namespace FluentMigrator.Expressions
         public virtual string SchemaName { get; set; }
         public virtual string TableName { get; set; }
         public virtual ColumnDefinition Column { get; set; }
+        public virtual bool CheckIfExists { get; set; }
 
         public AlterColumnExpression()
         {

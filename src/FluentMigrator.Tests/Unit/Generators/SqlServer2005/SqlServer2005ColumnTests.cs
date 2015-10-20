@@ -27,6 +27,17 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanAlterColumnWithCustomSchemaIdempotent()
+        {
+            //TODO: This will fail if there are any keys attached 
+            var expression = GeneratorTestHelper.GetAlterColumnExpressionIdempotent();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF EXISTS(SELECT * FROM sys.columns WHERE Name = N'TestColumn1' AND Object_ID = Object_ID(N'TestSchema.TestTable1')) BEGIN ALTER TABLE [TestSchema].[TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL END");
+        }
+
+        [Test]
         public override void CanAlterColumnWithDefaultSchema()
         {
             //TODO: This will fail if there are any keys attached 

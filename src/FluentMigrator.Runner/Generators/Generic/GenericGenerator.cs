@@ -22,9 +22,10 @@ namespace FluentMigrator.Runner.Generators.Generic
         public virtual string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
         public virtual string DropTable { get { return "DROP TABLE {0}"; } }
 
-        public virtual string AddColumn { get { return "ALTER TABLE {0} ADD COLUMN {1}"; } }
+        public virtual string AddColumn { get { return "ALTER TABLE {0} ADD COLUMN {1}"; } }        
         public virtual string DropColumn { get { return "ALTER TABLE {0} DROP COLUMN {1}"; } }
         public virtual string AlterColumn { get { return "ALTER TABLE {0} ALTER COLUMN {1}"; } }
+
         public virtual string RenameColumn { get { return "ALTER TABLE {0} RENAME COLUMN {1} TO {2}"; } }
 
         public virtual string RenameTable { get { return "RENAME TABLE {0} TO {1}"; } }

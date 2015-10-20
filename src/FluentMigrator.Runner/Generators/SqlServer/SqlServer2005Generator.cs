@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System.Linq.Expressions;
 using System.Text;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
@@ -43,7 +44,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string AddColumn { get { return "{0} ADD {1}"; } }
 
+        public virtual string AddColumnIdempotent { get { return "IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'{0}' AND Object_ID = Object_ID(N'{1}.{2}')) BEGIN ALTER TABLE {3}.{4} ADD {5} END"; } }
+
         public override string AlterColumn { get { return "{0} ALTER COLUMN {1}"; } }
+
+        public virtual string AlterColumnIdempotent { get { return "IF EXISTS(SELECT * FROM sys.columns WHERE Name = N'{0}' AND Object_ID = Object_ID(N'{1}.{2}')) BEGIN ALTER TABLE {3}.{4} END"; } }
 
         public override string RenameColumn { get { return "{0}.{1}', '{2}'"; } }
         public override string RenameTable { get { return "{0}', '{1}'"; } }
@@ -114,7 +119,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             string alterTableStatement;
             if (expression.CheckIfExists)
             {
-                alterTableStatement = string.Format("IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'{2}' AND Object_ID = Object_ID(N'{0}.{1}')) BEGIN ALTER TABLE {3}.{4} END", expression.SchemaName ?? "dbo", expression.TableName, expression.Column.Name, Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+                alterTableStatement = string.Format(AddColumnIdempotent, expression.Column.Name, expression.SchemaName ?? "dbo", expression.TableName, Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), Column.Generate(expression.Column));
             }
             else
             {
@@ -131,9 +136,18 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(AlterColumnExpression expression)
         {
-            var alterTableStatement = string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
-            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
+            string alterTableStatement;
+            if (expression.CheckIfExists)
+            {
+                alterTableStatement = string.Format(AlterColumnIdempotent, expression.Column.Name, expression.SchemaName ?? "dbo", expression.TableName, Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
 
+            }
+            else
+            {
+                alterTableStatement = string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            }
+
+            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
             if (string.IsNullOrEmpty(descriptionStatement))
                 return alterTableStatement;
 
@@ -418,7 +432,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
             if (expression.CheckIfExists)
             {
-                return string.Format(@"IF (NOT EXISTS (SELECT * FROM sys.schemas WHERE name = '{0}')) BEGIN EXEC sp_executesql N'CREATE SCHEMA [{0}]' END", expression.SchemaName);
+                return string.Format(@"IF (NOT EXISTS (SELECT * FROM sys.schemas WHERE name = '{0}')) BEGIN EXEC sp_executesql N'CREATE SCHEMA {1}' END", expression.SchemaName ?? "dbo", Quoter.QuoteSchemaName(expression.SchemaName));
             }
 
             return String.Format(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName));

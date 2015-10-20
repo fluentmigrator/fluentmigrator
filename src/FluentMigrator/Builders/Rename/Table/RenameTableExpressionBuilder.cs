@@ -44,7 +44,7 @@ namespace FluentMigrator.Builders.Rename.Table
 
         public IInSchemaSyntax CheckIfExists()
         {
-            throw new NotImplementedException();
+            return this;
         }
 
         public IInSchemaSyntax InSchema(string schemaName)

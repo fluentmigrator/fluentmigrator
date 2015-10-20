@@ -27,7 +27,7 @@ namespace FluentMigrator.Builders.Delete.Constraint
 
         public IInSchemaSyntax CheckIfExists()
         {
-            throw new NotImplementedException();
+            return this;
         }
     }
 }
