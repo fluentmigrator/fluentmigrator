@@ -105,6 +105,12 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
 
         [Test]
+        public void DateTimeOffsetIsTimestampWithTimeZone()
+        {
+            _typeMap.GetTypeMap(DbType.DateTimeOffset, 0, 0).ShouldBe("TIMESTAMP(4) WITH TIME ZONE");
+        }
+
+        [Test]
         public void DecimalDefaultIsNumber()
         {
             _typeMap.GetTypeMap(DbType.Decimal, 0, 0).ShouldBe("NUMBER(19,5)");
