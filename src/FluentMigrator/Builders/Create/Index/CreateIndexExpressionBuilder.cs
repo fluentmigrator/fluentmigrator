@@ -29,11 +29,10 @@ namespace FluentMigrator.Builders.Create.Index
     {
         public IndexColumnDefinition CurrentColumn { get; set; }
 
-        public CreateIndexExpressionBuilder(CreateIndexExpression expression, bool checkIfExists = false)
+        public CreateIndexExpressionBuilder(CreateIndexExpression expression)
             : base(expression)
 
         {
-            Expression.CheckIfExists = checkIfExists;
         }
 
         public ICreateIndexOnColumnOrInSchemaSyntax OnTable(string tableName)

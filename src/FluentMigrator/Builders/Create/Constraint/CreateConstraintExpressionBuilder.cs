@@ -11,10 +11,9 @@ namespace FluentMigrator.Builders.Create.Constraint
         /// <summary>
         /// Initializes a new instance of the <see cref="T:CreateConstraintExpressionBuilder"/> class.
         /// </summary>
-        public CreateConstraintExpressionBuilder(CreateConstraintExpression expression, bool checkIfExists = false)
+        public CreateConstraintExpressionBuilder(CreateConstraintExpression expression)
             : base(expression)
         {
-            Expression.CheckIfExists = checkIfExists;
         }
 
         public ICreateConstraintWithSchemaOrColumnSyntax OnTable(string tableName)

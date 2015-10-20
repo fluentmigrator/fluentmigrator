@@ -38,7 +38,6 @@ namespace FluentMigrator.Builders.Create.Column
         {
             _context = context;
             ColumnHelper = new ColumnExpressionBuilderHelper(this, context);
-            Expression.CheckIfExists = _context.CheckIfExists;
         }
 
         public ForeignKeyDefinition CurrentForeignKey { get; set; }

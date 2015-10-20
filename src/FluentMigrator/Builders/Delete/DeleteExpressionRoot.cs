@@ -47,28 +47,28 @@ namespace FluentMigrator.Builders.Delete
 
         public IInSchemaSyntax Table(string tableName)
         {
-            var expression = new DeleteTableExpression {TableName = tableName};
+            var expression = new DeleteTableExpression {TableName = tableName, CheckIfExists = _context.CheckIfExists };
             _context.Expressions.Add(expression);
             return new DeleteTableExpressionBuilder(expression);
         }
 
         public IDeleteColumnFromTableSyntax Column(string columnName)
         {
-            var expression = new DeleteColumnExpression {ColumnNames = {columnName}};
+            var expression = new DeleteColumnExpression {ColumnNames = {columnName}, CheckIfExists = _context.CheckIfExists };
             _context.Expressions.Add(expression);
             return new DeleteColumnExpressionBuilder(expression);
         }
 
         public IDeleteForeignKeyFromTableSyntax ForeignKey()
         {
-            var expression = new DeleteForeignKeyExpression();
+            var expression = new DeleteForeignKeyExpression { CheckIfExists = _context.CheckIfExists };
             _context.Expressions.Add(expression);
             return new DeleteForeignKeyExpressionBuilder(expression);
         }
 
         public IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName)
         {
-            var expression = new DeleteForeignKeyExpression {ForeignKey = {Name = foreignKeyName}};
+            var expression = new DeleteForeignKeyExpression {ForeignKey = {Name = foreignKeyName}, CheckIfExists = _context.CheckIfExists };
             _context.Expressions.Add(expression);
             return new DeleteForeignKeyExpressionBuilder(expression);
         }
@@ -82,7 +82,7 @@ namespace FluentMigrator.Builders.Delete
 
         public IDeleteIndexForTableSyntax Index(string indexName)
         {
-            var expression = new DeleteIndexExpression();
+            var expression = new DeleteIndexExpression { CheckIfExists = _context.CheckIfExists };
             expression.Index.Name = indexName;
             _context.Expressions.Add(expression);
             return new DeleteIndexExpressionBuilder(expression);
@@ -90,21 +90,21 @@ namespace FluentMigrator.Builders.Delete
 
         public IDeleteIndexForTableSyntax Index()
         {
-            var expression = new DeleteIndexExpression();
+            var expression = new DeleteIndexExpression { CheckIfExists = _context.CheckIfExists };
             _context.Expressions.Add(expression);
             return new DeleteIndexExpressionBuilder(expression);
         }
 
         public IInSchemaSyntax Sequence(string sequenceName)
         {
-            var expression = new DeleteSequenceExpression {SequenceName = sequenceName};
+            var expression = new DeleteSequenceExpression {SequenceName = sequenceName, CheckIfExists = _context.CheckIfExists };
             _context.Expressions.Add(expression);
             return new DeleteSequenceExpressionBuilder(expression);
         }
 
         public IDeleteConstraintOnTableSyntax PrimaryKey(string primaryKeyName)
         {
-            var expression = new DeleteConstraintExpression(ConstraintType.PrimaryKey);
+            var expression = new DeleteConstraintExpression(ConstraintType.PrimaryKey) { CheckIfExists = _context.CheckIfExists };
             expression.Constraint.ConstraintName = primaryKeyName;
             _context.Expressions.Add(expression);
             return new DeleteConstraintExpressionBuilder(expression);
@@ -112,7 +112,7 @@ namespace FluentMigrator.Builders.Delete
 
         public IDeleteConstraintOnTableSyntax UniqueConstraint(string constraintName)
         {
-            var expression = new DeleteConstraintExpression(ConstraintType.Unique);
+            var expression = new DeleteConstraintExpression(ConstraintType.Unique) { CheckIfExists = _context.CheckIfExists };
             expression.Constraint.ConstraintName = constraintName;
             _context.Expressions.Add(expression);
             return new DeleteConstraintExpressionBuilder(expression);
@@ -120,7 +120,7 @@ namespace FluentMigrator.Builders.Delete
 
         public IDeleteDefaultConstraintOnTableSyntax DefaultConstraint()
         {
-            var expression = new DeleteDefaultConstraintExpression();
+            var expression = new DeleteDefaultConstraintExpression { CheckIfExists = _context.CheckIfExists };
             _context.Expressions.Add(expression);
             return new DeleteDefaultConstraintExpressionBuilder(expression);
         }

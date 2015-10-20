@@ -28,10 +28,9 @@ namespace FluentMigrator.Builders.Create.ForeignKey
         ICreateForeignKeyPrimaryColumnOrInSchemaSyntax,
         ICreateForeignKeyCascadeSyntax
     {
-        public CreateForeignKeyExpressionBuilder(CreateForeignKeyExpression expression, bool checkIfExists = false)
+        public CreateForeignKeyExpressionBuilder(CreateForeignKeyExpression expression)
             : base(expression)
         {
-            Expression.CheckIfExists = checkIfExists;
         }
 
         public ICreateForeignKeyForeignColumnOrInSchemaSyntax FromTable(string table)

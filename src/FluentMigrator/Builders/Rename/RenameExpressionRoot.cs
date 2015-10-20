@@ -34,14 +34,14 @@ namespace FluentMigrator.Builders.Rename
 
         public IRenameTableToOrInSchemaSyntax Table(string oldName)
         {
-            var expression = new RenameTableExpression { OldName = oldName };
+            var expression = new RenameTableExpression { OldName = oldName, CheckIfExists = _context.CheckIfExists };
             _context.Expressions.Add(expression);
             return new RenameTableExpressionBuilder(expression);
         }
 
         public IRenameColumnTableSyntax Column(string oldName)
         {
-            var expression = new RenameColumnExpression { OldName = oldName };
+            var expression = new RenameColumnExpression { OldName = oldName, CheckIfExists = _context.CheckIfExists };
             _context.Expressions.Add(expression);
             return new RenameColumnExpressionBuilder(expression);
         }

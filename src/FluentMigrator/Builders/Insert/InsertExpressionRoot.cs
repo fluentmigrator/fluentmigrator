@@ -32,7 +32,7 @@ namespace FluentMigrator.Builders.Insert
 
         public IInsertDataOrInSchemaSyntax IntoTable(string tableName)
         {
-            var expression = new InsertDataExpression { TableName = tableName };
+            var expression = new InsertDataExpression { TableName = tableName, CheckIfExists = _context.CheckIfExists };
             _context.Expressions.Add(expression);
             return new InsertDataExpressionBuilder(expression);
         }
