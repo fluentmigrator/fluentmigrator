@@ -56,9 +56,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string DeleteData { get { return "DELETE FROM {0}.{1} WHERE {2}"; } }
         public override string IdentityInsert { get { return "SET IDENTITY_INSERT {0}.{1} {2}"; } }
 
-        public override string CreateForeignKeyConstraint { get { return "ALTER TABLE [{0}].{1} ADD CONSTRAINT [{2}] FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8}"; } }
+        public override string CreateForeignKeyConstraint { get { return "ALTER TABLE {0}.{1} ADD CONSTRAINT {2} FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8}"; } }
 
-        public string CreateForeignKeyConstraintIdempotent { get { return "IF (OBJECT_ID('{0}.{2}', 'F') IS NULL) BEGIN ALTER TABLE [{0}].{1} ADD CONSTRAINT [{2}] FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8} END"; } }
+        public string CreateForeignKeyConstraintIdempotent { get { return "IF (OBJECT_ID('{0}.{1}', 'F') IS NULL) BEGIN ALTER TABLE {2}.{3} ADD CONSTRAINT {4} FOREIGN KEY ({5}) REFERENCES {6}.{7} ({8}){9}{10} END"; } }
         public override string CreateConstraint { get { return "{0} ADD CONSTRAINT {1} {2}{3} ({4})"; } }
         public override string DeleteConstraint { get { return "{0} DROP CONSTRAINT {1}"; } }
 
@@ -74,7 +74,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             string createTableStatement;
             if (expression.CheckIfExists)
             {
-                createTableStatement = string.Format("IF (NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}')) BEGIN CREATE TABLE [{0}].{2} END", expression.SchemaName, expression.TableName, base.Generate(expression));
+                createTableStatement = string.Format("IF (NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}')) BEGIN CREATE TABLE {2}.{3} END", expression.SchemaName ?? "dbo", expression.TableName, Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
             }
             else
             {
@@ -103,7 +103,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
             if (expression.CheckIfExists)
             {
-                return string.Format("IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}')) BEGIN DROP TABLE [{0}].{2} END", expression.SchemaName, expression.TableName, base.Generate(expression));
+                return string.Format("IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}')) BEGIN DROP TABLE {2}.{3} END", expression.SchemaName ?? "dbo", expression.TableName, Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
             }
 
             return string.Format("DROP TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
@@ -114,7 +114,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             string alterTableStatement;
             if (expression.CheckIfExists)
             {
-                alterTableStatement = string.Format("IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'{2}' AND Object_ID = Object_ID(N'{0}.{1}')) BEGIN ALTER TABLE [{0}].{3} END", expression.SchemaName, expression.TableName, expression.Column.Name, base.Generate(expression));
+                alterTableStatement = string.Format("IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'{2}' AND Object_ID = Object_ID(N'{0}.{1}')) BEGIN ALTER TABLE {3}.{4} END", expression.SchemaName ?? "dbo", expression.TableName, expression.Column.Name, Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
             }
             else
             {
@@ -185,7 +185,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
             if (expression.CheckIfExists)
             {
-                return string.Format("IF (OBJECT_ID('{0}.{2}', 'F') IS NOT NULL) BEGIN ALTER TABLE [{0}].{1} END", expression.ForeignKey.ForeignTableSchema, base.Generate(expression), expression.ForeignKey.Name);
+                return string.Format("IF (OBJECT_ID('{0}.{1}', 'F') IS NOT NULL) BEGIN ALTER TABLE {2}.{3} END", expression.ForeignKey.ForeignTableSchema ?? "dbo", expression.ForeignKey.Name, Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema), base.Generate(expression));
             }
 
             return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema), base.Generate(expression));
@@ -253,11 +253,30 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             {
                 foreignColumns.Add(Quoter.QuoteColumnName(column));
             }
+
+            if (expression.CheckIfExists)
+            {
+                return string.Format(
+                    CreateForeignKeyConstraintIdempotent,
+                    expression.ForeignKey.ForeignTableSchema ?? "dbo",
+                    expression.ForeignKey.Name,
+                    Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema),
+                    Quoter.QuoteTableName(expression.ForeignKey.ForeignTable),
+                    Quoter.QuoteConstraintName(expression.ForeignKey.Name),
+                    String.Join(", ", foreignColumns.ToArray()),
+                    Quoter.QuoteSchemaName(expression.ForeignKey.PrimaryTableSchema),
+                    Quoter.QuoteTableName(expression.ForeignKey.PrimaryTable),
+                    String.Join(", ", primaryColumns.ToArray()),
+                    FormatCascade("DELETE", expression.ForeignKey.OnDelete),
+                    FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)
+                    );
+            }
+
             return string.Format(
-                expression.CheckIfExists ? CreateForeignKeyConstraintIdempotent : CreateForeignKeyConstraint,
-                expression.ForeignKey.ForeignTableSchema,
+                CreateForeignKeyConstraint,
+                Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema),
                 Quoter.QuoteTableName(expression.ForeignKey.ForeignTable),
-                expression.ForeignKey.Name,
+                Quoter.QuoteConstraintName(expression.ForeignKey.Name),
                 String.Join(", ", foreignColumns.ToArray()),
                 Quoter.QuoteSchemaName(expression.ForeignKey.PrimaryTableSchema),
                 Quoter.QuoteTableName(expression.ForeignKey.PrimaryTable),
@@ -328,7 +347,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 builder.AppendLine(
                     String.Format(
                         "-- now we can finally drop column" + Environment.NewLine +
-                        "IF EXISTS(SELECT * FROM sys.columns WHERE Name = N'{2}' AND Object_ID = Object_ID(N'{0}.{1}')) BEGIN ALTER TABLE [{0}].[{1}] DROP COLUMN [{2}] END", expression.SchemaName, expression.TableName, columnName));
+                        "IF EXISTS(SELECT * FROM sys.columns WHERE Name = N'{2}' AND Object_ID = Object_ID(N'{0}.{1}')) BEGIN ALTER TABLE {3}.{4} DROP COLUMN {5} END", expression.SchemaName ?? "dbo", expression.TableName, columnName, Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(columnName)));
             }
             else
             {

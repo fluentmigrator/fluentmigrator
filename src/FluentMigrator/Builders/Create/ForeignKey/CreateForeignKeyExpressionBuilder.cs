@@ -77,6 +77,12 @@ namespace FluentMigrator.Builders.Create.ForeignKey
             return this;
         }
 
+        public ICreateForeignKeyPrimaryColumnSyntax CheckIfExists()
+        {
+            Expression.CheckIfExists = true;
+            return this;
+        }
+
         public ICreateForeignKeyCascadeSyntax OnDelete(Rule rule)
         {
             Expression.ForeignKey.OnDelete = rule;

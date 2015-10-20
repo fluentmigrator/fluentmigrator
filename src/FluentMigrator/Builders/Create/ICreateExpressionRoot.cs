@@ -29,10 +29,10 @@ namespace FluentMigrator.Builders.Create
     public interface ICreateExpressionRoot : IFluentSyntax
     {
         void Schema(string schemaName, bool checkIfExists = false);
-        ICreateTableWithColumnOrSchemaOrDescriptionSyntax Table(string tableName, bool checkIfExists = false);
-        ICreateColumnOnTableSyntax Column(string columnName, bool checkIfExists = false);
-        ICreateForeignKeyFromTableSyntax ForeignKey(bool checkIfExists = false);
-        ICreateForeignKeyFromTableSyntax ForeignKey(string foreignKeyName, bool checkIfExists = false);
+        ICreateTableWithColumnOrSchemaOrDescriptionSyntax Table(string tableName);
+        ICreateColumnOnTableSyntax Column(string columnName);
+        ICreateForeignKeyFromTableSyntax ForeignKey();
+        ICreateForeignKeyFromTableSyntax ForeignKey(string foreignKeyName);
         ICreateIndexForTableSyntax Index();
         ICreateIndexForTableSyntax Index(string indexName);
 

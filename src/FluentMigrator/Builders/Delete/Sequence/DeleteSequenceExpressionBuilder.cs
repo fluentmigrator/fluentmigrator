@@ -1,3 +1,5 @@
+using System;
+
 namespace FluentMigrator.Builders.Delete.Sequence
 {
     using Expressions;
@@ -9,9 +11,15 @@ namespace FluentMigrator.Builders.Delete.Sequence
         {
         }
 
-        public void InSchema(string schemaName)
+        public IInSchemaSyntax InSchema(string schemaName)
         {
             Expression.SchemaName = schemaName;
+            return this;
+        }
+
+        public IInSchemaSyntax CheckIfExists()
+        {
+            throw new NotImplementedException();
         }
     }
 }

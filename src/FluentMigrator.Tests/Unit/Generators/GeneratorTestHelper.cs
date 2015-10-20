@@ -506,7 +506,6 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             var expression = GetDeleteColumnExpression(new[] { TestColumnName1 });
             expression.CheckIfExists = true;
-            expression.SchemaName = "TestSchema";
 
             return expression;
         }

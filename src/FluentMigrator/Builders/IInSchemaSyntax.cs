@@ -2,6 +2,8 @@ namespace FluentMigrator.Builders
 {
     public interface IInSchemaSyntax
     {
-        void InSchema(string schemaName);
+        IInSchemaSyntax InSchema(string schemaName);
+
+        IInSchemaSyntax CheckIfExists();
     }
 }

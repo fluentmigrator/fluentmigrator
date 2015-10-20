@@ -20,5 +20,6 @@ namespace FluentMigrator.Builders.Create.Column
 {
     public interface ICreateColumnAsTypeSyntax : IColumnTypeSyntax<ICreateColumnOptionSyntax>
     {
+        ICreateColumnAsTypeSyntax CheckIfExists();
     }
 }

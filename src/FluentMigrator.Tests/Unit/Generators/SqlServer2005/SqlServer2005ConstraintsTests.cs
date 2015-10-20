@@ -217,6 +217,15 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void GetCreateForeignKeyExpressionIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetCreateForeignKeyExpressionIdempotent();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF (OBJECT_ID('dbo.FK_TestTable1_TestColumn1_TestTable2_TestColumn2', 'F') IS NULL) BEGIN ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestTable2_TestColumn2] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2]) END");
+        }
+
+        [Test]
         public override void CanCreateForeignKeyWithDifferentSchemas()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
@@ -525,6 +534,15 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [FK_Test]");
+        }
+
+        [Test]
+        public void CanDropForeignKeyWithDefaultSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetDeleteForeignKeyExpressionIdempotent();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF (OBJECT_ID('dbo.FK_Test', 'F') IS NOT NULL) BEGIN ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [FK_Test] END");
         }
 
         [Test]

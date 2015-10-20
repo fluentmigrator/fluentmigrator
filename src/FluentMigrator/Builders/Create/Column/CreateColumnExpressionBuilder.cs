@@ -49,6 +49,12 @@ namespace FluentMigrator.Builders.Create.Column
             return this;
         }
 
+        public ICreateColumnAsTypeSyntax CheckIfExists()
+        {
+            Expression.CheckIfExists = true;
+            return this;
+        }
+
         public ICreateColumnAsTypeSyntax InSchema(string schemaName)
         {
             Expression.SchemaName = schemaName;

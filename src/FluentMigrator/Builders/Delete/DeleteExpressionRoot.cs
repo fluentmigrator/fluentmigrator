@@ -44,30 +44,30 @@ namespace FluentMigrator.Builders.Delete
             _context.Expressions.Add(expression);
         }
 
-        public IInSchemaSyntax Table(string tableName, bool checkIfExists = false)
+        public IInSchemaSyntax Table(string tableName)
         {
-            var expression = new DeleteTableExpression {TableName = tableName, CheckIfExists = checkIfExists};
+            var expression = new DeleteTableExpression {TableName = tableName};
             _context.Expressions.Add(expression);
             return new DeleteTableExpressionBuilder(expression);
         }
 
-        public IDeleteColumnFromTableSyntax Column(string columnName, bool checkIfExists = false)
+        public IDeleteColumnFromTableSyntax Column(string columnName)
         {
-            var expression = new DeleteColumnExpression {ColumnNames = {columnName}, CheckIfExists = checkIfExists};
+            var expression = new DeleteColumnExpression {ColumnNames = {columnName}};
             _context.Expressions.Add(expression);
             return new DeleteColumnExpressionBuilder(expression);
         }
 
-        public IDeleteForeignKeyFromTableSyntax ForeignKey(bool checkIfExists = false)
+        public IDeleteForeignKeyFromTableSyntax ForeignKey()
         {
-            var expression = new DeleteForeignKeyExpression { CheckIfExists = checkIfExists };
+            var expression = new DeleteForeignKeyExpression();
             _context.Expressions.Add(expression);
             return new DeleteForeignKeyExpressionBuilder(expression);
         }
 
-        public IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName, bool checkIfExists = false)
+        public IDeleteForeignKeyOnTableSyntax ForeignKey(string foreignKeyName)
         {
-            var expression = new DeleteForeignKeyExpression {ForeignKey = {Name = foreignKeyName}, CheckIfExists = checkIfExists};
+            var expression = new DeleteForeignKeyExpression {ForeignKey = {Name = foreignKeyName}};
             _context.Expressions.Add(expression);
             return new DeleteForeignKeyExpressionBuilder(expression);
         }

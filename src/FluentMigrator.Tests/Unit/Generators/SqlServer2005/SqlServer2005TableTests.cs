@@ -73,6 +73,15 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanCreateTableWithDefaultSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableIdempotentExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF (NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'TestTable1')) BEGIN CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL) END");
+        }
+
+        [Test]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNullWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -257,6 +266,15 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP TABLE [dbo].[TestTable1]");
+        }
+
+        [Test]
+        public void CanDropTableWithDefaultSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetDeleteTableExpressionIdempotent();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'TestTable1')) BEGIN DROP TABLE [dbo].[TestTable1] END");
         }
 
         [Test]

@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Builders.Rename.Table
@@ -41,9 +42,15 @@ namespace FluentMigrator.Builders.Rename.Table
             return this;
         }
 
-        public void InSchema(string schemaName)
+        public IInSchemaSyntax CheckIfExists()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IInSchemaSyntax InSchema(string schemaName)
         {
             Expression.SchemaName = schemaName;
+            return this;
         }
     }
 }
