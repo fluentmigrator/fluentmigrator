@@ -18,7 +18,6 @@
 
 using System.Collections.Generic;
 using FluentMigrator.Expressions;
-using System.Reflection;
 
 namespace FluentMigrator.Infrastructure
 {
@@ -33,5 +32,7 @@ namespace FluentMigrator.Infrastructure
         object ApplicationContext { get; set; }
 
         string Connection { get; set; }
+
+        bool CheckIfExists { get; }
     }
 }

@@ -37,6 +37,8 @@ namespace FluentMigrator.Infrastructure
         /// </summary>
         public string Connection { get; set; }
 
+        public bool CheckIfExists { get; }
+
         public MigrationContext(IMigrationConventions conventions, IQuerySchema querySchema, IAssemblyCollection migrationAssemblies, object context, string connection)
         {
             Conventions = conventions;

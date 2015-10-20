@@ -39,6 +39,7 @@ namespace FluentMigrator
         /// </summary>
         public string ConnectionString { get; protected set; }
 
+        public virtual bool CheckIfExists { get; }
 
         public abstract void Up();
         public abstract void Down();

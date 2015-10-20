@@ -40,6 +40,7 @@ namespace FluentMigrator.Builders.Delete
 
         public void Schema(string schemaName, bool checkIfExists = false)
         {
+            checkIfExists = _context.CheckIfExists || checkIfExists;
             var expression = new DeleteSchemaExpression {SchemaName = schemaName, CheckIfExists = checkIfExists };
             _context.Expressions.Add(expression);
         }

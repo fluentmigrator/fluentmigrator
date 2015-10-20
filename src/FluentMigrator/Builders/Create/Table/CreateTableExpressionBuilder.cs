@@ -38,6 +38,7 @@ namespace FluentMigrator.Builders.Create.Table
         {
             _context = context;
             ColumnHelper = new ColumnExpressionBuilderHelper(this, context);
+            expression.CheckIfExists = _context.CheckIfExists;
         }
 
         public ColumnDefinition CurrentColumn { get; set; }

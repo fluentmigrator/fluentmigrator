@@ -39,6 +39,7 @@ namespace FluentMigrator.Builders.Create
 
         public void Schema(string schemaName, bool checkIfExists = false)
         {
+            checkIfExists = checkIfExists || _context.CheckIfExists;
             var expression = new CreateSchemaExpression { SchemaName = schemaName, CheckIfExists = checkIfExists };
             _context.Expressions.Add(expression);
         }
@@ -61,28 +62,28 @@ namespace FluentMigrator.Builders.Create
         {
             var expression = new CreateForeignKeyExpression();
             _context.Expressions.Add(expression);
-            return new CreateForeignKeyExpressionBuilder(expression);
+            return new CreateForeignKeyExpressionBuilder(expression, _context.CheckIfExists);
         }
 
         public ICreateForeignKeyFromTableSyntax ForeignKey(string foreignKeyName)
         {
             var expression = new CreateForeignKeyExpression { ForeignKey = { Name = foreignKeyName } };
             _context.Expressions.Add(expression);
-            return new CreateForeignKeyExpressionBuilder(expression);
+            return new CreateForeignKeyExpressionBuilder(expression, _context.CheckIfExists);
         }
 
         public ICreateIndexForTableSyntax Index()
         {
             var expression = new CreateIndexExpression();
             _context.Expressions.Add(expression);
-            return new CreateIndexExpressionBuilder(expression);
+            return new CreateIndexExpressionBuilder(expression, _context.CheckIfExists);
         }
 
         public ICreateIndexForTableSyntax Index(string indexName)
         {
             var expression = new CreateIndexExpression { Index = { Name = indexName } };
             _context.Expressions.Add(expression);
-            return new CreateIndexExpressionBuilder(expression);
+            return new CreateIndexExpressionBuilder(expression, _context.CheckIfExists);
         }
 
         public ICreateSequenceInSchemaSyntax Sequence(string sequenceName)
@@ -96,7 +97,7 @@ namespace FluentMigrator.Builders.Create
         {
             var expression = new CreateConstraintExpression(ConstraintType.Unique);
             _context.Expressions.Add(expression);
-            return new CreateConstraintExpressionBuilder(expression);
+            return new CreateConstraintExpressionBuilder(expression, _context.CheckIfExists);
         }
 
         public Constraint.ICreateConstraintOnTableSyntax UniqueConstraint(string constraintName)
@@ -104,14 +105,14 @@ namespace FluentMigrator.Builders.Create
             var expression = new CreateConstraintExpression(ConstraintType.Unique);
             expression.Constraint.ConstraintName = constraintName;
             _context.Expressions.Add(expression);
-            return new CreateConstraintExpressionBuilder(expression);
+            return new CreateConstraintExpressionBuilder(expression, _context.CheckIfExists);
         }
 
         public Constraint.ICreateConstraintOnTableSyntax PrimaryKey()
         {
             var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
             _context.Expressions.Add(expression);
-            return new CreateConstraintExpressionBuilder(expression);
+            return new CreateConstraintExpressionBuilder(expression, _context.CheckIfExists);
         }
 
         public Constraint.ICreateConstraintOnTableSyntax PrimaryKey(string primaryKeyName)
@@ -119,7 +120,7 @@ namespace FluentMigrator.Builders.Create
             var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
             expression.Constraint.ConstraintName = primaryKeyName;
             _context.Expressions.Add(expression);
-            return new CreateConstraintExpressionBuilder(expression);
+            return new CreateConstraintExpressionBuilder(expression, _context.CheckIfExists);
         }
     }
 }
