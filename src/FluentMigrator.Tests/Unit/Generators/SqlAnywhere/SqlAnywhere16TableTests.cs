@@ -117,7 +117,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] INTEGER NOT NULL IDENTITY, [TestColumn2] INTEGER NOT NULL)");
+            result.ShouldBe("CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] INTEGER NOT NULL DEFAULT AUTOINCREMENT, [TestColumn2] INTEGER NOT NULL)");
         }
 
         [Test]
@@ -127,7 +127,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] INTEGER NOT NULL IDENTITY, [TestColumn2] INTEGER NOT NULL)");
+            result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] INTEGER NOT NULL DEFAULT AUTOINCREMENT, [TestColumn2] INTEGER NOT NULL)");
         }
 
         [Test]

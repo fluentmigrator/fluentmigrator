@@ -44,7 +44,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 
         private static string GetIdentityString(ColumnDefinition column)
         {
-            return "IDENTITY";
+            return "DEFAULT AUTOINCREMENT";
             // Seeding doesn't seem to be supported
                 //column.GetAdditionalFeature(SqlServerExtensions.IdentitySeed, 1),
                 //column.GetAdditionalFeature(SqlServerExtensions.IdentityIncrement, 1));
