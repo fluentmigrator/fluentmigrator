@@ -44,6 +44,10 @@ namespace FluentMigrator
         public abstract void Up();
         public abstract void Down();
 
+        public virtual void BeforeUp()
+        {
+        }
+
         public void ApplyConventions(IMigrationContext context)
         {
             foreach (var expression in context.Expressions)
@@ -57,6 +61,7 @@ namespace FluentMigrator
                 _context = context;
                 ApplicationContext = context.ApplicationContext;
                 ConnectionString = context.Connection;
+                BeforeUp();
                 Up();
                 _context = null;
             }

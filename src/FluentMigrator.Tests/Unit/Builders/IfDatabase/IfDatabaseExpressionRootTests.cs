@@ -153,7 +153,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
         {
             // Arrange
 
-            var context = new MigrationContext(new MigrationConventions(), processor ?? new JetProcessor(new OleDbConnection(), null, null, null), new SingleAssembly(GetType().Assembly), null, "");
+            var context = new MigrationContext(new MigrationConventions(), processor ?? new JetProcessor(new OleDbConnection(), null, null, null), new SingleAssembly(GetType().Assembly), null, "", false);
 
 
             var expression = new IfDatabaseExpressionRoot(context, databaseType.ToArray());
