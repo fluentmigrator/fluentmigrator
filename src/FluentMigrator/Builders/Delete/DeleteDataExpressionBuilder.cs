@@ -52,6 +52,11 @@ namespace FluentMigrator.Builders.Delete
             return this;
         }
 
+        public IDeleteDataOrInSchemaSyntax CheckIfExists(bool enabled = true)
+        {
+            return this;
+        }
+
         public void AllRows()
         {
             _expression.IsAllRows = true;

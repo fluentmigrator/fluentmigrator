@@ -39,6 +39,12 @@ namespace FluentMigrator.Builders.Delete.ForeignKey
             return this;
         }
 
+        public IDeleteForeignKeyFromTableSyntax CheckIfExists(bool enabled = true)
+        {
+            Expression.CheckIfExists = enabled;
+            return this;
+        }
+
         public IDeleteForeignKeyForeignColumnSyntax InSchema(string foreignSchemaName)
         {
             Expression.ForeignKey.ForeignTableSchema = foreignSchemaName;

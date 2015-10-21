@@ -38,6 +38,12 @@ namespace FluentMigrator.Builders.Delete.Index
             return this;
         }
 
+        public IDeleteIndexForTableSyntax CheckIfExists(bool enabled = true)
+        {
+            Expression.CheckIfExists = true;
+            return this;
+        }
+
         public IDeleteIndexOnColumnSyntax InSchema(string schemaName)
         {
             Expression.Index.SchemaName = schemaName;

@@ -19,6 +19,12 @@ namespace FluentMigrator.Builders.Delete.Constraint
             return this;
         }
 
+        public IDeleteConstraintOnTableSyntax CheckIfExists(bool enabled = true)
+        {
+            Expression.CheckIfExists = enabled;
+            return this;
+        }
+
         public IInSchemaSyntax InSchema(string schemaName)
         {
             Expression.Constraint.SchemaName = schemaName;

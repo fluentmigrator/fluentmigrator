@@ -5,5 +5,7 @@ namespace FluentMigrator.Builders.Delete.DefaultConstraint
     public interface IDeleteDefaultConstraintOnTableSyntax : IFluentSyntax
     {
         IDeleteDefaultConstraintOnColumnOrInSchemaSyntax OnTable(string tableName);
+
+        IDeleteDefaultConstraintOnTableSyntax CheckIfExists(bool enabled = true);
     }
 }

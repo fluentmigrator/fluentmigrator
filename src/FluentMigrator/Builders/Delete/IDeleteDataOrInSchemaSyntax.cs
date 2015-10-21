@@ -21,5 +21,7 @@ namespace FluentMigrator.Builders.Delete
     public interface IDeleteDataOrInSchemaSyntax : IDeleteDataSyntax
     {
         IDeleteDataSyntax InSchema(string schemaName);
+
+        IDeleteDataOrInSchemaSyntax CheckIfExists(bool enabled = true);
     }
 }

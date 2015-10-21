@@ -40,6 +40,12 @@ namespace FluentMigrator.Builders.Delete.Column
             return this;
         }
 
+        public IDeleteColumnFromTableSyntax CheckIfExists(bool enabled = true)
+        {
+            Expression.CheckIfExists = enabled;
+            return this;
+        }
+
         public IInSchemaSyntax InSchema(string schemaName)
         {
             Expression.SchemaName = schemaName;

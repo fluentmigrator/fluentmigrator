@@ -21,5 +21,7 @@ namespace FluentMigrator.Builders.Delete.Index
     public interface IDeleteIndexForTableSyntax
     {
         IDeleteIndexOnColumnOrInSchemaSyntax OnTable(string tableName);
+
+        IDeleteIndexForTableSyntax CheckIfExists(bool enabled = true);
     }
 }

@@ -24,5 +24,6 @@ namespace FluentMigrator.Builders.Delete.Column
     {
         IInSchemaSyntax FromTable(string tableName);
         IDeleteColumnFromTableSyntax Column(string columnName);
+        IDeleteColumnFromTableSyntax CheckIfExists(bool enabled = true);
     }
 }
