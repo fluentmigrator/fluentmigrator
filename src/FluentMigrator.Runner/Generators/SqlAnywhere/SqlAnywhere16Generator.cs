@@ -44,10 +44,10 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 
         public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
 
-        public override string AddColumn { get { return "ALTER TABLE {0} ADD {1}"; } }
+        public override string AddColumn { get { return "{0} ADD {1}"; } }
         public override string DropColumn { get { return "ALTER TABLE {0} DROP {1}"; } }
-        public override string AlterColumn { get { return "ALTER TABLE {0} ALTER {1}"; } }
-        public override string RenameColumn { get { return "ALTER TABLE {0} RENAME {1} TO {2}"; } }
+        public override string AlterColumn { get { return "{0} ALTER {1}"; } }
+        public override string RenameColumn { get { return "{0} RENAME {1} TO {2}"; } }
 
         public virtual string IdentityInsert { get { return "SET IDENTITY_INSERT {0} {1}"; } }
 
@@ -88,6 +88,28 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             return string.Format("DROP TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
         }
 
+        public override string Generate(CreateColumnExpression expression)
+        {
+            var alterTableStatement = string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
+
+            if (string.IsNullOrEmpty(descriptionStatement))
+                return alterTableStatement;
+
+            return ComposeStatements(alterTableStatement, new[] { descriptionStatement });
+        }
+
+        public override string Generate(AlterColumnExpression expression)
+        {
+            var alterTableStatement = string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
+
+            if (string.IsNullOrEmpty(descriptionStatement))
+                return alterTableStatement;
+
+            return ComposeStatements(alterTableStatement, new[] { descriptionStatement });
+        }
+
         public override string Generate(CreateConstraintExpression expression)
         {
             var constraintType = (expression.Constraint.IsPrimaryKeyConstraint) ? "PRIMARY KEY" : "UNIQUE";
@@ -118,37 +140,25 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 
         public override string Generate(RenameColumnExpression expression)
         {
-            return String.Format(RenameColumn, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(Quoter.QuoteCommand(expression.OldName)), Quoter.QuoteCommand(expression.NewName));
+            return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            //return String.Format(RenameColumn, alterTableStatement, Quoter.QuoteColumnName(Quoter.QuoteCommand(expression.OldName)), Quoter.QuoteCommand(expression.NewName));
         }
 
         public override string Generate(DeleteColumnExpression expression)
         {
-            // before we drop a column, we have to drop any default value constraints in SQL Server
+            // Create an ALTER TABLE statement for each column to be deleted
             var builder = new StringBuilder();
 
             foreach (string column in expression.ColumnNames)
-            {
-                if (expression.ColumnNames.First() != column) builder.AppendLine("GO");
                 BuildDelete(expression, column, builder);
-            }
 
             return builder.ToString();
         }
 
         protected virtual void BuildDelete(DeleteColumnExpression expression, string columnName, StringBuilder builder)
         {
-            builder.AppendLine(Generate(new DeleteDefaultConstraintExpression
-            {
-                ColumnName = columnName,
-                SchemaName = expression.SchemaName,
-                TableName = expression.TableName
-            }));
-
-            builder.AppendLine();
-
-            builder.AppendLine(String.Format("-- now we can finally drop column" + Environment.NewLine + "ALTER TABLE {0} DROP COLUMN {1};",
-                                         Quoter.QuoteTableName(expression.TableName),
-                                         Quoter.QuoteColumnName(columnName)));
+            string schemaAndTable = string.Format("{0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName));
+            builder.AppendLine(string.Format(DropColumn, schemaAndTable, Quoter.QuoteColumnName(columnName)));
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
@@ -245,24 +255,9 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
-            string sql =
-                "DECLARE @default sysname, @sql nvarchar(4000);" + Environment.NewLine + Environment.NewLine +
-                "-- get name of default constraint" + Environment.NewLine +
-                "SELECT @default = name" + Environment.NewLine +
-                "FROM sys.default_constraints" + Environment.NewLine +
-                "WHERE parent_object_id = object_id('{0}')" + Environment.NewLine +
-                "AND type = 'D'" + Environment.NewLine +
-                "AND parent_column_id = (" + Environment.NewLine +
-                "SELECT column_id" + Environment.NewLine +
-                "FROM sys.columns" + Environment.NewLine +
-                "WHERE object_id = object_id('{0}')" + Environment.NewLine +
-                "AND name = '{1}'" + Environment.NewLine +
-                ");" + Environment.NewLine + Environment.NewLine +
-                "-- create alter table command to drop constraint as string and run it" + Environment.NewLine +
-                "SET @sql = N'ALTER TABLE {0} DROP CONSTRAINT ' + @default;" + Environment.NewLine +
-                "EXEC sp_executesql @sql;";
-
-            return String.Format(sql, Quoter.QuoteTableName(expression.TableName), expression.ColumnName);
+            string sql = "ALTER TABLE {0} ALTER {1} DROP DEFAULT";
+            string schemaAndTable = string.Format("{0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName));
+            return String.Format(sql, schemaAndTable, Quoter.QuoteColumnName(expression.ColumnName));
         }
 
         public override bool IsAdditionalFeatureSupported(string feature)
