@@ -51,9 +51,9 @@ namespace FluentMigrator.Builders.Alter.Table
             return this;
         }
 
-        public IAlterTableAddColumnOrAlterColumnSyntax CheckIfExists()
+        public IAlterTableAddColumnOrAlterColumnOrSchemaOrDescriptionSyntax CheckIfExists(bool enabled = true)
         {
-            Expression.CheckIfExists = true;
+            Expression.CheckIfExists = enabled;
             return this;
         }
 

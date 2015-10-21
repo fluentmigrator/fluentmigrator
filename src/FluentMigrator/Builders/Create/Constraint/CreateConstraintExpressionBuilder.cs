@@ -22,6 +22,12 @@ namespace FluentMigrator.Builders.Create.Constraint
             return this;
         }
 
+        public ICreateConstraintOnTableSyntax CheckIfExists(bool enabled = true)
+        {
+            Expression.CheckIfExists = enabled;
+            return this;
+        }
+
         public ICreateConstraintOptionsSyntax Column(string columnName)
         {
             Expression.Constraint.Columns.Add(columnName);

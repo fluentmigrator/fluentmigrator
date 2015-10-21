@@ -41,6 +41,12 @@ namespace FluentMigrator.Builders.Create.Index
             return this;
         }
 
+        public ICreateIndexForTableSyntax CheckIfExists(bool enabled = true)
+        {
+            Expression.CheckIfExists = enabled;
+            return this;
+        }
+
         public ICreateIndexColumnOptionsSyntax OnColumn(string columnName)
         {
             CurrentColumn = new IndexColumnDefinition { Name = columnName };

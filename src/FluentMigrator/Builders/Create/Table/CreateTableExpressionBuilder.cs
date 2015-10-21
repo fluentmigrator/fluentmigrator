@@ -58,9 +58,9 @@ namespace FluentMigrator.Builders.Create.Table
             return this;
         }
 
-        public ICreateTableWithColumnSyntax CheckIfExists()
+        public ICreateTableWithColumnOrSchemaOrDescriptionSyntax CheckIfExists(bool enabled = true)
         {
-            Expression.CheckIfExists = true;
+            Expression.CheckIfExists = enabled;
             return this;
         }
         

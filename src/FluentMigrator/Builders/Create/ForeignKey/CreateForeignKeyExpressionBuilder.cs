@@ -77,9 +77,9 @@ namespace FluentMigrator.Builders.Create.ForeignKey
             return this;
         }
 
-        public ICreateForeignKeyPrimaryColumnSyntax CheckIfExists()
+        public ICreateForeignKeyFromTableSyntax CheckIfExists(bool enabled = true)
         {
-            Expression.CheckIfExists = true;
+            Expression.CheckIfExists = enabled;
             return this;
         }
 

@@ -21,5 +21,7 @@ namespace FluentMigrator.Builders.Create.Table
     public interface ICreateTableWithColumnOrSchemaOrDescriptionSyntax : ICreateTableWithColumnOrSchemaSyntax
     {
         ICreateTableWithColumnOrSchemaSyntax WithDescription(string description);
+
+        ICreateTableWithColumnOrSchemaOrDescriptionSyntax CheckIfExists(bool enabled = true);
     }
 }

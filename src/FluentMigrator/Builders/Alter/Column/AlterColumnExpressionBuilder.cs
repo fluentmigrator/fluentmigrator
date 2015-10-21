@@ -290,10 +290,9 @@ namespace FluentMigrator.Builders.Alter.Column
             }
         }
 
-        public IAlterColumnAsTypeSyntax CheckIfExists()
+        IAlterColumnOnTableSyntax IAlterColumnOnTableSyntax.CheckIfExists(bool enabled = true)
         {
-            Expression.CheckIfExists = true;
-
+            Expression.CheckIfExists = enabled;
             return this;
         }
     }

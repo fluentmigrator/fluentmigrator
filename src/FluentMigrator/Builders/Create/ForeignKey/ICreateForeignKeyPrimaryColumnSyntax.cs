@@ -24,7 +24,5 @@ namespace FluentMigrator.Builders.Create.ForeignKey
     {
         ICreateForeignKeyCascadeSyntax PrimaryColumn(string column);
         ICreateForeignKeyCascadeSyntax PrimaryColumns(params string[] columns);
-
-        ICreateForeignKeyPrimaryColumnSyntax CheckIfExists();
     }
 }
