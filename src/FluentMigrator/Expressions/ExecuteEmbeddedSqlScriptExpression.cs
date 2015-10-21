@@ -9,6 +9,7 @@ namespace FluentMigrator.Expressions
 {
     public class ExecuteEmbeddedSqlScriptExpression : MigrationExpressionBase
     {
+        public object[] Args { get; set; }
         public string SqlScript { get; set; }
 
         public IAssemblyCollection MigrationAssemblies { get; set; }
@@ -26,7 +27,7 @@ namespace FluentMigrator.Expressions
                 sqlText = reader.ReadToEnd();
             }
 
-
+            sqlText = string.Format(sqlText, Args ?? new object[0]);
             // since all the Processors are using String.Format() in their Execute method
             //  we need to escape the brackets with double brackets or else it throws an incorrect format error on the String.Format call
             sqlText = sqlText.Replace("{", "{{").Replace("}", "}}");
