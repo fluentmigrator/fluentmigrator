@@ -16,6 +16,9 @@ namespace FluentMigrator.Tests.Unit.Expressions
         private const string testSqlScript = "embeddedtestscript.sql";
         private const string scriptContents = "TEST SCRIPT";
 
+        private const string argsTestSqlScript = "embeddedtestscriptwithargs.sql";
+        private const string argsScriptContents = "TEST SCRIPT arg";
+
         [Test]
         public void ErrorIsReturnWhenSqlScriptIsNullOrEmpty()
         {
@@ -84,6 +87,18 @@ namespace FluentMigrator.Tests.Unit.Expressions
         {
             var expression = new ExecuteSqlScriptExpression { SqlScript = testSqlScript };
             expression.ToString().ShouldBe("ExecuteSqlScript embeddedtestscript.sql");
+        }
+
+        [Test]
+        public void ExecutesTheStatementWithArgs()
+        {
+            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = argsTestSqlScript, MigrationAssemblies = new SingleAssembly(Assembly.GetExecutingAssembly()), Args = new[] {"arg" } };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute(argsScriptContents)).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
         }
     }
 }

@@ -28,6 +28,9 @@ namespace FluentMigrator.Tests.Unit.Expressions
     [TestFixture]
     public class ExecuteSqlStatementExpressionTests
     {
+        private string argsTestSqlStatement = "INSERT INTO BLAH (ITEM) VALUES(\"{0}\")";
+        private string argsTestScriptContents = "INSERT INTO BLAH (ITEM) VALUES(\"arg\")";
+
         [Test]
         public void ErrorIsReturnWhenSqlStatementIsNullOrEmpty()
         {
@@ -43,6 +46,18 @@ namespace FluentMigrator.Tests.Unit.Expressions
 
             var processor = new Mock<IMigrationProcessor>();
             processor.Setup(x => x.Execute(expression.SqlStatement)).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+
+        [Test]
+        public void ExecutesTheStatementWithArgs()
+        {
+            var expression = new ExecuteSqlStatementExpression() { SqlStatement = argsTestSqlStatement , Args = new []{"arg"} };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute(argsTestScriptContents)).Verifiable();
 
             expression.ExecuteWith(processor.Object);
             processor.Verify();
