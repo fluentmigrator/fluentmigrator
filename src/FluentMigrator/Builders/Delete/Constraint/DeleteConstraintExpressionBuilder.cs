@@ -31,8 +31,9 @@ namespace FluentMigrator.Builders.Delete.Constraint
             return this;
         }
 
-        public IInSchemaSyntax CheckIfExists()
+        IInSchemaSyntax IInSchemaSyntax.CheckIfExists(bool enabled = true)
         {
+            Expression.CheckIfExists = enabled;
             return this;
         }
     }

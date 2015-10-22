@@ -27,12 +27,31 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanDeleteDataForAllRowsWithCustomSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpressionIdempotent();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'TestSchema' AND TABLE_NAME = 'TestTable1')) BEGIN DELETE FROM [TestSchema].[TestTable1] WHERE 1 = 1 END");
+        }
+
+        [Test]
         public override void CanDeleteDataForAllRowsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DELETE FROM [dbo].[TestTable1] WHERE 1 = 1");
+        }
+
+        [Test]
+        public void CanDeleteDataForAllRowsWithDefaultSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpressionIdempotent();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'TestTable1')) BEGIN DELETE FROM [dbo].[TestTable1] WHERE 1 = 1 END");
         }
 
         [Test]
@@ -87,12 +106,37 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanInsertDataWithCustomSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetInsertDataExpressionIdempotent();
+            expression.SchemaName = "TestSchema";
+
+            var expected = "IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'TestSchema' AND TABLE_NAME = 'TestTable1')) BEGIN INSERT INTO [TestSchema].[TestTable1] ([Id], [Name], [Website]) VALUES (1, 'Just''in', 'codethinked.com') END;";
+            expected += @" IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'TestSchema' AND TABLE_NAME = 'TestTable1')) BEGIN INSERT INTO [TestSchema].[TestTable1] ([Id], [Name], [Website]) VALUES (2, 'Na\te', 'kohari.org') END";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
+        }
+
+        [Test]
         public override void CanInsertDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
 
             var expected = "INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (1, 'Just''in', 'codethinked.com');";
             expected += @" INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (2, 'Na\te', 'kohari.org')";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
+        }
+
+        [Test]
+        public void CanInsertDataWithDefaultSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetInsertDataExpressionIdempotent();
+
+            var expected = "IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'TestTable1')) BEGIN INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (1, 'Just''in', 'codethinked.com') END;";
+            expected += @" IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'TestTable1')) BEGIN INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (2, 'Na\te', 'kohari.org') END";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
@@ -125,6 +169,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("UPDATE [TestSchema].[TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE 1 = 1");
+        }
+
+        [Test]
+        public void CanUpdateDataForAllDataWithCustomSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRowsIdempotent();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'TestSchema' AND TABLE_NAME = 'TestTable1')) BEGIN UPDATE [TestSchema].[TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE 1 = 1 END");
         }
 
         [Test]

@@ -54,12 +54,19 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string RenameTable { get { return "{0}', '{1}'"; } }
 
         public override string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3}.{4} ({5}{6}{7})"; } }
+
+        public string CreateIndexIdempotent { get { return "IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name = '{0}' AND object_id = OBJECT_ID('{1}.{2}')) BEGIN CREATE {3}{4}INDEX {5} ON {6}.{7} ({8}{9}{10}) END"; } }
         public override string DropIndex { get { return "DROP INDEX {0} ON {1}.{2}"; } }
 
         public override string InsertData { get { return "INSERT INTO {0}.{1} ({2}) VALUES ({3})"; } }
+        public string InsertDataIdempotent { get { return "IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}')) BEGIN INSERT INTO {2}.{3} ({4}) VALUES ({5}) END"; } }
         public override string UpdateData { get { return "{0} SET {1} WHERE {2}"; } }
         public override string DeleteData { get { return "DELETE FROM {0}.{1} WHERE {2}"; } }
+
+        public string DeleteDataIdempotent { get { return "IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}')) BEGIN DELETE FROM {2}.{3} WHERE {4} END"; } }
         public override string IdentityInsert { get { return "SET IDENTITY_INSERT {0}.{1} {2}"; } }
+
+        public string IdentityInsertIdempotent { get { return "IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}')) BEGIN SET IDENTITY_INSERT {2}.{3} {4} END"; } }
 
         public override string CreateForeignKeyConstraint { get { return "ALTER TABLE {0}.{1} ADD CONSTRAINT {2} FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8}"; } }
 
@@ -76,15 +83,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
             var descriptionStatements = DescriptionGenerator.GenerateDescriptionStatements(expression);
 
-            string createTableStatement;
-            if (expression.CheckIfExists)
-            {
-                createTableStatement = string.Format("IF (NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}')) BEGIN CREATE TABLE {2}.{3} END", expression.SchemaName ?? "dbo", expression.TableName, Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
-            }
-            else
-            {
-                createTableStatement = string.Format("CREATE TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
-            }
+            var createTableStatement = expression.CheckIfExists ? 
+                string.Format("IF (NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}')) BEGIN CREATE TABLE {2}.{3} END", expression.SchemaName ?? "dbo", expression.TableName, Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression)) : 
+                string.Format("CREATE TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
 
             var descriptionStatementsArray = descriptionStatements as string[] ?? descriptionStatements.ToArray();
 
@@ -106,25 +107,16 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(DeleteTableExpression expression)
         {
-            if (expression.CheckIfExists)
-            {
-                return string.Format("IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}')) BEGIN DROP TABLE {2}.{3} END", expression.SchemaName ?? "dbo", expression.TableName, Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
-            }
-
-            return string.Format("DROP TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            return expression.CheckIfExists ? 
+                string.Format("IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}')) BEGIN DROP TABLE {2}.{3} END", expression.SchemaName ?? "dbo", expression.TableName, Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression)) : 
+                string.Format("DROP TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
         }
 
         public override string Generate(CreateColumnExpression expression)
         {
-            string alterTableStatement;
-            if (expression.CheckIfExists)
-            {
-                alterTableStatement = string.Format(AddColumnIdempotent, expression.Column.Name, expression.SchemaName ?? "dbo", expression.TableName, Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), Column.Generate(expression.Column));
-            }
-            else
-            {
-                alterTableStatement = string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
-            }
+            var alterTableStatement = expression.CheckIfExists ? 
+                string.Format(AddColumnIdempotent, expression.Column.Name, expression.SchemaName ?? "dbo", expression.TableName, Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), Column.Generate(expression.Column)) : 
+                string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
 
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
 
@@ -136,16 +128,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(AlterColumnExpression expression)
         {
-            string alterTableStatement;
-            if (expression.CheckIfExists)
-            {
-                alterTableStatement = string.Format(AlterColumnIdempotent, expression.Column.Name, expression.SchemaName ?? "dbo", expression.TableName, Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
-
-            }
-            else
-            {
-                alterTableStatement = string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
-            }
+            var alterTableStatement = expression.CheckIfExists ? 
+                string.Format(AlterColumnIdempotent, expression.Column.Name, expression.SchemaName ?? "dbo", expression.TableName, Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression)) : 
+                string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
 
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
             if (string.IsNullOrEmpty(descriptionStatement))
@@ -156,17 +141,23 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(RenameColumnExpression expression)
         {
-            return string.Format("sp_rename '{0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            return expression.CheckIfExists ? 
+                string.Format("IF EXISTS(SELECT * FROM sys.columns WHERE Name = N'{0}' AND Object_ID = Object_ID(N'{1}.{2}')) BEGIN sp_rename '{3}.{4} END", expression.OldName, expression.SchemaName ?? "dbo", expression.TableName, Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression)) : 
+                string.Format("sp_rename '{0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
         }
 
         public override string Generate(RenameTableExpression expression)
         {
-            return string.Format("sp_rename '{0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            return expression.CheckIfExists
+                ? string.Format("IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}')) BEGIN sp_rename '{2}.{3} END", expression.OldName, expression.SchemaName ?? "dbo", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression))
+                : string.Format("sp_rename '{0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
         }
 
         public override string Generate(UpdateDataExpression expression)
         {
-            return string.Format("UPDATE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            return expression.CheckIfExists
+                ? string.Format("IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}')) BEGIN UPDATE {2}.{3} END", expression.SchemaName ?? "dbo", expression.TableName, Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression))
+                : string.Format("UPDATE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
         }
 
         public override string Generate(DeleteDataExpression expression)
@@ -176,7 +167,12 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             if (expression.IsAllRows)
             {
-                deleteItems.Add(string.Format(DeleteData, Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), "1 = 1"));
+                deleteItems.Add(expression.CheckIfExists == false
+                    ? string.Format(DeleteData, Quoter.QuoteSchemaName(expression.SchemaName),
+                        Quoter.QuoteTableName(expression.TableName), "1 = 1")
+                    : string.Format(DeleteDataIdempotent, expression.SchemaName ?? "dbo", expression.TableName,
+                        Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName),
+                        "1 = 1"));
             }
             else
             {
@@ -188,7 +184,12 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                         whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value)));
                     }
 
-                    deleteItems.Add(string.Format(DeleteData, Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), String.Join(" AND ", whereClauses.ToArray())));
+                    deleteItems.Add(expression.CheckIfExists
+                        ? string.Format(DeleteDataIdempotent, expression.SchemaName ?? "dbo", expression.TableName,
+                            Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName),
+                            String.Join(" AND ", whereClauses.ToArray()))
+                        : string.Format(DeleteData, Quoter.QuoteSchemaName(expression.SchemaName),
+                            Quoter.QuoteTableName(expression.TableName), String.Join(" AND ", whereClauses.ToArray())));
                 }
             }
 
@@ -197,12 +198,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(DeleteForeignKeyExpression expression)
         {
-            if (expression.CheckIfExists)
-            {
-                return string.Format("IF (OBJECT_ID('{0}.{1}', 'F') IS NOT NULL) BEGIN ALTER TABLE {2}.{3} END", expression.ForeignKey.ForeignTableSchema ?? "dbo", expression.ForeignKey.Name, Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema), base.Generate(expression));
-            }
-
-            return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema), base.Generate(expression));
+            return expression.CheckIfExists ? 
+                string.Format("IF (OBJECT_ID('{0}.{1}', 'F') IS NOT NULL) BEGIN ALTER TABLE {2}.{3} END", expression.ForeignKey.ForeignTableSchema ?? "dbo", expression.ForeignKey.Name, Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema), base.Generate(expression)) : 
+                string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema), base.Generate(expression));
         }
 
         public override string Generate(InsertDataExpression expression)
@@ -213,10 +211,22 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             if (IsUsingIdentityInsert(expression))
             {
-                insertStrings.Add(string.Format(IdentityInsert,
+                if (expression.CheckIfExists)
+                {
+                    insertStrings.Add(string.Format(IdentityInsertIdempotent,
+                            expression.SchemaName ?? "dbo", expression.TableName,
                             Quoter.QuoteSchemaName(expression.SchemaName),
                             Quoter.QuoteTableName(expression.TableName),
                             "ON"));
+                }
+                else
+                {
+                    insertStrings.Add(string.Format(IdentityInsert,
+                            Quoter.QuoteSchemaName(expression.SchemaName),
+                            Quoter.QuoteTableName(expression.TableName),
+                            "ON"));
+                }
+             
             }
 
             foreach (InsertionDataDefinition row in expression.Rows)
@@ -231,19 +241,43 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
                 string columns = String.Join(", ", columnNames.ToArray());
                 string values = String.Join(", ", columnValues.ToArray());
-                insertStrings.Add(String.Format(InsertData
-                    , Quoter.QuoteSchemaName(expression.SchemaName)
-                    , Quoter.QuoteTableName(expression.TableName)
-                    , columns
-                    , values));
+
+                if (expression.CheckIfExists)
+                {
+                    insertStrings.Add(String.Format(InsertDataIdempotent,
+                    expression.SchemaName ?? "dbo", expression.TableName
+                    ,Quoter.QuoteSchemaName(expression.SchemaName)
+                    ,Quoter.QuoteTableName(expression.TableName)
+                    ,columns
+                    ,values));
+                }
+                else
+                {
+                    insertStrings.Add(String.Format(InsertData
+                        ,Quoter.QuoteSchemaName(expression.SchemaName)
+                        ,Quoter.QuoteTableName(expression.TableName)
+                        ,columns
+                        ,values));
+                }
             }
 
             if (IsUsingIdentityInsert(expression))
             {
-                insertStrings.Add(string.Format(IdentityInsert,
+                if (expression.CheckIfExists)
+                {
+                    insertStrings.Add(string.Format(IdentityInsertIdempotent,
+                            expression.SchemaName ?? "dbo", expression.TableName,
                             Quoter.QuoteSchemaName(expression.SchemaName),
                             Quoter.QuoteTableName(expression.TableName),
                             "OFF"));
+                }
+                else
+                {
+                    insertStrings.Add(string.Format(IdentityInsert,
+                            Quoter.QuoteSchemaName(expression.SchemaName),
+                            Quoter.QuoteTableName(expression.TableName),
+                            "OFF"));
+                }              
             }
 
             return String.Join("; ", insertStrings.ToArray());
@@ -329,6 +363,18 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 indexIncludes[i] = Quoter.QuoteColumnName(includeDef.Name);
             }
 
+            if (expression.CheckIfExists)
+            {
+                return String.Format(CreateIndexIdempotent, expression.Index.Name, expression.Index.SchemaName ?? "dbo", expression.Index.TableName
+                    , GetUniqueString(expression)
+                    , GetClusterTypeString(expression)
+                    , Quoter.QuoteIndexName(expression.Index.Name)
+                    , Quoter.QuoteSchemaName(expression.Index.SchemaName)
+                    , Quoter.QuoteTableName(expression.Index.TableName)
+                    , String.Join(", ", indexColumns)
+                    , GetIncludeString(expression)
+                    , String.Join(", ", indexIncludes));
+            }
             return String.Format(CreateIndex
                 , GetUniqueString(expression)
                 , GetClusterTypeString(expression)

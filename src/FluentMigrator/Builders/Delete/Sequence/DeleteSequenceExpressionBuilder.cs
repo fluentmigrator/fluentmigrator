@@ -17,8 +17,9 @@ namespace FluentMigrator.Builders.Delete.Sequence
             return this;
         }
 
-        public IInSchemaSyntax CheckIfExists()
+        public IInSchemaSyntax CheckIfExists(bool enabled = true)
         {
+            Expression.CheckIfExists = enabled;
             return this;
         }
     }

@@ -15,9 +15,9 @@ namespace FluentMigrator.Builders.Delete.Table
             return this;
         }
 
-        public IInSchemaSyntax CheckIfExists()
+        public IInSchemaSyntax CheckIfExists(bool enabled = true)
         {
-            Expression.CheckIfExists = true;
+            Expression.CheckIfExists = enabled;
             return this;
         }
     }

@@ -131,6 +131,13 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static CreateIndexExpression GetCreateIndexExpressionIdempotent()
+        {
+            var expression = GetCreateIndexExpression();
+            expression.CheckIfExists = true;
+            return expression;
+        }
+
         public static CreateSchemaExpression GetCreateSchemaExpression()
         {
             return new CreateSchemaExpression { SchemaName = "TestSchema" };
@@ -234,6 +241,13 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static InsertDataExpression GetInsertDataExpressionIdempotent()
+        {
+            var expression = GetInsertDataExpression();
+            expression.CheckIfExists = true;
+            return expression;
+        }
+
         public static UpdateDataExpression GetUpdateDataExpression()
         {
             var expression = new UpdateDataExpression();
@@ -265,6 +279,14 @@ namespace FluentMigrator.Tests.Unit.Generators
                                  };
 
             expression.IsAllRows = true;
+
+            return expression;
+        }
+
+        public static UpdateDataExpression GetUpdateDataExpressionWithAllRowsIdempotent()
+        {
+            var expression = GetUpdateDataExpressionWithAllRows();
+            expression.CheckIfExists = true;
 
             return expression;
         }
@@ -320,9 +342,25 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static DeleteDataExpression GetDeleteDataAllRowsExpressionIdempotent()
+        {
+            var expression = GetDeleteDataAllRowsExpression();
+            expression.CheckIfExists = true;
+
+            return expression;
+        }
+
         public static RenameColumnExpression GetRenameColumnExpression()
         {
             return new RenameColumnExpression { OldName = TestColumnName1, NewName = TestColumnName2, TableName = TestTableName1 };
+        }
+
+        public static RenameColumnExpression GetRenameColumnExpressionIdempotent()
+        {
+            var expression = GetRenameColumnExpression();
+            expression.CheckIfExists = true;
+
+            return expression;
         }
 
         public static CreateColumnExpression GetCreateDecimalColumnExpression()

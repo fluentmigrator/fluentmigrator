@@ -42,6 +42,12 @@ namespace FluentMigrator.Builders.Rename.Table
             return this;
         }
 
+        IInSchemaSyntax IInSchemaSyntax.CheckIfExists(bool enabled = true)
+        {
+            Expression.CheckIfExists = enabled;
+            return this;
+        }
+
         public IRenameTableToOrInSchemaSyntax CheckIfExists(bool enabled = true)
         {
             Expression.CheckIfExists = enabled;

@@ -27,6 +27,7 @@ namespace FluentMigrator.Expressions
         public virtual string SchemaName { get; set; }
         public string TableName { get; set; }
         public virtual bool IsAllRows { get; set; }
+        public virtual bool CheckIfExists { get; set; }
 
         public List<DeletionDataDefinition> Rows
         {

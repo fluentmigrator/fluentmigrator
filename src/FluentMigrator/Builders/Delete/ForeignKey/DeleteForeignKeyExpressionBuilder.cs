@@ -51,9 +51,9 @@ namespace FluentMigrator.Builders.Delete.ForeignKey
             return this;
         }
 
-        public IInSchemaSyntax CheckIfExists()
+        IInSchemaSyntax IInSchemaSyntax.CheckIfExists(bool enabled)
         {
-            Expression.CheckIfExists = true;
+            Expression.CheckIfExists = enabled;
             return this;
         }
 

@@ -26,12 +26,31 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanCreateIndexWithCustomSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetCreateIndexExpressionIdempotent();
+            expression.Index.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name = 'TestIndex' AND object_id = OBJECT_ID('TestSchema.TestTable1')) BEGIN CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC) END");
+        }
+
+        [Test]
         public override void CanCreateIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC)");
+        }
+
+        [Test]
+        public void CanCreateIndexWithDefaultSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetCreateIndexExpressionIdempotent();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name = 'TestIndex' AND object_id = OBJECT_ID('dbo.TestTable1')) BEGIN CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) END");
         }
 
         [Test]

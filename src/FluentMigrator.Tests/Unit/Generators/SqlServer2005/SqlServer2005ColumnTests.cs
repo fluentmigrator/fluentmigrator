@@ -311,12 +311,31 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanRenameColumnWithCustomSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetRenameColumnExpressionIdempotent();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF EXISTS(SELECT * FROM sys.columns WHERE Name = N'TestColumn1' AND Object_ID = Object_ID(N'TestSchema.TestTable1')) BEGIN sp_rename '[TestSchema].[TestTable1].[TestColumn1]', 'TestColumn2' END");
+        }
+
+        [Test]
         public override void CanRenameColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
 
             var result = Generator.Generate(expression);
             result.ShouldBe("sp_rename '[dbo].[TestTable1].[TestColumn1]', 'TestColumn2'");
+        }
+
+        [Test]
+        public void CanRenameColumnWithDefaultSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetRenameColumnExpressionIdempotent();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF EXISTS(SELECT * FROM sys.columns WHERE Name = N'TestColumn1' AND Object_ID = Object_ID(N'dbo.TestTable1')) BEGIN sp_rename '[dbo].[TestTable1].[TestColumn1]', 'TestColumn2' END");
         }
     }
 }

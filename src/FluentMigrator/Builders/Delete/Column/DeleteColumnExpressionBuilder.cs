@@ -52,6 +52,12 @@ namespace FluentMigrator.Builders.Delete.Column
             return this;
         }
 
+        IInSchemaSyntax IInSchemaSyntax.CheckIfExists(bool enabled)
+        {
+            Expression.CheckIfExists = true;
+            return this;
+        }
+
         public IInSchemaSyntax CheckIfExists()
         {
             Expression.CheckIfExists = true;
