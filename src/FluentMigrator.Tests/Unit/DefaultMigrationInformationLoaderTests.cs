@@ -257,7 +257,7 @@ namespace FluentMigrator.Tests.Unit
             }
 
             public string ConnectionString { get; private set; }
-            public bool CheckIfExists { get; }
+            public bool CheckIfExists { get; private set; }
 
             public void GetUpExpressions(IMigrationContext context)
             {
