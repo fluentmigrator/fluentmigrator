@@ -60,6 +60,6 @@ namespace FluentMigrator.Infrastructure
             return string.Format("{0}", Migration.GetType().Name);
         }
 
-        public long DependsOn { get; }
+        public long DependsOn { get; protected set; }
     }
 }

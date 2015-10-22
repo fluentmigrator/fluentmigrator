@@ -121,12 +121,31 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanDropIndexWithCustomSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetDeleteIndexExpressionIdempotent();
+            expression.Index.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name = 'TestIndex' AND object_id = OBJECT_ID('TestSchema.TestTable1')) BEGIN DROP INDEX [TestIndex] ON [TestSchema].[TestTable1] END");
+        }
+
+        [Test]
         public override void CanDropIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP INDEX [TestIndex] ON [dbo].[TestTable1]");
+        }
+
+        [Test]
+        public void CanDropIndexWithDefaultSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetDeleteIndexExpressionIdempotent();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name = 'TestIndex' AND object_id = OBJECT_ID('dbo.TestTable1')) BEGIN DROP INDEX [TestIndex] ON [dbo].[TestTable1] END");
         }
     }
 }

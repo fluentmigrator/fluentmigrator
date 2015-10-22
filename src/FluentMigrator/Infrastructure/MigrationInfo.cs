@@ -68,7 +68,7 @@ namespace FluentMigrator.Infrastructure
             return string.Format("{0}: {1}", Version, Migration.GetType().Name);
         }
 
-        public long DependsOn { get; }
+        public long DependsOn { get; protected set; }
 
         public void AddTrait(string name, object value)
         {

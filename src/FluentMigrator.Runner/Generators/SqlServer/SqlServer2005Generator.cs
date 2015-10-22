@@ -57,6 +57,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public string CreateIndexIdempotent { get { return "IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name = '{0}' AND object_id = OBJECT_ID('{1}.{2}')) BEGIN CREATE {3}{4}INDEX {5} ON {6}.{7} ({8}{9}{10}) END"; } }
         public override string DropIndex { get { return "DROP INDEX {0} ON {1}.{2}"; } }
+        public string DropIndexIdempotent { get { return "IF NOT EXISTS(SELECT * FROM sys.indexes WHERE name = '{0}' AND object_id = OBJECT_ID('{1}.{2}')) BEGIN DROP INDEX {3} ON {4}.{5} END"; } }
 
         public override string InsertData { get { return "INSERT INTO {0}.{1} ({2}) VALUES ({3})"; } }
         public string InsertDataIdempotent { get { return "IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}')) BEGIN INSERT INTO {2}.{3} ({4}) VALUES ({5}) END"; } }
@@ -388,7 +389,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(DeleteIndexExpression expression)
         {
-            return String.Format(DropIndex, Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteSchemaName(expression.Index.SchemaName), Quoter.QuoteTableName(expression.Index.TableName));
+            return expression.CheckIfExists ?
+                String.Format(DropIndexIdempotent, expression.Index.Name, expression.Index.SchemaName ?? "dbo", expression.Index.TableName, Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteSchemaName(expression.Index.SchemaName), Quoter.QuoteTableName(expression.Index.TableName)) :
+                String.Format(DropIndex, Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteSchemaName(expression.Index.SchemaName), Quoter.QuoteTableName(expression.Index.TableName));
         }
 
         protected override void BuildDelete(DeleteColumnExpression expression, string columnName, StringBuilder builder)
@@ -428,24 +431,41 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             {
                 ColumnName = expression.ColumnName,
                 SchemaName = expression.SchemaName,
-                TableName = expression.TableName
+                TableName = expression.TableName,
+                CheckIfExists = expression.CheckIfExists
             }));
 
             builder.AppendLine();
 
-            builder.Append(String.Format("-- create alter table command to create new default constraint as string and run it" + Environment.NewLine + "ALTER TABLE {3}.{0} WITH NOCHECK ADD CONSTRAINT {4} DEFAULT({2}) FOR {1};",
-                Quoter.QuoteTableName(expression.TableName),
-                Quoter.QuoteColumnName(expression.ColumnName),
-                ((SqlServerColumn)Column).FormatDefaultValue(expression.DefaultValue),
-                Quoter.QuoteSchemaName(expression.SchemaName),
-                Quoter.QuoteConstraintName(SqlServerColumn.GetDefaultConstraintName(expression.TableName, expression.ColumnName))));
+            if (expression.CheckIfExists == false)
+            {
+                builder.Append(String.Format("-- create alter table command to create new default constraint as string and run it" + Environment.NewLine + "ALTER TABLE {3}.{0} WITH NOCHECK ADD CONSTRAINT {4} DEFAULT({2}) FOR {1};",
+                    Quoter.QuoteTableName(expression.TableName),
+                    Quoter.QuoteColumnName(expression.ColumnName),
+                    ((SqlServerColumn)Column).FormatDefaultValue(expression.DefaultValue),
+                    Quoter.QuoteSchemaName(expression.SchemaName),
+                    Quoter.QuoteConstraintName(SqlServerColumn.GetDefaultConstraintName(expression.TableName, expression.ColumnName))));
+            }
+            else
+            {
+                builder.Append(String.Format("-- create alter table command to create new default constraint as string and run it" + Environment.NewLine + "IF OBJECT_ID('{5}.{6}') IS NULL BEGIN ALTER TABLE {3}.{0} WITH NOCHECK ADD CONSTRAINT {4} DEFAULT({2}) FOR {1} END;",
+                    Quoter.QuoteTableName(expression.TableName),
+                    Quoter.QuoteColumnName(expression.ColumnName),
+                    ((SqlServerColumn)Column).FormatDefaultValue(expression.DefaultValue),
+                    Quoter.QuoteSchemaName(expression.SchemaName),
+                    Quoter.QuoteConstraintName(SqlServerColumn.GetDefaultConstraintName(expression.TableName, expression.ColumnName)),
+                    expression.SchemaName ?? "dbo",
+                    (SqlServerColumn.GetDefaultConstraintName(expression.TableName, expression.ColumnName))));
+            }
 
             return builder.ToString();
         }
 
         public override string Generate(CreateConstraintExpression expression)
         {
-            return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.Constraint.SchemaName), base.Generate(expression));
+            return expression.CheckIfExists
+                ? string.Format("IF OBJECT_ID('{2}.{3}') IS NULL BEGIN ALTER TABLE {0}.{1} END", Quoter.QuoteSchemaName(expression.Constraint.SchemaName), base.Generate(expression), expression.Constraint.SchemaName, expression.Constraint.ConstraintName)
+                : string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.Constraint.SchemaName), base.Generate(expression));
         }
 
         public override string Generate(DeleteDefaultConstraintExpression expression)
@@ -471,17 +491,16 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(DeleteConstraintExpression expression)
         {
-            return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.Constraint.SchemaName), base.Generate(expression));
+            return expression.CheckIfExists ?
+                string.Format("IF OBJECT_ID('{2}.{3}') IS NULL BEGIN ALTER TABLE {0}.{1} END", Quoter.QuoteSchemaName(expression.Constraint.SchemaName), base.Generate(expression), expression.Constraint.SchemaName, expression.Constraint.ConstraintName) :
+                string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.Constraint.SchemaName), base.Generate(expression));
         }
 
         public override string Generate(CreateSchemaExpression expression)
         {
-            if (expression.CheckIfExists)
-            {
-                return string.Format(@"IF (NOT EXISTS (SELECT * FROM sys.schemas WHERE name = '{0}')) BEGIN EXEC sp_executesql N'CREATE SCHEMA {1}' END", expression.SchemaName ?? "dbo", Quoter.QuoteSchemaName(expression.SchemaName));
-            }
-
-            return String.Format(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName));
+            return expression.CheckIfExists ? 
+                string.Format(@"IF (NOT EXISTS (SELECT * FROM sys.schemas WHERE name = '{0}')) BEGIN EXEC sp_executesql N'CREATE SCHEMA {1}' END", expression.SchemaName ?? "dbo", Quoter.QuoteSchemaName(expression.SchemaName)) : 
+                String.Format(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
         public override string Generate(DeleteSchemaExpression expression)

@@ -567,6 +567,14 @@ namespace FluentMigrator.Tests.Unit.Generators
             return new DeleteIndexExpression { Index = indexDefinition };
         }
 
+        public static DeleteIndexExpression GetDeleteIndexExpressionIdempotent()
+        {
+            var expression = GetDeleteIndexExpression();
+            expression.CheckIfExists = true;
+
+            return expression;
+        }
+
         public static DeleteForeignKeyExpression GetDeleteForeignKeyExpression()
         {
             var expression = new DeleteForeignKeyExpression();
@@ -700,6 +708,13 @@ namespace FluentMigrator.Tests.Unit.Generators
                                      DefaultValue = 1,
                                      TableName = TestTableName1
                                  };
+            return expression;
+        }
+
+        public static AlterDefaultConstraintExpression GetAlterDefaultConstraintExpressionIdempotent()
+        {
+            var expression = GetAlterDefaultConstraintExpression();
+            expression.CheckIfExists = true;
             return expression;
         }
 
