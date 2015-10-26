@@ -89,7 +89,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public void CurrencyIsNumber()
         {
-            _typeMap.GetTypeMap(DbType.Currency, 0, 0).ShouldBe("NUMBER(19,1)");
+            _typeMap.GetTypeMap(DbType.Currency, 0, 0).ShouldBe("NUMBER(19,4)");
         }
 
         [Test]
