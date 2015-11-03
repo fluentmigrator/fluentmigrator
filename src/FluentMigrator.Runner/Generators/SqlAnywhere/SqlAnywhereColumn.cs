@@ -13,6 +13,18 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             this.ClauseOrder.Insert(this.ClauseOrder.Count - 2, this.FormatUniqueConstraint);
         }
 
+        protected override string FormatNullable(ColumnDefinition column)
+        {
+            if (column.IsNullable.HasValue && column.IsNullable.Value)
+            {
+                return "NULL";
+            }
+            else
+            {
+                return "NOT NULL";
+            }
+        }
+
         protected override string FormatDefaultValue(ColumnDefinition column)
         {
             if (DefaultValueIsSqlFunction(column.DefaultValue))
