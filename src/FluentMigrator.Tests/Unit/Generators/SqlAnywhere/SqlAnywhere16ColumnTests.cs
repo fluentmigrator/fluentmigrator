@@ -1,6 +1,7 @@
 ﻿using FluentMigrator.Runner.Generators.SqlAnywhere;
 using NUnit.Framework;
 using Shouldly;
+using System;
 using System.Text;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
@@ -132,7 +133,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
             expression.SchemaName = "TestSchema";
 
-            var expected = "ALTER TABLE [TestSchema].[TestTable1] DROP [TestColumn1]\r\n";
+            var expected = "ALTER TABLE [TestSchema].[TestTable1] DROP [TestColumn1]" + Environment.NewLine;
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
@@ -145,7 +146,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             //This does not work if it is a primary key
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
 
-            var expected = "ALTER TABLE [dbo].[TestTable1] DROP [TestColumn1]\r\n";
+            var expected = "ALTER TABLE [dbo].[TestTable1] DROP [TestColumn1]" + Environment.NewLine;
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
