@@ -17,6 +17,28 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
+        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Column")]
+        public void CanAlterColumnToSetNullableTrue()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
+            expression.Column.IsNullable = true;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] NVARCHAR(20) NULL");
+        }
+
+        [Test]
+        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Column")]
+        public void CanAlterColumnToSetNullableFalse()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
+            expression.Column.IsNullable = false;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] NVARCHAR(20) NOT NULL");
+        }
+
+        [Test]
         [Category("SQLAnwyere"), Category("SQLAnwyere16"), Category("Generator"), Category("Column")]
         public override void CanAlterColumnWithCustomSchema()
         {
