@@ -39,7 +39,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnwyere"), Category("SQLAnwyere16"), Category("Generator"), Category("Column")]
+        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanAlterColumnWithCustomSchema()
         {
             //TODO: This will fail if there are any keys attached 
@@ -51,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnwyere"), Category("SQLAnwyere16"), Category("Generator"), Category("Column")]
+        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanAlterColumnWithDefaultSchema()
         {
             //TODO: This will fail if there are any keys attached 
@@ -62,7 +62,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnwyere"), Category("SQLAnwyere16"), Category("Generator"), Category("Column")]
+        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanCreateAutoIncrementColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
@@ -73,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnwyere"), Category("SQLAnwyere16"), Category("Generator"), Category("Column")]
+        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanCreateAutoIncrementColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
@@ -83,7 +83,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnwyere"), Category("SQLAnwyere16"), Category("Generator"), Category("Column")]
+        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanCreateColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -94,7 +94,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnwyere"), Category("SQLAnwyere16"), Category("Generator"), Category("Column")]
+        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanCreateColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -104,7 +104,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnwyere"), Category("SQLAnwyere16"), Category("Generator"), Category("Column")]
+        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanCreateDecimalColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
@@ -115,7 +115,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnwyere"), Category("SQLAnwyere16"), Category("Generator"), Category("Column")]
+        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanCreateDecimalColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
@@ -125,7 +125,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnwyere"), Category("SQLAnwyere16"), Category("Generator"), Category("Column")]
+        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanDropColumnWithCustomSchema()
         {
             //This does not work if it is a primary key
@@ -139,7 +139,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnwyere"), Category("SQLAnwyere16"), Category("Generator"), Category("Column")]
+        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanDropColumnWithDefaultSchema()
         {
             //This does not work if it is a primary key
@@ -152,7 +152,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnwyere"), Category("SQLAnwyere16"), Category("Generator"), Category("Column")]
+        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanDropMultipleColumnsWithCustomSchema()
         {
             //This does not work if it is a primary key
@@ -168,7 +168,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnwyere"), Category("SQLAnwyere16"), Category("Generator"), Category("Column")]
+        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanDropMultipleColumnsWithDefaultSchema()
         {
             //This does not work if it is a primary key
@@ -183,7 +183,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnwyere"), Category("SQLAnwyere16"), Category("Generator"), Category("Column")]
+        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanRenameColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
@@ -194,7 +194,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnwyere"), Category("SQLAnwyere16"), Category("Generator"), Category("Column")]
+        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanRenameColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
