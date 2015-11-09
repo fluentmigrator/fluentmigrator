@@ -310,7 +310,7 @@ namespace FluentMigrator.T4
                     sysType = string.Format("AsFixedLengthString({0})", sizeStr);
                     break;
                 case null:
-                    sysType = string.Format("AsCustom({0})", col.CustomType);
+                    sysType = string.Format("AsCustom(\"{0}\")", col.CustomType);
                     break;
                 default:
                     break;
