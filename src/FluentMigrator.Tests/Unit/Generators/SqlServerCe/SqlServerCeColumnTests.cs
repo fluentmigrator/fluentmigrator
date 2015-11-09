@@ -27,6 +27,17 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
+        public void CanAlterColumnToNullableWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
+            expression.SchemaName = "TestSchema";
+            expression.Column.IsNullable = true;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NULL");
+        }
+
+        [Test]
         public override void CanAlterColumnWithDefaultSchema()
         {
             //TODO: This will fail if there are any keys attached 
@@ -34,6 +45,17 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL");
+        }
+
+        [Test]
+        public void CanAlterColumnToNullableWithDefaultSchema()
+        {
+            //TODO: This will fail if there are any keys attached 
+            var expression = GeneratorTestHelper.GetAlterColumnExpression();
+            expression.Column.IsNullable = true;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NULL");
         }
 
         [Test]
