@@ -27,7 +27,7 @@ namespace FluentMigrator.Runner
                 if (loadNestedNamespaces)
                 {
                     string matchNested = @namespace + ".";
-                    shouldInclude = t => t.Namespace == @namespace || t.Namespace.StartsWith(matchNested);
+                    shouldInclude = t => t.Namespace != null && (t.Namespace == @namespace || t.Namespace.StartsWith(matchNested));
                 }
 
                 return types.Where(shouldInclude);
