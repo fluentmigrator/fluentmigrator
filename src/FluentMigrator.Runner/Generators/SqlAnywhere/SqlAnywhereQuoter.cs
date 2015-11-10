@@ -1,10 +1,35 @@
 ﻿using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Generic;
+using System;
 
 namespace FluentMigrator.Runner.Generators.SqlAnywhere
 {
     public class SqlAnywhereQuoter : GenericQuoter
     {
+        public override string FormatEnum(object value)
+        {
+            if (value is SystemMethods)
+            {
+                switch((SystemMethods)value)
+                {
+                    case SystemMethods.NewGuid:
+                        return "NEWID()";
+                    case SystemMethods.NewSequentialId:
+                        return "AUTOINCREMENT";
+                    case SystemMethods.CurrentDateTime:
+                        return "TIMESTAMP";
+                    case SystemMethods.CurrentUTCDateTime:
+                        return "UTC TIMESTAMP";
+                    case SystemMethods.CurrentUser:
+                        return "LAST USER";
+                    default:
+                        throw new NotImplementedException("FormatEnum not implemented for SystemMethods." + value.ToString());
+                }
+            }
+
+            return base.FormatEnum(value);
+        }
+
         public override string OpenQuote { get { return "["; } }
 
         public override string CloseQuote { get { return "]"; } }
