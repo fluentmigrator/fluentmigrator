@@ -30,6 +30,8 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             SetTypeMap(DbType.Decimal, "DECIMAL(19,5)");
             SetTypeMap(DbType.Decimal, "DECIMAL($size,$precision)", DecimalCapacity);
             SetTypeMap(DbType.Double, "DOUBLE PRECISION");
+            SetTypeMap(DbType.VarNumeric, "NUMERIC(30,6)");
+            SetTypeMap(DbType.VarNumeric, "NUMERIC($size,$precision)", DecimalCapacity);
             SetTypeMap(DbType.Guid, "UNIQUEIDENTIFIER");
             SetTypeMap(DbType.Int16, "SMALLINT");
             SetTypeMap(DbType.Int32, "INTEGER");
