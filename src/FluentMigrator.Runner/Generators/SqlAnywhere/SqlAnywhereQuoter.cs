@@ -45,11 +45,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 
         public override string QuoteValue(object value)
         {
-            if (value == null)
-            {
-                return "(null)";
-            } 
-            else if (value != null && value is ExplicitUnicodeString)
+            if (value != null && value is ExplicitUnicodeString)
             {
                 return string.Format("N{0}", FormatString(value.ToString()));
             }

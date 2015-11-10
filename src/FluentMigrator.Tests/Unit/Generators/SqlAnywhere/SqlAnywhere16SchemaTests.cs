@@ -3,7 +3,7 @@ using FluentMigrator.Runner.Generators.SqlAnywhere;
 using NUnit.Framework;
 using NUnit.Should;
 
-namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
+namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
 {
     [TestFixture]
     public class SqlAnywhere16SchemaTests : BaseSchemaTests

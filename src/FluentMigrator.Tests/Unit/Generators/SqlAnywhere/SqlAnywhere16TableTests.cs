@@ -73,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             expression.Columns[0].TableName = expression.TableName;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL DEFAULT (null), [TestColumn2] INTEGER NOT NULL)");
+            result.ShouldBe("CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL DEFAULT NULL, [TestColumn2] INTEGER NOT NULL)");
         }
 
         [Test]
@@ -85,7 +85,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             expression.Columns[0].TableName = expression.TableName;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL DEFAULT (null), [TestColumn2] INTEGER NOT NULL)");
+            result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL DEFAULT NULL, [TestColumn2] INTEGER NOT NULL)");
         }
 
         [Test]
