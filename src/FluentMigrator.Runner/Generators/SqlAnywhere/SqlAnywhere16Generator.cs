@@ -165,21 +165,19 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
         {
             // before we alter a default constraint on a column, we have to drop any default value constraints in SQL Anywhere
             var builder = new StringBuilder();
-
-            builder.AppendLine(Generate(new DeleteDefaultConstraintExpression
+            var deleteDefault = Generate(new DeleteDefaultConstraintExpression
             {
                 ColumnName = expression.ColumnName,
                 SchemaName = expression.SchemaName,
                 TableName = expression.TableName
-            }));
+            }) + ";";
+            builder.AppendLine(deleteDefault);
 
-            builder.AppendLine();
-
-            builder.Append(String.Format("-- create alter table command to create new default constraint as string and run it" + Environment.NewLine + "ALTER TABLE {0} WITH NOCHECK ADD CONSTRAINT {3} DEFAULT({2}) FOR {1};",
+            builder.Append(String.Format("-- create alter table command to create new default constraint as string and run it" + Environment.NewLine + "ALTER TABLE {0}.{1} ALTER {2} DEFAULT {3};",
+                Quoter.QuoteSchemaName(expression.SchemaName),
                 Quoter.QuoteTableName(expression.TableName),
                 Quoter.QuoteColumnName(expression.ColumnName),
-                Quoter.QuoteValue(expression.DefaultValue),
-                Quoter.QuoteConstraintName(SqlAnywhereColumn.GetDefaultConstraintName(expression.TableName, expression.ColumnName))));
+                Quoter.QuoteValue(expression.DefaultValue)));
 
             return builder.ToString();
         }
