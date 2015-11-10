@@ -276,11 +276,11 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
 
             [Test]
             [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
-            public void it_maps_decimal_by_default_to_decimal_19_5()
+            public void it_maps_decimal_by_default_to_decimal_30_6()
             {
                 var template = TypeMap.GetTypeMap(DbType.Decimal, 0, 0);
 
-                template.ShouldBe("DECIMAL(19,5)");
+                template.ShouldBe("DECIMAL(30,6)");
             }
 
             [Test]
@@ -297,10 +297,10 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
 
             [Test]
             [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
-            public void it_throws_if_decimal_precision_is_above_38()
+            public void it_throws_if_decimal_precision_is_above_127()
             {
                 Should.Throw<NotSupportedException>(
-                    () => TypeMap.GetTypeMap(DbType.Decimal, 39, 0));
+                    () => TypeMap.GetTypeMap(DbType.Decimal, 128, 0));
             }
 
             [Test]
