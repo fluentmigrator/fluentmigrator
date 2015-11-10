@@ -46,7 +46,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
         public override string DropTable { get { return "{0}"; } }
         public override string RenameTable { get { return "ALTER TABLE {0} RENAME {1}"; } }
 
-        public override string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3}.{4} ({5})"; } }
+        public override string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3}.{4} ({5}){6}"; } }
         public override string DropIndex { get { return "DROP INDEX {0}.{1}.{2}"; } }
 
         public override string AddColumn { get { return "{0} ADD {1}"; } }
@@ -74,6 +74,20 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
                 SqlServerExtensions.ConstraintType, out indexType)) return string.Empty;
 
             return (indexType.Equals(SqlServerConstraintType.Clustered)) ? " CLUSTERED" : " NONCLUSTERED";
+        }
+
+        public override string GetWithNullsDistinctString(IndexDefinition index)
+        {
+            if (index.IsNullDistinct.HasValue && !index.IsUnique)
+            {
+                compatabilityMode.HandleCompatabilty("With nulls distinct can only be used for unique indexes");
+            }
+            else if (index.IsNullDistinct.HasValue && index.IsUnique)
+            {
+                return index.IsNullDistinct.Value ? " WITH NULLS DISTINCT" : " WITH NULLS NOT DISTINCT";
+            }
+
+            return string.Empty;
         }
 
         public override string Generate(CreateTableExpression expression)
@@ -276,7 +290,8 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
                 , Quoter.QuoteIndexName(expression.Index.Name)
                 , Quoter.QuoteSchemaName(expression.Index.SchemaName)
                 , Quoter.QuoteTableName(expression.Index.TableName)
-                , String.Join(", ", indexColumns));
+                , String.Join(", ", indexColumns)
+                , GetWithNullsDistinctString(expression.Index));
         }
 
         public override string Generate(DeleteIndexExpression expression)
