@@ -87,7 +87,8 @@ namespace FluentMigrator.Runner.Generators.Firebird
                 , indexDirection == Direction.Ascending ? "ASC " : "DESC "
                 , Quoter.QuoteIndexName(expression.Index.Name)
                 , Quoter.QuoteTableName(expression.Index.TableName)
-                , indexColumns.ToString());
+                , indexColumns.ToString()
+                , GetWithNullsDistinctString(expression.Index));
         }
 
         public override string Generate(AlterColumnExpression expression)

@@ -33,7 +33,7 @@ namespace FluentMigrator.Runner.Generators.Generic
         public virtual string AlterSchema { get { return "ALTER SCHEMA {0} TRANSFER {1}.{2}"; } }
         public virtual string DropSchema { get { return "DROP SCHEMA {0}"; } }
 
-        public virtual string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3} ({4})"; } }
+        public virtual string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3} ({4}){5}"; } }
         public virtual string DropIndex { get { return "DROP INDEX {0}"; } }
 
         public virtual string InsertData { get { return "INSERT INTO {0} ({1}) VALUES ({2})"; } }
@@ -51,6 +51,20 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public virtual string GetClusterTypeString(CreateIndexExpression column)
         {
+            return string.Empty;
+        }
+
+        public virtual string GetWithNullsDistinctString(IndexDefinition index)
+        {
+            if (index.IsNullDistinct.HasValue && !index.IsUnique)
+            {
+                compatabilityMode.HandleCompatabilty("With nulls distinct can only be used for unique indexes");
+            }
+            else if (index.IsNullDistinct.HasValue)
+            {
+                compatabilityMode.HandleCompatabilty("With nulls distinct is not supported");
+            }
+
             return string.Empty;
         }
 
@@ -144,7 +158,8 @@ namespace FluentMigrator.Runner.Generators.Generic
                 , GetClusterTypeString(expression)
                 , Quoter.QuoteIndexName(expression.Index.Name)
                 , Quoter.QuoteTableName(expression.Index.TableName)
-                , String.Join(", ", indexColumns));
+                , String.Join(", ", indexColumns)
+                , GetWithNullsDistinctString(expression.Index));
         }
 
         public override string Generate(DeleteIndexExpression expression)
