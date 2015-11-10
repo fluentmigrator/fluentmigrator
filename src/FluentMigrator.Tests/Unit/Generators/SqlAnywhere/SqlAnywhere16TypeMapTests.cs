@@ -302,6 +302,35 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
                 Should.Throw<NotSupportedException>(
                     () => TypeMap.GetTypeMap(DbType.Decimal, 39, 0));
             }
+
+            [Test]
+            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            public void it_maps_varnumeric_by_default_to_numeric_19_5()
+            {
+                var template = TypeMap.GetTypeMap(DbType.VarNumeric, 0, 0);
+
+                template.ShouldBe("NUMERIC(30,6)");
+            }
+
+            [Test]
+            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [TestCase(1)]
+            [TestCase(20)]
+            [TestCase(38)]
+            public void it_maps_varnumeric_with_precision_to_numeric(int precision)
+            {
+                var template = TypeMap.GetTypeMap(DbType.VarNumeric, precision, 1);
+
+                template.ShouldBe(string.Format("NUMERIC({0},1)", precision));
+            }
+
+            [Test]
+            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            public void it_throws_if_varnumeric_precision_is_above_127()
+            {
+                Should.Throw<NotSupportedException>(
+                    () => TypeMap.GetTypeMap(DbType.VarNumeric, 128, 0));
+            }
         }
 
         [TestFixture]
