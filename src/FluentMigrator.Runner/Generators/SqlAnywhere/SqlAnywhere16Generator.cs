@@ -23,6 +23,7 @@ using System.Text;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Generators.Generic;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Generators.SqlAnywhere
 {
@@ -45,7 +46,8 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
         public override string DropTable { get { return "{0}"; } }
         public override string RenameTable { get { return "ALTER TABLE {0} RENAME {1}"; } }
 
-        public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
+        public override string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3}.{4} ({5})"; } }
+        public override string DropIndex { get { return "DROP INDEX {0}.{1}.{2}"; } }
 
         public override string AddColumn { get { return "{0} ADD {1}"; } }
         public override string DropColumn { get { return "ALTER TABLE {0} DROP {1}"; } }
@@ -242,6 +244,44 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
                 FormatCascade("DELETE", expression.ForeignKey.OnDelete),
                 FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)
                 );
+        }
+
+        public override string Generate(CreateIndexExpression expression)
+        {
+            string[] indexColumns = new string[expression.Index.Columns.Count];
+            IndexColumnDefinition columnDef;
+
+
+            for (int i = 0; i < expression.Index.Columns.Count; i++)
+            {
+                columnDef = expression.Index.Columns.ElementAt(i);
+                if (columnDef.Direction == Direction.Ascending)
+                {
+                    indexColumns[i] = Quoter.QuoteColumnName(columnDef.Name) + " ASC";
+                }
+                else
+                {
+                    indexColumns[i] = Quoter.QuoteColumnName(columnDef.Name) + " DESC";
+                }
+            }
+
+            if (expression.Index.Includes.Count > 0)
+            {
+                compatabilityMode.HandleCompatabilty("INCLUDES not supported in CREATE INDEX statements in SqlAnywhere");
+            }
+
+            return String.Format(CreateIndex
+                , GetUniqueString(expression)
+                , GetClusterTypeString(expression)
+                , Quoter.QuoteIndexName(expression.Index.Name)
+                , Quoter.QuoteSchemaName(expression.Index.SchemaName)
+                , Quoter.QuoteTableName(expression.Index.TableName)
+                , String.Join(", ", indexColumns));
+        }
+
+        public override string Generate(DeleteIndexExpression expression)
+        {
+            return String.Format(DropIndex, Quoter.QuoteSchemaName(expression.Index.SchemaName), Quoter.QuoteTableName(expression.Index.TableName), Quoter.QuoteIndexName(expression.Index.Name));
         }
 
         public override string Generate(AlterSchemaExpression expression)
