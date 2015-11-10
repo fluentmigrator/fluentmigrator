@@ -61,7 +61,7 @@ namespace FluentMigrator.Runner.Generators
             SetTypeMap(DbType.String, "NVARCHAR($size)", UnicodeStringCapacity);
             SetTypeMap(DbType.String, "NTEXT", int.MaxValue);
             SetTypeMap(DbType.String, "NTEXT", UnicodeTextCapacity);
-            SetTypeMap(DbType.Time, "NVARCHAR(16)");
+            SetTypeMap(DbType.Time, "DATETIME");
             SetTypeMap(DbType.Xml, "NTEXT");
         }
     }
