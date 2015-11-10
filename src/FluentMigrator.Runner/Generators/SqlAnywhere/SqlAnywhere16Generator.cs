@@ -38,6 +38,9 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
         {
         }
 
+        public override string CreateSchema { get { return "CREATE SCHEMA AUTHORIZATION {0}"; } }
+        public override string DropSchema { get { return "DROP USER {0}"; } }
+
         public override string CreateTable { get { return "{0} ({1})"; } }
         public override string DropTable { get { return "{0}"; } }
         public override string RenameTable { get { return "ALTER TABLE {0} RENAME {1}"; } }
@@ -239,6 +242,21 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
                 FormatCascade("DELETE", expression.ForeignKey.OnDelete),
                 FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)
                 );
+        }
+
+        public override string Generate(AlterSchemaExpression expression)
+        {
+            return compatabilityMode.HandleCompatabilty("AlterSchema is not supported in SqlAnywhere");
+        }
+
+        public override string Generate(CreateSchemaExpression expression)
+        {
+            return String.Format(CreateSchema, Quoter.QuoteSchemaName(expression.SchemaName));
+        }
+
+        public override string Generate(DeleteSchemaExpression expression)
+        {
+            return String.Format(DropSchema, Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
         public override string Generate(CreateSequenceExpression expression)
