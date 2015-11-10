@@ -2,7 +2,7 @@
 using NUnit.Framework;
 using NUnit.Should;
 
-namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
+namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
 {
     [TestFixture]
     public class SqlAnywhere16IndexTests : BaseIndexTests

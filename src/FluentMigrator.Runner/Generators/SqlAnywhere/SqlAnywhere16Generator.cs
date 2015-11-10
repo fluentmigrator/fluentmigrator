@@ -54,6 +54,9 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
         public override string AlterColumn { get { return "{0} ALTER {1}"; } }
         public override string RenameColumn { get { return "{0} RENAME {1} TO {2}"; } }
 
+        public override string InsertData { get { return "INSERT INTO {0}.{1} ({2}) VALUES ({3})"; } }
+        public override string UpdateData { get { return "{0} SET {1} WHERE {2}"; } }
+        public override string DeleteData { get { return "DELETE FROM {0}.{1} WHERE {2}"; } }
         public virtual string IdentityInsert { get { return "SET IDENTITY_INSERT {0} {1}"; } }
 
         public override string CreateForeignKeyConstraint { get { return "ALTER TABLE {0}.{1} ADD CONSTRAINT {2} FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8}"; } }
@@ -208,25 +211,63 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 
         public override string Generate(InsertDataExpression expression)
         {
-            if (IsUsingIdentityInsert(expression))
+            List<string> columnNames = new List<string>();
+            List<string> columnValues = new List<string>();
+            List<string> insertStrings = new List<string>();
+
+            foreach (InsertionDataDefinition row in expression.Rows)
             {
-                return string.Format("{0}; {1}; {2}",
-                            string.Format(IdentityInsert, Quoter.QuoteTableName(expression.TableName), "ON"),
-                            base.Generate(expression),
-                            string.Format(IdentityInsert, Quoter.QuoteTableName(expression.TableName), "OFF"));
+                columnNames.Clear();
+                columnValues.Clear();
+                foreach (KeyValuePair<string, object> item in row)
+                {
+                    columnNames.Add(Quoter.QuoteColumnName(item.Key));
+                    columnValues.Add(Quoter.QuoteValue(item.Value));
+                }
+
+                string columns = String.Join(", ", columnNames.ToArray());
+                string values = String.Join(", ", columnValues.ToArray());
+                insertStrings.Add(String.Format(InsertData
+                    , Quoter.QuoteSchemaName(expression.SchemaName)
+                    , Quoter.QuoteTableName(expression.TableName)
+                    , columns
+                    , values));
             }
-            return base.Generate(expression);
+
+            return String.Join("; ", insertStrings.ToArray());
         }
 
-        protected static bool IsUsingIdentityInsert(InsertDataExpression expression)
+        public override string Generate(UpdateDataExpression expression)
         {
-            if (expression.AdditionalFeatures.ContainsKey(SqlServerExtensions.IdentityInsert))
+            return string.Format("UPDATE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+        }
+
+        public override string Generate(DeleteDataExpression expression)
+        {
+            var deleteItems = new List<string>();
+
+
+            if (expression.IsAllRows)
             {
-                return (bool)expression.AdditionalFeatures[SqlServerExtensions.IdentityInsert];
+                deleteItems.Add(string.Format(DeleteData, Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), "1 = 1"));
+            }
+            else
+            {
+                foreach (var row in expression.Rows)
+                {
+                    var whereClauses = new List<string>();
+                    foreach (KeyValuePair<string, object> item in row)
+                    {
+                        whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value)));
+                    }
+
+                    deleteItems.Add(string.Format(DeleteData, Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), String.Join(" AND ", whereClauses.ToArray())));
+                }
             }
 
-            return false;
+            return String.Join("; ", deleteItems.ToArray());
         }
+
 
         public override string Generate(CreateForeignKeyExpression expression)
         {
