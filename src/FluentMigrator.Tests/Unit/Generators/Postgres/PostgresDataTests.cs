@@ -73,6 +73,15 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
+        public override void CanDeleteDataWithDbNullCriteria()
+        {
+            var expression = GeneratorTestHelper.GetDeleteDataExpressionWithDbNullValue();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DELETE FROM \"public\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL;");
+        }
+
+        [Test]
         public override void CanInsertDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
@@ -147,6 +156,15 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
         [Test]
         public override void CanUpdateDataWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetUpdateDataExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("UPDATE \"public\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL;");
+        }
+
+        [Test]
+        public override void CanUpdateDataWithDbNullCriteria()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
 
