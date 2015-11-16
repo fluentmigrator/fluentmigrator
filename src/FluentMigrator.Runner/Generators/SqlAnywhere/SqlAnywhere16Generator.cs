@@ -239,7 +239,32 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 
         public override string Generate(UpdateDataExpression expression)
         {
-            return string.Format("UPDATE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            // TODO: Uncomment line below and delete custom implementation once pull request #672 (https://github.com/schambers/fluentmigrator/pull/672)
+            //       has been accepted into the master branch.
+            //return string.Format("UPDATE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+
+            List<string> updateItems = new List<string>();
+            List<string> whereClauses = new List<string>();
+
+            foreach (var item in expression.Set)
+            {
+                updateItems.Add(string.Format("{0} = {1}", Quoter.QuoteColumnName(item.Key), Quoter.QuoteValue(item.Value)));
+            }
+
+            if (expression.IsAllRows)
+            {
+                whereClauses.Add("1 = 1");
+            }
+            else
+            {
+                foreach (var item in expression.Where)
+                {
+                    whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key),
+                                                   (item.Value == null || item.Value == DBNull.Value) ? "IS" : "=", Quoter.QuoteValue(item.Value)));
+                }
+            }
+            var genericGeneratorSql = String.Format(UpdateData, Quoter.QuoteTableName(expression.TableName), String.Join(", ", updateItems.ToArray()), String.Join(" AND ", whereClauses.ToArray()));
+            return string.Format("UPDATE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), genericGeneratorSql);
         }
 
         public override string Generate(DeleteDataExpression expression)
@@ -258,7 +283,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
                     var whereClauses = new List<string>();
                     foreach (KeyValuePair<string, object> item in row)
                     {
-                        whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value)));
+                        whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), (item.Value == null || item.Value == DBNull.Value) ? "IS" : "=", Quoter.QuoteValue(item.Value)));
                     }
 
                     deleteItems.Add(string.Format(DeleteData, Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), String.Join(" AND ", whereClauses.ToArray())));
