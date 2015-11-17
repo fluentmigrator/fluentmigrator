@@ -55,6 +55,8 @@ namespace FluentMigrator.Runner.Generators.Firebird
 
         public string ToFbObjectName(string objName)
         {
+            if (IsQuoted(objName))
+                return UnQuote(objName);
             var potentiallyQuoted = Quote(objName);
             if (IsQuoted(potentiallyQuoted))
                 return objName;
