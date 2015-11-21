@@ -26,7 +26,10 @@ namespace FluentMigrator.Runner.Generators.Oracle
             if (string.IsNullOrEmpty(tableDescription))
                 return string.Empty;
 
-            return string.Format(TableDescriptionTemplate, GetFullTableName(schemaName, tableName), tableDescription);
+            return string.Format(
+                TableDescriptionTemplate, 
+                GetFullTableName(schemaName, tableName), 
+                tableDescription.Replace("'", "''"));
         }
 
         protected override string GenerateColumnDescription(
@@ -39,7 +42,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 ColumnDescriptionTemplate,
                 GetFullTableName(schemaName, tableName),
                 columnName,
-                columnDescription);
+                columnDescription.Replace("'", "''"));
         }
     }
 }
