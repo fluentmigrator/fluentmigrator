@@ -57,7 +57,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             var formattedSchemaName = FormatSchemaName(schemaName);
 
             return string.Format(TableDescriptionTemplate,
-                tableDescription,
+                tableDescription.Replace("'", "''"),
                 formattedSchemaName,
                 tableName);
         }
@@ -69,7 +69,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             var formattedSchemaName = FormatSchemaName(schemaName);
 
-            return string.Format(ColumnDescriptionTemplate, columnDescription, formattedSchemaName, tableName, columnName);
+            return string.Format(ColumnDescriptionTemplate, columnDescription.Replace("'", "''"), formattedSchemaName, tableName, columnName);
         }
 
         private string GenerateTableDescriptionRemoval(string schemaName, string tableName)
