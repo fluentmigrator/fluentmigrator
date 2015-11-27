@@ -39,7 +39,12 @@ namespace FluentMigrator.Builders.Create
 
         public void Schema(string schemaName)
         {
-            var expression = new CreateSchemaExpression { SchemaName = schemaName };
+            this.Schema(schemaName, null);
+        }
+
+        public void Schema(string schemaName, string password)
+        {
+            var expression = new CreateSchemaExpression { SchemaName = schemaName, Password = password };
             _context.Expressions.Add(expression);
         }
 
