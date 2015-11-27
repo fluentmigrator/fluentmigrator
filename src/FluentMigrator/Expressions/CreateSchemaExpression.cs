@@ -7,6 +7,7 @@ namespace FluentMigrator.Expressions
     public class CreateSchemaExpression : MigrationExpressionBase
     {
         public virtual string SchemaName { get; set; }
+        public virtual string Password { get; set; }
 
         public override void CollectValidationErrors(ICollection<string> errors)
         {

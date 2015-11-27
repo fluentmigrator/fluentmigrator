@@ -23,6 +23,8 @@ using System;
 using System.Data;
 using System.IO;
 using FluentMigrator.Builders.Execute;
+using FluentMigrator.Expressions;
+using System.Text.RegularExpressions;
 
 namespace FluentMigrator.Runner.Processors.SqlAnywhere
 {
@@ -111,6 +113,48 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
                 FormatHelper.FormatSqlEscape(columnName), defaultValueAsString);
         }
 
+        public override void Process(CreateSchemaExpression expression)
+        {
+            if (string.IsNullOrEmpty(expression.Password))
+                throw new Exception("Create schema requires connection for the schema user. No password specified in CreateSchemaExpression.");
+
+            string connectionString = this.ReplaceUserIdAndPasswordInConnectionString(expression.SchemaName, expression.Password);
+            string sql = Generator.Generate(expression);
+            Announcer.Say("Creating connection for user {0} to create schema.", expression.SchemaName);
+            IDbConnection connection = this.Factory.CreateConnection(connectionString);
+            this.EnsureConnectionIsOpen(connection);
+            Announcer.Say("Beginning out of scope transaction to create schema.");
+            IDbTransaction transaction = connection.BeginTransaction();
+
+            try
+            {
+                this.ExecuteNonQuery(connection, transaction, sql);
+                transaction.Commit();
+                Announcer.Say("Out of scope transaction to create schema committed.");
+            }
+            catch
+            {
+                transaction.Rollback();
+                Announcer.Say("Out of scope transaction to create schema rolled back.");
+                throw;
+            }
+            finally
+            {
+                if (transaction != null) transaction.Dispose();
+                if (connection != null) connection.Dispose();
+            }
+        }
+
+        private string ReplaceUserIdAndPasswordInConnectionString(string userId, string password)
+        {
+            string mtsConnectionString = this.ConnectionString;
+            
+            mtsConnectionString = Regex.Replace(mtsConnectionString, "(.*)(uid=|userid=)([^;]+)(.+)", "${1}${2}" + userId + "${4}", RegexOptions.IgnoreCase);
+            mtsConnectionString = Regex.Replace(mtsConnectionString, "(.+)(pwd=|password=)([^;]+)(.+)", "${1}${2}" + password + "${4}", RegexOptions.IgnoreCase);
+
+            return mtsConnectionString;
+        }
+
         public override void Execute(string template, params object[] args)
         {
             Process(String.Format(template, args));
@@ -147,27 +191,43 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
 
         protected override void Process(string sql)
         {
+            this.ProcessWithConnection(this.Connection, this.Transaction, sql);
+        }
+
+        private void ProcessWithConnection(IDbConnection connection, IDbTransaction transaction, string sql)
+        {
             Announcer.Sql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
 
-            EnsureConnectionIsOpen();
+            EnsureConnectionIsOpen(connection);
 
             if (sql.IndexOf("GO", StringComparison.OrdinalIgnoreCase) >= 0)
             {
-                ExecuteBatchNonQuery(sql);
+                ExecuteBatchNonQuery(connection, transaction, sql);
 
             }
             else
             {
-                ExecuteNonQuery(sql);
+                ExecuteNonQuery(connection, transaction, sql);
             }
         }
 
-        private void ExecuteNonQuery(string sql)
+        protected override void EnsureConnectionIsOpen()
         {
-            using (var command = Factory.CreateCommand(sql, Connection, Transaction))
+            this.EnsureConnectionIsOpen(this.Connection);
+        }
+
+        private void EnsureConnectionIsOpen(IDbConnection connection)
+        {
+            if (connection.State != ConnectionState.Open)
+                connection.Open();
+        }
+
+        private void ExecuteNonQuery(IDbConnection connection, IDbTransaction transaction, string sql)
+        {
+            using (var command = Factory.CreateCommand(sql, connection, transaction))
             {
                 try
                 {
@@ -188,12 +248,12 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             }
         }
 
-        private void ExecuteBatchNonQuery(string sql)
+        private void ExecuteBatchNonQuery(IDbConnection connection, IDbTransaction transaction, string sql)
         {
             sql += "\nGO";   // make sure last batch is executed.
             string sqlBatch = string.Empty;
 
-            using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction))
+            using (var command = Factory.CreateCommand(string.Empty, connection, transaction))
             {
                 try
                 {
