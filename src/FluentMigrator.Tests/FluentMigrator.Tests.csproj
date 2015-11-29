@@ -471,6 +471,7 @@
     <Compile Include="Unit\Generators\SqlServerCe\SqlServerCeIndexTests.cs" />
     <Compile Include="Unit\Generators\SqlServerCe\SqlServerCeSchemaTests.cs" />
     <Compile Include="Unit\Generators\SqlServerCe\SqlServerCeTableTests.cs" />
+    <Compile Include="Unit\Generators\SqlServerCe\SqlServerCeTypeMapTests.cs" />
     <Compile Include="Unit\Initialization\ConnectionStringManagerTests.cs" />
     <Compile Include="Unit\Initialization\NetConfigManagerTests.cs" />
     <Compile Include="Unit\MigrationInfoTests.cs" />
