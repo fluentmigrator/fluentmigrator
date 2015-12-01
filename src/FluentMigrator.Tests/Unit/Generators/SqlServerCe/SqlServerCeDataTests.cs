@@ -79,8 +79,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             var expression = GeneratorTestHelper.GetInsertDataExpression();
             expression.SchemaName = "TestSchema";
 
-            var expected = "INSERT INTO [TestTable1] ([Id], [Name], [Website]) VALUES (1, 'Just''in', 'codethinked.com');";
-            expected += @" INSERT INTO [TestTable1] ([Id], [Name], [Website]) VALUES (2, 'Na\te', 'kohari.org')";
+            var expected = "INSERT INTO [TestTable1] ([Id], [Name], [Website]) SELECT 1, 'Just''in', 'codethinked.com'";
+            expected += @" UNION ALL SELECT 2, 'Na\te', 'kohari.org'";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
@@ -91,8 +91,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
 
-            var expected = "INSERT INTO [TestTable1] ([Id], [Name], [Website]) VALUES (1, 'Just''in', 'codethinked.com');";
-            expected += @" INSERT INTO [TestTable1] ([Id], [Name], [Website]) VALUES (2, 'Na\te', 'kohari.org')";
+            var expected = "INSERT INTO [TestTable1] ([Id], [Name], [Website]) SELECT 1, 'Just''in', 'codethinked.com'";
+            expected += @" UNION ALL SELECT 2, 'Na\te', 'kohari.org'";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
@@ -105,7 +105,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(System.String.Format("INSERT INTO [TestTable1] ([guid]) VALUES ('{0}')", GeneratorTestHelper.TestGuid.ToString()));
+            result.ShouldBe(System.String.Format("INSERT INTO [TestTable1] ([guid]) SELECT '{0}'", GeneratorTestHelper.TestGuid.ToString()));
         }
 
         [Test]
@@ -114,7 +114,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe(System.String.Format("INSERT INTO [TestTable1] ([guid]) VALUES ('{0}')", GeneratorTestHelper.TestGuid.ToString()));
+            result.ShouldBe(System.String.Format("INSERT INTO [TestTable1] ([guid]) SELECT '{0}'", GeneratorTestHelper.TestGuid.ToString()));
         }
 
         [Test]
@@ -162,8 +162,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             expression.AdditionalFeatures.Add(SqlServerExtensions.IdentityInsert, true);
 
             var expected = "SET IDENTITY_INSERT [TestTable1] ON;";
-            expected += " INSERT INTO [TestTable1] ([Id], [Name], [Website]) VALUES (1, 'Just''in', 'codethinked.com');";
-            expected += @" INSERT INTO [TestTable1] ([Id], [Name], [Website]) VALUES (2, 'Na\te', 'kohari.org');";
+            expected += " INSERT INTO [TestTable1] ([Id], [Name], [Website]) SELECT 1, 'Just''in', 'codethinked.com'";
+            expected += @" UNION ALL SELECT 2, 'Na\te', 'kohari.org';";
             expected += " SET IDENTITY_INSERT [TestTable1] OFF";
 
             var result = Generator.Generate(expression);
@@ -178,8 +178,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
 
             var expected = "SET IDENTITY_INSERT [TestTable1] ON;";
-            expected += " INSERT INTO [TestTable1] ([Id], [Name], [Website]) VALUES (1, 'Just''in', 'codethinked.com');";
-            expected += @" INSERT INTO [TestTable1] ([Id], [Name], [Website]) VALUES (2, 'Na\te', 'kohari.org');";
+            expected += " INSERT INTO [TestTable1] ([Id], [Name], [Website]) SELECT 1, 'Just''in', 'codethinked.com'";
+            expected += @" UNION ALL SELECT 2, 'Na\te', 'kohari.org';";
             expected += " SET IDENTITY_INSERT [TestTable1] OFF";
 
             var result = Generator.Generate(expression);
