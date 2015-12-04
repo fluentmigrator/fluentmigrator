@@ -102,5 +102,10 @@ namespace FluentMigrator
         {
             return new IfDatabaseExpressionRoot(_context, databaseType);
         }
+
+        public IIfDatabaseExpressionRoot IfDatabase(Predicate<string> databaseTypeFunc)
+        {
+            return new IfDatabaseExpressionRoot(_context, databaseTypeFunc);
+        }
     }
 }
