@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using FluentMigrator.Builders.Alter;
 using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.IfDatabase;
