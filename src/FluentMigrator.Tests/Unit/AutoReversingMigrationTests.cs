@@ -23,7 +23,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CreateTableUpAutoReversingMigrationGivesDeleteTableDown()
         {
-            var autoReversibleMigration = new TestAutoReversingMigrationCreateTable();
+            var autoReversibleMigration = new TestAutoReversingMigration();
             context.Object.Expressions = new Collection<IMigrationExpression>();
             autoReversibleMigration.GetDownExpressions(context.Object);
 
@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void DownMigrationsAreInReverseOrderOfUpMigrations()
         {
-            var autoReversibleMigration = new TestAutoReversingMigrationCreateTable();
+            var autoReversibleMigration = new TestAutoReversingMigration();
             context.Object.Expressions = new Collection<IMigrationExpression>();
             autoReversibleMigration.GetDownExpressions(context.Object);
 
@@ -43,7 +43,7 @@ namespace FluentMigrator.Tests.Unit
 
     }
 
-    internal class TestAutoReversingMigrationCreateTable : AutoReversingMigration
+    internal class TestAutoReversingMigration : AutoReversingMigration
     {
         public override void Up()
         {
