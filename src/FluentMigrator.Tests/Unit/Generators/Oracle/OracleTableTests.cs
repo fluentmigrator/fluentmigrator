@@ -2,9 +2,11 @@
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Framework;
 using NUnit.Should;
+using FluentMigrator.Runner;
 
 namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {
+
     [TestFixture]
     public class OracleTableTests : BaseTableTests
     {
@@ -229,6 +231,25 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP TABLE TestTable1");
+        }
+
+        [Test]
+        public override void CanDropTableIfExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
+            Generator.compatabilityMode = CompatabilityMode.LOOSE;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("");
+        }
+
+        [Test]
+        public void CantDropTableIfExistsWithDefaultSchemaInStrictCompatabilityMode()
+        {
+            var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
+            Generator.compatabilityMode = CompatabilityMode.STRICT;
+
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]

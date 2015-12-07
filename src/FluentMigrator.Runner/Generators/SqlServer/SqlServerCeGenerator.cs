@@ -81,6 +81,16 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return String.Format(sql, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(expression.ColumnNames.ElementAt(0)));
         }
 
+        public override string Generate(DeleteTableExpression expression)
+        {
+            if (expression.IfExists)
+            {
+                return compatabilityMode.HandleCompatabilty("Conditional logic is not supported.");
+            }
+
+            return base.Generate(expression);
+        }
+
         public override string Generate(DeleteIndexExpression expression)
         {
             return String.Format("DROP INDEX {0}.{1}", Quoter.QuoteTableName(expression.Index.TableName), Quoter.QuoteIndexName(expression.Index.Name));

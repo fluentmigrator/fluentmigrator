@@ -80,7 +80,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         public override string Generate(DeleteTableExpression expression)
         {
-            return String.Format("DROP TABLE {0}.{1};", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName));
+            return String.Format("DROP TABLE{0} {1}.{2};", expression.IfExists ? " IF EXISTS" : "", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName));
         }
 
         public override string Generate(DeleteColumnExpression expression)

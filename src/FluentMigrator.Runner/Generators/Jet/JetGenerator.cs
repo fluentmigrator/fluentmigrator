@@ -32,6 +32,15 @@ namespace FluentMigrator.Runner.Generators.Jet
             return compatabilityMode.HandleCompatabilty("Sequences are not supported for Jet");
         }
 
+        public override string Generate(DeleteTableExpression expression)
+        {
+            if (expression.IfExists)
+            {
+                return compatabilityMode.HandleCompatabilty("If Exists logic is not supported for Jet");
+            }
+            return base.Generate(expression);
+        }
+
         public override string Generate(DeleteSequenceExpression expression)
         {
             return compatabilityMode.HandleCompatabilty("Sequences are not supported for Jet");

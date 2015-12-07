@@ -8,6 +8,9 @@ using System.Text;
 
 namespace FluentMigrator.Tests.Unit.Generators.Db2
 {
+    using FluentMigrator.Exceptions;
+    using FluentMigrator.Runner;
+
     [TestFixture]
     public class Db2TableTests : BaseTableTests
     {
@@ -237,6 +240,25 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP TABLE TestTable1");
+        }
+
+        [Test]
+        public void CanDropTableIfExistsWithCustomSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(@"IF( EXISTS(SELECT 1 FROM SYSCAT.TABLES WHERE TABSCHEMA = 'TestSchema' AND TABNAME = 'TestTable1')) THEN DROP TABLE TestSchema.TestTable1 END IF");
+        }
+
+        [Test]
+        public override void CanDropTableIfExistsWithDefaultSchema()
+        {
+            var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
+            Generator.compatabilityMode = CompatabilityMode.STRICT;
+
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]

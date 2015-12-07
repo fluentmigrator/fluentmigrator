@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-
+    using FluentMigrator.Expressions;
     using FluentMigrator.Model;
     using FluentMigrator.Runner.Generators.Generic;
 
@@ -154,9 +154,17 @@
             return string.Format("CREATE SCHEMA {0}", Quoter.QuoteSchemaName(expression.SchemaName));
         }
 
-        public override string Generate(Expressions.DeleteTableExpression expression)
+        public override string Generate(DeleteTableExpression expression)
         {
-            return string.Format("DROP TABLE {0}", this.QuoteSchemaAndTable(expression.SchemaName, expression.TableName));
+            if (expression.IfExists)
+            {
+                if (expression.SchemaName == null)
+                {
+                    return compatabilityMode.HandleCompatabilty("Db2 needs schema name to safely handle if exists");
+                }
+                return string.Format("IF( EXISTS(SELECT 1 FROM SYSCAT.TABLES WHERE TABSCHEMA = '{0}' AND TABNAME = '{1}')) THEN DROP TABLE {2} END IF", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), QuoteSchemaAndTable(expression.SchemaName, expression.TableName));
+            }
+            return string.Format("DROP TABLE {0}", QuoteSchemaAndTable(expression.SchemaName, expression.TableName));
         }
 
         public override string Generate(Expressions.DeleteIndexExpression expression)

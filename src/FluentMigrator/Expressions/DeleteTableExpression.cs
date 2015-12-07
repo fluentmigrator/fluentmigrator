@@ -26,6 +26,7 @@ namespace FluentMigrator.Expressions
     {
         public virtual string SchemaName { get; set; }
         public virtual string TableName { get; set; }
+        public virtual bool IfExists { get; set; }
 
         public override void CollectValidationErrors(ICollection<string> errors)
         {

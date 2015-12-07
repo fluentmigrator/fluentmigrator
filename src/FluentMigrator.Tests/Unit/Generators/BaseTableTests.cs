@@ -24,6 +24,7 @@
         public abstract void CanCreateTableWithPrimaryKeyWithDefaultSchema();
         public abstract void CanDropTableWithCustomSchema();
         public abstract void CanDropTableWithDefaultSchema();
+        public abstract void CanDropTableIfExistsWithDefaultSchema();
         public abstract void CanRenameTableWithCustomSchema();
         public abstract void CanRenameTableWithDefaultSchema();
     }

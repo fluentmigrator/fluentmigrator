@@ -1,9 +1,12 @@
 ﻿using FluentMigrator.Runner.Generators.Jet;
 using NUnit.Framework;
 using NUnit.Should;
+using FluentMigrator.Exceptions;
+using FluentMigrator.Runner;
 
 namespace FluentMigrator.Tests.Unit.Generators.Jet
 {
+
     [TestFixture]
     public class JetTableTests : BaseTableTests
     {
@@ -230,6 +233,25 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP TABLE [TestTable1]");
+        }
+
+        [Test]
+        public override void CanDropTableIfExistsWithDefaultSchema()
+        {
+            Generator.compatabilityMode = CompatabilityMode.LOOSE;
+            var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(string.Empty);
+        }
+
+        [Test]
+        public void CantDropTableIfExistsWithDefaultSchemaInStrictCompatabilityMode()
+        {
+            Generator.compatabilityMode = CompatabilityMode.STRICT;
+            var expression = GeneratorTestHelper.GetDeleteTableIfExistsExpression();
+
+            Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
         [Test]
