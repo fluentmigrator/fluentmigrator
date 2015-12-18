@@ -28,6 +28,7 @@ using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.VersionTableInfo;
 
 namespace FluentMigrator.Runner
 {
@@ -68,13 +69,19 @@ namespace FluentMigrator.Runner
 
         public IRunnerContext RunnerContext { get; private set; }
 
+        public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor, IVersionTableMetaData versionTableMetaData)
+          : this(new SingleAssembly(assembly), runnerContext, processor, versionTableMetaData)
+        {
+
+        }
+
         public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
           : this(new SingleAssembly(assembly), runnerContext, processor)
         {
 
         }
 
-        public MigrationRunner(IAssemblyCollection assemblies, IRunnerContext runnerContext, IMigrationProcessor processor)
+        public MigrationRunner(IAssemblyCollection assemblies, IRunnerContext runnerContext, IMigrationProcessor processor, IVersionTableMetaData versionTableMetaData = null)
         {
             _migrationAssemblies = assemblies;
             _announcer = runnerContext.Announcer;
@@ -96,10 +103,10 @@ namespace FluentMigrator.Runner
             MaintenanceLoader = new MaintenanceLoader(_migrationAssemblies, runnerContext.Tags, Conventions);
 
             if (runnerContext.NoConnection){
-                VersionLoader = new ConnectionlessVersionLoader(this, _migrationAssemblies, Conventions, runnerContext.StartVersion, runnerContext.Version);
+                VersionLoader = new ConnectionlessVersionLoader(this, _migrationAssemblies, Conventions, runnerContext.StartVersion, runnerContext.Version, versionTableMetaData);
             }
             else{
-                VersionLoader = new VersionLoader(this, _migrationAssemblies, Conventions);
+                VersionLoader = new VersionLoader(this, _migrationAssemblies, Conventions, versionTableMetaData);
             }
         }
 
