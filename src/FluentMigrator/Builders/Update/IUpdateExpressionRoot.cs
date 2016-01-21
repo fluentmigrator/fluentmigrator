@@ -16,6 +16,7 @@
 //
 #endregion
 
+using FluentMigrator.Builders.Update.Column;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Update
@@ -23,5 +24,6 @@ namespace FluentMigrator.Builders.Update
     public interface IUpdateExpressionRoot : IFluentSyntax
     {
         IUpdateSetOrInSchemaSyntax Table(string tableName);
+        IUpdateColumnFromSyntax Column(string columnName);
     }
 }

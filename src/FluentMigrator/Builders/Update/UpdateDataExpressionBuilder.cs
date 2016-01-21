@@ -20,11 +20,16 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Builders.Update.Column;
+using System;
 
 namespace FluentMigrator.Builders.Update
 {
-    public class UpdateDataExpressionBuilder : IUpdateSetOrInSchemaSyntax,
-        IUpdateWhereSyntax
+    public class UpdateDataExpressionBuilder : 
+        IUpdateSetOrInSchemaSyntax,
+        IUpdateWhereSyntax,
+        IUpdateColumnFromSyntax,
+        IUpdateColumnOnTableSyntax
     {
         private readonly UpdateDataExpression _expression;
         private readonly IMigrationContext _context;
@@ -39,6 +44,19 @@ namespace FluentMigrator.Builders.Update
         {
             _expression.SchemaName = schemaName;
             return this;
+        }
+
+        public IUpdateColumnOnTableSyntax From(string columnName)
+        {
+            _expression.FromColumnName = columnName;
+            _expression.IsFromColumn = true;
+            return this;
+        }
+
+        public void OnTable(string tableName)
+        {
+            _expression.TableName = tableName;
+            _expression.IsAllRows = true;
         }
 
         public IUpdateWhereSyntax Set(object dataAsAnonymousType)

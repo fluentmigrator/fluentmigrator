@@ -26,10 +26,13 @@ namespace FluentMigrator.Expressions
     {
         public string SchemaName { get; set; }
         public string TableName { get; set; }
+        public string ColumnName { get; set; }
+        public string FromColumnName { get; set; }
 
         public List<KeyValuePair<string, object>> Set { get; set; }
         public List<KeyValuePair<string, object>> Where { get; set; }
         public bool IsAllRows { get; set; }
+        public bool IsFromColumn { get; set; }
 
         public override void CollectValidationErrors(ICollection<string> errors)
         {
