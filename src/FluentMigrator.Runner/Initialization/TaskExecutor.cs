@@ -50,6 +50,10 @@ namespace FluentMigrator.Runner.Initialization
             ProcessorFactoryProvider = processorFactoryProvider;
         }
 
+        /// <summary>
+        /// Creates a processor and runner. If Initialize() is called by an inherited TaskExecutor, 
+        /// make sure DisposeProcessor() is called or the DB connection won't be closed.
+        /// </summary>
         protected virtual void Initialize()
         {
             List<Assembly> assemblies = new List<Assembly>();
@@ -69,6 +73,15 @@ namespace FluentMigrator.Runner.Initialization
             var processor = RunnerContext.NoConnection? InitializeConnectionlessProcessor():InitializeProcessor(assemblyCollection);
 
             Runner = new MigrationRunner(assemblyCollection, RunnerContext, processor);
+        }
+
+        /// <summary>
+        /// Every time an inherited TaskExecutor calls its Initialize() method, it has to call DisposeProcessor()
+        /// to close the DB connection. Execute() will call Initialize() and dispose DB connection again.
+        /// </summary>
+        protected void DisposeProcessor()
+        {
+            Runner.Processor.Dispose();
         }
 
         public void Execute()
