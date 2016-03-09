@@ -25,8 +25,8 @@ namespace FluentMigrator.Runner.Generators.Postgres
 
         #region Constants
 
-        private const string TableDescriptionTemplate = "COMMENT ON TABLE {0} IS '{1}'";
-        private const string ColumnDescriptionTemplate = "COMMENT ON COLUMN {0}.{1} IS '{2}'";
+        private const string TableDescriptionTemplate = "COMMENT ON TABLE {0} IS '{1}';";
+        private const string ColumnDescriptionTemplate = "COMMENT ON COLUMN {0}.{1} IS '{2}';";
 
         #endregion
 
