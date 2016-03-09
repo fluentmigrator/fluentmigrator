@@ -3,8 +3,7 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
-
-    internal class SqlServer2000TypeMap : TypeMapBase
+    public class SqlServer2000TypeMap : TypeMapBase
     {
         public const int AnsiStringCapacity = 8000;
         public const int AnsiTextCapacity = 2147483647;
@@ -22,7 +21,6 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             SetTypeMap(DbType.AnsiString, "TEXT", AnsiTextCapacity);
             SetTypeMap(DbType.Binary, "VARBINARY(8000)");
             SetTypeMap(DbType.Binary, "VARBINARY($size)", AnsiStringCapacity);
-            SetTypeMap(DbType.Binary, "VARBINARY(MAX)", int.MaxValue);
             SetTypeMap(DbType.Binary, "IMAGE", ImageCapacity);
             SetTypeMap(DbType.Boolean, "BIT");
             SetTypeMap(DbType.Byte, "TINYINT");
@@ -41,10 +39,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             SetTypeMap(DbType.StringFixedLength, "NCHAR($size)", UnicodeStringCapacity);
             SetTypeMap(DbType.String, "NVARCHAR(255)");
             SetTypeMap(DbType.String, "NVARCHAR($size)", UnicodeStringCapacity);
-            SetTypeMap(DbType.String, "NVARCHAR(MAX)", int.MaxValue);
-            SetTypeMap(DbType.String, "NTEXT", UnicodeTextCapacity);
+            // Officially this is 1073741823 but we will allow the int.MaxValue Convention
+            SetTypeMap(DbType.String, "NTEXT", int.MaxValue);
             SetTypeMap(DbType.Time, "DATETIME");
-            SetTypeMap(DbType.Xml, "XML");
         }
     }
 }

@@ -123,7 +123,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE \"TestSchema\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE 1 = 1");
+            result.ShouldBe("UPDATE \"TestSchema\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE 1 = 1;");
         }
 
         [Test]
@@ -132,7 +132,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE \"public\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE 1 = 1");
+            result.ShouldBe("UPDATE \"public\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE 1 = 1;");
         }
 
         [Test]
@@ -142,7 +142,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE \"TestSchema\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL");
+            result.ShouldBe("UPDATE \"TestSchema\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL;");
         }
 
         [Test]
@@ -151,7 +151,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE \"public\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL");
+            result.ShouldBe("UPDATE \"public\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL;");
         }
     }
 }

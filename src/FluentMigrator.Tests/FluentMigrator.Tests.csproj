@@ -201,6 +201,7 @@
     <Compile Include="Integration\Migrations\Tagged\2_TenantBTable.cs" />
     <Compile Include="Integration\Migrations\Tagged\3_NormalTable.cs" />
     <Compile Include="Integration\Migrations\Tagged\4_TenantAandBTable.cs" />
+    <Compile Include="Integration\Migrations\Tagged\TenantABaseMigration.cs" />
     <Compile Include="Integration\Migrations\TestEmptyMigration.cs" />
     <Compile Include="Integration\Migrations\TestMigration.cs" />
     <Compile Include="Integration\Migrations\TestSetExistingRowValuesMigration.cs" />
@@ -434,6 +435,7 @@
     <Compile Include="Unit\Generators\Postgres\PostgresSchemaTests.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresSequenceTests.cs" />
     <Compile Include="Unit\Generators\Postgres\PostgresTableTests.cs" />
+    <Compile Include="Unit\Generators\Postgres\PostgresQuoterTests.cs" />
     <Compile Include="Unit\Generators\SQLite\SQLiteColumnTests.cs" />
     <Compile Include="Unit\Generators\SQLite\SQLiteConstraintsTests.cs" />
     <Compile Include="Unit\Generators\SQLite\SQLiteDataTests.cs" />
@@ -449,6 +451,8 @@
     <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000IndexTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000SchemaTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000TableTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2000\SqlServer2000TypeMapTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005TypeMapTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005ClusteredTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005ColumnTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005ConstraintsTests.cs" />

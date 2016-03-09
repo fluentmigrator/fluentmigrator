@@ -23,6 +23,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             if (value is bool) { return FormatBool((bool)value); }
             if (value is Guid) { return FormatGuid((Guid)value); }
             if (value is DateTime) { return FormatDateTime((DateTime)value); }
+            if (value is DateTimeOffset) { return FormatDateTimeOffset((DateTimeOffset)value); }
             if (value.GetType().IsEnum) { return FormatEnum(value); }
             if (value is double) {return FormatDouble((double)value);}
             if (value is float) {return FormatFloat((float)value);}
@@ -91,6 +92,11 @@ namespace FluentMigrator.Runner.Generators.Generic
         public virtual string FormatDateTime(DateTime value)
         {
             return ValueQuote + (value).ToString("yyyy-MM-ddTHH:mm:ss",CultureInfo.InvariantCulture) + ValueQuote;
+        }
+
+        public virtual string FormatDateTimeOffset(DateTimeOffset value) 
+        {
+            return ValueQuote + (value).ToString("yyyy-MM-ddTHH:mm:ss zzz", CultureInfo.InvariantCulture) + ValueQuote;
         }
 
         public virtual string FormatEnum(object value)

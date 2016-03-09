@@ -23,14 +23,25 @@ namespace FluentMigrator.Builders
 
         public NextT AsAnsiString()
         {
-            Column.Type = DbType.AnsiString;
+            SetColumnAsString(DbType.AnsiString);
+            return (NextT)(object)this;
+        }
+
+        public NextT AsAnsiString(string collationName)
+        {
+            SetColumnAsString(dbType: DbType.AnsiString, collationName: collationName);
             return (NextT)(object)this;
         }
 
         public NextT AsAnsiString(int size)
         {
-            Column.Type = DbType.AnsiString;
-            Column.Size = size;
+            SetColumnAsString(DbType.AnsiString, size);
+            return (NextT)(object)this;
+        }
+
+        public NextT AsAnsiString(int size, string collationName)
+        {
+            SetColumnAsString(DbType.AnsiString, size, collationName);
             return (NextT)(object)this;
         }
 
@@ -105,15 +116,25 @@ namespace FluentMigrator.Builders
 
         public NextT AsFixedLengthString(int size)
         {
-            Column.Type = DbType.StringFixedLength;
-            Column.Size = size;
+            SetColumnAsString(DbType.StringFixedLength, size);
+            return (NextT)(object)this;
+        }
+
+        public NextT AsFixedLengthString(int size, string collationName)
+        {
+            SetColumnAsString(DbType.StringFixedLength, size, collationName);
             return (NextT)(object)this;
         }
 
         public NextT AsFixedLengthAnsiString(int size)
         {
-            Column.Type = DbType.AnsiStringFixedLength;
-            Column.Size = size;
+            SetColumnAsString(DbType.AnsiStringFixedLength, size);
+            return (NextT)(object)this;
+        }
+
+        public NextT AsFixedLengthAnsiString(int size, string collationName)
+        {
+            SetColumnAsString(DbType.AnsiStringFixedLength, size, collationName);
             return (NextT)(object)this;
         }
 
@@ -149,14 +170,25 @@ namespace FluentMigrator.Builders
 
         public NextT AsString()
         {
-            Column.Type = DbType.String;
+            SetColumnAsString(DbType.String);
+            return (NextT)(object)this;
+        }
+
+        public NextT AsString(string collationName)
+        {
+            SetColumnAsString(dbType: DbType.String, collationName: collationName);
             return (NextT)(object)this;
         }
 
         public NextT AsString(int size)
         {
-            Column.Type = DbType.String;
-            Column.Size = size;
+            SetColumnAsString(DbType.String, size);
+            return (NextT)(object)this;
+        }
+
+        public NextT AsString(int size, string collationName)
+        {
+            SetColumnAsString(DbType.String, size, collationName);
             return (NextT)(object)this;
         }
 
@@ -184,6 +216,20 @@ namespace FluentMigrator.Builders
             Column.Type = null;
             Column.CustomType = customType;
             return (NextT)(object)this;
+        }
+
+        private void SetColumnAsString(DbType dbType, int size = -100, string collationName = "")
+        {
+            Column.Type = dbType;
+            if (size != -100)
+            {
+                Column.Size = size;
+            }
+
+            if (!string.IsNullOrEmpty(collationName))
+            {
+                Column.CollationName = collationName;
+            }
         }
     }
 }

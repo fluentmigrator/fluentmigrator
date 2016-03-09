@@ -120,19 +120,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         }
 
         [Test]
-        public void CanCreateXmlColumn()
-        {
-            var expression = new CreateColumnExpression
-                {
-                    TableName = "Table1",
-                    Column = new ColumnDefinition {Name = "MyXmlColumn", Type = DbType.Xml}
-                };
-
-            var result = Generator.Generate(expression);
-            result.ShouldNotBeNull();
-        }
-
-        [Test]
         public void CanDropSchemaInStrictMode()
         {
             Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;

@@ -89,7 +89,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         [Test]
         public void CurrencyIsNumber()
         {
-            _typeMap.GetTypeMap(DbType.Currency, 0, 0).ShouldBe("NUMBER(19,1)");
+            _typeMap.GetTypeMap(DbType.Currency, 0, 0).ShouldBe("NUMBER(19,4)");
         }
 
         [Test]
@@ -102,6 +102,12 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public void DateTimeIsTimestamp()
         {
             _typeMap.GetTypeMap(DbType.DateTime, 0, 0).ShouldBe("TIMESTAMP(4)");
+        }
+
+        [Test]
+        public void DateTimeOffsetIsTimestampWithTimeZone()
+        {
+            _typeMap.GetTypeMap(DbType.DateTimeOffset, 0, 0).ShouldBe("TIMESTAMP(4) WITH TIME ZONE");
         }
 
         [Test]

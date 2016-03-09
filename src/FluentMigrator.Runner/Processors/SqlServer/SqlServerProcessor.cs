@@ -28,6 +28,14 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 {
     public sealed class SqlServerProcessor : GenericProcessorBase
     {
+        private const string SCHEMA_EXISTS = "SELECT 1 WHERE EXISTS (SELECT * FROM sys.schemas WHERE NAME = '{0}') ";
+        private const string TABLE_EXISTS = "SELECT 1 WHERE EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}')";
+        private const string COLUMN_EXISTS = "SELECT 1 WHERE EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}')";
+        private const string CONSTRAINT_EXISTS = "SELECT 1 WHERE EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_CATALOG = DB_NAME() AND TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND CONSTRAINT_NAME = '{2}')";
+        private const string INDEX_EXISTS = "SELECT 1 WHERE EXISTS (SELECT * FROM sys.indexes WHERE name = '{0}' and object_id=OBJECT_ID('{1}.{2}'))";
+        private const string SEQUENCES_EXISTS = "SELECT 1 WHERE EXISTS (SELECT * FROM INFORMATION_SCHEMA.SEQUENCES WHERE SEQUENCE_SCHEMA = '{0}' AND SEQUENCE_NAME = '{1}' )";
+        private const string DEFAULTVALUE_EXISTS = "SELECT 1 WHERE EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}' AND COLUMN_DEFAULT LIKE '{3}')";
+
         public override string DatabaseType
         {
             get { return "SqlServer"; }
@@ -53,14 +61,14 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool SchemaExists(string schemaName)
         {
-            return Exists("SELECT * FROM sys.schemas WHERE NAME = '{0}'", SafeSchemaName(schemaName));
+            return Exists(SCHEMA_EXISTS, SafeSchemaName(schemaName));
         }
 
         public override bool TableExists(string schemaName, string tableName)
         {
             try
             {
-                return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}'", SafeSchemaName(schemaName),
+                return Exists(TABLE_EXISTS, SafeSchemaName(schemaName),
                     FormatHelper.FormatSqlEscape(tableName));
             }
             catch (Exception e)
@@ -72,32 +80,32 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
-            return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}'", SafeSchemaName(schemaName),
+            return Exists(COLUMN_EXISTS, SafeSchemaName(schemaName),
                 FormatHelper.FormatSqlEscape(tableName), FormatHelper.FormatSqlEscape(columnName));
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
-            return Exists("SELECT * FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE CONSTRAINT_CATALOG = DB_NAME() AND TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND CONSTRAINT_NAME = '{2}'", SafeSchemaName(schemaName),
+            return Exists(CONSTRAINT_EXISTS, SafeSchemaName(schemaName),
                 FormatHelper.FormatSqlEscape(tableName), FormatHelper.FormatSqlEscape(constraintName));
         }
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
-            return Exists("SELECT * FROM sys.indexes WHERE name = '{0}' and object_id=OBJECT_ID('{1}.{2}')",
+            return Exists(INDEX_EXISTS,
                 FormatHelper.FormatSqlEscape(indexName), SafeSchemaName(schemaName), FormatHelper.FormatSqlEscape(tableName));
         }
 
         public override bool SequenceExists(string schemaName, string sequenceName)
         {
-            return Exists("SELECT * FROM INFORMATION_SCHEMA.SEQUENCES WHERE SEQUENCE_SCHEMA = '{0}' AND SEQUENCE_NAME = '{1}'", SafeSchemaName(schemaName),
+            return Exists(SEQUENCES_EXISTS, SafeSchemaName(schemaName),
                 FormatHelper.FormatSqlEscape(sequenceName));
         }
 
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
             string defaultValueAsString = string.Format("%{0}%", FormatHelper.FormatSqlEscape(defaultValue.ToString()));
-            return Exists("SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}' AND COLUMN_DEFAULT LIKE '{3}'", SafeSchemaName(schemaName),
+            return Exists(DEFAULTVALUE_EXISTS, SafeSchemaName(schemaName),
                 FormatHelper.FormatSqlEscape(tableName),
                 FormatHelper.FormatSqlEscape(columnName), defaultValueAsString);
         }
@@ -112,9 +120,9 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             EnsureConnectionIsOpen();
 
             using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
-            using (var reader = command.ExecuteReader())
             {
-                return reader.Read();
+                var result = command.ExecuteScalar();
+                return DBNull.Value != result && Convert.ToInt32(result) == 1;
             }
         }
 
