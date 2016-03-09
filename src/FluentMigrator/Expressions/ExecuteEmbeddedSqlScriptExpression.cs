@@ -2,8 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentMigrator.Infrastructure;
-using System.Reflection;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace FluentMigrator.Expressions
 {
@@ -12,6 +12,8 @@ namespace FluentMigrator.Expressions
         public string SqlScript { get; set; }
 
         public IAssemblyCollection MigrationAssemblies { get; set; }
+
+        public IDictionary<string, string> Parameters { get; set; }
 
         public override void ExecuteWith(IMigrationProcessor processor)
         {
@@ -28,8 +30,18 @@ namespace FluentMigrator.Expressions
 
 
             // since all the Processors are using String.Format() in their Execute method
-            //  we need to escape the brackets with double brackets or else it throws an incorrect format error on the String.Format call
-            sqlText = sqlText.Replace("{", "{{").Replace("}", "}}");
+            //	1) we need to escape the brackets with double brackets or else it throws an incorrect format error on the String.Format call
+            //	2) we need to replace tokens
+            //	3) we need to replace escaped tokens
+            sqlText = Regex.Replace(
+                Regex.Replace(
+                    sqlText.Replace("{", "{{").Replace("}", "}}"),
+                    @"\$\((?<token>\w+)\)",
+                    m => ((Parameters != null) && Parameters.ContainsKey(m.Groups["token"].Value))
+                        ? Parameters[m.Groups["token"].Value]
+                        : ""),
+                @"\${2}\({2}(?<token>\w+)\){2}",
+                m => string.Format("$({0})", m.Groups["token"]));
             processor.Execute(sqlText);
         }
 

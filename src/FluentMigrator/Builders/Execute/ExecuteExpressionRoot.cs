@@ -63,7 +63,18 @@ namespace FluentMigrator.Builders.Execute
 
         public void EmbeddedScript(string EmbeddedSqlScriptName)
         {
-            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = EmbeddedSqlScriptName, MigrationAssemblies = _context.MigrationAssemblies };
+            EmbeddedScript(EmbeddedSqlScriptName, new Dictionary<string, string>());
+        }
+
+        public void EmbeddedScript(string EmbeddedSqlScriptName, IDictionary<string, string> tokenDictionary)
+        {
+            var expression = new ExecuteEmbeddedSqlScriptExpression
+            {
+                SqlScript = EmbeddedSqlScriptName,
+                MigrationAssemblies = _context.MigrationAssemblies,
+                Parameters = tokenDictionary
+            };
+
             _context.Expressions.Add(expression);
         }
     }
