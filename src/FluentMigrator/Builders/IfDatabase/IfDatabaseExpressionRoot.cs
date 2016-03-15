@@ -135,5 +135,14 @@ namespace FluentMigrator.Builders.IfDatabase
 
             return false;
         }
+
+        public void Delegate(Action delegation)
+        {
+            if (_context.QuerySchema is NullIfDatabaseProcessor)
+            {
+                return;
+            }
+            delegation.Invoke();
+        }
     }
 }
