@@ -20,8 +20,7 @@ namespace FluentMigrator.Runner.Generators.MySql
             SetTypeMap(DbType.AnsiStringFixedLength, "MEDIUMTEXT", MediumTextCapacity);
             SetTypeMap(DbType.AnsiStringFixedLength, "LONGTEXT", LongTextCapacity);
             SetTypeMap(DbType.AnsiString, "VARCHAR(255)");
-            SetTypeMap(DbType.AnsiString, "VARCHAR($size)", StringCapacity);
-            SetTypeMap(DbType.AnsiString, "TEXT", TextCapacity);
+            SetTypeMap(DbType.AnsiString, "VARCHAR($size)", TextCapacity);
             SetTypeMap(DbType.AnsiString, "MEDIUMTEXT", MediumTextCapacity);
             SetTypeMap(DbType.AnsiString, "LONGTEXT", LongTextCapacity);
             SetTypeMap(DbType.Binary, "LONGBLOB");
@@ -47,8 +46,7 @@ namespace FluentMigrator.Runner.Generators.MySql
             SetTypeMap(DbType.StringFixedLength, "MEDIUMTEXT", MediumTextCapacity);
             SetTypeMap(DbType.StringFixedLength, "LONGTEXT", LongTextCapacity);
             SetTypeMap(DbType.String, "VARCHAR(255)");
-            SetTypeMap(DbType.String, "VARCHAR($size)", StringCapacity);
-            SetTypeMap(DbType.String, "TEXT", TextCapacity);
+            SetTypeMap(DbType.String, "VARCHAR($size)", TextCapacity);
             SetTypeMap(DbType.String, "MEDIUMTEXT", MediumTextCapacity);
             SetTypeMap(DbType.String, "LONGTEXT", LongTextCapacity);
             SetTypeMap(DbType.Time, "DATETIME");
