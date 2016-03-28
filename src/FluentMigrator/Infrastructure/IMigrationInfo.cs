@@ -16,6 +16,8 @@
 
 #endregion
 
+using System;
+
 namespace FluentMigrator.Infrastructure
 {
     public interface IMigrationInfo
@@ -27,5 +29,6 @@ namespace FluentMigrator.Infrastructure
         object Trait(string name);
         bool HasTrait(string name);
         string GetName();
+        long DependsOn { get; }
     }
 }

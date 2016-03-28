@@ -22,9 +22,10 @@ namespace FluentMigrator.Runner.Generators.Generic
         public virtual string CreateTable { get { return "CREATE TABLE {0} ({1})"; } }
         public virtual string DropTable { get { return "DROP TABLE {0}"; } }
 
-        public virtual string AddColumn { get { return "ALTER TABLE {0} ADD COLUMN {1}"; } }
+        public virtual string AddColumn { get { return "ALTER TABLE {0} ADD COLUMN {1}"; } }        
         public virtual string DropColumn { get { return "ALTER TABLE {0} DROP COLUMN {1}"; } }
         public virtual string AlterColumn { get { return "ALTER TABLE {0} ALTER COLUMN {1}"; } }
+
         public virtual string RenameColumn { get { return "ALTER TABLE {0} RENAME COLUMN {1} TO {2}"; } }
 
         public virtual string RenameTable { get { return "RENAME TABLE {0} TO {1}"; } }
@@ -32,6 +33,8 @@ namespace FluentMigrator.Runner.Generators.Generic
         public virtual string CreateSchema { get { return "CREATE SCHEMA {0}"; } }
         public virtual string AlterSchema { get { return "ALTER SCHEMA {0} TRANSFER {1}.{2}"; } }
         public virtual string DropSchema { get { return "DROP SCHEMA {0}"; } }
+
+        public virtual string DropSchemaIdempotent { get { return "IF (EXISTS (SELECT * FROM sys.schemas WHERE name = '{0}')) BEGIN EXEC sp_executesql N'DROP SCHEMA [{0}]' END"; } }
 
         public virtual string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3} ({4})"; } }
         public virtual string DropIndex { get { return "DROP INDEX {0}"; } }

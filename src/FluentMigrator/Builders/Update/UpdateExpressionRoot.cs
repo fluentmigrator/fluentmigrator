@@ -14,7 +14,7 @@ namespace FluentMigrator.Builders.Update
 
         public IUpdateSetOrInSchemaSyntax Table(string tableName)
         {
-            var expression = new UpdateDataExpression { TableName = tableName };
+            var expression = new UpdateDataExpression { TableName = tableName, CheckIfExists = _context.CheckIfExists };
             _context.Expressions.Add(expression);
             return new UpdateDataExpressionBuilder(expression, _context);
         }

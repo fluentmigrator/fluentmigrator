@@ -1,3 +1,4 @@
+using System;
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Builders.Delete.Constraint
@@ -18,9 +19,22 @@ namespace FluentMigrator.Builders.Delete.Constraint
             return this;
         }
 
-        public void InSchema(string schemaName)
+        public IDeleteConstraintOnTableSyntax CheckIfExists(bool enabled = true)
+        {
+            Expression.CheckIfExists = enabled;
+            return this;
+        }
+
+        public IInSchemaSyntax InSchema(string schemaName)
         {
             Expression.Constraint.SchemaName = schemaName;
+            return this;
+        }
+
+        IInSchemaSyntax IInSchemaSyntax.CheckIfExists(bool enabled = true)
+        {
+            Expression.CheckIfExists = enabled;
+            return this;
         }
     }
 }

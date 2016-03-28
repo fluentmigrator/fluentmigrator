@@ -33,6 +33,7 @@ namespace FluentMigrator.Expressions
         public virtual string SchemaName { get; set; }
         public virtual string TableName { get; set; }
         public ICollection<string> ColumnNames { get; set; }
+        public virtual bool CheckIfExists { get; set; }
 
         public override void CollectValidationErrors(ICollection<string> errors)
         {

@@ -1,4 +1,5 @@
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Create.Constraint
 {
@@ -18,6 +19,12 @@ namespace FluentMigrator.Builders.Create.Constraint
         public ICreateConstraintWithSchemaOrColumnSyntax OnTable(string tableName)
         {
             Expression.Constraint.TableName = tableName;
+            return this;
+        }
+
+        public ICreateConstraintOnTableSyntax CheckIfExists(bool enabled = true)
+        {
+            Expression.CheckIfExists = enabled;
             return this;
         }
 

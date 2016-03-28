@@ -27,6 +27,17 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanAlterColumnWithCustomSchemaIdempotent()
+        {
+            //TODO: This will fail if there are any keys attached 
+            var expression = GeneratorTestHelper.GetAlterColumnExpressionIdempotent();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF EXISTS(SELECT * FROM sys.columns WHERE Name = N'TestColumn1' AND Object_ID = Object_ID(N'TestSchema.TestTable1')) BEGIN ALTER TABLE [TestSchema].[TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL END");
+        }
+
+        [Test]
         public override void CanAlterColumnWithDefaultSchema()
         {
             //TODO: This will fail if there are any keys attached 
@@ -66,12 +77,31 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanCreateColumnWithCustomSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionIdempotent();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'TestColumn1' AND Object_ID = Object_ID(N'TestSchema.TestTable1')) BEGIN ALTER TABLE [TestSchema].[TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL END");
+        }
+
+        [Test]
         public override void CanCreateColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL");
+        }
+
+        [Test]
+        public void CanCreateColumnWithDefaultSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionIdempotent();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF NOT EXISTS(SELECT * FROM sys.columns WHERE Name = N'TestColumn1' AND Object_ID = Object_ID(N'dbo.TestTable1')) BEGIN ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL END");
         }
 
         [Test]
@@ -145,6 +175,33 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
                         "EXEC sp_executesql @sql;" + System.Environment.NewLine + System.Environment.NewLine +
                         "-- now we can finally drop column" + System.Environment.NewLine +
                         "ALTER TABLE [dbo].[TestTable1] DROP COLUMN [TestColumn1];" + System.Environment.NewLine;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
+        }
+
+        [Test]
+        public void CanDropColumnWithDefaultSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetDeleteColumnExpressionIdempotent();
+
+            var expected = "DECLARE @default sysname, @sql nvarchar(max);" + System.Environment.NewLine + System.Environment.NewLine +
+                        "-- get name of default constraint" + System.Environment.NewLine +
+                        "SELECT @default = name" + System.Environment.NewLine +
+                        "FROM sys.default_constraints" + System.Environment.NewLine +
+                        "WHERE parent_object_id = object_id('[dbo].[TestTable1]')" + System.Environment.NewLine +
+                        "AND type = 'D'" + System.Environment.NewLine +
+                        "AND parent_column_id = (" + System.Environment.NewLine +
+                        "SELECT column_id" + System.Environment.NewLine +
+                        "FROM sys.columns" + System.Environment.NewLine +
+                        "WHERE object_id = object_id('[dbo].[TestTable1]')" + System.Environment.NewLine +
+                        "AND name = 'TestColumn1'" + System.Environment.NewLine +
+                        ");" + System.Environment.NewLine + System.Environment.NewLine +
+                        "-- create alter table command to drop constraint as string and run it" + System.Environment.NewLine +
+                        "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + @default;" + System.Environment.NewLine +
+                        "EXEC sp_executesql @sql;" + System.Environment.NewLine + System.Environment.NewLine +
+                        "-- now we can finally drop column" + System.Environment.NewLine +
+                        "IF EXISTS(SELECT * FROM sys.columns WHERE Name = N'TestColumn1' AND Object_ID = Object_ID(N'dbo.TestTable1')) BEGIN ALTER TABLE [dbo].[TestTable1] DROP COLUMN [TestColumn1] END" + System.Environment.NewLine;
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
@@ -254,12 +311,31 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanRenameColumnWithCustomSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetRenameColumnExpressionIdempotent();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF EXISTS(SELECT * FROM sys.columns WHERE Name = N'TestColumn1' AND Object_ID = Object_ID(N'TestSchema.TestTable1')) BEGIN sp_rename '[TestSchema].[TestTable1].[TestColumn1]', 'TestColumn2' END");
+        }
+
+        [Test]
         public override void CanRenameColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
 
             var result = Generator.Generate(expression);
             result.ShouldBe("sp_rename '[dbo].[TestTable1].[TestColumn1]', 'TestColumn2'");
+        }
+
+        [Test]
+        public void CanRenameColumnWithDefaultSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetRenameColumnExpressionIdempotent();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF EXISTS(SELECT * FROM sys.columns WHERE Name = N'TestColumn1' AND Object_ID = Object_ID(N'dbo.TestTable1')) BEGIN sp_rename '[dbo].[TestTable1].[TestColumn1]', 'TestColumn2' END");
         }
     }
 }

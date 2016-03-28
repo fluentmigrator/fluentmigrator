@@ -25,6 +25,7 @@ namespace FluentMigrator.Expressions
     public class CreateForeignKeyExpression : MigrationExpressionBase
     {
         public virtual ForeignKeyDefinition ForeignKey { get; set; }
+        public virtual bool CheckIfExists { get; set; }
 
         public CreateForeignKeyExpression()
         {

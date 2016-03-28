@@ -26,6 +26,8 @@ namespace FluentMigrator
         object ApplicationContext { get; }
         string ConnectionString { get; }
 
+        bool CheckIfExists { get; }
+
         void GetUpExpressions(IMigrationContext context);
         void GetDownExpressions(IMigrationContext context);
     }

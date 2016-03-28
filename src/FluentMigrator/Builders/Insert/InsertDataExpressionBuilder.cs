@@ -69,6 +69,12 @@ namespace FluentMigrator.Builders.Insert
             return this;
         }
 
+        public IInsertDataOrInSchemaSyntax CheckIfExists(bool enabled = true)
+        {
+            _expression.CheckIfExists = enabled;
+            return this;
+        }
+
         private static IDictionary<string, object> ExtractData(object dataAsAnonymousType)
         {
             var data = new Dictionary<string, object>();

@@ -23,5 +23,7 @@ namespace FluentMigrator.Builders.Create.ForeignKey
     public interface ICreateForeignKeyFromTableSyntax : IFluentSyntax
     {
         ICreateForeignKeyForeignColumnOrInSchemaSyntax FromTable(string table);
+
+        ICreateForeignKeyFromTableSyntax CheckIfExists(bool enabled = true);
     }
 }

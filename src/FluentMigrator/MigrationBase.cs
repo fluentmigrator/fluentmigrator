@@ -39,9 +39,14 @@ namespace FluentMigrator
         /// </summary>
         public string ConnectionString { get; protected set; }
 
+        public virtual bool CheckIfExists { get; protected set; }
 
         public abstract void Up();
         public abstract void Down();
+
+        public virtual void BeforeUp()
+        {
+        }
 
         public void ApplyConventions(IMigrationContext context)
         {
@@ -56,6 +61,7 @@ namespace FluentMigrator
                 _context = context;
                 ApplicationContext = context.ApplicationContext;
                 ConnectionString = context.Connection;
+                BeforeUp();
                 Up();
                 _context = null;
             }

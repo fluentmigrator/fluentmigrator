@@ -23,7 +23,15 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         public static CreateTableExpression GetCreateTableExpression()
         {
-            CreateTableExpression expression = new CreateTableExpression() { TableName = TestTableName1, };
+            CreateTableExpression expression = new CreateTableExpression() { TableName = TestTableName1 };
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, Type = DbType.String });
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, Type = DbType.Int32 });
+            return expression;
+        }
+
+        public static CreateTableExpression GetCreateTableIdempotentExpression()
+        {
+            CreateTableExpression expression = new CreateTableExpression() { TableName = TestTableName1, CheckIfExists = true };
             expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, Type = DbType.String });
             expression.Columns.Add(new ColumnDefinition { Name = TestColumnName2, Type = DbType.Int32 });
             return expression;
@@ -123,9 +131,21 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static CreateIndexExpression GetCreateIndexExpressionIdempotent()
+        {
+            var expression = GetCreateIndexExpression();
+            expression.CheckIfExists = true;
+            return expression;
+        }
+
         public static CreateSchemaExpression GetCreateSchemaExpression()
         {
             return new CreateSchemaExpression { SchemaName = "TestSchema" };
+        }
+
+        public static CreateSchemaExpression GetCreateSchemaIfNotExistsExpression()
+        {
+            return new CreateSchemaExpression { SchemaName = "TestSchema", CheckIfExists = true};
         }
 
         public static CreateSequenceExpression GetCreateSequenceExpression()
@@ -221,6 +241,13 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static InsertDataExpression GetInsertDataExpressionIdempotent()
+        {
+            var expression = GetInsertDataExpression();
+            expression.CheckIfExists = true;
+            return expression;
+        }
+
         public static UpdateDataExpression GetUpdateDataExpression()
         {
             var expression = new UpdateDataExpression();
@@ -252,6 +279,14 @@ namespace FluentMigrator.Tests.Unit.Generators
                                  };
 
             expression.IsAllRows = true;
+
+            return expression;
+        }
+
+        public static UpdateDataExpression GetUpdateDataExpressionWithAllRowsIdempotent()
+        {
+            var expression = GetUpdateDataExpressionWithAllRows();
+            expression.CheckIfExists = true;
 
             return expression;
         }
@@ -307,9 +342,25 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static DeleteDataExpression GetDeleteDataAllRowsExpressionIdempotent()
+        {
+            var expression = GetDeleteDataAllRowsExpression();
+            expression.CheckIfExists = true;
+
+            return expression;
+        }
+
         public static RenameColumnExpression GetRenameColumnExpression()
         {
             return new RenameColumnExpression { OldName = TestColumnName1, NewName = TestColumnName2, TableName = TestTableName1 };
+        }
+
+        public static RenameColumnExpression GetRenameColumnExpressionIdempotent()
+        {
+            var expression = GetRenameColumnExpression();
+            expression.CheckIfExists = true;
+
+            return expression;
         }
 
         public static CreateColumnExpression GetCreateDecimalColumnExpression()
@@ -328,6 +379,12 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, Type = DbType.String, Size = 5 };
             return new CreateColumnExpression { TableName = TestTableName1, Column = column };
+        }
+
+        public static CreateColumnExpression GetCreateColumnExpressionIdempotent()
+        {
+            ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, Type = DbType.String, Size = 5 };
+            return new CreateColumnExpression { TableName = TestTableName1, Column = column, CheckIfExists = true };
         }
 
         public static CreateColumnExpression GetCreateColumnExpressionWithDescription()
@@ -389,6 +446,14 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static AlterColumnExpression GetAlterColumnExpressionIdempotent()
+        {
+            var expression = GetAlterColumnExpression();
+            expression.CheckIfExists = true;
+
+            return expression;
+        }
+
         public static AlterColumnExpression GetAlterColumnExpressionWithDescription()
         {
             var columnExpression = GetAlterColumnExpression();
@@ -411,6 +476,18 @@ namespace FluentMigrator.Tests.Unit.Generators
         public static CreateForeignKeyExpression GetCreateForeignKeyExpression()
         {
             var expression = new CreateForeignKeyExpression();
+            expression.ForeignKey.PrimaryTable = TestTableName2;
+            expression.ForeignKey.ForeignTable = TestTableName1;
+            expression.ForeignKey.PrimaryColumns = new[] { TestColumnName2 };
+            expression.ForeignKey.ForeignColumns = new[] { TestColumnName1 };
+
+            expression.ApplyConventions(new MigrationConventions());
+            return expression;
+        }
+
+        public static CreateForeignKeyExpression GetCreateForeignKeyExpressionIdempotent()
+        {
+            var expression = new CreateForeignKeyExpression { CheckIfExists = true };
             expression.ForeignKey.PrimaryTable = TestTableName2;
             expression.ForeignKey.ForeignTable = TestTableName1;
             expression.ForeignKey.PrimaryColumns = new[] { TestColumnName2 };
@@ -461,9 +538,22 @@ namespace FluentMigrator.Tests.Unit.Generators
             return new DeleteTableExpression { TableName = TestTableName1 };
         }
 
+        public static DeleteTableExpression GetDeleteTableExpressionIdempotent()
+        {
+            return new DeleteTableExpression { TableName = TestTableName1, CheckIfExists = true };
+        }
+
         public static DeleteColumnExpression GetDeleteColumnExpression()
         {
             return GetDeleteColumnExpression(new[] { TestColumnName1 });
+        }
+
+        public static DeleteColumnExpression GetDeleteColumnExpressionIdempotent()
+        {
+            var expression = GetDeleteColumnExpression(new[] { TestColumnName1 });
+            expression.CheckIfExists = true;
+
+            return expression;
         }
 
         public static DeleteColumnExpression GetDeleteColumnExpression(string[] columns)
@@ -477,11 +567,28 @@ namespace FluentMigrator.Tests.Unit.Generators
             return new DeleteIndexExpression { Index = indexDefinition };
         }
 
+        public static DeleteIndexExpression GetDeleteIndexExpressionIdempotent()
+        {
+            var expression = GetDeleteIndexExpression();
+            expression.CheckIfExists = true;
+
+            return expression;
+        }
+
         public static DeleteForeignKeyExpression GetDeleteForeignKeyExpression()
         {
             var expression = new DeleteForeignKeyExpression();
             expression.ForeignKey.Name = "FK_Test";
             expression.ForeignKey.ForeignTable = TestTableName1;
+            return expression;
+        }
+
+        public static DeleteForeignKeyExpression GetDeleteForeignKeyExpressionIdempotent()
+        {
+            var expression = new DeleteForeignKeyExpression();
+            expression.ForeignKey.Name = "FK_Test";
+            expression.ForeignKey.ForeignTable = TestTableName1;
+            expression.CheckIfExists = true;
             return expression;
         }
 
@@ -496,6 +603,11 @@ namespace FluentMigrator.Tests.Unit.Generators
         public static DeleteSchemaExpression GetDeleteSchemaExpression()
         {
             return new DeleteSchemaExpression { SchemaName = "TestSchema" };
+        }
+
+        public static DeleteSchemaExpression GetDeleteSchemaExpressionIdempotent()
+        {
+            return new DeleteSchemaExpression { SchemaName = "TestSchema", CheckIfExists = true };
         }
 
         public static DeleteSequenceExpression GetDeleteSequenceExpression()
@@ -596,6 +708,13 @@ namespace FluentMigrator.Tests.Unit.Generators
                                      DefaultValue = 1,
                                      TableName = TestTableName1
                                  };
+            return expression;
+        }
+
+        public static AlterDefaultConstraintExpression GetAlterDefaultConstraintExpressionIdempotent()
+        {
+            var expression = GetAlterDefaultConstraintExpression();
+            expression.CheckIfExists = true;
             return expression;
         }
 

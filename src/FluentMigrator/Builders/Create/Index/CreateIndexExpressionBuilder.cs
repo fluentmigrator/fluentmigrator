@@ -31,12 +31,19 @@ namespace FluentMigrator.Builders.Create.Index
 
         public CreateIndexExpressionBuilder(CreateIndexExpression expression)
             : base(expression)
+
         {
         }
 
         public ICreateIndexOnColumnOrInSchemaSyntax OnTable(string tableName)
         {
             Expression.Index.TableName = tableName;
+            return this;
+        }
+
+        public ICreateIndexForTableSyntax CheckIfExists(bool enabled = true)
+        {
+            Expression.CheckIfExists = enabled;
             return this;
         }
 

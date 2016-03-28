@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
@@ -50,6 +51,12 @@ namespace FluentMigrator.Builders.Alter.Table
             return this;
         }
 
+        public IAlterTableAddColumnOrAlterColumnOrSchemaOrDescriptionSyntax CheckIfExists(bool enabled = true)
+        {
+            Expression.CheckIfExists = enabled;
+            return this;
+        }
+
         public void ToSchema(string schemaName)
         {
             var alterSchema = new AlterSchemaExpression
@@ -75,7 +82,8 @@ namespace FluentMigrator.Builders.Alter.Table
                                    {
                                        Column = column,
                                        SchemaName = Expression.SchemaName,
-                                       TableName = Expression.TableName
+                                       TableName = Expression.TableName,
+                                       CheckIfExists = Expression.CheckIfExists
                                    };
 
             CurrentColumn = column;
@@ -91,8 +99,9 @@ namespace FluentMigrator.Builders.Alter.Table
                                   {
                                       Column = column,
                                       SchemaName = Expression.SchemaName,
-                                      TableName = Expression.TableName
-                                  };
+                                      TableName = Expression.TableName,
+                                      CheckIfExists = Expression.CheckIfExists
+            };
 
             CurrentColumn = column;
 

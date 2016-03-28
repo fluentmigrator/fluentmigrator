@@ -23,5 +23,7 @@ namespace FluentMigrator.Builders.Delete.ForeignKey
     public interface IDeleteForeignKeyFromTableSyntax : IFluentSyntax
     {
         IDeleteForeignKeyForeignColumnOrInSchemaSyntax FromTable(string foreignTableName);
+
+        IDeleteForeignKeyFromTableSyntax CheckIfExists(bool enabled = true);
     }
 }

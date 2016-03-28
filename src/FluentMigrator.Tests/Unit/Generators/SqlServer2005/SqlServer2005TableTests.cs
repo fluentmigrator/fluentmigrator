@@ -29,6 +29,19 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanCreateTableWithCustomColumnTypeWithCustomSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableIdempotentExpression();
+            expression.SchemaName = "TestSchema";
+            expression.Columns[0].IsPrimaryKey = true;
+            expression.Columns[1].Type = null;
+            expression.Columns[1].CustomType = "[timestamp]";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF (NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'TestSchema' AND TABLE_NAME = 'TestTable1')) BEGIN CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] [timestamp] NOT NULL, PRIMARY KEY ([TestColumn1])) END");
+        }
+
+        [Test]
         public override void CanCreateTableWithCustomColumnTypeWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -57,6 +70,15 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL)");
+        }
+
+        [Test]
+        public void CanCreateTableWithDefaultSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableIdempotentExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF (NOT EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'TestTable1')) BEGIN CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL) END");
         }
 
         [Test]
@@ -228,12 +250,31 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanDropTableWithCustomSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetDeleteTableExpressionIdempotent();
+            expression.SchemaName = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'TestSchema' AND TABLE_NAME = 'TestTable1')) BEGIN DROP TABLE [TestSchema].[TestTable1] END");
+        }
+
+        [Test]
         public override void CanDropTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP TABLE [dbo].[TestTable1]");
+        }
+
+        [Test]
+        public void CanDropTableWithDefaultSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetDeleteTableExpressionIdempotent();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF (EXISTS (SELECT * FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_SCHEMA = 'dbo' AND TABLE_NAME = 'TestTable1')) BEGIN DROP TABLE [dbo].[TestTable1] END");
         }
 
         [Test]

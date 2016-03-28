@@ -23,6 +23,8 @@ namespace FluentMigrator.Expressions
 {
     public abstract class MigrationExpressionBase : IMigrationExpression
     {
+        public virtual bool CheckIfExists { get; set; }
+
         public abstract void ExecuteWith(IMigrationProcessor processor);
         public abstract void CollectValidationErrors(ICollection<string> errors);
 

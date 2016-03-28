@@ -16,6 +16,12 @@ namespace FluentMigrator.Builders.Delete.DefaultConstraint
             return this;
         }
 
+        public IDeleteDefaultConstraintOnTableSyntax CheckIfExists(bool enabled = true)
+        {
+            Expression.CheckIfExists = enabled;
+            return this;
+        }
+
         public void OnColumn(string columnName)
         {
             Expression.ColumnName = columnName;

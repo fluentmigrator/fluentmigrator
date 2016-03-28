@@ -21,5 +21,7 @@ namespace FluentMigrator.Builders.Update
     public interface IUpdateSetOrInSchemaSyntax : IUpdateSetSyntax
     {
         IUpdateSetSyntax InSchema(string schemaName);
+
+        IUpdateSetOrInSchemaSyntax CheckIfExists(bool enabled = true);
     }
 }

@@ -21,5 +21,7 @@ namespace FluentMigrator.Builders.Insert
     public interface IInsertDataOrInSchemaSyntax : IInsertDataSyntax
     {
         IInsertDataSyntax InSchema(string schemaName);
+
+        IInsertDataOrInSchemaSyntax CheckIfExists(bool enabled = true);
     }
 }

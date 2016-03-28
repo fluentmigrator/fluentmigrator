@@ -37,7 +37,9 @@ namespace FluentMigrator.Infrastructure
         /// </summary>
         public string Connection { get; set; }
 
-        public MigrationContext(IMigrationConventions conventions, IQuerySchema querySchema, IAssemblyCollection migrationAssemblies, object context, string connection)
+        public bool CheckIfExists { get; set; }
+
+        public MigrationContext(IMigrationConventions conventions, IQuerySchema querySchema, IAssemblyCollection migrationAssemblies, object context, string connection, bool checkIfExists)
         {
             Conventions = conventions;
             Expressions = new List<IMigrationExpression>();
@@ -45,6 +47,7 @@ namespace FluentMigrator.Infrastructure
             MigrationAssemblies = migrationAssemblies;
             this.ApplicationContext = context;
             this.Connection = connection;
+            CheckIfExists = checkIfExists;
         }
     }
 }

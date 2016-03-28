@@ -27,7 +27,7 @@ namespace FluentMigrator.Builders.Delete
 {
     public interface IDeleteExpressionRoot : IFluentSyntax
     {
-        void Schema(string schemaName);
+        void Schema(string schemaName, bool checkIfExists = false);
         IInSchemaSyntax Table(string tableName);
         IDeleteColumnFromTableSyntax Column(string columnName);
         IDeleteForeignKeyFromTableSyntax ForeignKey();

@@ -27,17 +27,18 @@ namespace FluentMigrator.Infrastructure
         private LazyLoader<IMigration> _lazyMigration;
 
         public MigrationInfo(long version, TransactionBehavior transactionBehavior, IMigration migration)
-            : this(version, null, transactionBehavior, () => migration)
+            : this(version, null, transactionBehavior, () => migration, 0L)
         {
         }
 
-        public MigrationInfo(long version, string description, TransactionBehavior transactionBehavior, Func<IMigration> migrationFunc)
+        public MigrationInfo(long version, string description, TransactionBehavior transactionBehavior, Func<IMigration> migrationFunc, long dependsOn)
         {
             if (migrationFunc == null) throw new ArgumentNullException("migrationFunc");
 
             Version = version;
             Description = description;
             TransactionBehavior = transactionBehavior;
+            DependsOn = dependsOn;
             _lazyMigration = new LazyLoader<IMigration>(migrationFunc);
         }
 
@@ -66,6 +67,8 @@ namespace FluentMigrator.Infrastructure
         {
             return string.Format("{0}: {1}", Version, Migration.GetType().Name);
         }
+
+        public long DependsOn { get; protected set; }
 
         public void AddTrait(string name, object value)
         {

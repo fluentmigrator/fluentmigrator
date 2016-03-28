@@ -27,6 +27,7 @@ namespace FluentMigrator.Expressions
     public class DeleteForeignKeyExpression : MigrationExpressionBase
     {
         public virtual ForeignKeyDefinition ForeignKey { get; set; }
+        public virtual bool CheckIfExists { get; set; }
 
         public DeleteForeignKeyExpression()
         {

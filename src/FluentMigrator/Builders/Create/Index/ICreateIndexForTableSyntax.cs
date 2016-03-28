@@ -21,5 +21,7 @@ namespace FluentMigrator.Builders.Create.Index
     public interface ICreateIndexForTableSyntax
     {
         ICreateIndexOnColumnOrInSchemaSyntax OnTable(string tableName);
+
+        ICreateIndexForTableSyntax CheckIfExists(bool enabled = true);
     }
 }

@@ -41,6 +41,12 @@ namespace FluentMigrator.Builders.Update
             return this;
         }
 
+        public IUpdateSetOrInSchemaSyntax CheckIfExists(bool enabled = true)
+        {
+            _expression.CheckIfExists = enabled;
+            return this;
+        }
+
         public IUpdateWhereSyntax Set(object dataAsAnonymousType)
         {
             _expression.Set = GetData(dataAsAnonymousType);

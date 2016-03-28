@@ -23,5 +23,7 @@ namespace FluentMigrator.Builders.Alter.Column
     public interface IAlterColumnOnTableSyntax : IFluentSyntax
     {
         IAlterColumnAsTypeOrInSchemaSyntax OnTable(string name);
+
+        IAlterColumnOnTableSyntax CheckIfExists(bool enabled = true);
     }
 }

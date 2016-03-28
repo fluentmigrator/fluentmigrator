@@ -34,14 +34,14 @@ namespace FluentMigrator.Builders.Alter
 
         public IAlterTableAddColumnOrAlterColumnOrSchemaOrDescriptionSyntax Table(string tableName)
         {
-            var expression = new AlterTableExpression { TableName = tableName };
+            var expression = new AlterTableExpression { TableName = tableName, CheckIfExists = _context.CheckIfExists };
             _context.Expressions.Add(expression);
             return new AlterTableExpressionBuilder(expression, _context);
         }
 
         public IAlterColumnOnTableSyntax Column(string columnName)
         {
-            var expression = new AlterColumnExpression { Column = { Name = columnName } };
+            var expression = new AlterColumnExpression { Column = { Name = columnName }, CheckIfExists = _context.CheckIfExists };
             _context.Expressions.Add(expression);
             return new AlterColumnExpressionBuilder(expression, _context);
         }

@@ -158,6 +158,34 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanAlterDefaultConstraintWithStringAsDefaultIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpressionIdempotent();
+            expression.DefaultValue = "TestString";
+
+            string expected = "DECLARE @default sysname, @sql nvarchar(max);" + Environment.NewLine + Environment.NewLine +
+            "-- get name of default constraint" + Environment.NewLine +
+            "SELECT @default = name" + Environment.NewLine +
+            "FROM sys.default_constraints" + Environment.NewLine +
+            "WHERE parent_object_id = object_id('[dbo].[TestTable1]')" + Environment.NewLine +
+            "AND type = 'D'" + Environment.NewLine +
+            "AND parent_column_id = (" + Environment.NewLine +
+            "SELECT column_id" + Environment.NewLine +
+            "FROM sys.columns" + Environment.NewLine +
+            "WHERE object_id = object_id('[dbo].[TestTable1]')" + Environment.NewLine +
+            "AND name = 'TestColumn1'" + Environment.NewLine +
+            ");" + Environment.NewLine + Environment.NewLine +
+            "-- create alter table command to drop constraint as string and run it" + Environment.NewLine +
+            "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + @default;" + Environment.NewLine +
+            "EXEC sp_executesql @sql;" + Environment.NewLine + Environment.NewLine +
+            "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
+            "IF OBJECT_ID('dbo.DF_TestTable1_TestColumn1') IS NULL BEGIN ALTER TABLE [dbo].[TestTable1] WITH NOCHECK ADD CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT('TestString') FOR [TestColumn1] END;";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe(expected);
+        }
+
+        [Test]
         public void CanAlterDefaultConstraintWithSqlFunctionAsDefault()
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
@@ -197,12 +225,32 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanCreateForeignKeyWithCustomSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetCreateForeignKeyExpressionIdempotent();
+            expression.ForeignKey.ForeignTableSchema = "TestSchema";
+            expression.ForeignKey.PrimaryTableSchema = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF (OBJECT_ID('TestSchema.FK_TestTable1_TestColumn1_TestTable2_TestColumn2', 'F') IS NULL) BEGIN ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestTable2_TestColumn2] FOREIGN KEY ([TestColumn1]) REFERENCES [TestSchema].[TestTable2] ([TestColumn2]) END");
+        }
+
+        [Test]
         public override void CanCreateForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestTable2_TestColumn2] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2])");
+        }
+
+        [Test]
+        public void GetCreateForeignKeyExpressionIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetCreateForeignKeyExpressionIdempotent();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF (OBJECT_ID('dbo.FK_TestTable1_TestColumn1_TestTable2_TestColumn2', 'F') IS NULL) BEGIN ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [FK_TestTable1_TestColumn1_TestTable2_TestColumn2] FOREIGN KEY ([TestColumn1]) REFERENCES [dbo].[TestTable2] ([TestColumn2]) END");
         }
 
         [Test]
@@ -498,12 +546,31 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanDropForeignKeyWithCustomSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetDeleteForeignKeyExpressionIdempotent();
+            expression.ForeignKey.ForeignTableSchema = "TestSchema";
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF (OBJECT_ID('TestSchema.FK_Test', 'F') IS NOT NULL) BEGIN ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT [FK_Test] END");
+        }
+
+        [Test]
         public override void CanDropForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [FK_Test]");
+        }
+
+        [Test]
+        public void CanDropForeignKeyWithDefaultSchemaIdempotent()
+        {
+            var expression = GeneratorTestHelper.GetDeleteForeignKeyExpressionIdempotent();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("IF (OBJECT_ID('dbo.FK_Test', 'F') IS NOT NULL) BEGIN ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [FK_Test] END");
         }
 
         [Test]

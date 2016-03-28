@@ -40,6 +40,12 @@ namespace FluentMigrator.Builders.Rename.Column
             return this;
         }
 
+        public IRenameColumnTableSyntax CheckIfExists(bool enabled = true)
+        {
+            Expression.CheckIfExists = true;
+            return this;
+        }
+
         public IRenameColumnToSyntax InSchema(string schemaName)
         {
             Expression.SchemaName = schemaName;
