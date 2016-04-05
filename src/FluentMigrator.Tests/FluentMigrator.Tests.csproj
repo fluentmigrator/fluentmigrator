@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>FluentMigrator.Tests</RootNamespace>
     <AssemblyName>FluentMigrator.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <FileUpgradeFlags>
     </FileUpgradeFlags>
@@ -578,9 +578,6 @@
     <None Include="Resources\icuuc30.dll" />
     <None Include="Resources\msvcp80.dll" />
     <None Include="Resources\msvcr80.dll" />
-    <EmbeddedResource Include="EmbeddedResources\EmbeddedtestscriptWithParameters.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </EmbeddedResource>
     <Content Include="testscript-withparameters.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
