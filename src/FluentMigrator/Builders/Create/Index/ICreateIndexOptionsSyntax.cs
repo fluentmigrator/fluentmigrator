@@ -20,7 +20,7 @@ namespace FluentMigrator.Builders.Create.Index
 {
     public interface ICreateIndexOptionsSyntax
     {
-        ICreateIndexOnColumnSyntax Unique();
+        ICreateIndexUniqueOptionsSyntax Unique();
         ICreateIndexOnColumnSyntax NonClustered();
         ICreateIndexOnColumnSyntax Clustered();
     }
