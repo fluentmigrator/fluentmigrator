@@ -122,6 +122,7 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="Builders\Create\Index\ICreateIndexMoreColumnOptionsSyntax.cs" />
     <Compile Include="MigrationStage.cs" />
     <Compile Include="MaintenanceAttribute.cs" />
     <Compile Include="Builders\Alter\AlterExpressionRoot.cs" />

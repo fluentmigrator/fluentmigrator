@@ -25,6 +25,7 @@ namespace FluentMigrator.Builders.Create.Index
         ICreateIndexForTableSyntax,
         ICreateIndexOnColumnOrInSchemaSyntax,
         ICreateIndexColumnOptionsSyntax,
+        ICreateIndexMoreColumnOptionsSyntax,
         ICreateIndexOptionsSyntax
     {
         public IndexColumnDefinition CurrentColumn { get; set; }
@@ -58,13 +59,13 @@ namespace FluentMigrator.Builders.Create.Index
             return this;
         }
 
-        public ICreateIndexOnColumnSyntax Ascending()
+        public ICreateIndexMoreColumnOptionsSyntax Ascending()
         {
             CurrentColumn.Direction = Direction.Ascending;
             return this;
         }
 
-        public ICreateIndexOnColumnSyntax Descending()
+        public ICreateIndexMoreColumnOptionsSyntax Descending()
         {
             CurrentColumn.Direction = Direction.Descending;
             return this;
@@ -73,6 +74,24 @@ namespace FluentMigrator.Builders.Create.Index
         ICreateIndexOnColumnSyntax ICreateIndexColumnOptionsSyntax.Unique()
         {
             Expression.Index.IsUnique = true;
+            return this;
+        }
+
+        /// <summary>
+        /// Column should have unique values, but multiple rows with null values should be accepted.
+        /// </summary>
+        public ICreateIndexOnColumnSyntax UniqueWithNullsNotDistinct()
+        {
+            CurrentColumn.IsNullDistinct = false;
+            return this;
+        }
+
+        /// <summary>
+        /// Column should have unique values. Only one row with null value should be accepted (default for most known database engines).
+        /// </summary>
+        public ICreateIndexOnColumnSyntax UniqueWithNullsDistinct()
+        {
+            CurrentColumn.IsNullDistinct = true;
             return this;
         }
 

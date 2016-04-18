@@ -54,6 +54,20 @@ namespace FluentMigrator.Runner.Generators.Generic
             return string.Empty;
         }
 
+        public virtual string GetWithNullsDistinctString(IndexDefinition index)
+        {
+            if (index.Columns.Where(c => c.IsNullDistinct.HasValue).Any() && !index.IsUnique)
+            {
+                compatabilityMode.HandleCompatabilty("With nulls distinct can only be used for unique indexes");
+            }
+            else if (index.Columns.Where(c => c.IsNullDistinct.HasValue).Any())
+            {
+                compatabilityMode.HandleCompatabilty("With nulls distinct is not supported");
+            }
+
+            return string.Empty;
+        }
+
         /// <summary>
         /// Outputs a create table string
         /// </summary>

@@ -26,6 +26,10 @@ namespace FluentMigrator.Model
     {
         public virtual string Name { get; set; }
         public virtual Direction Direction { get; set; }
+        /// <summary>
+        /// Gets or sets whether or not a unique index should treat null values as distinct for this column.
+        /// </summary>
+        public bool? IsNullDistinct { get; set; }
 
         public virtual void CollectValidationErrors(ICollection<string> errors)
         {
