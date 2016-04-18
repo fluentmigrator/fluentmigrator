@@ -265,6 +265,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 indexIncludes[i] = Quoter.QuoteColumnName(includeDef.Name);
             }
 
+            GetWithNullsDistinctString(expression.Index);  // Runs validation and throws in strict mode
+
             return String.Format(CreateIndex
                 , GetUniqueString(expression)
                 , GetClusterTypeString(expression)

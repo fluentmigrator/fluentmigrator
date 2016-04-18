@@ -153,6 +153,8 @@ namespace FluentMigrator.Runner.Generators.Generic
                 }
             }
 
+            GetWithNullsDistinctString(expression.Index);  // Runs validation and throws in strict mode
+
             return String.Format(CreateIndex
                 , GetUniqueString(expression)
                 , GetClusterTypeString(expression)

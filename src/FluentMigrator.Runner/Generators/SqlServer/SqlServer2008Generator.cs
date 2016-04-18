@@ -42,21 +42,14 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 compatabilityMode.HandleCompatabilty("With nulls distinct can only be used for unique indexes");
             }
 
-            return string.Empty;
-        }
-
-        public override string Generate(CreateIndexExpression expression)
-        {
-            string sql = base.Generate(expression);
-
-            if (expression.Index.IsUnique)
+            if (index.IsUnique)
             {
                 bool isFirstColumn = true;
                 bool appendFilterToSql = false;
                 StringBuilder filterSql = new StringBuilder();
                 filterSql.AppendFormat(" WHERE");
 
-                foreach (var column in expression.Index.Columns)
+                foreach (var column in index.Columns)
                 {
                     if (column.IsNullDistinct.HasValue && column.IsNullDistinct.Value == false)
                     {
@@ -70,9 +63,17 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 }
 
                 if (appendFilterToSql)
-                    sql += filterSql.ToString();
+                    return filterSql.ToString();
             }
 
+            return string.Empty;
+        }
+
+        public override string Generate(CreateIndexExpression expression)
+        {
+            string sql = base.Generate(expression);
+            sql += GetWithNullsDistinctString(expression.Index);
+            
             return sql;
         }
 
