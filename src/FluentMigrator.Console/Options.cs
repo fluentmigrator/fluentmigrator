@@ -134,10 +134,7 @@ using System.Runtime.Serialization;
 using System.Security.Permissions;
 using System.Text;
 using System.Text.RegularExpressions;
-
-#if LINQ
 using System.Linq;
-#endif
 
 #if TEST
 using NDesk.Options;
@@ -149,6 +146,7 @@ namespace NDesk.Options
 namespace Mono.Options
 #endif
 {
+
     public class OptionValueCollection : IList, IList<string>
     {
 
@@ -836,9 +834,9 @@ namespace Mono.Options
                 return false;
 
             Option p;
-            if (Contains(n))
+            if (ContainsKey(n))
             {
-                p = this[n];
+                p = GetOptionForKey(n);
                 c.OptionName = f + n;
                 c.Option = p;
                 switch (p.OptionValueType)
@@ -862,6 +860,17 @@ namespace Mono.Options
                 return true;
 
             return false;
+        }
+
+        private bool ContainsKey(string key)
+        {
+            return this.SelectMany(op => op.Names.Select(n => n.ToLower())).Contains(key.ToLower());
+        }
+
+
+        private Option GetOptionForKey(string key)
+        {
+            return this.SingleOrDefault(op => op.Names.Select(n => n.ToLower()).Contains(key.ToLower()));
         }
 
         private void ParseValue(string option, OptionContext c)

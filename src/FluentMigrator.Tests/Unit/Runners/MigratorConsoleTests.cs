@@ -54,6 +54,26 @@ namespace FluentMigrator.Tests.Unit.Runners
 
         [Test]
         [Category("NotWorkingOnMono")]
+        public void CanInitMigratorConsoleWithValidArgumentsRegardlessOfCase()
+        {
+            var console = new MigratorConsole(
+                "/db", Database,
+                "/Connection", Connection,
+                "/target", Target,
+                "/namespace", "FluentMigrator.Tests.Integration.Migrations",
+                "/nested",
+                "/TASK", "migrate:up",
+                "/vErSiOn", "1");
+
+            console.Connection.ShouldBe(Connection);
+            console.Namespace.ShouldBe("FluentMigrator.Tests.Integration.Migrations");
+            console.NestedNamespaces.ShouldBeTrue();
+            console.Task.ShouldBe("migrate:up");
+            console.Version.ShouldBe(1);
+        }
+
+        [Test]
+        [Category("NotWorkingOnMono")]
         public void ConsoleAnnouncerHasMoreOutputWhenVerbose()
         {
             var sbNonVerbose = new StringBuilder();
