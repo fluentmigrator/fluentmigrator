@@ -101,21 +101,18 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
         }
 
-        public override DataSet ReadTableData(string schemaName, string tableName)
+        public override IDataReader ReadTableData(string schemaName, string tableName)
         {
             return Read("SELECT * FROM [{0}]", tableName);
         }
 
-        public override DataSet Read(string template, params object[] args)
+        public override IDataReader Read(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
 
-            var ds = new DataSet();
             using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
             {
-                var adapter = Factory.CreateDataAdapter(command);
-                adapter.Fill(ds);
-                return ds;
+                return command.ExecuteReader();
             }
         }
 

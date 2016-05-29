@@ -148,7 +148,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             }
         }
 
-        public override DataSet ReadTableData(string schemaName, string tableName)
+        public override IDataReader ReadTableData(string schemaName, string tableName)
         {
             if (tableName == null)
                 throw new ArgumentNullException("tableName");
@@ -159,7 +159,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             return Read("SELECT * FROM {0}.{1}", schemaName.ToUpper(), tableName.ToUpper());
         }
 
-        public override DataSet Read(string template, params object[] args)
+        public override IDataReader Read(string template, params object[] args)
         {
             if (template == null)
                 throw new ArgumentNullException("template");
@@ -169,9 +169,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             var result = new DataSet();
             using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
             {
-                var adapter = Factory.CreateDataAdapter(command);
-                adapter.Fill(result);
-                return result;
+                return command.ExecuteReader();
             }
         }
 

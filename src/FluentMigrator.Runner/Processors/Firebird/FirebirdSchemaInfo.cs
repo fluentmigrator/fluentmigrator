@@ -32,7 +32,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public string Name { get; private set; }
 
-        public TableInfo(DataRow drMeta)
+        public TableInfo(IDataReader drMeta)
         {
             Name = drMeta["rdb$relation_name"].ToString().Trim();
         }
@@ -41,7 +41,11 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             var quoter = new FirebirdQuoter();
             var fbTableName = quoter.ToFbObjectName(tableName);
-            return new TableInfo(processor.Read(query, AdoHelper.FormatValue(fbTableName)).Tables[0].Rows[0]);
+            using (var dr = processor.Read(query, AdoHelper.FormatValue(fbTableName))) 
+            {
+                dr.Read();
+                return new TableInfo(dr);
+            }
         }
     }
 
@@ -79,7 +83,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public int? FieldSubType { get; private set; }
         public string FieldTypeName { get; private set; }
 
-        private ColumnInfo(DataRow drColumn, FirebirdProcessor processor)
+        private ColumnInfo(IDataReader drColumn, FirebirdProcessor processor)
         {
             Name = AdoHelper.GetStringValue(drColumn["field_name"]).Trim();
             TableName = AdoHelper.GetStringValue(drColumn["relation_name"]).Trim();
@@ -95,11 +99,11 @@ namespace FluentMigrator.Runner.Processors.Firebird
         }
         public static List<ColumnInfo> Read(FirebirdProcessor processor, TableInfo table)
         {
-            using (DataSet ds = processor.Read(query, AdoHelper.FormatValue(table.Name)))
+            using (IDataReader ds = processor.Read(query, AdoHelper.FormatValue(table.Name)))
             {
                 List<ColumnInfo> rows = new List<ColumnInfo>();
-                foreach (DataRow dr in ds.Tables[0].Rows)
-                    rows.Add(new ColumnInfo(dr, processor));
+                while (ds.Read())
+                    rows.Add(new ColumnInfo(ds, processor));
                 return rows;
             }
         }
@@ -215,36 +219,37 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public List<string> Columns { get; private set; }
 
 
-        private IndexInfo(DataRow drIndex, FirebirdProcessor processor)
+        private IndexInfo(IDataReader drIndex, FirebirdProcessor processor)
         {
             Name = drIndex["rdb$index_name"].ToString().Trim();
             TableName = drIndex["rdb$relation_name"].ToString().Trim();
             IsUnique = drIndex["rdb$unique_flag"].ToString().Trim() == "1";
             IsAscending = drIndex["rdb$index_type"].ToString().Trim() == "0";
             Columns = new List<string>();
-            using (DataSet dsColumns = processor.Read(indexFieldQuery, AdoHelper.FormatValue(Name)))
+            using (IDataReader dsColumns = processor.Read(indexFieldQuery, AdoHelper.FormatValue(Name)))
             {
-                foreach (DataRow indexColumn in dsColumns.Tables[0].Rows)
-                    Columns.Add(indexColumn["rdb$field_name"].ToString().Trim());
+                while (dsColumns.Read())
+                    Columns.Add(dsColumns["rdb$field_name"].ToString().Trim());
             }
         }
 
         public static List<IndexInfo> Read(FirebirdProcessor processor, TableInfo table)
         {
-            using (DataSet ds = processor.Read(query, AdoHelper.FormatValue(table.Name)))
+            using (IDataReader ds = processor.Read(query, AdoHelper.FormatValue(table.Name)))
             {
                 List<IndexInfo> rows = new List<IndexInfo>();
-                foreach (DataRow dr in ds.Tables[0].Rows)
-                    rows.Add(new IndexInfo(dr, processor));
+                while (ds.Read())
+                    rows.Add(new IndexInfo(ds, processor));
                 return rows;
             }
         }
 
         public static IndexInfo Read(FirebirdProcessor processor, string indexName)
         {
-            using (DataSet ds = processor.Read(singleQuery, AdoHelper.FormatValue(indexName)))
+            using (IDataReader ds = processor.Read(singleQuery, AdoHelper.FormatValue(indexName)))
             {
-                return new IndexInfo(ds.Tables[0].Rows[0], processor);
+                ds.Read();
+                return new IndexInfo(ds, processor);
             }
         }
     }
@@ -268,7 +273,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public Rule UpdateRule { get; private set; }
         public Rule DeleteRule { get; private set; }
 
-        private ConstraintInfo(DataRow drConstraint, FirebirdProcessor processor)
+        private ConstraintInfo(IDataReader drConstraint, FirebirdProcessor processor)
         {
             Name = drConstraint["rdb$constraint_name"].ToString().Trim();
             IsPrimaryKey = drConstraint["rdb$constraint_type"].ToString().Trim() == "PRIMARY KEY";
@@ -279,12 +284,12 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
             if (IsForeignKey)
             {
-                using (DataSet dsForeign = processor.Read(colQuery, AdoHelper.FormatValue(Name)))
+                using (IDataReader dsForeign = processor.Read(colQuery, AdoHelper.FormatValue(Name)))
                 {
-                    DataRow drForeign = dsForeign.Tables[0].Rows[0];
-                    ForeignIndex = IndexInfo.Read(processor, drForeign["rdb$const_name_uq"].ToString().Trim());
-                    UpdateRule = GetForeignRule(drForeign["rdb$update_rule"]);
-                    DeleteRule = GetForeignRule(drForeign["rdb$delete_rule"]);
+                    dsForeign.Read();
+                    ForeignIndex = IndexInfo.Read(processor, dsForeign["rdb$const_name_uq"].ToString().Trim());
+                    UpdateRule = GetForeignRule(dsForeign["rdb$update_rule"]);
+                    DeleteRule = GetForeignRule(dsForeign["rdb$delete_rule"]);
                 }
             }
         }
@@ -310,11 +315,11 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public static List<ConstraintInfo> Read(FirebirdProcessor processor, TableInfo table)
         {
-            using (DataSet ds = processor.Read(query, AdoHelper.FormatValue(table.Name)))
+            using (IDataReader ds = processor.Read(query, AdoHelper.FormatValue(table.Name)))
             {
                 List<ConstraintInfo> rows = new List<ConstraintInfo>();
-                foreach (DataRow dr in ds.Tables[0].Rows)
-                    rows.Add(new ConstraintInfo(dr, processor));
+                while (ds.Read())
+                    rows.Add(new ConstraintInfo(ds, processor));
                 return rows;
             }
         }
@@ -337,7 +342,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public bool OnDelete { get { return Type == 5 || Type == 6; } }
         public TriggerEvent Event { get { return OnInsert ? TriggerEvent.Insert : OnUpdate ? TriggerEvent.Update : TriggerEvent.Delete; } }
 
-        private TriggerInfo(DataRow drTrigger, FirebirdProcessor processor)
+        private TriggerInfo(IDataReader drTrigger, FirebirdProcessor processor)
         {
             Name = drTrigger["rdb$trigger_name"].ToString().Trim();
             Sequence = AdoHelper.GetIntValue(drTrigger["rdb$trigger_sequence"]) ?? 0;
@@ -347,11 +352,11 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public static List<TriggerInfo> Read(FirebirdProcessor processor, TableInfo table)
         {
-            using (DataSet ds = processor.Read(query, AdoHelper.FormatValue(table.Name)))
+            using (IDataReader ds = processor.Read(query, AdoHelper.FormatValue(table.Name)))
             {
                 List<TriggerInfo> rows = new List<TriggerInfo>();
-                foreach (DataRow dr in ds.Tables[0].Rows)
-                    rows.Add(new TriggerInfo(dr, processor));
+                while (ds.Read())
+                    rows.Add(new TriggerInfo(ds, processor));
                 return rows;
             }
         }
@@ -365,21 +370,23 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public string Name { get; private set; }
         public int CurrentValue{get; private set;}
 
-        private SequenceInfo(DataRow drSequence, FirebirdProcessor processor)
+        private SequenceInfo(IDataReader drSequence, FirebirdProcessor processor)
         {
             Name = drSequence["rdb$generator_name"].ToString().Trim();
-            using (DataSet ds = processor.Read(queryValue, Name))
+            using (IDataReader ds = processor.Read(queryValue, Name))
             {
-                CurrentValue = AdoHelper.GetIntValue(ds.Tables[0].Rows[0]["gen_val"]) ?? 0;
+                ds.Read();
+                CurrentValue = AdoHelper.GetIntValue(ds["gen_val"]) ?? 0;
             }
         }
 
         public static SequenceInfo Read(FirebirdProcessor processor, string sequenceName)
         {
             var fbSequenceName = new FirebirdQuoter().ToFbObjectName(sequenceName);
-            using (DataSet ds = processor.Read(query, AdoHelper.FormatValue(fbSequenceName)))
+            using (IDataReader ds = processor.Read(query, AdoHelper.FormatValue(fbSequenceName)))
             {
-                return new SequenceInfo(ds.Tables[0].Rows[0], processor);
+                ds.Read();
+                return new SequenceInfo(ds, processor);
             }
         }
     }

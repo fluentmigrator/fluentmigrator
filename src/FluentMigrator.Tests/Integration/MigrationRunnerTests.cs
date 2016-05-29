@@ -985,9 +985,9 @@ namespace FluentMigrator.Tests.Integration
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
                     runner.Up(new TestCreateAndDropTableMigration());
-                    DataSet ds = processor.ReadTableData(null, "TestTable");
-                    ds.Tables[0].Rows.Count.ShouldBe(1);
-                    ds.Tables[0].Rows[0][1].ShouldBe("Test");
+                    DataTable ds = processor.ReadTableData(null, "TestTable").ToDataTable();
+                    ds.Rows.Count.ShouldBe(1);
+                    ds.Rows[0][1].ShouldBe("Test");
 
                     runner.Down(new TestCreateAndDropTableMigration());
 
@@ -1005,9 +1005,9 @@ namespace FluentMigrator.Tests.Integration
                     runner.Up(new TestCreateSchema());
 
                     runner.Up(new TestCreateAndDropTableMigrationWithSchema());
-                    DataSet ds = processor.ReadTableData("TestSchema", "TestTable");
-                    ds.Tables[0].Rows.Count.ShouldBe(1);
-                    ds.Tables[0].Rows[0][1].ShouldBe("Test");
+                    DataTable ds = processor.ReadTableData("TestSchema", "TestTable").ToDataTable();
+                    ds.Rows.Count.ShouldBe(1);
+                    ds.Rows[0][1].ShouldBe("Test");
 
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
 
@@ -1028,14 +1028,14 @@ namespace FluentMigrator.Tests.Integration
                     runner.Up(new TestCreateAndDropTableMigrationWithSchema());
 
                     runner.Up(new TestUpdateData());
-                    DataSet upDs = processor.ReadTableData("TestSchema", "TestTable");
-                    upDs.Tables[0].Rows.Count.ShouldBe(1);
-                    upDs.Tables[0].Rows[0][1].ShouldBe("Updated");
+                    DataTable upDs = processor.ReadTableData("TestSchema", "TestTable").ToDataTable();
+                    upDs.Rows.Count.ShouldBe(1);
+                    upDs.Rows[0][1].ShouldBe("Updated");
 
                     runner.Down(new TestUpdateData());
-                    DataSet downDs = processor.ReadTableData("TestSchema", "TestTable");
-                    downDs.Tables[0].Rows.Count.ShouldBe(1);
-                    downDs.Tables[0].Rows[0][1].ShouldBe("Test");
+                    DataTable downDs = processor.ReadTableData("TestSchema", "TestTable").ToDataTable();
+                    downDs.Rows.Count.ShouldBe(1);
+                    downDs.Rows[0][1].ShouldBe("Test");
 
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
 
@@ -1054,13 +1054,13 @@ namespace FluentMigrator.Tests.Integration
                     runner.Up(new TestCreateAndDropTableMigration());
 
                     runner.Up(new TestDeleteData());
-                    DataSet upDs = processor.ReadTableData(null, "TestTable");
-                    upDs.Tables[0].Rows.Count.ShouldBe(0);
+                    DataTable upDs = processor.ReadTableData(null, "TestTable").ToDataTable();
+                    upDs.Rows.Count.ShouldBe(0);
 
                     runner.Down(new TestDeleteData());
-                    DataSet downDs = processor.ReadTableData(null, "TestTable");
-                    downDs.Tables[0].Rows.Count.ShouldBe(1);
-                    downDs.Tables[0].Rows[0][1].ShouldBe("Test");
+                    DataTable downDs = processor.ReadTableData(null, "TestTable").ToDataTable();
+                    downDs.Rows.Count.ShouldBe(1);
+                    downDs.Rows[0][1].ShouldBe("Test");
 
                     runner.Down(new TestCreateAndDropTableMigration());
 
@@ -1080,13 +1080,13 @@ namespace FluentMigrator.Tests.Integration
                     runner.Up(new TestCreateAndDropTableMigrationWithSchema());
 
                     runner.Up(new TestDeleteDataWithSchema());
-                    DataSet upDs = processor.ReadTableData("TestSchema", "TestTable");
-                    upDs.Tables[0].Rows.Count.ShouldBe(0);
+                    DataTable upDs = processor.ReadTableData("TestSchema", "TestTable").ToDataTable();
+                    upDs.Rows.Count.ShouldBe(0);
 
                     runner.Down(new TestDeleteDataWithSchema());
-                    DataSet downDs = processor.ReadTableData("TestSchema", "TestTable");
-                    downDs.Tables[0].Rows.Count.ShouldBe(1);
-                    downDs.Tables[0].Rows[0][1].ShouldBe("Test");
+                    DataTable downDs = processor.ReadTableData("TestSchema", "TestTable").ToDataTable();
+                    downDs.Rows.Count.ShouldBe(1);
+                    downDs.Rows[0][1].ShouldBe("Test");
 
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
 

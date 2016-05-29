@@ -80,12 +80,11 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             {
                 AddTestData(table);
 
-                DataSet ds = Processor.Read("SELECT * FROM {0}", table.Name);
+                DataTable ds = Processor.Read("SELECT * FROM {0}", table.Name).ToDataTable();
 
                 ds.ShouldNotBeNull();
-                ds.Tables.Count.ShouldBe(1);
-                ds.Tables[0].Rows.Count.ShouldBe(3);
-                ds.Tables[0].Rows[2][0].ShouldBe(2);
+                ds.Rows.Count.ShouldBe(3);
+                ds.Rows[2][0].ShouldBe(2);
             }
         }
 
@@ -96,12 +95,11 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             {
                 AddTestData(table);
 
-                DataSet ds = Processor.ReadTableData(null, table.Name);
+                DataTable ds = Processor.ReadTableData(null, table.Name).ToDataTable();
 
                 ds.ShouldNotBeNull();
-                ds.Tables.Count.ShouldBe(1);
-                ds.Tables[0].Rows.Count.ShouldBe(3);
-                ds.Tables[0].Rows[2][0].ShouldBe(2);
+                ds.Rows.Count.ShouldBe(3);
+                ds.Rows[2][0].ShouldBe(2);
             }
         }
 
@@ -125,12 +123,11 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             {
                 AddTestData(table);
 
-                DataSet ds = Processor.Read("SELECT * FROM {0}", table.NameWithSchema);
+                DataTable ds = Processor.Read("SELECT * FROM {0}", table.NameWithSchema).ToDataTable();
 
                 ds.ShouldNotBeNull();
-                ds.Tables.Count.ShouldBe(1);
-                ds.Tables[0].Rows.Count.ShouldBe(3);
-                ds.Tables[0].Rows[2][0].ShouldBe(2);
+                ds.Rows.Count.ShouldBe(3);
+                ds.Rows[2][0].ShouldBe(2);
             }
         }
 
@@ -141,12 +138,11 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             {
                 AddTestData(table);
 
-                DataSet ds = Processor.ReadTableData("TestSchema", table.Name);
+                DataTable ds = Processor.ReadTableData("TestSchema", table.Name).ToDataTable();
 
                 ds.ShouldNotBeNull();
-                ds.Tables.Count.ShouldBe(1);
-                ds.Tables[0].Rows.Count.ShouldBe(3);
-                ds.Tables[0].Rows[2][0].ShouldBe(2);
+                ds.Rows.Count.ShouldBe(3);
+                ds.Rows[2][0].ShouldBe(2);
             }
         }
 

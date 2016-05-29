@@ -18,6 +18,7 @@
 
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Expressions;
+using System.Data;
 
 namespace FluentMigrator.Runner.Processors
 {
@@ -176,9 +177,9 @@ namespace FluentMigrator.Runner.Processors
         {
         }
 
-        public abstract System.Data.DataSet ReadTableData(string schemaName, string tableName);
+        public abstract IDataReader ReadTableData(string schemaName, string tableName);
 
-        public abstract System.Data.DataSet Read(string template, params object[] args);
+        public abstract IDataReader Read(string template, params object[] args);
 
         public abstract bool Exists(string template, params object[] args);
 

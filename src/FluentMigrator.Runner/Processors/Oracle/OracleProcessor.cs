@@ -156,7 +156,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             }
         }
 
-        public override DataSet ReadTableData(string schemaName, string tableName)
+        public override IDataReader ReadTableData(string schemaName, string tableName)
         {
             if (tableName == null)
                 throw new ArgumentNullException("tableName");
@@ -167,19 +167,16 @@ namespace FluentMigrator.Runner.Processors.Oracle
             return Read("SELECT * FROM {0}.{1}", Quoter.QuoteSchemaName(schemaName), Quoter.QuoteTableName(tableName));
         }
 
-        public override DataSet Read(string template, params object[] args)
+        public override IDataReader Read(string template, params object[] args)
         {
             if (template == null)
                 throw new ArgumentNullException("template");
 
             EnsureConnectionIsOpen();
 
-            var result = new DataSet();
             using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
             {
-                var adapter = Factory.CreateDataAdapter(command);
-                adapter.Fill(result);
-                return result;
+                return command.ExecuteReader();
             }
         }
 

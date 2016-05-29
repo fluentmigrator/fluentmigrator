@@ -52,8 +52,8 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
 
             Processor.TableExists("NOTUSED", "TestTable1");
 
-            var dataset = Processor.ReadTableData("NOTUSED", "TestTable1");
-            dataset.Tables[0].Rows.Count.ShouldBe(1);
+            var dataset = Processor.ReadTableData("NOTUSED", "TestTable1").ToDataTable();
+            dataset.Rows.Count.ShouldBe(1);
         }
 
         [Test]
@@ -65,8 +65,8 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
 
             Processor.TableExists("NOTUSED", "TestTable1");
 
-            var dataset = Processor.ReadTableData("NOTUSED", "TestTable1");
-            dataset.Tables[0].Rows.Count.ShouldBe(1);
+            var dataset = Processor.ReadTableData("NOTUSED", "TestTable1").ToDataTable();
+            dataset.Rows.Count.ShouldBe(1);
         }
 
         [Test]
@@ -78,8 +78,8 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
 
             Processor.TableExists("NOTUSED", "TestTable1");
 
-            var dataset = Processor.ReadTableData("NOTUSED", "TestTable1");
-            dataset.Tables[0].Rows.Count.ShouldBe(1);
+            var dataset = Processor.ReadTableData("NOTUSED", "TestTable1").ToDataTable();
+            dataset.Rows.Count.ShouldBe(1);
         }
 
         private void RecreateDatabase()
