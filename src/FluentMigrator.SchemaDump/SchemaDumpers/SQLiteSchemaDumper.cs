@@ -47,12 +47,12 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
             return Processor.Exists(template, args);
         }
 
-        public virtual DataSet ReadTableData(string tableName)
+        public virtual IDataReader ReadTableData(string tableName)
         {
             return Processor.Read("SELECT * FROM [{0}]", tableName);
         }
 
-        public virtual DataSet Read(string template, params object[] args)
+        public virtual IDataReader Read(string template, params object[] args)
         {
             return Processor.Read(template, args);
         }
@@ -67,12 +67,12 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
             var dtTable = GetTableNamesAndDDL();
             var tableDefinitionList = new List<TableDefinition>();
 
-            foreach (DataRow dr in dtTable.Rows)
+            while (dtTable.Read())
             {
                 var tableDef = new TableDefinition
                 {
-                    Name = dr["name"].ToString(),
-                    Columns = GetColumnDefinitionsForTableDDL(dr["sql"].ToString())
+                    Name = dtTable["name"].ToString(),
+                    Columns = GetColumnDefinitionsForTableDDL(dtTable["sql"].ToString())
                 };
                 tableDefinitionList.Add(tableDef);
             }
@@ -107,10 +107,10 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
         /// Get table names and their DDL from database
         /// </summary>
         /// <returns>DataTable with 2 columns ( string name, string sql)</returns>
-        public virtual DataTable GetTableNamesAndDDL()
+        public virtual IDataReader GetTableNamesAndDDL()
         {
             const string sqlCommand = @"SELECT name, sql FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'ORDER BY name;";
-            return Read(sqlCommand).Tables[0];
+            return Read(sqlCommand);
         }
 
         /// <summary>
@@ -120,10 +120,14 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
         /// <returns>Table DDL or string.empty if table not found</returns>
         public virtual string GetTableDDL(string tableName)
         {
-            foreach (DataRow row in GetTableNamesAndDDL().Rows)
+            using (var dr = GetTableNamesAndDDL()) 
             {
-                var name = row["name"].ToString();
-                if (name.ToUpper().Equals(tableName.ToUpper())) return row["sql"].ToString();
+                while (dr.Read()) 
+                {
+                    var name = dr["name"].ToString();
+                    if (name.ToUpper().Equals(tableName.ToUpper()))
+                        return dr["sql"].ToString();
+                }
             }
             return string.Empty;
         }
@@ -209,25 +213,25 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
         private List<ColumnDefinition> GetColumnDefinitionsForTableUsingPragma(string tableName)
         {
             var query = String.Format(@"PRAGMA table_info({0})", tableName);
-            var dtTables = Read(query).Tables[0];
+            var dtTables = Read(query);
 
             var columns = new List<ColumnDefinition>();
 
-            foreach (DataRow dr in dtTables.Rows)
+            while (dtTables.Read())
             {
                 columns.Add(new ColumnDefinition
                 {
-                    Name = dr["name"].ToString(),
+                    Name = dtTables["name"].ToString(),
                     //CustomType = "type", //TODO: set this property
-                    DefaultValue = dr["dflt_value"].ToString(),
-                    IsNullable = dr["notnull"].ToString() == "0",
-                    IsPrimaryKey = dr["IsPrimaryKey"].ToString() == "1",
+                    DefaultValue = dtTables["dflt_value"].ToString(),
+                    IsNullable = dtTables["notnull"].ToString() == "0",
+                    IsPrimaryKey = dtTables["IsPrimaryKey"].ToString() == "1",
                     //IsUnique = dr["IsUnique"].ToString() == "1",
                     //Precision = int.Parse( dr["Precision"].ToString() ),
                     //PrimaryKeyName = dr.IsNull( "PrimaryKeyName" ) ? "" : dr["PrimaryKeyName"].ToString(),
                     //Size = int.Parse( dr["Length"].ToString() ),
                     TableName = tableName,
-                    Type = GetDbType(dr["type"].ToString()), //TODO: set this property
+                    Type = GetDbType(dtTables["type"].ToString()), //TODO: set this property
                     ModificationType = ColumnModificationType.Create
                 });
             }
@@ -364,18 +368,18 @@ namespace FluentMigrator.SchemaDump.SchemaDumpers
         protected virtual IList<IndexDefinition> ReadIndexes(string schemaName, string tableName)
         {
             var sqlCommand = string.Format(@"SELECT type, name, sql FROM sqlite_master WHERE tbl_name = '{0}' AND type = 'index' AND name NOT LIKE 'sqlite_auto%';", tableName);
-            DataTable table = Read(sqlCommand).Tables[0];
+            IDataReader table = Read(sqlCommand);
 
             IList<IndexDefinition> indexes = new List<IndexDefinition>();
 
-            foreach (DataRow dr in table.Rows)
+            while (table.Read())
             {
-                var sql = dr["sql"].ToString();
+                var sql = table["sql"].ToString();
                 var upper = sql.ToUpper();
                 var columnsString = GetTextBeteenBrackets(sql);
                 var iDef = new IndexDefinition
                 {
-                    Name = dr["name"].ToString(),
+                    Name = table["name"].ToString(),
                     SchemaName = schemaName,
                     IsClustered = false,
                     IsUnique = upper.Contains("UNIQUE"),

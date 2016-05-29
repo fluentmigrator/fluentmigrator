@@ -116,7 +116,8 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             var expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
             expression.Columns.Add(column.Object);
             _processor.Process(expression);
-            _processor.ReadTableData(null, tableNameThanMustBeEscaped).Tables.Count.ShouldBe(1);
+            //_processor.ReadTableData(null, tableNameThanMustBeEscaped).Tables.Count.ShouldBe(1);
+            _processor.ReadTableData(null, tableNameThanMustBeEscaped).Read().ShouldBeTrue();
         }
 
         [Test]

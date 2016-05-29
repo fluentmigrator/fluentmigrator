@@ -29,8 +29,8 @@ namespace FluentMigrator
         string ConnectionString { get; }
 
         void Execute(string template, params object[] args);
-        DataSet ReadTableData(string schemaName, string tableName);
-        DataSet Read(string template, params object[] args);
+        IDataReader ReadTableData(string schemaName, string tableName);
+        IDataReader Read(string template, params object[] args);
         bool Exists(string template, params object[] args);
 
         void BeginTransaction();

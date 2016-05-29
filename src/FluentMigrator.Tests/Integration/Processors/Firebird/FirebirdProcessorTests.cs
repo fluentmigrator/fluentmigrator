@@ -52,12 +52,11 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 Processor.CheckTable(table.Name);
                 AddTestData(table);
 
-                using (DataSet ds = Processor.Read("SELECT * FROM {0}", Quoter.QuoteTableName(table.Name)))
+                using (DataTable ds = Processor.Read("SELECT * FROM {0}", Quoter.QuoteTableName(table.Name)).ToDataTable())
                 {
                     ds.ShouldNotBeNull();
-                    ds.Tables.Count.ShouldBe(1);
-                    ds.Tables[0].Rows.Count.ShouldBe(3);
-                    ds.Tables[0].Rows[2][0].ShouldBe(2);
+                    ds.Rows.Count.ShouldBe(3);
+                    ds.Rows[2][0].ShouldBe(2);
                 }
             }
         }
@@ -70,12 +69,11 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 Processor.CheckTable(table.Name);
                 AddTestData(table);
 
-                using (DataSet ds = Processor.ReadTableData(null, table.Name))
+                using (DataTable ds = Processor.ReadTableData(null, table.Name).ToDataTable())
                 {
                     ds.ShouldNotBeNull();
-                    ds.Tables.Count.ShouldBe(1);
-                    ds.Tables[0].Rows.Count.ShouldBe(3);
-                    ds.Tables[0].Rows[2][0].ShouldBe(2);
+                    ds.Rows.Count.ShouldBe(3);
+                    ds.Rows[2][0].ShouldBe(2);
                 }
             }
         }
@@ -103,12 +101,11 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 Processor.CheckTable(table.Name);
                 AddTestData(table);
 
-                using (DataSet ds = Processor.Read("SELECT * FROM {0}", Quoter.QuoteTableName(table.Name)))
+                using (DataTable ds = Processor.Read("SELECT * FROM {0}", Quoter.QuoteTableName(table.Name)).ToDataTable())
                 {
                     ds.ShouldNotBeNull();
-                    ds.Tables.Count.ShouldBe(1);
-                    ds.Tables[0].Rows.Count.ShouldBe(3);
-                    ds.Tables[0].Rows[2][0].ShouldBe(2);
+                    ds.Rows.Count.ShouldBe(3);
+                    ds.Rows[2][0].ShouldBe(2);
                 }
             }
         }
@@ -121,12 +118,11 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 Processor.CheckTable(table.Name);
                 AddTestData(table);
 
-                using (var ds = Processor.ReadTableData("TestSchema", table.Name))
+                using (var ds = Processor.ReadTableData("TestSchema", table.Name).ToDataTable())
                 {
                     ds.ShouldNotBeNull();
-                    ds.Tables.Count.ShouldBe(1);
-                    ds.Tables[0].Rows.Count.ShouldBe(3);
-                    ds.Tables[0].Rows[2][0].ShouldBe(2);
+                    ds.Rows.Count.ShouldBe(3);
+                    ds.Rows[2][0].ShouldBe(2);
                 }
             }
         }
@@ -162,11 +158,11 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                     Sequence = { Name = "Sequence", StartWith = 6 }
                 });
 
-                using (DataSet ds = Processor.Read("SELECT GEN_ID(\"Sequence\", 1) as generated_value FROM RDB$DATABASE"))
+                using (DataTable ds = Processor.Read("SELECT GEN_ID(\"Sequence\", 1) as generated_value FROM RDB$DATABASE").ToDataTable())
                 {
-                    ds.Tables[0].ShouldNotBeNull();
-                    ds.Tables[0].Rows[0].ShouldNotBeNull();
-                    ds.Tables[0].Rows[0]["generated_value"].ShouldBe(7);
+                    ds.ShouldNotBeNull();
+                    ds.Rows[0].ShouldNotBeNull();
+                    ds.Rows[0]["generated_value"].ShouldBe(7);
                 }
 
                 Processor.Process(new DeleteSequenceExpression { SequenceName = "Sequence" });
@@ -313,12 +309,11 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 insert.Rows.Add(item);
                 Processor.Process(insert);
 
-                using (DataSet ds = Processor.ReadTableData(String.Empty, table.Name))
+                using (DataTable ds = Processor.ReadTableData(String.Empty, table.Name).ToDataTable())
                 {
-                    ds.Tables.Count.ShouldBe(1);
-                    ds.Tables[0].Rows.Count.ShouldBe(1);
-                    ds.Tables[0].Rows[0]["BOGUS"].ShouldBe(0);
-                    ds.Tables[0].Rows[0]["id"].ShouldBe(1);
+                    ds.Rows.Count.ShouldBe(1);
+                    ds.Rows[0]["BOGUS"].ShouldBe(0);
+                    ds.Rows[0]["id"].ShouldBe(1);
                 }
                 
             }
@@ -347,16 +342,15 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 Processor.Process(insert);
                 Processor.Process(insert);
 
-                using (DataSet ds = Processor.ReadTableData(String.Empty, table.Name))
+                using (DataTable ds = Processor.ReadTableData(String.Empty, table.Name).ToDataTable())
                 {
-                    ds.Tables.Count.ShouldBe(1);
-                    ds.Tables[0].Rows.Count.ShouldBe(5);
-                    ds.Tables[0].Rows[0]["BOGUS"].ShouldBe(0);
-                    ds.Tables[0].Rows[0]["id"].ShouldBe(1);
-                    ds.Tables[0].Rows[1]["id"].ShouldBe(2);
-                    ds.Tables[0].Rows[2]["id"].ShouldBe(3);
-                    ds.Tables[0].Rows[3]["id"].ShouldBe(4);
-                    ds.Tables[0].Rows[4]["id"].ShouldBe(5);
+                    ds.Rows.Count.ShouldBe(5);
+                    ds.Rows[0]["BOGUS"].ShouldBe(0);
+                    ds.Rows[0]["id"].ShouldBe(1);
+                    ds.Rows[1]["id"].ShouldBe(2);
+                    ds.Rows[2]["id"].ShouldBe(3);
+                    ds.Rows[3]["id"].ShouldBe(4);
+                    ds.Rows[4]["id"].ShouldBe(5);
                 }
 
             }

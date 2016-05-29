@@ -1,5 +1,6 @@
 ﻿using System;
 using FluentMigrator.Runner.Initialization;
+using System.Data;
 
 namespace FluentMigrator.Runner.Processors
 {
@@ -28,12 +29,12 @@ namespace FluentMigrator.Runner.Processors
             Process(string.Format(template, args));
         }
 
-        public System.Data.DataSet ReadTableData(string schemaName, string tableName)
+        public IDataReader ReadTableData(string schemaName, string tableName)
         {
             throw new NotImplementedException("Method is not supported by the connectionless processor");
         }
 
-        public System.Data.DataSet Read(string template, params object[] args)
+        public IDataReader Read(string template, params object[] args)
         {
             throw new NotImplementedException("Method is not supported by the connectionless processor");
         }

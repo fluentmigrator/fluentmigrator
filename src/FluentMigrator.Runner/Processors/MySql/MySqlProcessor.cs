@@ -123,23 +123,20 @@ namespace FluentMigrator.Runner.Processors.MySql
             }
         }
 
-        public override DataSet ReadTableData(string schemaName, string tableName)
+        public override IDataReader ReadTableData(string schemaName, string tableName)
         {
             return Read("select * from {0}", quoter.QuoteTableName(tableName));
         }
 
-        public override DataSet Read(string template, params object[] args)
+        public override IDataReader Read(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
 
-            var ds = new DataSet();
             using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
             {
                 command.CommandTimeout = Options.Timeout;
 
-                var adapter = Factory.CreateDataAdapter(command);
-                adapter.Fill(ds);
-                return ds;
+                return command.ExecuteReader();
             }
         }
 
@@ -192,7 +189,12 @@ SELECT CONCAT(
   FROM INFORMATION_SCHEMA.COLUMNS
  WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'", FormatHelper.FormatSqlEscape(expression.TableName), FormatHelper.FormatSqlEscape(expression.OldName));
 
-            var columnDefinition = Read(columnDefinitionSql).Tables[0].Rows[0].Field<string>(0);
+            string columnDefinition;
+            using (var dr = Read(columnDefinitionSql)) 
+            {
+                dr.Read();
+                columnDefinition = (string)dr[0];
+            }
 
             Process(Generator.Generate(expression) + columnDefinition);
         }

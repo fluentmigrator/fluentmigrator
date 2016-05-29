@@ -50,7 +50,14 @@ namespace FluentMigrator.Runner.Processors.SQLite
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
             var dataSet = Read("PRAGMA table_info([{0}])", tableName);
-            return dataSet.Tables.Count > 0 && dataSet.Tables[0].Select(string.Format("Name='{0}'", columnName.Replace("'", "''"))).Length > 0;
+            while (dataSet.Read()) 
+            {
+                if (dataSet["Name"].ToString() == columnName) {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
@@ -93,7 +100,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
             }
         }
 
-        public override DataSet ReadTableData(string schemaName, string tableName)
+        public override IDataReader ReadTableData(string schemaName, string tableName)
         {
             return Read("select * from [{0}]", tableName);
         }
@@ -186,16 +193,13 @@ namespace FluentMigrator.Runner.Processors.SQLite
             }
         }
 
-        public override DataSet Read(string template, params object[] args)
+        public override IDataReader Read(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
 
-            var ds = new DataSet();
             using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
             {
-                var adapter = Factory.CreateDataAdapter(command);
-                adapter.Fill(ds);
-                return ds;
+                return command.ExecuteReader();
             }
         }
     }

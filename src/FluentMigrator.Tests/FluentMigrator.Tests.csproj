@@ -169,6 +169,7 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="DataReaderExtensions.cs" />
     <Compile Include="Helpers\Db2TestTable.cs" />
     <Compile Include="Helpers\FirebirdTestTable.cs" />
     <Compile Include="Helpers\JetTestTable.cs" />
