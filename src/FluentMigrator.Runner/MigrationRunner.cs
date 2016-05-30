@@ -130,22 +130,32 @@ namespace FluentMigrator.Runner
 
             using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
-                ApplyMaintenance(MigrationStage.BeforeAll, useAutomaticTransactionManagement);
-
-                foreach (var pair in migrations)
+                try
                 {
-                    ApplyMaintenance(MigrationStage.BeforeEach, useAutomaticTransactionManagement);
-                    ApplyMigrationUp(pair.Value, useAutomaticTransactionManagement && pair.Value.TransactionBehavior == TransactionBehavior.Default);
-                    ApplyMaintenance(MigrationStage.AfterEach, useAutomaticTransactionManagement);
+                    ApplyMaintenance(MigrationStage.BeforeAll, useAutomaticTransactionManagement);
+
+                    foreach (var pair in migrations)
+                    {
+                        ApplyMaintenance(MigrationStage.BeforeEach, useAutomaticTransactionManagement);
+                        ApplyMigrationUp(pair.Value, useAutomaticTransactionManagement && pair.Value.TransactionBehavior == TransactionBehavior.Default);
+                        ApplyMaintenance(MigrationStage.AfterEach, useAutomaticTransactionManagement);
+                    }
+
+                    ApplyMaintenance(MigrationStage.BeforeProfiles, useAutomaticTransactionManagement);
+
+                    ApplyProfiles();
+
+                    ApplyMaintenance(MigrationStage.AfterAll, useAutomaticTransactionManagement);
+
+                    scope.Complete();
                 }
+                catch
+                {
+                    if (scope.IsActive)
+                        scope.Cancel();  // SQLAnywhere needs explicit call to rollback transaction
 
-                ApplyMaintenance(MigrationStage.BeforeProfiles, useAutomaticTransactionManagement);
-
-                ApplyProfiles();
-
-                ApplyMaintenance(MigrationStage.AfterAll, useAutomaticTransactionManagement);
-
-                scope.Complete();
+                    throw;
+                }
             }
 
             VersionLoader.LoadVersionInfo();
@@ -161,14 +171,24 @@ namespace FluentMigrator.Runner
             var migrationInfos = GetUpMigrationsToApply(targetVersion);
             using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
-                foreach (var migrationInfo in migrationInfos)
+                try
                 {
-                    ApplyMigrationUp(migrationInfo, useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
+                    foreach (var migrationInfo in migrationInfos)
+                    {
+                        ApplyMigrationUp(migrationInfo, useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
+                    }
+
+                    ApplyProfiles();
+
+                    scope.Complete();
                 }
+                catch
+                {
+                    if (scope.IsActive)
+                        scope.Cancel();  // SQLAnywhere needs explicit call to rollback transaction
 
-                ApplyProfiles();
-
-                scope.Complete();
+                    throw;
+                }
             }
 
             VersionLoader.LoadVersionInfo();
@@ -204,14 +224,24 @@ namespace FluentMigrator.Runner
 
             using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
-                foreach (var migrationInfo in migrationInfos)
+                try
                 {
-                    ApplyMigrationDown(migrationInfo, useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
+                    foreach (var migrationInfo in migrationInfos)
+                    {
+                        ApplyMigrationDown(migrationInfo, useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
+                    }
+
+                    ApplyProfiles();
+
+                    scope.Complete();
                 }
+                catch
+                {
+                    if (scope.IsActive)
+                        scope.Cancel();  // SQLAnywhere needs explicit call to rollback transaction
 
-                ApplyProfiles();
-
-                scope.Complete();
+                    throw;
+                }
             }
 
             VersionLoader.LoadVersionInfo();
@@ -259,14 +289,24 @@ namespace FluentMigrator.Runner
 
                 using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useTransaction))
                 {
-                    ExecuteMigration(migrationInfo.Migration, (m, c) => m.GetUpExpressions(c));
-                    
-                    if (migrationInfo.IsAttributed())
+                    try
                     {
-                        VersionLoader.UpdateVersionInfo(migrationInfo.Version, migrationInfo.Description ?? migrationInfo.Migration.GetType().Name);
+                        ExecuteMigration(migrationInfo.Migration, (m, c) => m.GetUpExpressions(c));
+
+                        if (migrationInfo.IsAttributed())
+                        {
+                            VersionLoader.UpdateVersionInfo(migrationInfo.Version, migrationInfo.Description ?? migrationInfo.Migration.GetType().Name);
+                        }
+
+                        scope.Complete();
                     }
-                    
-                    scope.Complete();
+                    catch
+                    {
+                        if (useTransaction && scope.IsActive)
+                            scope.Cancel();  // SQLAnywhere needs explicit call to rollback transaction
+
+                        throw;
+                    }
 
                     _stopWatch.Stop();
 
@@ -287,10 +327,20 @@ namespace FluentMigrator.Runner
 
             using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useTransaction))
             {
-                ExecuteMigration(migrationInfo.Migration, (m, c) => m.GetDownExpressions(c));
-                if (migrationInfo.IsAttributed()) VersionLoader.DeleteVersion(migrationInfo.Version);
-                
-                scope.Complete();
+                try
+                {
+                    ExecuteMigration(migrationInfo.Migration, (m, c) => m.GetDownExpressions(c));
+                    if (migrationInfo.IsAttributed()) VersionLoader.DeleteVersion(migrationInfo.Version);
+
+                    scope.Complete();
+                }
+                catch
+                {
+                    if (useTransaction && scope.IsActive)
+                        scope.Cancel();  // SQLAnywhere needs explicit call to rollback transaction
+
+                    throw;
+                }
 
                 _stopWatch.Stop();
 
@@ -317,12 +367,22 @@ namespace FluentMigrator.Runner
 
             using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
-                foreach (IMigrationInfo migrationInfo in migrationsToRollback.Take(steps))
+                try
                 {
-                    ApplyMigrationDown(migrationInfo, useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
+                    foreach (IMigrationInfo migrationInfo in migrationsToRollback.Take(steps))
+                    {
+                        ApplyMigrationDown(migrationInfo, useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
+                    }
+
+                    scope.Complete();
                 }
-            
-                scope.Complete();
+                catch
+                {
+                    if (scope.IsActive)
+                        scope.Cancel();  // SQLAnywhere needs explicit call to rollback transaction
+
+                    throw;
+                }
             }
 
             VersionLoader.LoadVersionInfo();
@@ -349,14 +409,24 @@ namespace FluentMigrator.Runner
 
             using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
-                foreach (IMigrationInfo migrationInfo in migrationsToRollback)
+                try
                 {
-                    if (version >= migrationInfo.Version) continue;
+                    foreach (IMigrationInfo migrationInfo in migrationsToRollback)
+                    {
+                        if (version >= migrationInfo.Version) continue;
 
-                    ApplyMigrationDown(migrationInfo, useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
+                        ApplyMigrationDown(migrationInfo, useAutomaticTransactionManagement && migrationInfo.TransactionBehavior == TransactionBehavior.Default);
+                    }
+
+                    scope.Complete();
                 }
-                
-                scope.Complete();
+                catch
+                {
+                    if (scope.IsActive)
+                        scope.Cancel();  // SQLAnywhere needs explicit call to rollback transaction
+
+                    throw;
+                }
             }
 
             VersionLoader.LoadVersionInfo();
