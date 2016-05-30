@@ -511,7 +511,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="FluentMigrator.snk" />
     <None Include="Resources\aliases.conf" />
     <None Include="Resources\firebird.conf" />
     <None Include="Resources\firebird.msg" />
@@ -571,6 +570,9 @@
     <EmbeddedResource Include="EmbeddedResources\B\NotUniqueResource.sql" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\FluentMigrator.snk">
+      <Link>FluentMigrator.snk</Link>
+    </None>
     <None Include="Resources\fbembed.dll" />
     <None Include="Resources\ib_util.dll" />
     <None Include="Resources\icudt30.dll" />
