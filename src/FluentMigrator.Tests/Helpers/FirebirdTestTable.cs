@@ -11,9 +11,18 @@ namespace FluentMigrator.Tests.Helpers
     {
         private readonly FirebirdQuoter quoter = new FirebirdQuoter();
         private readonly FirebirdProcessor processor;
-        public FbConnection Connection { get; private set; }
+
+        public FbConnection Connection
+        {
+            get { return (FbConnection)processor.Connection; }
+        }
+
         public string Name { get; set; }
-        public FbTransaction Transaction { get; private set; }
+
+        public FbTransaction Transaction
+        {
+            get { return (FbTransaction)processor.Transaction; }
+        }
 
         public FirebirdTestTable(FirebirdProcessor processor, string schemaName, params string[] columnDefinitions)
         {
@@ -32,9 +41,6 @@ namespace FluentMigrator.Tests.Helpers
 
         private void Init(FirebirdProcessor processor, IEnumerable<string> columnDefinitions)
         {
-            Connection = (FbConnection)processor.Connection;
-            Transaction = (FbTransaction)processor.Transaction;
-
             Create(columnDefinitions);
         }
 

@@ -76,6 +76,7 @@ namespace FluentMigrator.Runner.Processors
 
             Announcer.Say("Rolling back transaction");
             Transaction.Rollback();
+            Transaction.Dispose();
             WasCommitted = true;
             Transaction = null;
         }
@@ -86,6 +87,7 @@ namespace FluentMigrator.Runner.Processors
 
             Announcer.Say("Committing Transaction");
             Transaction.Commit();
+            Transaction.Dispose();
             WasCommitted = true;
             Transaction = null;
         }
