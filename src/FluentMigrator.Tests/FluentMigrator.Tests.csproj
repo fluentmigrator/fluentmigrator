@@ -302,6 +302,7 @@
     <Compile Include="Unit\Announcers\TextWriterAnnouncerTests.cs" />
     <Compile Include="Unit\Announcers\TextWriterWithGoAnnouncerTests.cs" />
     <Compile Include="Unit\AssemblyLoader\AssemblyLoaderTests.cs" />
+    <Compile Include="Unit\AutoReversingMigrationTests.cs" />
     <Compile Include="Unit\Builders\Alter\AlterColumnExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Alter\AlterExpressionRootTests.cs" />
     <Compile Include="Unit\Builders\Alter\AlterTableExpressionBuilderTests.cs" />
