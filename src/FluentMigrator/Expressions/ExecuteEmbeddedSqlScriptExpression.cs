@@ -45,7 +45,6 @@ namespace FluentMigrator.Expressions
                 .Take(sqlScriptParts.Length)
                 .SequenceEqual(sqlScriptParts, StringComparer.InvariantCultureIgnoreCase);
 
-            string result = null;
             var foundResources = resources.Where(isNameMatch).ToArray();
 
             if (foundResources.Length == 0)

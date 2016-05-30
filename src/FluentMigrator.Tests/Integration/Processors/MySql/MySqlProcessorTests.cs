@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Runner.Announcers;
@@ -15,6 +16,8 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
     public class MySqlProcessorTests
     {
         protected MySqlProcessor Processor;
+
+        [CLSCompliant(false)]
         protected MySqlConnection Connection;
 
         [SetUp]

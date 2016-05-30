@@ -5,6 +5,7 @@ namespace FluentMigrator
     /// <summary>
     /// Creates a MigrationAttribute which executes in order based on the given date and time.
     /// </summary>
+    [CLSCompliant(false)]
     public class TimestampedMigrationAttribute : MigrationAttribute
     {
         private static readonly int[] DaysToMonth365 =
@@ -82,6 +83,7 @@ namespace FluentMigrator
         /// <param name="hour">The hour the migration was created.</param>
         /// <param name="minute">The minute the migration was created.</param>
         /// <param name="transactionBehavior">The <see cref="FluentMigrator.TransactionBehavior"/> the migration will use.</param>
+        [CLSCompliant(false)]
         public TimestampedMigrationAttribute(ushort year, ushort month, ushort day, ushort hour, ushort minute, TransactionBehavior transactionBehavior)
             : base(DateTimeToFormattedInt(year, month, day, hour, minute, 0), transactionBehavior)
         {

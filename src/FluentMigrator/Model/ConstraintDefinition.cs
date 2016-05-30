@@ -12,6 +12,8 @@ namespace FluentMigrator.Model
 
     public class ConstraintDefinition : ICloneable, ICanBeConventional, ICanBeValidated, ISupportAdditionalFeatures
     {
+        [CLSCompliant(false)]
+        [Obsolete("Use the AdditionalFeatures property instead")]
         public readonly Dictionary<string, object> _additionalFeatures = new Dictionary<string, object>();
 
         private ConstraintType constraintType;
@@ -79,7 +81,9 @@ namespace FluentMigrator.Model
 
         public IDictionary<string, object> AdditionalFeatures
         {
+#pragma warning disable 618
             get { return _additionalFeatures; }
+#pragma warning restore 618
         }
 
         void ISupportAdditionalFeatures.AddAdditionalFeature(string feature, object value)

@@ -19,7 +19,7 @@ using System;
 namespace FluentMigrator.Helpers
 {
     /// <summary>
-    /// A pre-.NET4 Lazy<T> implementation
+    /// A pre-.NET4 Lazy{T} implementation
     /// </summary>
     internal class LazyLoader<T> where T : class
     {
