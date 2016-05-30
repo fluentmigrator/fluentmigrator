@@ -144,7 +144,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 });
 
                 Processor.SequenceExists("", "\"Sequence\"").ShouldBeTrue();
-                Processor.SequenceExists("", "Sequence").ShouldBeFalse();
+                Processor.SequenceExists("", "Sequence").ShouldBeTrue();
                 
                 Processor.Process(new DeleteSequenceExpression { SequenceName = "Sequence" });
 
