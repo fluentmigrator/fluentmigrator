@@ -20,13 +20,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 		[SetUp]
 		public void SetUp()
 		{
-            if (System.IO.File.Exists("fbtest.fdb"))
-            {
-                FbConnection.ClearAllPools();
-                FbConnection.DropDatabase(IntegrationTestOptions.Firebird.ConnectionString);
-            }
-
-            FbConnection.CreateDatabase(IntegrationTestOptions.Firebird.ConnectionString);
+            FbDatabase.CreateDatabase(IntegrationTestOptions.Firebird.ConnectionString);
 
 			_connection = new FbConnection(IntegrationTestOptions.Firebird.ConnectionString);
 			_processor = MakeProcessor();
@@ -41,8 +35,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 				_processor.CommitTransaction();
 			_connection.Close();
 
-			FbConnection.ClearPool(_connection);
-			FbConnection.DropDatabase(IntegrationTestOptions.Firebird.ConnectionString);
+            FbDatabase.DropDatabase(IntegrationTestOptions.Firebird.ConnectionString);
 		}
 
 		[Test]
