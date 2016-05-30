@@ -33,4 +33,3 @@ src/FluentMigrator.T4.Tests/IntialMigrationCode.cs
 #StyleCop
 *.StyleCop
 /TestResults
-/packages/SqlServerCompact.4.0.8482.1
