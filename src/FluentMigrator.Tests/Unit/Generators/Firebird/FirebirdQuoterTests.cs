@@ -58,6 +58,13 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             actual.ShouldBe(quoteArg);
         }
 
+        [TestCase("_test")]
+        public void Quote_ArgBeginsWithUnderscore_ArgShouldBeQuoted(string quoteArg)
+        {
+            var actual = new FirebirdQuoter().Quote(quoteArg);
+            actual.ShouldBe(string.Format("\"{0}\"", quoteArg));
+        }
+
         [Test, SetCulture("tr-TR")]
         public void Quote_PassesTurkishTest()
         {
