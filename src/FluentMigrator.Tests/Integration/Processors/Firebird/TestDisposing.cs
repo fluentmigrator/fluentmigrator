@@ -12,7 +12,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
 	[TestFixture]
 	[Category("Integration")]
-	public class TestDisposing
+    [Category("Firebird")]
+    public class TestDisposing
 	{
 		private FbConnection _connection;
 		private FirebirdProcessor _processor;

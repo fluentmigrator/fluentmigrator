@@ -11,6 +11,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
     [TestFixture]
     [Category("Integration")]
+    [Category("Firebird")]
     public class FirebirdConstraintTests : BaseConstraintTests
     {
         public FbConnection Connection { get; set; }

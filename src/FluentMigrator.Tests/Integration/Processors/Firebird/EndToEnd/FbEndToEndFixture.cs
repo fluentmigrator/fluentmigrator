@@ -7,6 +7,8 @@ using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
 {
+    [Category("Integration")]
+    [Category("Firebird")]
     public class FbEndToEndFixture
     {
         [SetUp]
