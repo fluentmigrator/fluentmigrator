@@ -31,7 +31,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var statements = descriptionGenerator.GenerateDescriptionStatements(createTableExpression).ToArray();
 
             var result = string.Join(";", statements);
-            result.ShouldBe("COMMENT ON TABLE TestTable1 IS 'TestDescription';COMMENT ON COLUMN TestTable1.TestColumn1 IS 'TestColumn1Description';COMMENT ON COLUMN TestTable1.TestColumn2 IS 'TestColumn2Description'");
+            result.ShouldBe(
+                "COMMENT ON TABLE TestTable1 IS 'TestDescription';COMMENT ON COLUMN TestTable1.TestColumn1 IS 'TestColumn1Description';COMMENT ON COLUMN TestTable1.TestColumn2 IS 'TestColumn2Description'");
         }
 
         [Test]
@@ -59,6 +60,17 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var statement = descriptionGenerator.GenerateDescriptionStatement(alterColumnExpression);
 
             statement.ShouldBe("COMMENT ON COLUMN TestTable1.TestColumn1 IS 'TestColumn1Description'");
+        }
+
+        [Test]
+        public void GenerateDescriptionStatementsWithSingleQuoteForCreateTableReturnTableDescriptionStatement()
+        {
+            var createTableExpression = GeneratorTestHelper.GetCreateTableWithTableDescription();
+            createTableExpression.TableDescription = "Test Description with single quote (') character here >> '";
+            var statements = descriptionGenerator.GenerateDescriptionStatements(createTableExpression);
+
+            var result = statements.First();
+            result.ShouldBe("COMMENT ON TABLE TestTable1 IS 'Test Description with single quote ('') character here >> '''");
         }
     }
 }
