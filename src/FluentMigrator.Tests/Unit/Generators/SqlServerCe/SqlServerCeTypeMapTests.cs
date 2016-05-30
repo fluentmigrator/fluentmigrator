@@ -1,8 +1,11 @@
-﻿using FluentMigrator.Runner.Generators;
-using NUnit.Framework;
-using Shouldly;
-using System;
+﻿using System;
 using System.Data;
+
+using FluentMigrator.Runner.Generators.SqlServer;
+
+using NUnit.Framework;
+
+using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 {
@@ -43,10 +46,10 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 
             [Test]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
-            public void it_throws_if_ansistring_has_size_above_4000(int size)
+            public void it_maps_ansistring_with_max_size_to_ntext()
             {
-                Should.Throw<NotSupportedException>(
-                    () => TypeMap.GetTypeMap(DbType.AnsiString, 4001, 0));
+                var template = TypeMap.GetTypeMap(DbType.AnsiString, int.MaxValue, 0);
+                template.ShouldBe("NTEXT");
             }
         }
 
@@ -108,7 +111,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 
             [Test]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
-            public void it_throws_if_string_has_size_above_4000(int size)
+            public void it_throws_if_string_has_size_above_4000()
             {
                 Should.Throw<NotSupportedException>(
                     () => TypeMap.GetTypeMap(DbType.AnsiStringFixedLength, 4001, 0));
