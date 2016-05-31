@@ -18,6 +18,25 @@ Latest build status: !http://teamcity.codebetter.com/app/rest/builds/buildType:(
 Our Mono build is hosted on Travis CI.
 Latest Mono build status: !https://secure.travis-ci.org/schambers/fluentmigrator.png!:http://travis-ci.org/schambers/fluentmigrator
 
+h2. Build instructions
+
+h3. Prerequisites
+
+* Ruby 2.2.4
+
+Gems:
+
+* Rake 10.5.0
+* albacore
+* version_bumper
+
+h3. Creating the nuget packages
+
+bc. tools\NuGet.exe restore FluentMigrator.sln
+rake nuget:create_nugets
+
+This will also build the whole solution.
+
 h2. Powered by
 
 <img src="http://www.jetbrains.com/img/logos/logo_resharper_small.gif" width="142" height="29" alt="ReSharper">
