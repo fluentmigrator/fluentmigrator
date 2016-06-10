@@ -40,13 +40,13 @@ namespace FluentMigrator.Runner.Generators.MySql
             SetTypeMap(DbType.Int32, "INTEGER");
             SetTypeMap(DbType.Int64, "BIGINT");
             SetTypeMap(DbType.Single, "FLOAT");
-            SetTypeMap(DbType.StringFixedLength, "CHAR(255)");
-            SetTypeMap(DbType.StringFixedLength, "CHAR($size)", StringCapacity);
+            SetTypeMap(DbType.StringFixedLength, "NCHAR(255)");
+            SetTypeMap(DbType.StringFixedLength, "NCHAR($size)", StringCapacity);
             SetTypeMap(DbType.StringFixedLength, "TEXT", TextCapacity);
             SetTypeMap(DbType.StringFixedLength, "MEDIUMTEXT", MediumTextCapacity);
             SetTypeMap(DbType.StringFixedLength, "LONGTEXT", LongTextCapacity);
-            SetTypeMap(DbType.String, "VARCHAR(255)");
-            SetTypeMap(DbType.String, "VARCHAR($size)", TextCapacity);
+            SetTypeMap(DbType.String, "NVARCHAR(255)");
+            SetTypeMap(DbType.String, "NVARCHAR($size)", TextCapacity);
             SetTypeMap(DbType.String, "MEDIUMTEXT", MediumTextCapacity);
             SetTypeMap(DbType.String, "LONGTEXT", LongTextCapacity);
             SetTypeMap(DbType.Time, "DATETIME");
