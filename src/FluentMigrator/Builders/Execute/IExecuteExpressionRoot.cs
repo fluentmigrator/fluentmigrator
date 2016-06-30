@@ -25,6 +25,7 @@ namespace FluentMigrator.Builders.Execute
     public interface IExecuteExpressionRoot : IFluentSyntax
     {
         void Sql(string sqlStatement);
+        void Sql(string sqlStatement, bool sayStatement);
         void Script(string pathToSqlScript);
         void WithConnection(Action<IDbConnection, IDbTransaction> operation);
         void EmbeddedScript(string EmbeddedSqlScriptName);
