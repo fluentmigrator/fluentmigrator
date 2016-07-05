@@ -134,7 +134,7 @@ namespace FluentMigrator.Runner
             return new InsertionDataDefinition
             {
                 new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version),
-                new KeyValuePair<string, object>(VersionTableMetaData.AppliedOnColumnName, RawSql.Insert("GETDATE()")),
+                new KeyValuePair<string, object>(VersionTableMetaData.AppliedOnColumnName, RawSql.Insert("CURRENT_TIMESTAMP")),
                 new KeyValuePair<string, object>(VersionTableMetaData.DescriptionColumnName, description)
             };
         }
