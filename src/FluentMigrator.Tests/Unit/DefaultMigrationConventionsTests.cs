@@ -181,7 +181,7 @@ namespace FluentMigrator.Tests.Unit
         public class TypeHasMatchingTags
         {
             [Fact]
-            [Category("Tagging")]
+            [Trait("Category", "Tagging")]
             public void WhenTypeHasTagAttributeButNoTagsPassedInReturnsFalse()
             {
                 DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithUk), new string[] { })
@@ -189,7 +189,7 @@ namespace FluentMigrator.Tests.Unit
             }
 
             [Fact]
-            [Category("Tagging")]
+            [Trait("Category", "Tagging")]
             public void WhenTypeHasTagAttributeWithNoTagNamesReturnsFalse()
             {
                 DefaultMigrationConventions.TypeHasMatchingTags(typeof(HasTagAttributeWithNoTagNames), new string[] { })
@@ -197,7 +197,7 @@ namespace FluentMigrator.Tests.Unit
             }
 
             [Fact]
-            [Category("Tagging")]
+            [Trait("Category", "Tagging")]
             public void WhenTypeHasOneTagThatDoesNotMatchSingleThenTagReturnsFalse()
             {
                 DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "IE" })
@@ -205,7 +205,7 @@ namespace FluentMigrator.Tests.Unit
             }
 
             [Fact]
-            [Category("Tagging")]
+            [Trait("Category", "Tagging")]
             public void WhenTypeHasOneTagThatDoesMatchSingleTagThenReturnsTrue()
             {
                 DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "UK" })
@@ -213,7 +213,7 @@ namespace FluentMigrator.Tests.Unit
             }
 
             [Fact]
-            [Category("Tagging")]
+            [Trait("Category", "Tagging")]
             public void WhenTypeHasOneTagThatPartiallyMatchesTagThenReturnsFalse()
             {
                 DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "UK2" })
@@ -221,7 +221,7 @@ namespace FluentMigrator.Tests.Unit
             }
 
             [Fact]
-            [Category("Tagging")]
+            [Trait("Category", "Tagging")]
             public void WhenTypeHasOneTagThatDoesMatchMultipleTagsThenReturnsFalse()
             {
                 DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "UK", "Production" })
@@ -229,7 +229,7 @@ namespace FluentMigrator.Tests.Unit
             }
 
             [Fact]
-            [Category("Tagging")]
+            [Trait("Category", "Tagging")]
             public void WhenTypeHasTagsInTwoAttributeThatDoesMatchSingleTagThenReturnsTrue()
             {
                 DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributes), new[] { "UK" })
@@ -237,7 +237,7 @@ namespace FluentMigrator.Tests.Unit
             }
 
             [Fact]
-            [Category("Tagging")]
+            [Trait("Category", "Tagging")]
             public void WhenTypeHasTagsInTwoAttributesThatDoesMatchMultipleTagsThenReturnsTrue()
             {
                 DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributes), new[] { "UK", "Production" })
@@ -245,7 +245,7 @@ namespace FluentMigrator.Tests.Unit
             }
 
             [Fact]
-            [Category("Tagging")]
+            [Trait("Category", "Tagging")]
             public void WhenTypeHasTagsInOneAttributeThatDoesMatchMultipleTagsThenReturnsTrue()
             {
                 DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInOneTagsAttribute), new[] { "UK", "Production" })
@@ -253,7 +253,7 @@ namespace FluentMigrator.Tests.Unit
             }
 
             [Fact]
-            [Category("Tagging")]
+            [Trait("Category", "Tagging")]
             public void WhenTypeHasTagsInTwoAttributesThatDontNotMatchMultipleTagsThenReturnsFalse()
             {
                 DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributes), new[] { "UK", "IE" })
@@ -261,7 +261,7 @@ namespace FluentMigrator.Tests.Unit
             }
 
             [Fact]
-            [Category("Tagging")]
+            [Trait("Category", "Tagging")]
             public void WhenBaseTypeHasTagsThenConcreteTypeReturnsTrue()
             {
                 DefaultMigrationConventions.TypeHasMatchingTags(typeof(ConcretehasTagAttribute), new[] { "UK" })
