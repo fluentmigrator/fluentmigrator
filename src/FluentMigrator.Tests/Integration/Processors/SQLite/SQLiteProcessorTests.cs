@@ -31,7 +31,7 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.SQLite
 {
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     public class SQLiteProcessorTests
     {
         private IDbConnection _connection;

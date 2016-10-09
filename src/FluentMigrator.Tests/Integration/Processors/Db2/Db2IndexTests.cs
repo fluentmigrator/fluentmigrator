@@ -14,7 +14,7 @@
     using Xunit;
     using FluentMigrator.Tests.Helpers;
 
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     public class Db2IndexTests : BaseIndexTests
     {
         #region Properties

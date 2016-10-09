@@ -18,7 +18,7 @@ using System.Linq;
 namespace FluentMigrator.Tests.Integration.SchemaDump
 {
 
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     public class SchemaDumpTests
     {
         public SqlConnection Connection;

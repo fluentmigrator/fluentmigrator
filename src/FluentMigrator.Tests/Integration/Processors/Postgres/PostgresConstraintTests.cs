@@ -9,7 +9,7 @@ using Npgsql;
 
 namespace FluentMigrator.Tests.Integration.Processors.Postgres
 {
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     public class PostgresConstraintTests : BaseConstraintTests
     {
         public NpgsqlConnection Connection { get; set; }

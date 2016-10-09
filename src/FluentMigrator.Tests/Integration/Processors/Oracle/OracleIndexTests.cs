@@ -5,7 +5,7 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Oracle
 {
-	[Category( "Integration" )]
+	[Trait("Category", "Integration")]
 	public class OracleIndexTests : OracleIndexTestsBase {
 		[SetUp]
 		public void SetUp( ) {

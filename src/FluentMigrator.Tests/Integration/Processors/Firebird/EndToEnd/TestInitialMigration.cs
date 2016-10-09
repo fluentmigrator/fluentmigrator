@@ -23,7 +23,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
         }
     }
 
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     [Category("Firebird")]
     public class TestInitialMigration : FbEndToEndFixture
     {

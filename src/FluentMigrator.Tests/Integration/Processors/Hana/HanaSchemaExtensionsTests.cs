@@ -10,7 +10,7 @@ using Sap.Data.Hana;
 
 namespace FluentMigrator.Tests.Integration.Processors.Hana
 {
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     public class HanaSchemaExtensionsTests : BaseSchemaExtensionsTests
     {
         public HanaConnection Connection { get; set; }

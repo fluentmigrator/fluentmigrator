@@ -11,7 +11,7 @@ using FluentMigrator.Runner.Processors.Oracle;
 using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Oracle {
-	[Category("Integration")]
+	[Trait("Category", "Integration")]
 	public abstract class OracleSchemaTestsBase : BaseSchemaTests
 	{
 		private const string SchemaName = "test";

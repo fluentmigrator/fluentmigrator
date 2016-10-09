@@ -10,7 +10,7 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
 {
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     public class SqlServerCeColumnTests : BaseColumnTests
     {
         public string DatabaseFilename { get; set; }

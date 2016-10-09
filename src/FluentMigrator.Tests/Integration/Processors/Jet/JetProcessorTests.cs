@@ -25,7 +25,7 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Jet
 {
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     public class JetProcessorTests
     {
         public OleDbConnection Connection { get; set; }

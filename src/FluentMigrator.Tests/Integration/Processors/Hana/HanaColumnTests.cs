@@ -9,7 +9,7 @@ using Sap.Data.Hana;
 
 namespace FluentMigrator.Tests.Integration.Processors.Hana
 {
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     public class HanaColumnTests : BaseColumnTests
     {
         public HanaConnection Connection { get; set; }

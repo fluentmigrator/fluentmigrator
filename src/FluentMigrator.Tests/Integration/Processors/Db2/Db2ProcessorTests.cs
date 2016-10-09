@@ -13,7 +13,7 @@
     using Xunit;
     using FluentMigrator.Tests.Helpers;
 
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     public class Db2ProcessorTests
     {
         #region Properties

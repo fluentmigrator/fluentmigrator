@@ -45,7 +45,7 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Integration
 {
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     public class MigrationRunnerTests : IntegrationTestBase
     {
         private IRunnerContext _runnerContext;

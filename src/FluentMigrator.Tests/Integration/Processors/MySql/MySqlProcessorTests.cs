@@ -10,7 +10,7 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.MySql
 {
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     public class MySqlProcessorTests
     {
         protected MySqlProcessor Processor;

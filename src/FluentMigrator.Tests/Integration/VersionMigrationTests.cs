@@ -30,7 +30,7 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Integration
 {
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     public class VersionMigrationTests : IntegrationTestBase
     {
         [Fact]

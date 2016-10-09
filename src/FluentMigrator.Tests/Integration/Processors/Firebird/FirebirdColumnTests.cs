@@ -9,7 +9,7 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     [Category("Firebird")]
     public class FirebirdColumnTests : BaseColumnTests
     {

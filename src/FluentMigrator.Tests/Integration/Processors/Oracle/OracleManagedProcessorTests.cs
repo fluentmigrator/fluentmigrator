@@ -7,7 +7,7 @@ using FluentMigrator.Runner.Processors.Oracle;
 using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Oracle {
-	[Category( "Integration" )]
+	[Trait("Category", "Integration")]
 	public class OracleManagedProcessorTests : OracleProcessorTestsBase {
 		[SetUp]
 		public void SetUp() {

@@ -3,7 +3,7 @@ using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Tests.Integration
 {
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     public class PerformDBOperationTests : IntegrationTestBase
     {
         [Fact]

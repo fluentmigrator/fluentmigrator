@@ -8,7 +8,7 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.SqlServer
 {
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     public class SqlServerSequenceTests : BaseSequenceTests
     {
         public SqlConnection Connection { get; set; }

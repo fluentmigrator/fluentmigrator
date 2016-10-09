@@ -13,7 +13,7 @@
 
     using Xunit;
 
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     public class Db2TableTests : BaseTableTests
     {
         #region Properties

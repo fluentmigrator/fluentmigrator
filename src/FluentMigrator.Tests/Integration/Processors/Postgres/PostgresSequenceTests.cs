@@ -8,7 +8,7 @@ using Npgsql;
 
 namespace FluentMigrator.Tests.Integration.Processors.Postgres
 {
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     public class PostgresSequenceTests : BaseSequenceTests
     {
         public NpgsqlConnection Connection { get; set; }
