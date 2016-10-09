@@ -131,7 +131,7 @@ namespace FluentMigrator.Tests.Unit
         }
 
         /// <summary>Unit test which ensures that the application context is correctly propagated down to each migration class.</summary>
-        [Test(Description = "Ensure that the application context is correctly propagated down to each migration class.")]
+        [Fact(DisplayName = "Ensure that the application context is correctly propagated down to each migration class.")]
         public void CanPassApplicationContext()
         {
             IMigration migration = new TestEmptyMigration();
