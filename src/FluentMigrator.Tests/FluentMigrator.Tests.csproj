@@ -110,6 +110,11 @@
     <Reference Include="FirebirdSql.Data.FirebirdClient">
       <HintPath>..\..\lib\FirebirdSql.Data.FirebirdClient.dll</HintPath>
     </Reference>
+    <Reference Include="nunit.framework, Version=2.6.2.12296, Culture=neutral, PublicKeyToken=96d09a1eb7f44a77, processorArchitecture=MSIL">
+        <HintPath>..\..\lib\nuget\NUnit.2.6.2\lib\nunit.framework.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Oracle.DataAccess">
       <HintPath>..\..\lib\Oracle.DataAccess.dll</HintPath>
     </Reference>
@@ -138,9 +143,6 @@
     </Reference>
     <Reference Include="Npgsql">
       <HintPath>..\..\lib\Postgres\Npgsql.dll</HintPath>
-    </Reference>
-    <Reference Include="nunit.framework">
-      <HintPath>..\..\lib\nunit.framework.dll</HintPath>
     </Reference>
     <Reference Include="Oracle.DataAccess">
       <HintPath>..\..\lib\Oracle.DataAccess.dll</HintPath>
@@ -515,6 +517,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Resources\aliases.conf" />
     <None Include="Resources\firebird.conf" />
     <None Include="Resources\firebird.msg" />
