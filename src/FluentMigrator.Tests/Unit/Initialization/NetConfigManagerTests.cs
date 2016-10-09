@@ -8,7 +8,7 @@ using System.Configuration;
 
 namespace FluentMigrator.Tests.Unit.Initialization
 {
-    [Category("NotWorkingOnMono")]
+    [Trait("BrokenRuntimes", "Mono")]
     public class NetConfigManagerTests
     {
         private static string GetPath(string relative)

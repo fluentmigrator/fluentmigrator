@@ -31,7 +31,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         private const string Target = "FluentMigrator.Tests.dll";
 
         [Fact]
-        [Category("NotWorkingOnMono")]
+        [Trait("BrokenRuntimes", "Mono")]
         public void CanInitMigratorConsoleWithValidArguments()
         {
             var console = new MigratorConsole(
@@ -51,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         }
 
         [Fact]
-        [Category("NotWorkingOnMono")]
+        [Trait("BrokenRuntimes", "Mono")]
         public void ConsoleAnnouncerHasMoreOutputWhenVerbose()
         {
             var sbNonVerbose = new StringBuilder();
@@ -101,7 +101,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         }
 
         [Fact]
-        [Category("NotWorkingOnMono")]
+        [Trait("BrokenRuntimes", "Mono")]
         public void ConsoleAnnouncerHasOutputEvenIfMarkedAsPreviewOnly()
         {
             var sb = new StringBuilder();

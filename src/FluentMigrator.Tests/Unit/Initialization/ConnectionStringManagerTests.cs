@@ -6,7 +6,7 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Initialization
 {
-    [Category("NotWorkingOnMono")]
+    [Trait("BrokenRuntimes", "Mono")]
     public class ConnectionStringManagerTests
     {
         [SetUp]

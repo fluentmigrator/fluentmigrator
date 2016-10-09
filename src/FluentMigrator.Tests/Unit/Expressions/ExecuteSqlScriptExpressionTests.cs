@@ -58,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         }
 
         [Fact]
-        [Category("NotWorkingOnMono")]
+        [Trait("BrokenRuntimes", "Mono")]
         public void CanUseScriptsOnAnotherDriveToWorkingDirectory()
         {
             var scriptOnAnotherDrive = "z" + Path.VolumeSeparatorChar + Path.DirectorySeparatorChar + testSqlScript;
