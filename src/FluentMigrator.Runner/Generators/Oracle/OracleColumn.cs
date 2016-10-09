@@ -34,27 +34,27 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return string.Empty;
         }
 
-		protected override string FormatNullable(ColumnDefinition column)
-		{
-			//Creates always return Not Null unless is nullable is true
-			if (column.ModificationType == ColumnModificationType.Create) {
-				if (column.IsNullable.HasValue && column.IsNullable.Value) {
-					return string.Empty;
-				}
-				else {
-					return "NOT NULL";
-				}
-			}
+        protected override string FormatNullable(ColumnDefinition column)
+        {
+            //Creates always return Not Null unless is nullable is true
+            if (column.ModificationType == ColumnModificationType.Create) {
+                if (column.IsNullable.HasValue && column.IsNullable.Value) {
+                    return string.Empty;
+                }
+                else {
+                    return "NOT NULL";
+                }
+            }
 
-			//alter only returns "Not Null" if IsNullable is explicitly set 
-			if (column.IsNullable.HasValue) {
-				return column.IsNullable.Value ? "NULL" : "NOT NULL";
-			}
-			else {
-				return String.Empty;
-			}
+            //alter only returns "Not Null" if IsNullable is explicitly set 
+            if (column.IsNullable.HasValue) {
+                return column.IsNullable.Value ? "NULL" : "NOT NULL";
+            }
+            else {
+                return String.Empty;
+            }
 
-		}
+        }
 
         protected override string FormatSystemMethods(SystemMethods systemMethod)
         {

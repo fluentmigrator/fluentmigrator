@@ -418,7 +418,7 @@ namespace FluentMigrator.Tests.Unit
 
             _announcer.Verify(a => a.Say("Version ordering valid."));
 
-            _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();		
+            _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();
         }
 
         [Test]
@@ -440,7 +440,7 @@ namespace FluentMigrator.Tests.Unit
 
             _announcer.Verify(a => a.Say("Version ordering valid."));
 
-            _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();		
+            _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();
         }
 
         [Test]

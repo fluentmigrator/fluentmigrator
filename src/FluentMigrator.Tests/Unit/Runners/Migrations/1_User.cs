@@ -18,19 +18,19 @@
 
 namespace FluentMigrator.Tests.Unit.Runners.Migrations
 {
-	[Migration(1)]
-	public class User : Migration
-	{
-		public override void Up()
-		{
-			Create.Table("User")
-				.WithColumn("Id").AsInt32().PrimaryKey().Identity()
-				.WithColumn("Name").AsString();
-		}
+    [Migration(1)]
+    public class User : Migration
+    {
+        public override void Up()
+        {
+            Create.Table("User")
+                .WithColumn("Id").AsInt32().PrimaryKey().Identity()
+                .WithColumn("Name").AsString();
+        }
 
-		public override void Down()
-		{
-			Delete.Table("User");
-		}
-	}
+        public override void Down()
+        {
+            Delete.Table("User");
+        }
+    }
 }

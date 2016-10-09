@@ -7,12 +7,12 @@ using FluentMigrator.Runner.Processors.Oracle;
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration.Processors.Oracle {
-	[TestFixture]
-	[Category( "Integration" )]
-	public class OracleManagedConstraintTests : OracleConstraintTestsBase {
-		[SetUp]
-		public void SetUp( ) {
-			base.SetUp( new OracleManagedDbFactory() );
-		}
-	}
+    [TestFixture]
+    [Category( "Integration" )]
+    public class OracleManagedConstraintTests : OracleConstraintTestsBase {
+        [SetUp]
+        public void SetUp( ) {
+            base.SetUp( new OracleManagedDbFactory() );
+        }
+    }
 }
