@@ -17,6 +17,14 @@
 	<target name="clean" description="Deletes the output folders for a clean build">
         <delete dir="${dir.bin}"/>
     </target>
+
+    <target name="nuget-restore" description="Restore NuGet packages for the solution">
+        <exec program="nuget.exe">
+            <arg value="restore" />
+            <arg value="FluentMigrator (2010).sln" />
+        </exec>
+
+    </target>
 	
 	<target name="generate-version" description="Generates the AssemblyInfo.cs" depends="clean">
 		<asminfo output="${path.base}\src\SolutionInfo.cs" language="CSharp">
@@ -30,7 +38,7 @@
 		</asminfo>
 	</target>
 	
-    <target name="build" description="Builds the app" depends="generate-version">
+    <target name="build" description="Builds the app" depends="generate-version nuget-restore">
 		<msbuild project="FluentMigrator (2010).sln">
 			<property name="Configuration" value="AutomatedRelease" />
 			<property name="OutDir" value="..\..\${dir.bin}\\" />
