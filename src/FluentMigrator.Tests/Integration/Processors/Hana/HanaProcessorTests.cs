@@ -11,7 +11,6 @@ using Sap.Data.Hana;
 
 namespace FluentMigrator.Tests.Integration.Processors.Hana
 {
-    [TestFixture]
     [Category("Integration")]
     public class HanaProcessorTests
     {

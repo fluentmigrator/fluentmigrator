@@ -23,7 +23,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Builders.Schema
 {
-    [TestFixture]
     public class SchemaExpressionRootTest
     {
         private Mock<IQuerySchema> _querySchemaMock;

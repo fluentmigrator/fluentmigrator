@@ -30,7 +30,6 @@ using System.Linq;
 
 namespace FluentMigrator.Tests.Unit
 {
-    [TestFixture]
     public class DefaultMigrationInformationLoaderTests
     {
         [Test]

@@ -7,7 +7,6 @@ using System.Text;
 
 namespace FluentMigrator.Tests.Unit.Generators.Db2
 {
-    [TestFixture]
     public class Db2TableTests : BaseTableTests
     {
         protected Db2Generator Generator;

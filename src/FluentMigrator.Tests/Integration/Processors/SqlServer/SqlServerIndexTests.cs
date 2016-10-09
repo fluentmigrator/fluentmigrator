@@ -9,7 +9,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.SqlServer
 {
-    [TestFixture]
     [Category("Integration")]
     public class SqlServerIndexTests : BaseIndexTests
     {

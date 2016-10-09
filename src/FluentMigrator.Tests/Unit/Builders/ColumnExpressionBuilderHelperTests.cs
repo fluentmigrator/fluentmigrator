@@ -10,7 +10,6 @@ using System.Linq;
 
 namespace FluentMigrator.Tests.Unit.Builders
 {
-    [TestFixture]
     public class ColumnExpressionBuilderHelperTests
     {
         [Test]

@@ -31,7 +31,6 @@ using System.Linq;
 
 namespace FluentMigrator.Tests.Unit
 {
-    [TestFixture]
     public class MigrationRunnerTests
     {
         private MigrationRunner _runner;

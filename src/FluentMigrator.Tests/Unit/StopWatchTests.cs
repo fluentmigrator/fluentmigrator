@@ -22,7 +22,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit
 {
-	[TestFixture]
 	public class StopWatchTests
 	{
 		[Test]

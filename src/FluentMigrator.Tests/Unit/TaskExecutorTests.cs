@@ -10,7 +10,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit
 {
-    [TestFixture]
     public class TaskExecutorTests : IntegrationTestBase
     {
         #region Setup/Teardown

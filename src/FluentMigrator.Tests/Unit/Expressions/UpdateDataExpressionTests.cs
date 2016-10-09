@@ -6,7 +6,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
-    [TestFixture]
     public class UpdateDataExpressionTests {
         private UpdateDataExpression expression;
 

@@ -15,7 +15,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
-    [TestFixture]
     [Category("Firebird")]
     public class FirebirdEmbeddedTableTests
     {

@@ -5,7 +5,6 @@ using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Tests.Unit.Generators.Firebird
 {
-    [TestFixture]
     public class FirebirdGeneratorTests
     {
         protected FirebirdGenerator generator;

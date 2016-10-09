@@ -5,7 +5,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests
 {
-    [TestFixture]
     public class MigrationValidatorTests
     {
         [SetUp]

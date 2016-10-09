@@ -3,7 +3,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Hana
 {
-    [TestFixture]
     public class HanaColumnTests : BaseColumnTests
     {
         protected HanaGenerator Generator;

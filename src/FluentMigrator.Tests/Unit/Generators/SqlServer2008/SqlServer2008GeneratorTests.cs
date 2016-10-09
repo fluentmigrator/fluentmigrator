@@ -7,7 +7,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
 {
-    [TestFixture]
     public class SqlServer2008GeneratorTests
     {
         protected SqlServer2008Generator Generator;

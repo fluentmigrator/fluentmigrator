@@ -10,7 +10,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.MySql
 {
-    [TestFixture]
     [Category("Integration")]
     public class MySqlProcessorTests
     {

@@ -3,7 +3,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.MySql
 {
-    [TestFixture]
     public class MySqlColumnTests : BaseColumnTests
     {
         protected MySqlGenerator Generator;

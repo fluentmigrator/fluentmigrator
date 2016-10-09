@@ -14,7 +14,6 @@
 
     using Xunit;
 
-    [TestFixture]
     [Category("Integration")]
     public class Db2ColumnTests : BaseColumnTests
     {

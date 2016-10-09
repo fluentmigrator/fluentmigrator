@@ -4,7 +4,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit
 {
-    [TestFixture]
     public class TimestampedMigrationAttributeTests
     {
         private const int DayOfMonth = 15;

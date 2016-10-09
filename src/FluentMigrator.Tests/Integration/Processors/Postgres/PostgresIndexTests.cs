@@ -9,7 +9,6 @@ using Npgsql;
 
 namespace FluentMigrator.Tests.Integration.Processors.Postgres
 {
-    [TestFixture]
     [Category("Integration")]
     public class PostgresIndexTests : BaseIndexTests
     {

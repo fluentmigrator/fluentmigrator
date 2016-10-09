@@ -6,7 +6,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.MySql
 {
-    [TestFixture]
     public class MySqlGeneratorTests
     {
         protected MySqlGenerator Generator;

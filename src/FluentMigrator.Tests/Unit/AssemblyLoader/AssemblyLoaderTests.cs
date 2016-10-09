@@ -21,7 +21,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.AssemblyLoader
 {
-    [TestFixture]
     public class AssemblyLoaderTests
     {
         private AssemblyLoaderFactory assemblyLoaderFactory;

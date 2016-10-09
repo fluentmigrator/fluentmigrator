@@ -6,7 +6,6 @@ using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 {
-    [TestFixture]
     public abstract class SqlServer2005TypeMapTests
     {
         protected SqlServer2005TypeMap TypeMap { get; private set; }
@@ -17,7 +16,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             TypeMap = new SqlServer2005TypeMap();
         }
 
-        [TestFixture]
         public class AnsistringTests : SqlServer2005TypeMapTests
         {
             [Test]
@@ -50,7 +48,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             }
         }
 
-        [TestFixture]
         public class AnsistringFixedLengthTests : SqlServer2005TypeMapTests
         {
             [Test]
@@ -80,7 +77,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             }
         }
 
-        [TestFixture]
         public class StringTests : SqlServer2005TypeMapTests
         {
             [Test]
@@ -120,7 +116,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             }
         }
 
-        [TestFixture]
         public class StringFixedLengthTests : SqlServer2005TypeMapTests
         {
             [Test]
@@ -150,7 +145,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             }
         }
 
-        [TestFixture]
         public class BinaryTests : SqlServer2005TypeMapTests
         {
             [Test]
@@ -183,7 +177,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             }
         }
 
-        [TestFixture]
         public class NumericTests : SqlServer2005TypeMapTests
         {
             [Test]
@@ -277,7 +270,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             }
         }
 
-        [TestFixture]
         public class GuidTests : SqlServer2005TypeMapTests
         {
             [Test]
@@ -289,7 +281,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             }
         }
 
-        [TestFixture]
         public class DateTimeTests : SqlServer2005TypeMapTests
         {
             [Test]
@@ -317,7 +308,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             }
         }
 
-        [TestFixture]
         public class XmlTests : SqlServer2005TypeMapTests
         {
             [Test]

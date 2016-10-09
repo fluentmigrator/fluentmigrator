@@ -8,7 +8,6 @@ using System.Text;
 
 namespace FluentMigrator.Tests.Unit.Announcers
 {
-    [TestFixture]
     public class TextWriterWithGoAnnouncerTests
     {
         private StringWriter _stringWriter;

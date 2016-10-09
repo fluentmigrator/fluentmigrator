@@ -7,7 +7,6 @@ using FluentMigrator.Runner.Processors.Oracle;
 using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Oracle {
-	[TestFixture]
 	[Category( "Integration" )]
 	public class OracleManagedSchemaTests : OracleSchemaTestsBase {
 		[SetUp]

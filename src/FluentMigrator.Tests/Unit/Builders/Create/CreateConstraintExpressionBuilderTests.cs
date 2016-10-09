@@ -9,7 +9,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
-    [TestFixture]
     public class CreateConstraintExpressionBuilderTests
     {
         private const string TableName = "Bacon";

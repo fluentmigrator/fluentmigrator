@@ -24,7 +24,6 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
     using FluentMigrator.Builders.Delete.Sequence;
 
-    [TestFixture]
     public class DeleteSequenceExpressionBuilderTests
     {
         [Test]

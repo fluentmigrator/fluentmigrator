@@ -8,7 +8,6 @@ using System.Configuration;
 
 namespace FluentMigrator.Tests.Unit.Initialization
 {
-    [TestFixture]
     [Category("NotWorkingOnMono")]
     public class NetConfigManagerTests
     {

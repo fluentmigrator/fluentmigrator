@@ -4,7 +4,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 {
-    [TestFixture]
     public class SqlServerCeSchemaTests : BaseSchemaTests
     {
         protected SqlServerCeGenerator Generator;

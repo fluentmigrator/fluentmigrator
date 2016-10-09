@@ -3,7 +3,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Jet
 {
-    [TestFixture]
     public class JetTableTests : BaseTableTests
     {
         protected JetGenerator Generator;

@@ -23,7 +23,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Announcers
 {
-    [TestFixture]
     public class TextWriterAnnouncerTests
     {
         [SetUp]

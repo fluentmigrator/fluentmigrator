@@ -5,7 +5,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {
-    [TestFixture]
     public class OracleConstraintsTests : BaseConstraintsTests
     {
         protected OracleGenerator Generator;

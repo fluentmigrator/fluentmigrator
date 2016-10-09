@@ -3,7 +3,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 {
-    [TestFixture]
     public class SqlServerCeIndexTests : BaseIndexTests
     {
         protected SqlServerCeGenerator Generator;

@@ -30,7 +30,6 @@ namespace FluentMigrator.Tests.Unit
         }
     }
 
-    [TestFixture]
     public class VersionLoaderTests
     {
         [Test]

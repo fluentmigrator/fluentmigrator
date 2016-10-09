@@ -27,7 +27,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Builders.Alter
 {
-    [TestFixture]
     public class AlterExpressionRootTests
     {
         [Test]

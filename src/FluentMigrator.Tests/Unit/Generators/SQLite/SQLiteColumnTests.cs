@@ -3,7 +3,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.SQLite
 {
-    [TestFixture]
     public class SQLiteColumnTests : BaseColumnTests
     {
         protected SQLiteGenerator Generator;

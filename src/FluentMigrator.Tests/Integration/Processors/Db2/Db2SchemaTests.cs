@@ -13,7 +13,6 @@
 
     using Xunit;
 
-    [TestFixture]
     [Category("Integration")]
     public class Db2SchemaTests : BaseSchemaTests
     {

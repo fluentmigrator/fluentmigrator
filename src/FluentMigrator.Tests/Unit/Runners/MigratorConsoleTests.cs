@@ -24,7 +24,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Runners
 {
-    [TestFixture]
     public class MigratorConsoleTests
     {
         private const string Database = "SQLite";

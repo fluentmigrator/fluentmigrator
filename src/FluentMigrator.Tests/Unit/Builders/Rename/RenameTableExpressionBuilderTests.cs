@@ -23,7 +23,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Builders.Rename
 {
-    [TestFixture]
     public class RenameTableExpressionBuilderTests
     {
         [Test]

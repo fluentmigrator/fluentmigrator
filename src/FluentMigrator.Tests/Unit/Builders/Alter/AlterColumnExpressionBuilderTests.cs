@@ -32,7 +32,6 @@ using FluentMigrator.Builders;
 
 namespace FluentMigrator.Tests.Unit.Builders.Alter
 {
-    [TestFixture]
     public class AlterColumnExpressionBuilderTests
     {
         private void VerifyColumnProperty(Action<ColumnDefinition> columnExpression, Action<AlterColumnExpressionBuilder> callToTest)

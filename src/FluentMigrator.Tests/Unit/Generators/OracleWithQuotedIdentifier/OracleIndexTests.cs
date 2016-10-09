@@ -3,7 +3,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
 {
-    [TestFixture]
     public class OracleIndexTests : BaseIndexTests
     {
         protected OracleGenerator Generator;

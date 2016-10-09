@@ -13,7 +13,6 @@
     using Xunit;
     using FluentMigrator.Tests.Helpers;
 
-    [TestFixture]
     [Category("Integration")]
     public class Db2ProcessorTests
     {

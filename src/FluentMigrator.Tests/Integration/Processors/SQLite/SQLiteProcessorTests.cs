@@ -31,7 +31,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.SQLite
 {
-    [TestFixture]
     [Category("Integration")]
     public class SQLiteProcessorTests
     {

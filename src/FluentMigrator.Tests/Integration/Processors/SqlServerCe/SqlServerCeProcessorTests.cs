@@ -10,7 +10,6 @@ using Xunit;
 namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
 {
 
-    [TestFixture]
     [Category("Integration")]
     public class SqlServerCeProcessorTests
     {

@@ -9,7 +9,6 @@ using System.Reflection;
 namespace FluentMigrator.Tests.Unit.Expressions
 {
 
-    [TestFixture]
     public class ExecuteEmbeddedSqlScriptExpressionTests
     {
         private const string testSqlScript = "embeddedtestscript.sql";

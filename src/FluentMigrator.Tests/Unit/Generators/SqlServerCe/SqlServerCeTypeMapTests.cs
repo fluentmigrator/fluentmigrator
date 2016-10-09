@@ -9,7 +9,6 @@ using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 {
-    [TestFixture]
     public abstract class SqlServerCeTypeMapTests
     {
         protected SqlServerCeTypeMap TypeMap { get; private set; }
@@ -20,7 +19,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             TypeMap = new SqlServerCeTypeMap();
         }
 
-        [TestFixture]
         public class AnsistringTests : SqlServerCeTypeMapTests
         {
             [Test]
@@ -53,7 +51,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             }
         }
 
-        [TestFixture]
         public class AnsistringFixedLengthTests : SqlServerCeTypeMapTests
         {
             [Test]
@@ -86,7 +83,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             }
         }
 
-        [TestFixture]
         public class StringTests : SqlServerCeTypeMapTests
         {
             [Test]
@@ -118,7 +114,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             }
         }
 
-        [TestFixture]
         public class StringFixedLengthTests : SqlServerCeTypeMapTests
         {
             [Test]
@@ -151,7 +146,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             }
         }
 
-        [TestFixture]
         public class BinaryTests : SqlServerCeTypeMapTests
         {
             [Test]
@@ -196,7 +190,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             }
         }
 
-        [TestFixture]
         public class NumericTests : SqlServerCeTypeMapTests
         {
             [Test]
@@ -301,7 +294,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             }
         }
 
-        [TestFixture]
         public class GuidTests : SqlServerCeTypeMapTests
         {
             [Test]
@@ -314,7 +306,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             }
         }
 
-        [TestFixture]
         public class DateTimeTests : SqlServerCeTypeMapTests
         {
             [Test]
@@ -345,7 +336,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             }
         }
 
-        [TestFixture]
         public class XmlTests : SqlServerCeTypeMapTests
         {
             [Test]

@@ -25,7 +25,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Jet
 {
-    [TestFixture]
     [Category("Integration")]
     public class JetProcessorTests
     {

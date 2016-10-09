@@ -3,7 +3,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
 {
-    [TestFixture]
     public class SqlServer2000ColumnTests : BaseColumnTests
     {
         protected SqlServer2000Generator Generator;

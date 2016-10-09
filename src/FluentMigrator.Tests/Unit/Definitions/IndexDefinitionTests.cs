@@ -3,7 +3,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Definitions
 {
-    [TestFixture]
     public class IndexDefinitionTests
     {
         [Test]

@@ -25,7 +25,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
-    [TestFixture]
     public class DeleteColumnExpressionBuilderTests
     {
         [Test]

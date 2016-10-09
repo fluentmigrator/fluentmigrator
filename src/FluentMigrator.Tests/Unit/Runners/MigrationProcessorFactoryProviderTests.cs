@@ -25,7 +25,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Runners
 {
-    [TestFixture]
     public class MigrationProcessorFactoryProviderTests
     {
         private MigrationProcessorFactoryProvider migrationProcessorFactoryProvider;

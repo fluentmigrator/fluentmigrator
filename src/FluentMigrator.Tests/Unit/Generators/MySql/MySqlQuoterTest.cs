@@ -13,7 +13,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.MySql
 {
-    [TestFixture]
     public class MySqlQuoterTest
     {
         private IQuoter quoter = default(MySqlQuoter);

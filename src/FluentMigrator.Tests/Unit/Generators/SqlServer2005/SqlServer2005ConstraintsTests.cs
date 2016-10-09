@@ -5,7 +5,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 {
-    [TestFixture]
     public class SqlServer2005ConstraintsTests : BaseConstraintsTests
     {
         protected SqlServer2005Generator Generator;

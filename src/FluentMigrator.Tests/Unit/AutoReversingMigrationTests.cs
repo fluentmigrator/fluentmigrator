@@ -8,7 +8,6 @@ namespace FluentMigrator.Tests.Unit
     using FluentMigrator.Expressions;
     using Moq;
 
-    [TestFixture]
     public class AutoReversingMigrationTests
     {
         private Mock<IMigrationContext> context;

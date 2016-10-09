@@ -4,7 +4,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Jet
 {
-    [TestFixture]
     public class JetConstraintsTests : BaseConstraintsTests
     {
         protected JetGenerator Generator;

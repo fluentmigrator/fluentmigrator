@@ -23,7 +23,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit
 {
-    [TestFixture]
     public class MigrationInfoTests
     {
         [SetUp]

@@ -4,7 +4,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Postgres
 {
-    [TestFixture]
     public class PostgresQuotesTests
     {
         [SetUp]

@@ -18,7 +18,6 @@ using System.Linq;
 namespace FluentMigrator.Tests.Integration.SchemaDump
 {
 
-    [TestFixture]
     [Category("Integration")]
     public class SchemaDumpTests
     {

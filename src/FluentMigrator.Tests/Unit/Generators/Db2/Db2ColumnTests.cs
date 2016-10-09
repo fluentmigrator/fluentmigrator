@@ -9,7 +9,6 @@
 
     using Xunit;
 
-    [TestFixture]
     public class Db2ColumnTests : BaseColumnTests
     {
         #region Properties

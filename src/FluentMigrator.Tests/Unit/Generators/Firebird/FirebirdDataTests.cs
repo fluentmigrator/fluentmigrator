@@ -4,7 +4,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Firebird
 {
-    [TestFixture]
     public class FirebirdDataTests : BaseDataTests
     {
         protected FirebirdGenerator Generator;

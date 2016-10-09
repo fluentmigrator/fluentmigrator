@@ -4,7 +4,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
 {
-    [TestFixture]
     public class OracleConstraintsTests : BaseConstraintsTests
     {
         protected OracleGenerator Generator;

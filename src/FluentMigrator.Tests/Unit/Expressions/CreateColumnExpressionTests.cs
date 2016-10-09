@@ -27,7 +27,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
-    [TestFixture]
     public class CreateColumnExpressionTests
     {
         [Test]

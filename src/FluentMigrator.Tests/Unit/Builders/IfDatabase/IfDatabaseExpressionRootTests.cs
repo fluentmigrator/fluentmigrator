@@ -29,7 +29,6 @@ using System.Linq;
 
 namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
 {
-    [TestFixture]
     public class IfDatabaseExpressionRootTests
     {
 

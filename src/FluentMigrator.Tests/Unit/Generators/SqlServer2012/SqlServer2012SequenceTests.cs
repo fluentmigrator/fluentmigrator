@@ -3,7 +3,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2012
 {
-    [TestFixture]
     public class SqlServer2012SequenceTests : BaseSequenceTests
     {
         protected SqlServer2012Generator Generator;

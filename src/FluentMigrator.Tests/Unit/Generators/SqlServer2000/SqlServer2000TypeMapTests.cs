@@ -6,7 +6,6 @@ using Shouldly;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
 {
-    [TestFixture]
     public abstract class SqlServer2000TypeMapTests
     {
         protected SqlServer2000TypeMap TypeMap { get; private set; }
@@ -17,7 +16,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             TypeMap = new SqlServer2000TypeMap();
         }
 
-        [TestFixture]
         public class AnsistringTests : SqlServer2000TypeMapTests
         {
             [Test]
@@ -50,7 +48,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             }
         }
 
-        [TestFixture]
         public class AnsistringFixedLengthTests : SqlServer2000TypeMapTests
         {
             [Test]
@@ -80,7 +77,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             }
         }
 
-        [TestFixture]
         public class StringTests : SqlServer2000TypeMapTests
         {
             [Test]
@@ -120,7 +116,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             }
         }
 
-        [TestFixture]
         public class StringFixedLengthTests : SqlServer2000TypeMapTests
         {
             [Test]
@@ -150,7 +145,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             }
         }
 
-        [TestFixture]
         public class BinaryTests : SqlServer2000TypeMapTests
         {
             [Test]
@@ -183,7 +177,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             }
         }
 
-        [TestFixture]
         public class NumericTests : SqlServer2000TypeMapTests
         {
             [Test]
@@ -277,7 +270,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             }
         }
 
-        [TestFixture]
         public class GuidTests : SqlServer2000TypeMapTests
         {
             [Test]
@@ -289,7 +281,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             }
         }
 
-        [TestFixture]
         public class DateTimeTests : SqlServer2000TypeMapTests
         {
             [Test]

@@ -13,7 +13,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {
-    [TestFixture]
     public class ConstantFormatterTests
     {
         [SetUp]

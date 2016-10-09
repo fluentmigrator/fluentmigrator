@@ -3,7 +3,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Postgres
 {
-    [TestFixture]
     public class PostgresSchemaTests : BaseSchemaTests
     {
         protected PostgresGenerator Generator;

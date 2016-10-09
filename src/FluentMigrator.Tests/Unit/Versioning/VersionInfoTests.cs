@@ -22,7 +22,6 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Versioning
 {
-	[TestFixture]
 	public class VersionInfoTests
 	{
 		private VersionInfo _versionInfo;

@@ -8,7 +8,6 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Tests.Unit
 {
-	[TestFixture]
 	public class ProfileLoaderTests
 	{
 		[Test]
