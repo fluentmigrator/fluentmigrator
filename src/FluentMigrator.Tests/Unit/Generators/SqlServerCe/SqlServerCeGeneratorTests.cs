@@ -68,7 +68,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Fact]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Trait("DbEngine", "SqlServerCe"), Category("Generator"), Category("Table")]
         public void CanCreateTableWithNtextSizeUpTo536870911()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -80,7 +80,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Fact]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Trait("DbEngine", "SqlServerCe"), Category("Generator"), Category("Table")]
         public void CanCreateTableWithSeededIdentity()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
