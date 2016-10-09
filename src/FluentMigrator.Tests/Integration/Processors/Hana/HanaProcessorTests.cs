@@ -1,3 +1,4 @@
+using System;
 using System.Data.SqlClient;
 using System.IO;
 using FluentMigrator.Builders.Execute;
@@ -12,7 +13,7 @@ using Sap.Data.Hana;
 namespace FluentMigrator.Tests.Integration.Processors.Hana
 {
     [Trait("Category", "Integration")]
-    public class HanaProcessorTests
+    public class HanaProcessorTests : IDisposable
     {
         public HanaConnection Connection { get; set; }
         public HanaProcessor Processor { get; set; }
@@ -25,8 +26,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             Processor.BeginTransaction();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.CommitTransaction();
             Processor.Dispose();

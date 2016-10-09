@@ -11,7 +11,7 @@ using Xunit;
 namespace FluentMigrator.Tests.Integration.Processors.MySql
 {
     [Trait("Category", "Integration")]
-    public class MySqlProcessorTests
+    public class MySqlProcessorTests : IDisposable
     {
         protected MySqlProcessor Processor;
 
@@ -25,8 +25,7 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
             Connection.Open();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.Dispose();
         }

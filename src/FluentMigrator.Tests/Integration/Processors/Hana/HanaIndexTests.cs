@@ -1,3 +1,4 @@
+using System;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Hana;
@@ -10,7 +11,7 @@ using Sap.Data.Hana;
 namespace FluentMigrator.Tests.Integration.Processors.Hana
 {
     [Trait("Category", "Integration")]
-    public class HanaIndexTests : BaseIndexTests
+    public class HanaIndexTests : BaseIndexTests, IDisposable
     {
         public HanaConnection Connection { get; set; }
         public HanaProcessor Processor { get; set; }
@@ -25,8 +26,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             Processor.BeginTransaction();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.CommitTransaction();
             Processor.Dispose();

@@ -14,7 +14,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
     [Trait("Category", "Integration")]
     [Trait("DbEngine", "Firebird")]
-    public class FirebirdProcessorTests
+    public class FirebirdProcessorTests : IDisposable
     {
         public FbConnection Connection { get; set; }
         public FirebirdProcessor Processor { get; set; }
@@ -32,8 +32,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             Processor.BeginTransaction();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             if (!Processor.WasCommitted)
                 Processor.CommitTransaction();

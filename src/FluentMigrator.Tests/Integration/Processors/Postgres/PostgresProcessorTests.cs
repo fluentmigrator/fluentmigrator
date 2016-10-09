@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Data;
 using System.IO;
 using FluentMigrator.Builders.Execute;
@@ -30,7 +31,7 @@ using Npgsql;
 namespace FluentMigrator.Tests.Integration.Processors.Postgres
 {
     [Trait("Category", "Integration")]
-    public class PostgresProcessorTests
+    public class PostgresProcessorTests : IDisposable
     {
         public NpgsqlConnection Connection { get; set; }
         public PostgresProcessor Processor { get; set; }
@@ -42,8 +43,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             Connection.Open();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.CommitTransaction();
             Processor.Dispose();

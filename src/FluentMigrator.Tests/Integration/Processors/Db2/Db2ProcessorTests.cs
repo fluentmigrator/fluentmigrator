@@ -14,7 +14,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
     using FluentMigrator.Tests.Helpers;
 
     [Trait("Category", "Integration")]
-    public class Db2ProcessorTests
+    public class Db2ProcessorTests : IDisposable
     {
         #region Properties
 
@@ -51,8 +51,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
             Connection.Open();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.Dispose();
         }

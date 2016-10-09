@@ -1,3 +1,4 @@
+using System;
 using System.Data;
 using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Expressions;
@@ -11,7 +12,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
 	[Trait("Category", "Integration")]
     [Trait("DbEngine", "Firebird")]
-    public class TestDisposing
+    public class TestDisposing : IDisposable
 	{
 		private FbConnection _connection;
 		private FirebirdProcessor _processor;
@@ -26,8 +27,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 			_processor.BeginTransaction();
 		}
 
-		[TearDown]
-		public void TearDown()
+		public void Dispose()
 		{
 			if (!_processor.WasCommitted)
 				_processor.CommitTransaction();

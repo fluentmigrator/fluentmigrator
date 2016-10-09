@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Data.SqlClient;
 using FluentMigrator.Runner;
@@ -19,7 +20,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
 {
 
     [Trait("Category", "Integration")]
-    public class SchemaDumpTests
+    public class SchemaDumpTests : IDisposable
     {
         public SqlConnection Connection;
         public SqlServerProcessor Processor;
@@ -33,8 +34,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
             Connection.Open();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.Dispose();
         }

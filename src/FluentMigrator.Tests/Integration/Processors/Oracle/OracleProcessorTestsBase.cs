@@ -14,7 +14,7 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 	[Trait("Category", "Integration")]
-	public abstract class OracleProcessorTestsBase
+	public abstract class OracleProcessorTestsBase : IDisposable
 	{
 		private const string SchemaName = "test";
 		private IDbConnection Connection { get; set; }
@@ -30,8 +30,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 			this.Connection.Open();
 		}
 
-		[TearDown]
-		public void TearDown()
+		public void Dispose()
 		{
 			this.Processor.Dispose();
 		}

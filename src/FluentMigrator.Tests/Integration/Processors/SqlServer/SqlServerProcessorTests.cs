@@ -1,3 +1,4 @@
+using System;
 using System.Data.SqlClient;
 using System.IO;
 using FluentMigrator.Builders.Execute;
@@ -11,7 +12,7 @@ using Xunit;
 namespace FluentMigrator.Tests.Integration.Processors.SqlServer
 {
     [Trait("Category", "Integration")]
-    public class SqlServerProcessorTests
+    public class SqlServerProcessorTests : IDisposable
     {
         public SqlConnection Connection { get; set; }
         public SqlServerProcessor Processor { get; set; }
@@ -24,8 +25,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
             Processor.BeginTransaction();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.CommitTransaction();
             Processor.Dispose();

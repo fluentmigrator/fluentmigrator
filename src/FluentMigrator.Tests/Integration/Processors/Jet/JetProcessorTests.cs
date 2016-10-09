@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.Data;
 using System.Data.OleDb;
 using FluentMigrator.Runner.Announcers;
@@ -26,7 +27,7 @@ using Xunit;
 namespace FluentMigrator.Tests.Integration.Processors.Jet
 {
     [Trait("Category", "Integration")]
-    public class JetProcessorTests
+    public class JetProcessorTests : IDisposable
     {
         public OleDbConnection Connection { get; set; }
         public JetProcessor Processor { get; set; }
@@ -113,8 +114,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
             }
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.CommitTransaction();
             Processor.Dispose();

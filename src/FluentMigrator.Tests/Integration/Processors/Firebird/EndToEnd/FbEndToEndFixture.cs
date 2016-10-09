@@ -9,15 +9,14 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
 {
     [Trait("Category", "Integration")]
     [Trait("DbEngine", "Firebird")]
-    public class FbEndToEndFixture
+    public class FbEndToEndFixture : IDisposable
     {
         public FbEndToEndFixture()
         {
             FbDatabase.CreateDatabase(IntegrationTestOptions.Firebird.ConnectionString);
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             FbDatabase.DropDatabase(IntegrationTestOptions.Firebird.ConnectionString);
         }

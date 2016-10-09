@@ -1,3 +1,4 @@
+using System;
 using System.Data.SqlServerCe;
 using System.IO;
 using FluentMigrator.Runner.Announcers;
@@ -11,7 +12,7 @@ using Xunit;
 namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
 {
     [Trait("Category", "Integration")]
-    public class SqlServerCeColumnTests : BaseColumnTests
+    public class SqlServerCeColumnTests : BaseColumnTests, IDisposable
     {
         public string DatabaseFilename { get; set; }
         public SqlCeConnection Connection { get; set; }
@@ -29,8 +30,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             Processor.BeginTransaction();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             if (Processor == null)
                 return;

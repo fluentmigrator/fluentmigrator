@@ -1,3 +1,4 @@
+using System;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Postgres;
@@ -10,7 +11,7 @@ using Npgsql;
 namespace FluentMigrator.Tests.Integration.Processors.Postgres
 {
     [Trait("Category", "Integration")]
-    public class PostgresColumnTests : BaseColumnTests
+    public class PostgresColumnTests : BaseColumnTests, IDisposable
     {
         public NpgsqlConnection Connection { get; set; }
         public PostgresProcessor Processor { get; set; }
@@ -24,8 +25,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             Connection.Open();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.CommitTransaction();
             Processor.Dispose();

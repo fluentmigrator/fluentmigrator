@@ -14,7 +14,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
     using Xunit;
 
     [Trait("Category", "Integration")]
-    public class Db2SchemaTests : BaseSchemaTests
+    public class Db2SchemaTests : BaseSchemaTests, IDisposable
     {
         #region Properties
 
@@ -70,8 +70,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
             Connection.Open();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.Dispose();
         }

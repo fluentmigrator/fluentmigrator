@@ -11,7 +11,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
 {
 
     [Trait("Category", "Integration")]
-    public class SqlServerCeProcessorTests
+    public class SqlServerCeProcessorTests : IDisposable
     {
         public string DatabaseFilename { get; set; }
         public SqlCeConnection Connection { get; set; }
@@ -27,8 +27,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             Processor.BeginTransaction();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.CommitTransaction();
             Processor.Dispose();
