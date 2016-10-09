@@ -9,7 +9,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
     {
         private IQuoter _quoter;
 
-        [SetUp]
         public void SetUp()
         {
             _quoter = new OracleQuoter();

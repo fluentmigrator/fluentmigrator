@@ -50,7 +50,6 @@ namespace FluentMigrator.Tests.Integration
     {
         private IRunnerContext _runnerContext;
 
-        [SetUp]
         public void SetUp()
         {
             _runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))

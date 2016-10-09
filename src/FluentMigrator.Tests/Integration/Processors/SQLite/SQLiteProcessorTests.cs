@@ -42,7 +42,6 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
         private string tableName;
         private string tableNameThanMustBeEscaped;
 
-        [SetUp]
         public void SetUp()
         {
             // This connection used in the tests

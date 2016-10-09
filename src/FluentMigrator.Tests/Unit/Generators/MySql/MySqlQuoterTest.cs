@@ -18,7 +18,6 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         private IQuoter quoter = default(MySqlQuoter);
         private readonly CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
 
-        [SetUp]
         public void SetUp()
         {
             quoter = new MySqlQuoter();

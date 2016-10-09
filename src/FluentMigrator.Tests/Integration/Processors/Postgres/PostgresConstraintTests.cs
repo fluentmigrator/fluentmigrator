@@ -16,7 +16,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         public PostgresProcessor Processor { get; set; }
         public IQuoter Quoter { get; set; }
 
-        [SetUp]
         public void SetUp()
         {
             Connection = new NpgsqlConnection(IntegrationTestOptions.Postgres.ConnectionString);

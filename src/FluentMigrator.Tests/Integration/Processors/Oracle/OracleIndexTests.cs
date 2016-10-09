@@ -7,7 +7,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
 {
 	[Trait("Category", "Integration")]
 	public class OracleIndexTests : OracleIndexTestsBase {
-		[SetUp]
 		public void SetUp( ) {
 			base.SetUp( new OracleDbFactory() );
 		}

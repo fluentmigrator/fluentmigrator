@@ -13,7 +13,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
     {
         protected SqlServer2000Generator Generator;
 
-        [SetUp]
         public void Setup()
         {
             Generator = new SqlServer2000Generator();

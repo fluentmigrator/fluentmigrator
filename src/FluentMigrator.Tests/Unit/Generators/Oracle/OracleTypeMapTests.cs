@@ -13,7 +13,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
     {
         private OracleTypeMap _typeMap;
 
-        [SetUp]
         public void SetUp()
         {
             _typeMap = new OracleTypeMap();

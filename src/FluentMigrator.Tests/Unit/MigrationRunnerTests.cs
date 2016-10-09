@@ -45,7 +45,6 @@ namespace FluentMigrator.Tests.Unit
         private TestVersionLoader _fakeVersionLoader;
         private int _applicationContext;
 
-        [SetUp]
         public void SetUp()
         {
             _applicationContext = new Random().Next();

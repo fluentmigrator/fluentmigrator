@@ -10,7 +10,6 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
     {
         protected MySqlGenerator Generator;
 
-        [SetUp]
         public void Setup()
         {
             Generator = new MySqlGenerator();

@@ -10,7 +10,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
     {
         protected SqlServer2000TypeMap TypeMap { get; private set; }
 
-        [SetUp]
         public void Setup()
         {
             TypeMap = new SqlServer2000TypeMap();

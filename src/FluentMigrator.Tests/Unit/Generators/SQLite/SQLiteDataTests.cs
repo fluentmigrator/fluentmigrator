@@ -9,7 +9,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
     {
         protected SQLiteGenerator Generator;
 
-        [SetUp]
         public void Setup()
         {
             Generator = new SQLiteGenerator();

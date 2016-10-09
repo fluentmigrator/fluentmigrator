@@ -17,7 +17,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         public FirebirdProcessor Processor { get; set; }
         public IQuoter Quoter { get; set; }
 
-        [SetUp]
         public void SetUp()
         {
             FbDatabase.CreateDatabase(IntegrationTestOptions.Firebird.ConnectionString);

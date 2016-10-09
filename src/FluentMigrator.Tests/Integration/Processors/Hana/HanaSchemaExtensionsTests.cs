@@ -17,7 +17,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         public HanaProcessor Processor { get; set; }
         public IQuoter Quoter { get; set; }
 
-        [SetUp]
         public void SetUp()
         {
             Connection = new HanaConnection(IntegrationTestOptions.Hana.ConnectionString);

@@ -12,7 +12,6 @@ namespace FluentMigrator.Tests.Unit
     {
         private Mock<IMigrationContext> context;
 
-        [SetUp]
         public void SetUp()
         {
             context = new Mock<IMigrationContext>();

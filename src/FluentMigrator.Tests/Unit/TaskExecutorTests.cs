@@ -14,7 +14,6 @@ namespace FluentMigrator.Tests.Unit
     {
         #region Setup/Teardown
 
-        [SetUp]
         public void SetUp()
         {
             _migrationRunner = new Mock<IMigrationRunner>();

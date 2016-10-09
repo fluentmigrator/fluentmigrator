@@ -9,7 +9,6 @@ namespace FluentMigrator.Tests.Unit.Initialization
     [Trait("BrokenRuntimes", "Mono")]
     public class ConnectionStringManagerTests
     {
-        [SetUp]
         public void Setup()
         {
             announcerMock = new Mock<IAnnouncer>(MockBehavior.Loose);

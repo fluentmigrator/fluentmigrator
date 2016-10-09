@@ -8,7 +8,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
     {
         protected SqlServer2005Generator Generator;
 
-        [SetUp]
         public void Setup()
         {
             Generator = new SqlServer2005Generator();

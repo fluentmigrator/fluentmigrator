@@ -25,7 +25,6 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
         public SqlServerProcessor Processor;
         public SqlServerSchemaDumper SchemaDumper;
 
-        [SetUp]
         public void Setup()
         {
             Connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);

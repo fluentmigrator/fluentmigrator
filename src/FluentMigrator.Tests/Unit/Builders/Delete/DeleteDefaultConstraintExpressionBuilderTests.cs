@@ -6,7 +6,6 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
     public class DeleteDefaultConstraintExpressionBuilderTests
     {
-        [SetUp]
         public void Setup()
         {
             expression = new DeleteDefaultConstraintExpression();

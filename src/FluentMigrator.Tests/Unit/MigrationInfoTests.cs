@@ -25,7 +25,6 @@ namespace FluentMigrator.Tests.Unit
 {
     public class MigrationInfoTests
     {
-        [SetUp]
         public void Setup()
         {
             _expectedVersion = new Random().Next();

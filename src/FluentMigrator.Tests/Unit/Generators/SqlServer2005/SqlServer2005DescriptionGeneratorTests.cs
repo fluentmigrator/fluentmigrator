@@ -6,7 +6,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 {
     public class SqlServer2005DescriptionGeneratorTests : BaseDescriptionGeneratorTests
     {
-        [SetUp]
         public void Setup()
         {
             descriptionGenerator = new SqlServer2005DescriptionGenerator();

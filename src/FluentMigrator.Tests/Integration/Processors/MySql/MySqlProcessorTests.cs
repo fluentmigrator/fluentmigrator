@@ -18,7 +18,6 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
         [CLSCompliant(false)]
         protected MySqlConnection Connection;
 
-        [SetUp]
         public void SetUp()
         {
             Connection = new MySqlConnection(IntegrationTestOptions.MySql.ConnectionString);

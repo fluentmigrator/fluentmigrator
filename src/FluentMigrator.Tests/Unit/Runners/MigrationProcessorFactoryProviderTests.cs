@@ -29,7 +29,6 @@ namespace FluentMigrator.Tests.Unit.Runners
     {
         private MigrationProcessorFactoryProvider migrationProcessorFactoryProvider;
 
-        [SetUp]
         public void Setup()
         {
             migrationProcessorFactoryProvider = new MigrationProcessorFactoryProvider();

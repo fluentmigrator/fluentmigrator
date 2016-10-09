@@ -16,7 +16,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 		private FbConnection _connection;
 		private FirebirdProcessor _processor;
 
-		[SetUp]
 		public void SetUp()
 		{
             FbDatabase.CreateDatabase(IntegrationTestOptions.Firebird.ConnectionString);

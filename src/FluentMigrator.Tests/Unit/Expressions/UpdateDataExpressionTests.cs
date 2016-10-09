@@ -9,7 +9,6 @@ namespace FluentMigrator.Tests.Unit.Expressions
     public class UpdateDataExpressionTests {
         private UpdateDataExpression expression;
 
-        [SetUp]
         public void Initialize() 
         {
             expression =

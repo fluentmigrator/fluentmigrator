@@ -7,7 +7,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2012
     {
         protected SqlServer2012Generator Generator;
 
-        [SetUp]
         public void Setup()
         {
             Generator = new SqlServer2012Generator();

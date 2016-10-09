@@ -6,7 +6,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 {
     public class PostgresQuotesTests
     {
-        [SetUp]
         public void SetUp()
         {
             quoter = new PostgresQuoter();

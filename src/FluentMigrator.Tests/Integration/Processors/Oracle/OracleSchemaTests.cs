@@ -6,7 +6,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
 {
 	[Trait("Category", "Integration")]
 	public class OracleSchemaTests : OracleSchemaTestsBase {
-		[SetUp]
 		public void SetUp( ) {
 			base.SetUp( new OracleDbFactory() );
 		}

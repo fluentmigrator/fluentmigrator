@@ -7,7 +7,6 @@ namespace FluentMigrator.Tests
 {
     public class MigrationValidatorTests
     {
-        [SetUp]
         public void Setup()
         {
             migration = Mock.Of<IMigration>();

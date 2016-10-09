@@ -9,7 +9,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
     {
         protected FirebirdGenerator Generator;
 
-        [SetUp]
         public void Setup()
         {
             Generator = new FirebirdGenerator(FirebirdOptions.StandardBehaviour());

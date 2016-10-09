@@ -14,7 +14,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
     {
         protected Db2Generator Generator;
 
-        [SetUp]
         public void Setup()
         {
             Generator = new Db2Generator();

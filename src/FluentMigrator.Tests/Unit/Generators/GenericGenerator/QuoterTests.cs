@@ -15,7 +15,6 @@ namespace FluentMigrator.Tests.Unit.Generators
 {
     public class ConstantFormatterTests
     {
-        [SetUp]
         public void SetUp()
         {
             quoter = new GenericQuoter();

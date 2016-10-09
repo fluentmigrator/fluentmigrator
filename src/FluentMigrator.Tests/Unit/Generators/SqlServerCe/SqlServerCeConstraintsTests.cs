@@ -8,7 +8,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
     {
         protected SqlServerCeGenerator Generator;
 
-        [SetUp]
         public void Setup()
         {
             Generator = new SqlServerCeGenerator();

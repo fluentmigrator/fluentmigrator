@@ -18,7 +18,6 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         public SqlServerCeProcessor Processor { get; set; }
         public IQuoter Quoter { get; set; }
 
-        [SetUp]
         public void SetUp()
         {
             DatabaseFilename = "TestDatabase.sdf";

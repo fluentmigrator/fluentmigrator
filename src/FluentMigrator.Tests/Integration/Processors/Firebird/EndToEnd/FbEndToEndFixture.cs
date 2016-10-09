@@ -11,7 +11,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
     [Trait("DbEngine", "Firebird")]
     public class FbEndToEndFixture
     {
-        [SetUp]
         public void SetUp()
         {
             FbDatabase.CreateDatabase(IntegrationTestOptions.Firebird.ConnectionString);

@@ -156,7 +156,6 @@
             result.ShouldBe(string.Empty);
         }
 
-        [SetUp]
         public void SetUp()
         {
             Generator = new Db2Generator();

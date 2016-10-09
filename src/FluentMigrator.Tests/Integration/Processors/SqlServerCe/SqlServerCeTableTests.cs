@@ -16,7 +16,6 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         public SqlCeConnection Connection { get; set; }
         public SqlServerCeProcessor Processor { get; set; }
 
-        [SetUp]
         public void SetUp()
         {
             DatabaseFilename = "TestDatabase.sdf";

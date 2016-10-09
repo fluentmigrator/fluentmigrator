@@ -7,7 +7,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
     {
         protected JetGenerator Generator;
 
-        [SetUp]
         public void Setup()
         {
             Generator = new JetGenerator();

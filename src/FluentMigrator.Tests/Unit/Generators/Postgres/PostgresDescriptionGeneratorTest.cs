@@ -6,7 +6,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 {
     public class PostgresDescriptionGeneratorTests : BaseDescriptionGeneratorTests
     {
-        [SetUp]
         public void Setup()
         {
             descriptionGenerator = new PostgresDescriptionGenerator();

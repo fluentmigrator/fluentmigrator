@@ -13,7 +13,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
     {
         protected SqlServerCeTypeMap TypeMap { get; private set; }
 
-        [SetUp]
         public void Setup()
         {
             TypeMap = new SqlServerCeTypeMap();

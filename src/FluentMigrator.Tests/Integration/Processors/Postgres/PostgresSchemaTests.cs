@@ -13,7 +13,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         public NpgsqlConnection Connection { get; set; }
         public PostgresProcessor Processor { get; set; }
 
-        [SetUp]
         public void SetUp()
         {
             Connection = new NpgsqlConnection(IntegrationTestOptions.Postgres.ConnectionString);

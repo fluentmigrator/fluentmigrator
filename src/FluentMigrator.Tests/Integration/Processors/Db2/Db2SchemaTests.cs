@@ -61,7 +61,6 @@
             }
         }
 
-        [SetUp]
         public void SetUp()
         {
             Factory = new Db2DbFactory();

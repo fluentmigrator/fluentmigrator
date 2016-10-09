@@ -10,7 +10,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
 {
 	[Trait("Category", "Integration")]
 	public class OracleProcessorFactoryTests : OracleProcessorFactoryTestsBase {
-        [SetUp]
         public void SetUp()
         {
 			base.SetUp( new OracleProcessorFactory() );

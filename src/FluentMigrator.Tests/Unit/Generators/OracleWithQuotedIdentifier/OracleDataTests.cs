@@ -8,7 +8,6 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
     {
         protected OracleGenerator Generator;
 
-        [SetUp]
         public void Setup()
         {
             Generator = new OracleGenerator(useQuotedIdentifiers: true);
