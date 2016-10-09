@@ -1,7 +1,6 @@
 ﻿using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Postgres;
 using NUnit.Framework;
-using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.Postgres
 {

@@ -20,7 +20,6 @@ using System.Collections.ObjectModel;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using NUnit.Framework;
-using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {

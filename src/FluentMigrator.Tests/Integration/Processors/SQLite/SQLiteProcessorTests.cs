@@ -28,7 +28,6 @@ using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SQLite;
 using Moq;
 using NUnit.Framework;
-using NUnit.Should;
 
 namespace FluentMigrator.Tests.Integration.Processors.SQLite
 {

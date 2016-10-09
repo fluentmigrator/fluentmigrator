@@ -5,7 +5,6 @@ using FluentMigrator.Model;
 using FluentMigrator.Tests.Helpers;
 using Moq;
 using NUnit.Framework;
-using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {

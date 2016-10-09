@@ -1,6 +1,5 @@
 ﻿using System.Linq;
 using NUnit.Framework;
-using NUnit.Should;
 using FluentMigrator.Expressions;
 using Moq;
 using FluentMigrator.Builders.Delete;

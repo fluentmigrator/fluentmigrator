@@ -8,7 +8,6 @@
     using FluentMigrator.Runner.Generators.DB2;
 
     using NUnit.Framework;
-    using NUnit.Should;
 
     [TestFixture]
     public class Db2ColumnTests : BaseColumnTests

@@ -5,7 +5,6 @@ using FluentMigrator.Runner;
 using FluentMigrator.VersionTableInfo;
 using Moq;
 using NUnit.Framework;
-using NUnit.Should;
 using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Tests.Unit

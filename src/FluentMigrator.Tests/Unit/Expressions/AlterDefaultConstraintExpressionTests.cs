@@ -2,7 +2,6 @@
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
-using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {

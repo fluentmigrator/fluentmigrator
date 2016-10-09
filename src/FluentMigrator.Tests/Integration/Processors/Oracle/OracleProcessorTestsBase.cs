@@ -11,7 +11,6 @@ using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Tests.Helpers;
 
 using NUnit.Framework;
-using NUnit.Should;
 
 namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 	[Category("Integration")]

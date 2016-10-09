@@ -2,7 +2,6 @@
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.DB2;
 using NUnit.Framework;
-using NUnit.Should;
 using System;
 using System.Collections.Generic;
 using System.Data;

@@ -27,7 +27,6 @@ using FluentMigrator.Runner.Processors;
 using FluentMigrator.Tests.Integration.Migrations;
 using Moq;
 using NUnit.Framework;
-using NUnit.Should;
 using System.Linq;
 
 namespace FluentMigrator.Tests.Unit

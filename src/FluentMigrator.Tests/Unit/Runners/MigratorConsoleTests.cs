@@ -21,7 +21,6 @@ using System.IO;
 using System.Text;
 using FluentMigrator.Console;
 using NUnit.Framework;
-using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Runners
 {

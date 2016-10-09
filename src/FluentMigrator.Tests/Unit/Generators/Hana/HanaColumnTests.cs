@@ -1,6 +1,5 @@
 ﻿using FluentMigrator.Runner.Generators.Hana;
 using NUnit.Framework;
-using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.Hana
 {

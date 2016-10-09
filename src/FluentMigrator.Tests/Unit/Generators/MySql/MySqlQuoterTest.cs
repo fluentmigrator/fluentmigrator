@@ -10,7 +10,6 @@ using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
-using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.MySql
 {

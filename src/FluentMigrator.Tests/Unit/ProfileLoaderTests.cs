@@ -4,7 +4,6 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using Moq;
 using NUnit.Framework;
-using NUnit.Should;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Tests.Unit

@@ -42,7 +42,6 @@ using FluentMigrator.Tests.Unit;
 using FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3;
 using Moq;
 using NUnit.Framework;
-using NUnit.Should;
 
 namespace FluentMigrator.Tests.Integration
 {

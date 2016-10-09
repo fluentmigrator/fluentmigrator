@@ -6,7 +6,6 @@ using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Hana;
 using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
-using NUnit.Should;
 using Sap.Data.Hana;
 
 namespace FluentMigrator.Tests.Integration.Processors.Hana

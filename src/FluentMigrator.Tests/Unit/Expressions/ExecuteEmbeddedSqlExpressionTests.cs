@@ -3,7 +3,6 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Tests.Helpers;
 using FluentMigrator.Infrastructure;
 using Moq;
-using NUnit.Should;
 using System;
 using System.Reflection;
 

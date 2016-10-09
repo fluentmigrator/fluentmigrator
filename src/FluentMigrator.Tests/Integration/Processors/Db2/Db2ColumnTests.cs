@@ -13,7 +13,6 @@
     using FluentMigrator.Tests.Helpers;
 
     using NUnit.Framework;
-    using NUnit.Should;
 
     [TestFixture]
     [Category("Integration")]

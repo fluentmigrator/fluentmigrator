@@ -12,7 +12,6 @@ using FluentMigrator.SchemaDump.SchemaDumpers;
 using FluentMigrator.Tests.Helpers;
 using FluentMigrator.Tests.Integration.Migrations;
 using NUnit.Framework;
-using NUnit.Should;
 using FluentMigrator.Runner.Generators.SqlServer;
 using System.Linq;
 

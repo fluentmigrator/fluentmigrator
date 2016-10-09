@@ -1,7 +1,6 @@
 ﻿using System.Data;
 using FluentMigrator.Runner.Generators.Jet;
 using NUnit.Framework;
-using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.Jet
 {

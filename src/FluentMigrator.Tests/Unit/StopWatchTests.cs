@@ -19,7 +19,6 @@
 using System;
 using FluentMigrator.Runner;
 using NUnit.Framework;
-using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit
 {

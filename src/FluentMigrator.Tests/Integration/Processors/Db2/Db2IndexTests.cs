@@ -12,7 +12,6 @@
     using FluentMigrator.Runner.Processors.DB2;
 
     using NUnit.Framework;
-    using NUnit.Should;
     using FluentMigrator.Tests.Helpers;
 
     [TestFixture]

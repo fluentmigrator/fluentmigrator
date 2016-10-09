@@ -4,7 +4,6 @@ using System.Linq;
 using System.Text;
 using FluentMigrator.Runner.Generators;
 using NUnit.Framework;
-using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {

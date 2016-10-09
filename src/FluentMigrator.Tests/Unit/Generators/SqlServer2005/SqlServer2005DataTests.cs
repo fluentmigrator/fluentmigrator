@@ -1,7 +1,6 @@
 ﻿using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
-using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 {

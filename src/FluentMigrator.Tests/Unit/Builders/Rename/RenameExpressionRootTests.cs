@@ -24,7 +24,6 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using Moq;
 using NUnit.Framework;
-using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Builders.Rename
 {

@@ -20,7 +20,6 @@ using FluentMigrator.Builders.Schema;
 using FluentMigrator.Infrastructure;
 using Moq;
 using NUnit.Framework;
-using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Builders.Schema
 {

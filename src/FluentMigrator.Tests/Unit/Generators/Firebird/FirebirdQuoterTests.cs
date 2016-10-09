@@ -1,7 +1,6 @@
 ﻿using System;
 using FluentMigrator.Runner.Generators.Firebird;
 using NUnit.Framework;
-using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.Firebird
 {

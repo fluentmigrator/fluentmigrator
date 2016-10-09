@@ -6,7 +6,6 @@ using FluentMigrator.Model;
 using FluentMigrator.Runner.Extensions;
 using Moq;
 using NUnit.Framework;
-using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
