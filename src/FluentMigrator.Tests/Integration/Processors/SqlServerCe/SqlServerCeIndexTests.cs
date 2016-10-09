@@ -1,4 +1,4 @@
-﻿using System.Data.SqlServerCe;
+using System.Data.SqlServerCe;
 using System.IO;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.SqlServer;
@@ -16,7 +16,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         public SqlCeConnection Connection { get; set; }
         public SqlServerCeProcessor Processor { get; set; }
 
-        public void SetUp()
+        public SqlServerCeIndexTests()
         {
             DatabaseFilename = "TestDatabase.sdf";
             RecreateDatabase();
@@ -117,3 +117,4 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         }
     }
 }
+

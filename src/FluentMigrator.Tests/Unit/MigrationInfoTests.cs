@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Unit
 {
     public class MigrationInfoTests
     {
-        public void Setup()
+        public MigrationInfoTests()
         {
             _expectedVersion = new Random().Next();
             _migration = Mock.Of<IMigration>();

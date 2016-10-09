@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Exceptions;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Generators.SQLite;
 using Xunit;
@@ -9,7 +9,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
     {
         protected SQLiteGenerator Generator;
 
-        public void Setup()
+        public SQLiteDataTests()
         {
             Generator = new SQLiteGenerator();
         }
@@ -178,3 +178,4 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
     }
 }
+

@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.AssemblyLoader
     {
         private AssemblyLoaderFactory assemblyLoaderFactory;
 
-        public void Setup()
+        public AssemblyLoaderTests()
         {
             assemblyLoaderFactory = new AssemblyLoaderFactory();
         }

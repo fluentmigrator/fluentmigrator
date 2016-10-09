@@ -1,4 +1,4 @@
-﻿namespace FluentMigrator.Tests.Integration.Processors.Db2
+namespace FluentMigrator.Tests.Integration.Processors.Db2
 {
     using System;
     using System.Collections.Generic;
@@ -42,7 +42,7 @@
 
         #region Methods
 
-        public void SetUp()
+        public Db2ProcessorTests()
         {
             Factory = new Db2DbFactory();
             Connection = Factory.CreateConnection(IntegrationTestOptions.Db2.ConnectionString);

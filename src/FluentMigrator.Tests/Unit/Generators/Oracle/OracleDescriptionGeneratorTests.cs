@@ -6,7 +6,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {
     public class OracleDescriptionGeneratorTests : BaseDescriptionGeneratorTests
     {
-        public void Setup()
+        public OracleDescriptionGeneratorTests()
         {
             descriptionGenerator = new OracleDescriptionGenerator();
         }

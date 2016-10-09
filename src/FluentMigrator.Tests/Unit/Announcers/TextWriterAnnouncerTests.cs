@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.Announcers
 {
     public class TextWriterAnnouncerTests
     {
-        public void SetUp()
+        public TextWriterAnnouncerTests()
         {
             _stringWriter = new StringWriter();
             _announcer = new TextWriterAnnouncer(_stringWriter)

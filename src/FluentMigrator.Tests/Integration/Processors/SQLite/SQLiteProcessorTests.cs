@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
         private string tableName;
         private string tableNameThanMustBeEscaped;
 
-        public void SetUp()
+        public SQLiteProcessorTests()
         {
             // This connection used in the tests
             var factory = new SQLiteDbFactory();

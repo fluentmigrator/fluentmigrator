@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.Announcers
 {
     public class AnnouncerTests
     {
-        public void Setup()
+        public AnnouncerTests()
         {
             var announcerMock = new Mock<Announcer> {CallBase = true};
             announcer = announcerMock.Object;

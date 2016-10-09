@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using FluentMigrator.Runner.Generators.Postgres;
 using Xunit;
 
@@ -6,7 +6,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 {
     public class PostgresDescriptionGeneratorTests : BaseDescriptionGeneratorTests
     {
-        public void Setup()
+        public PostgresDescriptionGeneratorTests()
         {
             descriptionGenerator = new PostgresDescriptionGenerator();
         }
@@ -59,3 +59,4 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
     }
 }
+

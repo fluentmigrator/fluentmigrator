@@ -19,7 +19,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		private IAnnouncer announcer;
 		private ProcessorOptions options;
 
-		protected void SetUp(IMigrationProcessorFactory processorFactory)
+		protected OracleProcessorFactoryTestsBase(IMigrationProcessorFactory processorFactory)
 		{
 			this.factory = processorFactory;
 			this.connectionString = "Data Source=localhost/XE;User Id=Something;Password=Something";

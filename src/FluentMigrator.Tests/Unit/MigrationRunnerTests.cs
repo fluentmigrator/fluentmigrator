@@ -45,7 +45,7 @@ namespace FluentMigrator.Tests.Unit
         private TestVersionLoader _fakeVersionLoader;
         private int _applicationContext;
 
-        public void SetUp()
+        public MigrationRunnerTests()
         {
             _applicationContext = new Random().Next();
             _migrationList = new SortedList<long, IMigrationInfo>();
@@ -532,3 +532,4 @@ namespace FluentMigrator.Tests.Unit
 
     }
 }
+

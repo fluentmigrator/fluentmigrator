@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Postgres;
 using Xunit;
 
@@ -6,7 +6,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 {
     public class PostgresQuotesTests
     {
-        public void SetUp()
+        public PostgresQuotesTests()
         {
             quoter = new PostgresQuoter();
         }

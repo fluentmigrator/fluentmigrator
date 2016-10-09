@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
@@ -13,7 +13,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
     {
         protected SqlServerCeGenerator Generator;
 
-        public void Setup()
+        public SqlServerCeGeneratorTests()
         {
             Generator = new SqlServerCeGenerator();
         }

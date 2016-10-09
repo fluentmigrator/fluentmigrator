@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
@@ -12,7 +12,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
     {
         protected IMigrationGenerator Generator;
 
-        public void Setup()
+        public SqlServer2005GeneratorTests()
         {
             Generator = new SqlServer2008Generator();
         }

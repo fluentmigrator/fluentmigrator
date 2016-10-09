@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
         private string _testSchema;
         private SchemaExpressionRoot _builder;
 
-        public void SetUp()
+        public SchemaExpressionRootTest()
         {
             _migrationContextMock = new Mock<IMigrationContext>();
             _querySchemaMock = new Mock<IQuerySchema>();
@@ -122,3 +122,4 @@ namespace FluentMigrator.Tests.Unit.Builders.Schema
         }
     }
 }
+

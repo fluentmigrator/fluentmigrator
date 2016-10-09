@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Runner.Extensions;
+using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Generators.SqlServer;
 using Xunit;
 
@@ -8,7 +8,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
     {
         protected SqlServer2000Generator Generator;
 
-        public void Setup()
+        public SqlServer2000DataTests()
         {
             Generator = new SqlServer2000Generator();
         }
@@ -184,3 +184,4 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         }
     }
 }
+

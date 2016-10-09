@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 
 using FluentMigrator.Runner.Generators.SqlServer;
@@ -13,7 +13,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
     {
         protected SqlServerCeTypeMap TypeMap { get; private set; }
 
-        public void Setup()
+        public SqlServerCeTypeMapTests()
         {
             TypeMap = new SqlServerCeTypeMap();
         }
@@ -348,3 +348,4 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
     }
 }
+

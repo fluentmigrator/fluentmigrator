@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Exceptions;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Generators.SqlServer;
 using Xunit;
 
@@ -8,7 +8,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
     {
         protected SqlServerCeGenerator Generator;
 
-        public void Setup()
+        public SqlServerCeColumnTests()
         {
             Generator = new SqlServerCeGenerator();
         }
@@ -170,3 +170,4 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
     }
 }
+

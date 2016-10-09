@@ -14,7 +14,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
         public SqlConnection Connection { get; set; }
         public SqlServerProcessor Processor { get; set; }
 
-        public void SetUp()
+        public SqlServerSequenceTests()
         {
             Connection = new SqlConnection(IntegrationTestOptions.SqlServer2012.ConnectionString);
             Processor = new SqlServerProcessor(Connection, new SqlServer2012Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());

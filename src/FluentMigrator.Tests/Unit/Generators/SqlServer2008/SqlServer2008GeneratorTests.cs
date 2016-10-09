@@ -11,7 +11,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
     {
         protected SqlServer2008Generator Generator;
 
-        public void Setup()
+        public SqlServer2008GeneratorTests()
         {
             Generator = new SqlServer2008Generator();
         }

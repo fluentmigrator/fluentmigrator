@@ -8,7 +8,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
     {
         protected MySqlGenerator Generator;
 
-        public void Setup()
+        public MySqlConstraintsTests()
         {
             Generator = new MySqlGenerator();
         }

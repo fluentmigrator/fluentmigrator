@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Runner.Generators.SqlServer;
 using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2012
@@ -7,7 +7,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2012
     {
         protected SqlServer2012Generator Generator;
 
-        public void Setup()
+        public SqlServer2012SequenceTests()
         {
             Generator = new SqlServer2012Generator();
         }

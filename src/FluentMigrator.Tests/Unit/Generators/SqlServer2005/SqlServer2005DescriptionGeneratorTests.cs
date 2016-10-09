@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using FluentMigrator.Runner.Generators.SqlServer;
 using Xunit;
 
@@ -6,7 +6,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 {
     public class SqlServer2005DescriptionGeneratorTests : BaseDescriptionGeneratorTests
     {
-        public void Setup()
+        public SqlServer2005DescriptionGeneratorTests()
         {
             descriptionGenerator = new SqlServer2005DescriptionGenerator();
         }
@@ -59,3 +59,4 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
     }
 }
+

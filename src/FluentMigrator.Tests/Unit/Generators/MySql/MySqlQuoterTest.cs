@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Threading;
 using FluentMigrator.Model;
@@ -18,7 +18,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         private IQuoter quoter = default(MySqlQuoter);
         private readonly CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
 
-        public void SetUp()
+        public MySqlQuoterTest()
         {
             quoter = new MySqlQuoter();
         }
@@ -31,3 +31,4 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         }
     }
 }
+

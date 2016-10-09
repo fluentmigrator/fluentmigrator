@@ -8,7 +8,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
     {
         protected HanaGenerator Generator;
 
-        public void Setup()
+        public HanaConstraintsTests()
         {
             Generator = new HanaGenerator();
         }

@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         private MaintenanceLoader _maintenanceLoader;
         private MaintenanceLoader _maintenanceLoaderNoTags;
 
-        public void Setup()
+        public MaintenanceLoaderTests()
         {
             _migrationConventions = new Mock<IMigrationConventions>();
             _migrationConventions.Setup(x => x.GetMaintenanceStage).Returns(DefaultMigrationConventions.GetMaintenanceStage);

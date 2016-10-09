@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using FluentMigrator.Runner.Generators.SqlServer;
 using Xunit;
@@ -10,7 +10,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
     {
         protected SqlServer2000TypeMap TypeMap { get; private set; }
 
-        public void Setup()
+        public SqlServer2000TypeMapTests()
         {
             TypeMap = new SqlServer2000TypeMap();
         }

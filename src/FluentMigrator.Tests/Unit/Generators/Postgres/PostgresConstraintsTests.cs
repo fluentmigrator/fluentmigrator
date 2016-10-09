@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using FluentMigrator.Runner.Generators.Postgres;
 using Xunit;
 
@@ -8,7 +8,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
     {
         protected PostgresGenerator Generator;
 
-        public void Setup()
+        public PostgresConstraintsTests()
         {
             Generator = new PostgresGenerator();
         }

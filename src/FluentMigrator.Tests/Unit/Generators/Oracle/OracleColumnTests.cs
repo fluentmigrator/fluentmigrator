@@ -8,7 +8,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
     {
         protected OracleGenerator Generator;
 
-        public void Setup()
+        public OracleColumnTests()
         {
             Generator = new OracleGenerator();
         }

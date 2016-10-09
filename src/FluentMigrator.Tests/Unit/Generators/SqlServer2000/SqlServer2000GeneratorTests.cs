@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
@@ -13,7 +13,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
     {
         protected SqlServer2000Generator Generator;
 
-        public void Setup()
+        public SqlServer2000GeneratorTests()
         {
             Generator = new SqlServer2000Generator();
         }

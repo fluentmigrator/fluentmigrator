@@ -7,7 +7,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
     {
         protected PostgresGenerator Generator;
 
-        public void Setup()
+        public PostgresSchemaTests()
         {
             Generator = new PostgresGenerator();
         }

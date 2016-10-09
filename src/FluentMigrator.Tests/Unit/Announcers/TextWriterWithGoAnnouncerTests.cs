@@ -13,7 +13,7 @@ namespace FluentMigrator.Tests.Unit.Announcers
         private StringWriter _stringWriter;
         private TextWriterWithGoAnnouncer announcer;
 
-        public void TestSetup()
+        public TextWriterWithGoAnnouncerTests()
         {
             _stringWriter = new StringWriter();
             announcer = new TextWriterWithGoAnnouncer(_stringWriter)

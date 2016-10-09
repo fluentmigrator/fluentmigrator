@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Exceptions;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Oracle;
 using Xunit;
@@ -9,7 +9,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
     {
         protected OracleGenerator Generator;
 
-        public void Setup()
+        public OracleGeneratorTests()
         {
             Generator = new OracleGenerator(useQuotedIdentifiers: true);
         }
@@ -49,3 +49,4 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
     }
 }
+

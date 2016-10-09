@@ -12,7 +12,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
     {
         protected Db2Generator Generator;
 
-        public void Setup()
+        public Db2ConstraintTests()
         {
             Generator = new Db2Generator();
         }

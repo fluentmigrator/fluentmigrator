@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Oracle;
 using Xunit;
@@ -9,7 +9,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
     {
         private IQuoter _quoter;
 
-        public void SetUp()
+        public OracleQuoterTest()
         {
             _quoter = new OracleQuoter();
         }

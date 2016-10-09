@@ -12,7 +12,7 @@ namespace FluentMigrator.Tests.Unit
     {
         private Mock<IMigrationContext> context;
 
-        public void SetUp()
+        public AutoReversingMigrationTests()
         {
             context = new Mock<IMigrationContext>();
             context.SetupAllProperties();

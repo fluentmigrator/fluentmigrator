@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Runner.Generators.SqlServer;
 using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
@@ -7,7 +7,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
     {
         protected SqlServer2005Generator Generator;
 
-        public void Setup()
+        public SqlServer2005TableTests()
         {
             Generator = new SqlServer2005Generator();
         }
@@ -253,3 +253,4 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
     }
 }
+

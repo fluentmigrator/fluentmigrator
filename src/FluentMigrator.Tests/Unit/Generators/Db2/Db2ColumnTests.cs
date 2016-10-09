@@ -1,4 +1,4 @@
-﻿namespace FluentMigrator.Tests.Unit.Generators.Db2
+namespace FluentMigrator.Tests.Unit.Generators.Db2
 {
     using System;
     using System.Collections.Generic;
@@ -156,7 +156,7 @@
             result.ShouldBe(string.Empty);
         }
 
-        public void SetUp()
+        public Db2ColumnTests()
         {
             Generator = new Db2Generator();
         }

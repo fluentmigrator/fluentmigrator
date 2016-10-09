@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Collections.Generic;
 using System;
 
@@ -10,9 +10,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle
 {
 	[Trait("Category", "Integration")]
 	public class OracleProcessorFactoryTests : OracleProcessorFactoryTestsBase {
-        public void SetUp()
+        public OracleProcessorFactoryTests()
+            : base(new OracleProcessorFactory())
         {
-			base.SetUp( new OracleProcessorFactory() );
         }
 	}
 }

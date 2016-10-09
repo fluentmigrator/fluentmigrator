@@ -20,7 +20,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		private OracleProcessor Processor { get; set; }
 		private IDbFactory Factory { get; set; }
 
-		protected void SetUp(IDbFactory dbFactory)
+		protected OracleConstraintTestsBase(IDbFactory dbFactory)
 		{
 			this.Factory = dbFactory;
 			this.Connection = this.Factory.CreateConnection(IntegrationTestOptions.Oracle.ConnectionString);

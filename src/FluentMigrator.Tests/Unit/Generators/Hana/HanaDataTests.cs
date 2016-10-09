@@ -7,7 +7,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
     {
         protected HanaGenerator Generator;
 
-        public void Setup()
+        public HanaDataTests()
         {
             Generator = new HanaGenerator();
         }

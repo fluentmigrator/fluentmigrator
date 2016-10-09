@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -13,7 +13,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
     {
         private OracleTypeMap _typeMap;
 
-        public void SetUp()
+        public OracleTypeMapTests()
         {
             _typeMap = new OracleTypeMap();
         }
@@ -193,3 +193,4 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
     }
 }
+

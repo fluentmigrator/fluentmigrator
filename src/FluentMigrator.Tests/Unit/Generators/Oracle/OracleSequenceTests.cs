@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Runner.Generators.Oracle;
+using FluentMigrator.Runner.Generators.Oracle;
 using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Oracle
@@ -7,7 +7,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
     {
         protected OracleGenerator Generator;
 
-        public void Setup()
+        public OracleSequenceTests()
         {
             Generator = new OracleGenerator();
         }

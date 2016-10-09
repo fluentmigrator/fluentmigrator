@@ -1,4 +1,4 @@
-﻿using FirebirdSql.Data.FirebirdClient;
+using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Processors;
@@ -15,7 +15,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         public FbConnection Connection { get; set; }
         public FirebirdProcessor Processor { get; set; }
 
-        public void SetUp()
+        public FirebirdTableTests()
         {
             FbDatabase.CreateDatabase(IntegrationTestOptions.Firebird.ConnectionString);
 

@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
     {
         public OleDbConnection Connection { get; set; }
         public JetProcessor Processor { get; set; }
-        public void SetUp()
+        public JetProcessorTests()
         {
             Connection = new OleDbConnection(IntegrationTestOptions.Jet.ConnectionString);
             Processor = new JetProcessor(Connection, new JetGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());

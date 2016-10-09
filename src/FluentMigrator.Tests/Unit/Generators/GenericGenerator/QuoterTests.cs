@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Threading;
 using FluentMigrator.Model;
@@ -15,7 +15,7 @@ namespace FluentMigrator.Tests.Unit.Generators
 {
     public class ConstantFormatterTests
     {
-        public void SetUp()
+        public ConstantFormatterTests()
         {
             quoter = new GenericQuoter();
         }

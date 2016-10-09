@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Unit
     public class AnnouncerExtensionsTests
     {
         
-        public void Setup()
+        public AnnouncerExtensionsTests()
         {
             announcer = new Mock<IAnnouncer>(MockBehavior.Strict).Object;
         }

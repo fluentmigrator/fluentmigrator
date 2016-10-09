@@ -26,7 +26,7 @@ namespace FluentMigrator.Tests.Unit.Versioning
 	{
 		private VersionInfo _versionInfo;
 
-		public void SetUp()
+		public VersionInfoTests()
 		{
 			_versionInfo = new VersionInfo();			
 		}
@@ -57,3 +57,4 @@ namespace FluentMigrator.Tests.Unit.Versioning
 		}
 	}
 }
+

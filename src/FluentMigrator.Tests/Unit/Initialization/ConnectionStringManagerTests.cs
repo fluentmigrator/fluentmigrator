@@ -1,4 +1,4 @@
-﻿using System.Configuration;
+using System.Configuration;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using Moq;
@@ -9,7 +9,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
     [Trait("BrokenRuntimes", "Mono")]
     public class ConnectionStringManagerTests
     {
-        public void Setup()
+        public ConnectionStringManagerTests()
         {
             announcerMock = new Mock<IAnnouncer>(MockBehavior.Loose);
             announcerMock.Setup(a => a.Say(It.IsAny<string>()));

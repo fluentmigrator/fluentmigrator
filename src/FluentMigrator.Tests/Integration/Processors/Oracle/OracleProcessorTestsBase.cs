@@ -22,7 +22,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		private IDbFactory Factory { get; set; }
 		private IQuoter Quoter { get { return this.Processor.Quoter; } }
 
-		protected void SetUp(IDbFactory dbFactory)
+		protected OracleProcessorTestsBase(IDbFactory dbFactory)
 		{
 			this.Factory = dbFactory;
 			this.Connection = this.Factory.CreateConnection(IntegrationTestOptions.Oracle.ConnectionString);

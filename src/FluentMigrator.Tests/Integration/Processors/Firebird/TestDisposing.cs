@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Announcers;
@@ -16,7 +16,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 		private FbConnection _connection;
 		private FirebirdProcessor _processor;
 
-		public void SetUp()
+		public TestDisposing()
 		{
             FbDatabase.CreateDatabase(IntegrationTestOptions.Firebird.ConnectionString);
 
@@ -66,3 +66,4 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
 	}
 }
+

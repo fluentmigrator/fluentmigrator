@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 
 using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
@@ -15,7 +15,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
     {
         protected SQLiteGenerator Generator;
 
-        public void Setup()
+        public SQLiteGeneratorTests()
         {
             Generator = new SQLiteGenerator();
         }
@@ -131,3 +131,4 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
     }
 }
+
