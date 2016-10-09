@@ -15,7 +15,7 @@ using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
-    [Category("Firebird")]
+    [Trait("DbEngine", "Firebird")]
     public class FirebirdEmbeddedTableTests
     {
         public class AutoDeleter: IDisposable

@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
     }
 
     [Trait("Category", "Integration")]
-    [Category("Firebird")]
+    [Trait("DbEngine", "Firebird")]
     public class TestInitialMigration : FbEndToEndFixture
     {
         [TestCase("SIMPLE")]

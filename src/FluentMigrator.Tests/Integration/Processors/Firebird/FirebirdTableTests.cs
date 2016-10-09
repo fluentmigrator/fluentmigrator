@@ -9,7 +9,7 @@ using Xunit;
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
     [Trait("Category", "Integration")]
-    [Category("Firebird")]
+    [Trait("DbEngine", "Firebird")]
     public class FirebirdTableTests : BaseTableTests
     {
         public FbConnection Connection { get; set; }
