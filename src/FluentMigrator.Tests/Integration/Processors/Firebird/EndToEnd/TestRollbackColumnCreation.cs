@@ -1,6 +1,6 @@
 ﻿using FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd.ExplicitlyCreatedFk;
 using FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd.ImplicitlyCreatedFk;
-using NUnit.Framework;
+using Xunit;
 using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd

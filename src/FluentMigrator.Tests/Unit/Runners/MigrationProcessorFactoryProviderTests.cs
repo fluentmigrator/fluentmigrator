@@ -21,7 +21,7 @@ using FluentMigrator.Runner.Processors.Hana;
 using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Runners
 {

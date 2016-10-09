@@ -1,6 +1,6 @@
 ﻿using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Generators.SqlServer;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 {

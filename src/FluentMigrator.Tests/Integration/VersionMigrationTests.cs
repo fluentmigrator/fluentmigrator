@@ -26,7 +26,7 @@ using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Tests.Unit;
 using FluentMigrator.VersionTableInfo;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration
 {

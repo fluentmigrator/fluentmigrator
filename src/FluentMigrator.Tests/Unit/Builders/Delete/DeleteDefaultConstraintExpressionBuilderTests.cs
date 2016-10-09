@@ -1,6 +1,6 @@
 ﻿using FluentMigrator.Builders.Delete.DefaultConstraint;
 using FluentMigrator.Expressions;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Builders.Delete
 {

@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using Xunit;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Tests.Unit

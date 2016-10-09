@@ -19,7 +19,7 @@
 using System.Collections.ObjectModel;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using FluentMigrator.Runner.Extensions;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Runners
 {

@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using FluentMigrator.Runner.Generators.Postgres;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Postgres
 {

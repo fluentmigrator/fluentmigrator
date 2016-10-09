@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using NUnit.Framework;
+using Xunit;
 using FluentMigrator.Runner.Initialization;
 using System.Configuration;
 

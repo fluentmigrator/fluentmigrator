@@ -20,7 +20,7 @@ using System.IO;
 using System.Reflection;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit
 {

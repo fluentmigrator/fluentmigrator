@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using Xunit;
 using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Tests.Integration

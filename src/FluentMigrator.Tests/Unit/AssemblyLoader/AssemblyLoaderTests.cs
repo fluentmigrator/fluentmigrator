@@ -17,7 +17,7 @@
 #endregion
 
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.AssemblyLoader
 {

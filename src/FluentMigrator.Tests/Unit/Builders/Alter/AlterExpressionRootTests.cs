@@ -23,7 +23,7 @@ using FluentMigrator.Builders.Alter.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Builders.Alter
 {

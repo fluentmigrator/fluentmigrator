@@ -3,7 +3,7 @@ using System.Data;
 
 using FluentMigrator.Runner.Generators.SqlServer;
 
-using NUnit.Framework;
+using Xunit;
 
 using Shouldly;
 

@@ -27,7 +27,7 @@ using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Extensions;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 using FluentMigrator.Builders;
 
 namespace FluentMigrator.Tests.Unit.Builders.Create

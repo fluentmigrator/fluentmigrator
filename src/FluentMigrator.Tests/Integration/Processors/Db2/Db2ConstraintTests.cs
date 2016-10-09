@@ -12,7 +12,7 @@
     using FluentMigrator.Runner.Processors.DB2;
     using FluentMigrator.Tests.Helpers;
 
-    using NUnit.Framework;
+    using Xunit;
 
     [TestFixture]
     [Category("Integration")]

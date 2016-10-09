@@ -20,7 +20,7 @@ using System;
 using System.IO;
 using System.Text;
 using FluentMigrator.Console;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Runners
 {

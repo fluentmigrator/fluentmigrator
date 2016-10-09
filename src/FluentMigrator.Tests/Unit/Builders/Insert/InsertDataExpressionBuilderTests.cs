@@ -20,7 +20,7 @@ using System.Collections.Generic;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Extensions;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Builders.Insert
 {

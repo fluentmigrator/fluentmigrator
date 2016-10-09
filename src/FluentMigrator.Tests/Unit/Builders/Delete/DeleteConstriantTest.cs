@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using NUnit.Framework;
+using Xunit;
 using FluentMigrator.Expressions;
 using Moq;
 using FluentMigrator.Infrastructure;

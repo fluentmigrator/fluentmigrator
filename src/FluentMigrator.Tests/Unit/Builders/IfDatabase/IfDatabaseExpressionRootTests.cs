@@ -23,7 +23,7 @@ using FluentMigrator.Builders.IfDatabase;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Processors.Jet;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 using System.Collections.Generic;
 using System.Linq;
 

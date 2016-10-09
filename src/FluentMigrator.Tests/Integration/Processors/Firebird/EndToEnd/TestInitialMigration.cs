@@ -1,5 +1,5 @@
 ﻿using FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd.SimpleMigration;
-using NUnit.Framework;
+using Xunit;
 using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd

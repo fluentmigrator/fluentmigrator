@@ -10,7 +10,7 @@
     using FluentMigrator.Runner.Processors;
     using FluentMigrator.Runner.Processors.DB2;
 
-    using NUnit.Framework;
+    using Xunit;
     using FluentMigrator.Tests.Helpers;
 
     [TestFixture]

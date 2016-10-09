@@ -3,7 +3,7 @@ using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.Hana;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Hana;
-using NUnit.Framework;
+using Xunit;
 using Sap.Data.Hana;
 
 namespace FluentMigrator.Tests.Integration.Processors.Hana

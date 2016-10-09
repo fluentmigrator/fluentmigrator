@@ -18,7 +18,7 @@
 
 using System.Linq;
 using FluentMigrator.Runner.Versioning;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Versioning
 {

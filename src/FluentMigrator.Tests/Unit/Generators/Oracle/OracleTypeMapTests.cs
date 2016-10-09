@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Oracle;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {

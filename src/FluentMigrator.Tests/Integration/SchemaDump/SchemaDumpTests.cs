@@ -11,7 +11,7 @@ using FluentMigrator.Model;
 using FluentMigrator.SchemaDump.SchemaDumpers;
 using FluentMigrator.Tests.Helpers;
 using FluentMigrator.Tests.Integration.Migrations;
-using NUnit.Framework;
+using Xunit;
 using FluentMigrator.Runner.Generators.SqlServer;
 using System.Linq;
 

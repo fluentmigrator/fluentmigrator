@@ -7,7 +7,7 @@
 
     using FluentMigrator.Runner.Generators.DB2;
 
-    using NUnit.Framework;
+    using Xunit;
 
     [TestFixture]
     public class Db2ColumnTests : BaseColumnTests

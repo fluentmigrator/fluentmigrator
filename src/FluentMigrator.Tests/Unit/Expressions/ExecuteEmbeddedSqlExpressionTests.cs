@@ -1,4 +1,4 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 using FluentMigrator.Expressions;
 using FluentMigrator.Tests.Helpers;
 using FluentMigrator.Infrastructure;

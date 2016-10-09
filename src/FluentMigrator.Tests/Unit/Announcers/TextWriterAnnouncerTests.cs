@@ -19,7 +19,7 @@
 using System;
 using System.IO;
 using FluentMigrator.Runner.Announcers;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Announcers
 {

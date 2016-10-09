@@ -7,7 +7,7 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Generators.SQLite;
 
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.SQLite
 {

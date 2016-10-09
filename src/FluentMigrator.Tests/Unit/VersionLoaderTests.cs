@@ -4,7 +4,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.VersionTableInfo;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Tests.Unit

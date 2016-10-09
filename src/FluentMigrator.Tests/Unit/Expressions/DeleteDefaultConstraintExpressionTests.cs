@@ -2,7 +2,7 @@
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Tests.Helpers;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {

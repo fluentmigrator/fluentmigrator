@@ -1,5 +1,5 @@
 ﻿using FluentMigrator.Runner.Generators.Oracle;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
 {

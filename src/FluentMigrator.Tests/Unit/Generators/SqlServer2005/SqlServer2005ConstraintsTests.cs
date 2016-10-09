@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Data;
 using FluentMigrator.Runner.Generators.SqlServer;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 {

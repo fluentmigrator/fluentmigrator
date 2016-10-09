@@ -3,7 +3,7 @@ using System.Reflection;
 using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
 {

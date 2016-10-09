@@ -2,7 +2,7 @@
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Initialization
 {

@@ -1,7 +1,7 @@
 ﻿using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests
 {

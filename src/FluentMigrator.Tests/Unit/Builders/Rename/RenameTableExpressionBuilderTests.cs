@@ -19,7 +19,7 @@
 using FluentMigrator.Builders.Rename.Table;
 using FluentMigrator.Expressions;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Builders.Rename
 {

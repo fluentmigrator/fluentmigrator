@@ -1,5 +1,5 @@
 ﻿using FluentMigrator.Runner.Announcers;
-using NUnit.Framework;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.IO;

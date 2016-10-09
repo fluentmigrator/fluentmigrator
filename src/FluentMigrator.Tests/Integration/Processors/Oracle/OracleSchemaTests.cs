@@ -1,6 +1,6 @@
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors.Oracle;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Oracle
 {

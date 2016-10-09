@@ -25,7 +25,7 @@ using FluentMigrator.Runner;
 using FluentMigrator.Tests.Integration.Migrations;
 using FluentMigrator.Tests.Unit.TaggingTestFakes;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 using System.Linq;
 
 namespace FluentMigrator.Tests.Unit

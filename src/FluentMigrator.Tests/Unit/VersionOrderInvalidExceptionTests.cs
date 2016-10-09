@@ -18,7 +18,7 @@ using System;
 using System.Collections.Generic;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit
 {
