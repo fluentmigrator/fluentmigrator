@@ -19,7 +19,7 @@ namespace FluentMigrator.Tests.Unit
             context.SetupAllProperties();
         }
 
-        [Test]
+        [Fact]
         public void CreateTableUpAutoReversingMigrationGivesDeleteTableDown()
         {
             var autoReversibleMigration = new TestAutoReversingMigration();
@@ -29,7 +29,7 @@ namespace FluentMigrator.Tests.Unit
             Assert.True(context.Object.Expressions.Any(me => me is DeleteTableExpression && ((DeleteTableExpression)me).TableName == "Foo"));
         }
 
-        [Test]
+        [Fact]
         public void DownMigrationsAreInReverseOrderOfUpMigrations()
         {
             var autoReversibleMigration = new TestAutoReversingMigration();

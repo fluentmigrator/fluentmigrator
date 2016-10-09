@@ -33,13 +33,13 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 			this.Processor.Dispose();
 		}
 
-		[Test]
+		[Fact]
 		public override void CallingSchemaExistsReturnsFalseIfSchemaDoesNotExist()
 		{
 			this.Processor.SchemaExists("DoesNotExist").ShouldBeFalse();
 		}
 
-		[Test]
+		[Fact]
 		public override void CallingSchemaExistsReturnsTrueIfSchemaExists()
 		{
 			this.Processor.SchemaExists(SchemaName).ShouldBeTrue();

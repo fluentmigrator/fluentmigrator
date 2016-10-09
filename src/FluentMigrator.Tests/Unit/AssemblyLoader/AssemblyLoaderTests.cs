@@ -31,7 +31,7 @@ namespace FluentMigrator.Tests.Unit.AssemblyLoader
             assemblyLoaderFactory = new AssemblyLoaderFactory();
         }
 
-        [Test]
+        [Fact]
         public void ShouldBeAbleToLoadAssemblyByFileName()
         {
             var assemblyLoader = assemblyLoaderFactory.GetAssemblyLoader(GetType().Assembly.Location);
@@ -39,7 +39,7 @@ namespace FluentMigrator.Tests.Unit.AssemblyLoader
             Assert.AreEqual(GetType().Assembly, assemblyLoader.Load());
         }
 
-        [Test]
+        [Fact]
         public void ShouldBeAbleToLoadAssemblyAssemblyName()
         {
             var assemblyLoader = assemblyLoaderFactory.GetAssemblyLoader(GetType().Assembly.GetName().Name);

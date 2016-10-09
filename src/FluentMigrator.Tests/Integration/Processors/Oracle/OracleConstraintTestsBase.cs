@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 			this.Processor.Dispose();
 		}
 
-		[Test]
+		[Fact]
 		public override void CallingConstraintExistsCanAcceptConstraintNameWithSingleQuote()
 		{
 			using (var table = new OracleTestTable(this.Connection, null, this.Factory, "id int"))
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 			}
 		}
 
-		[Test]
+		[Fact]
 		public override void CallingConstraintExistsCanAcceptTableNameWithSingleQuote()
 		{
 			using( var table = new OracleTestTable( "Test'Table", this.Connection, null, this.Factory, "id int" ) )
@@ -54,7 +54,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 			}
 		}
 
-		[Test]
+		[Fact]
 		public override void CallingConstraintExistsReturnsFalseIfConstraintDoesNotExist()
 		{
 			using (var table = new OracleTestTable(this.Connection, null, this.Factory, "id int"))
@@ -64,7 +64,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 			}
 		}
 
-		[Test]
+		[Fact]
 		public override void CallingConstraintExistsReturnsFalseIfConstraintDoesNotExistWithSchema()
 		{
 			using (var table = new OracleTestTable(this.Connection, SchemaName, this.Factory, "id int"))
@@ -74,19 +74,19 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 			}
 		}
 
-		[Test]
+		[Fact]
 		public override void CallingConstraintExistsReturnsFalseIfTableDoesNotExist()
 		{
 			this.Processor.ConstraintExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
 		}
 
-		[Test]
+		[Fact]
 		public override void CallingConstraintExistsReturnsFalseIfTableDoesNotExistWithSchema()
 		{
 			this.Processor.ConstraintExists(SchemaName, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
 		}
 
-		[Test]
+		[Fact]
 		public override void CallingConstraintExistsReturnsTrueIfConstraintExists()
 		{
 			using (var table = new OracleTestTable(this.Connection, null, this.Factory, "id int"))
@@ -96,7 +96,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 			}
 		}
 
-		[Test]
+		[Fact]
 		public override void CallingConstraintExistsReturnsTrueIfConstraintExistsWithSchema()
 		{
 			using (var table = new OracleTestTable(this.Connection, SchemaName, this.Factory, "id int"))

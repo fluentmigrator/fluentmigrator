@@ -17,7 +17,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         public abstract void GenerateDescriptionStatementForCreateColumnReturnColumnDescriptionStatement();
         public abstract void GenerateDescriptionStatementForAlterColumnReturnColumnDescriptionStatement();
 
-        [Test]
+        [Fact]
         public void GenerateDescriptionStatementsReturnEmptyForNoDescriptionsOnCreateTable()
         {
             var createTableExpression = GeneratorTestHelper.GetCreateTableExpression();
@@ -26,7 +26,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             result.ShouldBe(Enumerable.Empty<string>());
         }
 
-        [Test]
+        [Fact]
         public void GenerateDescriptionStatementReturnEmptyForNoDescriptionOnAlterTable()
         {
             var alterTableExpression = GeneratorTestHelper.GetAlterTableAutoIncrementColumnExpression();
@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             result.ShouldBe(string.Empty);
         }
 
-        [Test]
+        [Fact]
         public void GenerateDescriptionStatementReturnEmptyForNoDescriptionOnCreateColumn()
         {
             var createColumnExpression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             result.ShouldBe(string.Empty);
         }
 
-        [Test]
+        [Fact]
         public void GenerateDescriptionStatementReturnEmptyForNoDescriptionOnAlterColumn()
         {
             var alterColumnExpression = GeneratorTestHelper.GetAlterColumnExpression();
@@ -53,7 +53,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             result.ShouldBe(string.Empty);
         }
 
-        [Test]
+        [Fact]
         public void GenerateDescriptionStatementsHaveSingleStatementForDescriptionOnCreate()
         {
             var createTableExpression = GeneratorTestHelper.GetCreateTableWithTableDescription();

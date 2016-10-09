@@ -28,7 +28,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 {
     public class CreateIndexExpressionBuilderTests
     {
-        [Test]
+        [Fact]
         public void CallingOnTableSetsTableNameToSpecifiedValue()
         {
             var indexMock = new Mock<IndexDefinition>();
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             expressionMock.VerifyGet(e => e.Index);
         }
 
-        [Test]
+        [Fact]
         public void CallingOnColumnAddsNewColumnToExpression()
         {
             var collectionMock = new Mock<IList<IndexColumnDefinition>>();
@@ -63,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             expressionMock.VerifyGet(e => e.Index);
         }
 
-        [Test]
+        [Fact]
         public void CallingAscendingSetsDirectionToAscending()
         {
             var columnMock = new Mock<IndexColumnDefinition>();
@@ -77,7 +77,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             columnMock.VerifySet(c => c.Direction = Direction.Ascending);
         }
 
-        [Test]
+        [Fact]
         public void CallingDescendingSetsDirectionToDescending()
         {
             var columnMock = new Mock<IndexColumnDefinition>();
@@ -91,7 +91,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             columnMock.VerifySet(c => c.Direction = Direction.Descending);
         }
 
-        [Test]
+        [Fact]
         public void CallingIncludeAddsNewIncludeToExpression()
         {
             var collectionMock = new Mock<IList<IndexIncludeDefinition>>();

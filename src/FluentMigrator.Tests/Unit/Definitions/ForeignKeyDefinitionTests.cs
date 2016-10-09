@@ -26,7 +26,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
 {
     public class ForeignKeyDefinitionTests
     {
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenNameIsNull()
         {
             var column = new ForeignKeyDefinition { Name = null };
@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
             errors.ShouldContain(ErrorMessages.ForeignKeyNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenNameIsNotNullOrEmptyString()
         {
             var column = new ForeignKeyDefinition { Name = "Bacon" };
@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
             errors.ShouldNotContain(ErrorMessages.ForeignKeyNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenForeignTableNameIsNull()
         {
             var column = new ForeignKeyDefinition { ForeignTable = null };
@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
             errors.ShouldContain(ErrorMessages.ForeignTableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenTableNameIsNotNullOrEmptyString()
         {
             var column = new ForeignKeyDefinition { ForeignTable = "Bacon" };
@@ -58,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
             errors.ShouldNotContain(ErrorMessages.ForeignTableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenForeignTableNameIsEmptyString()
         {
             var column = new ForeignKeyDefinition { ForeignTable = String.Empty };
@@ -66,7 +66,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
             errors.ShouldContain(ErrorMessages.ForeignTableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenPrimaryTableNameIsNull()
         {
             var column = new ForeignKeyDefinition { PrimaryTable = null };
@@ -74,7 +74,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
             errors.ShouldContain(ErrorMessages.PrimaryTableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenPrimaryTableNameIsEmptyString()
         {
             var column = new ForeignKeyDefinition { PrimaryTable = String.Empty };
@@ -82,7 +82,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
             errors.ShouldContain(ErrorMessages.PrimaryTableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenPrimaryTableNameIsNotNullOrEmptyString()
         {
             var column = new ForeignKeyDefinition { PrimaryTable = "Bacon" };
@@ -90,7 +90,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
             errors.ShouldNotContain(ErrorMessages.PrimaryTableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenForeignColumnsIsEmpty()
         {
             var column = new ForeignKeyDefinition { ForeignColumns = new string[0] };
@@ -98,7 +98,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
             errors.ShouldContain(ErrorMessages.ForeignKeyMustHaveOneOrMoreForeignColumns);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenForeignColumnsIsNotEmpty()
         {
             var column = new ForeignKeyDefinition { ForeignColumns = new[] { "Bacon" } };
@@ -106,7 +106,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
             errors.ShouldNotContain(ErrorMessages.ForeignKeyMustHaveOneOrMoreForeignColumns);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenPrimaryColumnsIsEmpty()
         {
             var column = new ForeignKeyDefinition { PrimaryColumns = new string[0] };
@@ -114,7 +114,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
             errors.ShouldContain(ErrorMessages.ForeignKeyMustHaveOneOrMorePrimaryColumns);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenPrimaryColumnsIsNotEmpty()
         {
             var column = new ForeignKeyDefinition { PrimaryColumns = new[] { "Bacon" } };

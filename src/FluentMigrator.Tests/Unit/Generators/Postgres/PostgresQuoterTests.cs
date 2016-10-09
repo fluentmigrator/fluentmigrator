@@ -14,7 +14,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
         private IQuoter quoter = default(PostgresQuoter);
 
-        [Test]
+        [Fact]
         public void ByteArrayIsFormattedWithQuotes()
         {
             quoter.QuoteValue(new byte[] { 0, 254, 13, 18, 125, 17 })

@@ -14,7 +14,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             Generator = new PostgresGenerator();
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"FK_TestTable1_TestColumn1_TestTable2_TestColumn2\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"TestSchema\".\"TestTable2\" (\"TestColumn2\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_TestTable1_TestColumn1_TestTable2_TestColumn2\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateForeignKeyWithDifferentSchemas()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"FK_TestTable1_TestColumn1_TestTable2_TestColumn2\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4\" FOREIGN KEY (\"TestColumn1\",\"TestColumn3\") REFERENCES \"TestSchema\".\"TestTable2\" (\"TestColumn2\",\"TestColumn4\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
@@ -64,7 +64,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4\" FOREIGN KEY (\"TestColumn1\",\"TestColumn3\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\",\"TestColumn4\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnForeignKeyWithDifferentSchemas()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
@@ -74,7 +74,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4\" FOREIGN KEY (\"TestColumn1\",\"TestColumn3\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\",\"TestColumn4\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnPrimaryKeyConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnPrimaryKeyExpression();
@@ -84,7 +84,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1_TestColumn2\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnPrimaryKeyExpression();
@@ -93,7 +93,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1_TestColumn2\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnUniqueConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
@@ -103,7 +103,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"UC_TestTable1_TestColumn1_TestColumn2\" UNIQUE (\"TestColumn1\", \"TestColumn2\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
@@ -112,7 +112,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"UC_TestTable1_TestColumn1_TestColumn2\" UNIQUE (\"TestColumn1\", \"TestColumn2\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
@@ -123,7 +123,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"TestSchema\".\"TestTable2\" (\"TestColumn2\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
@@ -132,7 +132,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedForeignKeyWithDifferentSchemas()
         {
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
@@ -142,7 +142,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedForeignKeyWithOnDeleteAndOnUpdateOptions()
         {
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
@@ -173,7 +173,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe(string.Format("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\") ON UPDATE {0};", output));
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedMultiColumnForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnForeignKeyExpression();
@@ -184,7 +184,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\",\"TestColumn3\") REFERENCES \"TestSchema\".\"TestTable2\" (\"TestColumn2\",\"TestColumn4\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedMultiColumnForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnForeignKeyExpression();
@@ -193,7 +193,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\",\"TestColumn3\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\",\"TestColumn4\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedMultiColumnForeignKeyWithDifferentSchemas()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnForeignKeyExpression();
@@ -203,7 +203,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\",\"TestColumn3\") REFERENCES \"public\".\"TestTable2\" (\"TestColumn2\",\"TestColumn4\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedMultiColumnPrimaryKeyConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnPrimaryKeyExpression();
@@ -213,7 +213,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"TESTPRIMARYKEY\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedMultiColumnPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnPrimaryKeyExpression();
@@ -222,7 +222,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"TESTPRIMARYKEY\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedMultiColumnUniqueConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
@@ -232,7 +232,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"TESTUNIQUECONSTRAINT\" UNIQUE (\"TestColumn1\", \"TestColumn2\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedMultiColumnUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
@@ -241,7 +241,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"TESTUNIQUECONSTRAINT\" UNIQUE (\"TestColumn1\", \"TestColumn2\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedPrimaryKeyConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
@@ -251,7 +251,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"TESTPRIMARYKEY\" PRIMARY KEY (\"TestColumn1\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
@@ -260,7 +260,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"TESTPRIMARYKEY\" PRIMARY KEY (\"TestColumn1\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedUniqueConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
@@ -270,7 +270,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"TESTUNIQUECONSTRAINT\" UNIQUE (\"TestColumn1\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
@@ -279,7 +279,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"TESTUNIQUECONSTRAINT\" UNIQUE (\"TestColumn1\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreatePrimaryKeyConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
@@ -289,7 +289,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1\" PRIMARY KEY (\"TestColumn1\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreatePrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
@@ -298,7 +298,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1\" PRIMARY KEY (\"TestColumn1\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateUniqueConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
@@ -308,7 +308,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ADD CONSTRAINT \"UC_TestTable1_TestColumn1\" UNIQUE (\"TestColumn1\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
@@ -317,7 +317,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD CONSTRAINT \"UC_TestTable1_TestColumn1\" UNIQUE (\"TestColumn1\");");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
@@ -327,7 +327,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" DROP CONSTRAINT \"FK_Test\";");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
@@ -336,7 +336,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" DROP CONSTRAINT \"FK_Test\";");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropPrimaryKeyConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
@@ -346,7 +346,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" DROP CONSTRAINT \"TESTPRIMARYKEY\";");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
@@ -355,7 +355,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" DROP CONSTRAINT \"TESTPRIMARYKEY\";");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropUniqueConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();
@@ -365,7 +365,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" DROP CONSTRAINT \"TESTUNIQUECONSTRAINT\";");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();

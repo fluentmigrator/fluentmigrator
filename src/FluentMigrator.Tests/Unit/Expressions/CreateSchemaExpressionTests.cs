@@ -8,7 +8,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
 {
     public class CreateSchemaExpressionTests
     {
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenSchemaNameIsEmptyString()
         {
             var expression = new CreateSchemaExpression { SchemaName = String.Empty };
@@ -17,7 +17,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.SchemaNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenSchemaNameIsSet()
         {
             var expression = new CreateSchemaExpression { SchemaName = "schema1" };

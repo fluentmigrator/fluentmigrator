@@ -29,14 +29,14 @@ namespace FluentMigrator.Tests.Unit.Expressions
 {
     public class CreateColumnExpressionTests
     {
-        [Test]
+        [Fact]
         public void ModificationTypeShouldBeSetToCreate()
         {
             var expression = new CreateColumnExpression();
             Assert.AreEqual(ColumnModificationType.Create, expression.Column.ModificationType);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenOldNameIsNull()
         {
             var expression = new CreateColumnExpression { TableName = null };
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenOldNameIsEmptyString()
         {
             var expression = new CreateColumnExpression { TableName = String.Empty };
@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenOldNameIsNotNullEmptyString()
         {
             var expression = new CreateColumnExpression { TableName = "Bacon" };
@@ -60,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldNotContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ReverseReturnsDeleteColumnExpression()
         {
             var expression = new CreateColumnExpression { TableName = "Bacon", Column = { Name = "BaconId" } };
@@ -68,7 +68,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             reverse.ShouldBeOfType<DeleteColumnExpression>();
         }
 
-        [Test]
+        [Fact]
         public void ReverseSetsTableNameAndColumnNameOnGeneratedExpression()
         {
             var expression = new CreateColumnExpression { TableName = "Bacon", Column = { Name = "BaconId" } };
@@ -77,7 +77,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             reverse.ColumnNames.ElementAt(0).ShouldBe("BaconId");
         }
 
-        [Test]
+        [Fact]
         public void ToStringIsDescriptive()
         {
             var expression = new CreateColumnExpression { TableName = "Bacon", Column = { Name = "BaconId", Type = DbType.Int32 } };

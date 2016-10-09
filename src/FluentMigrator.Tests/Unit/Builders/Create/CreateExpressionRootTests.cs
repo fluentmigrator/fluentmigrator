@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
     public class CreateExpressionRootTests
     {
-        [Test]
+        [Fact]
         public void CallingTableAddsCreateTableExpressionToContextWithSpecifiedNameSet()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -49,7 +49,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingTableReturnsCreateTableExpressionBuilder()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -63,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnAddsCreateColumnExpressionToContextWithSpecifiedNameSet()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -78,7 +78,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnReturnsCreateColumnExpression()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -92,7 +92,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingForeignKeyWithoutNameAddsCreateForeignKeyExpressionToContext()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -107,7 +107,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingForeignKeyAddsCreateForeignKeyExpressionToContextWithSpecifiedNameSet()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -122,7 +122,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingForeignKeyWithoutNameReturnsCreateForeignKeyExpression()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -136,7 +136,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingForeignKeyCreatesCreateForeignKeyExpression()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -150,7 +150,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingIndexWithoutNameAddsCreateIndexExpressionToContext()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -165,7 +165,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingIndexAddsCreateIndexExpressionToContextWithSpecifiedNameSet()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -180,7 +180,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingIndexWithoutNameReturnsCreateIndexExpression()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -194,7 +194,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingIndexCreatesCreateIndexExpression()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -208,7 +208,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingPrimaryKeyAddsCreateColumnExpressionToContextWithSpecifiedNameSet()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -226,7 +226,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingPrimaryKeyReturnsCreateColumnExpression()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -240,7 +240,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingSequenceAddsCreateSequenceExpressionToContextWithSpecifiedNameSet()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -255,7 +255,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingSequenceReturnsCreateSequenceExpression()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -269,7 +269,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingUniqueConstraintCreateColumnExpressionToContextWithSpecifiedNameSet()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -287,7 +287,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingUniqueConstraintReturnsCreateColumnExpression()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();

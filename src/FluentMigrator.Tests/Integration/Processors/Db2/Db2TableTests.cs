@@ -45,7 +45,7 @@
 
         #region Methods
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsCanAcceptTableNameWithSingleQuote()
         {
             using (var table = new Db2TestTable("Test'Table", Processor, null, "ID INT"))
@@ -54,19 +54,19 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.TableExists(null, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
             Processor.TableExists("TstSchma", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsReturnsTrueIfTableExists()
         {
             using (var table = new Db2TestTable(Processor, null, "ID INT"))
@@ -75,7 +75,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsReturnsTrueIfTableExistsWithSchema()
         {
             using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT"))

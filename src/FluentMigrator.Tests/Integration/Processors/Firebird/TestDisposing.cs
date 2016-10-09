@@ -37,7 +37,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             FbDatabase.DropDatabase(IntegrationTestOptions.Firebird.ConnectionString);
 		}
 
-		[Test]
+		[Fact]
 		public void Dispose_WasCommited_ShouldNotRollback()
 		{
 			var createTable = new CreateTableExpression { TableName = "silly" };

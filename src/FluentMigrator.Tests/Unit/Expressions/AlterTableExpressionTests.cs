@@ -8,7 +8,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
 {
     public class AlterTableExpressionTests
     {
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenTableNameIsEmptyString()
         {
             var expression = new AlterTableExpression { TableName = String.Empty };
@@ -17,7 +17,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenTableNameIsSet()
         {
             var expression = new AlterTableExpression { TableName = "table1" };

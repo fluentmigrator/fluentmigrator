@@ -32,7 +32,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsCanAcceptColumnNameWithSingleQuote()
         {
             var columnNameWithSingleQuote = Quoter.Quote("i'd");
@@ -40,47 +40,47 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
                 Processor.ColumnExists(null, table.Name, "i'd").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsCanAcceptTableNameWithSingleQuote()
         {
             using (var table = new PostgresTestTable("Test'Table", Processor, null, "id int"))
                 Processor.ColumnExists(null, table.Name, "id").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsFalseIfColumnDoesNotExist()
         {
             using (var table = new PostgresTestTable(Processor, null, "id int"))
                 Processor.ColumnExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsFalseIfColumnDoesNotExistWithSchema()
         {
             using (var table = new PostgresTestTable(Processor, "TestSchema", "id int"))
                 Processor.ColumnExists("TestSchema", table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.ColumnExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
             Processor.ColumnExists("TestSchema", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsTrueIfColumnExists()
         {
             using (var table = new PostgresTestTable(Processor, null, "id int"))
                 Processor.ColumnExists(null, table.Name, "id").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsTrueIfColumnExistsWithSchema()
         {
             using (var table = new PostgresTestTable(Processor, "TestSchema", "id int"))

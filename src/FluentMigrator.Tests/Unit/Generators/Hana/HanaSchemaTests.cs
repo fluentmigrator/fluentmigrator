@@ -13,7 +13,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             Generator = new HanaGenerator();
         }
 
-        [Test]
+        [Fact]
         public override void CanAlterSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("ALTER TABLE \"TestSchema1\".\"TestTable\" SET SCHEMA \"TestSchema2\"");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE SCHEMA \"TestSchema\"");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");

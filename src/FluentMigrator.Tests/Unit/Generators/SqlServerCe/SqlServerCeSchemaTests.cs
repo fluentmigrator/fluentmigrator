@@ -14,19 +14,19 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             Generator = new SqlServerCeGenerator();
         }
 
-        [Test]
+        [Fact]
         public override void CanAlterSchema()
         {
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(GeneratorTestHelper.GetAlterSchemaExpression()));
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateSchema()
         {
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(GeneratorTestHelper.GetCreateSchemaExpression()));
         }
 
-        [Test]
+        [Fact]
         public override void CanDropSchema()
         {
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(GeneratorTestHelper.GetDeleteSchemaExpression()));

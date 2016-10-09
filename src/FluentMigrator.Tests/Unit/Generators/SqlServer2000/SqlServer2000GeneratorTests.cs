@@ -19,7 +19,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             Generator = new SqlServer2000Generator();
         }
 
-        [Test]
+        [Fact]
         public void CanAlterColumnWithDefaultValue()
         {
             //TODO: This will fail if there are any keys attached 
@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterDefaultConstraint()
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
@@ -57,7 +57,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe(expected);
         }
 
-        [Test]
+        [Fact]
         public void CanAlterSchemaInStrictMode()
         {
             Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
@@ -65,7 +65,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
 
-        [Test]
+        [Fact]
         public void CanAddColumnWithGetDateDefault()
         {
             var column = new ColumnDefinition
@@ -81,7 +81,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL DEFAULT GetDate()");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateSchemaInStrictMode()
         {
             Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
@@ -89,7 +89,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
 
-        [Test]
+        [Fact]
         public void CanCreateTableWithGetDateDefault()
         {
             var column = new ColumnDefinition
@@ -106,7 +106,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(5) NOT NULL DEFAULT GetDate())");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateTableWithSeededIdentity()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
@@ -117,7 +117,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(45,23), [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public void CanDropSchemaInStrictMode()
         {
             Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
@@ -125,7 +125,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new DeleteSchemaExpression()));
         }
 
-        [Test]
+        [Fact]
         public void CanGenerateNecessaryStatementsForADeleteDefaultExpression()
         {
             var expression = new DeleteDefaultConstraintExpression {ColumnName = "Name", SchemaName = "Personalia", TableName = "Person"};

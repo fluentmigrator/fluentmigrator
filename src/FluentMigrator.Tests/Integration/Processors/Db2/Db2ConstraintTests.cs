@@ -43,7 +43,7 @@
 
         #region Methods
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsCanAcceptConstraintNameWithSingleQuote()
         {
             using (var table = new Db2TestTable(Processor, null, "ID INT"))
@@ -53,7 +53,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsCanAcceptTableNameWithSingleQuote()
         {
             using (var table = new Db2TestTable("Test'Table", Processor, null, "ID INT"))
@@ -63,7 +63,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsFalseIfConstraintDoesNotExist()
         {
             using (var table = new Db2TestTable(Processor, null, "ID INT"))
@@ -72,7 +72,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsFalseIfConstraintDoesNotExistWithSchema()
         {
             using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT"))
@@ -81,19 +81,19 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.ConstraintExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
             Processor.ConstraintExists("TstSchma", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsTrueIfConstraintExists()
         {
             using (var table = new Db2TestTable(Processor, null, "ID INT"))
@@ -103,7 +103,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsTrueIfConstraintExistsWithSchema()
         {
             using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT"))

@@ -20,7 +20,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             Generator = new Db2Generator();
         }
 
-        [Test]
+        [Fact]
         public void CanCreateAutoIncrementColumnForInt64()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 BIGINT NOT NULL AS IDENTITY, TestColumn2 INTEGER NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateTableWithBinaryColumnWithSize()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -41,7 +41,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 VARBINARY(10000) NOT NULL, TestColumn2 INTEGER NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateTableWithBoolDefaultValue()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 CHAR(1) NOT NULL DEFAULT 'T', TestColumn2 INTEGER NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public void CanUseSystemMethodCurrentUserAsADefaultValueForAColumn()
         {
             const string tableName = "NewTable";
@@ -63,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("ALTER TABLE NewTable ADD COLUMN NewColumn VARCHAR(18) NOT NULL DEFAULT USER");
         }
 
-        [Test]
+        [Fact]
         public void CanUseSystemMethodCurrentUTCDateTimeAsADefaultValueForAColumn()
         {
             const string tableName = "NewTable";
@@ -74,7 +74,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("ALTER TABLE NewTable ADD COLUMN NewColumn VARGRAPHIC(5) CCSID 1200 NOT NULL DEFAULT (CURRENT_TIMESTAMP - CURRENT_TIMEZONE)");
         }
 
-        [Test]
+        [Fact]
         public void ExplicitUnicodeStringIgnoredForNonSqlServer()
         {
             var expression = new InsertDataExpression { TableName = "TestTable" };
@@ -88,7 +88,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("INSERT INTO TestTable (NormalString, UnicodeString) VALUES ('Just''in', 'codethinked''.com')");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterColumnAndSetAsNullable()
         {
             var expression = new AlterColumnExpression
@@ -102,7 +102,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 SET DATA TYPE DBCLOB(1048576) CCSID 1200");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterColumnAndSetAsNotNullable()
         {
             var expression = new AlterColumnExpression
@@ -116,7 +116,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 SET DATA TYPE DBCLOB(1048576) CCSID 1200 NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public void CanDeleteDefaultConstraint()
         {
             var expression = new DeleteDefaultConstraintExpression
@@ -130,7 +130,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 DROP DEFAULT");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterDefaultConstraintToCurrentUser()
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
@@ -141,7 +141,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 SET DEFAULT USER");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterDefaultConstraintToCurrentDate()
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
@@ -152,7 +152,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 SET DEFAULT CURRENT_TIMESTAMP");
         }
 
-        //[Test]
+        //[Fact]
         //public void CanAlterDefaultConstraintToCurrentUtcDateTime()
         //{
         //    var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
@@ -163,7 +163,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
         //    result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ALTER COLUMN TestColumn1 DROP DEFAULT, ALTER TestColumn1 SET DEFAULT (now() at time zone 'UTC')");
         //}
 
-        [Test]
+        [Fact]
         public void CanAlterColumnAndOnlySetTypeIfIsNullableNotSet()
         {
             var expression = new AlterColumnExpression

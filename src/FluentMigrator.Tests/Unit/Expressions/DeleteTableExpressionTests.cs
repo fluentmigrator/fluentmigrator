@@ -26,7 +26,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
 {
     public class DeleteTableExpressionTests
     {
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenTableNameIsNull()
         {
             var expression = new DeleteTableExpression { TableName = null };
@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenTableNameIsEmptyString()
         {
             var expression = new DeleteTableExpression { TableName = String.Empty };
@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenTableNameIsNotNullEmptyString()
         {
             var expression = new DeleteTableExpression { TableName = "Bacon" };
@@ -50,14 +50,14 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldNotContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         [ExpectedException(typeof(NotSupportedException))]
         public void ReverseThrowsException()
         {
             new DeleteColumnExpression().Reverse();
         }
 
-        [Test]
+        [Fact]
         public void ToStringIsDescriptive()
         {
             var expression = new DeleteTableExpression { TableName = "Bacon" };

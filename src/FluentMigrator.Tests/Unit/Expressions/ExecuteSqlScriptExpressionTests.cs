@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         private string testSqlScript = "testscript.sql";
         private string scriptContents = "TEST SCRIPT";
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnWhenSqlScriptIsNullOrEmpty()
         {
             var expression = new ExecuteSqlScriptExpression { SqlScript = null };
@@ -38,7 +38,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.SqlScriptCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ExecutesTheStatement()
         {
             var expression = new ExecuteSqlScriptExpression { SqlScript = testSqlScript };
@@ -50,14 +50,14 @@ namespace FluentMigrator.Tests.Unit.Expressions
             processor.Verify();
         }
 
-        [Test]
+        [Fact]
         public void ToStringIsDescriptive()
         {
             var expression = new ExecuteSqlScriptExpression { SqlScript = testSqlScript };
             expression.ToString().ShouldBe("ExecuteSqlScript testscript.sql");
         }
 
-        [Test]
+        [Fact]
         [Category("NotWorkingOnMono")]
         public void CanUseScriptsOnAnotherDriveToWorkingDirectory()
         {

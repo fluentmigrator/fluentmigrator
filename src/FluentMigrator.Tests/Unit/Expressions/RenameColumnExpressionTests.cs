@@ -26,7 +26,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
 {
     public class RenameColumnExpressionTests
     {
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenOldNameIsNull()
         {
             var expression = new RenameColumnExpression { OldName = null };
@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.OldColumnNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenOldNameIsEmptyString()
         {
             var expression = new RenameColumnExpression { OldName = String.Empty };
@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.OldColumnNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenOldNameIsNotNullEmptyString()
         {
             var expression = new RenameColumnExpression { OldName = "Bacon" };
@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldNotContain(ErrorMessages.OldColumnNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenNewNameIsNull()
         {
             var expression = new RenameColumnExpression { NewName = null };
@@ -58,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.NewColumnNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenNewNameIsEmptyString()
         {
             var expression = new RenameColumnExpression { NewName = String.Empty };
@@ -66,7 +66,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.NewColumnNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenNewNameIsNotNullOrEmptyString()
         {
             var expression = new RenameColumnExpression { NewName = "Bacon" };
@@ -74,7 +74,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldNotContain(ErrorMessages.NewColumnNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ReverseReturnsRenameColumnExpression()
         {
             var expression = new RenameColumnExpression { TableName = "Bacon", OldName = "BaconId", NewName = "ChunkyBaconId" };
@@ -82,7 +82,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             reverse.ShouldBeOfType<RenameColumnExpression>();
         }
 
-        [Test]
+        [Fact]
         public void ReverseSetsTableNameOldNameAndNewNameOnGeneratedExpression()
         {
             var expression = new RenameColumnExpression { TableName = "Bacon", OldName = "BaconId", NewName = "ChunkyBaconId" };
@@ -93,7 +93,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             reverse.NewName.ShouldBe("BaconId");
         }
 
-        [Test]
+        [Fact]
         public void ToStringIsDescriptive()
         {
             var expression = new RenameColumnExpression { TableName = "Bacon", OldName = "BaconId", NewName = "ChunkyBaconId" };

@@ -27,7 +27,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
 {
     public class ColumnDefinitionTests
     {
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenColumnNameIsNull()
         {
             var column = new ColumnDefinition { Name = null };
@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
             errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenColumnNameIsEmptyString()
         {
             var column = new ColumnDefinition { Name = String.Empty };
@@ -43,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
             errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenColumnNameIsNotNullOrEmptyString()
         {
             var column = new ColumnDefinition { Name = "Bacon" };
@@ -51,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
             errors.ShouldNotContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenColumnTypeIsNotSet()
         {
             var column = new ColumnDefinition { Type = null };
@@ -59,7 +59,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
             errors.Contains(ErrorMessages.ColumnTypeMustBeDefined);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenColumnTypeIsSet()
         {
             var column = new ColumnDefinition { Type = DbType.String };

@@ -15,14 +15,14 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             _quoter = new OracleQuoter();
         }
 
-        [Test]
+        [Fact]
         public void TimeSpanIsFormattedQuotes()
         {
             _quoter.QuoteValue(new TimeSpan(1, 2, 13, 65))
                    .ShouldBe("'1 2:14:5.0'");
         }
 
-        [Test]
+        [Fact]
         public void GuidIsFormattedAsOracleAndQuoted()
         {
             Guid givenValue = new Guid("CC28B6C7-9260-4800-9C1F-A5243960C087");

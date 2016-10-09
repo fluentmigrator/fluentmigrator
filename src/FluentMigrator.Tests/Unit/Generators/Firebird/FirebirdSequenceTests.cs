@@ -14,7 +14,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             Generator = new FirebirdGenerator(FirebirdOptions.StandardBehaviour());
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateSequenceWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSequenceExpression();
@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("CREATE SEQUENCE \"Sequence\"");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateSequenceWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSequenceExpression();
@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("CREATE SEQUENCE \"Sequence\"");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropSequenceWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSequenceExpression();
@@ -43,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("DROP SEQUENCE \"Sequence\"");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropSequenceWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSequenceExpression();

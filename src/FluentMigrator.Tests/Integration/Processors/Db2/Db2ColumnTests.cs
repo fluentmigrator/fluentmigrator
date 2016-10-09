@@ -47,7 +47,7 @@
 
         #region Methods
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsCanAcceptColumnNameWithSingleQuote()
         {
             var columnName = Quoter.Quote("I'D") + " INT";
@@ -57,7 +57,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsCanAcceptTableNameWithSingleQuote()
         {
             using (var table = new Db2TestTable("Test'Table", Processor, null, "ID INT"))
@@ -66,7 +66,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsFalseIfColumnDoesNotExist()
         {
             using (var table = new Db2TestTable(Processor, null, "ID INT"))
@@ -75,7 +75,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsFalseIfColumnDoesNotExistWithSchema()
         {
             using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT"))
@@ -84,19 +84,19 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.ColumnExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
             Processor.ColumnExists("TstSchma", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsTrueIfColumnExists()
         {
             using (var table = new Db2TestTable(Processor, null, "ID INT"))
@@ -105,7 +105,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsTrueIfColumnExistsWithSchema()
         {
             using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT"))

@@ -21,7 +21,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 
         public class AnsistringTests : SqlServerCeTypeMapTests
         {
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_maps_ansistring_by_default_to_nvarchar_255()
             {
@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
                 template.ShouldBe("NVARCHAR(255)");
             }
 
-            [Test]
+            [Fact]
             [TestCase(1)]
             [TestCase(2000)]
             [TestCase(4000)]
@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
                 template.ShouldBe(string.Format("NVARCHAR({0})", size));
             }
 
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_maps_ansistring_with_max_size_to_ntext()
             {
@@ -53,7 +53,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 
         public class AnsistringFixedLengthTests : SqlServerCeTypeMapTests
         {
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_maps_ansistring_fixed_length_by_default_to_nchar_255()
             {
@@ -62,7 +62,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
                 template.ShouldBe("NCHAR(255)");
             }
 
-            [Test]
+            [Fact]
             [TestCase(1)]
             [TestCase(2000)]
             [TestCase(4000)]
@@ -74,7 +74,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
                 template.ShouldBe(string.Format("NCHAR({0})", size));
             }
 
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_throws_if_ansistring_fixed_length_has_size_above_4000()
             {
@@ -85,7 +85,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 
         public class StringTests : SqlServerCeTypeMapTests
         {
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_maps_string_by_default_to_nvarchar_255()
             {
@@ -94,7 +94,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
                 template.ShouldBe("NVARCHAR(255)");
             }
 
-            [Test]
+            [Fact]
             [TestCase(1)]
             [TestCase(4000)]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
@@ -105,7 +105,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
                 template.ShouldBe(string.Format("NVARCHAR({0})", size));
             }
 
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_throws_if_string_has_size_above_4000()
             {
@@ -116,7 +116,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 
         public class StringFixedLengthTests : SqlServerCeTypeMapTests
         {
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_maps_string_fixed_length_by_default_to_nchar_255()
             {
@@ -126,7 +126,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             }
 
 
-            [Test]
+            [Fact]
             [TestCase(1)]
             [TestCase(4000)]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
@@ -137,7 +137,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
                 template.ShouldBe(string.Format("NCHAR({0})", size));
             }
 
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_throws_if_string_fixed_length_has_size_above_4000()
             {
@@ -148,7 +148,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 
         public class BinaryTests : SqlServerCeTypeMapTests
         {
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_maps_binary_by_default_to_varbinary_8000()
             {
@@ -157,7 +157,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
                 template.ShouldBe("VARBINARY(8000)");
             }
 
-            [Test]
+            [Fact]
             [TestCase(1)]
             [TestCase(4000)]
             [TestCase(8000)]
@@ -169,7 +169,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
                 template.ShouldBe(string.Format("VARBINARY({0})", size));
             }
 
-            [Test]
+            [Fact]
             [TestCase(8001)]
             [TestCase(1073741823)]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
@@ -180,7 +180,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
                 template.ShouldBe("IMAGE");
             }
 
-            [Test]
+            [Fact]
             [TestCase(1073741824)]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_throws_if_binary_size_is_above_1073741823(int size)
@@ -192,7 +192,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 
         public class NumericTests : SqlServerCeTypeMapTests
         {
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_maps_boolean_to_bit()
             {
@@ -201,7 +201,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
                 template.ShouldBe("BIT");
             }
 
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_maps_byte_to_tinyint()
             {
@@ -210,7 +210,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
                 template.ShouldBe("TINYINT");
             }
 
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_maps_int16_to_smallint()
             {
@@ -219,7 +219,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
                 template.ShouldBe("SMALLINT");
             }
 
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_maps_int32_to_int()
             {
@@ -228,7 +228,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
                 template.ShouldBe("INT");
             }
 
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_maps_int64_to_bigint()
             {
@@ -237,7 +237,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
                 template.ShouldBe("BIGINT");
             }
 
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_maps_single_to_real()
             {
@@ -246,7 +246,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
                 template.ShouldBe("REAL");
             }
 
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_maps_double_to_double_precision()
             {
@@ -255,7 +255,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
                 template.ShouldBe("FLOAT");
             }
 
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_maps_currency_to_money()
             {
@@ -264,7 +264,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
                 template.ShouldBe("MONEY");
             }
 
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_maps_decimal_by_default_to_decimal_19_5()
             {
@@ -273,7 +273,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
                 template.ShouldBe("NUMERIC(19,5)");
             }
 
-            [Test]
+            [Fact]
             [TestCase(1)]
             [TestCase(20)]
             [TestCase(38)]
@@ -285,7 +285,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
                 template.ShouldBe(string.Format("NUMERIC({0},1)", precision));
             }
 
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_throws_if_decimal_precision_is_above_38()
             {
@@ -296,7 +296,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 
         public class GuidTests : SqlServerCeTypeMapTests
         {
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_maps_guid_to_uniqueidentifier()
             {
@@ -308,7 +308,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 
         public class DateTimeTests : SqlServerCeTypeMapTests
         {
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_maps_time_to_datetime()
             {
@@ -317,7 +317,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
                 template.ShouldBe("DATETIME");
             }
 
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_maps_date_to_datetime()
             {
@@ -326,7 +326,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
                 template.ShouldBe("DATETIME");
             }
 
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_maps_datetime_to_datetime()
             {
@@ -338,7 +338,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 
         public class XmlTests : SqlServerCeTypeMapTests
         {
-            [Test]
+            [Fact]
             [Category("SqlServerCe"), Category("Generator"), Category("TypeMap")]
             public void it_maps_xml_to_ntext()
             {

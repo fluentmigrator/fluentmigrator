@@ -29,26 +29,26 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public override void CallingSequenceExistsReturnsFalseIfSequenceDoesNotExist()
         {
             Processor.SequenceExists(null, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingSequenceExistsReturnsFalseIfSequenceDoesNotExistWithSchema()
         {
             Processor.SequenceExists("test_schema", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingSequenceExistsReturnsTrueIfSequenceExists()
         {
             using (new PostgresTestSequence(Processor, null, "test_sequence"))
                 Processor.SequenceExists(null, "test_sequence").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingSequenceExistsReturnsTrueIfSequenceExistsWithSchema()
         {
             using (new PostgresTestSequence(Processor, "test_schema", "test_sequence"))

@@ -34,206 +34,206 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
 {
     public class AlterTableExpressionBuilderTests
     {
-        [Test]
+        [Fact]
         public void CallingAsAnsiStringSetsColumnDbTypeToAnsiString()
         {
             VerifyColumnDbType(DbType.AnsiString, b => b.AsAnsiString());
         }
 
-        [Test]
+        [Fact]
         public void CallingAsAnsiStringWithSizeSetsColumnDbTypeToAnsiString()
         {
             VerifyColumnDbType(DbType.AnsiString, b => b.AsAnsiString(255));
         }
 
-        [Test]
+        [Fact]
         public void CallingAsAnsiStringSetsColumnSizeToSpecifiedValue()
         {
             VerifyColumnSize(255, b => b.AsAnsiString(255));
         }
 
-        [Test]
+        [Fact]
         public void CallingAsBinarySetsColumnDbTypeToBinary()
         {
             VerifyColumnDbType(DbType.Binary, b => b.AsBinary(255));
         }
 
-        [Test]
+        [Fact]
         public void CallingAsBinarySetsColumnSizeToSpecifiedValue()
         {
             VerifyColumnSize(255, b => b.AsBinary(255));
         }
 
-        [Test]
+        [Fact]
         public void CallingAsBooleanSetsColumnDbTypeToBoolean()
         {
             VerifyColumnDbType(DbType.Boolean, b => b.AsBoolean());
         }
 
-        [Test]
+        [Fact]
         public void CallingAsByteSetsColumnDbTypeToByte()
         {
             VerifyColumnDbType(DbType.Byte, b => b.AsByte());
         }
 
-        [Test]
+        [Fact]
         public void CallingAsCurrencySetsColumnDbTypeToCurrency()
         {
             VerifyColumnDbType(DbType.Currency, b => b.AsCurrency());
         }
 
-        [Test]
+        [Fact]
         public void CallingAsDateSetsColumnDbTypeToDate()
         {
             VerifyColumnDbType(DbType.Date, b => b.AsDate());
         }
 
-        [Test]
+        [Fact]
         public void CallingAsDateTimeSetsColumnDbTypeToDateTime()
         {
             VerifyColumnDbType(DbType.DateTime, b => b.AsDateTime());
         }
 
-        [Test]
+        [Fact]
         public void CallingAsDateTimeOffsetSetsColumnDbTypeToDateTimeOffset() 
         {
             VerifyColumnDbType(DbType.DateTimeOffset, b => b.AsDateTimeOffset());
         }
 
-        [Test]
+        [Fact]
         public void CallingAsDecimalSetsColumnDbTypeToDecimal()
         {
             VerifyColumnDbType(DbType.Decimal, b => b.AsDecimal());
         }
 
-        [Test]
+        [Fact]
         public void CallingAsDecimalWithSizeSetsColumnDbTypeToDecimal()
         {
             VerifyColumnDbType(DbType.Decimal, b => b.AsDecimal(1, 2));
         }
 
-        [Test]
+        [Fact]
         public void CallingAsDecimalStringSetsColumnSizeToSpecifiedValue()
         {
             VerifyColumnSize(1, b => b.AsDecimal(1, 2));
         }
 
-        [Test]
+        [Fact]
         public void CallingAsDecimalStringSetsColumnPrecisionToSpecifiedValue()
         {
             VerifyColumnPrecision(2, b => b.AsDecimal(1, 2));
         }
 
-        [Test]
+        [Fact]
         public void CallingAsDoubleSetsColumnDbTypeToDouble()
         {
             VerifyColumnDbType(DbType.Double, b => b.AsDouble());
         }
 
-        [Test]
+        [Fact]
         public void CallingAsGuidSetsColumnDbTypeToGuid()
         {
             VerifyColumnDbType(DbType.Guid, b => b.AsGuid());
         }
 
-        [Test]
+        [Fact]
         public void CallingAsFixedLengthStringSetsColumnDbTypeToStringFixedLength()
         {
             VerifyColumnDbType(DbType.StringFixedLength, e => e.AsFixedLengthString(255));
         }
 
-        [Test]
+        [Fact]
         public void CallingAsFixedLengthStringSetsColumnSizeToSpecifiedValue()
         {
             VerifyColumnSize(255, b => b.AsFixedLengthString(255));
         }
 
-        [Test]
+        [Fact]
         public void CallingAsFixedLengthAnsiStringSetsColumnDbTypeToAnsiStringFixedLength()
         {
             VerifyColumnDbType(DbType.AnsiStringFixedLength, b => b.AsFixedLengthAnsiString(255));
         }
 
-        [Test]
+        [Fact]
         public void CallingAsFixedLengthAnsiStringSetsColumnSizeToSpecifiedValue()
         {
             VerifyColumnSize(255, b => b.AsFixedLengthAnsiString(255));
         }
 
-        [Test]
+        [Fact]
         public void CallingAsFloatSetsColumnDbTypeToSingle()
         {
             VerifyColumnDbType(DbType.Single, b => b.AsFloat());
         }
 
-        [Test]
+        [Fact]
         public void CallingAsInt16SetsColumnDbTypeToInt16()
         {
             VerifyColumnDbType(DbType.Int16, b => b.AsInt16());
         }
 
-        [Test]
+        [Fact]
         public void CallingAsInt32SetsColumnDbTypeToInt32()
         {
             VerifyColumnDbType(DbType.Int32, b => b.AsInt32());
         }
 
-        [Test]
+        [Fact]
         public void CallingAsInt64SetsColumnDbTypeToInt64()
         {
             VerifyColumnDbType(DbType.Int64, b => b.AsInt64());
         }
 
-        [Test]
+        [Fact]
         public void CallingAsStringSetsColumnDbTypeToString()
         {
             VerifyColumnDbType(DbType.String, b => b.AsString());
         }
 
-        [Test]
+        [Fact]
         public void CallingAsStringWithSizeSetsColumnDbTypeToString()
         {
             VerifyColumnDbType(DbType.String, b => b.AsString(255));
         }
 
-        [Test]
+        [Fact]
         public void CallingAsStringSetsColumnSizeToSpecifiedValue()
         {
             VerifyColumnSize(255, b => b.AsFixedLengthAnsiString(255));
         }
 
-        [Test]
+        [Fact]
         public void CallingAsTimeSetsColumnDbTypeToTime()
         {
             VerifyColumnDbType(DbType.Time, b => b.AsTime());
         }
 
-        [Test]
+        [Fact]
         public void CallingAsXmlSetsColumnDbTypeToXml()
         {
             VerifyColumnDbType(DbType.Xml, b => b.AsXml());
         }
 
-        [Test]
+        [Fact]
         public void CallingAsXmlWithSizeSetsColumnDbTypeToXml()
         {
             VerifyColumnDbType(DbType.Xml, b => b.AsXml(255));
         }
 
-        [Test]
+        [Fact]
         public void CallingAsXmlSetsColumnSizeToSpecifiedValue()
         {
             VerifyColumnSize(255, b => b.AsXml(255));
         }
 
-        [Test]
+        [Fact]
         public void CallingAsCustomSetsTypeToNullAndSetsCustomType()
         {
             VerifyColumnProperty(c => c.Type = null, b => b.AsCustom("Test"));
             VerifyColumnProperty(c => c.CustomType = "Test", b => b.AsCustom("Test"));
         }
 
-        [Test]
+        [Fact]
         public void CallingWithDefaultValueSetsDefaultValue()
         {
             const int value = 42;
@@ -253,7 +253,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             columnMock.VerifySet(c => c.DefaultValue = value);
         }
 
-        [Test]
+        [Fact]
         public void CallingWithDefaultValueOnNewColumnDoesNotAddDefaultConstraintExpression() {
             var expressions = new List<IMigrationExpression>();
             var contextMock = new Mock<IMigrationContext>();
@@ -271,7 +271,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             Assert.That(expressions.Count(), Is.EqualTo(0));
         }
 
-        [Test]
+        [Fact]
         public void CallingWithDefaultValueOnAlterColumnAddsDefaultConstraintExpression() {
             var expressions = new List<IMigrationExpression>();
             var contextMock = new Mock<IMigrationContext>();
@@ -289,7 +289,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             Assert.That(expressions.Count(), Is.EqualTo(1));
         }
 
-        [Test]
+        [Fact]
         public void CallingWithDefaultSetsDefaultValue()
         {
             var contextMock = new Mock<IMigrationContext>();
@@ -305,7 +305,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             columnMock.VerifySet(c => c.DefaultValue = SystemMethods.CurrentDateTime);
         }
 
-        [Test]
+        [Fact]
         public void CallingWithDefaultOnNewColumnDoesNotAddDefaultConstraintExpression()
         {
             var expressions = new List<IMigrationExpression>();
@@ -324,7 +324,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             Assert.That(expressions.Count(), Is.EqualTo(0));
         }
 
-        [Test]
+        [Fact]
         public void CallingWithDefaultOnAlterColumnAddsDefaultConstraintExpression()
         {
             var expressions = new List<IMigrationExpression>();
@@ -343,13 +343,13 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             Assert.That(expressions.Count(), Is.EqualTo(1));
         }
 
-        [Test]
+        [Fact]
         public void CallingForeignKeySetsIsForeignKeyToTrue()
         {
             VerifyColumnProperty(c => c.IsForeignKey = true, b => b.ForeignKey());
         }
 
-        [Test]
+        [Fact]
         public void CallingReferencedByAddsNewForeignKeyExpressionToContext()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -384,7 +384,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingForeignKeyAddsNewForeignKeyExpressionToContext()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -445,13 +445,13 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             Assert.That(builder.CurrentForeignKey.OnDelete, Is.EqualTo(rule));
         }
 
-        [Test]
+        [Fact]
         public void CallingIdentitySetsIsIdentityToTrue()
         {
             VerifyColumnProperty(c => c.IsIdentity = true, b => b.Identity());
         }
 
-        [Test]
+        [Fact]
         public void CallingIdentityWithSeededIdentitySetsAdditionalProperties()
         {
             var contextMock = new Mock<IMigrationContext>();
@@ -469,25 +469,25 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
                 new KeyValuePair<string, object>(SqlServerExtensions.IdentityIncrement, 44));
         }
 
-        [Test]
+        [Fact]
         public void CallingIndexedCallsHelperWithNullIndexName()
         {
             VerifyColumnHelperCall(c => c.Indexed(), h => h.Indexed(null));
         }
 
-        [Test]
+        [Fact]
         public void CallingIndexedNamedCallsHelperWithName()
         {
             VerifyColumnHelperCall(c => c.Indexed("MyIndexName"), h => h.Indexed("MyIndexName"));
         }
 
-        [Test]
+        [Fact]
         public void CallingPrimaryKeySetsIsPrimaryKeyToTrue()
         {
             VerifyColumnProperty(c => c.IsPrimaryKey = true, b => b.PrimaryKey());
         }
 
-        [Test]
+        [Fact]
         public void ColumnHelperSetOnCreation()
         {
             var expressionMock = new Mock<AlterTableExpression>();
@@ -498,7 +498,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             Assert.IsNotNull(builder.ColumnHelper);
         }
 
-        [Test]
+        [Fact]
         public void IColumnExpressionBuilder_UsesExpressionSchemaAndTableName()
         {
             var expressionMock = new Mock<AlterTableExpression>();
@@ -513,7 +513,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             Assert.AreEqual("Flinstone", builderAsInterface.TableName);
         }
 
-        [Test]
+        [Fact]
         public void IColumnExpressionBuilder_UsesCurrentColumn()
         {
             var expressionMock = new Mock<AlterTableExpression>();
@@ -529,32 +529,32 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             Assert.AreSame(curColumn, builderAsInterface.Column);
         }
 
-        [Test]
+        [Fact]
         public void NullableUsesHelper()
         {
             VerifyColumnHelperCall(c => c.Nullable(), h => h.SetNullable(true));
         }
 
-        [Test]
+        [Fact]
         public void NotNullableUsesHelper()
         {
             VerifyColumnHelperCall(c => c.NotNullable(), h => h.SetNullable(false));
         }
 
-        [Test]
+        [Fact]
         public void UniqueUsesHelper()
         {
             VerifyColumnHelperCall(c => c.Unique(), h => h.Unique(null));
         }
 
-        [Test]
+        [Fact]
         public void NamedUniqueUsesHelper()
         {
             VerifyColumnHelperCall(c => c.Unique("asdf"), h => h.Unique("asdf"));
         }
 
 
-        [Test]
+        [Fact]
         public void SetExistingRowsUsesHelper()
         {
             VerifyColumnHelperCall(c => c.SetExistingRowsTo("test"), h => h.SetExistingRowsTo("test"));

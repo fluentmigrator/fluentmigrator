@@ -46,7 +46,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             _maintenanceLoaderNoTags = new MaintenanceLoader(new SingleAssembly(GetType().Assembly), null, _migrationConventions.Object);
         }
 
-        [Test]
+        [Fact]
         public void LoadsMigrationsForCorrectStage()
         {
             var migrationInfos = _maintenanceLoader.LoadMaintenance(MigrationStage.BeforeEach);
@@ -66,7 +66,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             }
         }
 
-        [Test]
+        [Fact]
         public void LoadsMigrationsFilteredByTag()
         {
             var migrationInfos = _maintenanceLoader.LoadMaintenance(MigrationStage.BeforeEach);
@@ -85,7 +85,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             } 
         }
 
-        [Test]
+        [Fact]
         public void MigrationInfoIsAttributedIsFalse()
         {
             var migrationInfos = _maintenanceLoader.LoadMaintenance(MigrationStage.BeforeEach);
@@ -97,7 +97,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             }
         }
 
-        [Test]
+        [Fact]
         public void SetsTransactionBehaviorToSameAsMaintenanceAttribute()
         {
             var migrationInfos = _maintenanceLoader.LoadMaintenance(MigrationStage.BeforeEach);
@@ -113,7 +113,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             } 
         }
 
-        [Test]
+        [Fact]
         public void LoadsMigrationsNoTag()
         {
             var migrationInfos = _maintenanceLoaderNoTags.LoadMaintenance(MigrationStage.BeforeEach);

@@ -13,7 +13,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             Generator = new HanaGenerator();
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataForAllRowsWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("DELETE FROM \"TestSchema\".\"TestTable1\";");
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataForAllRowsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("DELETE FROM \"TestTable1\" WHERE 1 = 1;");
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataForMultipleRowsWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -45,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("DELETE FROM \"TestSchema\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL;DELETE FROM \"TestSchema\".\"TestTable1\" WHERE \"Website\" = 'github.com';");
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataForMultipleRowsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
                             "DELETE FROM \"TestTable1\" WHERE \"Website\" = 'github.com';");
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -67,7 +67,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("DELETE FROM \"TestSchema\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL;");
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
@@ -76,7 +76,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("DELETE FROM \"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL;");
         }
 
-        [Test]
+        [Fact]
         public override void CanInsertDataWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -91,7 +91,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe(expected);
         }
 
-        [Test]
+        [Fact]
         public override void CanInsertDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
@@ -103,7 +103,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe(expected);
         }
 
-        [Test]
+        [Fact]
         public override void CanInsertGuidDataWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -115,7 +115,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe(System.String.Format("INSERT INTO \"TestSchema\".\"TestTable1\" (\"guid\") VALUES ('{0}')", GeneratorTestHelper.TestGuid));
         }
 
-        [Test]
+        [Fact]
         public override void CanInsertGuidDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
@@ -124,7 +124,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe(System.String.Format("INSERT INTO \"TestTable1\" (\"guid\") VALUES ('{0}');", GeneratorTestHelper.TestGuid));
         }
 
-        [Test]
+        [Fact]
         public override void CanUpdateDataForAllDataWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -137,7 +137,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("UPDATE \"TestSchema\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE 1 = 1");
         }
 
-        [Test]
+        [Fact]
         public override void CanUpdateDataForAllDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
@@ -146,7 +146,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("UPDATE \"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE 1 = 1;");
         }
 
-        [Test]
+        [Fact]
         public override void CanUpdateDataWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -158,7 +158,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("UPDATE \"TestSchema\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanUpdateDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();

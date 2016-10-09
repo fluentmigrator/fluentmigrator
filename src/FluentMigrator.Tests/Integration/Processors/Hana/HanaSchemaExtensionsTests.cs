@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsCanAcceptSchemaNameWithSingleQuote()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -43,7 +43,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
                 Processor.ColumnExists("test'schema", table.Name, "id").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsCanAcceptSchemaNameWithSingleQuote()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
                 Processor.ConstraintExists("test'schema", table.Name, "c1").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsCanAcceptSchemaNameWithSingleQuote()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -64,7 +64,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingSchemaExistsCanAcceptSchemaNameWithSingleQuote()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -73,7 +73,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
                 Processor.SchemaExists("test'schema").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsCanAcceptSchemaNameWithSingleQuote()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -82,7 +82,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
                 Processor.TableExists("test'schema", table.Name).ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void CallingDefaultValueExistsCanAcceptSchemaNameWithSingleQuote()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");

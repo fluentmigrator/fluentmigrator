@@ -32,13 +32,13 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         }
 
 
-        [Test]
+        [Fact]
         public override void CallingSequenceExistsReturnsFalseIfSequenceDoesNotExist()
         {
             Processor.SequenceExists(null, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingSequenceExistsReturnsFalseIfSequenceDoesNotExistWithSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -46,14 +46,14 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             Processor.SequenceExists("test_schema", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingSequenceExistsReturnsTrueIfSequenceExists()
         {
             using (new HanaTestSequence(Processor, null, "test_sequence"))
                 Processor.SequenceExists(null, "test_sequence").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingSequenceExistsReturnsTrueIfSequenceExistsWithSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");

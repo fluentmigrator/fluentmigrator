@@ -10,7 +10,7 @@ namespace FluentMigrator.Tests.Unit
 {
 	public class ProfileLoaderTests
 	{
-		[Test]
+		[Fact]
 		public void BlankProfileDoesntLoadProfiles()
 		{
 			var _runnerContextMock = new Mock<IRunnerContext>();

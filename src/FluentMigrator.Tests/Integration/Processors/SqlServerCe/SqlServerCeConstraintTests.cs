@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             new SqlCeEngine(IntegrationTestOptions.SqlServerCe.ConnectionString).CreateDatabase();
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsCanAcceptConstraintNameWithSingleQuote()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
@@ -54,7 +54,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsCanAcceptTableNameWithSingleQuote()
         {
             using (var table = new SqlServerCeTestTable("Test'Table", Processor, "id int"))
@@ -64,7 +64,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsFalseIfConstraintDoesNotExist()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
@@ -74,7 +74,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsFalseIfConstraintDoesNotExistWithSchema()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
@@ -84,19 +84,19 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.ConstraintExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
             Processor.ConstraintExists("NotUsed", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsTrueIfConstraintExists()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
@@ -107,7 +107,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         }
 
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsTrueIfConstraintExistsWithSchema()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))

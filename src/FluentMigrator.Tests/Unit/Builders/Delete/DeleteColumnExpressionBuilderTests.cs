@@ -27,7 +27,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
     public class DeleteColumnExpressionBuilderTests
     {
-        [Test]
+        [Fact]
         public void CallingFromTableSetsTableName()
         {
             var expressionMock = new Mock<DeleteColumnExpression>();
@@ -38,7 +38,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             expressionMock.VerifySet(x => x.TableName = "Bacon");
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnAddsColumnNameToList() 
         {
             var expressionMock = new Mock<DeleteColumnExpression>();
@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             Assert.That(expressionMock.Object.ColumnNames.ElementAt(1), Is.EqualTo("Bacon"));
         }
 
-        [Test]
+        [Fact]
         public void CallingInSchemaSetsSchemaOnExpression() 
         {
             var expressionMock = new Mock<DeleteColumnExpression>();

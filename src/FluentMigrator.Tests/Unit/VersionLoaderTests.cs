@@ -32,7 +32,7 @@ namespace FluentMigrator.Tests.Unit
 
     public class VersionLoaderTests
     {
-        [Test]
+        [Fact]
         public void CanLoadCustomVersionTableMetaData()
         {
             var runnerContext = new Mock<IRunnerContext>();
@@ -49,7 +49,7 @@ namespace FluentMigrator.Tests.Unit
             versionTableMetaData.ShouldBeOfType<TestVersionTableMetaData>();
         }
 
-        [Test]
+        [Fact]
         public void CanLoadDefaultVersionTableMetaData()
         {
             var runnerContext = new Mock<IRunnerContext>();
@@ -66,7 +66,7 @@ namespace FluentMigrator.Tests.Unit
             versionTableMetaData.ShouldBeOfType<DefaultVersionTableMetaData>();
         }
 
-        [Test]
+        [Fact]
         public void CanSetupApplicationContext()
         {
             var applicationContext = "Test context";
@@ -86,7 +86,7 @@ namespace FluentMigrator.Tests.Unit
             versionTableMetaData.ApplicationContext.ShouldBe(applicationContext);
         }
         
-        [Test]
+        [Fact]
         public void DeleteVersionShouldExecuteDeleteDataExpression()
         {
             var runnerContext = new Mock<IRunnerContext>();
@@ -115,7 +115,7 @@ namespace FluentMigrator.Tests.Unit
             processor.VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void RemoveVersionTableShouldBehaveAsExpected()
         {
             var runnerContext = new Mock<IRunnerContext>();
@@ -142,7 +142,7 @@ namespace FluentMigrator.Tests.Unit
             processor.VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void RemoveVersionTableShouldNotRemoveSchemaIfItDidNotOwnTheSchema()
         {
             var runnerContext = new Mock<IRunnerContext>();
@@ -167,7 +167,7 @@ namespace FluentMigrator.Tests.Unit
             processor.Verify(p => p.Process(It.IsAny<DeleteSchemaExpression>()), Times.Never());
         }
 
-        [Test]
+        [Fact]
         public void UpdateVersionShouldExecuteInsertDataExpression()
         {
             var runnerContext = new Mock<IRunnerContext>();
@@ -195,7 +195,7 @@ namespace FluentMigrator.Tests.Unit
             processor.VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void VersionSchemaMigrationOnlyRunOnceEvenIfExistenceChecksReturnFalse()
         {
             var runnerContext = new Mock<IRunnerContext>();
@@ -216,7 +216,7 @@ namespace FluentMigrator.Tests.Unit
             runner.Verify(r => r.Up(loader.VersionSchemaMigration), Times.Once());
         }
 
-        [Test]
+        [Fact]
         public void VersionMigrationOnlyRunOnceEvenIfExistenceChecksReturnFalse()
         {
             var runnerContext = new Mock<IRunnerContext>();
@@ -237,7 +237,7 @@ namespace FluentMigrator.Tests.Unit
             runner.Verify(r => r.Up(loader.VersionMigration), Times.Once());
         }
 
-        [Test]
+        [Fact]
         public void VersionUniqueMigrationOnlyRunOnceEvenIfExistenceChecksReturnFalse()
         {
             var runnerContext = new Mock<IRunnerContext>();
@@ -258,7 +258,7 @@ namespace FluentMigrator.Tests.Unit
             runner.Verify(r => r.Up(loader.VersionUniqueMigration), Times.Once());
         }
 
-        [Test]
+        [Fact]
         public void VersionDescriptionMigrationOnlyRunOnceEvenIfExistenceChecksReturnFalse()
         {
             var runnerContext = new Mock<IRunnerContext>();

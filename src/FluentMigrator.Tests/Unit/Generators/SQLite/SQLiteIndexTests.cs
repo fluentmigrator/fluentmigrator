@@ -13,7 +13,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             Generator = new SQLiteGenerator();
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
@@ -23,7 +23,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             result.ShouldBe("CREATE INDEX \"TestIndex\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
@@ -32,7 +32,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             result.ShouldBe("CREATE INDEX \"TestIndex\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             result.ShouldBe("CREATE INDEX \"TestIndex\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" DESC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
@@ -51,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             result.ShouldBe("CREATE INDEX \"TestIndex\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" DESC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnUniqueIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
@@ -61,7 +61,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             result.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" DESC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnUniqueIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
@@ -70,7 +70,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             result.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" DESC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateUniqueIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
@@ -80,7 +80,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             result.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateUniqueIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
@@ -89,7 +89,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             result.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"TestTable1\" (\"TestColumn1\" ASC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
@@ -99,7 +99,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             result.ShouldBe("DROP INDEX \"TestIndex\"");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();

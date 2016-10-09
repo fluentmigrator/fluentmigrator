@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Integration
     [Category("Integration")]
     public class VersionMigrationTests : IntegrationTestBase
     {
-        [Test]
+        [Fact]
         public void CanUseVersionInfo()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -54,7 +54,7 @@ namespace FluentMigrator.Tests.Integration
                 });
         }
 
-        [Test]
+        [Fact]
         public void CanUseCustomVersionInfo()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -86,7 +86,7 @@ namespace FluentMigrator.Tests.Integration
             }, true, typeof(SQLiteProcessor), typeof(MySqlProcessor), typeof(FirebirdProcessor));
         }
 
-        [Test]
+        [Fact]
         public void CanUseCustomVersionInfoDefaultSchema()
         {
             ExecuteWithSupportedProcessors(processor =>

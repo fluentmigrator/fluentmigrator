@@ -16,7 +16,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             return string.Format(@"Unit\Initialization\Fixtures\{0}", relative);
         }
 
-        [Test]
+        [Fact]
         [ExpectedException(ExpectedException = typeof(ArgumentException))]
         public void ThrowsIfNullPath()
         {
@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             sut.LoadFromFile(null);
         }
 
-        [Test]
+        [Fact]
         [ExpectedException(ExpectedException = typeof(ArgumentException))]
         public void ThrowsIfPathDoesNotExist()
         {
@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             sut.LoadFromFile(GetPath("FileDoesNotExist.config"));
         }
 
-        [Test]
+        [Fact]
         public void LoadsConfigurationFromConfigFile()
         {
             var sut = new NetConfigManager();
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             config.ConnectionStrings.ConnectionStrings[0].ConnectionString.ShouldBe("From Arbitrary Config");
         }
 
-        [Test]
+        [Fact]
         public void LoadsConfigurationFromExeConfigFile()
         {
             var sut = new NetConfigManager();
@@ -54,7 +54,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             config.ConnectionStrings.ConnectionStrings[0].ConnectionString.ShouldBe("From App Config");
         }
 
-        [Test]
+        [Fact]
         public void AddsConfigExtensionWhenNoExtensionIsSpecified()
         {
             var sut = new NetConfigManager();
@@ -64,7 +64,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             config.ConnectionStrings.ConnectionStrings[0].ConnectionString.ShouldBe("From App Config");
         }
 
-        [Test]
+        [Fact]
         public void LoadsConfigurationFromMachineConfigFile()
         {
             var sut = new NetConfigManager();

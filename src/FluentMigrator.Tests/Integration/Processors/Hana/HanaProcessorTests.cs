@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void CallingProcessWithPerformDbOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
         {
             var output = new StringWriter();

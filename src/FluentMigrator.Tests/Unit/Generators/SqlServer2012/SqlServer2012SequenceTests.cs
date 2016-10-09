@@ -14,7 +14,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2012
         }
 
 
-        [Test]
+        [Fact]
         public override void CanCreateSequenceWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSequenceExpression();
@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2012
             result.ShouldBe("CREATE SEQUENCE [TestSchema].[Sequence] INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateSequenceWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSequenceExpression();
@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2012
             result.ShouldBe("CREATE SEQUENCE [dbo].[Sequence] INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropSequenceWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSequenceExpression();
@@ -43,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2012
             result.ShouldBe("DROP SEQUENCE [TestSchema].[Sequence]");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropSequenceWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSequenceExpression();

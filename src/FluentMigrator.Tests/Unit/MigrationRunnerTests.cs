@@ -109,21 +109,21 @@ namespace FluentMigrator.Tests.Unit
             _fakeVersionLoader.LoadVersionInfo();
         }
 
-        [Test]
+        [Fact]
         public void ProfilesAreAppliedWhenMigrateUpIsCalledWithNoVersion()
         {
             _runner.MigrateUp();
             _profileLoaderMock.Verify(x => x.ApplyProfiles(), Times.Once());
         }
 
-        [Test]
+        [Fact]
         public void ProfilesAreAppliedWhenMigrateUpIsCalledWithVersionParameter()
         {
             _runner.MigrateUp(2009010101);
             _profileLoaderMock.Verify(x => x.ApplyProfiles(), Times.Once());
         }
 
-        [Test]
+        [Fact]
         public void ProfilesAreAppliedWhenMigrateDownIsCalled()
         {
             _runner.MigrateDown(2009010101);
@@ -143,7 +143,7 @@ namespace FluentMigrator.Tests.Unit
             _announcer.VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void CanPassConnectionString()
         {
             IMigration migration = new TestEmptyMigration();
@@ -153,7 +153,7 @@ namespace FluentMigrator.Tests.Unit
             _announcer.VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void CanAnnounceUp()
         {
             _announcer.Setup(x => x.Heading(It.IsRegex(containsAll("Test", "migrating"))));
@@ -161,7 +161,7 @@ namespace FluentMigrator.Tests.Unit
             _announcer.VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void CanAnnounceUpFinish()
         {
             _announcer.Setup(x => x.Say(It.IsRegex(containsAll("Test", "migrated"))));
@@ -169,7 +169,7 @@ namespace FluentMigrator.Tests.Unit
             _announcer.VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void CanAnnounceDown()
         {
             _announcer.Setup(x => x.Heading(It.IsRegex(containsAll("Test", "reverting"))));
@@ -177,7 +177,7 @@ namespace FluentMigrator.Tests.Unit
             _announcer.VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void CanAnnounceDownFinish()
         {
             _announcer.Setup(x => x.Say(It.IsRegex(containsAll("Test", "reverted"))));
@@ -185,7 +185,7 @@ namespace FluentMigrator.Tests.Unit
             _announcer.VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void CanAnnounceUpElapsedTime()
         {
             var ts = new TimeSpan(0, 0, 0, 1, 3);
@@ -198,7 +198,7 @@ namespace FluentMigrator.Tests.Unit
             _announcer.VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void CanAnnounceDownElapsedTime()
         {
             var ts = new TimeSpan(0, 0, 0, 1, 3);
@@ -211,7 +211,7 @@ namespace FluentMigrator.Tests.Unit
             _announcer.VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void CanReportExceptions()
         {
             _processorMock.Setup(x => x.Process(It.IsAny<CreateTableExpression>())).Throws(new Exception("Oops"));
@@ -221,7 +221,7 @@ namespace FluentMigrator.Tests.Unit
             Assert.That(exception.Message, Is.StringContaining("Oops"));
         }
 
-        [Test]
+        [Fact]
         public void CanSayExpression()
         {
             _announcer.Setup(x => x.Say(It.IsRegex(containsAll("CreateTable"))));
@@ -233,7 +233,7 @@ namespace FluentMigrator.Tests.Unit
             _announcer.VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void CanTimeExpression()
         {
             var ts = new TimeSpan(0, 0, 0, 1, 3);
@@ -251,14 +251,14 @@ namespace FluentMigrator.Tests.Unit
             return ".*?" + string.Join(".*?", words) + ".*?";
         }
 
-        [Test]
+        [Fact]
         public void LoadsCorrectCallingAssembly()
         {
             var asm = _runner.MigrationAssemblies.Assemblies.Single();
             asm.ShouldBe(Assembly.GetAssembly(typeof(MigrationRunnerTests)));
         }
 
-        [Test]
+        [Fact]
         public void RollbackOnlyOneStepsOfTwoShouldNotDeleteVersionInfoTable()
         {
             long fakeMigrationVersion = 2009010101;
@@ -275,7 +275,7 @@ namespace FluentMigrator.Tests.Unit
 
         }
 
-        [Test]
+        [Fact]
         public void RollbackLastVersionShouldDeleteVersionInfoTable()
         {
             long fakeMigrationVersion = 2009010101;
@@ -289,7 +289,7 @@ namespace FluentMigrator.Tests.Unit
             _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void RollbackToVersionZeroShouldDeleteVersionInfoTable()
         {
             var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
@@ -300,7 +300,7 @@ namespace FluentMigrator.Tests.Unit
 
         }
 
-        [Test]
+        [Fact]
         public void RollbackToVersionZeroShouldNotCreateVersionInfoTableAfterRemoval()
         {
             var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
@@ -316,7 +316,7 @@ namespace FluentMigrator.Tests.Unit
                 );
         }
 
-        [Test]
+        [Fact]
         public void RollbackToVersionShouldShouldLimitMigrationsToNamespace()
         {
             const long fakeMigration1 = 2011010101;
@@ -335,7 +335,7 @@ namespace FluentMigrator.Tests.Unit
             _fakeVersionLoader.Versions.ShouldNotContain(fakeMigration3);
         }
 
-        [Test]
+        [Fact]
         public void RollbackToVersionZeroShouldShouldLimitMigrationsToNamespace()
         {
             const long fakeMigration1 = 2011010101;
@@ -355,7 +355,7 @@ namespace FluentMigrator.Tests.Unit
             _fakeVersionLoader.Versions.ShouldNotContain(fakeMigration3);
         }
 
-        [Test]
+        [Fact]
         public void RollbackShouldLimitMigrationsToNamespace()
         {
             const long fakeMigration1 = 2011010101;
@@ -376,7 +376,7 @@ namespace FluentMigrator.Tests.Unit
             _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public void RollbackToVersionShouldLoadVersionInfoIfVersionGreaterThanZero()
         {
             var versionInfoTableName = _runner.VersionLoader.VersionTableMetaData.TableName;
@@ -397,7 +397,7 @@ namespace FluentMigrator.Tests.Unit
             _fakeVersionLoader.DidLoadVersionInfoGetCalled.ShouldBe(true);
         }
 
-        [Test]
+        [Fact]
         public void ValidateVersionOrderingShouldReturnNothingIfNoUnappliedMigrations()
         {
             const long version1 = 2011010101;
@@ -419,7 +419,7 @@ namespace FluentMigrator.Tests.Unit
             _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();		
         }
 
-        [Test]
+        [Fact]
         public void ValidateVersionOrderingShouldReturnNothingIfUnappliedMigrationVersionIsGreaterThanLatestAppliedMigration()
         {
             const long version1 = 2011010101;
@@ -441,7 +441,7 @@ namespace FluentMigrator.Tests.Unit
             _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();		
         }
 
-        [Test]
+        [Fact]
         public void ValidateVersionOrderingShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanGreatestAppliedMigrationVersion()
         {
             const long version1 = 2011010101;
@@ -471,7 +471,7 @@ namespace FluentMigrator.Tests.Unit
             _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public void CanListVersions()
         {
             const long version1 = 2011010101;
@@ -492,7 +492,7 @@ namespace FluentMigrator.Tests.Unit
             _announcer.Verify(a => a.Emphasize("2011010102: IMigrationProxy (current)"));
         }
 
-        [Test]
+        [Fact]
         public void IfMigrationHasAnInvalidExpressionDuringUpActionShouldThrowAnExceptionAndAnnounceTheError()
         {
             var invalidMigration = new Mock<IMigration>();
@@ -504,7 +504,7 @@ namespace FluentMigrator.Tests.Unit
             _announcer.Verify(a => a.Error(It.Is<string>(s => s.Contains("UpdateDataExpression: Update statement is missing a condition. Specify one by calling .Where() or target all rows by calling .AllRows()."))));
         }
 
-        [Test]
+        [Fact]
         public void IfMigrationHasAnInvalidExpressionDuringDownActionShouldThrowAnExceptionAndAnnounceTheError()
         {
             var invalidMigration = new Mock<IMigration>();
@@ -516,7 +516,7 @@ namespace FluentMigrator.Tests.Unit
             _announcer.Verify(a => a.Error(It.Is<string>(s => s.Contains("UpdateDataExpression: Update statement is missing a condition. Specify one by calling .Where() or target all rows by calling .AllRows()."))));
         }
 
-        [Test]
+        [Fact]
         public void IfMigrationHasTwoInvalidExpressionsShouldAnnounceBothErrors()
         {
             var invalidMigration = new Mock<IMigration>();

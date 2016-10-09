@@ -26,7 +26,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
 {
     public class ExecuteSqlStatementExpressionTests
     {
-        [Test]
+        [Fact]
         public void ErrorIsReturnWhenSqlStatementIsNullOrEmpty()
         {
             var expression = new ExecuteSqlStatementExpression() { SqlStatement = null };
@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.SqlStatementCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ExecutesTheStatement()
         {
             var expression = new ExecuteSqlStatementExpression() { SqlStatement = "INSERT INTO BLAH" };
@@ -46,7 +46,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             processor.Verify();
         }
 
-        [Test]
+        [Fact]
         public void ToStringIsDescriptive()
         {
             var expression = new ExecuteSqlStatementExpression() { SqlStatement = "INSERT INTO BLAH" };

@@ -9,7 +9,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
     public class DeleteDataExpressionTests
     {
 
-        [Test]
+        [Fact]
         public void CallingRowAddAColumn()
         {
             var expressionMock = new Mock<DeleteDataExpression>();
@@ -23,7 +23,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             rowobject.Value.ShouldBe("TestValue");
         }
 
-        [Test]
+        [Fact]
         public void CallingRowTwiceAddTwoColumns()
         {
             var expressionMock = new Mock<DeleteDataExpression>();
@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             rowobject[0].Value.ShouldBe("TestValue2");
         }
 
-        [Test]
+        [Fact]
         public void CallingAllRowsSetsAllRowsToTrue()
         {
             var expressionMock = new Mock<DeleteDataExpression>();
@@ -54,7 +54,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             expressionMock.VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void CallingInSchemaSetSchemaName()
         {
             var expressionMock = new Mock<DeleteDataExpression>();
@@ -66,7 +66,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             expressionMock.VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void CallingIsNullAddsANullColumn()
         {
             var expressionMock = new Mock<DeleteDataExpression>();

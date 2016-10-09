@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public override void CallingSchemaExistsReturnsFalseIfSchemaDoesNotExist()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -38,7 +38,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             Processor.SchemaExists("DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingSchemaExistsReturnsTrueIfSchemaExists()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");

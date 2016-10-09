@@ -29,7 +29,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
 {
     public class AlterExpressionRootTests
     {
-        [Test]
+        [Fact]
         public void CallingTableAddsAlterTableExpressionToContextWithSpecifiedNameSet()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -46,7 +46,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingTableReturnsAlterTableExpressionBuilder()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -61,7 +61,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnAddsAlterColumnExpressionToContextWithSpecifiedNameSet()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -78,7 +78,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnReturnsAlterColumnExpression()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();

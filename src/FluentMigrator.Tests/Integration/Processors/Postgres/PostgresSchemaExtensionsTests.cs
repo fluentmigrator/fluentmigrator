@@ -32,21 +32,21 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsCanAcceptSchemaNameWithSingleQuote()
         {
             using (var table = new PostgresTestTable(Processor, "Test'Schema", "id int"))
                 Processor.ColumnExists("Test'Schema", table.Name, "id").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsCanAcceptSchemaNameWithSingleQuote()
         {
             using (var table = new PostgresTestTable(Processor, "Test'Schema", "id int", "wibble int CONSTRAINT c1 CHECK(wibble > 0)"))
                 Processor.ConstraintExists("Test'Schema", table.Name, "c1").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsCanAcceptSchemaNameWithSingleQuote()
         {
             using (var table = new PostgresTestTable(Processor, "Test'Schema", "id int"))
@@ -62,21 +62,21 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingSchemaExistsCanAcceptSchemaNameWithSingleQuote()
         {
             using (new PostgresTestTable(Processor, "Test'Schema", "id int"))
                 Processor.SchemaExists("Test'Schema").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsCanAcceptSchemaNameWithSingleQuote()
         {
             using (var table = new PostgresTestTable(Processor, "Test'Schema", "id int"))
                 Processor.TableExists("Test'Schema", table.Name).ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void CallingDefaultValueExistsCanAcceptSchemaNameWithSingleQuote()
         {
             using (var table = new PostgresTestTable(Processor, "test'schema", "id int"))

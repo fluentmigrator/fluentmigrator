@@ -13,7 +13,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             Generator = new SqlServer2000Generator();
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithCustomColumnTypeWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -26,7 +26,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] [timestamp] NOT NULL, PRIMARY KEY ([TestColumn1]))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithCustomColumnTypeWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -38,7 +38,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] [timestamp] NOT NULL, PRIMARY KEY ([TestColumn1]))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -48,7 +48,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -57,7 +57,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNullWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -69,7 +69,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT NULL, [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNullWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -80,7 +80,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT NULL, [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithDefaultValueWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
@@ -90,7 +90,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT 'Default', [TestColumn2] INT NOT NULL CONSTRAINT [DF_TestTable1_TestColumn2] DEFAULT 0)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithDefaultValueWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
@@ -99,7 +99,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT 'Default', [TestColumn2] INT NOT NULL CONSTRAINT [DF_TestTable1_TestColumn2] DEFAULT 0)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithIdentityWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
@@ -109,7 +109,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(1,1), [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithIdentityWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
@@ -118,7 +118,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(1,1), [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithMultiColumnPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
@@ -128,7 +128,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1], [TestColumn2]))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
@@ -137,7 +137,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1], [TestColumn2]))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithNamedMultiColumnPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
@@ -147,7 +147,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1], [TestColumn2]))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithNamedMultiColumnPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
@@ -156,7 +156,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1], [TestColumn2]))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithNamedPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
@@ -166,7 +166,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1]))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithNamedPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
@@ -175,7 +175,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1]))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithNullableFieldWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -186,7 +186,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255), [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithNullableFieldWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -196,7 +196,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255), [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
@@ -206,7 +206,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1]))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
@@ -215,7 +215,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1]))");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
@@ -225,7 +225,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("DROP TABLE [TestTable1]");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
@@ -234,7 +234,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("DROP TABLE [TestTable1]");
         }
 
-        [Test]
+        [Fact]
         public override void CanRenameTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
@@ -244,7 +244,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe("sp_rename '[TestTable1]', 'TestTable2'");
         }
 
-        [Test]
+        [Fact]
         public override void CanRenameTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();

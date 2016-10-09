@@ -44,28 +44,28 @@ namespace FluentMigrator.Tests.Unit.Announcers
             get { return _stringWriter.GetStringBuilder().ToString(); }
         }
 
-        [Test]
+        [Fact]
         public void CanAnnounceAndPadWithEquals()
         {
             _announcer.Heading("Test");
             Output.ShouldBe("/* Test ====================================================================== */" + Environment.NewLine + Environment.NewLine);
         }
 
-        [Test]
+        [Fact]
         public void CanSay()
         {
             _announcer.Say("Create table");
             Output.ShouldBe("/* Create table */" + Environment.NewLine);
         }
 
-        [Test]
+        [Fact]
         public void CanSaySql()
         {
             _announcer.Sql("DELETE Blah");
             Output.ShouldBe("DELETE Blah" + Environment.NewLine);
         }
 
-        [Test]
+        [Fact]
         public void CanSayTimeSpan()
         {
             _announcer.ElapsedTime(new TimeSpan(0, 0, 5));

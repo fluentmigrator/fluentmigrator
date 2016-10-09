@@ -32,7 +32,7 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void CallingProcessWithPerformDBOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
         {
             var output = new StringWriter();
@@ -73,7 +73,7 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
             tableExists.ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public void CallingExecuteWithPerformDBOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
         {
             var output = new StringWriter();
@@ -98,7 +98,7 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
             tableExists.ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public void CallingDefaultValueExistsReturnsTrueWhenMatches()
         {
             try
@@ -112,7 +112,7 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
             }
         }
 
-        [Test]
+        [Fact]
         public void CallingReadTableDataQuotesTableName()
         {
             try

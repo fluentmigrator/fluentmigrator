@@ -15,7 +15,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             generator = new FirebirdGenerator(FirebirdOptions.StandardBehaviour());
         }
 
-        [Test]
+        [Fact]
         public void CanAlterSequence()
         {
             var expression = new CreateSequenceExpression

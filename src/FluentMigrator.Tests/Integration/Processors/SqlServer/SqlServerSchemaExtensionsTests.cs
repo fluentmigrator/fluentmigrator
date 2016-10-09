@@ -33,21 +33,21 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsCanAcceptSchemaNameWithSingleQuote()
         {
             using (var table = new SqlServerTestTable(Processor, "test'schema", "id int"))
                 Processor.ColumnExists("test'schema", table.Name, "id").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsCanAcceptSchemaNameWithSingleQuote()
         {
             using (var table = new SqlServerTestTable(Processor, "test'schema", "id int", "wibble int CONSTRAINT c1 CHECK(wibble > 0)"))
                 Processor.ConstraintExists("test'schema", table.Name, "c1").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsCanAcceptSchemaNameWithSingleQuote()
         {
             using (var table = new SqlServerTestTable(Processor, "test'schema", "id int"))
@@ -57,21 +57,21 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingSchemaExistsCanAcceptSchemaNameWithSingleQuote()
         {
             using (new SqlServerTestTable(Processor, "test'schema", Quoter.QuoteColumnName("id") + " int"))
                 Processor.SchemaExists("test'schema").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsCanAcceptSchemaNameWithSingleQuote()
         {
             using (var table = new SqlServerTestTable(Processor, "test'schema", "id int"))
                 Processor.TableExists("test'schema", table.Name).ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void CallingDefaultValueExistsCanAcceptSchemaNameWithSingleQuote()
         {
             using (var table = new SqlServerTestTable(Processor, "test'schema", "id int"))

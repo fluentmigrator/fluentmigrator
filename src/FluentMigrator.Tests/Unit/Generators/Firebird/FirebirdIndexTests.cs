@@ -14,7 +14,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             Generator = new FirebirdGenerator(FirebirdOptions.StandardBehaviour());
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("CREATE ASC INDEX TestIndex ON TestTable1 (TestColumn1)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("CREATE ASC INDEX TestIndex ON TestTable1 (TestColumn1)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
@@ -43,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("CREATE ASC INDEX TestIndex ON TestTable1 (TestColumn1, TestColumn2)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("CREATE ASC INDEX TestIndex ON TestTable1 (TestColumn1, TestColumn2)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnUniqueIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
@@ -62,7 +62,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("CREATE UNIQUE ASC INDEX TestIndex ON TestTable1 (TestColumn1, TestColumn2)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnUniqueIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
@@ -71,7 +71,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("CREATE UNIQUE ASC INDEX TestIndex ON TestTable1 (TestColumn1, TestColumn2)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateUniqueIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
@@ -81,7 +81,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("CREATE UNIQUE ASC INDEX TestIndex ON TestTable1 (TestColumn1)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateUniqueIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
@@ -90,7 +90,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("CREATE UNIQUE ASC INDEX TestIndex ON TestTable1 (TestColumn1)");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
@@ -100,7 +100,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("DROP INDEX TestIndex");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();

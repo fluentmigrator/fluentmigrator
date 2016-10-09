@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
     public class DeleteExpressionRootTests
     {
-        [Test]
+        [Fact]
         public void CallingTableAddsDeleteTableExpressionToContextWithSpecifiedName()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -45,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnAddsDeleteColumnExpressionToContextWithSpecifiedName()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -60,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnReturnsDeleteColumnExpressionBuilder()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -74,7 +74,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingForeignKeyAddsDeleteForeignKeyExpressionToContext()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -89,7 +89,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingForeignKeyReturnsDeleteForeignKeyExpressionBuilder()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -103,7 +103,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingForeignKeyWithNameAddsDeleteForeignKeyExpressionToContextWithSpecifiedName()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -118,7 +118,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingSequenceAddsDeleteSequenceExpressionToContextWithSpecifiedName()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -133,7 +133,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingDefaultConstraintAddsDeleteDefaultConstraintExpressionToContext()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();

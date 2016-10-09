@@ -5,7 +5,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
 {
     public class IndexDefinitionTests
     {
-        [Test]
+        [Fact]
         public void ShouldApplyIndexNameConventionWhenIndexNameIsNull()
         {
             var indexDefinition = new IndexDefinition();

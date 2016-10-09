@@ -28,43 +28,43 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
     public class CreateSequenceExpressionBuilderTests
     {
-        [Test]
+        [Fact]
         public void CallingInSchemaSetsSchemaName()
         {
             VerifySequenceProperty(c => c.SchemaName = "Schema", b => b.InSchema("Schema"));
         }
 
-        [Test]
+        [Fact]
         public void CallingIncrementBySetsIncrement()
         {
             VerifySequenceProperty(c => c.Increment = 10, b => b.IncrementBy(10));
         }
 
-        [Test]
+        [Fact]
         public void CallingMinValueSetsMinValue()
         {
             VerifySequenceProperty(c => c.MinValue = 10, b => b.MinValue(10));
         }
 
-        [Test]
+        [Fact]
         public void CallingMaxValueSetsMaxValue()
         {
             VerifySequenceProperty(c => c.MaxValue = 10, b => b.MaxValue(10));
         }
 
-        [Test]
+        [Fact]
         public void CallingStartWithSetsStartWith()
         {
             VerifySequenceProperty(c => c.StartWith = 10, b => b.StartWith(10));
         }
 
-        [Test]
+        [Fact]
         public void CallingCacheSetsCache()
         {
             VerifySequenceProperty(c => c.Cache = 10, b => b.Cache(10));
         }
 
-        [Test]
+        [Fact]
         public void CallingCycleSetsCycleToTrue()
         {
             VerifySequenceProperty(c => c.Cycle = true, b => b.Cycle());

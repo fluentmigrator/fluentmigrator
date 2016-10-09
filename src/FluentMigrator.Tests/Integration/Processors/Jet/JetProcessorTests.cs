@@ -38,40 +38,40 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
             Connection.Open();
         }
 
-        [Test]
+        [Fact]
         public void CallingTableExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.TableExists(null, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public void CallingTableExistsReturnsTrueIfTableExists()
         {
             using (var table = new JetTestTable(Processor, "id int"))
                 Processor.TableExists(null, table.Name).ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnExistsReturnsTrueIfColumnExists()
         {
             using (var table = new JetTestTable(Processor, "id int"))
                 Processor.ColumnExists(null, table.Name, "id").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.ColumnExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnExistsReturnsFalseIfColumnDoesNotExist()
         {
             using (var table = new JetTestTable(Processor, "id int"))
                 Processor.ColumnExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public void CanReadData()
         {
             using (var table = new JetTestTable(Processor, "id int"))
@@ -87,7 +87,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
             }
         }
 
-        [Test]
+        [Fact]
         public void CanReadTableData()
         {
             using (var table = new JetTestTable(Processor, "id int"))

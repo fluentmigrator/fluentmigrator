@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsCanAcceptIndexNameWithSingleQuote()
         {
             const string columnSingleQuote = "i'd";
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsCanAcceptTableNameWithSingleQuote()
         {
             using (var table = new HanaTestTable("Test'Table", Processor, null, "\"id\" int"))
@@ -54,14 +54,14 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfIndexDoesNotExist()
         {
             using (var table = new HanaTestTable(Processor, null, "id int"))
                 Processor.IndexExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfIndexDoesNotExistWithSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -70,13 +70,13 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
                 Processor.IndexExists("test_schema", table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.IndexExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -84,7 +84,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             Processor.IndexExists("test_schema", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsTrueIfIndexExists()
         {
             using (var table = new HanaTestTable(Processor, null, "\"id\" int"))
@@ -94,7 +94,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsTrueIfIndexExistsWithSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");

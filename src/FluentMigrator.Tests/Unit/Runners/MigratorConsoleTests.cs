@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         private const string Connection = "Data Source=:memory:;Version=3;New=True;";
         private const string Target = "FluentMigrator.Tests.dll";
 
-        [Test]
+        [Fact]
         [Category("NotWorkingOnMono")]
         public void CanInitMigratorConsoleWithValidArguments()
         {
@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             console.Version.ShouldBe(1);
         }
 
-        [Test]
+        [Fact]
         [Category("NotWorkingOnMono")]
         public void ConsoleAnnouncerHasMoreOutputWhenVerbose()
         {
@@ -82,7 +82,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             Assert.Greater(sbVerbose.ToString().Length, sbNonVerbose.ToString().Length);
         }
 
-        [Test]
+        [Fact]
         public void ConsoleAnnouncerHasOutput()
         {
             var sb = new StringBuilder();
@@ -100,7 +100,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             Assert.AreNotEqual(0, output.Length);
         }
 
-        [Test]
+        [Fact]
         [Category("NotWorkingOnMono")]
         public void ConsoleAnnouncerHasOutputEvenIfMarkedAsPreviewOnly()
         {
@@ -123,7 +123,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             Assert.AreNotEqual(0, output.Length);
         }
 
-        [Test]
+        [Fact]
         public void FileAnnouncerHasOutputToDefaultOutputFile()
         {
             const string outputFileName = Target + ".sql";
@@ -144,7 +144,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             File.Delete(outputFileName);
         }
 
-        [Test]
+        [Fact]
         public void FileAnnouncerHasOutputToSpecifiedOutputFile()
         {
             const string outputFileName = "output.sql";
@@ -166,14 +166,14 @@ namespace FluentMigrator.Tests.Unit.Runners
             File.Delete(outputFileName);
         }
 
-        [Test]
+        [Fact]
         public void MustInitializeConsoleWithConnectionArgument()
         {
             new MigratorConsole("/db", Database);
             Assert.That(Environment.ExitCode == 1);
         }
 
-        [Test]
+        [Fact]
         public void MustInitializeConsoleWithDatabaseArgument()
         {
             new MigratorConsole("/connection", Connection);
@@ -185,7 +185,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         {
         }
 
-        [Test]
+        [Fact]
         public void TagsPassedToRunnerContextOnExecuteMigrations()
         {
             var migratorConsole = new MigratorConsole(
@@ -204,7 +204,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             CollectionAssert.AreEquivalent(expectedTags, migratorConsole.RunnerContext.Tags);   
         }
 
-        [Test]
+        [Fact]
         public void TransactionPerSessionShouldBeSetOnRunnerContextWithShortSwitch()
         {
             var console = new MigratorConsole(
@@ -218,7 +218,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             console.RunnerContext.TransactionPerSession.ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void TransactionPerSessionShouldBeSetOnRunnerContextWithLongSwitch()
         {
             var console = new MigratorConsole(
@@ -232,7 +232,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             console.RunnerContext.TransactionPerSession.ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void ProviderSwitchesPassedToRunnerContextOnExecuteMigrations()
         {
             var migratorConsole = new MigratorConsole(

@@ -8,7 +8,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
 {
     public class DeleteDefaultConstraintExpressionTests
     {
-        [Test]
+        [Fact]
         public void CollectValidationErrorsShouldReturnErrorIfColumnNameIsEmpty()
         {
             var expression = new DeleteDefaultConstraintExpression {ColumnName = string.Empty};
@@ -16,7 +16,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void CollectValidationErrorsShouldReturnErrorIfColumnNameIsNull()
         {
             var expression = new DeleteDefaultConstraintExpression {ColumnName = null};
@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void CollectValidationErrorsShouldReturnErrorIfTableNameIsEmpty()
         {
             var expression = new DeleteDefaultConstraintExpression {TableName = string.Empty};
@@ -32,7 +32,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void CollectValidationErrorsShouldReturnErrorIfTableNameIsNull()
         {
             var expression = new DeleteDefaultConstraintExpression {TableName = null};
@@ -40,7 +40,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ExecuteWithShouldDelegateProcessOnMigrationProcessor()
         {
             var expression = new DeleteDefaultConstraintExpression();
@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             processorMock.VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void ToStringIsDescriptive()
         {
             var expression = new DeleteDefaultConstraintExpression {SchemaName = "ThaSchema", TableName = "ThaTable", ColumnName = "ThaColumn"};

@@ -26,13 +26,13 @@ namespace FluentMigrator.Tests.Unit
 {
     public class DefaultMigrationConventionsTests
     {
-        [Test]
+        [Fact]
         public void GetPrimaryKeyNamePrefixesTableNameWithPKAndUnderscore()
         {
             DefaultMigrationConventions.GetPrimaryKeyName("Foo").ShouldBe("PK_Foo");
         }
 
-        [Test]
+        [Fact]
         public void GetForeignKeyNameReturnsValidForeignKeyNameForSimpleForeignKey()
         {
             var foreignKey = new ForeignKeyDefinition
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit
             DefaultMigrationConventions.GetForeignKeyName(foreignKey).ShouldBe("FK_Users_GroupId_Groups_Id");
         }
 
-        [Test]
+        [Fact]
         public void GetForeignKeyNameReturnsValidForeignKeyNameForComplexForeignKey()
         {
             var foreignKey = new ForeignKeyDefinition
@@ -56,7 +56,7 @@ namespace FluentMigrator.Tests.Unit
             DefaultMigrationConventions.GetForeignKeyName(foreignKey).ShouldBe("FK_Users_ColumnA_ColumnB_Groups_ColumnC_ColumnD");
         }
 
-        [Test]
+        [Fact]
         public void GetIndexNameReturnsValidIndexNameForSimpleIndex()
         {
             var index = new IndexDefinition
@@ -71,7 +71,7 @@ namespace FluentMigrator.Tests.Unit
             DefaultMigrationConventions.GetIndexName(index).ShouldBe("IX_Bacon_BaconName");
         }
 
-        [Test]
+        [Fact]
         public void GetIndexNameReturnsValidIndexNameForComplexIndex()
         {
             var index = new IndexDefinition
@@ -87,35 +87,35 @@ namespace FluentMigrator.Tests.Unit
             DefaultMigrationConventions.GetIndexName(index).ShouldBe("IX_Bacon_BaconName_BaconSpice");
         }
 
-        [Test]
+        [Fact]
         public void TypeIsMigrationReturnsTrueIfTypeExtendsMigrationAndHasMigrationAttribute()
         {
             DefaultMigrationConventions.TypeIsMigration(typeof(DefaultConventionMigrationFake))
                 .ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void TypeIsMigrationReturnsFalseIfTypeDoesNotExtendMigration()
         {
             DefaultMigrationConventions.TypeIsMigration(typeof(object))
                 .ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public void TypeIsMigrationReturnsFalseIfTypeDoesNotHaveMigrationAttribute()
         {
             DefaultMigrationConventions.TypeIsMigration(typeof(MigrationWithoutAttributeFake))
                 .ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public void GetMaintenanceStageReturnsCorrectStage()
         {
             DefaultMigrationConventions.GetMaintenanceStage(typeof (MaintenanceAfterEach))
                 .ShouldBe(MigrationStage.AfterEach);
         }
 
-        [Test]
+        [Fact]
         public void MigrationInfoShouldRetainMigration()
         {
             var migrationType = typeof(DefaultConventionMigrationFake);
@@ -123,7 +123,7 @@ namespace FluentMigrator.Tests.Unit
             migrationinfo.Migration.GetType().ShouldBeSameAs(migrationType);
         }
 
-        [Test]
+        [Fact]
         public void MigrationInfoShouldExtractVersion()
         {
             var migrationType = typeof(DefaultConventionMigrationFake);
@@ -131,7 +131,7 @@ namespace FluentMigrator.Tests.Unit
             migrationinfo.Version.ShouldBe(123);
         }
 
-        [Test]
+        [Fact]
         public void MigrationInfoShouldExtractTransactionBehavior()
         {
             var migrationType = typeof(DefaultConventionMigrationFake);
@@ -139,7 +139,7 @@ namespace FluentMigrator.Tests.Unit
             migrationinfo.TransactionBehavior.ShouldBe(TransactionBehavior.None);
         }
 
-        [Test]
+        [Fact]
         public void MigrationInfoShouldExtractTraits()
         {
             var migrationType = typeof(DefaultConventionMigrationFake);
@@ -147,7 +147,7 @@ namespace FluentMigrator.Tests.Unit
             migrationinfo.Trait("key").ShouldBe("test");
         }
 
-        [Test]
+        [Fact]
         [Category("Integration")]
         public void WorkingDirectoryConventionDefaultsToAssemblyFolder()
         {
@@ -157,21 +157,21 @@ namespace FluentMigrator.Tests.Unit
             defaultWorkingDirectory.Contains("bin").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void TypeHasTagsReturnTrueIfTypeHasTagsAttribute()
         {
             DefaultMigrationConventions.TypeHasTags(typeof(TaggedWithUk))
                 .ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void TypeHasTagsReturnFalseIfTypeDoesNotHaveTagsAttribute()
         {
             DefaultMigrationConventions.TypeHasTags(typeof(HasNoTagsFake))
                 .ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public void TypeHasTagsReturnTrueIfBaseTypeDoesHaveTagsAttribute()
         {
             DefaultMigrationConventions.TypeHasTags(typeof(ConcretehasTagAttribute))
@@ -180,7 +180,7 @@ namespace FluentMigrator.Tests.Unit
 
         public class TypeHasMatchingTags
         {
-            [Test]
+            [Fact]
             [Category("Tagging")]
             public void WhenTypeHasTagAttributeButNoTagsPassedInReturnsFalse()
             {
@@ -188,7 +188,7 @@ namespace FluentMigrator.Tests.Unit
                     .ShouldBeFalse();
             }
 
-            [Test]
+            [Fact]
             [Category("Tagging")]
             public void WhenTypeHasTagAttributeWithNoTagNamesReturnsFalse()
             {
@@ -196,7 +196,7 @@ namespace FluentMigrator.Tests.Unit
                     .ShouldBeFalse();
             }
 
-            [Test]
+            [Fact]
             [Category("Tagging")]
             public void WhenTypeHasOneTagThatDoesNotMatchSingleThenTagReturnsFalse()
             {
@@ -204,7 +204,7 @@ namespace FluentMigrator.Tests.Unit
                     .ShouldBeFalse();
             }
 
-            [Test]
+            [Fact]
             [Category("Tagging")]
             public void WhenTypeHasOneTagThatDoesMatchSingleTagThenReturnsTrue()
             {
@@ -212,7 +212,7 @@ namespace FluentMigrator.Tests.Unit
                     .ShouldBeTrue();
             }
 
-            [Test]
+            [Fact]
             [Category("Tagging")]
             public void WhenTypeHasOneTagThatPartiallyMatchesTagThenReturnsFalse()
             {
@@ -220,7 +220,7 @@ namespace FluentMigrator.Tests.Unit
                     .ShouldBeFalse();
             }
 
-            [Test]
+            [Fact]
             [Category("Tagging")]
             public void WhenTypeHasOneTagThatDoesMatchMultipleTagsThenReturnsFalse()
             {
@@ -228,7 +228,7 @@ namespace FluentMigrator.Tests.Unit
                     .ShouldBeFalse();
             }
 
-            [Test]
+            [Fact]
             [Category("Tagging")]
             public void WhenTypeHasTagsInTwoAttributeThatDoesMatchSingleTagThenReturnsTrue()
             {
@@ -236,7 +236,7 @@ namespace FluentMigrator.Tests.Unit
                     .ShouldBeTrue();
             }
 
-            [Test]
+            [Fact]
             [Category("Tagging")]
             public void WhenTypeHasTagsInTwoAttributesThatDoesMatchMultipleTagsThenReturnsTrue()
             {
@@ -244,7 +244,7 @@ namespace FluentMigrator.Tests.Unit
                     .ShouldBeTrue();
             }
 
-            [Test]
+            [Fact]
             [Category("Tagging")]
             public void WhenTypeHasTagsInOneAttributeThatDoesMatchMultipleTagsThenReturnsTrue()
             {
@@ -252,7 +252,7 @@ namespace FluentMigrator.Tests.Unit
                     .ShouldBeTrue();
             }
 
-            [Test]
+            [Fact]
             [Category("Tagging")]
             public void WhenTypeHasTagsInTwoAttributesThatDontNotMatchMultipleTagsThenReturnsFalse()
             {
@@ -260,7 +260,7 @@ namespace FluentMigrator.Tests.Unit
                     .ShouldBeFalse();
             }
 
-            [Test]
+            [Fact]
             [Category("Tagging")]
             public void WhenBaseTypeHasTagsThenConcreteTypeReturnsTrue()
             {
@@ -272,7 +272,7 @@ namespace FluentMigrator.Tests.Unit
         [FluentMigrator.Migration(20130508175300)]
         class AutoScriptMigrationFake : AutoScriptMigration { }
 
-        [Test]
+        [Fact]
         public void GetAutoScriptUpName()
         {
             var type = typeof(AutoScriptMigrationFake);
@@ -282,7 +282,7 @@ namespace FluentMigrator.Tests.Unit
                 .ShouldBe("Scripts.Up.20130508175300_AutoScriptMigrationFake_sqlserver.sql");
         }
 
-        [Test]
+        [Fact]
         public void GetAutoScriptDownName()
         {
             var type = typeof(AutoScriptMigrationFake);

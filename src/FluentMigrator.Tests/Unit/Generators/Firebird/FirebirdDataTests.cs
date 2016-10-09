@@ -14,7 +14,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             Generator = new FirebirdGenerator(FirebirdOptions.StandardBehaviour());
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataForAllRowsWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("DELETE FROM TestTable1 WHERE 1 = 1");
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataForAllRowsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
 
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataForMultipleRowsWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL; DELETE FROM TestTable1 WHERE Website = 'github.com'");
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataForMultipleRowsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
@@ -53,7 +53,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL; DELETE FROM TestTable1 WHERE Website = 'github.com'");
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
@@ -63,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
@@ -72,7 +72,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanInsertDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
@@ -85,7 +85,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe(expected);
         }
 
-        [Test]
+        [Fact]
         public override void CanInsertDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
@@ -97,7 +97,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe(expected);
         }
 
-        [Test]
+        [Fact]
         public override void CanInsertGuidDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
@@ -107,7 +107,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe(System.String.Format("INSERT INTO TestTable1 (guid) VALUES ('{0}')", GeneratorTestHelper.TestGuid));
         }
 
-        [Test]
+        [Fact]
         public override void CanInsertGuidDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
@@ -116,7 +116,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe(System.String.Format("INSERT INTO TestTable1 (guid) VALUES ('{0}')", GeneratorTestHelper.TestGuid));
         }
 
-        [Test]
+        [Fact]
         public override void CanUpdateDataForAllDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
@@ -126,7 +126,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE 1 = 1");
         }
 
-        [Test]
+        [Fact]
         public override void CanUpdateDataForAllDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
@@ -135,7 +135,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE 1 = 1");
         }
 
-        [Test]
+        [Fact]
         public override void CanUpdateDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
@@ -145,7 +145,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25 WHERE Id = 9 AND Homepage IS NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanUpdateDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();

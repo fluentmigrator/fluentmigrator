@@ -29,7 +29,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Rename
 {
     public class RenameExpressionRootTests
     {
-        [Test]
+        [Fact]
         public void CallingTableAddsRenameTableExpressionToContextWithSpecifiedOldName()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Rename
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingTableReturnsRenameTableExpressionBuilder()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -58,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Rename
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnAddsRenameColumnExpressionToContextWithSpecifiedOldName()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -73,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Rename
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnReturnsRenameColumnExpressionBuilder()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();

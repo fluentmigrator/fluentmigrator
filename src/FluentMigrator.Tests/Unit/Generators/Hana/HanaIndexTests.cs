@@ -13,7 +13,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             Generator = new HanaGenerator();
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateIndexWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE INDEX \"TestIndex\" ON \"TestSchema\".\"TestTable1\" (\"TestColumn1\" ASC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE INDEX \"TestIndex\" ON \"TestTable1\" (\"TestColumn1\" ASC);");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnIndexWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -46,7 +46,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE INDEX \"TestIndex\" ON \"TestSchema\".\"TestTable1\" (\"TestColumn1\" ASC,\"TestColumn2\" DESC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE INDEX \"TestIndex\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" DESC);");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnUniqueIndexWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -67,7 +67,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"TestSchema\".\"TestTable1\" (\"TestColumn1\" ASC,\"TestColumn2\" DESC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnUniqueIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
@@ -76,7 +76,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"TestTable1\" (\"TestColumn1\" ASC, \"TestColumn2\" DESC);");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateUniqueIndexWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -88,7 +88,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"TestSchema\".\"TestTable1\" (\"TestColumn1\" ASC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateUniqueIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
@@ -97,7 +97,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE UNIQUE INDEX \"TestIndex\" ON \"TestTable1\" (\"TestColumn1\" ASC);");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropIndexWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -109,7 +109,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("DROP INDEX \"TestSchema\".\"TestIndex\"");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();

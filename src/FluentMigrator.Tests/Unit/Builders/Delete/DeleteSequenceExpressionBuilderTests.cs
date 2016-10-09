@@ -26,7 +26,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 
     public class DeleteSequenceExpressionBuilderTests
     {
-        [Test]
+        [Fact]
         public void CallingInSchemaSetsInSchema()
         {
             var expressionMock = new Mock<DeleteSequenceExpression>();

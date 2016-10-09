@@ -14,7 +14,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             Generator = new OracleGenerator();
         }
 
-        [Test]
+        [Fact]
         public override void CanAlterColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("ALTER TABLE TestTable1 MODIFY TestColumn1 NVARCHAR2(20) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanAlterColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("ALTER TABLE TestTable1 MODIFY TestColumn1 NVARCHAR2(20) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateAutoIncrementColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateAutoIncrementColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -60,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NVARCHAR2(5) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -69,7 +69,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NVARCHAR2(5) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateDecimalColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
@@ -79,7 +79,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NUMBER(19,2) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateDecimalColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
@@ -88,7 +88,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NUMBER(19,2) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
@@ -98,7 +98,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("ALTER TABLE TestTable1 DROP COLUMN TestColumn1");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
@@ -107,7 +107,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("ALTER TABLE TestTable1 DROP COLUMN TestColumn1");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropMultipleColumnsWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "TestColumn1", "TestColumn2" });
@@ -117,7 +117,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("ALTER TABLE TestTable1 DROP COLUMN TestColumn1;" + System.Environment.NewLine + "ALTER TABLE TestTable1 DROP COLUMN TestColumn2");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropMultipleColumnsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "TestColumn1", "TestColumn2" });
@@ -126,7 +126,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("ALTER TABLE TestTable1 DROP COLUMN TestColumn1;" + System.Environment.NewLine + "ALTER TABLE TestTable1 DROP COLUMN TestColumn2");
         }
 
-        [Test]
+        [Fact]
         public override void CanRenameColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
@@ -136,7 +136,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("ALTER TABLE TestTable1 RENAME COLUMN TestColumn1 TO TestColumn2");
         }
 
-        [Test]
+        [Fact]
         public override void CanRenameColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
@@ -145,7 +145,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("ALTER TABLE TestTable1 RENAME COLUMN TestColumn1 TO TestColumn2");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateColumnWithDefaultValue()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -156,7 +156,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NVARCHAR2(5) DEFAULT 1 NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateColumnWithDefaultStringValue()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -167,7 +167,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NVARCHAR2(5) DEFAULT '1' NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateColumnWithDefaultSystemMethodNewGuid()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -178,7 +178,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NVARCHAR2(5) DEFAULT sys_guid() NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateColumnWithDefaultSystemMethodCurrentDateTime()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -189,7 +189,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NVARCHAR2(5) DEFAULT CURRENT_TIMESTAMP NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateColumnWithDefaultSystemMethodCurrentUser()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();

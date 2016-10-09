@@ -58,7 +58,7 @@
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnExistsReturnsFalseIfColumnExistsInDifferentSchema()
         {
             using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT"))
@@ -67,7 +67,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public void CallingConstraintExistsReturnsFalseIfConstraintExistsInDifferentSchema()
         {
             using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT"))
@@ -77,7 +77,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public void CallingTableExistsReturnsFalseIfTableExistsInDifferentSchema()
         {
             using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT"))

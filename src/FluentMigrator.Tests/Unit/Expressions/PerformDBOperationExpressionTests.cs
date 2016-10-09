@@ -7,7 +7,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
 {
     public class PerformDBOperationExpressionTests
     {
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenOperationIsNull()
         {
             var expression = new PerformDBOperationExpression() { Operation = null };

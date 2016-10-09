@@ -9,7 +9,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
     public class DeleteConstraintTest
     {
-        [Test]
+        [Fact]
         public void CallingDeletePrimaryKeyCreatesADeleteConstraintExpression()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingDeleteUniqueConstraintCreatesADeleteConstraintExpression()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();

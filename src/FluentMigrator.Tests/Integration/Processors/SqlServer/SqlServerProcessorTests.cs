@@ -32,28 +32,28 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnExistsReturnsFalseIfColumnExistsInDifferentSchema()
         {
             using (var table = new SqlServerTestTable(Processor, "test_schema", "id int"))
                 Processor.ColumnExists("test_schema2", table.Name, "id").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public void CallingConstraintExistsReturnsFalseIfConstraintExistsInDifferentSchema()
         {
             using (var table = new SqlServerTestTable(Processor, "test_schema", "id int", "wibble int CONSTRAINT c1 CHECK(wibble > 0)"))
                 Processor.ConstraintExists("test_schema2", table.Name, "c1").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public void CallingTableExistsReturnsFalseIfTableExistsInDifferentSchema()
         {
             using (var table = new SqlServerTestTable(Processor, "test_schema", "id int"))
                 Processor.TableExists("test_schema2", table.Name).ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public void CallingProcessWithPerformDbOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
         {
             var output = new StringWriter();

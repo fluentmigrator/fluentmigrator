@@ -9,7 +9,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
     [Category("Firebird")]
     public class TestRollbackColumnCreation : FbEndToEndFixture
     {
-        [Test]
+        [Fact]
         public void Rollback_ColumnCreatedOnTableWithImplicitlyCreatedFk_CreatedColumnShouldBeDropped()
         {
             var namespaceFilter = typeof(CreateImplicitFk).Namespace;
@@ -20,7 +20,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
             ColumnExists("table2", "silly").ShouldBe(false);
         }
 
-        [Test]
+        [Fact]
         public void Rollback_ColumnCreatedOnTableWithExplictlyCreatedFk_CreatedColumnShouldBeDropped()
         {
             var namespaceFilter = typeof(CreateExplicitFk).Namespace;
@@ -31,7 +31,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
             ColumnExists("table2", "silly").ShouldBe(false);
         }
 
-        [Test]
+        [Fact]
         public void Delete_ColumnCreateOnTableWithExplicitPk_ColumnShouldBeDropped()
         {
             Migrate(typeof(DeleteColumnOnTableWithFk.CreateExplicitFk).Namespace);
@@ -39,7 +39,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
             ColumnExists("table2", "silly").ShouldBe(false);
         }
 
-        [Test]
+        [Fact]
         public void Rollback_DeletedColumnOnTableWithExplicitFk_ColumnShouldBeRecreated()
         {
             var namespaceFilter = typeof(DeleteColumnOnTableWithFk.CreateExplicitFk).Namespace;

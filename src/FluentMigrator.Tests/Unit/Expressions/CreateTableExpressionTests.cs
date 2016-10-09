@@ -26,7 +26,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
 {
     public class CreateTableExpressionTests
     {
-        [Test]
+        [Fact]
         public void ToStringIsDescriptive()
         {
             new CreateTableExpression
@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
                 }.ToString().ShouldBe("CreateTable Table");
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenTableNameIsEmptyString()
         {
             var expression = new CreateTableExpression { TableName = String.Empty };
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenTableNameIsSet()
         {
             var expression = new CreateTableExpression { TableName = "table1" };

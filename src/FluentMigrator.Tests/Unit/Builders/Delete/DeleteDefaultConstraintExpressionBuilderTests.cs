@@ -16,21 +16,21 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
         private DeleteDefaultConstraintExpressionBuilder builder;
         private DeleteDefaultConstraintExpression expression;
 
-        [Test]
+        [Fact]
         public void OnColumnShouldSetColumnNameOnExpression()
         {
             builder.OnColumn("column");
             expression.ColumnName.ShouldBe("column");
         }
 
-        [Test]
+        [Fact]
         public void OnSchemaShouldSetSchemaNameOnExpression()
         {
             builder.InSchema("Shema");
             expression.SchemaName.ShouldBe("Shema");
         }
 
-        [Test]
+        [Fact]
         public void OnTableShouldSetTableNameOnExpression()
         {
             builder.OnTable("ThaTable");

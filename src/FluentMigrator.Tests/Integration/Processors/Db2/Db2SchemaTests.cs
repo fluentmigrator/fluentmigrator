@@ -46,13 +46,13 @@
 
         #region Methods
 
-        [Test]
+        [Fact]
         public override void CallingSchemaExistsReturnsFalseIfSchemaDoesNotExist()
         {
             Processor.SchemaExists("DNE").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingSchemaExistsReturnsTrueIfSchemaExists()
         {
             using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT"))

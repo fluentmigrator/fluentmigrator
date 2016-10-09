@@ -29,13 +29,13 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public override void CallingSchemaExistsReturnsFalseIfSchemaDoesNotExist()
         {
             Processor.SchemaExists("DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingSchemaExistsReturnsTrueIfSchemaExists()
         {
             Processor.SchemaExists("dbo").ShouldBeTrue();

@@ -56,7 +56,7 @@ namespace FluentMigrator.Tests.Unit
             _migrationRunner.VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void InvalidProviderNameShouldThrowArgumentException()
         {
             var runnerContext = new Mock<IRunnerContext>();
@@ -68,34 +68,34 @@ namespace FluentMigrator.Tests.Unit
             Assert.Throws<ProcessorFactoryNotFoundException>(() => new TaskExecutor(runnerContext.Object).Execute());
         }
 
-        [Test]
+        [Fact]
         public void ShouldCallMigrateDownIfSpecified()
         {
             Verify(x => x.MigrateDown(It.Is<long>(c => c == 20)), "migrate:down", 20, 0);
         }
 
-        [Test]
+        [Fact]
         public void ShouldCallMigrateUpByDefault()
         {
             Verify(x => x.MigrateUp(), null, 0, 0);
             Verify(x => x.MigrateUp(), "", 0, 0);
         }
 
-        [Test]
+        [Fact]
         public void ShouldCallMigrateUpIfSpecified()
         {
             Verify(x => x.MigrateUp(), "migrate", 0, 0);
             Verify(x => x.MigrateUp(), "migrate:up", 0, 0);
         }
 
-        [Test]
+        [Fact]
         public void ShouldCallMigrateUpWithVersionIfSpecified()
         {
             Verify(x => x.MigrateUp(It.Is<long>(c => c == 1)), "migrate", 1, 0);
             Verify(x => x.MigrateUp(It.Is<long>(c => c == 1)), "migrate:up", 1, 0);
         }
 
-        [Test]
+        [Fact]
         public void ShouldCallRollbackIfSpecified()
         {
             Verify(x => x.Rollback(It.Is<int>(c => c == 2)), "rollback", 0, 2);
@@ -107,7 +107,7 @@ namespace FluentMigrator.Tests.Unit
             Verify(x => x.Rollback(It.Is<int>(c => c == 1)), "rollback", 0, 0);
         }
 
-        [Test]
+        [Fact]
         public void ShouldCallValidateVersionOrder()
         {
             Verify(x => x.ValidateVersionOrder(), "validateversionorder", 0, 0);

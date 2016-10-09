@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Rename
 {
     public class RenameColumnExpressionBuilderTests
     {
-        [Test]
+        [Fact]
         public void CallingToSetsNewName()
         {
             var expressionMock = new Mock<RenameColumnExpression>();

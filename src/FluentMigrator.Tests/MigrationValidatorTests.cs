@@ -29,7 +29,7 @@ namespace FluentMigrator.Tests
             return expression;
         }
 
-        [Test]
+        [Fact]
         public void it_does_not_throw_if_expressions_are_valid()
         {
             Assert.DoesNotThrow(
@@ -37,7 +37,7 @@ namespace FluentMigrator.Tests
                                                                                   , new[] {BuildValidExpression()}));
         }
 
-        [Test]
+        [Fact]
         public void it_throws_invalid_migration_exception_if_expressions_are_invalid()
         {
             Assert.Throws<InvalidMigrationException>(
@@ -45,7 +45,7 @@ namespace FluentMigrator.Tests
                                                                                   , new[] {BuildInvalidExpression()}));
         }
 
-        [Test]
+        [Fact]
         public void it_throws_invalid_migration_exception_if_expressions_contains_multiple_invalid_of_same_type()
         {
             Assert.Throws<InvalidMigrationException>(

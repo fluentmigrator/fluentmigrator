@@ -31,26 +31,26 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
         }
 
 
-        [Test]
+        [Fact]
         public override void CallingSequenceExistsReturnsFalseIfSequenceDoesNotExist()
         {
             Processor.SequenceExists(null, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingSequenceExistsReturnsFalseIfSequenceDoesNotExistWithSchema()
         {
             Processor.SequenceExists("test_schema", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingSequenceExistsReturnsTrueIfSequenceExists()
         {
             using (new SqlServerTestSequence(Processor, null, "test_sequence"))
                 Processor.SequenceExists(null, "test_sequence").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingSequenceExistsReturnsTrueIfSequenceExistsWithSchema()
         {
             using (new SqlServerTestSequence(Processor, "test_schema", "test_sequence"))

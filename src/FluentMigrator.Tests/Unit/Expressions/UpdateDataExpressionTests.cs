@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
                 };
         }
 
-        [Test]
+        [Fact]
         public void NullUpdateTargetCausesErrorMessage() 
         {
             // null is the default value, but it might not always be, so I'm codifying it here anyway
@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.UpdateDataExpressionMustSpecifyWhereClauseOrAllRows);
         }
 
-        [Test]
+        [Fact]
         public void EmptyUpdateTargetCausesErrorMessage() 
         {
             // The same should be true for an empty list
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.UpdateDataExpressionMustSpecifyWhereClauseOrAllRows);
         }
 
-        [Test]
+        [Fact]
         public void DoesNotRequireWhereConditionWhenIsAllRowsIsSet() 
         {
             expression.IsAllRows = true;
@@ -53,7 +53,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldNotContain(ErrorMessages.UpdateDataExpressionMustSpecifyWhereClauseOrAllRows);
         }
 
-        [Test]
+        [Fact]
         public void DoesNotAllowWhereConditionWhenIsAllRowsIsSet() 
         {
             expression.IsAllRows = true;

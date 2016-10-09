@@ -9,7 +9,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
 {
     public class DeleteSequenceExpressionTests
     {
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenSequenceNameIsEmptyString()
         {
             var expression = new DeleteSequenceExpression { SequenceName = String.Empty };
@@ -18,7 +18,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.SequenceNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenSequenceNameIsSet()
         {
             var expression = new DeleteSequenceExpression { SequenceName = "sequence1" };

@@ -13,7 +13,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             Generator = new SqlServerCeGenerator();
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithCustomColumnTypeWithCustomSchema()
         {
@@ -27,7 +27,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] [timestamp] NOT NULL, PRIMARY KEY ([TestColumn1]))");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithCustomColumnTypeWithDefaultSchema()
         {
@@ -40,7 +40,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] [timestamp] NOT NULL, PRIMARY KEY ([TestColumn1]))");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithCustomSchema()
         {
@@ -51,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithDefaultSchema()
         {
@@ -61,7 +61,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNullWithCustomSchema()
         {
@@ -74,7 +74,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT NULL, [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNullWithDefaultSchema()
         {
@@ -87,7 +87,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithDefaultValueWithCustomSchema()
         {
@@ -98,7 +98,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT 'Default', [TestColumn2] INT NOT NULL CONSTRAINT [DF_TestTable1_TestColumn2] DEFAULT 0)");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithDefaultValueWithDefaultSchema()
         {
@@ -108,7 +108,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT 'Default', [TestColumn2] INT NOT NULL CONSTRAINT [DF_TestTable1_TestColumn2] DEFAULT 0)");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithIdentityWithCustomSchema()
         {
@@ -118,7 +118,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(1,1), [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithIdentityWithDefaultSchema()
         {
@@ -129,7 +129,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(1,1), [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithMultiColumnPrimaryKeyWithCustomSchema()
         {
@@ -140,7 +140,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1], [TestColumn2]))");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
         {
@@ -150,7 +150,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1], [TestColumn2]))");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithNamedMultiColumnPrimaryKeyWithCustomSchema()
         {
@@ -161,7 +161,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1], [TestColumn2]))");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithNamedMultiColumnPrimaryKeyWithDefaultSchema()
         {
@@ -171,7 +171,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1], [TestColumn2]))");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithNamedPrimaryKeyWithCustomSchema()
         {
@@ -182,7 +182,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1]))");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithNamedPrimaryKeyWithDefaultSchema()
         {
@@ -192,7 +192,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1]))");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithNullableFieldWithCustomSchema()
         {
@@ -204,7 +204,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255), [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithNullableFieldWithDefaultSchema()
         {
@@ -215,7 +215,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255), [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithPrimaryKeyWithCustomSchema()
         {
@@ -226,7 +226,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1]))");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithPrimaryKeyWithDefaultSchema()
         {
@@ -236,7 +236,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1]))");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanDropTableWithCustomSchema()
         {
@@ -247,7 +247,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("DROP TABLE [TestTable1]");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanDropTableWithDefaultSchema()
         {
@@ -257,7 +257,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("DROP TABLE [TestTable1]");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanRenameTableWithCustomSchema()
         {
@@ -268,7 +268,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("sp_rename 'TestTable1', 'TestTable2'");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public override void CanRenameTableWithDefaultSchema()
         {

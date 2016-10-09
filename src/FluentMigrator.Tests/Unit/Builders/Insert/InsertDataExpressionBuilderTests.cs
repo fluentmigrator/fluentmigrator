@@ -26,7 +26,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Insert
 {
     public class InsertDataExpressionBuilderTests
     {
-        [Test]
+        [Fact]
         public void RowsGetSetWhenRowIsCalled()
         {
             var expression = new InsertDataExpression();
@@ -51,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Insert
             expression.Rows[1][1].Value.ShouldBe("Row2Data2");
         }
 
-        [Test]
+        [Fact]
         public void RowsGetPopulatedWhenRowWithDictionaryIsCalled()
         {
             var values = new Dictionary<string, object>();
@@ -70,7 +70,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Insert
             expression.Rows[0][1].Value.ShouldBe("Row1Data2");
         }
 
-        [Test]
+        [Fact]
         public void SqlServerIdentityInsertAddsCorrectAdditionalFeature()
         {
             var expression = new InsertDataExpression();
@@ -81,7 +81,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Insert
                 new System.Collections.Generic.KeyValuePair<string, object>(SqlServerExtensions.IdentityInsert, true));
         }
 
-        [Test]
+        [Fact]
         public void SqlServerIdentityInsertCalledTwiceAddsCorrectAdditionalFeature()
         {
             var expression = new InsertDataExpression();

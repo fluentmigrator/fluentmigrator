@@ -13,7 +13,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             Generator = new MySqlGenerator();
         }
 
-        [Test]
+        [Fact]
         public override void CanAlterColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
@@ -23,7 +23,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             result.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` VARCHAR(20) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanAlterColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
@@ -32,7 +32,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             result.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` VARCHAR(20) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateAutoIncrementColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             result.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` INTEGER NOT NULL AUTO_INCREMENT");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateAutoIncrementColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
@@ -51,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             result.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` INTEGER NOT NULL AUTO_INCREMENT");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -61,7 +61,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` VARCHAR(5) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -70,7 +70,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` VARCHAR(5) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateDecimalColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
@@ -80,7 +80,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` DECIMAL(19,2) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateDecimalColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
@@ -89,7 +89,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` DECIMAL(19,2) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateCurrencyColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateCurrencyColumnExpression();
@@ -98,7 +98,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` DECIMAL(19,4) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateCurrencyColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateCurrencyColumnExpression();
@@ -108,7 +108,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` DECIMAL(19,4) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
@@ -118,7 +118,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             result.ShouldBe("ALTER TABLE `TestTable1` DROP COLUMN `TestColumn1`");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
@@ -127,7 +127,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             result.ShouldBe("ALTER TABLE `TestTable1` DROP COLUMN `TestColumn1`");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropMultipleColumnsWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "TestColumn1", "TestColumn2" });
@@ -137,7 +137,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             result.ShouldBe("ALTER TABLE `TestTable1` DROP COLUMN `TestColumn1`;" + System.Environment.NewLine + "ALTER TABLE `TestTable1` DROP COLUMN `TestColumn2`");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropMultipleColumnsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "TestColumn1", "TestColumn2" });
@@ -146,7 +146,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             result.ShouldBe("ALTER TABLE `TestTable1` DROP COLUMN `TestColumn1`;" + System.Environment.NewLine + "ALTER TABLE `TestTable1` DROP COLUMN `TestColumn2`");
         }
 
-        [Test]
+        [Fact]
         public override void CanRenameColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
@@ -156,7 +156,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             result.ShouldBe("ALTER TABLE `TestTable1` CHANGE `TestColumn1` `TestColumn2` ");
         }
 
-        [Test]
+        [Fact]
         public override void CanRenameColumnWithDefaultSchema()
         {
             // MySql does not appear to have a way to change column without re-specifying the existing column definition

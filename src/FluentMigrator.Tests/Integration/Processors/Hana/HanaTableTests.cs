@@ -31,20 +31,20 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsCanAcceptTableNameWithSingleQuote()
         {
             using (var table = new HanaTestTable("Test'Table", Processor, null, "id integer"))
                 Processor.TableExists(null, table.Name).ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.TableExists(null, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -52,14 +52,14 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             Processor.TableExists("test_schema", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsReturnsTrueIfTableExists()
         {
             using (var table = new HanaTestTable(Processor, null, "id int"))
                 Processor.TableExists(null, table.Name).ShouldBeTrue();
         }
         
-        [Test]
+        [Fact]
         public override void CallingTableExistsReturnsTrueIfTableExistsWithSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");

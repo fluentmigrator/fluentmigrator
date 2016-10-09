@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             new SqlCeEngine(IntegrationTestOptions.SqlServerCe.ConnectionString).CreateDatabase();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsCanAcceptIndexNameWithSingleQuote()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
@@ -54,7 +54,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsCanAcceptTableNameWithSingleQuote()
         {
             using (var table = new SqlServerCeTestTable("Test'Table", Processor, "id int"))
@@ -64,7 +64,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             }
         }
         
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfIndexDoesNotExist()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
@@ -74,7 +74,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfIndexDoesNotExistWithSchema()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
@@ -84,20 +84,20 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.IndexExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
             Processor.IndexExists("NOTUSED", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsTrueIfIndexExists()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
@@ -107,7 +107,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsTrueIfIndexExistsWithSchema()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))

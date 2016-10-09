@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
 {
     public class CreateForeignKeyExpressionTests
     {
-        [Test]
+        [Fact]
         public void ToStringIsDescriptive()
         {
             var sql = new CreateForeignKeyExpression

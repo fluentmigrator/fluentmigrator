@@ -28,7 +28,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
     public class DeleteForeignKeyExpressionBuilderTests
     {
-        [Test]
+        [Fact]
         public void CallingFromTableSetsForeignTableName()
         {
             var foreignKeyMock = new Mock<ForeignKeyDefinition>();
@@ -43,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             expressionMock.VerifyGet(e => e.ForeignKey);
         }
 
-        [Test]
+        [Fact]
         public void CallingToTableSetsPrimaryTableName()
         {
             var foreignKeyMock = new Mock<ForeignKeyDefinition>();
@@ -58,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             expressionMock.VerifyGet(e => e.ForeignKey);
         }
 
-        [Test]
+        [Fact]
         public void CallingOnTableSetsForeignTableName()
         {
             var foreignKeyMock = new Mock<ForeignKeyDefinition>();
@@ -73,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             expressionMock.VerifyGet(e => e.ForeignKey);
         }
 
-        [Test]
+        [Fact]
         public void CallingInSchemaSetsForeignTableSchemaName()
         {
             var foreignKeyMock = new Mock<ForeignKeyDefinition>();
@@ -88,7 +88,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             expressionMock.VerifyGet(e => e.ForeignKey);
         }
 
-        [Test]
+        [Fact]
         public void CallingForeignColumnAddsColumnNameToForeignColumnCollection()
         {
             var collectionMock = new Mock<IList<string>>();
@@ -107,7 +107,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             expressionMock.VerifyGet(e => e.ForeignKey);
         }
 
-        [Test]
+        [Fact]
         public void CallingForeignColumnsAddsColumnNamesToForeignColumnCollection()
         {
             var collectionMock = new Mock<IList<string>>();
@@ -127,7 +127,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             expressionMock.VerifyGet(e => e.ForeignKey);
         }
 
-        [Test]
+        [Fact]
         public void CallingPrimaryColumnAddsColumnNameToPrimaryColumnCollection()
         {
             var collectionMock = new Mock<IList<string>>();
@@ -146,7 +146,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             expressionMock.VerifyGet(e => e.ForeignKey);
         }
 
-        [Test]
+        [Fact]
         public void CallingPrimaryColumnsAddsColumnNamesToForeignColumnCollection()
         {
             var collectionMock = new Mock<IList<string>>();

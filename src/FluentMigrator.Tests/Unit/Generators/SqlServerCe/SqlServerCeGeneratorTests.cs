@@ -19,7 +19,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             Generator = new SqlServerCeGenerator();
         }
 
-        [Test]
+        [Fact]
         public void AlterDefaultConstraintThrowsNotSupportedException()
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
@@ -27,7 +27,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
-        [Test]
+        [Fact]
         public void CanCreateClusteredIndexTreatedAsNonClustered()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
@@ -37,7 +37,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE INDEX [TestIndex] ON [TestTable1] ([TestColumn1] ASC)");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateMultiColumnClusteredIndexTreatedAsNonClustered()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
@@ -47,7 +47,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE INDEX [TestIndex] ON [TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
         }
 
-        [Test]
+        [Fact]
         public void CanCreatMultiColumnUniqueClusteredIndexTreatedAsNonClustered()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
@@ -57,7 +57,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateUniqueClusteredIndexTreatedAsNonClustered()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
@@ -67,7 +67,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [TestTable1] ([TestColumn1] ASC)");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public void CanCreateTableWithNtextSizeUpTo536870911()
         {
@@ -79,7 +79,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NTEXT NOT NULL, [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public void CanCreateTableWithSeededIdentity()
         {
@@ -91,7 +91,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(45,23), [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateXmlColumn()
         {
             var expression = new CreateColumnExpression
@@ -104,7 +104,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] NTEXT NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public void CanNotDropMultipleColumns()
         {
             //This does not work if column in used in constraint, index etc.
@@ -113,7 +113,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
-        [Test]
+        [Fact]
         public void GenerateNecessaryStatementsForADeleteDefaultExpressionIsThrowsException()
         {
             var expression = new DeleteDefaultConstraintExpression { ColumnName = "Name", SchemaName = "Personalia", TableName = "Person" };

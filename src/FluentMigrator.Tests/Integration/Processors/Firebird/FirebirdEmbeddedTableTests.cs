@@ -100,7 +100,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }
         }
 
-        [Test]
+        [Fact]
         public void RenameTable_WhenOriginalTableExistsAndContainsDataWithNulls_ShouldNotThrowException()
         {
             //---------------Set up test pack-------------------
@@ -151,7 +151,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }
         }
 
-        [Test]
+        [Fact]
         public void RenameTable_WhenOriginalTableContainsMultipleRows_ShouldNotFailToMigrate()
         {
             //---------------Set up test pack-------------------
@@ -234,7 +234,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }
         }
 
-        [Test]
+        [Fact]
         public void OneMigrationWithOneDelete_ShouldDeleteAffectedRow()
         {
             //---------------Set up test pack-------------------
@@ -295,7 +295,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }
         }
 
-        [Test]
+        [Fact]
         public void OneMigrationWithMultipleDeletes_ShouldDeleteAffectedRow()
         {
             //---------------Set up test pack-------------------
@@ -368,7 +368,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }
         }
         
-        [Test]
+        [Fact]
         public void MigrationWithcAllRowsDelete_ShouldDeleteAllRows()
         {
             //---------------Set up test pack-------------------
@@ -429,7 +429,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }
         }
 
-        [Test]
+        [Fact]
         public void OneMigrationWithOneSpecificUpdate_ShouldUpdateAffectedRow()
         {
             //---------------Set up test pack-------------------
@@ -475,7 +475,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }
         }
 
-        [Test]
+        [Fact]
         public void TwoMigrationsWithSpecificUpdates_ShouldUpdateAffectedRows()
         {
             //---------------Set up test pack-------------------
@@ -530,7 +530,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }
         }
 
-        [Test]
+        [Fact]
         public void OneMigrationWithOneBlanketUpdate_ShouldUpdateAffectedRow()
         {
             //---------------Set up test pack-------------------
@@ -724,7 +724,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }
         }
 
-        [Test]
+        [Fact]
         public void RenamingTable_WhenTableHasTextBlobs_ShouldCreateNewTableWithTextBlobsNotBinaryBlobs()
         {
             var tempResources = WriteOutFirebirdEmbeddedLibrariesToCurrentWorkingDirectory();
@@ -794,7 +794,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
 
 
-        [Test]
+        [Fact]
         public void AlterTable_MigrationRequiresAutomaticDelete_AndProcessorHasUndoDisabled_ShouldNotThrow()
         {
             var tempResources = WriteOutFirebirdEmbeddedLibrariesToCurrentWorkingDirectory();

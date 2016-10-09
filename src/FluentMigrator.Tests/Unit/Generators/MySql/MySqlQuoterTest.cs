@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             quoter = new MySqlQuoter();
         }
 
-        [Test]
+        [Fact]
         public void TimeSpanIsFormattedQuotes()
         {
             quoter.QuoteValue(new TimeSpan(1,2, 13, 65))

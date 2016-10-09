@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit
 {
 	public class StopWatchTests
 	{
-		[Test]
+		[Fact]
 		public void CanGetTheElapsedTime()
 		{
 			var watch = new StopWatch();

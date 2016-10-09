@@ -27,7 +27,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Insert
 {
     public class InsertExpressionRootTests
     {
-        [Test]
+        [Fact]
         public void CallingIntoTableSetsTableName()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();

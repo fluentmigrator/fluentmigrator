@@ -6,7 +6,7 @@ namespace FluentMigrator.Tests.Integration
     [Category("Integration")]
     public class PerformDBOperationTests : IntegrationTestBase
     {
-        [Test]
+        [Fact]
         public void CanCreateAndDeleteTableUsingThePerformDBOperationExpressions()
         {
             var expression = new PerformDBOperationExpression

@@ -13,7 +13,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             Generator = new SqlServer2000Generator();
         }
 
-        [Test]
+        [Fact]
         public override void CanAlterSchema()
         {
             var expression = GeneratorTestHelper.GetAlterSchemaExpression();
@@ -22,7 +22,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe(string.Empty);
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSchemaExpression();
@@ -31,7 +31,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe(string.Empty);
         }
 
-        [Test]
+        [Fact]
         public override void CanDropSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSchemaExpression();

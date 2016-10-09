@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit
 {
     public class VersionOrderInvalidExceptionTests
     {
-        [Test]
+        [Fact]
         public void InvalidMigrationsPopulated()
         {
             var migrations = new[]
@@ -39,7 +39,7 @@ namespace FluentMigrator.Tests.Unit
             exception.InvalidMigrations.ShouldBe(migrations);
         }
 
-        [Test]
+        [Fact]
         public void ExceptionMessageListsInvalidMigrations()
         {
             var migrations = new[]

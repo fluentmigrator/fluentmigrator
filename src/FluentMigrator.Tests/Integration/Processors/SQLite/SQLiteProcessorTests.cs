@@ -63,7 +63,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             column.SetupGet(c => c.Type).Returns(DbType.Int32);
         }
 
-        [Test]
+        [Fact]
         public void CanDefaultAutoIncrementColumnTypeToInteger()
         {
             var column = new ColumnDefinition
@@ -86,7 +86,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             }
         }
 
-        [Test]
+        [Fact]
         public void CanCreateTableExpression()
         {
             var expression = new CreateTableExpression { TableName = tableName };
@@ -100,7 +100,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             }
         }
 
-        [Test]
+        [Fact]
         public void IsEscapingTableNameCorrectlyOnTableCreate()
         {
             var expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
@@ -108,7 +108,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             _processor.Process(expression);
         }
 
-        [Test]
+        [Fact]
         public void IsEscapingTableNameCorrectlyOnReadTableData()
         {
             var expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
@@ -117,7 +117,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             _processor.ReadTableData(null, tableNameThanMustBeEscaped).Tables.Count.ShouldBe(1);
         }
 
-        [Test]
+        [Fact]
         public void IsEscapingTableNameCorrectlyOnTableExists()
         {
             var expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
@@ -126,7 +126,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             _processor.TableExists(null, tableNameThanMustBeEscaped).ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void IsEscapingTableNameCorrectlyOnColumnExists()
         {
             const string columnName = "123ColumnName";
@@ -137,7 +137,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             _processor.ColumnExists(null, tableNameThanMustBeEscaped, columnName).ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void CallingProcessWithPerformDBOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
         {
             var output = new StringWriter();
