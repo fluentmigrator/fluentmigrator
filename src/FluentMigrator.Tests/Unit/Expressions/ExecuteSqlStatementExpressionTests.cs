@@ -49,9 +49,16 @@ namespace FluentMigrator.Tests.Unit.Expressions
         }
 
         [Test]
-        public void ToStringIsDescriptive()
+        public void ToStringCanDisableOutput()
         {
             var expression = new ExecuteSqlStatementExpression() { SqlStatement = "INSERT INTO BLAH" };
+            expression.ToString().ShouldBe("");
+        }
+
+        [Test]
+        public void ToStringIsDescriptive()
+        {
+            var expression = new ExecuteSqlStatementExpression() { SqlStatement = "INSERT INTO BLAH", SayStatement = true };
             expression.ToString().ShouldBe("ExecuteSqlStatement INSERT INTO BLAH");
         }
     }
