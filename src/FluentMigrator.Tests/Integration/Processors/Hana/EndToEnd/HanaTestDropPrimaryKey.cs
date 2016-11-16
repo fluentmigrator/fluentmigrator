@@ -46,7 +46,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana.EndToEnd
             foreach (var tableName in tableNames)
             {
                 if (Processor.TableExists(null, tableName))
-                    Processor.Execute($"DROP TABLE \"{tableName}\"");    
+                    Processor.Execute(string.Format("DROP TABLE \"{0}\"", tableName));    
             }
 
         }

@@ -211,10 +211,10 @@ namespace FluentMigrator.Runner.Generators.Hana
         {
             if (expression.Constraint.IsPrimaryKeyConstraint)
             {
-                return $"ALTER TABLE {Quoter.QuoteTableName(expression.Constraint.TableName)} DROP PRIMARY KEY ";
+                return string.Format("ALTER TABLE {0} DROP PRIMARY KEY ;", Quoter.QuoteTableName(expression.Constraint.TableName));
             }
 
-            return $"{base.Generate(expression)};";
+            return string.Format("{0};", base.Generate(expression));
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
