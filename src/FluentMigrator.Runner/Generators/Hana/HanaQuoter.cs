@@ -10,7 +10,7 @@ namespace FluentMigrator.Runner.Generators.Hana
 
         public override string QuoteValue(object value)
         {
-            if (value is string)
+            if (value is string || value is ExplicitUnicodeString)
             {
                 return string.Format("N{0}", FormatString(value.ToString()));
             }
