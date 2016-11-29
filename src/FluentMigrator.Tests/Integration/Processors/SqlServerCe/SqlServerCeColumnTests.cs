@@ -35,6 +35,8 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         [TearDown]
         public void TearDown()
         {
+            if (Processor == null)
+                return;
             Processor.CommitTransaction();
             Processor.Dispose();
         }

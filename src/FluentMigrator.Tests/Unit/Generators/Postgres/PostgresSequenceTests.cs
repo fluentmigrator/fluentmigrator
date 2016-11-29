@@ -22,7 +22,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             expression.Sequence.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE SEQUENCE \"TestSchema\".\"Sequence\" INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE");
+            result.ShouldBe("CREATE SEQUENCE \"TestSchema\".\"Sequence\" INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE;");
         }
 
         [Test]
@@ -31,7 +31,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expression = GeneratorTestHelper.GetCreateSequenceExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE SEQUENCE \"Sequence\" INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE");
+            result.ShouldBe("CREATE SEQUENCE \"Sequence\" INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE;");
         }
 
         [Test]
@@ -41,7 +41,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP SEQUENCE \"TestSchema\".\"Sequence\"");
+            result.ShouldBe("DROP SEQUENCE \"TestSchema\".\"Sequence\";");
         }
 
         [Test]
@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             var expression = GeneratorTestHelper.GetDeleteSequenceExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DROP SEQUENCE \"Sequence\"");
+            result.ShouldBe("DROP SEQUENCE \"Sequence\";");
         }
     }
 }

@@ -574,6 +574,36 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        public void MigrateUpWithDifferentTaggedShouldIgnoreConcreteOfTagged()
+        {
+            ExecuteWithSupportedProcessors(processor =>
+            {
+                var assembly = typeof(TenantATable).Assembly;
+
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                {
+                    Namespace = typeof(TenantATable).Namespace,
+                    Tags = new[] { "TenantB" }
+                };
+
+                var runner = new MigrationRunner(assembly, runnerContext, processor);
+
+                try
+                {
+                    runner.MigrateUp(false);
+
+                    processor.TableExists(null, "TenantATable").ShouldBeFalse();
+                    processor.TableExists(null, "NormalTable").ShouldBeTrue();
+                    processor.TableExists(null, "TenantBTable").ShouldBeTrue();
+                }
+                finally
+                {
+                    new MigrationRunner(assembly, runnerContext, processor).RollbackToVersion(0);
+                }
+            });
+        }
+
+        [Test]
         public void MigrateDownWithDifferentTagsToMigrateUpShouldApplyMatchedMigrations()
         {
             var assembly = typeof(TenantATable).Assembly;

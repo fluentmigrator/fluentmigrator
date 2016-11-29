@@ -250,28 +250,34 @@ namespace FluentMigrator.Runner.Generators.Generic
             string errors = ValidateAdditionalFeatureCompatibility(expression.AdditionalFeatures);
             if (!string.IsNullOrEmpty(errors)) return errors;
 
-            List<string> columnNames = new List<string>();
-            List<string> columnValues = new List<string>();
-            List<string> insertStrings = new List<string>();
+            var insertStrings = GenerateColumnNamesAndValues(expression).Select(x => String.Format(InsertData, Quoter.QuoteTableName(expression.TableName),x.Key, x.Value));
+            return String.Join("; ", insertStrings.ToArray());
+        }
+
+        protected List<KeyValuePair<string,string>> GenerateColumnNamesAndValues(InsertDataExpression expression)
+        {
+            var insertStrings = new List<KeyValuePair<string, string>>();
 
             foreach (InsertionDataDefinition row in expression.Rows)
             {
-                columnNames.Clear();
-                columnValues.Clear();
+                var columnNames = new List<string>();
+                var columnValues = new List<string>();
                 foreach (KeyValuePair<string, object> item in row)
                 {
                     columnNames.Add(Quoter.QuoteColumnName(item.Key));
                     columnValues.Add(Quoter.QuoteValue(item.Value));
                 }
 
-                string columns = String.Join(", ", columnNames.ToArray());
-                string values = String.Join(", ", columnValues.ToArray());
-                insertStrings.Add(String.Format(InsertData, Quoter.QuoteTableName(expression.TableName), columns, values));
+                var columns = String.Join(", ", columnNames.ToArray());
+                var values = String.Join(", ", columnValues.ToArray());
+                insertStrings.Add(new KeyValuePair<string, string>(columns, values));
             }
-            return String.Join("; ", insertStrings.ToArray());
+
+            return insertStrings;
         }
 
-        private string ValidateAdditionalFeatureCompatibility(IEnumerable<KeyValuePair<string, object>> features)
+
+        protected string ValidateAdditionalFeatureCompatibility(IEnumerable<KeyValuePair<string, object>> features)
         {
             if (compatabilityMode == CompatabilityMode.STRICT) {
                 List<string> unsupportedFeatures =

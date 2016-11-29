@@ -2,7 +2,7 @@
 <package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
   <metadata>
   <id>FluentMigrator.Runner</id>
-  <version>1.4.0.0</version>
+  <version>1.6.2</version>
   <authors>Josh Coffman, Tom Marien</authors>
   <owners>Sean Chambers</owners>
   <summary>FluentMigrator is a database migration framework for .NET written in C#.</summary>
@@ -13,7 +13,7 @@
   <licenseUrl>https://github.com/schambers/fluentmigrator/blob/master/LICENSE.txt</licenseUrl>
   <releaseNotes>https://github.com/schambers/fluentmigrator/releases</releaseNotes>
   <dependencies>
-    <dependency id="FluentMigrator" version="1.4.0.0"/>
+    <dependency id="FluentMigrator" version="1.6.2"/>
   </dependencies>
 </metadata>
   <files>

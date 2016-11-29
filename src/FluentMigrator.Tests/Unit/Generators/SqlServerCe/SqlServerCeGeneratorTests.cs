@@ -70,17 +70,19 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
 
         [Test]
-        public void CanCreateTableWithNvarcharMax()
+        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        public void CanCreateTableWithNtextSizeUpTo536870911()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
             expression.Columns[0].Type = DbType.String;
-            expression.Columns[0].Size = Int32.MaxValue;
+            expression.Columns[0].Size = 536870911;
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NTEXT NOT NULL, [TestColumn2] INT NOT NULL)");
         }
 
         [Test]
+        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
         public void CanCreateTableWithSeededIdentity()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();

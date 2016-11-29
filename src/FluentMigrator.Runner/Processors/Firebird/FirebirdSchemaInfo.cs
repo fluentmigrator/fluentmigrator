@@ -282,7 +282,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 using (DataSet dsForeign = processor.Read(colQuery, AdoHelper.FormatValue(Name)))
                 {
                     DataRow drForeign = dsForeign.Tables[0].Rows[0];
-                    ForeignIndex = IndexInfo.Read(processor, drForeign["rdb$const_name_uq"].ToString().Trim());
+                    ForeignIndex = IndexInfo.Read(processor, IndexName);
                     UpdateRule = GetForeignRule(drForeign["rdb$update_rule"]);
                     DeleteRule = GetForeignRule(drForeign["rdb$delete_rule"]);
                 }

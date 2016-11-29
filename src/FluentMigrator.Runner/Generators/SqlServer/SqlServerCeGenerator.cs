@@ -27,17 +27,24 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     public class SqlServerCeGenerator : SqlServer2000Generator
     {
         public SqlServerCeGenerator()
-            : base(new SqlServerColumn(new SqlServerCeTypeMap()), new EmptyDescriptionGenerator())
+            : base(new SqlServerCeColumn(new SqlServerCeTypeMap()), new EmptyDescriptionGenerator())
         {
+        }
+
+        public override string InsertData
+        {
+            get { return "INSERT INTO {0} ({1}) {2}"; }
         }
 
         public override string GetClusterTypeString(CreateIndexExpression column)
         {
+            // Only nonclusterd
             return string.Empty;
         }
 
-        protected string GetConstraintClusteringString(CreateConstraintExpression constraint)
+        protected override string GetConstraintClusteringString(CreateConstraintExpression constraint)
         {
+            // Only nonclustered
             return string.Empty;
         }
 
@@ -92,6 +99,26 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
             throw new DatabaseOperationNotSupportedException();
+        }
+
+        public override string Generate(InsertDataExpression expression)
+        {
+            var errors = ValidateAdditionalFeatureCompatibility(expression.AdditionalFeatures);
+            if (!string.IsNullOrEmpty(errors)) return errors;
+
+            var columnNamesValues = GenerateColumnNamesAndValues(expression);
+            var selectStrings = columnNamesValues.Select(kv => "SELECT " + kv.Value);
+
+            var sql = String.Format(InsertData, Quoter.QuoteTableName(expression.TableName), columnNamesValues.FirstOrDefault().Key, String.Join(" UNION ALL ", selectStrings.ToArray()));
+
+            if (IsUsingIdentityInsert(expression))
+            {
+                return string.Format("{0}; {1}; {2}",
+                            string.Format(IdentityInsert, Quoter.QuoteTableName(expression.TableName), "ON"),
+                            sql,
+                            string.Format(IdentityInsert, Quoter.QuoteTableName(expression.TableName), "OFF"));
+            }
+            return sql;
         }
     }
 }

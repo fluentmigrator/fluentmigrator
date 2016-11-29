@@ -201,6 +201,7 @@
     <Compile Include="Integration\Migrations\Tagged\2_TenantBTable.cs" />
     <Compile Include="Integration\Migrations\Tagged\3_NormalTable.cs" />
     <Compile Include="Integration\Migrations\Tagged\4_TenantAandBTable.cs" />
+    <Compile Include="Integration\Migrations\Tagged\TenantABaseMigration.cs" />
     <Compile Include="Integration\Migrations\TestEmptyMigration.cs" />
     <Compile Include="Integration\Migrations\TestMigration.cs" />
     <Compile Include="Integration\Migrations\TestSetExistingRowValuesMigration.cs" />
@@ -220,8 +221,10 @@
     <Compile Include="Integration\Processors\Db2\Db2ProcessorTests.cs" />
     <Compile Include="Integration\Processors\Db2\Db2SchemaTests.cs" />
     <Compile Include="Integration\Processors\Db2\Db2TableTests.cs" />
-    <Compile Include="Integration\Migrations\Firebird\FirstVersion\VersionOneSimpleTableMigration.cs" />
+    <Compile Include="Integration\Processors\Firebird\EndToEnd\FbEndToEndFixture.cs" />
     <Compile Include="Integration\Processors\Firebird\EndToEnd\TestInitialMigration.cs" />
+    <Compile Include="Integration\Processors\Firebird\EndToEnd\TestRollbackColumnCreation.cs" />
+    <Compile Include="Integration\Processors\Firebird\FbDatabase.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdColumnTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdConstraintTests.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdEmbeddedLibrariesForWindows.Designer.cs">
@@ -298,6 +301,7 @@
     <Compile Include="Unit\Announcers\TextWriterAnnouncerTests.cs" />
     <Compile Include="Unit\Announcers\TextWriterWithGoAnnouncerTests.cs" />
     <Compile Include="Unit\AssemblyLoader\AssemblyLoaderTests.cs" />
+    <Compile Include="Unit\AutoReversingMigrationTests.cs" />
     <Compile Include="Unit\Builders\Alter\AlterColumnExpressionBuilderTests.cs" />
     <Compile Include="Unit\Builders\Alter\AlterExpressionRootTests.cs" />
     <Compile Include="Unit\Builders\Alter\AlterTableExpressionBuilderTests.cs" />
@@ -470,6 +474,7 @@
     <Compile Include="Unit\Generators\SqlServerCe\SqlServerCeIndexTests.cs" />
     <Compile Include="Unit\Generators\SqlServerCe\SqlServerCeSchemaTests.cs" />
     <Compile Include="Unit\Generators\SqlServerCe\SqlServerCeTableTests.cs" />
+    <Compile Include="Unit\Generators\SqlServerCe\SqlServerCeTypeMapTests.cs" />
     <Compile Include="Unit\Initialization\ConnectionStringManagerTests.cs" />
     <Compile Include="Unit\Initialization\NetConfigManagerTests.cs" />
     <Compile Include="Unit\MigrationInfoTests.cs" />
@@ -510,7 +515,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <None Include="FluentMigrator.snk" />
     <None Include="Resources\aliases.conf" />
     <None Include="Resources\firebird.conf" />
     <None Include="Resources\firebird.msg" />
@@ -570,6 +574,9 @@
     <EmbeddedResource Include="EmbeddedResources\B\NotUniqueResource.sql" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\FluentMigrator.snk">
+      <Link>FluentMigrator.snk</Link>
+    </None>
     <None Include="Resources\fbembed.dll" />
     <None Include="Resources\ib_util.dll" />
     <None Include="Resources\icudt30.dll" />

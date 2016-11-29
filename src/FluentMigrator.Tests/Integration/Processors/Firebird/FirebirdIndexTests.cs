@@ -12,6 +12,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
     [TestFixture]
     [Category("Integration")]
+    [Category("Firebird")]
     public class FirebirdIndexTests : BaseIndexTests
     {
         public FbConnection Connection { get; set; }
@@ -21,10 +22,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [SetUp]
         public void SetUp()
         {
-            if (!System.IO.File.Exists("fbtest.fdb"))
-            {
-                FbConnection.CreateDatabase(IntegrationTestOptions.Firebird.ConnectionString);
-            }
+            FbDatabase.CreateDatabase(IntegrationTestOptions.Firebird.ConnectionString);
+
             Connection = new FbConnection(IntegrationTestOptions.Firebird.ConnectionString);
             var options = FirebirdOptions.AutoCommitBehaviour();
             Processor = new FirebirdProcessor(Connection, new FirebirdGenerator(options), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new FirebirdDbFactory(), options);
@@ -39,6 +38,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             if (!Processor.WasCommitted)
                 Processor.CommitTransaction();
             Connection.Close();
+
+            FbDatabase.DropDatabase(IntegrationTestOptions.Firebird.ConnectionString);
         }
 
         [Test]

@@ -20,27 +20,24 @@
 using System.Data;
 using FluentMigrator.Runner.Generators.Base;
 
-namespace FluentMigrator.Runner.Generators
+namespace FluentMigrator.Runner.Generators.SqlServer
 {
-    internal class SqlServerCeTypeMap : TypeMapBase
+    public class SqlServerCeTypeMap : TypeMapBase
     {
-        public const int AnsiStringCapacity = 8000;
-        public const int AnsiTextCapacity = 2147483647;
         public const int UnicodeStringCapacity = 4000;
-        public const int UnicodeTextCapacity = 1073741823;
-        public const int ImageCapacity = 2147483647;
-        public const int DecimalCapacity = 19;
+        public const int ImageCapacity = 1073741823;
+        public const int BinaryCapacity = 8000;
+        public const int DecimalCapacity = 38;
 
         protected override void SetupTypeMaps()
         {
-            SetTypeMap(DbType.AnsiStringFixedLength, "CHAR(255)");
-            SetTypeMap(DbType.AnsiStringFixedLength, "CHAR($size)", AnsiStringCapacity);
-            SetTypeMap(DbType.AnsiString, "VARCHAR(255)");
-            SetTypeMap(DbType.AnsiString, "VARCHAR($size)", AnsiStringCapacity);
-            SetTypeMap(DbType.AnsiString, "TEXT", AnsiTextCapacity);
+            SetTypeMap(DbType.AnsiStringFixedLength, "NCHAR(255)");  // No CHAR support
+            SetTypeMap(DbType.AnsiStringFixedLength, "NCHAR($size)", UnicodeStringCapacity);  // No CHAR support
+            SetTypeMap(DbType.AnsiString, "NVARCHAR(255)");  // No VARCHAR support
+            SetTypeMap(DbType.AnsiString, "NVARCHAR($size)", UnicodeStringCapacity);  // No VARCHAR support
+            SetTypeMap(DbType.AnsiString, "NTEXT", int.MaxValue);  // No TEXT support
             SetTypeMap(DbType.Binary, "VARBINARY(8000)");
-            SetTypeMap(DbType.Binary, "VARBINARY($size)", AnsiStringCapacity);
-            SetTypeMap(DbType.Binary, "VARBINARY(MAX)", int.MaxValue);
+            SetTypeMap(DbType.Binary, "VARBINARY($size)", BinaryCapacity);
             SetTypeMap(DbType.Binary, "IMAGE", ImageCapacity);
             SetTypeMap(DbType.Boolean, "BIT");
             SetTypeMap(DbType.Byte, "TINYINT");
@@ -60,9 +57,9 @@ namespace FluentMigrator.Runner.Generators
             SetTypeMap(DbType.String, "NVARCHAR(255)");
             SetTypeMap(DbType.String, "NVARCHAR($size)", UnicodeStringCapacity);
             SetTypeMap(DbType.String, "NTEXT", int.MaxValue);
-            SetTypeMap(DbType.String, "NTEXT", UnicodeTextCapacity);
-            SetTypeMap(DbType.Time, "NVARCHAR(16)");
-            SetTypeMap(DbType.Xml, "NTEXT");
+            SetTypeMap(DbType.Time, "DATETIME");
+            SetTypeMap(DbType.Xml, "NTEXT");  // No XML support
+            SetTypeMap(DbType.Xml, "NTEXT", int.MaxValue);  // No XML support
         }
     }
 }

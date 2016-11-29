@@ -1,8 +1,12 @@
-﻿using FluentMigrator.Exceptions;
+﻿using System.Data;
+
+using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Generators.SQLite;
+
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -102,6 +106,25 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
+        [Test]
+        public void CanUseSystemMethodCurrentDateTimeAsADefaultValueForAColumn()
+        {
+            var expression = new CreateTableExpression { TableName = "TestTable1" };
+            expression.Columns.Add(new ColumnDefinition { Name = "DateTimeCol", Type = DbType.DateTime, DefaultValue = SystemMethods.CurrentDateTime});
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"DateTimeCol\" DATETIME NOT NULL DEFAULT datetime('now','localtime'))");
+        }
+
+        [Test]
+        public void CanUseSystemMethodCurrentUTCDateTimeAsDefaultValueForColumn()
+        {
+            var expression = new CreateTableExpression { TableName = "TestTable1" };
+            expression.Columns.Add(new ColumnDefinition { Name = "DateTimeCol", Type = DbType.DateTime, DefaultValue = SystemMethods.CurrentUTCDateTime });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"DateTimeCol\" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP)");
+        }
         [Test]
         public void CanRenameColumnInStrictMode()
         {
