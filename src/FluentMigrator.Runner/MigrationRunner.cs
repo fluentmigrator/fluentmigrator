@@ -537,9 +537,10 @@ namespace FluentMigrator.Runner
             {
                 string migrationName = migration.Value.GetName();
                 bool isCurrent = migration.Key == currentVersion;
+                bool isApplied = VersionLoader.VersionInfo.HasAppliedMigration(migration.Value.Version);
                 string message = string.Format("{0}{1}",
                                                 migrationName,
-                                                isCurrent ? " (current)" : string.Empty);
+                                                (isCurrent ? " (current)" : (isApplied ? string.Empty : " (not applied)")));
 
                 if(isCurrent)
                     _announcer.Emphasize(message);
