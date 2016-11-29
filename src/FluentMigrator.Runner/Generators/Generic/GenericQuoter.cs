@@ -10,7 +10,7 @@ namespace FluentMigrator.Runner.Generators.Generic
         {
             if (value == null || value is DBNull) { return FormatNull(); }
 
-            if (value is string || value is NonUnicodeString)
+            if (value is string || value is NonUnicodeString || value is ExplicitUnicodeString)
             {
                 return FormatString(value.ToString());
             }

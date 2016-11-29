@@ -293,6 +293,18 @@ namespace FluentMigrator.Tests.Unit.Generators
         }
 
         [Test]
+        public void ExplicitUnicodeStringIsFormattedAsNormalString()
+        {
+            quoter.QuoteValue(new ExplicitUnicodeString("Test String")).ShouldBe("'Test String'");
+        }
+
+        [Test]
+        public void ExplicitUnicodeStringIsFormattedAsNormalStringQuotes()
+        {
+            quoter.QuoteValue(new ExplicitUnicodeString("Test ' String")).ShouldBe("'Test '' String'");
+        }
+
+        [Test]
         public void NonUnicodeStringIsFormattedAsNormalString()
         {
             quoter.QuoteValue(new NonUnicodeString("Test String")).ShouldBe("'Test String'");

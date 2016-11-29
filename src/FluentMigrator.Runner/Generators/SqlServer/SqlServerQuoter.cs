@@ -20,7 +20,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string QuoteValue(object value)
         {
             // in SQL Server, string literals should default to Unicode (N'some string')
-            if (value is string)
+            if (value is string || value is ExplicitUnicodeString)
             {
                 return string.Format("N{0}", FormatString(value.ToString()));
             }
