@@ -57,7 +57,7 @@ namespace FluentMigrator.Tests.Integration
 
             if (IntegrationTestOptions.AnyServerTypesEnabled == false)
             {
-                var optionsClassName = nameof(IntegrationTestOptions);
+                var optionsClassName = typeof(IntegrationTestOptions).Name;
                 Assert.Fail("No database processors are configured to run your migration tests.  This message is provided to avoid false positives.  To avoid this message enable one or more test runners in the {0} class.", optionsClassName);
             }
 
