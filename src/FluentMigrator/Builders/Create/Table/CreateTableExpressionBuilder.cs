@@ -130,9 +130,9 @@ namespace FluentMigrator.Builders.Create.Table
             return this;
         }
 
-        public ICreateTableColumnOptionOrWithColumnSyntax Unique(string indexName)
+        public ICreateTableColumnOptionOrWithColumnSyntax Unique(string name)
         {
-            ColumnHelper.Unique(indexName);
+            ColumnHelper.Unique(name);
             return this;
         }
 

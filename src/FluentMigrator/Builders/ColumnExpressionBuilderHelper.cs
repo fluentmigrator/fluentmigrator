@@ -139,28 +139,24 @@ namespace FluentMigrator.Builders
             }
         }
 
-        public virtual void Unique(string indexName)
+        public virtual void Unique(string name)
         {
             var column = _builder.Column;
             column.IsUnique = true;
 
-            var index = new CreateIndexExpression
+            var expression = new CreateConstraintExpression(ConstraintType.Unique)
             {
-                Index = new IndexDefinition
+                Constraint =
                 {
-                    Name = indexName,
+                    ConstraintName = name,
                     SchemaName = _builder.SchemaName,
-                    TableName = _builder.TableName,
-                    IsUnique = true
+                    TableName = _builder.TableName
                 }
             };
 
-            index.Index.Columns.Add(new IndexColumnDefinition
-            {
-                Name = _builder.Column.Name
-            });
+            expression.Constraint.Columns.Add(_builder.Column.Name);
 
-            _context.Expressions.Add(index);
+            _context.Expressions.Add(expression);
         }
 
         public virtual void Indexed(string indexName)

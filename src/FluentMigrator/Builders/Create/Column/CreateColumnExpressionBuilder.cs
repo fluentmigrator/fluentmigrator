@@ -127,9 +127,9 @@ namespace FluentMigrator.Builders.Create.Column
             return this;
         }
 
-        public ICreateColumnOptionSyntax Unique(string indexName)
+        public ICreateColumnOptionSyntax Unique(string name)
         {
-            ColumnHelper.Unique(indexName);
+            ColumnHelper.Unique(name);
             return this;
         }
 

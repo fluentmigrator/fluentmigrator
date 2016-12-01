@@ -39,7 +39,7 @@ namespace FluentMigrator.Builders
         TNext Nullable();
         TNext NotNullable();
         TNext Unique();
-        TNext Unique(string indexName);
+        TNext Unique(string name);
 
         TNextFk ForeignKey(string primaryTableName, string primaryColumnName);
         TNextFk ForeignKey(string foreignKeyName, string primaryTableName, string primaryColumnName);

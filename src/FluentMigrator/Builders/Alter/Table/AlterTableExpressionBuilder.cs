@@ -186,9 +186,9 @@ namespace FluentMigrator.Builders.Alter.Table
             return this;
         }
 
-        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax Unique(string indexName)
+        public IAlterTableColumnOptionOrAddColumnOrAlterColumnSyntax Unique(string name)
         {
-            ColumnHelper.Unique(indexName);
+            ColumnHelper.Unique(name);
             return this;
         }
 

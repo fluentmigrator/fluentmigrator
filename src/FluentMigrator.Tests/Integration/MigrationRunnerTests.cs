@@ -162,6 +162,24 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        public void CanApplyUniqueConvention()
+        {
+            ExecuteWithSupportedProcessors(
+                processor =>
+                {
+                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+
+                    runner.Up(new TestUniqueConstraintNamingConvention());
+                    processor.ConstraintExists(null, "Users", "UC_Users_GroupId").ShouldBeTrue();
+                    processor.TableExists(null, "Users").ShouldBeTrue();
+
+                    runner.Down(new TestUniqueConstraintNamingConvention());
+                    processor.ConstraintExists(null, "Users", "UC_Users_GroupId").ShouldBeFalse();
+                    processor.TableExists(null, "Users").ShouldBeFalse();
+                });
+        }
+
+        [Test]
         public void CanApplyIndexConventionWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -1229,6 +1247,25 @@ namespace FluentMigrator.Tests.Integration
         {
             Delete.Table("Users");
             Delete.Table("Groups");
+        }
+    }
+
+    internal class TestUniqueConstraintNamingConvention : Migration
+    {
+        public override void Up()
+        {
+            Create.Table("Users")
+                .WithColumn("UserId").AsInt32().Identity().PrimaryKey()
+                .WithColumn("GroupId").AsInt32().NotNullable().Unique()
+                .WithColumn("UserName").AsString(32).NotNullable()
+                .WithColumn("Password").AsString(32).NotNullable();
+
+        }
+
+        public override void Down()
+        {
+            Delete.UniqueConstraint("UC_Users_GroupId").FromTable("Users");
+            Delete.Table("Users");
         }
     }
 

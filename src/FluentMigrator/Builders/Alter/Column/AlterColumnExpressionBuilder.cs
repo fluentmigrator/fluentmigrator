@@ -132,9 +132,9 @@ namespace FluentMigrator.Builders.Alter.Column
             return this;
         }
 
-        public IAlterColumnOptionSyntax Unique(string indexName)
+        public IAlterColumnOptionSyntax Unique(string name)
         {
-            ColumnHelper.Unique(indexName);
+            ColumnHelper.Unique(name);
             return this;
         }
 
