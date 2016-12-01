@@ -201,7 +201,7 @@ namespace FluentMigrator.Tests.Unit.Builders
         }
 
         [Test]
-        public void CallingUniqueAddsIndexExpressionToContext()
+        public void CallingUniqueAddsConstraintExpressionToContext()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
             var builderMock = new Mock<IColumnExpressionBuilder>();
@@ -213,15 +213,14 @@ namespace FluentMigrator.Tests.Unit.Builders
             contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
 
             var helper = new ColumnExpressionBuilderHelper(builderMock.Object, contextMock.Object);
-            helper.Unique("IX_Bacon_BaconId");
+            helper.Unique("UC_Bacon_BaconId");
 
-            collectionMock.Verify(x => x.Add(It.Is<CreateIndexExpression>(
-                ix => ix.Index.Name == "IX_Bacon_BaconId"
-                      && ix.Index.TableName == "Bacon"
-                      && ix.Index.SchemaName == "Eggs"
-                      && ix.Index.IsUnique
-                      && !ix.Index.IsClustered
-                      && ix.Index.Columns.All(c => c.Name == "BaconId")
+            collectionMock.Verify(x => x.Add(It.Is<CreateConstraintExpression>(
+                ix => ix.Constraint.ConstraintName == "UC_Bacon_BaconId"
+                      && ix.Constraint.TableName == "Bacon"
+                      && ix.Constraint.SchemaName == "Eggs"
+                      && ix.Constraint.IsUniqueConstraint
+                      && ix.Constraint.Columns.All(c => c == "BaconId")
                                                  )));
 
             contextMock.VerifyGet(x => x.Expressions);
