@@ -117,6 +117,13 @@ namespace FluentMigrator.Builders.Delete
             return new DeleteConstraintExpressionBuilder(expression);
         }
 
+        public IDeleteConstraintOnTableSyntax UniqueConstraint()
+        {
+            var expression = new DeleteConstraintExpression(ConstraintType.Unique);
+            _context.Expressions.Add(expression);
+            return new DeleteConstraintExpressionBuilder(expression);
+        }
+
         public IDeleteDefaultConstraintOnTableSyntax DefaultConstraint()
         {
             var expression = new DeleteDefaultConstraintExpression();
