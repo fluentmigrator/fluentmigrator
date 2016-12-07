@@ -148,10 +148,18 @@ namespace FluentMigrator.Infrastructure
                 return false;
 
             var tagNamesForAllBehavior = tags.Where(t => t.Behavior == TagBehavior.RequireAll).SelectMany(t => t.TagNames).ToArray();
+            if (tagNamesForAllBehavior.Any() && tagsToMatch.All(t => tagNamesForAllBehavior.Any(t.Equals)))
+            {
+                return true;
+            }
+
             var tagNamesForAnyBehavior = tags.Where(t => t.Behavior == TagBehavior.RequireAny).SelectMany(t => t.TagNames).ToArray();
-            
-            return (tagNamesForAllBehavior.Any() && tagsToMatch.All(t => tagNamesForAllBehavior.Any(t.Equals)))
-                || (tagNamesForAnyBehavior.Any() && tagsToMatch.Any(t => tagNamesForAnyBehavior.Any(t.Equals)));
+            if (tagNamesForAnyBehavior.Any() && tagsToMatch.Any(t => tagNamesForAnyBehavior.Any(t.Equals)))
+            {
+                return true;
+            }
+
+            return false;
         }
 
         public static string GetAutoScriptUpName(Type type, string databaseType)
