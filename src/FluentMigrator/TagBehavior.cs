@@ -16,28 +16,11 @@
 //
 #endregion
 
-using System;
-
 namespace FluentMigrator
 {
-    /// <summary>
-    /// Specifies the behavior of a runner when evaluating a <see cref="TagsAttribute" />.
-    /// </summary>
-    public enum TagBehavior : int
+    public enum TagBehavior
     {
-        /// <summary>
-        /// The behavior is not specified.
-        /// </summary>
-        Unspecified = 0,
-
-        /// <summary>
-        /// The runner will execute the tagged migration if all tag names are matched.
-        /// </summary>
-        RequireAll = 1,
-
-        /// <summary>
-        /// The runner will execute the tagged migration if any tag names are matched.
-        /// </summary>
-        RequireAny = 2
+        RequireAll,
+        RequireAny
     }
 }

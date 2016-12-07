@@ -142,12 +142,16 @@ namespace FluentMigrator.Infrastructure
 
         public static bool TypeHasMatchingTags(Type type, IEnumerable<string> tagsToMatch)
         {
-            var tags = type.GetAllAttributes<TagsAttribute>(true).SelectMany(x => x.TagNames).ToArray();
+            var tags = type.GetAllAttributes<TagsAttribute>(true);
 
             if (tags.Any() && !tagsToMatch.Any())
                 return false;
 
-            return tags.Any() && tagsToMatch.All(t => tags.Any(t.Equals));
+            var tagNamesForAllBehavior = tags.Where(t => t.Behavior == TagBehavior.RequireAll).SelectMany(t => t.TagNames).ToArray();
+            var tagNamesForAnyBehavior = tags.Where(t => t.Behavior == TagBehavior.RequireAny).SelectMany(t => t.TagNames).ToArray();
+            
+            return (tagNamesForAllBehavior.Any() && tagsToMatch.All(t => tagNamesForAllBehavior.Any(t.Equals)))
+                || (tagNamesForAnyBehavior.Any() && tagsToMatch.Any(t => tagNamesForAnyBehavior.Any(t.Equals)));
         }
 
         public static string GetAutoScriptUpName(Type type, string databaseType)

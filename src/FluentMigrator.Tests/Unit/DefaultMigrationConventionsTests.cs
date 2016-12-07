@@ -314,10 +314,10 @@ namespace FluentMigrator.Tests.Unit
 
             [Test]
             [Category("Tagging")]
-            public void WhenTypeHasMultipleTagsWithMultipleTagNamesAndAllTagsHaveBehaviorOfAnyWithOneTagNotHavingAMatchingTagNameThenReturnFalse()
+            public void WhenTypeHasMultipleTagsWithMultipleTagNamesAndAllTagsHaveBehaviorOfAnyWithOneTagNotHavingAMatchingTagNameThenReturnTrue()
             {
                 DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributesWithAnyBehaviorOnBoth), new[] { "UK", "IE" })
-                    .ShouldBeFalse();
+                    .ShouldBeTrue();
             }
 
             [Test]
@@ -330,18 +330,18 @@ namespace FluentMigrator.Tests.Unit
 
             [Test]
             [Category("Tagging")]
-            public void WhenTypeHasMultipleTagsWithMultipleTagNamesAndOneHasBehaviorOfAnyAndOtherHasBehaviorOfAllWithoutAllTagNamesMatchingThenReturnFalse()
+            public void WhenTypeHasMultipleTagsWithMultipleTagNamesAndOneHasBehaviorOfAnyAndOtherHasBehaviorOfAllWithoutAllTagNamesMatchingThenReturnTrue()
             {
                 DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndAllBehaviorAndProductionAndStagingAndAnyBehaviorInTwoTagsAttributes), new[] { "UK", "Staging", "IE" })
-                    .ShouldBeFalse();
+                    .ShouldBeTrue();
             }
 
             [Test]
             [Category("Tagging")]
-            public void WhenTypeHasMultipleTagsWithMultipleTagNamesAndOneHasBehaviorOfAnyWithoutAnyMatchingTagNamesAndOtherHasBehaviorOfAllWithTagNamesMatchingThenReturnFalse()
+            public void WhenTypeHasMultipleTagsWithMultipleTagNamesAndOneHasBehaviorOfAnyWithoutAnyMatchingTagNamesAndOtherHasBehaviorOfAllWithTagNamesMatchingThenReturnTrue()
             {
-                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndAllBehaviorAndProductionAndStagingAndAnyBehaviorInTwoTagsAttributes), new[] { "Staging" })
-                    .ShouldBeFalse();
+                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndAllBehaviorAndProductionAndStagingAndAnyBehaviorInTwoTagsAttributes), new[] { "BE", "UK" })
+                    .ShouldBeTrue();
             }
         }
 
@@ -375,7 +375,7 @@ namespace FluentMigrator.Tests.Unit
     {
     }
 
-    [Tags("BE", "UK", "Staging", "Production")]
+    [Tags(TagBehavior.RequireAny, "BE", "UK", "Staging", "Production")]
     public class TaggedWithBeAndUkAndProductionAndStagingAndAnyBehaviorInOneTagsAttribute
     {
     }
@@ -386,14 +386,14 @@ namespace FluentMigrator.Tests.Unit
     {
     }
 
-    [Tags("BE", "UK")]
-    [Tags("Staging", "Production")]
+    [Tags(TagBehavior.RequireAny, "BE", "UK")]
+    [Tags(TagBehavior.RequireAny, "Staging", "Production")]
     public class TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributesWithAnyBehaviorOnBoth
     {
     }
 
-    [Tags("BE", "UK")]
-    [Tags("Staging", "Production")]
+    [Tags(TagBehavior.RequireAll,"BE", "UK", "Staging")]
+    [Tags(TagBehavior.RequireAny, "Staging", "Production")]
     public class TaggedWithBeAndUkAndAllBehaviorAndProductionAndStagingAndAnyBehaviorInTwoTagsAttributes
     {
     }
@@ -403,7 +403,7 @@ namespace FluentMigrator.Tests.Unit
     {
     }
 
-    [Tags("UK")]
+    [Tags(TagBehavior.RequireAny, "UK")]
     public class TaggedWithUkAndAnyBehavior
     {
     }
