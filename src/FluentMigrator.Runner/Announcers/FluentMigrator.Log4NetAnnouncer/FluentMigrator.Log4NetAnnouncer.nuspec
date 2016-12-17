@@ -21,5 +21,6 @@
   <files>
     <file src="bin\Release\FluentMigrator.Log4NetAnnouncer.dll" target="lib\35" />
     <file src="bin\Release\FluentMigrator.Log4NetAnnouncer.pdb" target="lib\35" />
+    <file src="readme.txt" target="" />
   </files>
 </package>
