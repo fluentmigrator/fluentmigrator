@@ -61,6 +61,7 @@ namespace FluentMigrator.Runner.Announcers.Log4Net
             Write("Ask For Help:");
             Write("  http://groups.google.com/group/fluentmigrator-google-group");
             HorizontalRule();
+            Write(message);
         }
 
         public override void Write(string message, bool escaped)
@@ -68,7 +69,7 @@ namespace FluentMigrator.Runner.Announcers.Log4Net
             _log.Info(message);
         }
 
-        public void HorizontalRule()
+        public virtual void HorizontalRule()
         {
             Write("".PadRight(79, '-'));
         }
