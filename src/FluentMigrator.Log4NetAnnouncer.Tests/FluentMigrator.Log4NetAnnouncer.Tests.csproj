@@ -61,11 +61,11 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\src\FluentMigrator.Runner\Announcers\FluentMigrator.Log4NetAnnouncer\FluentMigrator.Log4NetAnnouncer.csproj">
+    <ProjectReference Include="..\FluentMigrator.Runner\Announcers\FluentMigrator.Log4NetAnnouncer\FluentMigrator.Log4NetAnnouncer.csproj">
       <Project>{8433bcb1-f692-42fe-824c-070e19c3f6d6}</Project>
       <Name>FluentMigrator.Log4NetAnnouncer</Name>
     </ProjectReference>
-    <ProjectReference Include="..\src\FluentMigrator.Runner\FluentMigrator.Runner.csproj">
+    <ProjectReference Include="..\FluentMigrator.Runner\FluentMigrator.Runner.csproj">
       <Project>{cb468ad6-60c2-42e9-b3b0-01968ef94c65}</Project>
       <Name>FluentMigrator.Runner</Name>
     </ProjectReference>

@@ -34,7 +34,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Log4NetAnnou
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Announcers", "Announcers", "{88C4F78F-237A-45BA-8203-AAE9DB079E0C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Log4NetAnnouncer.Tests", "FluentMigrator.Log4NetAnnouncer.Tests\FluentMigrator.Log4NetAnnouncer.Tests.csproj", "{B641AE83-6214-4521-B08B-90BD5E540DB8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Log4NetAnnouncer.Tests", "src\FluentMigrator.Log4NetAnnouncer.Tests\FluentMigrator.Log4NetAnnouncer.Tests.csproj", "{B641AE83-6214-4521-B08B-90BD5E540DB8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
