@@ -3,7 +3,7 @@ using System.Reflection;
 
 namespace FluentMigrator.Runner.Announcers.Log4Net
 {
-    public class Log4NetAnnouncer : IAnnouncer
+    public class Log4NetAnnouncer : Announcer
     {
         private readonly log4net.ILog _log;
 
@@ -36,35 +36,22 @@ namespace FluentMigrator.Runner.Announcers.Log4Net
         { }
 
         public Log4NetAnnouncer(log4net.ILog log)
+            : base()
         {
             _log = log;
         }
 
-        public void ElapsedTime(TimeSpan timeSpan)
+        public override void Emphasize(string message)
         {
-            Write(string.Format("=> {0}s", timeSpan.TotalSeconds), true);
+            _log.Warn(string.Format("[+] {0}", message));
         }
 
-        public void Emphasize(string message)
-        {
-            Say(string.Format("[+] {0}", message));
-        }
-
-        public void Error(Exception exception)
-        {
-            while (exception != null)
-            {
-                Error(exception.Message);
-                exception = exception.InnerException;
-            }
-        }
-
-        public void Error(string message)
+        public override void Error(string message)
         {
             _log.ErrorFormat("!!! {0}", message);
         }
 
-        public void Heading(string message)
+        public override void Heading(string message)
         {
             HorizontalRule();
             Write("=============================== FluentMigrator ================================");
@@ -76,20 +63,7 @@ namespace FluentMigrator.Runner.Announcers.Log4Net
             HorizontalRule();
         }
 
-        public void Say(string message)
-        {
-            Write(message);
-        }
-
-        public void Sql(string sql)
-        {
-            if (string.IsNullOrEmpty(sql))
-                Write("No SQL statement executed.", true);
-            else
-                Write(sql, false);
-        }
-
-        public void Write(string message, bool escaped)
+        public override void Write(string message, bool escaped)
         {
             _log.Info(message);
         }
