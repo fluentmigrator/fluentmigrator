@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -18,10 +18,8 @@
 
 namespace FluentMigrator.Builders.Create.Index
 {
-    public interface ICreateIndexOnColumnSyntax
+    public interface ICreateIndexNonKeyColumnSyntax
     {
-        ICreateIndexColumnOptionsSyntax OnColumn(string columnName);
         ICreateIndexNonKeyColumnSyntax Include(string columnName);
-        ICreateIndexOptionsSyntax WithOptions();
     }
 }
