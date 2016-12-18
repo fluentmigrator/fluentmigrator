@@ -49,7 +49,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string RenameTable { get { return "{0}', '{1}'"; } }
 
         public override string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3}.{4} ({5}{6}{7}){8}"; } }
-        public override string DropIndex { get { return "DROP INDEX {0} ON {1}.{2}"; } }
+        public override string DropIndex { get { return "DROP INDEX {0} ON {1}.{2}{3}"; } }
 
         public override string InsertData { get { return "INSERT INTO {0}.{1} ({2}) VALUES ({3})"; } }
         public override string UpdateData { get { return "{0} SET {1} WHERE {2}"; } }
@@ -286,7 +286,18 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(DeleteIndexExpression expression)
         {
-            return String.Format(DropIndex, Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteSchemaName(expression.Index.SchemaName), Quoter.QuoteTableName(expression.Index.TableName));
+            string withOnline = string.Empty;
+
+            if (expression.Index.ApplyOnline.HasValue)
+            {
+                withOnline = string.Format(" WITH (ONLINE = {0})", (expression.Index.ApplyOnline == OnlineMode.On ? "ON" : "OFF"));
+            }
+
+            return String.Format(DropIndex
+                , Quoter.QuoteIndexName(expression.Index.Name)
+                , Quoter.QuoteSchemaName(expression.Index.SchemaName)
+                , Quoter.QuoteTableName(expression.Index.TableName)
+                , withOnline);
         }
 
         protected override void BuildDelete(DeleteColumnExpression expression, string columnName, StringBuilder builder)

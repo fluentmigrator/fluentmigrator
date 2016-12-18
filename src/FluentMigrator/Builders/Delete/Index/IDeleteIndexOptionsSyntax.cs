@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -16,11 +16,12 @@
 //
 #endregion
 
+using FluentMigrator.Model;
+
 namespace FluentMigrator.Builders.Delete.Index
 {
-    public interface IDeleteIndexForTableSyntax
+    public interface IDeleteIndexOptionsSyntax
     {
-        IDeleteIndexOnColumnOrInSchemaSyntax OnTable(string tableName);
-        IDeleteIndexOptionsSyntax WithOptions();
+        void ApplyOnline(OnlineMode mode);
     }
 }
