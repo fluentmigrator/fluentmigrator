@@ -119,5 +119,15 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP INDEX [TestIndex] ON [dbo].[TestTable1]");
         }
+
+        [Test]
+        public void CanDropIndexAndIgnoreApplyOnlineValue()
+        {
+            var expression = GeneratorTestHelper.GetDeleteIndexExpression();
+            expression.Index.ApplyOnline = Model.OnlineMode.On;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP INDEX [TestIndex] ON [dbo].[TestTable1]");
+        }
     }
 }

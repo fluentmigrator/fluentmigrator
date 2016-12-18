@@ -21,5 +21,18 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             return sql.ToString();
         }
+
+        public override string Generate(DeleteIndexExpression expression)
+        {
+            StringBuilder sql = new StringBuilder();
+            sql.Append(base.Generate(expression));
+
+            if (expression.Index.ApplyOnline.HasValue)
+            {
+                sql.Append(string.Format(" WITH (ONLINE = {0})", (expression.Index.ApplyOnline == OnlineMode.On ? "ON" : "OFF")));
+            }
+
+            return sql.ToString();
+        }
     }
 }

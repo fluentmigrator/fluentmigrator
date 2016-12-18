@@ -44,5 +44,35 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2016
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC)");
         }
+
+        [Test]
+        public void CanDropIndexWithOnlineOn()
+        {
+            var expression = GeneratorTestHelper.GetDeleteIndexExpression();
+            expression.Index.ApplyOnline = Model.OnlineMode.On;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP INDEX [TestIndex] ON [dbo].[TestTable1] WITH (ONLINE = ON)");
+        }
+
+        [Test]
+        public void CanDropIndexWithOnlineOff()
+        {
+            var expression = GeneratorTestHelper.GetDeleteIndexExpression();
+            expression.Index.ApplyOnline = Model.OnlineMode.Off;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP INDEX [TestIndex] ON [dbo].[TestTable1] WITH (ONLINE = OFF)");
+        }
+
+        [Test]
+        public void CanDropIndexWithoutOnlineModeSet()
+        {
+            var expression = GeneratorTestHelper.GetDeleteIndexExpression();
+            expression.Index.ApplyOnline = null;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP INDEX [TestIndex] ON [dbo].[TestTable1]");
+        }
     }
 }
