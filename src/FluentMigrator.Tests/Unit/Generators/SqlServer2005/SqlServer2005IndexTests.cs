@@ -92,6 +92,36 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanCreateIndexWithOnlineOn()
+        {
+            var expression = GeneratorTestHelper.GetCreateIndexExpression();
+            expression.Index.ApplyOnline = Model.OnlineMode.On;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WITH (ONLINE = ON)");
+        }
+
+        [Test]
+        public void CanCreateIndexWithOnlineOff()
+        {
+            var expression = GeneratorTestHelper.GetCreateIndexExpression();
+            expression.Index.ApplyOnline = Model.OnlineMode.Off;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WITH (ONLINE = OFF)");
+        }
+
+        [Test]
+        public void CanCreateIndexWithoutOnlineModeSet()
+        {
+            var expression = GeneratorTestHelper.GetCreateIndexExpression();
+            expression.Index.ApplyOnline = null;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC)");
+        }
+
+        [Test]
         public override void CanDropIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();

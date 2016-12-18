@@ -201,6 +201,7 @@
     <Compile Include="Infrastructure\IMigrationInfo.cs" />
     <Compile Include="Infrastructure\MigrationInfo.cs" />
     <Compile Include="Infrastructure\NonAttributedMigrationToMigrationInfoAdapter.cs" />
+    <Compile Include="Model\OnlineState.cs" />
     <Compile Include="RawSql.cs" />
     <Compile Include="Infrastructure\ISupportAdditionalFeatures.cs" />
     <Compile Include="Builders\Insert\IInsertDataOrInSchemaSyntax.cs" />

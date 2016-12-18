@@ -48,7 +48,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string RenameColumn { get { return "{0}.{1}', '{2}'"; } }
         public override string RenameTable { get { return "{0}', '{1}'"; } }
 
-        public override string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3}.{4} ({5}{6}{7})"; } }
+        public override string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3}.{4} ({5}{6}{7}){8}"; } }
         public override string DropIndex { get { return "DROP INDEX {0} ON {1}.{2}"; } }
 
         public override string InsertData { get { return "INSERT INTO {0}.{1} ({2}) VALUES ({3})"; } }
@@ -265,6 +265,13 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 indexIncludes[i] = Quoter.QuoteColumnName(includeDef.Name);
             }
 
+            string withOnline = string.Empty;
+
+            if (expression.Index.ApplyOnline.HasValue)
+            {
+                withOnline = string.Format(" WITH (ONLINE = {0})", (expression.Index.ApplyOnline == OnlineMode.On ? "ON" : "OFF"));
+            }
+
             return String.Format(CreateIndex
                 , GetUniqueString(expression)
                 , GetClusterTypeString(expression)
@@ -273,7 +280,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 , Quoter.QuoteTableName(expression.Index.TableName)
                 , String.Join(", ", indexColumns)
                 , GetIncludeString(expression)
-                , String.Join(", ", indexIncludes));
+                , String.Join(", ", indexIncludes)
+                , withOnline);
         }
 
         public override string Generate(DeleteIndexExpression expression)
