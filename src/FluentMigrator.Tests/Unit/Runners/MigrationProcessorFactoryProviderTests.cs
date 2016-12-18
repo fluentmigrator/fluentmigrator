@@ -79,6 +79,13 @@ namespace FluentMigrator.Tests.Unit.Runners
         }
 
         [Test]
+        public void CanRetrieveSqlServer2016FactoryWithArgumentString()
+        {
+            IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("SqlServer2016");
+            Assert.IsTrue(factory.GetType() == typeof(SqlServer2016ProcessorFactory));
+        }
+
+        [Test]
         public void RetrievesSqlServerProcessorFactoryIfArgumentIsSqlServer()
         {
             IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("SqlServer");
