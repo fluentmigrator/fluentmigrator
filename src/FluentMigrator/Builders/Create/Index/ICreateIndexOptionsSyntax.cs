@@ -16,6 +16,8 @@
 //
 #endregion
 
+using FluentMigrator.Model;
+
 namespace FluentMigrator.Builders.Create.Index
 {
     public interface ICreateIndexOptionsSyntax
@@ -23,5 +25,6 @@ namespace FluentMigrator.Builders.Create.Index
         ICreateIndexOnColumnSyntax Unique();
         ICreateIndexOnColumnSyntax NonClustered();
         ICreateIndexOnColumnSyntax Clustered();
+        ICreateIndexOnColumnSyntax ApplyOnline(OnlineMode mode);
     }
 }

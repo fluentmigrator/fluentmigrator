@@ -90,6 +90,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC)");
         }
+        
+        [Test]
+        public void CanCreateIndexAndIgnoreApplyOnlineValue()
+        {
+            var expression = GeneratorTestHelper.GetCreateIndexExpression();
+            expression.Index.ApplyOnline = Model.OnlineMode.On;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC)");
+        }
 
         [Test]
         public override void CanDropIndexWithCustomSchema()
