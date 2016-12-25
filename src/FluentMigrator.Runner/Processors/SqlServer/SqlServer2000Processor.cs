@@ -21,6 +21,7 @@
 
 using System;
 using System.Data;
+using System.Data.Common;
 using System.IO;
 using FluentMigrator.Builders.Execute;
 
@@ -28,7 +29,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 {
     public sealed class SqlServer2000Processor : GenericProcessorBase
     {
-        public SqlServer2000Processor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public SqlServer2000Processor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
         }

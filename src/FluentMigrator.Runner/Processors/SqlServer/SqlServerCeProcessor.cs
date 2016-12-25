@@ -25,6 +25,7 @@ using System.IO;
 using FluentMigrator.Builders.Execute;
 using System.Text;
 using System.Collections.Generic;
+using System.Data.Common;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
@@ -43,7 +44,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
         }
 
-        public SqlServerCeProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public SqlServerCeProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
         }

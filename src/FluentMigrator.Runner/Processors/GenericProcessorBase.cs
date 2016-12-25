@@ -17,6 +17,7 @@
 #endregion
 
 using System.Data;
+using System.Data.Common;
 
 namespace FluentMigrator.Runner.Processors
 {
@@ -24,7 +25,7 @@ namespace FluentMigrator.Runner.Processors
     {
         private readonly string connectionString;
 
-        protected GenericProcessorBase(IDbConnection connection, IDbFactory factory
+        protected GenericProcessorBase(DbConnection connection, IDbFactory factory
                                        , IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
             : base(generator, announcer, options)
         {
@@ -39,9 +40,9 @@ namespace FluentMigrator.Runner.Processors
 
         public override string ConnectionString { get { return connectionString; } }
 
-        public IDbConnection Connection { get; protected set; }
+        public DbConnection Connection { get; protected set; }
         public IDbFactory Factory { get; protected set; }
-        public IDbTransaction Transaction { get; protected set; }
+        public DbTransaction Transaction { get; protected set; }
 
         public virtual bool SupportsTransactions
         {

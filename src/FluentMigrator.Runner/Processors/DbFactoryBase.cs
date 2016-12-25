@@ -16,7 +16,6 @@
 
 #endregion
 
-using System.Data;
 using System.Data.Common;
 
 namespace FluentMigrator.Runner.Processors
@@ -57,14 +56,14 @@ namespace FluentMigrator.Runner.Processors
 
         #region IDbFactory Members
 
-        public IDbConnection CreateConnection(string connectionString)
+        public DbConnection CreateConnection(string connectionString)
         {
             var connection = Factory.CreateConnection();
             connection.ConnectionString = connectionString;
             return connection;
         }
 
-        public IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction)
+        public DbCommand CreateCommand(string commandText, DbConnection connection, DbTransaction transaction)
         {
             var command = connection.CreateCommand();
             command.CommandText = commandText;
@@ -72,14 +71,14 @@ namespace FluentMigrator.Runner.Processors
             return command;
         }
 
-        public IDbDataAdapter CreateDataAdapter(IDbCommand command)
+        public DbDataAdapter CreateDataAdapter(DbCommand command)
         {
-            IDbDataAdapter dataAdapter = Factory.CreateDataAdapter();
+            DbDataAdapter dataAdapter = Factory.CreateDataAdapter();
             dataAdapter.SelectCommand = command;
             return dataAdapter;
         }
 
-        public IDbCommand CreateCommand(string commandText, IDbConnection connection)
+        public DbCommand CreateCommand(string commandText, DbConnection connection)
         {
             return CreateCommand(commandText, connection, null);
         }

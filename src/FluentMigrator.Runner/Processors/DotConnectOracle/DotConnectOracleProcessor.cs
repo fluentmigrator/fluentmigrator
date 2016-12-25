@@ -18,6 +18,7 @@
 
 using System;
 using System.Data;
+using System.Data.Common;
 using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Runner.Processors.DotConnectOracle
@@ -29,7 +30,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             get { return "Oracle"; }
         }
 
-        public DotConnectOracleProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, DotConnectOracleDbFactory factory)
+        public DotConnectOracleProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, DotConnectOracleDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
         }

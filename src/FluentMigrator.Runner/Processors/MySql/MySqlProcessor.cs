@@ -20,6 +20,7 @@ using FluentMigrator.Runner.Helpers;
 
 using System;
 using System.Data;
+using System.Data.Common;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Runner.Generators.MySql;
 
@@ -34,7 +35,7 @@ namespace FluentMigrator.Runner.Processors.MySql
             get { return "MySql"; }
         }
 
-        public MySqlProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public MySqlProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
         }

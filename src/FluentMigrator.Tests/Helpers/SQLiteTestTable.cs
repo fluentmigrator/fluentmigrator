@@ -19,20 +19,21 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Text;
 using FluentMigrator.Runner.Processors.SQLite;
 
 namespace FluentMigrator.Tests.Helpers {
 	public class SQLiteTestTable : IDisposable {
 		private readonly string _schemaName;
-		private IDbConnection Connection { get; set; }
+		private DbConnection Connection { get; set; }
 		public string Name { get; set; }
-		private IDbTransaction Transaction { get; set; }
+		private DbTransaction Transaction { get; set; }
 
 		public SQLiteTestTable( SQLiteProcessor processor, string schemaName, params string[] columnDefinitions ) {
 			_schemaName = schemaName;
-			Connection = ( IDbConnection ) processor.Connection;
-			Transaction = ( IDbTransaction ) processor.Transaction;
+			Connection =  processor.Connection;
+			Transaction = processor.Transaction;
 
 			Name = "Table" + Guid.NewGuid().ToString( "N" );
 			Create( columnDefinitions );

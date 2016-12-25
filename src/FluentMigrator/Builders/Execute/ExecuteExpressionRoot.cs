@@ -18,11 +18,9 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data;
+using System.Data.Common;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
-using System.Runtime.CompilerServices;
-using System.Reflection;
 
 namespace FluentMigrator.Builders.Execute
 {
@@ -47,7 +45,7 @@ namespace FluentMigrator.Builders.Execute
             _context.Expressions.Add(expression);
         }
 
-        public void WithConnection(Action<IDbConnection, IDbTransaction> operation)
+        public void WithConnection(Action<DbConnection, DbTransaction> operation)
         {
             var expression = new PerformDBOperationExpression { Operation = operation };
             _context.Expressions.Add(expression);
@@ -73,6 +71,6 @@ namespace FluentMigrator.Builders.Execute
                 errors.Add(ErrorMessages.OperationCannotBeNull);
         }
 
-        public Action<IDbConnection, IDbTransaction> Operation { get; set; }
+        public Action<DbConnection, DbTransaction> Operation { get; set; }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Text.RegularExpressions;
 using FluentMigrator.Builders.Execute;
@@ -21,7 +22,7 @@ namespace FluentMigrator.Runner.Processors.Hana
             get { return true; }
         }
 
-        public HanaProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public HanaProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Reflection;
 using FluentMigrator.Builders.Execute;
@@ -389,10 +390,10 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         #endregion
 
-        public void Undo(IDbConnection connection)
+        public void Undo(DbConnection connection)
         {
             UndoExpressions.ForEach(x => {
-                using(IDbTransaction transaction = connection.BeginTransaction())
+                using(DbTransaction transaction = connection.BeginTransaction())
                 {
                     Run(x, connection, transaction);
                     transaction.Commit();
@@ -400,7 +401,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             });
         }
 
-        protected void Run(IMigrationExpression expression, IDbConnection connection, IDbTransaction transaction)
+        protected void Run(IMigrationExpression expression, DbConnection connection, DbTransaction transaction)
         {
             if (expression is PerformDBOperationExpression)
             {

@@ -2,7 +2,7 @@ using System.Data;
 using System.Linq;
 using System.Collections.Generic;
 using System;
-
+using System.Data.Common;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Oracle;
@@ -18,7 +18,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 	public abstract class OracleProcessorTestsBase
 	{
 		private const string SchemaName = "test";
-		private IDbConnection Connection { get; set; }
+		private DbConnection Connection { get; set; }
 		private OracleProcessor Processor { get; set; }
 		private IDbFactory Factory { get; set; }
 		private IQuoter Quoter { get { return this.Processor.Quoter; } }

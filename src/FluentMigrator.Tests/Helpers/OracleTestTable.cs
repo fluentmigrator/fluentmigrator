@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Text;
 
 using FluentMigrator.Runner.Generators;
@@ -14,7 +15,7 @@ namespace FluentMigrator.Tests.Helpers
     {
         private readonly IQuoter quoter = new OracleQuoterQuotedIdentifier();
 
-        private IDbConnection Connection { get; set; }
+        private DbConnection Connection { get; set; }
         private IDbFactory Factory { get; set; }
         private string _schema;
         private List<string> constraints = new List<string>();
@@ -22,7 +23,7 @@ namespace FluentMigrator.Tests.Helpers
         public string Name { get; set; }
 
 
-        public OracleTestTable(IDbConnection connection, string schema, IDbFactory factory, params string[] columnDefinitions)
+        public OracleTestTable(DbConnection connection, string schema, IDbFactory factory, params string[] columnDefinitions)
         {
             Connection = connection;
             Factory = factory;
@@ -35,7 +36,7 @@ namespace FluentMigrator.Tests.Helpers
             Create(columnDefinitions);
         }
 
-        public OracleTestTable(string table, IDbConnection connection, string schema, IDbFactory factory, params string[] columnDefinitions)
+        public OracleTestTable(string table, DbConnection connection, string schema, IDbFactory factory, params string[] columnDefinitions)
         {
             Connection = connection;
             Factory = factory;
