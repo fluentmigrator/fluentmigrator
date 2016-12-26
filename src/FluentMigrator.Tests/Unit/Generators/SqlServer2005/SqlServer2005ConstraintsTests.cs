@@ -536,6 +536,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanDropPrimaryKeyConstraintAndIgnoreApplyOnlineValue()
+        {
+            var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
+            expression.Constraint.ApplyOnline = Model.OnlineMode.On;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [TESTPRIMARYKEY]");
+        }
+
+        [Test]
         public override void CanDropUniqueConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();

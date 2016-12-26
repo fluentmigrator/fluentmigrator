@@ -47,5 +47,35 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2016
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1]) WITH (ONLINE = OFF)");
         }
+
+        [Test]
+        public void CanDropPrimaryKeyWithoutOnlineModeSet()
+        {
+            var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
+            expression.Constraint.ApplyOnline = null;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [TESTPRIMARYKEY]");
+        }
+
+        [Test]
+        public void CanDropPrimaryKeyWithOnlineOn()
+        {
+            var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
+            expression.Constraint.ApplyOnline = Model.OnlineMode.On;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [TESTPRIMARYKEY] WITH (ONLINE = ON)");
+        }
+
+        [Test]
+        public void CanDropPrimaryKeyWithOnlineOff()
+        {
+            var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
+            expression.Constraint.ApplyOnline = Model.OnlineMode.Off;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [TESTPRIMARYKEY] WITH (ONLINE = OFF)");
+        }
     }
 }

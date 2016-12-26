@@ -47,5 +47,18 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             return sql.ToString();
         }
+
+        public override string Generate(DeleteConstraintExpression expression)
+        {
+            StringBuilder sql = new StringBuilder();
+            sql.Append(base.Generate(expression));
+
+            if (expression.Constraint.ApplyOnline.HasValue)
+            {
+                sql.Append(string.Format(" WITH (ONLINE = {0})", (expression.Constraint.ApplyOnline == OnlineMode.On ? "ON" : "OFF")));
+            }
+
+            return sql.ToString();
+        }
     }
 }
