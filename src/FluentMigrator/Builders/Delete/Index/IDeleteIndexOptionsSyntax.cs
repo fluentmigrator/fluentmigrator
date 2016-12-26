@@ -22,6 +22,16 @@ namespace FluentMigrator.Builders.Delete.Index
 {
     public interface IDeleteIndexOptionsSyntax
     {
-        void ApplyOnline(OnlineMode mode);
+        /// <summary>
+        /// Specifies whether underlying tables and associated indexes are available for queries and data modification during the index operation.
+        /// The ONLINE option can only be specified when you drop clustered indexes (SQL Server 2016).
+        /// </summary>
+        /// <param name="mode">
+        /// ON
+        /// Long-term table locks are not held. This allows queries or updates to the underlying table to continue.
+        /// OFF
+        /// Table locks are applied and the table is unavailable for the duration of the index operation.
+        /// </param>
+        void ApplyOnline(OnlineMode mode = OnlineMode.On);
     }
 }
