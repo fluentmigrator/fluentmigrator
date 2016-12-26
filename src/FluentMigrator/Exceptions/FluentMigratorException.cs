@@ -17,11 +17,9 @@
 #endregion
 
 using System;
-using System.Runtime.Serialization;
 
 namespace FluentMigrator.Exceptions
 {
-    [Serializable]
     public abstract class FluentMigratorException : Exception
     {
         protected FluentMigratorException()
@@ -33,10 +31,6 @@ namespace FluentMigrator.Exceptions
         }
 
         protected FluentMigratorException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        protected FluentMigratorException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

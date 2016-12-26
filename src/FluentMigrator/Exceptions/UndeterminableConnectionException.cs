@@ -17,11 +17,9 @@
 #endregion
 
 using System;
-using System.Runtime.Serialization;
 
 namespace FluentMigrator.Exceptions
 {
-    [Serializable]
     public class UndeterminableConnectionException : FluentMigratorException
     {
         public UndeterminableConnectionException()
@@ -34,10 +32,6 @@ namespace FluentMigrator.Exceptions
 
         public UndeterminableConnectionException(string message, Exception innerException)
             : base(message, innerException)
-        {
-        }
-
-        public UndeterminableConnectionException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }
