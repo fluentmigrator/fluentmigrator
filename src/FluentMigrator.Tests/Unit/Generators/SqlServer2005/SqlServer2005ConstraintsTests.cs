@@ -488,6 +488,16 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanCreatePrimaryKeyAndIgnoreApplyOnlineValue()
+        {
+            var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
+            expression.Constraint.ApplyOnline = Model.OnlineMode.On;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1])");
+        }
+
+        [Test]
         public override void CanDropForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();

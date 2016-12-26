@@ -467,6 +467,7 @@
     <Compile Include="Unit\Generators\SqlServer2005\SqlServer2005TableTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2008\SqlServer2008GeneratorTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2012\SqlServer2012SequenceTests.cs" />
+    <Compile Include="Unit\Generators\SqlServer2016\SqlServer2016ConstraintTests.cs" />
     <Compile Include="Unit\Generators\SqlServer2016\SqlServer2016IndexTests.cs" />
     <Compile Include="Unit\Generators\SqlServerCe\SqlServerCeColumnTests.cs" />
     <Compile Include="Unit\Generators\SqlServerCe\SqlServerCeConstraintsTests.cs" />
