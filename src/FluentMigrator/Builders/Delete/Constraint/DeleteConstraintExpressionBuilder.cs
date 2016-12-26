@@ -1,8 +1,12 @@
+using System;
 using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Delete.Constraint
 {
-    public class DeleteConstraintExpressionBuilder : ExpressionBuilderBase<DeleteConstraintExpression>, IDeleteConstraintOnTableSyntax, IInSchemaSyntax
+    public class DeleteConstraintExpressionBuilder : ExpressionBuilderBase<DeleteConstraintExpression>, 
+        IDeleteConstraintOnTableSyntax, 
+        IDeleteConstraintInSchemaOptionsSyntax
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="T:CreateConstraintExpressionBuilder"/> class.
@@ -12,15 +16,22 @@ namespace FluentMigrator.Builders.Delete.Constraint
         {
         }
 
-        public IInSchemaSyntax FromTable(string tableName)
+        public IDeleteConstraintInSchemaOptionsSyntax ApplyOnline(OnlineMode mode)
+        {
+            Expression.Constraint.ApplyOnline = mode;
+            return this;
+        }
+
+        public IDeleteConstraintInSchemaOptionsSyntax FromTable(string tableName)
         {
             Expression.Constraint.TableName = tableName;
             return this;
         }
 
-        public void InSchema(string schemaName)
+        public IDeleteConstraintInSchemaOptionsSyntax InSchema(string schemaName)
         {
             Expression.Constraint.SchemaName = schemaName;
+            return this;
         }
     }
 }
