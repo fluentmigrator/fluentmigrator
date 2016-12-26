@@ -22,5 +22,6 @@ namespace FluentMigrator.Builders.Delete.Index
     {
         IDeleteIndexOptionsSyntax OnColumn(string columnName);
         IDeleteIndexOptionsSyntax OnColumns(params string[] columnNames);
+        IDeleteIndexOptionsSyntax WithOptions();
     }
 }
