@@ -24,6 +24,7 @@ namespace FluentMigrator.Model
         public virtual string ConstraintName { get; set; }
         public virtual string TableName { get; set; }
         public virtual ICollection<string> Columns { get; set; }
+        public OnlineMode? ApplyOnline { get; set; }
 
 
         /// <summary>

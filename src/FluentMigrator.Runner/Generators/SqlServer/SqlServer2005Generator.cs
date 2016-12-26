@@ -343,7 +343,14 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(CreateConstraintExpression expression)
         {
-            return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.Constraint.SchemaName), base.Generate(expression));
+            string withOnline = string.Empty;
+
+            if (expression.Constraint.ApplyOnline.HasValue)
+            {
+                withOnline = string.Format(" WITH (ONLINE = {0})", (expression.Constraint.ApplyOnline == OnlineMode.On ? "ON" : "OFF"));
+            }
+
+            return string.Format("ALTER TABLE {0}.{1}{2}", Quoter.QuoteSchemaName(expression.Constraint.SchemaName), base.Generate(expression), withOnline);
         }
 
         public override string Generate(DeleteDefaultConstraintExpression expression)
