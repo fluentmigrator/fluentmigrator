@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !COREFX
+using System;
 using System.Configuration;
 using System.Text.RegularExpressions;
 using FluentMigrator.Exceptions;
@@ -101,3 +102,4 @@ namespace FluentMigrator.Runner.Initialization
         }
     }
 }
+#endif

@@ -6,6 +6,9 @@ using System.Text;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
+#if COREFX
+using Rule = FluentMigrator.DataRule;
+#endif
 
 namespace FluentMigrator.Runner.Generators.Generic
 {

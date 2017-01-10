@@ -93,25 +93,22 @@ namespace FluentMigrator.Runner.Processors.Firebird
             return Exists("select rdb$trigger_name from rdb$triggers where (lower(rdb$relation_name) = lower('{0}')) and (lower(rdb$trigger_name) = lower('{1}'))", FormatToSafeName(tableName), FormatToSafeName(triggerName));
         }
 
-        public override DataSet ReadTableData(string schemaName, string tableName)
+        public override IDataReader ReadTableData(string schemaName, string tableName)
         {
             CheckTable(tableName);
             return Read("SELECT * FROM {0}", quoter.QuoteTableName(tableName));
         }
 
-        public override DataSet Read(string template, params object[] args)
+        public override IDataReader Read(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
 
             //Announcer.Sql(String.Format(template,args));
 
-            var ds = new DataSet();
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
-            {
-                var adapter = Factory.CreateDataAdapter(command);
-                adapter.Fill(ds);
-                return ds;
-            }
+            var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction);
+            var dataReader = command.ExecuteReader();
+
+            return new FirebirdDataReaderWrapper(dataReader, command);
         }
 
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
@@ -619,14 +616,14 @@ namespace FluentMigrator.Runner.Processors.Firebird
             InsertDataExpression data = new InsertDataExpression();
             data.TableName = tableDef.Name;
             data.SchemaName = tableDef.SchemaName;
-            using (DataSet ds = ReadTableData(String.Empty, expression.OldName))
+            using (IDataReader ds = ReadTableData(String.Empty, expression.OldName))
             {
-                foreach (DataRow dr in ds.Tables[0].Rows)
+                while (ds.Read())
                 {
                     InsertionDataDefinition insert = new InsertionDataDefinition();
                     for (int i = 0; i < columnCount; i++)
                     {
-                        insert.Add(new KeyValuePair<string, object>(columns[i], dr.ItemArray[i]));
+                        insert.Add(new KeyValuePair<string, object>(columns[i], ds.GetValue(i)));
                     }
                     data.Rows.Add(insert);
                 }
@@ -1022,5 +1019,161 @@ namespace FluentMigrator.Runner.Processors.Firebird
         #endregion
 
 
+        class FirebirdDataReaderWrapper : IDataReader
+        {
+            IDataReader dataReader;
+            IDbCommand dbCommand;
+
+            public FirebirdDataReaderWrapper(IDataReader dataReader, IDbCommand dbCommand) {
+                this.dataReader = dataReader;
+                this.dbCommand = dbCommand;
+            }
+
+            public object this[string name] {
+                get {
+                    return dataReader[name];
+                }
+            }
+
+            public object this[int i] {
+                get {
+                    return dataReader[i];
+                }
+            }
+
+            public int Depth {
+                get {
+                    return dataReader.Depth;
+                }
+            }
+
+            public int FieldCount {
+                get {
+                    return dataReader.FieldCount;
+                }
+            }
+
+            public bool IsClosed {
+                get {
+                    return dataReader.IsClosed;
+                }
+            }
+
+            public int RecordsAffected {
+                get {
+                    return dataReader.RecordsAffected;
+                }
+            }
+
+            public void Close() {
+                dataReader.Close();
+                dbCommand.Dispose();
+            }
+
+            public void Dispose() {
+                dataReader.Dispose();
+                dbCommand.Dispose();
+            }
+
+            public bool GetBoolean(int i) {
+                return dataReader.GetBoolean(i);
+            }
+
+            public byte GetByte(int i) {
+                return dataReader.GetByte(i);
+            }
+
+            public long GetBytes(int i, long fieldOffset, byte[] buffer, int bufferoffset, int length) {
+                return dataReader.GetBytes(i, fieldOffset, buffer, bufferoffset, length);
+            }
+
+            public char GetChar(int i) {
+                return dataReader.GetChar(i);
+            }
+
+            public long GetChars(int i, long fieldoffset, char[] buffer, int bufferoffset, int length) {
+                return dataReader.GetChars(i, fieldoffset, buffer, bufferoffset, length);
+            }
+
+            public IDataReader GetData(int i) {
+                return dataReader.GetData(i);
+            }
+
+            public string GetDataTypeName(int i) {
+                return dataReader.GetDataTypeName(i);
+            }
+
+            public DateTime GetDateTime(int i) {
+                return dataReader.GetDateTime(i);
+            }
+
+            public decimal GetDecimal(int i) {
+                return dataReader.GetDecimal(i);
+            }
+
+            public double GetDouble(int i) {
+                return dataReader.GetDouble(i);
+            }
+
+            public Type GetFieldType(int i) {
+                return dataReader.GetFieldType(i);
+            }
+
+            public float GetFloat(int i) {
+                return dataReader.GetFloat(i);
+            }
+
+            public Guid GetGuid(int i) {
+                return dataReader.GetGuid(i);
+            }
+
+            public short GetInt16(int i) {
+                return dataReader.GetInt16(i);
+            }
+
+            public int GetInt32(int i) {
+                return dataReader.GetInt32(i);
+            }
+
+            public long GetInt64(int i) {
+                return dataReader.GetInt64(i);
+            }
+
+            public string GetName(int i) {
+                return dataReader.GetName(i);
+            }
+
+            public int GetOrdinal(string name) {
+                return dataReader.GetOrdinal(name);
+            }
+
+            public DataTable GetSchemaTable() {
+                return dataReader.GetSchemaTable();
+            }
+
+            public string GetString(int i) {
+                return dataReader.GetString(i);
+            }
+
+            public object GetValue(int i) {
+                return dataReader.GetValue(i);
+            }
+
+            public int GetValues(object[] values) {
+                return dataReader.GetValues(values);
+            }
+
+            public bool IsDBNull(int i) {
+                return dataReader.IsDBNull(i);
+            }
+
+            public bool NextResult() {
+                return dataReader.NextResult();
+            }
+
+            public bool Read() {
+                return dataReader.Read();
+            }
+        }
     }
 }

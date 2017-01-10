@@ -31,7 +31,11 @@ namespace FluentMigrator.Runner.Initialization.AssemblyLoader
 
         public Assembly Load()
         {
+#if COREFX
+            Assembly assembly = Assembly.Load(new AssemblyName(this.name));
+#else
             Assembly assembly = Assembly.Load(this.name);
+#endif
             return assembly;
         }
     }

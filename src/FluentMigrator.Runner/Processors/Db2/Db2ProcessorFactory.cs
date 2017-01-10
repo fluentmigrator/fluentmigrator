@@ -1,4 +1,5 @@
-﻿namespace FluentMigrator.Runner.Processors.DB2
+﻿#if !COREFX
+namespace FluentMigrator.Runner.Processors.DB2
 {
     using FluentMigrator.Runner.Generators.DB2;
 
@@ -16,3 +17,4 @@
         #endregion Methods
     }
 }
+#endif

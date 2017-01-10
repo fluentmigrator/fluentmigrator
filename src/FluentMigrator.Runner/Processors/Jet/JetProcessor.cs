@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !COREFX
+using System;
 using System.Data;
 using System.Data.OleDb;
 using FluentMigrator.Builders.Execute;
@@ -74,22 +75,17 @@ namespace FluentMigrator.Runner.Processors.Jet
             }
         }
 
-        public override DataSet ReadTableData(string schemaName, string tableName)
+        public override IDataReader ReadTableData(string schemaName, string tableName)
         {
             return Read("SELECT * FROM [{0}]", tableName);
         }
 
-        public override DataSet Read(string template, params object[] args)
+        public override IDataReader Read(string template, params object[] args)
         {
             EnsureConnectionIsOpen();
 
-            var ds = new DataSet();
             using (var command = new OleDbCommand(String.Format(template, args), Connection, Transaction))
-            using (var adapter = new OleDbDataAdapter(command))
-            {
-                adapter.Fill(ds);
-                return ds;
-            }
+                return command.ExecuteReader();
         }
 
         public override bool Exists(string template, params object[] args)
@@ -220,3 +216,4 @@ namespace FluentMigrator.Runner.Processors.Jet
         }
     }
 }
+#endif

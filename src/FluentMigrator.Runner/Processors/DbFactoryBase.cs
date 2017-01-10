@@ -72,12 +72,14 @@ namespace FluentMigrator.Runner.Processors
             return command;
         }
 
+#if !COREFX
         public IDbDataAdapter CreateDataAdapter(IDbCommand command)
         {
             IDbDataAdapter dataAdapter = Factory.CreateDataAdapter();
             dataAdapter.SelectCommand = command;
             return dataAdapter;
         }
+#endif
 
         public IDbCommand CreateCommand(string commandText, IDbConnection connection)
         {

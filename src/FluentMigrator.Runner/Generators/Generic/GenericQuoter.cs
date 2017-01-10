@@ -1,5 +1,8 @@
 ﻿using System.Globalization;
 using FluentMigrator.Model;
+#if COREFX
+using System.Reflection;
+#endif
 
 namespace FluentMigrator.Runner.Generators.Generic
 {
@@ -24,7 +27,11 @@ namespace FluentMigrator.Runner.Generators.Generic
             if (value is Guid) { return FormatGuid((Guid)value); }
             if (value is DateTime) { return FormatDateTime((DateTime)value); }
             if (value is DateTimeOffset) { return FormatDateTimeOffset((DateTimeOffset)value); }
+#if COREFX
+            if (value.GetType().GetTypeInfo().IsEnum) { return FormatEnum(value); }
+#else
             if (value.GetType().IsEnum) { return FormatEnum(value); }
+#endif
             if (value is double) {return FormatDouble((double)value);}
             if (value is float) {return FormatFloat((float)value);}
             if (value is decimal) { return FormatDecimal((decimal)value); }

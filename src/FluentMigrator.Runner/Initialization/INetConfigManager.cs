@@ -1,4 +1,5 @@
-﻿using System.Configuration;
+﻿#if !COREFX
+using System.Configuration;
 
 namespace FluentMigrator.Runner.Initialization
 {
@@ -12,3 +13,4 @@ namespace FluentMigrator.Runner.Initialization
         Configuration LoadFromMachineConfiguration();
     }
 }
+#endif

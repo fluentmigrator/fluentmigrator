@@ -35,6 +35,10 @@ namespace FluentMigrator.Runner.Initialization
         private AssemblyLoaderFactory AssemblyLoaderFactory { get; set; }
         private MigrationProcessorFactoryProvider ProcessorFactoryProvider { get; set; }
 
+#if COREFX
+        public string ConnectionString { get; set; }
+#endif
+
         public TaskExecutor(IRunnerContext runnerContext)
             : this(runnerContext, new AssemblyLoaderFactory(), new MigrationProcessorFactoryProvider())
         {
@@ -66,7 +70,12 @@ namespace FluentMigrator.Runner.Initialization
 
             var assemblyCollection = new AssemblyCollection(assemblies);
 
-            var processor = RunnerContext.NoConnection? InitializeConnectionlessProcessor():InitializeProcessor(assemblyCollection);
+            var processor = RunnerContext.NoConnection? InitializeConnectionlessProcessor():
+#if COREFX
+                InitializeProcessor(assemblyCollection, ConnectionString);
+#else
+                InitializeProcessor(assemblyCollection);
+#endif
 
             Runner = new MigrationRunner(assemblyCollection, RunnerContext, processor);
         }
@@ -130,7 +139,11 @@ namespace FluentMigrator.Runner.Initialization
             return processor;
         }
 
+#if COREFX
+        private IMigrationProcessor InitializeProcessor(IAssemblyCollection assemblyCollection, string connectionString)
+#else
         private IMigrationProcessor InitializeProcessor(IAssemblyCollection assemblyCollection)
+#endif
         {
 
             if (RunnerContext.Timeout == 0)
@@ -138,7 +151,9 @@ namespace FluentMigrator.Runner.Initialization
                 RunnerContext.Timeout = 30; // Set default timeout for command
             }
 
+#if !COREFX
             var connectionString = LoadConnectionString(assemblyCollection);
+#endif
             var processorFactory = ProcessorFactoryProvider.GetFactory(RunnerContext.Database);
 
             if (processorFactory == null)
@@ -154,6 +169,7 @@ namespace FluentMigrator.Runner.Initialization
             return processor;
         }
 
+#if !COREFX
         private string LoadConnectionString(IAssemblyCollection assemblyCollection)
         {
             var singleAssembly = (assemblyCollection != null && assemblyCollection.Assemblies != null && assemblyCollection.Assemblies.Length == 1) ? assemblyCollection.Assemblies[0] : null;
@@ -166,5 +182,6 @@ namespace FluentMigrator.Runner.Initialization
             manager.LoadConnectionString();
             return manager.ConnectionString;
         }
+#endif
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !COREFX
+using System;
 using System.Configuration;
 using System.IO;
 
@@ -28,3 +29,4 @@ namespace FluentMigrator.Runner.Initialization
         }
     }
 }
+#endif

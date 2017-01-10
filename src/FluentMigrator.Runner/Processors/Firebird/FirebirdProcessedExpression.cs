@@ -125,19 +125,19 @@ namespace FluentMigrator.Runner.Processors.Firebird
             CanUndo = true;
             FirebirdSchemaProvider schema = new FirebirdSchemaProvider(Processor);
             FirebirdTableSchema table = schema.GetTableSchema(expression.TableName);
-            using (DataSet ds = Processor.ReadTableData(String.Empty, expression.TableName))
+            using (IDataReader ds = Processor.ReadTableData(String.Empty, expression.TableName))
             {
                 foreach (DeletionDataDefinition deletion in expression.Rows)
                 {
                     InsertDataExpression insert = new InsertDataExpression() { SchemaName = String.Empty, TableName = expression.TableName };
-                    foreach (DataRow dr in ds.Tables[0].Rows)
+                    while (ds.Read())
                     {
                         bool match = true;
                         if (!expression.IsAllRows)
                         {
                             foreach (var where in deletion)
                             {
-                                if (dr[where.Key].ToString() != where.Value.ToString())
+                                if (ds[where.Key].ToString() != where.Value.ToString())
                                 {
                                     match = false;
                                     break;
@@ -149,7 +149,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                             InsertionDataDefinition insertion = new InsertionDataDefinition();
                             foreach (ColumnDefinition colDef in table.Definition.Columns)
                             {
-                                insertion.Add(new KeyValuePair<string, object>(colDef.Name, dr[colDef.Name]));
+                                insertion.Add(new KeyValuePair<string, object>(colDef.Name, ds[colDef.Name]));
                             }
                             insert.Rows.Add(insertion);
                         }
@@ -167,9 +167,9 @@ namespace FluentMigrator.Runner.Processors.Firebird
             
             CanUndo = true;
 
-            using (DataSet ds = Processor.ReadTableData(String.Empty, expression.TableName))
+            using (IDataReader ds = Processor.ReadTableData(String.Empty, expression.TableName))
             {
-                foreach (DataRow dr in ds.Tables[0].Rows)
+                while (ds.Read())
                 {
                     if (!hasPrimary)
                     {
@@ -181,7 +181,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                     {
                         foreach (var where in expression.Where)
                         {
-                            if (dr[where.Key].ToString() != where.Value.ToString())
+                            if (ds[where.Key].ToString() != where.Value.ToString())
                             {
                                 match = false;
                                 break;
@@ -199,7 +199,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                         };
                         foreach (var set in expression.Set)
                         {
-                            update.Set.Add(new KeyValuePair<string, object>(set.Key, dr[set.Key]));
+                            update.Set.Add(new KeyValuePair<string, object>(set.Key, ds[set.Key]));
                         }
                         foreach (ColumnDefinition colDef in table.Definition.Columns)
                         {
@@ -207,7 +207,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                             {
                                 if (update.Where == null)
                                     update.Where = new List<KeyValuePair<string, object>>();
-                                update.Where.Add(new KeyValuePair<string, object>(colDef.Name, dr[colDef.Name]));
+                                update.Where.Add(new KeyValuePair<string, object>(colDef.Name, ds[colDef.Name]));
                             }
                         }
                         UndoExpressions.Add(update);
@@ -284,16 +284,16 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 SchemaName = expression.SchemaName
             };
 
-            using (DataSet data = Processor.ReadTableData(String.Empty, expression.TableName))
+            using (IDataReader data = Processor.ReadTableData(String.Empty, expression.TableName))
             {
-                int columnCount = data.Tables[0].Columns.Count;
+                int columnCount = data.FieldCount;
 
-                foreach (DataRow row in data.Tables[0].Rows)
+                while (data.Read())
                 {
                     InsertionDataDefinition insert = new InsertionDataDefinition();
                     for (int i = 0; i < columnCount; i++)
                     {
-                        insert.Add(new KeyValuePair<string, object>(data.Tables[0].Columns[i].ColumnName, row.ItemArray[i]));
+                        insert.Add(new KeyValuePair<string, object>(data.GetName(i), data.GetValue(i)));
                     }
                     values.Rows.Add(insert);
                 }
@@ -334,7 +334,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
             CanUndo = true;
 
-            using (DataSet ds = Processor.ReadTableData(String.Empty, expression.TableName))
+            using (IDataReader ds = Processor.ReadTableData(String.Empty, expression.TableName))
             {
                 //Create columns
                 foreach (string columnName in expression.ColumnNames)
@@ -352,7 +352,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 }
 
                 //Update data
-                foreach (DataRow dr in ds.Tables[0].Rows)
+                while (ds.Read())
                 {
                     if (!hasPrimary)
                     {
@@ -368,12 +368,12 @@ namespace FluentMigrator.Runner.Processors.Firebird
                     };
                     foreach (string columnName in expression.ColumnNames)
                     {
-                        update.Set.Add(new KeyValuePair<string, object>(columnName, dr[columnName]));
+                        update.Set.Add(new KeyValuePair<string, object>(columnName, ds[columnName]));
                     }
                     table.Definition.Columns.ToList().ForEach(col =>
                     {
                         if (col.IsPrimaryKey)
-                            update.Where.Add(new KeyValuePair<string, object>(col.Name, dr[col.Name]));
+                            update.Where.Add(new KeyValuePair<string, object>(col.Name, ds[col.Name]));
                     });
                     UndoExpressions.Add(update);
                 }

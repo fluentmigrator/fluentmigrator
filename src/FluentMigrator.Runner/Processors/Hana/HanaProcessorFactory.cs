@@ -1,4 +1,5 @@
-﻿using FluentMigrator.Runner.Generators.Hana;
+﻿#if !COREFX
+using FluentMigrator.Runner.Generators.Hana;
 
 namespace FluentMigrator.Runner.Processors.Hana
 {
@@ -14,3 +15,4 @@ namespace FluentMigrator.Runner.Processors.Hana
         }
     }
 }
+#endif

@@ -43,7 +43,11 @@ namespace FluentMigrator.Runner
 
             foreach (Type type in matchedTypes)
             {
+#if COREFX
+                yield return type.GetTypeInfo().Assembly.CreateInstance(type.FullName) as IMigration;
+#else
                 yield return type.Assembly.CreateInstance(type.FullName) as IMigration;
+#endif
             }
         }
 

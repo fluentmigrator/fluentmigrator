@@ -17,6 +17,9 @@
 #endregion
 
 using System;
+#if COREFX
+using System.Reflection;
+#endif
 
 namespace FluentMigrator.Runner.Extensions
 {
@@ -29,7 +32,11 @@ namespace FluentMigrator.Runner.Extensions
 
         public static bool IsConcrete(this Type type)
         {
+#if COREFX
+            return type.GetTypeInfo().IsClass && !type.GetTypeInfo().IsAbstract;
+#else
             return type.IsClass && !type.IsAbstract;
+#endif
         }
     }
 }

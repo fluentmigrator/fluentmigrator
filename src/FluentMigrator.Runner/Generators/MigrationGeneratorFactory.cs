@@ -13,7 +13,11 @@ namespace FluentMigrator.Runner.Generators
 
         static MigrationGeneratorFactory()
         {
+#if COREFX
+            Assembly assembly = typeof(IMigrationProcessorFactory).GetTypeInfo().Assembly;
+#else
             Assembly assembly = typeof (IMigrationProcessorFactory).Assembly;
+#endif
 
             List<Type> types = assembly
                 .GetExportedTypes()
