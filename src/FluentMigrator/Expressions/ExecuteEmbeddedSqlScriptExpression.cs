@@ -1,9 +1,8 @@
+using FluentMigrator.Infrastructure;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using FluentMigrator.Infrastructure;
-using System.Reflection;
 using System.IO;
+using System.Linq;
 
 namespace FluentMigrator.Expressions
 {
@@ -43,7 +42,7 @@ namespace FluentMigrator.Expressions
                 x.Name.Split('.')
                 .Reverse()
                 .Take(sqlScriptParts.Length)
-                .SequenceEqual(sqlScriptParts, StringComparer.InvariantCultureIgnoreCase);
+                .SequenceEqual(sqlScriptParts, StringComparer.OrdinalIgnoreCase);
 
             var foundResources = resources.Where(isNameMatch).ToArray();
 

@@ -24,7 +24,7 @@ using FluentMigrator.Infrastructure.Extensions;
 
 namespace FluentMigrator.Model
 {
-    public class IndexDefinition : ICloneable, ICanBeConventional, ICanBeValidated
+    public class IndexDefinition : ICloneable<IndexDefinition>, ICanBeConventional, ICanBeValidated
     {
         public virtual string Name { get; set; }
         public virtual string SchemaName { get; set; }
@@ -64,7 +64,7 @@ namespace FluentMigrator.Model
                 include.CollectValidationErrors(errors);
         }
 
-        public object Clone()
+        public IndexDefinition Clone()
         {
             return new IndexDefinition
             {

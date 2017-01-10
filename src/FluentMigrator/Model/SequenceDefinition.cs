@@ -4,7 +4,7 @@ namespace FluentMigrator.Model
     using System.Collections.Generic;
     using Infrastructure;
 
-    public class SequenceDefinition: ICloneable, ICanBeValidated
+    public class SequenceDefinition: ICloneable<SequenceDefinition>, ICanBeValidated
     {
         public virtual string Name { get; set; }
         public virtual string SchemaName { get; set; }
@@ -20,7 +20,7 @@ namespace FluentMigrator.Model
 
         public virtual bool Cycle { get; set; }
 
-        public object Clone()
+        public SequenceDefinition Clone()
         {
             return new SequenceDefinition
                    {

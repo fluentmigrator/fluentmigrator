@@ -129,7 +129,7 @@ namespace FluentMigrator.Builders.IfDatabase
                 string currentDatabaseType = context.QuerySchema.DatabaseType;
 
                 return (from db in databaseType
-                        where currentDatabaseType.StartsWith(db, StringComparison.InvariantCultureIgnoreCase)
+                        where currentDatabaseType.StartsWith(db, StringComparison.OrdinalIgnoreCase)
                         select db).Any();
             }
 

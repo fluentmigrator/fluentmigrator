@@ -22,7 +22,7 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Model
 {
-    public class IndexIncludeDefinition : ICloneable, ICanBeValidated
+    public class IndexIncludeDefinition : ICloneable<IndexIncludeDefinition>, ICanBeValidated
     {
         public virtual string Name { get; set; }
 
@@ -32,9 +32,9 @@ namespace FluentMigrator.Model
                 errors.Add(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }
 
-        public object Clone()
+        public IndexIncludeDefinition Clone()
         {
-            return MemberwiseClone();
+            return (IndexIncludeDefinition)MemberwiseClone();
         }
     }
 }

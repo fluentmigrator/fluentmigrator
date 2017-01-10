@@ -1,5 +1,8 @@
 using System.Data;
 using FluentMigrator.Infrastructure;
+#if COREFX
+using Rule = FluentMigrator.DataRule;
+#endif
 
 namespace FluentMigrator.Builders.Create.ForeignKey
 {

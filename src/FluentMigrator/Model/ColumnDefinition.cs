@@ -23,15 +23,13 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Model
 {
-    public class ColumnDefinition : ICloneable, ICanBeConventional, ICanBeValidated, ISupportAdditionalFeatures
+    public class ColumnDefinition : ICloneable<ColumnDefinition>, ICanBeConventional, ICanBeValidated, ISupportAdditionalFeatures
     {
         public ColumnDefinition()
         {
             DefaultValue = new UndefinedDefaultValue();
         }
 
-        [CLSCompliant(false)]
-        [Obsolete("Use the AdditionalFeatures property instead")]
         public readonly Dictionary<string, object> _additionalFeatures = new Dictionary<string, object>();
 
         public virtual string Name { get; set; }
@@ -67,9 +65,9 @@ namespace FluentMigrator.Model
                 errors.Add(ErrorMessages.ColumnTypeMustBeDefined);
         }
 
-        public virtual object Clone()
+        public virtual ColumnDefinition Clone()
         {
-            return MemberwiseClone();
+            return (ColumnDefinition)MemberwiseClone();
         }
 
         public class UndefinedDefaultValue

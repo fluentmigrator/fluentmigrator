@@ -22,6 +22,9 @@ using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+#if COREFX
+using Rule = FluentMigrator.DataRule;
+#endif
 
 namespace FluentMigrator.Builders.Create.Table
 {

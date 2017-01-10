@@ -23,6 +23,8 @@ using System.Text;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 using FluentMigrator.VersionTableInfo;
+using System.Reflection;
+using System.IO;
 
 namespace FluentMigrator.Infrastructure
 {
@@ -101,7 +103,11 @@ namespace FluentMigrator.Infrastructure
         public static IMigrationInfo GetMigrationInfoFor(Type migrationType)
         {
             var migrationAttribute = migrationType.GetOneAttribute<MigrationAttribute>();
+#if COREFX
+            Func<IMigration> migrationFunc = () => (IMigration)Activator.CreateInstance(migrationType.GetTypeInfo().Assembly.GetType(migrationType.FullName));
+#else
             Func<IMigration> migrationFunc = () => (IMigration)migrationType.Assembly.CreateInstance(migrationType.FullName);
+#endif
             var migrationInfo = new MigrationInfo(migrationAttribute.Version, migrationAttribute.Description, migrationAttribute.TransactionBehavior, migrationFunc);
 
             foreach (MigrationTraitAttribute traitAttribute in migrationType.GetAllAttributes<MigrationTraitAttribute>())
@@ -112,7 +118,7 @@ namespace FluentMigrator.Infrastructure
 
         public static string GetWorkingDirectory()
         {
-            return Environment.CurrentDirectory;
+            return Directory.GetCurrentDirectory();
         }
 
         public static string GetConstraintName(ConstraintDefinition expression)

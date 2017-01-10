@@ -25,7 +25,7 @@ using FluentMigrator.Infrastructure.Extensions;
 
 namespace FluentMigrator.Model
 {
-    public class TableDefinition : ICloneable, ICanBeConventional, ICanBeValidated
+    public class TableDefinition : ICloneable<TableDefinition>, ICanBeConventional, ICanBeValidated
     {
         public TableDefinition()
         {
@@ -60,7 +60,7 @@ namespace FluentMigrator.Model
                 fk.CollectValidationErrors(errors);
         }
 
-        public object Clone()
+        public TableDefinition Clone()
         {
             return new TableDefinition
             {

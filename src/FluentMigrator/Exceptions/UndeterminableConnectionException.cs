@@ -21,7 +21,11 @@ using System.Runtime.Serialization;
 
 namespace FluentMigrator.Exceptions
 {
+#if COREFX
+    [DataContract]
+#else
     [Serializable]
+#endif
     public class UndeterminableConnectionException : FluentMigratorException
     {
         public UndeterminableConnectionException()
@@ -37,8 +41,10 @@ namespace FluentMigrator.Exceptions
         {
         }
 
+#if !COREFX
         public UndeterminableConnectionException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
+#endif
     }
 }

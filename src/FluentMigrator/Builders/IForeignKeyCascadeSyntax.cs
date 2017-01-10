@@ -1,5 +1,8 @@
 using FluentMigrator.Infrastructure;
 using System.Data;
+#if COREFX
+using Rule = FluentMigrator.DataRule;
+#endif
 
 namespace FluentMigrator.Builders
 {

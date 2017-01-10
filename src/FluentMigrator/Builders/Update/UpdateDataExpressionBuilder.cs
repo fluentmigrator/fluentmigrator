@@ -20,6 +20,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+#if COREFX
+using System.Reflection;
+#endif
 
 namespace FluentMigrator.Builders.Update
 {
@@ -60,10 +63,17 @@ namespace FluentMigrator.Builders.Update
         private static List<KeyValuePair<string, object>> GetData(object dataAsAnonymousType)
         {
             var data = new List<KeyValuePair<string, object>>();
+#if COREFX
+            var properties = dataAsAnonymousType.GetType().GetTypeInfo().DeclaredProperties;
+
+            foreach (var property in properties)
+                data.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(dataAsAnonymousType)));
+#else
             var properties = TypeDescriptor.GetProperties(dataAsAnonymousType);
 
             foreach (PropertyDescriptor property in properties)
                 data.Add(new KeyValuePair<string, object>(property.Name, property.GetValue(dataAsAnonymousType)));
+#endif
             return data;
         }
     }

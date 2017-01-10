@@ -18,6 +18,9 @@
 
 using System.Data;
 using FluentMigrator.Expressions;
+#if COREFX
+using Rule = FluentMigrator.DataRule;
+#endif
 
 namespace FluentMigrator.Builders.Create.ForeignKey
 {

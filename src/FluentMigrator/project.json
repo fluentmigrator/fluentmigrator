@@ -1,0 +1,37 @@
+﻿{
+  "version": "1.6.2-*",
+  "packOptions": {
+    "repository": {
+      "type": "git",
+      "url": "https://github.com/volkanceylan/fluentmigrator"
+    }
+  },
+  "dependencies": {
+  },
+  "frameworks": {
+    "netstandard1.6": {
+      "buildOptions": {
+        "define": [
+          "COREFX",
+          "NETSTANDARD1_6"
+        ]
+      },
+      "dependencies": {
+        "NETStandard.Library": "1.6.0",
+        "System.Data.Common": "4.3.0",
+        "System.Reflection.TypeExtensions": "4.3.0",
+        "System.Runtime.Serialization.Primitives": "4.3.0"
+      }
+    },
+    "net35": {
+      "frameworkAssemblies": {
+        "System.Data": ""
+      }
+    }
+  },
+  "buildOptions": {
+    "compile": {
+      "excludeFiles": []
+    }
+  }
+}

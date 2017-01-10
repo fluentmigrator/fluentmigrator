@@ -24,10 +24,10 @@ namespace FluentMigrator.Infrastructure.Extensions
     public static class ExtensionsForIEnumerable
     {
         public static IEnumerable<T> CloneAll<T>(this IEnumerable<T> items)
-            where T : ICloneable
+            where T : ICloneable<T>
         {
             foreach (T item in items)
-                yield return (T)item.Clone();
+                yield return item.Clone();
         }
     }
 }

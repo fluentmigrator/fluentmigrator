@@ -21,6 +21,9 @@ using System.ComponentModel;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+#if COREFX
+using System.Reflection;
+#endif
 
 namespace FluentMigrator.Builders.Insert
 {
@@ -73,12 +76,21 @@ namespace FluentMigrator.Builders.Insert
         {
             var data = new Dictionary<string, object>();
 
+#if COREFX
+            var properties = dataAsAnonymousType.GetType().GetTypeInfo().DeclaredProperties;
+
+            foreach (var property in properties) 
+            {
+                data.Add(property.Name, property.GetValue(dataAsAnonymousType));
+            }
+#else
             PropertyDescriptorCollection properties = TypeDescriptor.GetProperties(dataAsAnonymousType);
 
             foreach (PropertyDescriptor property in properties)
             {
                 data.Add(property.Name, property.GetValue(dataAsAnonymousType));
             }
+#endif
 
             return data;
         }
