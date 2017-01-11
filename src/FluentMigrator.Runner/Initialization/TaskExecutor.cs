@@ -58,7 +58,14 @@ namespace FluentMigrator.Runner.Initialization
         {
             List<Assembly> assemblies = new List<Assembly>();
 
+#if COREFX
+            if (RunnerContext.TargetAssemblies != null)
+                assemblies.AddRange(RunnerContext.TargetAssemblies);
+
+            foreach (var target in RunnerContext.Targets ?? new string[0])
+#else
             foreach (var target in RunnerContext.Targets)
+#endif
             {
                 var assembly = AssemblyLoaderFactory.GetAssemblyLoader(target).Load();
 

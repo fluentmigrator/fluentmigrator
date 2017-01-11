@@ -1,4 +1,7 @@
 using System.Collections.Generic;
+#if COREFX
+using System.Reflection;
+#endif
 
 namespace FluentMigrator.Runner.Initialization
 {
@@ -13,6 +16,9 @@ namespace FluentMigrator.Runner.Initialization
         public string Database { get; set; }
         public string Connection { get; set; }
         public string[] Targets { get; set; }
+#if COREFX
+        public Assembly[] TargetAssemblies { get; set; }
+#endif
         public bool PreviewOnly { get; set; }
         public string Namespace { get; set; }
         public bool NestedNamespaces { get; set; }

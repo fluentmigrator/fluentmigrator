@@ -17,6 +17,9 @@
 #endregion
 
 using System.Collections.Generic;
+#if COREFX
+using System.Reflection;
+#endif
 
 namespace FluentMigrator.Runner.Initialization
 {
@@ -25,6 +28,9 @@ namespace FluentMigrator.Runner.Initialization
         string Database { get; set; }
         string Connection { get; set; }
         string[] Targets { get; set; }
+#if COREFX
+        Assembly[] TargetAssemblies { get; set; }
+#endif
         bool PreviewOnly { get; set; }
         string Namespace { get; set; }
         bool NestedNamespaces { get; set; }

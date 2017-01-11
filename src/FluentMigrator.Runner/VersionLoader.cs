@@ -179,10 +179,12 @@ namespace FluentMigrator.Runner
 
             if (!AlreadyCreatedVersionTable) return;
 
-            var dataReader = Processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
-            
-            while (dataReader.Read()) {
-                _versionInfo.AddAppliedMigration(long.Parse(dataReader[VersionTableMetaData.ColumnName].ToString()));
+            using (var dataReader = Processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName))
+            {
+                while (dataReader.Read())
+                {
+                    _versionInfo.AddAppliedMigration(long.Parse(dataReader[VersionTableMetaData.ColumnName].ToString()));
+                }
             }
         }
 

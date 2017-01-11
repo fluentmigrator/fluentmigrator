@@ -1,5 +1,7 @@
 ﻿{
-  "version": "1.6.3-*",
+  "version": "1.6.901-*",
+  "authors": [ "Volkan Ceylan" ],
+  "description": "This is a temporary .NET Core port of FluentMigrator for Serenity applications. It will only be used until an official version is out.",
   "packOptions": {
     "repository": {
       "type": "git",
