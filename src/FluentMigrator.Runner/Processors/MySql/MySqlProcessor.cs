@@ -132,12 +132,9 @@ namespace FluentMigrator.Runner.Processors.MySql
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
-            {
-                command.CommandTimeout = Options.Timeout;
-
-                return command.ExecuteReader();
-            }
+            var command = Factory.CreateCommand(String.Format(template, args), Connection);
+            command.CommandTimeout = Options.Timeout;
+            return command.ExecuteReader();
         }
 
         protected override void Process(string sql)
