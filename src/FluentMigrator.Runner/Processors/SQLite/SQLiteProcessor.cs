@@ -52,7 +52,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
             var dataSet = Read("PRAGMA table_info([{0}])", tableName);
             while (dataSet.Read()) 
             {
-                if (dataSet["Name"].ToString() == columnName) {
+                if (dataSet["name"].ToString() == columnName) {
                     return true;
                 }
             }
