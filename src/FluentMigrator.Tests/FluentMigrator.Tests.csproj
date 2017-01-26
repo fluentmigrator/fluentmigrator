@@ -119,7 +119,9 @@
     <Reference Include="Oracle.DataAccess">
       <HintPath>..\..\lib\Oracle.DataAccess.dll</HintPath>
     </Reference>
-    <Reference Include="Sap.Data.Hana.v3.5, Version=1.0.102.0, Culture=neutral, PublicKeyToken=0326b8ea63db4bc4, processorArchitecture=MSIL" />
+    <Reference Include="Sap.Data.Hana.v3.5">
+      <HintPath>..\..\lib\Hana\Sap.Data.Hana.v3.5.dll</HintPath>
+    </Reference>
     <Reference Include="Shouldly">
       <HintPath>..\..\lib\Shouldly\2.5.0\Shouldly.dll</HintPath>
     </Reference>
