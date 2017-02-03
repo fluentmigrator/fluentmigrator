@@ -44,5 +44,36 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var errors = ValidationHelper.CollectErrors(expression);
             Assert.That(errors.Count, Is.EqualTo(0));
         }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
+        {
+            var expression = new AlterDefaultConstraintExpression { TableName = "test", ColumnName = "Column1", DefaultValue = SystemMethods.CurrentDateTime };
+
+            expression.ApplyConventions(new MigrationConventions());
+
+            Assert.That(expression.SchemaName, Is.Null);
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsSetThenSchemaShouldNotBeChanged()
+        {
+            var expression = new AlterDefaultConstraintExpression { SchemaName = "testschema", TableName = "test", ColumnName = "Column1", DefaultValue = SystemMethods.CurrentDateTime };
+
+            expression.ApplyConventions(new MigrationConventions());
+
+            Assert.That(expression.SchemaName, Is.EqualTo("testschema"));
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsChangedAndSchemaIsNotSetThenSetSchema()
+        {
+            var expression = new AlterDefaultConstraintExpression { TableName = "test", ColumnName = "Column1", DefaultValue = SystemMethods.CurrentDateTime };
+            var migrationConventions = new MigrationConventions { GetDefaultSchema = () => "testdefault" };
+
+            expression.ApplyConventions(migrationConventions);
+
+            Assert.That(expression.SchemaName, Is.EqualTo("testdefault"));
+        }
     }
 }

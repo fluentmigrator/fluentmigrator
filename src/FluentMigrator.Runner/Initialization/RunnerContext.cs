@@ -43,5 +43,7 @@ namespace FluentMigrator.Runner.Initialization
 
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         public object ApplicationContext { get; set; }
+
+        public string SchemaName { get; set; }
     }
 }

@@ -175,5 +175,10 @@ namespace FluentMigrator.Infrastructure
             }
             return string.Empty;
         }
+
+        public static string GetDefaultSchema()
+        {
+            return null;
+        }
     }
 }

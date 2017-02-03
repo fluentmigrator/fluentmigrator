@@ -38,5 +38,6 @@ namespace FluentMigrator
         Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags { get; set; }
         Func<Type,string,string> GetAutoScriptUpName {get;set;}
         Func<Type, string, string> GetAutoScriptDownName { get; set; }
+        Func<string> GetDefaultSchema { get; set; }
     }
 }

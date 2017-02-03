@@ -4,10 +4,16 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
-    public class DeleteSequenceExpression : MigrationExpressionBase
+    public class DeleteSequenceExpression : MigrationExpressionBase, ICanBeConventional
     {
         public virtual string SchemaName { get; set; }
         public virtual string SequenceName { get; set; }
+
+        public override void ApplyConventions(IMigrationConventions conventions)
+        {
+            if (String.IsNullOrEmpty(SchemaName))
+                SchemaName = conventions.GetDefaultSchema();
+        }
 
         public override void CollectValidationErrors(ICollection<string> errors)
         {

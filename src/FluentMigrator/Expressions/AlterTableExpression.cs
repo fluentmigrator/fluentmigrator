@@ -16,12 +16,13 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
-    public class AlterTableExpression : MigrationExpressionBase
+    public class AlterTableExpression : MigrationExpressionBase, ICanBeConventional
     {
         public virtual string SchemaName { get; set; }
         public virtual string TableName { get; set; }
@@ -29,6 +30,12 @@ namespace FluentMigrator.Expressions
 
         public AlterTableExpression()
         {
+        }
+
+        public override void ApplyConventions(IMigrationConventions conventions)
+        {
+            if (String.IsNullOrEmpty(SchemaName))
+                SchemaName = conventions.GetDefaultSchema();
         }
 
         public override void CollectValidationErrors(ICollection<string> errors)

@@ -97,5 +97,36 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var expression = new DeleteColumnExpression { TableName = "Test", ColumnNames = {"Bacon"} };
             expression.ToString().ShouldBe("DeleteColumn Test Bacon");
         }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
+        {
+            var expression = new DeleteColumnExpression { TableName = "Test", ColumnNames = { "Bacon" } };
+
+            expression.ApplyConventions(new MigrationConventions());
+
+            Assert.That(expression.SchemaName, Is.Null);
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsSetThenSchemaShouldNotBeChanged()
+        {
+            var expression = new DeleteColumnExpression { SchemaName = "testschema", TableName = "Test", ColumnNames = { "Bacon" } };
+
+            expression.ApplyConventions(new MigrationConventions());
+
+            Assert.That(expression.SchemaName, Is.EqualTo("testschema"));
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsChangedAndSchemaIsNotSetThenSetSchema()
+        {
+            var expression = new DeleteColumnExpression { TableName = "Test", ColumnNames = { "Bacon" } };
+            var migrationConventions = new MigrationConventions { GetDefaultSchema = () => "testdefault" };
+
+            expression.ApplyConventions(migrationConventions);
+
+            Assert.That(expression.SchemaName, Is.EqualTo("testdefault"));
+        }
     }
 }

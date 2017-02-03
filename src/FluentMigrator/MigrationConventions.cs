@@ -39,6 +39,7 @@ namespace FluentMigrator
         public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags { get; set; }
         public Func<Type, string, string> GetAutoScriptUpName { get; set; }
         public Func<Type, string, string> GetAutoScriptDownName { get; set; }
+        public Func<string> GetDefaultSchema { get; set; }
 
         public MigrationConventions()
         {
@@ -56,6 +57,7 @@ namespace FluentMigrator
             TypeHasMatchingTags = DefaultMigrationConventions.TypeHasMatchingTags;
             GetAutoScriptUpName = DefaultMigrationConventions.GetAutoScriptUpName;
             GetAutoScriptDownName = DefaultMigrationConventions.GetAutoScriptDownName;
-        }        
+            GetDefaultSchema = DefaultMigrationConventions.GetDefaultSchema;
+        }
     }
 }

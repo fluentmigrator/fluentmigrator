@@ -333,6 +333,7 @@
     <Compile Include="Unit\Definitions\ColumnDefinitionTests.cs" />
     <Compile Include="Unit\Definitions\ForeignKeyDefinitionTests.cs" />
     <Compile Include="Unit\Definitions\IndexColumnDefinitionTests.cs" />
+    <Compile Include="Unit\Definitions\ConstraintDefinitionTests.cs" />
     <Compile Include="Unit\Definitions\IndexDefinitionTests.cs" />
     <Compile Include="Unit\Expressions\AlterColumnExpressionTests.cs" />
     <Compile Include="Unit\Expressions\AlterDefaultConstraintExpressionTests.cs" />
@@ -347,6 +348,8 @@
     <Compile Include="Unit\Expressions\CreateTableExpressionTests.cs" />
     <Compile Include="Unit\Expressions\DeleteColumnExpressionTests.cs" />
     <Compile Include="Unit\Expressions\DeleteConstraintExpressionTests.cs" />
+    <Compile Include="Unit\Definitions\SequenceDefinitionTests.cs" />
+    <Compile Include="Unit\Definitions\TableDefinitionTests.cs" />
     <Compile Include="Unit\Expressions\DeleteDefaultConstraintExpressionTests.cs" />
     <Compile Include="Unit\Expressions\DeleteForeignKeyExpressionTests.cs" />
     <Compile Include="Unit\Expressions\DeleteIndexExpressionTests.cs" />
