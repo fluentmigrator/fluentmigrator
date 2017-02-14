@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System.Collections.Generic;
 using System.IO;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -30,7 +31,6 @@ namespace FluentMigrator.Tests.Unit.Expressions
     public class ExecuteSqlScriptExpressionTests
     {
         private string testSqlScript = "testscript.sql";
-        private string scriptContents = "TEST SCRIPT";
 
         [Test]
         public void ErrorIsReturnWhenSqlScriptIsNullOrEmpty()
@@ -43,9 +43,28 @@ namespace FluentMigrator.Tests.Unit.Expressions
         [Test]
         public void ExecutesTheStatement()
         {
+            const string scriptContents = "TEST SCRIPT";
             var expression = new ExecuteSqlScriptExpression { SqlScript = testSqlScript };
+            var processor = new Mock<IMigrationProcessor>();
+
+            processor.Setup(x => x.Execute(scriptContents)).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+        
+        [Test]
+        public void ExecutesTheStatementWithParameters()
+        {
+            const string scriptContents = "TEST SCRIPT ParameterValue $(escaped_parameter)";
+            var expression = new ExecuteSqlScriptExpression
+            {
+                SqlScript = "testscript-withparameters.sql",
+                Parameters = new Dictionary<string, string> {{"parameter", "ParameterValue"}}
+            };
 
             var processor = new Mock<IMigrationProcessor>();
+
             processor.Setup(x => x.Execute(scriptContents)).Verifiable();
 
             expression.ExecuteWith(processor.Object);
