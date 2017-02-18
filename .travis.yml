@@ -5,7 +5,7 @@ install:
   - sudo apt-get install -y mono-devel mono-gmcs nunit-console libfbembed2.5
 
 script:
-  - xbuild /p:Configuration=Debug /p:Platform=x86 "FluentMigrator (2010).sln"
+  - xbuild /p:Configuration=Debug /p:Platform=x86 "FluentMigrator.sln"
   - sudo cp /var/lib/firebird/2.5/system/default-security2.fdb /var/lib/firebird/2.5/system/security2.fdb
   - sudo chmod a+rw /var/lib/firebird/2.5/system/security2.fdb
   - dpkg -L libfbembed2.5
