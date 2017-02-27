@@ -1,0 +1,3 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<processor name="SqlServer2014" ConnectionString="server=.\MSSQLSERVER2014;uid=test;pwd=test;Trusted_Connection=yes;database=FluentMigrator">
+</processor>

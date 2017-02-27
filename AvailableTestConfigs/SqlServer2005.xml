@@ -1,0 +1,3 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<processor name="SqlServer2005" ConnectionString="server=.\SQLEXPRESS;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator">
+</processor>

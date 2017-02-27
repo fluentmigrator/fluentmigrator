@@ -1,0 +1,3 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<processor name="Firebird" ConnectionString="ServerType=1;User=SYSDBA;Password=masterkey;Database=fluent_migrator.fdb;">
+</processor>

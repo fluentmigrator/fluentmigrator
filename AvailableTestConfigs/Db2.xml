@@ -1,0 +1,3 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<processor name="Db2" ConnectionString="Database=;UserID=TEST;DataSource=;Password=Testing;DefaultCollection=TEST;DataCompression=True;ConnectTimeout=60;">
+</processor>
