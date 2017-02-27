@@ -46,7 +46,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
                 case SystemMethods.CurrentUTCDateTime:
                     return "CURRENT_TIMESTAMP";
                 case SystemMethods.CurrentDateTime:
-                    return "datetime('now','localtime')";
+                    return "(datetime('now','localtime'))";
             }
 
             return null;
