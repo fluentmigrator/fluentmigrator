@@ -14,6 +14,7 @@ namespace FluentMigrator.Tests.Integration
         public TestDriver(TestProcessorFactory testProcessorFactory, string runningDbEngine)
         {
             _testProcessorFactory = testProcessorFactory;
+            _runningDbEngine = runningDbEngine;
         }
 
         public void Run(Action<IMigrationProcessor> test, bool tryRollback, IEnumerable<Type> excludedProcessors)
