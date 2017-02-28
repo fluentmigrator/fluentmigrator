@@ -4,9 +4,9 @@ Fluent Migrator is a migration framework for .NET much like Ruby on Rails Migrat
 
 h2. Project Info
 
-* *Documentation*: "https://github.com/schambers/fluentmigrator/wiki": https://github.com/schambers/fluentmigrator/wiki
+* *Documentation*: "https://github.com/fluentmigrator/fluentmigrator/wiki":https://github.com/fluentmigrator/fluentmigrator/wiki
 * *Discussions*: "fluentmigrator-google-group@googlegroups.com":http://groups.google.com/group/fluentmigrator-google-group
-* *Bug/Feature Tracking*: "http://github.com/schambers/fluentmigrator/issues":http://github.com/schambers/fluentmigrator/issues
+* *Bug/Feature Tracking*: "http://github.com/fluentmigrator/fluentmigrator/issues":http://github.com/fluentmigrator/fluentmigrator/issues
 * *TeamCity sources*: "http://teamcity.codebetter.com/viewType.html?buildTypeId=bt82&tab=buildTypeStatusDiv":http://teamcity.codebetter.com/viewType.html?buildTypeId=bt82&tab=buildTypeStatusDiv
 ** Click the "Login as guest" link in the footer of the page.
 
@@ -43,8 +43,8 @@ h2. Powered by
 
 h2. Contributors
 
-A "long list":https://github.com/schambers/fluentmigrator/wiki/ContributorList of everyone that has contributed to FluentMigrator. Thanks for all the Pull Requests!
+A "long list":https://github.com/fluentmigrator/fluentmigrator/wiki/ContributorList of everyone that has contributed to FluentMigrator. Thanks for all the Pull Requests!
 
 h2. License
 
-"Apache 2 License":https://github.com/schambers/fluentmigrator/blob/master/LICENSE.txt
+"Apache 2 License":https://github.com/fluentmigrator/fluentmigrator/blob/master/LICENSE.txt
