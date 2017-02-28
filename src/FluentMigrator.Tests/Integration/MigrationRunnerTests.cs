@@ -820,7 +820,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanCreateSequence()
         {
-            var exclude = Procesors.All().Except(new[] { typeof(SqlServerProcessor) }).ToArray();
+            var exclude = AllProcessors().Except(new[] { typeof(SqlServerProcessor) }).ToArray();
             ExecuteWithSupportedProcessor(
                 processor =>
                 {
@@ -848,7 +848,7 @@ namespace FluentMigrator.Tests.Integration
                                     processor.SequenceExists("TestSchema", "TestSequence").ShouldBeFalse();
                                 };
 
-            var exclude = Procesors.All().Except(new[] { typeof(SqlServerProcessor), typeof(PostgresProcessor) }).ToArray();
+            var exclude = AllProcessors().Except(new[] { typeof(SqlServerProcessor), typeof(PostgresProcessor) }).ToArray();
             ExecuteWithSupportedProcessor(action, true);
         }
 
