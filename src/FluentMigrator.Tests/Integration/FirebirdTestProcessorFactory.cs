@@ -13,11 +13,11 @@ namespace FluentMigrator.Tests.Integration
 {
     public class FirebirdTestProcessorFactory : TestProcessorFactory
     {
-        private readonly string _connectionString;
+        private readonly FbConnectionStringBuilder _connectionString;
 
         public FirebirdTestProcessorFactory(string connectionString)
         {
-            _connectionString = connectionString;
+            _connectionString = new FbConnectionStringBuilder(connectionString);
         }
 
         public IMigrationProcessor MakeProcessor(IDbConnection connection, IAnnouncer announcer)
@@ -28,16 +28,16 @@ namespace FluentMigrator.Tests.Integration
 
         public IDbConnection MakeConnection()
         {
-            var connectionString = new FbConnectionStringBuilder(_connectionString);
-            if (string.IsNullOrEmpty(Path.GetDirectoryName(connectionString.Database)))
-                connectionString.Database = Path.Combine(Directory.GetCurrentDirectory(), connectionString.Database);
+            if (string.IsNullOrEmpty(Path.GetDirectoryName(_connectionString.Database)))
+                _connectionString.Database = Path.Combine(Directory.GetCurrentDirectory(), _connectionString.Database);
 
-            if (!File.Exists(connectionString.Database))
+            var usedConnectionString = _connectionString.ToString();
+            if (!File.Exists(_connectionString.Database))
             {
-                FbConnection.CreateDatabase(_connectionString);
+                FbConnection.CreateDatabase(usedConnectionString);
             }
 
-            return new FbConnection(_connectionString);
+            return new FbConnection(usedConnectionString);
         }
 
         public bool ProcessorTypeWithin(IEnumerable<Type> candidates)
@@ -47,7 +47,7 @@ namespace FluentMigrator.Tests.Integration
 
         public void Done()
         {
-            FbConnection.DropDatabase(_connectionString);
+            FbConnection.DropDatabase(_connectionString.ToString());
         }
     }
 }
