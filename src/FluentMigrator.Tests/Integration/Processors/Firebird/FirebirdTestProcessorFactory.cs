@@ -9,7 +9,7 @@ using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 
-namespace FluentMigrator.Tests.Integration
+namespace FluentMigrator.Tests.Integration.Firebird
 {
     public class FirebirdTestProcessorFactory : TestProcessorFactory
     {

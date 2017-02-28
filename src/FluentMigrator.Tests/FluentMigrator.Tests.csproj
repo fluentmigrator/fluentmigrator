@@ -183,7 +183,7 @@
     <Compile Include="Helpers\SqlServerTestTable.cs" />
     <Compile Include="Helpers\ValidationHelper.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
-    <Compile Include="Integration\FirebirdTestProcessorFactory.cs" />
+    <Compile Include="Integration\Processors\Firebird\FirebirdTestProcessorFactory.cs" />
     <Compile Include="Integration\IntegrationTestBase.cs" />
     <Compile Include="Integration\ITestProcessorFactory.cs" />
     <Compile Include="Integration\MigrationRunnerTests.cs" />

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
+using FluentMigrator.Tests.Integration.Firebird;
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration
