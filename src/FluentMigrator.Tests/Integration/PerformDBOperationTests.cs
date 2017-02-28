@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Integration
             };
 
             var exclude = Procesors.All().Except(new[] { typeof(SqlServerProcessor) }).ToArray();
-            ExecuteWithSupportedProcessors(processor => processor.Process(expression), true, exclude);
+            ExecuteWithSupportedProcessor(processor => processor.Process(expression), true, exclude);
         }
     }
 }

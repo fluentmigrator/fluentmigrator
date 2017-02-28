@@ -38,7 +38,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanUseVersionInfo()
         {
-            ExecuteWithSupportedProcessors(processor =>
+            ExecuteWithSupportedProcessor(processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3" }, processor);
 
@@ -59,7 +59,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanUseCustomVersionInfo()
         {
-            ExecuteWithSupportedProcessors(processor =>
+            ExecuteWithSupportedProcessor(processor =>
             {
                 var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3" }, processor);
 
@@ -91,7 +91,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanUseCustomVersionInfoDefaultSchema()
         {
-            ExecuteWithSupportedProcessors(processor =>
+            ExecuteWithSupportedProcessor(processor =>
             {
                 var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3" }, processor);
 

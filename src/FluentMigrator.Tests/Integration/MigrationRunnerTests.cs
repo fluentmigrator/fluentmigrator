@@ -56,15 +56,15 @@ namespace FluentMigrator.Tests.Integration
         public void SetUp()
         {
             _runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
-                                        {
-                                            Namespace = "FluentMigrator.Tests.Integration.Migrations"
-                                        };
+            {
+                Namespace = "FluentMigrator.Tests.Integration.Migrations"
+            };
         }
 
         [Test]
         public void CanRunMigration()
         {
-            ExecuteWithSupportedProcessors(processor =>
+            ExecuteWithSupportedProcessor(processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
@@ -104,7 +104,7 @@ namespace FluentMigrator.Tests.Integration
             }
             finally
             {
-                ExecuteWithSupportedProcessors(processor =>
+                ExecuteWithSupportedProcessor(processor =>
                 {
                     MigrationRunner testRunner = SetupMigrationRunner(processor);
                     testRunner.RollbackToVersion(0);
@@ -115,7 +115,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanApplyForeignKeyConvention()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -131,7 +131,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanApplyForeignKeyConventionWithSchema()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -140,13 +140,13 @@ namespace FluentMigrator.Tests.Integration
 
                     processor.ConstraintExists("TestSchema", "Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeTrue();
                     runner.Down(new TestForeignKeyNamingConventionWithSchema());
-                }, false, new []{typeof(SQLiteProcessor), typeof(FirebirdProcessor)});
+                }, false, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
         }
 
         [Test]
         public void CanApplyIndexConvention()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -164,7 +164,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanApplyIndexConventionWithSchema()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -182,7 +182,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanCreateAndDropIndex()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -206,7 +206,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanCreateAndDropIndexWithSchema()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -233,7 +233,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanRenameTable()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -260,7 +260,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanRenameTableWithSchema()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -290,7 +290,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanRenameColumn()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -314,7 +314,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanRenameColumnWithSchema()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -342,7 +342,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanLoadMigrations()
         {
-            ExecuteWithSupportedProcessors(processor =>
+            ExecuteWithSupportedProcessor(processor =>
             {
                 var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
                 {
@@ -360,7 +360,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanLoadVersion()
         {
-            ExecuteWithSupportedProcessors(processor =>
+            ExecuteWithSupportedProcessor(processor =>
             {
                 var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
                 {
@@ -377,7 +377,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanRunMigrations()
         {
-            ExecuteWithSupportedProcessors(processor =>
+            ExecuteWithSupportedProcessor(processor =>
             {
                 MigrationRunner runner = SetupMigrationRunner(processor);
 
@@ -397,7 +397,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanMigrateASpecificVersion()
         {
-            ExecuteWithSupportedProcessors(processor =>
+            ExecuteWithSupportedProcessor(processor =>
             {
                 MigrationRunner runner = SetupMigrationRunner(processor);
                 try
@@ -419,7 +419,7 @@ namespace FluentMigrator.Tests.Integration
         {
             try
             {
-                ExecuteWithSupportedProcessors(processor =>
+                ExecuteWithSupportedProcessor(processor =>
                 {
                     MigrationRunner runner = SetupMigrationRunner(processor);
 
@@ -436,7 +436,7 @@ namespace FluentMigrator.Tests.Integration
             }
             finally
             {
-                ExecuteWithSupportedProcessors(processor =>
+                ExecuteWithSupportedProcessor(processor =>
                 {
                     MigrationRunner testRunner = SetupMigrationRunner(processor);
                     testRunner.RollbackToVersion(0, false);
@@ -447,7 +447,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void RollbackAllShouldRemoveVersionInfoTable()
         {
-            ExecuteWithSupportedProcessors(processor =>
+            ExecuteWithSupportedProcessor(processor =>
             {
                 MigrationRunner runner = SetupMigrationRunner(processor);
 
@@ -456,7 +456,7 @@ namespace FluentMigrator.Tests.Integration
                 processor.TableExists(runner.VersionLoader.VersionTableMetaData.SchemaName, runner.VersionLoader.VersionTableMetaData.TableName).ShouldBeTrue();
             });
 
-            ExecuteWithSupportedProcessors(processor =>
+            ExecuteWithSupportedProcessor(processor =>
             {
                 MigrationRunner runner = SetupMigrationRunner(processor);
                 runner.RollbackToVersion(0);
@@ -493,7 +493,7 @@ namespace FluentMigrator.Tests.Integration
         {
             if (!IntegrationTestOptions.SqlServer2008.IsEnabled)
 
-				return;
+                return;
 
             var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
             var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
@@ -515,7 +515,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void MigrateUpWithTaggedMigrationsShouldOnlyApplyMatchedMigrations()
         {
-            ExecuteWithSupportedProcessors(processor =>
+            ExecuteWithSupportedProcessor(processor =>
             {
                 var assembly = typeof(TenantATable).Assembly;
 
@@ -546,7 +546,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void MigrateUpWithTaggedMigrationsAndUsingMultipleTagsShouldOnlyApplyMatchedMigrations()
         {
-            ExecuteWithSupportedProcessors(processor =>
+            ExecuteWithSupportedProcessor(processor =>
             {
                 var assembly = typeof(TenantATable).Assembly;
 
@@ -557,7 +557,7 @@ namespace FluentMigrator.Tests.Integration
                 };
 
                 var runner = new MigrationRunner(assembly, runnerContext, processor);
-                
+
                 try
                 {
                     runner.MigrateUp(false);
@@ -577,7 +577,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void MigrateUpWithDifferentTaggedShouldIgnoreConcreteOfTagged()
         {
-            ExecuteWithSupportedProcessors(processor =>
+            ExecuteWithSupportedProcessor(processor =>
             {
                 var assembly = typeof(TenantATable).Assembly;
 
@@ -616,12 +616,12 @@ namespace FluentMigrator.Tests.Integration
             };
 
             // Excluded SqliteProcessor as it errors on DB cleanup (RollbackToVersion).
-            ExecuteWithSupportedProcessors(processor =>
+            ExecuteWithSupportedProcessor(processor =>
             {
                 try
                 {
                     runnerContext.Tags = new[] { "TenantA" };
-                    
+
                     new MigrationRunner(assembly, runnerContext, processor).MigrateUp(false);
 
                     processor.TableExists(null, "TenantATable").ShouldBeTrue();
@@ -657,7 +657,7 @@ namespace FluentMigrator.Tests.Integration
             var processorOptions = new ProcessorOptions { PreviewOnly = true };
 
             var outputSql = new StringWriter();
-            var announcer = new TextWriterAnnouncer(outputSql){ ShowSql = true };
+            var announcer = new TextWriterAnnouncer(outputSql) { ShowSql = true };
 
             var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), announcer, processorOptions, new SqlServerDbFactory());
 
@@ -669,7 +669,7 @@ namespace FluentMigrator.Tests.Integration
                     Namespace = "FluentMigrator.Tests.Integration.Migrations",
                     PreviewOnly = true
                 };
-                
+
                 var runner = new MigrationRunner(asm, runnerContext, processor);
                 runner.MigrateUp(1, false);
 
@@ -691,7 +691,7 @@ namespace FluentMigrator.Tests.Integration
                 createTableMatches.ShouldBe(1);
                 alterTableMatches.ShouldBe(1);
                 createIndexMatches.ShouldBe(1);
-                
+
             }
             finally
             {
@@ -702,7 +702,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void MigrateUpWithTaggedMigrationsShouldNotApplyAnyMigrationsIfNoTagsParameterIsPassedIntoTheRunner()
         {
-            ExecuteWithSupportedProcessors(processor =>
+            ExecuteWithSupportedProcessor(processor =>
             {
                 var assembly = typeof(TenantATable).Assembly;
 
@@ -737,20 +737,20 @@ namespace FluentMigrator.Tests.Integration
             var excludedProcessors = new[] { typeof(SQLiteProcessor), typeof(MySqlProcessor), typeof(PostgresProcessor) };
 
             var assembly = typeof(User).Assembly;
-            
+
             var runnerContext1 = new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = typeof(Migrations.Interleaved.Pass2.User).Namespace };
             var runnerContext2 = new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = typeof(Migrations.Interleaved.Pass3.User).Namespace };
 
             try
             {
-                ExecuteWithSupportedProcessors(processor =>
+                ExecuteWithSupportedProcessor(processor =>
                 {
                     var migrationRunner = new MigrationRunner(assembly, runnerContext1, processor);
 
                     migrationRunner.MigrateUp(3);
                 }, false, excludedProcessors);
 
-                ExecuteWithSupportedProcessors(processor =>
+                ExecuteWithSupportedProcessor(processor =>
                 {
                     var migrationRunner = new MigrationRunner(assembly, runnerContext2, processor);
 
@@ -759,7 +759,7 @@ namespace FluentMigrator.Tests.Integration
             }
             finally
             {
-                ExecuteWithSupportedProcessors(processor =>
+                ExecuteWithSupportedProcessor(processor =>
                 {
                     var migrationRunner = new MigrationRunner(assembly, runnerContext2, processor);
                     migrationRunner.RollbackToVersion(0);
@@ -783,13 +783,13 @@ namespace FluentMigrator.Tests.Integration
 
             try
             {
-                ExecuteWithSupportedProcessors(processor =>
+                ExecuteWithSupportedProcessor(processor =>
                 {
                     var migrationRunner = new MigrationRunner(assembly, runnerContext1, processor);
                     migrationRunner.MigrateUp();
                 }, false, excludedProcessors);
 
-                ExecuteWithSupportedProcessors(processor =>
+                ExecuteWithSupportedProcessor(processor =>
                 {
                     var migrationRunner = new MigrationRunner(assembly, runnerContext2, processor);
                     migrationRunner.ValidateVersionOrder();
@@ -801,7 +801,7 @@ namespace FluentMigrator.Tests.Integration
             }
             finally
             {
-                ExecuteWithSupportedProcessors(processor =>
+                ExecuteWithSupportedProcessor(processor =>
                 {
                     var migrationRunner = new MigrationRunner(assembly, runnerContext2, processor);
                     migrationRunner.RollbackToVersion(0);
@@ -820,7 +820,8 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanCreateSequence()
         {
-            ExecuteWithSqlServer2012(
+            var exclude = Procesors.All().Except(new[] { typeof(SqlServerProcessor) }).ToArray();
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -830,7 +831,7 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateSequence());
                     processor.SequenceExists(null, "TestSequence").ShouldBeFalse();
-                }, true);
+                }, true, exclude);
         }
 
         [Test]
@@ -847,16 +848,14 @@ namespace FluentMigrator.Tests.Integration
                                     processor.SequenceExists("TestSchema", "TestSequence").ShouldBeFalse();
                                 };
 
-            ExecuteWithSqlServer2012(
-                action,true);
-
-            ExecuteWithPostgres(action, IntegrationTestOptions.Postgres, true);
+            var exclude = Procesors.All().Except(new[] { typeof(SqlServerProcessor), typeof(PostgresProcessor) }).ToArray();
+            ExecuteWithSupportedProcessor(action, true);
         }
 
         [Test]
         public void CanAlterColumnWithSchema()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -883,7 +882,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanAlterTableWithSchema()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -908,7 +907,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanAlterTablesSchema()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -933,7 +932,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanCreateUniqueConstraint()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -955,7 +954,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanCreateUniqueConstraintWithSchema()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -980,7 +979,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanInsertData()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -998,7 +997,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanInsertDataWithSchema()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -1019,7 +1018,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanUpdateData()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -1047,7 +1046,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanDeleteData()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -1071,7 +1070,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanDeleteDataWithSchema()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -1098,7 +1097,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanReverseCreateIndex()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -1122,7 +1121,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanReverseCreateUniqueConstraint()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -1143,7 +1142,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanReverseCreateUniqueConstraintWithSchema()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -1168,7 +1167,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanExecuteSql()
         {
-            ExecuteWithSupportedProcessors(
+            ExecuteWithSupportedProcessor(
                 processor =>
                 {
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
@@ -1494,7 +1493,7 @@ namespace FluentMigrator.Tests.Integration
         }
     }
 
-    internal class TestAlterColumnWithSchema: Migration
+    internal class TestAlterColumnWithSchema : Migration
     {
         public override void Up()
         {
@@ -1587,11 +1586,11 @@ namespace FluentMigrator.Tests.Integration
         }
     }
 
-    internal class TestDeleteDataWithSchema :Migration
+    internal class TestDeleteDataWithSchema : Migration
     {
         public override void Up()
         {
-            Delete.FromTable("TestTable").InSchema("TestSchema").Row(new { Name = "Test"});
+            Delete.FromTable("TestTable").InSchema("TestSchema").Row(new { Name = "Test" });
         }
 
         public override void Down()
