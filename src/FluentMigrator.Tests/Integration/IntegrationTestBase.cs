@@ -39,7 +39,9 @@ namespace FluentMigrator.Tests.Integration
 {
     public class IntegrationTestBase
     {
-        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test)
+		private const string TestConfigFileName = "TestConfig";
+
+		public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test)
         {
             ExecuteWithSupportedProcessors(test, true);
         }
@@ -49,27 +51,34 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithSupportedProcessors(test, tryRollback, new Type[] { });
         }
 
-        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback, params Type[] exceptProcessors)
+        public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback, params Type[] excludedProcessors)
         {
-            if (exceptProcessors.Count(t => typeof(SqlServerProcessor).IsAssignableFrom(t)) == 0)
-            {
-                ExecuteWithSqlServer2005(test, tryRollback);
-                ExecuteWithSqlServer2008(test, tryRollback);
-                ExecuteWithSqlServer2012(test, tryRollback);
-                ExecuteWithSqlServer2014(test, tryRollback);
-            }
-            
-            if (exceptProcessors.Count(t => typeof(SQLiteProcessor).IsAssignableFrom(t)) == 0)
-                ExecuteWithSqlite(test, IntegrationTestOptions.SqlLite);
+			var testConfiguration = new TestConfiguration(TestConfigFileName);
+			testConfiguration.Configure();
+			var requestedProcessor = testConfiguration.GetProcessor();
+			//var testDriver = new TestDriver();
+			//testDriver.Run(test, tryRollback, excludedProcessors);
 
-            if (exceptProcessors.Count(t => typeof(MySqlProcessor).IsAssignableFrom(t)) == 0)
-                ExecuteWithMySql(test, IntegrationTestOptions.MySql);
 
-            if (exceptProcessors.Count(t => typeof(PostgresProcessor).IsAssignableFrom(t)) == 0)
-                ExecuteWithPostgres(test, IntegrationTestOptions.Postgres, tryRollback);
+            //if (excludedProcessors.Count(t => typeof(SqlServerProcessor).IsAssignableFrom(t)) == 0)
+            //{
+            //    ExecuteWithSqlServer2005(test, tryRollback);
+            //    ExecuteWithSqlServer2008(test, tryRollback);
+            //    ExecuteWithSqlServer2012(test, tryRollback);
+            //    ExecuteWithSqlServer2014(test, tryRollback);
+            //}
+            //
+            //if (excludedProcessors.Count(t => typeof(SQLiteProcessor).IsAssignableFrom(t)) == 0)
+            //    ExecuteWithSqlite(test, IntegrationTestOptions.SqlLite);
 
-            if (exceptProcessors.Count(t => typeof(FirebirdProcessor).IsAssignableFrom(t)) == 0)
-                ExecuteWithFirebird(test, IntegrationTestOptions.Firebird);
+            //if (excludedProcessors.Count(t => typeof(MySqlProcessor).IsAssignableFrom(t)) == 0)
+            //    ExecuteWithMySql(test, IntegrationTestOptions.MySql);
+
+            //if (excludedProcessors.Count(t => typeof(PostgresProcessor).IsAssignableFrom(t)) == 0)
+            //    ExecuteWithPostgres(test, IntegrationTestOptions.Postgres, tryRollback);
+
+            //if (excludedProcessors.Count(t => typeof(FirebirdProcessor).IsAssignableFrom(t)) == 0)
+            //    ExecuteWithFirebird(test, IntegrationTestOptions.Firebird);
         }
 
         protected static void ExecuteWithSqlServer2014(Action<IMigrationProcessor> test, bool tryRollback)

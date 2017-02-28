@@ -492,7 +492,8 @@ namespace FluentMigrator.Tests.Integration
         public void MigrateUpSpecificVersionWithSqlServerProcessorShouldCommitItsTransaction()
         {
             if (!IntegrationTestOptions.SqlServer2008.IsEnabled)
-                return;
+
+				return;
 
             var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
             var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());

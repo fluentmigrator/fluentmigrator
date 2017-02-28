@@ -292,6 +292,7 @@
     <Compile Include="Integration\Processors\SqlServer\SqlServerTableTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaDumpTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaTestWriter.cs" />
+    <Compile Include="Integration\TestConfiguration.cs" />
     <Compile Include="Integration\VersionMigrationTests.cs" />
     <Compile Include="MigrationValidatorTests.cs" />
     <Compile Include="NUnitShouldShouldlyBridgeExtensions.cs" />
