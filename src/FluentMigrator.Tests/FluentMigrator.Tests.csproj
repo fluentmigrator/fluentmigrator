@@ -183,7 +183,9 @@
     <Compile Include="Helpers\SqlServerTestTable.cs" />
     <Compile Include="Helpers\ValidationHelper.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
+    <Compile Include="Integration\FirebirdTestProcessorFactory.cs" />
     <Compile Include="Integration\IntegrationTestBase.cs" />
+    <Compile Include="Integration\ITestProcessorFactory.cs" />
     <Compile Include="Integration\MigrationRunnerTests.cs" />
     <Compile Include="Integration\Migrations\Interleaved\Pass1\3_UserRoles.cs" />
     <Compile Include="Integration\Migrations\Interleaved\Pass2\1_User.cs" />
@@ -293,6 +295,7 @@
     <Compile Include="Integration\SchemaDump\SchemaDumpTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaTestWriter.cs" />
     <Compile Include="Integration\TestConfiguration.cs" />
+    <Compile Include="Integration\TestDriver.cs" />
     <Compile Include="Integration\VersionMigrationTests.cs" />
     <Compile Include="MigrationValidatorTests.cs" />
     <Compile Include="NUnitShouldShouldlyBridgeExtensions.cs" />

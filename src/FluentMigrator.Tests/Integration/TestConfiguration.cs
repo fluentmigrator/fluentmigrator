@@ -1,46 +1,68 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Xml.Linq;
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration
 {
-	public class TestConfiguration
-	{
-		private const string CurrentTestConfiguration = "CurrentTestConfig";
-		private string _testConfigFileName;
+    public class TestConfiguration
+    {
+        private const string CurrentTestConfiguration = "CurrentTestConfig";
+        private string _connectionString;
+        private readonly IDictionary<string, Func<string, TestProcessorFactory>> _factoryMap = new Dictionary<string, Func<string, TestProcessorFactory>>
+        {
+            { "Firebird", connectionString => new FirebirdTestProcessorFactory(connectionString) }
+        };
 
-		public TestConfiguration(string testConfigFileName)
-		{
-			_testConfigFileName = testConfigFileName;
-		}
+        private string _testConfigFileName;
 
-		public void Configure()
-		{
-			var configFile = FindConfigFile();
-			if (configFile == null)
-				Assert.Fail("Test configuration was not found. Please ensure that the file 'TestConfig.xml' ist present under a folder named 'CurrentTestConfig' in the root directory of the repo.");
-		}
+        public TestConfiguration(string testConfigFileName)
+        {
+            _testConfigFileName = testConfigFileName;
+        }
 
-		public object GetProcessor()
-		{
-			return null;
-		}
+        public void Configure()
+        {
+            var configFile = FindConfigFile();
+            if (configFile == null)
+                Assert.Fail("Test configuration was not found. Please ensure that the file '{0}' ist present under a folder named '{1}' in the root directory of the repo.", _testConfigFileName, CurrentTestConfiguration);
 
-		private string FindConfigFile()
-		{
-			var baseDir = AppDomain.CurrentDomain.BaseDirectory;
-			var relativeSearchPath = AppDomain.CurrentDomain.RelativeSearchPath;
-			var folder = relativeSearchPath == null ? baseDir : Path.Combine(baseDir, relativeSearchPath);
+            LoadConfigFile(configFile);
+        }
 
-			while (folder != null)
-			{
-				string current = Path.Combine(Path.Combine(folder, CurrentTestConfiguration), _testConfigFileName);
-				if (File.Exists(current))
-					return current;
-				folder = Path.GetDirectoryName(folder);
-			}
+        public TestProcessorFactory GetProcessorFactory()
+        {
+            return _factoryMap[RequestedDbEngine](_connectionString);
+        }
 
-			return null;
-		}
-	}
+        private string FindConfigFile()
+        {
+            var baseDir = AppDomain.CurrentDomain.BaseDirectory;
+            var relativeSearchPath = AppDomain.CurrentDomain.RelativeSearchPath;
+            var folder = relativeSearchPath == null ? baseDir : Path.Combine(baseDir, relativeSearchPath);
+
+            while (folder != null)
+            {
+                string current = Path.Combine(Path.Combine(folder, CurrentTestConfiguration), _testConfigFileName);
+                if (File.Exists(current))
+                    return current;
+                folder = Path.GetDirectoryName(folder);
+            }
+
+            return null;
+        }
+        public string RequestedDbEngine { get; private set; }
+
+        private void LoadConfigFile(string configFile)
+        {
+            var doc = XDocument.Load(configFile);
+            RequestedDbEngine = doc.Root.Attribute("name").Value;
+            _connectionString = doc.Root.Attribute("ConnectionString").Value;
+        }
+
+        private void CreateRequestedProcessor()
+        {
+        }
+    }
 }

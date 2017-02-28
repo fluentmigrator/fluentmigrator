@@ -39,7 +39,7 @@ namespace FluentMigrator.Tests.Integration
 {
     public class IntegrationTestBase
     {
-		private const string TestConfigFileName = "TestConfig";
+		private const string TestConfigFileName = "TestConfig.xml";
 
 		public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test)
         {
@@ -55,9 +55,8 @@ namespace FluentMigrator.Tests.Integration
         {
 			var testConfiguration = new TestConfiguration(TestConfigFileName);
 			testConfiguration.Configure();
-			var requestedProcessor = testConfiguration.GetProcessor();
-			//var testDriver = new TestDriver();
-			//testDriver.Run(test, tryRollback, excludedProcessors);
+			var testDriver = new TestDriver(testConfiguration.GetProcessorFactory(), testConfiguration.RequestedDbEngine);
+			testDriver.Run(test, tryRollback, excludedProcessors);
 
 
             //if (excludedProcessors.Count(t => typeof(SqlServerProcessor).IsAssignableFrom(t)) == 0)
