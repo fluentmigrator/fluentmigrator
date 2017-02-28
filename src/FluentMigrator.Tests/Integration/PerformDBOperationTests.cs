@@ -1,5 +1,7 @@
-using NUnit.Framework;
+using System.Linq;
 using FluentMigrator.Builders.Execute;
+using FluentMigrator.Runner.Processors.SqlServer;
+using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration
 {
@@ -28,14 +30,11 @@ namespace FluentMigrator.Tests.Integration
                     command2.CommandText = "DROP TABLE dbo.TestTable";
 
                     command2.ExecuteNonQuery();
-
-
                 }
             };
 
-            ExecuteWithSqlServer2008(processor => processor.Process(expression), true);
-            ExecuteWithSqlServer2012(processor => processor.Process(expression), true);
-            ExecuteWithSqlServer2014(processor => processor.Process(expression), true);
+            var exclude = Procesors.All().Except(new[] { typeof(SqlServerProcessor) }).ToArray();
+            ExecuteWithSupportedProcessors(processor => processor.Process(expression), true, exclude);
         }
     }
 }
