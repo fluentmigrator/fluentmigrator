@@ -72,9 +72,6 @@ namespace FluentMigrator.Tests.Integration
 
                     processor.TableExists(null, "TestTable").ShouldBeTrue();
 
-                    // This is a hack until MigrationVersionRunner and MigrationRunner are refactored and merged together
-                    //processor.CommitTransaction();
-
                     runner.Down(new TestCreateAndDropTableMigration());
                     processor.TableExists(null, "TestTable").ShouldBeFalse();
                 });
@@ -198,8 +195,6 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateAndDropTableMigration());
                     processor.IndexExists(null, "TestTable", "IX_TestTable_Name").ShouldBeFalse();
-
-                    //processor.CommitTransaction();
                 });
         }
 
@@ -226,7 +221,6 @@ namespace FluentMigrator.Tests.Integration
                     processor.IndexExists("TestSchema", "TestTable", "IX_TestTable_Name").ShouldBeFalse();
 
                     runner.Down(new TestCreateSchema());
-                    //processor.CommitTransaction();
                 }, false, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
         }
 
@@ -251,8 +245,6 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateAndDropTableMigration());
                     processor.TableExists(null, "TestTable2").ShouldBeFalse();
-
-                    //processor.CommitTransaction();
                 });
         }
 
@@ -282,8 +274,6 @@ namespace FluentMigrator.Tests.Integration
                     processor.TableExists("TestSchema", "TestTable2").ShouldBeFalse();
 
                     runner.Down(new TestCreateSchema());
-
-                    //processor.CommitTransaction();
                 });
         }
 
@@ -351,8 +341,6 @@ namespace FluentMigrator.Tests.Integration
 
                 var runner = new MigrationRunner(typeof(MigrationRunnerTests).Assembly, runnerContext, processor);
 
-                //runner.Processor.CommitTransaction();
-
                 runner.MigrationLoader.LoadMigrations().ShouldNotBeNull();
             });
         }
@@ -369,7 +357,6 @@ namespace FluentMigrator.Tests.Integration
 
                 var runner = new MigrationRunner(typeof(TestMigration).Assembly, runnerContext, processor);
 
-                //runner.Processor.CommitTransaction();
                 runner.VersionLoader.VersionInfo.ShouldNotBeNull();
             });
         }
@@ -820,7 +807,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanCreateSequence()
         {
-            var exclude = AllProcessors().Except(new[] { typeof(SqlServerProcessor) }).ToArray();
+            var exclude = AllProcessors().Except(new[] { typeof(SqlServerProcessor), typeof(FirebirdProcessor) }).ToArray();
             ExecuteWithSupportedProcessor(
                 processor =>
                 {
@@ -849,7 +836,7 @@ namespace FluentMigrator.Tests.Integration
                                 };
 
             var exclude = AllProcessors().Except(new[] { typeof(SqlServerProcessor), typeof(PostgresProcessor) }).ToArray();
-            ExecuteWithSupportedProcessor(action, true);
+            ExecuteWithSupportedProcessor(action, true, exclude);
         }
 
         [Test]
