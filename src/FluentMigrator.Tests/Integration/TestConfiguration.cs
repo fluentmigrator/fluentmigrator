@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
-using FluentMigrator.Tests.Integration.Firebird;
+using FluentMigrator.Tests.Integration.Processors.Firebird;
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration
@@ -60,10 +60,6 @@ namespace FluentMigrator.Tests.Integration
             var doc = XDocument.Load(configFile);
             RequestedDbEngine = doc.Root.Attribute("name").Value;
             _connectionString = doc.Root.Attribute("ConnectionString").Value;
-        }
-
-        private void CreateRequestedProcessor()
-        {
         }
     }
 }

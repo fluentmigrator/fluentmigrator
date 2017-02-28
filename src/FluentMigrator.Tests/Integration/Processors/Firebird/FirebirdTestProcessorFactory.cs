@@ -9,7 +9,7 @@ using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 
-namespace FluentMigrator.Tests.Integration.Firebird
+namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
     public class FirebirdTestProcessorFactory : TestProcessorFactory
     {
@@ -32,10 +32,7 @@ namespace FluentMigrator.Tests.Integration.Firebird
                 _connectionString.Database = Path.Combine(Directory.GetCurrentDirectory(), _connectionString.Database);
 
             var usedConnectionString = _connectionString.ToString();
-            if (!File.Exists(_connectionString.Database))
-            {
-                FbConnection.CreateDatabase(usedConnectionString);
-            }
+            FbDatabase.CreateDatabase(usedConnectionString);
 
             return new FbConnection(usedConnectionString);
         }
@@ -47,7 +44,7 @@ namespace FluentMigrator.Tests.Integration.Firebird
 
         public void Done()
         {
-            FbConnection.DropDatabase(_connectionString.ToString());
+            FbDatabase.DropDatabase(_connectionString.ToString());
         }
     }
 }
