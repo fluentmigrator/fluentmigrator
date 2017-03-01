@@ -1,22 +1,20 @@
 ﻿using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Jet;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Jet
 {
-    [TestFixture]
     public class JetGeneratorTests
     {
         protected JetGenerator Generator;
 
-        [SetUp]
-        public void Setup()
+        public JetGeneratorTests()
         {
             Generator = new JetGenerator();
         }
 
-        [Test]
+        [Fact]
         public void CanAlterSchemaInStrictMode()
         {
             Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
@@ -24,7 +22,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
 
-        [Test]
+        [Fact]
         public void CanCreateSchemaInStrictMode()
         {
             Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
@@ -32,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
 
-        [Test]
+        [Fact]
         public void CanDropSchemaInStrictMode()
         {
             Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
@@ -40,7 +38,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new DeleteSchemaExpression()));
         }
 
-        [Test]
+        [Fact]
         public void CanRenameColumnInStrictMode()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
@@ -49,7 +47,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
-        [Test]
+        [Fact]
         public void CanRenameTableInStrictMode()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();

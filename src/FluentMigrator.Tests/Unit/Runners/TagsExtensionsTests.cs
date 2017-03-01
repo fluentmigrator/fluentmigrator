@@ -1,13 +1,12 @@
 ﻿using System.Collections.Generic;
 using FluentMigrator.Runner.Extensions;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Runners
 {
-    [TestFixture]
     public class TagsExtensionsTests
     {
-        [Test]
+        [Fact]
         public void ToTags_WithOneTag_ShouldReturnListWithOneTag()
         {
             List<string> tags = "Test".ToTags();
@@ -15,7 +14,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             Assert.That(tags[0], Is.EqualTo("Test"));
         }
 
-        [Test]
+        [Fact]
         public void ToTags_WithNullString_ShouldReturnEmptyList()
         {
             string nullString = null;
@@ -24,7 +23,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             Assert.That(tags, Is.Not.Null);
         }
 
-        [Test]
+        [Fact]
         public void ToTags_WithThreeTags_ShouldReturnListWithThreeTags()
         {
             List<string> tags = "Dev,Test,Prod".ToTags();

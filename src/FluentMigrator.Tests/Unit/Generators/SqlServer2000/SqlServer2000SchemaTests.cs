@@ -1,21 +1,18 @@
-﻿using FluentMigrator.Runner.Generators.SqlServer;
-using NUnit.Framework;
-using NUnit.Should;
+using FluentMigrator.Runner.Generators.SqlServer;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
 {
-    [TestFixture]
     public class SqlServer2000SchemaTests : BaseSchemaTests
     {
         protected SqlServer2000Generator Generator;
 
-        [SetUp]
-        public void Setup()
+        public SqlServer2000SchemaTests()
         {
             Generator = new SqlServer2000Generator();
         }
 
-        [Test]
+        [Fact]
         public override void CanAlterSchema()
         {
             var expression = GeneratorTestHelper.GetAlterSchemaExpression();
@@ -24,7 +21,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe(string.Empty);
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSchemaExpression();
@@ -33,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             result.ShouldBe(string.Empty);
         }
 
-        [Test]
+        [Fact]
         public override void CanDropSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSchemaExpression();
@@ -43,3 +40,4 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
         }
     }
 }
+

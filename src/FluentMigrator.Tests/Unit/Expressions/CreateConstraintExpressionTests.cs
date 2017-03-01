@@ -3,15 +3,13 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
-    [TestFixture]
     public class CreateConstraintExpressionTests
     {
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenTableNameIsEmptyString()
         {
             var expression = new CreateConstraintExpression(ConstraintType.Unique)
@@ -27,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenHasNoColumns()
         {
             var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey)
@@ -42,7 +40,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.ConstraintMustHaveAtLeastOneColumn);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenTableNameIsSetAndHasAtLeastOneColumn()
         {
             var expression = new CreateConstraintExpression(ConstraintType.Unique)

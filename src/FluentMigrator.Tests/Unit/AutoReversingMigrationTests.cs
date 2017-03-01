@@ -1,4 +1,4 @@
-using NUnit.Framework;
+using Xunit;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Tests.Unit
@@ -8,19 +8,17 @@ namespace FluentMigrator.Tests.Unit
     using FluentMigrator.Expressions;
     using Moq;
 
-    [TestFixture]
     public class AutoReversingMigrationTests
     {
         private Mock<IMigrationContext> context;
 
-        [SetUp]
-        public void SetUp()
+        public AutoReversingMigrationTests()
         {
             context = new Mock<IMigrationContext>();
             context.SetupAllProperties();
         }
 
-        [Test]
+        [Fact]
         public void CreateTableUpAutoReversingMigrationGivesDeleteTableDown()
         {
             var autoReversibleMigration = new TestAutoReversingMigration();
@@ -30,7 +28,7 @@ namespace FluentMigrator.Tests.Unit
             Assert.True(context.Object.Expressions.Any(me => me is DeleteTableExpression && ((DeleteTableExpression)me).TableName == "Foo"));
         }
 
-        [Test]
+        [Fact]
         public void DownMigrationsAreInReverseOrderOfUpMigrations()
         {
             var autoReversibleMigration = new TestAutoReversingMigration();

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Threading;
 using FluentMigrator.Model;
@@ -9,24 +9,21 @@ using FluentMigrator.Runner.Generators.MySql;
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.Runner.Generators.SqlServer;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.MySql
 {
-    [TestFixture]
     public class MySqlQuoterTest
     {
         private IQuoter quoter = default(MySqlQuoter);
         private readonly CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
 
-        [SetUp]
-        public void SetUp()
+        public MySqlQuoterTest()
         {
             quoter = new MySqlQuoter();
         }
 
-        [Test]
+        [Fact]
         public void TimeSpanIsFormattedQuotes()
         {
             quoter.QuoteValue(new TimeSpan(1,2, 13, 65))
@@ -34,3 +31,4 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         }
     }
 }
+

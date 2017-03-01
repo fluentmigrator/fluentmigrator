@@ -1,6 +1,5 @@
 ﻿using FluentMigrator.Runner.Announcers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,14 +8,12 @@ using System.Text;
 
 namespace FluentMigrator.Tests.Unit.Announcers
 {
-    [TestFixture]
     public class TextWriterWithGoAnnouncerTests
     {
         private StringWriter _stringWriter;
         private TextWriterWithGoAnnouncer announcer;
 
-        [SetUp]
-        public void TestSetup()
+        public TextWriterWithGoAnnouncerTests()
         {
             _stringWriter = new StringWriter();
             announcer = new TextWriterWithGoAnnouncer(_stringWriter)
@@ -26,7 +23,7 @@ namespace FluentMigrator.Tests.Unit.Announcers
             };
         }
 
-        [Test]
+        [Fact]
         public void Adds_Go_StatementAfterSqlAnouncement()
         {
             announcer.Sql("DELETE Blah");
@@ -34,7 +31,7 @@ namespace FluentMigrator.Tests.Unit.Announcers
                 "GO" + Environment.NewLine);
         }
 
-        [Test]
+        [Fact]
         public void Sql_Should_Not_Write_When_Show_Sql_Is_False()
         {
             announcer.ShowSql = false;
@@ -43,7 +40,7 @@ namespace FluentMigrator.Tests.Unit.Announcers
             Output.ShouldBe(String.Empty);
         }
 
-        [Test]
+        [Fact]
         public void Sql_Should_Not_Write_Go_When_Sql_Is_Empty()
         {
             announcer.Sql("");

@@ -20,15 +20,13 @@ using System;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
-    [TestFixture]
     public class AlterSchemaExpressionTests
     {
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenTableNameIsNull()
         {
             var expression = new AlterSchemaExpression { TableName = null };
@@ -36,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenTableNameIsEmptyString()
         {
             var expression = new AlterSchemaExpression { TableName = String.Empty };
@@ -44,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenTableNameIsNotNullEmptyString()
         {
             var expression = new AlterSchemaExpression { TableName = "Bacon" };
@@ -52,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldNotContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenDestinationSchemaNameIsNull()
         {
             var expression = new AlterSchemaExpression { DestinationSchemaName = null };
@@ -60,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.DestinationSchemaCannotBeNull);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenDestinationSchemaNameIsEmptyString()
         {
             var expression = new AlterSchemaExpression { DestinationSchemaName = String.Empty };
@@ -68,7 +66,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.DestinationSchemaCannotBeNull);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenDestinationSchemaNameIsNotNullEmptyString()
         {
             var expression = new AlterSchemaExpression { DestinationSchemaName = "Bacon" };
@@ -76,14 +74,14 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldNotContain(ErrorMessages.DestinationSchemaCannotBeNull);
         }
 
-        [Test]
+        [Fact]
         [ExpectedException(typeof(NotSupportedException))]
         public void ReverseThrowsException()
         {
             new AlterSchemaExpression().Reverse();
         }
 
-        [Test]
+        [Fact]
         public void ToStringIsDescriptive()
         {
             var expression = new AlterSchemaExpression { TableName = "Test", DestinationSchemaName = "Bacon" };

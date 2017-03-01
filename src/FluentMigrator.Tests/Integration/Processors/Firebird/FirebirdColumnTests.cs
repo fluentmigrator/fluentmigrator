@@ -1,26 +1,24 @@
-﻿using FirebirdSql.Data.FirebirdClient;
+using System;
+using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
-    [TestFixture]
-    [Category("Integration")]
-    [Category("Firebird")]
-    public class FirebirdColumnTests : BaseColumnTests
+    [Trait("Category", "Integration")]
+    [Trait("DbEngine", "Firebird")]
+    public class FirebirdColumnTests : BaseColumnTests, IDisposable
     {
         public FbConnection Connection { get; set; }
         public FirebirdProcessor Processor { get; set; }
         public IQuoter Quoter { get; set; }
 
-        [SetUp]
-        public void SetUp()
+        public FirebirdColumnTests()
         {
             FbDatabase.CreateDatabase(IntegrationTestOptions.Firebird.ConnectionString);
             Connection = new FbConnection(IntegrationTestOptions.Firebird.ConnectionString);
@@ -31,8 +29,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             Processor.BeginTransaction();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             if (!Processor.WasCommitted)
                 Processor.CommitTransaction();
@@ -41,7 +38,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             FbDatabase.DropDatabase(IntegrationTestOptions.Firebird.ConnectionString);
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsCanAcceptColumnNameWithSingleQuote()
         {
             var columnNameWithSingleQuote = "\"i'd\"";
@@ -49,47 +46,47 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 Processor.ColumnExists(null, table.Name, "\"i'd\"").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsCanAcceptTableNameWithSingleQuote()
         {
             using (var table = new FirebirdTestTable("\"Test'Table\"", Processor, null, "id int"))
                 Processor.ColumnExists(null, table.Name, "ID").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsFalseIfColumnDoesNotExist()
         {
             using (var table = new FirebirdTestTable(Processor, null, "id int"))
                 Processor.ColumnExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsFalseIfColumnDoesNotExistWithSchema()
         {
             using (var table = new FirebirdTestTable(Processor, "TestSchema", "id int"))
                 Processor.ColumnExists("TestSchema", table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.ColumnExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
             Processor.ColumnExists("TestSchema", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsTrueIfColumnExists()
         {
             using (var table = new FirebirdTestTable(Processor, null, "id int"))
                 Processor.ColumnExists(null, table.Name, "ID").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsTrueIfColumnExistsWithSchema()
         {
             using (var table = new FirebirdTestTable(Processor, "TestSchema", "id int"))

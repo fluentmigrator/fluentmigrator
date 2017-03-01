@@ -23,15 +23,13 @@ using FluentMigrator.Builders.Rename.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using Moq;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Builders.Rename
 {
-    [TestFixture]
     public class RenameExpressionRootTests
     {
-        [Test]
+        [Fact]
         public void CallingTableAddsRenameTableExpressionToContextWithSpecifiedOldName()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -46,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Rename
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingTableReturnsRenameTableExpressionBuilder()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -60,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Rename
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnAddsRenameColumnExpressionToContextWithSpecifiedOldName()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -75,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Rename
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnReturnsRenameColumnExpressionBuilder()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();

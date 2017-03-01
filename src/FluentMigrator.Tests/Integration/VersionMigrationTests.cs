@@ -26,16 +26,14 @@ using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Tests.Unit;
 using FluentMigrator.VersionTableInfo;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration
 {
-    [TestFixture]
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     public class VersionMigrationTests : IntegrationTestBase
     {
-        [Test]
+        [Fact]
         public void CanUseVersionInfo()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -56,7 +54,7 @@ namespace FluentMigrator.Tests.Integration
                 });
         }
 
-        [Test]
+        [Fact]
         public void CanUseCustomVersionInfo()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -88,7 +86,7 @@ namespace FluentMigrator.Tests.Integration
             }, true, typeof(SQLiteProcessor), typeof(MySqlProcessor), typeof(FirebirdProcessor));
         }
 
-        [Test]
+        [Fact]
         public void CanUseCustomVersionInfoDefaultSchema()
         {
             ExecuteWithSupportedProcessors(processor =>

@@ -1,26 +1,24 @@
-﻿using FirebirdSql.Data.FirebirdClient;
+using System;
+using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
-    [TestFixture]
-    [Category("Integration")]
-    [Category("Firebird")]
-    public class FirebirdIndexTests : BaseIndexTests
+    [Trait("Category", "Integration")]
+    [Trait("DbEngine", "Firebird")]
+    public class FirebirdIndexTests : BaseIndexTests, IDisposable
     {
         public FbConnection Connection { get; set; }
         public FirebirdProcessor Processor { get; set; }
         public IQuoter Quoter { get; set; }
 
-        [SetUp]
-        public void SetUp()
+        public FirebirdIndexTests()
         {
             FbDatabase.CreateDatabase(IntegrationTestOptions.Firebird.ConnectionString);
 
@@ -32,8 +30,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             Processor.BeginTransaction();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             if (!Processor.WasCommitted)
                 Processor.CommitTransaction();
@@ -42,7 +39,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             FbDatabase.DropDatabase(IntegrationTestOptions.Firebird.ConnectionString);
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsCanAcceptIndexNameWithSingleQuote()
         {
             using (var table = new FirebirdTestTable(Processor, null, "id int"))
@@ -64,7 +61,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsCanAcceptTableNameWithSingleQuote()
         {
             using (var table = new FirebirdTestTable("\"Test'Table\"", Processor, null, "id int"))
@@ -86,33 +83,33 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfIndexDoesNotExist()
         {
             using (var table = new FirebirdTestTable(Processor, null, "id int"))
                 Processor.IndexExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfIndexDoesNotExistWithSchema()
         {
             using (var table = new FirebirdTestTable(Processor, "TestSchema", "id int"))
                 Processor.IndexExists("TestSchema", table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.IndexExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
             Processor.IndexExists("TestSchema", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsTrueIfIndexExists()
         {
             using (var table = new FirebirdTestTable(Processor, null, "id int"))
@@ -134,7 +131,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsTrueIfIndexExistsWithSchema()
         {
             using (var table = new FirebirdTestTable(Processor, "TestSchema", "id int"))

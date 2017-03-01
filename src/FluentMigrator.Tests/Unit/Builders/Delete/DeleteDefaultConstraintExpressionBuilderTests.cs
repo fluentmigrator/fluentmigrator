@@ -1,15 +1,12 @@
 ﻿using FluentMigrator.Builders.Delete.DefaultConstraint;
 using FluentMigrator.Expressions;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
-    [TestFixture]
     public class DeleteDefaultConstraintExpressionBuilderTests
     {
-        [SetUp]
-        public void Setup()
+        public DeleteDefaultConstraintExpressionBuilderTests()
         {
             expression = new DeleteDefaultConstraintExpression();
             builder = new DeleteDefaultConstraintExpressionBuilder(expression);
@@ -18,21 +15,21 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
         private DeleteDefaultConstraintExpressionBuilder builder;
         private DeleteDefaultConstraintExpression expression;
 
-        [Test]
+        [Fact]
         public void OnColumnShouldSetColumnNameOnExpression()
         {
             builder.OnColumn("column");
             expression.ColumnName.ShouldBe("column");
         }
 
-        [Test]
+        [Fact]
         public void OnSchemaShouldSetSchemaNameOnExpression()
         {
             builder.InSchema("Shema");
             expression.SchemaName.ShouldBe("Shema");
         }
 
-        [Test]
+        [Fact]
         public void OnTableShouldSetTableNameOnExpression()
         {
             builder.OnTable("ThaTable");

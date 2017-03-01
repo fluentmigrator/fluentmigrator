@@ -20,20 +20,18 @@ using System;
 using System.IO;
 using System.Text;
 using FluentMigrator.Console;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Runners
 {
-    [TestFixture]
     public class MigratorConsoleTests
     {
         private const string Database = "SQLite";
         private const string Connection = "Data Source=:memory:;Version=3;New=True;";
         private const string Target = "FluentMigrator.Tests.dll";
 
-        [Test]
-        [Category("NotWorkingOnMono")]
+        [Fact]
+        [Trait("BrokenRuntimes", "Mono")]
         public void CanInitMigratorConsoleWithValidArguments()
         {
             var console = new MigratorConsole(
@@ -52,8 +50,8 @@ namespace FluentMigrator.Tests.Unit.Runners
             console.Version.ShouldBe(1);
         }
 
-        [Test]
-        [Category("NotWorkingOnMono")]
+        [Fact]
+        [Trait("BrokenRuntimes", "Mono")]
         public void ConsoleAnnouncerHasMoreOutputWhenVerbose()
         {
             var sbNonVerbose = new StringBuilder();
@@ -84,7 +82,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             Assert.Greater(sbVerbose.ToString().Length, sbNonVerbose.ToString().Length);
         }
 
-        [Test]
+        [Fact]
         public void ConsoleAnnouncerHasOutput()
         {
             var sb = new StringBuilder();
@@ -102,8 +100,8 @@ namespace FluentMigrator.Tests.Unit.Runners
             Assert.AreNotEqual(0, output.Length);
         }
 
-        [Test]
-        [Category("NotWorkingOnMono")]
+        [Fact]
+        [Trait("BrokenRuntimes", "Mono")]
         public void ConsoleAnnouncerHasOutputEvenIfMarkedAsPreviewOnly()
         {
             var sb = new StringBuilder();
@@ -125,7 +123,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             Assert.AreNotEqual(0, output.Length);
         }
 
-        [Test]
+        [Fact]
         public void FileAnnouncerHasOutputToDefaultOutputFile()
         {
             const string outputFileName = Target + ".sql";
@@ -146,7 +144,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             File.Delete(outputFileName);
         }
 
-        [Test]
+        [Fact]
         public void FileAnnouncerHasOutputToSpecifiedOutputFile()
         {
             const string outputFileName = "output.sql";
@@ -168,26 +166,26 @@ namespace FluentMigrator.Tests.Unit.Runners
             File.Delete(outputFileName);
         }
 
-        [Test]
+        [Fact]
         public void MustInitializeConsoleWithConnectionArgument()
         {
             new MigratorConsole("/db", Database);
             Assert.That(Environment.ExitCode == 1);
         }
 
-        [Test]
+        [Fact]
         public void MustInitializeConsoleWithDatabaseArgument()
         {
             new MigratorConsole("/connection", Connection);
             Assert.That(Environment.ExitCode == 1);
         }
 
-        [Test, Ignore("implement this test")]
+        [Fact(Skip = "implement this test")]
         public void OrderOfConsoleArgumentsShouldNotMatter()
         {
         }
 
-        [Test]
+        [Fact]
         public void TagsPassedToRunnerContextOnExecuteMigrations()
         {
             var migratorConsole = new MigratorConsole(
@@ -206,7 +204,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             CollectionAssert.AreEquivalent(expectedTags, migratorConsole.RunnerContext.Tags);   
         }
 
-        [Test]
+        [Fact]
         public void TransactionPerSessionShouldBeSetOnRunnerContextWithShortSwitch()
         {
             var console = new MigratorConsole(
@@ -220,7 +218,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             console.RunnerContext.TransactionPerSession.ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void TransactionPerSessionShouldBeSetOnRunnerContextWithLongSwitch()
         {
             var console = new MigratorConsole(
@@ -234,7 +232,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             console.RunnerContext.TransactionPerSession.ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void ProviderSwitchesPassedToRunnerContextOnExecuteMigrations()
         {
             var migratorConsole = new MigratorConsole(

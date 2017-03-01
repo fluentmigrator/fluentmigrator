@@ -21,14 +21,13 @@ using FluentMigrator.Builders.Insert;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Builders.Insert
 {
-    [TestFixture]
     public class InsertExpressionRootTests
     {
-        [Test]
+        [Fact]
         public void CallingIntoTableSetsTableName()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();

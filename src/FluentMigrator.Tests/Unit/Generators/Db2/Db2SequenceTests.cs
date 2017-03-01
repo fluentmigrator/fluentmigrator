@@ -1,6 +1,5 @@
 ﻿using FluentMigrator.Runner.Generators.DB2;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,18 +7,16 @@ using System.Text;
 
 namespace FluentMigrator.Tests.Unit.Generators.Db2
 {
-    [TestFixture]
     public class Db2SequenceTests : BaseSequenceTests
     {
         protected Db2Generator Generator;
 
-        [SetUp]
-        public void Setup()
+        public Db2SequenceTests()
         {
             Generator = new Db2Generator();
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateSequenceWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSequenceExpression();
@@ -29,7 +26,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE SEQUENCE TestSchema.Sequence INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateSequenceWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSequenceExpression();
@@ -38,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE SEQUENCE Sequence INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropSequenceWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSequenceExpression();
@@ -48,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("DROP SEQUENCE TestSchema.Sequence");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropSequenceWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSequenceExpression();

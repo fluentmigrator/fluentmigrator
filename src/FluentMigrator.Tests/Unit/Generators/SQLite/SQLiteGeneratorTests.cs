@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 
 using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
@@ -7,23 +7,20 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Generators.SQLite;
 
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.SQLite
 {
-    [TestFixture]
     public class SQLiteGeneratorTests
     {
         protected SQLiteGenerator Generator;
 
-        [SetUp]
-        public void Setup()
+        public SQLiteGeneratorTests()
         {
             Generator = new SQLiteGenerator();
         }
 
-        [Test]
+        [Fact]
         public void CanAlterColumnInStrictMode()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
@@ -32,7 +29,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
-        [Test]
+        [Fact]
         public void CanAlterSchemaInStrictMode()
         {
             Generator.compatabilityMode = CompatabilityMode.STRICT;
@@ -40,7 +37,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
 
-        [Test]
+        [Fact]
         public void CanCreateForeignKeyInStrictMode()
         {
             Generator.compatabilityMode = CompatabilityMode.STRICT;
@@ -48,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(GeneratorTestHelper.GetCreateNamedForeignKeyExpression()));
         }
 
-        [Test]
+        [Fact]
         public void CanCreateMulitColumnForeignKeyInStrictMode()
         {
             Generator.compatabilityMode = CompatabilityMode.STRICT;
@@ -56,7 +53,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(GeneratorTestHelper.GetCreateNamedMultiColumnForeignKeyExpression()));
         }
 
-        [Test]
+        [Fact]
         public void CanCreateSchemaInStrictMode()
         {
             Generator.compatabilityMode = CompatabilityMode.STRICT;
@@ -64,7 +61,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
 
-        [Test]
+        [Fact]
         public void CanCreateTableWithSeededIdentityAndLooseCompatibility()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
@@ -77,7 +74,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \"TestColumn2\" INTEGER NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public void CanDropForeignKeyInStrictMode()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
@@ -86,7 +83,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
-        [Test]
+        [Fact]
         public void CanDropSchemaInStrictMode()
         {
             Generator.compatabilityMode = CompatabilityMode.STRICT;
@@ -94,7 +91,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new DeleteSchemaExpression()));
         }
 
-        [Test]
+        [Fact]
         public void CanNotCreateTableWithSeededIdentityAndStrictCompatibility()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
@@ -106,7 +103,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
-        [Test]
+        [Fact]
         public void CanUseSystemMethodCurrentDateTimeAsADefaultValueForAColumn()
         {
             var expression = new CreateTableExpression { TableName = "TestTable1" };
@@ -116,7 +113,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             result.ShouldBe("CREATE TABLE \"TestTable1\" (\"DateTimeCol\" DATETIME NOT NULL DEFAULT (datetime('now','localtime')))");
         }
 
-        [Test]
+        [Fact]
         public void CanUseSystemMethodCurrentUTCDateTimeAsDefaultValueForColumn()
         {
             var expression = new CreateTableExpression { TableName = "TestTable1" };
@@ -125,7 +122,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestTable1\" (\"DateTimeCol\" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP)");
         }
-        [Test]
+        [Fact]
         public void CanRenameColumnInStrictMode()
         {
             Generator.compatabilityMode = CompatabilityMode.STRICT;
@@ -134,3 +131,4 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         }
     }
 }
+

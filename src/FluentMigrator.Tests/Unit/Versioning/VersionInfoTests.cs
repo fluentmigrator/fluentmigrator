@@ -18,30 +18,27 @@
 
 using System.Linq;
 using FluentMigrator.Runner.Versioning;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Versioning
 {
-	[TestFixture]
 	public class VersionInfoTests
 	{
 		private VersionInfo _versionInfo;
 
-		[SetUp]
-		public void SetUp()
+		public VersionInfoTests()
 		{
 			_versionInfo = new VersionInfo();			
 		}
 
-		[Test]
+		[Fact]
 		public void CanAddAppliedMigration()
 		{
 			_versionInfo.AddAppliedMigration(200909060953);
 			_versionInfo.HasAppliedMigration(200909060953).ShouldBeTrue();
 		}
 
-		[Test]
+		[Fact]
 		public void CanGetLatestMigration()
 		{
 			_versionInfo.AddAppliedMigration(200909060953);
@@ -49,7 +46,7 @@ namespace FluentMigrator.Tests.Unit.Versioning
 			_versionInfo.Latest().ShouldBe(200909060953);
 		}
 
-		[Test]
+		[Fact]
 		public void CanGetAppliedMigrationsLatestFirst()
 		{
 			_versionInfo.AddAppliedMigration(200909060953);
@@ -60,3 +57,4 @@ namespace FluentMigrator.Tests.Unit.Versioning
 		}
 	}
 }
+

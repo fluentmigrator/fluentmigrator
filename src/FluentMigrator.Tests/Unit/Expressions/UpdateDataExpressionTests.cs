@@ -2,16 +2,13 @@
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
-    [TestFixture]
     public class UpdateDataExpressionTests {
         private UpdateDataExpression expression;
 
-        [SetUp]
         public void Initialize() 
         {
             expression =
@@ -26,7 +23,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
                 };
         }
 
-        [Test]
+        [Fact]
         public void NullUpdateTargetCausesErrorMessage() 
         {
             // null is the default value, but it might not always be, so I'm codifying it here anyway
@@ -36,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.UpdateDataExpressionMustSpecifyWhereClauseOrAllRows);
         }
 
-        [Test]
+        [Fact]
         public void EmptyUpdateTargetCausesErrorMessage() 
         {
             // The same should be true for an empty list
@@ -46,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.UpdateDataExpressionMustSpecifyWhereClauseOrAllRows);
         }
 
-        [Test]
+        [Fact]
         public void DoesNotRequireWhereConditionWhenIsAllRowsIsSet() 
         {
             expression.IsAllRows = true;
@@ -55,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldNotContain(ErrorMessages.UpdateDataExpressionMustSpecifyWhereClauseOrAllRows);
         }
 
-        [Test]
+        [Fact]
         public void DoesNotAllowWhereConditionWhenIsAllRowsIsSet() 
         {
             expression.IsAllRows = true;

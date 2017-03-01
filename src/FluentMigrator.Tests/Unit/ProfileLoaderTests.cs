@@ -3,16 +3,14 @@ using System.Reflection;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using Moq;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Tests.Unit
 {
-	[TestFixture]
 	public class ProfileLoaderTests
 	{
-		[Test]
+		[Fact]
 		public void BlankProfileDoesntLoadProfiles()
 		{
 			var _runnerContextMock = new Mock<IRunnerContext>();

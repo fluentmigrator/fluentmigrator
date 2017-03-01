@@ -18,15 +18,13 @@
 
 using System;
 using FluentMigrator.Runner;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit
 {
-	[TestFixture]
 	public class StopWatchTests
 	{
-		[Test]
+		[Fact]
 		public void CanGetTheElapsedTime()
 		{
 			var watch = new StopWatch();

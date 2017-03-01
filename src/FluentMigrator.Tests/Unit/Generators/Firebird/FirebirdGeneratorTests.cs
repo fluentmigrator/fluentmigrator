@@ -1,23 +1,20 @@
-﻿using NUnit.Framework;
-using NUnit.Should;
+﻿using Xunit;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Tests.Unit.Generators.Firebird
 {
-    [TestFixture]
     public class FirebirdGeneratorTests
     {
         protected FirebirdGenerator generator;
 
-        [SetUp]
-        public void Setup()
+        public FirebirdGeneratorTests()
         {
             generator = new FirebirdGenerator(FirebirdOptions.StandardBehaviour());
         }
 
-        [Test]
+        [Fact]
         public void CanAlterSequence()
         {
             var expression = new CreateSequenceExpression

@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.Data;
 using System.Data.OleDb;
 using FluentMigrator.Runner.Announcers;
@@ -21,59 +22,56 @@ using FluentMigrator.Runner.Generators.Jet;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Jet;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Jet
 {
-    [TestFixture]
-    [Category("Integration")]
-    public class JetProcessorTests
+    [Trait("Category", "Integration")]
+    public class JetProcessorTests : IDisposable
     {
         public OleDbConnection Connection { get; set; }
         public JetProcessor Processor { get; set; }
-        [SetUp]
-        public void SetUp()
+        public JetProcessorTests()
         {
             Connection = new OleDbConnection(IntegrationTestOptions.Jet.ConnectionString);
             Processor = new JetProcessor(Connection, new JetGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
             Connection.Open();
         }
 
-        [Test]
+        [Fact]
         public void CallingTableExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.TableExists(null, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public void CallingTableExistsReturnsTrueIfTableExists()
         {
             using (var table = new JetTestTable(Processor, "id int"))
                 Processor.TableExists(null, table.Name).ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnExistsReturnsTrueIfColumnExists()
         {
             using (var table = new JetTestTable(Processor, "id int"))
                 Processor.ColumnExists(null, table.Name, "id").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.ColumnExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnExistsReturnsFalseIfColumnDoesNotExist()
         {
             using (var table = new JetTestTable(Processor, "id int"))
                 Processor.ColumnExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public void CanReadData()
         {
             using (var table = new JetTestTable(Processor, "id int"))
@@ -89,7 +87,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
             }
         }
 
-        [Test]
+        [Fact]
         public void CanReadTableData()
         {
             using (var table = new JetTestTable(Processor, "id int"))
@@ -116,8 +114,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
             }
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.CommitTransaction();
             Processor.Dispose();

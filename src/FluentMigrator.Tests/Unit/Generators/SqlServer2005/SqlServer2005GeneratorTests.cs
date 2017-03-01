@@ -1,26 +1,23 @@
-﻿using System;
+using System;
 using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Generators.SqlServer;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 {
-    [TestFixture]
     public class SqlServer2005GeneratorTests
     {
         protected IMigrationGenerator Generator;
 
-        [SetUp]
-        public void Setup()
+        public SqlServer2005GeneratorTests()
         {
             Generator = new SqlServer2008Generator();
         }
 
-        [Test]
+        [Fact]
         public void CanAlterDefaultConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
@@ -48,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe(expected);
         }
 
-        [Test]
+        [Fact]
         public void CanAlterDefaultConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
@@ -75,7 +72,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe(expected);
         }
 
-        [Test]
+        [Fact]
         public void CanCreateIncludeIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateIncludeIndexExpression();
@@ -85,7 +82,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2])");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateIncludeIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateIncludeIndexExpression();
@@ -94,7 +91,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2])");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateMultiColumnIncludeIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiIncludeIndexExpression();
@@ -104,7 +101,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2], [TestColumn3])");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateMultiColumnIncludeIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiIncludeIndexExpression();
@@ -113,7 +110,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) INCLUDE ([TestColumn2], [TestColumn3])");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateTableWithNvarcharMaxWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -125,7 +122,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] NVARCHAR(MAX) NOT NULL, [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateTableWithNvarcharMaxWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -136,7 +133,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(MAX) NOT NULL, [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateTableWithSeededIdentityWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
@@ -147,7 +144,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(45,23), [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateXmlColumnWithCustomSchema()
         {
             var expression = new CreateColumnExpression();
@@ -162,7 +159,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD [TestColumn1] XML NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateXmlColumnWithDefaultSchema()
         {
             var expression = new CreateColumnExpression();
@@ -176,7 +173,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] XML NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public void CanDropDefaultExpression()
         {
             var expression = new DeleteDefaultConstraintExpression {ColumnName = "Name", SchemaName = "Personalia", TableName = "Person"};
@@ -201,7 +198,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe(expected);
         }
 
-        [Test]
+        [Fact]
         public void CanUseSystemMethodCurrentDateTimeAsADefaultValueForAColumn()
         {
             var expression = new CreateColumnExpression
@@ -218,7 +215,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT GETDATE()");
         }
 
-        [Test]
+        [Fact]
         public void CanUseSystemMethodCurrentUserAsADefaultValueForAColumn()
         {
             var expression = new CreateColumnExpression
@@ -237,7 +234,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] NVARCHAR(15) NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT CURRENT_USER");
         }
 
-        [Test]
+        [Fact]
         public void CanUseSystemMethodCurrentUTCDateTimeAsADefaultValueForAColumn()
         {
             var expression = new CreateColumnExpression
@@ -254,7 +251,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT GETUTCDATE()");
         }
 
-        [Test]
+        [Fact]
         public void CanUseSystemMethodNewGuidAsADefaultValueForAColumn()
         {
             var expression = new CreateColumnExpression
@@ -271,7 +268,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT NEWID()");
         }
 
-        [Test]
+        [Fact]
         public void CanUseSystemMethodNewSequentialIdAsADefaultValueForAColumn()
         {
             var expression = new CreateColumnExpression
@@ -288,7 +285,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] UNIQUEIDENTIFIER NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT NEWSEQUENTIALID()");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateTableWithDescriptionAndColumnDescription()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithTableDescriptionAndColumnDescriptions();
@@ -300,7 +297,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
                             "EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'TestDescription', @level0type=N'SCHEMA', @level0name='dbo', @level1type=N'TABLE', @level1name='TestTable1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'TestColumn2Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn2'" + Environment.NewLine);
         }
 
-        [Test]
+        [Fact]
         public void CanAlterTableWithDescription()
         {
             var expression = GeneratorTestHelper.GetAlterTableWithDescriptionExpression();
@@ -310,7 +307,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe(@"IF EXISTS ( SELECT * FROM fn_listextendedproperty(N'MS_Description', N'SCHEMA', N'dbo', N'TABLE', N'TestTable1', NULL, NULL)) EXEC sys.sp_dropextendedproperty @name=N'MS_Description', @level0type=N'SCHEMA', @level0name='dbo', @level1type=N'TABLE', @level1name='TestTable1';EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'TestDescription', @level0type=N'SCHEMA', @level0name='dbo', @level1type=N'TABLE', @level1name='TestTable1'");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateColumnWithDescription()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithDescription();
@@ -322,7 +319,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
                             "EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1'" + Environment.NewLine);
         }
 
-        [Test]
+        [Fact]
         public void CanAlterColumnWithDescription()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpressionWithDescription();
@@ -334,7 +331,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
                             "IF EXISTS (SELECT * FROM fn_listextendedproperty(N'MS_Description', N'SCHEMA', N'dbo', N'TABLE', N'TestTable1', N'Column', N'TestColumn1' )) EXEC sys.sp_dropextendedproperty @name=N'MS_Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1';EXEC sys.sp_addextendedproperty @name = N'MS_Description', @value = N'TestColumn1Description', @level0type = N'SCHEMA', @level0name = 'dbo', @level1type = N'Table', @level1name = 'TestTable1', @level2type = N'Column',  @level2name = 'TestColumn1'" + Environment.NewLine);
         }
 
-        [Test]
+        [Fact]
         public void CanCreateColumnWithCollation()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithCollation();
@@ -344,7 +341,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe(@"ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5) COLLATE " + GeneratorTestHelper.TestColumnCollationName + " NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterColumnWithCollation()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpressionWithCollation();

@@ -1,25 +1,23 @@
-﻿using System.Data.SqlServerCe;
+using System;
+using System.Data.SqlServerCe;
 using System.IO;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
 {
-    [TestFixture]
-    [Category("Integration")]
-    public class SqlServerCeConstraintTests : BaseConstraintTests
+    [Trait("Category", "Integration")]
+    public class SqlServerCeConstraintTests : BaseConstraintTests, IDisposable
     {
         public string DatabaseFilename { get; set; }
         public SqlCeConnection Connection { get; set; }
         public SqlServerCeProcessor Processor { get; set; }
 
-        [SetUp]
-        public void SetUp()
+        public SqlServerCeConstraintTests()
         {
             DatabaseFilename = "TestDatabase.sdf";
             RecreateDatabase();
@@ -29,8 +27,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             Processor.BeginTransaction();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.CommitTransaction();
             Processor.Dispose();
@@ -46,7 +43,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             new SqlCeEngine(IntegrationTestOptions.SqlServerCe.ConnectionString).CreateDatabase();
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsCanAcceptConstraintNameWithSingleQuote()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
@@ -56,7 +53,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsCanAcceptTableNameWithSingleQuote()
         {
             using (var table = new SqlServerCeTestTable("Test'Table", Processor, "id int"))
@@ -66,7 +63,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsFalseIfConstraintDoesNotExist()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
@@ -76,7 +73,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsFalseIfConstraintDoesNotExistWithSchema()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
@@ -86,19 +83,19 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.ConstraintExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
             Processor.ConstraintExists("NotUsed", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsTrueIfConstraintExists()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
@@ -109,7 +106,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         }
 
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsTrueIfConstraintExistsWithSchema()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
@@ -120,3 +117,4 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         }
     }
 }
+

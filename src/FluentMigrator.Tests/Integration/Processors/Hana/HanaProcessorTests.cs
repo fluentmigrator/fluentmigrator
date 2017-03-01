@@ -1,3 +1,4 @@
+using System;
 using System.Data.SqlClient;
 using System.IO;
 using FluentMigrator.Builders.Execute;
@@ -6,21 +7,18 @@ using FluentMigrator.Runner.Generators.Hana;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Hana;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 using Sap.Data.Hana;
 
 namespace FluentMigrator.Tests.Integration.Processors.Hana
 {
-    [TestFixture]
-    [Category("Integration")]
-    public class HanaProcessorTests
+    [Trait("Category", "Integration")]
+    public class HanaProcessorTests : IDisposable
     {
         public HanaConnection Connection { get; set; }
         public HanaProcessor Processor { get; set; }
 
-        [SetUp]
-        public void SetUp()
+        public HanaProcessorTests()
         {
             Connection = new HanaConnection(IntegrationTestOptions.Hana.ConnectionString);
             Processor = new HanaProcessor(Connection, new HanaGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new HanaDbFactory());
@@ -28,14 +26,13 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             Processor.BeginTransaction();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.CommitTransaction();
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void CallingProcessWithPerformDbOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
         {
             var output = new StringWriter();

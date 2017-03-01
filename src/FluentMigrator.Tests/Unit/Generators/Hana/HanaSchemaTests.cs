@@ -1,21 +1,18 @@
 ﻿using FluentMigrator.Runner.Generators.Hana;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Hana
 {
-    [TestFixture]
     public class HanaSchemaTests : BaseSchemaTests
     {
         protected HanaGenerator Generator;
 
-        [SetUp]
-        public void Setup()
+        public HanaSchemaTests()
         {
             Generator = new HanaGenerator();
         }
 
-        [Test]
+        [Fact]
         public override void CanAlterSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -26,7 +23,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("ALTER TABLE \"TestSchema1\".\"TestTable\" SET SCHEMA \"TestSchema2\"");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -37,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE SCHEMA \"TestSchema\"");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");

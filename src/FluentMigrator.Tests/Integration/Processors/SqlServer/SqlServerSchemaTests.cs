@@ -1,22 +1,20 @@
+using System;
 using System.Data.SqlClient;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.SqlServer
 {
-    [TestFixture]
-    [Category("Integration")]
-    public class SqlServerSchemaTests : BaseSchemaTests
+    [Trait("Category", "Integration")]
+    public class SqlServerSchemaTests : BaseSchemaTests, IDisposable
     {
         public SqlConnection Connection { get; set; }
         public SqlServerProcessor Processor { get; set; }
 
-        [SetUp]
-        public void SetUp()
+        public SqlServerSchemaTests()
         {
             Connection = new SqlConnection(IntegrationTestOptions.SqlServer2012.ConnectionString);
             Processor = new SqlServerProcessor(Connection, new SqlServer2012Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
@@ -24,20 +22,19 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
             Processor.BeginTransaction();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.CommitTransaction();
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public override void CallingSchemaExistsReturnsFalseIfSchemaDoesNotExist()
         {
             Processor.SchemaExists("DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingSchemaExistsReturnsTrueIfSchemaExists()
         {
             Processor.SchemaExists("dbo").ShouldBeTrue();

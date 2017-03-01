@@ -1,21 +1,18 @@
-﻿using FluentMigrator.Runner.Generators.SQLite;
-using NUnit.Framework;
-using NUnit.Should;
+using FluentMigrator.Runner.Generators.SQLite;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.SQLite
 {
-    [TestFixture]
     public class SQLiteSchemaTests : BaseSchemaTests
     {
         protected SQLiteGenerator Generator;
 
-        [SetUp]
-        public void Setup()
+        public SQLiteSchemaTests()
         {
             Generator = new SQLiteGenerator();
         }
 
-        [Test]
+        [Fact]
         public override void CanAlterSchema()
         {
             var expression = GeneratorTestHelper.GetAlterSchemaExpression();
@@ -24,7 +21,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             result.ShouldBe(string.Empty);
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSchemaExpression();
@@ -33,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             result.ShouldBe(string.Empty);
         }
 
-        [Test]
+        [Fact]
         public override void CanDropSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSchemaExpression();

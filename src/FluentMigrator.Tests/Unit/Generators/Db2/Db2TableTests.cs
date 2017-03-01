@@ -1,6 +1,5 @@
 ﻿using FluentMigrator.Runner.Generators.DB2;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,18 +7,16 @@ using System.Text;
 
 namespace FluentMigrator.Tests.Unit.Generators.Db2
 {
-    [TestFixture]
     public class Db2TableTests : BaseTableTests
     {
         protected Db2Generator Generator;
 
-        [SetUp]
-        public void Setup()
+        public Db2TableTests()
         {
             Generator = new Db2Generator();
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithCustomColumnTypeWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -32,7 +29,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE TABLE TestSchema.TestTable1 (TestColumn1 DBCLOB(1048576) CCSID 1200 NOT NULL, TestColumn2 json NOT NULL, PRIMARY KEY (TestColumn1))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithCustomColumnTypeWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -44,7 +41,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 DBCLOB(1048576) CCSID 1200 NOT NULL, TestColumn2 json NOT NULL, PRIMARY KEY (TestColumn1))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -54,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE TABLE TestSchema.TestTable1 (TestColumn1 DBCLOB(1048576) CCSID 1200 NOT NULL, TestColumn2 INTEGER NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -63,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 DBCLOB(1048576) CCSID 1200 NOT NULL, TestColumn2 INTEGER NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNullWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
@@ -75,7 +72,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE TABLE TestSchema.TestTable1 (TestColumn1 DBCLOB(1048576) CCSID 1200 NOT NULL DEFAULT NULL, TestColumn2 INTEGER NOT NULL DEFAULT 0)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNullWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
@@ -87,7 +84,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
 
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithDefaultValueWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
@@ -97,7 +94,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE TABLE TestSchema.TestTable1 (TestColumn1 DBCLOB(1048576) CCSID 1200 NOT NULL DEFAULT 'Default', TestColumn2 INTEGER NOT NULL DEFAULT 0)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithIdentityWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
@@ -107,7 +104,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE TABLE TestSchema.TestTable1 (TestColumn1 INTEGER NOT NULL AS IDENTITY, TestColumn2 INTEGER NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithIdentityWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
@@ -116,7 +113,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 INTEGER NOT NULL AS IDENTITY, TestColumn2 INTEGER NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithDefaultValueWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
@@ -125,7 +122,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 DBCLOB(1048576) CCSID 1200 NOT NULL DEFAULT 'Default', TestColumn2 INTEGER NOT NULL DEFAULT 0)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithMultiColumnPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
@@ -135,7 +132,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE TABLE TestSchema.TestTable1 (TestColumn1 DBCLOB(1048576) CCSID 1200 NOT NULL, TestColumn2 INTEGER NOT NULL, PRIMARY KEY (TestColumn1, TestColumn2))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
@@ -144,7 +141,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 DBCLOB(1048576) CCSID 1200 NOT NULL, TestColumn2 INTEGER NOT NULL, PRIMARY KEY (TestColumn1, TestColumn2))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithNamedMultiColumnPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
@@ -154,7 +151,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE TABLE TestSchema.TestTable1 (TestColumn1 DBCLOB(1048576) CCSID 1200 NOT NULL, TestColumn2 INTEGER NOT NULL, CONSTRAINT TestKey PRIMARY KEY (TestColumn1, TestColumn2))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithNamedMultiColumnPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
@@ -163,7 +160,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 DBCLOB(1048576) CCSID 1200 NOT NULL, TestColumn2 INTEGER NOT NULL, CONSTRAINT TestKey PRIMARY KEY (TestColumn1, TestColumn2))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithNamedPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
@@ -173,7 +170,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE TABLE TestSchema.TestTable1 (TestColumn1 DBCLOB(1048576) CCSID 1200 NOT NULL, TestColumn2 INTEGER NOT NULL, CONSTRAINT TestKey PRIMARY KEY (TestColumn1))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithNamedPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
@@ -182,7 +179,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 DBCLOB(1048576) CCSID 1200 NOT NULL, TestColumn2 INTEGER NOT NULL, CONSTRAINT TestKey PRIMARY KEY (TestColumn1))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithNullableFieldWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
@@ -192,7 +189,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE TABLE TestSchema.TestTable1 (TestColumn1 DBCLOB(1048576) CCSID 1200, TestColumn2 INTEGER NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithNullableFieldWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
@@ -201,7 +198,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 DBCLOB(1048576) CCSID 1200, TestColumn2 INTEGER NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
@@ -211,7 +208,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE TABLE TestSchema.TestTable1 (TestColumn1 DBCLOB(1048576) CCSID 1200 NOT NULL, TestColumn2 INTEGER NOT NULL, PRIMARY KEY (TestColumn1))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
@@ -220,7 +217,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 DBCLOB(1048576) CCSID 1200 NOT NULL, TestColumn2 INTEGER NOT NULL, PRIMARY KEY (TestColumn1))");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
@@ -230,7 +227,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("DROP TABLE TestSchema.TestTable1");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
@@ -239,7 +236,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("DROP TABLE TestTable1");
         }
 
-        [Test]
+        [Fact]
         public override void CanRenameTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
@@ -249,7 +246,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("RENAME TABLE TestSchema.TestTable1 TO TestTable2");
         }
 
-        [Test]
+        [Fact]
         public override void CanRenameTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();

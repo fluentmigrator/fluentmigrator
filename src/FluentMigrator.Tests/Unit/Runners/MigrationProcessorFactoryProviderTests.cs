@@ -21,92 +21,90 @@ using FluentMigrator.Runner.Processors.Hana;
 using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Runners
 {
-    [TestFixture]
     public class MigrationProcessorFactoryProviderTests
     {
         private MigrationProcessorFactoryProvider migrationProcessorFactoryProvider;
 
-        [SetUp]
-        public void Setup()
+        public MigrationProcessorFactoryProviderTests()
         {
             migrationProcessorFactoryProvider = new MigrationProcessorFactoryProvider();
         }
 
-        [Test]
+        [Fact]
         public void CanRetrieveFactoryWithArgumentString()
         {
             IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("SQLite");
             Assert.IsTrue(factory.GetType() == typeof(SQLiteProcessorFactory));
         }
 
-        [Test]
+        [Fact]
         public void CanRetrieveSqlServer2000FactoryWithArgumentString()
         {
             IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("SqlServer2000");
             Assert.IsTrue(factory.GetType() == typeof(SqlServer2000ProcessorFactory));
         }
 
-        [Test]
+        [Fact]
         public void CanRetrieveSqlServer2005FactoryWithArgumentString()
         {
             IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("SqlServer2005");
             Assert.IsTrue(factory.GetType() == typeof(SqlServer2005ProcessorFactory));
         }
 
-        [Test]
+        [Fact]
         public void CanRetrieveSqlServer2008FactoryWithArgumentString()
         {
             IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("SqlServer2008");
             Assert.IsTrue(factory.GetType() == typeof(SqlServer2008ProcessorFactory));
         }
 
-        [Test]
+        [Fact]
         public void CanRetrieveSqlServer2012FactoryWithArgumentString()
         {
             IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("SqlServer2012");
             Assert.IsTrue(factory.GetType() == typeof(SqlServer2012ProcessorFactory));
         }
 
-        [Test]
+        [Fact]
         public void CanRetrieveSqlServer2014FactoryWithArgumentString()
         {
             IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("SqlServer2014");
             Assert.IsTrue(factory.GetType() == typeof(SqlServer2014ProcessorFactory));
         }
 
-        [Test]
+        [Fact]
         public void RetrievesSqlServerProcessorFactoryIfArgumentIsSqlServer()
         {
             IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("SqlServer");
             Assert.IsTrue(factory.GetType() == typeof(SqlServerProcessorFactory));
         }
 
-        [Test]
+        [Fact]
         public void CanRetrieveSqlServerCeFactoryWithArgumentString()
         {
             IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("SqlServerCe");
             Assert.IsTrue(factory.GetType() == typeof(SqlServerCeProcessorFactory));
         }
 
-        [Test]
+        [Fact]
         public void CanRetrieveOracleFactoryWithArgumentString()
         {
             IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("Oracle");
             Assert.IsTrue(factory.GetType() == typeof(OracleProcessorFactory));
         }
 
-        [Test]
+        [Fact]
         public void CanRetrieveOracleManagedFactoryWithArgumentString()
         {
             IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("OracleManaged");
             Assert.IsTrue(factory.GetType() == typeof(OracleManagedProcessorFactory));
         }
 
-        [Test]
+        [Fact]
         public void CanRetrieveHanaFactoryWithArgumentString()
         {
             var factory = migrationProcessorFactoryProvider.GetFactory("Hana");

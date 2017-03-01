@@ -1,3 +1,4 @@
+using System;
 using System.Data.SqlClient;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
@@ -5,22 +6,19 @@ using FluentMigrator.Runner.Generators.Hana;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Hana;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 using Sap.Data.Hana;
 
 namespace FluentMigrator.Tests.Integration.Processors.Hana
 {
-    [TestFixture]
-    [Category("Integration")]
-    public class HanaConstraintTests : BaseConstraintTests
+    [Trait("Category", "Integration")]
+    public class HanaConstraintTests : BaseConstraintTests, IDisposable
     {
         public HanaConnection Connection { get; set; }
         public HanaProcessor Processor { get; set; }
         public IQuoter Quoter { get; set; }
 
-        [SetUp]
-        public void SetUp()
+        public HanaConstraintTests()
         {
             Connection = new HanaConnection(IntegrationTestOptions.Hana.ConnectionString);
             Processor = new HanaProcessor(Connection, new HanaGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new HanaDbFactory());
@@ -29,14 +27,13 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             Processor.BeginTransaction();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.CommitTransaction();
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsCanAcceptConstraintNameWithSingleQuote()
         {
             using (var table = new HanaTestTable(Processor, null, "id int"))
@@ -46,7 +43,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsCanAcceptTableNameWithSingleQuote()
         {
             using (var table = new HanaTestTable("Test'Table", Processor, null, "id int"))
@@ -56,7 +53,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsFalseIfConstraintDoesNotExist()
         {
             using (var table = new HanaTestTable(this.Processor, null, "id int"))
@@ -66,7 +63,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsFalseIfConstraintDoesNotExistWithSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -78,13 +75,13 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsFalseIfTableDoesNotExist()
         {
             this.Processor.ConstraintExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -92,7 +89,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             this.Processor.ConstraintExists("SchemaName", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsTrueIfConstraintExists()
         {
             using (var table = new HanaTestTable(Processor, null, "id int"))
@@ -102,7 +99,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsTrueIfConstraintExistsWithSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");

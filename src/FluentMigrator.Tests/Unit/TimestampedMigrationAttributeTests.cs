@@ -1,10 +1,9 @@
 ﻿using System;
 
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit
 {
-    [TestFixture]
     public class TimestampedMigrationAttributeTests
     {
         private const int DayOfMonth = 15;
@@ -25,7 +24,7 @@ namespace FluentMigrator.Tests.Unit
 
         private const int Year = 2000;
 
-        [Test]
+        [Fact]
         public void CanCreateOneAccurateToTheMinute()
         {
             // Arrange
@@ -35,7 +34,7 @@ namespace FluentMigrator.Tests.Unit
             Assert.That((TestDelegate)action.Invoke, Throws.Nothing);
         }
 
-        [Test]
+        [Fact]
         public void CanCreateOneAccurateToTheMinuteWithDescription()
         {
             // Arrange
@@ -45,7 +44,7 @@ namespace FluentMigrator.Tests.Unit
             Assert.That((TestDelegate)action.Invoke, Throws.Nothing);
         }
 
-        [Test]
+        [Fact]
         public void CanCreateOneAccurateToTheMinuteWithTransactionBehavior()
         {
             // Arrange
@@ -56,7 +55,7 @@ namespace FluentMigrator.Tests.Unit
             Assert.That(code, Throws.Nothing);
         }
 
-        [Test]
+        [Fact]
         public void CanCreateOneAccurateToTheMinuteWithTransactionBehaviorAndDescription()
         {
             // Arrange
@@ -67,7 +66,7 @@ namespace FluentMigrator.Tests.Unit
             Assert.That(code, Throws.Nothing);
         }
 
-        [Test]
+        [Fact]
         public void CanCreateOneAccurateToTheSecond()
         {
             // Arrange
@@ -78,7 +77,7 @@ namespace FluentMigrator.Tests.Unit
             Assert.That(code, Throws.Nothing);
         }
 
-        [Test]
+        [Fact]
         public void CanCreateOneAccurateToTheSecondWithDescription()
         {
             // Arrange
@@ -89,7 +88,7 @@ namespace FluentMigrator.Tests.Unit
             Assert.That(code, Throws.Nothing);
         }
 
-        [Test]
+        [Fact]
         public void CanCreateOneAccurateToTheSecondWithTransactionBehavior()
         {
             // Arrange
@@ -100,7 +99,7 @@ namespace FluentMigrator.Tests.Unit
             Assert.That(code, Throws.Nothing);
         }
 
-        [Test]
+        [Fact]
         public void CanCreateOneAccurateToTheSecondWithTransactionBehaviorAndDescription()
         {
             // Arrange
@@ -111,7 +110,7 @@ namespace FluentMigrator.Tests.Unit
             Assert.That(code, Throws.Nothing);
         }
 
-        [Test]
+        [Fact]
         public void CreatingOneSetsUnderlyingValues()
         {
             // Arrange and Act
@@ -123,7 +122,7 @@ namespace FluentMigrator.Tests.Unit
             Assert.That(attribute.Version, Is.EqualTo(20000615123030));
         }
 
-        [Test]
+        [Fact]
         public void ExtendsMigrationAttribute()
         {
             // Arrange and Act
@@ -133,7 +132,7 @@ namespace FluentMigrator.Tests.Unit
             Assert.That(timestampedMigrationAttribute, Is.InstanceOf<MigrationAttribute>());
         }
 
-        [Test]
+        [Fact]
         public void TryingToCreateWithInvalidDayOfMonthResultsInArgumentOutOfRangeException()
         {
             // Arrange
@@ -144,7 +143,7 @@ namespace FluentMigrator.Tests.Unit
             Assert.That(exception.Message, Is.EqualTo(InvalidDateExceptionMessage));
         }
 
-        [Test]
+        [Fact]
         public void TryingToCreateWithInvalidHourResultsInArgumentOutOfRangeException()
         {
             // Arrange
@@ -155,7 +154,7 @@ namespace FluentMigrator.Tests.Unit
             Assert.That(exception.Message, Is.EqualTo(InvalidTimeExceptionMessage));
         }
 
-        [Test]
+        [Fact]
         public void TryingToCreateWithInvalidMinuteResultsInArgumentOutOfRangeException()
         {
             // Arrange
@@ -166,7 +165,7 @@ namespace FluentMigrator.Tests.Unit
             Assert.That(exception.Message, Is.EqualTo(InvalidTimeExceptionMessage));
         }
 
-        [Test]
+        [Fact]
         public void TryingToCreateWithInvalidMonthResultsInArgumentOutOfRangeException()
         {
             // Arrange
@@ -177,7 +176,7 @@ namespace FluentMigrator.Tests.Unit
             Assert.That(exception.Message, Is.EqualTo(InvalidDateExceptionMessage));
         }
 
-        [Test]
+        [Fact]
         public void TryingToCreateWithInvalidSecondResultsInArgumentOutOfRangeException()
         {
             // Arrange
@@ -188,7 +187,7 @@ namespace FluentMigrator.Tests.Unit
             Assert.That(exception.Message, Is.EqualTo(InvalidTimeExceptionMessage));
         }
 
-        [Test]
+        [Fact]
         public void TryingToCreateWithInvalidYearResultsInArgumentOutOfRangeException()
         {
             // Arrange

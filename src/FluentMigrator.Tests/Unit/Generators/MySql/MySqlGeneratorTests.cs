@@ -2,23 +2,20 @@
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.MySql;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.MySql
 {
-    [TestFixture]
     public class MySqlGeneratorTests
     {
         protected MySqlGenerator Generator;
 
-        [SetUp]
-        public void Setup()
+        public MySqlGeneratorTests()
         {
             Generator = new MySqlGenerator();
         }
 
-        [Test]
+        [Fact]
         public void CanAlterSchemaInStrictMode()
         {
             Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
@@ -26,7 +23,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
 
-        [Test]
+        [Fact]
         public void CanCreateSchemaInStrictMode()
         {
             Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
@@ -34,7 +31,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
 
-        [Test]
+        [Fact]
         public void CanDropSchemaInStrictMode()
         {
             Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
@@ -42,7 +39,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new DeleteSchemaExpression()));
         }
 
-        [Test]
+        [Fact]
         public void CanUseSystemMethodCurrentDateTimeAsADefaultValueForAColumn()
         {
             var columnDefinition = new ColumnDefinition { Name = "NewColumn", Size = 15, Type = null, CustomType = "TIMESTAMP", DefaultValue = SystemMethods.CurrentDateTime };

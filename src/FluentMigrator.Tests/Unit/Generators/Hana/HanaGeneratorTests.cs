@@ -3,23 +3,20 @@ using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Hana;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Hana
 {
-    [TestFixture]
     public class HanaGeneratorTests
     {
         protected HanaGenerator Generator;
 
-        [SetUp]
-        public void Setup()
+        public HanaGeneratorTests()
         {
             Generator = new HanaGenerator();
         }
 
-        [Test]
+        [Fact]
         public void CanCreateAutoIncrementColumnForInt64()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
@@ -29,7 +26,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE COLUMN TABLE \"TestTable1\" (\"TestColumn1\" BIGINT GENERATED ALWAYS AS IDENTITY, \"TestColumn2\" INTEGER);");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateTableWithBinaryColumnWithSize()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -40,7 +37,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE COLUMN TABLE \"TestTable1\" (\"TestColumn1\" VARBINARY(10000), \"TestColumn2\" INTEGER);");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateTableWithBlobColumn()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -50,7 +47,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE COLUMN TABLE \"TestTable1\" (\"TestColumn1\" BLOB, \"TestColumn2\" INTEGER);");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateTableWithBlobColumnWithObjectType()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -60,7 +57,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE COLUMN TABLE \"TestTable1\" (\"TestColumn1\" BLOB, \"TestColumn2\" INTEGER);");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateTableWithBoolDefaultValue()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -70,7 +67,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE COLUMN TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR(255) DEFAULT 1, \"TestColumn2\" INTEGER);");
         }
 
-        [Test]
+        [Fact]
         public void CanUseSystemMethodCurrentUTCDateTimeAsADefaultValueForAColumn()
         {
             const string tableName = "NewTable";
@@ -82,7 +79,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("ALTER TABLE \"NewTable\" ADD (\"NewColumn\" NVARCHAR(5) DEFAULT CURRENT_UTCTIMESTAMP);");
         }
 
-        [Test]
+        [Fact]
         public void CanUseSystemMethodCurrentCDateTimeAsADefaultValueForAColumn()
         {
             const string tableName = "NewTable";
@@ -94,7 +91,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("ALTER TABLE \"NewTable\" ADD (\"NewColumn\" NVARCHAR(5) DEFAULT CURRENT_TIMESTAMP);");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterColumnAndSetAsNullable()
         {
             var expression = new AlterColumnExpression
@@ -108,7 +105,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("ALTER TABLE \"TestTable1\" ALTER (\"TestColumn1\" NVARCHAR(255) NULL);");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterColumnAndSetAsNotNullable()
         {
             var expression = new AlterColumnExpression
@@ -122,7 +119,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("ALTER TABLE \"TestTable1\" ALTER (\"TestColumn1\" NVARCHAR(255) NOT NULL);");
         }
 
-        [Test]
+        [Fact]
         public void CanDeleteDefaultConstraint()
         {
             Assert.Ignore("Hana support change default value with type like bellow");
@@ -138,7 +135,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("ALTER TABLE \"TestTable1\" ALTER (\"TestColumn1\" NVARCHAR(255) DEFAULT NULL)");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterDefaultConstraintToCurrentUser()
         {
             Assert.Ignore("Hana support change default value with type like bellow");
@@ -151,7 +148,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("ALTER TABLE \"TestTable1\" ALTER (\"TestColumn1\" NVARCHAR(255) DEFAULT CURRENT_UTCTIMESTAMP)");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterDefaultConstraintToCurrentDate()
         {
             Assert.Ignore("Hana support change default value with type like bellow");
@@ -165,7 +162,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("ALTER TABLE \"TestTable1\" ALTER (\"TestColumn1\" NVARCHAR(255) DEFAULT CURRENT_TIMESTAMP)");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterColumnAndOnlySetTypeIfIsNullableNotSet()
         {
             var expression = new AlterColumnExpression

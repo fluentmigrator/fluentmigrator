@@ -8,10 +8,10 @@ using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Oracle;
 
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Oracle {
-	[Category( "Integration" )]
+	[Trait("Category", "Integration")]
 	public abstract class OracleProcessorFactoryTestsBase
 	{
 		private IMigrationProcessorFactory factory;
@@ -19,7 +19,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		private IAnnouncer announcer;
 		private ProcessorOptions options;
 
-		protected void SetUp(IMigrationProcessorFactory processorFactory)
+		protected OracleProcessorFactoryTestsBase(IMigrationProcessorFactory processorFactory)
 		{
 			this.factory = processorFactory;
 			this.connectionString = "Data Source=localhost/XE;User Id=Something;Password=Something";

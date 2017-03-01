@@ -1,4 +1,4 @@
-﻿namespace FluentMigrator.Tests.Integration.Processors.Db2
+namespace FluentMigrator.Tests.Integration.Processors.Db2
 {
     using System;
     using System.Collections.Generic;
@@ -10,13 +10,11 @@
     using FluentMigrator.Runner.Processors;
     using FluentMigrator.Runner.Processors.DB2;
 
-    using NUnit.Framework;
-    using NUnit.Should;
+    using Xunit;
     using FluentMigrator.Tests.Helpers;
 
-    [TestFixture]
-    [Category("Integration")]
-    public class Db2ProcessorTests
+    [Trait("Category", "Integration")]
+    public class Db2ProcessorTests : IDisposable
     {
         #region Properties
 
@@ -44,8 +42,7 @@
 
         #region Methods
 
-        [SetUp]
-        public void SetUp()
+        public Db2ProcessorTests()
         {
             Factory = new Db2DbFactory();
             Connection = Factory.CreateConnection(IntegrationTestOptions.Db2.ConnectionString);
@@ -54,13 +51,12 @@
             Connection.Open();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnExistsReturnsFalseIfColumnExistsInDifferentSchema()
         {
             using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT"))
@@ -69,7 +65,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public void CallingConstraintExistsReturnsFalseIfConstraintExistsInDifferentSchema()
         {
             using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT"))
@@ -79,7 +75,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public void CallingTableExistsReturnsFalseIfTableExistsInDifferentSchema()
         {
             using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT"))

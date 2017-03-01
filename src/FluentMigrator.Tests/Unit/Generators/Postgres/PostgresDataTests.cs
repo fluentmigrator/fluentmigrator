@@ -1,21 +1,18 @@
-﻿using FluentMigrator.Runner.Generators.Postgres;
-using NUnit.Framework;
-using NUnit.Should;
+using FluentMigrator.Runner.Generators.Postgres;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Postgres
 {
-    [TestFixture]
     public class PostgresDataTests : BaseDataTests
     {
         protected PostgresGenerator Generator;
 
-        [SetUp]
-        public void Setup()
+        public PostgresDataTests()
         {
             Generator = new PostgresGenerator();
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataForAllRowsWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
@@ -25,7 +22,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("DELETE FROM \"TestSchema\".\"TestTable1\";");
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataForAllRowsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
@@ -34,7 +31,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("DELETE FROM \"public\".\"TestTable1\";");
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataForMultipleRowsWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
@@ -44,7 +41,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("DELETE FROM \"TestSchema\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL;DELETE FROM \"TestSchema\".\"TestTable1\" WHERE \"Website\" = 'github.com';");
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataForMultipleRowsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
@@ -53,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("DELETE FROM \"public\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL;DELETE FROM \"public\".\"TestTable1\" WHERE \"Website\" = 'github.com';");
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
@@ -63,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("DELETE FROM \"TestSchema\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL;");
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
@@ -72,7 +69,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("DELETE FROM \"public\".\"TestTable1\" WHERE \"Name\" = 'Just''in' AND \"Website\" IS NULL;");
         }
 
-        [Test]
+        [Fact]
         public override void CanInsertDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
@@ -85,7 +82,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe(expected);
         }
 
-        [Test]
+        [Fact]
         public override void CanInsertDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
@@ -97,7 +94,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe(expected);
         }
 
-        [Test]
+        [Fact]
         public override void CanInsertGuidDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
@@ -107,7 +104,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe(System.String.Format("INSERT INTO \"TestSchema\".\"TestTable1\" (\"guid\") VALUES ('{0}');", GeneratorTestHelper.TestGuid));
         }
 
-        [Test]
+        [Fact]
         public override void CanInsertGuidDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
@@ -116,7 +113,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe(System.String.Format("INSERT INTO \"public\".\"TestTable1\" (\"guid\") VALUES ('{0}');", GeneratorTestHelper.TestGuid));
         }
 
-        [Test]
+        [Fact]
         public override void CanUpdateDataForAllDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
@@ -126,7 +123,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("UPDATE \"TestSchema\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE 1 = 1;");
         }
 
-        [Test]
+        [Fact]
         public override void CanUpdateDataForAllDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
@@ -135,7 +132,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("UPDATE \"public\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE 1 = 1;");
         }
 
-        [Test]
+        [Fact]
         public override void CanUpdateDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
@@ -145,7 +142,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("UPDATE \"TestSchema\".\"TestTable1\" SET \"Name\" = 'Just''in', \"Age\" = 25 WHERE \"Id\" = 9 AND \"Homepage\" IS NULL;");
         }
 
-        [Test]
+        [Fact]
         public override void CanUpdateDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();

@@ -1,11 +1,9 @@
 ﻿using System;
 using FluentMigrator.Runner.Generators.Firebird;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Firebird
 {
-    [TestFixture]
     public class FirebirdQuoterTests
     {
         private readonly string[] _fbKeywords = new[]
@@ -42,7 +40,8 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             "WRITE", "YEAR", "YEARDAY"
         };
 
-        [Test, TestCaseSource("_fbKeywords")]
+        [Fact]
+        [TestCaseSource("_fbKeywords")]
         public void Quote_ArgIsFirebirdKeyword_ArgShouldBeQuoted(string quoteArg)
         {
             var actual = new FirebirdQuoter().Quote(quoteArg);
@@ -65,14 +64,16 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             actual.ShouldBe(string.Format("\"{0}\"", quoteArg));
         }
 
-        [Test, SetCulture("tr-TR")]
+        [Fact]
+        [SetCulture("tr-TR")]
         public void Quote_PassesTurkishTest()
         {
             var actual = new FirebirdQuoter().Quote("similar");
             actual.ShouldBe("\"similar\"");
         }
 
-        [Test, TestCaseSource("_fbKeywords")]
+        [Fact]
+        [TestCaseSource("_fbKeywords")]
         public void Quote_ArgIsKeywordInLowercase_ArgShouldBeQuoted(string quoteArg)
         {
             var argInLowerCase = quoteArg.ToLower();

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Data.SqlClient;
 using FluentMigrator.Runner;
@@ -11,24 +12,21 @@ using FluentMigrator.Model;
 using FluentMigrator.SchemaDump.SchemaDumpers;
 using FluentMigrator.Tests.Helpers;
 using FluentMigrator.Tests.Integration.Migrations;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 using FluentMigrator.Runner.Generators.SqlServer;
 using System.Linq;
 
 namespace FluentMigrator.Tests.Integration.SchemaDump
 {
 
-    [TestFixture]
-    [Category("Integration")]
-    public class SchemaDumpTests
+    [Trait("Category", "Integration")]
+    public class SchemaDumpTests : IDisposable
     {
         public SqlConnection Connection;
         public SqlServerProcessor Processor;
         public SqlServerSchemaDumper SchemaDumper;
 
-        [SetUp]
-        public void Setup()
+        public SchemaDumpTests()
         {
             Connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
             Processor = new SqlServerProcessor(Connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
@@ -36,13 +34,12 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
             Connection.Open();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void TestSchemaTestWriter()
         {
             var tableDef = new TableDefinition
@@ -63,7 +60,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
             output.ShouldBe(expectedMessage);
         }
 
-        [Test]
+        [Fact]
         public void CanReadBasicSchemaInfo()
         {
             // this is the fun part.. this test should fail until the schema reading code works
@@ -80,7 +77,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
             }
         }
 
-        [Test]
+        [Fact]
         public void CanReadSchemaInfoWithIdentity()
         {
             using (new SqlServerTestTable(Processor, null, "id int IDENTITY(1,1) NOT NULL"))
@@ -94,7 +91,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
             }
         }
 
-        [Test]
+        [Fact]
         public void CanReadSchemaInfoWithNullable()
         {
             using (new SqlServerTestTable(Processor, null, "id int NULL"))
@@ -107,7 +104,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
             }
         }
 
-        [Test]
+        [Fact]
         public void VerifyTestMigrationSchema()
         {
             //run TestMigration migration, read, then remove...

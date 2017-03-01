@@ -1,22 +1,19 @@
-﻿using FluentMigrator.Exceptions;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Generators.SqlServer;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 {
-    [TestFixture]
     public class SqlServerCeColumnTests : BaseColumnTests
     {
         protected SqlServerCeGenerator Generator;
 
-        [SetUp]
-        public void Setup()
+        public SqlServerCeColumnTests()
         {
             Generator = new SqlServerCeGenerator();
         }
 
-        [Test]
+        [Fact]
         public override void CanAlterColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
@@ -26,7 +23,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterColumnToNullableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
@@ -37,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanAlterColumnWithDefaultSchema()
         {
             //TODO: This will fail if there are any keys attached 
@@ -47,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterColumnToNullableWithDefaultSchema()
         {
             //TODO: This will fail if there are any keys attached 
@@ -58,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateAutoIncrementColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
@@ -68,7 +65,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] INT NOT NULL IDENTITY(1,1)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateAutoIncrementColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
@@ -77,7 +74,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] INT NOT NULL IDENTITY(1,1)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -87,7 +84,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -96,7 +93,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateDecimalColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
@@ -106,7 +103,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] NUMERIC(19,2) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateDecimalColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
@@ -115,7 +112,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("ALTER TABLE [TestTable1] ADD [TestColumn1] NUMERIC(19,2) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropColumnWithCustomSchema()
         {
             //This does not work if column in used in constraint, index etc.
@@ -126,7 +123,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("ALTER TABLE [TestTable1] DROP COLUMN [TestColumn1];");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropColumnWithDefaultSchema()
         {
             //This does not work if column in used in constraint, index etc.
@@ -136,7 +133,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("ALTER TABLE [TestTable1] DROP COLUMN [TestColumn1];");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropMultipleColumnsWithCustomSchema()
         {
             //This does not work if it is a primary key
@@ -146,7 +143,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
-        [Test]
+        [Fact]
         public override void CanDropMultipleColumnsWithDefaultSchema()
         {
             //This does not work if it is a primary key
@@ -155,7 +152,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
-        [Test]
+        [Fact]
         public override void CanRenameColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
@@ -164,7 +161,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(expression));
         }
 
-        [Test]
+        [Fact]
         public override void CanRenameColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
@@ -173,3 +170,4 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
     }
 }
+

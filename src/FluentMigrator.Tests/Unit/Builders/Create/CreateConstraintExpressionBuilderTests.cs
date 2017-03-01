@@ -5,12 +5,10 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Extensions;
 using Moq;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
-    [TestFixture]
     public class CreateConstraintExpressionBuilderTests
     {
         private const string TableName = "Bacon";
@@ -52,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             return collectionMock;
         }
 
-        [Test]
+        [Fact]
         public void CallingOnTableSetsTableNameForPrimaryKey()
         {
             var constraintMock = CreateMockOfConstraint(ConstraintType.PrimaryKey, b => b.OnTable(TableName));
@@ -60,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             constraintMock.VerifySet(x => x.TableName = TableName);
         }
 
-        [Test]
+        [Fact]
         public void CallingOnTableSetsTableNamesForUnique()
         {
             var constraintMock = CreateMockOfConstraint(ConstraintType.Unique, b => b.OnTable(TableName));
@@ -68,7 +66,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             constraintMock.VerifySet(x => x.TableName = TableName);
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnAddsColumnNameForPrimaryKey()
         {
             var collectionMock = CreateMockOfConstraintColumns(ConstraintType.PrimaryKey, b => b.Column(Column1));
@@ -76,7 +74,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             collectionMock.Verify(x => x.Add(Column1));
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnAddsColumnNameForUnique()
         {
             var collectionMock = CreateMockOfConstraintColumns(ConstraintType.Unique, b => b.Column(Column1));
@@ -84,7 +82,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             collectionMock.Verify(x => x.Add(Column1));
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnsAddsColumnNamesForPrimaryKey()
         {
             var collectionMock = CreateMockOfConstraintColumns(ConstraintType.PrimaryKey, b => b.Columns(new[] { Column1, Column2 }));
@@ -93,7 +91,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             collectionMock.Verify(x => x.Add(Column2));
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnsAddsColumnNamesForUnique()
         {
             var collectionMock = CreateMockOfConstraintColumns(ConstraintType.Unique, b => b.Columns(new[] { Column1, Column2 }));
@@ -102,7 +100,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             collectionMock.Verify(x => x.Add(Column2));
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnsWithDuplicateNamesAddsSetOfColumnNamesForPrimaryKey()
         {
             var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
@@ -113,7 +111,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             Assert.That(expression.Constraint.Columns.Count, Is.EqualTo(2));
         }
 
-        [Test]
+        [Fact]
         public void CallingColumnsWithDuplicateNamesAddsSetOfColumnNamesForUnique()
         {
             var expression = new CreateConstraintExpression(ConstraintType.Unique);
@@ -124,7 +122,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             Assert.That(expression.Constraint.Columns.Count, Is.EqualTo(2));
         }
 
-        [Test]
+        [Fact]
         public void CallingClusteredSetsAdditionalPropertiesForPrimaryKey()
         {
             var constraintMock = CreateMockOfConstraint(ConstraintType.PrimaryKey, b => b.Clustered());
@@ -134,7 +132,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
                     SqlServerConstraintType.Clustered));
         }
 
-        [Test]
+        [Fact]
         public void CallingClusteredSetsAdditionalPropertiesForUnique()
         {
             var constraintMock = CreateMockOfConstraint(ConstraintType.Unique, b => b.Clustered());
@@ -144,7 +142,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
                     SqlServerConstraintType.Clustered));
         }
 
-        [Test]
+        [Fact]
         public void CallingNonClusteredSetsAdditionalPropertiesForPrimaryKey()
         {
             var constraintMock = CreateMockOfConstraint(ConstraintType.PrimaryKey, b => b.NonClustered());
@@ -154,7 +152,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
                     SqlServerConstraintType.NonClustered));
         }
 
-        [Test]
+        [Fact]
         public void CallingNonClusteredSetsAdditionalPropertiesForUnique()
         {
             var constraintMock = CreateMockOfConstraint(ConstraintType.Unique, b => b.NonClustered());

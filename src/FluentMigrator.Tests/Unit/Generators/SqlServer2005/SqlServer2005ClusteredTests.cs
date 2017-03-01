@@ -1,22 +1,19 @@
-﻿using FluentMigrator.Runner.Extensions;
+using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Generators.SqlServer;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 {
-    [TestFixture]
     public class SqlServer2005ClusteredTests : BaseSqlServerClusteredTests
     {
         protected SqlServer2005Generator Generator;
 
-        [SetUp]
-        public void Setup()
+        public SqlServer2005ClusteredTests()
         {
             Generator = new SqlServer2005Generator();
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateClusteredIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
@@ -27,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("CREATE CLUSTERED INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateClusteredIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
@@ -37,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("CREATE CLUSTERED INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnClusteredIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
@@ -48,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("CREATE CLUSTERED INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnClusteredIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
@@ -58,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("CREATE CLUSTERED INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedClusteredPrimaryKeyConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
@@ -69,7 +66,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY CLUSTERED ([TestColumn1])");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedClusteredPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
@@ -79,7 +76,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY CLUSTERED ([TestColumn1])");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedClusteredUniqueConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
@@ -90,7 +87,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE CLUSTERED ([TestColumn1])");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedClusteredUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
@@ -100,7 +97,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE CLUSTERED ([TestColumn1])");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedMultiColumnClusteredPrimaryKeyConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnPrimaryKeyExpression();
@@ -111,7 +108,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY CLUSTERED ([TestColumn1], [TestColumn2])");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedMultiColumnClusteredPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnPrimaryKeyExpression();
@@ -121,7 +118,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY CLUSTERED ([TestColumn1], [TestColumn2])");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedMultiColumnClusteredUniqueConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
@@ -132,7 +129,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE CLUSTERED ([TestColumn1], [TestColumn2])");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedMultiColumnClusteredUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
@@ -142,7 +139,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE CLUSTERED ([TestColumn1], [TestColumn2])");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedMultiColumnNonClusteredPrimaryKeyConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnPrimaryKeyExpression();
@@ -153,7 +150,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY NONCLUSTERED ([TestColumn1], [TestColumn2])");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedMultiColumnNonClusteredPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnPrimaryKeyExpression();
@@ -163,7 +160,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY NONCLUSTERED ([TestColumn1], [TestColumn2])");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedMultiColumnNonClusteredUniqueConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
@@ -174,7 +171,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE NONCLUSTERED ([TestColumn1], [TestColumn2])");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedMultiColumnNonClusteredUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
@@ -184,7 +181,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE NONCLUSTERED ([TestColumn1], [TestColumn2])");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedNonClusteredPrimaryKeyConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
@@ -195,7 +192,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY NONCLUSTERED ([TestColumn1])");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedNonClusteredPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
@@ -205,7 +202,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [TESTPRIMARYKEY] PRIMARY KEY NONCLUSTERED ([TestColumn1])");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedNonClusteredUniqueConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
@@ -216,7 +213,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE NONCLUSTERED ([TestColumn1])");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateNamedNonClusteredUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
@@ -226,7 +223,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [TESTUNIQUECONSTRAINT] UNIQUE NONCLUSTERED ([TestColumn1])");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateUniqueClusteredIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
@@ -237,7 +234,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("CREATE UNIQUE CLUSTERED INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateUniqueClusteredIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
@@ -247,7 +244,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("CREATE UNIQUE CLUSTERED INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateUniqueClusteredMultiColumnIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
@@ -258,7 +255,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("CREATE UNIQUE CLUSTERED INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateUniqueClusteredMultiColumnIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
@@ -269,3 +266,4 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
     }
 }
+

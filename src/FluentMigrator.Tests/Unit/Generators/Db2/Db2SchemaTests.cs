@@ -1,6 +1,5 @@
 ﻿using FluentMigrator.Runner.Generators.DB2;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,18 +7,16 @@ using System.Text;
 
 namespace FluentMigrator.Tests.Unit.Generators.Db2
 {
-    [TestFixture]
     public class Db2SchemaTests : BaseSchemaTests
     {
         protected Db2Generator Generator;
 
-        [SetUp]
-        public void Setup()
+        public Db2SchemaTests()
         {
             Generator = new Db2Generator();
         }
 
-        [Test]
+        [Fact]
         public override void CanAlterSchema()
         {
             var expression = GeneratorTestHelper.GetAlterSchemaExpression();
@@ -28,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe(string.Empty);
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSchemaExpression();
@@ -37,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE SCHEMA TestSchema");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSchemaExpression();

@@ -19,15 +19,13 @@
 using System;
 using FluentMigrator.Runner.Announcers;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Announcers
 {
-    [TestFixture]
     public class AnnouncerTests
     {
-        [SetUp]
-        public void Setup()
+        public AnnouncerTests()
         {
             var announcerMock = new Mock<Announcer> {CallBase = true};
             announcer = announcerMock.Object;
@@ -35,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Announcers
 
         private Announcer announcer;
 
-        [Test]
+        [Fact]
         public void ElapsedTime_Should_Not_Write_When_ShowElapsedTime_Is_False()
         {
             var time = new TimeSpan(0, 1, 40);
@@ -45,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Announcers
             Mock.Get(announcer).Verify(a => a.Write(It.IsAny<string>(), It.IsAny<bool>()), Times.Never());
         }
 
-        [Test]
+        [Fact]
         public void ElapsedTime_Should_Write_When_ShowElapsedTime_Is_True()
         {
             var time = new TimeSpan(0, 1, 40);
@@ -57,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Announcers
             Mock.Get(announcer).VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void Error_Should_Write()
         {
             var message = "TheMessage";
@@ -68,7 +66,7 @@ namespace FluentMigrator.Tests.Unit.Announcers
             Mock.Get(announcer).VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void Heading_Should_Write()
         {
             var message = "TheMessage";
@@ -79,7 +77,7 @@ namespace FluentMigrator.Tests.Unit.Announcers
             Mock.Get(announcer).VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void Say_Should_Write()
         {
             var message = "TheMessage";
@@ -90,7 +88,7 @@ namespace FluentMigrator.Tests.Unit.Announcers
             Mock.Get(announcer).VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void Sql_Should_Not_Write_When_Show_Sql_Is_False()
         {
             var sql = "INSERT INTO table(Id,Name) VALUES (1, 'Test');";
@@ -100,7 +98,7 @@ namespace FluentMigrator.Tests.Unit.Announcers
             Mock.Get(announcer).Verify(a => a.Write(It.IsAny<string>(), It.IsAny<bool>()), Times.Never());
         }
 
-        [Test]
+        [Fact]
         public void Sql_Should_Write_When_Show_Sql_Is_True()
         {
             var sql = "INSERT INTO table(Id,Name) VALUES (1, 'Test');";
@@ -112,7 +110,7 @@ namespace FluentMigrator.Tests.Unit.Announcers
             Mock.Get(announcer).VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void Sql_Should_Write_When_Show_Sql_Is_True_And_Sql_Is_Empty()
         {
             var sql = "";

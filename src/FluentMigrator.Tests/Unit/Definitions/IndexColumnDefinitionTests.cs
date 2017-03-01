@@ -20,22 +20,20 @@ using System;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Definitions
 {
-    [TestFixture]
     public class IndexColumnDefinitionTests
     {
-        [Test]
+        [Fact]
         public void DirectionIsAscendingIfNotSpecified()
         {
             var column = new IndexColumnDefinition();
             column.Direction.ShouldBe(Direction.Ascending);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenColumnNameIsNull()
         {
             var column = new IndexColumnDefinition { Name = null };
@@ -43,7 +41,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
             errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenColumnNameIsEmptyString()
         {
             var column = new IndexColumnDefinition { Name = String.Empty };
@@ -51,7 +49,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
             errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenColumnNameIsNotNullOrEmptyString()
         {
             var column = new IndexColumnDefinition { Name = "Bacon" };
@@ -59,7 +57,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
             errors.ShouldNotContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenIncludeNameIsNull()
         {
             var column = new IndexIncludeDefinition { Name = null };
@@ -67,7 +65,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
             errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenIncludeNameIsEmptyString()
         {
             var column = new IndexIncludeDefinition { Name = String.Empty };
@@ -75,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Definitions
             errors.ShouldContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenIncludeNameIsNotNullOrEmptyString()
         {
             var column = new IndexIncludeDefinition { Name = "Bacon" };

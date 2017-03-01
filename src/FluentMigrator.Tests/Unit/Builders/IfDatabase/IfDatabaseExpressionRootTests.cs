@@ -23,18 +23,16 @@ using FluentMigrator.Builders.IfDatabase;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Processors.Jet;
 using Moq;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
 {
-    [TestFixture]
     public class IfDatabaseExpressionRootTests
     {
 
-        [Test]
+        [Fact]
         public void WillAddExpressionIfDatabaseTypeApplies()
         {
             var context = ExecuteTestMigration("Jet");
@@ -42,7 +40,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             context.Expressions.Count.ShouldBe(1);
         }
 
-        [Test]
+        [Fact]
         public void WillNotAddExpressionIfDatabaseTypeApplies()
         {
             var context = ExecuteTestMigration("Unknown");
@@ -50,7 +48,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             context.Expressions.Count.ShouldBe(0);
         }
 
-        [Test]
+        [Fact]
         public void WillNotAddExpressionIfProcessorNotMigrationProcessor()
         {
             var mock = new Mock<IQuerySchema>();
@@ -59,7 +57,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             context.Expressions.Count.ShouldBe(0);
         }
 
-        [Test]
+        [Fact]
         public void WillAddExpressionIfOneDatabaseTypeApplies()
         {
             var context = ExecuteTestMigration("Jet", "Unknown");
@@ -67,7 +65,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             context.Expressions.Count.ShouldBe(1);
         }
 
-        [Test]
+        [Fact]
         public void WillAddAlterExpression()
         {
             var context = ExecuteTestMigration(new List<string>() { "Jet" }, m => m.Alter.Table("Foo").AddColumn("Blah").AsString());
@@ -75,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             context.Expressions.Count.ShouldBeGreaterThan(0);
         }
 
-        [Test]
+        [Fact]
         public void WillAddCreateExpression()
         {
             var context = ExecuteTestMigration(new List<string>() { "Jet" }, m => m.Create.Table("Foo").WithColumn("Blah").AsString());
@@ -83,7 +81,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             context.Expressions.Count.ShouldBeGreaterThan(0);
         }
 
-        [Test]
+        [Fact]
         public void WillAddDeleteExpression()
         {
             var context = ExecuteTestMigration(new List<string>() { "Jet" }, m => m.Delete.Table("Foo"));
@@ -91,7 +89,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             context.Expressions.Count.ShouldBeGreaterThan(0);
         }
 
-        [Test]
+        [Fact]
         public void WillAddExecuteExpression()
         {
             var context = ExecuteTestMigration(new List<string>() { "Jet" }, m => m.Execute.Sql("DROP TABLE Foo"));
@@ -99,7 +97,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             context.Expressions.Count.ShouldBeGreaterThan(0);
         }
 
-        [Test]
+        [Fact]
         public void WillAddInsertExpression()
         {
             var context = ExecuteTestMigration(new List<string>() { "Jet" }, m => m.Insert.IntoTable("Foo").Row(new { Id = 1 }));
@@ -107,7 +105,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             context.Expressions.Count.ShouldBeGreaterThan(0);
         }
 
-        [Test]
+        [Fact]
         public void WillAddRenameExpression()
         {
             var context = ExecuteTestMigration(new List<string>() { "Jet" }, m => m.Rename.Table("Foo").To("Foo2"));
@@ -115,7 +113,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             context.Expressions.Count.ShouldBeGreaterThan(0);
         }
 
-        [Test]
+        [Fact]
         public void WillAddSchemaExpression()
         {
             var databaseTypes = new List<string>() { "Unknown" };
@@ -131,7 +129,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             unknownProcessorMock.Verify(x => x.TableExists(null, "Foo"));
         }
 
-        [Test]
+        [Fact]
         public void WillAddUpdateExpression()
         {
             var context = ExecuteTestMigration(new List<string>() { "Jet" }, m => m.Update.Table("Foo").Set(new { Id = 1 }));

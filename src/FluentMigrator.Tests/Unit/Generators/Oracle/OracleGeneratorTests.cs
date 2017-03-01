@@ -1,23 +1,20 @@
-﻿using FluentMigrator.Exceptions;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Oracle;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {
-    [TestFixture]
     public class OracleGeneratorTests
     {
         protected OracleGenerator Generator;
 
-        [SetUp]
-        public void Setup()
+        public OracleGeneratorTests()
         {
             Generator = new OracleGenerator();
         }
 
-        [Test]
+        [Fact]
         public void CanAlterColumnNoNullSettings()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
@@ -27,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("ALTER TABLE TestTable1 MODIFY TestColumn1 NVARCHAR2(20)");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterColumnNull()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
@@ -37,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("ALTER TABLE TestTable1 MODIFY TestColumn1 NVARCHAR2(20) NULL");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterColumnNotNull()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
@@ -47,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("ALTER TABLE TestTable1 MODIFY TestColumn1 NVARCHAR2(20) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterSchemaInStrictMode()
         {
             Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
@@ -55,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
 
-        [Test]
+        [Fact]
         public void CanCreateSchemaInStrictMode()
         {
             Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
@@ -63,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
 
-        [Test]
+        [Fact]
         public void CanDropSchemaInStrictMode()
         {
             Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
@@ -71,7 +68,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new DeleteSchemaExpression()));
         }
 
-        [Test]
+        [Fact]
         public void CanCreateTableWithoutAnyDescriptions()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -81,7 +78,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255) NOT NULL, TestColumn2 NUMBER(10,0) NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateTableWithDescriptionAndColumnDescription()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithTableDescriptionAndColumnDescriptions();
@@ -91,7 +88,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("BEGIN EXECUTE IMMEDIATE 'CREATE TABLE TestTable1 (TestColumn1 NVARCHAR2(255), TestColumn2 NUMBER(10,0) NOT NULL)';EXECUTE IMMEDIATE 'COMMENT ON TABLE TestTable1 IS ''TestDescription''';EXECUTE IMMEDIATE 'COMMENT ON COLUMN TestTable1.TestColumn1 IS ''TestColumn1Description''';EXECUTE IMMEDIATE 'COMMENT ON COLUMN TestTable1.TestColumn2 IS ''TestColumn2Description'''; END;");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterTableWithDescription()
         {
             var expression = GeneratorTestHelper.GetAlterTableWithDescriptionExpression();
@@ -101,7 +98,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("COMMENT ON TABLE TestTable1 IS 'TestDescription'");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterTableWithoutAnyDescripion()
         {
             var expression = GeneratorTestHelper.GetAlterTable();
@@ -111,7 +108,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe(string.Empty);
         }
 
-        [Test]
+        [Fact]
         public void CanCreateColumnWithDescription()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpressionWithDescription();
@@ -121,7 +118,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("BEGIN EXECUTE IMMEDIATE 'ALTER TABLE TestTable1 ADD TestColumn1 NVARCHAR2(5) NOT NULL';EXECUTE IMMEDIATE 'COMMENT ON COLUMN TestTable1.TestColumn1 IS ''TestColumn1Description'''; END;");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateColumnWithoutDescription()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -131,7 +128,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NVARCHAR2(5) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterColumnWithDescription()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpressionWithDescription();
@@ -141,7 +138,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("BEGIN EXECUTE IMMEDIATE 'ALTER TABLE TestTable1 MODIFY TestColumn1 NVARCHAR2(20) NOT NULL';EXECUTE IMMEDIATE 'COMMENT ON COLUMN TestTable1.TestColumn1 IS ''TestColumn1Description'''; END;");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterColumnWithoutDescription()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
@@ -152,3 +149,4 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         }
     }
 }
+

@@ -1,21 +1,18 @@
 using FluentMigrator.Runner.Generators.Jet;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Jet
 {
-    [TestFixture]
     public class JetColumnTests : BaseColumnTests
     {
         protected JetGenerator Generator;
 
-        [SetUp]
-        public void Setup()
+        public JetColumnTests()
         {
             Generator = new JetGenerator();
         }
 
-        [Test]
+        [Fact]
         public override void CanAlterColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
@@ -25,7 +22,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] VARCHAR(20) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanAlterColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
@@ -34,7 +31,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] VARCHAR(20) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateAutoIncrementColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
@@ -44,7 +41,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] COUNTER NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateAutoIncrementColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
@@ -53,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             result.ShouldBe("ALTER TABLE [TestTable1] ALTER COLUMN [TestColumn1] COUNTER NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -63,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             result.ShouldBe("ALTER TABLE [TestTable1] ADD COLUMN [TestColumn1] VARCHAR(5) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -72,7 +69,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             result.ShouldBe("ALTER TABLE [TestTable1] ADD COLUMN [TestColumn1] VARCHAR(5) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateDecimalColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
@@ -82,7 +79,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             result.ShouldBe("ALTER TABLE [TestTable1] ADD COLUMN [TestColumn1] DECIMAL(19,2) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateDecimalColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
@@ -91,7 +88,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             result.ShouldBe("ALTER TABLE [TestTable1] ADD COLUMN [TestColumn1] DECIMAL(19,2) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
@@ -101,7 +98,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             result.ShouldBe("ALTER TABLE [TestTable1] DROP COLUMN [TestColumn1]");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
@@ -110,7 +107,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             result.ShouldBe("ALTER TABLE [TestTable1] DROP COLUMN [TestColumn1]");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropMultipleColumnsWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "TestColumn1", "TestColumn2" });
@@ -120,7 +117,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             result.ShouldBe("ALTER TABLE [TestTable1] DROP COLUMN [TestColumn1];" + System.Environment.NewLine + "ALTER TABLE [TestTable1] DROP COLUMN [TestColumn2]");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropMultipleColumnsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "TestColumn1", "TestColumn2" });
@@ -129,7 +126,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             result.ShouldBe("ALTER TABLE [TestTable1] DROP COLUMN [TestColumn1];" + System.Environment.NewLine + "ALTER TABLE [TestTable1] DROP COLUMN [TestColumn2]");
         }
 
-        [Test]
+        [Fact]
         public override void CanRenameColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
@@ -139,7 +136,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
             result.ShouldBe(string.Empty);
         }
 
-        [Test]
+        [Fact]
         public override void CanRenameColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();

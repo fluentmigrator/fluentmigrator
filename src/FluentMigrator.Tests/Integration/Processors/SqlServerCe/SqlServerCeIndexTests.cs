@@ -1,25 +1,23 @@
-﻿using System.Data.SqlServerCe;
+using System;
+using System.Data.SqlServerCe;
 using System.IO;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
 {
-    [TestFixture]
-    [Category("Integration")]
-    public class SqlServerCeIndexTests : BaseIndexTests
+    [Trait("Category", "Integration")]
+    public class SqlServerCeIndexTests : BaseIndexTests, IDisposable
     {
         public string DatabaseFilename { get; set; }
         public SqlCeConnection Connection { get; set; }
         public SqlServerCeProcessor Processor { get; set; }
 
-        [SetUp]
-        public void SetUp()
+        public SqlServerCeIndexTests()
         {
             DatabaseFilename = "TestDatabase.sdf";
             RecreateDatabase();
@@ -29,8 +27,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             Processor.BeginTransaction();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.CommitTransaction();
             Processor.Dispose();
@@ -46,7 +43,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             new SqlCeEngine(IntegrationTestOptions.SqlServerCe.ConnectionString).CreateDatabase();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsCanAcceptIndexNameWithSingleQuote()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
@@ -56,7 +53,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsCanAcceptTableNameWithSingleQuote()
         {
             using (var table = new SqlServerCeTestTable("Test'Table", Processor, "id int"))
@@ -66,7 +63,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             }
         }
         
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfIndexDoesNotExist()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
@@ -76,7 +73,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfIndexDoesNotExistWithSchema()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
@@ -86,20 +83,20 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.IndexExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
             Processor.IndexExists("NOTUSED", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsTrueIfIndexExists()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
@@ -109,7 +106,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsTrueIfIndexExistsWithSchema()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
@@ -120,3 +117,4 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         }
     }
 }
+

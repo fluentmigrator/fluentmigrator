@@ -1,23 +1,20 @@
-﻿using FluentMigrator.Exceptions;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Oracle;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
 {
-    [TestFixture]
     public class OracleGeneratorTests
     {
         protected OracleGenerator Generator;
 
-        [SetUp]
-        public void Setup()
+        public OracleGeneratorTests()
         {
             Generator = new OracleGenerator(useQuotedIdentifiers: true);
         }
 
-        [Test]
+        [Fact]
         public void CanAlterColumnNoNullSettings()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
@@ -27,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             result.ShouldBe("ALTER TABLE \"TestTable1\" MODIFY \"TestColumn1\" NVARCHAR2(20)");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterSchemaInStrictMode()
         {
             Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
@@ -35,7 +32,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
 
-        [Test]
+        [Fact]
         public void CanCreateSchemaInStrictMode()
         {
             Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
@@ -43,7 +40,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             Assert.Throws<DatabaseOperationNotSupportedException>(() => Generator.Generate(new CreateSchemaExpression()));
         }
 
-        [Test]
+        [Fact]
         public void CanDropSchemaInStrictMode()
         {
             Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
@@ -52,3 +49,4 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
         }
     }
 }
+

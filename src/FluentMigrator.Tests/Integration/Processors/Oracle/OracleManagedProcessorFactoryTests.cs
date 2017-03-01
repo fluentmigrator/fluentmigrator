@@ -1,19 +1,17 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Collections.Generic;
 using System;
 
 using FluentMigrator.Runner.Processors.Oracle;
 
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Oracle {
-	[TestFixture]
-	[Category( "Integration" )]
+	[Trait("Category", "Integration")]
 	public class OracleManagedProcessorFactoryTests : OracleProcessorFactoryTestsBase {
-		[SetUp]
-		public void SetUp()
+		public OracleManagedProcessorFactoryTests()
+            : base(new OracleManagedProcessorFactory())
 		{
-			base.SetUp( new OracleManagedProcessorFactory() );
 		}
 	}
 }

@@ -22,14 +22,13 @@ using FluentMigrator.Builders.Create.ForeignKey;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Builders.Create
 {
-    [TestFixture]
     public class CreateForeignKeyExpressionBuilderTests
     {
-        [Test]
+        [Fact]
         public void CallingFromTableSetsForeignTableName()
         {
             var foreignKeyMock = new Mock<ForeignKeyDefinition>();
@@ -44,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             expressionMock.VerifyGet(e => e.ForeignKey);
         }
 
-        [Test]
+        [Fact]
         public void CallingToTableSetsPrimaryTableName()
         {
             var foreignKeyMock = new Mock<ForeignKeyDefinition>();
@@ -59,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             expressionMock.VerifyGet(e => e.ForeignKey);
         }
 
-        [Test]
+        [Fact]
         public void CallingForeignColumnAddsColumnNameToForeignColumnCollection()
         {
             var collectionMock = new Mock<IList<string>>();
@@ -78,7 +77,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             expressionMock.VerifyGet(e => e.ForeignKey);
         }
 
-        [Test]
+        [Fact]
         public void CallingForeignColumnsAddsColumnNamesToForeignColumnCollection()
         {
             var collectionMock = new Mock<IList<string>>();
@@ -98,7 +97,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             expressionMock.VerifyGet(e => e.ForeignKey);
         }
 
-        [Test]
+        [Fact]
         public void CallingPrimaryColumnAddsColumnNameToPrimaryColumnCollection()
         {
             var collectionMock = new Mock<IList<string>>();
@@ -117,7 +116,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             expressionMock.VerifyGet(e => e.ForeignKey);
         }
 
-        [Test]
+        [Fact]
         public void CallingPrimaryColumnsAddsColumnNamesToForeignColumnCollection()
         {
             var collectionMock = new Mock<IList<string>>();

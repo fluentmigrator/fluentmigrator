@@ -19,15 +19,13 @@
 using System.Collections.ObjectModel;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
-    [TestFixture]
     public class CreateForeignKeyExpressionTests
     {
-        [Test]
+        [Fact]
         public void ToStringIsDescriptive()
         {
             var sql = new CreateForeignKeyExpression

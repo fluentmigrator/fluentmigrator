@@ -1,15 +1,13 @@
 ﻿using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests
 {
-    [TestFixture]
     public class MigrationValidatorTests
     {
-        [SetUp]
-        public void Setup()
+        public MigrationValidatorTests()
         {
             migration = Mock.Of<IMigration>();
             migrationValidator = new MigrationValidator(Mock.Of<IAnnouncer>(), new MigrationConventions());
@@ -30,7 +28,7 @@ namespace FluentMigrator.Tests
             return expression;
         }
 
-        [Test]
+        [Fact]
         public void it_does_not_throw_if_expressions_are_valid()
         {
             Assert.DoesNotThrow(
@@ -38,7 +36,7 @@ namespace FluentMigrator.Tests
                                                                                   , new[] {BuildValidExpression()}));
         }
 
-        [Test]
+        [Fact]
         public void it_throws_invalid_migration_exception_if_expressions_are_invalid()
         {
             Assert.Throws<InvalidMigrationException>(
@@ -46,7 +44,7 @@ namespace FluentMigrator.Tests
                                                                                   , new[] {BuildInvalidExpression()}));
         }
 
-        [Test]
+        [Fact]
         public void it_throws_invalid_migration_exception_if_expressions_contains_multiple_invalid_of_same_type()
         {
             Assert.Throws<InvalidMigrationException>(

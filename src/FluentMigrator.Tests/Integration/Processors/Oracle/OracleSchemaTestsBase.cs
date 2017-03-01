@@ -8,19 +8,18 @@ using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Oracle;
 
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Oracle {
-	[Category("Integration")]
-	public abstract class OracleSchemaTestsBase : BaseSchemaTests
+	[Trait("Category", "Integration")]
+	public abstract class OracleSchemaTestsBase : BaseSchemaTests, IDisposable
 	{
 		private const string SchemaName = "test";
 		private IDbConnection Connection { get; set; }
 		private OracleProcessor Processor { get; set; }
 		private IDbFactory Factory { get; set; }
 
-		protected void SetUp(IDbFactory dbFactory)
+		protected OracleSchemaTestsBase(IDbFactory dbFactory)
 		{
 			this.Factory = dbFactory;
 			this.Connection = this.Factory.CreateConnection(IntegrationTestOptions.Oracle.ConnectionString);
@@ -28,19 +27,18 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 			this.Connection.Open();
 		}
 
-		[TearDown]
-		public void TearDown()
+		public void Dispose()
 		{
 			this.Processor.Dispose();
 		}
 
-		[Test]
+		[Fact]
 		public override void CallingSchemaExistsReturnsFalseIfSchemaDoesNotExist()
 		{
 			this.Processor.SchemaExists("DoesNotExist").ShouldBeFalse();
 		}
 
-		[Test]
+		[Fact]
 		public override void CallingSchemaExistsReturnsTrueIfSchemaExists()
 		{
 			this.Processor.SchemaExists(SchemaName).ShouldBeTrue();

@@ -10,12 +10,11 @@ using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Tests.Helpers;
 
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Oracle {
-	[Category("Integration")]
-	public abstract class OracleProcessorTestsBase
+	[Trait("Category", "Integration")]
+	public abstract class OracleProcessorTestsBase : IDisposable
 	{
 		private const string SchemaName = "test";
 		private IDbConnection Connection { get; set; }
@@ -23,7 +22,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		private IDbFactory Factory { get; set; }
 		private IQuoter Quoter { get { return this.Processor.Quoter; } }
 
-		protected void SetUp(IDbFactory dbFactory)
+		protected OracleProcessorTestsBase(IDbFactory dbFactory)
 		{
 			this.Factory = dbFactory;
 			this.Connection = this.Factory.CreateConnection(IntegrationTestOptions.Oracle.ConnectionString);
@@ -31,20 +30,19 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 			this.Connection.Open();
 		}
 
-		[TearDown]
-		public void TearDown()
+		public void Dispose()
 		{
 			this.Processor.Dispose();
 		}
 
-		[Test]
+		[Fact]
 		public void CallingColumnExistsReturnsFalseIfColumnExistsInDifferentSchema()
 		{
 			using (var table = new OracleTestTable(this.Connection, SchemaName, this.Factory, "id int"))
 				this.Processor.ColumnExists("testschema", table.Name, "ID").ShouldBeFalse();
 		}
 
-		[Test]
+		[Fact]
 		public void CallingConstraintExistsReturnsFalseIfConstraintExistsInDifferentSchema()
 		{
 			using (var table = new OracleTestTable(this.Connection, SchemaName, this.Factory, "id int"))
@@ -54,14 +52,14 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 			}
 		}
 
-		[Test]
+		[Fact]
 		public void CallingTableExistsReturnsFalseIfTableExistsInDifferentSchema()
 		{
 			using (var table = new OracleTestTable(this.Connection, SchemaName, this.Factory, "id int"))
 				this.Processor.TableExists("testschema", table.Name).ShouldBeFalse();
 		}
 
-		[Test]
+		[Fact]
 		public void CallingColumnExistsWithIncorrectCaseReturnsTrueIfColumnExists()
 		{
 			//the ColumnExisits() function is'nt case sensitive
@@ -69,7 +67,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 				this.Processor.ColumnExists(null, table.Name, "Id").ShouldBeTrue();
 		}
 
-		[Test]
+		[Fact]
 		public void CallingConstraintExistsWithIncorrectCaseReturnsTrueIfConstraintExists()
 		{
 			//the ConstraintExists() function is'nt case sensitive
@@ -80,7 +78,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 			}
 		}
 
-		[Test]
+		[Fact]
 		public void CallingIndexExistsWithIncorrectCaseReturnsFalseIfIndexExist()
 		{
 			//the IndexExists() function is'nt case sensitive
@@ -91,7 +89,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 			}
 		}
 
-		[Test]
+		[Fact]
 		public void TestQuery()
 		{
 			string sql = "SELECT SYSDATE FROM " + this.Quoter.QuoteTableName("DUAL");

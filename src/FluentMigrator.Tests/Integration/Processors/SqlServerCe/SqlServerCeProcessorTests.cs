@@ -5,22 +5,19 @@ using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
 {
 
-    [TestFixture]
-    [Category("Integration")]
-    public class SqlServerCeProcessorTests
+    [Trait("Category", "Integration")]
+    public class SqlServerCeProcessorTests : IDisposable
     {
         public string DatabaseFilename { get; set; }
         public SqlCeConnection Connection { get; set; }
         public SqlServerCeProcessor Processor { get; set; }
 
-        [SetUp]
-        public void SetUp()
+        public SqlServerCeProcessorTests()
         {
             DatabaseFilename = "TestDatabase.sdf";
             RecreateDatabase();
@@ -30,20 +27,19 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             Processor.BeginTransaction();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.CommitTransaction();
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void CallingSchemaExistsReturnsTrueAlways()
         {
             Processor.SchemaExists("NOTUSED").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void CallingExecuteWithMultilineSqlShouldExecuteInBatches()
         {
             Processor.Execute("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL);" + Environment.NewLine +
@@ -56,7 +52,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             dataset.Tables[0].Rows.Count.ShouldBe(1);
         }
 
-        [Test]
+        [Fact]
         public void CallingExecuteWithMultilineSqlAsLowercaseShouldExecuteInBatches()
         {
             Processor.Execute("create table [TestTable1] ([TestColumn1] nvarchar(255) not null, [TestColumn2] int not null);" + Environment.NewLine +
@@ -69,7 +65,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             dataset.Tables[0].Rows.Count.ShouldBe(1);
         }
 
-        [Test]
+        [Fact]
         public void CallingExecuteWithMultilineSqlWithNoTrailingSemicolonShouldExecuteInBatches()
         {
             Processor.Execute("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL);" + Environment.NewLine +

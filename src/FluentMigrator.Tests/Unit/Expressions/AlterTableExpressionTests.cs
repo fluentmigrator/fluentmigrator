@@ -2,15 +2,13 @@
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
-    [TestFixture]
     public class AlterTableExpressionTests
     {
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenTableNameIsEmptyString()
         {
             var expression = new AlterTableExpression { TableName = String.Empty };
@@ -19,7 +17,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenTableNameIsSet()
         {
             var expression = new AlterTableExpression { TableName = "table1" };

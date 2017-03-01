@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using NUnit.Framework;
+using Xunit;
 using FluentMigrator.Expressions;
 using Moq;
 using FluentMigrator.Infrastructure;
@@ -7,10 +7,9 @@ using FluentMigrator.Builders.Delete;
 
 namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
-    [TestFixture]
     public class DeleteConstraintTest
     {
-        [Test]
+        [Fact]
         public void CallingDeletePrimaryKeyCreatesADeleteConstraintExpression()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -26,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Delete
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingDeleteUniqueConstraintCreatesADeleteConstraintExpression()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();

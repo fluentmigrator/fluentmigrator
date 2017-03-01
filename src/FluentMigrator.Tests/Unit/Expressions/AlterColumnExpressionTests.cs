@@ -22,22 +22,20 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
-    [TestFixture]
     public class AlterColumnExpressionTests
     {
-        [Test]
+        [Fact]
         public void ModificationTypeShouldBeSetToAlter()
         {
             var expression = new CreateColumnExpression();
             Assert.AreEqual(ColumnModificationType.Create, expression.Column.ModificationType);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenOldNameIsNull()
         {
             var expression = new AlterColumnExpression { TableName = null };
@@ -45,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenOldNameIsEmptyString()
         {
             var expression = new AlterColumnExpression { TableName = String.Empty };
@@ -53,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenOldNameIsNotNullEmptyString()
         {
             var expression = new AlterColumnExpression { TableName = "Bacon" };
@@ -61,7 +59,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldNotContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ToStringIsDescriptive()
         {
             var expression = new AlterColumnExpression { TableName = "Bacon", Column = { Name = "BaconId", Type = DbType.Int32 } };

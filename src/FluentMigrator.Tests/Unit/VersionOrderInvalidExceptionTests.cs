@@ -18,15 +18,13 @@ using System;
 using System.Collections.Generic;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit
 {
-    [TestFixture]
     public class VersionOrderInvalidExceptionTests
     {
-        [Test]
+        [Fact]
         public void InvalidMigrationsPopulated()
         {
             var migrations = new[]
@@ -41,7 +39,7 @@ namespace FluentMigrator.Tests.Unit
             exception.InvalidMigrations.ShouldBe(migrations);
         }
 
-        [Test]
+        [Fact]
         public void ExceptionMessageListsInvalidMigrations()
         {
             var migrations = new[]

@@ -1,17 +1,15 @@
-﻿using System.Configuration;
+using System.Configuration;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Initialization
 {
-    [TestFixture]
-    [Category("NotWorkingOnMono")]
+    [Trait("BrokenRuntimes", "Mono")]
     public class ConnectionStringManagerTests
     {
-        [SetUp]
-        public void Setup()
+        public ConnectionStringManagerTests()
         {
             announcerMock = new Mock<IAnnouncer>(MockBehavior.Loose);
             announcerMock.Setup(a => a.Say(It.IsAny<string>()));
@@ -37,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             return ConfigurationManager.OpenMappedExeConfiguration(fileMap, ConfigurationUserLevel.None);
         }
 
-        [Test]
+        [Fact]
         public void ShouldLoadMachineNameConnectionFromSpecifiedConfigIfNoConnectionNameSpecified()
         {
             string configPath = GetPath("WithConnectionString.config");
@@ -51,7 +49,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             Assert.That(sut.ConnectionString, Is.EqualTo("From Machine Name"));
         }
 
-        [Test]
+        [Fact]
         public void ShouldLoadNamedConnectionFromMachineConfigIfTargetAssemblyConfigHasNoMatch()
         {
             string configPath = GetPath("WithWrongConnectionString.config");
@@ -71,7 +69,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             Assert.That(sut.ConnectionString, Is.EqualTo("From Machine Config"));
         }
 
-        [Test]
+        [Fact]
         public void ShouldLoadNamedConnectionFromSpecifiedConfigFile()
         {
             string configPath = GetPath("WithConnectionString.config");
@@ -84,7 +82,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             Assert.That(sut.ConnectionString, Is.EqualTo("From Arbitrary Config"));
         }
 
-        [Test]
+        [Fact]
         public void ShouldLoadNamedConnectionFromTargetAssemblyConfig()
         {
             string configPath = GetPath("WithConnectionString.exe.config");
@@ -99,7 +97,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             Assert.That(sut.ConnectionString, Is.EqualTo("From App Config"));
         }
 
-        [Test]
+        [Fact]
         public void ShouldObfuscatePasswordOfConnectionString()
         {
             string configPath = GetPath("WithWrongConnectionString.config");
@@ -120,7 +118,7 @@ namespace FluentMigrator.Tests.Unit.Initialization
             announcerMock.Verify(a => a.Say(@"Using Database sqlserver2008 and Connection String server=.\SQLEXPRESS;uid=test;pwd=********;Trusted_Connection=yes;database=FluentMigrator"), Times.Once());
         }
 
-        [Test]
+        [Fact]
         public void ShouldUseAsConnectionStringIfNoConnectionMatchesAndNoMatchInMachineConfig()
         {
             string configPath = GetPath("WithWrongConnectionString.config");

@@ -1,21 +1,18 @@
-﻿using FluentMigrator.Runner.Generators.SqlServer;
-using NUnit.Framework;
-using NUnit.Should;
+using FluentMigrator.Runner.Generators.SqlServer;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 {
-    [TestFixture]
     public class SqlServer2005ColumnTests : BaseColumnTests
     {
         protected SqlServer2005Generator Generator;
 
-        [SetUp]
-        public void Setup()
+        public SqlServer2005ColumnTests()
         {
             Generator = new SqlServer2005Generator();
         }
 
-        [Test]
+        [Fact]
         public override void CanAlterColumnWithCustomSchema()
         {
             //TODO: This will fail if there are any keys attached 
@@ -26,7 +23,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanAlterColumnWithDefaultSchema()
         {
             //TODO: This will fail if there are any keys attached 
@@ -36,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateAutoIncrementColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
@@ -46,7 +43,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ALTER COLUMN [TestColumn1] INT NOT NULL IDENTITY(1,1)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateAutoIncrementColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
@@ -55,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ALTER COLUMN [TestColumn1] INT NOT NULL IDENTITY(1,1)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -65,7 +62,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -74,7 +71,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateDecimalColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
@@ -84,7 +81,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [TestSchema].[TestTable1] ADD [TestColumn1] DECIMAL(19,2) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateDecimalColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
@@ -93,7 +90,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] DECIMAL(19,2) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropColumnWithCustomSchema()
         {
             //This does not work if it is a primary key
@@ -122,7 +119,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe(expected);
         }
 
-        [Test]
+        [Fact]
         public override void CanDropColumnWithDefaultSchema()
         {
             //This does not work if it is a primary key
@@ -150,7 +147,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe(expected);
         }
 
-        [Test]
+        [Fact]
         public override void CanDropMultipleColumnsWithCustomSchema()
         {
             //This does not work if it is a primary key
@@ -197,7 +194,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe(expected);
         }
 
-        [Test]
+        [Fact]
         public override void CanDropMultipleColumnsWithDefaultSchema()
         {
             //This does not work if it is a primary key
@@ -243,7 +240,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe(expected);
         }
 
-        [Test]
+        [Fact]
         public override void CanRenameColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
@@ -253,7 +250,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             result.ShouldBe("sp_rename '[TestSchema].[TestTable1].[TestColumn1]', 'TestColumn2'");
         }
 
-        [Test]
+        [Fact]
         public override void CanRenameColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
@@ -263,3 +260,4 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
     }
 }
+

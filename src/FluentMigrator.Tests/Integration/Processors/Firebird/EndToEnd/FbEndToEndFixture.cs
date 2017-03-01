@@ -3,22 +3,20 @@ using System.Reflection;
 using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
 {
-    [Category("Integration")]
-    [Category("Firebird")]
-    public class FbEndToEndFixture
+    [Trait("Category", "Integration")]
+    [Trait("DbEngine", "Firebird")]
+    public class FbEndToEndFixture : IDisposable
     {
-        [SetUp]
-        public void SetUp()
+        public FbEndToEndFixture()
         {
             FbDatabase.CreateDatabase(IntegrationTestOptions.Firebird.ConnectionString);
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             FbDatabase.DropDatabase(IntegrationTestOptions.Firebird.ConnectionString);
         }
@@ -91,3 +89,4 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
         }
     }
 }
+

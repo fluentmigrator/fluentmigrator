@@ -1,6 +1,5 @@
 ﻿using FluentMigrator.Runner.Generators.DB2;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,18 +7,16 @@ using System.Text;
 
 namespace FluentMigrator.Tests.Unit.Generators.Db2
 {
-    [TestFixture]
     public class Db2DataTests : BaseDataTests
     {
         protected Db2Generator Generator;
 
-        [SetUp]
-        public void Setup()
+        public Db2DataTests()
         {
             Generator = new Db2Generator();
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataForAllRowsWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
@@ -29,7 +26,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("DELETE FROM TestSchema.TestTable1");
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataForAllRowsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
@@ -38,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("DELETE FROM TestTable1");
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataForMultipleRowsWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
@@ -48,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("DELETE FROM TestSchema.TestTable1 WHERE Name = 'Just''in' AND Website IS NULL DELETE FROM TestSchema.TestTable1 WHERE Website = 'github.com'");
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataForMultipleRowsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
@@ -57,7 +54,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL DELETE FROM TestTable1 WHERE Website = 'github.com'");
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
@@ -67,7 +64,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("DELETE FROM TestSchema.TestTable1 WHERE Name = 'Just''in' AND Website IS NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanDeleteDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
@@ -76,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanInsertDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
@@ -89,7 +86,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe(expected);
         }
 
-        [Test]
+        [Fact]
         public override void CanInsertDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
@@ -101,7 +98,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe(expected);
         }
 
-        [Test]
+        [Fact]
         public override void CanInsertGuidDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
@@ -111,7 +108,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe(System.String.Format("INSERT INTO TestSchema.TestTable1 (guid) VALUES ('{0}')", GeneratorTestHelper.TestGuid));
         }
 
-        [Test]
+        [Fact]
         public override void CanInsertGuidDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
@@ -120,7 +117,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe(System.String.Format("INSERT INTO TestTable1 (guid) VALUES ('{0}')", GeneratorTestHelper.TestGuid));
         }
 
-        [Test]
+        [Fact]
         public override void CanUpdateDataForAllDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
@@ -130,7 +127,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("UPDATE TestSchema.TestTable1 SET Name = 'Just''in', Age = 25");
         }
 
-        [Test]
+        [Fact]
         public override void CanUpdateDataForAllDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
@@ -139,7 +136,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("UPDATE TestTable1 SET Name = 'Just''in', Age = 25");
         }
 
-        [Test]
+        [Fact]
         public override void CanUpdateDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
@@ -149,7 +146,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("UPDATE TestSchema.TestTable1 SET Name = 'Just''in', Age = 25 WHERE Id = 9 AND Homepage IS NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanUpdateDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();

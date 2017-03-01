@@ -2,15 +2,13 @@
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
-    [TestFixture]
     public class DeleteSchemaExpressionTests
     {
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenSchemaNameIsEmptyString()
         {
             var expression = new DeleteSchemaExpression { SchemaName = String.Empty };
@@ -19,7 +17,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.SchemaNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenSchemaNameIsSet()
         {
             var expression = new DeleteSchemaExpression { SchemaName = "schema1" };

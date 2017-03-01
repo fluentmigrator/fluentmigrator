@@ -1,22 +1,19 @@
-﻿using FluentMigrator.Runner.Generators.SqlServer;
-using NUnit.Framework;
-using NUnit.Should;
+using FluentMigrator.Runner.Generators.SqlServer;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 {
-    [TestFixture]
     public class SqlServerCeTableTests : BaseTableTests
     {
         protected SqlServerCeGenerator Generator;
 
-        [SetUp]
-        public void Setup()
+        public SqlServerCeTableTests()
         {
             Generator = new SqlServerCeGenerator();
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanCreateTableWithCustomColumnTypeWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -29,8 +26,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] [timestamp] NOT NULL, PRIMARY KEY ([TestColumn1]))");
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanCreateTableWithCustomColumnTypeWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -42,8 +39,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] [timestamp] NOT NULL, PRIMARY KEY ([TestColumn1]))");
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanCreateTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -53,8 +50,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanCreateTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -63,8 +60,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNullWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -76,8 +73,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT NULL, [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNullWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -89,8 +86,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanCreateTableWithDefaultValueWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
@@ -100,8 +97,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT 'Default', [TestColumn2] INT NOT NULL CONSTRAINT [DF_TestTable1_TestColumn2] DEFAULT 0)");
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanCreateTableWithDefaultValueWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
@@ -110,8 +107,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT 'Default', [TestColumn2] INT NOT NULL CONSTRAINT [DF_TestTable1_TestColumn2] DEFAULT 0)");
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanCreateTableWithIdentityWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
@@ -120,8 +117,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(1,1), [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanCreateTableWithIdentityWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
@@ -131,8 +128,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] INT NOT NULL IDENTITY(1,1), [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanCreateTableWithMultiColumnPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
@@ -142,8 +139,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1], [TestColumn2]))");
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
@@ -152,8 +149,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1], [TestColumn2]))");
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanCreateTableWithNamedMultiColumnPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
@@ -163,8 +160,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1], [TestColumn2]))");
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanCreateTableWithNamedMultiColumnPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
@@ -173,8 +170,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1], [TestColumn2]))");
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanCreateTableWithNamedPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
@@ -184,8 +181,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1]))");
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanCreateTableWithNamedPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
@@ -194,8 +191,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, CONSTRAINT [TestKey] PRIMARY KEY ([TestColumn1]))");
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanCreateTableWithNullableFieldWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -206,8 +203,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255), [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanCreateTableWithNullableFieldWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -217,8 +214,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255), [TestColumn2] INT NOT NULL)");
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanCreateTableWithPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
@@ -228,8 +225,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1]))");
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanCreateTableWithPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
@@ -238,8 +235,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1]))");
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanDropTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
@@ -249,8 +246,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("DROP TABLE [TestTable1]");
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanDropTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
@@ -259,8 +256,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("DROP TABLE [TestTable1]");
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanRenameTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
@@ -270,8 +267,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             result.ShouldBe("sp_rename 'TestTable1', 'TestTable2'");
         }
 
-        [Test]
-        [Category("SqlServerCe"), Category("Generator"), Category("Table")]
+        [Fact]
+        [Trait("DbEngine", "SqlServerCe"), Trait("Subsystem", "Generator"), Trait("GeneratorAssert", "Table")]
         public override void CanRenameTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
@@ -281,3 +278,4 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         }
     }
 }
+

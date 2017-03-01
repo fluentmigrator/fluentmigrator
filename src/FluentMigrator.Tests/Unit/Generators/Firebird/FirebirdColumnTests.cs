@@ -1,22 +1,19 @@
 ﻿using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Processors.Firebird;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Firebird
 {
-    [TestFixture]
     public class FirebirdColumnTests : BaseColumnTests
     {
         protected FirebirdGenerator Generator;
 
-        [SetUp]
-        public void Setup()
+        public FirebirdColumnTests()
         {
             Generator = new FirebirdGenerator(FirebirdOptions.StandardBehaviour());
         }
 
-        [Test]
+        [Fact]
         public override void CanAlterColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
@@ -26,7 +23,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe(string.Empty);
         }
 
-        [Test]
+        [Fact]
         public override void CanAlterColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
@@ -35,7 +32,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe(string.Empty);
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateAutoIncrementColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
@@ -45,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe(string.Empty);
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateAutoIncrementColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
@@ -54,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe(string.Empty);
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -64,7 +61,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 VARCHAR(5) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -73,7 +70,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 VARCHAR(5) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateDecimalColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
@@ -83,7 +80,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 DECIMAL(19, 2) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateDecimalColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
@@ -92,7 +89,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 DECIMAL(19, 2) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
@@ -102,7 +99,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("ALTER TABLE TestTable1 DROP TestColumn1");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
@@ -111,7 +108,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("ALTER TABLE TestTable1 DROP TestColumn1");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropMultipleColumnsWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "TestColumn1", "TestColumn2" });
@@ -121,7 +118,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("ALTER TABLE TestTable1 DROP TestColumn1;" + System.Environment.NewLine + "ALTER TABLE TestTable1 DROP TestColumn2");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropMultipleColumnsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "TestColumn1", "TestColumn2" });
@@ -130,7 +127,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("ALTER TABLE TestTable1 DROP TestColumn1;" + System.Environment.NewLine + "ALTER TABLE TestTable1 DROP TestColumn2");
         }
 
-        [Test]
+        [Fact]
         public override void CanRenameColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
@@ -140,7 +137,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("ALTER TABLE TestTable1 ALTER COLUMN TestColumn1 TO TestColumn2");
         }
 
-        [Test]
+        [Fact]
         public override void CanRenameColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
@@ -149,7 +146,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("ALTER TABLE TestTable1 ALTER COLUMN TestColumn1 TO TestColumn2");
         }
 
-        [Test]
+        [Fact]
         public virtual void CanCreateDefaultString()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -159,7 +156,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 VARCHAR(255) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public virtual void CanCreateSizedString()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -169,7 +166,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Firebird
             result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 VARCHAR(10) NOT NULL");
         }
 
-        [Test]
+        [Fact]
         public virtual void CanCreateText()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();

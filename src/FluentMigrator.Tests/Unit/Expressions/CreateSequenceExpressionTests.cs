@@ -3,15 +3,13 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
-    [TestFixture]
     public class CreateSequenceExpressionTests
     {
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenSequenceNameIsEmptyString()
         {
             var expression = new CreateSequenceExpression { Sequence = new SequenceDefinition { Name = String.Empty } };
@@ -20,7 +18,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.SequenceNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenSequenceNameIsSet()
         {
             var expression = new CreateSequenceExpression { Sequence = new SequenceDefinition { Name = "sequence1" } };

@@ -1,24 +1,22 @@
-﻿using FirebirdSql.Data.FirebirdClient;
+using System;
+using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
-    [TestFixture]
-    [Category("Integration")]
-    [Category("Firebird")]
-    public class FirebirdTableTests : BaseTableTests
+    [Trait("Category", "Integration")]
+    [Trait("DbEngine", "Firebird")]
+    public class FirebirdTableTests : BaseTableTests, IDisposable
     {
         public FbConnection Connection { get; set; }
         public FirebirdProcessor Processor { get; set; }
 
-        [SetUp]
-        public void SetUp()
+        public FirebirdTableTests()
         {
             FbDatabase.CreateDatabase(IntegrationTestOptions.Firebird.ConnectionString);
 
@@ -29,8 +27,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             Processor.BeginTransaction();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             if (!Processor.WasCommitted)
                 Processor.CommitTransaction();
@@ -39,33 +36,33 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             FbDatabase.DropDatabase(IntegrationTestOptions.Firebird.ConnectionString);
         }
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsCanAcceptTableNameWithSingleQuote()
         {
             using (var table = new FirebirdTestTable("\"Test'Table\"", Processor, null, "id int"))
                 Processor.TableExists(null, table.Name).ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.TableExists(null, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
             Processor.TableExists("TestSchema", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsReturnsTrueIfTableExists()
         {
             using (var table = new FirebirdTestTable(Processor, null, "id int"))
                 Processor.TableExists(null, table.Name).ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsReturnsTrueIfTableExistsWithSchema()
         {
             using (var table = new FirebirdTestTable(Processor, "TestSchema", "id int"))

@@ -1,3 +1,4 @@
+using System;
 using System.Data.SqlClient;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
@@ -5,21 +6,18 @@ using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.SqlServer
 {
-    [TestFixture]
-    [Category("Integration")]
-    public class SqlServerSchemaExtensionsTests : BaseSchemaExtensionsTests
+    [Trait("Category", "Integration")]
+    public class SqlServerSchemaExtensionsTests : BaseSchemaExtensionsTests, IDisposable
     {
         public SqlConnection Connection { get; set; }
         public SqlServerProcessor Processor { get; set; }
         public IQuoter Quoter { get; set; }
 
-        [SetUp]
-        public void SetUp()
+        public SqlServerSchemaExtensionsTests()
         {
             Connection = new SqlConnection(IntegrationTestOptions.SqlServer2012.ConnectionString);
             Processor = new SqlServerProcessor(Connection, new SqlServer2012Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
@@ -28,28 +26,27 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
             Processor.BeginTransaction();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.CommitTransaction();
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsCanAcceptSchemaNameWithSingleQuote()
         {
             using (var table = new SqlServerTestTable(Processor, "test'schema", "id int"))
                 Processor.ColumnExists("test'schema", table.Name, "id").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsCanAcceptSchemaNameWithSingleQuote()
         {
             using (var table = new SqlServerTestTable(Processor, "test'schema", "id int", "wibble int CONSTRAINT c1 CHECK(wibble > 0)"))
                 Processor.ConstraintExists("test'schema", table.Name, "c1").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsCanAcceptSchemaNameWithSingleQuote()
         {
             using (var table = new SqlServerTestTable(Processor, "test'schema", "id int"))
@@ -59,21 +56,21 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingSchemaExistsCanAcceptSchemaNameWithSingleQuote()
         {
             using (new SqlServerTestTable(Processor, "test'schema", Quoter.QuoteColumnName("id") + " int"))
                 Processor.SchemaExists("test'schema").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsCanAcceptSchemaNameWithSingleQuote()
         {
             using (var table = new SqlServerTestTable(Processor, "test'schema", "id int"))
                 Processor.TableExists("test'schema", table.Name).ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void CallingDefaultValueExistsCanAcceptSchemaNameWithSingleQuote()
         {
             using (var table = new SqlServerTestTable(Processor, "test'schema", "id int"))

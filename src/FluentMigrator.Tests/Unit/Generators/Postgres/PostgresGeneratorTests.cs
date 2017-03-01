@@ -3,23 +3,20 @@ using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Postgres;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Postgres
 {
-    [TestFixture]
     public class PostgresGeneratorTests
     {
         protected PostgresGenerator Generator;
 
-        [SetUp]
-        public void Setup()
+        public PostgresGeneratorTests()
         {
             Generator = new PostgresGenerator();
         }
 
-        [Test]
+        [Fact]
         public void CanCreateTableWithDateTimeOffsetColumn() 
         {
             var tableName = "TestTable1";
@@ -33,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe(string.Format("CREATE TABLE \"public\".\"{0}\" (\"TestColumn1\" timestamptz NOT NULL, \"TestColumn2\" timestamp NOT NULL, \"TestColumn3\" date NOT NULL, \"TestColumn4\" time NOT NULL);", tableName));
         }
 
-        [Test]
+        [Fact]
         public void CanCreateAutoIncrementColumnForInt64()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
@@ -43,7 +40,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" bigserial NOT NULL, \"TestColumn2\" integer NOT NULL);");
         }
 
-        [Test]
+        [Fact]
         public void CanCreateTableWithBinaryColumnWithSize()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -54,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" bytea NOT NULL, \"TestColumn2\" integer NOT NULL);"); // PostgreSQL does not actually use the configured size
         }
 
-        [Test]
+        [Fact]
         public void CanCreateTableWithBoolDefaultValue()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -64,7 +61,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("CREATE TABLE \"public\".\"TestTable1\" (\"TestColumn1\" text NOT NULL DEFAULT true, \"TestColumn2\" integer NOT NULL);");
         }
 
-        [Test]
+        [Fact]
         public void CanUseSystemMethodCurrentUserAsADefaultValueForAColumn()
         {
             const string tableName = "NewTable";
@@ -75,7 +72,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"public\".\"NewTable\" ADD \"NewColumn\" varchar(15) NOT NULL DEFAULT current_user;");
         }
 
-        [Test]
+        [Fact]
         public void CanUseSystemMethodCurrentUTCDateTimeAsADefaultValueForAColumn()
         {
             const string tableName = "NewTable";
@@ -86,7 +83,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"public\".\"NewTable\" ADD \"NewColumn\" varchar(5) NOT NULL DEFAULT (now() at time zone 'UTC');");
         }
 
-        [Test]
+        [Fact]
         public void ExplicitUnicodeStringIgnoredForNonSqlServer()
         {
             var expression = new InsertDataExpression {TableName = "TestTable"};
@@ -100,7 +97,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("INSERT INTO \"public\".\"TestTable\" (\"NormalString\",\"UnicodeString\") VALUES ('Just''in','codethinked''.com');");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterColumnAndSetAsNullable()
         {
             var expression = new AlterColumnExpression
@@ -114,7 +111,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ALTER \"TestColumn1\" TYPE text, ALTER \"TestColumn1\" DROP NOT NULL;");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterColumnAndSetAsNotNullable()
         {
             var expression = new AlterColumnExpression
@@ -128,7 +125,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ALTER \"TestColumn1\" TYPE text, ALTER \"TestColumn1\" SET NOT NULL;");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterDefaultConstraintToNewGuid()
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
@@ -139,7 +136,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ALTER \"TestColumn1\" DROP DEFAULT, ALTER \"TestColumn1\" SET DEFAULT uuid_generate_v4();");
         }
 
-        [Test]
+        [Fact]
         public void CanDeleteDefaultConstraint()
         {
             var expression = new DeleteDefaultConstraintExpression
@@ -153,7 +150,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ALTER \"TestColumn1\" DROP DEFAULT;");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterDefaultConstraintToCurrentUser()
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
@@ -164,7 +161,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ALTER \"TestColumn1\" DROP DEFAULT, ALTER \"TestColumn1\" SET DEFAULT current_user;");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterDefaultConstraintToCurrentDate()
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
@@ -175,7 +172,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ALTER \"TestColumn1\" DROP DEFAULT, ALTER \"TestColumn1\" SET DEFAULT now();");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterDefaultConstraintToCurrentUtcDateTime()
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
@@ -186,7 +183,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ALTER \"TestColumn1\" DROP DEFAULT, ALTER \"TestColumn1\" SET DEFAULT (now() at time zone 'UTC');");
         }
 
-        [Test]
+        [Fact]
         public void CanAlterColumnAndOnlySetTypeIfIsNullableNotSet()
         {
             var expression = new AlterColumnExpression

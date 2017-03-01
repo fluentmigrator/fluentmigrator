@@ -1,15 +1,14 @@
 using FluentMigrator.Runner.Processors.Oracle;
 
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Oracle
 {
-    [TestFixture]
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     public class OracleColumnTests : OracleColumnTestsBase {
-		[SetUp]
-		public void SetUp( ) {
-			base.SetUp( new OracleDbFactory(  ) );
+		public OracleColumnTests()
+            : base(new OracleDbFactory())
+        {
 		}
     }
 }

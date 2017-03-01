@@ -1,21 +1,18 @@
-﻿using FluentMigrator.Runner.Generators.Oracle;
-using NUnit.Framework;
-using NUnit.Should;
+using FluentMigrator.Runner.Generators.Oracle;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {
-    [TestFixture]
     public class OracleSequenceTests : BaseSequenceTests
     {
         protected OracleGenerator Generator;
 
-        [SetUp]
-        public void Setup()
+        public OracleSequenceTests()
         {
             Generator = new OracleGenerator();
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateSequenceWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSequenceExpression();
@@ -25,7 +22,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("CREATE SEQUENCE TestSchema.Sequence INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateSequenceWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSequenceExpression();
@@ -34,7 +31,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("CREATE SEQUENCE Sequence INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropSequenceWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSequenceExpression();
@@ -44,7 +41,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe("DROP SEQUENCE TestSchema.Sequence");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropSequenceWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSequenceExpression();

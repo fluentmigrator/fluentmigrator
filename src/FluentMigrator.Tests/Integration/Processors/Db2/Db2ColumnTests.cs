@@ -1,4 +1,4 @@
-﻿namespace FluentMigrator.Tests.Integration.Processors.Db2
+namespace FluentMigrator.Tests.Integration.Processors.Db2
 {
     using System;
     using System.Collections.Generic;
@@ -12,12 +12,10 @@
     using FluentMigrator.Runner.Processors.DB2;
     using FluentMigrator.Tests.Helpers;
 
-    using NUnit.Framework;
-    using NUnit.Should;
+    using Xunit;
 
-    [TestFixture]
-    [Category("Integration")]
-    public class Db2ColumnTests : BaseColumnTests
+    [Trait("Category", "Integration")]
+    public class Db2ColumnTests : BaseColumnTests, IDisposable
     {
         #region Properties
 
@@ -49,7 +47,7 @@
 
         #region Methods
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsCanAcceptColumnNameWithSingleQuote()
         {
             var columnName = Quoter.Quote("I'D") + " INT";
@@ -59,7 +57,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsCanAcceptTableNameWithSingleQuote()
         {
             using (var table = new Db2TestTable("Test'Table", Processor, null, "ID INT"))
@@ -68,7 +66,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsFalseIfColumnDoesNotExist()
         {
             using (var table = new Db2TestTable(Processor, null, "ID INT"))
@@ -77,7 +75,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsFalseIfColumnDoesNotExistWithSchema()
         {
             using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT"))
@@ -86,19 +84,19 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.ColumnExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
             Processor.ColumnExists("TstSchma", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsTrueIfColumnExists()
         {
             using (var table = new Db2TestTable(Processor, null, "ID INT"))
@@ -107,7 +105,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsTrueIfColumnExistsWithSchema()
         {
             using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT"))
@@ -116,8 +114,7 @@
             }
         }
 
-        [SetUp]
-        public void SetUp()
+        public Db2ColumnTests()
         {
             Factory = new Db2DbFactory();
             Connection = Factory.CreateConnection(IntegrationTestOptions.Db2.ConnectionString);
@@ -126,8 +123,7 @@
             Connection.Open();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.Dispose();
         }

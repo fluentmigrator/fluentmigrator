@@ -3,17 +3,16 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 
 namespace FluentMigrator.Tests.Unit.Builders
 {
-    [TestFixture]
     public class ColumnExpressionBuilderHelperTests
     {
-        [Test]
+        [Fact]
         public void SetNotNullable_SetsColumnIfNotSettingExistingRowValues()
         {
             var builderMock = new Mock<IColumnExpressionBuilder>();
@@ -28,7 +27,7 @@ namespace FluentMigrator.Tests.Unit.Builders
             columnMock.VerifySet(n => n.IsNullable = false);
         }
 
-        [Test]
+        [Fact]
         public void SetNotNullable_DoesntSetIfSettingExistingRowValues()
         {
             var builderMock = new Mock<IColumnExpressionBuilder>();
@@ -51,7 +50,7 @@ namespace FluentMigrator.Tests.Unit.Builders
             columnCloneMock.VerifySet(n => n.IsNullable = false, Times.Once());
         }
 
-        [Test]
+        [Fact]
         public void SetExistingRows_AddsAllRowsExpression()
         {
             var builderMock = new Mock<IColumnExpressionBuilder>();
@@ -84,7 +83,7 @@ namespace FluentMigrator.Tests.Unit.Builders
             Assert.AreEqual(5, updateDataExpr.Set[0].Value);
         }
 
-        [Test]
+        [Fact]
         public void SetExistingRows_IgnoredIfAlterColumn()
         {
             var builderMock = new Mock<IColumnExpressionBuilder>();
@@ -99,7 +98,7 @@ namespace FluentMigrator.Tests.Unit.Builders
             contextMock.Verify(n => n.Expressions.Add(It.IsAny<IMigrationExpression>()), Times.Never());
         }
 
-        [Test]
+        [Fact]
         public void SetExistingRows_AfterNotNullableAddsAlterColumnExpression()
         {
             var builderMock = new Mock<IColumnExpressionBuilder>();
@@ -155,7 +154,7 @@ namespace FluentMigrator.Tests.Unit.Builders
             Assert.AreEqual(2, alterColColumn.Precision);
         }
 
-        [Test]
+        [Fact]
         public void SetExistingRows_AfterNotNullableSetsOriginalColumnNullable()
         {
             var builderMock = new Mock<IColumnExpressionBuilder>();
@@ -182,25 +181,25 @@ namespace FluentMigrator.Tests.Unit.Builders
         }
 
         
-        [Test]
+        [Fact]
         public void SetNullable_ToTrue()
         {
             VerifyColumnModification(h => h.SetNullable(true), c => c.IsNullable = true);
         }
 
-        [Test]
+        [Fact]
         public void SetNullable_ToFalse()
         {
             VerifyColumnModification(h => h.SetNullable(false), c => c.IsNullable = false);
         }
 
-        [Test]
+        [Fact]
         public void CallingUniqueSetsIsUniqueToTrue()
         {
             VerifyColumnModification(h => h.Unique(null), c => c.IsUnique = true);
         }
 
-        [Test]
+        [Fact]
         public void CallingUniqueAddsIndexExpressionToContext()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -227,7 +226,7 @@ namespace FluentMigrator.Tests.Unit.Builders
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingIndexedNamedAddsIndexExpressionToContext()
         {
             var collectionMock = new Mock<ICollection<IMigrationExpression>>();
@@ -254,7 +253,7 @@ namespace FluentMigrator.Tests.Unit.Builders
             contextMock.VerifyGet(x => x.Expressions);
         }
 
-        [Test]
+        [Fact]
         public void CallingIndexedSetsIsIndexedToTrue()
         {
             VerifyColumnModification(h => h.Indexed(null), c => c.IsIndexed = true);

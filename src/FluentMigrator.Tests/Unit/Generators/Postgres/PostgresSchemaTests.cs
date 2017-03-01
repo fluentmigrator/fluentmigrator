@@ -1,21 +1,18 @@
 ﻿using FluentMigrator.Runner.Generators.Postgres;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Postgres
 {
-    [TestFixture]
     public class PostgresSchemaTests : BaseSchemaTests
     {
         protected PostgresGenerator Generator;
 
-        [SetUp]
-        public void Setup()
+        public PostgresSchemaTests()
         {
             Generator = new PostgresGenerator();
         }
 
-        [Test]
+        [Fact]
         public override void CanAlterSchema()
         {
             var expression = GeneratorTestHelper.GetAlterSchemaExpression();
@@ -24,7 +21,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("ALTER TABLE \"TestSchema1\".\"TestTable\" SET SCHEMA \"TestSchema2\";");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSchemaExpression();
@@ -33,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("CREATE SCHEMA \"TestSchema\";");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSchemaExpression();

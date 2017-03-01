@@ -1,22 +1,19 @@
-﻿using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Postgres;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Postgres
 {
-    [TestFixture]
     public class PostgresQuotesTests
     {
-        [SetUp]
-        public void SetUp()
+        public PostgresQuotesTests()
         {
             quoter = new PostgresQuoter();
         }
 
         private IQuoter quoter = default(PostgresQuoter);
 
-        [Test]
+        [Fact]
         public void ByteArrayIsFormattedWithQuotes()
         {
             quoter.QuoteValue(new byte[] { 0, 254, 13, 18, 125, 17 })

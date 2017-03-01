@@ -1,15 +1,13 @@
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
-    [TestFixture]
     public class PerformDBOperationExpressionTests
     {
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenOperationIsNull()
         {
             var expression = new PerformDBOperationExpression() { Operation = null };

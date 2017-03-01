@@ -20,12 +20,10 @@ using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner;
 using Moq;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Runners
 {
-    [TestFixture]
     public class MaintenanceLoaderTests
     {
         public const string Tag1 = "MaintenanceTestTag1";
@@ -36,8 +34,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         private MaintenanceLoader _maintenanceLoader;
         private MaintenanceLoader _maintenanceLoaderNoTags;
 
-        [SetUp]
-        public void Setup()
+        public MaintenanceLoaderTests()
         {
             _migrationConventions = new Mock<IMigrationConventions>();
             _migrationConventions.Setup(x => x.GetMaintenanceStage).Returns(DefaultMigrationConventions.GetMaintenanceStage);
@@ -48,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             _maintenanceLoaderNoTags = new MaintenanceLoader(new SingleAssembly(GetType().Assembly), null, _migrationConventions.Object);
         }
 
-        [Test]
+        [Fact]
         public void LoadsMigrationsForCorrectStage()
         {
             var migrationInfos = _maintenanceLoader.LoadMaintenance(MigrationStage.BeforeEach);
@@ -68,7 +65,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             }
         }
 
-        [Test]
+        [Fact]
         public void LoadsMigrationsFilteredByTag()
         {
             var migrationInfos = _maintenanceLoader.LoadMaintenance(MigrationStage.BeforeEach);
@@ -87,7 +84,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             } 
         }
 
-        [Test]
+        [Fact]
         public void MigrationInfoIsAttributedIsFalse()
         {
             var migrationInfos = _maintenanceLoader.LoadMaintenance(MigrationStage.BeforeEach);
@@ -99,7 +96,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             }
         }
 
-        [Test]
+        [Fact]
         public void SetsTransactionBehaviorToSameAsMaintenanceAttribute()
         {
             var migrationInfos = _maintenanceLoader.LoadMaintenance(MigrationStage.BeforeEach);
@@ -115,7 +112,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             } 
         }
 
-        [Test]
+        [Fact]
         public void LoadsMigrationsNoTag()
         {
             var migrationInfos = _maintenanceLoaderNoTags.LoadMaintenance(MigrationStage.BeforeEach);

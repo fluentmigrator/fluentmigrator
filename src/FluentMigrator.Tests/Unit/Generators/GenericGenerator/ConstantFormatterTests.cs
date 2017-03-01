@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Threading;
 using FluentMigrator.Model;
@@ -9,16 +9,13 @@ using FluentMigrator.Runner.Generators.MySql;
 using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.Runner.Generators.SqlServer;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {
-    [TestFixture]
     public class ConstantFormatterTests
     {
-        [SetUp]
-        public void SetUp()
+        public ConstantFormatterTests()
         {
             quoter = new GenericQuoter();
         }
@@ -50,81 +47,81 @@ namespace FluentMigrator.Tests.Unit.Generators
             }
         }
 
-        [Test]
+        [Fact]
         public void CanEscapeAString()
         {
             quoter.Quote("Test\"String").ShouldBe("\"Test\"\"String\"");
         }
 
-        [Test]
+        [Fact]
         public void CanHandleAnAlreadyQuotedColumnName()
         {
             quoter.QuoteColumnName("\"ColumnName\"").ShouldBe("\"ColumnName\"");
         }
 
-        [Test]
+        [Fact]
         public void CanHandleAnAlreadyQuotedSchemaName()
         {
             quoter.QuoteColumnName("\"SchemaName\"").ShouldBe("\"SchemaName\"");
         }
 
-        [Test]
+        [Fact]
         public void CanHandleAnAlreadyQuotedTableName()
         {
             quoter.QuoteColumnName("\"TableName\"").ShouldBe("\"TableName\"");
         }
 
-        [Test]
+        [Fact]
         public void CanHandleAnUnQuotedColumnName()
         {
             quoter.QuoteColumnName("ColumnName").ShouldBe("\"ColumnName\"");
         }
 
-        [Test]
+        [Fact]
         public void CanHandleAnUnQuotedSchemaName()
         {
             quoter.QuoteColumnName("SchemaName").ShouldBe("\"SchemaName\"");
         }
 
-        [Test]
+        [Fact]
         public void CanHandleAnUnQuotedTableName()
         {
             quoter.QuoteColumnName("TableName").ShouldBe("\"TableName\"");
         }
 
-        [Test]
+        [Fact]
         public void CanQuoteAString()
         {
             quoter.Quote("TestString").ShouldBe("\"TestString\"");
         }
 
-        [Test]
+        [Fact]
         public void CanRecogniseAQuotedString()
         {
             quoter.IsQuoted("\"QuotedString\"").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void CanRecogniseAnUnQuotedString()
         {
             quoter.IsQuoted("UnQuotedString").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public void CharIsFormattedWithQuotes()
         {
             quoter.QuoteValue('A')
                 .ShouldBe("'A'");
         }
 
-        [Test]
+        [Fact]
         public void CustomTypeIsBare()
         {
             quoter.QuoteValue(new CustomClass())
                 .ShouldBe("CustomClass");
         }
 
-        [Test]
+        [Fact]
         public void DateTimeIsFormattedIso8601WithQuotes()
         {
             ChangeCulture();
@@ -133,7 +130,7 @@ namespace FluentMigrator.Tests.Unit.Generators
                 .ShouldBe("'2010-01-02T18:04:05'");
         } 
         
-        [Test]
+        [Fact]
         public void DateTimeIsFormattedIso8601WithQuotes_WithItalyAsCulture()
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo("it-IT");
@@ -142,7 +139,7 @@ namespace FluentMigrator.Tests.Unit.Generators
                 .ShouldBe("'2010-01-02T18:04:05'");
         }
 
-        [Test]
+        [Fact]
         public void DateTimeOffsetIsFormattedIso8601WithQuotes() 
         {
             ChangeCulture();
@@ -150,7 +147,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             quoter.QuoteValue(date).ShouldBe("'2010-01-02T18:04:05 -04:00'");
         }
 
-        [Test]
+        [Fact]
         public void DateTimeOffsetIsFormattedIso8601WithQuotes_WithItalyAsCulture() 
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo("it-IT");
@@ -159,21 +156,21 @@ namespace FluentMigrator.Tests.Unit.Generators
                 .ShouldBe("'2010-01-02T18:04:05 -04:00'");
         }
 
-        [Test]
+        [Fact]
         public void EnumIsFormattedAsString()
         {
             quoter.QuoteValue(Foo.Bar)
                 .ShouldBe("'Bar'");
         }
 
-        [Test]
+        [Fact]
         public void FalseIsFormattedAsZero()
         {
             quoter.QuoteValue(false)
                 .ShouldBe("0");
         }
 
-        [Test]
+        [Fact]
         public void GuidIsFormattedWithQuotes()
         {
             Guid guid = new Guid("00000000-0000-0000-0000-000000000000");
@@ -181,21 +178,21 @@ namespace FluentMigrator.Tests.Unit.Generators
                 .ShouldBe("'00000000-0000-0000-0000-000000000000'");
         }
 
-        [Test]
+        [Fact]
         public void Int32IsBare()
         {
             quoter.QuoteValue(1234)
                 .ShouldBe("1234");
         }
 
-        [Test]
+        [Fact]
         public void NullIsFormattedAsLiteral()
         {
             quoter.QuoteValue(null)
                 .ShouldBe("NULL");
         }
 
-        [Test]
+        [Fact]
         public void ShouldEscapeJetObjectNames()
         {
             //This will throw and error on the Jet Engine if special characters are used.
@@ -204,14 +201,14 @@ namespace FluentMigrator.Tests.Unit.Generators
             quoter.Quote("[Table]Name").ShouldBe("[[Table]Name]");
         }
 
-        [Test]
+        [Fact]
         public void ShouldEscapeMySqlObjectNames()
         {
             MySqlQuoter quoter = new MySqlQuoter();
             quoter.Quote("`Table`Name").ShouldBe("```Table``Name`");
         }
 
-        [Test]
+        [Fact]
         public void ShouldEscapeOracleObjectNames()
         {
             //Do Nothing at the moment due to case sensitivity issues with oracle
@@ -219,21 +216,21 @@ namespace FluentMigrator.Tests.Unit.Generators
             quoter.Quote("Table\"Name").ShouldBe("\"Table\"\"Name\"");
         }
 
-        [Test]
+        [Fact]
         public void ShouldEscapeSqlServerObjectNames()
         {
             SqlServerQuoter quoter = new SqlServerQuoter();
             quoter.Quote("[Table]Name").ShouldBe("[[Table]]Name]");
         }
 
-        [Test]
+        [Fact]
         public void ShouldEscapeSqliteObjectNames()
         {
             SQLiteQuoter quoter = new SQLiteQuoter();
             quoter.Quote("Table\"Name").ShouldBe("\"Table\"\"Name\"");
         }
 
-        [Test]
+        [Fact]
         public void ShouldHandleDecimalToStringConversionInAnyCulture()
         {
             ChangeCulture();
@@ -241,7 +238,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             RestoreCulture();
         }
 
-        [Test]
+        [Fact]
         public void ShouldHandleDoubleToStringConversionInAnyCulture()
         {
             ChangeCulture();
@@ -249,7 +246,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             RestoreCulture();
         }
 
-        [Test]
+        [Fact]
         public void ShouldHandleFloatToStringConversionInAnyCulture()
         {
             ChangeCulture();
@@ -257,48 +254,48 @@ namespace FluentMigrator.Tests.Unit.Generators
             RestoreCulture();
         }
 
-        [Test]
+        [Fact]
         public void StringIsFormattedWithQuotes()
         {
             quoter.QuoteValue("value")
                 .ShouldBe("'value'");
         }
 
-        [Test]
+        [Fact]
         public void StringWithQuoteIsFormattedWithDoubleQuote()
         {
             quoter.QuoteValue("val'ue")
                 .ShouldBe("'val''ue'");
         }
 
-        [Test]
+        [Fact]
         public void TrueIsFormattedAsOne()
         {
             quoter.QuoteValue(true)
                 .ShouldBe("1");
         }
 
-        [Test]
+        [Fact]
         public void ByteArrayIsFormattedWithQuotes()
         {
             quoter.QuoteValue(new byte[] { 0, 254, 13, 18, 125, 17 })
                 .ShouldBe("0x00fe0d127d11");
         }
 
-        [Test]
+        [Fact]
         public void TimeSpanIsFormattedQuotes()
         {
             quoter.QuoteValue(new TimeSpan(2, 13, 65))
                 .ShouldBe("'02:14:05'");
         }
 
-        [Test]
+        [Fact]
         public void ExplicitUnicodeStringIsFormattedAsNormalString()
         {
             quoter.QuoteValue(new ExplicitUnicodeString("Test String")).ShouldBe("'Test String'");
         }
 
-        [Test]
+        [Fact]
         public void ExplicitUnicodeStringIsFormattedAsNormalStringQuotes()
         {
             quoter.QuoteValue(new ExplicitUnicodeString("Test ' String")).ShouldBe("'Test '' String'");

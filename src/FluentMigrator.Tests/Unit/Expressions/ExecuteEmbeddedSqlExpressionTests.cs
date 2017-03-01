@@ -1,22 +1,20 @@
-﻿using NUnit.Framework;
+﻿using Xunit;
 using FluentMigrator.Expressions;
 using FluentMigrator.Tests.Helpers;
 using FluentMigrator.Infrastructure;
 using Moq;
-using NUnit.Should;
 using System;
 using System.Reflection;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
 
-    [TestFixture]
     public class ExecuteEmbeddedSqlScriptExpressionTests
     {
         private const string testSqlScript = "embeddedtestscript.sql";
         private const string scriptContents = "TEST SCRIPT";
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnWhenSqlScriptIsNullOrEmpty()
         {
             var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = null };
@@ -24,7 +22,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.SqlScriptCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ExecutesTheStatement()
         {
             var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = testSqlScript, MigrationAssemblies = new SingleAssembly(Assembly.GetExecutingAssembly()) };
@@ -36,7 +34,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             processor.Verify();
         }
 
-        [Test]
+        [Fact]
         public void ResourceFinderIsCaseInsensitive()
         {
             var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = testSqlScript.ToUpper(), MigrationAssemblies = new SingleAssembly(Assembly.GetExecutingAssembly()) };
@@ -47,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             processor.Verify();
         }
 
-        [Test]
+        [Fact]
         public void ResourceFinderFindFileWithFullName()
         {
             var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = "InitialSchema.sql", MigrationAssemblies = new SingleAssembly(Assembly.GetExecutingAssembly()) };
@@ -58,7 +56,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             processor.Verify();
         }
 
-        [Test]
+        [Fact]
         public void ResourceFinderFindFileWithFullNameAndNamespace()
         {
             var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = "FluentMigrator.Tests.EmbeddedResources.InitialSchema.sql", MigrationAssemblies = new SingleAssembly(Assembly.GetExecutingAssembly()) };
@@ -69,7 +67,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             processor.Verify();
         }
 
-        [Test]
+        [Fact]
         public void ResourceFinderFindThrowsExceptionIfFoundMoreThenOneResource()
         {
             var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = "NotUniqueResource.sql", MigrationAssemblies = new SingleAssembly(Assembly.GetExecutingAssembly()) };
@@ -79,7 +77,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             processor.Verify(x => x.Execute("NotUniqueResource"), Times.Never());
         }
 
-        [Test]
+        [Fact]
         public void ToStringIsDescriptive()
         {
             var expression = new ExecuteSqlScriptExpression { SqlScript = testSqlScript };

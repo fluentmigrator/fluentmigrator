@@ -18,16 +18,15 @@
 
 using FluentMigrator.Expressions;
 using Moq;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Builders.Delete
 {
     using FluentMigrator.Builders.Delete.Sequence;
 
-    [TestFixture]
     public class DeleteSequenceExpressionBuilderTests
     {
-        [Test]
+        [Fact]
         public void CallingInSchemaSetsInSchema()
         {
             var expressionMock = new Mock<DeleteSequenceExpression>();

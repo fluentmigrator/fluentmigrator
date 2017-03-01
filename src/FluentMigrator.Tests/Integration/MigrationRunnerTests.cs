@@ -41,19 +41,16 @@ using FluentMigrator.Tests.Integration.Migrations.Tagged;
 using FluentMigrator.Tests.Unit;
 using FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3;
 using Moq;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration
 {
-    [TestFixture]
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     public class MigrationRunnerTests : IntegrationTestBase
     {
         private IRunnerContext _runnerContext;
 
-        [SetUp]
-        public void SetUp()
+        public MigrationRunnerTests()
         {
             _runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
                                         {
@@ -61,7 +58,7 @@ namespace FluentMigrator.Tests.Integration
                                         };
         }
 
-        [Test]
+        [Fact]
         public void CanRunMigration()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -80,7 +77,7 @@ namespace FluentMigrator.Tests.Integration
                 });
         }
 
-        [Test]
+        [Fact]
         public void CanSilentlyFail()
         {
             try
@@ -112,7 +109,7 @@ namespace FluentMigrator.Tests.Integration
             }
         }
 
-        [Test]
+        [Fact]
         public void CanApplyForeignKeyConvention()
         {
             ExecuteWithSupportedProcessors(
@@ -128,7 +125,7 @@ namespace FluentMigrator.Tests.Integration
                 }, false, typeof(SQLiteProcessor));
         }
 
-        [Test]
+        [Fact]
         public void CanApplyForeignKeyConventionWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -143,7 +140,7 @@ namespace FluentMigrator.Tests.Integration
                 }, false, new []{typeof(SQLiteProcessor), typeof(FirebirdProcessor)});
         }
 
-        [Test]
+        [Fact]
         public void CanApplyIndexConvention()
         {
             ExecuteWithSupportedProcessors(
@@ -161,7 +158,7 @@ namespace FluentMigrator.Tests.Integration
                 });
         }
 
-        [Test]
+        [Fact]
         public void CanApplyIndexConventionWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -179,7 +176,7 @@ namespace FluentMigrator.Tests.Integration
                 });
         }
 
-        [Test]
+        [Fact]
         public void CanCreateAndDropIndex()
         {
             ExecuteWithSupportedProcessors(
@@ -203,7 +200,7 @@ namespace FluentMigrator.Tests.Integration
                 });
         }
 
-        [Test]
+        [Fact]
         public void CanCreateAndDropIndexWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -230,7 +227,7 @@ namespace FluentMigrator.Tests.Integration
                 }, false, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
         }
 
-        [Test]
+        [Fact]
         public void CanRenameTable()
         {
             ExecuteWithSupportedProcessors(
@@ -257,7 +254,7 @@ namespace FluentMigrator.Tests.Integration
         }
 
 
-        [Test]
+        [Fact]
         public void CanRenameTableWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -287,7 +284,7 @@ namespace FluentMigrator.Tests.Integration
                 });
         }
 
-        [Test]
+        [Fact]
         public void CanRenameColumn()
         {
             ExecuteWithSupportedProcessors(
@@ -311,7 +308,7 @@ namespace FluentMigrator.Tests.Integration
                 }, true, typeof(SQLiteProcessor));
         }
 
-        [Test]
+        [Fact]
         public void CanRenameColumnWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -339,7 +336,7 @@ namespace FluentMigrator.Tests.Integration
                 }, true, typeof(SQLiteProcessor), typeof(FirebirdProcessor));
         }
 
-        [Test]
+        [Fact]
         public void CanLoadMigrations()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -357,7 +354,7 @@ namespace FluentMigrator.Tests.Integration
             });
         }
 
-        [Test]
+        [Fact]
         public void CanLoadVersion()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -374,7 +371,7 @@ namespace FluentMigrator.Tests.Integration
             });
         }
 
-        [Test]
+        [Fact]
         public void CanRunMigrations()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -394,7 +391,7 @@ namespace FluentMigrator.Tests.Integration
             });
         }
 
-        [Test]
+        [Fact]
         public void CanMigrateASpecificVersion()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -414,7 +411,7 @@ namespace FluentMigrator.Tests.Integration
             });
         }
 
-        [Test]
+        [Fact]
         public void CanMigrateASpecificVersionDown()
         {
             try
@@ -444,7 +441,7 @@ namespace FluentMigrator.Tests.Integration
             }
         }
 
-        [Test]
+        [Fact]
         public void RollbackAllShouldRemoveVersionInfoTable()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -465,7 +462,7 @@ namespace FluentMigrator.Tests.Integration
             });
         }
 
-        [Test]
+        [Fact]
         public void MigrateUpWithSqlServerProcessorShouldCommitItsTransaction()
         {
             if (!IntegrationTestOptions.SqlServer2008.IsEnabled)
@@ -488,7 +485,7 @@ namespace FluentMigrator.Tests.Integration
             }
         }
 
-        [Test]
+        [Fact]
         public void MigrateUpSpecificVersionWithSqlServerProcessorShouldCommitItsTransaction()
         {
             if (!IntegrationTestOptions.SqlServer2008.IsEnabled)
@@ -511,7 +508,7 @@ namespace FluentMigrator.Tests.Integration
             }
         }
 
-        [Test]
+        [Fact]
         public void MigrateUpWithTaggedMigrationsShouldOnlyApplyMatchedMigrations()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -542,7 +539,7 @@ namespace FluentMigrator.Tests.Integration
             });
         }
 
-        [Test]
+        [Fact]
         public void MigrateUpWithTaggedMigrationsAndUsingMultipleTagsShouldOnlyApplyMatchedMigrations()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -573,7 +570,7 @@ namespace FluentMigrator.Tests.Integration
             });
         }
 
-        [Test]
+        [Fact]
         public void MigrateUpWithDifferentTaggedShouldIgnoreConcreteOfTagged()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -603,7 +600,7 @@ namespace FluentMigrator.Tests.Integration
             });
         }
 
-        [Test]
+        [Fact]
         public void MigrateDownWithDifferentTagsToMigrateUpShouldApplyMatchedMigrations()
         {
             var assembly = typeof(TenantATable).Assembly;
@@ -646,7 +643,7 @@ namespace FluentMigrator.Tests.Integration
             }, true, typeof(SQLiteProcessor));
         }
 
-        [Test]
+        [Fact]
         public void VersionInfoCreationScriptsOnlyGeneratedOnceInPreviewMode()
         {
             if (!IntegrationTestOptions.SqlServer2008.IsEnabled)
@@ -698,7 +695,7 @@ namespace FluentMigrator.Tests.Integration
             }
         }
 
-        [Test]
+        [Fact]
         public void MigrateUpWithTaggedMigrationsShouldNotApplyAnyMigrationsIfNoTagsParameterIsPassedIntoTheRunner()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -728,7 +725,7 @@ namespace FluentMigrator.Tests.Integration
             });
         }
 
-        [Test]
+        [Fact]
         public void ValidateVersionOrderShouldDoNothingIfUnappliedMigrationVersionIsGreaterThanLatestAppliedMigration()
         {
 
@@ -766,7 +763,7 @@ namespace FluentMigrator.Tests.Integration
             }
         }
 
-        [Test]
+        [Fact]
         public void ValidateVersionOrderShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanLatestAppliedMigration()
         {
 
@@ -816,7 +813,7 @@ namespace FluentMigrator.Tests.Integration
             keyValuePair.Value.Migration.ShouldBeOfType<UserEmail>();
         }
 
-        [Test]
+        [Fact]
         public void CanCreateSequence()
         {
             ExecuteWithSqlServer2012(
@@ -832,7 +829,7 @@ namespace FluentMigrator.Tests.Integration
                 }, true);
         }
 
-        [Test]
+        [Fact]
         public void CanCreateSequenceWithSchema()
         {
             Action<IMigrationProcessor> action = processor =>
@@ -852,7 +849,7 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithPostgres(action, IntegrationTestOptions.Postgres, true);
         }
 
-        [Test]
+        [Fact]
         public void CanAlterColumnWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -879,7 +876,7 @@ namespace FluentMigrator.Tests.Integration
                 }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
         }
 
-        [Test]
+        [Fact]
         public void CanAlterTableWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -904,7 +901,7 @@ namespace FluentMigrator.Tests.Integration
                 }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
         }
 
-        [Test]
+        [Fact]
         public void CanAlterTablesSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -929,7 +926,7 @@ namespace FluentMigrator.Tests.Integration
                 }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
         }
 
-        [Test]
+        [Fact]
         public void CanCreateUniqueConstraint()
         {
             ExecuteWithSupportedProcessors(
@@ -951,7 +948,7 @@ namespace FluentMigrator.Tests.Integration
                 }, true, typeof(SQLiteProcessor));
         }
 
-        [Test]
+        [Fact]
         public void CanCreateUniqueConstraintWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -976,7 +973,7 @@ namespace FluentMigrator.Tests.Integration
                 }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
         }
 
-        [Test]
+        [Fact]
         public void CanInsertData()
         {
             ExecuteWithSupportedProcessors(
@@ -994,7 +991,7 @@ namespace FluentMigrator.Tests.Integration
                 }, true, new[] { typeof(SQLiteProcessor) });
         }
 
-        [Test]
+        [Fact]
         public void CanInsertDataWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -1015,7 +1012,7 @@ namespace FluentMigrator.Tests.Integration
                 }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
         }
 
-        [Test]
+        [Fact]
         public void CanUpdateData()
         {
             ExecuteWithSupportedProcessors(
@@ -1043,7 +1040,7 @@ namespace FluentMigrator.Tests.Integration
                 }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
         }
 
-        [Test]
+        [Fact]
         public void CanDeleteData()
         {
             ExecuteWithSupportedProcessors(
@@ -1067,7 +1064,7 @@ namespace FluentMigrator.Tests.Integration
                 }, true, new[] { typeof(SQLiteProcessor) });
         }
 
-        [Test]
+        [Fact]
         public void CanDeleteDataWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -1094,7 +1091,7 @@ namespace FluentMigrator.Tests.Integration
                 }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
         }
 
-        [Test]
+        [Fact]
         public void CanReverseCreateIndex()
         {
             ExecuteWithSupportedProcessors(
@@ -1118,7 +1115,7 @@ namespace FluentMigrator.Tests.Integration
                 }, true, new[] { typeof(SQLiteProcessor) });
         }
 
-        [Test]
+        [Fact]
         public void CanReverseCreateUniqueConstraint()
         {
             ExecuteWithSupportedProcessors(
@@ -1139,7 +1136,7 @@ namespace FluentMigrator.Tests.Integration
                 }, true, new[] { typeof(SQLiteProcessor) });
         }
 
-        [Test]
+        [Fact]
         public void CanReverseCreateUniqueConstraintWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -1164,7 +1161,7 @@ namespace FluentMigrator.Tests.Integration
                 }, true, new[] { typeof(SQLiteProcessor) });
         }
 
-        [Test]
+        [Fact]
         public void CanExecuteSql()
         {
             ExecuteWithSupportedProcessors(

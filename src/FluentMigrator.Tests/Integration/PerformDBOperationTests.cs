@@ -1,13 +1,12 @@
-using NUnit.Framework;
+using Xunit;
 using FluentMigrator.Builders.Execute;
 
 namespace FluentMigrator.Tests.Integration
 {
-    [TestFixture]
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     public class PerformDBOperationTests : IntegrationTestBase
     {
-        [Test]
+        [Fact]
         public void CanCreateAndDeleteTableUsingThePerformDBOperationExpressions()
         {
             var expression = new PerformDBOperationExpression

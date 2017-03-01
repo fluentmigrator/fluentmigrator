@@ -1,25 +1,23 @@
+using System;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Hana;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Hana;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 using Sap.Data.Hana;
 
 namespace FluentMigrator.Tests.Integration.Processors.Hana
 {
-    [TestFixture]
-    [Category("Integration")]
-    public class HanaColumnTests : BaseColumnTests
+    [Trait("Category", "Integration")]
+    public class HanaColumnTests : BaseColumnTests, IDisposable
     {
         public HanaConnection Connection { get; set; }
         public HanaProcessor Processor { get; set; }
         public IQuoter Quoter { get; set; }
 
-        [SetUp]
-        public void SetUp()
+        public HanaColumnTests()
         {
             Connection = new HanaConnection(IntegrationTestOptions.Hana.ConnectionString);
             Processor = new HanaProcessor(Connection, new HanaGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new HanaDbFactory());
@@ -28,14 +26,13 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             Processor.BeginTransaction();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.CommitTransaction();
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsCanAcceptColumnNameWithSingleQuote()
         {
             var columnNameWithSingleQuote = Quoter.Quote("i'd");
@@ -43,21 +40,21 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
                 Processor.ColumnExists(null, table.Name, "i'd").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsCanAcceptTableNameWithSingleQuote()
         {
             using (var table = new HanaTestTable("Test'Table", Processor, null, "id int"))
                 Processor.ColumnExists(null, table.Name, "id").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsFalseIfColumnDoesNotExist()
         {
             using (var table = new HanaTestTable(Processor, null, "id int"))
                 Processor.ColumnExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsFalseIfColumnDoesNotExistWithSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -66,13 +63,13 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
                 Processor.ColumnExists("test_schema", table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.ColumnExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -80,14 +77,14 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             Processor.ColumnExists("test_schema", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
         
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsTrueIfColumnExists()
         {
             using (var table = new HanaTestTable(Processor, null, "id int"))
                 Processor.ColumnExists(null, table.Name, "id").ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingColumnExistsReturnsTrueIfColumnExistsWithSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");

@@ -1,4 +1,4 @@
-﻿namespace FluentMigrator.Tests.Integration.Processors.Db2
+namespace FluentMigrator.Tests.Integration.Processors.Db2
 {
     using System;
     using System.Collections.Generic;
@@ -12,12 +12,10 @@
     using FluentMigrator.Runner.Processors.DB2;
     using FluentMigrator.Tests.Helpers;
 
-    using NUnit.Framework;
-    using NUnit.Should;
+    using Xunit;
 
-    [TestFixture]
-    [Category("Integration")]
-    public class Db2ConstraintTests : BaseConstraintTests
+    [Trait("Category", "Integration")]
+    public class Db2ConstraintTests : BaseConstraintTests, IDisposable
     {
         #region Properties
 
@@ -45,7 +43,7 @@
 
         #region Methods
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsCanAcceptConstraintNameWithSingleQuote()
         {
             using (var table = new Db2TestTable(Processor, null, "ID INT"))
@@ -55,7 +53,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsCanAcceptTableNameWithSingleQuote()
         {
             using (var table = new Db2TestTable("Test'Table", Processor, null, "ID INT"))
@@ -65,7 +63,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsFalseIfConstraintDoesNotExist()
         {
             using (var table = new Db2TestTable(Processor, null, "ID INT"))
@@ -74,7 +72,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsFalseIfConstraintDoesNotExistWithSchema()
         {
             using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT"))
@@ -83,19 +81,19 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.ConstraintExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
             Processor.ConstraintExists("TstSchma", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsTrueIfConstraintExists()
         {
             using (var table = new Db2TestTable(Processor, null, "ID INT"))
@@ -105,7 +103,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingConstraintExistsReturnsTrueIfConstraintExistsWithSchema()
         {
             using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT"))
@@ -115,8 +113,7 @@
             }
         }
 
-        [SetUp]
-        public void SetUp()
+        public Db2ConstraintTests()
         {
             Factory = new Db2DbFactory();
             Connection = Factory.CreateConnection(IntegrationTestOptions.Db2.ConnectionString);
@@ -125,8 +122,7 @@
             Connection.Open();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.Dispose();
         }

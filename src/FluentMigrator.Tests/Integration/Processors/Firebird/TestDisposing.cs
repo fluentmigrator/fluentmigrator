@@ -1,25 +1,23 @@
-﻿using System.Data;
+using System;
+using System.Data;
 using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
-	[TestFixture]
-	[Category("Integration")]
-    [Category("Firebird")]
-    public class TestDisposing
+	[Trait("Category", "Integration")]
+    [Trait("DbEngine", "Firebird")]
+    public class TestDisposing : IDisposable
 	{
 		private FbConnection _connection;
 		private FirebirdProcessor _processor;
 
-		[SetUp]
-		public void SetUp()
+		public TestDisposing()
 		{
             FbDatabase.CreateDatabase(IntegrationTestOptions.Firebird.ConnectionString);
 
@@ -29,8 +27,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 			_processor.BeginTransaction();
 		}
 
-		[TearDown]
-		public void TearDown()
+		public void Dispose()
 		{
 			if (!_processor.WasCommitted)
 				_processor.CommitTransaction();
@@ -39,7 +36,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             FbDatabase.DropDatabase(IntegrationTestOptions.Firebird.ConnectionString);
 		}
 
-		[Test]
+		[Fact]
 		public void Dispose_WasCommited_ShouldNotRollback()
 		{
 			var createTable = new CreateTableExpression { TableName = "silly" };
@@ -69,3 +66,4 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
 	}
 }
+

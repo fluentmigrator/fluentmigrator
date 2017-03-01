@@ -1,21 +1,18 @@
 ﻿using FluentMigrator.Runner.Generators.MySql;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.MySql
 {
-    [TestFixture]
     public class MySqlSchemaTests : BaseSchemaTests
     {
         protected MySqlGenerator Generator;
 
-        [SetUp]
-        public void Setup()
+        public MySqlSchemaTests()
         {
             Generator = new MySqlGenerator();
         }
 
-        [Test]
+        [Fact]
         public override void CanAlterSchema()
         {
             var expression = GeneratorTestHelper.GetAlterSchemaExpression();
@@ -24,7 +21,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             result.ShouldBe(string.Empty);
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSchemaExpression();
@@ -33,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             result.ShouldBe(string.Empty);
         }
 
-        [Test]
+        [Fact]
         public override void CanDropSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSchemaExpression();

@@ -1,12 +1,11 @@
 ﻿using FluentMigrator.Model;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Definitions
 {
-    [TestFixture]
     public class IndexDefinitionTests
     {
-        [Test]
+        [Fact]
         public void ShouldApplyIndexNameConventionWhenIndexNameIsNull()
         {
             var indexDefinition = new IndexDefinition();

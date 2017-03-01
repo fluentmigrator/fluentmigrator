@@ -3,23 +3,20 @@ using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.SqlServer;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
 {
-    [TestFixture]
     public class SqlServer2008GeneratorTests
     {
         protected SqlServer2008Generator Generator;
 
-        [SetUp]
-        public void Setup()
+        public SqlServer2008GeneratorTests()
         {
             Generator = new SqlServer2008Generator();
         }
 
-        [Test]
+        [Fact]
         public void CanCreateTableWithDateTimeOffsetColumn()
         {
             var expression = new CreateTableExpression {TableName = "TestTable1"};
@@ -32,7 +29,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] DATETIMEOFFSET NOT NULL, [TestColumn2] DATETIME2 NOT NULL, [TestColumn3] DATE NOT NULL, [TestColumn4] TIME NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public void CanInsertScopeIdentity()
         {
             var expression = new InsertDataExpression {TableName = "TestTable"};
@@ -47,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             result.ShouldBe("INSERT INTO [dbo].[TestTable] ([Id], [Name], [Website]) VALUES (1, SCOPE_IDENTITY(), 'codethinked.com')");
         }
 
-        [Test]
+        [Fact]
         public void CanInsertAtAtIdentity()
         {
             var expression = new InsertDataExpression {TableName = "TestTable"};
@@ -62,7 +59,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
             result.ShouldBe("INSERT INTO [dbo].[TestTable] ([Id], [Name], [Website]) VALUES (1, @@IDENTITY, 'codethinked.com')");
         }
 
-        [Test]
+        [Fact]
         public void ExplicitUnicodeQuotesCorrectly()
         {
             var expression = new InsertDataExpression {TableName = "TestTable"};

@@ -1,25 +1,23 @@
+using System;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 using Npgsql;
 
 namespace FluentMigrator.Tests.Integration.Processors.Postgres
 {
-    [TestFixture]
-    [Category("Integration")]
-    public class PostgresIndexTests : BaseIndexTests
+    [Trait("Category", "Integration")]
+    public class PostgresIndexTests : BaseIndexTests, IDisposable
     {
         public NpgsqlConnection Connection { get; set; }
         public PostgresProcessor Processor { get; set; }
         public IQuoter Quoter { get; set; }
 
-        [SetUp]
-        public void SetUp()
+        public PostgresIndexTests()
         {
             Connection = new NpgsqlConnection(IntegrationTestOptions.Postgres.ConnectionString);
             Processor = new PostgresProcessor(Connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new PostgresDbFactory());
@@ -27,14 +25,13 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             Connection.Open();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.CommitTransaction();
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsCanAcceptIndexNameWithSingleQuote()
         {
             using (var table = new PostgresTestTable(Processor, null, "id int"))
@@ -50,7 +47,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsCanAcceptTableNameWithSingleQuote()
         {
             using (var table = new PostgresTestTable("Test'Table", Processor, null, "id int"))
@@ -66,33 +63,33 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfIndexDoesNotExist()
         {
             using (var table = new PostgresTestTable(Processor, null, "id int"))
                 Processor.IndexExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfIndexDoesNotExistWithSchema()
         {
             using (var table = new PostgresTestTable(Processor, "TestSchema", "id int"))
                 Processor.IndexExists("TestSchema", table.Name, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.IndexExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
             Processor.IndexExists("TestSchema", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsTrueIfIndexExists()
         {
             using (var table = new PostgresTestTable(Processor, null, "id int"))
@@ -108,7 +105,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsTrueIfIndexExistsWithSchema()
         {
             using (var table = new PostgresTestTable(Processor, "TestSchema", "id int"))

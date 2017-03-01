@@ -1,5 +1,5 @@
 ﻿using FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd.SimpleMigration;
-using NUnit.Framework;
+using Xunit;
 using Shouldly;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
@@ -23,9 +23,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
         }
     }
 
-    [TestFixture]
-    [Category("Integration")]
-    [Category("Firebird")]
+    [Trait("Category", "Integration")]
+    [Trait("DbEngine", "Firebird")]
     public class TestInitialMigration : FbEndToEndFixture
     {
         [TestCase("SIMPLE")]

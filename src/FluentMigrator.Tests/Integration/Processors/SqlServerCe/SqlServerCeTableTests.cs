@@ -1,25 +1,23 @@
-﻿using System.Data.SqlServerCe;
+using System;
+using System.Data.SqlServerCe;
 using System.IO;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
 {
-    [TestFixture]
-    [Category("Integration")]
-    public class SqlServerCeTableTests : BaseTableTests
+    [Trait("Category", "Integration")]
+    public class SqlServerCeTableTests : BaseTableTests, IDisposable
     {
         public string DatabaseFilename { get; set; }
         public SqlCeConnection Connection { get; set; }
         public SqlServerCeProcessor Processor { get; set; }
 
-        [SetUp]
-        public void SetUp()
+        public SqlServerCeTableTests()
         {
             DatabaseFilename = "TestDatabase.sdf";
             RecreateDatabase();
@@ -29,8 +27,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             Processor.BeginTransaction();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.CommitTransaction();
             Processor.Dispose();
@@ -46,33 +43,33 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             new SqlCeEngine(IntegrationTestOptions.SqlServerCe.ConnectionString).CreateDatabase();
         }
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsCanAcceptTableNameWithSingleQuote()
         {
             using (var table = new SqlServerCeTestTable("Test'Table", Processor, "id int"))
                 Processor.TableExists("NOTUSED", table.Name).ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.TableExists(null, "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
             Processor.TableExists("NOTUSED", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsReturnsTrueIfTableExists()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
                 Processor.TableExists(null, table.Name).ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public override void CallingTableExistsReturnsTrueIfTableExistsWithSchema()
         {
             using (var table = new SqlServerCeTestTable(Processor, "id int"))
@@ -80,3 +77,4 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         }
     }
 }
+

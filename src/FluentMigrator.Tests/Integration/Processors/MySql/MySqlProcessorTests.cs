@@ -6,35 +6,31 @@ using FluentMigrator.Runner.Generators.MySql;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.MySql;
 using MySql.Data.MySqlClient;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.MySql
 {
-    [TestFixture]
-    [Category("Integration")]
-    public class MySqlProcessorTests
+    [Trait("Category", "Integration")]
+    public class MySqlProcessorTests : IDisposable
     {
         protected MySqlProcessor Processor;
 
         [CLSCompliant(false)]
         protected MySqlConnection Connection;
 
-        [SetUp]
-        public void SetUp()
+        public MySqlProcessorTests()
         {
             Connection = new MySqlConnection(IntegrationTestOptions.MySql.ConnectionString);
             Processor = new MySqlProcessor(Connection, new MySqlGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new MySqlDbFactory());
             Connection.Open();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.Dispose();
         }
 
-        [Test]
+        [Fact]
         public void CallingProcessWithPerformDBOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
         {
             var output = new StringWriter();
@@ -75,7 +71,7 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
             tableExists.ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public void CallingExecuteWithPerformDBOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
         {
             var output = new StringWriter();
@@ -100,7 +96,7 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
             tableExists.ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public void CallingDefaultValueExistsReturnsTrueWhenMatches()
         {
             try
@@ -114,7 +110,7 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
             }
         }
 
-        [Test]
+        [Fact]
         public void CallingReadTableDataQuotesTableName()
         {
             try

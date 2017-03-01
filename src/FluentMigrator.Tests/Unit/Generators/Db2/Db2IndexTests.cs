@@ -1,6 +1,5 @@
 ﻿using FluentMigrator.Runner.Generators.DB2;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,18 +7,16 @@ using System.Text;
 
 namespace FluentMigrator.Tests.Unit.Generators.Db2
 {
-    [TestFixture]
     public class Db2IndexTests : BaseIndexTests
     {
         protected Db2Generator Generator;
 
-        [SetUp]
-        public void Setup()
+        public Db2IndexTests()
         {
             Generator = new Db2Generator();
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
@@ -29,7 +26,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE INDEX TestSchema.TestIndex ON TestSchema.TestTable1 (TestColumn1)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
@@ -38,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE INDEX TestIndex ON TestTable1 (TestColumn1)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
@@ -48,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE INDEX TestSchema.TestIndex ON TestSchema.TestTable1 (TestColumn1, TestColumn2 DESC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
@@ -57,7 +54,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE INDEX TestIndex ON TestTable1 (TestColumn1, TestColumn2 DESC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnUniqueIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
@@ -67,7 +64,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE UNIQUE INDEX TestSchema.TestIndex ON TestSchema.TestTable1 (TestColumn1, TestColumn2 DESC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateMultiColumnUniqueIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
@@ -76,7 +73,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE UNIQUE INDEX TestIndex ON TestTable1 (TestColumn1, TestColumn2 DESC)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateUniqueIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
@@ -86,7 +83,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE UNIQUE INDEX TestSchema.TestIndex ON TestSchema.TestTable1 (TestColumn1)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateUniqueIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
@@ -95,7 +92,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("CREATE UNIQUE INDEX TestIndex ON TestTable1 (TestColumn1)");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
@@ -105,7 +102,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
             result.ShouldBe("DROP INDEX TestSchema.TestIndex");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();

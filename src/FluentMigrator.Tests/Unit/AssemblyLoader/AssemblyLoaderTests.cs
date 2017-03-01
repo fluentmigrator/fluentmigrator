@@ -17,22 +17,20 @@
 #endregion
 
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
-using NUnit.Framework;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.AssemblyLoader
 {
-    [TestFixture]
     public class AssemblyLoaderTests
     {
         private AssemblyLoaderFactory assemblyLoaderFactory;
 
-        [SetUp]
-        public void Setup()
+        public AssemblyLoaderTests()
         {
             assemblyLoaderFactory = new AssemblyLoaderFactory();
         }
 
-        [Test]
+        [Fact]
         public void ShouldBeAbleToLoadAssemblyByFileName()
         {
             var assemblyLoader = assemblyLoaderFactory.GetAssemblyLoader(GetType().Assembly.Location);
@@ -40,7 +38,7 @@ namespace FluentMigrator.Tests.Unit.AssemblyLoader
             Assert.AreEqual(GetType().Assembly, assemblyLoader.Load());
         }
 
-        [Test]
+        [Fact]
         public void ShouldBeAbleToLoadAssemblyAssemblyName()
         {
             var assemblyLoader = assemblyLoaderFactory.GetAssemblyLoader(GetType().Assembly.GetName().Name);

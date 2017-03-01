@@ -20,15 +20,13 @@ using System;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
-    [TestFixture]
     public class CreateTableExpressionTests
     {
-        [Test]
+        [Fact]
         public void ToStringIsDescriptive()
         {
             new CreateTableExpression
@@ -37,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
                 }.ToString().ShouldBe("CreateTable Table");
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenTableNameIsEmptyString()
         {
             var expression = new CreateTableExpression { TableName = String.Empty };
@@ -46,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenTableNameIsSet()
         {
             var expression = new CreateTableExpression { TableName = "table1" };

@@ -1,21 +1,18 @@
 ﻿using FluentMigrator.Runner.Generators.Hana;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Hana
 {
-    [TestFixture]
     public class HanaSequenceTests : BaseSequenceTests
     {
         protected HanaGenerator Generator;
 
-        [SetUp]
-        public void Setup()
+        public HanaSequenceTests()
         {
             Generator = new HanaGenerator();
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateSequenceWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -27,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE SEQUENCE \"TestSchema\".\"Sequence\" INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateSequenceWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSequenceExpression();
@@ -36,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE SEQUENCE \"Sequence\" INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE;");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropSequenceWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -48,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("DROP SEQUENCE \"TestSchema\".\"Sequence\"");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropSequenceWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSequenceExpression();

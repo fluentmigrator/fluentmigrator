@@ -1,21 +1,18 @@
-﻿using FluentMigrator.Runner.Generators.Postgres;
-using NUnit.Framework;
-using NUnit.Should;
+using FluentMigrator.Runner.Generators.Postgres;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Postgres
 {
-    [TestFixture]
     public class PostgresSequenceTests : BaseSequenceTests
     {
         protected PostgresGenerator Generator;
 
-        [SetUp]
-        public void Setup()
+        public PostgresSequenceTests()
         {
             Generator = new PostgresGenerator();
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateSequenceWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSequenceExpression();
@@ -25,7 +22,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("CREATE SEQUENCE \"TestSchema\".\"Sequence\" INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE;");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateSequenceWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSequenceExpression();
@@ -34,7 +31,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("CREATE SEQUENCE \"Sequence\" INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE;");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropSequenceWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSequenceExpression();
@@ -44,7 +41,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
             result.ShouldBe("DROP SEQUENCE \"TestSchema\".\"Sequence\";");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropSequenceWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSequenceExpression();

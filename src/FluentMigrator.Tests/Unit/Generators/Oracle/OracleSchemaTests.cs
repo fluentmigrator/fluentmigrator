@@ -1,21 +1,18 @@
-﻿using FluentMigrator.Runner.Generators.Oracle;
-using NUnit.Framework;
-using NUnit.Should;
+using FluentMigrator.Runner.Generators.Oracle;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Oracle
 {
-    [TestFixture]
     public class OracleSchemaTests : BaseSchemaTests
     {
         protected OracleGenerator Generator;
 
-        [SetUp]
-        public void Setup()
+        public OracleSchemaTests()
         {
             Generator = new OracleGenerator();
         }
 
-        [Test]
+        [Fact]
         public override void CanAlterSchema()
         {
             var expression = GeneratorTestHelper.GetAlterSchemaExpression();
@@ -24,7 +21,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe(string.Empty);
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSchemaExpression();
@@ -33,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             result.ShouldBe(string.Empty);
         }
 
-        [Test]
+        [Fact]
         public override void CanDropSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSchemaExpression();

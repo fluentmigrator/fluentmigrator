@@ -1,4 +1,4 @@
-﻿namespace FluentMigrator.Tests.Integration.Processors.Db2
+namespace FluentMigrator.Tests.Integration.Processors.Db2
 {
     using System;
     using System.Collections.Generic;
@@ -11,13 +11,11 @@
     using FluentMigrator.Runner.Processors;
     using FluentMigrator.Runner.Processors.DB2;
 
-    using NUnit.Framework;
-    using NUnit.Should;
+    using Xunit;
     using FluentMigrator.Tests.Helpers;
 
-    [TestFixture]
-    [Category("Integration")]
-    public class Db2IndexTests : BaseIndexTests
+    [Trait("Category", "Integration")]
+    public class Db2IndexTests : BaseIndexTests, IDisposable
     {
         #region Properties
 
@@ -45,7 +43,7 @@
 
         #region Methods
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsCanAcceptIndexNameWithSingleQuote()
         {
             using (var table = new Db2TestTable(Processor, null, "ID INT"))
@@ -55,7 +53,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsCanAcceptTableNameWithSingleQuote()
         {
             using (var table = new Db2TestTable("Test'Table", Processor, null, "ID INT"))
@@ -65,7 +63,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfIndexDoesNotExist()
         {
             using (var table = new Db2TestTable(Processor, null, "ID INT"))
@@ -74,7 +72,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfIndexDoesNotExistWithSchema()
         {
             using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT"))
@@ -83,19 +81,19 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfTableDoesNotExist()
         {
             Processor.IndexExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
             Processor.IndexExists("TstSchma", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsTrueIfIndexExists()
         {
             using (var table = new Db2TestTable(Processor, null, "ID INT"))
@@ -105,7 +103,7 @@
             }
         }
 
-        [Test]
+        [Fact]
         public override void CallingIndexExistsReturnsTrueIfIndexExistsWithSchema()
         {
             using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT"))
@@ -115,8 +113,7 @@
             }
         }
 
-        [SetUp]
-        public void SetUp()
+        public Db2IndexTests()
         {
             Factory = new Db2DbFactory();
             Connection = Factory.CreateConnection(IntegrationTestOptions.Db2.ConnectionString);
@@ -125,8 +122,7 @@
             Connection.Open();
         }
 
-        [TearDown]
-        public void TearDown()
+        public void Dispose()
         {
             Processor.Dispose();
         }

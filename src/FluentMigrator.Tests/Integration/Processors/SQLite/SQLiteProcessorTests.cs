@@ -27,13 +27,11 @@ using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SQLite;
 using Moq;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Integration.Processors.SQLite
 {
-    [TestFixture]
-    [Category("Integration")]
+    [Trait("Category", "Integration")]
     public class SQLiteProcessorTests
     {
         private IDbConnection _connection;
@@ -44,8 +42,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
         private string tableName;
         private string tableNameThanMustBeEscaped;
 
-        [SetUp]
-        public void SetUp()
+        public SQLiteProcessorTests()
         {
             // This connection used in the tests
             var factory = new SQLiteDbFactory();
@@ -65,7 +62,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             column.SetupGet(c => c.Type).Returns(DbType.Int32);
         }
 
-        [Test]
+        [Fact]
         public void CanDefaultAutoIncrementColumnTypeToInteger()
         {
             var column = new ColumnDefinition
@@ -88,7 +85,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             }
         }
 
-        [Test]
+        [Fact]
         public void CanCreateTableExpression()
         {
             var expression = new CreateTableExpression { TableName = tableName };
@@ -102,7 +99,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             }
         }
 
-        [Test]
+        [Fact]
         public void IsEscapingTableNameCorrectlyOnTableCreate()
         {
             var expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
@@ -110,7 +107,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             _processor.Process(expression);
         }
 
-        [Test]
+        [Fact]
         public void IsEscapingTableNameCorrectlyOnReadTableData()
         {
             var expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
@@ -119,7 +116,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             _processor.ReadTableData(null, tableNameThanMustBeEscaped).Tables.Count.ShouldBe(1);
         }
 
-        [Test]
+        [Fact]
         public void IsEscapingTableNameCorrectlyOnTableExists()
         {
             var expression = new CreateTableExpression { TableName = tableNameThanMustBeEscaped };
@@ -128,7 +125,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             _processor.TableExists(null, tableNameThanMustBeEscaped).ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void IsEscapingTableNameCorrectlyOnColumnExists()
         {
             const string columnName = "123ColumnName";
@@ -139,7 +136,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             _processor.ColumnExists(null, tableNameThanMustBeEscaped, columnName).ShouldBeTrue();
         }
 
-        [Test]
+        [Fact]
         public void CallingProcessWithPerformDBOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
         {
             var output = new StringWriter();

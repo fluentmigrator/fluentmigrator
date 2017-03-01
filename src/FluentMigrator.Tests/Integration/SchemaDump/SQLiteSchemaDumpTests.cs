@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Data.SQLite;
 using System.IO;
 using FluentMigrator.Runner;
@@ -31,7 +31,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
         public SqliteSchemaDumper SchemaDumper;
 
         [SetUp]
-        public void Setup()
+        public SQLiteSchemaDumpTests()
         {
             Connection = new SQLiteConnection(IntegrationTestOptions.SqlLite.ConnectionString);
             Processor = new SqliteProcessor(Connection, new SqliteGenerator(), new TextWriterAnnouncer(System.Console.Out),

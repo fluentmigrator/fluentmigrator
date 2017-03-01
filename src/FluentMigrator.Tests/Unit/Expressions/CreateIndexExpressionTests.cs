@@ -4,15 +4,13 @@ using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Tests.Helpers;
 using Moq;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
-    [TestFixture]
     public class CreateIndexExpressionTests
     {
-        [Test]
+        [Fact]
         public void ShouldDelegateApplyConventionsToIndexDefinition()
         {
             var definitionMock = new Mock<IndexDefinition>();
@@ -26,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             definitionMock.VerifyAll();
         }
 
-        [Test]
+        [Fact]
         public void ToStringIsDescriptive()
         {
             new CreateIndexExpression
@@ -44,7 +42,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
                 }.ToString().ShouldBe("CreateIndex Table (Name, Slug)");
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenNameIsNull()
         {
             var expression = new CreateIndexExpression {Index = {Name = null, TableName = "test"}};
@@ -54,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.IndexNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenTableNameIsNull()
         {
             var expression = new CreateIndexExpression { Index = { Name = "IX", TableName = null } };
@@ -64,7 +62,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsReturnedWhenColumnCountIsZero()
         {
             var expression = new CreateIndexExpression { Index = { Name = "IX", TableName = "test" } };
@@ -73,7 +71,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.IndexMustHaveOneOrMoreColumns);
         }
 
-        [Test]
+        [Fact]
         public void ErrorIsNotReturnedWhenValidExpression()
         {
             var expression = new CreateIndexExpression { Index = { Name = "IX", TableName = "test" } };

@@ -22,15 +22,13 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Tests.Helpers;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Expressions
 {
-    [TestFixture]
     public class DeleteForeignKeyExpressionTests
     {
-        [Test]
+        [Fact]
         public void ToStringIsDescriptive()
         {
             new DeleteForeignKeyExpression
@@ -46,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             }.ToString().ShouldBe("DeleteForeignKey FK UserRoles (User_id) User (Id)");
         }
 
-        [Test]
+        [Fact]
         public void CollectValidationErrorsShouldReturnErrorIfForeignTableNameIsEmpty()
         {
             var expression = new DeleteForeignKeyExpression { ForeignKey = new ForeignKeyDefinition { ForeignTable = string.Empty } };
@@ -54,7 +52,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.ForeignTableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void CollectValidationErrorsShouldReturnErrorIfForeignTableNameIsNull()
         {
             var expression = new DeleteForeignKeyExpression { ForeignKey = new ForeignKeyDefinition { ForeignTable = null } };
@@ -62,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.ForeignTableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void CollectValidationErrorsShouldReturnNoErrorsIfForeignTableNameAndForeignKeyNameAreSet()
         {
             var expression = new DeleteForeignKeyExpression { ForeignKey = new ForeignKeyDefinition { ForeignTable = "ForeignTable", Name = "FK"} };
@@ -71,7 +69,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             Assert.That(errors.Count, Is.EqualTo(0));
         }
 
-        [Test]
+        [Fact]
         public void CollectValidationErrorsShouldReturnErrorsIfForeignColumnsAreSetButNotPrimaryTable()
         {
             var expression = new DeleteForeignKeyExpression
@@ -88,7 +86,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.PrimaryTableNameCannotBeNullOrEmpty);
         }
 
-        [Test]
+        [Fact]
         public void CollectValidationErrorsShouldReturnErrorsIfForeignColumnsAreSetButNotPrimaryColumns()
         {
             var expression = new DeleteForeignKeyExpression
@@ -106,7 +104,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             errors.ShouldContain(ErrorMessages.ForeignKeyMustHaveOneOrMorePrimaryColumns);
         }
 
-        [Test]
+        [Fact]
         public void CollectValidationErrorsShouldReturnNoErrorsIfAllPropertiesAreSet()
         {
             var expression = new DeleteForeignKeyExpression
@@ -125,7 +123,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             Assert.That(errors.Count, Is.EqualTo(0));
         }
 
-        [Test]
+        [Fact]
         public void ReverseReturnsDeleteForeignKeyExpression()
         {
             var expression = new DeleteForeignKeyExpression
@@ -143,7 +141,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             reverse.ShouldBeOfType<CreateForeignKeyExpression>();
         }
 
-        [Test]
+        [Fact]
         public void ReverseReturnsDeleteForeignKeyExpressionAfterApplyingConventions()
         {
             var expression = new DeleteForeignKeyExpression
@@ -161,7 +159,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
             reverse.ShouldBeOfType<CreateForeignKeyExpression>();
         }
 
-        [Test]
+        [Fact]
         public void ReverseSetsForeignTableAndForeignColumnsAndPrimaryTableAndPrimaryColumnsAOnGeneratedExpression()
         {
             var expression = new DeleteForeignKeyExpression

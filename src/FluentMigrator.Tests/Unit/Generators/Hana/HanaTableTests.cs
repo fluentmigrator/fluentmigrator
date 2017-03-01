@@ -1,21 +1,18 @@
 ﻿using FluentMigrator.Runner.Generators.Hana;
-using NUnit.Framework;
-using NUnit.Should;
+using Xunit;
 
 namespace FluentMigrator.Tests.Unit.Generators.Hana
 {
-    [TestFixture]
     public class HanaTableTests : BaseTableTests
     {
         protected HanaGenerator Generator;
 
-        [SetUp]
-        public void Setup()
+        public HanaTableTests()
         {
             Generator = new HanaGenerator();
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithCustomColumnTypeWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -30,7 +27,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE COLUMN TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" json NOT NULL, PRIMARY KEY (\"TestColumn1\"))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithCustomColumnTypeWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -42,7 +39,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE COLUMN TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR(255), \"TestColumn2\" json, PRIMARY KEY (\"TestColumn1\"));");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -54,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE COLUMN TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" integer NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -63,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE COLUMN TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR(255), \"TestColumn2\" INTEGER);");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNullWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -77,7 +74,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE COLUMN TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" text NOT NULL DEFAULT NULL, \"TestColumn2\" integer NOT NULL DEFAULT 0)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNullWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
@@ -89,7 +86,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
 
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithDefaultValueWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -101,7 +98,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE COLUMN TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" text NOT NULL DEFAULT 'Default', \"TestColumn2\" integer NOT NULL DEFAULT 0)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithIdentityWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -113,7 +110,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE COLUMN TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" serial NOT NULL, \"TestColumn2\" integer NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithIdentityWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
@@ -122,7 +119,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE COLUMN TABLE \"TestTable1\" (\"TestColumn1\" INTEGER GENERATED ALWAYS AS IDENTITY, \"TestColumn2\" INTEGER);");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithDefaultValueWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
@@ -131,7 +128,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE COLUMN TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR(255) DEFAULT 'Default', \"TestColumn2\" INTEGER DEFAULT 0);");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithMultiColumnPrimaryKeyWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -143,7 +140,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE COLUMN TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" integer NOT NULL, PRIMARY KEY (\"TestColumn1\",\"TestColumn2\"))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
@@ -153,7 +150,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
                             " PRIMARY KEY (\"TestColumn1\", \"TestColumn2\"));");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithNamedMultiColumnPrimaryKeyWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -165,7 +162,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE COLUMN TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" integer NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\",\"TestColumn2\"))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithNamedMultiColumnPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
@@ -176,7 +173,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             //HANA no support name of primary key on composit key on create
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithNamedPrimaryKeyWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -188,7 +185,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE COLUMN TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" integer NOT NULL, CONSTRAINT \"TestKey\" PRIMARY KEY (\"TestColumn1\"))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithNamedPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
@@ -198,7 +195,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             //Hana dosen't support to name primary key
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithNullableFieldWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -210,7 +207,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE COLUMN TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" text, \"TestColumn2\" integer NOT NULL)");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithNullableFieldWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNullableColumn();
@@ -219,7 +216,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE COLUMN TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR(255) NULL, \"TestColumn2\" INTEGER);");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithPrimaryKeyWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -231,7 +228,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE COLUMN TABLE \"TestSchema\".\"TestTable1\" (\"TestColumn1\" text NOT NULL, \"TestColumn2\" integer NOT NULL, PRIMARY KEY (\"TestColumn1\"))");
         }
 
-        [Test]
+        [Fact]
         public override void CanCreateTableWithPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
@@ -240,7 +237,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("CREATE COLUMN TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR(255), \"TestColumn2\" INTEGER, PRIMARY KEY (\"TestColumn1\"));");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropTableWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -252,7 +249,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("DROP TABLE \"TestSchema\".\"TestTable1\"");
         }
 
-        [Test]
+        [Fact]
         public override void CanDropTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
@@ -261,7 +258,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("DROP TABLE \"TestTable1\";");
         }
 
-        [Test]
+        [Fact]
         public override void CanRenameTableWithCustomSchema()
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
@@ -273,7 +270,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" RENAME TO \"TestTable2\"");
         }
 
-        [Test]
+        [Fact]
         public override void CanRenameTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
