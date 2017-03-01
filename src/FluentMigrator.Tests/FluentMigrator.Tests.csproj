@@ -183,6 +183,7 @@
     <Compile Include="Helpers\SqlServerTestTable.cs" />
     <Compile Include="Helpers\ValidationHelper.cs" />
     <Compile Include="IntegrationTestOptions.cs" />
+    <Compile Include="Integration\Migrations\TestPreviewOnlyVersionTableMetaData.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdTestProcessorFactory.cs" />
     <Compile Include="Integration\IntegrationTestBase.cs" />
     <Compile Include="Integration\ITestProcessorFactory.cs" />
@@ -286,7 +287,6 @@
     <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeTableTests.cs" />
     <Compile Include="Integration\Processors\SqlServer\SqlServerColumnTests.cs" />
     <Compile Include="Integration\Processors\SqlServer\SqlServerConstraintTests.cs" />
-    <Compile Include="Integration\Processors\SqlServer\SqlServerDb.cs" />
     <Compile Include="Integration\Processors\SqlServer\SqlServerIndexTests.cs" />
     <Compile Include="Integration\Processors\SqlServer\SqlServerProcessorTests.cs" />
     <Compile Include="Integration\Processors\SqlServer\SqlServerSchemaExtensionsTests.cs" />

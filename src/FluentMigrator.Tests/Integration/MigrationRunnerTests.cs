@@ -20,7 +20,6 @@
 
 using System;
 using System.Data;
-using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -28,7 +27,6 @@ using System.Text.RegularExpressions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
@@ -37,9 +35,8 @@ using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Integration.Migrations;
-using FluentMigrator.Tests.Integration.Migrations.Tagged;
-using FluentMigrator.Tests.Unit;
 using FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3;
+using FluentMigrator.Tests.Integration.Migrations.Tagged;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
@@ -137,7 +134,7 @@ namespace FluentMigrator.Tests.Integration
 
                     processor.ConstraintExists("TestSchema", "Users", "FK_Users_GroupId_Groups_GroupId").ShouldBeTrue();
                     runner.Down(new TestForeignKeyNamingConventionWithSchema());
-                }, false, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
+                }, false, typeof(SQLiteProcessor), typeof(FirebirdProcessor));
         }
 
         [Test]
@@ -173,7 +170,7 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestIndexNamingConventionWithSchema());
                     processor.IndexExists("TestSchema", "Users", "IX_Users_GroupId").ShouldBeFalse();
                     processor.TableExists("TestSchema", "Users").ShouldBeFalse();
-                });
+                }, false, typeof(SQLiteProcessor), typeof(FirebirdProcessor));
         }
 
         [Test]
@@ -221,7 +218,7 @@ namespace FluentMigrator.Tests.Integration
                     processor.IndexExists("TestSchema", "TestTable", "IX_TestTable_Name").ShouldBeFalse();
 
                     runner.Down(new TestCreateSchema());
-                }, false, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
+                }, false, typeof(SQLiteProcessor), typeof(FirebirdProcessor));
         }
 
         [Test]
@@ -274,7 +271,7 @@ namespace FluentMigrator.Tests.Integration
                     processor.TableExists("TestSchema", "TestTable2").ShouldBeFalse();
 
                     runner.Down(new TestCreateSchema());
-                });
+                }, false, typeof(SQLiteProcessor), typeof(FirebirdProcessor));
         }
 
         [Test]
@@ -455,48 +452,43 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void MigrateUpWithSqlServerProcessorShouldCommitItsTransaction()
         {
-            if (!IntegrationTestOptions.SqlServer2008.IsEnabled)
-                return;
-
-            var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
-            var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
-
-            MigrationRunner runner = SetupMigrationRunner(processor);
-            runner.MigrateUp();
-
-            try
+            ExecuteWithSupportedProcessor(processor =>
             {
-                processor.WasCommitted.ShouldBeTrue();
+                MigrationRunner runner = SetupMigrationRunner(processor);
 
-            }
-            finally
-            {
-                CleanupTestSqlServerDatabase(connection, processor);
-            }
+                try
+                {
+                    runner.MigrateUp();
+
+                    var sqlServerProcessor = processor as SqlServerProcessor;
+                    sqlServerProcessor.WasCommitted.ShouldBeTrue();
+                }
+                finally
+                {
+                    runner.RollbackToVersion(0);
+                }
+            }, false, AllProcessors().Except(new[] { typeof(SqlServerProcessor) }).ToArray());
         }
 
         [Test]
         public void MigrateUpSpecificVersionWithSqlServerProcessorShouldCommitItsTransaction()
         {
-            if (!IntegrationTestOptions.SqlServer2008.IsEnabled)
-
-                return;
-
-            var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
-            var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
-
-            MigrationRunner runner = SetupMigrationRunner(processor);
-            runner.MigrateUp(1);
-
-            try
+            ExecuteWithSupportedProcessor(processor =>
             {
-                processor.WasCommitted.ShouldBeTrue();
+                MigrationRunner runner = SetupMigrationRunner(processor);
 
-            }
-            finally
-            {
-                CleanupTestSqlServerDatabase(connection, processor);
-            }
+                try
+                {
+                    runner.MigrateUp(1);
+
+                    var sqlServerProcessor = processor as SqlServerProcessor;
+                    sqlServerProcessor.WasCommitted.ShouldBeTrue();
+                }
+                finally
+                {
+                    runner.RollbackToVersion(0);
+                }
+            }, false, AllProcessors().Except(new[] { typeof(SqlServerProcessor) }).ToArray());
         }
 
         [Test]
@@ -637,53 +629,49 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void VersionInfoCreationScriptsOnlyGeneratedOnceInPreviewMode()
         {
-            if (!IntegrationTestOptions.SqlServer2008.IsEnabled)
-                return;
-
-            var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
-            var processorOptions = new ProcessorOptions { PreviewOnly = true };
-
+            ProcessorOptions = new ProcessorOptions { PreviewOnly = true };
             var outputSql = new StringWriter();
-            var announcer = new TextWriterAnnouncer(outputSql) { ShowSql = true };
+            Announcer = new TextWriterAnnouncer(outputSql) { ShowSql = true };
 
-            var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), announcer, processorOptions, new SqlServerDbFactory());
-
-            try
+            ExecuteWithSupportedProcessor(processor =>
             {
                 var asm = typeof(MigrationRunnerTests).Assembly;
-                var runnerContext = new RunnerContext(announcer)
+                var runnerContext = new RunnerContext(Announcer)
                 {
                     Namespace = "FluentMigrator.Tests.Integration.Migrations",
                     PreviewOnly = true
                 };
 
                 var runner = new MigrationRunner(asm, runnerContext, processor);
-                runner.MigrateUp(1, false);
 
-                processor.CommitTransaction();
+                try
+                {
+                    runner.MigrateUp(1, false);
 
-                string schemaName = new TestVersionTableMetaData().SchemaName;
-                var schemaAndTableName = string.Format("\\[{0}\\]\\.\\[{1}\\]", schemaName, TestVersionTableMetaData.TABLENAME);
+                    processor.CommitTransaction();
 
-                var outputSqlString = outputSql.ToString();
+                    string schemaName = new TestPreviewOnlyVersionTableMetaData().SchemaName;
+                    var schemaAndTableName = string.Format("\\[{0}\\]\\.\\[{1}\\]", schemaName, TestPreviewOnlyVersionTableMetaData.TABLE_NAME);
 
-                var createSchemaMatches = new Regex(string.Format("CREATE SCHEMA \\[{0}\\]", schemaName)).Matches(outputSqlString).Count;
-                var createTableMatches = new Regex("CREATE TABLE " + schemaAndTableName).Matches(outputSqlString).Count;
-                var createIndexMatches = new Regex("CREATE UNIQUE CLUSTERED INDEX \\[" + TestVersionTableMetaData.UNIQUEINDEXNAME + "\\] ON " + schemaAndTableName).Matches(outputSqlString).Count;
-                var alterTableMatches = new Regex("ALTER TABLE " + schemaAndTableName).Matches(outputSqlString).Count;
+                    var outputSqlString = outputSql.ToString();
 
-                System.Console.WriteLine(outputSqlString);
+                    var createSchemaMatches = new Regex(string.Format("CREATE SCHEMA \\[{0}\\]", schemaName)).Matches(outputSqlString).Count;
+                    var createTableMatches = new Regex("CREATE TABLE " + schemaAndTableName).Matches(outputSqlString).Count;
+                    var createIndexMatches = new Regex("CREATE UNIQUE CLUSTERED INDEX \\[" + TestPreviewOnlyVersionTableMetaData.UNIQUE_INDEX_NAME + "\\] ON " + schemaAndTableName).Matches(outputSqlString).Count;
+                    var alterTableMatches = new Regex("ALTER TABLE " + schemaAndTableName).Matches(outputSqlString).Count;
 
-                createSchemaMatches.ShouldBe(1);
-                createTableMatches.ShouldBe(1);
-                alterTableMatches.ShouldBe(1);
-                createIndexMatches.ShouldBe(1);
+                    System.Console.WriteLine(outputSqlString);
 
-            }
-            finally
-            {
-                CleanupTestSqlServerDatabase(connection, processor);
-            }
+                    createSchemaMatches.ShouldBe(1);
+                    createTableMatches.ShouldBe(1);
+                    alterTableMatches.ShouldBe(2); // one adding testAppliedOnColumnName + one adding testDescriptionColumnName
+                    createIndexMatches.ShouldBe(1);
+                }
+                finally
+                {
+                    runner.RollbackToVersion(0);
+                }
+            }, false, AllProcessors().Except(new[] { typeof(SqlServerProcessor) }).ToArray());
         }
 
         [Test]
@@ -757,7 +745,6 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void ValidateVersionOrderShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanLatestAppliedMigration()
         {
-
             // Using SqlServer instead of SqlLite as versions not deleted from VersionInfo table when using Sqlite.
             var excludedProcessors = new[] { typeof(SQLiteProcessor), typeof(MySqlProcessor), typeof(PostgresProcessor) };
 
@@ -807,7 +794,7 @@ namespace FluentMigrator.Tests.Integration
         [Test]
         public void CanCreateSequence()
         {
-            var exclude = AllProcessors().Except(new[] { typeof(SqlServerProcessor), typeof(FirebirdProcessor) }).ToArray();
+            var exclude = AllProcessors().Except(new[] { typeof(SqlServerProcessor), typeof(FirebirdProcessor), typeof(PostgresProcessor) }).ToArray();
             ExecuteWithSupportedProcessor(
                 processor =>
                 {
@@ -863,7 +850,7 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
 
                     runner.Down(new TestCreateSchema());
-                }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
+                }, true, typeof(SQLiteProcessor), typeof(FirebirdProcessor));
         }
 
         [Test]
@@ -888,7 +875,7 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
 
                     runner.Down(new TestCreateSchema());
-                }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
+                }, true, typeof(SQLiteProcessor), typeof(FirebirdProcessor));
         }
 
         [Test]
@@ -913,7 +900,7 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
 
                     runner.Down(new TestCreateSchema());
-                }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
+                }, true, typeof(SQLiteProcessor), typeof(FirebirdProcessor));
         }
 
         [Test]
@@ -960,7 +947,7 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
 
                     runner.Down(new TestCreateSchema());
-                }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
+                }, true, typeof(SQLiteProcessor), typeof(FirebirdProcessor));
         }
 
         [Test]
@@ -978,7 +965,7 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateAndDropTableMigration());
 
-                }, true, new[] { typeof(SQLiteProcessor) });
+                }, true, typeof(SQLiteProcessor));
         }
 
         [Test]
@@ -999,7 +986,7 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
 
                     runner.Down(new TestCreateSchema());
-                }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
+                }, true, typeof(SQLiteProcessor), typeof(FirebirdProcessor));
         }
 
         [Test]
@@ -1027,7 +1014,7 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
 
                     runner.Down(new TestCreateSchema());
-                }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
+                }, true, typeof(SQLiteProcessor));
         }
 
         [Test]
@@ -1051,7 +1038,7 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateAndDropTableMigration());
 
-                }, true, new[] { typeof(SQLiteProcessor) });
+                }, true, typeof(SQLiteProcessor));
         }
 
         [Test]
@@ -1078,7 +1065,7 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
 
                     runner.Down(new TestCreateSchema());
-                }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
+                }, true, typeof(SQLiteProcessor), typeof(FirebirdProcessor));
         }
 
         [Test]
@@ -1102,7 +1089,7 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
 
                     runner.Down(new TestCreateSchema());
-                }, true, new[] { typeof(SQLiteProcessor) });
+                }, true, typeof(SQLiteProcessor));
         }
 
         [Test]
@@ -1123,7 +1110,7 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateAndDropTableMigration());
 
-                }, true, new[] { typeof(SQLiteProcessor) });
+                }, true, typeof(SQLiteProcessor));
         }
 
         [Test]
@@ -1148,7 +1135,7 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateSchema());
 
-                }, true, new[] { typeof(SQLiteProcessor) });
+                }, true, typeof(SQLiteProcessor), typeof(FirebirdProcessor));
         }
 
         [Test]
@@ -1162,7 +1149,7 @@ namespace FluentMigrator.Tests.Integration
                     runner.Up(new TestExecuteSql());
                     runner.Down(new TestExecuteSql());
 
-                }, true, new[] { typeof(FirebirdProcessor) });
+                }, true, typeof(FirebirdProcessor));
         }
 
         private static MigrationRunner SetupMigrationRunner(IMigrationProcessor processor)
@@ -1174,23 +1161,6 @@ namespace FluentMigrator.Tests.Integration
             };
 
             return new MigrationRunner(asm, runnerContext, processor);
-        }
-
-        private static void CleanupTestSqlServerDatabase(SqlConnection connection, SqlServerProcessor origProcessor)
-        {
-            if (origProcessor.WasCommitted)
-            {
-                connection.Close();
-
-                var cleanupProcessor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
-                MigrationRunner cleanupRunner = SetupMigrationRunner(cleanupProcessor);
-                cleanupRunner.RollbackToVersion(0);
-
-            }
-            else
-            {
-                origProcessor.RollbackTransaction();
-            }
         }
     }
 
