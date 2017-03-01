@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Linq;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Processors;
@@ -22,21 +23,16 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
 
         public void Done()
         {
-            if (IsLocalDb())
-                SqlServerDb.DropLocalDatabase(_connectionString);
         }
 
         public IDbConnection MakeConnection()
         {
-            if (!string.IsNullOrEmpty(_connectionString.AttachDBFilename))
-                SqlServerDb.CreateLocalDb(_connectionString);
-
             return new SqlConnection(_connectionString.ToString());
         }
 
-        public IMigrationProcessor MakeProcessor(IDbConnection connection, IAnnouncer announcer)
+        public IMigrationProcessor MakeProcessor(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
-            return new SqlServerProcessor(connection, _generator, announcer, new ProcessorOptions(), new SqlServerDbFactory()); ;
+            return new SqlServerProcessor(connection, _generator, announcer, options, new SqlServerDbFactory()); ;
         }
 
         public bool ProcessorTypeWithin(IEnumerable<Type> candidates)

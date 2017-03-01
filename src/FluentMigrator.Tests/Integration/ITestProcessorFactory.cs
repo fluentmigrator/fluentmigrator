@@ -7,7 +7,7 @@ namespace FluentMigrator.Tests.Integration
 {
     public interface TestProcessorFactory
     {
-        IMigrationProcessor MakeProcessor(IDbConnection connection, IAnnouncer announcer);
+        IMigrationProcessor MakeProcessor(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options);
         IDbConnection MakeConnection();
         bool ProcessorTypeWithin(IEnumerable<Type> candidates);
         void Done();

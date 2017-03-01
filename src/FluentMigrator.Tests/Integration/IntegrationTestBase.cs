@@ -18,6 +18,9 @@
 
 using System;
 using System.Collections.Generic;
+using FluentMigrator.Runner;
+using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.DB2;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.Hana;
@@ -27,14 +30,31 @@ using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
+using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration
 {
     public class IntegrationTestBase
     {
 		private const string TestConfigFileName = "TestConfig.xml";
+        private TestDriver _testDriver;
 
-		public void ExecuteWithSupportedProcessor(Action<IMigrationProcessor> test)
+        [TestFixtureSetUp]
+        public void BeforeAllTests()
+        {
+            var testConfiguration = new TestConfiguration(TestConfigFileName);
+            testConfiguration.Configure();
+            _testDriver = new TestDriver(testConfiguration.GetProcessorFactory(), testConfiguration.RequestedDbEngine);
+            Announcer = new TextWriterAnnouncer(System.Console.Out);
+            ((TextWriterAnnouncer)Announcer).ShowSql = true;
+            Announcer.Heading(string.Format("Testing Migration against {0} Server", testConfiguration.RequestedDbEngine));
+        }
+
+        protected ProcessorOptions ProcessorOptions { get; set; }
+
+        protected IAnnouncer Announcer { get; set; }
+
+        public void ExecuteWithSupportedProcessor(Action<IMigrationProcessor> test)
         {
             ExecuteWithSupportedProcessor(test, true);
         }
@@ -46,10 +66,7 @@ namespace FluentMigrator.Tests.Integration
 
         public void ExecuteWithSupportedProcessor(Action<IMigrationProcessor> test, Boolean tryRollback, params Type[] excludedProcessors)
         {
-			var testConfiguration = new TestConfiguration(TestConfigFileName);
-			testConfiguration.Configure();
-			var testDriver = new TestDriver(testConfiguration.GetProcessorFactory(), testConfiguration.RequestedDbEngine);
-			testDriver.Run(test, tryRollback, excludedProcessors);
+			_testDriver.Run(test, Announcer, ProcessorOptions, tryRollback, excludedProcessors);
         }
 
         public static IEnumerable<Type> AllProcessors()

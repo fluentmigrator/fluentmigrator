@@ -20,10 +20,10 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             _connectionString = new FbConnectionStringBuilder(connectionString);
         }
 
-        public IMigrationProcessor MakeProcessor(IDbConnection connection, IAnnouncer announcer)
+        public IMigrationProcessor MakeProcessor(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
-            var options = FirebirdOptions.AutoCommitBehaviour();
-            return new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer, new ProcessorOptions(), new FirebirdDbFactory(), options);
+            var fbOptions = FirebirdOptions.AutoCommitBehaviour();
+            return new FirebirdProcessor(connection, new FirebirdGenerator(fbOptions), announcer, options, new FirebirdDbFactory(), fbOptions);
         }
 
         public IDbConnection MakeConnection()

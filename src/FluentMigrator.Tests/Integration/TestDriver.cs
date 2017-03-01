@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Processors;
 using NUnit.Framework;
@@ -17,18 +18,16 @@ namespace FluentMigrator.Tests.Integration
             _runningDbEngine = runningDbEngine;
         }
 
-        public void Run(Action<IMigrationProcessor> test, bool tryRollback, IEnumerable<Type> excludedProcessors)
+        public void Run(Action<IMigrationProcessor> test, IAnnouncer announcer, IMigrationProcessorOptions options, bool tryRollback, IEnumerable<Type> excludedProcessors)
         {
             if (_testProcessorFactory.ProcessorTypeWithin(excludedProcessors))
                 Assert.Ignore("Tested feature not supported by {0}", _runningDbEngine);
 
-            var announcer = new TextWriterAnnouncer(System.Console.Out);
-            announcer.ShowSql = true;
-            announcer.Heading(string.Format("Testing Migration against {0} Server", _runningDbEngine));
-
             using (var connection = _testProcessorFactory.MakeConnection())
             {
-                var processor = _testProcessorFactory.MakeProcessor(connection, announcer);
+                if (options == null)
+                    options = new ProcessorOptions();
+                var processor = _testProcessorFactory.MakeProcessor(connection, announcer, options);
 
                 test(processor);
 
