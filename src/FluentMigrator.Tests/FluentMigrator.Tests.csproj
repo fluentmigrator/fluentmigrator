@@ -286,12 +286,14 @@
     <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeTableTests.cs" />
     <Compile Include="Integration\Processors\SqlServer\SqlServerColumnTests.cs" />
     <Compile Include="Integration\Processors\SqlServer\SqlServerConstraintTests.cs" />
+    <Compile Include="Integration\Processors\SqlServer\SqlServerDb.cs" />
     <Compile Include="Integration\Processors\SqlServer\SqlServerIndexTests.cs" />
     <Compile Include="Integration\Processors\SqlServer\SqlServerProcessorTests.cs" />
     <Compile Include="Integration\Processors\SqlServer\SqlServerSchemaExtensionsTests.cs" />
     <Compile Include="Integration\Processors\SqlServer\SqlServerSchemaTests.cs" />
     <Compile Include="Integration\Processors\SqlServer\SqlServerSequenceTests.cs" />
     <Compile Include="Integration\Processors\SqlServer\SqlServerTableTests.cs" />
+    <Compile Include="Integration\Processors\SqlServer\SqlServerTestProcessorFactory.cs" />
     <Compile Include="Integration\SchemaDump\SchemaDumpTests.cs" />
     <Compile Include="Integration\SchemaDump\SchemaTestWriter.cs" />
     <Compile Include="Integration\TestConfiguration.cs" />

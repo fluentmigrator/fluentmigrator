@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
+using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Tests.Integration.Processors.Firebird;
+using FluentMigrator.Tests.Integration.Processors.SqlServer;
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration
@@ -14,6 +16,7 @@ namespace FluentMigrator.Tests.Integration
         private readonly IDictionary<string, Func<string, TestProcessorFactory>> _factoryMap = new Dictionary<string, Func<string, TestProcessorFactory>>
         {
             { "Firebird", connectionString => new FirebirdTestProcessorFactory(connectionString) },
+            { "SqlServer2012", connectionString => new SqlServerTestProcessorFactory(connectionString, new SqlServer2012Generator()) }
         };
 
         private string _testConfigFileName;

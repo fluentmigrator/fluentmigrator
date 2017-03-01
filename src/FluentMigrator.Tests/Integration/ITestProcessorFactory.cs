@@ -9,7 +9,7 @@ namespace FluentMigrator.Tests.Integration
     {
         IMigrationProcessor MakeProcessor(IDbConnection connection, IAnnouncer announcer);
         IDbConnection MakeConnection();
-        bool ProcessorTypeWithin(IEnumerable<Type> excludedProcessors);
+        bool ProcessorTypeWithin(IEnumerable<Type> candidates);
         void Done();
     }
 }
