@@ -13,7 +13,7 @@ namespace FluentMigrator.Tests.Integration
         private string _connectionString;
         private readonly IDictionary<string, Func<string, TestProcessorFactory>> _factoryMap = new Dictionary<string, Func<string, TestProcessorFactory>>
         {
-            { "Firebird", connectionString => new FirebirdTestProcessorFactory(connectionString) }
+            { "Firebird", connectionString => new FirebirdTestProcessorFactory(connectionString) },
         };
 
         private string _testConfigFileName;
@@ -34,7 +34,11 @@ namespace FluentMigrator.Tests.Integration
 
         public TestProcessorFactory GetProcessorFactory()
         {
-            return _factoryMap[RequestedDbEngine](_connectionString);
+            Func<string, TestProcessorFactory> result = null;
+            if (!_factoryMap.TryGetValue(RequestedDbEngine, out result))
+                Assert.Fail("A TestProcessorFactory for {0} was not found. Please add a proper implementation of TestProcessorFactory to the class TestConfiguration", RequestedDbEngine);
+
+            return result(_connectionString);
         }
 
         private string FindConfigFile()
