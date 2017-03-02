@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Processors;
 using NUnit.Framework;
 

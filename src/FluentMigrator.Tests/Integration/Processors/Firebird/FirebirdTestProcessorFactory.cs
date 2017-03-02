@@ -6,7 +6,6 @@ using System.Linq;
 using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.Firebird;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
