@@ -281,6 +281,7 @@
     <Compile Include="Integration\Processors\Postgres\PostgresSequenceTests.cs" />
     <Compile Include="Integration\Processors\Postgres\PostgresTableTests.cs" />
     <Compile Include="Integration\Processors\SQLite\SQLiteProcessorTests.cs" />
+    <Compile Include="Integration\Processors\SQLite\SQLiteTestProcessorFactory.cs" />
     <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeColumnTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeConstraintTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeIndexTests.cs" />
