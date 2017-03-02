@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Processors;
@@ -67,6 +68,12 @@ namespace FluentMigrator.Tests.Integration
         public void ExecuteWithSupportedProcessor(Action<IMigrationProcessor> test, Boolean tryRollback, params Type[] excludedProcessors)
         {
 			_testDriver.Run(test, Announcer, ProcessorOptions, tryRollback, excludedProcessors);
+        }
+
+        public void ExecuteFor(Type processorType, Action<IMigrationProcessor> test)
+        {
+            var excluded = AllProcessors().Except(new[] { processorType });
+            ExecuteWithSupportedProcessor(test, false, excluded.ToArray());
         }
 
         public static IEnumerable<Type> AllProcessors()
