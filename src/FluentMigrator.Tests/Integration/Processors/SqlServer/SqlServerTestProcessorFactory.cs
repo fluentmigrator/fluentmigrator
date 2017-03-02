@@ -2,10 +2,8 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.IO;
 using System.Linq;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
 
 namespace FluentMigrator.Tests.Integration.Processors.SqlServer
@@ -38,11 +36,6 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
         public bool ProcessorTypeWithin(IEnumerable<Type> candidates)
         {
             return candidates.Any(t => typeof(SqlServerProcessor).IsAssignableFrom(t));
-        }
-
-        private bool IsLocalDb()
-        {
-            return !string.IsNullOrEmpty(_connectionString.AttachDBFilename);
         }
     }
 }
