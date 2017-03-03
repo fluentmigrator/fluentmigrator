@@ -76,17 +76,27 @@ namespace FluentMigrator.Tests.Integration
             ExecuteWithSupportedProcessor(test, false, excluded.ToArray());
         }
 
+        public static readonly Type DB2 = typeof(Db2Processor);
+        public static readonly Type FIREBIRD = typeof(FirebirdProcessor);
+        public static readonly Type HANA = typeof(HanaProcessor);
+        public static readonly Type JET = typeof(JetProcessor);
+        public static readonly Type MYSQL = typeof(MySqlProcessor);
+        public static readonly Type ORACLE = typeof(OracleProcessor);
+        public static readonly Type POSTGRES = typeof(PostgresProcessor);
+        public static readonly Type SQLITE = typeof(SQLiteProcessor);
+        public static readonly Type MS_SQL_SERVER = typeof(SqlServerProcessor);
+
         public static IEnumerable<Type> AllProcessors()
         {
-            yield return typeof(Db2Processor);
-            yield return typeof(FirebirdProcessor);
-            yield return typeof(HanaProcessor);
-            yield return typeof(JetProcessor);
-            yield return typeof(MySqlProcessor);
-            yield return typeof(OracleProcessor);
-            yield return typeof(PostgresProcessor);
-            yield return typeof(SQLiteProcessor);
-            yield return typeof(SqlServerProcessor);
+            yield return DB2;
+            yield return FIREBIRD;
+            yield return HANA;
+            yield return JET;
+            yield return MYSQL;
+            yield return ORACLE;
+            yield return POSTGRES;
+            yield return SQLITE;
+            yield return MS_SQL_SERVER;
         }
     }
 }
