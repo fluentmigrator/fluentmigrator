@@ -4,7 +4,7 @@ using System.Data;
 using System.Linq;
 using FluentMigrator.Runner;
 
-namespace FluentMigrator.Tests.Integration.Processors.Firebird
+namespace FluentMigrator.Tests.Integration
 {
     public abstract class AbstractTestProcessorFactoryOf<TProcessor> : TestProcessorFactory
         where TProcessor : IMigrationProcessor

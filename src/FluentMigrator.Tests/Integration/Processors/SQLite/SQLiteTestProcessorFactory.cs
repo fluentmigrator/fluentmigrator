@@ -2,7 +2,6 @@
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.Runner.Processors.SQLite;
-using FluentMigrator.Tests.Integration.Processors.Firebird;
 
 namespace FluentMigrator.Tests.Integration.Processors.SQLite
 {

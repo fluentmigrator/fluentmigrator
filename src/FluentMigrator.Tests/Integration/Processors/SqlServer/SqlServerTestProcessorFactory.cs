@@ -2,7 +2,6 @@
 using System.Data.SqlClient;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Processors.SqlServer;
-using FluentMigrator.Tests.Integration.Processors.Firebird;
 
 namespace FluentMigrator.Tests.Integration.Processors.SqlServer
 {
