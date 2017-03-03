@@ -93,6 +93,7 @@ namespace FluentMigrator.Tests.Integration
         public static readonly Type POSTGRES = typeof(PostgresProcessor);
         public static readonly Type SQLITE = typeof(SQLiteProcessor);
         public static readonly Type MS_SQL_SERVER = typeof(SqlServerProcessor);
+        public static readonly Type MS_SQL_CE = typeof(SqlServerCeProcessor);
 
         public static IEnumerable<Type> AllProcessors()
         {
@@ -105,6 +106,7 @@ namespace FluentMigrator.Tests.Integration
             yield return POSTGRES;
             yield return SQLITE;
             yield return MS_SQL_SERVER;
+            yield return MS_SQL_CE;
         }
     }
 }
