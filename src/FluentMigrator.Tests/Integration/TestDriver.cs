@@ -20,7 +20,7 @@ namespace FluentMigrator.Tests.Integration
         public void Run(Action<IMigrationProcessor> test, IAnnouncer announcer, IMigrationProcessorOptions options, bool tryRollback, IEnumerable<Type> excludedProcessors)
         {
             if (_testProcessorFactory.ProcessorTypeWithin(excludedProcessors))
-                Assert.Ignore("Tested feature not supported by {0}", _runningDbEngine);
+                Assert.Ignore("Tested feature not supported by {0} or test is intended for another db engine", _runningDbEngine);
 
             using (var connection = _testProcessorFactory.MakeConnection())
             {
