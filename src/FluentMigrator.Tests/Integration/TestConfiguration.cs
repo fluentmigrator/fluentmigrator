@@ -18,7 +18,10 @@ namespace FluentMigrator.Tests.Integration
         private readonly IDictionary<string, Func<string, TestProcessorFactory>> _factoryMap = new Dictionary<string, Func<string, TestProcessorFactory>>
         {
             { "Firebird", connectionString => new FirebirdTestProcessorFactory(connectionString) },
+            { "SqlServer2005", connectionString => new SqlServerTestProcessorFactory(connectionString, new SqlServer2005Generator()) },
+            { "SqlServer2008", connectionString => new SqlServerTestProcessorFactory(connectionString, new SqlServer2008Generator()) },
             { "SqlServer2012", connectionString => new SqlServerTestProcessorFactory(connectionString, new SqlServer2012Generator()) },
+            { "SqlServer2014", connectionString => new SqlServerTestProcessorFactory(connectionString, new SqlServer2014Generator()) },
             { "SQLite", connectionString => new SQLiteTestProcessorFactory(connectionString) }
         };
 
