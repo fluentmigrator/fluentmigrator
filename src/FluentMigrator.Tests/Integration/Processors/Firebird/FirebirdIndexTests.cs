@@ -1,5 +1,4 @@
-﻿using System;
-using FluentMigrator.Runner.Generators.Firebird;
+﻿using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Processors.Firebird;
 using NUnit.Framework;
 using NUnit.Should;
@@ -11,8 +10,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
     [Category("Firebird")]
     public class FirebirdIndexTests : BaseIndexTests
     {
-        private static readonly Type FIREBIRD = typeof(FirebirdProcessor);
-
         [Test]
         public override void CallingIndexExistsCanAcceptIndexNameWithSingleQuote()
         {

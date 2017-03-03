@@ -1,5 +1,4 @@
-﻿using System;
-using FluentMigrator.Runner.Processors.Firebird;
+﻿using FluentMigrator.Runner.Processors.Firebird;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -10,12 +9,10 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
     [Category("Firebird")]
     public class FirebirdConstraintTests : BaseConstraintTests
     {
-        private static readonly Type FB_PROCESSOR = typeof(FirebirdProcessor);
-
         [Test]
         public override void CallingConstraintExistsCanAcceptConstraintNameWithSingleQuote()
         {
-            ExecuteFor(FB_PROCESSOR, processor =>
+            ExecuteFor(FIREBIRD, processor =>
             {
                 var fbProcessor = processor as FirebirdProcessor;
                 using (var table = new FirebirdTestTable(fbProcessor, null, "id int", string.Format("wibble int CONSTRAINT {0} CHECK(wibble > 0)", "\"c'1\"")))
@@ -26,7 +23,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public override void CallingConstraintExistsCanAcceptTableNameWithSingleQuote()
         {
-            ExecuteFor(FB_PROCESSOR, processor =>
+            ExecuteFor(FIREBIRD, processor =>
             {
                 var fbProcessor = processor as FirebirdProcessor;
                 using (var table = new FirebirdTestTable("\"Test'Table\"", fbProcessor, null, "id int", "wibble int CONSTRAINT c1 CHECK(wibble > 0)"))
@@ -37,7 +34,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public override void CallingConstraintExistsReturnsFalseIfConstraintDoesNotExist()
         {
-            ExecuteFor(FB_PROCESSOR, processor =>
+            ExecuteFor(FIREBIRD, processor =>
             {
                 var fbProcessor = processor as FirebirdProcessor;
                 using (var table = new FirebirdTestTable(fbProcessor, null, "id int"))
@@ -48,7 +45,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public override void CallingConstraintExistsReturnsFalseIfConstraintDoesNotExistWithSchema()
         {
-            ExecuteFor(FB_PROCESSOR, processor =>
+            ExecuteFor(FIREBIRD, processor =>
             {
                 var fbProcessor = processor as FirebirdProcessor;
                 using (var table = new FirebirdTestTable(fbProcessor, "TestSchema", "id int"))
@@ -59,7 +56,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public override void CallingConstraintExistsReturnsFalseIfTableDoesNotExist()
         {
-            ExecuteFor(FB_PROCESSOR, processor =>
+            ExecuteFor(FIREBIRD, processor =>
             {
                 processor.ConstraintExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
             });
@@ -68,7 +65,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public override void CallingConstraintExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
-            ExecuteFor(FB_PROCESSOR, processor =>
+            ExecuteFor(FIREBIRD, processor =>
             {
                 processor.ConstraintExists("TestSchema", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
             });
@@ -77,7 +74,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public override void CallingConstraintExistsReturnsTrueIfConstraintExists()
         {
-            ExecuteFor(FB_PROCESSOR, processor =>
+            ExecuteFor(FIREBIRD, processor =>
             {
                 var fbProcessor = processor as FirebirdProcessor;
                 using (var table = new FirebirdTestTable(fbProcessor, null, "id int", "wibble int CONSTRAINT c1 CHECK(wibble > 0)"))
@@ -88,7 +85,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public override void CallingConstraintExistsReturnsTrueIfConstraintExistsWithSchema()
         {
-            ExecuteFor(FB_PROCESSOR, processor =>
+            ExecuteFor(FIREBIRD, processor =>
             {
                 var fbProcessor = processor as FirebirdProcessor;
                 using (var table = new FirebirdTestTable(fbProcessor, "TestSchema", "id int", "wibble int CONSTRAINT C1 CHECK(wibble > 0)"))
