@@ -187,7 +187,7 @@
     <Compile Include="Integration\Migrations\TestPreviewOnlyVersionTableMetaData.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdTestProcessorFactory.cs" />
     <Compile Include="Integration\IntegrationTestBase.cs" />
-    <Compile Include="Integration\ITestProcessorFactory.cs" />
+    <Compile Include="Integration\TestProcessorFactory.cs" />
     <Compile Include="Integration\MigrationRunnerTests.cs" />
     <Compile Include="Integration\Migrations\Interleaved\Pass1\3_UserRoles.cs" />
     <Compile Include="Integration\Migrations\Interleaved\Pass2\1_User.cs" />
