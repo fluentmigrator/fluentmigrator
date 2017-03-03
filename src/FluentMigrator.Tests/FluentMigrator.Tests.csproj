@@ -171,6 +171,7 @@
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
     <Compile Include="Helpers\Db2TestTable.cs" />
+    <Compile Include="Integration\Processors\Firebird\AbstractTestProcessorFactoryOf.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdTestTable.cs" />
     <Compile Include="Helpers\JetTestTable.cs" />
     <Compile Include="Helpers\OracleTestTable.cs" />

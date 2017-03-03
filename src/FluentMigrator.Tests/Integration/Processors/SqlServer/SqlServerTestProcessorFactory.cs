@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
+﻿using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Processors.SqlServer;
+using FluentMigrator.Tests.Integration.Processors.Firebird;
 
 namespace FluentMigrator.Tests.Integration.Processors.SqlServer
 {
-    public class SqlServerTestProcessorFactory : TestProcessorFactory
+    public class SqlServerTestProcessorFactory : AbstractTestProcessorFactoryOf<SqlServerProcessor>
     {
         private readonly SqlConnectionStringBuilder _connectionString;
         private readonly IMigrationGenerator _generator;
@@ -19,23 +17,18 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
             _generator = generator;
         }
 
-        public void Done()
+        public override void Done()
         {
         }
 
-        public IDbConnection MakeConnection()
+        public override IDbConnection MakeConnection()
         {
             return new SqlConnection(_connectionString.ToString());
         }
 
-        public IMigrationProcessor MakeProcessor(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
+        public override IMigrationProcessor MakeProcessor(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             return new SqlServerProcessor(connection, _generator, announcer, options, new SqlServerDbFactory()); ;
-        }
-
-        public bool ProcessorTypeWithin(IEnumerable<Type> candidates)
-        {
-            return candidates.Any(t => typeof(SqlServerProcessor).IsAssignableFrom(t));
         }
     }
 }
