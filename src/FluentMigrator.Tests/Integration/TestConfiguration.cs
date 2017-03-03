@@ -6,6 +6,7 @@ using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Tests.Integration.Processors.Firebird;
 using FluentMigrator.Tests.Integration.Processors.SQLite;
 using FluentMigrator.Tests.Integration.Processors.SqlServer;
+using FluentMigrator.Tests.Integration.Processors.SqlServerCe;
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration
@@ -22,6 +23,7 @@ namespace FluentMigrator.Tests.Integration
             { "SqlServer2008", connectionString => new SqlServerTestProcessorFactory(connectionString, new SqlServer2008Generator()) },
             { "SqlServer2012", connectionString => new SqlServerTestProcessorFactory(connectionString, new SqlServer2012Generator()) },
             { "SqlServer2014", connectionString => new SqlServerTestProcessorFactory(connectionString, new SqlServer2014Generator()) },
+            { "SqlServerCe", connectionString => new SqlServerCeTestFactory(connectionString) },
             { "SQLite", connectionString => new SQLiteTestProcessorFactory(connectionString) }
         };
 
