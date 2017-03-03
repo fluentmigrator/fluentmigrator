@@ -26,18 +26,17 @@ namespace FluentMigrator.Tests.Integration
             {
                 if (options == null)
                     options = new ProcessorOptions();
-                var processor = _testProcessorFactory.MakeProcessor(connection, announcer, options);
-
-                test(processor);
-
-                var baseProcessor = processor as ProcessorBase;
-                if (tryRollback && baseProcessor != null && !baseProcessor.WasCommitted)
+                using (var processor = _testProcessorFactory.MakeProcessor(connection, announcer, options))
                 {
-                    processor.RollbackTransaction();
+                    test(processor);
+
+                    var baseProcessor = processor as ProcessorBase;
+                    if (tryRollback && baseProcessor != null && !baseProcessor.WasCommitted)
+                    {
+                        processor.RollbackTransaction();
+                    }
                 }
             }
-
-            _testProcessorFactory.Done();
         }
     }
 }

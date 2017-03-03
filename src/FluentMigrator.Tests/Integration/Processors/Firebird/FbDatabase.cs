@@ -9,10 +9,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         public static void CreateDatabase(string connectionString)
         {
             var connectionStringBuilder = new FbConnectionStringBuilder(connectionString);
-            if (File.Exists(connectionStringBuilder.Database))
-                DropDatabase(connectionString);
 
-            FbConnection.CreateDatabase(connectionString);
+            if (!File.Exists(connectionStringBuilder.Database))
+                FbConnection.CreateDatabase(connectionString);
         }
 
         public static void DropDatabase(string connectionString)

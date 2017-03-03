@@ -38,6 +38,7 @@ namespace FluentMigrator.Tests.Integration
     public class IntegrationTestBase
     {
         private const string TestConfigFileName = "TestConfig.xml";
+        private TestProcessorFactory _testProcessorFactory;
         private TestDriver _testDriver;
 
         [TestFixtureSetUp]
@@ -45,10 +46,17 @@ namespace FluentMigrator.Tests.Integration
         {
             var testConfiguration = new TestConfiguration(TestConfigFileName);
             testConfiguration.Configure();
-            _testDriver = new TestDriver(testConfiguration.GetProcessorFactory(), testConfiguration.RequestedDbEngine);
+            _testProcessorFactory = testConfiguration.GetProcessorFactory();
+            _testDriver = new TestDriver(_testProcessorFactory, testConfiguration.RequestedDbEngine);
             Announcer = new TextWriterAnnouncer(System.Console.Out);
             ((TextWriterAnnouncer)Announcer).ShowSql = true;
             Announcer.Heading(string.Format("Testing Migration against {0} Server", testConfiguration.RequestedDbEngine));
+        }
+
+        [TestFixtureTearDown]
+        public void AfterAllTests()
+        {
+            _testProcessorFactory.Done();
         }
 
         protected ProcessorOptions ProcessorOptions { get; set; }
