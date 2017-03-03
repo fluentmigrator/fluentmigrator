@@ -14,14 +14,13 @@ namespace FluentMigrator.Tests.Integration
     {
         private const string CurrentTestConfiguration = "CurrentTestConfig";
         private string _connectionString;
+        private string _testConfigFileName;
         private readonly IDictionary<string, Func<string, TestProcessorFactory>> _factoryMap = new Dictionary<string, Func<string, TestProcessorFactory>>
         {
             { "Firebird", connectionString => new FirebirdTestProcessorFactory(connectionString) },
             { "SqlServer2012", connectionString => new SqlServerTestProcessorFactory(connectionString, new SqlServer2012Generator()) },
             { "SQLite", connectionString => new SQLiteTestProcessorFactory(connectionString) }
         };
-
-        private string _testConfigFileName;
 
         public TestConfiguration(string testConfigFileName)
         {
@@ -46,6 +45,8 @@ namespace FluentMigrator.Tests.Integration
             return result(_connectionString);
         }
 
+        public string RequestedDbEngine { get; private set; }
+
         private string FindConfigFile()
         {
             var baseDir = AppDomain.CurrentDomain.BaseDirectory;
@@ -62,7 +63,6 @@ namespace FluentMigrator.Tests.Integration
 
             return null;
         }
-        public string RequestedDbEngine { get; private set; }
 
         private void LoadConfigFile(string configFile)
         {

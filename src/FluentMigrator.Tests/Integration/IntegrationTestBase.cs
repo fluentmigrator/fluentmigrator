@@ -37,7 +37,7 @@ namespace FluentMigrator.Tests.Integration
 {
     public class IntegrationTestBase
     {
-		private const string TestConfigFileName = "TestConfig.xml";
+        private const string TestConfigFileName = "TestConfig.xml";
         private TestDriver _testDriver;
 
         [TestFixtureSetUp]
@@ -67,7 +67,7 @@ namespace FluentMigrator.Tests.Integration
 
         public void ExecuteWithSupportedProcessor(Action<IMigrationProcessor> test, Boolean tryRollback, params Type[] excludedProcessors)
         {
-			_testDriver.Run(test, Announcer, ProcessorOptions, tryRollback, excludedProcessors);
+            _testDriver.Run(test, Announcer, ProcessorOptions, tryRollback, excludedProcessors);
         }
 
         public void ExecuteFor(Type processorType, Action<IMigrationProcessor> test)
@@ -87,7 +87,6 @@ namespace FluentMigrator.Tests.Integration
             yield return typeof(PostgresProcessor);
             yield return typeof(SQLiteProcessor);
             yield return typeof(SqlServerProcessor);
-
         }
     }
 }
