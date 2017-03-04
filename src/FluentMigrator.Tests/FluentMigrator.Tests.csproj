@@ -180,7 +180,7 @@
     <Compile Include="Helpers\HanaTestTable.cs" />
     <Compile Include="Helpers\PostgresTestTable.cs" />
     <Compile Include="Helpers\SQLiteTestTable.cs" />
-    <Compile Include="Helpers\SqlServerCeTestTable.cs" />
+    <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeTestTable.cs" />
     <Compile Include="Helpers\SqlServerTestSequence.cs" />
     <Compile Include="Helpers\SqlServerTestTable.cs" />
     <Compile Include="Helpers\ValidationHelper.cs" />

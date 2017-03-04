@@ -80,10 +80,16 @@ namespace FluentMigrator.Tests.Integration
             _testDriver.Run(test, Announcer, ProcessorOptions, tryRollback, excludedProcessors);
         }
 
-        public void ExecuteFor(Type processorType, Action<IMigrationProcessor> test)
+        public void ExecuteFor(Type processorType, Action<IMigrationProcessor> test, bool cleanUpAfterwords = false)
         {
             var excluded = AllProcessors().Except(new[] { processorType });
             ExecuteWithSupportedProcessor(test, false, excluded.ToArray());
+            if (cleanUpAfterwords)
+            {
+                var testCleaner = _testProcessorFactory as TestCleaner;
+                if (testCleaner != null)
+                    testCleaner.CleanUp();
+            }
         }
 
         public static readonly Type DB2 = typeof(Db2Processor);
