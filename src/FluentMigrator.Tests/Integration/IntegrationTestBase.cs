@@ -56,7 +56,9 @@ namespace FluentMigrator.Tests.Integration
         [TestFixtureTearDown]
         public void AfterAllTests()
         {
-            _testProcessorFactory.Done();
+            var testCleaner = _testProcessorFactory as TestCleaner;
+            if (testCleaner != null)
+                testCleaner.CleanUp();
         }
 
         protected ProcessorOptions ProcessorOptions { get; set; }

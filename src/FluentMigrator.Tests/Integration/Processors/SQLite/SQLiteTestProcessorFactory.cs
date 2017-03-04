@@ -15,10 +15,6 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
             _connectionString = connectionString;
         }
 
-        public override void Done()
-        {
-        }
-
         public override IDbConnection MakeConnection()
         {
             _factory = new SQLiteDbFactory();

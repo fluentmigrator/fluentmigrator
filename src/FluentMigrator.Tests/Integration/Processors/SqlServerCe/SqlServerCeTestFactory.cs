@@ -16,10 +16,6 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             _connectionString = new SqlCeConnectionStringBuilder(connectionString);
         }
 
-        public override void Done()
-        {
-        }
-
         public override IDbConnection MakeConnection()
         {
             if (string.IsNullOrEmpty(Path.GetDirectoryName(_connectionString.DataSource)))

@@ -7,7 +7,7 @@ using FluentMigrator.Runner.Processors.Firebird;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
-    public class FirebirdTestProcessorFactory : AbstractTestProcessorFactoryOf<FirebirdProcessor>
+    public class FirebirdTestProcessorFactory : AbstractTestProcessorFactoryOf<FirebirdProcessor>, TestCleaner
     {
         private readonly FbConnectionStringBuilder _connectionString;
 
@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             return new FbConnection(usedConnectionString);
         }
 
-        public override void Done()
+        public void CleanUp()
         {
             FbDatabase.DropDatabase(_connectionString.ToString());
         }

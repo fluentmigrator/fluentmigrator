@@ -16,10 +16,6 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
             _generator = generator;
         }
 
-        public override void Done()
-        {
-        }
-
         public override IDbConnection MakeConnection()
         {
             return new SqlConnection(_connectionString.ToString());
