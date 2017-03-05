@@ -24,19 +24,16 @@ namespace FluentMigrator.Tests.Integration
             if (excludedProcessors.Any(t => processorType.IsAssignableFrom(t)))
                 Assert.Ignore("Tested feature not supported by {0} or test is intended for another db engine", _runningDbEngine);
 
-            using (var connection = _testProcessorFactory.MakeConnection())
+            if (options == null)
+                options = new ProcessorOptions();
+            using (var processor = _testProcessorFactory.MakeProcessor(announcer, options))
             {
-                if (options == null)
-                    options = new ProcessorOptions();
-                using (var processor = _testProcessorFactory.MakeProcessor(connection, announcer, options))
-                {
-                    test(processor);
+                test(processor);
 
-                    var baseProcessor = processor as ProcessorBase;
-                    if (tryRollback && baseProcessor != null && !baseProcessor.WasCommitted)
-                    {
-                        processor.RollbackTransaction();
-                    }
+                var baseProcessor = processor as ProcessorBase;
+                if (tryRollback && baseProcessor != null && !baseProcessor.WasCommitted)
+                {
+                    processor.RollbackTransaction();
                 }
             }
         }

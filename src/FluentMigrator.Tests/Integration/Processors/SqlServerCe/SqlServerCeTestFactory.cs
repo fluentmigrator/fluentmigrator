@@ -24,7 +24,18 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             }
         }
 
-        public override IDbConnection MakeConnection()
+        public override IMigrationProcessor MakeProcessor(IAnnouncer announcer, IMigrationProcessorOptions options)
+        {
+            return new SqlServerCeProcessor(MakeConnection(), new SqlServerCeGenerator(), announcer, options, new SqlServerCeDbFactory());
+        }
+
+        private void RecreateDatabase()
+        {
+            if (!File.Exists(_connectionString.DataSource))
+                new SqlCeEngine(_connectionString.ToString()).CreateDatabase();
+        }
+
+        private IDbConnection MakeConnection()
         {
             if (string.IsNullOrEmpty(Path.GetDirectoryName(_connectionString.DataSource)))
                 _connectionString.DataSource = Path.Combine(Directory.GetCurrentDirectory(), _connectionString.DataSource);
@@ -32,17 +43,6 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             RecreateDatabase();
 
             return new SqlCeConnection(_connectionString.ToString());
-        }
-
-        public override IMigrationProcessor MakeProcessor(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
-        {
-            return new SqlServerCeProcessor(connection, new SqlServerCeGenerator(), announcer, options, new SqlServerCeDbFactory());
-        }
-
-        private void RecreateDatabase()
-        {
-            if (!File.Exists(_connectionString.DataSource))
-                new SqlCeEngine(_connectionString.ToString()).CreateDatabase();
         }
     }
 }

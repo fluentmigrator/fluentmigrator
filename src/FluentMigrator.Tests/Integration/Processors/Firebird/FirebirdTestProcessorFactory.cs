@@ -16,13 +16,19 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             _connectionString = new FbConnectionStringBuilder(connectionString);
         }
 
-        public override IMigrationProcessor MakeProcessor(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
+        public override IMigrationProcessor MakeProcessor(IAnnouncer announcer, IMigrationProcessorOptions options)
         {
             var fbOptions = FirebirdOptions.AutoCommitBehaviour();
+            var connection = MakeConnection();
             return new FirebirdProcessor(connection, new FirebirdGenerator(fbOptions), announcer, options, new FirebirdDbFactory(), fbOptions);
         }
 
-        public override IDbConnection MakeConnection()
+        public void CleanUp()
+        {
+            FbDatabase.DropDatabase(_connectionString.ToString());
+        }
+
+        private IDbConnection MakeConnection()
         {
             if (string.IsNullOrEmpty(Path.GetDirectoryName(_connectionString.Database)))
                 _connectionString.Database = Path.Combine(Directory.GetCurrentDirectory(), _connectionString.Database);
@@ -31,11 +37,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             FbDatabase.CreateDatabase(usedConnectionString);
 
             return new FbConnection(usedConnectionString);
-        }
-
-        public void CleanUp()
-        {
-            FbDatabase.DropDatabase(_connectionString.ToString());
         }
     }
 }

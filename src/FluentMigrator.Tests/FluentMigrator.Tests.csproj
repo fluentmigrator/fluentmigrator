@@ -172,6 +172,7 @@
     </Compile>
     <Compile Include="Helpers\Db2TestTable.cs" />
     <Compile Include="Integration\AbstractTestProcessorFactoryOf.cs" />
+    <Compile Include="Integration\GenericTestFactory.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdTestTable.cs" />
     <Compile Include="Helpers\JetTestTable.cs" />
     <Compile Include="Helpers\OracleTestTable.cs" />
@@ -283,7 +284,6 @@
     <Compile Include="Integration\Processors\Postgres\PostgresSequenceTests.cs" />
     <Compile Include="Integration\Processors\Postgres\PostgresTableTests.cs" />
     <Compile Include="Integration\Processors\SQLite\SQLiteProcessorTests.cs" />
-    <Compile Include="Integration\Processors\SQLite\SQLiteTestProcessorFactory.cs" />
     <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeColumnTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeConstraintTests.cs" />
     <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeIndexTests.cs" />

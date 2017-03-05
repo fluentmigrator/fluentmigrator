@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
 using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Tests.Integration.Processors.Firebird;
-using FluentMigrator.Tests.Integration.Processors.SQLite;
 using FluentMigrator.Tests.Integration.Processors.SqlServer;
 using FluentMigrator.Tests.Integration.Processors.SqlServerCe;
 using NUnit.Framework;
@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Integration
             { "SqlServer2012", connectionString => new SqlServerTestProcessorFactory(connectionString, new SqlServer2012Generator()) },
             { "SqlServer2014", connectionString => new SqlServerTestProcessorFactory(connectionString, new SqlServer2014Generator()) },
             { "SqlServerCe", connectionString => new SqlServerCeTestFactory(connectionString) },
-            { "SQLite", connectionString => new SQLiteTestProcessorFactory(connectionString) }
+            { "SQLite", connectionString => new DefaultTestFactoryFor<SQLiteProcessor>(connectionString, new SQLiteProcessorFactory()) }
         };
 
         public TestConfiguration(string testConfigFileName)

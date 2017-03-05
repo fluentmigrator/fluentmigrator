@@ -16,14 +16,14 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
             _generator = generator;
         }
 
-        public override IDbConnection MakeConnection()
+        public override IMigrationProcessor MakeProcessor(IAnnouncer announcer, IMigrationProcessorOptions options)
         {
-            return new SqlConnection(_connectionString.ToString());
+            return new SqlServerProcessor(MakeConnection(), _generator, announcer, options, new SqlServerDbFactory()); ;
         }
 
-        public override IMigrationProcessor MakeProcessor(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options)
+        private IDbConnection MakeConnection()
         {
-            return new SqlServerProcessor(connection, _generator, announcer, options, new SqlServerDbFactory()); ;
+            return new SqlConnection(_connectionString.ToString());
         }
     }
 }
