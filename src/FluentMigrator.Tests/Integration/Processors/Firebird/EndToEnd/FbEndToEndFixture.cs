@@ -3,24 +3,29 @@ using System.Reflection;
 using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors.Firebird;
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
 {
     [Category("Integration")]
     [Category("Firebird")]
-    public class FbEndToEndFixture
+    public class FbEndToEndFixture : IntegrationTestBase
     {
         [SetUp]
         public void SetUp()
         {
-            FbDatabase.CreateDatabase(IntegrationTestOptions.Firebird.ConnectionString);
+            if (ConfiguredProcessor.IsAssignableFrom(typeof(FirebirdProcessor)))
+                FbDatabase.CreateDatabase(IntegrationTestOptions.Firebird.ConnectionString);
+            else
+                Assert.Ignore("Test is intended to run against Firebird server. Current configuration: {0}", ConfiguredDbEngine);
         }
 
         [TearDown]
         public void TearDown()
         {
-            FbDatabase.DropDatabase(IntegrationTestOptions.Firebird.ConnectionString);
+            if (ConfiguredProcessor.IsAssignableFrom(typeof(FirebirdProcessor)))
+                FbDatabase.DropDatabase(IntegrationTestOptions.Firebird.ConnectionString);
         }
 
         protected void Migrate(string migrationsNamespace)

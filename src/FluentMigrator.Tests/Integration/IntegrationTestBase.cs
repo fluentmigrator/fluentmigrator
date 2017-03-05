@@ -47,7 +47,9 @@ namespace FluentMigrator.Tests.Integration
             var testConfiguration = new TestConfiguration(TestConfigFileName);
             testConfiguration.Configure();
             _testProcessorFactory = testConfiguration.GetProcessorFactory();
-            _testDriver = new TestDriver(_testProcessorFactory, testConfiguration.RequestedDbEngine);
+            ConfiguredProcessor = _testProcessorFactory.GetProcessorType();
+            ConfiguredDbEngine = testConfiguration.RequestedDbEngine;
+            _testDriver = new TestDriver(_testProcessorFactory, ConfiguredDbEngine);
             Announcer = new TextWriterAnnouncer(System.Console.Out);
             ((TextWriterAnnouncer)Announcer).ShowSql = true;
             Announcer.Heading(string.Format("Testing Migration against {0} Server", testConfiguration.RequestedDbEngine));
@@ -64,6 +66,10 @@ namespace FluentMigrator.Tests.Integration
         protected ProcessorOptions ProcessorOptions { get; set; }
 
         protected IAnnouncer Announcer { get; set; }
+
+        protected Type ConfiguredProcessor { get; private set; }
+
+        protected string ConfiguredDbEngine { get; private set; }
 
         public void ExecuteWithSupportedProcessor(Action<IMigrationProcessor> test)
         {
