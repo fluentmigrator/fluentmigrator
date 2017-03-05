@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
 using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Runner.Processors.DB2;
+using FluentMigrator.Runner.Processors.Hana;
+using FluentMigrator.Runner.Processors.MySql;
+using FluentMigrator.Runner.Processors.Oracle;
+using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Tests.Integration.Processors.Firebird;
 using FluentMigrator.Tests.Integration.Processors.SqlServer;
@@ -24,7 +29,12 @@ namespace FluentMigrator.Tests.Integration
             { "SqlServer2012", connectionString => new SqlServerTestProcessorFactory(connectionString, new SqlServer2012Generator()) },
             { "SqlServer2014", connectionString => new SqlServerTestProcessorFactory(connectionString, new SqlServer2014Generator()) },
             { "SqlServerCe", connectionString => new SqlServerCeTestFactory(connectionString) },
-            { "SQLite", connectionString => new DefaultTestFactoryFor<SQLiteProcessor>(connectionString, new SQLiteProcessorFactory()) }
+            { "SQLite", connectionString => new DefaultTestFactoryFor<SQLiteProcessor>(connectionString, new SQLiteProcessorFactory()) },
+            { "Db2", connectionString => new DefaultTestFactoryFor<Db2Processor>(connectionString, new Db2ProcessorFactory()) },
+            { "Hana", connectionString => new DefaultTestFactoryFor<HanaProcessor>(connectionString, new HanaProcessorFactory()) },
+            { "MySql", connectionString => new DefaultTestFactoryFor<MySqlProcessor>(connectionString, new MySqlProcessorFactory()) },
+            { "Oracle", connectionString => new DefaultTestFactoryFor<OracleProcessor>(connectionString, new OracleProcessorFactory()) },
+            { "Postgres", connectionString => new DefaultTestFactoryFor<PostgresProcessor>(connectionString, new PostgresProcessorFactory()) }
         };
 
         public TestConfiguration(string testConfigFileName)
