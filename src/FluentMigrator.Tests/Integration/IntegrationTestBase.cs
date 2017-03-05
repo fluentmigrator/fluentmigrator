@@ -122,5 +122,10 @@ namespace FluentMigrator.Tests.Integration
             yield return MS_SQL_SERVER;
             yield return MS_SQL_CE;
         }
+
+        protected IMigrationProcessor CreateProcessor()
+        {
+            return _testProcessorFactory.MakeProcessor(Announcer, ProcessorOptions);
+        }
     }
 }
