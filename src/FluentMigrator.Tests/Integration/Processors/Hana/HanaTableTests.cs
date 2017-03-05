@@ -2,7 +2,6 @@ using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.Hana;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Hana;
-using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
 using NUnit.Should;
 using Sap.Data.Hana;

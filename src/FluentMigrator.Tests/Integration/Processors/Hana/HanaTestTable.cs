@@ -5,7 +5,7 @@ using FluentMigrator.Runner.Generators.Hana;
 using FluentMigrator.Runner.Processors.Hana;
 using Sap.Data.Hana;
 
-namespace FluentMigrator.Tests.Helpers
+namespace FluentMigrator.Tests.Integration.Processors.Hana
 {
     public class HanaTestTable : IDisposable
     {
