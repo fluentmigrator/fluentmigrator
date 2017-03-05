@@ -174,7 +174,7 @@
     <Compile Include="Integration\AbstractTestProcessorFactoryOf.cs" />
     <Compile Include="Integration\DefaultTestFactory.cs" />
     <Compile Include="Integration\Processors\Firebird\FirebirdTestTable.cs" />
-    <Compile Include="Helpers\JetTestTable.cs" />
+    <Compile Include="Integration\Processors\Jet\JetTestTable.cs" />
     <Compile Include="Helpers\OracleTestTable.cs" />
     <Compile Include="Integration\Processors\Hana\HanaTestSequence.cs" />
     <Compile Include="Helpers\PostgresTestSequence.cs" />

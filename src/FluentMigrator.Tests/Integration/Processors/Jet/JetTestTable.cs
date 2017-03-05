@@ -21,7 +21,7 @@ using System.Text;
 using FluentMigrator.Runner.Generators.Jet;
 using FluentMigrator.Runner.Processors.Jet;
 
-namespace FluentMigrator.Tests.Helpers
+namespace FluentMigrator.Tests.Integration.Processors.Jet
 {
     public class JetTestTable : IDisposable
     {
