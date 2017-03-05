@@ -1,4 +1,3 @@
-using System.Data.SqlClient;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.Hana;
 using FluentMigrator.Runner.Processors;

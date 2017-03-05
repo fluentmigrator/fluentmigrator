@@ -1,12 +1,8 @@
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Hana;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Hana;
 using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
 using NUnit.Should;
-using Sap.Data.Hana;
 
 namespace FluentMigrator.Tests.Integration.Processors.Hana
 {
@@ -14,31 +10,33 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
     [Category("Integration")]
     public class HanaColumnTests : BaseColumnTests
     {
-        public HanaConnection Connection { get; set; }
         public HanaProcessor Processor { get; set; }
-        public IQuoter Quoter { get; set; }
 
         [SetUp]
         public void SetUp()
         {
-            Connection = new HanaConnection(IntegrationTestOptions.Hana.ConnectionString);
-            Processor = new HanaProcessor(Connection, new HanaGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new HanaDbFactory());
-            Quoter = new HanaQuoter();
-            Connection.Open();
-            Processor.BeginTransaction();
+            if (ConfiguredProcessor.IsAssignableFrom(typeof(HanaProcessor)))
+            {
+                Processor = CreateProcessor() as HanaProcessor;
+            }
+            else
+                Assert.Ignore("Test is intended to run against Hana server. Current configuration: {0}", ConfiguredDbEngine);
         }
 
         [TearDown]
         public void TearDown()
         {
-            Processor.CommitTransaction();
-            Processor.Dispose();
+            if (ConfiguredProcessor.IsAssignableFrom(typeof(HanaProcessor)))
+            {
+                Processor.CommitTransaction();
+                Processor.Dispose();
+            }
         }
 
         [Test]
         public override void CallingColumnExistsCanAcceptColumnNameWithSingleQuote()
         {
-            var columnNameWithSingleQuote = Quoter.Quote("i'd");
+            var columnNameWithSingleQuote = new HanaQuoter().Quote("i'd");
             using (var table = new HanaTestTable(Processor, null, string.Format("{0} int", columnNameWithSingleQuote)))
                 Processor.ColumnExists(null, table.Name, "i'd").ShouldBeTrue();
         }
