@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Runner.Announcers;
@@ -13,25 +12,26 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
 {
     [TestFixture]
     [Category("Integration")]
-    public class MySqlProcessorTests
+    public class MySqlProcessorTests : IntegrationTestBase
     {
         protected MySqlProcessor Processor;
-
-        [CLSCompliant(false)]
-        protected MySqlConnection Connection;
 
         [SetUp]
         public void SetUp()
         {
-            Connection = new MySqlConnection(IntegrationTestOptions.MySql.ConnectionString);
-            Processor = new MySqlProcessor(Connection, new MySqlGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new MySqlDbFactory());
-            Connection.Open();
+            if (ConfiguredProcessor.IsAssignableFrom(typeof(MySqlProcessor)))
+            {
+                Processor = CreateProcessor() as MySqlProcessor;
+            }
+            else
+                Assert.Ignore("Test is intended to run against Oracle. Current configuration: {0}", ConfiguredDbEngine);
         }
 
         [TearDown]
         public void TearDown()
         {
-            Processor.Dispose();
+            if (ConfiguredProcessor.IsAssignableFrom(typeof(MySqlProcessor)))
+                Processor.Dispose();
         }
 
         [Test]
@@ -134,7 +134,7 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
                 connection,
                 new MySqlGenerator(),
                 new TextWriterAnnouncer(output),
-                new ProcessorOptions {PreviewOnly = true},
+                new ProcessorOptions { PreviewOnly = true },
                 new MySqlDbFactory());
             return processor;
         }
