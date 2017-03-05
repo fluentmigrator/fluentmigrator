@@ -1,16 +1,10 @@
 ﻿namespace FluentMigrator.Tests.Integration.Processors.Db2
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
 
     using FluentMigrator.Runner.Announcers;
-    using FluentMigrator.Runner.Generators;
     using FluentMigrator.Runner.Generators.DB2;
     using FluentMigrator.Runner.Processors;
     using FluentMigrator.Runner.Processors.DB2;
-    using FluentMigrator.Tests.Helpers;
 
     using NUnit.Framework;
     using NUnit.Should;

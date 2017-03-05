@@ -1,9 +1,8 @@
-﻿namespace FluentMigrator.Tests.Helpers
+﻿namespace FluentMigrator.Tests.Integration.Processors.Db2
 {
     using System;
     using System.Collections.Generic;
     using System.Data;
-    using System.Linq;
     using System.Text;
 
     using FluentMigrator.Runner.Generators.DB2;

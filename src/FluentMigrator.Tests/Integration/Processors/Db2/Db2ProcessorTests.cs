@@ -1,9 +1,5 @@
 ﻿namespace FluentMigrator.Tests.Integration.Processors.Db2
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
 
     using FluentMigrator.Runner.Announcers;
     using FluentMigrator.Runner.Generators.DB2;
@@ -12,7 +8,6 @@
 
     using NUnit.Framework;
     using NUnit.Should;
-    using FluentMigrator.Tests.Helpers;
 
     [TestFixture]
     [Category("Integration")]
