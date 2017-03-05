@@ -9,6 +9,6 @@ namespace FluentMigrator.Tests.Integration
     {
         IMigrationProcessor MakeProcessor(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options);
         IDbConnection MakeConnection();
-        bool ProcessorTypeWithin(IEnumerable<Type> candidates);
+        Type GetProcessorType();
     }
 }

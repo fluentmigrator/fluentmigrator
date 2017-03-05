@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Processors;
 using NUnit.Framework;
@@ -19,7 +20,8 @@ namespace FluentMigrator.Tests.Integration
 
         public void Run(Action<IMigrationProcessor> test, IAnnouncer announcer, IMigrationProcessorOptions options, bool tryRollback, IEnumerable<Type> excludedProcessors)
         {
-            if (_testProcessorFactory.ProcessorTypeWithin(excludedProcessors))
+            var processorType = _testProcessorFactory.GetProcessorType();
+            if (excludedProcessors.Any(t => processorType.IsAssignableFrom(t)))
                 Assert.Ignore("Tested feature not supported by {0} or test is intended for another db engine", _runningDbEngine);
 
             using (var connection = _testProcessorFactory.MakeConnection())

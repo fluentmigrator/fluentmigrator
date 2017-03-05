@@ -13,9 +13,9 @@ namespace FluentMigrator.Tests.Integration
 
         public abstract IMigrationProcessor MakeProcessor(IDbConnection connection, IAnnouncer announcer, IMigrationProcessorOptions options);
 
-        public bool ProcessorTypeWithin(IEnumerable<Type> candidates)
+        public Type GetProcessorType()
         {
-            return candidates.Any(t => typeof(TProcessor).IsAssignableFrom(t));
+            return typeof(TProcessor);
         }
     }
 }
