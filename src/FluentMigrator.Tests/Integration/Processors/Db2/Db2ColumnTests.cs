@@ -1,52 +1,42 @@
-﻿namespace FluentMigrator.Tests.Integration.Processors.Db2
+﻿using FluentMigrator.Runner.Generators.DB2;
+using FluentMigrator.Runner.Processors.DB2;
+
+using NUnit.Framework;
+using NUnit.Should;
+
+namespace FluentMigrator.Tests.Integration.Processors.Db2
 {
-
-    using FluentMigrator.Runner.Announcers;
-    using FluentMigrator.Runner.Generators.DB2;
-    using FluentMigrator.Runner.Processors;
-    using FluentMigrator.Runner.Processors.DB2;
-
-    using NUnit.Framework;
-    using NUnit.Should;
 
     [TestFixture]
     [Category("Integration")]
     public class Db2ColumnTests : BaseColumnTests
     {
-        #region Properties
-
-        public System.Data.IDbConnection Connection
-        {
-            get;
-            set;
-        }
-
-        public Db2DbFactory Factory
-        {
-            get;
-            set;
-        }
-
         public Db2Processor Processor
         {
             get;
             set;
         }
 
-        public Db2Quoter Quoter
+        [SetUp]
+        public void SetUp()
         {
-            get;
-            set;
+            if (ConfiguredProcessor.IsAssignableFrom(typeof(Db2Processor)))
+                Processor = CreateProcessor() as Db2Processor;
+            else
+                Assert.Ignore("Test is intended to run against Db2 server. Current configuration: {0}", ConfiguredDbEngine);
         }
 
-        #endregion Properties
-
-        #region Methods
+        [TearDown]
+        public void TearDown()
+        {
+            if (ConfiguredProcessor.IsAssignableFrom(typeof(Db2Processor)))
+                Processor.Dispose();
+        }
 
         [Test]
         public override void CallingColumnExistsCanAcceptColumnNameWithSingleQuote()
         {
-            var columnName = Quoter.Quote("I'D") + " INT";
+            var columnName = new Db2Quoter().Quote("I'D") + " INT";
             using (var table = new Db2TestTable(Processor, null, columnName))
             {
                 Processor.ColumnExists(null, table.Name, "I'D").ShouldBeTrue();
@@ -109,23 +99,5 @@
                 Processor.ColumnExists("TstSchma", table.Name, "ID").ShouldBeTrue();
             }
         }
-
-        [SetUp]
-        public void SetUp()
-        {
-            Factory = new Db2DbFactory();
-            Connection = Factory.CreateConnection(IntegrationTestOptions.Db2.ConnectionString);
-            Quoter = new Db2Quoter();
-            Processor = new Db2Processor(Connection, new Db2Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), Factory);
-            Connection.Open();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Processor.Dispose();
-        }
-
-        #endregion Methods
     }
 }
