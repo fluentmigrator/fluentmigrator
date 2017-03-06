@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
                 Processor = CreateProcessor() as MySqlProcessor;
             }
             else
-                Assert.Ignore("Test is intended to run against Oracle. Current configuration: {0}", ConfiguredDbEngine);
+                Assert.Ignore("Test is intended to run against MySql. Current configuration: {0}", ConfiguredDbEngine);
         }
 
         [TearDown]
