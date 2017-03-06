@@ -13,6 +13,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         public void Setup()
         {
             Generator = new SqlServerCeGenerator();
+            Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
         }
 
         [Test]
