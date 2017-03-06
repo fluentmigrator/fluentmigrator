@@ -230,10 +230,10 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Up(new TestRenameTableMigration());
                     processor.TableExists(null, "TestTable2").ShouldBeFalse();
-                    processor.TableExists(null, "TestTable'3").ShouldBeTrue();
+                    processor.TableExists(null, "TestTable3").ShouldBeTrue();
 
                     runner.Down(new TestRenameTableMigration());
-                    processor.TableExists(null, "TestTable'3").ShouldBeFalse();
+                    processor.TableExists(null, "TestTable3").ShouldBeFalse();
                     processor.TableExists(null, "TestTable2").ShouldBeTrue();
 
                     runner.Down(new TestCreateAndDropTableMigration());
@@ -283,10 +283,10 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Up(new TestRenameColumnMigration());
                     processor.ColumnExists(null, "TestTable2", "Name").ShouldBeFalse();
-                    processor.ColumnExists(null, "TestTable2", "Name'3").ShouldBeTrue();
+                    processor.ColumnExists(null, "TestTable2", "Name3").ShouldBeTrue();
 
                     runner.Down(new TestRenameColumnMigration());
-                    processor.ColumnExists(null, "TestTable2", "Name'3").ShouldBeFalse();
+                    processor.ColumnExists(null, "TestTable2", "Name3").ShouldBeFalse();
                     processor.ColumnExists(null, "TestTable2", "Name").ShouldBeTrue();
 
                     runner.Down(new TestCreateAndDropTableMigration());
@@ -1265,7 +1265,7 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
-            Rename.Table("TestTable2").To("TestTable'3");
+            Rename.Table("TestTable2").To("TestTable3");
         }
     }
 
@@ -1273,7 +1273,7 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
-            Rename.Column("Name").OnTable("TestTable2").To("Name'3");
+            Rename.Column("Name").OnTable("TestTable2").To("Name3");
         }
     }
 
