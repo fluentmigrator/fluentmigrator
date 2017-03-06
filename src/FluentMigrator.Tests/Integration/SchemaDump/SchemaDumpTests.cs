@@ -1,45 +1,46 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Data.SqlClient;
+using System.Linq;
+using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Processors;
-using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.SchemaDump.SchemaWriters;
-using FluentMigrator.Model;
+using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.SchemaDump.SchemaDumpers;
+using FluentMigrator.SchemaDump.SchemaWriters;
 using FluentMigrator.Tests.Helpers;
 using FluentMigrator.Tests.Integration.Migrations;
 using NUnit.Framework;
 using NUnit.Should;
-using FluentMigrator.Runner.Generators.SqlServer;
-using System.Linq;
 
 namespace FluentMigrator.Tests.Integration.SchemaDump
 {
 
     [TestFixture]
     [Category("Integration")]
-    public class SchemaDumpTests
+    public class SchemaDumpTests : IntegrationTestBase
     {
-        public SqlConnection Connection;
         public SqlServerProcessor Processor;
         public SqlServerSchemaDumper SchemaDumper;
 
         [SetUp]
         public void Setup()
         {
-            Connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
-            Processor = new SqlServerProcessor(Connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
-            SchemaDumper = new SqlServerSchemaDumper(Processor, new TextWriterAnnouncer(System.Console.Out));
-            Connection.Open();
+            if (ConfiguredProcessor.IsAssignableFrom(typeof(SqlServerProcessor)))
+            {
+                Processor = CreateProcessor() as SqlServerProcessor;
+                SchemaDumper = new SqlServerSchemaDumper(Processor, new TextWriterAnnouncer(System.Console.Out));
+                Processor.Connection.Open();
+            }
+            else
+                Assert.Ignore("Test is intended to run against SqlServer. Current configuration: {0}", ConfiguredDbEngine);
         }
 
         [TearDown]
         public void TearDown()
         {
-            Processor.Dispose();
+            if (ConfiguredProcessor.IsAssignableFrom(typeof(SqlServerProcessor)))
+                Processor.Dispose();
         }
 
         [Test]
@@ -54,7 +55,7 @@ namespace FluentMigrator.Tests.Integration.SchemaDump
                 ForeignKeys = new List<ForeignKeyDefinition> { new ForeignKeyDefinition() }
             };
 
-            var defs = new List<TableDefinition> {tableDef};
+            var defs = new List<TableDefinition> { tableDef };
 
             var testWriter = new SchemaTestWriter();
             var output = GetOutput(testWriter, defs);

@@ -51,6 +51,7 @@ namespace FluentMigrator.Tests.Integration
             ConfiguredDbEngine = testConfiguration.RequestedDbEngine;
             _testDriver = new TestDriver(_testProcessorFactory, ConfiguredDbEngine);
             Announcer = new TextWriterAnnouncer(System.Console.Out);
+            ProcessorOptions = new ProcessorOptions();
             ((TextWriterAnnouncer)Announcer).ShowSql = true;
             Announcer.Heading(string.Format("Testing Migration against {0} Server", testConfiguration.RequestedDbEngine));
         }
