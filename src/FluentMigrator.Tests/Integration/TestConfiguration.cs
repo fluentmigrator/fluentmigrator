@@ -34,6 +34,7 @@ namespace FluentMigrator.Tests.Integration
             { "Hana", connectionString => new DefaultTestFactoryFor<HanaProcessor>(connectionString, new HanaProcessorFactory()) },
             { "MySql", connectionString => new DefaultTestFactoryFor<MySqlProcessor>(connectionString, new MySqlProcessorFactory()) },
             { "Oracle", connectionString => new DefaultTestFactoryFor<OracleProcessor>(connectionString, new OracleProcessorFactory()) },
+            { "OracleManaged", connectionString => new DefaultTestFactoryFor<OracleProcessor>(connectionString, new OracleManagedProcessorFactory()) },
             { "Postgres", connectionString => new DefaultTestFactoryFor<PostgresProcessor>(connectionString, new PostgresProcessorFactory()) }
         };
 
