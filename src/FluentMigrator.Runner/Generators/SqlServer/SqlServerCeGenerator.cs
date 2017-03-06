@@ -64,11 +64,6 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             throw new DatabaseOperationNotSupportedException();
         }
 
-        public override string Generate(DeleteSchemaExpression expression)
-        {
-            throw new DatabaseOperationNotSupportedException();
-        }
-
         public override string Generate(AlterSchemaExpression expression)
         {
             throw new DatabaseOperationNotSupportedException();
