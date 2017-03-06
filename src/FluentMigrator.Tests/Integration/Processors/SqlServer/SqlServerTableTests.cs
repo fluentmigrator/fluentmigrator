@@ -1,7 +1,3 @@
-using System.Data.SqlClient;
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators.SqlServer;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.SqlServer;
 using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
@@ -13,23 +9,29 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
     [Category("Integration")]
     public class SqlServerTableTests : BaseTableTests
     {
-        public SqlConnection Connection { get; set; }
         public SqlServerProcessor Processor { get; set; }
 
         [SetUp]
         public void SetUp()
         {
-            Connection = new SqlConnection(IntegrationTestOptions.SqlServer2012.ConnectionString);
-            Processor = new SqlServerProcessor(Connection, new SqlServer2012Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
-            Connection.Open();
-            Processor.BeginTransaction();
+            if (ConfiguredDbEngine == "SqlServer2012")
+            {
+                Processor = CreateProcessor() as SqlServerProcessor;
+                Processor.Connection.Open();
+                Processor.BeginTransaction();
+            }
+            else
+                Assert.Ignore("Test is intended to run against SqlServer2012. Current configuration: {0}", ConfiguredDbEngine);
         }
 
         [TearDown]
         public void TearDown()
         {
-            Processor.CommitTransaction();
-            Processor.Dispose();
+            if (ConfiguredDbEngine == "SqlServer2012")
+            {
+                Processor.CommitTransaction();
+                Processor.Dispose();
+            }
         }
 
         [Test]
@@ -57,7 +59,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
             using (var table = new SqlServerTestTable(Processor, null, "id int"))
                 Processor.TableExists(null, table.Name).ShouldBeTrue();
         }
-        
+
         [Test]
         public override void CallingTableExistsReturnsTrueIfTableExistsWithSchema()
         {
