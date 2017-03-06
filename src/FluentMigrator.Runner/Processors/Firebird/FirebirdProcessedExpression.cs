@@ -94,6 +94,9 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 if (Expression is DeleteDataExpression)
                     SetupUndoDeleteData(Expression as DeleteDataExpression);
 
+                if (Expression is DeleteConstraintExpression)
+                    SetupUndoDeleteConstraintExpression(Expression as DeleteConstraintExpression);
+
                 //Skippables
                 if (Expression is AlterTableExpression 
                     || Expression is DeleteSchemaExpression 
@@ -379,6 +382,18 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 }
             }
 
+        }
+
+        private void SetupUndoDeleteConstraintExpression(DeleteConstraintExpression deleteConstraintExpression)
+        {
+            CanUndo = true;
+
+            CreateConstraintExpression constraint = new CreateConstraintExpression(ConstraintType.Unique)
+            {
+                Constraint = deleteConstraintExpression.Constraint
+            };
+
+            UndoExpressions.Add(constraint);
         }
 
         public void AddUndoExpression(IMigrationExpression expression)
