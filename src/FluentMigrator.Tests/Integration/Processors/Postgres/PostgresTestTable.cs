@@ -5,7 +5,7 @@ using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Processors.Postgres;
 using Npgsql;
 
-namespace FluentMigrator.Tests.Helpers
+namespace FluentMigrator.Tests.Integration.Processors.Postgres
 {
     public class PostgresTestTable : IDisposable
     {

@@ -177,9 +177,9 @@
     <Compile Include="Integration\Processors\Jet\JetTestTable.cs" />
     <Compile Include="Helpers\OracleTestTable.cs" />
     <Compile Include="Integration\Processors\Hana\HanaTestSequence.cs" />
-    <Compile Include="Helpers\PostgresTestSequence.cs" />
+    <Compile Include="Integration\Processors\Postgres\PostgresTestSequence.cs" />
     <Compile Include="Integration\Processors\Hana\HanaTestTable.cs" />
-    <Compile Include="Helpers\PostgresTestTable.cs" />
+    <Compile Include="Integration\Processors\Postgres\PostgresTestTable.cs" />
     <Compile Include="Integration\Processors\SqlServerCe\SqlServerCeTestTable.cs" />
     <Compile Include="Helpers\SqlServerTestSequence.cs" />
     <Compile Include="Helpers\SqlServerTestTable.cs" />

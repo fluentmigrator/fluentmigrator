@@ -2,7 +2,6 @@ using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Postgres;
-using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
 using NUnit.Should;
 using Npgsql;
