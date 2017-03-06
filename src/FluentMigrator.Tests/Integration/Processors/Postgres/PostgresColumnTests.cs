@@ -1,11 +1,7 @@
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Postgres;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Postgres;
 using NUnit.Framework;
 using NUnit.Should;
-using Npgsql;
 
 namespace FluentMigrator.Tests.Integration.Processors.Postgres
 {
@@ -13,30 +9,33 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
     [Category("Integration")]
     public class PostgresColumnTests : BaseColumnTests
     {
-        public NpgsqlConnection Connection { get; set; }
         public PostgresProcessor Processor { get; set; }
-        public IQuoter Quoter { get; set; }
 
         [SetUp]
         public void SetUp()
         {
-            Connection = new NpgsqlConnection(IntegrationTestOptions.Postgres.ConnectionString);
-            Processor = new PostgresProcessor(Connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new PostgresDbFactory());
-            Quoter = new PostgresQuoter();
-            Connection.Open();
+            if (ConfiguredProcessor.IsAssignableFrom(typeof(PostgresProcessor)))
+            {
+                Processor = CreateProcessor() as PostgresProcessor;
+            }
+            else
+                Assert.Ignore("Test is intended to run against Postgres. Current configuration: {0}", ConfiguredDbEngine);
         }
 
         [TearDown]
         public void TearDown()
         {
-            Processor.CommitTransaction();
-            Processor.Dispose();
+            if (ConfiguredProcessor.IsAssignableFrom(typeof(PostgresProcessor)))
+            {
+                Processor.CommitTransaction();
+                Processor.Dispose();
+            }
         }
 
         [Test]
         public override void CallingColumnExistsCanAcceptColumnNameWithSingleQuote()
         {
-            var columnNameWithSingleQuote = Quoter.Quote("i'd");
+            var columnNameWithSingleQuote = new PostgresQuoter().Quote("i'd");
             using (var table = new PostgresTestTable(Processor, null, columnNameWithSingleQuote + " int"))
                 Processor.ColumnExists(null, table.Name, "i'd").ShouldBeTrue();
         }
