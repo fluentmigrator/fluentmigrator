@@ -85,7 +85,7 @@ namespace FluentMigrator.Tests.Integration
 
                 runner.Down(new VersionSchemaMigration(tableMetaData));
                 processor.SchemaExists(tableMetaData.SchemaName).ShouldBeFalse();
-            }, true, typeof(SQLiteProcessor), typeof(MySqlProcessor), typeof(FirebirdProcessor));
+            }, true, typeof(SQLiteProcessor), typeof(MySqlProcessor), typeof(FirebirdProcessor), MS_SQL_CE);
         }
 
         [Test]
