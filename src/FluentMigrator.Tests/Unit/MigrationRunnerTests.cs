@@ -35,6 +35,7 @@ namespace FluentMigrator.Tests.Unit
     [TestFixture]
     public class MigrationRunnerTests
     {
+        private const string CONNECTION_STRING = @"server=.\SQLEXPRESS;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator";
         private MigrationRunner _runner;
         private Mock<IAnnouncer> _announcer;
         private Mock<IStopWatch> _stopWatch;
@@ -67,13 +68,13 @@ namespace FluentMigrator.Tests.Unit
                             };
 
             _processorMock.SetupGet(x => x.Options).Returns(options);
-            _processorMock.SetupGet(x => x.ConnectionString).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
+            _processorMock.SetupGet(x => x.ConnectionString).Returns(CONNECTION_STRING);
 
             _runnerContextMock.SetupGet(x => x.Namespace).Returns("FluentMigrator.Tests.Integration.Migrations");
             _runnerContextMock.SetupGet(x => x.Announcer).Returns(_announcer.Object);
             _runnerContextMock.SetupGet(x => x.StopWatch).Returns(_stopWatch.Object);
             _runnerContextMock.SetupGet(x => x.Targets).Returns(new string[] { Assembly.GetExecutingAssembly().ToString()});
-            _runnerContextMock.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
+            _runnerContextMock.SetupGet(x => x.Connection).Returns(CONNECTION_STRING);
             _runnerContextMock.SetupGet(x => x.Database).Returns("sqlserver");
             _runnerContextMock.SetupGet(x => x.ApplicationContext).Returns(_applicationContext);
 
@@ -151,7 +152,7 @@ namespace FluentMigrator.Tests.Unit
             IMigration migration = new TestEmptyMigration();
             _runner.Up(migration);
 
-            Assert.AreEqual(IntegrationTestOptions.SqlServer2008.ConnectionString, migration.ConnectionString, "The migration does not have the expected connection string.");
+            Assert.AreEqual(CONNECTION_STRING, migration.ConnectionString, "The migration does not have the expected connection string.");
             _announcer.VerifyAll();
         }
 

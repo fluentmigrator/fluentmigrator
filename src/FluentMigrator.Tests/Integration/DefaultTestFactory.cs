@@ -19,5 +19,10 @@ namespace FluentMigrator.Tests.Integration
         {
             return _processorFactory.Create(_connectionString, announcer, options);
         }
+
+        public override string ConnectionString
+        {
+            get { return _connectionString; }
+        }
     }
 }

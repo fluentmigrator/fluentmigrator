@@ -39,7 +39,7 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
         {
             var output = new StringWriter();
 
-            var connection = new MySqlConnection(IntegrationTestOptions.MySql.ConnectionString);
+            var connection = new MySqlConnection(ConnectionString);
 
             var processor = SetupMySqlProcessorWithPreviewOnly(output, connection);
 
@@ -80,7 +80,7 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
         {
             var output = new StringWriter();
 
-            var connection = new MySqlConnection(IntegrationTestOptions.MySql.ConnectionString);
+            var connection = new MySqlConnection(ConnectionString);
 
             var processor = SetupMySqlProcessorWithPreviewOnly(output, connection);
 

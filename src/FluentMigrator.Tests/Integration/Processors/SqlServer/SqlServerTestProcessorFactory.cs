@@ -21,6 +21,11 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
             return new SqlServerProcessor(MakeConnection(), _generator, announcer, options, new SqlServerDbFactory()); ;
         }
 
+        public override string ConnectionString
+        {
+            get { return _connectionString.ToString(); }
+        }
+
         private IDbConnection MakeConnection()
         {
             return new SqlConnection(_connectionString.ToString());

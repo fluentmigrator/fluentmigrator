@@ -13,6 +13,8 @@ namespace FluentMigrator.Tests.Unit
     [TestFixture]
     public class TaskExecutorTests : IntegrationTestBase
     {
+        private const string CONNECTION_STRING = @"server=.\SQLEXPRESS;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator";
+
         #region Setup/Teardown
 
         [SetUp]
@@ -43,7 +45,7 @@ namespace FluentMigrator.Tests.Unit
             runnerContext.SetupGet(x => x.Announcer).Returns(announcer.Object);
             runnerContext.SetupGet(x => x.StopWatch).Returns(stopWatch.Object);
             runnerContext.SetupGet(x => x.Database).Returns("sqlserver2008");
-            runnerContext.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
+            runnerContext.SetupGet(x => x.Connection).Returns(CONNECTION_STRING);
             runnerContext.SetupGet(x => x.Task).Returns(task);
             runnerContext.SetupGet(x => x.Version).Returns(version);
             runnerContext.SetupGet(x => x.Steps).Returns(steps);
@@ -62,7 +64,7 @@ namespace FluentMigrator.Tests.Unit
         {
             var runnerContext = new Mock<IRunnerContext>();
             runnerContext.SetupGet(x => x.Database).Returns("sqlWRONG");
-            runnerContext.SetupGet(x => x.Connection).Returns(IntegrationTestOptions.SqlServer2008.ConnectionString);
+            runnerContext.SetupGet(x => x.Connection).Returns(CONNECTION_STRING);
             runnerContext.SetupGet(x => x.Targets).Returns(new string[] { GetType().Assembly.Location });
             runnerContext.SetupGet(x => x.Announcer).Returns(new Mock<IAnnouncer>().Object);
 

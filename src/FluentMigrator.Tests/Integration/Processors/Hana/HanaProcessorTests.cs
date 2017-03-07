@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         {
             var output = new StringWriter();
 
-            var connection = new HanaConnection(IntegrationTestOptions.Hana.ConnectionString);
+            var connection = new HanaConnection(ConnectionString);
 
             var processor = new HanaProcessor(
                 connection,

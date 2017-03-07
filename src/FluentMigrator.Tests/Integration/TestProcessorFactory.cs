@@ -7,5 +7,6 @@ namespace FluentMigrator.Tests.Integration
     {
         IMigrationProcessor MakeProcessor(IAnnouncer announcer, IMigrationProcessorOptions options);
         Type GetProcessorType();
+        string ConnectionString { get; }
     }
 }

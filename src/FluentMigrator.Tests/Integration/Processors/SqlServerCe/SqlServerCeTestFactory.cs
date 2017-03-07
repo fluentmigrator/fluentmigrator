@@ -14,6 +14,8 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         public SqlServerCeTestFactory(string connectionString)
         {
             _connectionString = new SqlCeConnectionStringBuilder(connectionString);
+            if (string.IsNullOrEmpty(Path.GetDirectoryName(_connectionString.DataSource)))
+                _connectionString.DataSource = Path.Combine(Directory.GetCurrentDirectory(), _connectionString.DataSource);
         }
 
         public void CleanUp()
@@ -29,6 +31,11 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             return new SqlServerCeProcessor(MakeConnection(), new SqlServerCeGenerator(), announcer, options, new SqlServerCeDbFactory());
         }
 
+        public override string ConnectionString
+        {
+            get { return _connectionString.ToString(); }
+        }
+
         private void RecreateDatabase()
         {
             if (!File.Exists(_connectionString.DataSource))
@@ -37,9 +44,6 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
 
         private IDbConnection MakeConnection()
         {
-            if (string.IsNullOrEmpty(Path.GetDirectoryName(_connectionString.DataSource)))
-                _connectionString.DataSource = Path.Combine(Directory.GetCurrentDirectory(), _connectionString.DataSource);
-
             RecreateDatabase();
 
             return new SqlCeConnection(_connectionString.ToString());

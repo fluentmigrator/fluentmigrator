@@ -159,7 +159,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         {
             var output = new StringWriter();
 
-            var connection = new NpgsqlConnection(IntegrationTestOptions.Postgres.ConnectionString);
+            var connection = new NpgsqlConnection(ConnectionString);
 
             var processor = new PostgresProcessor(
                 connection,

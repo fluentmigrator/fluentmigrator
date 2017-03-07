@@ -12,5 +12,7 @@ namespace FluentMigrator.Tests.Integration
         {
             return typeof(TProcessor);
         }
+
+        public abstract string ConnectionString { get; }
     }
 }

@@ -16,7 +16,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
         public void SetUp()
         {
             if (ConfiguredProcessor.IsAssignableFrom(typeof(FirebirdProcessor)))
-                FbDatabase.CreateDatabase(IntegrationTestOptions.Firebird.ConnectionString);
+                FbDatabase.CreateDatabase(ConnectionString);
             else
                 Assert.Ignore("Test is intended to run against Firebird server. Current configuration: {0}", ConfiguredDbEngine);
         }
@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
         public void TearDown()
         {
             if (ConfiguredProcessor.IsAssignableFrom(typeof(FirebirdProcessor)))
-                FbDatabase.DropDatabase(IntegrationTestOptions.Firebird.ConnectionString);
+                FbDatabase.DropDatabase(ConnectionString);
         }
 
         protected void Migrate(string migrationsNamespace)
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
             var runnerContext = new RunnerContext(announcer)
             {
                 Database = "Firebird",
-                Connection = IntegrationTestOptions.Firebird.ConnectionString,
+                Connection = ConnectionString,
                 Targets = new[] { Assembly.GetExecutingAssembly().Location },
                 Namespace = migrationsNamespace,
                 Task = task
@@ -52,7 +52,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
             return new TaskExecutor(runnerContext);
         }
 
-        protected static bool TableExists(string candidate)
+        protected bool TableExists(string candidate)
         {
             return IsInDatabase(cmd =>
                 {
@@ -61,7 +61,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
                 });
         }
 
-        protected static bool ColumnExists(string tableName, string candidateColumn)
+        protected bool ColumnExists(string tableName, string candidateColumn)
         {
             return IsInDatabase(cmd =>
                 {
@@ -71,10 +71,10 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
                 });
         }
 
-        protected static bool IsInDatabase(Action<FbCommand> adjustCommand)
+        protected bool IsInDatabase(Action<FbCommand> adjustCommand)
         {
             var result = false;
-            using (var connection = new FbConnection(IntegrationTestOptions.Firebird.ConnectionString))
+            using (var connection = new FbConnection(ConnectionString))
             {
                 connection.Open();
                 using (var tx = connection.BeginTransaction())

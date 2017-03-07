@@ -144,7 +144,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
         {
             var output = new StringWriter();
 
-            var connection = new SQLiteConnection(IntegrationTestOptions.SqlLite.ConnectionString);
+            var connection = new SQLiteConnection(_connection.ConnectionString);
 
             var processor = new SQLiteProcessor(
                 connection,

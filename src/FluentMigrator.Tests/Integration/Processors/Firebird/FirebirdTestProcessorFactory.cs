@@ -14,6 +14,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         public FirebirdTestProcessorFactory(string connectionString)
         {
             _connectionString = new FbConnectionStringBuilder(connectionString);
+            if (string.IsNullOrEmpty(Path.GetDirectoryName(_connectionString.Database)))
+                _connectionString.Database = Path.Combine(Directory.GetCurrentDirectory(), _connectionString.Database);
         }
 
         public override IMigrationProcessor MakeProcessor(IAnnouncer announcer, IMigrationProcessorOptions options)
@@ -23,6 +25,11 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             return new FirebirdProcessor(connection, new FirebirdGenerator(fbOptions), announcer, options, new FirebirdDbFactory(), fbOptions);
         }
 
+        public override string ConnectionString
+        {
+            get { return _connectionString.ToString(); }
+        }
+
         public void CleanUp()
         {
             FbDatabase.DropDatabase(_connectionString.ToString());
@@ -30,9 +37,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
         private IDbConnection MakeConnection()
         {
-            if (string.IsNullOrEmpty(Path.GetDirectoryName(_connectionString.Database)))
-                _connectionString.Database = Path.Combine(Directory.GetCurrentDirectory(), _connectionString.Database);
-
             var usedConnectionString = _connectionString.ToString();
             FbDatabase.CreateDatabase(usedConnectionString);
 

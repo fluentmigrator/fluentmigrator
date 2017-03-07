@@ -49,6 +49,7 @@ namespace FluentMigrator.Tests.Integration
             _testProcessorFactory = testConfiguration.GetProcessorFactory();
             ConfiguredProcessor = _testProcessorFactory.GetProcessorType();
             ConfiguredDbEngine = testConfiguration.RequestedDbEngine;
+            ConnectionString = _testProcessorFactory.ConnectionString;
             _testDriver = new TestDriver(_testProcessorFactory, ConfiguredDbEngine);
             Announcer = new TextWriterAnnouncer(System.Console.Out);
             ProcessorOptions = new ProcessorOptions();
@@ -71,6 +72,8 @@ namespace FluentMigrator.Tests.Integration
         protected Type ConfiguredProcessor { get; private set; }
 
         protected string ConfiguredDbEngine { get; private set; }
+
+        protected string ConnectionString { get; private set; }
 
         public void ExecuteWithSupportedProcessor(Action<IMigrationProcessor> test)
         {
