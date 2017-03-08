@@ -37,7 +37,7 @@ namespace FluentMigrator.Runner.Generators.MySql
             SetTypeMap(DbType.Decimal, "DECIMAL(19,5)");
             SetTypeMap(DbType.Decimal, "DECIMAL($size,$precision)", DecimalCapacity);
             SetTypeMap(DbType.Double, "DOUBLE");
-            SetTypeMap(DbType.Guid, "VARCHAR(40)");
+            SetTypeMap(DbType.Guid, "CHAR(36)");
             SetTypeMap(DbType.Int16, "SMALLINT");
             SetTypeMap(DbType.Int32, "INTEGER");
             SetTypeMap(DbType.Int64, "BIGINT");
