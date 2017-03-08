@@ -4,14 +4,13 @@ using System.Linq.Expressions;
 using FluentMigrator.Exceptions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Tests.Integration;
 using Moq;
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit
 {
     [TestFixture]
-    public class TaskExecutorTests : IntegrationTestBase
+    public class TaskExecutorTests
     {
         private const string CONNECTION_STRING = @"server=.\SQLEXPRESS;uid=;pwd=;Trusted_Connection=yes;database=FluentMigrator";
 
