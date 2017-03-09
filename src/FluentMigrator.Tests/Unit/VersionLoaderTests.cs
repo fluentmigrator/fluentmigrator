@@ -2,11 +2,11 @@ using System.Linq;
 using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Initialization;
 using FluentMigrator.VersionTableInfo;
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
-using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Tests.Unit
 {
@@ -38,6 +38,7 @@ namespace FluentMigrator.Tests.Unit
         public void CanLoadCustomVersionTableMetaData()
         {
             var runnerContext = new Mock<IRunnerContext>();
+            runnerContext.SetupGet(rc => rc.Namespace).Returns(typeof(TestVersionTableMetaData).Namespace);
 
             var runner = new Mock<IMigrationRunner>();
             runner.SetupGet(r => r.Processor.Options).Returns(new TestMigrationProcessorOptions());
@@ -55,7 +56,7 @@ namespace FluentMigrator.Tests.Unit
         public void CanLoadDefaultVersionTableMetaData()
         {
             var runnerContext = new Mock<IRunnerContext>();
-            
+
             var runner = new Mock<IMigrationRunner>();
             runner.SetupGet(r => r.Processor.Options).Returns(new TestMigrationProcessorOptions());
             runner.SetupGet(r => r.RunnerContext).Returns(runnerContext.Object);
@@ -87,7 +88,7 @@ namespace FluentMigrator.Tests.Unit
             var versionTableMetaData = loader.GetVersionTableMetaData();
             versionTableMetaData.ApplicationContext.ShouldBe(applicationContext);
         }
-        
+
         [Test]
         public void DeleteVersionShouldExecuteDeleteDataExpression()
         {
@@ -148,6 +149,7 @@ namespace FluentMigrator.Tests.Unit
         public void RemoveVersionTableShouldNotRemoveSchemaIfItDidNotOwnTheSchema()
         {
             var runnerContext = new Mock<IRunnerContext>();
+            runnerContext.SetupGet(rc => rc.Namespace).Returns(typeof(TestVersionTableMetaData).Namespace);
             var processor = new Mock<IMigrationProcessor>();
             var runner = new Mock<IMigrationRunner>();
             runner.SetupGet(r => r.Processor).Returns(processor.Object);
@@ -157,7 +159,7 @@ namespace FluentMigrator.Tests.Unit
             var asm = Assembly.GetExecutingAssembly();
             var loader = new VersionLoader(runner.Object, asm, conventions);
 
-            ((TestVersionTableMetaData) loader.VersionTableMetaData).OwnsSchema = false;
+            ((TestVersionTableMetaData)loader.VersionTableMetaData).OwnsSchema = false;
 
             processor.Setup(p => p.Process(It.Is<DeleteTableExpression>(expression =>
                                                                         expression.SchemaName == loader.VersionTableMetaData.SchemaName
