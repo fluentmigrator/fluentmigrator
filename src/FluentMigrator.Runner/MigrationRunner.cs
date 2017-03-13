@@ -136,9 +136,7 @@ namespace FluentMigrator.Runner
 
         public void MigrateUp(long targetVersion, bool useAutomaticTransactionManagement)
         {
-            var migrationInfos = GetUpMigrationsToApply(targetVersion);
-
-            if (!migrationInfos.Any()) return;
+            var migrationInfos = GetUpMigrationsToApply(targetVersion).ToList();
 
             using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
