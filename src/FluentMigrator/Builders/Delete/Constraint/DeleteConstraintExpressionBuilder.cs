@@ -16,7 +16,7 @@ namespace FluentMigrator.Builders.Delete.Constraint
         {
         }
 
-        public IDeleteConstraintInSchemaOptionsSyntax ApplyOnline(OnlineMode mode)
+        public IDeleteConstraintInSchemaOptionsSyntax ApplyOnline(OnlineMode mode = OnlineMode.On)
         {
             Expression.Constraint.ApplyOnline = mode;
             return this;

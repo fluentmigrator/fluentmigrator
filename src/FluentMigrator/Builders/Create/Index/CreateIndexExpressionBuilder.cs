@@ -95,7 +95,7 @@ namespace FluentMigrator.Builders.Create.Index
             return this;
         }
 
-        public ICreateIndexOnColumnSyntax ApplyOnline(OnlineMode mode)
+        public ICreateIndexOnColumnSyntax ApplyOnline(OnlineMode mode = OnlineMode.On)
         {
             Expression.Index.ApplyOnline = mode;
             return this;

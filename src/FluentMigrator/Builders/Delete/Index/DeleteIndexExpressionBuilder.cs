@@ -58,7 +58,7 @@ namespace FluentMigrator.Builders.Delete.Index
                 Expression.Index.Columns.Add(new IndexColumnDefinition { Name = columnName });
         }
 
-        public void ApplyOnline(OnlineMode mode)
+        public void ApplyOnline(OnlineMode mode = OnlineMode.On)
         {
             Expression.Index.ApplyOnline = mode;
         }

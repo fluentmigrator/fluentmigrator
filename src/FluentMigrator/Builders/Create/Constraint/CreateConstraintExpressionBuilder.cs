@@ -44,7 +44,7 @@ namespace FluentMigrator.Builders.Create.Constraint
             return this;
         }
 
-        public ICreateConstraintOptionsSyntax ApplyOnline(OnlineMode mode)
+        public ICreateConstraintOptionsSyntax ApplyOnline(OnlineMode mode = OnlineMode.On)
         {
             Expression.Constraint.ApplyOnline = mode;
             return this;

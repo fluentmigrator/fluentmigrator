@@ -22,6 +22,16 @@ namespace FluentMigrator.Builders.Create.Constraint
 {
     public interface ICreateConstraintOptionsSyntax
     {
-        ICreateConstraintOptionsSyntax ApplyOnline(OnlineMode mode);
+        /// <summary>
+        /// Specifies whether underlying tables and associated indexes are available for queries and data modification during the index operation.
+        /// The ONLINE option can only be specified in certain situations, please refer to documentation for SQL Server 2005 and newer.
+        /// </summary>
+        /// <param name="mode">
+        /// ON
+        /// Long-term table locks are not held. This allows queries or updates to the underlying table to continue.
+        /// OFF
+        /// Table locks are applied and the table is unavailable for the duration of the index operation.
+        /// </param>
+        ICreateConstraintOptionsSyntax ApplyOnline(OnlineMode mode = OnlineMode.On);
     }
 }
