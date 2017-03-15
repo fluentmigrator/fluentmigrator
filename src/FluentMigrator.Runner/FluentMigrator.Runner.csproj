@@ -110,6 +110,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Core">
       <RequiredTargetFramework>3.5</RequiredTargetFramework>
     </Reference>
@@ -136,6 +137,10 @@
     <Compile Include="Announcers\TextWriterWithGoAnnouncer.cs" />
     <Compile Include="CompatabilityMode.cs" />
     <Compile Include="Generators\Postgres\PostgresDescriptionGenerator.cs" />
+    <Compile Include="Generators\SqlAnywhere\SqlAnywhere16Generator.cs" />
+    <Compile Include="Generators\SqlAnywhere\SqlAnywhere16TypeMap.cs" />
+    <Compile Include="Generators\SqlAnywhere\SqlAnywhereColumn.cs" />
+    <Compile Include="Generators\SqlAnywhere\SqlAnywhereQuoter.cs" />
     <Compile Include="Generators\SqlServer\SqlServer2014Generator.cs" />
     <Compile Include="Generators\Hana\HanaColumn.cs" />
     <Compile Include="Generators\Hana\HanaDescriptionGenerator.cs" />
@@ -261,6 +266,9 @@
     <Compile Include="Processors\IDbFactory.cs" />
     <Compile Include="Processors\DbFactoryBase.cs" />
     <Compile Include="Processors\ReflectionBasedDbFactory.cs" />
+    <Compile Include="Processors\SqlAnywhere\SqlAnywhereDbFactory.cs" />
+    <Compile Include="Processors\SqlAnywhere\SqlAnywhereProcessor.cs" />
+    <Compile Include="Processors\SqlAnywhere\SqlAnywhereProcessorFactory.cs" />
     <Compile Include="Processors\SQLite\SQLiteDbFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2000Processor.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2012ProcessorFactory.cs" />
