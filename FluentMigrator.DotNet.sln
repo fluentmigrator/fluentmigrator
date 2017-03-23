@@ -1,11 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26228.9
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "FluentMigrator", "src\FluentMigrator\FluentMigrator.xproj", "{FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentMigrator", "src\FluentMigrator\FluentMigrator.csproj", "{FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "FluentMigrator.Runner", "src\FluentMigrator.Runner\FluentMigrator.Runner.xproj", "{FE941CF9-6FEA-47F7-A98E-B4F6FB0539B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentMigrator.Runner", "src\FluentMigrator.Runner\FluentMigrator.Runner.csproj", "{FE941CF9-6FEA-47F7-A98E-B4F6FB0539B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
