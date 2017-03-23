@@ -257,6 +257,7 @@ namespace FluentMigrator.Runner
                 _alreadyOutputPreviewOnlyModeWarning = true;
             }
 
+            if (!migrationInfo.IsAttributed() || !VersionLoader.VersionInfo.HasAppliedMigration(migrationInfo.Version))
             {
                 var name = migrationInfo.GetName();
                 _announcer.Heading(string.Format("{0} migrating", name));
