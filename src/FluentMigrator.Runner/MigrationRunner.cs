@@ -136,7 +136,7 @@ namespace FluentMigrator.Runner
 
         public void MigrateUp(long targetVersion, bool useAutomaticTransactionManagement)
         {
-            var migrationInfos = GetUpMigrationsToApply(targetVersion).ToList();
+            var migrationInfos = GetUpMigrationsToApply(targetVersion);
 
             using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useAutomaticTransactionManagement && TransactionPerSession))
             {
@@ -230,8 +230,7 @@ namespace FluentMigrator.Runner
 
             var migrationsToApply = (from pair in migrations 
                                      where IsMigrationStepNeededForDownMigration(pair.Key, targetVersion) 
-                                     select pair.Value)
-                                     .ToList();
+                                     select pair.Value);
 
             return migrationsToApply.OrderByDescending(x => x.Version);
         }
