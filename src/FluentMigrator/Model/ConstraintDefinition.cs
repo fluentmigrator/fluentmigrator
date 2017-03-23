@@ -12,7 +12,7 @@ namespace FluentMigrator.Model
 
     public class ConstraintDefinition : ICloneable<ConstraintDefinition>, ICanBeConventional, ICanBeValidated, ISupportAdditionalFeatures
     {
-        public readonly Dictionary<string, object> _additionalFeatures = new Dictionary<string, object>();
+        private readonly Dictionary<string, object> _additionalFeatures = new Dictionary<string, object>();
 
         private ConstraintType constraintType;
         public bool IsPrimaryKeyConstraint { get { return ConstraintType.PrimaryKey == constraintType; } }
