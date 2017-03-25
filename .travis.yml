@@ -1,14 +1,25 @@
-language: c
+language: csharp
+solution: FluentMigrator.DotNetCore.sln
+dist: trusty
+sudo: false
+mono: none
+dotnet: 1.0.1
 
-install:
-  - sudo apt-get update -qq
-  - sudo apt-get install -y mono-devel mono-gmcs nunit-console libfbembed2.5
+# Replace this with a script that builds only the .NET Standard libraries
+# in the feature/dotnet-core branch.
+#install:
+#- sudo apt-get install -y mono-devel mono-gmcs nunit-console libfbembed2.5
+#- sudo apt-get update -qq
 
 script:
-  - xbuild CI.proj
-  - sudo cp /var/lib/firebird/2.5/system/default-security2.fdb /var/lib/firebird/2.5/system/security2.fdb
-  - sudo chmod a+rw /var/lib/firebird/2.5/system/security2.fdb
-  - dpkg -L libfbembed2.5
-  - for f in $(dpkg -L libfbembed2.5 | grep libfbembed.so); do cp $f ./src/FluentMigrator.Tests/bin/Debug; done
-  - for f in $(dpkg -L libfbembed2.5 | grep libfbembed.so); do cp $f ./src/FluentMigrator.Tests/bin/Debug/libfbembed.so; done
-  - nunit-console ./src/FluentMigrator.Tests/bin/Debug/FluentMigrator.Tests.dll -exclude Integration,NotWorkingOnMono
+  - dotnet restore FluentMigrator.DotNetCore.sln
+  - dotnet build FluentMigrator.DotNetCore.sln
+  - dotnet pack FluentMigrator.DotNetCore.sln
+# Replace this with a script that builds only the .NET Standard libraries
+# in the feature/dotnet-core branch.
+#- sudo cp /var/lib/firebird/2.5/system/default-security2.fdb /var/lib/firebird/2.5/system/security2.fdb
+#- sudo chmod a+rw /var/lib/firebird/2.5/system/security2.fdb
+#- dpkg -L libfbembed2.5
+#- for f in $(dpkg -L libfbembed2.5 | grep libfbembed.so); do cp $f ./src/FluentMigrator.Tests/bin/Debug; done
+#- for f in $(dpkg -L libfbembed2.5 | grep libfbembed.so); do cp $f ./src/FluentMigrator.Tests/bin/Debug/libfbembed.so; done
+#- nunit-console ./src/FluentMigrator.Tests/bin/Debug/FluentMigrator.Tests.dll -exclude Integration,NotWorkingOnMono

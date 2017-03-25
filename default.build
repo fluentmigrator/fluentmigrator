@@ -12,7 +12,10 @@
 	<property name="major.version" value="1.0" />
 	<property name="complete.version" value="${major.version}.0.${build.number}" />
 	
-	<target name="all" depends="generate-version build package-bin package-source package-sample" />
+	<!-- Default target in master branch. Replace this with a script that builds only the .NET Standard libraries
+	     in the feature/dotnet-core branch.
+	<target name="all" depends="generate-version build package-bin package-source package-sample" />-->
+	<target name="all" depends="buildnetstandardlibs" />
 
 	<target name="clean" description="Deletes the output folders for a clean build">
         <delete dir="${dir.bin}"/>
@@ -28,6 +31,18 @@
 				<attribute type="System.CLSCompliantAttribute" value="true" />
 			</attributes>
 		</asminfo>
+	</target>
+
+	<target name="buildnetstandardlibs" description="Builds the .NET Standard libraries" depends="generate-version">
+		<exec program="dotnet">
+			<arg value="restore FluentMigrator.DotNetCore.sln" />
+		</exec>
+		<exec program="dotnet">
+			<arg value="build FluentMigrator.DotNetCore.sln" />
+		</exec>
+		<exec program="dotnet">
+			<arg value="pack FluentMigrator.DotNetCore.sln" />
+		</exec>
 	</target>
 	
     <target name="build" description="Builds the app" depends="generate-version">

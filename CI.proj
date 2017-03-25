@@ -1,7 +1,16 @@
 <?xml version="1.0"?>
 <Project ToolsVersion="4.0" DefaultTargets="CI" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <Target Name="CI" DependsOnTargets="Build" />
+  <!-- Default target in master branch. Replace this with a script that builds only the .NET Standard libraries
+	     in the feature/dotnet-core branch.
+  <Target Name="CI" DependsOnTargets="Build" />-->
+  <Target Name="CI" DependsOnTargets="BuildNetStandardLibs" />
+
+  <Target Name="BuildNetStandardLibs">
+    <Exec Command="dotnet restore FluentMigrator.DotNetCore.sln" />
+    <Exec Command="dotnet build FluentMigrator.DotNetCore.sln" />
+    <Exec Command="dotnet pack FluentMigrator.DotNetCore.sln" />
+  </Target>
 
   <Target Name="Build">
     <MSBuild Projects="FluentMigrator (2010).sln" Properties="Configuration=Debug;Platform=x86" />

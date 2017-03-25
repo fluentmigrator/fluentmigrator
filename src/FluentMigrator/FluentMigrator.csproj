@@ -4,7 +4,8 @@
     <Description>This is a temporary .NET Core port of FluentMigrator for Serenity applications. It will only be used until an official version is out.</Description>
     <VersionPrefix>1.6.901</VersionPrefix>
     <Authors>Volkan Ceylan</Authors>
-    <TargetFrameworks>netstandard1.6;net35</TargetFrameworks>
+    <TargetFrameworks>netstandard1.6</TargetFrameworks>
+    <!--<TargetFrameworks>netstandard1.6;net35</TargetFrameworks>-->
     <AssemblyName>FluentMigrator</AssemblyName>
     <PackageId>FluentMigrator</PackageId>
     <RepositoryType>git</RepositoryType>
@@ -24,9 +25,10 @@
     <DefineConstants>$(DefineConstants);COREFX;NETSTANDARD1_6</DefineConstants>
   </PropertyGroup>
 
+  <!--
   <ItemGroup Condition=" '$(TargetFramework)' == 'net35' ">
     <Reference Include="System.Data" />
     <Reference Include="System" />
-  </ItemGroup>
+  </ItemGroup>-->
 
 </Project>
