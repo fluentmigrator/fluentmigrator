@@ -74,21 +74,26 @@ namespace FluentMigrator.Runner.Announcers
         public override void Error(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Write(string.Format("!!! {0}", message));
+            Write(string.Format("!!! {0}", message), true);
             Console.ResetColor();
         }
 
         public void Write(string message)
         {
-            LogMessage(message, true);
+            LogMessage(message, true, false);
         }
 
-        public override void Write(string message, bool escaped)
+        public override void Write(string message, bool isError)
         {
-            LogMessage(message, escaped);
+            LogMessage(message, true, isError);
         }
 
-        void LogMessage(string message, bool escaped, bool isError = false)
+        public override void Write(string message, bool escaped, bool isError)
+        {
+            LogMessage(message, escaped, isError);
+        }
+
+        void LogMessage(string message, bool escaped, bool isError)
         {
             if (!isError)
                 Console.Out.WriteLine(message);
@@ -103,11 +108,6 @@ namespace FluentMigrator.Runner.Announcers
                 var log = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {(!isError ? "INFO" : "ERROR")} {message}";
                 sw.WriteLine(log);
             }
-        }
-
-        void LogMessage()
-        {
-            LogMessage("", true);
         }
 
         bool IsFileLocked(FileInfo file)

@@ -73,5 +73,6 @@ namespace FluentMigrator.Runner.Announcers
         }
 
         public abstract void Write(string message, bool escaped);
+        public abstract void Write(string message, bool escaped, bool isError);
     }
 }
