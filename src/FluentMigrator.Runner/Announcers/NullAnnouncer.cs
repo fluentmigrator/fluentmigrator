@@ -23,5 +23,9 @@ namespace FluentMigrator.Runner.Announcers
         public override void Write(string message, bool escaped)
         {
         }
+
+        public override void Write(string message, bool escaped, bool isError)
+        {
+        }
     }
 }

@@ -52,5 +52,10 @@ namespace FluentMigrator.Runner.Announcers
             write(escaped ? string.Format("/* {0} */", message) : message);
             write(Environment.NewLine);
         }
+
+        public override void Write(string message, bool escaped, bool isError)
+        {
+            Write(message, escaped);
+        }
     }
 }
