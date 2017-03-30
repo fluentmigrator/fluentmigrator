@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.IO;
 
 namespace FluentMigrator.Runner.Announcers
 {
@@ -73,18 +74,60 @@ namespace FluentMigrator.Runner.Announcers
         public override void Error(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.Error.WriteLine(string.Format("!!! {0}", message));
+            Write(string.Format("!!! {0}", message));
             Console.ResetColor();
         }
 
         public void Write(string message)
         {
-            Write(message, true);
+            LogMessage(message, true);
         }
 
         public override void Write(string message, bool escaped)
         {
-            Console.Out.WriteLine(message);
+            LogMessage(message, escaped);
+        }
+
+        void LogMessage(string message, bool escaped, bool isError = false)
+        {
+            if (!isError)
+                Console.Out.WriteLine(message);
+            else
+                Console.Error.WriteLine(message);
+
+            if (!WriteToLogFile || string.IsNullOrEmpty(message))
+                return;
+
+            using (var sw = new StreamWriter(LogFile, true))
+            {
+                var log = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {(!isError ? "INFO" : "ERROR")} {message}";
+                sw.WriteLine(log);
+            }
+        }
+
+        void LogMessage()
+        {
+            LogMessage("", true);
+        }
+
+        bool IsFileLocked(FileInfo file)
+        {
+            FileStream stream = null;
+
+            try
+            {
+                stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None);
+            }
+            catch (IOException)
+            {
+                return true;
+            }
+            finally
+            {
+                if (stream != null) stream.Close();
+            }
+
+            return false;
         }
     }
 }
