@@ -88,6 +88,10 @@ namespace FluentMigrator.Runner.Processors.MySql
 
         public override void Execute(string template, params object[] args)
         {
+            var commandText = string.Format(template, args);
+
+            Announcer.Sql(commandText);
+
             if (Options.PreviewOnly)
             {
                 return;
@@ -95,7 +99,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
+            using (var command = Factory.CreateCommand(commandText, Connection))
             {
                 command.CommandTimeout = Options.Timeout;
                 command.ExecuteNonQuery();
