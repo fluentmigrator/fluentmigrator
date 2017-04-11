@@ -24,6 +24,7 @@ namespace FluentMigrator.Runner.Announcers
     {
         public virtual bool ShowSql { get; set; }
         public virtual bool ShowElapsedTime { get; set; }
+        public virtual bool StopOnError { get; set; }
 
         public virtual void Heading(string message)
         {

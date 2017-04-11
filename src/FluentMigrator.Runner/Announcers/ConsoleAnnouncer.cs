@@ -75,6 +75,12 @@ namespace FluentMigrator.Runner.Announcers
             Console.ForegroundColor = ConsoleColor.Red;
             Console.Error.WriteLine(string.Format("!!! {0}", message));
             Console.ResetColor();
+
+            if (StopOnError)
+            {
+                Console.WriteLine("Press enter to continue...");
+                Console.ReadLine();
+            }
         }
 
         public void Write(string message)
