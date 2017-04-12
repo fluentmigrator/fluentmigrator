@@ -100,5 +100,32 @@ namespace FluentMigrator.Tests.Unit
             migrationinfo.AddTrait("foo", value);
             migrationinfo.Trait("foo").ShouldBeSameAs(value);
         }
+
+        [Test]
+        public void ConstructingShouldGateInstantiated()
+        {
+            MigrationInfo migrationinfo = Create();
+
+            migrationinfo.Gate.ShouldNotBeNull();
+        }
+
+        [Test]
+        public void GateShouldBeFilled()
+        {
+            MigrationInfo migrationinfo = Create();
+            migrationinfo.Gate.SetGate(new DateTime(), new DateTime());
+
+            migrationinfo.Gate.Start.HasValue.ShouldBeTrue();
+            migrationinfo.Gate.End.HasValue.ShouldBeTrue();
+        }
+
+        [Test]
+        public void GateShouldBeOpened()
+        {
+            MigrationInfo migrationinfo = Create();
+            migrationinfo.Gate.SetGate(DateTime.Now.AddDays(-1), DateTime.Now.AddDays(1));
+
+            migrationinfo.Gate.IsOpen.ShouldBeTrue();
+        }
     }
 }

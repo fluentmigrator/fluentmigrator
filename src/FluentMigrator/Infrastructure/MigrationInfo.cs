@@ -39,6 +39,7 @@ namespace FluentMigrator.Infrastructure
             Description = description;
             TransactionBehavior = transactionBehavior;
             _lazyMigration = new LazyLoader<IMigration>(migrationFunc);
+            Gate = new Gate();
         }
 
         public long Version { get; private set; }
@@ -52,7 +53,7 @@ namespace FluentMigrator.Infrastructure
             }
         }
 
-        public IGate Gate { get; set; }
+        public IGate Gate { get; private set; }
 
         public object Trait(string name)
         {

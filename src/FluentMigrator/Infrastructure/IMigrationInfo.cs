@@ -24,7 +24,7 @@ namespace FluentMigrator.Infrastructure
         string Description { get; }
         TransactionBehavior TransactionBehavior { get; }
         IMigration Migration { get; }
-        IGate Gate { get; set; }
+        IGate Gate { get; }
         object Trait(string name);
         bool HasTrait(string name);
         string GetName();
