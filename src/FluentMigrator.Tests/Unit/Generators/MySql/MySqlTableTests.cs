@@ -1,4 +1,5 @@
-﻿using FluentMigrator.Runner.Generators.MySql;
+﻿using System;
+using FluentMigrator.Runner.Generators.MySql;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -253,6 +254,32 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
 
             var result = Generator.Generate(expression);
             result.ShouldBe("RENAME TABLE `TestTable1` TO `TestTable2`");
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentException))]
+        public void CantCreateTableWithDescription()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithTableDescription();
+            Generator.Generate(expression);
+        }
+
+        [Test]
+        public void CanCreateTableWithDescriptionAndColumnDescriptions()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithTableDescriptionAndColumnDescriptions();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE `TestTable1` (`TestColumn1` VARCHAR(255) COMMENT 'TestColumn1Description', `TestColumn2` INTEGER NOT NULL COMMENT 'TestColumn2Description') COMMENT 'TestDescription' ENGINE = INNODB");
+        }
+
+        [Test]
+        public void CanAlterTableWithDescription()
+        {
+            var expression = GeneratorTestHelper.GetAlterTableWithDescriptionExpression();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE `TestTable1` COMMENT 'TestDescription'");
         }
     }
 }

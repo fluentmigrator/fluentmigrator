@@ -188,6 +188,7 @@ SELECT CONCAT(
           IF(IS_NULLABLE = 'NO' AND COLUMN_DEFAULT IS NULL,
              '',
              CONCAT('DEFAULT ', QUOTE(COLUMN_DEFAULT), ' ')),
+          IF(COLUMN_COMMENT = '', '', CONCAT('COMMENT ', QUOTE(COLUMN_COMMENT), ' ')),
           UPPER(extra))
   FROM INFORMATION_SCHEMA.COLUMNS
  WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'", FormatHelper.FormatSqlEscape(expression.TableName), FormatHelper.FormatSqlEscape(expression.OldName));

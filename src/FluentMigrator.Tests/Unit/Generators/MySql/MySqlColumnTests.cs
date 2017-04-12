@@ -167,5 +167,23 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE `TestTable1` CHANGE `TestColumn1` `TestColumn2` ");
         }
+
+        [Test]
+        public void CanAlterColumnWithDescription()
+        {
+            var expression = GeneratorTestHelper.GetAlterColumnExpressionWithDescription();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE `TestTable1` MODIFY COLUMN `TestColumn1` VARCHAR(20) NOT NULL COMMENT 'TestColumn1Description'");
+        }
+
+        [Test]
+        public void CanCreateColumnWithDescription()
+        {
+            var expression = GeneratorTestHelper.GetCreateColumnExpressionWithDescription();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` VARCHAR(5) NOT NULL COMMENT 'TestColumn1Description'");
+        }
     }
 }

@@ -266,6 +266,7 @@
     <Compile Include="Model\TableDefinition.cs" />
     <Compile Include="ProfileAttribute.cs" />
     <Compile Include="SystemMethods.cs" />
+    <Compile Include="TagBehavior.cs" />
     <Compile Include="TagsAttribute.cs" />
     <Compile Include="AutoScriptMigration.cs" />
     <Compile Include="TimestampedMigrationAttribute.cs" />

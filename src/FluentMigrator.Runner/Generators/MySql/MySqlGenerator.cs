@@ -16,6 +16,9 @@
 //
 #endregion
 
+using System;
+using System.Linq;
+
 namespace FluentMigrator.Runner.Generators.MySql
 {
     using Expressions;
@@ -32,7 +35,33 @@ namespace FluentMigrator.Runner.Generators.MySql
         public override string DeleteConstraint { get { return "ALTER TABLE {0} DROP {1}{2}"; } }
         //public override string DeleteConstraint { get { return "ALTER TABLE {0} DROP FOREIGN KEY {1}"; } }
 
-        public override string CreateTable { get { return "CREATE TABLE {0} ({1}) ENGINE = INNODB"; } }
+        public override string Generate(CreateTableExpression expression)
+        {
+            if (string.IsNullOrEmpty(expression.TableName)) throw new ArgumentNullException("expression", "expression.TableName cannot be empty");
+            if (expression.Columns.Count == 0) throw new ArgumentException("You must specifiy at least one column");
+
+            string errors = ValidateAdditionalFeatureCompatibility(expression.Columns.SelectMany(x => x.AdditionalFeatures));
+            if (!string.IsNullOrEmpty(errors)) return errors;
+
+            string quotedTableName = Quoter.QuoteTableName(expression.TableName);
+
+            string tableDescription = string.IsNullOrEmpty(expression.TableDescription)
+                ? string.Empty
+                : string.Format(" COMMENT {0}", Quoter.QuoteValue(expression.TableDescription));
+
+            return string.Format("CREATE TABLE {0} ({1}){2} ENGINE = INNODB",
+                quotedTableName,
+                Column.Generate(expression.Columns, quotedTableName),
+                tableDescription);
+        }
+
+        public override string Generate(AlterTableExpression expression)
+        {
+            if (string.IsNullOrEmpty(expression.TableDescription))
+                return base.Generate(expression);
+
+            return string.Format("ALTER TABLE {0} COMMENT {1}", Quoter.QuoteTableName(expression.TableName), Quoter.QuoteValue(expression.TableDescription));
+        }
 
         public override string Generate(DeleteIndexExpression expression)
         {
