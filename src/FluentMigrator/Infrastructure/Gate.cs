@@ -22,5 +22,18 @@ namespace FluentMigrator.Infrastructure {
             Start = start;
             End = end;
         }
+
+        public override string ToString() {
+            if (Start.HasValue && End.HasValue)
+                return string.Format("Gate start in {0} until {1}.", Start.Value, End.Value);
+
+            if (Start.HasValue)
+                return string.Format("Gate start in {0}.", Start.Value);
+
+            if (End.HasValue)
+                return string.Format("Gate ending until {0}.", End.Value);
+
+            return "Gate empty";
+        }
     }
 }

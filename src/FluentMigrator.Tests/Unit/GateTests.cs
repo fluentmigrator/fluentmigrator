@@ -53,6 +53,11 @@ namespace FluentMigrator.Tests.Unit {
         }
 
         [Test]
+        public void GateShouldBeNoOpenedWhenNotInformed() {
+            gate.IsOpen.ShouldBeFalse();
+        }
+
+        [Test]
         public void GateShouldBeNoOpenedWhenTheDateIsPassed() {
             gate.SetGate(DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-1));
 
@@ -71,6 +76,37 @@ namespace FluentMigrator.Tests.Unit {
             gate.SetGate(null, DateTime.Now.AddDays(-1));
 
             gate.IsOpen.ShouldBeFalse();
+        }
+
+        [Test]
+        public void GateToStringShouldShowTheStartAndTheEnd() {
+            var start = DateTime.Now.AddDays(-1);
+            var end = DateTime.Now.AddDays(1);
+
+            gate.SetGate(start, end);
+
+            Assert.That(gate.ToString(), Is.EqualTo(string.Format("Gate start in {0} until {1}.", start, end)));
+        }
+
+        [Test]
+        public void GateToStringShouldShowTheStart() {
+            var start = DateTime.Now.AddDays(-1);
+            gate.SetGate(start, null);
+
+            Assert.That(gate.ToString(), Is.EqualTo(string.Format("Gate start in {0}.", start)));
+        }
+
+        [Test]
+        public void GateToStringShouldShowAndTheEnd() {
+            var end = DateTime.Now.AddDays(1);
+            gate.SetGate(null, end);
+
+            Assert.That(gate.ToString(), Is.EqualTo(string.Format("Gate ending until {0}.", end)));
+        }
+
+        [Test]
+        public void GateToStringShouldShowEmptyWhenNotInformed() {
+            Assert.That(gate.ToString(), Is.EqualTo("Gate empty"));
         }
     }
 }
