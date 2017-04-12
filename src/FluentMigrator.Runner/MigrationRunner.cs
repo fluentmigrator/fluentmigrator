@@ -508,13 +508,14 @@ namespace FluentMigrator.Runner
 
             foreach(KeyValuePair<long, IMigrationInfo> migration in MigrationLoader.LoadMigrations())
             {
-                string migrationName = migration.Value.GetName();
-                bool isCurrent = migration.Key == currentVersion;
-                string message = string.Format("{0}{1}",
+                var migrationInfo = migration.Value;
+                var migrationName = migrationInfo.GetName();
+                var isCurrent = migration.Key == currentVersion;
+                var message = string.Format("{0}{1}",
                                                 migrationName,
                                                 isCurrent ? " (current)" : string.Empty);
 
-                if(isCurrent)
+                if (isCurrent)
                     _announcer.Emphasize(message);
                 else
                     _announcer.Say(message);

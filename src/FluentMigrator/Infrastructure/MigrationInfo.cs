@@ -65,9 +65,12 @@ namespace FluentMigrator.Infrastructure
             return _traits.ContainsKey(name);
         }
 
-        public string GetName()
-        {
-            return string.Format("{0}: {1}", Version, Migration.GetType().Name);
+        public string GetName() {
+            var name = string.Format("{0}: {1}", Version, Migration.GetType().Name);
+            if (!Gate.IsEmpty())
+                name = string.Format("{0} [{1}]", name, Gate);
+
+            return name;
         }
 
         public void AddTrait(string name, object value)

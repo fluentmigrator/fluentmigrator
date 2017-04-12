@@ -106,7 +106,35 @@ namespace FluentMigrator.Tests.Unit {
 
         [Test]
         public void GateToStringShouldShowEmptyWhenNotInformed() {
-            Assert.That(gate.ToString(), Is.EqualTo("Gate empty"));
+            Assert.That(gate.ToString(), Is.Empty);
+        }
+
+        [Test]
+        public void GateShouldBeNotEmptyWhenStartAndEndDateIsFilled() {
+            gate.SetGate(DateTime.Now.AddDays(-1), DateTime.Now.AddDays(1));
+
+            gate.IsEmpty().ShouldBeFalse();
+        }
+
+        [Test]
+        public void GateShouldBeNotEmptyWhenToHaveOnlyStart() {
+            gate.SetGate(DateTime.Now.AddDays(-1), null);
+
+            gate.IsEmpty().ShouldBeFalse();
+        }
+
+        [Test]
+        public void GateShouldBeNotEmptyWhenToHaveOnlyEndDate() {
+            gate.SetGate(null, DateTime.Now.AddDays(1));
+
+            gate.IsEmpty().ShouldBeFalse();
+        }
+
+        [Test]
+        public void GateShouldBeEmptyWhenNotInformedStartOrEnd() {
+            gate.SetGate(null, null);
+
+            gate.IsEmpty().ShouldBeTrue();
         }
     }
 }

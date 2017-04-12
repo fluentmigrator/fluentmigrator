@@ -23,6 +23,10 @@ namespace FluentMigrator.Infrastructure {
             End = end;
         }
 
+        public bool IsEmpty() {
+            return !Start.HasValue && !End.HasValue;
+        }
+
         public override string ToString() {
             if (Start.HasValue && End.HasValue)
                 return string.Format("Gate start in {0} until {1}.", Start.Value, End.Value);
@@ -33,7 +37,7 @@ namespace FluentMigrator.Infrastructure {
             if (End.HasValue)
                 return string.Format("Gate ending until {0}.", End.Value);
 
-            return "Gate empty";
+            return string.Empty;
         }
     }
 }

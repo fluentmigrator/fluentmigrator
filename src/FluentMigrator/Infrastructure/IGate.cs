@@ -6,5 +6,6 @@ namespace FluentMigrator.Infrastructure {
         DateTime? End { get; }
         bool IsOpen { get; }
         void SetGate(DateTime? start, DateTime? end);
+        bool IsEmpty();
     }
 }

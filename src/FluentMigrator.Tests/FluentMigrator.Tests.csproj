@@ -479,6 +479,7 @@
     <Compile Include="Unit\Initialization\NetConfigManagerTests.cs" />
     <Compile Include="Unit\GateTests.cs" />
     <Compile Include="Unit\MigrationInfoTests.cs" />
+    <Compile Include="Unit\MigrationRunnerWithGateTests.cs" />
     <Compile Include="Unit\MigrationRunnerTests.cs" />
     <Compile Include="Unit\ProfileLoaderTests.cs" />
     <Compile Include="Unit\Runners\MaintenanceLoaderTests.cs" />

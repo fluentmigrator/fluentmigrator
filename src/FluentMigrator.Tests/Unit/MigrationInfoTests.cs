@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Unit
         [SetUp]
         public void Setup()
         {
-            _expectedVersion = new Random().Next();
+            _expectedVersion = 300;
             _migration = Mock.Of<IMigration>();
         }
 
@@ -126,6 +126,23 @@ namespace FluentMigrator.Tests.Unit
             migrationinfo.Gate.SetGate(DateTime.Now.AddDays(-1), DateTime.Now.AddDays(1));
 
             migrationinfo.Gate.IsOpen.ShouldBeTrue();
+        }
+
+        [Test]
+        public void GateShouldBeInGetName()
+        {
+            MigrationInfo migrationinfo = Create();
+            migrationinfo.Gate.SetGate(DateTime.Now.AddDays(-1), DateTime.Now.AddDays(1));
+
+            Assert.That(migrationinfo.GetName(), Is.StringContaining("300: IMigrationProxy [Gate"));
+        }
+
+        [Test]
+        public void GateShouldBeNotInGetName()
+        {
+            MigrationInfo migrationinfo = Create();
+
+            migrationinfo.GetName().ShouldBe("300: IMigrationProxy");
         }
     }
 }

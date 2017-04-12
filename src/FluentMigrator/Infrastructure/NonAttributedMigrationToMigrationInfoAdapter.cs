@@ -32,6 +32,7 @@ namespace FluentMigrator.Infrastructure
              if (migration == null) throw new ArgumentNullException("migration");
             Migration = migration;
             TransactionBehavior = transactionBehavior;
+            Gate = new Gate();
         }
 
         public string Description { get; private set; }
