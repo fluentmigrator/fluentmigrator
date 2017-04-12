@@ -18,14 +18,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Infrastructure.Extensions;
 
@@ -280,39 +277,39 @@ namespace FluentMigrator.Runner
                 _alreadyOutputPreviewOnlyModeWarning = true;
             }
 
-            if (!migrationInfo.IsAttributed() || !VersionLoader.VersionInfo.HasAppliedMigration(migrationInfo.Version))
+            if (migrationInfo.IsAttributed() && VersionLoader.VersionInfo.HasAppliedMigration(migrationInfo.Version))
+                return;
+
+            var name = migrationInfo.GetName();
+            _announcer.Heading(string.Format("{0} migrating", name));
+
+            _stopWatch.Start();
+
+            using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useTransaction))
             {
-                var name = migrationInfo.GetName();
-                _announcer.Heading(string.Format("{0} migrating", name));
-
-                _stopWatch.Start();
-
-                using (IMigrationScope scope = _migrationScopeHandler.CreateOrWrapMigrationScope(useTransaction))
+                try
                 {
-                    try
+                    ExecuteMigration(migrationInfo.Migration, (m, c) => m.GetUpExpressions(c));
+
+                    if (migrationInfo.IsAttributed())
                     {
-                        ExecuteMigration(migrationInfo.Migration, (m, c) => m.GetUpExpressions(c));
-
-                        if (migrationInfo.IsAttributed())
-                        {
-                            VersionLoader.UpdateVersionInfo(migrationInfo.Version, migrationInfo.Description ?? migrationInfo.Migration.GetType().Name);
-                        }
-
-                        scope.Complete();
-                    }
-                    catch
-                    {
-                        if (useTransaction && scope.IsActive)
-                            scope.Cancel();  // SQLAnywhere needs explicit call to rollback transaction
-
-                        throw;
+                        VersionLoader.UpdateVersionInfo(migrationInfo.Version, migrationInfo.Description ?? migrationInfo.Migration.GetType().Name);
                     }
 
-                    _stopWatch.Stop();
-
-                    _announcer.Say(string.Format("{0} migrated", name));
-                    _announcer.ElapsedTime(_stopWatch.ElapsedTime());
+                    scope.Complete();
                 }
+                catch
+                {
+                    if (useTransaction && scope.IsActive)
+                        scope.Cancel();  // SQLAnywhere needs explicit call to rollback transaction
+
+                    throw;
+                }
+
+                _stopWatch.Stop();
+
+                _announcer.Say(string.Format("{0} migrated", name));
+                _announcer.ElapsedTime(_stopWatch.ElapsedTime());
             }
         }
 

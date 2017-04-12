@@ -45,6 +45,8 @@ namespace FluentMigrator.Infrastructure
 
         public IMigration Migration { get; private set; }
 
+        public IGate Gate { get; set; }
+
         public object Trait(string name)
         {
             return null;

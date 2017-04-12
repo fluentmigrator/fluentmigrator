@@ -8,7 +8,6 @@ using FluentMigrator.Model;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.VersionTableInfo;
 using FluentMigrator.Infrastructure;
-using FluentMigrator.Runner.Initialization;
 
 namespace FluentMigrator.Runner
 {

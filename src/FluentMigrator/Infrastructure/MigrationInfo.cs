@@ -52,6 +52,8 @@ namespace FluentMigrator.Infrastructure
             }
         }
 
+        public IGate Gate { get; set; }
+
         public object Trait(string name)
         {
             return _traits.ContainsKey(name) ? _traits[name] : null;
