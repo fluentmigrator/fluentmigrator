@@ -294,25 +294,63 @@
     <Compile Include="VersionOrderInvalidException.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj">
+      <Project>{FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8}</Project>
+      <Name>FluentMigrator</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
     <None Include="..\FluentMigrator.snk">
       <Link>FluentMigrator.snk</Link>
     </None>
-    <Content Include="SQLServerCENative\amd64\Microsoft.VC90.CRT\msvcr90.dll" />
-    <Content Include="SQLServerCENative\amd64\Microsoft.VC90.CRT\README_ENU.txt" />
-    <Content Include="SQLServerCENative\amd64\sqlceca40.dll" />
-    <Content Include="SQLServerCENative\amd64\sqlcecompact40.dll" />
-    <Content Include="SQLServerCENative\amd64\sqlceer40EN.dll" />
-    <Content Include="SQLServerCENative\amd64\sqlceme40.dll" />
-    <Content Include="SQLServerCENative\amd64\sqlceqp40.dll" />
-    <Content Include="SQLServerCENative\amd64\sqlcese40.dll" />
-    <Content Include="SQLServerCENative\x86\Microsoft.VC90.CRT\msvcr90.dll" />
-    <Content Include="SQLServerCENative\x86\Microsoft.VC90.CRT\README_ENU.txt" />
-    <Content Include="SQLServerCENative\x86\sqlceca40.dll" />
-    <Content Include="SQLServerCENative\x86\sqlcecompact40.dll" />
-    <Content Include="SQLServerCENative\x86\sqlceer40EN.dll" />
-    <Content Include="SQLServerCENative\x86\sqlceme40.dll" />
-    <Content Include="SQLServerCENative\x86\sqlceqp40.dll" />
-    <Content Include="SQLServerCENative\x86\sqlcese40.dll" />
+    <Content Include="SQLServerCENative\amd64\Microsoft.VC90.CRT\msvcr90.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQLServerCENative\amd64\Microsoft.VC90.CRT\README_ENU.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQLServerCENative\amd64\sqlceca40.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQLServerCENative\amd64\sqlcecompact40.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQLServerCENative\amd64\sqlceer40EN.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQLServerCENative\amd64\sqlceme40.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQLServerCENative\amd64\sqlceqp40.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQLServerCENative\amd64\sqlcese40.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQLServerCENative\x86\Microsoft.VC90.CRT\msvcr90.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQLServerCENative\x86\Microsoft.VC90.CRT\README_ENU.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQLServerCENative\x86\sqlceca40.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQLServerCENative\x86\sqlcecompact40.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQLServerCENative\x86\sqlceer40EN.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQLServerCENative\x86\sqlceme40.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQLServerCENative\x86\sqlceqp40.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQLServerCENative\x86\sqlcese40.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -332,8 +370,12 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="SQLServerCENative\amd64\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />
-    <Content Include="SQLServerCENative\x86\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest" />
+    <Content Include="SQLServerCENative\amd64\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="SQLServerCENative\x86\Microsoft.VC90.CRT\Microsoft.VC90.CRT.manifest">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
