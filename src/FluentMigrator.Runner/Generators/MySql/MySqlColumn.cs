@@ -30,6 +30,8 @@ namespace FluentMigrator.Runner.Generators.MySql
             {
                 case SystemMethods.CurrentDateTime:
                     return "CURRENT_TIMESTAMP";
+                case SystemMethods.NewSequentialId:
+                    return "AUTO_INCREMENT";
             }
 
             throw new NotImplementedException();
