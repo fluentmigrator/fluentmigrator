@@ -132,5 +132,56 @@ namespace FluentMigrator.Tests.Unit
             _announcer.Verify(a => a.Say(string.Format("2011010101: IMigrationProxy [{0}]", migrationInfo1.Gate)));
             _announcer.Verify(a => a.Emphasize("2011010102: IMigrationProxy (current)"));
         }
+
+        [Test]
+        public void CanMigratingUpOnlyTheMigrationGateOpened() {
+            const long version1 = 2011010115;
+
+            var mockMigration1 = new Mock<IMigration>();
+
+            ClearAllVersionData();
+
+            _migrationList.Clear();
+
+            var migrationInfo1 = new MigrationInfo(version1, TransactionBehavior.Default, mockMigration1.Object);
+            migrationInfo1.Gate.SetGate(DateTime.Now.AddDays(-1), DateTime.Now.AddDays(1));
+
+            _migrationList.Add(version1, migrationInfo1);
+
+            _announcer.Setup(x => x.Heading(It.IsRegex(containsAll(string.Format("2011010115: IMigrationProxy[{0}]", migrationInfo1.Gate), 
+                                                                                "migrating"))));
+            _runner.MigrateUp();
+            _announcer.VerifyAll();
+        }
+
+        [Test]
+        public void CanNotMigratingUpIfTheMigrationGateNotOpened() {
+            const long version1 = 2011010116;
+
+            var mockMigration1 = new Mock<IMigration>();
+
+            ClearAllVersionData();
+
+            _migrationList.Clear();
+
+            var migrationInfo1 = new MigrationInfo(version1, TransactionBehavior.Default, mockMigration1.Object);
+            migrationInfo1.Gate.SetGate(DateTime.Now.AddDays(-2), DateTime.Now.AddDays(-1));
+
+            _migrationList.Add(version1, migrationInfo1);
+            
+            _runner.MigrateUp();
+
+            _announcer.Verify(x => x.Heading(It.IsRegex(containsAll(string.Format("2011010116: IMigrationProxy[{0}]", migrationInfo1.Gate),
+                                                                                  "migrating"))), Times.Never());
+        }
+
+        private void ClearAllVersionData() {
+            _fakeVersionLoader.Versions.Clear();
+            _fakeVersionLoader.LoadVersionInfo();
+        }
+
+        private string containsAll(params string[] words) {
+            return ".*?" + string.Join(".*?", words) + ".*?";
+        }
     }
 }

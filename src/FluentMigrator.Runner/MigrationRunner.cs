@@ -173,18 +173,13 @@ namespace FluentMigrator.Runner
             var migrations = MigrationLoader.LoadMigrations();
 
             return from pair in migrations 
-                   where IsMigrationStepNeededForUpMigration(pair.Key, version) 
+                   where IsMigrationStepNeededForUpMigration(pair.Key, version)
+                         && pair.Value.Gate.IsOpen
                    select pair.Value;
         }
 
-        private bool IsMigrationStepNeededForUpMigration(long versionOfMigration, long targetVersion)
-        {
-            if (versionOfMigration <= targetVersion && !VersionLoader.VersionInfo.HasAppliedMigration(versionOfMigration))
-            {
-                return true;
-            }
-            return false;
-
+        private bool IsMigrationStepNeededForUpMigration(long versionOfMigration, long targetVersion) {
+            return versionOfMigration <= targetVersion && !VersionLoader.VersionInfo.HasAppliedMigration(versionOfMigration);
         }
 
         public void MigrateDown(long targetVersion)
@@ -231,16 +226,9 @@ namespace FluentMigrator.Runner
 
             return migrationsToApply.OrderByDescending(x => x.Version);
         }
-
-
-        private bool IsMigrationStepNeededForDownMigration(long versionOfMigration, long targetVersion)
-        {
-            if (versionOfMigration > targetVersion && VersionLoader.VersionInfo.HasAppliedMigration(versionOfMigration))
-            {
-                return true;
-            }
-            return false;
-
+        
+        private bool IsMigrationStepNeededForDownMigration(long versionOfMigration, long targetVersion) {
+            return versionOfMigration > targetVersion && VersionLoader.VersionInfo.HasAppliedMigration(versionOfMigration);
         }
 
         public virtual void ApplyMigrationUp(IMigrationInfo migrationInfo, bool useTransaction)
