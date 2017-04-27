@@ -23,6 +23,9 @@ using System;
 using System.Data;
 using System.IO;
 using FluentMigrator.Builders.Execute;
+using System.Text;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
@@ -189,28 +192,30 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         private void ExecuteBatchNonQuery(string sql)
         {
-            sql += "\nGO";   // make sure last batch is executed.
-            string sqlBatch = string.Empty;
+            var sqlBatch = new StringBuilder();
 
             using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction))
             {
                 try
                 {
-                    foreach (string line in sql.Split(new[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries))
+                    List<string> lines = sql.Split(new[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries).ToList();
+                    lines.Add("GO");   // make sure last batch is executed.
+
+                    foreach (string line in lines)
                     {
                         if (line.ToUpperInvariant().Trim() == "GO")
                         {
-                            if (!string.IsNullOrEmpty(sqlBatch))
+                            if (sqlBatch.Length > 0)
                             {
-                                command.CommandText = sqlBatch;
+                                command.CommandText = sqlBatch.ToString();
                                 command.CommandTimeout = Options.Timeout;
                                 command.ExecuteNonQuery();
-                                sqlBatch = string.Empty;
+                                sqlBatch.Length = 0;
                             }
                         }
                         else
                         {
-                            sqlBatch += line + "\n";
+                            sqlBatch.AppendLine(line);
                         }
                     }
                 }
