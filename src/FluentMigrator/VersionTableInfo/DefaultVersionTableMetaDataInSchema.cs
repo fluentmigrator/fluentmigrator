@@ -27,6 +27,6 @@ namespace FluentMigrator.VersionTableInfo
             this.SchemaName = schemaName;
         }
 
-        public override string SchemaName { get; }
+        public override string SchemaName { get; protected set; }
     }
 }
