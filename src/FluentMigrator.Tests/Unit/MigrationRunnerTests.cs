@@ -543,8 +543,19 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanLoadDefaultMigrationConventionsIfNoCustomConventionsAreSpecified()
         {
+            var processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
+
+            var options = new ProcessorOptions
+            {
+                PreviewOnly = false
+            };
+
+            processorMock.SetupGet(x => x.Options).Returns(options);
+
             var asm = "s".GetType().Assembly;
-            var runner = new MigrationRunner(asm, _runnerContextMock.Object, _processorMock.Object);
+
+            var runner = new MigrationRunner(asm, _runnerContextMock.Object, processorMock.Object);
+
             Assert.That(runner.Conventions, Is.TypeOf<MigrationConventions>());
             Assert.That(runner.Conventions.GetDefaultSchema.Invoke(), Is.Null);
         }

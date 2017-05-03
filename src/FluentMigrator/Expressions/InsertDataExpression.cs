@@ -57,10 +57,10 @@ namespace FluentMigrator.Expressions
         public IMigrationExpression Reverse()
         {
             var expression = new DeleteDataExpression
-                                {
-                                    SchemaName = SchemaName,
-                                    TableName = TableName
-                                };
+            {
+                SchemaName = SchemaName,
+                TableName = TableName
+            };
 
             foreach (var row in Rows)
             {
@@ -75,6 +75,8 @@ namespace FluentMigrator.Expressions
 
         public void ApplyConventions(IMigrationConventions conventions)
         {
+            if (String.IsNullOrEmpty(SchemaName))
+                SchemaName = conventions.GetDefaultSchema();
         }
     }
 }
