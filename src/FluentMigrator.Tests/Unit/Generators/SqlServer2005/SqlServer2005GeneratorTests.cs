@@ -17,7 +17,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         [SetUp]
         public void Setup()
         {
-            Generator = new SqlServer2008Generator();
+            Generator = new SqlServer2005Generator();
         }
 
         [Test]
