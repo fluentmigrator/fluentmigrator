@@ -29,7 +29,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     public class SqlServer2005Generator : SqlServer2000Generator
     {
         public SqlServer2005Generator()
-            : base(new SqlServerColumn(new SqlServer2005TypeMap()), new SqlServer2005DescriptionGenerator())
+            : base(new SqlServer2000Column(new SqlServer2005TypeMap()), new SqlServer2005DescriptionGenerator())
         {
         }
 
@@ -315,9 +315,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             builder.Append(String.Format("-- create alter table command to create new default constraint as string and run it" + Environment.NewLine + "ALTER TABLE {3}.{0} WITH NOCHECK ADD CONSTRAINT {4} DEFAULT({2}) FOR {1};",
                 Quoter.QuoteTableName(expression.TableName),
                 Quoter.QuoteColumnName(expression.ColumnName),
-                ((SqlServerColumn)Column).FormatDefaultValue(expression.DefaultValue),
+                ((SqlServer2000Column)Column).FormatDefaultValue(expression.DefaultValue),
                 Quoter.QuoteSchemaName(expression.SchemaName),
-                Quoter.QuoteConstraintName(SqlServerColumn.GetDefaultConstraintName(expression.TableName, expression.ColumnName))));
+                Quoter.QuoteConstraintName(SqlServer2000Column.GetDefaultConstraintName(expression.TableName, expression.ColumnName))));
 
             return builder.ToString();
         }

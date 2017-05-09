@@ -136,6 +136,7 @@
     <Compile Include="Announcers\TextWriterWithGoAnnouncer.cs" />
     <Compile Include="CompatabilityMode.cs" />
     <Compile Include="Generators\Postgres\PostgresDescriptionGenerator.cs" />
+    <Compile Include="Generators\SqlServer\SqlServer2008Column.cs" />
     <Compile Include="Generators\SqlServer\SqlServer2014Generator.cs" />
     <Compile Include="Generators\Hana\HanaColumn.cs" />
     <Compile Include="Generators\Hana\HanaDescriptionGenerator.cs" />
@@ -209,7 +210,7 @@
     <Compile Include="Generators\SqlServer\SqlServer2008TypeMap.cs" />
     <Compile Include="Generators\SqlServer\SqlServerCeGenerator.cs" />
     <Compile Include="Generators\SqlServer\SqlServerCeTypeMap.cs" />
-    <Compile Include="Generators\SqlServer\SqlServerColumn.cs" />
+    <Compile Include="Generators\SqlServer\SqlServer2000Column.cs" />
     <Compile Include="Generators\Base\TypeMapBase.cs" />
     <Compile Include="Generators\SqlServer\SqlServerQuoter.cs" />
     <Compile Include="IAnnouncer.cs" />

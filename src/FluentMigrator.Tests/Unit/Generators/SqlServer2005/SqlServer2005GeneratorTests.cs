@@ -255,6 +255,24 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanUseSystemMethodCurrentDateTimeOffsetUsingGetUtcDateAsADefaultValueForAColumn()
+        {
+            var expression = new CreateColumnExpression
+            {
+                Column = new ColumnDefinition
+                {
+                    Name = "NewColumn",
+                    Type = DbType.DateTime,
+                    DefaultValue = SystemMethods.CurrentDateTimeOffset
+                },
+                TableName = "NewTable"
+            };
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT GETUTCDATE()");
+        }
+
+        [Test]
         public void CanUseSystemMethodNewGuidAsADefaultValueForAColumn()
         {
             var expression = new CreateColumnExpression
