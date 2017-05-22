@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -18,13 +18,13 @@
 
 using FluentMigrator.Model;
 
-namespace FluentMigrator.Builders.Create.Constraint
+namespace FluentMigrator.Builders.Delete.Index
 {
-    public interface ICreateConstraintOptionsSyntax
+    public interface IDeleteIndexOptionsSyntax
     {
         /// <summary>
         /// Specifies whether underlying tables and associated indexes are available for queries and data modification during the index operation.
-        /// The ONLINE option can only be specified in certain situations, please refer to documentation for SQL Server 2016.
+        /// The ONLINE option can only be specified when you drop clustered indexes (SQL Server 2016).
         /// </summary>
         /// <param name="mode">
         /// ON
@@ -32,6 +32,6 @@ namespace FluentMigrator.Builders.Create.Constraint
         /// OFF
         /// Table locks are applied and the table is unavailable for the duration of the index operation.
         /// </param>
-        ICreateConstraintOptionsSyntax ApplyOnline(OnlineMode mode = OnlineMode.On);
+        void ApplyOnline(OnlineMode mode = OnlineMode.On);
     }
 }

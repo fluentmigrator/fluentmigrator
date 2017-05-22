@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 
@@ -91,6 +92,12 @@ namespace FluentMigrator.Builders.Create.Index
         public ICreateIndexOnColumnSyntax Clustered()
         {
             Expression.Index.IsClustered = true;
+            return this;
+        }
+
+        public ICreateIndexOnColumnSyntax ApplyOnline(OnlineMode mode)
+        {
+            Expression.Index.ApplyOnline = mode;
             return this;
         }
     }

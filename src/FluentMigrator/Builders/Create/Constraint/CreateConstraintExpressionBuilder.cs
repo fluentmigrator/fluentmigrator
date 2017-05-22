@@ -1,4 +1,6 @@
+using System;
 using FluentMigrator.Expressions;
+using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Create.Constraint
 {
@@ -39,6 +41,12 @@ namespace FluentMigrator.Builders.Create.Constraint
         public ICreateConstraintColumnsSyntax WithSchema(string schemaName)
         {
             Expression.Constraint.SchemaName = schemaName;
+            return this;
+        }
+
+        public ICreateConstraintOptionsSyntax ApplyOnline(OnlineMode mode)
+        {
+            Expression.Constraint.ApplyOnline = mode;
             return this;
         }
     }
