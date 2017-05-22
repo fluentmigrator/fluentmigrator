@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
@@ -352,6 +353,74 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var result = Generator.Generate(expression);
 
             result.ShouldBe(@"ALTER TABLE [dbo].[TestTable1] ALTER COLUMN [TestColumn1] NVARCHAR(20) COLLATE " + GeneratorTestHelper.TestColumnCollationName + " NOT NULL");
+        }
+
+        [Test]
+        public void CanUseSystemMethodNewGuidInUpdateStatements()
+        {
+            var expression = new UpdateDataExpression
+            {
+                TableName = GeneratorTestHelper.TestTableName1,
+                Set = new List<KeyValuePair<string, object>>
+                {
+                    new KeyValuePair<string, object>("Guid", SystemMethods.NewGuid)
+                },
+                IsAllRows = true
+            };
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("UPDATE [dbo].[TestTable1] SET [Guid] = NEWID() WHERE 1 = 1");
+        }
+
+        [Test]
+        public void CanUseSystemMethodNewSequentialIdInUpdateStatements()
+        {
+            var expression = new UpdateDataExpression
+            {
+                TableName = GeneratorTestHelper.TestTableName1,
+                Set = new List<KeyValuePair<string, object>>
+                {
+                    new KeyValuePair<string, object>("Guid", SystemMethods.NewSequentialId)
+                },
+                IsAllRows = true
+            };
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("UPDATE [dbo].[TestTable1] SET [Guid] = NEWSEQUENTIALID() WHERE 1 = 1");
+        }
+
+        [Test]
+        public void CanUseSystemMethodCurrentDateTimeInUpdateStatements()
+        {
+            var expression = new UpdateDataExpression
+            {
+                TableName = GeneratorTestHelper.TestTableName1,
+                Set = new List<KeyValuePair<string, object>>
+                {
+                    new KeyValuePair<string, object>("DateTime", SystemMethods.CurrentDateTime)
+                },
+                IsAllRows = true
+            };
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("UPDATE [dbo].[TestTable1] SET [DateTime] = GETDATE() WHERE 1 = 1");
+        }
+
+        [Test]
+        public void CanUseSystemMethodCurrentUtcDateTimeInUpdateStatements()
+        {
+            var expression = new UpdateDataExpression
+            {
+                TableName = GeneratorTestHelper.TestTableName1,
+                Set = new List<KeyValuePair<string, object>>
+                {
+                    new KeyValuePair<string, object>("DateTime", SystemMethods.CurrentUTCDateTime)
+                },
+                IsAllRows = true
+            };
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("UPDATE [dbo].[TestTable1] SET [DateTime] = GETUTCDATE() WHERE 1 = 1");
         }
     }
 }

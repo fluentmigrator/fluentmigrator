@@ -24,6 +24,21 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             {
                 return string.Format("N{0}", FormatString(value.ToString()));
             }
+
+            if (value != null && value is SystemMethods)
+            {
+                switch ((SystemMethods)value)
+                {
+                    case SystemMethods.NewGuid:
+                        return "NEWID()";
+                    case SystemMethods.NewSequentialId:
+                        return "NEWSEQUENTIALID()";
+                    case SystemMethods.CurrentDateTime:
+                        return "GETDATE()";
+                    case SystemMethods.CurrentUTCDateTime:
+                        return "GETUTCDATE()";
+                }
+            }
             
             return base.QuoteValue(value);
         }
