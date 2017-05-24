@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using FluentMigrator.Builders.Execute;
+using FluentMigrator.Info;
 using FluentMigrator.Runner.Generators.Postgres;
 using FluentMigrator.Runner.Helpers;
 
@@ -73,6 +75,16 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
             string defaultValueAsString = string.Format("%{0}%", FormatHelper.FormatSqlEscape(defaultValue.ToString()));
             return Exists("select * from information_schema.columns where table_schema = '{0}' and table_name = '{1}' and column_name = '{2}' and column_default like '{3}'", FormatToSafeSchemaName(schemaName), FormatToSafeName(tableName), FormatToSafeName(columnName), defaultValueAsString);
+        }
+
+        public override IEnumerable<TableInfo> GetTableInfos(string schemaName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IEnumerable<ColumnInfo> GetColumnInfos(string schemaName, string tableName)
+        {
+            throw new NotImplementedException();
         }
 
         public override DataSet Read(string template, params object[] args)

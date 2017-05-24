@@ -16,21 +16,18 @@
 //
 #endregion
 
-using System.Collections.Generic;
-using FluentMigrator.Builders.Schema.Column;
-using FluentMigrator.Builders.Schema.Constraint;
-using FluentMigrator.Builders.Schema.Index;
-using FluentMigrator.Info;
+using System.Data;
 
-namespace FluentMigrator.Builders.Schema.Table
+namespace FluentMigrator.Builders.Select
 {
-    public interface ISchemaTableSyntax
+    public interface ISelectColumnSyntax
     {
-        bool Exists();
-        ISchemaColumnSyntax Column(string column);
-        ISchemaIndexSyntax Index(string indexName);
-        ISchemaConstraintSyntax Constraint(string constraintName);
-        TableInfo Info { get; }
-        IEnumerable<ISchemaColumnSyntax> Columns { get; }
+        ISelectColumnSyntax Column(string name);
+
+        ISelectColumnSyntax AllColumns { get; }
+
+        ISelectWhereSyntax Where();
+
+        DataSet Read();
     }
 }

@@ -1,4 +1,7 @@
-﻿namespace FluentMigrator.Runner.Processors.DB2
+﻿using System.Collections.Generic;
+using FluentMigrator.Info;
+
+namespace FluentMigrator.Runner.Processors.DB2
 {
     using System.Data;
     using System.Linq;
@@ -66,6 +69,16 @@
             var defaultValueAsString = string.Format("%{0}%", FormatHelper.FormatSqlEscape(defaultValue.ToString()));
 
             return this.Exists("SELECT COLUMN_DEFAULT FROM INFORMATION_SCHEMA.COLUMNS WHERE {0} TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}' AND COLUMN_DEFAULT LIKE '{3}'", schema, this.FormatToSafeName(tableName), columnName.ToUpper(), defaultValueAsString);
+        }
+
+        public override IEnumerable<TableInfo> GetTableInfos(string schemaName)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public override IEnumerable<ColumnInfo> GetColumnInfos(string schemaName, string tableName)
+        {
+            throw new System.NotImplementedException();
         }
 
         public override void Execute(string template, params object[] args)

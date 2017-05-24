@@ -119,6 +119,16 @@ namespace FluentMigrator.Runner.Processors.Firebird
             return false;
         }
 
+        public override IEnumerable<Info.TableInfo> GetTableInfos(string schemaName)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override IEnumerable<Info.ColumnInfo> GetColumnInfos(string schemaName, string tableName)
+        {
+            throw new NotImplementedException();
+        }
+
         public override bool Exists(string template, params object[] args)
         {
             EnsureConnectionIsOpen();

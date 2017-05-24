@@ -16,35 +16,31 @@
 //
 #endregion
 
+using System.Collections.Generic;
 using System.Linq;
-using FluentMigrator.Info;
 using FluentMigrator.Infrastructure;
 
-namespace FluentMigrator.Builders.Schema.Column
+namespace FluentMigrator.Builders.Select
 {
-    public class SchemaColumnQuery : ISchemaColumnSyntax
+    public class SelectExpressionRoot : ISelectExpressionRoot
     {
-        private readonly string _schemaName;
-        private readonly string _tableName;
-        private readonly string _columnName;
         private readonly IMigrationContext _context;
 
-        public SchemaColumnQuery(string schemaName, string tableName, string columnName, IMigrationContext context)
+        public SelectExpressionRoot(IMigrationContext context)
         {
-            _schemaName = schemaName;
-            _tableName = tableName;
-            _columnName = columnName;
             _context = context;
         }
 
-        public bool Exists()
+        public ISelectColumnSyntax Table(string tableName)
         {
-            return _context.QuerySchema.ColumnExists(_schemaName, _tableName, _columnName);
+            return new SelectColumnSyntax(_context, tableName);
         }
 
-        public ColumnInfo Info
+        public IEnumerable<ISelectColumnSyntax> Tables
         {
-            get { return _context.QuerySchema.GetColumnInfos(_schemaName,_tableName).FirstOrDefault(x => x.Name == _columnName); }
+            get {
+                return _context.QuerySchema.GetTableInfos(null).Select(tableInfo => new SelectColumnSyntax(_context, tableInfo.Name)).Cast<ISelectColumnSyntax>();
+            }
         }
     }
 }

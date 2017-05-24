@@ -17,20 +17,14 @@
 #endregion
 
 using System.Collections.Generic;
-using FluentMigrator.Builders.Schema.Column;
-using FluentMigrator.Builders.Schema.Constraint;
-using FluentMigrator.Builders.Schema.Index;
-using FluentMigrator.Info;
+using FluentMigrator.Infrastructure;
 
-namespace FluentMigrator.Builders.Schema.Table
+namespace FluentMigrator.Builders.Select
 {
-    public interface ISchemaTableSyntax
+    public interface ISelectExpressionRoot : IFluentSyntax
     {
-        bool Exists();
-        ISchemaColumnSyntax Column(string column);
-        ISchemaIndexSyntax Index(string indexName);
-        ISchemaConstraintSyntax Constraint(string constraintName);
-        TableInfo Info { get; }
-        IEnumerable<ISchemaColumnSyntax> Columns { get; }
+        ISelectColumnSyntax Table(string tableName);
+
+        IEnumerable<ISelectColumnSyntax> Tables { get; }
     }
 }

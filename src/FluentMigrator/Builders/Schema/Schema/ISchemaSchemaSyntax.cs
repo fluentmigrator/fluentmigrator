@@ -18,6 +18,8 @@
 
 #endregion
 
+using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 using FluentMigrator.Builders.Schema.Table;
 
 namespace FluentMigrator.Builders.Schema.Schema
@@ -26,5 +28,7 @@ namespace FluentMigrator.Builders.Schema.Schema
     {
         bool Exists();
         ISchemaTableSyntax Table(string tableName);
+
+        IEnumerable<ISchemaTableSyntax> Tables { get; }
     }
 }

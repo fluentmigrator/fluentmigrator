@@ -16,8 +16,11 @@
 //
 #endregion
 
+using System.Collections.Generic;
+using System.Linq;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Expressions;
+using FluentMigrator.Info;
 
 namespace FluentMigrator.Runner.Processors
 {
@@ -30,7 +33,7 @@ namespace FluentMigrator.Runner.Processors
         public abstract string ConnectionString { get; }
 
         public abstract string DatabaseType { get; }
-
+        
         public bool WasCommitted { get; protected set; }
 
         protected ProcessorBase(IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
@@ -163,7 +166,7 @@ namespace FluentMigrator.Runner.Processors
         }
 
         protected abstract void Process(string sql);
-
+       
         public virtual void BeginTransaction()
         {
         }
@@ -182,6 +185,22 @@ namespace FluentMigrator.Runner.Processors
 
         public abstract bool Exists(string template, params object[] args);
 
+        public virtual string QuoteColumnNameIfRequired(string columnName)
+        {
+            return columnName;
+        }
+
+        public virtual string QuoteTableNameIfRequired(string tableName)
+        {
+            return tableName;
+        }
+
+        public string BuildSelect(string tableName, List<string> columns)
+        {
+            var columnsString = string.Join(",", columns.Select(QuoteColumnNameIfRequired).ToArray());
+            return string.Format("select {0} from {1}", columnsString, QuoteTableNameIfRequired(tableName));            
+        }
+
         public abstract void Execute(string template, params object[] args);
 
         public abstract bool SchemaExists(string schemaName);
@@ -197,6 +216,10 @@ namespace FluentMigrator.Runner.Processors
         public abstract bool SequenceExists(string schemaName, string sequenceName);
 
         public abstract bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue);
+
+        public abstract IEnumerable<TableInfo> GetTableInfos(string schemaName);
+
+        public abstract IEnumerable<ColumnInfo> GetColumnInfos(string schemaName, string tableName);
 
         public void Dispose()
         {

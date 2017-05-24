@@ -262,6 +262,7 @@
     <Compile Include="Processors\DbFactoryBase.cs" />
     <Compile Include="Processors\ReflectionBasedDbFactory.cs" />
     <Compile Include="Processors\SQLite\SQLiteDbFactory.cs" />
+    <Compile Include="Processors\SQLite\SqliteKeywords.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2000Processor.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2012ProcessorFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2014ProcessorFactory.cs" />

@@ -16,10 +16,13 @@
 //
 #endregion
 
+using FluentMigrator.Info;
+
 namespace FluentMigrator.Builders.Schema.Column
 {
     public interface ISchemaColumnSyntax
     {
         bool Exists();
+        ColumnInfo Info { get; }
     }
 }

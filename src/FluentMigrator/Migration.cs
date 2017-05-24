@@ -18,6 +18,7 @@
 
 using FluentMigrator.Builders.Delete;
 using FluentMigrator.Builders.Execute;
+using FluentMigrator.Builders.Select;
 using FluentMigrator.Builders.Update;
 
 namespace FluentMigrator
@@ -37,6 +38,11 @@ namespace FluentMigrator
         public IUpdateExpressionRoot Update
         {
             get { return new UpdateExpressionRoot(_context); }
+        }
+
+        public ISelectExpressionRoot Select
+        {
+            get { return new SelectExpressionRoot(_context); }
         }
     }
 }

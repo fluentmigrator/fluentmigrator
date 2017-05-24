@@ -16,6 +16,9 @@
 //
 #endregion
 
+using System.Collections.Generic;
+using FluentMigrator.Info;
+
 namespace FluentMigrator
 {
     public interface IQuerySchema
@@ -28,5 +31,8 @@ namespace FluentMigrator
         bool SequenceExists(string schemaName, string sequenceName);
         bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue);
         string DatabaseType { get; }
+
+        IEnumerable<TableInfo> GetTableInfos(string schemaName);
+        IEnumerable<ColumnInfo> GetColumnInfos(string schemaName, string tableName);
     }
 }
