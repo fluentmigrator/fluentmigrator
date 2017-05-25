@@ -61,7 +61,7 @@ namespace FluentMigrator.Runner
             dataExpression.Rows.Add(CreateVersionInfoInsertionData(version, description));
             dataExpression.TableName = VersionTableMetaData.TableName;
             dataExpression.SchemaName = VersionTableMetaData.SchemaName;
-            
+
             dataExpression.ExecuteWith(Processor);
         }
 
@@ -88,7 +88,7 @@ namespace FluentMigrator.Runner
             return new InsertionDataDefinition
                        {
                            new KeyValuePair<string, object>(VersionTableMetaData.ColumnName, version),
-                           new KeyValuePair<string, object>(VersionTableMetaData.AppliedOnColumnName, DateTime.UtcNow),
+                           new KeyValuePair<string, object>(VersionTableMetaData.AppliedOnColumnName, RawSql.Insert("CURRENT_TIMESTAMP")),
                            new KeyValuePair<string, object>(VersionTableMetaData.DescriptionColumnName, description),
                        };
         }
@@ -113,7 +113,7 @@ namespace FluentMigrator.Runner
             get
             {
                 return string.IsNullOrEmpty(VersionTableMetaData.SchemaName) ||
-					   Processor.SchemaExists(VersionTableMetaData.SchemaName);
+                       Processor.SchemaExists(VersionTableMetaData.SchemaName);
             }
         }
 
@@ -180,7 +180,7 @@ namespace FluentMigrator.Runner
             if (!AlreadyCreatedVersionTable) return;
 
             var dataSet = Processor.ReadTableData(VersionTableMetaData.SchemaName, VersionTableMetaData.TableName);
-            
+
             foreach (DataRow row in dataSet.Tables[0].Rows)
             {
                 _versionInfo.AddAppliedMigration(long.Parse(row[VersionTableMetaData.ColumnName].ToString()));

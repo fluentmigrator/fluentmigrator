@@ -37,7 +37,12 @@ namespace FluentMigrator.Builders.Execute
 
         public void Sql(string sqlStatement)
         {
-            var expression = new ExecuteSqlStatementExpression { SqlStatement = sqlStatement };
+            Sql(sqlStatement, false);
+        }
+
+        public void Sql(string sqlStatement, bool sayStatement)
+        {
+            var expression = new ExecuteSqlStatementExpression { SqlStatement = sqlStatement, SayStatement = sayStatement };
             _context.Expressions.Add(expression);
         }
 

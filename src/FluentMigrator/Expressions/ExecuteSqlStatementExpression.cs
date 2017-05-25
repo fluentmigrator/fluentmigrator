@@ -26,6 +26,8 @@ namespace FluentMigrator.Expressions
     {
         public virtual string SqlStatement { get; set; }
 
+        public virtual bool SayStatement { get; set; }
+
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             // since all the Processors are using String.Format() in their Execute method
@@ -42,7 +44,7 @@ namespace FluentMigrator.Expressions
 
         public override string ToString()
         {
-            return base.ToString() + SqlStatement;
+            return (SayStatement ? base.ToString() + SqlStatement : "");
         }
     }
 }
