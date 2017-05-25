@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="Migrate">
+   <PropertyGroup>
+		<DatabaseType>sqlite</DatabaseType>
+		<ConnectionString>Data Source=:memory:;Version=3;New=True;</ConnectionString>
+		<!-- SqlServer2008 connection string
+		<ConnectionString>server=.\SQLEXPRESS;uid=test;pwd=test;Trusted_Connection=yes;database=FluentMigrator</ConnectionString>
+		-->
+		
+		<ExamplePath>build/FluentMigrator.Example.dll</ExamplePath>
+	</PropertyGroup>
+	
+   <UsingTask TaskName="FluentMigrator.MSBuild.Migrate" 
+        AssemblyFile="./packages/FluentMigrator.Tools.1.0.3.0/tools/AnyCPU/40/FluentMigrator.MSBuild.dll"/>
+
+  <Target Name="Migrate" >
+    <Message Text="Starting FluentMigrator Migration"/>
+   
+    <Migrate Database="$(DatabaseType)"
+             Connection="$(ConnectionString)"
+			 Verbose="true"
+			 Output="True" 
+			 OutputFilename="generated_migrate_up.sql"
+             Target="$(ExamplePath)">
+    </Migrate>
+  </Target>
+  
+  <Target Name="MigrateRollback" >
+    <Message Text="Starting FluentMigrator Migration Rollback"/>
+
+    <Migrate Database="$(DatabaseType)"
+             Connection="$(ConnectionString)"
+             Target="$(ExamplePath)"
+			 Verbose="true"
+			 Output="True" 
+			 OutputFilename="generated_migrate_rollback.sql"
+			 Task="rollback">
+    </Migrate>
+  </Target>
+  
+  <Target Name="MigrateRollbackAll" >
+    <Message Text="Starting FluentMigrator Migration Rollback All"/>
+
+	<Migrate Database="$(DatabaseType)"
+             Connection="$(ConnectionString)"
+             Target="$(ExamplePath)"
+			 Verbose="true"
+			 Output="True" 
+			 OutputFilename="generated_migrate_rollbackall.sql"
+			 Task="rollback:all">
+    </Migrate>
+  </Target>
+
+</Project>
