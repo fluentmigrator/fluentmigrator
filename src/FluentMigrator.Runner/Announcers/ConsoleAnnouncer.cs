@@ -105,7 +105,7 @@ namespace FluentMigrator.Runner.Announcers
 
             using (var sw = new StreamWriter(LogFile, true))
             {
-                var log = $"{DateTime.Now:yyyy-MM-dd HH:mm:ss} {(!isError ? "INFO" : "ERROR")} {message}";
+                var log = string.Format("{0:yyyy-MM-dd HH:mm:ss} {1} {2}", DateTime.Now, (!isError ? "INFO" : "ERROR"), message);
                 sw.WriteLine(log);
             }
         }
