@@ -83,9 +83,9 @@ namespace FluentMigrator.Runner.Announcers
             LogMessage(message, true, false);
         }
 
-        public override void Write(string message, bool isError)
+        public override void Write(string message, bool escaped)
         {
-            LogMessage(message, true, isError);
+            LogMessage(message, escaped, false);
         }
 
         public override void Write(string message, bool escaped, bool isError)
@@ -100,7 +100,7 @@ namespace FluentMigrator.Runner.Announcers
             else
                 Console.Error.WriteLine(message);
 
-            if (!WriteToLogFile || string.IsNullOrEmpty(message))
+            if (!WriteToLogFile || string.IsNullOrEmpty(message) || string.IsNullOrEmpty(LogFile))
                 return;
 
             using (var sw = new StreamWriter(LogFile, true))

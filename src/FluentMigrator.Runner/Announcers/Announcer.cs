@@ -69,7 +69,7 @@ namespace FluentMigrator.Runner.Announcers
 
         public virtual void Error(string message)
         {
-            Write(string.Format("!!! {0}", message), true);
+            Write(string.Format("!!! {0}", message), true, true);
         }
 
         public abstract void Write(string message, bool escaped);
