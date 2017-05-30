@@ -424,6 +424,7 @@
     <Compile Include="Unit\Generators\Oracle\OracleDescriptionGeneratorTests.cs" />
     <Compile Include="Unit\Generators\Oracle\OracleGeneratorTests.cs" />
     <Compile Include="Unit\Generators\Oracle\OracleIndexTests.cs" />
+    <Compile Include="Unit\Generators\Oracle\OracleQuoterKeywordTests.cs" />
     <Compile Include="Unit\Generators\Oracle\OracleQuoterTest.cs" />
     <Compile Include="Unit\Generators\Oracle\OracleSchemaTests.cs" />
     <Compile Include="Unit\Generators\Oracle\OracleSequenceTests.cs" />
