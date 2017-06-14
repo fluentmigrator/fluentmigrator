@@ -19,8 +19,8 @@
 namespace FluentMigrator.Builders.Create.Table
 {
     public interface ICreateTableColumnOptionOrWithColumnSyntax :
-        IColumnOptionSyntax<ICreateTableColumnOptionOrWithColumnSyntax,ICreateTableColumnOptionOrForeignKeyCascadeOrWithColumnSyntax>, 
-        ICreateTableWithColumnOrSchemaOrDescriptionSyntax
+        IColumnOptionSyntax<ICreateTableColumnOptionOrWithColumnSyntax,ICreateTableColumnOptionOrForeignKeyCascadeOrWithColumnSyntax>,
+        ICreateTableWithColumnSyntax
     {
     }
 }

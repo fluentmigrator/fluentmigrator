@@ -236,10 +236,11 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var createTableExpression = (CreateTableExpression)migrationContext.Expressions.Where(e => e.GetType() == typeof(CreateTableExpression)).First();
             var createForeignKeyExpression = (CreateForeignKeyExpression)migrationContext.Expressions.Where(e => e.GetType() == typeof(CreateForeignKeyExpression)).First();
 
+            createForeignKeyExpression.ApplyConventions(new MigrationConventions());
             string createTableResult = Generator.Generate(createTableExpression);
             string createForeignKeyResult = Generator.Generate(createForeignKeyExpression);
             createTableResult.ShouldBe("CREATE TABLE [dbo].[FooTable] ([FooColumn] INT NOT NULL)");
-            createForeignKeyResult.ShouldBe("ALTER TABLE [dbo].[FooTable] ADD CONSTRAINT [fk_foo] FOREIGN KEY ([FooColumn]) REFERENCES [dbo].[BarTable] ([BarColumn])");
+            createForeignKeyResult.ShouldBe("ALTER TABLE [dbo].[FooTable] ADD CONSTRAINT [FK_FooTable_FooColumn_BarTable_BarColumn] FOREIGN KEY ([FooColumn]) REFERENCES [dbo].[BarTable] ([BarColumn])");
         }
 
         [Test]
@@ -251,14 +252,14 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var migrationContext = migrationContexMock.Object;
             new CreateExpressionRoot(migrationContext)
                 .Table("FooTable").InSchema("FooSchema")
-                .WithColumn("FooColumn").AsInt32().ForeignKey("BarTable", "BarColumn").InSchema("BarSchema");
+                .WithColumn("FooColumn").AsInt32().ForeignKey("fk_bar_foo", "BarSchema", "BarTable", "BarColumn");
             var createTableExpression = (CreateTableExpression)migrationContext.Expressions.Where(e => e.GetType() == typeof(CreateTableExpression)).First();
             var createForeignKeyExpression = (CreateForeignKeyExpression)migrationContext.Expressions.Where(e => e.GetType() == typeof(CreateForeignKeyExpression)).First();
 
             string createTableResult = Generator.Generate(createTableExpression);
             string createForeignKeyResult = Generator.Generate(createForeignKeyExpression);
             createTableResult.ShouldBe("CREATE TABLE [FooSchema].[FooTable] ([FooColumn] INT NOT NULL)");
-            createForeignKeyResult.ShouldBe("ALTER TABLE [FooSchema].[FooTable] ADD CONSTRAINT [fk_foo] FOREIGN KEY ([FooColumn]) REFERENCES [BarSchema].[BarTable] ([BarColumn])");
+            createForeignKeyResult.ShouldBe("ALTER TABLE [FooSchema].[FooTable] ADD CONSTRAINT [fk_bar_foo] FOREIGN KEY ([FooColumn]) REFERENCES [BarSchema].[BarTable] ([BarColumn])");
         }
 
         [Test]
