@@ -132,12 +132,6 @@ namespace FluentMigrator.Runner.Initialization
 
         private IMigrationProcessor InitializeProcessor(IAssemblyCollection assemblyCollection)
         {
-
-            if (RunnerContext.Timeout == 0)
-            {
-                RunnerContext.Timeout = 30; // Set default timeout for command
-            }
-
             var connectionString = LoadConnectionString(assemblyCollection);
             var processorFactory = ProcessorFactoryProvider.GetFactory(RunnerContext.Database);
 

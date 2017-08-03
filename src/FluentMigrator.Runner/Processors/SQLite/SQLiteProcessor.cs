@@ -77,7 +77,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Options))
             using (var reader = command.ExecuteReader())
             {
                 try
@@ -140,7 +140,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         private void ExecuteNonQuery(string sql)
         {
-            using (var command = Factory.CreateCommand(sql, Connection))
+            using (var command = Factory.CreateCommand(sql, Connection, Options))
             {
                 try
                 {
@@ -158,7 +158,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
             sql += "\nGO";   // make sure last batch is executed.
             string sqlBatch = string.Empty;
 
-            using (var command = Factory.CreateCommand(sql, Connection))
+            using (var command = Factory.CreateCommand(sql, Connection, Options))
             {
                 try
                 {
@@ -191,7 +191,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
             EnsureConnectionIsOpen();
 
             var ds = new DataSet();
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Options))
             {
                 var adapter = Factory.CreateDataAdapter(command);
                 adapter.Fill(ds);

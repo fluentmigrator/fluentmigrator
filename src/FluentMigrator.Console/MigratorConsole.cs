@@ -45,7 +45,7 @@ namespace FluentMigrator.Console
         public List<string> Tags = new List<string>();
         public string TargetAssembly;
         public string Task;
-        public int Timeout;
+        public int? Timeout;
         public bool Verbose;
         public long Version;
         public long StartVersion;

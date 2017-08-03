@@ -411,9 +411,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
             if (String.IsNullOrEmpty(sql))
                 return;
             Processor.Announcer.Sql(sql);
-            using (var command = Processor.Factory.CreateCommand(sql, connection, transaction))
+            using (var command = Processor.Factory.CreateCommand(sql, connection, transaction, Processor.Options))
             {
-                command.CommandTimeout = Processor.Options.Timeout;
                 command.ExecuteNonQuery();
             }
         }
