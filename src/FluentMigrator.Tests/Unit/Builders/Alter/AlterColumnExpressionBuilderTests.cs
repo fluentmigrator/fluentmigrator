@@ -415,6 +415,27 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
                 new KeyValuePair<string, object>(SqlServerExtensions.IdentityIncrement, 44));
         }
 
+
+        [Test]
+        public void CallingSeededLongIdentitySetsAdditionalProperties()
+        {
+            var contextMock = new Mock<IMigrationContext>();
+
+            var columnMock = new Mock<ColumnDefinition>();
+            columnMock.SetupGet(x => x.Name).Returns("BaconId");
+
+            var expressionMock = new Mock<AlterColumnExpression>();
+            expressionMock.SetupGet(x => x.Column).Returns(columnMock.Object);
+
+            var builder = new AlterColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
+            builder.Identity(long.MaxValue, 44);
+
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(SqlServerExtensions.IdentitySeed, long.MaxValue));
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(SqlServerExtensions.IdentityIncrement, 44));
+        }
+
         [Test]
         public void CallingIndexedCallsHelperWithNullIndexName()
         {
