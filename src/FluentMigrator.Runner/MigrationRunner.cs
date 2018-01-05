@@ -267,6 +267,15 @@ namespace FluentMigrator.Runner
                 {
                     try
                     {
+                        if (migrationInfo.IsAttributed())
+                        {
+                            if (migrationInfo.IsBreakingChange && !RunnerContext.PreviewOnly &&
+                                !RunnerContext.AllowBreakingChange)
+                            {
+                                throw new InvalidOperationException(string.Format("The migration {0} is identified as a breaking change, and will not be executed unless the necessary flag (allow-breaking-changes|abc) is passed to the runner.", 
+                                    migrationInfo.GetName()));
+                            }
+                        }
                         ExecuteMigration(migrationInfo.Migration, (m, c) => m.GetUpExpressions(c));
 
                         if (migrationInfo.IsAttributed())
@@ -513,11 +522,14 @@ namespace FluentMigrator.Runner
             {
                 string migrationName = migration.Value.GetName();
                 bool isCurrent = migration.Key == currentVersion;
-                string message = string.Format("{0}{1}",
-                                                migrationName,
-                                                isCurrent ? " (current)" : string.Empty);
+                bool isBreakingChange = migration.Value.IsBreakingChange;
 
-                if(isCurrent)
+                string message = string.Format("{0}{1}{2}",
+                                                migrationName,
+                                                isCurrent ? " (current)" : string.Empty,
+                                                isBreakingChange ? " (BREAKING)" : string.Empty);
+
+                if(isCurrent || isBreakingChange)
                     _announcer.Emphasize(message);
                 else
                     _announcer.Say(message);

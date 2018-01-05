@@ -105,7 +105,7 @@ namespace FluentMigrator.Tests.Unit
             foreach (var version in fakeVersions)
             {
                 _fakeVersionLoader.Versions.Add(version);
-                _migrationList.Add(version,new MigrationInfo(version, TransactionBehavior.Default, new TestMigration()));
+                _migrationList.Add(version,new MigrationInfo(version, TransactionBehavior.Default, false, new TestMigration()));
             }
 
             _fakeVersionLoader.LoadVersionInfo();
@@ -411,8 +411,8 @@ namespace FluentMigrator.Tests.Unit
             LoadVersionData(version1, version2);
 
             _migrationList.Clear();
-            _migrationList.Add(version1,new MigrationInfo(version1, TransactionBehavior.Default, mockMigration1.Object));
-            _migrationList.Add(version2, new MigrationInfo(version2, TransactionBehavior.Default, mockMigration2.Object));
+            _migrationList.Add(version1,new MigrationInfo(version1, TransactionBehavior.Default, false, mockMigration1.Object));
+            _migrationList.Add(version2, new MigrationInfo(version2, TransactionBehavior.Default, false, mockMigration2.Object));
 
             Assert.DoesNotThrow(() => _runner.ValidateVersionOrder());
 
@@ -433,8 +433,8 @@ namespace FluentMigrator.Tests.Unit
             LoadVersionData(version1);
 
             _migrationList.Clear();
-            _migrationList.Add(version1, new MigrationInfo(version1, TransactionBehavior.Default, mockMigration1.Object));
-            _migrationList.Add(version2, new MigrationInfo(version2, TransactionBehavior.Default, mockMigration2.Object));
+            _migrationList.Add(version1, new MigrationInfo(version1, TransactionBehavior.Default, false, mockMigration1.Object));
+            _migrationList.Add(version2, new MigrationInfo(version2, TransactionBehavior.Default, false, mockMigration2.Object));
 
             Assert.DoesNotThrow(() => _runner.ValidateVersionOrder());
 
@@ -459,10 +459,10 @@ namespace FluentMigrator.Tests.Unit
             LoadVersionData(version1, version4);
 
             _migrationList.Clear();
-            _migrationList.Add(version1, new MigrationInfo(version1, TransactionBehavior.Default, mockMigration1.Object));
-            _migrationList.Add(version2, new MigrationInfo(version2, TransactionBehavior.Default, mockMigration2.Object));
-            _migrationList.Add(version3, new MigrationInfo(version3, TransactionBehavior.Default, mockMigration3.Object));
-            _migrationList.Add(version4, new MigrationInfo(version4, TransactionBehavior.Default, mockMigration4.Object));
+            _migrationList.Add(version1, new MigrationInfo(version1, TransactionBehavior.Default, false, mockMigration1.Object));
+            _migrationList.Add(version2, new MigrationInfo(version2, TransactionBehavior.Default, false, mockMigration2.Object));
+            _migrationList.Add(version3, new MigrationInfo(version3, TransactionBehavior.Default, false, mockMigration3.Object));
+            _migrationList.Add(version4, new MigrationInfo(version4, TransactionBehavior.Default, false, mockMigration4.Object));
 
             var exception = Assert.Throws<VersionOrderInvalidException>(() => _runner.ValidateVersionOrder());
 
@@ -478,20 +478,23 @@ namespace FluentMigrator.Tests.Unit
         {
             const long version1 = 2011010101;
             const long version2 = 2011010102;
+            const long version3 = 2011010103;
 
             var mockMigration1 = new Mock<IMigration>();
             var mockMigration2 = new Mock<IMigration>();
+            var mockMigration3 = new Mock<IMigration>();
             
             LoadVersionData(version1, version2);
 
             _migrationList.Clear();
-            _migrationList.Add(version1, new MigrationInfo(version1, TransactionBehavior.Default, mockMigration1.Object));
-            _migrationList.Add(version2, new MigrationInfo(version2, TransactionBehavior.Default, mockMigration2.Object));
-
+            _migrationList.Add(version1, new MigrationInfo(version1, TransactionBehavior.Default, false, mockMigration1.Object));
+            _migrationList.Add(version2, new MigrationInfo(version2, TransactionBehavior.Default, false, mockMigration2.Object));
+            _migrationList.Add(version3, new MigrationInfo(version3, TransactionBehavior.Default, true, mockMigration3.Object));
             _runner.ListMigrations();
 
             _announcer.Verify(a => a.Say("2011010101: IMigrationProxy"));
             _announcer.Verify(a => a.Emphasize("2011010102: IMigrationProxy (current)"));
+            _announcer.Verify(a => a.Emphasize("2011010103: IMigrationProxy (BREAKING)"));
         }
 
         [Test]
@@ -533,5 +536,32 @@ namespace FluentMigrator.Tests.Unit
             _announcer.Verify(a => a.Error(It.Is<string>(s => s.Contains("CreateColumnExpression: The table's name cannot be null or an empty string. The column's name cannot be null or an empty string. The column does not have a type defined."))));
         }
 
+        [Test]
+        public void CanBlockBreakingChangesByDefault()
+        {
+            InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => _runner.ApplyMigrationUp(new MigrationInfo(7, TransactionBehavior.Default, true, new TestBreakingMigration()), true));
+
+            Assert.NotNull(ex);
+
+            Assert.AreEqual("The migration 7: TestBreakingMigration is identified as a breaking change, and will not be executed unless the necessary flag (allow-breaking-changes|abc) is passed to the runner.", ex.Message);
+        }
+
+        [Test]
+        public void CanRunBreakingChangesIfSpecified()
+        {
+            _runnerContextMock.SetupGet(rcm => rcm.AllowBreakingChange).Returns(true);
+
+            Assert.DoesNotThrow(() => _runner.ApplyMigrationUp(new MigrationInfo(7, TransactionBehavior.Default, true, new TestBreakingMigration()), true));
+        }
+
+        [Test]
+        public void CanRunBreakingChangesInPreview()
+        {
+            _runnerContextMock.SetupGet(rcm => rcm.PreviewOnly).Returns(true);
+
+            _runnerContextMock.SetupGet(rcm => rcm.AllowBreakingChange).Returns(true);
+
+            Assert.DoesNotThrow(() => _runner.ApplyMigrationUp(new MigrationInfo(7, TransactionBehavior.Default, true, new TestBreakingMigration()), true));
+        }
     }
 }

@@ -43,6 +43,7 @@ namespace FluentMigrator.Runner.Initialization
         string ProviderSwitches { get; set; }
 
         bool TransactionPerSession { get; set; }
+        bool AllowBreakingChange { get; set; }
 
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         object ApplicationContext { get; set; }

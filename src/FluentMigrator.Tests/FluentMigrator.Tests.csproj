@@ -202,6 +202,7 @@
     <Compile Include="Integration\Migrations\Tagged\3_NormalTable.cs" />
     <Compile Include="Integration\Migrations\Tagged\4_TenantAandBTable.cs" />
     <Compile Include="Integration\Migrations\Tagged\TenantABaseMigration.cs" />
+    <Compile Include="Integration\Migrations\TestBreakingMigration.cs" />
     <Compile Include="Integration\Migrations\TestEmptyMigration.cs" />
     <Compile Include="Integration\Migrations\TestMigration.cs" />
     <Compile Include="Integration\Migrations\TestSetExistingRowValuesMigration.cs" />

@@ -52,6 +52,7 @@ namespace FluentMigrator.Console
         public bool NoConnection;
         public string WorkingDirectory;
         public bool TransactionPerSession;
+        public bool AllowBreakingChange;
         public string ProviderSwitches;
 
         public RunnerContext RunnerContext { get; private set;}
@@ -187,6 +188,11 @@ namespace FluentMigrator.Console
                                             "transaction-per-session|tps",
                                             "Overrides the transaction behavior of migrations, so that all migrations to be executed will run in one transaction.",
                                             v => { TransactionPerSession = true; }
+                                            },
+                                        {
+                                            "allow-breaking-changes|abc",
+                                            "Allows execution of migrations marked as breaking changes.",
+                                            v => { AllowBreakingChange = true; }
                                             }
                                     };
 
@@ -315,7 +321,8 @@ namespace FluentMigrator.Console
                 ApplicationContext = ApplicationContext,
                 Tags = Tags,
                 TransactionPerSession = TransactionPerSession,
-                ProviderSwitches = ProviderSwitches
+                ProviderSwitches = ProviderSwitches,
+                AllowBreakingChange = AllowBreakingChange
             };
 
             new TaskExecutor(RunnerContext).Execute();
