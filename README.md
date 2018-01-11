@@ -30,7 +30,7 @@ Latest Mono build status: [![Travis CI status](https://travis-ci.org/fluentmigra
 
 ```
 tools\NuGet.exe restore FluentMigrator.sln
-rake nuget:create_nugets
+bundler exec rake nuget:create_nugets
 ```
 
 This will also build the whole solution.
