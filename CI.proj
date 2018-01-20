@@ -4,7 +4,7 @@
   <Target Name="CI" DependsOnTargets="Build" />
 
   <Target Name="Build">
-    <MSBuild Projects="FluentMigrator.sln" Properties="Configuration=Debug;Platform=x86" />
+    <Exec Command="dotnet build src\FluentMigrator.Runner\FluentMigrator.Runner.csproj" />
   </Target>
 
 </Project>
