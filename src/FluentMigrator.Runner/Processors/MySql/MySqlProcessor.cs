@@ -193,7 +193,11 @@ SELECT CONCAT(
   FROM INFORMATION_SCHEMA.COLUMNS
  WHERE TABLE_NAME = '{0}' AND COLUMN_NAME = '{1}'", FormatHelper.FormatSqlEscape(expression.TableName), FormatHelper.FormatSqlEscape(expression.OldName));
 
+#if !NETSTANDARD2_0
             var columnDefinition = Read(columnDefinitionSql).Tables[0].Rows[0].Field<string>(0);
+#else
+            var columnDefinition = (string)Read(columnDefinitionSql).Tables[0].Rows[0].ItemArray[0];
+#endif
 
             Process(Generator.Generate(expression) + columnDefinition);
         }
