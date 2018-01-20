@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net35;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net452;netstandard2.0</TargetFrameworks>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>../FluentMigrator.snk</AssemblyOriginatorKeyFile>
     <Copyright>Copyright - Sean Chambers 2008-2016</Copyright>
@@ -90,8 +90,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="System.Configuration" Condition="'$(TargetFramework)'=='net35'" />
-    <Reference Include="System.Data.DataSetExtensions" Condition="'$(TargetFramework)'=='net35'" />
+    <Reference Include="System.Configuration" Condition="'$(TargetFramework)'=='net452'" />
+    <Reference Include="System.Data.DataSetExtensions" Condition="'$(TargetFramework)'=='net452'" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="4.4.0" Condition="'$(TargetFramework)'=='netstandard2.0'" />
     <PackageReference Include="System.Data.SqlClient" Version="4.1.0" Condition="'$(TargetFramework)'=='netstandard2.0'" />
   </ItemGroup>
