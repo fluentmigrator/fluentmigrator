@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>../FluentMigrator.snk</AssemblyOriginatorKeyFile>
     <Version>1.6.2.0</Version>
     <Copyright>Copyright - Sean Chambers 2008-2016</Copyright>
     <PackageLicenseUrl>https://github.com/fluentmigrator/fluentmigrator/blob/master/LICENSE.txt</PackageLicenseUrl>

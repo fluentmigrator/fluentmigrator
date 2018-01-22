@@ -2,8 +2,6 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0</TargetFrameworks>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>../FluentMigrator.snk</AssemblyOriginatorKeyFile>
     <Copyright>Copyright - Sean Chambers 2008-2016</Copyright>
     <Product>FluentMigrator</Product>
     <Version>1.6.2.0</Version>
@@ -86,7 +84,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj" />
+    <ProjectReference Include="..\FluentMigrator\FluentMigrator.NetStandard.csproj" />
   </ItemGroup>
 
   <ItemGroup>
