@@ -1,12 +1,15 @@
-language: c
-
+language: csharp
+mono: none
+dotnet: 2.0
+solution: FluentMigrator.sln
 install:
-  - sudo sh -c 'echo "deb [arch=amd64] http://apt-mo.trafficmanager.net/repos/dotnet/ trusty main" > /etc/apt/sources.list.d/dotnetdev.list'
-  - sudo apt-key adv --keyserver apt-mo.trafficmanager.net --recv-keys 417A0893
   - sudo apt-get update -qq
-  - sudo apt-get install -y mono-devel mono-gmcs nunit-console libfbembed2.5 dotnet
+  - sudo apt-get install -y nunit-console libfbembed2.5
+  - nuget restore FluentMigrator.sln
 
 script:
+  - dotnet build src/FluentMigrator/FluentMigrator.csproj
+  - dotnet build src/FluentMigrator.Runner/FluentMigrator.Runner.csproj
   - xbuild CI.proj
   - sudo cp /var/lib/firebird/2.5/system/default-security2.fdb /var/lib/firebird/2.5/system/security2.fdb
   - sudo chmod a+rw /var/lib/firebird/2.5/system/security2.fdb
