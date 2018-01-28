@@ -80,11 +80,11 @@
       <Name>FluentMigrator.Console</Name>
     </ProjectReference>
     <ProjectReference Include="..\FluentMigrator.Runner\FluentMigrator.Runner.csproj">
-      <Project>{CB468AD6-60C2-42E9-B3B0-01968EF94C65}</Project>
+      <Project>{cb468ad6-60c2-42e9-b3b0-01968ef94c65}</Project>
       <Name>FluentMigrator.Runner</Name>
     </ProjectReference>
     <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj">
-      <Project>{FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8}</Project>
+      <Project>{fd9410f9-6fea-47f7-a78e-b4f6fb0539b8}</Project>
       <Name>FluentMigrator</Name>
     </ProjectReference>
   </ItemGroup>
