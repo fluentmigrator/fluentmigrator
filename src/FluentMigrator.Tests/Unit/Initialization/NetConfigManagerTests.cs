@@ -19,21 +19,19 @@ namespace FluentMigrator.Tests.Unit.Initialization
         }
 
         [Test]
-        [ExpectedException(ExpectedException = typeof(ArgumentException))]
         public void ThrowsIfNullPath()
         {
             var sut = new NetConfigManager();
 
-            sut.LoadFromFile(null);
+            Assert.Throws<ArgumentException>(() => sut.LoadFromFile(null));
         }
 
         [Test]
-        [ExpectedException(ExpectedException = typeof(ArgumentException))]
         public void ThrowsIfPathDoesNotExist()
         {
             var sut = new NetConfigManager();
 
-            sut.LoadFromFile(GetPath("FileDoesNotExist.config"));
+            Assert.Throws<ArgumentException>(() => sut.LoadFromFile(GetPath("FileDoesNotExist.config")));
         }
 
         [Test]

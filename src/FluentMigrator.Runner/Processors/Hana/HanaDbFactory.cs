@@ -1,4 +1,5 @@
-﻿using System.Data.Common;
+﻿#if !NETSTANDARD2_0
+using System.Data.Common;
 
 namespace FluentMigrator.Runner.Processors.Hana
 {
@@ -10,3 +11,4 @@ namespace FluentMigrator.Runner.Processors.Hana
         }
     }
 }
+#endif

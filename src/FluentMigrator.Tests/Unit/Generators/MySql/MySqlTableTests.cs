@@ -257,11 +257,10 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void CantCreateTableWithDescription()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithTableDescription();
-            Generator.Generate(expression);
+            Assert.Throws<ArgumentException>(() => Generator.Generate(expression));
         }
 
         [Test]

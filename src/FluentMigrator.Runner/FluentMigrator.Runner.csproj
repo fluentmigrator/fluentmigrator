@@ -294,12 +294,6 @@
     <Compile Include="VersionOrderInvalidException.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj">
-      <Project>{FD9410F9-6FEA-47F7-A78E-B4F6FB0539B8}</Project>
-      <Name>FluentMigrator</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\FluentMigrator.snk">
       <Link>FluentMigrator.snk</Link>
     </None>
@@ -377,7 +371,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj">
+      <Project>{fd9410f9-6fea-47f7-a78e-b4f6fb0539b8}</Project>
+      <Name>FluentMigrator</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

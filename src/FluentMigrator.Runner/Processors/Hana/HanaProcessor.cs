@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !NETSTANDARD2_0
+using System;
 using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -192,3 +193,4 @@ namespace FluentMigrator.Runner.Processors.Hana
 
     }
 }
+#endif

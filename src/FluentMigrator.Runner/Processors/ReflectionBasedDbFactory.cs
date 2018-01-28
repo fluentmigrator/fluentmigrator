@@ -2,6 +2,7 @@ namespace FluentMigrator.Runner.Processors
 {
     using System;
     using System.Data.Common;
+    using System.Linq;
 
     public class ReflectionBasedDbFactory : DbFactoryBase
     {
@@ -16,7 +17,12 @@ namespace FluentMigrator.Runner.Processors
 
         protected override DbProviderFactory CreateFactory()
         {
+#if NETSTANDARD2_0
+            var factoryType = AppDomain.CurrentDomain.GetAssemblies().Where(a => a.FullName == assemblyName).First().GetType(dbProviderFactoryTypeName);
+            return (DbProviderFactory)Activator.CreateInstance(factoryType);
+#else
             return (DbProviderFactory)AppDomain.CurrentDomain.CreateInstanceAndUnwrap(assemblyName, dbProviderFactoryTypeName);
+#endif
         }
     }
 }
