@@ -182,7 +182,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
 
             tableExists.ShouldBeFalse();
 
-            Assert.That(output.ToString(), Is.StringContaining(@"/* Performing DB Operation */"));
+            Assert.That(output.ToString(), Does.Contain(@"/* Performing DB Operation */"));
         }
     }
 }

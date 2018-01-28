@@ -79,7 +79,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             tableExists.ShouldBeFalse();
 
             var fmOutput = output.ToString();
-            Assert.That(fmOutput, Is.StringContaining("/* Performing DB Operation */"));
+            Assert.That(fmOutput, Does.Contain("/* Performing DB Operation */"));
         }
     }
 }

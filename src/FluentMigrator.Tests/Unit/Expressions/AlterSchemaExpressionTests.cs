@@ -77,10 +77,9 @@ namespace FluentMigrator.Tests.Unit.Expressions
         }
 
         [Test]
-        [ExpectedException(typeof(NotSupportedException))]
         public void ReverseThrowsException()
         {
-            new AlterSchemaExpression().Reverse();
+            Assert.Throws<NotSupportedException>(() => new AlterSchemaExpression().Reverse());
         }
 
         [Test]

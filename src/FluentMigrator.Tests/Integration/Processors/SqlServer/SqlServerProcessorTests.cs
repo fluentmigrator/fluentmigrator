@@ -99,7 +99,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
             tableExists.ShouldBeFalse();
 
             string fmOutput = output.ToString();
-            Assert.That(fmOutput, Is.StringContaining("/* Performing DB Operation */"));
+            Assert.That(fmOutput, Does.Contain("/* Performing DB Operation */"));
         }
     }
 }

@@ -219,8 +219,7 @@ namespace FluentMigrator.Tests.Unit
             _processorMock.Setup(x => x.Process(It.IsAny<CreateTableExpression>())).Throws(new Exception("Oops"));
 
             var exception = Assert.Throws<Exception>(() => _runner.Up(new TestMigration()));
-            
-            Assert.That(exception.Message, Is.StringContaining("Oops"));
+            Assert.That(exception.Message, Does.Contain("Oops"));
         }
 
         [Test]
