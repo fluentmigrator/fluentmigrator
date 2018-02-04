@@ -1,4 +1,5 @@
-﻿using System;
+﻿#if !NETSTANDARD2_0
+using System;
 using System.Data;
 using System.Data.OleDb;
 using FluentMigrator.Builders.Execute;
@@ -220,3 +221,4 @@ namespace FluentMigrator.Runner.Processors.Jet
         }
     }
 }
+#endif
