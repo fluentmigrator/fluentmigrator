@@ -5,7 +5,7 @@
     <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
     <AssemblyName>FluentMigrator.Runner</AssemblyName>
     <RootNamespace>FluentMigrator.Runner</RootNamespace>
-    <SignAssembly>true</SignAssembly>
+    <SignAssembly>false</SignAssembly>
     <AssemblyOriginatorKeyFile>../FluentMigrator.snk</AssemblyOriginatorKeyFile>
     <Copyright>Copyright - Sean Chambers 2008-2016</Copyright>
     <Product>FluentMigrator</Product>
