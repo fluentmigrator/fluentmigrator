@@ -22,19 +22,15 @@ Latest Mono build status: [![Travis CI status](https://travis-ci.org/fluentmigra
 
 ### Prerequisites
 
-* Ruby 2.2.4
-
-Gems:
-
-* Rake 10.5.0
-* albacore
-* version_bumper
+* Ruby 2.2.6, 2.3.3 or 2.4.x
+* Install bundler: gem install bundler
+* Install build requirements when you are in the root directory of the source: bundler install
 
 ### Creating the nuget packages
 
 ```
 tools\NuGet.exe restore FluentMigrator.sln
-rake nuget:create_nugets
+bundler exec rake nuget:create_nugets
 ```
 
 This will also build the whole solution.
