@@ -463,6 +463,40 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
                                                 )));
         }
 
+        [Test]
+        public void CallingForeignKeyWithCustomSchemaAddsNewForeignKeyExpressionToContext()
+        {
+            var collectionMock = new Mock<ICollection<IMigrationExpression>>();
+
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.Setup(x => x.Expressions).Returns(collectionMock.Object);
+
+            var columnMock = new Mock<ColumnDefinition>();
+            columnMock.SetupGet(x => x.Name).Returns("BaconId");
+
+            var expressionMock = new Mock<CreateColumnExpression>();
+            expressionMock.SetupGet(x => x.SchemaName).Returns("FooSchema");
+            expressionMock.SetupGet(x => x.TableName).Returns("Bacon");
+            expressionMock.SetupGet(x => x.Column).Returns(columnMock.Object);
+
+            var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
+
+            builder.ForeignKey("fk_foo", "BarSchema", "BarTable", "BarColumn");
+
+            contextMock.VerifyGet(x => x.Expressions);
+            collectionMock.Verify(x => x.Add(It.Is<CreateForeignKeyExpression>(
+                fk => fk.ForeignKey.Name == "fk_foo" &&
+                        fk.ForeignKey.PrimaryTableSchema == "BarSchema" &&
+                        fk.ForeignKey.PrimaryTable == "BarTable" &&
+                        fk.ForeignKey.PrimaryColumns.Contains("BarColumn") &&
+                        fk.ForeignKey.PrimaryColumns.Count == 1 &&
+                        fk.ForeignKey.ForeignTableSchema == "FooSchema" &&
+                        fk.ForeignKey.ForeignTable == "Bacon" &&
+                        fk.ForeignKey.ForeignColumns.Contains("BaconId") &&
+                        fk.ForeignKey.ForeignColumns.Count == 1
+                                                )));
+        }
+
         [TestCase(Rule.Cascade), TestCase(Rule.SetDefault), TestCase(Rule.SetNull), TestCase(Rule.None)]
         public void CallingOnUpdateSetsOnUpdateOnForeignKeyExpression(Rule rule) 
         {
