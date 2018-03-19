@@ -1,4 +1,5 @@
-﻿namespace FluentMigrator.Runner.Processors.Jet
+﻿#if !NETSTANDARD2_0
+namespace FluentMigrator.Runner.Processors.Jet
 {
     using System.Data.OleDb;
     using Generators.Jet;
@@ -12,3 +13,4 @@
         }
     }
 }
+#endif
