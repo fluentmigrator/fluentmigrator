@@ -1,8 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2012
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Runner", "src\FluentMigrator.Runner\FluentMigrator.Runner.csproj", "{CB468AD6-60C2-42E9-B3B0-01968EF94C65}"
 EndProject
@@ -28,6 +27,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.SchemaDump", "src\FluentMigrator.SchemaDump\FluentMigrator.SchemaDump.csproj", "{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Contrib", "Contrib", "{20A56FA9-113F-4875-A67F-5FEBA0D2BB30}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "T4", "T4", "{5E55AFE0-3E32-439B-BAD4-A4F02699968B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.T4", "src\FluentMigrator.T4\FluentMigrator.T4.csproj", "{B08E4C78-29DD-4367-8A84-35CD76971D73}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.T4.Tests", "src\FluentMigrator.T4.Tests\FluentMigrator.T4.Tests.csproj", "{A68E6543-6DB8-4AFF-A9B1-0F928B34EAA9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -111,9 +118,28 @@ Global
 		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}.Debug|x86.Build.0 = Debug|Any CPU
 		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}.Release|Any CPU.Build.0 = Release|Any CPU
 		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413}.Release|x86.ActiveCfg = Release|Any CPU
+		{B08E4C78-29DD-4367-8A84-35CD76971D73}.AutomatedRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{B08E4C78-29DD-4367-8A84-35CD76971D73}.AutomatedRelease|Any CPU.Build.0 = Release|Any CPU
+		{B08E4C78-29DD-4367-8A84-35CD76971D73}.AutomatedRelease|x86.ActiveCfg = Release|Any CPU
+		{B08E4C78-29DD-4367-8A84-35CD76971D73}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B08E4C78-29DD-4367-8A84-35CD76971D73}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B08E4C78-29DD-4367-8A84-35CD76971D73}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B08E4C78-29DD-4367-8A84-35CD76971D73}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B08E4C78-29DD-4367-8A84-35CD76971D73}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B08E4C78-29DD-4367-8A84-35CD76971D73}.Release|x86.ActiveCfg = Release|Any CPU
+		{A68E6543-6DB8-4AFF-A9B1-0F928B34EAA9}.AutomatedRelease|Any CPU.ActiveCfg = Release|Any CPU
+		{A68E6543-6DB8-4AFF-A9B1-0F928B34EAA9}.AutomatedRelease|Any CPU.Build.0 = Release|Any CPU
+		{A68E6543-6DB8-4AFF-A9B1-0F928B34EAA9}.AutomatedRelease|x86.ActiveCfg = Release|Any CPU
+		{A68E6543-6DB8-4AFF-A9B1-0F928B34EAA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A68E6543-6DB8-4AFF-A9B1-0F928B34EAA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A68E6543-6DB8-4AFF-A9B1-0F928B34EAA9}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{A68E6543-6DB8-4AFF-A9B1-0F928B34EAA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A68E6543-6DB8-4AFF-A9B1-0F928B34EAA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A68E6543-6DB8-4AFF-A9B1-0F928B34EAA9}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -126,5 +152,8 @@ Global
 		{C2B629E5-9394-48DA-A9E8-4999B398F37E} = {CB10ADAF-FB42-457B-ADFE-7CF866C5DA6E}
 		{97849F97-BD7D-453B-B0CF-6CD922BB1596} = {CB10ADAF-FB42-457B-ADFE-7CF866C5DA6E}
 		{F81E3EAB-CD44-4B55-A0EC-16F05CB45413} = {CB10ADAF-FB42-457B-ADFE-7CF866C5DA6E}
+		{5E55AFE0-3E32-439B-BAD4-A4F02699968B} = {20A56FA9-113F-4875-A67F-5FEBA0D2BB30}
+		{B08E4C78-29DD-4367-8A84-35CD76971D73} = {5E55AFE0-3E32-439B-BAD4-A4F02699968B}
+		{A68E6543-6DB8-4AFF-A9B1-0F928B34EAA9} = {5E55AFE0-3E32-439B-BAD4-A4F02699968B}
 	EndGlobalSection
 EndGlobal

@@ -385,7 +385,9 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
 
             var builder = new CreateColumnExpressionBuilder(expressionMock.Object, contextMock.Object);
 
+#pragma warning disable 618 // Disable is obsolete warning in unit tests
             builder.References("fk_foo", "FooTable", new[] { "BarColumn" });
+#pragma warning restore 618 // Disable is obsolete warning in unit tests
 
             collectionMock.Verify(x => x.Add(It.Is<CreateForeignKeyExpression>(
                 fk => fk.ForeignKey.Name == "fk_foo" &&
