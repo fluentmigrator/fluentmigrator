@@ -18,12 +18,9 @@
 
 #endregion
 
-using FluentMigrator.Infrastructure;
-
 namespace FluentMigrator.Builders.Delete.Constraint
 {
-    public interface IDeleteConstraintOnTableSyntax : IFluentSyntax
+    public interface IDeleteConstraintColumnOrInSchemaSyntax : IDeleteConstraintColumnSyntax, IDeleteConstraintInSchemaSyntax
     {
-        IDeleteConstraintColumnOrInSchemaSyntax FromTable(string tableName);
     }
 }

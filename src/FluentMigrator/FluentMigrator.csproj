@@ -123,6 +123,9 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="Builders\Delete\Constraint\IDeleteConstraintInSchemaSyntax.cs" />
+    <Compile Include="Builders\Delete\Constraint\IDeleteConstraintColumnOrInSchemaSyntax.cs" />
+    <Compile Include="Builders\Delete\Constraint\IDeleteConstraintColumnSyntax.cs" />
     <Compile Include="MigrationStage.cs" />
     <Compile Include="MaintenanceAttribute.cs" />
     <Compile Include="Builders\Alter\AlterExpressionRoot.cs" />

@@ -62,6 +62,12 @@ namespace FluentMigrator.Builders.Delete
         /// <returns></returns>
         IDeleteConstraintOnTableSyntax UniqueConstraint(string constraintName);
 
+        /// <summary>
+        /// Deletes a named Unique Constraint From a table based on the naming convention in effect
+        /// </summary>
+        /// <returns></returns>
+        IDeleteConstraintOnTableSyntax UniqueConstraint();
+
         IDeleteDefaultConstraintOnTableSyntax DefaultConstraint();
     }
 }
