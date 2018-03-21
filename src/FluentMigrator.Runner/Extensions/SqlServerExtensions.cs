@@ -52,6 +52,26 @@ namespace FluentMigrator.Runner.Extensions
             int seed, int increment) where TNext : IFluentSyntax where TNextFk : IFluentSyntax
         {
             ISupportAdditionalFeatures castColumn = GetColumn(expression);
+            return SetIdentity(expression, seed, increment, castColumn);
+        }
+
+        /// <summary>
+        /// Makes a column an Identity column using the specified seed and increment values with bigint support.
+        /// </summary>
+        /// <param name="expression">Column on which to apply the identity.</param>
+        /// <param name="seed">Starting value of the identity.</param>
+        /// <param name="increment">Increment value of the identity.</param>
+        /// <returns></returns>
+        public static TNext Identity<TNext, TNextFk>(this IColumnOptionSyntax<TNext, TNextFk> expression,
+            long seed, int increment) where TNext : IFluentSyntax where TNextFk : IFluentSyntax
+        {
+            ISupportAdditionalFeatures castColumn = GetColumn(expression);
+            return SetIdentity(expression, seed, increment, castColumn);
+        }
+
+        private static TNext SetIdentity<TNext, TNextFk>(IColumnOptionSyntax<TNext, TNextFk> expression, object seed, int increment,
+            ISupportAdditionalFeatures castColumn) where TNext : IFluentSyntax where TNextFk : IFluentSyntax
+        {
             castColumn.AddAdditionalFeature(IdentitySeed, seed);
             castColumn.AddAdditionalFeature(IdentityIncrement, increment);
             return expression.Identity();
