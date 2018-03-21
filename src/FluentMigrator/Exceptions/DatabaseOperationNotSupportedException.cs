@@ -17,11 +17,9 @@
 #endregion
 
 using System;
-using System.Runtime.Serialization;
 
 namespace FluentMigrator.Exceptions
 {
-    [Serializable]
     public class DatabaseOperationNotSupportedException : FluentMigratorException
     {
         public DatabaseOperationNotSupportedException()
@@ -34,11 +32,6 @@ namespace FluentMigrator.Exceptions
 
         public DatabaseOperationNotSupportedException(string message, Exception innerException)
             : base(message, innerException)
-        {
-        }
-
-        public DatabaseOperationNotSupportedException(SerializationInfo info, StreamingContext context)
-            : base(info, context)
         {
         }
     }

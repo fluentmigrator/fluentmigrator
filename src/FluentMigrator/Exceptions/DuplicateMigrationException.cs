@@ -17,11 +17,9 @@
 #endregion
 
 using System;
-using System.Runtime.Serialization;
 
 namespace FluentMigrator.Exceptions
 {
-    [Serializable]
     public class DuplicateMigrationException : FluentMigratorException
     {
         public DuplicateMigrationException()
@@ -33,10 +31,6 @@ namespace FluentMigrator.Exceptions
         }
 
         public DuplicateMigrationException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        public DuplicateMigrationException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }

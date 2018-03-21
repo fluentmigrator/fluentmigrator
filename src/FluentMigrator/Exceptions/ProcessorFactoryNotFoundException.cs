@@ -17,11 +17,9 @@
 #endregion
 
 using System;
-using System.Runtime.Serialization;
 
 namespace FluentMigrator.Exceptions
 {
-    [Serializable]
     public class ProcessorFactoryNotFoundException : FluentMigratorException
     {
         public ProcessorFactoryNotFoundException()
@@ -34,10 +32,6 @@ namespace FluentMigrator.Exceptions
 
         public ProcessorFactoryNotFoundException(string message, Exception innerException)
             : base(message, innerException)
-        {
-        }
-
-        public ProcessorFactoryNotFoundException(SerializationInfo info, StreamingContext context) : base(info, context)
         {
         }
     }
