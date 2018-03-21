@@ -29,19 +29,19 @@ namespace FluentMigrator.Runner
         public IMigration VersionUniqueMigration { get; private set; }
         public IMigration VersionDescriptionMigration { get; private set; }
 
-        public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions)
-          : this(runner, new SingleAssembly(assembly), conventions)
+        public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions, IVersionTableMetaData versionTableMetaData = null)
+          : this(runner, new SingleAssembly(assembly), conventions, versionTableMetaData)
         {
         }
 
-        public VersionLoader(IMigrationRunner runner, IAssemblyCollection assemblies, IMigrationConventions conventions)
+        public VersionLoader(IMigrationRunner runner, IAssemblyCollection assemblies, IMigrationConventions conventions, IVersionTableMetaData versionTableMetaData = null)
         {
             Runner = runner;
             Processor = runner.Processor;
             Assemblies = assemblies;
 
             Conventions = conventions;
-            VersionTableMetaData = GetVersionTableMetaData();
+            VersionTableMetaData = versionTableMetaData ?? GetVersionTableMetaData();
             VersionMigration = new VersionMigration(VersionTableMetaData);
             VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
             VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);

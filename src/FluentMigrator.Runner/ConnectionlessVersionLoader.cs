@@ -13,7 +13,7 @@ namespace FluentMigrator.Runner
     {
         private bool _versionsLoaded;
 
-        public ConnectionlessVersionLoader(IMigrationRunner runner, IAssemblyCollection assemblies, IMigrationConventions conventions, long startVersion, long targetVersion)
+        public ConnectionlessVersionLoader(IMigrationRunner runner, IAssemblyCollection assemblies, IMigrationConventions conventions, long startVersion, long targetVersion, IVersionTableMetaData versionTableMetaData = null)
         {
             Runner = runner;
             Assemblies = assemblies;
@@ -24,7 +24,7 @@ namespace FluentMigrator.Runner
             Processor = Runner.Processor;
 
             VersionInfo = new VersionInfo();
-            VersionTableMetaData = GetVersionTableMetaData();
+            VersionTableMetaData = versionTableMetaData ?? GetVersionTableMetaData();
             VersionMigration = new VersionMigration(VersionTableMetaData);
             VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
             VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
