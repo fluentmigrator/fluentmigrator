@@ -302,9 +302,16 @@ namespace FluentMigrator.Runner.Generators.Generic
             List<string> updateItems = new List<string>();
             List<string> whereClauses = new List<string>();
 
-            foreach (var item in expression.Set)
+            if (expression.IsFromColumn)
             {
-                updateItems.Add(string.Format("{0} = {1}", Quoter.QuoteColumnName(item.Key), Quoter.QuoteValue(item.Value)));
+                updateItems.Add(string.Format("{0} = {1}", Quoter.QuoteColumnName(expression.ColumnName), Quoter.QuoteColumnName(expression.FromColumnName)));
+            }
+            else
+            {
+                foreach (var item in expression.Set)
+                {
+                    updateItems.Add(string.Format("{0} = {1}", Quoter.QuoteColumnName(item.Key), Quoter.QuoteValue(item.Value)));
+                }
             }
 
             if(expression.IsAllRows)

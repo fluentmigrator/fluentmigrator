@@ -123,6 +123,8 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="Builders\Update\Column\IUpdateColumnFromSyntax.cs" />
+    <Compile Include="Builders\Update\Column\IUpdateColumnOnTableSyntax.cs" />
     <Compile Include="MigrationStage.cs" />
     <Compile Include="MaintenanceAttribute.cs" />
     <Compile Include="Builders\Alter\AlterExpressionRoot.cs" />
