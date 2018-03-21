@@ -55,6 +55,14 @@ namespace FluentMigrator.Infrastructure
             return false;
         }
 
+        public bool IsBreakingChange
+        {
+            get
+            {
+                return false;
+            }
+        }
+
         public string GetName()
         {
             return string.Format("{0}", Migration.GetType().Name);

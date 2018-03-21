@@ -26,6 +26,7 @@ namespace FluentMigrator.Infrastructure
         IMigration Migration { get; }
         object Trait(string name);
         bool HasTrait(string name);
+        bool IsBreakingChange { get; }
         string GetName();
     }
 }

@@ -102,7 +102,7 @@ namespace FluentMigrator.Infrastructure
         {
             var migrationAttribute = migrationType.GetOneAttribute<MigrationAttribute>();
             Func<IMigration> migrationFunc = () => (IMigration)migrationType.Assembly.CreateInstance(migrationType.FullName);
-            var migrationInfo = new MigrationInfo(migrationAttribute.Version, migrationAttribute.Description, migrationAttribute.TransactionBehavior, migrationFunc);
+            var migrationInfo = new MigrationInfo(migrationAttribute.Version, migrationAttribute.Description, migrationAttribute.TransactionBehavior, migrationAttribute.BreakingChange, migrationFunc);
 
             foreach (MigrationTraitAttribute traitAttribute in migrationType.GetAllAttributes<MigrationTraitAttribute>())
                 migrationInfo.AddTrait(traitAttribute.Name, traitAttribute.Value);

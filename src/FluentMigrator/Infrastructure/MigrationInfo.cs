@@ -25,13 +25,14 @@ namespace FluentMigrator.Infrastructure
     {
         private readonly Dictionary<string, object> _traits = new Dictionary<string, object>();
         private LazyLoader<IMigration> _lazyMigration;
+        private readonly bool _isBreakingChange;
 
-        public MigrationInfo(long version, TransactionBehavior transactionBehavior, IMigration migration)
-            : this(version, null, transactionBehavior, () => migration)
+        public MigrationInfo(long version, TransactionBehavior transactionBehavior, bool isBreakingChange, IMigration migration)
+            : this(version, null, transactionBehavior, isBreakingChange, () => migration)
         {
         }
 
-        public MigrationInfo(long version, string description, TransactionBehavior transactionBehavior, Func<IMigration> migrationFunc)
+        public MigrationInfo(long version, string description, TransactionBehavior transactionBehavior, bool isBreakingChange, Func<IMigration> migrationFunc)
         {
             if (migrationFunc == null) throw new ArgumentNullException("migrationFunc");
 
@@ -39,6 +40,7 @@ namespace FluentMigrator.Infrastructure
             Description = description;
             TransactionBehavior = transactionBehavior;
             _lazyMigration = new LazyLoader<IMigration>(migrationFunc);
+            _isBreakingChange = isBreakingChange;
         }
 
         public long Version { get; private set; }
@@ -60,6 +62,11 @@ namespace FluentMigrator.Infrastructure
         public bool HasTrait(string name)
         {
             return _traits.ContainsKey(name);
+        }
+
+        public bool IsBreakingChange
+        {
+            get { return _isBreakingChange; }
         }
 
         public string GetName()
