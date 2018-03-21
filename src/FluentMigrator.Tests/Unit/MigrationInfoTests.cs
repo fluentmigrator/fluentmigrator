@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Unit
         [SetUp]
         public void Setup()
         {
-            _expectedVersion = new Random().Next();
+            _expectedVersion = 300;
             _migration = Mock.Of<IMigration>();
         }
 
@@ -99,6 +99,50 @@ namespace FluentMigrator.Tests.Unit
             const string value = "bar";
             migrationinfo.AddTrait("foo", value);
             migrationinfo.Trait("foo").ShouldBeSameAs(value);
+        }
+
+        [Test]
+        public void ConstructingShouldGateInstantiated()
+        {
+            MigrationInfo migrationinfo = Create();
+
+            migrationinfo.Gate.ShouldNotBeNull();
+        }
+
+        [Test]
+        public void GateShouldBeFilled()
+        {
+            MigrationInfo migrationinfo = Create();
+            migrationinfo.Gate.SetGate(new DateTime(), new DateTime());
+
+            migrationinfo.Gate.Start.HasValue.ShouldBeTrue();
+            migrationinfo.Gate.End.HasValue.ShouldBeTrue();
+        }
+
+        [Test]
+        public void GateShouldBeOpened()
+        {
+            MigrationInfo migrationinfo = Create();
+            migrationinfo.Gate.SetGate(DateTime.Now.AddDays(-1), DateTime.Now.AddDays(1));
+
+            migrationinfo.Gate.IsOpen.ShouldBeTrue();
+        }
+
+        [Test]
+        public void GateShouldBeInGetName()
+        {
+            MigrationInfo migrationinfo = Create();
+            migrationinfo.Gate.SetGate(DateTime.Now.AddDays(-1), DateTime.Now.AddDays(1));
+
+            Assert.That(migrationinfo.GetName(), Is.StringContaining("300: IMigrationProxy [Gate"));
+        }
+
+        [Test]
+        public void GateShouldBeNotInGetName()
+        {
+            MigrationInfo migrationinfo = Create();
+
+            migrationinfo.GetName().ShouldBe("300: IMigrationProxy");
         }
     }
 }

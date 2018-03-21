@@ -319,7 +319,7 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        public void RollbackToVersionShouldShouldLimitMigrationsToNamespace()
+        public void RollbackToVersionShouldLimitMigrationsToNamespace()
         {
             const long fakeMigration1 = 2011010101;
             const long fakeMigration2 = 2011010102;

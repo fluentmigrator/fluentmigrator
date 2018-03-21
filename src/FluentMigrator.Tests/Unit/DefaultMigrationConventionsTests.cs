@@ -16,8 +16,7 @@
 //
 #endregion
 
-using System.IO;
-using System.Reflection;
+using System;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using NUnit.Framework;
@@ -157,6 +156,66 @@ namespace FluentMigrator.Tests.Unit
 
             defaultWorkingDirectory.ShouldNotBeNull();
             defaultWorkingDirectory.Contains("bin").ShouldBeTrue();
+        }
+
+        [Test]
+        public void MigrationInfoShouldExtractStartGate() {
+            var migrationType = typeof(MigrationWithGateAttributeFake);
+            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migrationType);
+
+            migrationinfo.Gate.ShouldNotBeNull();
+            migrationinfo.Gate.Start.HasValue.ShouldBeTrue();
+            migrationinfo.Gate.Start.ShouldBe(new DateTime(2017, 04, 11, 1, 10, 10));
+        }
+
+        [Test]
+        public void MigrationInfoShouldExtractEndGate() {
+            var migrationType = typeof(MigrationWithGateAttributeFake);
+            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migrationType);
+
+            migrationinfo.Gate.ShouldNotBeNull();
+            migrationinfo.Gate.End.HasValue.ShouldBeTrue();
+            migrationinfo.Gate.End.ShouldBe(new DateTime(2017, 04, 11, 2, 10, 10));
+        }
+
+        [Test]
+        public void MigrationInfoShouldExtractStartGateWithZerosForHourMinuteSecond() {
+            var migrationType = typeof(MigrationWithGateAttributeWithOutHourMinuteSecondFake);
+            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migrationType);
+
+            migrationinfo.Gate.ShouldNotBeNull();
+            migrationinfo.Gate.Start.HasValue.ShouldBeTrue();
+            migrationinfo.Gate.Start.ShouldBe(new DateTime(2017, 04, 20, 0, 0, 0));
+        }
+
+        [Test]
+        public void MigrationInfoShouldExtractEndGateWithLastTimeOfTheDay() {
+            var migrationType = typeof(MigrationWithGateAttributeWithOutHourMinuteSecondFake);
+            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migrationType);
+
+            migrationinfo.Gate.ShouldNotBeNull();
+            migrationinfo.Gate.End.HasValue.ShouldBeTrue();
+            migrationinfo.Gate.End.ShouldBe(new DateTime(2017, 04, 20, 23, 59, 59));
+        }
+
+        [Test]
+        public void MigrationInfoShouldExtractStartGateWhenHaveOnlyStart() {
+            var migrationType = typeof(MigrationWithGateAttributeWithOutEndGateFake);
+            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migrationType);
+
+            migrationinfo.Gate.ShouldNotBeNull();
+            migrationinfo.Gate.Start.HasValue.ShouldBeTrue();
+            migrationinfo.Gate.End.HasValue.ShouldBeFalse();
+        }
+
+        [Test]
+        public void MigrationInfoShouldExtractEndGateWhenHaveOnlyEnd() {
+            var migrationType = typeof(MigrationWithGateAttributeWithOutStartGateFake);
+            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migrationType);
+
+            migrationinfo.Gate.ShouldNotBeNull();
+            migrationinfo.Gate.End.HasValue.ShouldBeTrue(); 
+            migrationinfo.Gate.Start.HasValue.ShouldBeFalse();
         }
 
         [Test]
@@ -451,4 +510,37 @@ namespace FluentMigrator.Tests.Unit
         public override void Down() { }
     }
 
+    [StartGate(2017, 04, 11, 1, 10, 10)]
+    [EndGate(2017, 04, 11, 2, 10, 10)]
+    [Migration(456)]
+    internal class MigrationWithGateAttributeFake : Migration
+    {
+        public override void Up() { }
+        public override void Down() { }
+    }
+
+    [StartGate(2017, 04, 20)]
+    [EndGate(2017, 04, 20)]
+    [Migration(789)]
+    internal class MigrationWithGateAttributeWithOutHourMinuteSecondFake : Migration
+    {
+        public override void Up() { }
+        public override void Down() { }
+    }
+
+    [StartGate(2017, 04, 21)]
+    [Migration(789)]
+    internal class MigrationWithGateAttributeWithOutEndGateFake : Migration
+    {
+        public override void Up() { }
+        public override void Down() { }
+    }
+
+    [EndGate(2017, 04, 22)]
+    [Migration(789)]
+    internal class MigrationWithGateAttributeWithOutStartGateFake : Migration
+    {
+        public override void Up() { }
+        public override void Down() { }
+    }
 }

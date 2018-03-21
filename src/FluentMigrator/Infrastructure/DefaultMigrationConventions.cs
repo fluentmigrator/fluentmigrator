@@ -101,8 +101,13 @@ namespace FluentMigrator.Infrastructure
         public static IMigrationInfo GetMigrationInfoFor(Type migrationType)
         {
             var migrationAttribute = migrationType.GetOneAttribute<MigrationAttribute>();
+            var startGateAttribute = migrationType.GetOneAttribute<StartGateAttribute>();
+            var endGateAttribute = migrationType.GetOneAttribute<EndGateAttribute>();
+
             Func<IMigration> migrationFunc = () => (IMigration)migrationType.Assembly.CreateInstance(migrationType.FullName);
             var migrationInfo = new MigrationInfo(migrationAttribute.Version, migrationAttribute.Description, migrationAttribute.TransactionBehavior, migrationFunc);
+            migrationInfo.Gate.SetGate(startGateAttribute == null ? null : startGateAttribute.DateTime,
+                                       endGateAttribute == null ? null : endGateAttribute.DateTime);
 
             foreach (MigrationTraitAttribute traitAttribute in migrationType.GetAllAttributes<MigrationTraitAttribute>())
                 migrationInfo.AddTrait(traitAttribute.Name, traitAttribute.Value);
