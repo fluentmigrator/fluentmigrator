@@ -142,6 +142,7 @@
     <Compile Include="Generators\Hana\HanaGenerator.cs" />
     <Compile Include="Generators\Hana\HanaQuoter.cs" />
     <Compile Include="Generators\Hana\HanaTypeMap.cs" />
+    <Compile Include="Generators\SqlServer\SqlServer2016Generator.cs" />
     <Compile Include="Generators\SqlServer\SqlServerCeColumn.cs" />
     <Compile Include="MaintenanceLoader.cs" />
     <Compile Include="IMaintenanceLoader.cs" />
@@ -265,6 +266,7 @@
     <Compile Include="Processors\SqlServer\SqlServer2000Processor.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2012ProcessorFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServer2014ProcessorFactory.cs" />
+    <Compile Include="Processors\SqlServer\SqlServer2016ProcessorFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServerCeDbFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServerDbFactory.cs" />
     <Compile Include="Processors\SqlServer\SqlServerCeProcessor.cs" />
