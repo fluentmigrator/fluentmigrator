@@ -102,7 +102,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             EnsureConnectionIsOpen();
 
             var ds = new DataSet();
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
             {
                 var adapter = Factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
@@ -114,7 +114,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -148,11 +148,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         private void ExecuteNonQuery(string sql)
         {
-            using (var command = Factory.CreateCommand(sql, Connection, Transaction))
+            using (var command = Factory.CreateCommand(sql, Connection, Transaction, Options))
             {
                 try
                 {
-                    command.CommandTimeout = Options.Timeout;
                     command.ExecuteNonQuery();
                 }
                 catch (Exception ex)
@@ -174,7 +173,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             sql += "\nGO";   // make sure last batch is executed.
             string sqlBatch = string.Empty;
 
-            using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction))
+            using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
             {
                 try
                 {

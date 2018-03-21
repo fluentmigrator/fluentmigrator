@@ -9,12 +9,14 @@
     using FluentMigrator.Runner.Generators.DB2;
     using FluentMigrator.Runner.Processors;
     using FluentMigrator.Runner.Processors.DB2;
+    using Unit;
 
     public class Db2TestTable : IDisposable
     {
         #region Fields
 
         private readonly Db2Quoter quoter = new Db2Quoter();
+        private IMigrationProcessorOptions Options { get; set; }
 
         private List<string> constraints = new List<string>();
         private string _schema;
@@ -25,6 +27,7 @@
 
         public Db2TestTable(Db2Processor processor, string schema, params string[] columnDefinitions)
         {
+            Options = new TestMigrationProcessorOptions();
             Connection = processor.Connection;
             Transaction = processor.Transaction;
             Processor = processor;
@@ -105,7 +108,7 @@
             var columns = string.Join(", ", columnDefinitions);
             sb.AppendFormat("CREATE TABLE {0} ({1})", NameWithSchema, columns);
 
-            using (var command = Factory.CreateCommand(sb.ToString(), Connection, Transaction))
+            using (var command = Factory.CreateCommand(sb.ToString(), Connection, Transaction, Options))
             {
                 command.ExecuteNonQuery();
             }
@@ -120,7 +123,7 @@
         {
             var tableCommand = string.Format("DROP TABLE {0}", NameWithSchema);
 
-            using (var command = Factory.CreateCommand(tableCommand, Connection, Transaction))
+            using (var command = Factory.CreateCommand(tableCommand, Connection, Transaction, Options))
             {
                 command.ExecuteNonQuery();
             }
@@ -129,7 +132,7 @@
             {
                 var schemaCommand = string.Format("DROP SCHEMA {0} RESTRICT", quoter.QuoteSchemaName(_schema));
 
-                using (var commandToo = Factory.CreateCommand(schemaCommand, Connection, Transaction))
+                using (var commandToo = Factory.CreateCommand(schemaCommand, Connection, Transaction, Options))
                 {
                     commandToo.ExecuteNonQuery();
                 }
@@ -144,7 +147,7 @@
                 quoter.QuoteColumnName(column)
                 );
 
-            using (var command = Factory.CreateCommand(query, Connection, Transaction))
+            using (var command = Factory.CreateCommand(query, Connection, Transaction, Options))
             {
                 command.ExecuteNonQuery();
             }
@@ -160,7 +163,7 @@
                 quoter.QuoteColumnName(column)
             );
 
-            using (var command = Factory.CreateCommand(query, Connection, Transaction))
+            using (var command = Factory.CreateCommand(query, Connection, Transaction, Options))
             {
                 command.ExecuteNonQuery();
             }

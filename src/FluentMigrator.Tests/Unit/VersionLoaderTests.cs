@@ -17,7 +17,7 @@ namespace FluentMigrator.Tests.Unit
             get { return false; }
         }
 
-        public int Timeout
+        public int? Timeout
         {
             get { return 30; }
         }

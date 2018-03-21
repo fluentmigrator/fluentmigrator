@@ -94,7 +94,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -111,7 +111,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             EnsureConnectionIsOpen();
 
             var ds = new DataSet();
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
             {
                 var adapter = Factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
@@ -128,14 +128,13 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand("", Connection, Transaction))
+            using (var command = Factory.CreateCommand("", Connection, Transaction, Options))
             {
                 foreach (string statement in SplitIntoSingleStatements(sql))
                 {
                     try
                     {
                         command.CommandText = statement;
-                        command.CommandTimeout = 0; // SQL Server CE does not support non-zero command timeout values!! :/
                         command.ExecuteNonQuery();
                     }
                     catch (Exception ex)

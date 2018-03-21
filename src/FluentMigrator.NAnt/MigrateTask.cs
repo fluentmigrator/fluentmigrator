@@ -68,7 +68,7 @@ namespace FluentMigrator.NAnt
         public string Tags { get; set; }
 
         [TaskAttribute("timeout")]
-        public int Timeout { get; set; }
+        public int? Timeout { get; set; }
 
         [TaskAttribute("output")]
         public bool Output { get; set; }

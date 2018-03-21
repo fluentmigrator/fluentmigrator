@@ -12,20 +12,23 @@ using FluentMigrator.Tests.Helpers;
 
 using NUnit.Framework;
 using NUnit.Should;
+using FluentMigrator.Tests.Unit;
 
 namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 	[Category("Integration")]
 	public abstract class OracleProcessorTestsBase
 	{
 		private const string SchemaName = "test";
-		private IDbConnection Connection { get; set; }
+        private IMigrationProcessorOptions Options { get; set; }
+        private IDbConnection Connection { get; set; }
 		private OracleProcessor Processor { get; set; }
 		private IDbFactory Factory { get; set; }
 		private IQuoter Quoter { get { return this.Processor.Quoter; } }
 
 		protected void SetUp(IDbFactory dbFactory)
 		{
-			this.Factory = dbFactory;
+            Options = new TestMigrationProcessorOptions();
+            this.Factory = dbFactory;
 			this.Connection = this.Factory.CreateConnection(IntegrationTestOptions.Oracle.ConnectionString);
 			this.Processor = new OracleProcessor(this.Connection, new OracleGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), this.Factory);
 			this.Connection.Open();
@@ -96,7 +99,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		{
 			string sql = "SELECT SYSDATE FROM " + this.Quoter.QuoteTableName("DUAL");
 			var ds = new DataSet();
-			using (var command = this.Factory.CreateCommand(sql, this.Connection))
+			using (var command = this.Factory.CreateCommand(sql, this.Connection, Options))
 			{
 				var adapter = this.Factory.CreateDataAdapter(command);
 				adapter.Fill(ds);

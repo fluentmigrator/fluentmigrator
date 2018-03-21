@@ -119,7 +119,7 @@ namespace FluentMigrator.Runner.Processors.Hana
 
             Announcer.Sql(string.Format("{0};", querySql));
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Options))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -145,7 +145,7 @@ namespace FluentMigrator.Runner.Processors.Hana
             EnsureConnectionIsOpen();
 
             var result = new DataSet();
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Options))
             {
                 var adapter = Factory.CreateDataAdapter(command);
                 adapter.Fill(result);
@@ -185,7 +185,7 @@ namespace FluentMigrator.Runner.Processors.Hana
                     ? batch.Remove(batch.Length - 1) 
                     : batch;
 
-                using (var command = Factory.CreateCommand(batchCommand, Connection))
+                using (var command = Factory.CreateCommand(batchCommand, Connection, Options))
                     command.ExecuteNonQuery();
             }
         }

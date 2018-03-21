@@ -64,11 +64,12 @@ namespace FluentMigrator.Runner.Processors
             return connection;
         }
 
-        public IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction)
+        public virtual IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction, IMigrationProcessorOptions options)
         {
             var command = connection.CreateCommand();
             command.CommandText = commandText;
             if (transaction != null) command.Transaction = transaction;
+            if (options != null && options.Timeout.HasValue) command.CommandTimeout = options.Timeout.Value;
             return command;
         }
 
@@ -79,9 +80,9 @@ namespace FluentMigrator.Runner.Processors
             return dataAdapter;
         }
 
-        public IDbCommand CreateCommand(string commandText, IDbConnection connection)
+        public IDbCommand CreateCommand(string commandText, IDbConnection connection, IMigrationProcessorOptions options)
         {
-            return CreateCommand(commandText, connection, null);
+            return CreateCommand(commandText, connection, null, options);
         }
 
         #endregion
