@@ -21,6 +21,7 @@ using FluentMigrator.Runner.Helpers;
 
 using System;
 using System.Data;
+using System.Data.Common;
 using System.IO;
 using FluentMigrator.Builders.Execute;
 
@@ -49,7 +50,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             }
         }
 
-        public SqlServerProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public SqlServerProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.IO;
 using System.Linq;
 using FluentMigrator.Builders.Execute;
@@ -37,7 +38,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
         }
 
-        public FirebirdProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory, FirebirdOptions fbOptions)
+        public FirebirdProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory, FirebirdOptions fbOptions)
             : base(connection, factory, generator, announcer, options)
         {
             if (fbOptions == null)

@@ -1,4 +1,6 @@
-﻿namespace FluentMigrator.Tests.Integration.Processors.Db2
+﻿using System.Data.Common;
+
+namespace FluentMigrator.Tests.Integration.Processors.Db2
 {
     using System;
     using System.Collections.Generic;
@@ -20,7 +22,7 @@
     {
         #region Properties
 
-        public System.Data.IDbConnection Connection
+        public DbConnection Connection
         {
             get; set;
         }

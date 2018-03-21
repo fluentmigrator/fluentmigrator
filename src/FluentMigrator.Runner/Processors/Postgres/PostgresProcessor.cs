@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Data;
+using System.Data.Common;
 using System.IO;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Runner.Generators.Postgres;
@@ -24,7 +25,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
             }
         }
 
-        public PostgresProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public PostgresProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
         }

@@ -22,6 +22,7 @@ using FluentMigrator.Runner.Helpers;
 
 using System;
 using System.Data;
+using System.Data.Common;
 using FluentMigrator.Builders.Execute;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Oracle;
@@ -35,7 +36,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             get { return "Oracle"; }
         }
 
-        public OracleProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public OracleProcessor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
         }

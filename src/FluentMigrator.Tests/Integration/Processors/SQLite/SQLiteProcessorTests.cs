@@ -17,6 +17,7 @@
 #endregion
 
 using System.Data;
+using System.Data.Common;
 using System.Data.SQLite;
 using System.IO;
 using FluentMigrator.Builders.Execute;
@@ -36,10 +37,10 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
     [Category("Integration")]
     public class SQLiteProcessorTests
     {
-        private IDbConnection _connection;
+        private DbConnection _connection;
         private SQLiteProcessor _processor;
         private Mock<ColumnDefinition> column;
-        private IDbCommand _command;
+        private DbCommand _command;
         private string columnName;
         private string tableName;
         private string tableNameThanMustBeEscaped;

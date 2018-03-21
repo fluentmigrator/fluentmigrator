@@ -1,12 +1,12 @@
+using System.Data.Common;
+
 namespace FluentMigrator.Runner.Processors
 {
-    using System.Data;
-
     public interface IDbFactory
     {
-        IDbConnection CreateConnection(string connectionString);
-        IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction);
-        IDbDataAdapter CreateDataAdapter(IDbCommand command);
-        IDbCommand CreateCommand(string commandText, IDbConnection connection);
+        DbConnection CreateConnection(string connectionString);
+        DbCommand CreateCommand(string commandText, DbConnection connection, DbTransaction transaction);
+        DbDataAdapter CreateDataAdapter(DbCommand command);
+        DbCommand CreateCommand(string commandText, DbConnection connection);
     }
 }

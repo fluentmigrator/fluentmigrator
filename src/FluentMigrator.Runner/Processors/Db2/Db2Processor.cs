@@ -1,4 +1,6 @@
-﻿namespace FluentMigrator.Runner.Processors.DB2
+﻿using System.Data.Common;
+
+namespace FluentMigrator.Runner.Processors.DB2
 {
     using System.Data;
     using System.Linq;
@@ -12,7 +14,7 @@
     {
         #region Constructors
 
-        public Db2Processor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public Db2Processor(DbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
             this.Quoter = new Db2Quoter();

@@ -1,4 +1,6 @@
-﻿namespace FluentMigrator.Tests.Helpers
+﻿using System.Data.Common;
+
+namespace FluentMigrator.Tests.Helpers
 {
     using System;
     using System.Collections.Generic;
@@ -71,13 +73,13 @@
             set;
         }
 
-        public IDbTransaction Transaction
+        public DbTransaction Transaction
         {
             get;
             set;
         }
 
-        private IDbConnection Connection
+        private DbConnection Connection
         {
             get;
             set;
