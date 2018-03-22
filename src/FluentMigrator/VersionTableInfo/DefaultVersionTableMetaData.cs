@@ -22,6 +22,16 @@ namespace FluentMigrator.VersionTableInfo
 {
     public class DefaultVersionTableMetaData : IVersionTableMetaData
     {
+        public DefaultVersionTableMetaData()
+        {
+            SchemaName = string.Empty;
+        }
+
+        public DefaultVersionTableMetaData(string schemaName)
+        {
+            this.SchemaName = schemaName;
+        }
+
         /// <summary>
         /// Provides access to <code>ApplicationContext</code> object.
         /// </summary>
@@ -32,11 +42,8 @@ namespace FluentMigrator.VersionTableInfo
         /// </remarks>
         public object ApplicationContext { get; set; }
 
-        public virtual string SchemaName
-        {
-            get { return string.Empty; }
-        }
-  
+        public virtual string SchemaName { get; protected set; }
+
         public virtual string TableName
         {
             get { return "VersionInfo"; }

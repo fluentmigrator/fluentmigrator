@@ -64,5 +64,33 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldContain(ErrorMessages.UpdateDataExpressionMustNotSpecifyBothWhereClauseAndAllRows);
         }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
+        {
+            expression.ApplyConventions(new MigrationConventions());
+
+            Assert.That(expression.SchemaName, Is.Null);
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsSetThenSchemaShouldNotBeChanged()
+        {
+            expression.SchemaName = "testschema";
+
+            expression.ApplyConventions(new MigrationConventions());
+
+            Assert.That(expression.SchemaName, Is.EqualTo("testschema"));
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsChangedAndSchemaIsNotSetThenSetSchema()
+        {
+            var migrationConventions = new MigrationConventions { GetDefaultSchema = () => "testdefault" };
+
+            expression.ApplyConventions(migrationConventions);
+
+            Assert.That(expression.SchemaName, Is.EqualTo("testdefault"));
+        }
     }
 }

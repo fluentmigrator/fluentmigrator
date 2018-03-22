@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using System.Collections.Generic;
 using FluentMigrator.Model;
 
@@ -63,6 +64,8 @@ namespace FluentMigrator.Expressions
 
         public void ApplyConventions(IMigrationConventions conventions)
         {
+            if (String.IsNullOrEmpty(SchemaName))
+                SchemaName = conventions.GetDefaultSchema();
         }
     }
 }

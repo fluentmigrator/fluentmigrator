@@ -123,6 +123,7 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="MigrationConventionsWithDefaultSchema.cs" />
     <Compile Include="MigrationStage.cs" />
     <Compile Include="MaintenanceAttribute.cs" />
     <Compile Include="Builders\Alter\AlterExpressionRoot.cs" />
@@ -267,6 +268,7 @@
     <Compile Include="AutoScriptMigration.cs" />
     <Compile Include="TimestampedMigrationAttribute.cs" />
     <Compile Include="TransactionBehavior.cs" />
+    <Compile Include="VersionTableInfo\DefaultVersionTableMetaDataInSchema.cs" />
     <Compile Include="VersionTableInfo\DefaultVersionTableMetaData.cs" />
     <Compile Include="VersionTableInfo\IVersionTableMetaData.cs" />
     <Compile Include="MigrationTraitAttribute.cs" />

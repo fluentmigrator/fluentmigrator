@@ -1,4 +1,5 @@
 #region License
+
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -14,11 +15,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
+
 #endregion
 
-using System.Reflection;
-using System.Security;
+namespace FluentMigrator.VersionTableInfo
+{
+    public class DefaultVersionTableMetaDataInSchema : DefaultVersionTableMetaData
+    {
+        public DefaultVersionTableMetaDataInSchema(string schemaName)
+        {
+            this.SchemaName = schemaName;
+        }
 
-[assembly: AssemblyTitle("FluentMigrator")]
-[assembly: AssemblyDescription("FluentMigrator")]
-[assembly: AllowPartiallyTrustedCallers]
+        public override string SchemaName { get; protected set; }
+    }
+}

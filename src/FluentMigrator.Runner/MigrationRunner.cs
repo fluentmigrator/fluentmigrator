@@ -85,7 +85,7 @@ namespace FluentMigrator.Runner
             SilentlyFail = false;
             CaughtExceptions = null;
 
-            Conventions = new MigrationConventions();
+            Conventions = GetMigrationConventions(runnerContext);
             if (!string.IsNullOrEmpty(runnerContext.WorkingDirectory))
                 Conventions.GetWorkingDirectory = () => runnerContext.WorkingDirectory;
 
@@ -101,6 +101,23 @@ namespace FluentMigrator.Runner
             else{
                 VersionLoader = new VersionLoader(this, _migrationAssemblies, Conventions);
             }
+        }
+
+        private IMigrationConventions GetMigrationConventions(IRunnerContext runnerContext)
+        {
+            Type matchedType = this._migrationAssemblies.GetExportedTypes().FirstOrDefault(t => typeof(IMigrationConventions).IsAssignableFrom(t));
+
+            if (matchedType == null)
+            {
+                if (!string.IsNullOrEmpty(runnerContext.SchemaName))
+                {
+                    return new MigrationConventionsWithDefaultSchema(runnerContext.SchemaName);
+                }
+
+                return new MigrationConventions();
+            }
+
+            return (IMigrationConventions)Activator.CreateInstance(matchedType);
         }
 
         public IVersionLoader VersionLoader { get; set; }

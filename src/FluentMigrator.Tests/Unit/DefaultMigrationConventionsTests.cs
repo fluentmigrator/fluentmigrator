@@ -16,8 +16,6 @@
 //
 #endregion
 
-using System.IO;
-using System.Reflection;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using NUnit.Framework;
@@ -157,6 +155,14 @@ namespace FluentMigrator.Tests.Unit
 
             defaultWorkingDirectory.ShouldNotBeNull();
             defaultWorkingDirectory.Contains("bin").ShouldBeTrue();
+        }
+
+        [Test]
+        public void DefaultSchemaConventionDefaultsToNull()
+        {
+            var defaultSchema = DefaultMigrationConventions.GetDefaultSchema();
+
+            Assert.That(defaultSchema, Is.Null);
         }
 
         [Test]

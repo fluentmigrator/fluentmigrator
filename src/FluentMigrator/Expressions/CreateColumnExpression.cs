@@ -23,7 +23,7 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-    public class CreateColumnExpression : MigrationExpressionBase
+    public class CreateColumnExpression : MigrationExpressionBase, ICanBeConventional
     {
         public virtual string SchemaName { get; set; }
         public virtual string TableName { get; set; }
@@ -36,6 +36,9 @@ namespace FluentMigrator.Expressions
 
         public override void ApplyConventions(IMigrationConventions conventions)
         {
+            if (String.IsNullOrEmpty(SchemaName))
+                SchemaName = conventions.GetDefaultSchema();
+
             Column.ApplyConventions(conventions);
         }
 

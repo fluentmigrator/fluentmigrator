@@ -73,6 +73,11 @@ namespace FluentMigrator.Runner
 
             if (matchedType == null)
             {
+                if (!string.IsNullOrEmpty(Conventions.GetDefaultSchema()))
+                {
+                    return new DefaultVersionTableMetaDataInSchema(Conventions.GetDefaultSchema());
+                }
+
                 return new DefaultVersionTableMetaData();
             }
 

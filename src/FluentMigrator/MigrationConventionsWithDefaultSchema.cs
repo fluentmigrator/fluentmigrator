@@ -16,9 +16,13 @@
 //
 #endregion
 
-using System.Reflection;
-using System.Security;
-
-[assembly: AssemblyTitle("FluentMigrator")]
-[assembly: AssemblyDescription("FluentMigrator")]
-[assembly: AllowPartiallyTrustedCallers]
+namespace FluentMigrator
+{
+    public class MigrationConventionsWithDefaultSchema : MigrationConventions
+    {
+        public MigrationConventionsWithDefaultSchema(string schemaName)
+        {
+            this.GetDefaultSchema = () => schemaName;
+        }
+    }
+}

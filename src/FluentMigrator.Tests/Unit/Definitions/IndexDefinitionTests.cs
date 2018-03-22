@@ -16,5 +16,35 @@ namespace FluentMigrator.Tests.Unit.Definitions
 
             Assert.AreEqual("IX_Table_Name", indexDefinition.Name);
         }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
+        {
+            var indexDefinition = new IndexDefinition { Name = "Test" };
+
+            indexDefinition.ApplyConventions(new MigrationConventions());
+
+            Assert.That(indexDefinition.SchemaName, Is.Null);
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsSetThenSchemaShouldNotBeChanged()
+        {
+            var indexDefinition = new IndexDefinition{ Name = "Test", SchemaName = "testschema" };
+
+            indexDefinition.ApplyConventions(new MigrationConventions());
+
+            Assert.That(indexDefinition.SchemaName, Is.EqualTo("testschema"));
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsChangedAndSchemaIsNotSetThenSetSchema()
+        {
+            var indexDefinition = new IndexDefinition { Name = "Test" };
+            var migrationConventions = new MigrationConventions {GetDefaultSchema = () => "testdefault"};
+            indexDefinition.ApplyConventions(migrationConventions);
+
+            Assert.That(indexDefinition.SchemaName, Is.EqualTo("testdefault"));
+        }
     }
 }
