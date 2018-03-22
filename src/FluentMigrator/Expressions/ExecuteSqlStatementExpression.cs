@@ -24,13 +24,16 @@ namespace FluentMigrator.Expressions
 {
     public class ExecuteSqlStatementExpression : MigrationExpressionBase
     {
+        public object[] Args { get; set; }
         public virtual string SqlStatement { get; set; }
 
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             // since all the Processors are using String.Format() in their Execute method
             //  we need to escape the brackets with double brackets or else it throws an incorrect format error on the String.Format call
-            var sqlText = SqlStatement.Replace("{", "{{").Replace("}", "}}");
+
+            var sqlText = string.Format(SqlStatement, Args ?? new object[0])
+                .Replace("{", "{{").Replace("}", "}}");
             processor.Execute(sqlText);
         }
 

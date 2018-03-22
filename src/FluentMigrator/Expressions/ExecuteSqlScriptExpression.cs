@@ -26,12 +26,15 @@ namespace FluentMigrator.Expressions
     {
         public string SqlScript { get; set; }
 
+        public object[] Args { get; set; }
+
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             string sqlText;
             using (var reader = File.OpenText(SqlScript))
                 sqlText = reader.ReadToEnd();
 
+            sqlText = string.Format(sqlText, Args ?? new object[0]);
             // since all the Processors are using String.Format() in their Execute method
             //  we need to escape the brackets with double brackets or else it throws an incorrect format error on the String.Format call
             sqlText = sqlText.Replace("{", "{{").Replace("}", "}}");

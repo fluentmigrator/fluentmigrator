@@ -35,15 +35,15 @@ namespace FluentMigrator.Builders.Execute
             _context = context;
         }
 
-        public void Sql(string sqlStatement)
+        public void Sql(string sqlStatement, params object[] args)
         {
-            var expression = new ExecuteSqlStatementExpression { SqlStatement = sqlStatement };
+            var expression = new ExecuteSqlStatementExpression { SqlStatement = sqlStatement , Args = args };
             _context.Expressions.Add(expression);
         }
 
-        public void Script(string pathToSqlScript)
+        public void Script(string pathToSqlScript, params object[] args)
         {
-            var expression = new ExecuteSqlScriptExpression { SqlScript = pathToSqlScript };
+            var expression = new ExecuteSqlScriptExpression { SqlScript = pathToSqlScript, Args = args };
             _context.Expressions.Add(expression);
         }
 
@@ -53,9 +53,9 @@ namespace FluentMigrator.Builders.Execute
             _context.Expressions.Add(expression);
         }
 
-        public void EmbeddedScript(string EmbeddedSqlScriptName)
+        public void EmbeddedScript(string EmbeddedSqlScriptName, params object[] args)
         {
-            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = EmbeddedSqlScriptName, MigrationAssemblies = _context.MigrationAssemblies };
+            var expression = new ExecuteEmbeddedSqlScriptExpression { SqlScript = EmbeddedSqlScriptName, MigrationAssemblies = _context.MigrationAssemblies, Args = args };
             _context.Expressions.Add(expression);
         }
     }

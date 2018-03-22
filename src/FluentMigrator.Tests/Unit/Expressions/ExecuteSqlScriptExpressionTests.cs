@@ -32,6 +32,9 @@ namespace FluentMigrator.Tests.Unit.Expressions
         private string testSqlScript = "testscript.sql";
         private string scriptContents = "TEST SCRIPT";
 
+        private string argsTestSqlScript = "testscriptwithargs.sql";
+        private string argsScriptContents = "TEST SCRIPT arg";
+
         [Test]
         public void ErrorIsReturnWhenSqlScriptIsNullOrEmpty()
         {
@@ -70,6 +73,18 @@ namespace FluentMigrator.Tests.Unit.Expressions
             expression.ApplyConventions(conventions);
             
             expression.SqlScript.ShouldBe(scriptOnAnotherDrive);
+        }
+
+        [Test]
+        public void ExecutesTheStatementWithArgs()
+        {
+            var expression = new ExecuteSqlScriptExpression { SqlScript = argsTestSqlScript, Args = new []{"arg"} };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute(argsScriptContents)).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
         }
     }
 }

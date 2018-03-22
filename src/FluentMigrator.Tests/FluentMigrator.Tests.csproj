@@ -584,6 +584,12 @@
     <None Include="Resources\icuuc30.dll" />
     <None Include="Resources\msvcp80.dll" />
     <None Include="Resources\msvcr80.dll" />
+    <EmbeddedResource Include="EmbeddedResources\EmbeddedtestscriptWithArgs.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </EmbeddedResource>
+    <None Include="testscriptwithargs.sql">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <Content Include="Unit\Initialization\Fixtures\WithConnectionString.exe">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
