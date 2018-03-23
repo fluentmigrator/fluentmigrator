@@ -155,7 +155,7 @@ namespace FluentMigrator.Runner.Generators.Hana
 
             return string.Format("{0};",
                 string.IsNullOrEmpty(descriptionStatement)
-                ? base.Generate(expression) : descriptionStatement);;
+                ? base.Generate(expression) : descriptionStatement); ;
         }
 
         public override string Generate(CreateColumnExpression expression)
@@ -163,7 +163,7 @@ namespace FluentMigrator.Runner.Generators.Hana
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
 
             if (string.IsNullOrEmpty(descriptionStatement))
-                return string.Format("{0};",base.Generate(expression) );
+                return string.Format("{0};", base.Generate(expression));
 
             var wrappedCreateColumnStatement = base.Generate(expression);
 
@@ -195,7 +195,7 @@ namespace FluentMigrator.Runner.Generators.Hana
 
         public override string Generate(CreateForeignKeyExpression expression)
         {
-            return string.Format("{0};", base.Generate(expression));            
+            return string.Format("{0};", base.Generate(expression));
         }
         public override string Generate(CreateConstraintExpression expression)
         {
@@ -209,6 +209,11 @@ namespace FluentMigrator.Runner.Generators.Hana
 
         public override string Generate(DeleteConstraintExpression expression)
         {
+            if (expression.Constraint.IsPrimaryKeyConstraint)
+            {
+                return string.Format("ALTER TABLE {0} DROP PRIMARY KEY ;", Quoter.QuoteTableName(expression.Constraint.TableName));
+            }
+
             return string.Format("{0};", base.Generate(expression));
         }
 
