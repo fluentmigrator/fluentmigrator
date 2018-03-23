@@ -35,6 +35,8 @@ using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Generators.Firebird;
 
+using NUnit.Framework;
+
 namespace FluentMigrator.Tests.Integration
 {
     public class IntegrationTestBase
@@ -51,6 +53,14 @@ namespace FluentMigrator.Tests.Integration
 
         public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback, params Type[] exceptProcessors)
         {
+
+
+            if (IntegrationTestOptions.AnyServerTypesEnabled == false)
+            {
+                var optionsClassName = typeof(IntegrationTestOptions).Name;
+                Assert.Fail("No database processors are configured to run your migration tests.  This message is provided to avoid false positives.  To avoid this message enable one or more test runners in the {0} class.", optionsClassName);
+            }
+
             if (exceptProcessors.Count(t => typeof(SqlServerProcessor).IsAssignableFrom(t)) == 0)
             {
                 ExecuteWithSqlServer2005(test, tryRollback);

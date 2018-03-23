@@ -86,6 +86,26 @@ namespace FluentMigrator.Tests
             IsEnabled = false
         };
 
+        public static bool AnyServerTypesEnabled
+        {
+            get
+            {
+                return Db2.IsEnabled 
+                    || Firebird.IsEnabled 
+                    || Hana.IsEnabled 
+                    || Jet.IsEnabled 
+                    || MySql.IsEnabled
+                    || Oracle.IsEnabled 
+                    || Postgres.IsEnabled 
+                    || SqlLite.IsEnabled 
+                    || SqlServer2005.IsEnabled
+                    || SqlServer2008.IsEnabled 
+                    || SqlServer2012.IsEnabled 
+                    || SqlServer2014.IsEnabled
+                    || SqlServerCe.IsEnabled;
+            }
+        }
+
         public class DatabaseServerOptions
         {
             public string ConnectionString;
