@@ -26,6 +26,7 @@ using FluentMigrator.Builders.Insert;
 using FluentMigrator.Builders.Rename;
 using FluentMigrator.Builders.Schema;
 using FluentMigrator.Builders.Update;
+using System;
 
 namespace FluentMigrator.Builders.IfDatabase
 {
@@ -49,5 +50,7 @@ namespace FluentMigrator.Builders.IfDatabase
         ISchemaExpressionRoot Schema { get; }
 
         IUpdateExpressionRoot Update { get; }
+
+        void Delegate(Action delegation);
     }
 }
