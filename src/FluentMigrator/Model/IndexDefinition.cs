@@ -31,6 +31,7 @@ namespace FluentMigrator.Model
         public virtual string TableName { get; set; }
         public virtual bool IsUnique { get; set; }
         public bool IsClustered { get; set; }
+        public OnlineMode? ApplyOnline { get; set; }
         public virtual ICollection<IndexColumnDefinition> Columns { get; set; }
         public virtual ICollection<IndexIncludeDefinition> Includes { get; set; }
 
