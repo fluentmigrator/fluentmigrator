@@ -165,6 +165,7 @@ namespace FluentMigrator.Builders.Create.Column
 
             _context.Expressions.Add(fk);
             CurrentForeignKey = fk.ForeignKey;
+            Expression.Column.ForeignKey = fk.ForeignKey;
             return this;
         }
 

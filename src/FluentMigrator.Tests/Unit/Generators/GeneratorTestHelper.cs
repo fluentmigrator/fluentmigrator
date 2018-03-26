@@ -113,6 +113,88 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static CreateTableExpression GetCreateTableWithForeignKey()
+        {
+            var expression = new CreateTableExpression {TableName = TestTableName1};
+            expression.Columns.Add(new ColumnDefinition {Name = TestColumnName1, Type = DbType.String});
+            expression.Columns.Add(new ColumnDefinition
+            {
+                Name = TestColumnName2,
+                Type = DbType.Int32,
+                IsForeignKey = true,
+                ForeignKey = new ForeignKeyDefinition()
+                {
+                    PrimaryTable = TestTableName2,
+                    ForeignTable = TestTableName1,
+                    PrimaryColumns = new[] {TestColumnName2},
+                    ForeignColumns = new[] {TestColumnName1}
+                }
+            });
+            return expression;
+        }
+
+        public static CreateTableExpression GetCreateTableWithMultiColumnForeignKey()
+        {
+            var expression = new CreateTableExpression { TableName = TestTableName1 };
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, Type = DbType.String });
+            expression.Columns.Add(new ColumnDefinition
+            {
+                Name = TestColumnName2,
+                Type = DbType.Int32,
+                IsForeignKey = true,
+                ForeignKey = new ForeignKeyDefinition()
+                {
+                    PrimaryTable = TestTableName2,
+                    ForeignTable = TestTableName1,
+                    PrimaryColumns = new[] { TestColumnName2, "TestColumn4" },
+                    ForeignColumns = new[] { TestColumnName1, "TestColumn3" }
+                }
+            });
+            return expression;
+        }
+
+        public static CreateTableExpression GetCreateTableWithNameForeignKey()
+        {
+            var expression = new CreateTableExpression { TableName = TestTableName1 };
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, Type = DbType.String });
+            expression.Columns.Add(new ColumnDefinition
+            {
+                Name = TestColumnName2,
+                Type = DbType.Int32,
+                IsForeignKey = true,
+                ForeignKey = new ForeignKeyDefinition()
+                {
+                    Name = "FK_Test",
+                    PrimaryTable = TestTableName2,
+                    ForeignTable = TestTableName1,
+                    PrimaryColumns = new[] { TestColumnName2 },
+                    ForeignColumns = new[] { TestColumnName1 }
+                }
+            });
+            return expression;
+        }
+
+        public static CreateTableExpression GetCreateTableWithNameMultiColumnForeignKey()
+        {
+            var expression = new CreateTableExpression { TableName = TestTableName1 };
+            expression.Columns.Add(new ColumnDefinition { Name = TestColumnName1, Type = DbType.String });
+            expression.Columns.Add(new ColumnDefinition
+            {
+                Name = TestColumnName2,
+                Type = DbType.Int32,
+                IsForeignKey = true,
+                ForeignKey = new ForeignKeyDefinition()
+                {
+                    Name = "FK_Test",
+                    PrimaryTable = TestTableName2,
+                    ForeignTable = TestTableName1,
+                    PrimaryColumns = new[] { TestColumnName2, "TestColumn4" },
+                    ForeignColumns = new[] { TestColumnName1, "TestColumn3" }
+                }
+            });
+            return expression;
+        }
+
         public static CreateIndexExpression GetCreateIndexExpression()
         {
             var expression = new CreateIndexExpression();

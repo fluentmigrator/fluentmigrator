@@ -231,8 +231,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 Quoter.QuoteSchemaName(expression.ForeignKey.PrimaryTableSchema),
                 Quoter.QuoteTableName(expression.ForeignKey.PrimaryTable),
                 String.Join(", ", primaryColumns.ToArray()),
-                FormatCascade("DELETE", expression.ForeignKey.OnDelete),
-                FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)
+                Column.FormatCascade("DELETE", expression.ForeignKey.OnDelete),
+                Column.FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)
                 );
         }
 
