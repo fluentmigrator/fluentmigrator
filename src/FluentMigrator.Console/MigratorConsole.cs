@@ -19,6 +19,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
@@ -268,7 +269,7 @@ namespace FluentMigrator.Console
 
         private void ExecuteMigrations(string outputTo)
         {
-            using (var sw = new StreamWriter(outputTo))
+            using (var sw = new StreamWriter(outputTo, false, Encoding.UTF8))
             {
                 var fileAnnouncer = this.ExecutingAgainstMsSql ?
                     new TextWriterWithGoAnnouncer(sw) :
