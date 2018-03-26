@@ -218,7 +218,7 @@ namespace FluentMigrator.Runner.Generators.Postgres
                             where += " AND ";
                         }
 
-                        where += String.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value));
+                        where += String.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), (item.Value == null || item.Value == DBNull.Value) ? "IS" : "=", Quoter.QuoteValue(item.Value));
                         i++;
                     }
 
