@@ -60,6 +60,14 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
         }
 
         [Test]
+        public void WillNotAddExpressionIfProcessorNotInMigrationProcessorPredicate()
+        {
+            var context = ExecuteTestMigration(x => x == "Db2" || x == "Hana");
+
+            context.Expressions.Count.ShouldBe(0);
+        }
+
+        [Test]
         public void WillAddExpressionIfOneDatabaseTypeApplies()
         {
             var context = ExecuteTestMigration("Jet", "Unknown");
@@ -157,6 +165,30 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
 
 
             var expression = new IfDatabaseExpressionRoot(context, databaseType.ToArray());
+
+            // Act
+            if (fluentExpression == null || fluentExpression.Length == 0)
+                expression.Create.Table("Foo").WithColumn("Id").AsInt16();
+            else
+            {
+                foreach (var action in fluentExpression)
+                {
+                    action(expression);
+                }
+
+            }
+
+            return context;
+        }
+
+        private MigrationContext ExecuteTestMigration(Predicate<string> databaseTypePredicate , params Action<IIfDatabaseExpressionRoot>[] fluentExpression)
+        {
+            // Arrange
+
+            var context = new MigrationContext(new MigrationConventions(), new JetProcessor(new OleDbConnection(), null, null, null), new SingleAssembly(GetType().Assembly), null, "");
+
+
+            var expression = new IfDatabaseExpressionRoot(context, databaseTypePredicate);
 
             // Act
             if (fluentExpression == null || fluentExpression.Length == 0)

@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using FluentMigrator.Builders.Alter;
 using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.IfDatabase;
@@ -101,6 +102,11 @@ namespace FluentMigrator
         public IIfDatabaseExpressionRoot IfDatabase(params string[] databaseType)
         {
             return new IfDatabaseExpressionRoot(_context, databaseType);
+        }
+
+        public IIfDatabaseExpressionRoot IfDatabase(Predicate<string> databaseTypeFunc)
+        {
+            return new IfDatabaseExpressionRoot(_context, databaseTypeFunc);
         }
     }
 }
