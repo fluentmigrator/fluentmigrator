@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 
@@ -24,10 +25,12 @@ namespace FluentMigrator.Builders.Create.Index
     public class CreateIndexExpressionBuilder : ExpressionBuilderBase<CreateIndexExpression>,
         ICreateIndexForTableSyntax,
         ICreateIndexOnColumnOrInSchemaSyntax,
+        ICreateIndexNonKeyColumnSyntax,
         ICreateIndexColumnOptionsSyntax,
         ICreateIndexOptionsSyntax
     {
         public IndexColumnDefinition CurrentColumn { get; set; }
+        public IndexIncludeDefinition CurrentNonkeyColumn { get; set; }
 
         public CreateIndexExpressionBuilder(CreateIndexExpression expression)
             : base(expression)
@@ -91,6 +94,13 @@ namespace FluentMigrator.Builders.Create.Index
         public ICreateIndexOnColumnSyntax Clustered()
         {
             Expression.Index.IsClustered = true;
+            return this;
+        }
+
+        public ICreateIndexNonKeyColumnSyntax Include(string columnName)
+        {
+            CurrentNonkeyColumn = new IndexIncludeDefinition() { Name = columnName };
+            Expression.Index.Includes.Add(CurrentNonkeyColumn);
             return this;
         }
     }
