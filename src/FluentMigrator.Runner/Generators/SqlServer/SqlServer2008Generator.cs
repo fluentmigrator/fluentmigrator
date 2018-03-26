@@ -16,6 +16,11 @@
 //
 #endregion
 
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
+using System.Linq;
+using System.Text;
+
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
     public class SqlServer2008Generator : SqlServer2005Generator
@@ -29,5 +34,48 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             :base(column, descriptionGenerator)
         {
         }
+
+        public override string GetWithNullsDistinctString(IndexDefinition index)
+        {
+            if (index.Columns.Where(c => c.IsNullDistinct.HasValue).Any() && !index.IsUnique)
+            {
+                compatabilityMode.HandleCompatabilty("With nulls distinct can only be used for unique indexes");
+            }
+
+            if (index.IsUnique)
+            {
+                bool isFirstColumn = true;
+                bool appendFilterToSql = false;
+                StringBuilder filterSql = new StringBuilder();
+                filterSql.AppendFormat(" WHERE");
+
+                foreach (var column in index.Columns)
+                {
+                    if (column.IsNullDistinct.HasValue && column.IsNullDistinct.Value == false)
+                    {
+                        if (!isFirstColumn)
+                            filterSql.AppendFormat(" AND");
+
+                        filterSql.AppendFormat(" {0} IS NOT NULL", Quoter.QuoteColumnName(column.Name));
+                        isFirstColumn = false;
+                        appendFilterToSql = true;
+                    }
+                }
+
+                if (appendFilterToSql)
+                    return filterSql.ToString();
+            }
+
+            return string.Empty;
+        }
+
+        public override string Generate(CreateIndexExpression expression)
+        {
+            string sql = base.Generate(expression);
+            sql += GetWithNullsDistinctString(expression.Index);
+            
+            return sql;
+        }
+
     }
 }

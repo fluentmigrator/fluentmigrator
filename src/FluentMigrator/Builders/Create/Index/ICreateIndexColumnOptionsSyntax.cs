@@ -20,8 +20,16 @@ namespace FluentMigrator.Builders.Create.Index
 {
     public interface ICreateIndexColumnOptionsSyntax
     {
-        ICreateIndexOnColumnSyntax Ascending();
-        ICreateIndexOnColumnSyntax Descending();
+        ICreateIndexMoreColumnOptionsSyntax Ascending();
+        ICreateIndexMoreColumnOptionsSyntax Descending();
         ICreateIndexOnColumnSyntax Unique();
+        /// <summary>
+        /// Column should have unique values, but multiple rows with null values should be accepted.
+        /// </summary>
+        ICreateIndexOnColumnSyntax UniqueWithNullsNotDistinct();
+        /// <summary>
+        /// Column should have unique values. Only one row with null value should be accepted (default for most known database engines).
+        /// </summary>
+        ICreateIndexOnColumnSyntax UniqueWithNullsDistinct();
     }
 }
