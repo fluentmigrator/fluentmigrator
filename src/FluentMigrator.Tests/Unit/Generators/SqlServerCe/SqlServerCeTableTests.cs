@@ -97,7 +97,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT 'Default', [TestColumn2] INT NOT NULL CONSTRAINT [DF_TestTable1_TestColumn2] DEFAULT 0)");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT N'Default', [TestColumn2] INT NOT NULL CONSTRAINT [DF_TestTable1_TestColumn2] DEFAULT 0)");
         }
 
         [Test]
@@ -107,7 +107,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT 'Default', [TestColumn2] INT NOT NULL CONSTRAINT [DF_TestTable1_TestColumn2] DEFAULT 0)");
+            result.ShouldBe("CREATE TABLE [TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT N'Default', [TestColumn2] INT NOT NULL CONSTRAINT [DF_TestTable1_TestColumn2] DEFAULT 0)");
         }
 
         [Test]
@@ -267,7 +267,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("sp_rename 'TestTable1', 'TestTable2'");
+            result.ShouldBe("sp_rename N'TestTable1', N'TestTable2'");
         }
 
         [Test]
@@ -277,7 +277,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
             var expression = GeneratorTestHelper.GetRenameTableExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("sp_rename 'TestTable1', 'TestTable2'");
+            result.ShouldBe("sp_rename N'TestTable1', N'TestTable2'");
         }
     }
 }

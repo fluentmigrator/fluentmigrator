@@ -91,6 +91,20 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
         }
 
         [Test]
+        public void NonUnicodeStringIgnoredForNonSqlServer()
+        {
+            var expression = new InsertDataExpression { TableName = "TestTable" };
+            expression.Rows.Add(new InsertionDataDefinition
+                                    {
+                                        new KeyValuePair<string, object>("NormalString", "Just'in"),
+                                        new KeyValuePair<string, object>("NonUnicodeString", new NonUnicodeString("codethinked'.com"))
+                                    });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("INSERT INTO TestTable (NormalString, NonUnicodeString) VALUES ('Just''in', 'codethinked''.com')");
+        }
+
+        [Test]
         public void CanAlterColumnAndSetAsNullable()
         {
             var expression = new AlterColumnExpression

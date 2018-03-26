@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
                                     });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([Id], [Name], [Website]) VALUES (1, SCOPE_IDENTITY(), 'codethinked.com')");
+            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([Id], [Name], [Website]) VALUES (1, SCOPE_IDENTITY(), N'codethinked.com')");
         }
 
         [Test]
@@ -59,21 +59,36 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
                                     });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([Id], [Name], [Website]) VALUES (1, @@IDENTITY, 'codethinked.com')");
+            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([Id], [Name], [Website]) VALUES (1, @@IDENTITY, N'codethinked.com')");
         }
 
         [Test]
         public void ExplicitUnicodeQuotesCorrectly()
         {
-            var expression = new InsertDataExpression {TableName = "TestTable"};
+            var expression = new InsertDataExpression { TableName = "TestTable" };
             expression.Rows.Add(new InsertionDataDefinition
                                     {
                                         new KeyValuePair<string, object>("UnicodeStringValue", new ExplicitUnicodeString("UnicodeString")),
-                                        new KeyValuePair<string, object>("StringValue", "AnsiiString")
+                                        new KeyValuePair<string, object>("StringValue", "UnicodeString")
                                     });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([UnicodeStringValue], [StringValue]) VALUES (N'UnicodeString', 'AnsiiString')");
+            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([UnicodeStringValue], [StringValue]) VALUES (N'UnicodeString', N'UnicodeString')");
+
+        }
+
+        [Test]
+        public void NonUnicodeStringQuotesCorrectly()
+        {
+            var expression = new InsertDataExpression {TableName = "TestTable"};
+            expression.Rows.Add(new InsertionDataDefinition
+                                    {
+                                        new KeyValuePair<string, object>("UnicodeStringValue", "UnicodeString"),
+                                        new KeyValuePair<string, object>("StringValue",  new NonUnicodeString("AnsiString"))
+                                    });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([UnicodeStringValue], [StringValue]) VALUES (N'UnicodeString', 'AnsiString')");
 
         }
 

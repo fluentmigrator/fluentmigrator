@@ -303,5 +303,17 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             quoter.QuoteValue(new ExplicitUnicodeString("Test ' String")).ShouldBe("'Test '' String'");
         }
+
+        [Test]
+        public void NonUnicodeStringIsFormattedAsNormalString()
+        {
+            quoter.QuoteValue(new NonUnicodeString("Test String")).ShouldBe("'Test String'");
+        }
+
+        [Test]
+        public void NonUnicodeStringIsFormattedAsNormalStringQuotes()
+        {
+            quoter.QuoteValue(new NonUnicodeString("Test ' String")).ShouldBe("'Test '' String'");
+        }
     }
 }

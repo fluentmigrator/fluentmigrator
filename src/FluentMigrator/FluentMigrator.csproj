@@ -123,6 +123,7 @@
     <Compile Include="..\SolutionInfo.cs">
       <Link>Properties\SolutionInfo.cs</Link>
     </Compile>
+    <Compile Include="ExplicitUnicodeString.cs" />
     <Compile Include="MigrationStage.cs" />
     <Compile Include="MaintenanceAttribute.cs" />
     <Compile Include="Builders\Alter\AlterExpressionRoot.cs" />
@@ -187,7 +188,7 @@
     <Compile Include="Builders\IInSchemaSyntax.cs" />
     <Compile Include="Builders\Schema\Constraint\ISchemaConstraintSyntax.cs" />
     <Compile Include="Builders\Schema\Constraint\SchemaConstraintQuery.cs" />
-    <Compile Include="ExplicitUnicodeString.cs" />
+    <Compile Include="NonUnicodeString.cs" />
     <Compile Include="Exceptions\DatabaseOperationNotSupportedException.cs" />
     <Compile Include="Exceptions\DuplicateMigrationException.cs" />
     <Compile Include="Exceptions\FluentMigratorException.cs" />
