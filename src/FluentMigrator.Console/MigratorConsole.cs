@@ -47,6 +47,7 @@ namespace FluentMigrator.Console
         public string Task;
         public int Timeout;
         public bool Verbose;
+        public bool StopOnError;
         public long Version;
         public long StartVersion;
         public bool NoConnection;
@@ -147,6 +148,11 @@ namespace FluentMigrator.Console
                                             "verbose=",
                                             "Show the SQL statements generated and execution time in the console. Default is false.",
                                             v => { Verbose = true; }
+                                            },
+                                        {
+                                            "stopOnError=",
+                                            "Pauses migration execution until the user input if any error occured. Default is false.",
+                                            v => { StopOnError = true; }
                                             },
                                         {
                                             "workingdirectory=|wd=",
@@ -262,6 +268,7 @@ namespace FluentMigrator.Console
         {
             consoleAnnouncer.ShowElapsedTime = Verbose;
             consoleAnnouncer.ShowSql = Verbose;
+            consoleAnnouncer.StopOnError = StopOnError;
 
             ExecuteMigrations(consoleAnnouncer);
         }
@@ -279,6 +286,7 @@ namespace FluentMigrator.Console
 
                 consoleAnnouncer.ShowElapsedTime = Verbose;
                 consoleAnnouncer.ShowSql = Verbose;
+                consoleAnnouncer.StopOnError = StopOnError;
 
                 var announcer = new CompositeAnnouncer(consoleAnnouncer, fileAnnouncer);
 
