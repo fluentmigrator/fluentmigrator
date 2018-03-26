@@ -102,5 +102,12 @@ namespace FluentMigrator.Runner.Extensions
             throw new InvalidOperationException("The seeded identity method can only be called on a valid object.");
         }
 
+        public static ICreateTableColumnOptionOrWithColumnSyntax RowGuid( this ICreateTableColumnOptionOrWithColumnSyntax expression )
+        {
+            CreateTableExpressionBuilder cast = expression as CreateTableExpressionBuilder;
+            if ( cast != null )
+                cast.CurrentColumn.IsRowGuid = true;
+            return expression;
+        }
     }
 }

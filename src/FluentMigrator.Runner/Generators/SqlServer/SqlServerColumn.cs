@@ -1,6 +1,7 @@
 ﻿using FluentMigrator.Model;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Generators.Base;
+using System.Linq;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
@@ -9,6 +10,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public SqlServerColumn(ITypeMap typeMap)
             : base(typeMap, new SqlServerQuoter())
         {
+            // place the ROWGUIDCOL keyword after data type.
+            ClauseOrder.Insert( ClauseOrder.IndexOf( FormatType ) + 1, FormatRowGuid );
         }
 
         protected override string FormatDefaultValue(ColumnDefinition column)
@@ -39,6 +42,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return string.Format("IDENTITY({0},{1})",
                 column.GetAdditionalFeature(SqlServerExtensions.IdentitySeed, 1),
                 column.GetAdditionalFeature(SqlServerExtensions.IdentityIncrement, 1));
+        }
+
+        protected string FormatRowGuid( ColumnDefinition column )
+        {
+            return column.IsRowGuid ? "ROWGUIDCOL" : string.Empty;
         }
 
         protected override string FormatSystemMethods(SystemMethods systemMethod)
