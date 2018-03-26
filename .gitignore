@@ -29,6 +29,7 @@ examplecommand.txt
 *.ncrunchsolution
 *.crunchsolution.cache
 src/FluentMigrator.T4.Tests/IntialMigrationCode.cs
+lib/nuget
 
 #StyleCop
 *.StyleCop
