@@ -204,10 +204,8 @@ namespace FluentMigrator.Console
                 if (string.IsNullOrEmpty(Task))
                     Task = "migrate";
 
-                if (string.IsNullOrEmpty(ProcessorType) ||
-                    string.IsNullOrEmpty(TargetAssembly))
+                if (!ValidateArguments(optionSet))
                 {
-                    DisplayHelp(optionSet);
                     Environment.ExitCode = 1;
                     return;
                 }
@@ -235,6 +233,27 @@ namespace FluentMigrator.Console
             }
 
             System.Console.ResetColor();
+        }
+
+        private bool ValidateArguments(OptionSet optionSet)
+        {
+            if (string.IsNullOrEmpty(TargetAssembly))
+            {
+                DisplayHelp(optionSet, "Please enter the path of the assembly containing migrations you want to execute.");
+                return false;
+            }
+            if (string.IsNullOrEmpty(ProcessorType))
+            {
+                DisplayHelp(optionSet, "Please enter the kind of database you are migrating against.");
+                return false;
+            }
+            return true;
+        }
+
+        private void DisplayHelp(OptionSet optionSet, string validationErrorMessage)
+        {
+            consoleAnnouncer.Emphasize(validationErrorMessage);
+            DisplayHelp(optionSet);
         }
 
         private void DisplayHelp(OptionSet p)
