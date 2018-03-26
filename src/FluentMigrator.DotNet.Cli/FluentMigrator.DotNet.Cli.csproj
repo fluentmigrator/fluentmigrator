@@ -19,14 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FluentMigrator.Runner.Db2\FluentMigrator.Runner.Db2.csproj" />
-    <ProjectReference Include="..\FluentMigrator.Runner.Firebird\FluentMigrator.Runner.Firebird.csproj" />
-    <ProjectReference Include="..\FluentMigrator.Runner.MySql\FluentMigrator.Runner.MySql.csproj" />
-    <ProjectReference Include="..\FluentMigrator.Runner.Oracle\FluentMigrator.Runner.Oracle.csproj" />
-    <ProjectReference Include="..\FluentMigrator.Runner.Postgres\FluentMigrator.Runner.Postgres.csproj" />
-    <ProjectReference Include="..\FluentMigrator.Runner.SQLite\FluentMigrator.Runner.SQLite.csproj" />
-    <ProjectReference Include="..\FluentMigrator.Runner.SqlServerCe\FluentMigrator.Runner.SqlServerCe.csproj" />
-    <ProjectReference Include="..\FluentMigrator.Runner.SqlServer\FluentMigrator.Runner.SqlServer.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner\FluentMigrator.Runner.csproj" />
   </ItemGroup>
 

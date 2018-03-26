@@ -1,5 +1,4 @@
 #region License
-
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,7 +12,6 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-
 #endregion
 
 using System;
@@ -23,6 +21,14 @@ using System.Reflection;
 
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Extensions;
+using FluentMigrator.Runner.Processors.DB2;
+using FluentMigrator.Runner.Processors.DotConnectOracle;
+using FluentMigrator.Runner.Processors.Firebird;
+using FluentMigrator.Runner.Processors.MySql;
+using FluentMigrator.Runner.Processors.Oracle;
+using FluentMigrator.Runner.Processors.Postgres;
+using FluentMigrator.Runner.Processors.SqlServer;
+using FluentMigrator.Runner.Processors.SQLite;
 
 namespace FluentMigrator.Runner.Processors
 {
@@ -30,6 +36,34 @@ namespace FluentMigrator.Runner.Processors
     {
         private static readonly object _lock = new object();
         private static IDictionary<string, IMigrationProcessorFactory> _migrationProcessorFactories;
+
+        static MigrationProcessorFactoryProvider()
+        {
+            // Register all available processor factories. The library usually tries
+            // to find all provider factories by scanning all referenced assemblies,
+            // but this fails if we don't have any reference. Adding the package
+            // isn't enough. We MUST have a reference to a type, otherwise the
+            // assembly reference gets removed by the C# compiler!
+            Register(new Db2ProcessorFactory());
+            Register(new DotConnectOracleProcessorFactory());
+            Register(new FirebirdProcessorFactory());
+            Register(new MySqlProcessorFactory());
+            Register(new OracleManagedProcessorFactory());
+            Register(new PostgresProcessorFactory());
+            Register(new SQLiteProcessorFactory());
+            Register(new SqlServer2000ProcessorFactory());
+            Register(new SqlServer2005ProcessorFactory());
+            Register(new SqlServer2008ProcessorFactory());
+            Register(new SqlServer2012ProcessorFactory());
+            Register(new SqlServer2014ProcessorFactory());
+            Register(new SqlServerProcessorFactory());
+            Register(new SqlServerCeProcessorFactory());
+
+#if NET40 || NET45
+            Register(new Hana.HanaProcessorFactory());
+            Register(new Jet.JetProcessorFactory());
+#endif
+        }
 
         private static IDictionary<string, IMigrationProcessorFactory> MigrationProcessorFactories
         {

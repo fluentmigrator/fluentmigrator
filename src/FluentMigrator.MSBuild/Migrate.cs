@@ -49,34 +49,6 @@ namespace FluentMigrator.MSBuild
         Task
 #endif
     {
-        static Migrate()
-        {
-            // Register all available processor factories. The library usually tries
-            // to find all provider factories by scanning all referenced assemblies,
-            // but this fails if we don't have any reference. Adding the package
-            // isn't enough. We MUST have a reference to a type, otherwise the
-            // assembly reference gets removed by the C# compiler!
-            MigrationProcessorFactoryProvider.Register(new Db2ProcessorFactory());
-            MigrationProcessorFactoryProvider.Register(new DotConnectOracleProcessorFactory());
-            MigrationProcessorFactoryProvider.Register(new FirebirdProcessorFactory());
-            MigrationProcessorFactoryProvider.Register(new MySqlProcessorFactory());
-            MigrationProcessorFactoryProvider.Register(new OracleManagedProcessorFactory());
-            MigrationProcessorFactoryProvider.Register(new PostgresProcessorFactory());
-            MigrationProcessorFactoryProvider.Register(new SQLiteProcessorFactory());
-            MigrationProcessorFactoryProvider.Register(new SqlServer2000ProcessorFactory());
-            MigrationProcessorFactoryProvider.Register(new SqlServer2005ProcessorFactory());
-            MigrationProcessorFactoryProvider.Register(new SqlServer2008ProcessorFactory());
-            MigrationProcessorFactoryProvider.Register(new SqlServer2012ProcessorFactory());
-            MigrationProcessorFactoryProvider.Register(new SqlServer2014ProcessorFactory());
-            MigrationProcessorFactoryProvider.Register(new SqlServerProcessorFactory());
-            MigrationProcessorFactoryProvider.Register(new SqlServerCeProcessorFactory());
-
-#if NET40 || NET45
-            MigrationProcessorFactoryProvider.Register(new Runner.Processors.Hana.HanaProcessorFactory());
-            MigrationProcessorFactoryProvider.Register(new Runner.Processors.Jet.JetProcessorFactory());
-#endif
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="T:Migrate"/> class.
         /// </summary>
