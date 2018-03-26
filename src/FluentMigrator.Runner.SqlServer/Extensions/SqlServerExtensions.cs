@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Dynamic;
 
@@ -30,6 +30,7 @@ namespace FluentMigrator.Runner.Extensions
         public const string ConstraintType = "SqlServerConstraintType";
         public const string IncludesList = "SqlServerIncludes";
         public const string OnlineIndex = "SqlServerOnlineIndex";
+        public const string RowGuidColumn = "SqlServerRowGuidColumn";
 
         /// <summary>
         /// Inserts data using Sql Server's IDENTITY INSERT feature.
@@ -82,16 +83,23 @@ namespace FluentMigrator.Runner.Extensions
 
         public static ICreateIndexOptionsSyntax Online(this ICreateIndexOptionsSyntax expression, bool active = true)
         {
-            var additionalFeatures = expression as ISupportAdditionalFeatures ?? throw new InvalidOperationException("The include method must be called on an object that implements ISupportAdditionalFeatures.");
+            var additionalFeatures = expression as ISupportAdditionalFeatures ?? throw new InvalidOperationException("The Online method must be called on an object that implements ISupportAdditionalFeatures.");
             additionalFeatures.AdditionalFeatures[OnlineIndex] = active;
             return expression;
         }
 
         public static ICreateIndexOptionsSyntax Include(this ICreateIndexOptionsSyntax expression, string columnName)
         {
-            var additionalFeatures = expression as ISupportAdditionalFeatures ?? throw new InvalidOperationException("The include method must be called on an object that implements ISupportAdditionalFeatures.");
+            var additionalFeatures = expression as ISupportAdditionalFeatures ?? throw new InvalidOperationException("The Include method must be called on an object that implements ISupportAdditionalFeatures.");
             var includes = additionalFeatures.GetAdditionalFeature<IList<IndexIncludeDefinition>>(IncludesList, () => new List<IndexIncludeDefinition>());
             includes.Add(new IndexIncludeDefinition { Name = columnName });
+            return expression;
+        }
+
+        public static ICreateTableColumnOptionOrWithColumnSyntax RowGuid(this ICreateTableColumnOptionOrWithColumnSyntax expression)
+        {
+            var columnExpression = expression as IColumnExpressionBuilder ?? throw new InvalidOperationException("The Include method must be called on an object that implements IColumnExpressionBuilder.");
+            columnExpression.Column.AdditionalFeatures[RowGuidColumn] = true;
             return expression;
         }
 

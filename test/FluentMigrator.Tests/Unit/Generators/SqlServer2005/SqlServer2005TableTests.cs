@@ -1,4 +1,8 @@
-﻿using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Builders.Create.Table;
+using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
+using FluentMigrator.Runner.Extensions;
+using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -13,6 +17,21 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         public void Setup()
         {
             Generator = new SqlServer2005Generator();
+        }
+        
+        [Test]
+        public void CanCreateTableWithIgnoredRowGuidCol()
+        {
+            var expression = new CreateTableExpression()
+            {
+                TableName = "TestTable1",
+            };
+
+            new CreateTableExpressionBuilder(expression, new MigrationContext(null, null, null, null, null))
+                .WithColumn("Id").AsGuid().PrimaryKey().RowGuid();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([Id] UNIQUEIDENTIFIER NOT NULL ROWGUIDCOL, PRIMARY KEY ([Id]))");
         }
 
         [Test]

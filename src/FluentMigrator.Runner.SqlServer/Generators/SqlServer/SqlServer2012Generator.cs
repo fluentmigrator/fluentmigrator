@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // Copyright (c) 2012, Daniel Lee
@@ -24,13 +24,18 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     public class SqlServer2012Generator : SqlServer2008Generator
     {
         public SqlServer2012Generator()
-            :base(new SqlServerColumn(new SqlServer2008TypeMap()), new SqlServer2005DescriptionGenerator())
+            :base(new SqlServer2005Column(new SqlServer2008TypeMap()), new SqlServer2005DescriptionGenerator())
+        {
+        }
+        
+        protected SqlServer2012Generator(IColumn column, IDescriptionGenerator descriptionGenerator)
+            :base(column, descriptionGenerator)
         {
         }
 
         public override string Generate(Expressions.CreateSequenceExpression expression)
         {
-            var result = new StringBuilder(string.Format("CREATE SEQUENCE "));
+            var result = new StringBuilder("CREATE SEQUENCE ");
             var seq = expression.Sequence;
             result.AppendFormat("{0}.{1}", Quoter.QuoteSchemaName(seq.SchemaName), Quoter.QuoteSequenceName(seq.Name));
 
@@ -69,7 +74,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(Expressions.DeleteSequenceExpression expression)
         {
-            var result = new StringBuilder(string.Format("DROP SEQUENCE "));
+            var result = new StringBuilder("DROP SEQUENCE ");
             result.AppendFormat("{0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteSequenceName(expression.SequenceName));
 
             return result.ToString();

@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2010, Nathan Brown
 //
@@ -32,7 +32,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     public class SqlServer2005Generator : SqlServer2000Generator
     {
         public SqlServer2005Generator()
-            : base(new SqlServerColumn(new SqlServer2005TypeMap()), new SqlServer2005DescriptionGenerator())
+            : base(new SqlServer2005Column(new SqlServer2005TypeMap()), new SqlServer2005DescriptionGenerator())
         {
         }
 
