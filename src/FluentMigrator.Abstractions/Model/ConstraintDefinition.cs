@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
@@ -15,8 +14,6 @@ namespace FluentMigrator.Model
 
     public class ConstraintDefinition : ICloneable, ICanBeConventional, ICanBeValidated, ISupportAdditionalFeatures
     {
-        private readonly ExpandoObject _additionalFeatures = new ExpandoObject();
-
         private ConstraintType constraintType;
         public bool IsPrimaryKeyConstraint { get { return ConstraintType.PrimaryKey == constraintType; } }
         public bool IsUniqueConstraint { get { return ConstraintType.Unique == constraintType; } }
@@ -37,7 +34,7 @@ namespace FluentMigrator.Model
             Columns = new HashSet<string>();
         }
 
-        public IDictionary<string, object> AdditionalFeatures => _additionalFeatures;
+        public IDictionary<string, object> AdditionalFeatures { get; } = new Dictionary<string, object>();
 
         #region ICloneable Members
 
@@ -50,7 +47,7 @@ namespace FluentMigrator.Model
                 TableName = TableName
             };
 
-            _additionalFeatures.CloneTo(result._additionalFeatures);
+            AdditionalFeatures.CloneTo(result.AdditionalFeatures);
 
             return result;
         }

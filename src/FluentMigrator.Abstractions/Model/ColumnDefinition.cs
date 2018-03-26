@@ -19,7 +19,6 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Dynamic;
 
 using FluentMigrator.Infrastructure;
 
@@ -27,8 +26,6 @@ namespace FluentMigrator.Model
 {
     public class ColumnDefinition : ICloneable, ICanBeConventional, ICanBeValidated, ISupportAdditionalFeatures
     {
-        private readonly ExpandoObject _additionalFeatures = new ExpandoObject();
-
         public ColumnDefinition()
         {
             DefaultValue = new UndefinedDefaultValue();
@@ -76,6 +73,6 @@ namespace FluentMigrator.Model
         {
         }
 
-        public IDictionary<string, object> AdditionalFeatures => _additionalFeatures;
+        public IDictionary<string, object> AdditionalFeatures { get; } = new Dictionary<string, object>();
     }
 }

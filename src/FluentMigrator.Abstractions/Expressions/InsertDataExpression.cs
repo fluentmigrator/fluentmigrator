@@ -18,7 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
@@ -27,18 +26,12 @@ namespace FluentMigrator.Expressions
 {
     public class InsertDataExpression : IMigrationExpression, ISupportAdditionalFeatures
     {
-        private readonly List<InsertionDataDefinition> _rows = new List<InsertionDataDefinition>();
-        private readonly ExpandoObject _additionalFeatures = new ExpandoObject();
-
         public string SchemaName { get; set; }
         public string TableName { get; set; }
 
-        public IDictionary<string, object> AdditionalFeatures => _additionalFeatures;
+        public IDictionary<string, object> AdditionalFeatures { get; } = new Dictionary<string, object>();
 
-        public List<InsertionDataDefinition> Rows
-        {
-            get { return _rows; }
-        }
+        public List<InsertionDataDefinition> Rows { get; } = new List<InsertionDataDefinition>();
 
         public void CollectValidationErrors(ICollection<string> errors)
         {
