@@ -88,10 +88,16 @@ namespace FluentMigrator.Builders.Create.Index
             return this;
         }
 
-        public ICreateIndexOnColumnSyntax Clustered()
-        {
-            Expression.Index.IsClustered = true;
-            return this;
-        }
-    }
+		public ICreateIndexOnColumnSyntax Clustered()
+		{
+			Expression.Index.IsClustered = true;
+			return this;
+		}
+
+		public ICreateIndexOnColumnSyntax Online()
+		{
+			Expression.Index.IsOnline = true;
+			return this;
+		}
+	}
 }
