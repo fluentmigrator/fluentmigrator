@@ -33,6 +33,24 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
         }
 
         [Test]
+        public void CanUseSystemMethodCurrentDateTimeOffsetAsADefaultValueForAColumn()
+        {
+            var expression = new CreateColumnExpression
+            {
+                Column = new ColumnDefinition
+                {
+                    Name = "NewColumn",
+                    Type = DbType.DateTime,
+                    DefaultValue = SystemMethods.CurrentDateTimeOffset
+                },
+                TableName = "NewTable"
+            };
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT SYSDATETIMEOFFSET()");
+        }
+
+        [Test]
         public void CanInsertScopeIdentity()
         {
             var expression = new InsertDataExpression {TableName = "TestTable"};

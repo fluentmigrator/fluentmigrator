@@ -2,7 +2,7 @@
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
-    internal class SqlServerCeColumn : SqlServerColumn
+    internal class SqlServerCeColumn : SqlServer2000Column
     {
         public SqlServerCeColumn(ITypeMap typeMap) : base(typeMap)
         {

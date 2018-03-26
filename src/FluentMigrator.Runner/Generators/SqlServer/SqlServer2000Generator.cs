@@ -29,7 +29,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     public class SqlServer2000Generator : GenericGenerator
     {
         public SqlServer2000Generator()
-            : base(new SqlServerColumn(new SqlServer2000TypeMap()), new SqlServerQuoter(), new EmptyDescriptionGenerator())
+            : base(new SqlServer2000Column(new SqlServer2000TypeMap()), new SqlServerQuoter(), new EmptyDescriptionGenerator())
         {
         }
 
@@ -138,7 +138,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 Quoter.QuoteTableName(expression.TableName),
                 Quoter.QuoteColumnName(expression.ColumnName),
                 Quoter.QuoteValue(expression.DefaultValue),
-                Quoter.QuoteConstraintName(SqlServerColumn.GetDefaultConstraintName(expression.TableName, expression.ColumnName))));
+                Quoter.QuoteConstraintName(SqlServer2000Column.GetDefaultConstraintName(expression.TableName, expression.ColumnName))));
 
             return builder.ToString();
         }

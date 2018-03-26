@@ -1,6 +1,6 @@
 ﻿#region License
 // 
-// Copyright (c) 2010, Nathan Brown
+// Copyright (c) 2007-2017, Sean Chambers <schambers80@gmail.com>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,16 +18,21 @@
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
-    public class SqlServer2008Generator : SqlServer2005Generator
+    internal class SqlServer2008Column : SqlServer2000Column
     {
-        public SqlServer2008Generator()
-            : base(new SqlServer2008Column(new SqlServer2008TypeMap()), new SqlServer2005DescriptionGenerator())
-        {
-        }
+        public SqlServer2008Column(ITypeMap typeMap)
+            : base(typeMap)
+        { }
 
-        public SqlServer2008Generator(IColumn column, IDescriptionGenerator descriptionGenerator)
-            :base(column, descriptionGenerator)
+        protected override string FormatSystemMethods(SystemMethods systemMethod)
         {
+            switch (systemMethod)
+            {
+                case SystemMethods.CurrentDateTimeOffset:
+                    return "SYSDATETIMEOFFSET()";
+            }
+
+            return base.FormatSystemMethods(systemMethod);
         }
     }
 }

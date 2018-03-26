@@ -18,7 +18,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         [SetUp]
         public void Setup()
         {
-            Generator = new SqlServer2008Generator();
+            Generator = new SqlServer2005Generator();
         }
 
         [Test]
@@ -250,6 +250,24 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
                             DefaultValue = SystemMethods.CurrentUTCDateTime
                         }, TableName = "NewTable"
                 };
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT GETUTCDATE()");
+        }
+
+        [Test]
+        public void CanUseSystemMethodCurrentDateTimeOffsetUsingGetUtcDateAsADefaultValueForAColumn()
+        {
+            var expression = new CreateColumnExpression
+            {
+                Column = new ColumnDefinition
+                {
+                    Name = "NewColumn",
+                    Type = DbType.DateTime,
+                    DefaultValue = SystemMethods.CurrentDateTimeOffset
+                },
+                TableName = "NewTable"
+            };
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[NewTable] ADD [NewColumn] DATETIME NOT NULL CONSTRAINT [DF__NewColumn] DEFAULT GETUTCDATE()");
