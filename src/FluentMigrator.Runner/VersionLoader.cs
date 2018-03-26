@@ -113,7 +113,7 @@ namespace FluentMigrator.Runner
             get
             {
                 return string.IsNullOrEmpty(VersionTableMetaData.SchemaName) ||
-					   Processor.SchemaExists(VersionTableMetaData.SchemaName);
+                    Processor.SchemaExists(VersionTableMetaData.SchemaName);
             }
         }
 

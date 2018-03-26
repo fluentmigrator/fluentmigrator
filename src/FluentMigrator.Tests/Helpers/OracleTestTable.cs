@@ -95,7 +95,7 @@ namespace FluentMigrator.Tests.Helpers
             sb.Append(string.Format("ALTER TABLE {0} ADD CONSTRAINT {1} UNIQUE ({2})", quoter.QuoteTableName(Name), quoter.QuoteConstraintName(name), quoter.QuoteColumnName(column)));
             using (var command = Factory.CreateCommand(sb.ToString(), Connection))
                 command.ExecuteNonQuery();
-			constraints.Add(name);
+            constraints.Add(name);
        }
 
         public void WithIndexOn(string column)

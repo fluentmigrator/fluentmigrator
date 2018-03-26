@@ -21,6 +21,6 @@ namespace FluentMigrator.Builders.Alter.Column
     public interface IAlterColumnOptionOrForeignKeyCascadeSyntax : 
         IAlterColumnOptionSyntax,
         IForeignKeyCascadeSyntax<IAlterColumnOptionSyntax, IAlterColumnOptionOrForeignKeyCascadeSyntax>
-	{
-	}
+    {
+    }
 }

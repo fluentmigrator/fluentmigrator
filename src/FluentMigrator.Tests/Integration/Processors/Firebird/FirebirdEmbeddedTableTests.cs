@@ -657,8 +657,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         {
             switch (Environment.OSVersion.Platform)
             {
-		case PlatformID.Unix:
-		    return new string[] { };
+        case PlatformID.Unix:
+            return new string[] { };
                 case PlatformID.Win32NT:
                 case PlatformID.Win32S:
                 case PlatformID.Win32Windows:

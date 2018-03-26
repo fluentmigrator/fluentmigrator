@@ -32,7 +32,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             if (value is byte[]) { return FormatByteArray((byte[])value); }
             if (value is TimeSpan) { return FromTimeSpan((TimeSpan)value); }
             
-			return value.ToString();
+            return value.ToString();
         }
 
         public virtual string FromTimeSpan(TimeSpan value)
