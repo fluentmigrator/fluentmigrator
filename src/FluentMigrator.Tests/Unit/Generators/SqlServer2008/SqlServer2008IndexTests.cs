@@ -1,18 +1,22 @@
 ﻿using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
 using NUnit.Should;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
+namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
 {
     [TestFixture]
-    public class SqlServer2005IndexTests : BaseIndexTests
+    public class SqlServer2008IndexTests : BaseIndexTests
     {
-        protected SqlServer2005Generator Generator;
+        protected SqlServer2008Generator Generator;
 
         [SetUp]
         public void Setup()
         {
-            Generator = new SqlServer2005Generator();
+            Generator = new SqlServer2008Generator();
         }
 
         [Test]
@@ -121,13 +125,23 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
-        public void CanCreateUniqueIndexIgnoringNonDistinctNulls()
+        public void CanCreateUniqueIndexWithNonDistinctNulls()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
             expression.Index.IsNullDistinct = false;
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC)");
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WHERE [TestColumn1] IS NOT NULL");
+        }
+
+        [Test]
+        public void CanCreateMultiColumnUniqueIndexWithNonDistinctNulls()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
+            expression.Index.IsNullDistinct = false;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC) WHERE [TestColumn1] IS NOT NULL AND [TestColumn2] IS NOT NULL");
         }
     }
 }

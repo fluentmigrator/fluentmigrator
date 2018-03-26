@@ -25,6 +25,7 @@ namespace FluentMigrator.Builders.Create.Index
         ICreateIndexForTableSyntax,
         ICreateIndexOnColumnOrInSchemaSyntax,
         ICreateIndexColumnOptionsSyntax,
+        ICreateIndexUniqueOptionsSyntax,
         ICreateIndexOptionsSyntax
     {
         public IndexColumnDefinition CurrentColumn { get; set; }
@@ -76,9 +77,27 @@ namespace FluentMigrator.Builders.Create.Index
             return this;
         }
 
-        public ICreateIndexOnColumnSyntax Unique()
+        public ICreateIndexUniqueOptionsSyntax Unique()
         {
             Expression.Index.IsUnique = true;
+            return this;
+        }
+
+        /// <summary>
+        /// Multiple rows with null values in index column(s) will be allowed.
+        /// </summary>
+        public ICreateIndexOptionsSyntax WithNullsNotDistinct()
+        {
+            Expression.Index.IsNullDistinct = false;
+            return this;
+        }
+
+        /// <summary>
+        /// Only one row with null values in index column(s) will be allowed.
+        /// </summary>
+        public ICreateIndexOptionsSyntax WithNullsDistinct()
+        {
+            Expression.Index.IsNullDistinct = true;
             return this;
         }
 

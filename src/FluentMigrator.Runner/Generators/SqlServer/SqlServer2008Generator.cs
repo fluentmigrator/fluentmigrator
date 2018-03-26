@@ -16,6 +16,9 @@
 //
 #endregion
 
+using FluentMigrator.Expressions;
+using System.Text;
+
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
     public class SqlServer2008Generator : SqlServer2005Generator
@@ -28,6 +31,31 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public SqlServer2008Generator(IColumn column, IDescriptionGenerator descriptionGenerator)
             :base(column, descriptionGenerator)
         {
+        }
+
+        public override string Generate(CreateIndexExpression expression)
+        {
+            string sql = base.Generate(expression);
+
+            if (expression.Index.IsNullDistinct.HasValue && expression.Index.IsNullDistinct.Value == false && expression.Index.IsUnique)
+            {
+                bool isFirstColumn = true;
+                StringBuilder filterSql = new StringBuilder();
+                filterSql.AppendFormat(" WHERE");
+
+                foreach (var column in expression.Index.Columns)
+                {
+                    if (!isFirstColumn)
+                        filterSql.AppendFormat(" AND");
+
+                    filterSql.AppendFormat(" {0} IS NOT NULL", Quoter.QuoteColumnName(column.Name));
+                    isFirstColumn = false;
+                }
+
+                sql += filterSql.ToString();
+            }
+
+            return sql;
         }
     }
 }
