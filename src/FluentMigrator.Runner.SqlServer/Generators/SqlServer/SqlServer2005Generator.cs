@@ -69,6 +69,18 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return includes?.Count > 0 ? ") INCLUDE (" : string.Empty;
         }
 
+        public virtual string GetWithOptions(CreateIndexExpression expression)
+        {
+            var items = new List<string>();
+            if (expression.AdditionalFeatures.TryGetValue(SqlServerExtensions.OnlineIndex, out var status))
+            {
+                var isOn = Convert.ToBoolean(status);
+                items.Add($"ONLINE={(isOn ? "ON" : "OFF")}");
+            }
+
+            return string.Join(", ", items);
+        }
+
         public override string Generate(CreateTableExpression expression)
         {
             var descriptionStatements = DescriptionGenerator.GenerateDescriptionStatements(expression);
@@ -272,15 +284,19 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 }
             }
 
-            return String.Format(CreateIndex
-                , GetUniqueString(expression)
-                , GetClusterTypeString(expression)
-                , Quoter.QuoteIndexName(expression.Index.Name)
-                , Quoter.QuoteSchemaName(expression.Index.SchemaName)
-                , Quoter.QuoteTableName(expression.Index.TableName)
-                , String.Join(", ", indexColumns)
-                , GetIncludeString(expression)
-                , String.Join(", ", indexIncludes));
+            var result = new StringBuilder().AppendFormat(
+                CreateIndex, GetUniqueString(expression), GetClusterTypeString(expression),
+                Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteSchemaName(expression.Index.SchemaName),
+                Quoter.QuoteTableName(expression.Index.TableName), String.Join(", ", indexColumns),
+                GetIncludeString(expression), String.Join(", ", indexIncludes));
+
+            var withParts = GetWithOptions(expression);
+            if (!string.IsNullOrEmpty(withParts))
+            {
+                result.AppendFormat(" WITH ({0})", withParts);
+            }
+
+            return result.ToString();
         }
 
         public override string Generate(DeleteIndexExpression expression)

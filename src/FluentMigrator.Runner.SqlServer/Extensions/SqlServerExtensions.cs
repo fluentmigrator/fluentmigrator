@@ -29,6 +29,7 @@ namespace FluentMigrator.Runner.Extensions
         public const string IdentityIncrement = "SqlServerIdentityIncrement";
         public const string ConstraintType = "SqlServerConstraintType";
         public const string IncludesList = "SqlServerIncludes";
+        public const string OnlineIndex = "SqlServerOnlineIndex";
 
         /// <summary>
         /// Inserts data using Sql Server's IDENTITY INSERT feature.
@@ -77,6 +78,13 @@ namespace FluentMigrator.Runner.Extensions
         public static void NonClustered(this ICreateConstraintOptionsSyntax expression)
         {
             SetConstraintType(expression, SqlServerConstraintType.NonClustered);
+        }
+
+        public static ICreateIndexOptionsSyntax Online(this ICreateIndexOptionsSyntax expression, bool active = true)
+        {
+            var additionalFeatures = expression as ISupportAdditionalFeatures ?? throw new InvalidOperationException("The include method must be called on an object that implements ISupportAdditionalFeatures.");
+            additionalFeatures.AdditionalFeatures[OnlineIndex] = active;
+            return expression;
         }
 
         public static ICreateIndexOptionsSyntax Include(this ICreateIndexOptionsSyntax expression, string columnName)

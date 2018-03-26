@@ -1,4 +1,6 @@
-﻿using FluentMigrator.Runner.Generators.SqlServer;
+﻿using FluentMigrator.Builders.Create.Index;
+using FluentMigrator.Runner.Extensions;
+using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -108,6 +110,38 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP INDEX [TestIndex] ON [dbo].[TestTable1]");
+        }
+
+        [Test]
+        public void CanCreateIndexWithOnlineOnOption()
+        {
+            var expression = GeneratorTestHelper.GetCreateIndexExpression();
+            var builder = new CreateIndexExpressionBuilder(expression);
+            builder
+                .InSchema("TestSchema")
+                .WithOptions()
+                .Online();
+
+            // Verify Online Option is used
+            var result = Generator.Generate(expression);
+            result.ShouldBe(
+                "CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC) WITH (ONLINE=ON)");
+        }
+
+        [Test]
+        public void CanCreateIndexWithOnlineOffOption()
+        {
+            var expression = GeneratorTestHelper.GetCreateIndexExpression();
+            var builder = new CreateIndexExpressionBuilder(expression);
+            builder
+                .InSchema("TestSchema")
+                .WithOptions()
+                .Online(false);
+
+            // Verify Online Option is used
+            var result = Generator.Generate(expression);
+            result.ShouldBe(
+                "CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC) WITH (ONLINE=OFF)");
         }
     }
 }
