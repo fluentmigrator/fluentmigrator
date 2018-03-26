@@ -7,6 +7,8 @@ using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Tests.Integration;
 using Moq;
 using NUnit.Framework;
+using FluentMigrator.Infrastructure;
+using System.Collections.Generic;
 
 namespace FluentMigrator.Tests.Unit
 {
@@ -113,6 +115,87 @@ namespace FluentMigrator.Tests.Unit
         {
             Verify(x => x.ValidateVersionOrder(), "validateversionorder", 0, 0);
         }
+
+        #region Verify that the correct HasMigrationsToApply... method is called
+        private void VerifyHasMigrationsToApply(Expression<Func<IMigrationRunner, bool>> func, string task, long version)
+        {
+            _migrationRunner.Setup(func).Verifiable();
+
+            var processor = new Mock<IMigrationProcessor>();
+            var dataSet = new DataSet();
+            dataSet.Tables.Add(new DataTable());
+            processor.Setup(x => x.ReadTableData(null, It.IsAny<string>())).Returns(dataSet);
+            _migrationRunner.SetupGet(x => x.Processor).Returns(processor.Object);
+
+            var runnerContext = new Mock<IRunnerContext>();
+            runnerContext.SetupGet(x => x.Task).Returns(task);
+            runnerContext.SetupGet(rc => rc.Version).Returns(version);
+            var taskExecutor = new FakeTaskExecutor(runnerContext.Object, _migrationRunner.Object);
+            taskExecutor.HasMigrationsToApply();
+            _migrationRunner.Verify(func, Times.Once());
+        }
+
+        [Test]
+        public void ShouldCallHasMigrationsToApplyUpWithNullVersionOnNoTask()
+        {
+            VerifyHasMigrationsToApply(x => x.HasMigrationsToApplyUp(It.Is<long?>(version => !version.HasValue)), "", 0);
+        }
+
+        [Test]
+        public void ShouldCallHasMigrationsToApplyUpWithVersionOnNoTask()
+        {
+            VerifyHasMigrationsToApply(x => x.HasMigrationsToApplyUp(It.Is<long?>(version => version.GetValueOrDefault() == 1)), "", 1);
+        }
+
+        [Test]
+        public void ShouldCallHasMigrationsToApplyUpWithNullVersionOnMigrate()
+        {
+            VerifyHasMigrationsToApply(x => x.HasMigrationsToApplyUp(It.Is<long?>(version => !version.HasValue)), "migrate", 0);
+        }
+
+        [Test]
+        public void ShouldCallHasMigrationsToApplyUpWithVersionOnMigrate()
+        {
+            VerifyHasMigrationsToApply(x => x.HasMigrationsToApplyUp(It.Is<long?>(version => version.GetValueOrDefault() == 1)), "migrate", 1);
+        }
+
+        [Test]
+        public void ShouldCallHasMigrationsToApplyUpWithNullVersionOnMigrateUp()
+        {
+            VerifyHasMigrationsToApply(x => x.HasMigrationsToApplyUp(It.Is<long?>(version => !version.HasValue)), "migrate:up", 0);
+        }
+
+        [Test]
+        public void ShouldCallHasMigrationsToApplyUpWithVersionOnMigrateUp()
+        {
+            VerifyHasMigrationsToApply(x => x.HasMigrationsToApplyUp(It.Is<long?>(version => version.GetValueOrDefault() == 1)), "migrate:up", 1);
+        }
+
+        [Test]
+        public void ShouldCallHasMigrationsToApplyRollbackOnRollback()
+        {
+            VerifyHasMigrationsToApply(x => x.HasMigrationsToApplyRollback(), "rollback", 0);
+        }
+
+        [Test]
+        public void ShouldCallHasMigrationsToApplyRollbackOnRollbackAll()
+        {
+            VerifyHasMigrationsToApply(x => x.HasMigrationsToApplyRollback(), "rollback:all", 0);
+        }
+
+        [Test]
+        public void ShouldCallHasMigrationsToApplyDownOnRollbackToVersion()
+        {
+            VerifyHasMigrationsToApply(x => x.HasMigrationsToApplyDown(It.Is<long>(version => version == 2)), "rollback:toversion", 2);
+        }
+
+        [Test]
+        public void ShouldCallHasMigrationsToApplyDownOnMigrateDown()
+        {
+            VerifyHasMigrationsToApply(x => x.HasMigrationsToApplyDown(It.Is<long>(version => version == 2)), "migrate:down", 2);
+        }
+        #endregion  // Verify that the correct HasMigrationsToApply... method is called
+
     }
 
     internal class FakeTaskExecutor : TaskExecutor

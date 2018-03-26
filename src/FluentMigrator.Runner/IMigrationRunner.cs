@@ -19,5 +19,8 @@ namespace FluentMigrator.Runner
         void MigrateDown(long version);
         void ValidateVersionOrder();
         void ListMigrations();
+        bool HasMigrationsToApplyUp(long? version = null);
+        bool HasMigrationsToApplyDown(long version);
+        bool HasMigrationsToApplyRollback();
     }
 }

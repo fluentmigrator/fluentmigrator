@@ -22,6 +22,7 @@ using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Infrastructure;
+using System.Linq;
 using System.Reflection;
 using System.Collections.Generic;
 
@@ -69,6 +70,41 @@ namespace FluentMigrator.Runner.Initialization
             var processor = RunnerContext.NoConnection? InitializeConnectionlessProcessor():InitializeProcessor(assemblyCollection);
 
             Runner = new MigrationRunner(assemblyCollection, RunnerContext, processor);
+        }
+
+        /// <summary>
+        /// Checks whether the current task will actually run any migrations. 
+        /// Can be used to decide whether it's necessary perform a backup before the migrations are executed.
+        /// </summary>
+        public bool HasMigrationsToApply()
+        {
+            Initialize();
+            try
+            {
+                switch(RunnerContext.Task)
+                {
+                    case null:
+                    case "":
+                    case "migrate":
+                    case "migrate:up":
+                        if (RunnerContext.Version != 0)
+                            return Runner.HasMigrationsToApplyUp(RunnerContext.Version);
+
+                        return Runner.HasMigrationsToApplyUp();
+                    case "rollback":
+                    case "rollback:all":
+                        return Runner.HasMigrationsToApplyRollback();  // Number of steps doesn't matter as long as there's at least one migration applied (at least that one will be rolled back)
+                    case "rollback:toversion":
+                    case "migrate:down":
+                        return Runner.HasMigrationsToApplyDown(RunnerContext.Version);
+                    default:
+                        return false;
+                }
+            }
+            finally
+            {
+                Runner.Processor.Dispose();
+            }
         }
 
         public void Execute()
