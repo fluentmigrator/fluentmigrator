@@ -13,25 +13,33 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
 {
     [TestFixture]
     [Category("Integration")]
-    public class SqlServerProcessorTests
+    public class SqlServerProcessorTests : IntegrationTestBase
     {
-        public SqlConnection Connection { get; set; }
+        private string _connectionString;
         public SqlServerProcessor Processor { get; set; }
 
         [SetUp]
         public void SetUp()
         {
-            Connection = new SqlConnection(IntegrationTestOptions.SqlServer2012.ConnectionString);
-            Processor = new SqlServerProcessor(Connection, new SqlServer2012Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
-            Connection.Open();
-            Processor.BeginTransaction();
+            if (ConfiguredDbEngine == "SqlServer2012")
+            {
+                Processor = CreateProcessor() as SqlServerProcessor;
+                Processor.Connection.Open();
+                Processor.BeginTransaction();
+                _connectionString = Processor.Connection.ConnectionString;
+            }
+            else
+                Assert.Ignore("Test is intended to run against SqlServer2012. Current configuration: {0}", ConfiguredDbEngine);
         }
 
         [TearDown]
         public void TearDown()
         {
-            Processor.CommitTransaction();
-            Processor.Dispose();
+            if (ConfiguredDbEngine == "SqlServer2012")
+            {
+                Processor.CommitTransaction();
+                Processor.Dispose();
+            }
         }
 
         [Test]
@@ -60,7 +68,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
         {
             var output = new StringWriter();
 
-            var connection = new SqlConnection(IntegrationTestOptions.SqlServer2012.ConnectionString);
+            var connection = new SqlConnection(_connectionString);
 
             var processor = new SqlServerProcessor(
                 connection,

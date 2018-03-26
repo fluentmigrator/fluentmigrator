@@ -15,12 +15,7 @@
 #endregion
 
 using System.Data;
-using System.Data.OleDb;
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators.Jet;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Jet;
-using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -28,16 +23,27 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
 {
     [TestFixture]
     [Category("Integration")]
-    public class JetProcessorTests
+    public class JetProcessorTests : IntegrationTestBase
     {
-        public OleDbConnection Connection { get; set; }
         public JetProcessor Processor { get; set; }
+
         [SetUp]
         public void SetUp()
         {
-            Connection = new OleDbConnection(IntegrationTestOptions.Jet.ConnectionString);
-            Processor = new JetProcessor(Connection, new JetGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
-            Connection.Open();
+            if (ConfiguredProcessor.IsAssignableFrom(typeof(JetProcessor)))
+                Processor = CreateProcessor() as JetProcessor;
+            else
+                Assert.Ignore("Test is intended to run against an OLEDB database. Current configuration: {0}", ConfiguredDbEngine);
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            if (ConfiguredProcessor.IsAssignableFrom(typeof(JetProcessor)))
+            {
+                Processor.CommitTransaction();
+                Processor.Dispose();
+            }
         }
 
         [Test]
@@ -114,13 +120,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
                 cmd.CommandText = string.Format("INSERT INTO {0} (id) VALUES ({1})", table.Name, i);
                 cmd.ExecuteNonQuery();
             }
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Processor.CommitTransaction();
-            Processor.Dispose();
         }
     }
 }

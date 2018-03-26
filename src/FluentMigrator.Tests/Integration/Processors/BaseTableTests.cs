@@ -1,6 +1,6 @@
 namespace FluentMigrator.Tests.Integration.Processors
 {
-    public abstract class BaseTableTests
+    public abstract class BaseTableTests : IntegrationTestBase
     {
         public abstract void CallingTableExistsCanAcceptTableNameWithSingleQuote();
         public abstract void CallingTableExistsReturnsFalseIfTableDoesNotExist();

@@ -1,11 +1,6 @@
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators.Postgres;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Postgres;
-using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
 using NUnit.Should;
-using Npgsql;
 
 namespace FluentMigrator.Tests.Integration.Processors.Postgres
 {
@@ -13,22 +8,27 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
     [Category("Integration")]
     public class PostgresSequenceTests : BaseSequenceTests
     {
-        public NpgsqlConnection Connection { get; set; }
         public PostgresProcessor Processor { get; set; }
 
         [SetUp]
         public void SetUp()
         {
-            Connection = new NpgsqlConnection(IntegrationTestOptions.Postgres.ConnectionString);
-            Processor = new PostgresProcessor(Connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new PostgresDbFactory());
-            Connection.Open();
+            if (ConfiguredProcessor.IsAssignableFrom(typeof(PostgresProcessor)))
+            {
+                Processor = CreateProcessor() as PostgresProcessor;
+            }
+            else
+                Assert.Ignore("Test is intended to run against Postgres. Current configuration: {0}", ConfiguredDbEngine);
         }
 
         [TearDown]
         public void TearDown()
         {
-            Processor.CommitTransaction();
-            Processor.Dispose();
+            if (ConfiguredProcessor.IsAssignableFrom(typeof(PostgresProcessor)))
+            {
+                Processor.CommitTransaction();
+                Processor.Dispose();
+            }
         }
 
         [Test]

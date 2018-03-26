@@ -404,7 +404,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                     }
                 };
                 FirebirdProcessedExpressionBase fbExpression = new FirebirdProcessedExpression<AlterColumnExpression>(expression, this);
-                if (this.FBOptions.UndoEnabled) 
+                if (this.FBOptions.UndoEnabled && !IsRunningOutOfMigrationScope()) 
                     fbExpression.AddUndoExpression(unSet);
                 RegisterExpression(fbExpression);
                 InternalProcess((Generator as FirebirdGenerator).GenerateSetNull(expression.Column));
@@ -920,7 +920,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             PerformDBOperationExpression createTrigger = CreateTriggerExpression(tableName, triggerName, true, TriggerEvent.Insert, trigger);
             PerformDBOperationExpression deleteTrigger = DeleteTriggerExpression(tableName, triggerName);
             FirebirdProcessedExpressionBase fbExpression = new FirebirdProcessedExpression(createTrigger, typeof(PerformDBOperationExpression), this);
-            if (this.FBOptions.UndoEnabled)
+            if (this.FBOptions.UndoEnabled && !IsRunningOutOfMigrationScope())
                 fbExpression.AddUndoExpression(deleteTrigger);
             RegisterExpression(fbExpression);
             Process(createTrigger);
@@ -955,7 +955,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 if (trigger.Name.ToUpper() == triggerName.ToUpper())
                 {
                     PerformDBOperationExpression createTrigger = CreateTriggerExpression(tableName, trigger);
-                    if (this.FBOptions.UndoEnabled)
+                    if (this.FBOptions.UndoEnabled && !IsRunningOutOfMigrationScope())
                         fbExpression.AddUndoExpression(createTrigger);
                     break;
                 }

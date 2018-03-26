@@ -1,0 +1,3 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<processor name="SQLite" ConnectionString="Data Source=:memory:;Version=3;New=True;">
+</processor>

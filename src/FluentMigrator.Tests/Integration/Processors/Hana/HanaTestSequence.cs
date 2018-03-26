@@ -15,28 +15,28 @@
 #endregion
 
 using System;
-using FluentMigrator.Runner.Generators.Postgres;
-using FluentMigrator.Runner.Processors.Postgres;
-using Npgsql;
+using FluentMigrator.Runner.Generators.Hana;
+using FluentMigrator.Runner.Processors.Hana;
+using Sap.Data.Hana;
 
-namespace FluentMigrator.Tests.Helpers
+namespace FluentMigrator.Tests.Integration.Processors.Hana
 {
-    public class PostgresTestSequence: IDisposable
+    public class HanaTestSequence: IDisposable
     {
-        private readonly PostgresQuoter quoter = new PostgresQuoter();
+        private readonly HanaQuoter quoter = new HanaQuoter();
         private readonly string _schemaName;
-        private NpgsqlConnection Connection { get; set; }
+        private HanaConnection Connection { get; set; }
         public string Name { get; set; }
         public string NameWithSchema { get; set; }
-        private NpgsqlTransaction Transaction { get; set; }
+        private HanaTransaction Transaction { get; set; }
 
-        public PostgresTestSequence(PostgresProcessor processor, string schemaName, string sequenceName)
+        public HanaTestSequence(HanaProcessor processor, string schemaName, string sequenceName)
         {
             _schemaName = schemaName;
             Name = quoter.QuoteSequenceName(sequenceName);
 
-            Connection = (NpgsqlConnection)processor.Connection;
-            Transaction = (NpgsqlTransaction)processor.Transaction;
+            Connection = (HanaConnection)processor.Connection;
+            Transaction = (HanaTransaction)processor.Transaction;
             NameWithSchema = string.IsNullOrEmpty(_schemaName) ? Name : string.Format("\"{0}\".{1}", _schemaName, Name);
             Create();
         }
@@ -50,23 +50,23 @@ namespace FluentMigrator.Tests.Helpers
         {
             if (!string.IsNullOrEmpty(_schemaName))
             {
-                using (var command = new NpgsqlCommand(string.Format("CREATE SCHEMA \"{0}\";", _schemaName), Connection, Transaction))
+                using (var command = new HanaCommand(string.Format("CREATE SCHEMA \"{0}\";", _schemaName), Connection, Transaction))
                     command.ExecuteNonQuery();
             }
 
-            string createCommand = string.Format("CREATE SEQUENCE {0} INCREMENT 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE", NameWithSchema);
-            using (var command = new NpgsqlCommand(createCommand, Connection, Transaction))
+            string createCommand = string.Format("CREATE SEQUENCE {0} INCREMENT BY 2 MINVALUE 0 MAXVALUE 100 START WITH 2 CACHE 10 CYCLE", NameWithSchema);
+            using (var command = new HanaCommand(createCommand, Connection, Transaction))
                 command.ExecuteNonQuery();
         }
 
         public void Drop()
         {
-            using (var command = new NpgsqlCommand("DROP SEQUENCE " + NameWithSchema, Connection, Transaction))
+            using (var command = new HanaCommand("DROP SEQUENCE " + NameWithSchema, Connection, Transaction))
                 command.ExecuteNonQuery();
 
             if (!string.IsNullOrEmpty(_schemaName))
             {
-                using (var command = new NpgsqlCommand(string.Format("DROP SCHEMA \"{0}\"", _schemaName), Connection, Transaction))
+                using (var command = new HanaCommand(string.Format("DROP SCHEMA \"{0}\"", _schemaName), Connection, Transaction))
                     command.ExecuteNonQuery();
             }
         }

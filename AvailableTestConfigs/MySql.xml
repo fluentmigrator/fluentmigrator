@@ -1,0 +1,3 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<processor name="MySql" ConnectionString="Database=FluentMigrator;Data Source=localhost;User Id=test;Password=test;">
+</processor>

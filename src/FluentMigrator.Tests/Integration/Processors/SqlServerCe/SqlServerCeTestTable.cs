@@ -1,12 +1,13 @@
 using System;
-using System.Data.SqlServerCe;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlServerCe;
 using System.Text;
-using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Processors.SqlServer;
 
-namespace FluentMigrator.Tests.Helpers
+namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
 {
 
     public class SqlServerCeTestTable : IDisposable
@@ -55,6 +56,9 @@ namespace FluentMigrator.Tests.Helpers
             }
 
             sb.Remove(sb.Length - 2, 2);
+
+            if (Connection.State != ConnectionState.Open)
+                Connection.Open();
 
             using (var command = new SqlCeCommand(sb.ToString(), Connection))
                 command.ExecuteNonQuery();

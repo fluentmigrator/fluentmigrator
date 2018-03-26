@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Text;
 using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Processors.Firebird;
 
-namespace FluentMigrator.Tests.Helpers
+namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
     public class FirebirdTestTable : IDisposable
     {
@@ -41,12 +42,15 @@ namespace FluentMigrator.Tests.Helpers
 
         private void Init(FirebirdProcessor processor, IEnumerable<string> columnDefinitions)
         {
+            if (Connection.State != ConnectionState.Open)
+                Connection.Open();
+
             Create(columnDefinitions);
         }
 
         public void Dispose()
         {
-            if (Connection.State == System.Data.ConnectionState.Open && !processor.WasCommitted)
+            if (Connection.State == ConnectionState.Open && !processor.WasCommitted)
                 Drop();
         }
 
@@ -89,7 +93,6 @@ namespace FluentMigrator.Tests.Helpers
                 command.ExecuteNonQuery();
 
             processor.AutoCommit();
-
         }
     }
 }

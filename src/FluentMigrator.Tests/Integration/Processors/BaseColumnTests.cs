@@ -1,6 +1,6 @@
 namespace FluentMigrator.Tests.Integration.Processors
 {
-    public abstract class BaseColumnTests
+    public abstract class BaseColumnTests : IntegrationTestBase
     {
         public abstract void CallingColumnExistsCanAcceptColumnNameWithSingleQuote();
         public abstract void CallingColumnExistsCanAcceptTableNameWithSingleQuote();

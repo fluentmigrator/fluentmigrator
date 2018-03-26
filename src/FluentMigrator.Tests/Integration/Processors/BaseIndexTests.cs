@@ -1,6 +1,6 @@
 namespace FluentMigrator.Tests.Integration.Processors
 {
-    public abstract class BaseIndexTests
+    public abstract class BaseIndexTests : IntegrationTestBase
     {
         public abstract void CallingIndexExistsCanAcceptIndexNameWithSingleQuote();
         public abstract void CallingIndexExistsCanAcceptTableNameWithSingleQuote();

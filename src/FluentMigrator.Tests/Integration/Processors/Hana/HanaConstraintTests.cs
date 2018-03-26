@@ -1,13 +1,6 @@
-using System.Data.SqlClient;
-using FluentMigrator.Runner.Announcers;
-using FluentMigrator.Runner.Generators;
-using FluentMigrator.Runner.Generators.Hana;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Hana;
-using FluentMigrator.Tests.Helpers;
 using NUnit.Framework;
 using NUnit.Should;
-using Sap.Data.Hana;
 
 namespace FluentMigrator.Tests.Integration.Processors.Hana
 {
@@ -15,25 +8,27 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
     [Category("Integration")]
     public class HanaConstraintTests : BaseConstraintTests
     {
-        public HanaConnection Connection { get; set; }
         public HanaProcessor Processor { get; set; }
-        public IQuoter Quoter { get; set; }
 
         [SetUp]
         public void SetUp()
         {
-            Connection = new HanaConnection(IntegrationTestOptions.Hana.ConnectionString);
-            Processor = new HanaProcessor(Connection, new HanaGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new HanaDbFactory());
-            Quoter = new HanaQuoter();
-            Connection.Open();
-            Processor.BeginTransaction();
+            if (ConfiguredProcessor.IsAssignableFrom(typeof(HanaProcessor)))
+            {
+                Processor = CreateProcessor() as HanaProcessor;
+            }
+            else
+                Assert.Ignore("Test is intended to run against Hana server. Current configuration: {0}", ConfiguredDbEngine);
         }
 
         [TearDown]
         public void TearDown()
         {
-            Processor.CommitTransaction();
-            Processor.Dispose();
+            if (ConfiguredProcessor.IsAssignableFrom(typeof(HanaProcessor)))
+            {
+                Processor.CommitTransaction();
+                Processor.Dispose();
+            }
         }
 
         [Test]
@@ -42,7 +37,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             using (var table = new HanaTestTable(Processor, null, "id int"))
             {
                 table.WithUniqueConstraintOn("ID", "UC'id");
-                this.Processor.ConstraintExists(null, table.Name, "UC'id").ShouldBeTrue();
+                Processor.ConstraintExists(null, table.Name, "UC'id").ShouldBeTrue();
             }
         }
 
@@ -52,7 +47,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             using (var table = new HanaTestTable("Test'Table", Processor, null, "id int"))
             {
                 table.WithUniqueConstraintOn("ID");
-                this.Processor.ConstraintExists(null, table.Name, "UC_id").ShouldBeTrue();
+                Processor.ConstraintExists(null, table.Name, "UC_id").ShouldBeTrue();
             }
         }
 
@@ -62,7 +57,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             using (var table = new HanaTestTable(this.Processor, null, "id int"))
             {
                 table.WithUniqueConstraintOn("ID");
-                this.Processor.ConstraintExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
+                Processor.ConstraintExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
             }
         }
 
@@ -74,14 +69,14 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             using (var table = new HanaTestTable(Processor, "schemaName", "id int"))
             {
                 table.WithUniqueConstraintOn("ID");
-                this.Processor.ConstraintExists("schemaName", table.Name, "DoesNotExist").ShouldBeFalse();
+                Processor.ConstraintExists("schemaName", table.Name, "DoesNotExist").ShouldBeFalse();
             }
         }
 
         [Test]
         public override void CallingConstraintExistsReturnsFalseIfTableDoesNotExist()
         {
-            this.Processor.ConstraintExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
+            Processor.ConstraintExists(null, "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
         [Test]
@@ -89,7 +84,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         {
             Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
 
-            this.Processor.ConstraintExists("SchemaName", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
+            Processor.ConstraintExists("SchemaName", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
         [Test]
@@ -98,7 +93,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             using (var table = new HanaTestTable(Processor, null, "id int"))
             {
                 table.WithUniqueConstraintOn("ID");
-                this.Processor.ConstraintExists(null, table.Name, "UC_id").ShouldBeTrue();
+                Processor.ConstraintExists(null, table.Name, "UC_id").ShouldBeTrue();
             }
         }
 
@@ -110,7 +105,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             using (var table = new HanaTestTable(Processor, "schema", "id int"))
             {
                 table.WithUniqueConstraintOn("ID");
-                this.Processor.ConstraintExists("schema", table.Name, "UC_id").ShouldBeTrue();
+                Processor.ConstraintExists("schema", table.Name, "UC_id").ShouldBeTrue();
             }
         }
     }

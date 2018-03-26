@@ -1,6 +1,6 @@
 namespace FluentMigrator.Tests.Integration.Processors
 {
-    public abstract class BaseConstraintTests
+    public abstract class BaseConstraintTests : IntegrationTestBase
     {
         public abstract void CallingConstraintExistsCanAcceptConstraintNameWithSingleQuote();
         public abstract void CallingConstraintExistsCanAcceptTableNameWithSingleQuote();
