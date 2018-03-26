@@ -18,16 +18,15 @@
 
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
-using System.Text;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.VersionTableInfo;
 
 namespace FluentMigrator.Runner
 {
@@ -71,10 +70,10 @@ namespace FluentMigrator.Runner
         public MigrationRunner(Assembly assembly, IRunnerContext runnerContext, IMigrationProcessor processor)
           : this(new SingleAssembly(assembly), runnerContext, processor)
         {
-
         }
 
-        public MigrationRunner(IAssemblyCollection assemblies, IRunnerContext runnerContext, IMigrationProcessor processor)
+        public MigrationRunner(IAssemblyCollection assemblies, IRunnerContext runnerContext,
+                               IMigrationProcessor processor, IVersionTableMetaData versionTableMetaData = null)
         {
             _migrationAssemblies = assemblies;
             _announcer = runnerContext.Announcer;
@@ -91,15 +90,21 @@ namespace FluentMigrator.Runner
 
             _migrationScopeHandler = new MigrationScopeHandler(Processor);
             _migrationValidator = new MigrationValidator(_announcer, Conventions);
-            MigrationLoader = new DefaultMigrationInformationLoader(Conventions, _migrationAssemblies, runnerContext.Namespace, runnerContext.NestedNamespaces, runnerContext.Tags);
+            MigrationLoader = new DefaultMigrationInformationLoader(Conventions, _migrationAssemblies,
+                                                                    runnerContext.Namespace,
+                                                                    runnerContext.NestedNamespaces, runnerContext.Tags);
             ProfileLoader = new ProfileLoader(runnerContext, this, Conventions);
             MaintenanceLoader = new MaintenanceLoader(_migrationAssemblies, runnerContext.Tags, Conventions);
 
-            if (runnerContext.NoConnection){
-                VersionLoader = new ConnectionlessVersionLoader(this, _migrationAssemblies, Conventions, runnerContext.StartVersion, runnerContext.Version);
+            if (runnerContext.NoConnection)
+            {
+                VersionLoader = new ConnectionlessVersionLoader(
+                    this, _migrationAssemblies, Conventions,
+                    runnerContext.StartVersion, runnerContext.Version, versionTableMetaData);
             }
-            else{
-                VersionLoader = new VersionLoader(this, _migrationAssemblies, Conventions);
+            else
+            {
+                VersionLoader = new VersionLoader(this, _migrationAssemblies, Conventions, versionTableMetaData);
             }
         }
 

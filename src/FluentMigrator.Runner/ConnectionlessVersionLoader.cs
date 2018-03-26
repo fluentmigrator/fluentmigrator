@@ -1,6 +1,25 @@
-﻿using System;
+﻿#region License
+//
+// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
@@ -13,7 +32,9 @@ namespace FluentMigrator.Runner
     {
         private bool _versionsLoaded;
 
-        public ConnectionlessVersionLoader(IMigrationRunner runner, IAssemblyCollection assemblies, IMigrationConventions conventions, long startVersion, long targetVersion)
+        public ConnectionlessVersionLoader(IMigrationRunner runner, IAssemblyCollection assemblies,
+                                           IMigrationConventions conventions, long startVersion, long targetVersion,
+                                           IVersionTableMetaData versionTableMetaData = null)
         {
             Runner = runner;
             Assemblies = assemblies;
@@ -24,7 +45,7 @@ namespace FluentMigrator.Runner
             Processor = Runner.Processor;
 
             VersionInfo = new VersionInfo();
-            VersionTableMetaData = GetVersionTableMetaData();
+            VersionTableMetaData = versionTableMetaData ?? GetVersionTableMetaData();
             VersionMigration = new VersionMigration(VersionTableMetaData);
             VersionSchemaMigration = new VersionSchemaMigration(VersionTableMetaData);
             VersionUniqueMigration = new VersionUniqueMigration(VersionTableMetaData);
@@ -38,10 +59,10 @@ namespace FluentMigrator.Runner
         public IMigrationConventions Conventions { get; set; }
         public long StartVersion { get; set; }
         public long TargetVersion { get; set; }
-        public VersionSchemaMigration VersionSchemaMigration { get; private set; }
-        public IMigration VersionMigration { get; private set; }
-        public IMigration VersionUniqueMigration { get; private set; }
-        public IMigration VersionDescriptionMigration { get; private set; }
+        public VersionSchemaMigration VersionSchemaMigration { get; }
+        public IMigration VersionMigration { get; }
+        public IMigration VersionUniqueMigration { get; }
+        public IMigration VersionDescriptionMigration { get; }
         public IMigrationRunner Runner { get; set; }
         public IVersionInfo VersionInfo { get; set; }
         public IVersionTableMetaData VersionTableMetaData { get; set; }
