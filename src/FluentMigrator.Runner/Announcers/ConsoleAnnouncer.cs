@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.IO;
 
 namespace FluentMigrator.Runner.Announcers
 {
@@ -73,18 +74,60 @@ namespace FluentMigrator.Runner.Announcers
         public override void Error(string message)
         {
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.Error.WriteLine(string.Format("!!! {0}", message));
+            Write(string.Format("!!! {0}", message), true);
             Console.ResetColor();
         }
 
         public void Write(string message)
         {
-            Write(message, true);
+            LogMessage(message, true, false);
         }
 
         public override void Write(string message, bool escaped)
         {
-            Console.Out.WriteLine(message);
+            LogMessage(message, escaped, false);
+        }
+
+        public override void Write(string message, bool escaped, bool isError)
+        {
+            LogMessage(message, escaped, isError);
+        }
+
+        void LogMessage(string message, bool escaped, bool isError)
+        {
+            if (!isError)
+                Console.Out.WriteLine(message);
+            else
+                Console.Error.WriteLine(message);
+
+            if (!WriteToLogFile || string.IsNullOrEmpty(message) || string.IsNullOrEmpty(LogFile))
+                return;
+
+            using (var sw = new StreamWriter(LogFile, true))
+            {
+                var log = string.Format("{0:yyyy-MM-dd HH:mm:ss} {1} {2}", DateTime.Now, (!isError ? "INFO" : "ERROR"), message);
+                sw.WriteLine(log);
+            }
+        }
+
+        bool IsFileLocked(FileInfo file)
+        {
+            FileStream stream = null;
+
+            try
+            {
+                stream = file.Open(FileMode.Open, FileAccess.Read, FileShare.None);
+            }
+            catch (IOException)
+            {
+                return true;
+            }
+            finally
+            {
+                if (stream != null) stream.Close();
+            }
+
+            return false;
         }
     }
 }
