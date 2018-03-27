@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -179,6 +179,48 @@ namespace FluentMigrator.Tests.Unit.Expressions
             reverse.ForeignKey.PrimaryTable.ShouldBe("UserRoles");
             reverse.ForeignKey.ForeignColumns.First().ShouldBe("PrimaryId");
             reverse.ForeignKey.PrimaryColumns.First().ShouldBe("ForeignId");
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
+        {
+            var expression = new DeleteForeignKeyExpression();
+
+            expression.ApplyConventions(new MigrationConventions());
+
+            Assert.That(expression.ForeignKey.ForeignTableSchema, Is.Null);
+            Assert.That(expression.ForeignKey.PrimaryTableSchema, Is.Null);
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsSetThenSchemaShouldNotBeChanged()
+        {
+            var expression = new DeleteForeignKeyExpression()
+            {
+                ForeignKey =
+                {
+                    ForeignTableSchema = "testschema",
+                    PrimaryTableSchema = "testschema",
+                },
+            };
+
+            expression.ApplyConventions(new MigrationConventions());
+
+            Assert.That(expression.ForeignKey.ForeignTableSchema, Is.EqualTo("testschema"));
+            Assert.That(expression.ForeignKey.PrimaryTableSchema, Is.EqualTo("testschema"));
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsChangedAndSchemaIsNotSetThenSetSchema()
+        {
+            var expression = new DeleteForeignKeyExpression();
+
+            var migrationConventions = new MigrationConventions { GetDefaultSchema = () => "testdefault" };
+
+            expression.ApplyConventions(migrationConventions);
+
+            Assert.That(expression.ForeignKey.ForeignTableSchema, Is.EqualTo("testdefault"));
+            Assert.That(expression.ForeignKey.PrimaryTableSchema, Is.EqualTo("testdefault"));
         }
     }
 }

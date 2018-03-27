@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
@@ -56,6 +56,37 @@ namespace FluentMigrator.Tests.Unit.Expressions
 
             var errors = ValidationHelper.CollectErrors(expression);
             Assert.That(errors.Count, Is.EqualTo(0));
+        }
+  
+        [Test]
+        public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.Unique);
+
+            expression.ApplyConventions(new MigrationConventions());
+
+            Assert.That(expression.Constraint.SchemaName, Is.Null);
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsSetThenSchemaShouldNotBeChanged()
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.Unique) { Constraint = { SchemaName = "testschema" } };
+
+            expression.ApplyConventions(new MigrationConventions());
+
+            Assert.That(expression.Constraint.SchemaName, Is.EqualTo("testschema"));
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsChangedAndSchemaIsNotSetThenSetSchema()
+        {
+            var expression = new CreateConstraintExpression(ConstraintType.Unique);
+            var migrationConventions = new MigrationConventions { GetDefaultSchema = () => "testdefault" };
+
+            expression.ApplyConventions(migrationConventions);
+
+            Assert.That(expression.Constraint.SchemaName, Is.EqualTo("testdefault"));
         }
     }
 }

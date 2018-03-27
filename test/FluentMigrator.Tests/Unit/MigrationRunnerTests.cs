@@ -625,5 +625,39 @@ namespace FluentMigrator.Tests.Unit
             _announcer.Verify(a => a.Error(It.Is<string>(s => s.Contains($"CreateColumnExpression: {ErrorMessages.TableNameCannotBeNullOrEmpty} {ErrorMessages.ColumnNameCannotBeNullOrEmpty} {ErrorMessages.ColumnTypeMustBeDefined}"))));
         }
 
+        [Test]
+        public void CanLoadCustomMigrationConventions()
+        {
+            Assert.That(_runner.Conventions, Is.TypeOf<CustomMigrationConventions>());
+            Assert.That(_runner.Conventions.GetWorkingDirectory.Invoke(), Is.EqualTo("testwd"));
+        }
+
+        [Test]
+        public void CanLoadDefaultMigrationConventionsIfNoCustomConventionsAreSpecified()
+        {
+            var processorMock = new Mock<IMigrationProcessor>(MockBehavior.Loose);
+
+            var options = new ProcessorOptions
+            {
+                PreviewOnly = false
+            };
+
+            processorMock.SetupGet(x => x.Options).Returns(options);
+
+            var asm = "s".GetType().Assembly;
+
+            var runner = new MigrationRunner(asm, _runnerContextMock.Object, processorMock.Object);
+
+            Assert.That(runner.Conventions, Is.TypeOf<MigrationConventions>());
+            Assert.That(runner.Conventions.GetDefaultSchema.Invoke(), Is.Null);
+        }
+
+        public class CustomMigrationConventions : MigrationConventions
+        {
+            public CustomMigrationConventions()
+            {
+                GetWorkingDirectory = () => "testwd";
+            }
+        }
     }
 }

@@ -160,6 +160,13 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        public void DefaultSchemaConventionDefaultsToNull()
+        {
+            DefaultMigrationConventions.GetDefaultSchema()
+                .ShouldBeNull();
+        }
+
+        [Test]
         public void TypeHasTagsReturnTrueIfTypeHasTagsAttribute()
         {
             DefaultMigrationConventions.TypeHasTags(typeof(TaggedWithUk))

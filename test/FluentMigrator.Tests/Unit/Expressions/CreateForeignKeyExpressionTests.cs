@@ -43,5 +43,47 @@ namespace FluentMigrator.Tests.Unit.Expressions
                         }.ToString();
             sql.ShouldBe("CreateForeignKey FK UserRoles(User_id) User(Id)");
         }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
+        {
+            var expression = new CreateForeignKeyExpression();
+
+            expression.ApplyConventions(new MigrationConventions());
+
+            Assert.That(expression.ForeignKey.ForeignTableSchema, Is.Null);
+            Assert.That(expression.ForeignKey.PrimaryTableSchema, Is.Null);
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsSetThenSchemaShouldNotBeChanged()
+        {
+            var expression = new CreateForeignKeyExpression()
+            {
+                ForeignKey =
+                {
+                    ForeignTableSchema = "testschema",
+                    PrimaryTableSchema = "testschema"
+                },
+            };
+
+            expression.ApplyConventions(new MigrationConventions());
+
+            Assert.That(expression.ForeignKey.ForeignTableSchema, Is.EqualTo("testschema"));
+            Assert.That(expression.ForeignKey.PrimaryTableSchema, Is.EqualTo("testschema"));
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsChangedAndSchemaIsNotSetThenSetSchema()
+        {
+            var expression = new CreateForeignKeyExpression();
+
+            var migrationConventions = new MigrationConventions { GetDefaultSchema = () => "testdefault" };
+
+            expression.ApplyConventions(migrationConventions);
+
+            Assert.That(expression.ForeignKey.ForeignTableSchema, Is.EqualTo("testdefault"));
+            Assert.That(expression.ForeignKey.PrimaryTableSchema, Is.EqualTo("testdefault"));
+        }
     }
 }

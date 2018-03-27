@@ -18,10 +18,12 @@
 
 using System;
 using System.Data;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Tests.Helpers;
+
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -66,6 +68,37 @@ namespace FluentMigrator.Tests.Unit.Expressions
         {
             var expression = new AlterColumnExpression { TableName = "Bacon", Column = { Name = "BaconId", Type = DbType.Int32 } };
             expression.ToString().ShouldBe("AlterColumn Bacon BaconId Int32");
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
+        {
+            var expression = new AlterColumnExpression { TableName = "Bacon", Column = { Name = "BaconId", Type = DbType.Int32 } };
+
+            expression.ApplyConventions(new MigrationConventions());
+
+            Assert.That(expression.SchemaName, Is.Null);
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsSetThenSchemaShouldNotBeChanged()
+        {
+            var expression = new AlterColumnExpression { SchemaName = "testschema", TableName = "Bacon", Column = { Name = "BaconId", Type = DbType.Int32 } };
+
+            expression.ApplyConventions(new MigrationConventions());
+
+            Assert.That(expression.SchemaName, Is.EqualTo("testschema"));
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsChangedAndSchemaIsNotSetThenSetSchema()
+        {
+            var expression = new AlterColumnExpression { TableName = "Bacon", Column = { Name = "BaconId", Type = DbType.Int32 } };
+            var migrationConventions = new MigrationConventions { GetDefaultSchema = () => "testdefault" };
+
+            expression.ApplyConventions(migrationConventions);
+
+            Assert.That(expression.SchemaName, Is.EqualTo("testdefault"));
         }
     }
 }

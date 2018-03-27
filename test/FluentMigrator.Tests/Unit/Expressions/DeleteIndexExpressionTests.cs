@@ -70,5 +70,43 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var errors = ValidationHelper.CollectErrors(expression);
             Assert.That(errors.Count, Is.EqualTo(0));
         }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
+        {
+            var expression = new DeleteIndexExpression();
+
+            expression.ApplyConventions(new MigrationConventions());
+
+            Assert.That(expression.Index.SchemaName, Is.Null);
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsSetThenSchemaShouldNotBeChanged()
+        {
+            var expression = new DeleteIndexExpression()
+            {
+                Index =
+                {
+                    SchemaName = "testschema",
+                },
+            };
+
+            expression.ApplyConventions(new MigrationConventions());
+
+            Assert.That(expression.Index.SchemaName, Is.EqualTo("testschema"));
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsChangedAndSchemaIsNotSetThenSetSchema()
+        {
+            var expression = new DeleteIndexExpression();
+
+            var migrationConventions = new MigrationConventions { GetDefaultSchema = () => "testdefault" };
+
+            expression.ApplyConventions(migrationConventions);
+
+            Assert.That(expression.Index.SchemaName, Is.EqualTo("testdefault"));
+        }
     }
 }

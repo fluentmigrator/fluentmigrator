@@ -99,5 +99,36 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var expression = new RenameTableExpression { OldName = "Bacon", NewName = "ChunkyBacon" };
             expression.ToString().ShouldBe("RenameTable Bacon ChunkyBacon");
         }
+  
+        [Test]
+        public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
+        {
+            var expression = new RenameTableExpression { OldName = "Bacon", NewName = "ChunkyBacon" };
+
+            expression.ApplyConventions(new MigrationConventions());
+
+            Assert.That(expression.SchemaName, Is.Null);
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsSetThenSchemaShouldNotBeChanged()
+        {
+            var expression = new RenameTableExpression { SchemaName = "testschema", OldName = "Bacon", NewName = "ChunkyBacon" };
+
+            expression.ApplyConventions(new MigrationConventions());
+
+            Assert.That(expression.SchemaName, Is.EqualTo("testschema"));
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsChangedAndSchemaIsNotSetThenSetSchema()
+        {
+            var expression = new RenameTableExpression { OldName = "Bacon", NewName = "ChunkyBacon" };
+            var migrationConventions = new MigrationConventions { GetDefaultSchema = () => "testdefault" };
+
+            expression.ApplyConventions(migrationConventions);
+
+            Assert.That(expression.SchemaName, Is.EqualTo("testdefault"));
+        }
     }
 }

@@ -123,5 +123,39 @@ namespace FluentMigrator.Tests.Unit.Definitions
             var errors = ValidationHelper.CollectErrors(column);
             errors.ShouldNotContain(ErrorMessages.ForeignKeyMustHaveOneOrMorePrimaryColumns);
         }
+ 
+        [Test]
+        public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
+        {
+            var foreignKeyDefinition = new ForeignKeyDefinition { Name = "Test" };
+
+            foreignKeyDefinition.ApplyConventions(new MigrationConventions());
+
+            Assert.That(foreignKeyDefinition.ForeignTableSchema, Is.Null);
+            Assert.That(foreignKeyDefinition.PrimaryTableSchema, Is.Null);
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsSetThenSchemaShouldNotBeChanged()
+        {
+            var foreignKeyDefinition = new ForeignKeyDefinition { Name = "Test", ForeignTableSchema = "testschema", PrimaryTableSchema = "testschema" };
+
+            foreignKeyDefinition.ApplyConventions(new MigrationConventions());
+
+            Assert.That(foreignKeyDefinition.ForeignTableSchema, Is.EqualTo("testschema"));
+            Assert.That(foreignKeyDefinition.PrimaryTableSchema, Is.EqualTo("testschema"));
+        }
+
+        [Test]
+        public void WhenDefaultSchemaConventionIsChangedAndSchemaIsNotSetThenSetSchema()
+        {
+            var foreignKeyDefinition = new ForeignKeyDefinition { Name = "Test" };
+            var migrationConventions = new MigrationConventions { GetDefaultSchema = () => "testdefault" };
+
+            foreignKeyDefinition.ApplyConventions(migrationConventions);
+
+            Assert.That(foreignKeyDefinition.ForeignTableSchema, Is.EqualTo("testdefault"));
+            Assert.That(foreignKeyDefinition.PrimaryTableSchema, Is.EqualTo("testdefault"));
+        }
     }
 }
