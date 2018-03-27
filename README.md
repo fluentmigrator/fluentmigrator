@@ -69,7 +69,7 @@ dotnet vstest test/FluentMigrator.Tests/bin/Debug/net452/FluentMigrator.Tests.dl
 * [x] [DBNull for Insert/Update criteria expression](https://github.com/fluentmigrator/fluentmigrator/pull/672)
 * [x] [Overload IfDatabase to accept predicate](https://github.com/fluentmigrator/fluentmigrator/pull/683)
 * [x] [TaskExecutor got method HasMigrationsToApply](https://github.com/fluentmigrator/fluentmigrator/pull/701)
-* [ ] [Enable delegation to methods for IfDatabase expressions](https://github.com/fluentmigrator/fluentmigrator/pull/707)
+* [x] [Enable delegation to methods for IfDatabase expressions](https://github.com/fluentmigrator/fluentmigrator/pull/707)
 * [ ] [709 case insensitive arguments and give more instructive messages when required options are not given](https://github.com/fluentmigrator/fluentmigrator/pull/719)
 * [ ] [ListMigrations says "(not applied)" for migrations not applied](https://github.com/fluentmigrator/fluentmigrator/pull/750)
 * [ ] [Syntax for creating indexes with nonkey columns](https://github.com/fluentmigrator/fluentmigrator/pull/759)

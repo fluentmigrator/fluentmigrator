@@ -19,6 +19,7 @@
 
 using System;
 using System.Linq;
+
 using FluentMigrator.Builders.Alter;
 using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.Delete;
@@ -135,6 +136,16 @@ namespace FluentMigrator.Builders.IfDatabase
         public IUpdateExpressionRoot Update
         {
             get { return new UpdateExpressionRoot(_context); }
+        }
+
+        public void Delegate(Action delegation)
+        {
+            if (_context.QuerySchema is NullIfDatabaseProcessor)
+            {
+                return;
+            }
+
+            delegation.Invoke();
         }
 
         /// <summary>

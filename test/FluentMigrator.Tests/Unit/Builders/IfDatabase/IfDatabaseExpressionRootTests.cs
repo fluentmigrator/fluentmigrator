@@ -34,6 +34,29 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
     [TestFixture]
     public class IfDatabaseExpressionRootTests
     {
+        public void CallsDelegateIfDatabaseTypeApplies()
+        {
+            var delegateCalled = false;
+            var context = ExecuteTestMigration(new[] { "Jet" }, expr =>
+            {
+                expr.Delegate(() => delegateCalled = true);
+            });
+
+            context.Expressions.Count.ShouldBe(1);
+            delegateCalled.ShouldBeTrue();
+        }
+
+        public void DoesntCallsDelegateIfDatabaseTypeDoesntMatch()
+        {
+            var delegateCalled = false;
+            var context = ExecuteTestMigration(new[] { "Blurb" }, expr =>
+            {
+                expr.Delegate(() => delegateCalled = true);
+            });
+
+            context.Expressions.Count.ShouldBe(0);
+            delegateCalled.ShouldBeFalse();
+        }
 
         [Test]
         public void WillAddExpressionIfDatabaseTypeApplies()

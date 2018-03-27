@@ -1,8 +1,8 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // Copyright (c) 2011, Grant Archibald
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 //
 #endregion
 
+using System;
 
 using FluentMigrator.Builders.Alter;
 using FluentMigrator.Builders.Create;
@@ -49,5 +50,7 @@ namespace FluentMigrator.Builders.IfDatabase
         ISchemaExpressionRoot Schema { get; }
 
         IUpdateExpressionRoot Update { get; }
+
+        void Delegate(Action delegation);
     }
 }
