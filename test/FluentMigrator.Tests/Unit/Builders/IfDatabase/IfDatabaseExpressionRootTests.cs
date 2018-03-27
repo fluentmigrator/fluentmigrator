@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // Copyright (c) 2011, Grant Archibald
@@ -41,6 +41,22 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             var context = ExecuteTestMigration("Jet");
 
             context.Expressions.Count.ShouldBe(1);
+        }
+
+        [Test]
+        public void WillAddExpressionIfProcessorInMigrationProcessorPredicate()
+        {
+            var context = ExecuteTestMigration(x => x == "Jet");
+
+            context.Expressions.Count.ShouldBe(1);
+        }
+
+        [Test]
+        public void WillNotAddExpressionIfProcessorNotInMigrationProcessorPredicate()
+        {
+            var context = ExecuteTestMigration(x => x == "Db2" || x == "Hana");
+
+            context.Expressions.Count.ShouldBe(0);
         }
 
         [Test]
@@ -174,6 +190,29 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
 
             return context;
         }
-    }
 
+        private MigrationContext ExecuteTestMigration(Predicate<string> databaseTypePredicate, params Action<IIfDatabaseExpressionRoot>[] fluentExpression)
+        {
+            // Arrange
+
+            var context = new MigrationContext(new MigrationConventions(), new JetProcessor(new OleDbConnection(), null, null, null), new SingleAssembly(GetType().Assembly), null, "");
+
+
+            var expression = new IfDatabaseExpressionRoot(context, databaseTypePredicate);
+
+            // Act
+            if (fluentExpression == null || fluentExpression.Length == 0)
+                expression.Create.Table("Foo").WithColumn("Id").AsInt16();
+            else
+            {
+                foreach (var action in fluentExpression)
+                {
+                    action(expression);
+                }
+
+            }
+
+            return context;
+        }
+    }
 }

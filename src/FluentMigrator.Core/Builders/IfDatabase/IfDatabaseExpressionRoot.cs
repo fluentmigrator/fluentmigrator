@@ -1,8 +1,8 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // Copyright (c) 2011, Grant Archibald
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -43,16 +43,37 @@ namespace FluentMigrator.Builders.IfDatabase
         private readonly IMigrationContext _context;
 
         /// <summary>
-        /// Constricts a new instance of a <see cref="IfDatabaseExpressionRoot"/> that will only add expressions to the provided <see cref="context"/> if <see cref="databaseType"/> matches the migration processor
+        /// Initializes a new instance of a the <see cref="IfDatabaseExpressionRoot"/> class that will only add expressions to the provided <see cref="context"/> if <see cref="databaseType"/> matches the migration processor
         /// </summary>
         /// <remarks>If the database type does not apply then a <seealso cref="NullIfDatabaseProcessor"/> will be used as a container to void any fluent expressions that would have been executed</remarks>
         /// <param name="context">The context to add expressions to if the database type applies</param>
         /// <param name="databaseType">The database type that the expressions relate to</param>
         public IfDatabaseExpressionRoot(IMigrationContext context, params string[] databaseType)
         {
-            if (databaseType == null) throw new ArgumentNullException("databaseType");
+            if (databaseType == null) throw new ArgumentNullException(nameof(databaseType));
 
-            _context = DatabaseTypeApplies(context, databaseType) ? context : new MigrationContext(new MigrationConventions(), new NullIfDatabaseProcessor(), context.MigrationAssemblies, context.ApplicationContext, "");
+            _context = DatabaseTypeApplies(context, databaseType)
+                ? context
+                : new MigrationContext(
+                    new MigrationConventions(), new NullIfDatabaseProcessor(),
+                    context.MigrationAssemblies, context.ApplicationContext, "");
+        }
+
+        /// <summary>
+        /// Initializes a new instance of a the <see cref="IfDatabaseExpressionRoot"/> class that will only add expressions to the provided <see cref="context"/> if <see cref="databaseTypePredicate"/> is true for the migration processor
+        /// </summary>
+        /// <remarks>If the database type does not apply then a <seealso cref="NullIfDatabaseProcessor"/> will be used as a container to void any fluent expressions that would have been executed</remarks>
+        /// <param name="context">The context to add expressions to if the database type applies</param>
+        /// <param name="databaseTypePredicate">The predicate that must be true for the expression to run</param>
+        public IfDatabaseExpressionRoot(IMigrationContext context, Predicate<string> databaseTypePredicate)
+        {
+            if (databaseTypePredicate == null) throw new ArgumentNullException(nameof(databaseTypePredicate));
+
+            _context = DatabaseTypeApplies(context, databaseTypePredicate)
+                ? context
+                : new MigrationContext(
+                    new MigrationConventions(),new NullIfDatabaseProcessor(),
+                    context.MigrationAssemblies, context.ApplicationContext, "");
         }
 
         /// <summary>
@@ -120,17 +141,31 @@ namespace FluentMigrator.Builders.IfDatabase
         /// Checks if the database type matches the name of the context migration processor
         /// </summary>
         /// <param name="context">The context to evaluate</param>
-        /// <param name="databaseType">The type to be checked</param>
+        /// <param name="databaseTypes">The type to be checked</param>
         /// <returns><c>True</c> if the database type applies, <c>False</c> if not</returns>
-        private static bool DatabaseTypeApplies(IMigrationContext context, params string[] databaseType)
+        private static bool DatabaseTypeApplies(IMigrationContext context, params string[] databaseTypes)
         {
-            if (context.QuerySchema is IMigrationProcessor)
+            if (context.QuerySchema is IMigrationProcessor mp)
             {
-                string currentDatabaseType = context.QuerySchema.DatabaseType;
+                var currentDatabaseType = mp.DatabaseType;
+                return databaseTypes
+                    .Any(db => currentDatabaseType.StartsWith(db, StringComparison.InvariantCultureIgnoreCase));
+            }
 
-                return (from db in databaseType
-                        where currentDatabaseType.StartsWith(db, StringComparison.InvariantCultureIgnoreCase)
-                        select db).Any();
+            return false;
+        }
+
+        /// <summary>
+        /// Checks if the database type matches the name of the context migration processor
+        /// </summary>
+        /// <param name="context">The context to evaluate</param>
+        /// <param name="databaseTypePredicate">The predicate to be evaluated</param>
+        /// <returns><c>True</c> if the database type applies, <c>False</c> if not</returns>
+        private static bool DatabaseTypeApplies(IMigrationContext context, Predicate<string> databaseTypePredicate)
+        {
+            if (context.QuerySchema is IMigrationProcessor mp)
+            {
+                return databaseTypePredicate(mp.DatabaseType);
             }
 
             return false;
