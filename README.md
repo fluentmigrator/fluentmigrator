@@ -80,7 +80,7 @@ dotnet vstest test/FluentMigrator.Tests/bin/Debug/net452/FluentMigrator.Tests.dl
 * [x] [Added StopOnError flag in order to pause console if some migration fails](https://github.com/fluentmigrator/fluentmigrator/pull/795)
 * [x] [Add SystemMethods.CurrentDateTimeOffset](https://github.com/fluentmigrator/fluentmigrator/pull/803)
 * [x] [Remove default connection timeout. Use provider's default instead.](https://github.com/fluentmigrator/fluentmigrator/pull/811)
-* [ ] [64 bit identity seed for SQL Server](https://github.com/fluentmigrator/fluentmigrator/pull/816)
+* [x] [64 bit identity seed for SQL Server](https://github.com/fluentmigrator/fluentmigrator/pull/816)
 
 ### Bug fixes
 

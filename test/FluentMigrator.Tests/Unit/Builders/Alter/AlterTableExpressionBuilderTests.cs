@@ -478,6 +478,24 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
         }
 
         [Test]
+        public void CallingIdentityWithSeededLongIdentitySetsAdditionalProperties()
+        {
+            var contextMock = new Mock<IMigrationContext>();
+
+            var columnMock = new Mock<ColumnDefinition>();
+
+            var expressionMock = new Mock<AlterTableExpression>();
+            var builder = new AlterTableExpressionBuilder(expressionMock.Object, contextMock.Object);
+            builder.CurrentColumn = columnMock.Object;
+            builder.Identity(long.MinValue, 44);
+
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(SqlServerExtensions.IdentitySeed, long.MinValue));
+            columnMock.Object.AdditionalFeatures.ShouldContain(
+                new KeyValuePair<string, object>(SqlServerExtensions.IdentityIncrement, 44));
+        }
+
+        [Test]
         public void CallingIndexedCallsHelperWithNullIndexName()
         {
             VerifyColumnHelperCall(c => c.Indexed(), h => h.Indexed(null));
