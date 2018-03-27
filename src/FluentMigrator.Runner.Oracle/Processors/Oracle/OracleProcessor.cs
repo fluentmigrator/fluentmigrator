@@ -161,7 +161,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             EnsureConnectionIsOpen();
 
             Announcer.Sql(String.Format(template, args));
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Options))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -187,7 +187,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
             EnsureConnectionIsOpen();
 
             var result = new DataSet();
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Options))
             {
                 var adapter = Factory.CreateDataAdapter(command);
                 adapter.Fill(result);
@@ -218,7 +218,7 @@ namespace FluentMigrator.Runner.Processors.Oracle
 
             foreach (var batch in batches)
             {
-                using (var command = Factory.CreateCommand(batch, Connection))
+                using (var command = Factory.CreateCommand(batch, Connection, Options))
                     command.ExecuteNonQuery();
             }
         }

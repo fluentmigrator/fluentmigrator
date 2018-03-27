@@ -120,7 +120,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
             {
                 var result = command.ExecuteScalar();
                 return DBNull.Value != result && Convert.ToInt32(result) == 1;
@@ -137,7 +137,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             EnsureConnectionIsOpen();
 
             var ds = new DataSet();
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
             {
                 var adapter = Factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
@@ -167,11 +167,10 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         private void ExecuteNonQuery(string sql)
         {
-            using (var command = Factory.CreateCommand(sql, Connection, Transaction))
+            using (var command = Factory.CreateCommand(sql, Connection, Transaction, Options))
             {
                 try
                 {
-                    command.CommandTimeout = Options.Timeout;
                     command.ExecuteNonQuery();
                 }
                 catch (Exception ex)
@@ -193,7 +192,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             sql += "\nGO";   // make sure last batch is executed.
             string sqlBatch = string.Empty;
 
-            using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction))
+            using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
             {
                 try
                 {
@@ -204,7 +203,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                             if (!string.IsNullOrEmpty(sqlBatch))
                             {
                                 command.CommandText = sqlBatch;
-                                command.CommandTimeout = Options.Timeout;
                                 command.ExecuteNonQuery();
                                 sqlBatch = string.Empty;
                             }
@@ -238,8 +236,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             EnsureConnectionIsOpen();
 
-            if (expression.Operation != null)
-                expression.Operation(Connection, Transaction);
+            expression.Operation?.Invoke(Connection, Transaction);
         }
     }
 }

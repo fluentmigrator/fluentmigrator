@@ -37,7 +37,7 @@ namespace FluentMigrator.Runner.Initialization
         string Profile { get; set; }
         IAnnouncer Announcer { get; }
         IStopWatch StopWatch { get; }
-        int Timeout { get; set; }
+        int? Timeout { get; set; }
         string ConnectionStringConfigPath { get; set; }
         IEnumerable<string> Tags { get; set; }
         string ProviderSwitches { get; set; }

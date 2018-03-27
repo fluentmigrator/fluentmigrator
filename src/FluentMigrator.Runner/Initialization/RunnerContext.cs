@@ -23,7 +23,7 @@ namespace FluentMigrator.Runner.Initialization
         public int Steps { get; set; }
         public string WorkingDirectory { get; set; }
         public string Profile { get; set; }
-        public int Timeout { get; set; }
+        public int? Timeout { get; set; }
         public string ConnectionStringConfigPath { get; set; }
         public IEnumerable<string> Tags { get; set; }
         public bool TransactionPerSession { get; set; }

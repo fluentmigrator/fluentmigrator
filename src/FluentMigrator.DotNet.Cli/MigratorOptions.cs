@@ -35,7 +35,7 @@ namespace FluentMigrator.DotNet.Cli
         public bool Verbose { get; private set; }
         public string Profile { get; private set; }
         public string Context { get; private set; }
-        public int Timeout { get; private set; }
+        public int? Timeout { get; private set; }
         public TransactionMode TransactionMode { get; private set; }
         public bool Output { get; private set; }
         public string OutputFileName { get; private set; }

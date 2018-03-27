@@ -129,7 +129,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Options))
             {
                 command.ExecuteNonQuery();
             }
@@ -142,7 +142,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Options))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -168,7 +168,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
             EnsureConnectionIsOpen();
 
             var result = new DataSet();
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Options))
             {
                 var adapter = Factory.CreateDataAdapter(command);
                 adapter.Fill(result);
@@ -193,7 +193,7 @@ namespace FluentMigrator.Runner.Processors.DotConnectOracle
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(sql, Connection))
+            using (var command = Factory.CreateCommand(sql, Connection, Options))
                 command.ExecuteNonQuery();
         }
     }

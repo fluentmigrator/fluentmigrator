@@ -9,6 +9,7 @@ using FluentMigrator.Runner.Generators.Oracle;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Tests.Helpers;
+using FluentMigrator.Tests.Unit;
 
 using NUnit.Framework;
 using NUnit.Should;
@@ -27,7 +28,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		{
 			this.Factory = dbFactory;
 			this.Connection = this.Factory.CreateConnection(IntegrationTestOptions.Oracle.ConnectionString);
-			this.Processor = new OracleProcessor(this.Connection, new OracleGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), this.Factory);
+			this.Processor = new OracleProcessor(this.Connection, new OracleGenerator(), new TextWriterAnnouncer(System.Console.Out), new TestMigrationProcessorOptions(), this.Factory);
 			this.Connection.Open();
 		}
 
@@ -96,7 +97,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		{
 			string sql = "SELECT SYSDATE FROM " + this.Quoter.QuoteTableName("DUAL");
 			var ds = new DataSet();
-			using (var command = this.Factory.CreateCommand(sql, this.Connection))
+			using (var command = this.Factory.CreateCommand(sql, this.Connection, Processor.Options))
 			{
 				var adapter = this.Factory.CreateDataAdapter(command);
 				adapter.Fill(ds);

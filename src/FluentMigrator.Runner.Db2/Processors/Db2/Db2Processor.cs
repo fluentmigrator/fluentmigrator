@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 //
@@ -97,7 +97,7 @@ namespace FluentMigrator.Runner.Processors.DB2
         {
             this.EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(string.Format(template, args), Connection, Transaction))
+            using (var command = Factory.CreateCommand(string.Format(template, args), Connection, Transaction, Options))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -138,7 +138,7 @@ namespace FluentMigrator.Runner.Processors.DB2
             this.EnsureConnectionIsOpen();
 
             var ds = new DataSet();
-            using (var command = Factory.CreateCommand(string.Format(template, args), Connection, Transaction))
+            using (var command = Factory.CreateCommand(string.Format(template, args), Connection, Transaction, Options))
             {
                 var adapter = Factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
@@ -180,9 +180,8 @@ namespace FluentMigrator.Runner.Processors.DB2
 
             this.EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(sql, Connection))
+            using (var command = Factory.CreateCommand(sql, Connection, Options))
             {
-                command.CommandTimeout = Options.Timeout;
                 command.ExecuteNonQuery();
             }
         }

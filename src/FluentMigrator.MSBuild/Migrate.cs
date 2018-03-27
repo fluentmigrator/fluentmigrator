@@ -95,7 +95,7 @@ namespace FluentMigrator.MSBuild
 
         public string WorkingDirectory { get; set; }
 
-        public int Timeout { get; set; }
+        public int? Timeout { get; set; }
 
         public string Profile { get; set; }
 

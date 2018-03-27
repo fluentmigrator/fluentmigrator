@@ -1,4 +1,4 @@
-﻿namespace FluentMigrator.Tests.Helpers
+namespace FluentMigrator.Tests.Helpers
 {
     using System;
     using System.Collections.Generic;
@@ -105,7 +105,7 @@
             var columns = string.Join(", ", columnDefinitions);
             sb.AppendFormat("CREATE TABLE {0} ({1})", NameWithSchema, columns);
 
-            using (var command = Factory.CreateCommand(sb.ToString(), Connection, Transaction))
+            using (var command = Factory.CreateCommand(sb.ToString(), Connection, Transaction, Processor.Options))
             {
                 command.ExecuteNonQuery();
             }
@@ -120,7 +120,7 @@
         {
             var tableCommand = string.Format("DROP TABLE {0}", NameWithSchema);
 
-            using (var command = Factory.CreateCommand(tableCommand, Connection, Transaction))
+            using (var command = Factory.CreateCommand(tableCommand, Connection, Transaction, Processor.Options))
             {
                 command.ExecuteNonQuery();
             }
@@ -129,7 +129,7 @@
             {
                 var schemaCommand = string.Format("DROP SCHEMA {0} RESTRICT", quoter.QuoteSchemaName(_schema));
 
-                using (var commandToo = Factory.CreateCommand(schemaCommand, Connection, Transaction))
+                using (var commandToo = Factory.CreateCommand(schemaCommand, Connection, Transaction, Processor.Options))
                 {
                     commandToo.ExecuteNonQuery();
                 }
@@ -144,7 +144,7 @@
                 quoter.QuoteColumnName(column)
                 );
 
-            using (var command = Factory.CreateCommand(query, Connection, Transaction))
+            using (var command = Factory.CreateCommand(query, Connection, Transaction, Processor.Options))
             {
                 command.ExecuteNonQuery();
             }
@@ -160,7 +160,7 @@
                 quoter.QuoteColumnName(column)
             );
 
-            using (var command = Factory.CreateCommand(query, Connection, Transaction))
+            using (var command = Factory.CreateCommand(query, Connection, Transaction, Processor.Options))
             {
                 command.ExecuteNonQuery();
             }
