@@ -21,7 +21,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
     public class SqlServer2008Generator : SqlServer2005Generator
     {
         public SqlServer2008Generator()
-            : base(new SqlServer2005Column(new SqlServer2008TypeMap()), new SqlServer2005DescriptionGenerator())
+            : base(new SqlServer2008Column(new SqlServer2008TypeMap()), new SqlServer2005DescriptionGenerator())
         {
         }
 

@@ -6,7 +6,8 @@ namespace FluentMigrator
         NewGuid,
         NewSequentialId,
         CurrentDateTime,
+        CurrentDateTimeOffset,
         CurrentUTCDateTime,
-        CurrentUser
+        CurrentUser,
     }
 }

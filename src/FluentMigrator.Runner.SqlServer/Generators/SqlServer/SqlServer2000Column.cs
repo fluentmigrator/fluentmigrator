@@ -67,6 +67,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                     return "NEWSEQUENTIALID()";
                 case SystemMethods.CurrentDateTime:
                     return "GETDATE()";
+                case SystemMethods.CurrentDateTimeOffset:
                 case SystemMethods.CurrentUTCDateTime:
                     return "GETUTCDATE()";
                 case SystemMethods.CurrentUser:
