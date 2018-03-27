@@ -20,9 +20,13 @@ namespace FluentMigrator.Runner.Generators.MySql
 {
     internal class MySql5TypeMap : MySql4TypeMap
     {
+        public new const int DecimalCapacity = 65;
+
         protected override void SetupTypeMaps()
         {
             base.SetupTypeMaps();
+
+            SetTypeMap(DbType.Decimal, "DECIMAL($size,$precision)", DecimalCapacity);
 
             SetTypeMap(DbType.StringFixedLength, "NCHAR(255)");
             SetTypeMap(DbType.StringFixedLength, "NCHAR($size)", StringCapacity);

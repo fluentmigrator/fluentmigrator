@@ -89,7 +89,7 @@ dotnet vstest test/FluentMigrator.Tests/bin/Debug/net452/FluentMigrator.Tests.dl
       `MySql` is now `MySql4` and this feature requires `MySql5`
 * [x] [[Hana] Fix drop primary key](https://github.com/fluentmigrator/fluentmigrator/pull/745)
 * [x] [IntegrationTestBase Assert on configuration error](https://github.com/fluentmigrator/fluentmigrator/pull/751)
-* [ ] [Update Max Decimal for MySql](https://github.com/fluentmigrator/fluentmigrator/pull/825)
+* [x] [Update Max Decimal for MySql](https://github.com/fluentmigrator/fluentmigrator/pull/825)
 
 ### Optimization
 

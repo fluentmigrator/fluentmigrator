@@ -28,7 +28,7 @@ namespace FluentMigrator.Runner.Generators.MySql
         public const int TextCapacity = 65535;
         public const int MediumTextCapacity = 16777215;
         public const int LongTextCapacity = int.MaxValue;
-        public const int DecimalCapacity = 19;
+        public const int DecimalCapacity = 254;
 
         protected override void SetupTypeMaps()
         {
