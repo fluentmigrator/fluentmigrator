@@ -77,7 +77,7 @@ dotnet vstest test/FluentMigrator.Tests/bin/Debug/net452/FluentMigrator.Tests.dl
 * [x] [Add MySQL alter and drop of defaults](https://github.com/fluentmigrator/fluentmigrator/pull/783)
 * [x] [SQL Server 2005 support WITH (ONLINE = ON|OFF)](https://github.com/fluentmigrator/fluentmigrator/pull/788)
 * [x] [MySqlProcessor was not announcing the SQL of embedded scripts](https://github.com/fluentmigrator/fluentmigrator/pull/793)
-* [ ] [Added StopOnError flag in order to pause console if some migration fails](https://github.com/fluentmigrator/fluentmigrator/pull/795)
+* [x] [Added StopOnError flag in order to pause console if some migration fails](https://github.com/fluentmigrator/fluentmigrator/pull/795)
 * [ ] [Add SystemMethods.CurrentDateTimeOffset](https://github.com/fluentmigrator/fluentmigrator/pull/803)
 * [ ] [Remove default connection timeout. Use provider's default instead.](https://github.com/fluentmigrator/fluentmigrator/pull/811)
 * [ ] [64 bit identity seed for SQL Server](https://github.com/fluentmigrator/fluentmigrator/pull/816)

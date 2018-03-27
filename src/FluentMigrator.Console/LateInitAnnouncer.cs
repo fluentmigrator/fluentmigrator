@@ -27,8 +27,7 @@ namespace FluentMigrator.Console
     class LateInitAnnouncer : IAnnouncer, IDisposable
     {
         private readonly bool _executeAgainstMsSql;
-        private readonly bool _verbose;
-        private readonly ConsoleAnnouncer _consoleAnnouncer;
+        private readonly IAnnouncer _consoleAnnouncer;
 
         private StreamWriter _streamWriter;
 
@@ -36,11 +35,9 @@ namespace FluentMigrator.Console
 
         private IAnnouncer InnerAnnouncer => _innerAnnouncer ?? (_innerAnnouncer = InitInnerAnnouncer());
 
-        public LateInitAnnouncer(ConsoleAnnouncer consoleAnnouncer, bool executeAgainstMsSql, bool verbose,
-            string outputTo)
+        public LateInitAnnouncer(IAnnouncer consoleAnnouncer, bool executeAgainstMsSql, string outputTo)
         {
             _executeAgainstMsSql = executeAgainstMsSql;
-            _verbose = verbose;
             OutputTo = outputTo;
             _consoleAnnouncer = consoleAnnouncer;
         }
@@ -100,9 +97,6 @@ namespace FluentMigrator.Console
 
             fileAnnouncer.ShowElapsedTime = false;
             fileAnnouncer.ShowSql = true;
-
-            _consoleAnnouncer.ShowElapsedTime = _verbose;
-            _consoleAnnouncer.ShowSql = _verbose;
 
             var announcer = new CompositeAnnouncer(_consoleAnnouncer, fileAnnouncer);
             _streamWriter = sw;
