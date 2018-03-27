@@ -1,13 +1,13 @@
 #region License
 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,11 +19,26 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
+
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.DB2;
+using FluentMigrator.Runner.Processors.DotConnectOracle;
+using FluentMigrator.Runner.Processors.Firebird;
+using FluentMigrator.Runner.Processors.MySql;
+using FluentMigrator.Runner.Processors.Oracle;
+using FluentMigrator.Runner.Processors.Postgres;
+using FluentMigrator.Runner.Processors.SqlServer;
+using FluentMigrator.Runner.Processors.SQLite;
+
 using Mono.Options;
+
+using Processors = FluentMigrator.Runner.Processors;
 
 namespace FluentMigrator.Console
 {
@@ -190,6 +205,31 @@ namespace FluentMigrator.Console
                                             }
                                     };
 
+                // Register all available processor factories. The library usually tries
+                // to find all provider factories by scanning all referenced assemblies,
+                // but this fails if we don't have any reference. Adding the package
+                // isn't enough. We MUST have a reference to a type, otherwise the
+                // assembly reference gets removed by the C# compiler!
+                MigrationProcessorFactoryProvider.Register(new Db2ProcessorFactory());
+                MigrationProcessorFactoryProvider.Register(new DotConnectOracleProcessorFactory());
+                MigrationProcessorFactoryProvider.Register(new FirebirdProcessorFactory());
+                MigrationProcessorFactoryProvider.Register(new MySqlProcessorFactory());
+                MigrationProcessorFactoryProvider.Register(new OracleManagedProcessorFactory());
+                MigrationProcessorFactoryProvider.Register(new PostgresProcessorFactory());
+                MigrationProcessorFactoryProvider.Register(new SQLiteProcessorFactory());
+                MigrationProcessorFactoryProvider.Register(new SqlServer2000ProcessorFactory());
+                MigrationProcessorFactoryProvider.Register(new SqlServer2005ProcessorFactory());
+                MigrationProcessorFactoryProvider.Register(new SqlServer2008ProcessorFactory());
+                MigrationProcessorFactoryProvider.Register(new SqlServer2012ProcessorFactory());
+                MigrationProcessorFactoryProvider.Register(new SqlServer2014ProcessorFactory());
+                MigrationProcessorFactoryProvider.Register(new SqlServerProcessorFactory());
+                MigrationProcessorFactoryProvider.Register(new SqlServerCeProcessorFactory());
+
+#if NET40 || NET45
+                MigrationProcessorFactoryProvider.Register(new Processors.Hana.HanaProcessorFactory());
+                MigrationProcessorFactoryProvider.Register(new Processors.Jet.JetProcessorFactory());
+#endif
+
                 try
                 {
                     optionSet.Parse(args);
@@ -220,9 +260,6 @@ namespace FluentMigrator.Console
 
                 if (Output)
                 {
-                    if (string.IsNullOrEmpty(OutputFilename))
-                        OutputFilename = TargetAssembly + ".sql";
-
                     ExecuteMigrations(OutputFilename);
                 }
                 else
@@ -268,23 +305,12 @@ namespace FluentMigrator.Console
 
         private void ExecuteMigrations(string outputTo)
         {
-            using (var sw = new StreamWriter(outputTo))
+            using (var announcer = new LateInitAnnouncer(consoleAnnouncer, ExecutingAgainstMsSql, Verbose, outputTo))
             {
-                var fileAnnouncer = this.ExecutingAgainstMsSql ?
-                    new TextWriterWithGoAnnouncer(sw) :
-                    new TextWriterAnnouncer(sw);
-
-                fileAnnouncer.ShowElapsedTime = false;
-                fileAnnouncer.ShowSql = true;
-
-                consoleAnnouncer.ShowElapsedTime = Verbose;
-                consoleAnnouncer.ShowSql = Verbose;
-
-                var announcer = new CompositeAnnouncer(consoleAnnouncer, fileAnnouncer);
-
                 ExecuteMigrations(announcer);
             }
         }
+
         private bool ExecutingAgainstMsSql
         {
             get
@@ -318,7 +344,7 @@ namespace FluentMigrator.Console
                 ProviderSwitches = ProviderSwitches
             };
 
-            new TaskExecutor(RunnerContext).Execute();
+            new LateInitTaskExecutor(RunnerContext).Execute();
         }
     }
 }

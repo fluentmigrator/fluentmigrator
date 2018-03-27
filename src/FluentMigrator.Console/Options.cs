@@ -550,21 +550,6 @@ namespace Mono.Options
             throw new InvalidOperationException("Option has no names!");
         }
 
-        [Obsolete("Use KeyedCollection.this[string]")]
-        protected Option GetOptionForName(string option)
-        {
-            if (option == null)
-                throw new ArgumentNullException("option");
-            try
-            {
-                return base[option];
-            }
-            catch (KeyNotFoundException)
-            {
-                return null;
-            }
-        }
-
         protected override void InsertItem(int index, Option item)
         {
             base.InsertItem(index, item);

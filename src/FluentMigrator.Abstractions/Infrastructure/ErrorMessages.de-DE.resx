@@ -1,0 +1,90 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="ColumnNameCannotBeNullOrEmpty" xml:space="preserve">
+    <value>Der Spaltenname darf nicht null oder leer sein.</value>
+  </data>
+  <data name="ColumnNamesMustBeUnique" xml:space="preserve">
+    <value>Spaltennamen müssen eindeutig sein.</value>
+  </data>
+  <data name="ColumnTypeMustBeDefined" xml:space="preserve">
+    <value>Die Spalte hat keinen definierten Typen.</value>
+  </data>
+  <data name="ConstraintMustHaveAtLeastOneColumn" xml:space="preserve">
+    <value>Die Einschränkung muss mindestens eine Spalte umfassen.</value>
+  </data>
+  <data name="DefaultValueCannotBeNull" xml:space="preserve">
+    <value>Der Standard-Wert darf nicht null sein.</value>
+  </data>
+  <data name="DestinationSchemaCannotBeNull" xml:space="preserve">
+    <value>Der Schema-Name des Ziels darf nicht null oder leer sein.</value>
+  </data>
+  <data name="ForeignKeyMustHaveOneOrMoreForeignColumns" xml:space="preserve">
+    <value>Der Fremdschlüssel muss eine oder mehrere referenzierenden Spalten umfassen.</value>
+  </data>
+  <data name="ForeignKeyMustHaveOneOrMorePrimaryColumns" xml:space="preserve">
+    <value>Der Fremdschlüssel muss eine oder mehrere Primärspalten umfassen.</value>
+  </data>
+  <data name="ForeignKeyNameCannotBeNullOrEmpty" xml:space="preserve">
+    <value>Der Fremdschlüssel-Name darf nicht null oder leer sein.</value>
+  </data>
+  <data name="ForeignTableNameCannotBeNullOrEmpty" xml:space="preserve">
+    <value>Der Name der referenzierenden Tabelle darf nicht null oder leer sein.</value>
+  </data>
+  <data name="IndexMustHaveOneOrMoreColumns" xml:space="preserve">
+    <value>Der Index muss eine oder mehrere Spalten umfassen.</value>
+  </data>
+  <data name="IndexNameCannotBeNullOrEmpty" xml:space="preserve">
+    <value>Der Index-Name darf nicht null oder leer sein.</value>
+  </data>
+  <data name="NewColumnNameCannotBeNullOrEmpty" xml:space="preserve">
+    <value>Der neue Spaltenname darf nicht null oder leer sein.</value>
+  </data>
+  <data name="NewTableNameCannotBeNullOrEmpty" xml:space="preserve">
+    <value>Der neue Tabellenname darf nicht null oder leer sein.</value>
+  </data>
+  <data name="OldColumnNameCannotBeNullOrEmpty" xml:space="preserve">
+    <value>Der alte Spaltenname darf nicht null oder leer sein.</value>
+  </data>
+  <data name="OldTableNameCannotBeNullOrEmpty" xml:space="preserve">
+    <value>Der alte Tabellenname darf nicht null oder leer sein.</value>
+  </data>
+  <data name="OperationCannotBeNull" xml:space="preserve">
+    <value>Die auf der Datenbankverbindung auszuführende Aktion darf nicht null sein.</value>
+  </data>
+  <data name="PrimaryTableNameCannotBeNullOrEmpty" xml:space="preserve">
+    <value>Der primäre Tabellenname darf nicht null oder leer sein.</value>
+  </data>
+  <data name="SchemaNameCannotBeNullOrEmpty" xml:space="preserve">
+    <value>Der Schema-Name darf nicht null oder leer sein.</value>
+  </data>
+  <data name="SequenceNameCannotBeNullOrEmpty" xml:space="preserve">
+    <value>Der Sequenz-Name darf nicht null oder leer sein.</value>
+  </data>
+  <data name="SqlScriptCannotBeNullOrEmpty" xml:space="preserve">
+    <value>Das SQL-Script darf nicht null oder leer sein.</value>
+  </data>
+  <data name="SqlStatementCannotBeNullOrEmpty" xml:space="preserve">
+    <value>Die SQL-Anweisung darf nicht null oder leer sein.</value>
+  </data>
+  <data name="TableNameCannotBeNullOrEmpty" xml:space="preserve">
+    <value>Der abellenname darf nicht null oder leer sein.</value>
+  </data>
+  <data name="UpdateDataExpressionMustNotSpecifyBothWhereClauseAndAllRows" xml:space="preserve">
+    <value>Die Update-Anweisung spezifiziert sowohl eine .Where()-Bedingung und auch, dass .AllRows() als Ziel gewählt werden sollen. Nur eines von beiden darf angegeben werden.</value>
+  </data>
+  <data name="UpdateDataExpressionMustSpecifyWhereClauseOrAllRows" xml:space="preserve">
+    <value>Der Update-Anweisung fehlt eine Bedingung, wie z.B. .Where() für einen oder mehrere Datensätze oder .AllRows() für alle Datensätze.</value>
+  </data>
+</root>

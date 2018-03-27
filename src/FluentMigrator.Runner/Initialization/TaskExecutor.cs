@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -36,35 +36,48 @@ namespace FluentMigrator.Runner.Initialization
         private MigrationProcessorFactoryProvider ProcessorFactoryProvider { get; set; }
 
         public TaskExecutor(IRunnerContext runnerContext)
-            : this(runnerContext, new AssemblyLoaderFactory(), new MigrationProcessorFactoryProvider())
+            : this(runnerContext, new DefaultConnectionStringProvider(), new AssemblyLoaderFactory(), new MigrationProcessorFactoryProvider())
         {
         }
 
-        public TaskExecutor(IRunnerContext runnerContext, AssemblyLoaderFactory assemblyLoaderFactory, MigrationProcessorFactoryProvider processorFactoryProvider)
+        public TaskExecutor(IRunnerContext runnerContext, IConnectionStringProvider connectionStringProvider, AssemblyLoaderFactory assemblyLoaderFactory, MigrationProcessorFactoryProvider processorFactoryProvider)
         {
             if (runnerContext == null) throw new ArgumentNullException("runnerContext");
             if (assemblyLoaderFactory == null) throw new ArgumentNullException("assemblyLoaderFactory");
 
             RunnerContext = runnerContext;
+            ConnectionStringProvider = connectionStringProvider;
             AssemblyLoaderFactory = assemblyLoaderFactory;
             ProcessorFactoryProvider = processorFactoryProvider;
         }
 
-        protected virtual void Initialize()
+        protected IConnectionStringProvider ConnectionStringProvider { get; }
+
+        protected virtual IEnumerable<Assembly> GetTargetAssemblies()
         {
-            List<Assembly> assemblies = new List<Assembly>();
+            var assemblies = new HashSet<Assembly>();
 
             foreach (var target in RunnerContext.Targets)
             {
                 var assembly = AssemblyLoaderFactory.GetAssemblyLoader(target).Load();
 
-                if (!assemblies.Contains(assembly))
+                if (assemblies.Add(assembly))
                 {
-                    assemblies.Add(assembly);
+                    yield return assembly;
                 }
             }
+        }
+
+        protected virtual void Initialize()
+        {
+            var assemblies = GetTargetAssemblies();
 
             var assemblyCollection = new AssemblyCollection(assemblies);
+
+            if (!RunnerContext.NoConnection && ConnectionStringProvider == null)
+            {
+                RunnerContext.NoConnection = true;
+            }
 
             var processor = RunnerContext.NoConnection? InitializeConnectionlessProcessor():InitializeProcessor(assemblyCollection);
 
@@ -159,12 +172,14 @@ namespace FluentMigrator.Runner.Initialization
             var singleAssembly = (assemblyCollection != null && assemblyCollection.Assemblies != null && assemblyCollection.Assemblies.Length == 1) ? assemblyCollection.Assemblies[0] : null;
             var singleAssemblyLocation = singleAssembly != null ? singleAssembly.Location : string.Empty;
 
-            var manager = new ConnectionStringManager(new NetConfigManager(), RunnerContext.Announcer, RunnerContext.Connection,
-                                                      RunnerContext.ConnectionStringConfigPath, singleAssemblyLocation,
-                                                      RunnerContext.Database);
+            var connectionString = ConnectionStringProvider.GetConnectionString(
+                RunnerContext.Announcer,
+                RunnerContext.Connection,
+                RunnerContext.ConnectionStringConfigPath,
+                singleAssemblyLocation,
+                RunnerContext.Database);
 
-            manager.LoadConnectionString();
-            return manager.ConnectionString;
+            return connectionString;
         }
     }
 }

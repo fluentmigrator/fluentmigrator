@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -40,7 +40,7 @@ namespace FluentMigrator.Runner
         private readonly MigrationValidator _migrationValidator;
         private readonly MigrationScopeHandler _migrationScopeHandler;
 
-        public bool TransactionPerSession 
+        public bool TransactionPerSession
         {
             get { return RunnerContext.TransactionPerSession; }
         }
@@ -175,8 +175,8 @@ namespace FluentMigrator.Runner
         {
             var migrations = MigrationLoader.LoadMigrations();
 
-            return from pair in migrations 
-                   where IsMigrationStepNeededForUpMigration(pair.Key, version) 
+            return from pair in migrations
+                   where IsMigrationStepNeededForUpMigration(pair.Key, version)
                    select pair.Value;
         }
 
@@ -228,8 +228,8 @@ namespace FluentMigrator.Runner
         {
             var migrations = MigrationLoader.LoadMigrations();
 
-            var migrationsToApply = (from pair in migrations 
-                                     where IsMigrationStepNeededForDownMigration(pair.Key, targetVersion) 
+            var migrationsToApply = (from pair in migrations
+                                     where IsMigrationStepNeededForDownMigration(pair.Key, targetVersion)
                                      select pair.Value);
 
             return migrationsToApply.OrderByDescending(x => x.Version);
@@ -364,7 +364,9 @@ namespace FluentMigrator.Runner
             VersionLoader.LoadVersionInfo();
 
             if (!VersionLoader.VersionInfo.AppliedMigrations().Any())
+            {
                 VersionLoader.RemoveVersionTable();
+            }
         }
 
         public void RollbackToVersion(long version)
@@ -427,7 +429,7 @@ namespace FluentMigrator.Runner
         {
             CaughtExceptions = new List<Exception>();
             var context = new MigrationContext(Conventions, Processor, MigrationAssemblies, RunnerContext.ApplicationContext, Processor.ConnectionString);
-            
+
             getExpressions(migration, context);
 
             _migrationValidator.ApplyConventionsToAndValidateExpressions(migration, context.Expressions);
@@ -441,7 +443,7 @@ namespace FluentMigrator.Runner
             ApplyMigrationDown(migrationInfoAdapter, true);
         }
 
-       
+
 
         /// <summary>
         /// execute each migration expression in the expression collection

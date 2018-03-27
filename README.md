@@ -1,48 +1,48 @@
-# FluentMigrator [![http://badge.fury.io/nu/fluentmigrator](https://badge.fury.io/nu/fluentmigrator.png)](http://badge.fury.io/nu/fluentmigrator)
+# Goals and changes for 2.x
 
-Fluent Migrator is a migration framework for .NET much like Ruby on Rails Migrations. Migrations are a structured way to alter your database schema and are an alternative to creating lots of sql scripts that have to be run manually by every developer involved. Migrations solve the problem of evolving a database schema for multiple databases (for example, the developer's local database, the test database and the production database). Database schema changes are described in classes written in C# that can be checked into a version control system.
+## New features
 
-## Project Info
+- Using the .NET Core CLI tooling
+- .NET Standard 2.0 support
+- .NET Framework 4.5 support
 
-* **Documentation**: [https://github.com/fluentmigrator/fluentmigrator/wiki](https://github.com/fluentmigrator/fluentmigrator/wiki)
-* **Discussions**: [fluentmigrator-google-group@googlegroups.com](http://groups.google.com/group/fluentmigrator-google-group)
-* **Bug/Feature Tracking**: [http://github.com/fluentmigrator/fluentmigrator/issues](http://github.com/fluentmigrator/fluentmigrator/issues)
-* **TeamCity sources**: [http://teamcity.codebetter.com/viewType.html?buildTypeId=bt82&tab=buildTypeStatusDiv](http://teamcity.codebetter.com/viewType.html?buildTypeId=bt82&tab=buildTypeStatusDiv)
-  * Click the "Login as guest" link in the footer of the page.
+## Breaking changes
 
-## Build Status
+- `FluentMigrator` package only contains the core functionality
+  - All tools are now only in `FluentMigrator.Tools`
+- Removal of deprecated functions
+- Moving database specific code from `FluentMigrator.Runner` to `FluentMigrator.Runner.<Database>`
+- Removal of .NET Framework 3.5 support
+- NAnt build task is published as ZIP
+- MSBuild task is available as separate package (with custom .targets file)
+- Removal of SchemaDump and T4 experiments
 
-The build is generously hosted and run on the [CodeBetter TeamCity](http://codebetter.com/codebetter-ci/) infrastructure.
-Latest build status: [![TeamCity status](http://teamcity.codebetter.com/app/rest/builds/buildType:(id:bt82)/statusIcon)](http://teamcity.codebetter.com/viewType.html?buildTypeId=bt82&guest=1)
+# How to build
 
-Our Mono build is hosted on Travis CI.
-Latest Mono build status: [![Travis CI status](https://travis-ci.org/fluentmigrator/fluentmigrator.svg?branch=master)](https://travis-ci.org/fluentmigrator/fluentmigrator)
-
-## Build instructions
-
-### Prerequisites
-
-* Ruby 2.2.6, 2.3.3 or 2.4.x
-* Install bundler: gem install bundler
-* Install build requirements when you are in the root directory of the source: bundler install
-
-### Creating the nuget packages
+## Windows
 
 ```
-tools\NuGet.exe restore FluentMigrator.sln
-bundler exec rake nuget:create_nugets
+dotnet restore
+dotnet build
 ```
 
-This will also build the whole solution.
+## Linux
 
-## Powered by
+```
+dotnet restore
+msbuild FluentMigrator.sln
+```
 
-![ReSharper](http://www.jetbrains.com/img/logos/logo_resharper_small.gif)
+# How to test
 
-## Contributors
+## Windows
 
-A [long list](https://github.com/fluentmigrator/fluentmigrator/wiki/ContributorList) of everyone that has contributed to FluentMigrator. Thanks for all the Pull Requests!
+```
+dotnet vstest test/FluentMigrator.Tests/bin/Debug/net452/FluentMigrator.Tests.dll --TestCaseFilter:"TestCategory!=Integration"
+```
 
-## License
+## Linux
 
-[Apache 2 License](https://github.com/fluentmigrator/fluentmigrator/blob/master/LICENSE.txt)
+```
+dotnet vstest test/FluentMigrator.Tests/bin/Debug/net452/FluentMigrator.Tests.dll --TestCaseFilter:'TestCategory!=Integration&TestCategory!=NotWorkingOnMono'
+```

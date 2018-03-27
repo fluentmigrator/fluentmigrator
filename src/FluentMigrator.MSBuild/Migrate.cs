@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -24,14 +24,58 @@ using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.Processors;
+using FluentMigrator.Runner.Processors.DB2;
+using FluentMigrator.Runner.Processors.DotConnectOracle;
+using FluentMigrator.Runner.Processors.Firebird;
+using FluentMigrator.Runner.Processors.MySql;
+using FluentMigrator.Runner.Processors.Oracle;
+using FluentMigrator.Runner.Processors.Postgres;
+using FluentMigrator.Runner.Processors.SqlServer;
+using FluentMigrator.Runner.Processors.SQLite;
+
 using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 
+using Processors = FluentMigrator.Runner.Processors;
+
 namespace FluentMigrator.MSBuild
 {
-    public class Migrate : AppDomainIsolatedTask
+    [CLSCompliant(false)]
+    public class Migrate :
+#if NET40 || NET45
+        AppDomainIsolatedTask
+#else
+        Task
+#endif
     {
+        static Migrate()
+        {
+            // Register all available processor factories. The library usually tries
+            // to find all provider factories by scanning all referenced assemblies,
+            // but this fails if we don't have any reference. Adding the package
+            // isn't enough. We MUST have a reference to a type, otherwise the
+            // assembly reference gets removed by the C# compiler!
+            MigrationProcessorFactoryProvider.Register(new Db2ProcessorFactory());
+            MigrationProcessorFactoryProvider.Register(new DotConnectOracleProcessorFactory());
+            MigrationProcessorFactoryProvider.Register(new FirebirdProcessorFactory());
+            MigrationProcessorFactoryProvider.Register(new MySqlProcessorFactory());
+            MigrationProcessorFactoryProvider.Register(new OracleManagedProcessorFactory());
+            MigrationProcessorFactoryProvider.Register(new PostgresProcessorFactory());
+            MigrationProcessorFactoryProvider.Register(new SQLiteProcessorFactory());
+            MigrationProcessorFactoryProvider.Register(new SqlServer2000ProcessorFactory());
+            MigrationProcessorFactoryProvider.Register(new SqlServer2005ProcessorFactory());
+            MigrationProcessorFactoryProvider.Register(new SqlServer2008ProcessorFactory());
+            MigrationProcessorFactoryProvider.Register(new SqlServer2012ProcessorFactory());
+            MigrationProcessorFactoryProvider.Register(new SqlServer2014ProcessorFactory());
+            MigrationProcessorFactoryProvider.Register(new SqlServerProcessorFactory());
+            MigrationProcessorFactoryProvider.Register(new SqlServerCeProcessorFactory());
 
+#if NET40 || NET45
+            MigrationProcessorFactoryProvider.Register(new Runner.Processors.Hana.HanaProcessorFactory());
+            MigrationProcessorFactoryProvider.Register(new Runner.Processors.Jet.JetProcessorFactory());
+#endif
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="T:Migrate"/> class.
@@ -50,7 +94,7 @@ namespace FluentMigrator.MSBuild
         private string databaseType;
 
         public string ApplicationContext { get; set; }
-        
+
         [Required]
         public string Connection { get; set; }
 
@@ -131,7 +175,7 @@ namespace FluentMigrator.MSBuild
             }
 
             Log.LogMessage(MessageImportance.Low, "Creating Context");
-                   
+
             var runnerContext = new RunnerContext(announcer)
             {
                 ApplicationContext = ApplicationContext,
