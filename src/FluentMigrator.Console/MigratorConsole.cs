@@ -18,27 +18,13 @@
 
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
-using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Processors;
-using FluentMigrator.Runner.Processors.DB2;
-using FluentMigrator.Runner.Processors.DotConnectOracle;
-using FluentMigrator.Runner.Processors.Firebird;
-using FluentMigrator.Runner.Processors.MySql;
-using FluentMigrator.Runner.Processors.Oracle;
-using FluentMigrator.Runner.Processors.Postgres;
-using FluentMigrator.Runner.Processors.SqlServer;
-using FluentMigrator.Runner.Processors.SQLite;
 
 using Mono.Options;
-
-using Processors = FluentMigrator.Runner.Processors;
 
 namespace FluentMigrator.Console
 {
@@ -219,8 +205,7 @@ namespace FluentMigrator.Console
                 if (string.IsNullOrEmpty(Task))
                     Task = "migrate";
 
-                if (string.IsNullOrEmpty(ProcessorType) ||
-                    string.IsNullOrEmpty(TargetAssembly))
+                if (!ValidateArguments(optionSet))
                 {
                     DisplayHelp(optionSet);
                     Environment.ExitCode = 1;
@@ -247,6 +232,27 @@ namespace FluentMigrator.Console
             }
 
             System.Console.ResetColor();
+        }
+
+        private bool ValidateArguments(OptionSet optionSet)
+        {
+            if (string.IsNullOrEmpty(TargetAssembly))
+            {
+                DisplayHelp(optionSet, "Please enter the path of the assembly containing migrations you want to execute.");
+                return false;
+            }
+            if (string.IsNullOrEmpty(ProcessorType))
+            {
+                DisplayHelp(optionSet, "Please enter the kind of database you are migrating against.");
+                return false;
+            }
+            return true;
+        }
+
+        private void DisplayHelp(OptionSet optionSet, string validationErrorMessage)
+        {
+            consoleAnnouncer.Emphasize(validationErrorMessage);
+            DisplayHelp(optionSet);
         }
 
         private void DisplayHelp(OptionSet p)

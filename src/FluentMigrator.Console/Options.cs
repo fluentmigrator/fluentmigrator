@@ -130,24 +130,13 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Security.Permissions;
 using System.Text;
 using System.Text.RegularExpressions;
 
-#if LINQ
-using System.Linq;
-#endif
-
-#if TEST
-using NDesk.Options;
-#endif
-
-#if NDESK_OPTIONS
-namespace NDesk.Options
-#else
 namespace Mono.Options
-#endif
 {
     public class OptionValueCollection : IList, IList<string>
     {
@@ -713,35 +702,6 @@ namespace Mono.Options
             return new OptionContext(this);
         }
 
-#if LINQ
-		public List<string> Parse (IEnumerable<string> arguments)
-		{
-			bool process = true;
-			OptionContext c = CreateOptionContext ();
-			c.OptionIndex = -1;
-			var def = GetOptionForName ("<>");
-			var unprocessed = 
-				from argument in arguments
-				where ++c.OptionIndex >= 0 && (process || def != null)
-					? process
-						? argument == "--" 
-							? (process = false)
-							: !Parse (argument, c)
-								? def != null 
-									? Unprocessed (null, def, c, argument) 
-									: true
-								: false
-						: def != null 
-							? Unprocessed (null, def, c, argument)
-							: true
-					: true
-				select argument;
-			List<string> r = unprocessed.ToList ();
-			if (c.Option != null)
-				c.Option.Invoke (c);
-			return r;
-		}
-#else
         public List<string> Parse(IEnumerable<string> arguments)
         {
             OptionContext c = CreateOptionContext();
@@ -769,7 +729,6 @@ namespace Mono.Options
                 c.Option.Invoke(c);
             return unprocessed;
         }
-#endif
 
         private static bool Unprocessed(ICollection<string> extra, Option def, OptionContext c, string argument)
         {
@@ -821,9 +780,9 @@ namespace Mono.Options
                 return false;
 
             Option p;
-            if (Contains(n))
+            if (ContainsKey(n))
             {
-                p = this[n];
+                p = GetOptionForKey(n);
                 c.OptionName = f + n;
                 c.Option = p;
                 switch (p.OptionValueType)
@@ -847,6 +806,16 @@ namespace Mono.Options
                 return true;
 
             return false;
+        }
+
+        private bool ContainsKey(string key)
+        {
+            return this.SelectMany(op => op.Names.Select(n => n.ToLower())).Contains(key.ToLower());
+        }
+
+        private Option GetOptionForKey(string key)
+        {
+            return this.SingleOrDefault(op => op.Names.Select(n => n.ToLower()).Contains(key.ToLower()));
         }
 
         private void ParseValue(string option, OptionContext c)

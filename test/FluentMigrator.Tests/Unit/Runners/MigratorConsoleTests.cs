@@ -18,9 +18,10 @@
 
 using System;
 using System.IO;
-using System.Reflection;
 using System.Text;
+
 using FluentMigrator.Console;
+
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -44,6 +45,25 @@ namespace FluentMigrator.Tests.Unit.Runners
                 "/nested",
                 "/task", "migrate:up",
                 "/version", "1");
+
+            console.Connection.ShouldBe(Connection);
+            console.Namespace.ShouldBe("FluentMigrator.Tests.Integration.Migrations");
+            console.NestedNamespaces.ShouldBeTrue();
+            console.Task.ShouldBe("migrate:up");
+            console.Version.ShouldBe(1);
+        }
+
+        [Test]
+        public void CanInitMigratorConsoleWithValidArgumentsRegardlessOfCase()
+        {
+            var console = new MigratorConsole(
+                "/db", Database,
+                "/Connection", Connection,
+                "/target", Target,
+                "/namespace", "FluentMigrator.Tests.Integration.Migrations",
+                "/nested",
+                "/TASK", "migrate:up",
+                "/vErSiOn", "1");
 
             console.Connection.ShouldBe(Connection);
             console.Namespace.ShouldBe("FluentMigrator.Tests.Integration.Migrations");
