@@ -840,10 +840,12 @@ namespace FluentMigrator.Tests.Integration
                                 {
                                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
-                                    runner.Up(new TestCreateSequence());
-                                    processor.SequenceExists("TestSchema", "TestSequence");
+                                    runner.Up(new TestCreateSchema());
+                                    runner.Up(new TestCreateSequenceWithSchema());
+                                    processor.SequenceExists("TestSchema", "TestSequence").ShouldBeTrue();
 
-                                    runner.Down(new TestCreateSequence());
+                                    runner.Down(new TestCreateSequenceWithSchema());
+                                    runner.Down(new TestCreateSchema());
                                     processor.SequenceExists("TestSchema", "TestSequence").ShouldBeFalse();
                                 };
 
