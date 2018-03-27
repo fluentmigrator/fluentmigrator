@@ -261,6 +261,92 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
+        public void HasMigrationsToApplyUpWhenThereAreMigrations()
+        {
+            long fakeMigrationVersion1 = 2009010101;
+            long fakeMigrationVersion2 = 2009010102;
+            LoadVersionData(fakeMigrationVersion1, fakeMigrationVersion2);
+            _fakeVersionLoader.Versions.Remove(fakeMigrationVersion2);
+            _fakeVersionLoader.LoadVersionInfo();
+
+            _runner.HasMigrationsToApplyUp().ShouldBeTrue();
+        }
+
+        [Test]
+        public void HasMigrationsToApplyUpWhenThereAreNoNewMigrations()
+        {
+            long fakeMigrationVersion1 = 2009010101;
+            long fakeMigrationVersion2 = 2009010102;
+            LoadVersionData(fakeMigrationVersion1, fakeMigrationVersion2);
+
+            _runner.HasMigrationsToApplyUp().ShouldBeFalse();
+        }
+
+        [Test]
+        public void HasMigrationsToApplyUpToSpecificVersionWhenTheSpecificHasNotBeenApplied()
+        {
+            long fakeMigrationVersion1 = 2009010101;
+            long fakeMigrationVersion2 = 2009010102;
+            LoadVersionData(fakeMigrationVersion1, fakeMigrationVersion2);
+            _fakeVersionLoader.Versions.Remove(fakeMigrationVersion2);
+            _fakeVersionLoader.LoadVersionInfo();
+
+            _runner.HasMigrationsToApplyUp(fakeMigrationVersion2).ShouldBeTrue();
+        }
+
+        [Test]
+        public void HasMigrationsToApplyUpToSpecificVersionWhenTheSpecificHasBeenApplied()
+        {
+            long fakeMigrationVersion1 = 2009010101;
+            long fakeMigrationVersion2 = 2009010102;
+            LoadVersionData(fakeMigrationVersion1, fakeMigrationVersion2);
+            _fakeVersionLoader.Versions.Remove(fakeMigrationVersion2);
+            _fakeVersionLoader.LoadVersionInfo();
+
+            _runner.HasMigrationsToApplyUp(fakeMigrationVersion1).ShouldBeFalse();
+        }
+
+        [Test]
+        public void HasMigrationsToApplyRollbackWithOneMigrationApplied()
+        {
+            long fakeMigrationVersion1 = 2009010101;
+            LoadVersionData(fakeMigrationVersion1);
+
+            _runner.HasMigrationsToApplyRollback().ShouldBeTrue();
+        }
+
+        [Test]
+        public void HasMigrationsToApplyRollbackWithNoMigrationsApplied()
+        {
+            LoadVersionData();
+
+            _runner.HasMigrationsToApplyRollback().ShouldBeFalse();
+        }
+
+
+        [Test]
+        public void HasMigrationsToApplyDownWhenTheVersionHasNotBeenApplied()
+        {
+            long fakeMigrationVersion1 = 2009010101;
+            long fakeMigrationVersion2 = 2009010102;
+            LoadVersionData(fakeMigrationVersion1, fakeMigrationVersion2);
+            _fakeVersionLoader.Versions.Remove(fakeMigrationVersion2);
+            _fakeVersionLoader.LoadVersionInfo();
+
+            _runner.HasMigrationsToApplyDown(fakeMigrationVersion1).ShouldBeFalse();
+        }
+
+        [Test]
+        public void HasMigrationsToApplyDownWhenTheVersionHasBeenApplied()
+        {
+            long fakeMigrationVersion1 = 2009010101;
+            long fakeMigrationVersion2 = 2009010102;
+            LoadVersionData(fakeMigrationVersion1, fakeMigrationVersion2);
+
+            _runner.HasMigrationsToApplyDown(fakeMigrationVersion1).ShouldBeTrue();
+        }
+
+        [Test]
         public void RollbackOnlyOneStepsOfTwoShouldNotDeleteVersionInfoTable()
         {
             long fakeMigrationVersion = 2009010101;

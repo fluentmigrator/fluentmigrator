@@ -251,6 +251,24 @@ namespace FluentMigrator.Runner
 
         }
 
+        public bool HasMigrationsToApplyUp(long? version = null)
+        {
+            if (version.HasValue)
+                return GetUpMigrationsToApply(version.Value).Any();
+
+            return MigrationLoader.LoadMigrations().Any(mi => !VersionLoader.VersionInfo.HasAppliedMigration(mi.Key));
+        }
+
+        public bool HasMigrationsToApplyDown(long version)
+        {
+            return GetDownMigrationsToApply(version).Any();
+        }
+
+        public bool HasMigrationsToApplyRollback()
+        {
+            return VersionLoader.VersionInfo.AppliedMigrations().Any();
+        }
+
         public virtual void ApplyMigrationUp(IMigrationInfo migrationInfo, bool useTransaction)
         {
             if (migrationInfo == null) throw new ArgumentNullException("migrationInfo");
