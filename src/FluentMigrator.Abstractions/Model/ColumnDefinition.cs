@@ -49,6 +49,17 @@ namespace FluentMigrator.Model
         public virtual string ColumnDescription { get; set; }
         public virtual string CollationName { get; set; }
 
+        /// <summary>
+        /// Gets or sets the foreign key definition
+        /// </summary>
+        /// <remarks>
+        /// A column might be marked as <see cref="IsForeignKey"/>, but
+        /// <see cref="ForeignKey"/> might still be <c>null</c>. This
+        /// happens when <c>ForeignKey()</c> without arguments gets
+        /// called on a column.
+        /// </remarks>
+        public virtual ForeignKeyDefinition ForeignKey { get; set; }
+
         public void ApplyConventions(IMigrationConventions conventions)
         {
             if (String.IsNullOrEmpty(PrimaryKeyName))

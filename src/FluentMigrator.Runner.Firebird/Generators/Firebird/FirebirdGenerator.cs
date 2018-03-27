@@ -188,10 +188,10 @@ namespace FluentMigrator.Runner.Generators.Firebird
             return base.Generate(expression);
         }
 
-        public override string GenerateForeignKeyName(CreateForeignKeyExpression expression)
+        public override string GenerateForeignKeyName(ForeignKeyDefinition foreignKey)
         {
-            truncator.Truncate(expression);
-            return truncator.Truncate(base.GenerateForeignKeyName(expression));
+            truncator.Truncate(foreignKey);
+            return truncator.Truncate(base.GenerateForeignKeyName(foreignKey));
         }
 
         public override string Generate(DeleteForeignKeyExpression expression)

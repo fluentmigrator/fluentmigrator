@@ -65,7 +65,7 @@ dotnet vstest test/FluentMigrator.Tests/bin/Debug/net452/FluentMigrator.Tests.dl
 
 * [x] [Add db type datetime2](https://github.com/fluentmigrator/fluentmigrator/pull/657)
 * [ ] [Remove ExplicitUnicodeString and add NonUnicodeString](https://github.com/fluentmigrator/fluentmigrator/pull/642)
-* [ ] [Create Foreign Key with SQLite](https://github.com/fluentmigrator/fluentmigrator/pull/638)
+* [x] [Create Foreign Key with SQLite](https://github.com/fluentmigrator/fluentmigrator/pull/638)
 * [ ] [DBNull for Insert/Update criteria expression](https://github.com/fluentmigrator/fluentmigrator/pull/672)
 * [ ] [Overload IfDatabase to accept predicate](https://github.com/fluentmigrator/fluentmigrator/pull/683)
 * [ ] [TaskExecutor got method HasMigrationsToApply](https://github.com/fluentmigrator/fluentmigrator/pull/701)

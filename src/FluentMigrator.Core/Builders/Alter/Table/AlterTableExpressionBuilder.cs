@@ -225,6 +225,7 @@ namespace FluentMigrator.Builders.Alter.Table
 
             _context.Expressions.Add(fk);
             CurrentForeignKey = fk.ForeignKey;
+            CurrentColumn.ForeignKey = fk.ForeignKey;
             return this;
         }
 

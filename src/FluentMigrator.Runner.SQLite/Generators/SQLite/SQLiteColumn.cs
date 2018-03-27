@@ -14,6 +14,16 @@ namespace FluentMigrator.Runner.Generators.SQLite
         {
         }
 
+        public override string Generate(IEnumerable<ColumnDefinition> columns, string tableName)
+        {
+            var colDefs = columns.ToList();
+            var foreignKeyColumns = colDefs.Where(x => x.IsForeignKey && x.ForeignKey != null);
+            var foreignKeyClauses = foreignKeyColumns
+                .Select(x => ", " + FormatForeignKey(x.ForeignKey, GenerateForeignKeyName));
+            // Append foreign key definitions after all column definitions and the primary key definition
+            return base.Generate(colDefs, tableName) + string.Concat(foreignKeyClauses);
+        }
+
         protected override string FormatIdentity(ColumnDefinition column)
         {
             //SQLite only supports the concept of Identity in combination with a single primary key

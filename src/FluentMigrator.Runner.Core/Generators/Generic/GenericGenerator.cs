@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -42,7 +42,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public virtual string CreateConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} {2} ({3})"; } }
         public virtual string DeleteConstraint { get { return "ALTER TABLE {0} DROP CONSTRAINT {1}"; } }
-        public virtual string CreateForeignKeyConstraint { get { return "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}"; } }
+        public virtual string CreateForeignKeyConstraint { get { return "ALTER TABLE {0} ADD {1}"; } }
 
         public virtual string GetUniqueString(CreateIndexExpression column)
         {
@@ -154,36 +154,10 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public override string Generate(CreateForeignKeyExpression expression)
         {
-            if (expression.ForeignKey.PrimaryColumns.Count != expression.ForeignKey.ForeignColumns.Count)
-            {
-                throw new ArgumentException("Number of primary columns and secondary columns must be equal");
-            }
-
-            string keyName = string.IsNullOrEmpty(expression.ForeignKey.Name)
-                ? GenerateForeignKeyName(expression)
-                : expression.ForeignKey.Name;
-
-            List<string> primaryColumns = new List<string>();
-            List<string> foreignColumns = new List<string>();
-            foreach (var column in expression.ForeignKey.PrimaryColumns)
-            {
-                primaryColumns.Add(Quoter.QuoteColumnName(column));
-            }
-
-            foreach (var column in expression.ForeignKey.ForeignColumns)
-            {
-                foreignColumns.Add(Quoter.QuoteColumnName(column));
-            }
             return string.Format(
                 CreateForeignKeyConstraint,
                 Quoter.QuoteTableName(expression.ForeignKey.ForeignTable),
-                Quoter.QuoteConstraintName(keyName),
-                String.Join(", ", foreignColumns.ToArray()),
-                Quoter.QuoteTableName(expression.ForeignKey.PrimaryTable),
-                String.Join(", ", primaryColumns.ToArray()),
-                FormatCascade("DELETE", expression.ForeignKey.OnDelete),
-                FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)
-                );
+                Column.FormatForeignKey(expression.ForeignKey, GenerateForeignKeyName));
         }
 
         public override string Generate(CreateConstraintExpression expression)
@@ -209,9 +183,9 @@ namespace FluentMigrator.Runner.Generators.Generic
             return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.Constraint.TableName), Quoter.QuoteConstraintName(expression.Constraint.ConstraintName));
         }
 
-        public virtual string GenerateForeignKeyName(CreateForeignKeyExpression expression)
+        public virtual string GenerateForeignKeyName(ForeignKeyDefinition foreignKey)
         {
-            return string.Format("FK_{0}_{1}", expression.ForeignKey.PrimaryTable.Substring(0, 5), expression.ForeignKey.ForeignTable.Substring(0, 5));
+            return Column.GenerateForeignKeyName(foreignKey);
         }
 
         public override string Generate(DeleteForeignKeyExpression expression)
@@ -221,29 +195,6 @@ namespace FluentMigrator.Runner.Generators.Generic
 
             return string.Format(DeleteConstraint, Quoter.QuoteTableName(expression.ForeignKey.ForeignTable), Quoter.QuoteColumnName(expression.ForeignKey.Name));
         }
-
-
-        protected string FormatCascade(string onWhat, Rule rule)
-        {
-            string action = "NO ACTION";
-            switch (rule)
-            {
-                case Rule.None:
-                    return "";
-                case Rule.Cascade:
-                    action = "CASCADE";
-                    break;
-                case Rule.SetNull:
-                    action = "SET NULL";
-                    break;
-                case Rule.SetDefault:
-                    action = "SET DEFAULT";
-                    break;
-            }
-
-            return string.Format(" ON {0} {1}", onWhat, action);
-        }
-
 
         public override string Generate(InsertDataExpression expression)
         {

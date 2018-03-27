@@ -104,16 +104,16 @@ namespace FluentMigrator.Runner.Generators.Postgres
             const string sql = "ALTER TABLE {0}.{1} ADD CONSTRAINT {2} FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8};";
 
             return string.Format(sql,
-                                Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema),
-                                Quoter.QuoteTableName(expression.ForeignKey.ForeignTable),
-                                Quoter.Quote(expression.ForeignKey.Name),
-                                foreignColumns,
-                                Quoter.QuoteSchemaName(expression.ForeignKey.PrimaryTableSchema),
-                                Quoter.QuoteTableName(expression.ForeignKey.PrimaryTable),
-                                primaryColumns,
-                                FormatCascade("DELETE", expression.ForeignKey.OnDelete),
-                                FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)
-                );
+                Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema),
+                Quoter.QuoteTableName(expression.ForeignKey.ForeignTable),
+                Quoter.Quote(expression.ForeignKey.Name),
+                foreignColumns,
+                Quoter.QuoteSchemaName(expression.ForeignKey.PrimaryTableSchema),
+                Quoter.QuoteTableName(expression.ForeignKey.PrimaryTable),
+                primaryColumns,
+                Column.FormatCascade("DELETE", expression.ForeignKey.OnDelete),
+                Column.FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)
+            );
         }
 
         public override string Generate(DeleteForeignKeyExpression expression)

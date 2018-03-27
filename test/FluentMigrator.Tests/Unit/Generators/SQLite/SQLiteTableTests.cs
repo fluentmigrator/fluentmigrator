@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Runner.Generators.SQLite;
+using FluentMigrator.Runner.Generators.SQLite;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -217,6 +217,42 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, PRIMARY KEY (\"TestColumn1\"))");
+        }
+
+        [Test]
+        public void CanCreateTableWithForeignKey()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithForeignKey();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"FK_TestT_TestT\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"TestTable2\" (\"TestColumn2\"))");
+        }
+
+        [Test]
+        public void CanCreateTableWithMultiColumnForeignKey()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnForeignKey();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"FK_TestT_TestT\" FOREIGN KEY (\"TestColumn1\", \"TestColumn3\") REFERENCES \"TestTable2\" (\"TestColumn2\", \"TestColumn4\"))");
+        }
+
+        [Test]
+        public void CanCreateTableWithNameForeignKey()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithNameForeignKey();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\") REFERENCES \"TestTable2\" (\"TestColumn2\"))");
+        }
+
+        [Test]
+        public void CanCreateTableWithNameMultiColumnForeignKey()
+        {
+            var expression = GeneratorTestHelper.GetCreateTableWithNameMultiColumnForeignKey();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE TABLE \"TestTable1\" (\"TestColumn1\" TEXT NOT NULL, \"TestColumn2\" INTEGER NOT NULL, CONSTRAINT \"FK_Test\" FOREIGN KEY (\"TestColumn1\", \"TestColumn3\") REFERENCES \"TestTable2\" (\"TestColumn2\", \"TestColumn4\"))");
         }
 
         [Test]

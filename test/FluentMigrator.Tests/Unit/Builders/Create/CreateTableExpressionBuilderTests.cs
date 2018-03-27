@@ -282,6 +282,33 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
         }
 
         [Test]
+        public void CallingForeignKeySetForeignKey()
+        {
+            var expressionMock = new Mock<CreateTableExpression>();
+            var contextMock = new Mock<IMigrationContext>();
+            contextMock.SetupGet(x => x.Expressions).Returns(new List<IMigrationExpression>());
+            var builder = new CreateTableExpressionBuilder(expressionMock.Object, contextMock.Object);
+            builder.CurrentColumn = new ColumnDefinition();
+
+            var fk = new ForeignKeyDefinition
+            {
+                Name = "foreignKeyName",
+                PrimaryTable = "primaryTableName",
+                PrimaryTableSchema = "primaryTableSchema",
+                ForeignTable = builder.Expression.TableName,
+                ForeignTableSchema = builder.Expression.SchemaName
+            };
+
+            builder.ForeignKey(fk.Name, fk.PrimaryTableSchema, fk.PrimaryTable, "primaryColumnName");
+            Assert.IsTrue(builder.CurrentColumn.IsForeignKey);
+            Assert.AreEqual(builder.CurrentColumn.ForeignKey.Name, fk.Name);
+            Assert.AreEqual(builder.CurrentColumn.ForeignKey.PrimaryTable, fk.PrimaryTable);
+            Assert.AreEqual(builder.CurrentColumn.ForeignKey.PrimaryTableSchema, fk.PrimaryTableSchema);
+            Assert.AreEqual(builder.CurrentColumn.ForeignKey.ForeignTable, fk.ForeignTable);
+            Assert.AreEqual(builder.CurrentColumn.ForeignKey.ForeignTableSchema, fk.ForeignTableSchema);
+        }
+
+        [Test]
         public void CallingIdentitySetsIsIdentityToTrue()
         {
             VerifyColumnProperty(c => c.IsIdentity = true, b => b.Identity());

@@ -1,12 +1,12 @@
 #region License
 // Copyright (c) 2007-2018, Sean Chambers and the FluentMigrator Project
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,29 +26,27 @@ namespace FluentMigrator.Runner.Generators.Base
     public abstract class ColumnBase : IColumn
     {
         private readonly ITypeMap _typeMap;
-        private readonly IQuoter _quoter;
         protected IList<Func<ColumnDefinition, string>> ClauseOrder { get; set; }
 
         public ColumnBase(ITypeMap typeMap, IQuoter quoter)
         {
             _typeMap = typeMap;
-            _quoter = quoter;
+            Quoter = quoter;
             ClauseOrder = new List<Func<ColumnDefinition, string>> { FormatString, FormatType, FormatCollation, FormatNullable, FormatDefaultValue, FormatPrimaryKey, FormatIdentity };
         }
+
+        public virtual string ForeignKeyConstraint => "{0}FOREIGN KEY ({1}) REFERENCES {2} ({3}){4}{5}";
+
+        protected IQuoter Quoter { get; }
 
         protected string GetTypeMap(DbType value, int size, int precision)
         {
             return _typeMap.GetTypeMap(value, size, precision);
         }
 
-        protected IQuoter Quoter
-        {
-            get { return _quoter; }
-        }
-
         public virtual string FormatString(ColumnDefinition column)
         {
-            return _quoter.QuoteColumnName(column.Name);
+            return Quoter.QuoteColumnName(column.Name);
         }
 
         protected virtual string FormatType(ColumnDefinition column)
@@ -109,6 +107,70 @@ namespace FluentMigrator.Runner.Generators.Base
             }
         }
 
+        public virtual string FormatCascade(string onWhat, Rule rule)
+        {
+            string action = "NO ACTION";
+            switch (rule)
+            {
+                case Rule.None:
+                    return "";
+                case Rule.Cascade:
+                    action = "CASCADE";
+                    break;
+                case Rule.SetNull:
+                    action = "SET NULL";
+                    break;
+                case Rule.SetDefault:
+                    action = "SET DEFAULT";
+                    break;
+            }
+
+            return string.Format(" ON {0} {1}", onWhat, action);
+        }
+
+        public virtual string GenerateForeignKeyName(ForeignKeyDefinition foreignKey)
+        {
+            return string.Format("FK_{0}_{1}", foreignKey.PrimaryTable.Substring(0, 5), foreignKey.ForeignTable.Substring(0, 5));
+        }
+
+        public virtual string FormatForeignKey(ForeignKeyDefinition foreignKey, Func<ForeignKeyDefinition, string> fkNameGeneration)
+        {
+            if (foreignKey.PrimaryColumns.Count != foreignKey.ForeignColumns.Count)
+            {
+                throw new ArgumentException("Number of primary columns and secondary columns must be equal");
+            }
+
+            string constraintName = string.IsNullOrEmpty(foreignKey.Name)
+                ? fkNameGeneration(foreignKey)
+                : foreignKey.Name;
+
+            List<string> primaryColumns = new List<string>();
+            List<string> foreignColumns = new List<string>();
+            foreach (var column in foreignKey.PrimaryColumns)
+            {
+                primaryColumns.Add(Quoter.QuoteColumnName(column));
+            }
+
+            foreach (var column in foreignKey.ForeignColumns)
+            {
+                foreignColumns.Add(Quoter.QuoteColumnName(column));
+            }
+
+            var constraintClause = string.IsNullOrEmpty(constraintName)
+                ? string.Empty
+                : $"CONSTRAINT {Quoter.QuoteConstraintName(constraintName)} ";
+
+            return string.Format(
+                ForeignKeyConstraint,
+                constraintClause,
+                String.Join(", ", foreignColumns.ToArray()),
+                Quoter.QuoteTableName(foreignKey.PrimaryTable),
+                String.Join(", ", primaryColumns.ToArray()),
+                FormatCascade("DELETE", foreignKey.OnDelete),
+                FormatCascade("UPDATE", foreignKey.OnUpdate)
+            );
+        }
+
         public virtual string Generate(ColumnDefinition column)
         {
             var clauses = new List<string>();
@@ -123,7 +185,7 @@ namespace FluentMigrator.Runner.Generators.Base
             return string.Join(" ", clauses.ToArray());
         }
 
-        public string Generate(IEnumerable<ColumnDefinition> columns, string tableName)
+        public virtual string Generate(IEnumerable<ColumnDefinition> columns, string tableName)
         {
             string primaryKeyString = string.Empty;
 
@@ -138,7 +200,7 @@ namespace FluentMigrator.Runner.Generators.Base
                 foreach (ColumnDefinition column in columns) { column.IsPrimaryKey = false; }
             }
 
-            return String.Join(", ", columns.Select(x => Generate(x)).ToArray()) + primaryKeyString;
+            return string.Join(", ", columns.Select(x => Generate(x)).ToArray()) + primaryKeyString;
         }
 
         public virtual bool ShouldPrimaryKeysBeAddedSeparately(IEnumerable<ColumnDefinition> primaryKeyColumns)
