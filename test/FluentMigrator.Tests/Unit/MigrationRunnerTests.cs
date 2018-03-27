@@ -564,20 +564,24 @@ namespace FluentMigrator.Tests.Unit
         {
             const long version1 = 2011010101;
             const long version2 = 2011010102;
+            const long version3 = 2011010103;
 
             var mockMigration1 = new Mock<IMigration>();
             var mockMigration2 = new Mock<IMigration>();
-            
-            LoadVersionData(version1, version2);
+            var mockMigration3 = new Mock<IMigration>();
+
+            LoadVersionData(version1, version3);
 
             _migrationList.Clear();
             _migrationList.Add(version1, new MigrationInfo(version1, TransactionBehavior.Default, mockMigration1.Object));
             _migrationList.Add(version2, new MigrationInfo(version2, TransactionBehavior.Default, mockMigration2.Object));
+            _migrationList.Add(version3, new MigrationInfo(version3, TransactionBehavior.Default, mockMigration3.Object));
 
             _runner.ListMigrations();
 
             _announcer.Verify(a => a.Say("2011010101: IMigrationProxy"));
-            _announcer.Verify(a => a.Emphasize("2011010102: IMigrationProxy (current)"));
+            _announcer.Verify(a => a.Say("2011010102: IMigrationProxy (not applied)"));
+            _announcer.Verify(a => a.Emphasize("2011010103: IMigrationProxy (current)"));
         }
 
         [Test]

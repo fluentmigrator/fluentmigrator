@@ -71,7 +71,7 @@ dotnet vstest test/FluentMigrator.Tests/bin/Debug/net452/FluentMigrator.Tests.dl
 * [x] [TaskExecutor got method HasMigrationsToApply](https://github.com/fluentmigrator/fluentmigrator/pull/701)
 * [x] [Enable delegation to methods for IfDatabase expressions](https://github.com/fluentmigrator/fluentmigrator/pull/707)
 * [x] [case insensitive arguments and give more instructive messages when required options are not given](https://github.com/fluentmigrator/fluentmigrator/pull/719)
-* [ ] [ListMigrations says "(not applied)" for migrations not applied](https://github.com/fluentmigrator/fluentmigrator/pull/750)
+* [x] [ListMigrations says "(not applied)" for migrations not applied](https://github.com/fluentmigrator/fluentmigrator/pull/750)
 * [ ] [Syntax for creating indexes with nonkey columns](https://github.com/fluentmigrator/fluentmigrator/pull/759)
 * [ ] [Ability to specify the Default Schema Name](https://github.com/fluentmigrator/fluentmigrator/pull/772)
 * [ ] [Add MySQL alter and drop of defaults](https://github.com/fluentmigrator/fluentmigrator/pull/783)
