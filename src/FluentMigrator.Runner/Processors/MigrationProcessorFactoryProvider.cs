@@ -83,7 +83,7 @@ namespace FluentMigrator.Runner.Processors
             {
                 if (_migrationProcessorFactories == null)
                 {
-                    _migrationProcessorFactories = new Dictionary<string, IMigrationProcessorFactory>();
+                    _migrationProcessorFactories = new Dictionary<string, IMigrationProcessorFactory>(StringComparer.OrdinalIgnoreCase);
                 }
 
                 _migrationProcessorFactories[factory.Name] = factory;
@@ -95,10 +95,9 @@ namespace FluentMigrator.Runner.Processors
 
         public virtual IMigrationProcessorFactory GetFactory(string name)
         {
-            return MigrationProcessorFactories
-                .Where(pair => pair.Key.Equals(name, StringComparison.OrdinalIgnoreCase))
-                .Select(pair => pair.Value)
-                .FirstOrDefault();
+            if (MigrationProcessorFactories.TryGetValue(name, out var result))
+                return result;
+            return null;
         }
 
         public string ListAvailableProcessorTypes()
@@ -108,7 +107,7 @@ namespace FluentMigrator.Runner.Processors
 
         private static IDictionary<string, IMigrationProcessorFactory> FindProcessorFactories()
         {
-            var availableMigrationProcessorFactories = new SortedDictionary<string, IMigrationProcessorFactory>();
+            var availableMigrationProcessorFactories = new SortedDictionary<string, IMigrationProcessorFactory>(StringComparer.OrdinalIgnoreCase);
 
             foreach (var assembly in GetAssemblies())
             {
