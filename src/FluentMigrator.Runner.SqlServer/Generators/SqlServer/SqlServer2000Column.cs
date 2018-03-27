@@ -20,9 +20,9 @@ using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
-    internal class SqlServerColumn : ColumnBase
+    internal class SqlServer2000Column : ColumnBase
     {
-        public SqlServerColumn(ITypeMap typeMap)
+        public SqlServer2000Column(ITypeMap typeMap)
             : base(typeMap, new SqlServerQuoter())
         {
         }

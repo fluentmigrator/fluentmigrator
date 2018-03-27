@@ -18,7 +18,7 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
-    internal class SqlServer2005Column : SqlServerColumn
+    internal class SqlServer2005Column : SqlServer2000Column
     {
         public SqlServer2005Column(ITypeMap typeMap)
             : base(typeMap)
