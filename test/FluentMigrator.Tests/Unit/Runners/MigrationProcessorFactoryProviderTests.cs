@@ -95,8 +95,7 @@ namespace FluentMigrator.Tests.Unit.Runners
         [Test]
         public void CanRetrieveOracleFactoryWithArgumentString()
         {
-            IMigrationProcessorFactory factory = migrationProcessorFactoryProvider.GetFactory("Oracle");
-            Assert.IsTrue(factory.GetType() == typeof(OracleProcessorFactory));
+            Assert.IsInstanceOf<OracleProcessorFactory>(migrationProcessorFactoryProvider.GetFactory("Oracle"));
         }
 
         [Test]
