@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -196,7 +196,13 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
         }
 
         [Test]
-        public void CallingAsDateTimeOffsetSetsColumnDbTypeToDateTimeOffset() 
+        public void CallingAsDateTime2SetsColumnDbTypeToDateTime2()
+        {
+            VerifyColumnDbType(DbType.DateTime2, b => b.AsDateTime2());
+        }
+
+        [Test]
+        public void CallingAsDateTimeOffsetSetsColumnDbTypeToDateTimeOffset()
         {
             VerifyColumnDbType(DbType.DateTimeOffset, b => b.AsDateTimeOffset());
         }
@@ -396,7 +402,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Alter
         }
 
         [Test]
-        public void CallingSeededIdentitySetsAdditionalProperties() 
+        public void CallingSeededIdentitySetsAdditionalProperties()
         {
             var contextMock = new Mock<IMigrationContext>();
 

@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -34,6 +34,7 @@ namespace FluentMigrator.Builders
         TNext AsCurrency();
         TNext AsDate();
         TNext AsDateTime();
+        TNext AsDateTime2();
         TNext AsDateTimeOffset();
         TNext AsDecimal();
         TNext AsDecimal(int size, int precision);
