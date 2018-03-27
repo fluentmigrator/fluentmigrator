@@ -62,6 +62,7 @@ namespace FluentMigrator.DotNet.Cli
                 .AddProcessorFactory<MySql4ProcessorFactory>()
                 .AddProcessorFactory<MySql5ProcessorFactory>()
                 .AddProcessorFactory<OracleManagedProcessorFactory>()
+                .AddProcessorFactory<OracleProcessorFactory>()
                 .AddProcessorFactory<PostgresProcessorFactory>()
                 .AddProcessorFactory<SQLiteProcessorFactory>()
                 .AddProcessorFactory<SqlServer2000ProcessorFactory>()

@@ -43,8 +43,8 @@ namespace FluentMigrator.Runner.Processors.Hana
                 throw new ArgumentNullException("tableName");
 
             return Exists(
-                "SELECT 1 FROM TABLES WHERE SCHEMA_NAME = CURRENT_SCHEMA AND upper(TABLE_NAME) = upper('{0}')",
-                FormatHelper.FormatSqlEscape(Quoter.UnQuote(tableName).ToUpper()));
+                "SELECT 1 FROM TABLES WHERE SCHEMA_NAME = CURRENT_SCHEMA AND TABLE_NAME = '{0}'",
+                FormatHelper.FormatSqlEscape(Quoter.UnQuote(tableName)));
         }
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)

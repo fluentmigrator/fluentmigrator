@@ -371,6 +371,11 @@
             <para>Specifying only this value causes the default behavior to be used. By default, triggers are enabled.</para>
         </summary>
         </member>
+        <member name="F:Sap.Data.Hana.HanaBulkCopyOptions.KeepIdentity">
+            <summary>
+            <para>When specified, the source values to be copied into an identity column are preserved. By default, new identity values are generated in the destination table.</para>
+        </summary>
+        </member>
         <member name="F:Sap.Data.Hana.HanaBulkCopyOptions.TableLock">
             <summary>
             <para>When specified the table is locked using the command LOCK TABLE table_name WITH HOLD IN SHARE MODE. This lock is in place until the connection is closed.</para>
@@ -632,31 +637,31 @@ private void DoStuff() {
             <para>The truncation only happens for the following data types:</para>
             <list>
             <item>
-            <term>VARCHAR</term> 
+            <description>VARCHAR</description> 
             </item>
             <item>
-            <term>NVARCHAR</term> 
+            <description>NVARCHAR</description> 
             </item>
             <item>
-            <term>ALPHANUM</term> 
+            <description>ALPHANUM</description> 
             </item>
             <item>
-            <term>SHORTTEXT</term> 
+            <description>SHORTTEXT</description> 
             </item>
             <item>
-            <term>VARBINARY</term> 
+            <description>VARBINARY</description> 
             </item>
             <item>
-            <term>BLOB</term> 
+            <description>BLOB</description> 
             </item>
             <item>
-            <term>CLOB</term> 
+            <description>CLOB</description> 
             </item>
             <item>
-            <term>NCLOB</term> 
+            <description>NCLOB</description> 
             </item>
             <item>
-            <term>TEXT</term> 
+            <description>TEXT</description> 
             </item>
             </list>
             <para>If the Size property is not specified, then the default value is used and the data is not truncated.</para>
@@ -1372,6 +1377,9 @@ conn.Open();</code>
    <para>A HanaCommand object.</para>
   </returns><seealso cref="T:Sap.Data.Hana.HanaCommand"/><seealso cref="T:Sap.Data.Hana.HanaConnection"/>
         </member>
+        <member name="M:Sap.Data.Hana.HanaConnection.GetSqldbcConnectionOptions">
+            @internal
+        </member>
         <member name="M:Sap.Data.Hana.HanaConnection.Open">
             <summary>
    <para>Opens a database connection with the property settings specified by the HanaConnection.ConnectionString.</para>
@@ -1909,6 +1917,11 @@ conn.Open();</code>
         <member name="P:Sap.Data.Hana.HanaConnectionStringBuilder.PersistSecurityInfo">
             <summary>
    <para>Gets or sets the PersistSecurityInfo connection property.</para>
+  </summary>
+        </member>
+        <member name="P:Sap.Data.Hana.HanaConnectionStringBuilder.DataFormatSupport">
+            <summary>
+   <para>Gets or sets the DataFormatSupport connection property.</para>
   </summary>
         </member>
         <member name="P:Sap.Data.Hana.HanaConnectionStringBuilder.ConnectionLifetime">
@@ -2840,21 +2853,6 @@ HanaDataReader reader = cmd.ExecuteReader();</code>
 	    <para>The value of the specified column as an object.</para>
         </returns>
         </member>
-        <member name="M:Sap.Data.Hana.HanaDataReader.GetValue(System.Int32,System.Int64,System.Int32)">
-            <summary>
-            <para>Returns a substring of the value of the specified column as an Object.</para>
-        </summary><remarks>
-            <para>This method returns DBNull for NULL database columns.</para>
-        </remarks><param name="ordinal">
-            An ordinal number indicating the column from which the value is obtained. The numbering is zero-based. 
-        </param><param name="index">
-            A zero-based index of the substring of the value to be obtained. 
-        </param><param name="length">
-            The length of the substring of the value to be obtained. 
-        </param><returns>
-	    <para>The substring value is returned as an object.</para>
-        </returns>
-        </member>
         <member name="M:Sap.Data.Hana.HanaDataReader.GetValues(System.Object[])">
             <summary>
             <para>Gets all the columns in the current row.</para>
@@ -3003,6 +3001,9 @@ reader.Close();</code>
             <term><b>Blob</b></term> <term><see cref="T:System.Array"/></term> <term>Byte[]</term> <term>Byte()</term> 
             </item>
             <item>
+            <term><b>Boolean</b></term> <term><see cref="T:System.Boolean"/></term> <term>Boolean</term> <term>Boolean</term> 
+            </item>
+            <item>
             <term><b>Clob </b></term> <term><see cref="T:System.String"/></term> <term>string</term> <term>String</term>  
             </item>
             <item>
@@ -3075,6 +3076,9 @@ reader.Close();</code>
             <summary>
             <para>Large binary data.</para>
         </summary>
+        </member>
+        <member name="F:Sap.Data.Hana.HanaDbType.Boolean">
+            <!-- No matching elements were found for the following include tag --><include file="enum.xml" path="doc/member[@name=&quot;HanaDbType_Boolean&quot;]/*"/>
         </member>
         <member name="F:Sap.Data.Hana.HanaDbType.Clob">
             <summary>
@@ -3402,6 +3406,9 @@ parm.Value = HanaDefault.Value;</code>
             <para><b>Implements:</b> <see cref="T:System.Data.IDbDataParameter"/>, <see cref="T:System.Data.IDataParameter"/>, <see cref="T:System.ICloneable"/></para>
         </remarks>
         </member>
+        <member name="F:Sap.Data.Hana.HanaParameter._dbType">
+            @internal
+        </member>
         <member name="M:Sap.Data.Hana.HanaParameter.Finalize">
             <summary>
             <para>Destructs a HanaParameter object.</para>
@@ -3596,9 +3603,6 @@ parm.Value = HanaDefault.Value;</code>
             <para>Both the DbType and HanaDbType properties can be inferred by setting the Value.</para>
             <para>The Value property is overwritten by Update.</para>
         </remarks>
-        </member>
-        <member name="T:Sap.Data.Hana.HanaParameter.HanaParameterConverter">
-            @internal
         </member>
         <member name="T:Sap.Data.Hana.HanaParameterCollection">
             <summary>
@@ -3916,6 +3920,114 @@ parm.Value = HanaDefault.Value;</code>
         <member name="T:Sap.Data.Hana.HanaRes">
             @internal
         </member>
+        <member name="T:Sap.Data.Hana.HanaSqlTrace">
+            <summary>
+            <para>A set of methods to enable logging of SQL statements, communication packages, and method calls between the data provider client and the SAP HANA database server.</para>
+        </summary><remarks>
+            <para>There is no constructor for HanaSqlTrace.</para>
+            <para>The functionality in this class is based on SQLDBC Trace.</para>
+        </remarks>
+        </member>
+        <member name="M:Sap.Data.Hana.HanaSqlTrace.SetTraceOption(System.String,System.String)">
+            <summary>
+            <para>Sets or replaces a trace option in the current set of trace options.</para>
+        </summary><param name="option">
+            A string identifying the option to set or replace.
+        </param><param name="value">
+            A string specifying the value of the trace option.
+	    Any of "TRUE", "FALSE", "YES", "NO", "1", or "0" can be used for options that accept boolean values.
+	    A string representing a number (for example, "4096") must be specified for options that accept numeric values.
+        </param><remarks>
+	    <para>The following trace options are supported.</para>
+	    <list type="table">
+		<listheader>
+		    <term>Option</term>
+		    <description>Description</description>
+		</listheader>
+		<item>
+		    <term>FILENAME</term> 
+		    <description>This option accepts a string value representing the file path of the trace file including its file name and file type.</description>
+		</item>
+		<item>
+		    <term>LONG</term> 
+		    <description>This option accepts a boolean string value that enables or disables long trace. Internal method calls with parameters are logged.</description>
+		</item>
+		<item>
+		    <term>PACKET</term> 
+		    <description>This option accepts a boolean string value that enables or disables packet trace. Incoming and outgoing packets are logged.</description>
+		</item>
+		<item>
+		    <term>SQL</term> 
+		    <description>This option accepts a boolean string value that enables or disables SQL trace. SQL statements and data are logged.</description>
+		</item>
+	    </list>
+	    <para>Trace option names are case-insensitive. Boolean values are case-insensitive.</para>
+	    <para>SetTraceOption must be called before the Enable method is called.</para>
+	    <para>The FILENAME option must be specified before enabling tracing. There is no default filename.</para>
+            <para>Options only take effect when the Enable method is called. Enable must be called to start tracing.</para>
+	    <para>If none of the SQL, LONG, or PACKET options is set before enabling tracing, no trace file is created.</para>
+	    <para>Unrecognized options are not flagged.</para>
+	    <para>The output format of the trace file is HTML.</para>
+	</remarks><example>
+            <para>Set the FILENAME trace option and add it to the current set of trace options:</para>
+            <code>HanaSqlTrace.SetTraceOption( "FILENAME", "\temp\sqltrace.html" );</code>
+	    <para>The FILENAME trace option is set.</para>
+            <para>Set the SQL trace option and add it to the current set of trace options:</para>
+            <code>HanaSqlTrace.SetTraceOption( "SQL", "TRUE" );</code>
+	    <para>The SQL trace option is set.</para>
+            <para>Set the PACKET trace option and add it to the current set of trace options:</para>
+            <code>HanaSqlTrace.SetTraceOption( "PACKET", "TRUE" );</code>
+	    <para>The SQL and PACKET trace options are both set.</para>
+        </example><seealso cref="M:Sap.Data.Hana.HanaSqlTrace.Enable"/>
+        </member>
+        <member name="M:Sap.Data.Hana.HanaSqlTrace.RemoveTraceOption(System.String)">
+            <summary>
+            <para>Removes a trace option from the current set of trace options.</para>
+        </summary><param name="option">
+            A string identifying the option to remove.
+        </param><remarks>
+	    <para>Use this method to unset (clear) an option.</para>
+	</remarks><example>
+            <para>Remove the PACKET trace option from the current set of trace options:</para>
+            <code>HanaSqlTrace.RemoveTraceOption( "PACKET" );</code>
+	    <para>The specified trace option is removed.</para>
+        </example>
+        </member>
+        <member name="M:Sap.Data.Hana.HanaSqlTrace.GetTraceOptions">
+            <summary>
+            <para>Returns a HashTable containing the current set of trace options.</para>
+        </summary><remarks>
+	    <para>Use this method to get the current set of trace options.</para>
+	</remarks><example>
+            <para>Get the current set of trace options:</para>
+            <code>Hashtable traceOptions = HanaSqlTrace.GetTraceOptions();</code>
+        </example>
+        </member>
+        <member name="M:Sap.Data.Hana.HanaSqlTrace.Enable">
+            <summary>
+            <para>Use this method to start tracing.</para>
+        </summary><remarks>
+	    <para>SetTraceOption must be called before the Enable method is called.</para>
+	    <para>The FILENAME option must be specified before enabling tracing. There is no default filename.</para>
+            <para>Options only take effect when the Enable method is called. Enable must be called to start tracing.</para>
+	    <para>If one of the SQL, SHORT, LONG, or PACKET options is not set before enabling tracing, no trace file is written.</para>
+	</remarks><example>
+            <para>Enable low-level tracing of communications between the client and server:</para>
+            <code>HanaSqlTrace.Enable();</code>
+	    <para>The trace options are enabled, the trace file is created, and logging begins.</para>
+        </example>
+        </member>
+        <member name="M:Sap.Data.Hana.HanaSqlTrace.Disable">
+            <summary>
+            <para>Use this method to stop tracing.</para>
+        </summary><remarks>
+            <para>When this method is called, tracing stops and the trace output file is closed.</para>
+	</remarks><example>
+            <para>Stop all low-level tracing of communications between the client and server:</para>
+            <code>HanaSqlTrace.Disable();</code>
+	    <para>The trace output file is closed and tracing stops.</para>
+        </example>
+        </member>
         <member name="T:Sap.Data.Hana.HanaTrace">
             @internal
         </member>
@@ -4061,7 +4173,7 @@ parm.Value = HanaDefault.Value;</code>
         <member name="M:Sap.Data.Hana.HanaOdbcDataSource.FindOdbcDataSource(System.String)">
             @internal
         </member>
-        <member name="P:Sap.Data.Hana.HanaOdbcDataSource.Server">
+        <member name="P:Sap.Data.Hana.HanaOdbcDataSource.ConnectionOptions">
             @internal
         </member>
         <member name="T:Sap.Data.Hana.RegKeyUtil64">

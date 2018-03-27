@@ -399,7 +399,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" DROP CONSTRAINT \"TESTPRIMARYKEY\";");
+            result.ShouldBe("ALTER TABLE \"TestTable1\" DROP PRIMARY KEY;");
         }
 
         [Test]
@@ -408,7 +408,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" DROP CONSTRAINT \"TESTPRIMARYKEY\";");
+            result.ShouldBe("ALTER TABLE \"TestTable1\" DROP PRIMARY KEY;");
         }
 
         [Test]

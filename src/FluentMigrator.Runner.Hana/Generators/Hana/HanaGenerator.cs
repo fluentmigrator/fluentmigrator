@@ -195,6 +195,11 @@ namespace FluentMigrator.Runner.Generators.Hana
 
         public override string Generate(DeleteConstraintExpression expression)
         {
+            if (expression.Constraint.IsPrimaryKeyConstraint)
+            {
+                return string.Format("ALTER TABLE {0} DROP PRIMARY KEY;", Quoter.QuoteTableName(expression.Constraint.TableName));
+            }
+
             return string.Format("{0};", base.Generate(expression));
         }
 
