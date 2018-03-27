@@ -65,85 +65,102 @@ namespace FluentMigrator.Tests.Integration
 
         public void ExecuteWithSupportedProcessors(Action<IMigrationProcessor> test, Boolean tryRollback, params Type[] exceptProcessors)
         {
+            if (IntegrationTestOptions.AnyServerTypesEnabled == false)
+            {
+                Assert.Fail(
+                    "No database processors are configured to run your migration tests.  This message is provided to avoid false positives.  To avoid this message enable one or more test runners in the {0} class.",
+                    nameof(IntegrationTestOptions));
+            }
+
+            var executed = false;
             if (exceptProcessors.Count(t => typeof(SqlServerProcessor).IsAssignableFrom(t)) == 0)
             {
-                ExecuteWithSqlServer2005(test, tryRollback);
-                ExecuteWithSqlServer2008(test, tryRollback);
-                ExecuteWithSqlServer2012(test, tryRollback);
-                ExecuteWithSqlServer2014(test, tryRollback);
+                executed |= ExecuteWithSqlServer2005(test, tryRollback);
+                executed |= ExecuteWithSqlServer2008(test, tryRollback);
+                executed |= ExecuteWithSqlServer2012(test, tryRollback);
+                executed |= ExecuteWithSqlServer2014(test, tryRollback);
             }
 
             if (exceptProcessors.Count(t => typeof(SQLiteProcessor).IsAssignableFrom(t)) == 0)
-                ExecuteWithSqlite(test, IntegrationTestOptions.SqlLite);
+                executed |= ExecuteWithSqlite(test, IntegrationTestOptions.SqlLite);
 
             if (exceptProcessors.Count(t => typeof(MySqlProcessor).IsAssignableFrom(t)) == 0)
-                ExecuteWithMySql(test, IntegrationTestOptions.MySql);
+                executed |= ExecuteWithMySql(test, IntegrationTestOptions.MySql);
 
             if (exceptProcessors.Count(t => typeof(PostgresProcessor).IsAssignableFrom(t)) == 0)
-                ExecuteWithPostgres(test, IntegrationTestOptions.Postgres, tryRollback);
+                executed |= ExecuteWithPostgres(test, IntegrationTestOptions.Postgres, tryRollback);
 
             if (exceptProcessors.Count(t => typeof(FirebirdProcessor).IsAssignableFrom(t)) == 0)
-                ExecuteWithFirebird(test, IntegrationTestOptions.Firebird);
+                executed |= ExecuteWithFirebird(test, IntegrationTestOptions.Firebird);
+
+            if (!executed)
+            {
+                Assert.Ignore("No processor found for the given action.");
+            }
         }
 
-        protected static void ExecuteWithSqlServer2014(Action<IMigrationProcessor> test, bool tryRollback)
+        protected static bool ExecuteWithSqlServer2014(Action<IMigrationProcessor> test, bool tryRollback)
         {
 
             var serverOptions = IntegrationTestOptions.SqlServer2014;
 
             if (!serverOptions.IsEnabled)
-                return;
+                return false;
 
             var announcer = new TextWriterAnnouncer(System.Console.Out);
             announcer.Heading("Testing Migration against MS SQL Server 2014");
             var generator = new SqlServer2014Generator();
 
             ExecuteWithSqlServer(serverOptions, announcer, generator, test, tryRollback);
+            return true;
         }
 
-        protected static void ExecuteWithSqlServer2012(Action<IMigrationProcessor> test, bool tryRollback)
+        protected static bool ExecuteWithSqlServer2012(Action<IMigrationProcessor> test, bool tryRollback)
         {
 
             var serverOptions = IntegrationTestOptions.SqlServer2012;
 
             if (!serverOptions.IsEnabled)
-                return;
+                return false;
 
             var announcer = new TextWriterAnnouncer(System.Console.Out);
             announcer.Heading("Testing Migration against MS SQL Server 2012");
             var generator = new SqlServer2012Generator();
 
             ExecuteWithSqlServer(serverOptions, announcer, generator, test, tryRollback);
+            return true;
         }
 
-        protected static void ExecuteWithSqlServer2008(Action<IMigrationProcessor> test, bool tryRollback)
+        protected static bool ExecuteWithSqlServer2008(Action<IMigrationProcessor> test, bool tryRollback)
         {
 
             var serverOptions = IntegrationTestOptions.SqlServer2008;
 
             if (!serverOptions.IsEnabled)
-                return;
+                return false;
 
             var announcer = new TextWriterAnnouncer(System.Console.Out);
             announcer.Heading("Testing Migration against MS SQL Server 2008");
             var generator = new SqlServer2008Generator();
 
             ExecuteWithSqlServer(serverOptions, announcer, generator, test, tryRollback);
+            return true;
         }
 
-        protected static void ExecuteWithSqlServer2005(Action<IMigrationProcessor> test, bool tryRollback)
+        protected static bool ExecuteWithSqlServer2005(Action<IMigrationProcessor> test, bool tryRollback)
         {
 
             var serverOptions = IntegrationTestOptions.SqlServer2005;
 
             if (!serverOptions.IsEnabled)
-                return;
+                return false;
 
             var announcer = new TextWriterAnnouncer(System.Console.Out);
             announcer.Heading("Testing Migration against MS SQL Server 2005");
             var generator = new SqlServer2005Generator();
 
             ExecuteWithSqlServer(serverOptions, announcer, generator, test, tryRollback);
+            return true;
         }
 
         private static void ExecuteWithSqlServer(IntegrationTestOptions.DatabaseServerOptions serverOptions, TextWriterAnnouncer announcer, SqlServer2005Generator generator, Action<IMigrationProcessor> test, bool tryRollback)
@@ -160,10 +177,10 @@ namespace FluentMigrator.Tests.Integration
             }
         }
 
-        protected static void ExecuteWithSqlite(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
+        protected static bool ExecuteWithSqlite(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
         {
             if (!serverOptions.IsEnabled)
-                return;
+                return false;
 
             var announcer = new TextWriterAnnouncer(System.Console.Out);
             announcer.Heading("Testing Migration against SQLite");
@@ -174,12 +191,14 @@ namespace FluentMigrator.Tests.Integration
                 var processor = new SQLiteProcessor(connection, new SQLiteGenerator(), announcer, new ProcessorOptions(), factory);
                 test(processor);
             }
+
+            return true;
         }
 
-        protected static void ExecuteWithPostgres(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions, Boolean tryRollback)
+        protected static bool ExecuteWithPostgres(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions, Boolean tryRollback)
         {
             if (!serverOptions.IsEnabled)
-                return;
+                return false;
 
             var announcer = new TextWriterAnnouncer(System.Console.Out);
             announcer.Heading("Testing Migration against Postgres");
@@ -195,12 +214,14 @@ namespace FluentMigrator.Tests.Integration
                     processor.RollbackTransaction();
                 }
             }
+
+            return true;
         }
 
-        protected static void ExecuteWithMySql(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
+        protected static bool ExecuteWithMySql(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
         {
             if (!serverOptions.IsEnabled)
-                return;
+                return false;
 
             var announcer = new TextWriterAnnouncer(System.Console.Out);
             announcer.Heading("Testing Migration against MySQL Server");
@@ -210,12 +231,14 @@ namespace FluentMigrator.Tests.Integration
                 var processor = new MySqlProcessor(connection, new MySql4Generator(), announcer, new ProcessorOptions(), new MySqlDbFactory());
                 test(processor);
             }
+
+            return true;
         }
 
-        protected void ExecuteWithFirebird(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
+        protected bool ExecuteWithFirebird(Action<IMigrationProcessor> test, IntegrationTestOptions.DatabaseServerOptions serverOptions)
         {
             if (!serverOptions.IsEnabled)
-                return;
+                return false;
 
             var announcer = new TextWriterAnnouncer(System.Console.Out);
             announcer.ShowSql = true;
@@ -251,6 +274,8 @@ namespace FluentMigrator.Tests.Integration
                     throw;
                 }
             }
+
+            return true;
         }
     }
 }
