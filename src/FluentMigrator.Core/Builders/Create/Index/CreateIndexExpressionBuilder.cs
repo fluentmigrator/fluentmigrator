@@ -31,14 +31,14 @@ namespace FluentMigrator.Builders.Create.Index
         ICreateIndexOptionsSyntax,
         ISupportAdditionalFeatures
     {
-        public IndexColumnDefinition CurrentColumn { get; set; }
-
         public CreateIndexExpressionBuilder(CreateIndexExpression expression)
             : base(expression)
         {
         }
 
         public IDictionary<string, object> AdditionalFeatures => Expression.Index.AdditionalFeatures;
+
+        public IndexColumnDefinition CurrentColumn { get; set; }
 
         public ICreateIndexOnColumnOrInSchemaSyntax OnTable(string tableName)
         {
