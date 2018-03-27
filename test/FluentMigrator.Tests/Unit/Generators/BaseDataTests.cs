@@ -1,4 +1,4 @@
-﻿namespace FluentMigrator.Tests.Unit.Generators
+namespace FluentMigrator.Tests.Unit.Generators
 {
     public abstract class BaseDataTests
     {
@@ -8,6 +8,7 @@
         public abstract void CanDeleteDataForMultipleRowsWithDefaultSchema();
         public abstract void CanDeleteDataWithCustomSchema();
         public abstract void CanDeleteDataWithDefaultSchema();
+        public abstract void CanDeleteDataWithDbNullCriteria();
         public abstract void CanInsertDataWithCustomSchema();
         public abstract void CanInsertDataWithDefaultSchema();
         public abstract void CanInsertGuidDataWithCustomSchema();
@@ -16,5 +17,6 @@
         public abstract void CanUpdateDataForAllDataWithDefaultSchema();
         public abstract void CanUpdateDataWithCustomSchema();
         public abstract void CanUpdateDataWithDefaultSchema();
+        public abstract void CanUpdateDataWithDbNullCriteria();
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -88,9 +88,9 @@ namespace FluentMigrator.Runner.Generators.Postgres
             StringBuilder builder = new StringBuilder();
             foreach (string columnName in expression.ColumnNames) {
                 if (expression.ColumnNames.First() != columnName) builder.AppendLine("");
-                builder.AppendFormat("ALTER TABLE {0}.{1} DROP COLUMN {2};", 
-                    Quoter.QuoteSchemaName(expression.SchemaName), 
-                    Quoter.QuoteTableName(expression.TableName), 
+                builder.AppendFormat("ALTER TABLE {0}.{1} DROP COLUMN {2};",
+                    Quoter.QuoteSchemaName(expression.SchemaName),
+                    Quoter.QuoteTableName(expression.TableName),
                     Quoter.QuoteColumnName(columnName));
             }
             return builder.ToString();
@@ -145,13 +145,13 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return String.Format(result.ToString(), Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteSchemaName(expression.Index.SchemaName), Quoter.QuoteTableName(expression.Index.TableName));
 
             /*
-            var idx = String.Format(result.ToString(), expression.Index.Name, Quoter.QuoteSchemaName(expression.Index.SchemaName), expression.Index.TableName); 
+            var idx = String.Format(result.ToString(), expression.Index.Name, Quoter.QuoteSchemaName(expression.Index.SchemaName), expression.Index.TableName);
             if (!expression.Index.IsClustered)
                 return idx;
-              
+
              // Clustered indexes in Postgres do not cluster updates/inserts to the table after the initial cluster operation is applied.
              // To keep the clustered index up to date run CLUSTER TableName periodically
-             
+
             return string.Format("{0}; CLUSTER {1}\"{2}\" ON \"{3}\"", idx, Quoter.QuoteSchemaName(expression.Index.SchemaName), expression.Index.TableName, expression.Index.Name);
              */
         }
@@ -218,7 +218,8 @@ namespace FluentMigrator.Runner.Generators.Postgres
                             where += " AND ";
                         }
 
-                        where += String.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value));
+                        var op = item.Value == null || item.Value == DBNull.Value ? "IS" : "=";
+                        where += String.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), op, Quoter.QuoteValue(item.Value));
                         i++;
                     }
 
@@ -247,8 +248,9 @@ namespace FluentMigrator.Runner.Generators.Postgres
             {
                 foreach (var item in expression.Where)
                 {
+                    var op = item.Value == null || item.Value == DBNull.Value ? "IS" : "=";
                     whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key),
-                                                   item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value)));
+                                                   op, Quoter.QuoteValue(item.Value)));
                 }
             }
             return String.Format("UPDATE {0}.{1} SET {2} WHERE {3};", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), String.Join(", ", updateItems.ToArray()), String.Join(" AND ", whereClauses.ToArray()));

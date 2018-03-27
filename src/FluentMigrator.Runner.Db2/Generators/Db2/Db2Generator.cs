@@ -1,4 +1,4 @@
-﻿namespace FluentMigrator.Runner.Generators.DB2
+namespace FluentMigrator.Runner.Generators.DB2
 {
     using System;
     using System.Collections.Generic;
@@ -211,7 +211,9 @@
                     var clauses = row.Aggregate(new StringBuilder(), (acc, rowVal) =>
                     {
                         var accumulator = acc.Length == 0 ? string.Empty : " AND ";
-                        var clauseOperator = rowVal.Value == null ? "IS" : "=";
+                        var clauseOperator = rowVal.Value == null || rowVal.Value == DBNull.Value
+                            ? "IS"
+                            : "=";
 
                         return acc.AppendFormat("{0}{1} {2} {3}", accumulator, Quoter.QuoteColumnName(rowVal.Key), clauseOperator, Quoter.QuoteValue(rowVal.Value));
                     });
@@ -275,7 +277,7 @@
             var whereClauses = expression.Where.Aggregate(new StringBuilder(), (acc, rowVal) =>
             {
                 var accumulator = acc.Length == 0 ? string.Empty : " AND ";
-                var clauseOperator = rowVal.Value == null ? "IS" : "=";
+                var clauseOperator = rowVal.Value == null || rowVal.Value == DBNull.Value ? "IS" : "=";
 
                 return acc.AppendFormat("{0}{1} {2} {3}", accumulator, Quoter.QuoteColumnName(rowVal.Key), clauseOperator, Quoter.QuoteValue(rowVal.Value));
             });

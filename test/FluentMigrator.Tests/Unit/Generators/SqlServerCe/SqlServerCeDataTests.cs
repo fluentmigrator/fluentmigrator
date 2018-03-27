@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Runner.Extensions;
+using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
 using NUnit.Should;
@@ -69,6 +69,14 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
 
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DELETE FROM [TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL");
+        }
+
+        [Test]
+        public override void CanDeleteDataWithDbNullCriteria()
+        {
+            var expression = GeneratorTestHelper.GetDeleteDataExpressionWithDbNullValue();
             var result = Generator.Generate(expression);
             result.ShouldBe("DELETE FROM [TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL");
         }
@@ -184,6 +192,15 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServerCe
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
+        }
+
+        [Test]
+        public override void CanUpdateDataWithDbNullCriteria()
+        {
+            var expression = GeneratorTestHelper.GetUpdateDataExpressionWithDbNullValue();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("UPDATE [TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL");
         }
     }
 }

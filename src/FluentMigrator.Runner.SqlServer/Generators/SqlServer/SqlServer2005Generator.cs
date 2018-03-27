@@ -161,7 +161,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                     var whereClauses = new List<string>();
                     foreach (KeyValuePair<string, object> item in row)
                     {
-                        whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value)));
+                        var op = item.Value == null || item.Value == DBNull.Value ? "IS" : "=";
+                        whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), op, Quoter.QuoteValue(item.Value)));
                     }
 
                     deleteItems.Add(string.Format(DeleteData, Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), String.Join(" AND ", whereClauses.ToArray())));

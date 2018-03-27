@@ -327,6 +327,25 @@ namespace FluentMigrator.Tests.Unit.Generators
             return expression;
         }
 
+        public static UpdateDataExpression GetUpdateDataExpressionWithDbNullValue()
+        {
+            var expression = new UpdateDataExpression();
+            expression.TableName = TestTableName1;
+
+            expression.Set = new List<KeyValuePair<string, object>>
+            {
+                new KeyValuePair<string, object>("Name", "Just'in"),
+                new KeyValuePair<string, object>("Age", 25)
+            };
+
+            expression.Where = new List<KeyValuePair<string, object>>
+            {
+                new KeyValuePair<string, object>("Id", 9),
+                new KeyValuePair<string, object>("Homepage", DBNull.Value)
+            };
+            return expression;
+        }
+
         public static UpdateDataExpression GetUpdateDataExpressionWithAllRows()
         {
             var expression = new UpdateDataExpression();
@@ -365,6 +384,19 @@ namespace FluentMigrator.Tests.Unit.Generators
                                         new KeyValuePair<string, object>("Name", "Just'in"),
                                         new KeyValuePair<string, object>("Website", null)
                                     });
+
+            return expression;
+        }
+
+        public static DeleteDataExpression GetDeleteDataExpressionWithDbNullValue()
+        {
+            var expression = new DeleteDataExpression();
+            expression.TableName = TestTableName1;
+            expression.Rows.Add(new DeletionDataDefinition
+            {
+                new KeyValuePair<string, object>("Name", "Just'in"),
+                new KeyValuePair<string, object>("Website", DBNull.Value)
+            });
 
             return expression;
         }

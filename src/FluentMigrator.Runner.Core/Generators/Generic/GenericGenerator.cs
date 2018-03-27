@@ -265,8 +265,9 @@ namespace FluentMigrator.Runner.Generators.Generic
             {
                 foreach (var item in expression.Where)
                 {
+                    var op = item.Value == null || item.Value == DBNull.Value ? "IS" : "=";
                     whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key),
-                                                   item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value)));
+                                                   op, Quoter.QuoteValue(item.Value)));
                 }
             }
             return String.Format(UpdateData, Quoter.QuoteTableName(expression.TableName), String.Join(", ", updateItems.ToArray()), String.Join(" AND ", whereClauses.ToArray()));
@@ -288,7 +289,13 @@ namespace FluentMigrator.Runner.Generators.Generic
                     var whereClauses = new List<string>();
                     foreach (KeyValuePair<string, object> item in row)
                     {
-                        whereClauses.Add(string.Format("{0} {1} {2}", Quoter.QuoteColumnName(item.Key), item.Value == null ? "IS" : "=", Quoter.QuoteValue(item.Value)));
+                        var op = item.Value == null || item.Value == DBNull.Value ? "IS" : "=";
+                        whereClauses.Add(
+                            string.Format(
+                                "{0} {1} {2}",
+                                Quoter.QuoteColumnName(item.Key),
+                                op,
+                                Quoter.QuoteValue(item.Value)));
                     }
 
                     deleteItems.Add(string.Format(DeleteData, Quoter.QuoteTableName(expression.TableName), String.Join(" AND ", whereClauses.ToArray())));

@@ -180,11 +180,6 @@ namespace FluentMigrator.Tests.Unit.Runners
             Assert.That(Environment.ExitCode == 1);
         }
 
-        [Test, Ignore("implement this test")]
-        public void OrderOfConsoleArgumentsShouldNotMatter()
-        {
-        }
-
         [Test]
         public void TagsPassedToRunnerContextOnExecuteMigrations()
         {
