@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -37,7 +37,7 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         public override string Generate(CreateTableExpression expression)
         {
-            if (string.IsNullOrEmpty(expression.TableName)) throw new ArgumentNullException("expression", "expression.TableName cannot be empty");
+            if (string.IsNullOrEmpty(expression.TableName)) throw new ArgumentNullException(nameof(expression), "expression.TableName cannot be empty");
             if (expression.Columns.Count == 0) throw new ArgumentException("You must specifiy at least one column");
 
             string errors = ValidateAdditionalFeatureCompatibility(expression.Columns.SelectMany(x => x.AdditionalFeatures));
@@ -75,7 +75,13 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         public override string Generate(AlterDefaultConstraintExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Altering of default constraints is not supporteed for MySql");
+            // Available since MySQL 4.0.22 (2005)
+            var defaultValue = ((MySqlColumn)Column).FormatDefaultValue(expression.DefaultValue);
+            return string.Format(
+                "ALTER TABLE {0} ALTER {1} SET {2}",
+                Quoter.QuoteTableName(expression.TableName),
+                Quoter.QuoteColumnName(expression.ColumnName),
+                defaultValue);
         }
 
         public override string Generate(CreateSequenceExpression expression)
@@ -104,7 +110,11 @@ namespace FluentMigrator.Runner.Generators.MySql
 
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
-            return compatabilityMode.HandleCompatabilty("Default constraints are not supported");
+            // Available since MySQL 4.0.22 (2005)
+            return string.Format(
+                "ALTER TABLE {0} ALTER {1} DROP DEFAULT",
+                Quoter.QuoteTableName(expression.TableName),
+                Quoter.QuoteColumnName(expression.ColumnName));
         }
     }
 }

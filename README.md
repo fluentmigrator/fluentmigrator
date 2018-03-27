@@ -74,7 +74,7 @@ dotnet vstest test/FluentMigrator.Tests/bin/Debug/net452/FluentMigrator.Tests.dl
 * [x] [ListMigrations says "(not applied)" for migrations not applied](https://github.com/fluentmigrator/fluentmigrator/pull/750)
 * [x] [Syntax for creating indexes with nonkey columns](https://github.com/fluentmigrator/fluentmigrator/pull/759)
 * [x] [Ability to specify the Default Schema Name](https://github.com/fluentmigrator/fluentmigrator/pull/772)
-* [ ] [Add MySQL alter and drop of defaults](https://github.com/fluentmigrator/fluentmigrator/pull/783)
+* [x] [Add MySQL alter and drop of defaults](https://github.com/fluentmigrator/fluentmigrator/pull/783)
 * [ ] [SQL Server 2005 support WITH (ONLINE = ON|OFF)](https://github.com/fluentmigrator/fluentmigrator/pull/788)
 * [ ] [MySqlProcessor was not announcing the SQL of embedded scripts](https://github.com/fluentmigrator/fluentmigrator/pull/793)
 * [ ] [Added StopOnError flag in order to pause console if some migration fails](https://github.com/fluentmigrator/fluentmigrator/pull/795)

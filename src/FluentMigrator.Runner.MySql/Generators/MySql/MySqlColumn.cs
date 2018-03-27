@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
 
@@ -10,6 +10,12 @@ namespace FluentMigrator.Runner.Generators.MySql
             : base(new MySqlTypeMap(), new MySqlQuoter())
         {
             ClauseOrder.Add(FormatDescription);
+        }
+
+        internal string FormatDefaultValue(object defaultValue)
+        {
+            string formatDefaultValue = base.FormatDefaultValue(new ColumnDefinition { DefaultValue = defaultValue });
+            return formatDefaultValue;
         }
 
         protected string FormatDescription(ColumnDefinition column)

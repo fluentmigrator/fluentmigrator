@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Exceptions;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.MySql;
@@ -50,6 +50,29 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE `NewTable` ADD COLUMN `NewColumn` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP");
+        }
+
+        [Test]
+        public void CanAlterDefaultConstraintToCurrentTimestamp()
+        {
+            var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
+            expression.DefaultValue = SystemMethods.CurrentDateTime;
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE `TestTable1` ALTER `TestColumn1` SET DEFAULT CURRENT_TIMESTAMP");
+        }
+
+        [Test]
+        public void CanDeleteDefaultConstraint()
+        {
+            var expression = new DeleteDefaultConstraintExpression
+            {
+                ColumnName = "TestColumn1",
+                TableName = "TestTable1"
+            };
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE `TestTable1` ALTER `TestColumn1` DROP DEFAULT");
         }
     }
 }
