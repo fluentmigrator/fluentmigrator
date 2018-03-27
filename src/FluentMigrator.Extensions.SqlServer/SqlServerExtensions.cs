@@ -86,10 +86,16 @@ namespace FluentMigrator
 
         public static ICreateIndexOptionsSyntax Include(this ICreateIndexOptionsSyntax expression, string columnName)
         {
-            var additionalFeatures = expression as ISupportAdditionalFeatures ?? throw new InvalidOperationException("The Include method must be called on an object that implements ISupportAdditionalFeatures.");
-            var includes = additionalFeatures.GetAdditionalFeature<IList<IndexIncludeDefinition>>(IncludesList, () => new List<IndexIncludeDefinition>());
-            includes.Add(new IndexIncludeDefinition { Name = columnName });
+            var additionalFeatures = expression as ISupportAdditionalFeatures;
+            additionalFeatures.Include(columnName);
             return expression;
+        }
+
+        public static ICreateIndexNonKeyColumnSyntax Include(this ICreateIndexOnColumnSyntax expression, string columnName)
+        {
+            var additionalFeatures = expression as ISupportAdditionalFeatures;
+            additionalFeatures.Include(columnName);
+            return new CreateIndexExpressionNonKeyBuilder(expression, additionalFeatures);
         }
 
         public static ICreateTableColumnOptionOrWithColumnSyntax RowGuid(this ICreateTableColumnOptionOrWithColumnSyntax expression)
@@ -99,12 +105,19 @@ namespace FluentMigrator
             return expression;
         }
 
+        internal static void Include(this ISupportAdditionalFeatures additionalFeatures, string columnName)
+        {
+            if (additionalFeatures == null)
+                throw new InvalidOperationException("The Include method must be called on an object that implements IColumnExpressionBuilder.");
+            var includes = additionalFeatures.GetAdditionalFeature<IList<IndexIncludeDefinition>>(IncludesList, () => new List<IndexIncludeDefinition>());
+            includes.Add(new IndexIncludeDefinition { Name = columnName });
+        }
+
         private static ISupportAdditionalFeatures GetColumn<TNext, TNextFk>(IColumnOptionSyntax<TNext, TNextFk> expression) where TNext : IFluentSyntax where TNextFk : IFluentSyntax
         {
             if (expression is IColumnExpressionBuilder cast1) return cast1.Column;
 
             throw new InvalidOperationException("The seeded identity method can only be called on a valid object.");
         }
-
     }
 }

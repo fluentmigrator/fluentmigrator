@@ -17,11 +17,13 @@
 #endregion
 
 using System.Collections.Generic;
+
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
-using FluentMigrator.Runner.Extensions;
+
 using Moq;
+
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Builders.Create
@@ -108,7 +110,7 @@ namespace FluentMigrator.Tests.Unit.Builders.Create
             var expressionMock = new Mock<CreateIndexExpression>();
             expressionMock.SetupGet(e => e.Index).Returns(indexMock.Object);
 
-            var builder = new CreateIndexExpressionBuilder(expressionMock.Object);
+            ICreateIndexOnColumnOrInSchemaSyntax builder = new CreateIndexExpressionBuilder(expressionMock.Object);
             builder.Include("BaconId");
 
             collectionMock.Verify(x => x.Add(It.Is<IndexIncludeDefinition>(c => c.Name.Equals("BaconId"))));
