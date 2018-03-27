@@ -93,7 +93,7 @@ dotnet vstest test/FluentMigrator.Tests/bin/Debug/net452/FluentMigrator.Tests.dl
 
 ### Optimization
 
-* [ ] [Add StringBuilder to ExecuteBatchNonQuery()](https://github.com/fluentmigrator/fluentmigrator/pull/798)
+* [x] [Add StringBuilder to ExecuteBatchNonQuery()](https://github.com/fluentmigrator/fluentmigrator/pull/798)
 * [ ] [Avoid confusion reported in issue #748](https://github.com/fluentmigrator/fluentmigrator/pull/808):
   may be a breaking change.
 

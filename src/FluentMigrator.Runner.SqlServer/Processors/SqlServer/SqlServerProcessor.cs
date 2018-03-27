@@ -22,6 +22,8 @@ using FluentMigrator.Runner.Helpers;
 using System;
 using System.Data;
 using System.IO;
+using System.Linq;
+using System.Text;
 
 using FluentMigrator.Expressions;
 
@@ -189,28 +191,35 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         private void ExecuteBatchNonQuery(string sql)
         {
-            sql += "\nGO";   // make sure last batch is executed.
-            string sqlBatch = string.Empty;
+            var sqlBatch = new StringBuilder();
 
             using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
             {
                 try
                 {
-                    foreach (string line in sql.Split(new[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries))
+                    var lines = sql.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+
+                    foreach (var line in lines)
                     {
-                        if (line.ToUpperInvariant().Trim() == "GO")
+                        if (string.Equals(line, "GO", StringComparison.OrdinalIgnoreCase))
                         {
-                            if (!string.IsNullOrEmpty(sqlBatch))
+                            if (sqlBatch.Length > 0)
                             {
-                                command.CommandText = sqlBatch;
+                                command.CommandText = sqlBatch.ToString();
                                 command.ExecuteNonQuery();
-                                sqlBatch = string.Empty;
+                                sqlBatch.Clear();
                             }
                         }
                         else
                         {
-                            sqlBatch += line + "\n";
+                            sqlBatch.AppendLine(line);
                         }
+                    }
+
+                    if (sqlBatch.Length > 0)
+                    {
+                        command.CommandText = sqlBatch.ToString();
+                        command.ExecuteNonQuery();
                     }
                 }
                 catch (Exception ex)
@@ -218,7 +227,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
                     using (var message = new StringWriter())
                     {
                         message.WriteLine("An error occurred executing the following sql:");
-                        message.WriteLine(sql);
+                        message.WriteLine(command.CommandText);
                         message.WriteLine("The error was {0}", ex.Message);
 
                         throw new Exception(message.ToString(), ex);
