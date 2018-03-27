@@ -1,8 +1,14 @@
+using System.Collections.Generic;
+using System.Linq;
+
+using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
-using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Generators.SqlServer;
+
+using Moq;
+
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -18,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         {
             Generator = new SqlServer2005Generator();
         }
-        
+
         [Test]
         public void CanCreateTableWithIgnoredRowGuidCol()
         {
@@ -234,6 +240,45 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL, [TestColumn2] INT NOT NULL, PRIMARY KEY ([TestColumn1]))");
+        }
+
+        [Test]
+        public void CanCreateTableWithForeignKeyColumnWithDefaultSchema()
+        {
+            var expressions = new List<IMigrationExpression>();
+            var migrationContexMock = new Mock<IMigrationContext>();
+            migrationContexMock.SetupGet(mc => mc.Expressions).Returns(expressions);
+            var migrationContext = migrationContexMock.Object;
+            new CreateExpressionRoot(migrationContext)
+                .Table("FooTable")
+                .WithColumn("FooColumn").AsInt32().ForeignKey("BarTable", "BarColumn");
+            var createTableExpression = migrationContext.Expressions.OfType<CreateTableExpression>().First();
+            var createForeignKeyExpression = migrationContext.Expressions.OfType<CreateForeignKeyExpression>().First();
+
+            createForeignKeyExpression.ApplyConventions(new MigrationConventions());
+            string createTableResult = Generator.Generate(createTableExpression);
+            string createForeignKeyResult = Generator.Generate(createForeignKeyExpression);
+            createTableResult.ShouldBe("CREATE TABLE [dbo].[FooTable] ([FooColumn] INT NOT NULL)");
+            createForeignKeyResult.ShouldBe("ALTER TABLE [dbo].[FooTable] ADD CONSTRAINT [FK_FooTable_FooColumn_BarTable_BarColumn] FOREIGN KEY ([FooColumn]) REFERENCES [dbo].[BarTable] ([BarColumn])");
+        }
+
+        [Test]
+        public void CanCreateTableWithForeignKeyColumnWithCustomSchema()
+        {
+            var expressions = new List<IMigrationExpression>();
+            var migrationContexMock = new Mock<IMigrationContext>();
+            migrationContexMock.SetupGet(mc => mc.Expressions).Returns(expressions);
+            var migrationContext = migrationContexMock.Object;
+            new CreateExpressionRoot(migrationContext)
+                .Table("FooTable").InSchema("FooSchema")
+                .WithColumn("FooColumn").AsInt32().ForeignKey("fk_bar_foo", "BarSchema", "BarTable", "BarColumn");
+            var createTableExpression = migrationContext.Expressions.OfType<CreateTableExpression>().First();
+            var createForeignKeyExpression = migrationContext.Expressions.OfType<CreateForeignKeyExpression>().First();
+
+            string createTableResult = Generator.Generate(createTableExpression);
+            string createForeignKeyResult = Generator.Generate(createForeignKeyExpression);
+            createTableResult.ShouldBe("CREATE TABLE [FooSchema].[FooTable] ([FooColumn] INT NOT NULL)");
+            createForeignKeyResult.ShouldBe("ALTER TABLE [FooSchema].[FooTable] ADD CONSTRAINT [fk_bar_foo] FOREIGN KEY ([FooColumn]) REFERENCES [BarSchema].[BarTable] ([BarColumn])");
         }
 
         [Test]
