@@ -49,6 +49,7 @@ namespace FluentMigrator.Runner.Processors
             Register(new FirebirdProcessorFactory());
             Register(new MySqlProcessorFactory());
             Register(new OracleManagedProcessorFactory());
+            Register(new OracleProcessorFactory());
             Register(new PostgresProcessorFactory());
             Register(new SQLiteProcessorFactory());
             Register(new SqlServer2000ProcessorFactory());
