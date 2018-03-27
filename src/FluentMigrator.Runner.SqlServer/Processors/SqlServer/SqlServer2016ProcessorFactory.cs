@@ -14,17 +14,17 @@
 // limitations under the License.
 #endregion
 
-namespace FluentMigrator.Runner.Generators.SqlServer
-{
-    public class SqlServer2014Generator : SqlServer2012Generator
-    {
-        public SqlServer2014Generator()
-        {
-        }
+using FluentMigrator.Runner.Generators.SqlServer;
 
-        protected SqlServer2014Generator(IColumn column, IDescriptionGenerator descriptionGenerator)
-            :base(column, descriptionGenerator)
+namespace FluentMigrator.Runner.Processors.SqlServer
+{
+    public class SqlServer2016ProcessorFactory : MigrationProcessorFactory
+    {
+        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
+            var factory = new SqlServerDbFactory();
+            var connection = factory.CreateConnection(connectionString);
+            return new SqlServerProcessor(connection, new SqlServer2016Generator(), announcer, options, factory);
         }
     }
 }

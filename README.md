@@ -60,7 +60,7 @@ dotnet vstest test/FluentMigrator.Tests/bin/Debug/net452/FluentMigrator.Tests.dl
 
 - [ ] [Redshift provider](https://github.com/fluentmigrator/fluentmigrator/pull/605)
 - [ ] [Support SQLAnywhere](https://github.com/fluentmigrator/fluentmigrator/pull/659)
-- [ ] [SQL Server 2016](https://github.com/fluentmigrator/fluentmigrator/pull/833)
+- [x] [SQL Server 2016](https://github.com/fluentmigrator/fluentmigrator/pull/833)
 
 ### New features
 

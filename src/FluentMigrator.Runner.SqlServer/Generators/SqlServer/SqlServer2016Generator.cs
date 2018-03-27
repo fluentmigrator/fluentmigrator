@@ -16,13 +16,13 @@
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
-    public class SqlServer2014Generator : SqlServer2012Generator
+    public class SqlServer2016Generator : SqlServer2014Generator
     {
-        public SqlServer2014Generator()
+        public SqlServer2016Generator()
         {
         }
 
-        protected SqlServer2014Generator(IColumn column, IDescriptionGenerator descriptionGenerator)
+        protected SqlServer2016Generator(IColumn column, IDescriptionGenerator descriptionGenerator)
             :base(column, descriptionGenerator)
         {
         }

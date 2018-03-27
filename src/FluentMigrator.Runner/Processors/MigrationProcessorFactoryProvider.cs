@@ -58,6 +58,7 @@ namespace FluentMigrator.Runner.Processors
             Register(new SqlServer2008ProcessorFactory());
             Register(new SqlServer2012ProcessorFactory());
             Register(new SqlServer2014ProcessorFactory());
+            Register(new SqlServer2016ProcessorFactory());
             Register(new SqlServerProcessorFactory());
             Register(new SqlServerCeProcessorFactory());
 
