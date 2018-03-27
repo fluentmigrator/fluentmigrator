@@ -14,6 +14,9 @@
 // limitations under the License.
 #endregion
 
+using System;
+using System.Data;
+
 namespace FluentMigrator.Runner.Processors.MySql
 {
     public class MySqlDbFactory : ReflectionBasedDbFactory
@@ -21,6 +24,15 @@ namespace FluentMigrator.Runner.Processors.MySql
         public MySqlDbFactory()
             : base("MySql.Data", "MySql.Data.MySqlClient.MySqlClientFactory")
         {
+        }
+
+        public override IDbDataAdapter CreateDataAdapter(IDbCommand command)
+        {
+            var dataAdapter =
+                Factory.CreateDataAdapter()
+             ?? (IDbDataAdapter)Activator.CreateInstance(Factory.GetType().Assembly.GetType("MySql.Data.MySqlClient.MySqlDataAdapter"));
+            dataAdapter.SelectCommand = command;
+            return dataAdapter;
         }
     }
 }

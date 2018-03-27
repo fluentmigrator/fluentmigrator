@@ -18,6 +18,7 @@
 
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics;
 
 namespace FluentMigrator.Runner.Processors
 {
@@ -35,7 +36,7 @@ namespace FluentMigrator.Runner.Processors
         {
         }
 
-        private DbProviderFactory Factory
+        protected DbProviderFactory Factory
         {
             get
             {
@@ -73,9 +74,10 @@ namespace FluentMigrator.Runner.Processors
             return command;
         }
 
-        public IDbDataAdapter CreateDataAdapter(IDbCommand command)
+        public virtual IDbDataAdapter CreateDataAdapter(IDbCommand command)
         {
             IDbDataAdapter dataAdapter = Factory.CreateDataAdapter();
+            Debug.Assert(dataAdapter != null, nameof(dataAdapter) + " != null");
             dataAdapter.SelectCommand = command;
             return dataAdapter;
         }
