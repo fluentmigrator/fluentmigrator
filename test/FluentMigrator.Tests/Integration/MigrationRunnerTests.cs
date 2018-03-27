@@ -48,7 +48,14 @@ namespace FluentMigrator.Tests.Integration
 {
     [TestFixture]
     [Category("Integration")]
-    [Category("Multi")]
+    [Category("Firebird")]
+    [Category("MySql")]
+    [Category("SQLite")]
+    [Category("Postgres")]
+    [Category("SqlServer2005")]
+    [Category("SqlServer2008")]
+    [Category("SqlServer2012")]
+    [Category("SqlServer2014")]
     public class MigrationRunnerTests : IntegrationTestBase
     {
         private IRunnerContext _runnerContext;

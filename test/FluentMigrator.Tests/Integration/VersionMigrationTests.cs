@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -33,7 +33,14 @@ namespace FluentMigrator.Tests.Integration
 {
     [TestFixture]
     [Category("Integration")]
-    [Category("Multi")]
+    [Category("Firebird")]
+    [Category("MySql")]
+    [Category("SQLite")]
+    [Category("Postgres")]
+    [Category("SqlServer2005")]
+    [Category("SqlServer2008")]
+    [Category("SqlServer2012")]
+    [Category("SqlServer2014")]
     public class VersionMigrationTests : IntegrationTestBase
     {
         [Test]
