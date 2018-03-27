@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -31,12 +31,20 @@ namespace FluentMigrator.Expressions
         public List<KeyValuePair<string, object>> Where { get; set; }
         public bool IsAllRows { get; set; }
 
+        public override void ApplyConventions(IMigrationConventions conventions)
+        {
+            if (string.IsNullOrEmpty(SchemaName))
+            {
+                SchemaName = conventions.GetDefaultSchema();
+            }
+        }
+
         public override void CollectValidationErrors(ICollection<string> errors)
         {
             if (String.IsNullOrEmpty(TableName))
                 errors.Add(ErrorMessages.TableNameCannotBeNullOrEmpty);
 
-            if (!IsAllRows && (Where == null || Where.Count == 0)) 
+            if (!IsAllRows && (Where == null || Where.Count == 0))
                 errors.Add(ErrorMessages.UpdateDataExpressionMustSpecifyWhereClauseOrAllRows);
 
             if (IsAllRows && Where != null && Where.Count > 0)

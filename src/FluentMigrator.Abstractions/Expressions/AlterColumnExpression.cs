@@ -34,6 +34,14 @@ namespace FluentMigrator.Expressions
             Column = new ColumnDefinition() { ModificationType = ColumnModificationType.Alter };
         }
 
+        public override void ApplyConventions(IMigrationConventions conventions)
+        {
+            if (string.IsNullOrEmpty(SchemaName))
+            {
+                SchemaName = conventions.GetDefaultSchema();
+            }
+        }
+
         public override void CollectValidationErrors(ICollection<string> errors)
         {
             if (String.IsNullOrEmpty(TableName))

@@ -42,7 +42,10 @@ namespace FluentMigrator.Model
 
         public void ApplyConventions(IMigrationConventions conventions)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(SchemaName))
+            {
+                SchemaName = conventions.GetDefaultSchema();
+            }
         }
 
         public void CollectValidationErrors(ICollection<string> errors)

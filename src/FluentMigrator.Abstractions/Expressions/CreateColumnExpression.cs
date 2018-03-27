@@ -36,6 +36,11 @@ namespace FluentMigrator.Expressions
 
         public override void ApplyConventions(IMigrationConventions conventions)
         {
+            if (string.IsNullOrEmpty(SchemaName))
+            {
+                SchemaName = conventions.GetDefaultSchema();
+            }
+
             Column.ApplyConventions(conventions);
         }
 

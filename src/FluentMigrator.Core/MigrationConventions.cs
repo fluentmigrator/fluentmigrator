@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,6 +18,7 @@
 
 using System;
 using System.Collections.Generic;
+
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 
@@ -39,6 +40,7 @@ namespace FluentMigrator
         public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags { get; set; }
         public Func<Type, string, string> GetAutoScriptUpName { get; set; }
         public Func<Type, string, string> GetAutoScriptDownName { get; set; }
+        public Func<string> GetDefaultSchema { get; set; }
 
         public MigrationConventions()
         {
@@ -56,6 +58,7 @@ namespace FluentMigrator
             TypeHasMatchingTags = DefaultMigrationConventions.TypeHasMatchingTags;
             GetAutoScriptUpName = DefaultMigrationConventions.GetAutoScriptUpName;
             GetAutoScriptDownName = DefaultMigrationConventions.GetAutoScriptDownName;
-        }        
+            GetDefaultSchema = DefaultMigrationConventions.GetDefaultSchema;
+        }
     }
 }

@@ -26,12 +26,7 @@ namespace FluentMigrator.Expressions
 {
     public class DeleteIndexExpression : MigrationExpressionBase
     {
-        public virtual IndexDefinition Index { get; set; }
-
-        public DeleteIndexExpression()
-        {
-            Index = new IndexDefinition();
-        }
+        public virtual IndexDefinition Index { get; set; } = new IndexDefinition();
 
         public override void ApplyConventions(IMigrationConventions conventions)
         {

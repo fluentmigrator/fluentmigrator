@@ -31,6 +31,14 @@ namespace FluentMigrator.Expressions
         {
         }
 
+        public override void ApplyConventions(IMigrationConventions conventions)
+        {
+            if (string.IsNullOrEmpty(SchemaName))
+            {
+                SchemaName = conventions.GetDefaultSchema();
+            }
+        }
+
         public override void CollectValidationErrors(ICollection<string> errors)
         {
             if (string.IsNullOrEmpty(TableName))

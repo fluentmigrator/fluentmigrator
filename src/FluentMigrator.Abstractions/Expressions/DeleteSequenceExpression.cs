@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
@@ -8,6 +9,14 @@ namespace FluentMigrator.Expressions
     {
         public virtual string SchemaName { get; set; }
         public virtual string SequenceName { get; set; }
+
+        public override void ApplyConventions(IMigrationConventions conventions)
+        {
+            if (string.IsNullOrEmpty(SchemaName))
+            {
+                SchemaName = conventions.GetDefaultSchema();
+            }
+        }
 
         public override void CollectValidationErrors(ICollection<string> errors)
         {
@@ -23,6 +32,6 @@ namespace FluentMigrator.Expressions
         public override string ToString()
         {
             return base.ToString() + SequenceName;
-        } 
+        }
     }
 }

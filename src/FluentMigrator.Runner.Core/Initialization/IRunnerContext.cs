@@ -46,5 +46,10 @@ namespace FluentMigrator.Runner.Initialization
 
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         object ApplicationContext { get; set; }
+
+        /// <summary>
+        /// Gets or sets the default schema name
+        /// </summary>
+        string DefaultSchemaName { get;set; }
     }
 }

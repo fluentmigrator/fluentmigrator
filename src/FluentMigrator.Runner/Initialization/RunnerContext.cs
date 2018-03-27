@@ -29,19 +29,14 @@ namespace FluentMigrator.Runner.Initialization
         public bool TransactionPerSession { get; set; }
         public string ProviderSwitches { get; set; }
 
-        public IAnnouncer Announcer
-        {
-            get;
-            private set;
-        }
+        public IAnnouncer Announcer { get; }
 
-        public IStopWatch StopWatch
-        {
-            get;
-            private set;
-        }
+        public IStopWatch StopWatch { get; }
 
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         public object ApplicationContext { get; set; }
+
+        /// <inheritdoc />
+        public string DefaultSchemaName { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 //
@@ -99,7 +99,7 @@ namespace FluentMigrator.Runner
 
             if (matchedType == null)
             {
-                return new DefaultVersionTableMetaData();
+                return new DefaultVersionTableMetaData(Conventions.GetDefaultSchema());
             }
 
             return (IVersionTableMetaData) Activator.CreateInstance(matchedType);

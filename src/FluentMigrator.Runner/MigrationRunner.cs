@@ -72,8 +72,10 @@ namespace FluentMigrator.Runner
         {
         }
 
-        public MigrationRunner(IAssemblyCollection assemblies, IRunnerContext runnerContext,
-                               IMigrationProcessor processor, IVersionTableMetaData versionTableMetaData = null)
+        public MigrationRunner(
+            IAssemblyCollection assemblies, IRunnerContext runnerContext,
+            IMigrationProcessor processor, IVersionTableMetaData versionTableMetaData = null,
+            IMigrationConventions migrationConventions = null)
         {
             _migrationAssemblies = assemblies;
             _announcer = runnerContext.Announcer;
@@ -84,7 +86,7 @@ namespace FluentMigrator.Runner
             SilentlyFail = false;
             CaughtExceptions = null;
 
-            Conventions = new MigrationConventions();
+            Conventions = migrationConventions ?? GetMigrationConventions(runnerContext);
             if (!string.IsNullOrEmpty(runnerContext.WorkingDirectory))
                 Conventions.GetWorkingDirectory = () => runnerContext.WorkingDirectory;
 
@@ -174,6 +176,27 @@ namespace FluentMigrator.Runner
             }
 
             VersionLoader.LoadVersionInfo();
+        }
+
+        private IMigrationConventions GetMigrationConventions(IRunnerContext runnerContext)
+        {
+            var matchedType = _migrationAssemblies
+                .GetExportedTypes()
+                .FirstOrDefault(t => typeof(IMigrationConventions).IsAssignableFrom(t));
+
+            if (matchedType != null)
+            {
+                return (IMigrationConventions) Activator.CreateInstance(matchedType);
+            }
+
+            var result = new MigrationConventions();
+            var defaultSchemaName = runnerContext.DefaultSchemaName;
+            if (string.IsNullOrEmpty(defaultSchemaName))
+            {
+                result.GetDefaultSchema = () => defaultSchemaName;
+            }
+
+            return result;
         }
 
         private IEnumerable<IMigrationInfo> GetUpMigrationsToApply(long version)

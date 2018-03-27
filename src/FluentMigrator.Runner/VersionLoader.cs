@@ -92,7 +92,7 @@ namespace FluentMigrator.Runner
 
             if (matchedType == null)
             {
-                return new DefaultVersionTableMetaData();
+                return new DefaultVersionTableMetaData(Conventions.GetDefaultSchema());
             }
 
             var versionTableMetaData = (IVersionTableMetaData)Activator.CreateInstance(matchedType);

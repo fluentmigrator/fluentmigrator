@@ -27,18 +27,20 @@ namespace FluentMigrator.Expressions
     {
         public virtual string SchemaName { get; set; }
         public virtual string TableName { get; set; }
-        public virtual IList<ColumnDefinition> Columns { get; set; }
+        public virtual IList<ColumnDefinition> Columns { get; set; } = new List<ColumnDefinition>();
         public virtual string TableDescription { get; set; }
-
-        public CreateTableExpression()
-        {
-            Columns = new List<ColumnDefinition>();
-        }
 
         public override void ApplyConventions(IMigrationConventions conventions)
         {
+            if (string.IsNullOrEmpty(SchemaName))
+            {
+                SchemaName = conventions.GetDefaultSchema();
+            }
+
             foreach (var column in Columns)
+            {
                 column.ApplyConventions(conventions);
+            }
         }
 
         public override void CollectValidationErrors(ICollection<string> errors)

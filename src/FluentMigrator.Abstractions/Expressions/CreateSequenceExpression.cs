@@ -5,12 +5,12 @@ namespace FluentMigrator.Expressions
 
     public class CreateSequenceExpression : MigrationExpressionBase
     {
-        public CreateSequenceExpression()
-        {
-            Sequence = new SequenceDefinition();
-        }
+        public virtual SequenceDefinition Sequence { get; set; } = new SequenceDefinition();
 
-        public virtual SequenceDefinition Sequence { get; set; }
+        public override void ApplyConventions(IMigrationConventions conventions)
+        {
+            Sequence.ApplyConventions(conventions);
+        }
 
         public override void ExecuteWith(IMigrationProcessor processor)
         {

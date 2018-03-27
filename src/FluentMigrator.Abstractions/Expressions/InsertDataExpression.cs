@@ -63,6 +63,10 @@ namespace FluentMigrator.Expressions
 
         public void ApplyConventions(IMigrationConventions conventions)
         {
+            if (string.IsNullOrEmpty(SchemaName))
+            {
+                SchemaName = conventions.GetDefaultSchema();
+            }
         }
     }
 }

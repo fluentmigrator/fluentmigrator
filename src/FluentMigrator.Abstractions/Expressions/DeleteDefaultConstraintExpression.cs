@@ -15,6 +15,14 @@ namespace FluentMigrator.Expressions
             processor.Process(this);
         }
 
+        public override void ApplyConventions(IMigrationConventions conventions)
+        {
+            if (string.IsNullOrEmpty(SchemaName))
+            {
+                SchemaName = conventions.GetDefaultSchema();
+            }
+        }
+
         public override void CollectValidationErrors(ICollection<string> errors)
         {
             if (String.IsNullOrEmpty(TableName))

@@ -45,8 +45,15 @@ namespace FluentMigrator.Model
 
         public virtual void ApplyConventions(IMigrationConventions conventions)
         {
+            if (string.IsNullOrEmpty(SchemaName))
+            {
+                SchemaName = conventions.GetDefaultSchema();
+            }
+
             if (String.IsNullOrEmpty(Name))
+            {
                 Name = conventions.GetIndexName(this);
+            }
         }
 
         public virtual void CollectValidationErrors(ICollection<string> errors)

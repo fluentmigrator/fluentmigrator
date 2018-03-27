@@ -23,15 +23,11 @@ namespace FluentMigrator.Expressions
 {
     public class DeleteDataExpression : IMigrationExpression
     {
-        private readonly List<DeletionDataDefinition> _rows = new List<DeletionDataDefinition>();
         public virtual string SchemaName { get; set; }
         public string TableName { get; set; }
         public virtual bool IsAllRows { get; set; }
 
-        public List<DeletionDataDefinition> Rows
-        {
-            get { return _rows; }
-        }
+        public List<DeletionDataDefinition> Rows { get; } = new List<DeletionDataDefinition>();
 
         public void CollectValidationErrors(ICollection<string> errors)
         {
@@ -63,6 +59,10 @@ namespace FluentMigrator.Expressions
 
         public void ApplyConventions(IMigrationConventions conventions)
         {
+            if (string.IsNullOrEmpty(SchemaName))
+            {
+                SchemaName = conventions.GetDefaultSchema();
+            }
         }
     }
 }

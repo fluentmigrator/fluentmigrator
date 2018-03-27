@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -79,11 +79,11 @@ namespace FluentMigrator.Infrastructure
             return typeof(IMigration).IsAssignableFrom(type) && type.HasAttribute<MigrationAttribute>();
         }
 
-        public static MigrationStage? GetMaintenanceStage(Type type) 
+        public static MigrationStage? GetMaintenanceStage(Type type)
         {
             if (!typeof(IMigration).IsAssignableFrom(type))
                 return null;
-            
+
             var attribute = type.GetOneAttribute<MaintenanceAttribute>();
             return attribute != null ? attribute.Stage : (MigrationStage?)null;
         }
@@ -187,5 +187,7 @@ namespace FluentMigrator.Infrastructure
             }
             return string.Empty;
         }
+
+        public static string GetDefaultSchema() => null;
     }
 }
