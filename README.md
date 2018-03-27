@@ -73,7 +73,7 @@ dotnet vstest test/FluentMigrator.Tests/bin/Debug/net452/FluentMigrator.Tests.dl
 * [x] [case insensitive arguments and give more instructive messages when required options are not given](https://github.com/fluentmigrator/fluentmigrator/pull/719)
 * [x] [ListMigrations says "(not applied)" for migrations not applied](https://github.com/fluentmigrator/fluentmigrator/pull/750)
 * [x] [Syntax for creating indexes with nonkey columns](https://github.com/fluentmigrator/fluentmigrator/pull/759)
-* [ ] [Ability to specify the Default Schema Name](https://github.com/fluentmigrator/fluentmigrator/pull/772)
+* [x] [Ability to specify the Default Schema Name](https://github.com/fluentmigrator/fluentmigrator/pull/772)
 * [ ] [Add MySQL alter and drop of defaults](https://github.com/fluentmigrator/fluentmigrator/pull/783)
 * [ ] [SQL Server 2005 support WITH (ONLINE = ON|OFF)](https://github.com/fluentmigrator/fluentmigrator/pull/788)
 * [ ] [MySqlProcessor was not announcing the SQL of embedded scripts](https://github.com/fluentmigrator/fluentmigrator/pull/793)
