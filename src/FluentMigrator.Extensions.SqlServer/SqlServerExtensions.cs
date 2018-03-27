@@ -1,11 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 
 using FluentMigrator.Builders;
-using FluentMigrator.Builders.Alter.Column;
-using FluentMigrator.Builders.Alter.Table;
-using FluentMigrator.Builders.Create.Column;
 using FluentMigrator.Builders.Create.Constraint;
 using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Builders.Create.Index;
@@ -14,7 +10,7 @@ using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 
-namespace FluentMigrator.Runner.Extensions
+namespace FluentMigrator
 {
     public enum SqlServerConstraintType
     {

@@ -19,7 +19,6 @@
 using System.Text;
 
 using FluentMigrator.Infrastructure.Extensions;
-using FluentMigrator.Runner.Extensions;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
