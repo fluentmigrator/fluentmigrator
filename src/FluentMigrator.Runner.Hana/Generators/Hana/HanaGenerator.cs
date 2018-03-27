@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Text;
 using FluentMigrator.Expressions;
@@ -37,14 +37,7 @@ namespace FluentMigrator.Runner.Generators.Hana
             var result = new StringBuilder(string.Format("CREATE SEQUENCE "));
             var seq = expression.Sequence;
 
-            if (string.IsNullOrEmpty(seq.SchemaName))
-            {
-                result.AppendFormat(Quoter.QuoteSequenceName(seq.Name));
-            }
-            else
-            {
-                result.AppendFormat("{0}.{1}", Quoter.QuoteSchemaName(seq.SchemaName), Quoter.QuoteSequenceName(seq.Name));
-            }
+            result.AppendFormat(Quoter.QuoteSequenceName(seq.Name));
 
             if (seq.Increment.HasValue)
             {
@@ -99,11 +92,6 @@ namespace FluentMigrator.Runner.Generators.Hana
 
         public override string RenameColumn { get { return "RENAME COLUMN {0}.{1} TO {2}"; } }
 
-        private string ExpandTableName(string schema, string table)
-        {
-            return String.IsNullOrEmpty(schema) ? table : String.Concat(schema, ".", table);
-        }
-
         public override string Generate(DeleteDataExpression expression)
         {
             return string.Format("{0};", base.Generate(expression));
@@ -117,9 +105,7 @@ namespace FluentMigrator.Runner.Generators.Hana
         private string InnerGenerate(CreateTableExpression expression)
         {
             var tableName = Quoter.QuoteTableName(expression.TableName);
-            var schemaName = Quoter.QuoteSchemaName(expression.SchemaName);
-
-            return string.Format("CREATE COLUMN TABLE {0} ({1});", ExpandTableName(schemaName, tableName), Column.Generate(expression.Columns, tableName));
+            return string.Format("CREATE COLUMN TABLE {0} ({1});", tableName, Column.Generate(expression.Columns, tableName));
         }
 
         public override string Generate(UpdateDataExpression expression)
@@ -195,7 +181,7 @@ namespace FluentMigrator.Runner.Generators.Hana
 
         public override string Generate(CreateForeignKeyExpression expression)
         {
-            return string.Format("{0};", base.Generate(expression));            
+            return string.Format("{0};", base.Generate(expression));
         }
         public override string Generate(CreateConstraintExpression expression)
         {
@@ -234,7 +220,10 @@ namespace FluentMigrator.Runner.Generators.Hana
 
         public override string Generate(DeleteSequenceExpression expression)
         {
-            return string.Format("{0};", base.Generate(expression));
+            var result = new StringBuilder("DROP SEQUENCE ")
+                .Append(Quoter.QuoteSequenceName(expression.SequenceName))
+                .Append(';');
+            return result.ToString();
         }
 
         public override string Generate(RenameColumnExpression expression)

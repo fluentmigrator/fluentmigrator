@@ -1,14 +1,16 @@
-using System.Collections.Generic;
 using System.Data;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Hana;
+
 using NUnit.Framework;
 using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.Hana
 {
     [TestFixture]
+    [Category("Hana")]
     public class HanaGeneratorTests
     {
         protected HanaGenerator Generator;
@@ -120,66 +122,6 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"TestTable1\" ALTER (\"TestColumn1\" NVARCHAR(255) NOT NULL);");
-        }
-
-        [Test]
-        public void CanDeleteDefaultConstraint()
-        {
-            Assert.Ignore("Hana support change default value with type like bellow");
-            
-            var expression = new DeleteDefaultConstraintExpression
-            {
-                ColumnName = "TestColumn1",
-                SchemaName = "TestSchema",
-                TableName = "TestTable1"
-            };
-
-            var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ALTER (\"TestColumn1\" NVARCHAR(255) DEFAULT NULL)");
-        }
-
-        [Test]
-        public void CanAlterDefaultConstraintToCurrentUser()
-        {
-            Assert.Ignore("Hana support change default value with type like bellow");
-
-            var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
-            expression.DefaultValue = SystemMethods.CurrentUTCDateTime;
-            expression.SchemaName = "TestSchema";
-
-            var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ALTER (\"TestColumn1\" NVARCHAR(255) DEFAULT CURRENT_UTCTIMESTAMP)");
-        }
-
-        [Test]
-        public void CanAlterDefaultConstraintToCurrentDate()
-        {
-            Assert.Ignore("Hana support change default value with type like bellow");
-
-            var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
-
-            expression.DefaultValue = SystemMethods.CurrentDateTime;
-            expression.SchemaName = "TestSchema";
-
-            var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ALTER (\"TestColumn1\" NVARCHAR(255) DEFAULT CURRENT_TIMESTAMP)");
-        }
-
-        [Test]
-        public void CanAlterColumnAndOnlySetTypeIfIsNullableNotSet()
-        {
-            var expression = new AlterColumnExpression
-            {
-                SchemaName = "TestSchema",
-                TableName = "TestTable1"
-            };
-
-            expression.Column.Type = DbType.String;
-            expression.Column.Name = "TestColumn1";
-            expression.Column.IsNullable = null;
-
-            var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ALTER (\"TestColumn1\" NVARCHAR(255));");
         }
     }
 }
