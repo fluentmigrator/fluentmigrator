@@ -1,5 +1,8 @@
-﻿using System;
+using System;
 using System.Data;
+
+using FluentMigrator.Builders.Create.Constraint;
+using FluentMigrator.Builders.Delete.Constraint;
 using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
 using NUnit.Should;
@@ -488,6 +491,26 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         }
 
         [Test]
+        public void CanCreatePrimaryKeyWithOnlineOn()
+        {
+            var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
+            new CreateConstraintExpressionBuilder(expression).Online();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1]) WITH (ONLINE=ON)");
+        }
+
+        [Test]
+        public void CanCreatePrimaryKeyWithOnlineOff()
+        {
+            var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
+            new CreateConstraintExpressionBuilder(expression).Online(false);
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD CONSTRAINT [PK_TestTable1_TestColumn1] PRIMARY KEY ([TestColumn1]) WITH (ONLINE=OFF)");
+        }
+
+        [Test]
         public override void CanDropForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
@@ -523,6 +546,24 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [TESTPRIMARYKEY]");
+        }
+
+        [Test]
+        public void CanDropPrimaryKeyWithOnlineOn()
+        {
+            var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
+            new DeleteConstraintExpressionBuilder(expression).Online();
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [TESTPRIMARYKEY] WITH (ONLINE=ON)");
+        }
+
+        [Test]
+        public void CanDropPrimaryKeyWithOnlineOff()
+        {
+            var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
+            new DeleteConstraintExpressionBuilder(expression).Online(false);
+            var result = Generator.Generate(expression);
+            result.ShouldBe("ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT [TESTPRIMARYKEY] WITH (ONLINE=OFF)");
         }
 
         [Test]

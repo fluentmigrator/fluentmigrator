@@ -1,6 +1,7 @@
-﻿using FluentMigrator.Builders.Create.Index;
-using FluentMigrator.Runner.Extensions;
+using FluentMigrator.Builders.Create.Index;
+using FluentMigrator.Builders.Delete.Index;
 using FluentMigrator.Runner.Generators.SqlServer;
+
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -116,32 +117,36 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         public void CanCreateIndexWithOnlineOnOption()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
-            var builder = new CreateIndexExpressionBuilder(expression);
-            builder
-                .InSchema("TestSchema")
-                .WithOptions()
-                .Online();
-
-            // Verify Online Option is used
+            new CreateIndexExpressionBuilder(expression).Online();
             var result = Generator.Generate(expression);
-            result.ShouldBe(
-                "CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC) WITH (ONLINE=ON)");
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WITH (ONLINE=ON)");
         }
 
         [Test]
         public void CanCreateIndexWithOnlineOffOption()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
-            var builder = new CreateIndexExpressionBuilder(expression);
-            builder
-                .InSchema("TestSchema")
-                .WithOptions()
-                .Online(false);
-
-            // Verify Online Option is used
+            new CreateIndexExpressionBuilder(expression).Online(false);
             var result = Generator.Generate(expression);
-            result.ShouldBe(
-                "CREATE INDEX [TestIndex] ON [TestSchema].[TestTable1] ([TestColumn1] ASC) WITH (ONLINE=OFF)");
+            result.ShouldBe("CREATE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WITH (ONLINE=OFF)");
+        }
+
+        [Test]
+        public void CanDropIndexWithOnlineOn()
+        {
+            var expression = GeneratorTestHelper.GetDeleteIndexExpression();
+            new DeleteIndexExpressionBuilder(expression).Online();
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP INDEX [TestIndex] ON [dbo].[TestTable1] WITH (ONLINE=ON)");
+        }
+
+        [Test]
+        public void CanDropIndexWithOnlineOff()
+        {
+            var expression = GeneratorTestHelper.GetDeleteIndexExpression();
+            new DeleteIndexExpressionBuilder(expression).Online(false);
+            var result = Generator.Generate(expression);
+            result.ShouldBe("DROP INDEX [TestIndex] ON [dbo].[TestTable1] WITH (ONLINE=OFF)");
         }
     }
 }

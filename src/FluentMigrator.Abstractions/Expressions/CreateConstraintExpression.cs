@@ -1,9 +1,11 @@
 using System.Collections.Generic;
+
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-    public class CreateConstraintExpression : MigrationExpressionBase
+    public class CreateConstraintExpression : MigrationExpressionBase, ISupportAdditionalFeatures
     {
         public virtual ConstraintDefinition Constraint { get; set; }
 
@@ -14,6 +16,8 @@ namespace FluentMigrator.Expressions
         {
             Constraint = new ConstraintDefinition(type);
         }
+
+        public IDictionary<string, object> AdditionalFeatures => Constraint.AdditionalFeatures;
 
         public override void ExecuteWith(IMigrationProcessor processor)
         {

@@ -4,7 +4,7 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-    public class DeleteConstraintExpression : MigrationExpressionBase
+    public class DeleteConstraintExpression : MigrationExpressionBase, ISupportAdditionalFeatures
     {
         public ConstraintDefinition Constraint { get; set; }
 
@@ -15,6 +15,8 @@ namespace FluentMigrator.Expressions
         {
             Constraint = new ConstraintDefinition(type);
         }
+
+        public IDictionary<string, object> AdditionalFeatures => Constraint.AdditionalFeatures;
 
         public override void ExecuteWith(IMigrationProcessor processor)
         {

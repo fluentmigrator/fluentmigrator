@@ -16,21 +16,28 @@
 //
 #endregion
 
+using System.Collections.Generic;
+
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Builders.Delete.Index
 {
     public class DeleteIndexExpressionBuilder : ExpressionBuilderBase<DeleteIndexExpression>,
         IDeleteIndexForTableSyntax,
-        IDeleteIndexOnColumnOrInSchemaSyntax
+        IDeleteIndexOnColumnOrInSchemaSyntax,
+        IDeleteIndexOptionsSyntax,
+        ISupportAdditionalFeatures
     {
-        public IndexColumnDefinition CurrentColumn { get; set; }
-
         public DeleteIndexExpressionBuilder(DeleteIndexExpression expression)
             : base(expression)
         {
         }
+
+        public IndexColumnDefinition CurrentColumn { get; set; }
+
+        public IDictionary<string, object> AdditionalFeatures => Expression.AdditionalFeatures;
 
         public IDeleteIndexOnColumnOrInSchemaSyntax OnTable(string tableName)
         {
@@ -54,6 +61,23 @@ namespace FluentMigrator.Builders.Delete.Index
         {
             foreach (string columnName in columnNames)
                 Expression.Index.Columns.Add(new IndexColumnDefinition { Name = columnName });
+        }
+
+        IDeleteIndexOptionsSyntax IDeleteIndexOnColumnSyntax.OnColumns(params string[] columnNames)
+        {
+            OnColumns(columnNames);
+            return this;
+        }
+
+        IDeleteIndexOptionsSyntax IDeleteIndexOnColumnSyntax.OnColumn(string columnName)
+        {
+            OnColumn(columnName);
+            return this;
+        }
+
+        public IDeleteIndexOptionsSyntax WithOptions()
+        {
+            return this;
         }
     }
 }

@@ -18,6 +18,7 @@
 
 using System.Text;
 
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
@@ -50,8 +51,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public override string RenameColumn { get { return "{0}.{1}', '{2}'"; } }
         public override string RenameTable { get { return "{0}', '{1}'"; } }
 
-        public override string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3}.{4} ({5}{6}{7})"; } }
-        public override string DropIndex { get { return "DROP INDEX {0} ON {1}.{2}"; } }
+        public override string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3}.{4} ({5}{6}{7}){8}"; } }
+        public override string DropIndex { get { return "DROP INDEX {0} ON {1}.{2}{3}"; } }
 
         public override string InsertData { get { return "INSERT INTO {0}.{1} ({2}) VALUES ({3})"; } }
         public override string UpdateData { get { return "{0} SET {1} WHERE {2}"; } }
@@ -68,13 +69,13 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return includes?.Count > 0 ? ") INCLUDE (" : string.Empty;
         }
 
-        public virtual string GetWithOptions(CreateIndexExpression expression)
+        public virtual string GetWithOptions(ISupportAdditionalFeatures expression)
         {
             var items = new List<string>();
-            if (expression.AdditionalFeatures.TryGetValue(SqlServerExtensions.OnlineIndex, out var status))
+            var isOnline = expression.GetAdditionalFeature(SqlServerExtensions.OnlineIndex, (bool?)null);
+            if (isOnline.HasValue)
             {
-                var isOn = Convert.ToBoolean(status);
-                items.Add($"ONLINE={(isOn ? "ON" : "OFF")}");
+                items.Add($"ONLINE={(isOnline.Value ? "ON" : "OFF")}");
             }
 
             return string.Join(", ", items);
@@ -284,24 +285,39 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 }
             }
 
-            var result = new StringBuilder().AppendFormat(
-                CreateIndex, GetUniqueString(expression), GetClusterTypeString(expression),
-                Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteSchemaName(expression.Index.SchemaName),
-                Quoter.QuoteTableName(expression.Index.TableName), String.Join(", ", indexColumns),
-                GetIncludeString(expression), String.Join(", ", indexIncludes));
-
             var withParts = GetWithOptions(expression);
-            if (!string.IsNullOrEmpty(withParts))
-            {
-                result.AppendFormat(" WITH ({0})", withParts);
-            }
+            var withPart = !string.IsNullOrEmpty(withParts)
+                ? $" WITH ({withParts})"
+                : string.Empty;
 
-            return result.ToString();
+            var result = string.Format(
+                CreateIndex,
+                GetUniqueString(expression),
+                GetClusterTypeString(expression),
+                Quoter.QuoteIndexName(expression.Index.Name),
+                Quoter.QuoteSchemaName(expression.Index.SchemaName),
+                Quoter.QuoteTableName(expression.Index.TableName),
+                String.Join(", ", indexColumns),
+                GetIncludeString(expression),
+                String.Join(", ", indexIncludes),
+                withPart);
+
+            return result;
         }
 
         public override string Generate(DeleteIndexExpression expression)
         {
-            return String.Format(DropIndex, Quoter.QuoteIndexName(expression.Index.Name), Quoter.QuoteSchemaName(expression.Index.SchemaName), Quoter.QuoteTableName(expression.Index.TableName));
+            var withParts = GetWithOptions(expression);
+            var withPart = !string.IsNullOrEmpty(withParts)
+                ? $" WITH ({withParts})"
+                : string.Empty;
+
+            return string.Format(
+                DropIndex,
+                Quoter.QuoteIndexName(expression.Index.Name),
+                Quoter.QuoteSchemaName(expression.Index.SchemaName),
+                Quoter.QuoteTableName(expression.Index.TableName),
+                withPart);
         }
 
         protected override void BuildDelete(DeleteColumnExpression expression, string columnName, StringBuilder builder)
@@ -347,7 +363,15 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(CreateConstraintExpression expression)
         {
-            return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.Constraint.SchemaName), base.Generate(expression));
+            var withParts = GetWithOptions(expression);
+            var withPart = !string.IsNullOrEmpty(withParts)
+                ? $" WITH ({withParts})"
+                : string.Empty;
+
+            return string.Format("ALTER TABLE {0}.{1}{2}",
+                Quoter.QuoteSchemaName(expression.Constraint.SchemaName),
+                base.Generate(expression),
+                withPart);
         }
 
         public override string Generate(DeleteDefaultConstraintExpression expression)
@@ -373,7 +397,15 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(DeleteConstraintExpression expression)
         {
-            return string.Format("ALTER TABLE {0}.{1}", Quoter.QuoteSchemaName(expression.Constraint.SchemaName), base.Generate(expression));
+            var withParts = GetWithOptions(expression);
+            var withPart = !string.IsNullOrEmpty(withParts)
+                ? $" WITH ({withParts})"
+                : string.Empty;
+
+            return string.Format("ALTER TABLE {0}.{1}{2}",
+                Quoter.QuoteSchemaName(expression.Constraint.SchemaName),
+                base.Generate(expression),
+                withPart);
         }
 
         public override string Generate(CreateSchemaExpression expression)

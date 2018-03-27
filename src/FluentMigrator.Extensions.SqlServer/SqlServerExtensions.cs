@@ -12,13 +12,7 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator
 {
-    public enum SqlServerConstraintType
-    {
-        Clustered,
-        NonClustered
-    }
-
-    public static class SqlServerExtensions
+    public static partial class SqlServerExtensions
     {
         public const string IdentityInsert = "SqlServerIdentityInsert";
         public const string IdentitySeed = "SqlServerIdentitySeed";
@@ -77,40 +71,11 @@ namespace FluentMigrator
             SetConstraintType(expression, SqlServerConstraintType.NonClustered);
         }
 
-        public static ICreateIndexOptionsSyntax Online(this ICreateIndexOptionsSyntax expression, bool active = true)
-        {
-            var additionalFeatures = expression as ISupportAdditionalFeatures ?? throw new InvalidOperationException("The Online method must be called on an object that implements ISupportAdditionalFeatures.");
-            additionalFeatures.AdditionalFeatures[OnlineIndex] = active;
-            return expression;
-        }
-
-        public static ICreateIndexOptionsSyntax Include(this ICreateIndexOptionsSyntax expression, string columnName)
-        {
-            var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.Include(columnName);
-            return expression;
-        }
-
-        public static ICreateIndexNonKeyColumnSyntax Include(this ICreateIndexOnColumnSyntax expression, string columnName)
-        {
-            var additionalFeatures = expression as ISupportAdditionalFeatures;
-            additionalFeatures.Include(columnName);
-            return new CreateIndexExpressionNonKeyBuilder(expression, additionalFeatures);
-        }
-
         public static ICreateTableColumnOptionOrWithColumnSyntax RowGuid(this ICreateTableColumnOptionOrWithColumnSyntax expression)
         {
             var columnExpression = expression as IColumnExpressionBuilder ?? throw new InvalidOperationException("The Include method must be called on an object that implements IColumnExpressionBuilder.");
             columnExpression.Column.AdditionalFeatures[RowGuidColumn] = true;
             return expression;
-        }
-
-        internal static void Include(this ISupportAdditionalFeatures additionalFeatures, string columnName)
-        {
-            if (additionalFeatures == null)
-                throw new InvalidOperationException("The Include method must be called on an object that implements IColumnExpressionBuilder.");
-            var includes = additionalFeatures.GetAdditionalFeature<IList<IndexIncludeDefinition>>(IncludesList, () => new List<IndexIncludeDefinition>());
-            includes.Add(new IndexIncludeDefinition { Name = columnName });
         }
 
         private static ISupportAdditionalFeatures GetColumn<TNext, TNextFk>(IColumnOptionSyntax<TNext, TNextFk> expression) where TNext : IFluentSyntax where TNextFk : IFluentSyntax
