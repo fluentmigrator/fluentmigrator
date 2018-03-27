@@ -50,6 +50,7 @@ dotnet vstest test/FluentMigrator.Tests/bin/Debug/net452/FluentMigrator.Tests.dl
 # TODO
 
 * Port sample application
+* Test PR #798
 
 # Pull Requests for 2.0
 
