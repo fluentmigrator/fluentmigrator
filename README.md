@@ -63,7 +63,7 @@ dotnet vstest test/FluentMigrator.Tests/bin/Debug/net452/FluentMigrator.Tests.dl
 
 ### New features
 
-* [ ] [Add db type datetim2](https://github.com/fluentmigrator/fluentmigrator/pull/657)
+* [ ] [Add db type datetime2](https://github.com/fluentmigrator/fluentmigrator/pull/657)
 * [ ] [Remove ExplicitUnicodeString and add NonUnicodeString](https://github.com/fluentmigrator/fluentmigrator/pull/642)
 * [ ] [Create Foreign Key with SQLite](https://github.com/fluentmigrator/fluentmigrator/pull/638)
 * [ ] [DBNull for Insert/Update criteria expression](https://github.com/fluentmigrator/fluentmigrator/pull/672)
