@@ -85,8 +85,9 @@ dotnet vstest test/FluentMigrator.Tests/bin/Debug/net452/FluentMigrator.Tests.dl
 ### Bug fixes
 
 * [ ] [allowed for TagsAttribute to match by inheritance](https://github.com/fluentmigrator/fluentmigrator/pull/643)
-* [ ] [AsString() -> Nvarchar() in MySql](https://github.com/fluentmigrator/fluentmigrator/pull/725)
 * [ ] [[Hana] Fix drop primary key](https://github.com/fluentmigrator/fluentmigrator/pull/745)
+* [x] [AsString() -> Nvarchar() in MySql](https://github.com/fluentmigrator/fluentmigrator/pull/725):
+      `MySql` is now `MySql4` and this feature requires `MySql5`
 * [ ] [IntegrationTestBase Assert on configuration error](https://github.com/fluentmigrator/fluentmigrator/pull/751)
 * [ ] [Update Max Decimal for MySql](https://github.com/fluentmigrator/fluentmigrator/pull/825)
 

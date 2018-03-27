@@ -26,7 +26,7 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
         public void SetUp()
         {
             Connection = new MySqlConnection(IntegrationTestOptions.MySql.ConnectionString);
-            Processor = new MySqlProcessor(Connection, new MySqlGenerator(),
+            Processor = new MySqlProcessor(Connection, new MySql4Generator(),
                 new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new MySqlDbFactory());
             Connection.Open();
         }
@@ -136,7 +136,7 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
         {
             var processor = new MySqlProcessor(
                 connection,
-                new MySqlGenerator(),
+                new MySql4Generator(),
                 new TextWriterAnnouncer(output),
                 new ProcessorOptions { PreviewOnly = true },
                 new MySqlDbFactory());

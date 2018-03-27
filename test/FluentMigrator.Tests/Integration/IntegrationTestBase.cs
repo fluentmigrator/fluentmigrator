@@ -18,9 +18,9 @@
 
 using System;
 using System.Data.SqlClient;
-using System.IO;
 using System.Linq;
-using System.Text.RegularExpressions;
+
+using FirebirdSql.Data.FirebirdClient;
 
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.Postgres;
@@ -29,14 +29,15 @@ using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.Postgres;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
-using MySql.Data.MySqlClient;
-using Npgsql;
 using FluentMigrator.Runner.Generators.SQLite;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.Runner.Generators.MySql;
-using FirebirdSql.Data.FirebirdClient;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Generators.Firebird;
+
+using MySql.Data.MySqlClient;
+
+using Npgsql;
 
 using NUnit.Framework;
 
@@ -206,7 +207,7 @@ namespace FluentMigrator.Tests.Integration
 
             using (var connection = new MySqlConnection(serverOptions.ConnectionString))
             {
-                var processor = new MySqlProcessor(connection, new MySqlGenerator(), announcer, new ProcessorOptions(), new MySqlDbFactory());
+                var processor = new MySqlProcessor(connection, new MySql4Generator(), announcer, new ProcessorOptions(), new MySqlDbFactory());
                 test(processor);
             }
         }

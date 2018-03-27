@@ -14,13 +14,19 @@
 // limitations under the License.
 #endregion
 
-namespace FluentMigrator.Runner.Processors.MySql
+namespace FluentMigrator.Runner.Generators.MySql
 {
-    public class MySqlDbFactory : ReflectionBasedDbFactory
+    public class MySql5Generator : MySql4Generator
     {
-        public MySqlDbFactory()
-            : base("MySql.Data", "MySql.Data.MySqlClient.MySqlClientFactory")
+        public MySql5Generator()
+            : base(new MySqlColumn(new MySql5TypeMap(), new MySqlQuoter()), new MySqlQuoter(), new EmptyDescriptionGenerator())
         {
         }
+
+        protected MySql5Generator(IColumn column, IQuoter quoter, IDescriptionGenerator descriptionGenerator)
+            : base(column, quoter, descriptionGenerator)
+        {
+        }
+
     }
 }

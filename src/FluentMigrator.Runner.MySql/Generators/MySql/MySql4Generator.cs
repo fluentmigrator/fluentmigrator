@@ -24,10 +24,15 @@ namespace FluentMigrator.Runner.Generators.MySql
     using Expressions;
     using Generic;
 
-    public class MySqlGenerator : GenericGenerator
+    public class MySql4Generator : GenericGenerator
     {
-        public MySqlGenerator()
-            : base(new MySqlColumn(), new MySqlQuoter(), new EmptyDescriptionGenerator())
+        public MySql4Generator()
+            : base(new MySqlColumn(new MySql4TypeMap(), new MySqlQuoter()), new MySqlQuoter(), new EmptyDescriptionGenerator())
+        {
+        }
+
+        protected MySql4Generator(IColumn column, IQuoter quoter, IDescriptionGenerator descriptionGenerator)
+            : base(column, quoter, descriptionGenerator)
         {
         }
 

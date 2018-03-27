@@ -47,7 +47,8 @@ namespace FluentMigrator.Runner.Processors
             Register(new Db2ProcessorFactory());
             Register(new DotConnectOracleProcessorFactory());
             Register(new FirebirdProcessorFactory());
-            Register(new MySqlProcessorFactory());
+            Register(new MySql4ProcessorFactory());
+            Register(new MySql5ProcessorFactory());
             Register(new OracleManagedProcessorFactory());
             Register(new OracleProcessorFactory());
             Register(new PostgresProcessorFactory());

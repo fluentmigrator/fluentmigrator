@@ -2,20 +2,21 @@ using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.MySql;
+
 using NUnit.Framework;
 using NUnit.Should;
 
-namespace FluentMigrator.Tests.Unit.Generators.MySql
+namespace FluentMigrator.Tests.Unit.Generators.MySql4
 {
     [TestFixture]
-    public class MySqlGeneratorTests
+    public class MySql4GeneratorTests
     {
-        protected MySqlGenerator Generator;
+        protected MySql4Generator Generator;
 
         [SetUp]
         public void Setup()
         {
-            Generator = new MySqlGenerator();
+            Generator = new MySql4Generator();
         }
 
         [Test]
