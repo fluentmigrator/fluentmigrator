@@ -13,7 +13,7 @@
 - Removal of deprecated functions
 - Moving database specific code from `FluentMigrator.Runner` to `FluentMigrator.Runner.<Database>`
 - Removal of .NET Framework 3.5 support
-- NAnt build task is published as ZIP
+- Removal of NAnt build task
 - MSBuild task is available as separate package (with custom .targets file)
 - Removal of SchemaDump and T4 experiments
 
@@ -57,54 +57,54 @@ dotnet vstest test/FluentMigrator.Tests/bin/Debug/net452/FluentMigrator.Tests.dl
 
 ### New providers
 
-* [Redshift provider](https://github.com/fluentmigrator/fluentmigrator/pull/605)
-* [Support SQLAnywhere](https://github.com/fluentmigrator/fluentmigrator/pull/659)
-* [SQL Server 2016](https://github.com/fluentmigrator/fluentmigrator/pull/833)
+- [ ] [Redshift provider](https://github.com/fluentmigrator/fluentmigrator/pull/605)
+- [ ] [Support SQLAnywhere](https://github.com/fluentmigrator/fluentmigrator/pull/659)
+- [ ] [SQL Server 2016](https://github.com/fluentmigrator/fluentmigrator/pull/833)
 
 ### New features
 
-* [Add db type datetim2](https://github.com/fluentmigrator/fluentmigrator/pull/657)
-* [Remove ExplicitUnicodeString and add NonUnicodeString](https://github.com/fluentmigrator/fluentmigrator/pull/642)
-* [Create Foreign Key with SQLite](https://github.com/fluentmigrator/fluentmigrator/pull/638)
-* [DBNull for Insert/Update criteria expression](https://github.com/fluentmigrator/fluentmigrator/pull/672)
-* [Overload IfDatabase to accept predicate](https://github.com/fluentmigrator/fluentmigrator/pull/683)
-* [TaskExecutor got method HasMigrationsToApply](https://github.com/fluentmigrator/fluentmigrator/pull/701)
-* [Enable delegation to methods for IfDatabase expressions](https://github.com/fluentmigrator/fluentmigrator/pull/707)
-* [709 case insensitive arguments and give more instructive messages when required options are not given](https://github.com/fluentmigrator/fluentmigrator/pull/719)
-* [ListMigrations says "(not applied)" for migrations not applied](https://github.com/fluentmigrator/fluentmigrator/pull/750)
-* [Syntax for creating indexes with nonkey columns](https://github.com/fluentmigrator/fluentmigrator/pull/759)
-* [Ability to specify the Default Schema Name](https://github.com/fluentmigrator/fluentmigrator/pull/772)
-* [Add MySQL alter and drop of defaults](https://github.com/fluentmigrator/fluentmigrator/pull/783)
-* [SQL Server 2005 support WITH (ONLINE = ON|OFF)](https://github.com/fluentmigrator/fluentmigrator/pull/788)
-* [MySqlProcessor was not announcing the SQL of embedded scripts](https://github.com/fluentmigrator/fluentmigrator/pull/793)
-* [Added StopOnError flag in order to pause console if some migration fails](https://github.com/fluentmigrator/fluentmigrator/pull/795)
-* [Add SystemMethods.CurrentDateTimeOffset](https://github.com/fluentmigrator/fluentmigrator/pull/803)
-* [Remove default connection timeout. Use provider's default instead.](https://github.com/fluentmigrator/fluentmigrator/pull/811)
-* [64 bit identity seed for SQL Server](https://github.com/fluentmigrator/fluentmigrator/pull/816)
+* [ ] [Add db type datetim2](https://github.com/fluentmigrator/fluentmigrator/pull/657)
+* [ ] [Remove ExplicitUnicodeString and add NonUnicodeString](https://github.com/fluentmigrator/fluentmigrator/pull/642)
+* [ ] [Create Foreign Key with SQLite](https://github.com/fluentmigrator/fluentmigrator/pull/638)
+* [ ] [DBNull for Insert/Update criteria expression](https://github.com/fluentmigrator/fluentmigrator/pull/672)
+* [ ] [Overload IfDatabase to accept predicate](https://github.com/fluentmigrator/fluentmigrator/pull/683)
+* [ ] [TaskExecutor got method HasMigrationsToApply](https://github.com/fluentmigrator/fluentmigrator/pull/701)
+* [ ] [Enable delegation to methods for IfDatabase expressions](https://github.com/fluentmigrator/fluentmigrator/pull/707)
+* [ ] [709 case insensitive arguments and give more instructive messages when required options are not given](https://github.com/fluentmigrator/fluentmigrator/pull/719)
+* [ ] [ListMigrations says "(not applied)" for migrations not applied](https://github.com/fluentmigrator/fluentmigrator/pull/750)
+* [ ] [Syntax for creating indexes with nonkey columns](https://github.com/fluentmigrator/fluentmigrator/pull/759)
+* [ ] [Ability to specify the Default Schema Name](https://github.com/fluentmigrator/fluentmigrator/pull/772)
+* [ ] [Add MySQL alter and drop of defaults](https://github.com/fluentmigrator/fluentmigrator/pull/783)
+* [ ] [SQL Server 2005 support WITH (ONLINE = ON|OFF)](https://github.com/fluentmigrator/fluentmigrator/pull/788)
+* [ ] [MySqlProcessor was not announcing the SQL of embedded scripts](https://github.com/fluentmigrator/fluentmigrator/pull/793)
+* [ ] [Added StopOnError flag in order to pause console if some migration fails](https://github.com/fluentmigrator/fluentmigrator/pull/795)
+* [ ] [Add SystemMethods.CurrentDateTimeOffset](https://github.com/fluentmigrator/fluentmigrator/pull/803)
+* [ ] [Remove default connection timeout. Use provider's default instead.](https://github.com/fluentmigrator/fluentmigrator/pull/811)
+* [ ] [64 bit identity seed for SQL Server](https://github.com/fluentmigrator/fluentmigrator/pull/816)
 
 ### Bug fixes
 
-* [allowed for TagsAttribute to match by inheritance](https://github.com/fluentmigrator/fluentmigrator/pull/643)
-* [AsString() -> Nvarchar() in MySql](https://github.com/fluentmigrator/fluentmigrator/pull/725)
-* [[Hana] Fix drop primary key](https://github.com/fluentmigrator/fluentmigrator/pull/745)
-* [IntegrationTestBase Assert on configuration error](https://github.com/fluentmigrator/fluentmigrator/pull/751)
-* [Update Max Decimal for MySql](https://github.com/fluentmigrator/fluentmigrator/pull/825)
+* [ ] [allowed for TagsAttribute to match by inheritance](https://github.com/fluentmigrator/fluentmigrator/pull/643)
+* [ ] [AsString() -> Nvarchar() in MySql](https://github.com/fluentmigrator/fluentmigrator/pull/725)
+* [ ] [[Hana] Fix drop primary key](https://github.com/fluentmigrator/fluentmigrator/pull/745)
+* [ ] [IntegrationTestBase Assert on configuration error](https://github.com/fluentmigrator/fluentmigrator/pull/751)
+* [ ] [Update Max Decimal for MySql](https://github.com/fluentmigrator/fluentmigrator/pull/825)
 
 ### Optimization
 
-* [Add StringBuilder to ExecuteBatchNonQuery()](https://github.com/fluentmigrator/fluentmigrator/pull/798)
-* [Avoid confusion reported in issue #748](https://github.com/fluentmigrator/fluentmigrator/pull/808):
+* [ ] [Add StringBuilder to ExecuteBatchNonQuery()](https://github.com/fluentmigrator/fluentmigrator/pull/798)
+* [ ] [Avoid confusion reported in issue #748](https://github.com/fluentmigrator/fluentmigrator/pull/808):
   may be a breaking change.
 
 ## Medium priority
 
 ### New features
 
-* [Fluent API](https://github.com/fluentmigrator/fluentmigrator/pull/386)
-* [Pass arguments to scripts](https://github.com/fluentmigrator/fluentmigrator/pull/666)
-* [add delete.Table.IfExists() syntax and support generators](https://github.com/fluentmigrator/fluentmigrator/pull/684/files)
+* [ ] [Fluent API](https://github.com/fluentmigrator/fluentmigrator/pull/386)
+* [ ] [Pass arguments to scripts](https://github.com/fluentmigrator/fluentmigrator/pull/666)
+* [ ] [add delete.Table.IfExists() syntax and support generators](https://github.com/fluentmigrator/fluentmigrator/pull/684/files)
   seems to be a more generic take than PR #664.
-* [add breaking change identification](https://github.com/fluentmigrator/fluentmigrator/pull/829)
+* [ ] [add breaking change identification](https://github.com/fluentmigrator/fluentmigrator/pull/829)
 
 ## Not sure about priority/effort/correctness
 
