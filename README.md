@@ -38,13 +38,13 @@ msbuild FluentMigrator.sln
 ## Windows
 
 ```
-dotnet vstest test/FluentMigrator.Tests/bin/Debug/net452/FluentMigrator.Tests.dll --TestCaseFilter:"TestCategory!=Integration"
+dotnet vstest test/FluentMigrator.Tests/bin/Debug/net471/FluentMigrator.Tests.dll --TestCaseFilter:"TestCategory!=Integration"
 ```
 
 ## Linux
 
 ```
-dotnet vstest test/FluentMigrator.Tests/bin/Debug/net452/FluentMigrator.Tests.dll --TestCaseFilter:'TestCategory!=Integration&TestCategory!=NotWorkingOnMono'
+dotnet vstest test/FluentMigrator.Tests/bin/Debug/net471/FluentMigrator.Tests.dll --TestCaseFilter:'TestCategory!=Integration&TestCategory!=NotWorkingOnMono'
 ```
 
 # TODO
