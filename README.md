@@ -45,7 +45,7 @@ msbuild ./FluentMigrator.sln /v:m  /t:Pack /p:PackageOutputPath="/tmp/fluentmigr
   * [ ] [Unique index with support for multiple null values per column](https://github.com/fluentmigrator/fluentmigrator/pull/717)
   * [ ] [Unique index with support for multiple null values](https://github.com/fluentmigrator/fluentmigrator/pull/716)
 * [x] [Travis CI](https://travis-ci.org/fluentmigrator/fluentmigrator)
-* [ ] [JetBrains TeamCity Build Server](https://teamcity.jetbrains.com/project.html?projectId=FluentMigrator)
+* [x] [JetBrains TeamCity Build Server](https://teamcity.jetbrains.com/project.html?projectId=FluentMigrator)
 
 # Pull Requests for 2.0
 
