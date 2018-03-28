@@ -775,6 +775,7 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("NotWorkingOnMono")]
         public void ValidateVersionOrderShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanLatestAppliedMigration()
         {
 
