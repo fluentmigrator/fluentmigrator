@@ -219,7 +219,9 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
         private MigrationContext ExecuteTestMigration(Predicate<string> databaseTypePredicate, params Action<IIfDatabaseExpressionRoot>[] fluentExpression)
         {
             // Arrange
-            var context = new MigrationContext(new MigrationConventions(), new SQLiteProcessor(new SQLiteConnection(), null, null, null, new SQLiteDbFactory()), new SingleAssembly(GetType().Assembly), null, "");
+            var mock = new Mock<IDbConnection>(MockBehavior.Loose);
+            mock.Setup(x => x.State).Returns(ConnectionState.Open);
+            var context = new MigrationContext(new MigrationConventions(), new SQLiteProcessor(mock.Object, null, null, null, new SQLiteDbFactory()), new SingleAssembly(GetType().Assembly), null, "");
 
             var expression = new IfDatabaseExpressionRoot(context, databaseTypePredicate);
 
