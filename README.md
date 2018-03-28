@@ -17,34 +17,23 @@
 - MSBuild task is available as separate package (with custom .targets file)
 - Removal of SchemaDump and T4 experiments
 
-# How to build
+# How to build/test/pack
 
 ## Windows
 
 ```
-dotnet restore
-dotnet build
+dotnet build FluentMigrator.sln
+dotnet test test\FluentMigrator.Tests\FluentMigrator.Tests.csproj --filter "TestCategory!=Integration"
+dotnet pack .\FluentMigrator.sln --output "C:\fluentmigrator\output"
 ```
 
 ## Linux
 
 ```
 dotnet restore
-msbuild FluentMigrator.sln
-```
-
-# How to test
-
-## Windows
-
-```
-dotnet vstest test/FluentMigrator.Tests/bin/Debug/net471/FluentMigrator.Tests.dll --TestCaseFilter:"TestCategory!=Integration"
-```
-
-## Linux
-
-```
+msbuild ./FluentMigrator.sln
 dotnet vstest test/FluentMigrator.Tests/bin/Debug/net471/FluentMigrator.Tests.dll --TestCaseFilter:'TestCategory!=Integration&TestCategory!=NotWorkingOnMono'
+msbuild ./FluentMigrator.sln /v:m  /t:Pack /p:PackageOutputPath="/tmp/fluentmigrator/output"
 ```
 
 # TODO
@@ -55,7 +44,7 @@ dotnet vstest test/FluentMigrator.Tests/bin/Debug/net471/FluentMigrator.Tests.dl
   * [ ] [Support SQLAnywhere](https://github.com/fluentmigrator/fluentmigrator/pull/659)
   * [ ] [Unique index with support for multiple null values per column](https://github.com/fluentmigrator/fluentmigrator/pull/717)
   * [ ] [Unique index with support for multiple null values](https://github.com/fluentmigrator/fluentmigrator/pull/716)
-* [ ] [Travis CI](https://travis-ci.org/fluentmigrator/fluentmigrator)
+* [x] [Travis CI](https://travis-ci.org/fluentmigrator/fluentmigrator)
 * [ ] [JetBrains TeamCity Build Server](https://teamcity.jetbrains.com/project.html?projectId=FluentMigrator)
 
 # Pull Requests for 2.0
