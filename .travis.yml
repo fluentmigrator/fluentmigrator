@@ -6,10 +6,9 @@ mono: latest
 dotnet: 2.1.103
 git:
   depth: false
-before_install:
+before_script:
   - nuget install GitVersion.CommandLine -Version 4.0.0-beta0012 -Prerelease
-env:
-  - VERSION_SUFFIX=$(mono GitVersion.CommandLine.4.0.0-beta0012/tools/GitVersion.exe /showvariable PreReleaseTag)
+  - export VERSION_SUFFIX=$(mono GitVersion.CommandLine.4.0.0-beta0012/tools/GitVersion.exe /showvariable PreReleaseTag)
 script:
   - dotnet restore ./FluentMigrator.sln
   - msbuild ./FluentMigrator.sln /v:m /p:VersionSuffix="$VERSION_SUFFIX"
