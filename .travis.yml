@@ -12,7 +12,7 @@ env:
 before_script:
   - nuget install GitVersion.CommandLine -Version 4.0.0-beta0012 -Prerelease
   - export VERSION_SUFFIX=$(mono GitVersion.CommandLine.4.0.0-beta0012/tools/GitVersion.exe /showvariable NuGetVersion | sed -r 's/^[^-]+-(.*)$/\1/')
-  - echo 'Using VersionSuffix=$VERSION_SUFFIX'
+  - echo Using VersionSuffix=$VERSION_SUFFIX
 script:
   - dotnet restore ./FluentMigrator.sln
   - msbuild ./FluentMigrator.sln /v:m /p:VersionSuffix="$VERSION_SUFFIX"
