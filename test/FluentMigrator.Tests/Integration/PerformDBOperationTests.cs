@@ -9,8 +9,18 @@ namespace FluentMigrator.Tests.Integration
     public class PerformDBOperationTests : IntegrationTestBase
     {
         [Test]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
         public void CanCreateAndDeleteTableUsingThePerformDBOperationExpressions()
         {
+            if (!IntegrationTestOptions.SqlServer2008.IsEnabled
+             && !IntegrationTestOptions.SqlServer2012.IsEnabled
+             && !IntegrationTestOptions.SqlServer2014.IsEnabled)
+            {
+                Assert.Ignore("No processor found for the given action.");
+            }
+
             var expression = new PerformDBOperationExpression
             {
                 Operation = (connection, transaction) =>
@@ -32,9 +42,20 @@ namespace FluentMigrator.Tests.Integration
                 }
             };
 
-            ExecuteWithSqlServer2008(processor => processor.Process(expression), true);
-            ExecuteWithSqlServer2012(processor => processor.Process(expression), true);
-            ExecuteWithSqlServer2014(processor => processor.Process(expression), true);
+            if (IntegrationTestOptions.SqlServer2008.IsEnabled)
+            {
+                ExecuteWithSqlServer2008(processor => processor.Process(expression), true, IntegrationTestOptions.SqlServer2008);
+            }
+
+            if (IntegrationTestOptions.SqlServer2012.IsEnabled)
+            {
+                ExecuteWithSqlServer2012(processor => processor.Process(expression), true, IntegrationTestOptions.SqlServer2012);
+            }
+
+            if (IntegrationTestOptions.SqlServer2014.IsEnabled)
+            {
+                ExecuteWithSqlServer2014(processor => processor.Process(expression), true, IntegrationTestOptions.SqlServer2014);
+            }
         }
     }
 }

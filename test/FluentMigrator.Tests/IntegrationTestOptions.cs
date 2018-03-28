@@ -42,51 +42,49 @@ namespace FluentMigrator.Tests
 
         public static IReadOnlyDictionary<string, DatabaseServerOptions> DatabaseServers { get;}
 
-        public static DatabaseServerOptions SqlServer2005 => DatabaseServers["SqlServer2005"];
+        public static DatabaseServerOptions SqlServer2005 => GetOptions("SqlServer2005");
 
-        public static DatabaseServerOptions SqlServer2008 => DatabaseServers["SqlServer2008"];
+        public static DatabaseServerOptions SqlServer2008 => GetOptions("SqlServer2008");
 
-        public static DatabaseServerOptions SqlServer2012 => DatabaseServers["SqlServer2012"];
+        public static DatabaseServerOptions SqlServer2012 => GetOptions("SqlServer2012");
 
-        public static DatabaseServerOptions SqlServer2014 => DatabaseServers["SqlServer2014"];
+        public static DatabaseServerOptions SqlServer2014 => GetOptions("SqlServer2014");
 
-        public static DatabaseServerOptions SqlServerCe => DatabaseServers["SqlServerCe"];
+        public static DatabaseServerOptions SqlServer2016 => GetOptions("SqlServer2016");
 
-        public static DatabaseServerOptions Jet => DatabaseServers["Jet"];
+        public static DatabaseServerOptions SqlServerCe => GetOptions("SqlServerCe");
 
-        public static DatabaseServerOptions SqlLite => DatabaseServers["SQLite"];
+        public static DatabaseServerOptions SqlAnywhere16 => GetOptions("SqlAnywhere16");
 
-        public static DatabaseServerOptions MySql => DatabaseServers["MySql"];
+        public static DatabaseServerOptions Jet => GetOptions("Jet");
 
-        public static DatabaseServerOptions Postgres => DatabaseServers["Postgres"];
+        public static DatabaseServerOptions SqlLite => GetOptions("SQLite");
 
-        public static DatabaseServerOptions Firebird => DatabaseServers["Firebird"];
+        public static DatabaseServerOptions MySql => GetOptions("MySql");
 
-        public static DatabaseServerOptions Oracle => DatabaseServers["Oracle"];
+        public static DatabaseServerOptions Postgres => GetOptions("Postgres");
 
-        public static DatabaseServerOptions Db2 => DatabaseServers["Db2"];
+        public static DatabaseServerOptions Firebird => GetOptions("Firebird");
 
-        public static DatabaseServerOptions Hana => DatabaseServers["Hana"];
+        public static DatabaseServerOptions Oracle => GetOptions("Oracle");
 
-        public static bool AnyServerTypesEnabled
-            => Db2.IsEnabled
-             || Firebird.IsEnabled
-             || Hana.IsEnabled
-             || Jet.IsEnabled
-             || MySql.IsEnabled
-             || Oracle.IsEnabled
-             || Postgres.IsEnabled
-             || SqlLite.IsEnabled
-             || SqlServer2005.IsEnabled
-             || SqlServer2008.IsEnabled
-             || SqlServer2012.IsEnabled
-             || SqlServer2014.IsEnabled
-             || SqlServerCe.IsEnabled;
+        public static DatabaseServerOptions Db2 => GetOptions("Db2");
+
+        public static DatabaseServerOptions Hana => GetOptions("Hana");
 
         public class DatabaseServerOptions
         {
+            public static DatabaseServerOptions Empty { get; } = new DatabaseServerOptions() { IsEnabled = false };
+
             public string ConnectionString { get; set; }
             public bool IsEnabled { get; set; } = true;
+        }
+
+        private static DatabaseServerOptions GetOptions(string key)
+        {
+            if (DatabaseServers.TryGetValue(key, out var options))
+                return options;
+            return DatabaseServerOptions.Empty;
         }
     }
 }

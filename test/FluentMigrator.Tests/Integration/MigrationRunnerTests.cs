@@ -56,6 +56,8 @@ namespace FluentMigrator.Tests.Integration
     [Category("SqlServer2008")]
     [Category("SqlServer2012")]
     [Category("SqlServer2014")]
+    [Category("SqlServer2016")]
+    [Category("SqlAnywhere16")]
     public class MigrationRunnerTests : IntegrationTestBase
     {
         private IRunnerContext _runnerContext;
@@ -775,12 +777,10 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
-        [Category("NotWorkingOnMono")]
         public void ValidateVersionOrderShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanLatestAppliedMigration()
         {
-
             // Using SqlServer instead of SqlLite as versions not deleted from VersionInfo table when using Sqlite.
-            var excludedProcessors = new[] { typeof(MySqlProcessor) };
+            var excludedProcessors = new[] { typeof(MySqlProcessor), typeof(SQLiteProcessor) };
 
             var assembly = typeof(User).Assembly;
 
@@ -826,8 +826,15 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("SqlServer2012")]
         public void CanCreateSequence()
         {
+            var opt = IntegrationTestOptions.SqlServer2012;
+            if (!opt.IsEnabled)
+            {
+                Assert.Ignore("No processor found for the given action.");
+            }
+
             ExecuteWithSqlServer2012(
                 processor =>
                 {
@@ -838,29 +845,44 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateSequence());
                     processor.SequenceExists(null, "TestSequence").ShouldBeFalse();
-                }, true);
+                }, true, opt);
         }
 
         [Test]
+        [Category("SqlServer2012")]
+        [Category("Postgres")]
         public void CanCreateSequenceWithSchema()
         {
+            if (!IntegrationTestOptions.SqlServer2012.IsEnabled && !IntegrationTestOptions.Postgres.IsEnabled)
+            {
+                Assert.Ignore("No processor found for the given action.");
+            }
+
             Action<IMigrationProcessor> action = processor =>
-                                {
-                                    var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
+            {
+                var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
-                                    runner.Up(new TestCreateSchema());
-                                    runner.Up(new TestCreateSequenceWithSchema());
-                                    processor.SequenceExists("TestSchema", "TestSequence").ShouldBeTrue();
+                runner.Up(new TestCreateSchema());
+                runner.Up(new TestCreateSequenceWithSchema());
+                processor.SequenceExists("TestSchema", "TestSequence").ShouldBeTrue();
 
-                                    runner.Down(new TestCreateSequenceWithSchema());
-                                    runner.Down(new TestCreateSchema());
-                                    processor.SequenceExists("TestSchema", "TestSequence").ShouldBeFalse();
-                                };
+                runner.Down(new TestCreateSequenceWithSchema());
+                runner.Down(new TestCreateSchema());
+                processor.SequenceExists("TestSchema", "TestSequence").ShouldBeFalse();
+            };
 
-            ExecuteWithSqlServer2012(
-                action,true);
+            if (IntegrationTestOptions.SqlServer2012.IsEnabled)
+            {
+                ExecuteWithSqlServer2012(
+                    action,
+                    true,
+                    IntegrationTestOptions.SqlServer2012);
+            }
 
-            ExecuteWithPostgres(action, IntegrationTestOptions.Postgres, true);
+            if (IntegrationTestOptions.Postgres.IsEnabled)
+            {
+                ExecuteWithPostgres(action, true, IntegrationTestOptions.Postgres);
+            }
         }
 
         [Test]
