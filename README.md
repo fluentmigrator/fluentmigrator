@@ -8,10 +8,10 @@
 
 ## Breaking changes
 
-- `FluentMigrator` package only contains the core functionality
-  - All tools are now only in `FluentMigrator.Tools`
-- Removal of deprecated functions
 - Moving database specific code from `FluentMigrator.Runner` to `FluentMigrator.Runner.<Database>`
+- `FluentMigrator` is now `FluentMigrator.Core`
+- Extension methods for - e.g. SqlServer - are now in `FluentMigrator.Extensions.SqlServer`
+- Removal of deprecated functions
 - Removal of .NET Framework 3.5 support
 - Removal of NAnt build task
 - MSBuild task is available as separate package (with custom .targets file)
