@@ -261,3 +261,5 @@ paket-files/
 __pycache__/
 *.pyc
 GitVersion\.CommandLine\.*/
+
+\.vscode/
