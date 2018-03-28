@@ -6,7 +6,7 @@ mono: latest
 dotnet: 2.1.103
 git:
   depth: false
-install:
+before_install:
   - nuget install GitVersion.CommandLine -Version 4.0.0-beta0012 -Prerelease
 env:
   - VERSION_SUFFIX=$(mono GitVersion.CommandLine.4.0.0-beta0012/tools/GitVersion.exe /showvariable PreReleaseTag)
