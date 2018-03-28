@@ -7,4 +7,4 @@ dotnet: 2.1.103
 script:
   - dotnet restore ./FluentMigrator.sln
   - msbuild ./FluentMigrator.sln
-  - dotnet vstest test/FluentMigrator.Tests/bin/Debug/net471/FluentMigrator.Tests.dll --TestCaseFilter:'TestCategory!=Integration&TestCategory!=NotWorkingOnMono'
+  - dotnet vstest test/FluentMigrator.Tests/bin/Debug/net471/FluentMigrator.Tests.dll --TestCaseFilter:'TestCategory!=NotWorkingOnMono&(TestCategory!=Integration|(TestCategory=Integration&(TestCategory=SQLite)))'
