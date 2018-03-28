@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,6 +20,7 @@ using FluentMigrator.Builders.Create.Column;
 using FluentMigrator.Builders.Create.Constraint;
 using FluentMigrator.Builders.Create.ForeignKey;
 using FluentMigrator.Builders.Create.Index;
+using FluentMigrator.Builders.Create.Schema;
 using FluentMigrator.Builders.Create.Sequence;
 using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Expressions;
@@ -37,10 +38,11 @@ namespace FluentMigrator.Builders.Create
             _context = context;
         }
 
-        public void Schema(string schemaName)
+        public ICreateSchemaOptionsSyntax Schema(string schemaName)
         {
             var expression = new CreateSchemaExpression { SchemaName = schemaName };
             _context.Expressions.Add(expression);
+            return new CreateSchemaExpressionBuilder(expression);
         }
 
         public ICreateTableWithColumnOrSchemaOrDescriptionSyntax Table(string tableName)

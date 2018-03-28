@@ -51,6 +51,7 @@ dotnet vstest test/FluentMigrator.Tests/bin/Debug/net452/FluentMigrator.Tests.dl
 
 * Port sample application
 * Test PR #798
+* Test Distinct NULL unique constraints for SQL Anywhere
 
 # Pull Requests for 2.0
 
@@ -59,7 +60,7 @@ dotnet vstest test/FluentMigrator.Tests/bin/Debug/net452/FluentMigrator.Tests.dl
 ### New providers
 
 - [ ] [Redshift provider](https://github.com/fluentmigrator/fluentmigrator/pull/605)
-- [ ] [Support SQLAnywhere](https://github.com/fluentmigrator/fluentmigrator/pull/659)
+- [x] [Support SQLAnywhere](https://github.com/fluentmigrator/fluentmigrator/pull/659)
 - [x] [SQL Server 2016](https://github.com/fluentmigrator/fluentmigrator/pull/833)
 
 ### New features

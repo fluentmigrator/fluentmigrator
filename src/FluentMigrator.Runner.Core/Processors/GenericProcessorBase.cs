@@ -48,7 +48,7 @@ namespace FluentMigrator.Runner.Processors
             get { return false; }
         }
 
-        protected void EnsureConnectionIsOpen()
+        protected virtual void EnsureConnectionIsOpen()
         {
             if (Connection.State != ConnectionState.Open)
             {
@@ -56,7 +56,7 @@ namespace FluentMigrator.Runner.Processors
             }
         }
 
-        protected void EnsureConnectionIsClosed()
+        protected virtual void EnsureConnectionIsClosed()
         {
             if (Connection.State != ConnectionState.Closed)
             {

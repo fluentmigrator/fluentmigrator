@@ -22,7 +22,7 @@ using FluentMigrator.Builders.Delete.Constraint;
 using FluentMigrator.Builders.Delete.Index;
 using FluentMigrator.Infrastructure;
 
-namespace FluentMigrator
+namespace FluentMigrator.SqlServer
 {
     public static partial class SqlServerExtensions
     {

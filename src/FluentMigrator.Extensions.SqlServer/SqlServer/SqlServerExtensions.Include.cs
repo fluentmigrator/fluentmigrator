@@ -22,7 +22,7 @@ using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 
-namespace FluentMigrator
+namespace FluentMigrator.SqlServer
 {
     public static partial class SqlServerExtensions
     {

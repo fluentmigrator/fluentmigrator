@@ -1,6 +1,7 @@
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Builders.Delete.Index;
 using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.SqlServer;
 
 using NUnit.Framework;
 using NUnit.Should;

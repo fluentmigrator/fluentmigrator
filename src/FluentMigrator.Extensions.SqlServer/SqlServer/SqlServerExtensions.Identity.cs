@@ -19,7 +19,7 @@ using System;
 using FluentMigrator.Builders;
 using FluentMigrator.Infrastructure;
 
-namespace FluentMigrator
+namespace FluentMigrator.SqlServer
 {
     public static partial class SqlServerExtensions
     {

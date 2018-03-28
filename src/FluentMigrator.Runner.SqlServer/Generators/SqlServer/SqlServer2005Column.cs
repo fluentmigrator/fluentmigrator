@@ -15,6 +15,7 @@
 #endregion
 
 using FluentMigrator.Model;
+using FluentMigrator.SqlServer;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {

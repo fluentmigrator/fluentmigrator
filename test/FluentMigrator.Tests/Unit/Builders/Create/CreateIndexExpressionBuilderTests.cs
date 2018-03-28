@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
+using FluentMigrator.SqlServer;
 
 using Moq;
 

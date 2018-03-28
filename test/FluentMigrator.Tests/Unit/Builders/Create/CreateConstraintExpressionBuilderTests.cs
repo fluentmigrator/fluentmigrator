@@ -1,9 +1,11 @@
 using System;
 using System.Collections.Generic;
+
 using FluentMigrator.Builders.Create.Constraint;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
-using FluentMigrator.Runner.Extensions;
+using FluentMigrator.SqlServer;
+
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;

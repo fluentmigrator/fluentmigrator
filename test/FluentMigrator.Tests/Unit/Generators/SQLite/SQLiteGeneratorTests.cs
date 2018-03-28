@@ -1,11 +1,11 @@
-﻿using System.Data;
+using System.Data;
 
 using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
-using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Generators.SQLite;
+using FluentMigrator.SqlServer;
 
 using NUnit.Framework;
 using NUnit.Should;

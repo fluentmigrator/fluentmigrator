@@ -22,7 +22,7 @@ using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Builders.Insert;
 using FluentMigrator.Infrastructure;
 
-namespace FluentMigrator
+namespace FluentMigrator.SqlServer
 {
     public static partial class SqlServerExtensions
     {

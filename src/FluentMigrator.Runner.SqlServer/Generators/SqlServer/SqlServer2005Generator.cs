@@ -20,6 +20,7 @@ using System.Text;
 
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.SqlServer;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {

@@ -5,6 +5,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Extensions;
+using FluentMigrator.SqlServer;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {

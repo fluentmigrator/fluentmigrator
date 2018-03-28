@@ -15,6 +15,7 @@
 #endregion
 
 using FluentMigrator.Infrastructure;
+using FluentMigrator.SqlServer;
 
 namespace FluentMigrator.Builders.Create.Index
 {

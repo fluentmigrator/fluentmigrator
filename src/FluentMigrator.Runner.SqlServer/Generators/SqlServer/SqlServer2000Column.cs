@@ -17,6 +17,7 @@
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
+using FluentMigrator.SqlServer;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {

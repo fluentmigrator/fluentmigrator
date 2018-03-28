@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,6 +20,7 @@ using FluentMigrator.Builders.Create.Column;
 using FluentMigrator.Builders.Create.Constraint;
 using FluentMigrator.Builders.Create.ForeignKey;
 using FluentMigrator.Builders.Create.Index;
+using FluentMigrator.Builders.Create.Schema;
 using FluentMigrator.Builders.Create.Sequence;
 using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Infrastructure;
@@ -28,7 +29,7 @@ namespace FluentMigrator.Builders.Create
 {
     public interface ICreateExpressionRoot : IFluentSyntax
     {
-        void Schema(string schemaName);
+        ICreateSchemaOptionsSyntax Schema(string schemaName);
         ICreateTableWithColumnOrSchemaOrDescriptionSyntax Table(string tableName);
         ICreateColumnOnTableSyntax Column(string columnName);
         ICreateForeignKeyFromTableSyntax ForeignKey();

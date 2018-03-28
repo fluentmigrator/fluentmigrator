@@ -5,6 +5,8 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.SqlServer;
+
 using NUnit.Framework;
 using NUnit.Should;
 

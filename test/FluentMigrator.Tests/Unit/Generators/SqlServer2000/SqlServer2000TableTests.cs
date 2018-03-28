@@ -1,8 +1,9 @@
 using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
-using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.SqlServer;
+
 using NUnit.Framework;
 using NUnit.Should;
 

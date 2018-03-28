@@ -4,6 +4,8 @@ using System.Data;
 using FluentMigrator.Builders.Create.Constraint;
 using FluentMigrator.Builders.Delete.Constraint;
 using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.SqlServer;
+
 using NUnit.Framework;
 using NUnit.Should;
 

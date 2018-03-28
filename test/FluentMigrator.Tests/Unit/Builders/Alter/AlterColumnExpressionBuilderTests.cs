@@ -30,6 +30,7 @@ using Moq;
 using NUnit.Framework;
 using NUnit.Should;
 using FluentMigrator.Builders;
+using FluentMigrator.SqlServer;
 
 namespace FluentMigrator.Tests.Unit.Builders.Alter
 {
