@@ -4,8 +4,12 @@ sudo: false
 solution: FluentMigrator.sln
 mono: latest
 dotnet: 2.1.103
+git:
+  depth: false
+install:
+  - nuget install GitVersion.CommandLine -Version 4.0.0-beta0012 -Prerelease
 env:
-  - VERSION_SUFFIX="travis-ci.$TRAVIS_BUILD_NUMBER"
+  - VERSION_SUFFIX=$(mono GitVersion.CommandLine.4.0.0-beta0012/tools/GitVersion.exe /showvariable PreReleaseTag)
 script:
   - dotnet restore ./FluentMigrator.sln
   - msbuild ./FluentMigrator.sln /v:m /p:VersionSuffix="$VERSION_SUFFIX"
