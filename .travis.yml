@@ -11,7 +11,8 @@ env:
     secure: LBwjIieB3lGAb21LFO75eW42F3gm4Af+Wd/y37gbAJC9WXLO6i4aLOIDjaheq9wZEWAjsjLrG9aDf2YgCoiboGLhIVVS2CUEcLL8v9A8fdwG0MMdNbJ+HiwOCro97lZywT32yQ6dDzTf2xcUWufQ2YhQXBE52Ym6hMjkm5iaWnY=
 before_script:
   - nuget install GitVersion.CommandLine -Version 4.0.0-beta0012 -Prerelease
-  - export VERSION_SUFFIX=$(mono GitVersion.CommandLine.4.0.0-beta0012/tools/GitVersion.exe /showvariable NuGetVersion | sed -r 's/^[a-z]-(.*)$/\1/')
+  - export VERSION_SUFFIX=$(mono GitVersion.CommandLine.4.0.0-beta0012/tools/GitVersion.exe /showvariable NuGetVersion | sed -r 's/^[^-]+-(.*)$/\1/')
+  - echo 'Using VersionSuffix=$VERSION_SUFFIX'
 script:
   - dotnet restore ./FluentMigrator.sln
   - msbuild ./FluentMigrator.sln /v:m /p:VersionSuffix="$VERSION_SUFFIX"
