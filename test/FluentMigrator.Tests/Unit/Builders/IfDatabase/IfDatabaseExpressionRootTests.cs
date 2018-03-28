@@ -18,16 +18,19 @@
 #endregion
 
 using System;
-using System.Data.OleDb;
-using FluentMigrator.Builders.IfDatabase;
-using FluentMigrator.Infrastructure;
-using FluentMigrator.Runner.Processors.Jet;
-using Moq;
-using NUnit.Framework;
-using NUnit.Should;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.SQLite;
 using System.Linq;
+
+using FluentMigrator.Builders.IfDatabase;
+using FluentMigrator.Infrastructure;
+using FluentMigrator.Runner.Processors.SQLite;
+
+using Moq;
+
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
 {
@@ -37,7 +40,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
         public void CallsDelegateIfDatabaseTypeApplies()
         {
             var delegateCalled = false;
-            var context = ExecuteTestMigration(new[] { "Jet" }, expr =>
+            var context = ExecuteTestMigration(new[] { "SQLite" }, expr =>
             {
                 expr.Delegate(() => delegateCalled = true);
             });
@@ -61,7 +64,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
         [Test]
         public void WillAddExpressionIfDatabaseTypeApplies()
         {
-            var context = ExecuteTestMigration("Jet");
+            var context = ExecuteTestMigration("SQLite");
 
             context.Expressions.Count.ShouldBe(1);
         }
@@ -69,7 +72,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
         [Test]
         public void WillAddExpressionIfProcessorInMigrationProcessorPredicate()
         {
-            var context = ExecuteTestMigration(x => x == "Jet");
+            var context = ExecuteTestMigration(x => x == "SQLite");
 
             context.Expressions.Count.ShouldBe(1);
         }
@@ -94,7 +97,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
         public void WillNotAddExpressionIfProcessorNotMigrationProcessor()
         {
             var mock = new Mock<IQuerySchema>();
-            var context = ExecuteTestMigration(new List<string>() { "Jet" }, mock.Object);
+            var context = ExecuteTestMigration(new List<string>() { "SQLite" }, mock.Object);
 
             context.Expressions.Count.ShouldBe(0);
         }
@@ -102,7 +105,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
         [Test]
         public void WillAddExpressionIfOneDatabaseTypeApplies()
         {
-            var context = ExecuteTestMigration("Jet", "Unknown");
+            var context = ExecuteTestMigration("SQLite", "Unknown");
 
             context.Expressions.Count.ShouldBe(1);
         }
@@ -110,7 +113,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
         [Test]
         public void WillAddAlterExpression()
         {
-            var context = ExecuteTestMigration(new List<string>() { "Jet" }, m => m.Alter.Table("Foo").AddColumn("Blah").AsString());
+            var context = ExecuteTestMigration(new List<string>() { "SQLite" }, m => m.Alter.Table("Foo").AddColumn("Blah").AsString());
 
             context.Expressions.Count.ShouldBeGreaterThan(0);
         }
@@ -118,7 +121,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
         [Test]
         public void WillAddCreateExpression()
         {
-            var context = ExecuteTestMigration(new List<string>() { "Jet" }, m => m.Create.Table("Foo").WithColumn("Blah").AsString());
+            var context = ExecuteTestMigration(new List<string>() { "SQLite" }, m => m.Create.Table("Foo").WithColumn("Blah").AsString());
 
             context.Expressions.Count.ShouldBeGreaterThan(0);
         }
@@ -126,7 +129,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
         [Test]
         public void WillAddDeleteExpression()
         {
-            var context = ExecuteTestMigration(new List<string>() { "Jet" }, m => m.Delete.Table("Foo"));
+            var context = ExecuteTestMigration(new List<string>() { "SQLite" }, m => m.Delete.Table("Foo"));
 
             context.Expressions.Count.ShouldBeGreaterThan(0);
         }
@@ -134,7 +137,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
         [Test]
         public void WillAddExecuteExpression()
         {
-            var context = ExecuteTestMigration(new List<string>() { "Jet" }, m => m.Execute.Sql("DROP TABLE Foo"));
+            var context = ExecuteTestMigration(new List<string>() { "SQLite" }, m => m.Execute.Sql("DROP TABLE Foo"));
 
             context.Expressions.Count.ShouldBeGreaterThan(0);
         }
@@ -142,7 +145,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
         [Test]
         public void WillAddInsertExpression()
         {
-            var context = ExecuteTestMigration(new List<string>() { "Jet" }, m => m.Insert.IntoTable("Foo").Row(new { Id = 1 }));
+            var context = ExecuteTestMigration(new List<string>() { "SQLite" }, m => m.Insert.IntoTable("Foo").Row(new { Id = 1 }));
 
             context.Expressions.Count.ShouldBeGreaterThan(0);
         }
@@ -150,7 +153,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
         [Test]
         public void WillAddRenameExpression()
         {
-            var context = ExecuteTestMigration(new List<string>() { "Jet" }, m => m.Rename.Table("Foo").To("Foo2"));
+            var context = ExecuteTestMigration(new List<string>() { "SQLite" }, m => m.Rename.Table("Foo").To("Foo2"));
 
             context.Expressions.Count.ShouldBeGreaterThan(0);
         }
@@ -174,7 +177,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
         [Test]
         public void WillAddUpdateExpression()
         {
-            var context = ExecuteTestMigration(new List<string>() { "Jet" }, m => m.Update.Table("Foo").Set(new { Id = 1 }));
+            var context = ExecuteTestMigration(new List<string>() { "SQLite" }, m => m.Update.Table("Foo").Set(new { Id = 1 }));
 
             context.Expressions.Count.ShouldBeGreaterThan(0);
         }
@@ -194,8 +197,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
             // Arrange
             var mock = new Mock<IDbConnection>(MockBehavior.Loose);
             mock.Setup(x => x.State).Returns(ConnectionState.Open);
-            var context = new MigrationContext(new MigrationConventions(), processor ?? new JetProcessor(mock.Object, null, null, null), new SingleAssembly(GetType().Assembly), null, "");
-
+            var context = new MigrationContext(new MigrationConventions(), processor ?? new SQLiteProcessor(mock.Object, null, null, null, new SQLiteDbFactory()), new SingleAssembly(GetType().Assembly), null, "");
 
             var expression = new IfDatabaseExpressionRoot(context, databaseType.ToArray());
 
@@ -217,9 +219,7 @@ namespace FluentMigrator.Tests.Unit.Builders.IfDatabase
         private MigrationContext ExecuteTestMigration(Predicate<string> databaseTypePredicate, params Action<IIfDatabaseExpressionRoot>[] fluentExpression)
         {
             // Arrange
-
-            var context = new MigrationContext(new MigrationConventions(), new JetProcessor(new OleDbConnection(), null, null, null), new SingleAssembly(GetType().Assembly), null, "");
-
+            var context = new MigrationContext(new MigrationConventions(), new SQLiteProcessor(new SQLiteConnection(), null, null, null, new SQLiteDbFactory()), new SingleAssembly(GetType().Assembly), null, "");
 
             var expression = new IfDatabaseExpressionRoot(context, databaseTypePredicate);
 
