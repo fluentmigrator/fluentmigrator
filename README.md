@@ -49,9 +49,14 @@ dotnet vstest test/FluentMigrator.Tests/bin/Debug/net452/FluentMigrator.Tests.dl
 
 # TODO
 
-* Port sample application
-* Test PR #798
-* Test Distinct NULL unique constraints for SQL Anywhere
+* [ ] Port sample application
+* [ ] Test [PR #798](https://github.com/fluentmigrator/fluentmigrator/pull/798)
+* [ ] Implement Distinct NULL unique constraints for SQL Anywhere, affected by:
+  * [ ] [Support SQLAnywhere](https://github.com/fluentmigrator/fluentmigrator/pull/659)
+  * [ ] [Unique index with support for multiple null values per column](https://github.com/fluentmigrator/fluentmigrator/pull/717)
+  * [ ] [Unique index with support for multiple null values](https://github.com/fluentmigrator/fluentmigrator/pull/716)
+* [ ] [Travis CI](https://travis-ci.org/fluentmigrator/fluentmigrator)
+* [ ] [JetBrains TeamCity Build Server](https://teamcity.jetbrains.com/project.html?projectId=FluentMigrator)
 
 # Pull Requests for 2.0
 
