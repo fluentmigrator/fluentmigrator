@@ -1,0 +1,10 @@
+language: csharp
+dist: trusty
+sudo: false
+solution: FluentMigrator.sln
+mono: latest
+dotnet: 2.1.103
+script:
+  - dotnet resture
+  - msbuild FluentMigrator.sln
+  - dotnet vstest test/FluentMigrator.Tests/bin/Debug/net471/FluentMigrator.Tests.dll --TestCaseFilter:'TestCategory!=Integration&TestCategory!=NotWorkingOnMono'
