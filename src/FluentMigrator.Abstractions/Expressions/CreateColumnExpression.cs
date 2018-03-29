@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -23,26 +23,14 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-    public class CreateColumnExpression : MigrationExpressionBase
+    public class CreateColumnExpression : MigrationExpressionBase,
+        ISchemaExpression, IColumnsExpression
     {
         public virtual string SchemaName { get; set; }
         public virtual string TableName { get; set; }
-        public virtual ColumnDefinition Column { get; set; }
+        public virtual ColumnDefinition Column { get; set; } = new ColumnDefinition { ModificationType = ColumnModificationType.Create };
 
-        public CreateColumnExpression()
-        {
-            Column = new ColumnDefinition { ModificationType = ColumnModificationType.Create};
-        }
-
-        public override void ApplyConventions(IMigrationConventions conventions)
-        {
-            if (string.IsNullOrEmpty(SchemaName))
-            {
-                SchemaName = conventions.GetDefaultSchema();
-            }
-
-            Column.ApplyConventions(conventions);
-        }
+        IEnumerable<ColumnDefinition> IColumnsExpression.Columns => new[] { Column };
 
         public override void CollectValidationErrors(ICollection<string> errors)
         {

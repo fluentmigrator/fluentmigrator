@@ -24,7 +24,7 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Model
 {
-    public class ColumnDefinition : ICloneable, ICanBeConventional, ICanBeValidated, ISupportAdditionalFeatures
+    public class ColumnDefinition : ICloneable, ICanBeValidated, ISupportAdditionalFeatures
     {
         public ColumnDefinition()
         {
@@ -59,12 +59,6 @@ namespace FluentMigrator.Model
         /// called on a column.
         /// </remarks>
         public virtual ForeignKeyDefinition ForeignKey { get; set; }
-
-        public void ApplyConventions(IMigrationConventions conventions)
-        {
-            if (String.IsNullOrEmpty(PrimaryKeyName))
-                PrimaryKeyName = conventions.GetPrimaryKeyName(TableName);
-        }
 
         public virtual void CollectValidationErrors(ICollection<string> errors)
         {

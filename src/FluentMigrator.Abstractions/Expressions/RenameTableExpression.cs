@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -22,19 +22,11 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
-    public class RenameTableExpression : MigrationExpressionBase
+    public class RenameTableExpression : MigrationExpressionBase, ISchemaExpression
     {
         public virtual string SchemaName { get; set; }
         public virtual string OldName { get; set; }
         public virtual string NewName { get; set; }
-
-        public override void ApplyConventions(IMigrationConventions conventions)
-        {
-            if (string.IsNullOrEmpty(SchemaName))
-            {
-                SchemaName = conventions.GetDefaultSchema();
-            }
-        }
 
         public override void CollectValidationErrors(ICollection<string> errors)
         {

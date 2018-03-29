@@ -22,19 +22,9 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-    public class CreateForeignKeyExpression : MigrationExpressionBase
+    public class CreateForeignKeyExpression : MigrationExpressionBase, IForeignKeyExpression
     {
-        public virtual ForeignKeyDefinition ForeignKey { get; set; }
-
-        public CreateForeignKeyExpression()
-        {
-            ForeignKey = new ForeignKeyDefinition();
-        }
-
-        public override void ApplyConventions(IMigrationConventions conventions)
-        {
-            ForeignKey.ApplyConventions(conventions);
-        }
+        public virtual ForeignKeyDefinition ForeignKey { get; set; } = new ForeignKeyDefinition();
 
         public override void CollectValidationErrors(ICollection<string> errors)
         {

@@ -24,6 +24,5 @@ namespace FluentMigrator.Expressions
     {
         void ExecuteWith(IMigrationProcessor processor);
         IMigrationExpression Reverse();
-        void ApplyConventions(IMigrationConventions conventions);
     }
 }

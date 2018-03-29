@@ -19,11 +19,12 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Model
 {
-    public class ForeignKeyDefinition : ICloneable, ICanBeConventional, ICanBeValidated
+    public class ForeignKeyDefinition : ICloneable, ICanBeValidated
     {
         public virtual string Name { get; set; }
         public virtual string ForeignTable { get; set; }
@@ -32,32 +33,8 @@ namespace FluentMigrator.Model
         public virtual string PrimaryTableSchema { get; set; }
         public virtual Rule OnDelete { get; set; }
         public virtual Rule OnUpdate { get; set; }
-        public virtual ICollection<string> ForeignColumns { get; set; }
-        public virtual ICollection<string> PrimaryColumns { get; set; }
-
-        public ForeignKeyDefinition()
-        {
-            ForeignColumns = new List<string>();
-            PrimaryColumns = new List<string>();
-        }
-
-        public void ApplyConventions(IMigrationConventions conventions)
-        {
-            if (string.IsNullOrEmpty(ForeignTableSchema))
-            {
-                ForeignTableSchema = conventions.GetDefaultSchema();
-            }
-
-            if (string.IsNullOrEmpty(PrimaryTableSchema))
-            {
-                PrimaryTableSchema = conventions.GetDefaultSchema();
-            }
-
-            if (string.IsNullOrEmpty(Name))
-            {
-                Name = conventions.GetForeignKeyName(this);
-            }
-        }
+        public virtual ICollection<string> ForeignColumns { get; set; } = new List<string>();
+        public virtual ICollection<string> PrimaryColumns { get; set; } = new List<string>();
 
         public virtual void CollectValidationErrors(ICollection<string> errors)
         {

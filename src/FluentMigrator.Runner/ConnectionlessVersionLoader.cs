@@ -23,6 +23,7 @@ using System.Linq;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.VersionTableInfo;
 
@@ -30,12 +31,15 @@ namespace FluentMigrator.Runner
 {
     public class ConnectionlessVersionLoader : IVersionLoader
     {
+        private readonly IConventionSet _conventionSet;
         private bool _versionsLoaded;
 
         public ConnectionlessVersionLoader(IMigrationRunner runner, IAssemblyCollection assemblies,
-                                           IMigrationConventions conventions, long startVersion, long targetVersion,
-                                           IVersionTableMetaData versionTableMetaData = null)
+            IConventionSet conventionSet,
+            IMigrationConventions conventions, long startVersion, long targetVersion,
+            IVersionTableMetaData versionTableMetaData = null)
         {
+            _conventionSet = conventionSet;
             Runner = runner;
             Assemblies = assemblies;
             Conventions = conventions;
@@ -99,7 +103,9 @@ namespace FluentMigrator.Runner
 
             if (matchedType == null)
             {
-                return new DefaultVersionTableMetaData(Conventions.GetDefaultSchema());
+                var result = new DefaultVersionTableMetaData();
+                _conventionSet.SchemaConvention?.Apply(result);
+                return result;
             }
 
             return (IVersionTableMetaData) Activator.CreateInstance(matchedType);

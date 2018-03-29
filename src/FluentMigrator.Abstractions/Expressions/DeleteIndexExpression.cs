@@ -24,16 +24,11 @@ using System.Linq;
 
 namespace FluentMigrator.Expressions
 {
-    public class DeleteIndexExpression : MigrationExpressionBase, ISupportAdditionalFeatures
+    public class DeleteIndexExpression : MigrationExpressionBase, ISupportAdditionalFeatures, IIndexExpression
     {
         public virtual IndexDefinition Index { get; set; } = new IndexDefinition();
 
         public IDictionary<string, object> AdditionalFeatures => Index.AdditionalFeatures;
-
-        public override void ApplyConventions(IMigrationConventions conventions)
-        {
-            Index.ApplyConventions(conventions);
-        }
 
         public override void CollectValidationErrors(ICollection<string> errors)
         {

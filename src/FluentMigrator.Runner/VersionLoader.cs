@@ -27,11 +27,13 @@ using FluentMigrator.Model;
 using FluentMigrator.Runner.Versioning;
 using FluentMigrator.VersionTableInfo;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Runner.Conventions;
 
 namespace FluentMigrator.Runner
 {
     public class VersionLoader : IVersionLoader
     {
+        private readonly IConventionSet _conventionSet;
         private bool _versionSchemaMigrationAlreadyRun;
         private bool _versionMigrationAlreadyRun;
         private bool _versionUniqueMigrationAlreadyRun;
@@ -47,14 +49,17 @@ namespace FluentMigrator.Runner
         public IMigration VersionUniqueMigration { get; }
         public IMigration VersionDescriptionMigration { get; }
 
-        public VersionLoader(IMigrationRunner runner, Assembly assembly, IMigrationConventions conventions)
-            : this(runner, new SingleAssembly(assembly), conventions)
+        public VersionLoader(IMigrationRunner runner, Assembly assembly, IConventionSet conventionSet, IMigrationConventions conventions)
+            : this(runner, new SingleAssembly(assembly), conventionSet, conventions)
         {
         }
 
-        public VersionLoader(IMigrationRunner runner, IAssemblyCollection assemblies, IMigrationConventions conventions,
-                             IVersionTableMetaData versionTableMetaData = null)
+        public VersionLoader(IMigrationRunner runner, IAssemblyCollection assemblies,
+            IConventionSet conventionSet,
+            IMigrationConventions conventions,
+            IVersionTableMetaData versionTableMetaData = null)
         {
+            _conventionSet = conventionSet;
             Runner = runner;
             Processor = runner.Processor;
             Assemblies = assemblies;
@@ -92,7 +97,9 @@ namespace FluentMigrator.Runner
 
             if (matchedType == null)
             {
-                return new DefaultVersionTableMetaData(Conventions.GetDefaultSchema());
+                var result = new DefaultVersionTableMetaData();
+                _conventionSet.SchemaConvention?.Apply(result);
+                return result;
             }
 
             var versionTableMetaData = (IVersionTableMetaData)Activator.CreateInstance(matchedType);

@@ -16,37 +16,20 @@
 //
 #endregion
 
-
 using System;
 using System.Collections.Generic;
-using System.Linq;
+
 using FluentMigrator.Infrastructure;
-using FluentMigrator.Infrastructure.Extensions;
 
 namespace FluentMigrator.Model
 {
-    public class TableDefinition : ICloneable, ICanBeConventional, ICanBeValidated
+    public class TableDefinition : ICanBeValidated
     {
-        public TableDefinition()
-        {
-            Columns = new List<ColumnDefinition>();
-            ForeignKeys = new List<ForeignKeyDefinition>();
-            Indexes = new List<IndexDefinition>();
-        }
-
         public virtual string Name { get; set; }
         public virtual string SchemaName { get; set; }
-        public virtual ICollection<ColumnDefinition> Columns { get; set; }
-        public virtual ICollection<ForeignKeyDefinition> ForeignKeys { get; set; }
-        public virtual ICollection<IndexDefinition> Indexes { get; set; }
-
-        public void ApplyConventions(IMigrationConventions conventions)
-        {
-            if (string.IsNullOrEmpty(SchemaName))
-            {
-                SchemaName = conventions.GetDefaultSchema();
-            }
-        }
+        public virtual ICollection<ColumnDefinition> Columns { get; set; } = new List<ColumnDefinition>();
+        public virtual ICollection<ForeignKeyDefinition> ForeignKeys { get; set; } = new List<ForeignKeyDefinition>();
+        public virtual ICollection<IndexDefinition> Indexes { get; set; } = new List<IndexDefinition>();
 
         public void CollectValidationErrors(ICollection<string> errors)
         {
@@ -61,17 +44,6 @@ namespace FluentMigrator.Model
 
             foreach (ForeignKeyDefinition fk in ForeignKeys)
                 fk.CollectValidationErrors(errors);
-        }
-
-        public object Clone()
-        {
-            return new TableDefinition
-            {
-                Name = Name,
-                SchemaName = SchemaName,
-                Columns = Columns.CloneAll().ToList(),
-                Indexes = Indexes.CloneAll().ToList()
-            };
         }
     }
 }

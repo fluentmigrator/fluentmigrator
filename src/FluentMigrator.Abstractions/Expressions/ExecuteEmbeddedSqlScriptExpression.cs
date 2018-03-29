@@ -63,11 +63,6 @@ Possible candidates are:
             return foundResources[0];
         }
 
-        public override void ApplyConventions(IMigrationConventions conventions)
-        {
-
-        }
-
         public override void CollectValidationErrors(ICollection<string> errors)
         {
             if (string.IsNullOrEmpty(SqlScript))

@@ -12,6 +12,9 @@
   <ItemGroup>
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />
   </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="IoC.Container" Version="1.0.6" />
+  </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.Runner.Db2\FluentMigrator.Runner.Db2.csproj" />

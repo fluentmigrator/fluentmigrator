@@ -4,7 +4,7 @@ namespace FluentMigrator.Model
     using System.Collections.Generic;
     using Infrastructure;
 
-    public class SequenceDefinition: ICloneable, ICanBeValidated, ICanBeConventional
+    public class SequenceDefinition: ICloneable, ICanBeValidated
     {
         public virtual string Name { get; set; }
         public virtual string SchemaName { get; set; }
@@ -39,14 +39,6 @@ namespace FluentMigrator.Model
         {
             if (String.IsNullOrEmpty(Name))
                 errors.Add(ErrorMessages.SequenceNameCannotBeNullOrEmpty);
-        }
-
-        public void ApplyConventions(IMigrationConventions conventions)
-        {
-            if (string.IsNullOrEmpty(SchemaName))
-            {
-                SchemaName = conventions.GetDefaultSchema();
-            }
         }
     }
 }

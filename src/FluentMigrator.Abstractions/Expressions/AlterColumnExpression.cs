@@ -23,7 +23,8 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-    public class AlterColumnExpression : MigrationExpressionBase
+    public class AlterColumnExpression : MigrationExpressionBase,
+        ISchemaExpression
     {
         public virtual string SchemaName { get; set; }
         public virtual string TableName { get; set; }
@@ -32,14 +33,6 @@ namespace FluentMigrator.Expressions
         public AlterColumnExpression()
         {
             Column = new ColumnDefinition() { ModificationType = ColumnModificationType.Alter };
-        }
-
-        public override void ApplyConventions(IMigrationConventions conventions)
-        {
-            if (string.IsNullOrEmpty(SchemaName))
-            {
-                SchemaName = conventions.GetDefaultSchema();
-            }
         }
 
         public override void CollectValidationErrors(ICollection<string> errors)

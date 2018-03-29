@@ -16,7 +16,9 @@
 //
 #endregion
 
+using FluentMigrator.Expressions;
 using FluentMigrator.Model;
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Infrastructure;
 
 using NUnit.Framework;
@@ -32,46 +34,75 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void GetPrimaryKeyNamePrefixesTableNameWithPKAndUnderscore()
         {
-            _default.GetPrimaryKeyName("Foo").ShouldBe("PK_Foo");
+            var expr = new CreateColumnExpression()
+            {
+                Column =
+                {
+                    Name = "Foo",
+                    IsPrimaryKey = true,
+                }
+            };
+
+            var processed = expr.Apply(ConventionSets.NoSchemaName);
+            processed.Column.PrimaryKeyName.ShouldBe("PK_Foo");
         }
 
         [Test]
         public void GetForeignKeyNameReturnsValidForeignKeyNameForSimpleForeignKey()
         {
-            var foreignKey = new ForeignKeyDefinition
+            var expr = new CreateForeignKeyExpression()
             {
-                ForeignTable = "Users", ForeignColumns = new[] { "GroupId" },
-                PrimaryTable = "Groups", PrimaryColumns = new[] { "Id" }
+                ForeignKey =
+                {
+                    ForeignTable = "Users",
+                    ForeignColumns = new[] { "GroupId" },
+                    PrimaryTable = "Groups",
+                    PrimaryColumns = new[] { "Id" }
+                }
             };
 
-            _default.GetForeignKeyName(foreignKey).ShouldBe("FK_Users_GroupId_Groups_Id");
+            var processed = expr.Apply(ConventionSets.NoSchemaName);
+
+            processed.ForeignKey.Name.ShouldBe("FK_Users_GroupId_Groups_Id");
         }
 
         [Test]
         public void GetForeignKeyNameReturnsValidForeignKeyNameForComplexForeignKey()
         {
-            var foreignKey = new ForeignKeyDefinition
+            var expr = new CreateForeignKeyExpression()
             {
-                ForeignTable = "Users", ForeignColumns = new[] { "ColumnA", "ColumnB" },
-                PrimaryTable = "Groups", PrimaryColumns = new[] { "ColumnC", "ColumnD" }
+                ForeignKey =
+                {
+                    ForeignTable = "Users",
+                    ForeignColumns = new[] { "ColumnA", "ColumnB" },
+                    PrimaryTable = "Groups",
+                    PrimaryColumns = new[] { "ColumnC", "ColumnD" }
+                }
             };
 
-            _default.GetForeignKeyName(foreignKey).ShouldBe("FK_Users_ColumnA_ColumnB_Groups_ColumnC_ColumnD");
+            var processed = expr.Apply(ConventionSets.NoSchemaName);
+
+            processed.ForeignKey.Name.ShouldBe("FK_Users_ColumnA_ColumnB_Groups_ColumnC_ColumnD");
         }
 
         [Test]
         public void GetIndexNameReturnsValidIndexNameForSimpleIndex()
         {
-            var index = new IndexDefinition
+            var expr = new CreateIndexExpression()
             {
-                TableName = "Bacon",
-                Columns =
+                Index =
                 {
-                    new IndexColumnDefinition { Name = "BaconName", Direction = Direction.Ascending }
+                    TableName = "Bacon",
+                    Columns =
+                    {
+                        new IndexColumnDefinition { Name = "BaconName", Direction = Direction.Ascending }
+                    }
                 }
             };
 
-            _default.GetIndexName(index).ShouldBe("IX_Bacon_BaconName");
+            var processed = expr.Apply(ConventionSets.NoSchemaName);
+
+            processed.Index.Name.ShouldBe("IX_Bacon_BaconName");
         }
 
         [Test]

@@ -24,21 +24,11 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-    public class CreateIndexExpression : MigrationExpressionBase, ISupportAdditionalFeatures
+    public class CreateIndexExpression : MigrationExpressionBase, ISupportAdditionalFeatures, IIndexExpression
     {
-        public virtual IndexDefinition Index { get; set; }
-
-        public CreateIndexExpression()
-        {
-            Index = new IndexDefinition();
-        }
+        public virtual IndexDefinition Index { get; set; } = new IndexDefinition();
 
         public IDictionary<string, object> AdditionalFeatures => Index.AdditionalFeatures;
-
-        public override void ApplyConventions(IMigrationConventions conventions)
-        {
-            Index.ApplyConventions(conventions);
-        }
 
         public override void CollectValidationErrors(ICollection<string> errors)
         {

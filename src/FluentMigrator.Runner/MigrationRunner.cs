@@ -87,13 +87,12 @@ namespace FluentMigrator.Runner
             SilentlyFail = false;
             CaughtExceptions = null;
 
-            var conv = migrationConventions ?? GetMigrationConventions(runnerContext);
-            Conventions = string.IsNullOrEmpty(runnerContext.WorkingDirectory)
-                ? conv
-                : ReplaceGetWorkingDirectory(conv, () => runnerContext.WorkingDirectory);
+            Conventions = migrationConventions ?? GetMigrationConventions(runnerContext);
+
+            var convSet = new DefaultConventionSet(runnerContext);
 
             _migrationScopeHandler = new MigrationScopeHandler(Processor);
-            _migrationValidator = new MigrationValidator(_announcer, Conventions);
+            _migrationValidator = new MigrationValidator(_announcer, convSet);
             MigrationLoader = new DefaultMigrationInformationLoader(Conventions, _migrationAssemblies,
                                                                     runnerContext.Namespace,
                                                                     runnerContext.NestedNamespaces, runnerContext.Tags);
@@ -103,12 +102,12 @@ namespace FluentMigrator.Runner
             if (runnerContext.NoConnection)
             {
                 VersionLoader = new ConnectionlessVersionLoader(
-                    this, _migrationAssemblies, Conventions,
+                    this, _migrationAssemblies, convSet, Conventions,
                     runnerContext.StartVersion, runnerContext.Version, versionTableMetaData);
             }
             else
             {
-                VersionLoader = new VersionLoader(this, _migrationAssemblies, Conventions, versionTableMetaData);
+                VersionLoader = new VersionLoader(this, _migrationAssemblies, convSet, Conventions, versionTableMetaData);
             }
         }
 
@@ -191,14 +190,7 @@ namespace FluentMigrator.Runner
                 return (IMigrationConventions) Activator.CreateInstance(matchedType);
             }
 
-            var result = new MigrationConventions();
-            var defaultSchemaName = runnerContext.DefaultSchemaName;
-            if (string.IsNullOrEmpty(defaultSchemaName))
-            {
-                result.GetDefaultSchema = () => defaultSchemaName;
-            }
-
-            return result;
+            return new MigrationConventions();
         }
 
         private IEnumerable<IMigrationInfo> GetUpMigrationsToApply(long version)
@@ -586,58 +578,6 @@ namespace FluentMigrator.Runner
         public IMigrationScope BeginScope()
         {
             return _migrationScopeHandler.BeginScope();
-        }
-
-        private IMigrationConventions ReplaceGetWorkingDirectory(IMigrationConventions conventions, Func<string> getWorkingDirectoryFunc)
-        {
-            if (conventions is MigrationConventions conv)
-            {
-                conv.GetWorkingDirectory = getWorkingDirectoryFunc;
-                return conv;
-            }
-
-            return new RunnerMigrationConventions(conventions, getWorkingDirectoryFunc);
-        }
-
-        private class RunnerMigrationConventions : IMigrationConventions
-        {
-            private readonly IMigrationConventions _conventions;
-
-            public RunnerMigrationConventions(IMigrationConventions conventions, Func<string> getWorkingDirectoryFunc)
-            {
-                _conventions = conventions;
-                GetWorkingDirectory = getWorkingDirectoryFunc;
-            }
-
-            public Func<ForeignKeyDefinition, string> GetForeignKeyName => _conventions.GetForeignKeyName;
-
-            public Func<IndexDefinition, string> GetIndexName => _conventions.GetIndexName;
-
-            public Func<string, string> GetPrimaryKeyName => _conventions.GetPrimaryKeyName;
-
-            public Func<Type, bool> TypeIsMigration => _conventions.TypeIsMigration;
-
-            public Func<Type, bool> TypeIsProfile => _conventions.TypeIsProfile;
-
-            public Func<Type, MigrationStage?> GetMaintenanceStage => _conventions.GetMaintenanceStage;
-
-            public Func<Type, bool> TypeIsVersionTableMetaData => _conventions.TypeIsVersionTableMetaData;
-
-            public Func<string> GetWorkingDirectory { get; }
-
-            public Func<Type, IMigrationInfo> GetMigrationInfo => _conventions.GetMigrationInfo;
-
-            public Func<ConstraintDefinition, string> GetConstraintName => _conventions.GetConstraintName;
-
-            public Func<Type, bool> TypeHasTags => _conventions.TypeHasTags;
-
-            public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags => _conventions.TypeHasMatchingTags;
-
-            public Func<Type, string, string> GetAutoScriptUpName => _conventions.GetAutoScriptUpName;
-
-            public Func<Type, string, string> GetAutoScriptDownName => _conventions.GetAutoScriptDownName;
-
-            public Func<string> GetDefaultSchema => _conventions.GetDefaultSchema;
         }
     }
 }

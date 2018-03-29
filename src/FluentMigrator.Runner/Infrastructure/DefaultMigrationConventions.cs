@@ -19,11 +19,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
-using FluentMigrator.Model;
 using FluentMigrator.VersionTableInfo;
 
 namespace FluentMigrator.Runner.Infrastructure
@@ -36,67 +34,15 @@ namespace FluentMigrator.Runner.Infrastructure
 
         public static DefaultMigrationConventions Instance { get; } = new DefaultMigrationConventions();
 
-        public Func<ForeignKeyDefinition, string> GetForeignKeyName => GetForeignKeyNameImpl;
-        public Func<IndexDefinition, string> GetIndexName => GetIndexNameImpl;
-        public Func<string, string> GetPrimaryKeyName => GetPrimaryKeyNameImpl;
         public Func<Type, bool> TypeIsMigration => TypeIsMigrationImpl;
         public Func<Type, bool> TypeIsProfile => TypeIsProfileImpl;
         public Func<Type, MigrationStage?> GetMaintenanceStage => GetMaintenanceStageImpl;
         public Func<Type, bool> TypeIsVersionTableMetaData => TypeIsVersionTableMetaDataImpl;
-        public Func<string> GetWorkingDirectory => () => Environment.CurrentDirectory;
         public Func<Type, IMigrationInfo> GetMigrationInfo => GetMigrationInfoForImpl;
-        public Func<ConstraintDefinition, string> GetConstraintName => GetConstraintNameImpl;
         public Func<Type, bool> TypeHasTags => TypeHasTagsImpl;
         public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags => TypeHasMatchingTagsImpl;
         public Func<Type, string, string> GetAutoScriptUpName => GetAutoScriptUpNameImpl;
         public Func<Type, string, string> GetAutoScriptDownName => GetAutoScriptDownNameImpl;
-        public Func<string> GetDefaultSchema => () => null;
-
-        private static string GetPrimaryKeyNameImpl(string tableName)
-        {
-            return "PK_" + tableName;
-        }
-
-        private static string GetForeignKeyNameImpl(ForeignKeyDefinition foreignKey)
-        {
-            var sb = new StringBuilder();
-
-            sb.Append("FK_");
-            sb.Append(foreignKey.ForeignTable);
-
-            foreach (string foreignColumn in foreignKey.ForeignColumns)
-            {
-                sb.Append("_");
-                sb.Append(foreignColumn);
-            }
-
-            sb.Append("_");
-            sb.Append(foreignKey.PrimaryTable);
-
-            foreach (string primaryColumn in foreignKey.PrimaryColumns)
-            {
-                sb.Append("_");
-                sb.Append(primaryColumn);
-            }
-
-            return sb.ToString();
-        }
-
-        private static string GetIndexNameImpl(IndexDefinition index)
-        {
-            var sb = new StringBuilder();
-
-            sb.Append("IX_");
-            sb.Append(index.TableName);
-
-            foreach (IndexColumnDefinition column in index.Columns)
-            {
-                sb.Append("_");
-                sb.Append(column.Name);
-            }
-
-            return sb.ToString();
-        }
 
         private static bool TypeIsMigrationImpl(Type type)
         {
@@ -136,19 +82,6 @@ namespace FluentMigrator.Runner.Infrastructure
                 migrationInfo.AddTrait(traitAttribute.Name, traitAttribute.Value);
 
             return migrationInfo;
-        }
-
-        private static string GetConstraintNameImpl(ConstraintDefinition expression)
-        {
-            StringBuilder sb = new StringBuilder();
-            sb.Append(expression.IsPrimaryKeyConstraint ? "PK_" : "UC_");
-
-            sb.Append(expression.TableName);
-            foreach (var column in expression.Columns)
-            {
-                sb.Append("_" + column);
-            }
-            return sb.ToString();
         }
 
         private static bool TypeHasTagsImpl(Type type)

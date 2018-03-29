@@ -4,10 +4,8 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-    public class DeleteConstraintExpression : MigrationExpressionBase, ISupportAdditionalFeatures
+    public class DeleteConstraintExpression : MigrationExpressionBase, ISupportAdditionalFeatures, IConstraintExpression
     {
-        public ConstraintDefinition Constraint { get; set; }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="T:DeleteConstraintExpression"/> class.
         /// </summary>
@@ -16,16 +14,13 @@ namespace FluentMigrator.Expressions
             Constraint = new ConstraintDefinition(type);
         }
 
+        public ConstraintDefinition Constraint { get; set; }
+
         public IDictionary<string, object> AdditionalFeatures => Constraint.AdditionalFeatures;
 
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             processor.Process(this);
-        }
-
-        public override void ApplyConventions(IMigrationConventions conventions)
-        {
-            Constraint.ApplyConventions(conventions);
         }
 
         public override string ToString()

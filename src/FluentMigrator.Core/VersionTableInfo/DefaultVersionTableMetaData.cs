@@ -18,9 +18,11 @@
 
 #endregion
 
+using FluentMigrator.Expressions;
+
 namespace FluentMigrator.VersionTableInfo
 {
-    public class DefaultVersionTableMetaData : IVersionTableMetaData
+    public class DefaultVersionTableMetaData : IVersionTableMetaData, ISchemaExpression
     {
         public DefaultVersionTableMetaData()
             : this(string.Empty)
@@ -42,7 +44,7 @@ namespace FluentMigrator.VersionTableInfo
         /// </remarks>
         public object ApplicationContext { get; set; }
 
-        public virtual string SchemaName { get; }
+        public virtual string SchemaName { get; set; }
 
         public virtual string TableName => "VersionInfo";
 

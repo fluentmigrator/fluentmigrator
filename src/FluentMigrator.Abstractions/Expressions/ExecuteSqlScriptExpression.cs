@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,29 +18,28 @@
 
 using System.Collections.Generic;
 using System.IO;
+
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
-    public class ExecuteSqlScriptExpression : MigrationExpressionBase
+    public class ExecuteSqlScriptExpression : MigrationExpressionBase, IFileSystemExpression
     {
         public string SqlScript { get; set; }
+
+        public string RootPath { get; set; }
 
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             string sqlText;
-            using (var reader = File.OpenText(SqlScript))
+            var sqlScriptFileName = Path.Combine(RootPath, SqlScript);
+            using (var reader = File.OpenText(sqlScriptFileName))
                 sqlText = reader.ReadToEnd();
 
             // since all the Processors are using String.Format() in their Execute method
             //  we need to escape the brackets with double brackets or else it throws an incorrect format error on the String.Format call
             sqlText = sqlText.Replace("{", "{{").Replace("}", "}}");
             processor.Execute(sqlText);
-        }
-
-        public override void ApplyConventions(IMigrationConventions conventions)
-        {
-            SqlScript = Path.Combine(conventions.GetWorkingDirectory(), SqlScript);
         }
 
         public override void CollectValidationErrors(ICollection<string> errors)

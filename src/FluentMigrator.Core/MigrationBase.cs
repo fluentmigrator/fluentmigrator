@@ -32,7 +32,7 @@ namespace FluentMigrator
     {
         internal IMigrationContext _context;
         private readonly object _mutex = new object();
-        
+
         /// <summary>The arbitrary application context passed to the task runner.</summary>
         public object ApplicationContext { get; protected set; }
 
@@ -41,15 +41,8 @@ namespace FluentMigrator
         /// </summary>
         public string ConnectionString { get; protected set; }
 
-
         public abstract void Up();
         public abstract void Down();
-
-        public void ApplyConventions(IMigrationContext context)
-        {
-            foreach (var expression in context.Expressions)
-                expression.ApplyConventions(context.Conventions);
-        }
 
         public virtual void GetUpExpressions(IMigrationContext context)
         {
