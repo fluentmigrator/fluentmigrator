@@ -21,6 +21,7 @@ using System.Reflection;
 
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Extensions;
+using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Processors.DB2;
 using FluentMigrator.Runner.Processors.DotConnectOracle;
 using FluentMigrator.Runner.Processors.Firebird;

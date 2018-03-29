@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 //
@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 
-namespace FluentMigrator.Infrastructure.Hosts
+namespace FluentMigrator.Runner.Infrastructure.Hosts
 {
     internal class NetCoreHost : IHostAbstraction
     {

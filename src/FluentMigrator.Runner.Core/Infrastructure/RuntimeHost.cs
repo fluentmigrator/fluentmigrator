@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 //
@@ -16,9 +16,9 @@
 //
 #endregion
 
-using FluentMigrator.Infrastructure.Hosts;
+using FluentMigrator.Runner.Infrastructure.Hosts;
 
-namespace FluentMigrator.Infrastructure
+namespace FluentMigrator.Runner.Infrastructure
 {
     public static class RuntimeHost
     {
