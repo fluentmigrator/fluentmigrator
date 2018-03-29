@@ -20,20 +20,44 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 using FluentMigrator.VersionTableInfo;
 
-namespace FluentMigrator.Infrastructure
+namespace FluentMigrator.Runner.Infrastructure
 {
-    public static class DefaultMigrationConventions
+    public class DefaultMigrationConventions : IMigrationConventions
     {
-        public static string GetPrimaryKeyName(string tableName)
+        private DefaultMigrationConventions()
+        {
+        }
+
+        public static DefaultMigrationConventions Instance { get; } = new DefaultMigrationConventions();
+
+        public Func<ForeignKeyDefinition, string> GetForeignKeyName => GetForeignKeyNameImpl;
+        public Func<IndexDefinition, string> GetIndexName => GetIndexNameImpl;
+        public Func<string, string> GetPrimaryKeyName => GetPrimaryKeyNameImpl;
+        public Func<Type, bool> TypeIsMigration => TypeIsMigrationImpl;
+        public Func<Type, bool> TypeIsProfile => TypeIsProfileImpl;
+        public Func<Type, MigrationStage?> GetMaintenanceStage => GetMaintenanceStageImpl;
+        public Func<Type, bool> TypeIsVersionTableMetaData => TypeIsVersionTableMetaDataImpl;
+        public Func<string> GetWorkingDirectory => () => Environment.CurrentDirectory;
+        public Func<Type, IMigrationInfo> GetMigrationInfo => GetMigrationInfoForImpl;
+        public Func<ConstraintDefinition, string> GetConstraintName => GetConstraintNameImpl;
+        public Func<Type, bool> TypeHasTags => TypeHasTagsImpl;
+        public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags => TypeHasMatchingTagsImpl;
+        public Func<Type, string, string> GetAutoScriptUpName => GetAutoScriptUpNameImpl;
+        public Func<Type, string, string> GetAutoScriptDownName => GetAutoScriptDownNameImpl;
+        public Func<string> GetDefaultSchema => () => null;
+
+        private static string GetPrimaryKeyNameImpl(string tableName)
         {
             return "PK_" + tableName;
         }
 
-        public static string GetForeignKeyName(ForeignKeyDefinition foreignKey)
+        private static string GetForeignKeyNameImpl(ForeignKeyDefinition foreignKey)
         {
             var sb = new StringBuilder();
 
@@ -58,7 +82,7 @@ namespace FluentMigrator.Infrastructure
             return sb.ToString();
         }
 
-        public static string GetIndexName(IndexDefinition index)
+        private static string GetIndexNameImpl(IndexDefinition index)
         {
             var sb = new StringBuilder();
 
@@ -74,35 +98,39 @@ namespace FluentMigrator.Infrastructure
             return sb.ToString();
         }
 
-        public static bool TypeIsMigration(Type type)
+        private static bool TypeIsMigrationImpl(Type type)
         {
             return typeof(IMigration).IsAssignableFrom(type) && type.HasAttribute<MigrationAttribute>();
         }
 
-        public static MigrationStage? GetMaintenanceStage(Type type)
+        private static MigrationStage? GetMaintenanceStageImpl(Type type)
         {
             if (!typeof(IMigration).IsAssignableFrom(type))
                 return null;
 
             var attribute = type.GetOneAttribute<MaintenanceAttribute>();
-            return attribute != null ? attribute.Stage : (MigrationStage?)null;
+            return attribute?.Stage;
         }
 
-        public static bool TypeIsProfile(Type type)
+        private static bool TypeIsProfileImpl(Type type)
         {
             return typeof(IMigration).IsAssignableFrom(type) && type.HasAttribute<ProfileAttribute>();
         }
 
-        public static bool TypeIsVersionTableMetaData(Type type)
+        private static bool TypeIsVersionTableMetaDataImpl(Type type)
         {
             return typeof(IVersionTableMetaData).IsAssignableFrom(type) && type.HasAttribute<VersionTableMetaDataAttribute>();
         }
 
-        public static IMigrationInfo GetMigrationInfoFor(Type migrationType)
+        private static IMigrationInfo GetMigrationInfoForImpl(Type migrationType)
         {
+            IMigration CreateMigration()
+            {
+                return (IMigration) Activator.CreateInstance(migrationType);
+            }
+
             var migrationAttribute = migrationType.GetOneAttribute<MigrationAttribute>();
-            Func<IMigration> migrationFunc = () => (IMigration)migrationType.Assembly.CreateInstance(migrationType.FullName);
-            var migrationInfo = new MigrationInfo(migrationAttribute.Version, migrationAttribute.Description, migrationAttribute.TransactionBehavior, migrationFunc);
+            var migrationInfo = new MigrationInfo(migrationAttribute.Version, migrationAttribute.Description, migrationAttribute.TransactionBehavior, CreateMigration);
 
             foreach (MigrationTraitAttribute traitAttribute in migrationType.GetAllAttributes<MigrationTraitAttribute>())
                 migrationInfo.AddTrait(traitAttribute.Name, traitAttribute.Value);
@@ -110,22 +138,10 @@ namespace FluentMigrator.Infrastructure
             return migrationInfo;
         }
 
-        public static string GetWorkingDirectory()
-        {
-            return Environment.CurrentDirectory;
-        }
-
-        public static string GetConstraintName(ConstraintDefinition expression)
+        private static string GetConstraintNameImpl(ConstraintDefinition expression)
         {
             StringBuilder sb = new StringBuilder();
-            if (expression.IsPrimaryKeyConstraint)
-            {
-                sb.Append("PK_");
-            }
-            else
-            {
-                sb.Append("UC_");
-            }
+            sb.Append(expression.IsPrimaryKeyConstraint ? "PK_" : "UC_");
 
             sb.Append(expression.TableName);
             foreach (var column in expression.Columns)
@@ -135,12 +151,12 @@ namespace FluentMigrator.Infrastructure
             return sb.ToString();
         }
 
-        public static bool TypeHasTags(Type type)
+        private static bool TypeHasTagsImpl(Type type)
         {
             return type.GetOneAttribute<TagsAttribute>(true) != null;
         }
 
-        public static bool TypeHasMatchingTags(Type type, IEnumerable<string> tagsToMatch)
+        private static bool TypeHasMatchingTagsImpl(Type type, IEnumerable<string> tagsToMatch)
         {
             var tags = type.GetAllAttributes<TagsAttribute>(true);
 
@@ -162,9 +178,9 @@ namespace FluentMigrator.Infrastructure
             return false;
         }
 
-        public static string GetAutoScriptUpName(Type type, string databaseType)
+        private static string GetAutoScriptUpNameImpl(Type type, string databaseType)
         {
-            if (TypeIsMigration(type))
+            if (TypeIsMigrationImpl(type))
             {
                 var version = type.GetOneAttribute<MigrationAttribute>().Version;
                 return string.Format("Scripts.Up.{0}_{1}_{2}.sql"
@@ -175,9 +191,9 @@ namespace FluentMigrator.Infrastructure
             return string.Empty;
         }
 
-        public static string GetAutoScriptDownName(Type type, string databaseType)
+        private static string GetAutoScriptDownNameImpl(Type type, string databaseType)
         {
-            if (TypeIsMigration(type))
+            if (TypeIsMigrationImpl(type))
             {
                 var version = type.GetOneAttribute<MigrationAttribute>().Version;
                 return string.Format("Scripts.Down.{0}_{1}_{2}.sql"
@@ -187,7 +203,5 @@ namespace FluentMigrator.Infrastructure
             }
             return string.Empty;
         }
-
-        public static string GetDefaultSchema() => null;
     }
 }

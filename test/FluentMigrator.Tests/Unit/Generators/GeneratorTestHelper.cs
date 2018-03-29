@@ -4,6 +4,7 @@ using System.Data;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.SqlServer;
 

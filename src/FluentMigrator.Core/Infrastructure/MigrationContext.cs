@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -17,13 +17,23 @@
 #endregion
 
 using System.Collections.Generic;
+
 using FluentMigrator.Expressions;
-using System.Reflection;
 
 namespace FluentMigrator.Infrastructure
 {
     public class MigrationContext : IMigrationContext
     {
+        public MigrationContext(IMigrationConventions conventions, IQuerySchema querySchema, IAssemblyCollection migrationAssemblies, object context, string connection)
+        {
+            Conventions = conventions;
+            Expressions = new List<IMigrationExpression>();
+            QuerySchema = querySchema;
+            MigrationAssemblies = migrationAssemblies;
+            this.ApplicationContext = context;
+            this.Connection = connection;
+        }
+
         public virtual IMigrationConventions Conventions { get; set; }
         public virtual ICollection<IMigrationExpression> Expressions { get; set; }
         public virtual IQuerySchema QuerySchema { get; set; }
@@ -36,15 +46,5 @@ namespace FluentMigrator.Infrastructure
         /// Connection String from the runner.
         /// </summary>
         public string Connection { get; set; }
-
-        public MigrationContext(IMigrationConventions conventions, IQuerySchema querySchema, IAssemblyCollection migrationAssemblies, object context, string connection)
-        {
-            Conventions = conventions;
-            Expressions = new List<IMigrationExpression>();
-            QuerySchema = querySchema;
-            MigrationAssemblies = migrationAssemblies;
-            this.ApplicationContext = context;
-            this.Connection = connection;
-        }
     }
 }

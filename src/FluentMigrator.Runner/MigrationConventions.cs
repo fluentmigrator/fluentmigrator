@@ -21,11 +21,14 @@ using System.Collections.Generic;
 
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Infrastructure;
 
-namespace FluentMigrator
+namespace FluentMigrator.Runner
 {
     public class MigrationConventions : IMigrationConventions
     {
+        private static readonly IMigrationConventions _default = DefaultMigrationConventions.Instance;
+
         public Func<string, string> GetPrimaryKeyName { get; set; }
         public Func<ForeignKeyDefinition, string> GetForeignKeyName { get; set; }
         public Func<IndexDefinition, string> GetIndexName { get; set; }
@@ -35,7 +38,7 @@ namespace FluentMigrator
         public Func<Type, bool> TypeIsVersionTableMetaData { get; set; }
         public Func<Type, IMigrationInfo> GetMigrationInfo { get; set; }
         public Func<string> GetWorkingDirectory { get; set; }
-        public Func<Model.ConstraintDefinition, string> GetConstraintName { get; set; }
+        public Func<ConstraintDefinition, string> GetConstraintName { get; set; }
         public Func<Type, bool> TypeHasTags { get; set; }
         public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags { get; set; }
         public Func<Type, string, string> GetAutoScriptUpName { get; set; }
@@ -44,21 +47,21 @@ namespace FluentMigrator
 
         public MigrationConventions()
         {
-            GetPrimaryKeyName = DefaultMigrationConventions.GetPrimaryKeyName;
-            GetForeignKeyName = DefaultMigrationConventions.GetForeignKeyName;
-            GetIndexName = DefaultMigrationConventions.GetIndexName;
-            TypeIsMigration = DefaultMigrationConventions.TypeIsMigration;
-            TypeIsProfile = DefaultMigrationConventions.TypeIsProfile;
-            GetMaintenanceStage = DefaultMigrationConventions.GetMaintenanceStage;
-            TypeIsVersionTableMetaData = DefaultMigrationConventions.TypeIsVersionTableMetaData;
-            GetMigrationInfo = DefaultMigrationConventions.GetMigrationInfoFor;
-            GetWorkingDirectory = DefaultMigrationConventions.GetWorkingDirectory;
-            GetConstraintName = DefaultMigrationConventions.GetConstraintName;
-            TypeHasTags = DefaultMigrationConventions.TypeHasTags;
-            TypeHasMatchingTags = DefaultMigrationConventions.TypeHasMatchingTags;
-            GetAutoScriptUpName = DefaultMigrationConventions.GetAutoScriptUpName;
-            GetAutoScriptDownName = DefaultMigrationConventions.GetAutoScriptDownName;
-            GetDefaultSchema = DefaultMigrationConventions.GetDefaultSchema;
+            GetPrimaryKeyName = _default.GetPrimaryKeyName;
+            GetForeignKeyName = _default.GetForeignKeyName;
+            GetIndexName = _default.GetIndexName;
+            TypeIsMigration = _default.TypeIsMigration;
+            TypeIsProfile = _default.TypeIsProfile;
+            GetMaintenanceStage = _default.GetMaintenanceStage;
+            TypeIsVersionTableMetaData = _default.TypeIsVersionTableMetaData;
+            GetMigrationInfo = _default.GetMigrationInfo;
+            GetWorkingDirectory = _default.GetWorkingDirectory;
+            GetConstraintName = _default.GetConstraintName;
+            TypeHasTags = _default.TypeHasTags;
+            TypeHasMatchingTags = _default.TypeHasMatchingTags;
+            GetAutoScriptUpName = _default.GetAutoScriptUpName;
+            GetAutoScriptDownName = _default.GetAutoScriptDownName;
+            GetDefaultSchema = _default.GetDefaultSchema;
         }
     }
 }

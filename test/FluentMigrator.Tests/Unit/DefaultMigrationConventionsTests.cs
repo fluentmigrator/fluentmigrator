@@ -16,10 +16,9 @@
 //
 #endregion
 
-using System.IO;
-using System.Reflection;
-using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Infrastructure;
+
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -28,10 +27,12 @@ namespace FluentMigrator.Tests.Unit
     [TestFixture]
     public class DefaultMigrationConventionsTests
     {
+        private static readonly IMigrationConventions _default = DefaultMigrationConventions.Instance;
+
         [Test]
         public void GetPrimaryKeyNamePrefixesTableNameWithPKAndUnderscore()
         {
-            DefaultMigrationConventions.GetPrimaryKeyName("Foo").ShouldBe("PK_Foo");
+            _default.GetPrimaryKeyName("Foo").ShouldBe("PK_Foo");
         }
 
         [Test]
@@ -43,7 +44,7 @@ namespace FluentMigrator.Tests.Unit
                 PrimaryTable = "Groups", PrimaryColumns = new[] { "Id" }
             };
 
-            DefaultMigrationConventions.GetForeignKeyName(foreignKey).ShouldBe("FK_Users_GroupId_Groups_Id");
+            _default.GetForeignKeyName(foreignKey).ShouldBe("FK_Users_GroupId_Groups_Id");
         }
 
         [Test]
@@ -55,7 +56,7 @@ namespace FluentMigrator.Tests.Unit
                 PrimaryTable = "Groups", PrimaryColumns = new[] { "ColumnC", "ColumnD" }
             };
 
-            DefaultMigrationConventions.GetForeignKeyName(foreignKey).ShouldBe("FK_Users_ColumnA_ColumnB_Groups_ColumnC_ColumnD");
+            _default.GetForeignKeyName(foreignKey).ShouldBe("FK_Users_ColumnA_ColumnB_Groups_ColumnC_ColumnD");
         }
 
         [Test]
@@ -70,7 +71,7 @@ namespace FluentMigrator.Tests.Unit
                 }
             };
 
-            DefaultMigrationConventions.GetIndexName(index).ShouldBe("IX_Bacon_BaconName");
+            _default.GetIndexName(index).ShouldBe("IX_Bacon_BaconName");
         }
 
         [Test]
@@ -86,34 +87,34 @@ namespace FluentMigrator.Tests.Unit
                 }
             };
 
-            DefaultMigrationConventions.GetIndexName(index).ShouldBe("IX_Bacon_BaconName_BaconSpice");
+            _default.GetIndexName(index).ShouldBe("IX_Bacon_BaconName_BaconSpice");
         }
 
         [Test]
         public void TypeIsMigrationReturnsTrueIfTypeExtendsMigrationAndHasMigrationAttribute()
         {
-            DefaultMigrationConventions.TypeIsMigration(typeof(DefaultConventionMigrationFake))
+            _default.TypeIsMigration(typeof(DefaultConventionMigrationFake))
                 .ShouldBeTrue();
         }
 
         [Test]
         public void TypeIsMigrationReturnsFalseIfTypeDoesNotExtendMigration()
         {
-            DefaultMigrationConventions.TypeIsMigration(typeof(object))
+            _default.TypeIsMigration(typeof(object))
                 .ShouldBeFalse();
         }
 
         [Test]
         public void TypeIsMigrationReturnsFalseIfTypeDoesNotHaveMigrationAttribute()
         {
-            DefaultMigrationConventions.TypeIsMigration(typeof(MigrationWithoutAttributeFake))
+            _default.TypeIsMigration(typeof(MigrationWithoutAttributeFake))
                 .ShouldBeFalse();
         }
 
         [Test]
         public void GetMaintenanceStageReturnsCorrectStage()
         {
-            DefaultMigrationConventions.GetMaintenanceStage(typeof (MaintenanceAfterEach))
+            _default.GetMaintenanceStage(typeof (MaintenanceAfterEach))
                 .ShouldBe(MigrationStage.AfterEach);
         }
 
@@ -121,7 +122,7 @@ namespace FluentMigrator.Tests.Unit
         public void MigrationInfoShouldRetainMigration()
         {
             var migrationType = typeof(DefaultConventionMigrationFake);
-            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migrationType);
+            var migrationinfo = _default.GetMigrationInfo(migrationType);
             migrationinfo.Migration.GetType().ShouldBeSameAs(migrationType);
         }
 
@@ -129,7 +130,7 @@ namespace FluentMigrator.Tests.Unit
         public void MigrationInfoShouldExtractVersion()
         {
             var migrationType = typeof(DefaultConventionMigrationFake);
-            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migrationType);
+            var migrationinfo = _default.GetMigrationInfo(migrationType);
             migrationinfo.Version.ShouldBe(123);
         }
 
@@ -137,7 +138,7 @@ namespace FluentMigrator.Tests.Unit
         public void MigrationInfoShouldExtractTransactionBehavior()
         {
             var migrationType = typeof(DefaultConventionMigrationFake);
-            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migrationType);
+            var migrationinfo = _default.GetMigrationInfo(migrationType);
             migrationinfo.TransactionBehavior.ShouldBe(TransactionBehavior.None);
         }
 
@@ -145,7 +146,7 @@ namespace FluentMigrator.Tests.Unit
         public void MigrationInfoShouldExtractTraits()
         {
             var migrationType = typeof(DefaultConventionMigrationFake);
-            var migrationinfo = DefaultMigrationConventions.GetMigrationInfoFor(migrationType);
+            var migrationinfo = _default.GetMigrationInfo(migrationType);
             migrationinfo.Trait("key").ShouldBe("test");
         }
 
@@ -153,7 +154,7 @@ namespace FluentMigrator.Tests.Unit
         [Category("Integration")]
         public void WorkingDirectoryConventionDefaultsToAssemblyFolder()
         {
-            var defaultWorkingDirectory = DefaultMigrationConventions.GetWorkingDirectory();
+            var defaultWorkingDirectory = _default.GetWorkingDirectory();
 
             defaultWorkingDirectory.ShouldNotBeNull();
             defaultWorkingDirectory.Contains("bin").ShouldBeTrue();
@@ -162,35 +163,35 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void DefaultSchemaConventionDefaultsToNull()
         {
-            DefaultMigrationConventions.GetDefaultSchema()
+            _default.GetDefaultSchema()
                 .ShouldBeNull();
         }
 
         [Test]
         public void TypeHasTagsReturnTrueIfTypeHasTagsAttribute()
         {
-            DefaultMigrationConventions.TypeHasTags(typeof(TaggedWithUk))
+            _default.TypeHasTags(typeof(TaggedWithUk))
                 .ShouldBeTrue();
         }
 
         [Test]
         public void TypeHasTagsReturnTrueIfInheritedTypeHasTagsAttribute()
         {
-            DefaultMigrationConventions.TypeHasTags(typeof(InheritedFromTaggedWithUk))
+            _default.TypeHasTags(typeof(InheritedFromTaggedWithUk))
                 .ShouldBeTrue();
         }
 
         [Test]
         public void TypeHasTagsReturnFalseIfTypeDoesNotHaveTagsAttribute()
         {
-            DefaultMigrationConventions.TypeHasTags(typeof(HasNoTagsFake))
+            _default.TypeHasTags(typeof(HasNoTagsFake))
                 .ShouldBeFalse();
         }
 
         [Test]
         public void TypeHasTagsReturnTrueIfBaseTypeDoesHaveTagsAttribute()
         {
-            DefaultMigrationConventions.TypeHasTags(typeof(ConcretehasTagAttribute))
+            _default.TypeHasTags(typeof(ConcretehasTagAttribute))
                 .ShouldBeTrue();
         }
 
@@ -200,7 +201,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasTagAttributeButNoTagsPassedInReturnsFalse()
             {
-                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithUk), new string[] { })
+                _default.TypeHasMatchingTags(typeof(TaggedWithUk), new string[] { })
                     .ShouldBeFalse();
             }
 
@@ -208,7 +209,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasTagAttributeWithNoTagNamesReturnsFalse()
             {
-                DefaultMigrationConventions.TypeHasMatchingTags(typeof(HasTagAttributeWithNoTagNames), new string[] { })
+                _default.TypeHasMatchingTags(typeof(HasTagAttributeWithNoTagNames), new string[] { })
                     .ShouldBeFalse();
             }
 
@@ -216,7 +217,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasOneTagThatDoesNotMatchSingleThenTagReturnsFalse()
             {
-                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "IE" })
+                _default.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "IE" })
                     .ShouldBeFalse();
             }
 
@@ -224,7 +225,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasOneTagThatDoesMatchSingleTagThenReturnsTrue()
             {
-                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "UK" })
+                _default.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "UK" })
                     .ShouldBeTrue();
             }
 
@@ -232,7 +233,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasOneTagThatPartiallyMatchesTagThenReturnsFalse()
             {
-                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "UK2" })
+                _default.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "UK2" })
                     .ShouldBeFalse();
             }
 
@@ -240,7 +241,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasOneTagThatDoesMatchMultipleTagsThenReturnsFalse()
             {
-                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "UK", "Production" })
+                _default.TypeHasMatchingTags(typeof(TaggedWithUk), new[] { "UK", "Production" })
                     .ShouldBeFalse();
             }
 
@@ -248,7 +249,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasTagsInTwoAttributeThatDoesMatchSingleTagThenReturnsTrue()
             {
-                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributes), new[] { "UK" })
+                _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributes), new[] { "UK" })
                     .ShouldBeTrue();
             }
 
@@ -256,7 +257,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasTagsInTwoAttributesThatDoesMatchMultipleTagsThenReturnsTrue()
             {
-                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributes), new[] { "UK", "Production" })
+                _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributes), new[] { "UK", "Production" })
                     .ShouldBeTrue();
             }
 
@@ -264,7 +265,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasTagsInOneAttributeThatDoesMatchMultipleTagsThenReturnsTrue()
             {
-                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInOneTagsAttribute), new[] { "UK", "Production" })
+                _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInOneTagsAttribute), new[] { "UK", "Production" })
                     .ShouldBeTrue();
             }
 
@@ -272,7 +273,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasTagsInTwoAttributesThatDontNotMatchMultipleTagsThenReturnsFalse()
             {
-                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributes), new[] { "UK", "IE" })
+                _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributes), new[] { "UK", "IE" })
                     .ShouldBeFalse();
             }
 
@@ -280,7 +281,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenBaseTypeHasTagsThenConcreteTypeReturnsTrue()
             {
-                DefaultMigrationConventions.TypeHasMatchingTags(typeof(ConcretehasTagAttribute), new[] { "UK" })
+                _default.TypeHasMatchingTags(typeof(ConcretehasTagAttribute), new[] { "UK" })
                     .ShouldBeTrue();
             }
 
@@ -290,7 +291,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasSingleTagWithSingleTagNameAndBehaviorOfAnyAndHasMatchingTagNamesThenReturnTrue()
             {
-                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithUkAndAnyBehavior), new[] { "UK", "IE" })
+                _default.TypeHasMatchingTags(typeof(TaggedWithUkAndAnyBehavior), new[] { "UK", "IE" })
                     .ShouldBeTrue();
             }
 
@@ -298,7 +299,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasSingleTagWithSingleTagNameAndBehaviorOfAnyButNoMatchingTagNamesThenReturnFalse()
             {
-                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithUkAndAnyBehavior), new[] { "Chrome", "IE" })
+                _default.TypeHasMatchingTags(typeof(TaggedWithUkAndAnyBehavior), new[] { "Chrome", "IE" })
                     .ShouldBeFalse();
             }
 
@@ -306,7 +307,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasSingleTagWithMultipleTagNamesAndBehaviorOfAnyWithSomeMatchingTagNamesThenReturnTrue()
             {
-                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingAndAnyBehaviorInOneTagsAttribute), new[] { "UK", "Staging", "IE" })
+                _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingAndAnyBehaviorInOneTagsAttribute), new[] { "UK", "Staging", "IE" })
                     .ShouldBeTrue();
             }
 
@@ -314,7 +315,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasSingleTagWithMultipleTagNamesAndBehaviorOfAnyWithNoMatchingTagNamesThenReturnFalse()
             {
-                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingAndAnyBehaviorInOneTagsAttribute), new[] { "IE", "Chrome" })
+                _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingAndAnyBehaviorInOneTagsAttribute), new[] { "IE", "Chrome" })
                     .ShouldBeFalse();
             }
 
@@ -322,7 +323,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasMultipleTagsWithMultipleTagNamesAndAllTagsHaveBehaviorOfAnyWithAllHavingAMatchingTagNameThenReturnTrue()
             {
-                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributesWithAnyBehaviorOnBoth), new[] { "UK", "Staging" })
+                _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributesWithAnyBehaviorOnBoth), new[] { "UK", "Staging" })
                     .ShouldBeTrue();
             }
 
@@ -330,7 +331,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasMultipleTagsWithMultipleTagNamesAndAllTagsHaveBehaviorOfAnyWithOneTagNotHavingAMatchingTagNameThenReturnTrue()
             {
-                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributesWithAnyBehaviorOnBoth), new[] { "UK", "IE" })
+                _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndProductionAndStagingInTwoTagsAttributesWithAnyBehaviorOnBoth), new[] { "UK", "IE" })
                     .ShouldBeTrue();
             }
 
@@ -338,7 +339,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasMultipleTagsWithMultipleTagNamesAndOneHasBehaviorOfAnyAndOtherHasBehaviorOfAllWithAllTagNamesMatchingThenReturnTrue()
             {
-                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndAllBehaviorAndProductionAndStagingAndAnyBehaviorInTwoTagsAttributes), new[] { "UK", "Staging" })
+                _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndAllBehaviorAndProductionAndStagingAndAnyBehaviorInTwoTagsAttributes), new[] { "UK", "Staging" })
                     .ShouldBeTrue();
             }
 
@@ -346,7 +347,7 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasMultipleTagsWithMultipleTagNamesAndOneHasBehaviorOfAnyAndOtherHasBehaviorOfAllWithoutAllTagNamesMatchingThenReturnTrue()
             {
-                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndAllBehaviorAndProductionAndStagingAndAnyBehaviorInTwoTagsAttributes), new[] { "UK", "Staging", "IE" })
+                _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndAllBehaviorAndProductionAndStagingAndAnyBehaviorInTwoTagsAttributes), new[] { "UK", "Staging", "IE" })
                     .ShouldBeTrue();
             }
 
@@ -354,12 +355,12 @@ namespace FluentMigrator.Tests.Unit
             [Category("Tagging")]
             public void WhenTypeHasMultipleTagsWithMultipleTagNamesAndOneHasBehaviorOfAnyWithoutAnyMatchingTagNamesAndOtherHasBehaviorOfAllWithTagNamesMatchingThenReturnTrue()
             {
-                DefaultMigrationConventions.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndAllBehaviorAndProductionAndStagingAndAnyBehaviorInTwoTagsAttributes), new[] { "BE", "UK" })
+                _default.TypeHasMatchingTags(typeof(TaggedWithBeAndUkAndAllBehaviorAndProductionAndStagingAndAnyBehaviorInTwoTagsAttributes), new[] { "BE", "UK" })
                     .ShouldBeTrue();
             }
         }
 
-        [FluentMigrator.Migration(20130508175300)]
+        [Migration(20130508175300)]
         class AutoScriptMigrationFake : AutoScriptMigration { }
 
         [Test]
@@ -368,7 +369,7 @@ namespace FluentMigrator.Tests.Unit
             var type = typeof(AutoScriptMigrationFake);
             var databaseType = "sqlserver";
 
-            DefaultMigrationConventions.GetAutoScriptUpName(type, databaseType)
+            _default.GetAutoScriptUpName(type, databaseType)
                 .ShouldBe("Scripts.Up.20130508175300_AutoScriptMigrationFake_sqlserver.sql");
         }
 
@@ -378,7 +379,7 @@ namespace FluentMigrator.Tests.Unit
             var type = typeof(AutoScriptMigrationFake);
             var databaseType = "sqlserver";
 
-            DefaultMigrationConventions.GetAutoScriptDownName(type, databaseType)
+            _default.GetAutoScriptDownName(type, databaseType)
                 .ShouldBe("Scripts.Down.20130508175300_AutoScriptMigrationFake_sqlserver.sql");
         }
     }

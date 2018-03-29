@@ -15,6 +15,7 @@
 #endregion
 
 using FluentMigrator.Model;
+using FluentMigrator.Runner;
 
 using NUnit.Framework;
 

@@ -1,4 +1,6 @@
-﻿using FluentMigrator.Model;
+using FluentMigrator.Model;
+using FluentMigrator.Runner;
+
 using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Definitions

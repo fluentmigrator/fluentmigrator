@@ -19,15 +19,20 @@
 using System;
 using System.Reflection;
 using System.Collections.Generic;
+using System.Linq;
+
 using FluentMigrator.Exceptions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Tests.Integration.Migrations;
 using FluentMigrator.Tests.Unit.TaggingTestFakes;
+
 using Moq;
+
 using NUnit.Framework;
 using NUnit.Should;
-using System.Linq;
+
 
 namespace FluentMigrator.Tests.Unit
 {
@@ -121,7 +126,7 @@ namespace FluentMigrator.Tests.Unit
             var tagsToMatch = new[] { "UK", "Production" };
 
             var conventionsMock = new Mock<IMigrationConventions>();
-            conventionsMock.SetupGet(m => m.GetMigrationInfo).Returns(DefaultMigrationConventions.GetMigrationInfoFor);
+            conventionsMock.SetupGet(m => m.GetMigrationInfo).Returns(DefaultMigrationConventions.Instance.GetMigrationInfo);
             conventionsMock.SetupGet(m => m.TypeIsMigration).Returns(t => true);
             conventionsMock.SetupGet(m => m.TypeHasTags).Returns(t => migrationType == t);
             conventionsMock.SetupGet(m => m.TypeHasMatchingTags).Returns((type, tags) => (migrationType == type && tagsToMatch == tags));
@@ -143,7 +148,7 @@ namespace FluentMigrator.Tests.Unit
             var tagsToMatch = new[] { "UK", "Production" };
 
             var conventionsMock = new Mock<IMigrationConventions>();
-            conventionsMock.SetupGet(m => m.GetMigrationInfo).Returns(DefaultMigrationConventions.GetMigrationInfoFor);
+            conventionsMock.SetupGet(m => m.GetMigrationInfo).Returns(DefaultMigrationConventions.Instance.GetMigrationInfo);
             conventionsMock.SetupGet(m => m.TypeIsMigration).Returns(t => true);
             conventionsMock.SetupGet(m => m.TypeHasTags).Returns(t => migrationType == t);
             conventionsMock.SetupGet(m => m.TypeHasMatchingTags).Returns((type, tags) => false);

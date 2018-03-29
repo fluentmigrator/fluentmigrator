@@ -5,6 +5,7 @@ using FluentMigrator.Builders.Create;
 using FluentMigrator.Builders.Create.Table;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.SqlServer;
 

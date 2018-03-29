@@ -1,5 +1,6 @@
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Runner;
 using FluentMigrator.Tests.Helpers;
 using Moq;
 using NUnit.Framework;

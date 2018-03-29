@@ -19,6 +19,8 @@
 using System.Collections.ObjectModel;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
+using FluentMigrator.Runner;
+
 using NUnit.Framework;
 using NUnit.Should;
 

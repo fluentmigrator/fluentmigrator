@@ -55,9 +55,7 @@ namespace FluentMigrator.Builders.IfDatabase
 
             _context = DatabaseTypeApplies(context, databaseType)
                 ? context
-                : new MigrationContext(
-                    new MigrationConventions(), new NullIfDatabaseProcessor(),
-                    context.MigrationAssemblies, context.ApplicationContext, "");
+                : CreateEmptyMigrationContext(context);
         }
 
         /// <summary>
@@ -72,9 +70,7 @@ namespace FluentMigrator.Builders.IfDatabase
 
             _context = DatabaseTypeApplies(context, databaseTypePredicate)
                 ? context
-                : new MigrationContext(
-                    new MigrationConventions(),new NullIfDatabaseProcessor(),
-                    context.MigrationAssemblies, context.ApplicationContext, "");
+                : CreateEmptyMigrationContext(context);
         }
 
         /// <summary>
@@ -180,6 +176,17 @@ namespace FluentMigrator.Builders.IfDatabase
             }
 
             return false;
+        }
+
+        private static IMigrationContext CreateEmptyMigrationContext(IMigrationContext originalContext)
+        {
+            var result = new MigrationContext(
+                originalContext.Conventions,
+                new NullIfDatabaseProcessor(),
+                originalContext.MigrationAssemblies,
+                originalContext.ApplicationContext,
+                string.Empty);
+            return result;
         }
     }
 }

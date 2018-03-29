@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+using FluentMigrator.Runner;
 using FluentMigrator.Tests.Helpers;
 using Moq;
 using NUnit.Framework;

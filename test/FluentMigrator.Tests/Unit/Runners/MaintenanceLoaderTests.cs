@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // 
@@ -19,6 +19,8 @@
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Infrastructure;
+
 using Moq;
 using NUnit.Framework;
 using NUnit.Should;
@@ -40,9 +42,9 @@ namespace FluentMigrator.Tests.Unit.Runners
         public void Setup()
         {
             _migrationConventions = new Mock<IMigrationConventions>();
-            _migrationConventions.Setup(x => x.GetMaintenanceStage).Returns(DefaultMigrationConventions.GetMaintenanceStage);
-            _migrationConventions.Setup(x => x.TypeHasTags).Returns(DefaultMigrationConventions.TypeHasTags);
-            _migrationConventions.Setup(x => x.TypeHasMatchingTags).Returns(DefaultMigrationConventions.TypeHasMatchingTags);
+            _migrationConventions.Setup(x => x.GetMaintenanceStage).Returns(DefaultMigrationConventions.Instance.GetMaintenanceStage);
+            _migrationConventions.Setup(x => x.TypeHasTags).Returns(DefaultMigrationConventions.Instance.TypeHasTags);
+            _migrationConventions.Setup(x => x.TypeHasMatchingTags).Returns(DefaultMigrationConventions.Instance.TypeHasMatchingTags);
 
             _maintenanceLoader = new MaintenanceLoader(new SingleAssembly(GetType().Assembly), _tags, _migrationConventions.Object);
             _maintenanceLoaderNoTags = new MaintenanceLoader(new SingleAssembly(GetType().Assembly), null, _migrationConventions.Object);
@@ -82,7 +84,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 // The NoTag maintenance should not be found in the tagged maintenanceLoader because it wants tagged classes
                 Assert.IsFalse(migrationInfo.Migration.GetType().Equals(typeof(MaintenanceBeforeEachNoTag)));
 
-                DefaultMigrationConventions.TypeHasMatchingTags(migrationInfo.Migration.GetType(), _tags)
+                DefaultMigrationConventions.Instance.TypeHasMatchingTags(migrationInfo.Migration.GetType(), _tags)
                     .ShouldBeTrue();
             } 
         }
@@ -134,7 +136,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 }
                 else
                 {
-                    DefaultMigrationConventions.TypeHasMatchingTags(migrationInfo.Migration.GetType(), _tags)
+                    DefaultMigrationConventions.Instance.TypeHasMatchingTags(migrationInfo.Migration.GetType(), _tags)
                         .ShouldBeTrue();
                 }
             }
