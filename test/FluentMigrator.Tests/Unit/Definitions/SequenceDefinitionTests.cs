@@ -41,22 +41,31 @@ namespace FluentMigrator.Tests.Unit.Definitions
         [Test]
         public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsSetThenSchemaShouldNotBeChanged()
         {
-            var sequenceDefinition = new SequenceDefinition { Name = "Test", SchemaName = "testschema" };
+            var expr = new CreateSequenceExpression()
+            {
+                Sequence =
+                {
+                    Name = "Test",
+                    SchemaName = "testschema"
+                }
+            };
 
-            sequenceDefinition.ApplyConventions(new MigrationConventions());
+            var processed = expr.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(sequenceDefinition.SchemaName, Is.EqualTo("testschema"));
+            Assert.That(processed.Sequence.SchemaName, Is.EqualTo("testschema"));
         }
 
         [Test]
         public void WhenDefaultSchemaConventionIsChangedAndSchemaIsNotSetThenSetSchema()
         {
-            var sequenceDefinition = new SequenceDefinition { Name = "Test" };
-            var migrationConventions = new MigrationConventions { GetDefaultSchema = () => "testdefault" };
+            var expr = new CreateSequenceExpression()
+            {
+                Sequence = new SequenceDefinition { Name = "Test" },
+            };
 
-            sequenceDefinition.ApplyConventions(migrationConventions);
+            var processed = expr.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(sequenceDefinition.SchemaName, Is.EqualTo("testdefault"));
+            Assert.That(processed.Sequence.SchemaName, Is.EqualTo("testdefault"));
         }
     }
 }

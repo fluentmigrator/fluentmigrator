@@ -13,13 +13,13 @@ namespace FluentMigrator.Tests.Unit.Expressions
         private UpdateDataExpression expression;
 
         [SetUp]
-        public void Initialize() 
+        public void Initialize()
         {
             expression =
-                new UpdateDataExpression() 
+                new UpdateDataExpression()
                 {
                     TableName = "ExampleTable",
-                    Set = new List<KeyValuePair<string, object>> 
+                    Set = new List<KeyValuePair<string, object>>
                     {
                         new KeyValuePair<string, object>("Column", "value")
                     },
@@ -28,7 +28,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         }
 
         [Test]
-        public void NullUpdateTargetCausesErrorMessage() 
+        public void NullUpdateTargetCausesErrorMessage()
         {
             // null is the default value, but it might not always be, so I'm codifying it here anyway
             expression.Where = null;
@@ -38,7 +38,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         }
 
         [Test]
-        public void EmptyUpdateTargetCausesErrorMessage() 
+        public void EmptyUpdateTargetCausesErrorMessage()
         {
             // The same should be true for an empty list
             expression.Where = new List<KeyValuePair<string, object>>();
@@ -48,7 +48,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         }
 
         [Test]
-        public void DoesNotRequireWhereConditionWhenIsAllRowsIsSet() 
+        public void DoesNotRequireWhereConditionWhenIsAllRowsIsSet()
         {
             expression.IsAllRows = true;
 
@@ -57,7 +57,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         }
 
         [Test]
-        public void DoesNotAllowWhereConditionWhenIsAllRowsIsSet() 
+        public void DoesNotAllowWhereConditionWhenIsAllRowsIsSet()
         {
             expression.IsAllRows = true;
             expression.Where = new List<KeyValuePair<string, object>> {new KeyValuePair<string, object>("key", "value")};
@@ -65,13 +65,13 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldContain(ErrorMessages.UpdateDataExpressionMustNotSpecifyBothWhereClauseAndAllRows);
         }
- 
+
         [Test]
         public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
         {
-            expression.ApplyConventions(new MigrationConventions());
+            var processed = expression.Apply(ConventionSets.NoSchemaName);
 
-            Assert.That(expression.SchemaName, Is.Null);
+            Assert.That(processed.SchemaName, Is.Null);
         }
 
         [Test]
@@ -79,19 +79,17 @@ namespace FluentMigrator.Tests.Unit.Expressions
         {
             expression.SchemaName = "testschema";
 
-            expression.ApplyConventions(new MigrationConventions());
+            var processed = expression.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(expression.SchemaName, Is.EqualTo("testschema"));
+            Assert.That(processed.SchemaName, Is.EqualTo("testschema"));
         }
 
         [Test]
         public void WhenDefaultSchemaConventionIsChangedAndSchemaIsNotSetThenSetSchema()
         {
-            var migrationConventions = new MigrationConventions { GetDefaultSchema = () => "testdefault" };
+            var processed = expression.Apply(ConventionSets.WithSchemaName);
 
-            expression.ApplyConventions(migrationConventions);
-
-            Assert.That(expression.SchemaName, Is.EqualTo("testdefault"));
+            Assert.That(processed.SchemaName, Is.EqualTo("testdefault"));
         }
     }
 }

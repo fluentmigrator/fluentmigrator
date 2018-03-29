@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -55,15 +55,15 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var errors = ValidationHelper.CollectErrors(expression);
             Assert.That(errors.Count, Is.EqualTo(0));
         }
-    
+
         [Test]
         public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
         {
             var expression = new CreateTableExpression { TableName = "table1" };
 
-            expression.ApplyConventions(new MigrationConventions());
+            var processed = expression.Apply(ConventionSets.NoSchemaName);
 
-            Assert.That(expression.SchemaName, Is.Null);
+            Assert.That(processed.SchemaName, Is.Null);
         }
 
         [Test]
@@ -71,20 +71,19 @@ namespace FluentMigrator.Tests.Unit.Expressions
         {
             var expression = new CreateTableExpression { SchemaName = "testschema", TableName = "table1" };
 
-            expression.ApplyConventions(new MigrationConventions());
+            var processed = expression.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(expression.SchemaName, Is.EqualTo("testschema"));
+            Assert.That(processed.SchemaName, Is.EqualTo("testschema"));
         }
 
         [Test]
         public void WhenDefaultSchemaConventionIsChangedAndSchemaIsNotSetThenSetSchema()
         {
             var expression = new CreateTableExpression { TableName = "table1" };
-            var migrationConventions = new MigrationConventions { GetDefaultSchema = () => "testdefault" };
 
-            expression.ApplyConventions(migrationConventions);
+            var processed = expression.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(expression.SchemaName, Is.EqualTo("testdefault"));
+            Assert.That(processed.SchemaName, Is.EqualTo("testdefault"));
         }
     }
 }

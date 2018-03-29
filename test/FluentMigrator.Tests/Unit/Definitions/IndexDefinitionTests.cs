@@ -1,3 +1,4 @@
+using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
 
@@ -11,12 +12,21 @@ namespace FluentMigrator.Tests.Unit.Definitions
         [Test]
         public void ShouldApplyIndexNameConventionWhenIndexNameIsNull()
         {
-            var indexDefinition = new IndexDefinition();
-            var conventions = new MigrationConventions { GetIndexName = definition => "IX_Table_Name" };
+            var expr = new CreateIndexExpression()
+            {
+                Index =
+                {
+                    TableName = "Table",
+                    Columns =
+                    {
+                        new IndexColumnDefinition() {Name = "Name"}
+                    }
+                }
+            };
 
-            indexDefinition.ApplyConventions(conventions);
+            var processed = expr.Apply(ConventionSets.NoSchemaName);
 
-            Assert.AreEqual("IX_Table_Name", indexDefinition.Name);
+            Assert.AreEqual("IX_Table_Name", processed.Index.Name);
         }
     }
 }

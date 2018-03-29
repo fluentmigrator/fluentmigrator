@@ -41,9 +41,9 @@ namespace FluentMigrator.Tests.Unit.Expressions
         {
             var expression = new DeleteConstraintExpression(ConstraintType.Unique);
 
-            expression.ApplyConventions(new MigrationConventions());
+            var processed = expression.Apply(ConventionSets.NoSchemaName);
 
-            Assert.That(expression.Constraint.SchemaName, Is.Null);
+            Assert.That(processed.Constraint.SchemaName, Is.Null);
         }
 
         [Test]
@@ -57,9 +57,9 @@ namespace FluentMigrator.Tests.Unit.Expressions
                 },
             };
 
-            expression.ApplyConventions(new MigrationConventions());
+            var processed = expression.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(expression.Constraint.SchemaName, Is.EqualTo("testschema"));
+            Assert.That(processed.Constraint.SchemaName, Is.EqualTo("testschema"));
         }
 
         [Test]
@@ -67,11 +67,9 @@ namespace FluentMigrator.Tests.Unit.Expressions
         {
             var expression = new DeleteConstraintExpression(ConstraintType.Unique);
 
-            var migrationConventions = new MigrationConventions { GetDefaultSchema = () => "testdefault" };
+            var processed = expression.Apply(ConventionSets.WithSchemaName);
 
-            expression.ApplyConventions(migrationConventions);
-
-            Assert.That(expression.Constraint.SchemaName, Is.EqualTo("testdefault"));
+            Assert.That(processed.Constraint.SchemaName, Is.EqualTo("testdefault"));
         }
     }
 }

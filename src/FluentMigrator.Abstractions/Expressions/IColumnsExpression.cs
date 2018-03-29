@@ -22,6 +22,7 @@ namespace FluentMigrator.Expressions
 {
     public interface IColumnsExpression
     {
+        string TableName { get; }
         IEnumerable<ColumnDefinition> Columns { get; }
     }
 }

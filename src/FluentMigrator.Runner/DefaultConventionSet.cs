@@ -14,14 +14,13 @@
 // limitations under the License.
 #endregion
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
 
+using Autofac;
+
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Initialization;
-
-using IoC;
 
 namespace FluentMigrator.Runner
 {
@@ -29,15 +28,29 @@ namespace FluentMigrator.Runner
     {
         public DefaultConventionSet(IRunnerContext runnerContext)
         {
-            var container = Container.Create().Using(new ContainerConfiguration(runnerContext));
+            var builder = new ContainerBuilder();
+            builder.Register(ctx => new DefaultSchemaConvention(runnerContext?.DefaultSchemaName))
+                .SingleInstance().AsImplementedInterfaces();
+            builder.Register(ctx => new DefaultRootPathConvention(runnerContext?.WorkingDirectory))
+                .SingleInstance().AsImplementedInterfaces();
+            builder.RegisterType<DefaultConstraintNameConvention>()
+                .SingleInstance().AsImplementedInterfaces();
+            builder.RegisterType<DefaultForeignKeyNameConvention>()
+                .SingleInstance().AsImplementedInterfaces();
+            builder.RegisterType<DefaultIndexNameConvention>()
+                .SingleInstance().AsImplementedInterfaces();
+            builder.RegisterType<DefaultPrimaryKeyNameConvention>()
+                .SingleInstance().AsImplementedInterfaces();
 
-            ColumnsConventions = container.Get<IEnumerable<IColumnsConvention>>().ToList();
-            ConstraintConventions = container.Get<IEnumerable<IConstraintConvention>>().ToList();
-            ForeignKeyConventions = container.Get<IEnumerable<IForeignKeyConvention>>().ToList();
-            IndexConventions = container.Get<IEnumerable<IIndexConvention>>().ToList();
-            RootPathConvention = container.Get<IRootPathConvention>();
-            SchemaConvention = container.Get<ISchemaConvention>();
-            SequenceConventions = container.Get<IEnumerable<ISequenceConvention>>().ToList();
+            var container = builder.Build();
+
+            ColumnsConventions = container.Resolve<IEnumerable<IColumnsConvention>>().ToList();
+            ConstraintConventions = container.Resolve<IEnumerable<IConstraintConvention>>().ToList();
+            ForeignKeyConventions = container.Resolve<IEnumerable<IForeignKeyConvention>>().ToList();
+            IndexConventions = container.Resolve<IEnumerable<IIndexConvention>>().ToList();
+            RootPathConvention = container.Resolve<IRootPathConvention>();
+            SchemaConvention = container.Resolve<ISchemaConvention>();
+            SequenceConventions = container.Resolve<IEnumerable<ISequenceConvention>>().ToList();
         }
 
         public IRootPathConvention RootPathConvention { get; }
@@ -47,34 +60,5 @@ namespace FluentMigrator.Runner
         public IList<IForeignKeyConvention> ForeignKeyConventions { get; }
         public IList<IIndexConvention> IndexConventions { get; }
         public IList<ISequenceConvention> SequenceConventions { get; }
-
-        private class ContainerConfiguration : IConfiguration
-        {
-            private readonly string _rootDirectory;
-            private readonly string _defaultSchema;
-
-            public ContainerConfiguration(IRunnerContext runnerContext)
-            {
-                _rootDirectory = string.IsNullOrEmpty(runnerContext?.WorkingDirectory) ? null : runnerContext?.WorkingDirectory;
-                _defaultSchema = runnerContext?.DefaultSchemaName ?? string.Empty;
-            }
-
-            public IEnumerable<IDisposable> Apply(IContainer container)
-            {
-                yield return RegisterInstance(container, new DefaultRootPathConvention(_rootDirectory));
-                if (!string.IsNullOrEmpty(_defaultSchema))
-                    yield return RegisterInstance(container, new DefaultSchemaConvention(_defaultSchema));
-                yield return RegisterInstance(container, new DefaultConstraintNameConvention());
-                yield return RegisterInstance(container, new DefaultForeignKeyNameConvention());
-                yield return RegisterInstance(container, new DefaultIndexNameConvention());
-                yield return RegisterInstance(container, new DefaultPrimaryKeyNameConvention());
-            }
-
-            private static IDisposable RegisterInstance(IContainer container, object convention)
-            {
-                var contractTypes = convention.GetType().GetInterfaces().Where(x => x != typeof(IDisposable)).ToArray();
-                return container.Bind(contractTypes).Lifetime(Lifetime.Singletone).To(() => convention);
-            }
-        }
     }
 }

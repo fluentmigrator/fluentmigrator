@@ -23,52 +23,46 @@ namespace FluentMigrator.Tests
         private static readonly DefaultSchemaConvention _noSchemaNameConvention = new DefaultSchemaConvention(null);
         private static readonly DefaultSchemaConvention _testSchemaNameConvention = new DefaultSchemaConvention("testdefault");
 
-        public static readonly ConventionSet NoSchemaName = new ConventionSet
-        {
-            SchemaConvention = _noSchemaNameConvention,
-            ConstraintConventions =
-            {
-                new DefaultConstraintNameConvention(),
-                _noSchemaNameConvention,
-            },
-            ColumnsConventions =
-            {
-                new DefaultPrimaryKeyNameConvention(),
-            },
-            ForeignKeyConventions =
-            {
-                new DefaultForeignKeyNameConvention(),
-                _noSchemaNameConvention,
-            },
-            IndexConventions =
-            {
-                new DefaultIndexNameConvention(),
-                _noSchemaNameConvention,
-            }
-        };
+        public static readonly IConventionSet NoSchemaName = CreateNoSchemaName(null);
 
-        public static readonly ConventionSet WithSchemaName = new ConventionSet
+        public static readonly IConventionSet WithSchemaName = CreateTestSchemaName(null);
+
+        public static IConventionSet CreateNoSchemaName(string rootPath)
+            => Create(_noSchemaNameConvention, rootPath);
+
+        public static IConventionSet CreateTestSchemaName(string rootPath)
+            => Create(_testSchemaNameConvention, rootPath);
+
+        public static IConventionSet Create(DefaultSchemaConvention schemaConvention, string rootPath)
         {
-            SchemaConvention = _testSchemaNameConvention,
-            ConstraintConventions =
+            return new ConventionSet
             {
-                new DefaultConstraintNameConvention(),
-                _testSchemaNameConvention,
-            },
-            ColumnsConventions =
-            {
-                new DefaultPrimaryKeyNameConvention(),
-            },
-            ForeignKeyConventions =
-            {
-                new DefaultForeignKeyNameConvention(),
-                _testSchemaNameConvention,
-            },
-            IndexConventions =
-            {
-                new DefaultIndexNameConvention(),
-                _testSchemaNameConvention,
-            }
-        };
+                SchemaConvention = schemaConvention,
+                RootPathConvention = new DefaultRootPathConvention(rootPath),
+                ConstraintConventions =
+                {
+                    new DefaultConstraintNameConvention(),
+                    schemaConvention,
+                },
+                ColumnsConventions =
+                {
+                    new DefaultPrimaryKeyNameConvention(),
+                },
+                ForeignKeyConventions =
+                {
+                    new DefaultForeignKeyNameConvention(),
+                    schemaConvention,
+                },
+                IndexConventions =
+                {
+                    new DefaultIndexNameConvention(),
+                    schemaConvention,
+                },
+                SequenceConventions =
+                {
+                    schemaConvention,
+                },
+            };
+        }
     }
 }

@@ -26,7 +26,7 @@ namespace FluentMigrator.Runner.Conventions
             {
                 if (columnDefinition.IsPrimaryKey && string.IsNullOrEmpty(columnDefinition.PrimaryKeyName))
                 {
-                    columnDefinition.PrimaryKeyName = GetPrimaryKeyName(columnDefinition.TableName);
+                    columnDefinition.PrimaryKeyName = GetPrimaryKeyName(columnDefinition.TableName ?? expression.TableName);
                 }
             }
 

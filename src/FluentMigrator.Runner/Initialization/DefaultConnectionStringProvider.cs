@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 //
@@ -43,7 +43,7 @@ namespace FluentMigrator.Runner.Initialization
             return _connectionString;
         }
 
-#if NET40 || NET45
+#if NET461
         private static string GetConnectionStringFromManager(
             IAnnouncer announcer,
             string connection,

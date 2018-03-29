@@ -38,7 +38,7 @@ namespace FluentMigrator.Tests.Unit
             {
                 Column =
                 {
-                    Name = "Foo",
+                    TableName = "Foo",
                     IsPrimaryKey = true,
                 }
             };
@@ -108,17 +108,22 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void GetIndexNameReturnsValidIndexNameForComplexIndex()
         {
-            var index = new IndexDefinition
+            var expr = new CreateIndexExpression()
             {
-                TableName = "Bacon",
-                Columns =
+                Index =
                 {
-                    new IndexColumnDefinition { Name = "BaconName", Direction = Direction.Ascending },
-                    new IndexColumnDefinition { Name = "BaconSpice", Direction = Direction.Descending }
+                    TableName = "Bacon",
+                    Columns =
+                    {
+                        new IndexColumnDefinition { Name = "BaconName", Direction = Direction.Ascending },
+                        new IndexColumnDefinition { Name = "BaconSpice", Direction = Direction.Descending }
+                    }
                 }
             };
 
-            _default.GetIndexName(index).ShouldBe("IX_Bacon_BaconName_BaconSpice");
+            var processed = expr.Apply(ConventionSets.NoSchemaName);
+
+            processed.Index.Name.ShouldBe("IX_Bacon_BaconName_BaconSpice");
         }
 
         [Test]
@@ -185,17 +190,18 @@ namespace FluentMigrator.Tests.Unit
         [Category("Integration")]
         public void WorkingDirectoryConventionDefaultsToAssemblyFolder()
         {
-            var defaultWorkingDirectory = _default.GetWorkingDirectory();
-
-            defaultWorkingDirectory.ShouldNotBeNull();
-            defaultWorkingDirectory.Contains("bin").ShouldBeTrue();
+            var expr = new ConventionsTestClass();
+            var processed = ConventionSets.NoSchemaName.RootPathConvention.Apply(expr);
+            processed.RootPath.ShouldNotBeNull();
+            processed.RootPath.Contains("bin").ShouldBeTrue();
         }
 
         [Test]
         public void DefaultSchemaConventionDefaultsToNull()
         {
-            _default.GetDefaultSchema()
-                .ShouldBeNull();
+            var expr = new ConventionsTestClass();
+            var processed = ConventionSets.NoSchemaName.SchemaConvention.Apply(expr);
+            processed.SchemaName.ShouldBeNull();
         }
 
         [Test]
@@ -413,6 +419,12 @@ namespace FluentMigrator.Tests.Unit
             _default.GetAutoScriptDownName(type, databaseType)
                 .ShouldBe("Scripts.Down.20130508175300_AutoScriptMigrationFake_sqlserver.sql");
         }
+
+        private class ConventionsTestClass : ISchemaExpression, IFileSystemExpression
+        {
+            public string SchemaName { get; set; }
+            public string RootPath { get; set; }
+        }
     }
 
 
@@ -500,5 +512,4 @@ namespace FluentMigrator.Tests.Unit
         public override void Up() { }
         public override void Down() { }
     }
-
 }

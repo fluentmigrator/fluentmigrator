@@ -25,16 +25,37 @@ namespace FluentMigrator.Expressions
 {
     public class ExecuteSqlScriptExpression : MigrationExpressionBase, IFileSystemExpression
     {
-        public string SqlScript { get; set; }
+        private string _rootPath;
+        private string _sqlScript;
+        private string _unchangedSqlScript;
 
-        public string RootPath { get; set; }
+        public string SqlScript
+        {
+            get => _sqlScript;
+            set
+            {
+                _unchangedSqlScript =  value;
+                UpdateSqlScript();
+            }
+        }
+
+        public string RootPath
+        {
+            get => _rootPath;
+            set
+            {
+                _rootPath = value;
+                UpdateSqlScript();
+            }
+        }
 
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             string sqlText;
-            var sqlScriptFileName = Path.Combine(RootPath, SqlScript);
-            using (var reader = File.OpenText(sqlScriptFileName))
+            using (var reader = File.OpenText(SqlScript))
+            {
                 sqlText = reader.ReadToEnd();
+            }
 
             // since all the Processors are using String.Format() in their Execute method
             //  we need to escape the brackets with double brackets or else it throws an incorrect format error on the String.Format call
@@ -51,6 +72,18 @@ namespace FluentMigrator.Expressions
         public override string ToString()
         {
             return base.ToString() + SqlScript;
+        }
+
+        private void UpdateSqlScript()
+        {
+            if (!string.IsNullOrEmpty(_rootPath))
+            {
+                _sqlScript = Path.Combine(_rootPath, _unchangedSqlScript);
+            }
+            else
+            {
+                _sqlScript = _unchangedSqlScript;
+            }
         }
     }
 }
