@@ -1,4 +1,4 @@
-#if NET461
+#if NET40 || NET45
 using System;
 using System.Configuration;
 using System.IO;

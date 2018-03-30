@@ -21,7 +21,7 @@ namespace FluentMigrator.Runner.Conventions
     public class ConventionSet : IConventionSet
     {
         public IRootPathConvention RootPathConvention { get; set; }
-        public ISchemaConvention SchemaConvention { get; set; }
+        public DefaultSchemaConvention SchemaConvention { get; set; }
         public IList<IColumnsConvention> ColumnsConventions { get; } = new List<IColumnsConvention>();
         public IList<IConstraintConvention> ConstraintConventions { get; } = new List<IConstraintConvention>();
         public IList<IForeignKeyConvention> ForeignKeyConventions { get; } = new List<IForeignKeyConvention>();

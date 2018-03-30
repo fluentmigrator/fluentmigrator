@@ -15,9 +15,6 @@
 #endregion
 
 using System.Collections.Generic;
-using System.Linq;
-
-using Autofac;
 
 using FluentMigrator.Runner.Conventions;
 using FluentMigrator.Runner.Initialization;
@@ -28,33 +25,43 @@ namespace FluentMigrator.Runner
     {
         public DefaultConventionSet(IRunnerContext runnerContext)
         {
-            var builder = new ContainerBuilder();
-            builder.Register(ctx => new DefaultSchemaConvention(runnerContext?.DefaultSchemaName))
-                .SingleInstance().AsImplementedInterfaces();
-            builder.Register(ctx => new DefaultRootPathConvention(runnerContext?.WorkingDirectory))
-                .SingleInstance().AsImplementedInterfaces();
-            builder.RegisterType<DefaultConstraintNameConvention>()
-                .SingleInstance().AsImplementedInterfaces();
-            builder.RegisterType<DefaultForeignKeyNameConvention>()
-                .SingleInstance().AsImplementedInterfaces();
-            builder.RegisterType<DefaultIndexNameConvention>()
-                .SingleInstance().AsImplementedInterfaces();
-            builder.RegisterType<DefaultPrimaryKeyNameConvention>()
-                .SingleInstance().AsImplementedInterfaces();
+            var schemaConvention =
+                new DefaultSchemaConvention(new DefaultSchemaNameConvention(runnerContext?.DefaultSchemaName));
 
-            var container = builder.Build();
+            ColumnsConventions = new List<IColumnsConvention>()
+            {
+                new DefaultPrimaryKeyNameConvention(),
+            };
 
-            ColumnsConventions = container.Resolve<IEnumerable<IColumnsConvention>>().ToList();
-            ConstraintConventions = container.Resolve<IEnumerable<IConstraintConvention>>().ToList();
-            ForeignKeyConventions = container.Resolve<IEnumerable<IForeignKeyConvention>>().ToList();
-            IndexConventions = container.Resolve<IEnumerable<IIndexConvention>>().ToList();
-            RootPathConvention = container.Resolve<IRootPathConvention>();
-            SchemaConvention = container.Resolve<ISchemaConvention>();
-            SequenceConventions = container.Resolve<IEnumerable<ISequenceConvention>>().ToList();
+            ConstraintConventions = new List<IConstraintConvention>()
+            {
+                new DefaultConstraintNameConvention(),
+                schemaConvention,
+            };
+
+            ForeignKeyConventions = new List<IForeignKeyConvention>()
+            {
+                new DefaultForeignKeyNameConvention(),
+                schemaConvention,
+            };
+
+            IndexConventions = new List<IIndexConvention>()
+            {
+                new DefaultIndexNameConvention(),
+                schemaConvention,
+            };
+
+            SequenceConventions = new List<ISequenceConvention>()
+            {
+                schemaConvention,
+            };
+
+            SchemaConvention = schemaConvention;
+            RootPathConvention = new DefaultRootPathConvention(runnerContext?.WorkingDirectory);
         }
 
         public IRootPathConvention RootPathConvention { get; }
-        public ISchemaConvention SchemaConvention { get; }
+        public DefaultSchemaConvention SchemaConvention { get; }
         public IList<IColumnsConvention> ColumnsConventions { get; }
         public IList<IConstraintConvention> ConstraintConventions { get; }
         public IList<IForeignKeyConvention> ForeignKeyConventions { get; }

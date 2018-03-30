@@ -65,7 +65,7 @@ namespace FluentMigrator.Runner.Processors
             Register(new SqlServerCeProcessorFactory());
             Register(new SqlAnywhereProcessorFactory());
 
-#if NET461
+#if NET40 || NET45
             Register(new Hana.HanaProcessorFactory());
             Register(new Jet.JetProcessorFactory());
 #endif

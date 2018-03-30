@@ -14,12 +14,26 @@
 // limitations under the License.
 #endregion
 
-using FluentMigrator.Expressions;
-
 namespace FluentMigrator.Runner.Conventions
 {
-    public interface ISchemaConvention
+    public class DefaultSchemaNameConvention : IDefaultSchemaNameConvention
     {
-        ISchemaExpression Apply(ISchemaExpression expression);
+        private readonly string _defaultSchemaName;
+        private readonly bool _isActive;
+
+        public DefaultSchemaNameConvention(string defaultSchemaName)
+        {
+            _defaultSchemaName = defaultSchemaName;
+            _isActive = !string.IsNullOrEmpty(defaultSchemaName);
+        }
+
+        public string GetSchemaName(string originalSchemaName)
+        {
+            if (!_isActive)
+                return originalSchemaName;
+            if (!string.IsNullOrEmpty(originalSchemaName))
+                return originalSchemaName;
+            return _defaultSchemaName;
+        }
     }
 }

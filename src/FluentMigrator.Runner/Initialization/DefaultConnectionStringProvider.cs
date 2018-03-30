@@ -43,7 +43,7 @@ namespace FluentMigrator.Runner.Initialization
             return _connectionString;
         }
 
-#if NET461
+#if NET40 || NET45
         private static string GetConnectionStringFromManager(
             IAnnouncer announcer,
             string connection,

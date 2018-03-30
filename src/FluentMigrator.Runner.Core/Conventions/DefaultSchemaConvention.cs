@@ -18,59 +18,58 @@ using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Conventions
 {
-    public class DefaultSchemaConvention : ISchemaConvention, IForeignKeyConvention, IConstraintConvention, IIndexConvention, ISequenceConvention
+    public sealed class DefaultSchemaConvention : IForeignKeyConvention, IConstraintConvention, IIndexConvention, ISequenceConvention
     {
-        private readonly string _defaultSchema;
+        private readonly IDefaultSchemaNameConvention _defaultSchemaNameConvention;
 
-        public DefaultSchemaConvention(string defaultSchema)
+        public DefaultSchemaConvention()
+            : this(new DefaultSchemaNameConvention(null))
         {
-            _defaultSchema = defaultSchema ?? string.Empty;
+        }
+
+        public DefaultSchemaConvention(string defaultSchemaName)
+            : this(new DefaultSchemaNameConvention(defaultSchemaName))
+        {
+        }
+
+        public DefaultSchemaConvention(IDefaultSchemaNameConvention defaultSchemaNameConvention)
+        {
+            _defaultSchemaNameConvention = defaultSchemaNameConvention;
+        }
+
+        string GetSchemaName(string originalSchemaName)
+        {
+            return _defaultSchemaNameConvention.GetSchemaName(originalSchemaName);
         }
 
         public ISchemaExpression Apply(ISchemaExpression expression)
         {
-            if (string.IsNullOrEmpty(_defaultSchema))
-                return expression;
-            if (string.IsNullOrEmpty(expression.SchemaName))
-                expression.SchemaName = _defaultSchema;
+            expression.SchemaName = GetSchemaName(expression.SchemaName);
             return expression;
         }
 
         public IForeignKeyExpression Apply(IForeignKeyExpression expression)
         {
-            if (string.IsNullOrEmpty(_defaultSchema))
-                return expression;
-            if (string.IsNullOrEmpty(expression.ForeignKey.ForeignTableSchema))
-                expression.ForeignKey.ForeignTableSchema = _defaultSchema;
-            if (string.IsNullOrEmpty(expression.ForeignKey.PrimaryTableSchema))
-                expression.ForeignKey.PrimaryTableSchema = _defaultSchema;
+            expression.ForeignKey.ForeignTableSchema = GetSchemaName(expression.ForeignKey.ForeignTableSchema);
+            expression.ForeignKey.PrimaryTableSchema = GetSchemaName(expression.ForeignKey.PrimaryTableSchema);
             return expression;
         }
 
         public IConstraintExpression Apply(IConstraintExpression expression)
         {
-            if (string.IsNullOrEmpty(_defaultSchema))
-                return expression;
-            if (string.IsNullOrEmpty(expression.Constraint.SchemaName))
-                expression.Constraint.SchemaName = _defaultSchema;
+            expression.Constraint.SchemaName = GetSchemaName(expression.Constraint.SchemaName);
             return expression;
         }
 
         public IIndexExpression Apply(IIndexExpression expression)
         {
-            if (string.IsNullOrEmpty(_defaultSchema))
-                return expression;
-            if (string.IsNullOrEmpty(expression.Index.SchemaName))
-                expression.Index.SchemaName = _defaultSchema;
+            expression.Index.SchemaName = GetSchemaName(expression.Index.SchemaName);
             return expression;
         }
 
         public ISequenceExpression Apply(ISequenceExpression expression)
         {
-            if (string.IsNullOrEmpty(_defaultSchema))
-                return expression;
-            if (string.IsNullOrEmpty(expression.Sequence.SchemaName))
-                expression.Sequence.SchemaName = _defaultSchema;
+            expression.Sequence.SchemaName = GetSchemaName(expression.Sequence.SchemaName);
             return expression;
         }
     }

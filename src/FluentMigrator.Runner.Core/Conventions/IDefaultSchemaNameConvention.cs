@@ -14,18 +14,10 @@
 // limitations under the License.
 #endregion
 
-using System.Collections.Generic;
-
 namespace FluentMigrator.Runner.Conventions
 {
-    public interface IConventionSet
+    public interface IDefaultSchemaNameConvention
     {
-        IRootPathConvention RootPathConvention { get; }
-        DefaultSchemaConvention SchemaConvention { get; }
-        IList<IColumnsConvention> ColumnsConventions { get; }
-        IList<IConstraintConvention> ConstraintConventions { get; }
-        IList<IForeignKeyConvention> ForeignKeyConventions { get; }
-        IList<IIndexConvention> IndexConventions { get; }
-        IList<ISequenceConvention> SequenceConventions { get; }
+        string GetSchemaName(string originalSchemaName);
     }
 }

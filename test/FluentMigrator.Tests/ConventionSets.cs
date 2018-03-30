@@ -20,7 +20,7 @@ namespace FluentMigrator.Tests
 {
     public static class ConventionSets
     {
-        private static readonly DefaultSchemaConvention _noSchemaNameConvention = new DefaultSchemaConvention(null);
+        private static readonly DefaultSchemaConvention _noSchemaNameConvention = new DefaultSchemaConvention();
         private static readonly DefaultSchemaConvention _testSchemaNameConvention = new DefaultSchemaConvention("testdefault");
 
         public static readonly IConventionSet NoSchemaName = CreateNoSchemaName(null);

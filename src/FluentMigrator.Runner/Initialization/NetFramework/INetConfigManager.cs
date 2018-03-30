@@ -1,4 +1,4 @@
-#if NET461
+#if NET40 || NET45
 using System.Configuration;
 
 namespace FluentMigrator.Runner.Initialization.NetFramework
