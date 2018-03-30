@@ -18,8 +18,14 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
+    /// <summary>
+    /// Opt-in into the sequence expression conventions
+    /// </summary>
     public interface ISequenceExpression
     {
+        /// <summary>
+        /// Gets the sequence definition
+        /// </summary>
         SequenceDefinition Sequence { get; }
     }
 }

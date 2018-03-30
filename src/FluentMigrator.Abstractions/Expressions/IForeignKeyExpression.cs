@@ -18,8 +18,14 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
+    /// <summary>
+    /// Opt-in into the foreign key expressions conventions
+    /// </summary>
     public interface IForeignKeyExpression
     {
+        /// <summary>
+        /// Gets the foreign key defintion
+        /// </summary>
         ForeignKeyDefinition ForeignKey { get; }
     }
 }

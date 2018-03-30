@@ -16,16 +16,52 @@
 
 using System.Collections.Generic;
 
+using FluentMigrator.Expressions;
+
 namespace FluentMigrator.Runner.Conventions
 {
+    /// <summary>
+    /// A set of conventions to be applied to expressions
+    /// </summary>
     public interface IConventionSet
     {
+        /// <summary>
+        /// Gets the root path convention to be applied to <see cref="IFileSystemExpression"/> implementations
+        /// </summary>
         IRootPathConvention RootPathConvention { get; }
+
+        /// <summary>
+        /// Gets the default schema name convention to be applied to <see cref="ISchemaExpression"/> implementations
+        /// </summary>
+        /// <remarks>
+        /// This class cannot be overridden. The <see cref="IDefaultSchemaNameConvention"/>
+        /// must be implemented/provided instead.
+        /// </remarks>
         DefaultSchemaConvention SchemaConvention { get; }
+
+        /// <summary>
+        /// Gets the conventions to be applied to <see cref="IColumnsExpression"/> implementations
+        /// </summary>
         IList<IColumnsConvention> ColumnsConventions { get; }
+
+        /// <summary>
+        /// Gets the conventions to be applied to <see cref="IConstraintExpression"/> implementations
+        /// </summary>
         IList<IConstraintConvention> ConstraintConventions { get; }
+
+        /// <summary>
+        /// Gets the conventions to be applied to <see cref="IForeignKeyExpression"/> implementations
+        /// </summary>
         IList<IForeignKeyConvention> ForeignKeyConventions { get; }
+
+        /// <summary>
+        /// Gets the conventions to be applied to <see cref="IIndexExpression"/> implementations
+        /// </summary>
         IList<IIndexConvention> IndexConventions { get; }
+
+        /// <summary>
+        /// Gets the conventions to be applied to <see cref="ISequenceExpression"/> implementations
+        /// </summary>
         IList<ISequenceConvention> SequenceConventions { get; }
     }
 }

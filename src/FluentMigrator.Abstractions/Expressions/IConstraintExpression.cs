@@ -18,8 +18,14 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
+    /// <summary>
+    /// Opt-in into constraint expression conventions
+    /// </summary>
     public interface IConstraintExpression
     {
+        /// <summary>
+        /// Gets the constraint definition
+        /// </summary>
         ConstraintDefinition Constraint { get; }
     }
 }

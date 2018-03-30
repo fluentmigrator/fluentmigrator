@@ -16,16 +16,52 @@
 
 using System.Collections.Generic;
 
+using FluentMigrator.Expressions;
+
 namespace FluentMigrator.Runner.Conventions
 {
+    /// <summary>
+    /// A convenience (empty) implementation of <see cref="IConventionSet"/>
+    /// </summary>
     public class ConventionSet : IConventionSet
     {
+        /// <summary>
+        /// Gets or sets the root path convention to be applied to <see cref="IFileSystemExpression"/> implementations
+        /// </summary>
         public IRootPathConvention RootPathConvention { get; set; }
+
+        /// <summary>
+        /// Gets or sets the default schema name convention to be applied to <see cref="ISchemaExpression"/> implementations
+        /// </summary>
+        /// <remarks>
+        /// This class cannot be overridden. The <see cref="IDefaultSchemaNameConvention"/>
+        /// must be implemented/provided instead.
+        /// </remarks>
         public DefaultSchemaConvention SchemaConvention { get; set; }
+
+        /// <summary>
+        /// Gets or sets the conventions to be applied to <see cref="IColumnsExpression"/> implementations
+        /// </summary>
         public IList<IColumnsConvention> ColumnsConventions { get; } = new List<IColumnsConvention>();
+
+        /// <summary>
+        /// Gets or sets the conventions to be applied to <see cref="IConstraintExpression"/> implementations
+        /// </summary>
         public IList<IConstraintConvention> ConstraintConventions { get; } = new List<IConstraintConvention>();
+
+        /// <summary>
+        /// Gets or sets the conventions to be applied to <see cref="IForeignKeyExpression"/> implementations
+        /// </summary>
         public IList<IForeignKeyConvention> ForeignKeyConventions { get; } = new List<IForeignKeyConvention>();
+
+        /// <summary>
+        /// Gets or sets the conventions to be applied to <see cref="IIndexExpression"/> implementations
+        /// </summary>
         public IList<IIndexConvention> IndexConventions { get; } = new List<IIndexConvention>();
+
+        /// <summary>
+        /// Gets or sets the conventions to be applied to <see cref="ISequenceExpression"/> implementations
+        /// </summary>
         public IList<ISequenceConvention> SequenceConventions { get; } = new List<ISequenceConvention>();
     }
 }

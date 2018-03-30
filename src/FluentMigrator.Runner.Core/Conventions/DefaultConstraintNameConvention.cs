@@ -21,8 +21,15 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Conventions
 {
+    /// <summary>
+    /// The default implementation of a <see cref="IConstraintConvention"/>
+    /// </summary>
+    /// <remarks>
+    /// It sets the default name of a constraint.
+    /// </remarks>
     public class DefaultConstraintNameConvention : IConstraintConvention
     {
+        /// <inheritdoc />
         public IConstraintExpression Apply(IConstraintExpression expression)
         {
             if (string.IsNullOrEmpty(expression.Constraint.ConstraintName))

@@ -18,8 +18,16 @@ using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Conventions
 {
+    /// <summary>
+    /// A convention working on <see cref="ISequenceExpression"/> implementations
+    /// </summary>
     public interface ISequenceConvention
     {
+        /// <summary>
+        /// Applies a convention to a <see cref="ISequenceExpression"/>
+        /// </summary>
+        /// <param name="expression">The expression this convention should be applied to</param>
+        /// <returns>The same or a new expression. The underlying type must stay the same.</returns>
         ISequenceExpression Apply(ISequenceExpression expression);
     }
 }

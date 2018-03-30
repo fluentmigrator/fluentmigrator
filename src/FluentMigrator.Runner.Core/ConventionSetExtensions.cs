@@ -21,8 +21,17 @@ using FluentMigrator.Runner.Conventions;
 
 namespace FluentMigrator.Runner
 {
+    /// <summary>
+    /// Extension methods that work in <see cref="IMigrationExpression"/> and are using <see cref="IConventionSet"/> implementations.
+    /// </summary>
     public static class ConventionSetExtensions
     {
+        /// <summary>
+        /// Applies all conventions in a <paramref name="conventionSet"/> to the given <paramref name="expressions"/>.
+        /// </summary>
+        /// <param name="expressions">The expression to apply the convention set to</param>
+        /// <param name="conventionSet">The convention set to apply to the expressions</param>
+        /// <returns>A sequence of expressions where the conventions have been applied to</returns>
         public static IEnumerable<IMigrationExpression> Apply(this IEnumerable<IMigrationExpression> expressions,
             IConventionSet conventionSet)
         {
@@ -33,6 +42,14 @@ namespace FluentMigrator.Runner
             }
         }
 
+        /// <summary>
+        /// Apply all conventions in a <paramref name="conventionSet"/> to the given <paramref name="expression"/>.
+        /// </summary>
+        /// <typeparam name="T">The expression type, derived from <see cref="IMigrationExpression"/></typeparam>
+        /// <param name="expression">The expression to apply the <paramref name="conventionSet"/> to</param>
+        /// <param name="conventionSet">The convention set to apply to the <paramref name="expression"/></param>
+        /// <returns>The same or a new instance of the expression. The underlying type of the expression must
+        /// not be changed.</returns>
         public static T Apply<T>(this T expression, IConventionSet conventionSet)
             where T : IMigrationExpression
         {

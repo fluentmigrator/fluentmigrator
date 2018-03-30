@@ -21,8 +21,15 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Conventions
 {
+    /// <summary>
+    /// The default implementation of a <see cref="IForeignKeyConvention"/>
+    /// </summary>
+    /// <remarks>
+    /// It sets the default name of a foreign key.
+    /// </remarks>
     public class DefaultForeignKeyNameConvention : IForeignKeyConvention
     {
+        /// <inheritdoc />
         public IForeignKeyExpression Apply(IForeignKeyExpression expression)
         {
             if (string.IsNullOrEmpty(expression.ForeignKey.Name))

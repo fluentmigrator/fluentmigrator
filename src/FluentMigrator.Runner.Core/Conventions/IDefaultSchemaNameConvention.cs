@@ -16,8 +16,19 @@
 
 namespace FluentMigrator.Runner.Conventions
 {
+    /// <summary>
+    /// A convention that returns the default schema name depending on the original schema name
+    /// </summary>
     public interface IDefaultSchemaNameConvention
     {
+        /// <summary>
+        /// Returns the default schema name depending on the original schema name
+        /// </summary>
+        /// <param name="originalSchemaName">The original schema name</param>
+        /// <returns>Returns the <paramref name="originalSchemaName"/> when the
+        /// default schema name is null or empty and returns the new default
+        /// schema name when the <paramref name="originalSchemaName"/> is null
+        /// or empty</returns>
         string GetSchemaName(string originalSchemaName);
     }
 }

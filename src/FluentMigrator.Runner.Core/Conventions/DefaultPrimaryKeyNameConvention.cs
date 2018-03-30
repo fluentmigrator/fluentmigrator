@@ -18,8 +18,15 @@ using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Conventions
 {
+    /// <summary>
+    /// The default implementation of a <see cref="IColumnsConvention"/>
+    /// </summary>
+    /// <remarks>
+    /// It sets the default constraint name of a primary key column.
+    /// </remarks>
     public class DefaultPrimaryKeyNameConvention : IColumnsConvention
     {
+        /// <inheritdoc />
         public IColumnsExpression Apply(IColumnsExpression expression)
         {
             foreach (var columnDefinition in expression.Columns)

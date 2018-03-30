@@ -18,8 +18,16 @@ using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Conventions
 {
+    /// <summary>
+    /// A convention working on <see cref="IIndexExpression"/> implementations
+    /// </summary>
     public interface IIndexConvention
     {
+        /// <summary>
+        /// Applies a convention to a <see cref="IIndexExpression"/>
+        /// </summary>
+        /// <param name="expression">The expression this convention should be applied to</param>
+        /// <returns>The same or a new expression. The underlying type must stay the same.</returns>
         IIndexExpression Apply(IIndexExpression expression);
     }
 }

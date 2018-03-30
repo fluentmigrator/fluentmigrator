@@ -18,8 +18,16 @@ using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Conventions
 {
+    /// <summary>
+    /// A convention working on <see cref="IForeignKeyExpression"/> implementations
+    /// </summary>
     public interface IForeignKeyConvention
     {
+        /// <summary>
+        /// Applies a convention to a <see cref="IForeignKeyExpression"/>
+        /// </summary>
+        /// <param name="expression">The expression this convention should be applied to</param>
+        /// <returns>The same or a new expression. The underlying type must stay the same.</returns>
         IForeignKeyExpression Apply(IForeignKeyExpression expression);
     }
 }

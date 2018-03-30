@@ -18,8 +18,14 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
+    /// <summary>
+    /// Opt-in into the index expression conventions
+    /// </summary>
     public interface IIndexExpression
     {
+        /// <summary>
+        /// Gets the index definition
+        /// </summary>
         IndexDefinition Index { get; }
     }
 }

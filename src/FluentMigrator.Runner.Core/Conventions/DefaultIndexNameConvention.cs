@@ -21,8 +21,15 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Conventions
 {
+    /// <summary>
+    /// The default implementation of a <see cref="IIndexConvention"/>
+    /// </summary>
+    /// <remarks>
+    /// It sets the default name of an index.
+    /// </remarks>
     public class DefaultIndexNameConvention : IIndexConvention
     {
+        /// <inheritdoc />
         public IIndexExpression Apply(IIndexExpression expression)
         {
             if (string.IsNullOrEmpty(expression.Index.Name))

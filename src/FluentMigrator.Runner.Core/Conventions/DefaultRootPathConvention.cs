@@ -20,15 +20,30 @@ using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Conventions
 {
+    /// <summary>
+    /// The default implementation of a <see cref="IRootPathConvention"/>
+    /// </summary>
+    /// <remarks>
+    /// It sets the working directory, which is either the
+    /// path given in the constructor or - when the given path is
+    /// null - the current directory.
+    /// </remarks>
     public class DefaultRootPathConvention : IRootPathConvention
     {
         private readonly string _rootPath;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DefaultRootPathConvention"/> class.
+        /// </summary>
+        /// <param name="rootPath">The root path for expressions requiring file system access.</param>
+        /// <remarks>When <paramref name="rootPath"/> is null, then the current directory is
+        /// returned</remarks>
         public DefaultRootPathConvention(string rootPath)
         {
             _rootPath = rootPath ?? Environment.CurrentDirectory;
         }
 
+        /// <inheritdoc />
         public IFileSystemExpression Apply(IFileSystemExpression expression)
         {
             if (string.IsNullOrEmpty(expression.RootPath))

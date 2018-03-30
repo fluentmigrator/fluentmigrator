@@ -16,17 +16,25 @@
 
 namespace FluentMigrator.Runner.Conventions
 {
+    /// <summary>
+    /// The default implementation of the <see cref="IDefaultSchemaNameConvention"/>
+    /// </summary>
     public class DefaultSchemaNameConvention : IDefaultSchemaNameConvention
     {
         private readonly string _defaultSchemaName;
         private readonly bool _isActive;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IDefaultSchemaNameConvention"/> class.
+        /// </summary>
+        /// <param name="defaultSchemaName">The default schema name (can be null or empty)</param>
         public DefaultSchemaNameConvention(string defaultSchemaName)
         {
             _defaultSchemaName = defaultSchemaName;
             _isActive = !string.IsNullOrEmpty(defaultSchemaName);
         }
 
+        /// <inheritdoc />
         public string GetSchemaName(string originalSchemaName)
         {
             if (!_isActive)

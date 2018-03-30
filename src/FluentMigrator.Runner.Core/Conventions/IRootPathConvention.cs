@@ -18,8 +18,16 @@ using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Conventions
 {
+    /// <summary>
+    /// A convention working on <see cref="IFileSystemExpression"/> implementations
+    /// </summary>
     public interface IRootPathConvention
     {
+        /// <summary>
+        /// Applies a convention to a <see cref="IFileSystemExpression"/>
+        /// </summary>
+        /// <param name="expression">The expression this convention should be applied to</param>
+        /// <returns>The same or a new expression. The underlying type must stay the same.</returns>
         IFileSystemExpression Apply(IFileSystemExpression expression);
     }
 }
