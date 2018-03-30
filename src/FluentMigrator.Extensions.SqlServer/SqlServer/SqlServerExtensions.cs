@@ -33,6 +33,7 @@ namespace FluentMigrator.SqlServer
         public const string IncludesList = "SqlServerIncludes";
         public const string OnlineIndex = "SqlServerOnlineIndex";
         public const string RowGuidColumn = "SqlServerRowGuidColumn";
+        public const string IndexColumnNullsDistinct = "SqlServerIndexColumnNullsDistinct";
 
         /// <summary>
         /// Inserts data using Sql Server's IDENTITY INSERT feature.

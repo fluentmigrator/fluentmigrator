@@ -1,5 +1,8 @@
+using System.Linq;
+
 using FluentMigrator.Builders.Create.Index;
 using FluentMigrator.Builders.Delete.Index;
+using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner.Generators.SqlServer;
 using FluentMigrator.SqlServer;
 
@@ -112,6 +115,26 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP INDEX [TestIndex] ON [dbo].[TestTable1]");
+        }
+
+        [Test]
+        public void CanCreateUniqueIndexWithDistinctNulls()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
+            expression.Index.Columns.First().SetAdditionalFeature(SqlServerExtensions.IndexColumnNullsDistinct, true);
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC)");
+        }
+
+        [Test]
+        public void CanCreateUniqueIndexIgnoringNonDistinctNulls()
+        {
+            var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
+            expression.Index.Columns.First().SetAdditionalFeature(SqlServerExtensions.IndexColumnNullsDistinct, false);
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC)");
         }
 
         [Test]

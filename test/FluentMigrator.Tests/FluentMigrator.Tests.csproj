@@ -1,5 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net47</TargetFramework>
     <DefineConstants>NOT_CLS_COMPLIANT;$(DefineConstants)</DefineConstants>
@@ -7,18 +6,14 @@
     <AssemblyOriginatorKeyFile>..\..\FluentMigrator.snk</AssemblyOriginatorKeyFile>
     <UserSecretsId>FluentMigrator.Tests</UserSecretsId>
   </PropertyGroup>
-
   <Import Project="$(MSBuildThisFileDirectory)../../Global.proj" />
-
   <ItemGroup>
     <DotNetCliToolReference Include="Microsoft.Extensions.SecretManager.Tools" Version="2.0.0" />
   </ItemGroup>
-
   <ItemGroup>
     <EmbeddedResource Include="EmbeddedResources/**/*.sql" />
     <None Include="..\..\FluentMigrator.snk" Link="FluentMigrator.snk" />
   </ItemGroup>
-
   <ItemGroup>
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="5.12.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.0.1" />
@@ -33,7 +28,6 @@
     <PackageReference Include="Shouldly" Version="3.0.0" />
     <PackageReference Include="System.Data.SQLite" Version="1.0.108" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\..\src\FluentMigrator.Console\FluentMigrator.Console.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.Db2\FluentMigrator.Runner.Db2.csproj" />
@@ -47,7 +41,6 @@
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.SqlServerCe\FluentMigrator.Runner.SqlServerCe.csproj" />
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.SqlServer\FluentMigrator.Runner.SqlServer.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <Reference Include="Sap.Data.Hana.v3.5">
       <HintPath>..\..\lib\Hana\Sap.Data.Hana.v3.5.dll</HintPath>
@@ -56,7 +49,6 @@
       <HintPath>..\..\lib\SQLServerCE4\System.Data.SqlServerCe.dll</HintPath>
     </Reference>
   </ItemGroup>
-
   <ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
@@ -68,9 +60,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
   </ItemGroup>
-
 </Project>

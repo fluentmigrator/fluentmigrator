@@ -29,7 +29,9 @@ namespace FluentMigrator.Builders.Create.Index
         ICreateIndexOnColumnOrInSchemaSyntax,
         ICreateIndexColumnOptionsSyntax,
         ICreateIndexOptionsSyntax,
-        ISupportAdditionalFeatures
+        ISupportAdditionalFeatures,
+        ICreateIndexColumnUniqueOptionsSyntax,
+        ICreateIndexMoreColumnOptionsSyntax
     {
         public CreateIndexExpressionBuilder(CreateIndexExpression expression)
             : base(expression)
@@ -64,25 +66,25 @@ namespace FluentMigrator.Builders.Create.Index
             return this;
         }
 
-        public ICreateIndexOnColumnSyntax Ascending()
+        public ICreateIndexMoreColumnOptionsSyntax Ascending()
         {
             CurrentColumn.Direction = Direction.Ascending;
             return this;
         }
 
-        public ICreateIndexOnColumnSyntax Descending()
+        public ICreateIndexMoreColumnOptionsSyntax Descending()
         {
             CurrentColumn.Direction = Direction.Descending;
             return this;
         }
 
-        ICreateIndexOnColumnSyntax ICreateIndexColumnOptionsSyntax.Unique()
+        public ICreateIndexColumnUniqueOptionsSyntax Unique()
         {
             Expression.Index.IsUnique = true;
             return this;
         }
 
-        public ICreateIndexOnColumnSyntax Unique()
+        ICreateIndexOnColumnSyntax ICreateIndexOptionsSyntax.Unique()
         {
             Expression.Index.IsUnique = true;
             return this;

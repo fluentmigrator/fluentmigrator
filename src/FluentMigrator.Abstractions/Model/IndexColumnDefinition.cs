@@ -19,13 +19,16 @@
 using System;
 using System.Collections.Generic;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Infrastructure.Extensions;
 
 namespace FluentMigrator.Model
 {
-    public class IndexColumnDefinition : ICloneable, ICanBeValidated
+    public class IndexColumnDefinition : ICloneable, ICanBeValidated, ISupportAdditionalFeatures
     {
         public virtual string Name { get; set; }
         public virtual Direction Direction { get; set; }
+
+        public virtual IDictionary<string, object> AdditionalFeatures { get; } = new Dictionary<string, object>();
 
         public virtual void CollectValidationErrors(ICollection<string> errors)
         {
@@ -35,7 +38,15 @@ namespace FluentMigrator.Model
 
         public object Clone()
         {
-            return MemberwiseClone();
+            var result = new IndexColumnDefinition()
+            {
+                Name = Name,
+                Direction = Direction,
+            };
+
+            AdditionalFeatures.CloneTo(result.AdditionalFeatures);
+
+            return result;
         }
     }
 }
