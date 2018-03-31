@@ -14,7 +14,10 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 using FluentMigrator.Builders.Create.Index;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.SqlServer
 {
@@ -66,9 +69,35 @@ namespace FluentMigrator.SqlServer
             this ICreateIndexMoreColumnOptionsSyntax expression,
             bool nullsAreDistinct = true)
         {
-            // Hopefully, the object doesn't change during the call to Unique()
             expression.CurrentColumn.AdditionalFeatures[IndexColumnNullsDistinct] = nullsAreDistinct;
             return expression;
+        }
+
+        /// <summary>
+        /// Index should have unique values, but multiple rows with null values should be accepted.
+        /// </summary>
+        /// <param name="expression">The expression to set this option for</param>
+        /// <returns>The <paramref name="expression"/></returns>
+        public static ICreateIndexOnColumnSyntax UniqueNullsNotDistinct(
+            this ICreateIndexOptionsSyntax expression)
+        {
+            return UniqueNullsDistinct(expression, false);
+        }
+
+        /// <summary>
+        /// Index should have unique values. Only one row with null value should be accepted (default for most known database engines).
+        /// </summary>
+        /// <param name="expression">The expression to set this option for</param>
+        /// <param name="nullsAreDistinct"><c>true</c> when nulls should be distinct</param>
+        /// <returns>The <paramref name="expression"/></returns>
+        public static ICreateIndexOnColumnSyntax UniqueNullsDistinct(
+            this ICreateIndexOptionsSyntax expression,
+            bool nullsAreDistinct = true)
+        {
+            var additionalFeatures = expression as ISupportAdditionalFeatures ??
+                throw new InvalidOperationException(UnsupportedMethodMessage("Nulls(Not)Distinct", nameof(ISupportAdditionalFeatures)));
+            additionalFeatures.AdditionalFeatures[IndexColumnNullsDistinct] = nullsAreDistinct;
+            return expression.Unique();
         }
     }
 }

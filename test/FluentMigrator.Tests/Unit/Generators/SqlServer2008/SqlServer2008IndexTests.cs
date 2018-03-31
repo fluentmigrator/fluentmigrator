@@ -188,6 +188,50 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
         }
 
         [Test]
+        public void CanCreateMultiColumnUniqueIndexWithNonDistinctNulls()
+        {
+            var expression = new CreateIndexExpression()
+            {
+                Index =
+                {
+                    Name = GeneratorTestHelper.TestIndexName,
+                }
+            };
+
+            var builder = new CreateIndexExpressionBuilder(expression);
+            builder
+                .OnTable(GeneratorTestHelper.TestTableName1)
+                .OnColumn(GeneratorTestHelper.TestColumnName1).Ascending()
+                .OnColumn(GeneratorTestHelper.TestColumnName2).Descending()
+                .WithOptions().UniqueNullsNotDistinct();
+
+            var result = _generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC) WHERE [TestColumn1] IS NOT NULL AND [TestColumn2] IS NOT NULL");
+        }
+
+        [Test]
+        public void CanCreateMultiColumnUniqueIndexWithNonDistinctNullsWithSingleColumnNullsDistinct()
+        {
+            var expression = new CreateIndexExpression()
+            {
+                Index =
+                {
+                    Name = GeneratorTestHelper.TestIndexName,
+                }
+            };
+
+            var builder = new CreateIndexExpressionBuilder(expression);
+            builder
+                .OnTable(GeneratorTestHelper.TestTableName1)
+                .OnColumn(GeneratorTestHelper.TestColumnName1).Ascending().NullsDistinct()
+                .OnColumn(GeneratorTestHelper.TestColumnName2).Descending()
+                .WithOptions().UniqueNullsNotDistinct();
+
+            var result = _generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC, [TestColumn2] DESC) WHERE [TestColumn2] IS NOT NULL");
+        }
+
+        [Test]
         public void CanCreateMultiColumnUniqueIndexWithOneNonDistinctNulls()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();

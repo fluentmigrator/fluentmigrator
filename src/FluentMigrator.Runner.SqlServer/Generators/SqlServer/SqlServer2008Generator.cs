@@ -44,15 +44,21 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 return column.GetAdditionalFeature(SqlServerExtensions.IndexColumnNullsDistinct, (bool?) null);
             }
 
-            var nullDistinctColumns = index.Columns.Where(c => GetNullsDistinct(c) != null).ToList();
+            var indexNullsDistinct = index.GetAdditionalFeature(SqlServerExtensions.IndexColumnNullsDistinct, (bool?) null);
+
+            var nullDistinctColumns = index.Columns.Where(c => indexNullsDistinct != null || GetNullsDistinct(c) != null).ToList();
             if (nullDistinctColumns.Count != 0 && !index.IsUnique)
             {
+                // Should never occur
                 compatabilityMode.HandleCompatabilty("With nulls distinct can only be used for unique indexes");
                 return string.Empty;
             }
 
+            // The "Nulls (not) distinct" value of the column
+            // takes higher precedence than the value of the index
+            // itself.
             var conditions = nullDistinctColumns
-                .Where(x => (GetNullsDistinct(x) ?? true) == false)
+                .Where(x => (GetNullsDistinct(x) ?? indexNullsDistinct ?? true) == false)
                 .Select(c => $"{Quoter.QuoteColumnName(c.Name)} IS NOT NULL");
 
             var condition = string.Join(" AND ", conditions);
