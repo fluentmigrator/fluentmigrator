@@ -10,6 +10,7 @@ using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Helpers;
+using FluentMigrator.Runner.Models;
 
 namespace FluentMigrator.Runner.Processors.Firebird
 {
@@ -501,8 +502,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             truncator.Truncate(expression);
             FirebirdSchemaProvider schema = new FirebirdSchemaProvider(this);
-            TableDefinition tableDef = schema.GetTableDefinition(expression.OldName);
-            tableDef.Name = expression.NewName;
+            FirebirdTableDefinition firebirdTableDef = schema.GetTableDefinition(expression.OldName);
+            firebirdTableDef.Name = expression.NewName;
             CreateTableExpression createNew = new CreateTableExpression()
             {
                 TableName = expression.NewName,
@@ -510,7 +511,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             };
 
             //copy column definitions (nb: avoid to copy key names, because in firebird they must be globally unique, so let it rename)
-            tableDef.Columns.ToList().ForEach(x => createNew.Columns.Add(new ColumnDefinition()
+            firebirdTableDef.Columns.ToList().ForEach(x => createNew.Columns.Add(new ColumnDefinition()
             {
                 Name = x.Name,
                 DefaultValue = x.DefaultValue,
@@ -529,11 +530,11 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
             Process(createNew);
 
-            int columnCount = tableDef.Columns.Count;
-            string[] columns = tableDef.Columns.Select(x => x.Name).ToArray();
+            int columnCount = firebirdTableDef.Columns.Count;
+            string[] columns = firebirdTableDef.Columns.Select(x => x.Name).ToArray();
             InsertDataExpression data = new InsertDataExpression();
-            data.TableName = tableDef.Name;
-            data.SchemaName = tableDef.SchemaName;
+            data.TableName = firebirdTableDef.Name;
+            data.SchemaName = firebirdTableDef.SchemaName;
             using (DataSet ds = ReadTableData(String.Empty, expression.OldName))
             {
                 foreach (DataRow dr in ds.Tables[0].Rows)
