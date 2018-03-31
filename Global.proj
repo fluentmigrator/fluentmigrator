@@ -19,6 +19,14 @@
     <Compile Include="$(MSBuildThisFileDirectory)src/GlobalAssemblyInfo.cs" Link="Properties\GlobalAssemblyInfo.cs" />
   </ItemGroup>
 
+  <PropertyGroup Condition=" '$(Configuration)'=='Debug' ">
+    <NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(OutputType)' == 'library' and '$(AssemblyName)' != 'FluentMigrator.Tests' ">
+    <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
+  </PropertyGroup>
+
   <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
     <DebugType>portable</DebugType>
   </PropertyGroup>

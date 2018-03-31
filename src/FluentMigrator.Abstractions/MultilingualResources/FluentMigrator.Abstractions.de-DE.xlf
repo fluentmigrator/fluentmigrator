@@ -106,6 +106,10 @@
           <source>Update statement is missing a condition. Specify one by calling .Where() or target all rows by calling .AllRows().</source>
           <target state="final">Der Update-Anweisung fehlt eine Bedingung, wie z.B. .Where() für einen oder mehrere Datensätze oder .AllRows() für alle Datensätze.</target>
         </trans-unit>
+        <trans-unit id="MethodXMustBeCalledOnObjectImplementingY" translate="yes" xml:space="preserve">
+          <source>The {0} method must be called on an object that implements {1}.</source>
+          <target state="final">Die Methode {0} darf nur auf einem Objekt aufgerufen werden, dass {1} implementiert.</target>
+        </trans-unit>
       </group>
     </body>
   </file>

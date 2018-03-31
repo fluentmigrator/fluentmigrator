@@ -25,10 +25,12 @@ namespace FluentMigrator.SqlAnywhere
     {
         public const string ConstraintType = "SqlAnywhereConstraintType";
         public const string SchemaPassword = "SqlAnywhereSchemaPassword";
+        public const string WithNullsDistinct = "SqlAnywhereNullsDistinct";
 
         private static void SetConstraintType(ICreateConstraintOptionsSyntax expression, SqlAnywhereConstraintType type)
         {
-            if (!(expression is ISupportAdditionalFeatures additionalFeatures)) throw new InvalidOperationException(type + " must be called on an object that implements ISupportAdditionalFeatures.");
+            if (!(expression is ISupportAdditionalFeatures additionalFeatures))
+                throw new InvalidOperationException(UnsupportedMethodMessage(type, nameof(ISupportAdditionalFeatures)));
 
             additionalFeatures.AdditionalFeatures[ConstraintType] = type;
         }
@@ -41,6 +43,12 @@ namespace FluentMigrator.SqlAnywhere
         public static void NonClustered(this ICreateConstraintOptionsSyntax expression)
         {
             SetConstraintType(expression, SqlAnywhereConstraintType.NonClustered);
+        }
+
+        private static string UnsupportedMethodMessage(object methodName, string interfaceName)
+        {
+            var msg = string.Format(ErrorMessages.MethodXMustBeCalledOnObjectImplementingY, methodName, interfaceName);
+            return msg;
         }
     }
 }

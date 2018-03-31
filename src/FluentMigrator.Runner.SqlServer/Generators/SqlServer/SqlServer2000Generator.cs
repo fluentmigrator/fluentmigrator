@@ -203,10 +203,10 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         }
 
         private readonly IEnumerable<string> _supportedAdditionalFeatures = new List<string> 
-        { 
+        {
             SqlServerExtensions.IdentityInsert,
-            SqlServerExtensions.IdentitySeed, 
-            SqlServerExtensions.IdentityIncrement, 
+            SqlServerExtensions.IdentitySeed,
+            SqlServerExtensions.IdentityIncrement,
             SqlServerExtensions.ConstraintType
         };
     }

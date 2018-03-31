@@ -153,6 +153,9 @@
   <data name="IndexNameCannotBeNullOrEmpty" xml:space="preserve">
     <value>The index's name cannot be null or an empty string.</value>
   </data>
+  <data name="MethodXMustBeCalledOnObjectImplementingY" xml:space="preserve">
+    <value>The {0} method must be called on an object that implements {1}.</value>
+  </data>
   <data name="NewColumnNameCannotBeNullOrEmpty" xml:space="preserve">
     <value>The new column name cannot be null or empty.</value>
   </data>

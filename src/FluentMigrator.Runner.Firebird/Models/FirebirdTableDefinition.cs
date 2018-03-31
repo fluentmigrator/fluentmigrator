@@ -16,12 +16,22 @@
 //
 #endregion
 
-namespace FluentMigrator.Builders.Create.Index
+
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.Model;
+
+namespace FluentMigrator.Runner.Models
 {
-    public interface ICreateIndexColumnOptionsSyntax
+    internal class FirebirdTableDefinition
     {
-        ICreateIndexMoreColumnOptionsSyntax Ascending();
-        ICreateIndexMoreColumnOptionsSyntax Descending();
-        ICreateIndexColumnUniqueOptionsSyntax Unique();
+        public string Name { get; set; }
+        public string SchemaName { get; set; }
+        public ICollection<ColumnDefinition> Columns { get; set; } = new List<ColumnDefinition>();
+        public ICollection<ForeignKeyDefinition> ForeignKeys { get; set; } = new List<ForeignKeyDefinition>();
+        public ICollection<IndexDefinition> Indexes { get; set; } = new List<IndexDefinition>();
     }
 }
