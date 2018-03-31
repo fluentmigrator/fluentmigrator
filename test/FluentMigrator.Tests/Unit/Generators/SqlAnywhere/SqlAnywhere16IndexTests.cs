@@ -1,4 +1,7 @@
+using FluentMigrator.Builders.Create.Index;
+using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.SqlAnywhere;
+using FluentMigrator.SqlAnywhere;
 
 using NUnit.Framework;
 using NUnit.Should;
@@ -6,6 +9,7 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
 {
     [TestFixture]
+    [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Index")]
     public class SqlAnywhere16IndexTests : BaseIndexTests
     {
         protected SqlAnywhere16Generator Generator;
@@ -17,7 +21,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Index")]
         public override void CanCreateIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
@@ -28,7 +31,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Index")]
         public override void CanCreateIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateIndexExpression();
@@ -38,7 +40,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Index")]
         public override void CanCreateMultiColumnIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
@@ -49,7 +50,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Index")]
         public override void CanCreateMultiColumnIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnCreateIndexExpression();
@@ -59,7 +59,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Index")]
         public override void CanCreateMultiColumnUniqueIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
@@ -70,7 +69,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Index")]
         public override void CanCreateMultiColumnUniqueIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueMultiColumnIndexExpression();
@@ -80,7 +78,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Index")]
         public override void CanCreateUniqueIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
@@ -91,7 +88,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Index")]
         public override void CanCreateUniqueIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueIndexExpression();
@@ -101,7 +97,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Index")]
         public override void CanDropIndexWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
@@ -112,13 +107,56 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Index")]
         public override void CanDropIndexWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteIndexExpression();
 
             var result = Generator.Generate(expression);
             result.ShouldBe("DROP INDEX [dbo].[TestTable1].[TestIndex]");
+        }
+
+        [Test]
+        public void CanCreateUniqueIndexWithNonDistinctNulls()
+        {
+            var expression = new CreateIndexExpression()
+            {
+                Index =
+                {
+                    Name = GeneratorTestHelper.TestIndexName,
+                }
+            };
+
+            var builder = new CreateIndexExpressionBuilder(expression);
+            builder
+                .OnTable(GeneratorTestHelper.TestTableName1)
+                .OnColumn(GeneratorTestHelper.TestColumnName1)
+                .Ascending()
+                .WithOptions().UniqueNullsNotDistinct();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WITH NULLS NOT DISTINCT");
+        }
+
+        [Test]
+        public void CanCreateUniqueIndexWithDistinctNulls()
+        {
+            var expression = new CreateIndexExpression()
+            {
+                Index =
+                {
+                    Name = GeneratorTestHelper.TestIndexName,
+                }
+            };
+
+            var builder = new CreateIndexExpressionBuilder(expression);
+            builder
+                .OnTable(GeneratorTestHelper.TestTableName1)
+                .OnColumn(GeneratorTestHelper.TestColumnName1)
+                .Ascending()
+                .WithOptions().UniqueNullsDistinct();
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("CREATE UNIQUE INDEX [TestIndex] ON [dbo].[TestTable1] ([TestColumn1] ASC) WITH NULLS DISTINCT");
         }
     }
 }

@@ -22,6 +22,7 @@ using System.Linq;
 using System.Text;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.Model;
 using FluentMigrator.SqlAnywhere;
@@ -50,7 +51,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 
         public override string RenameTable => "ALTER TABLE {0} RENAME {1}";
 
-        public override string CreateIndex => "CREATE {0}{1}INDEX {2} ON {3}.{4} ({5})";
+        public override string CreateIndex => "CREATE {0}{1}INDEX {2} ON {3}.{4} ({5}){6}";
 
         public override string DropIndex => "DROP INDEX {0}.{1}.{2}";
 
@@ -308,6 +309,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             {
                 foreignColumns.Add(Quoter.QuoteColumnName(column));
             }
+
             return string.Format(
                 CreateForeignKeyConstraint,
                 Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema),
@@ -345,7 +347,8 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
                 , Quoter.QuoteIndexName(expression.Index.Name)
                 , Quoter.QuoteSchemaName(expression.Index.SchemaName)
                 , Quoter.QuoteTableName(expression.Index.TableName)
-                , String.Join(", ", indexColumns));
+                , string.Join(", ", indexColumns)
+                , GetWithNullsDistinctString(expression.Index));
         }
 
         public override string Generate(DeleteIndexExpression expression)
@@ -390,9 +393,26 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             return _supportedAdditionalFeatures.Any(x => x == feature);
         }
 
+        protected virtual string GetWithNullsDistinctString(IndexDefinition index)
+        {
+            var indexNullsDistinct = index.GetAdditionalFeature(SqlAnywhereExtensions.WithNullsDistinct, (bool?)null);
+
+            if (indexNullsDistinct == null)
+                return string.Empty;
+
+            if (indexNullsDistinct.Value)
+            {
+                return " WITH NULLS DISTINCT";
+            }
+
+            return " WITH NULLS NOT DISTINCT";
+        }
+
         private readonly IEnumerable<string> _supportedAdditionalFeatures = new List<string>
         {
-            SqlAnywhereExtensions.ConstraintType
+            SqlAnywhereExtensions.ConstraintType,
+            SqlAnywhereExtensions.SchemaPassword,
+            SqlAnywhereExtensions.WithNullsDistinct,
         };
 
         private string ComposeStatements(string ddlStatement, IEnumerable<string> otherStatements)

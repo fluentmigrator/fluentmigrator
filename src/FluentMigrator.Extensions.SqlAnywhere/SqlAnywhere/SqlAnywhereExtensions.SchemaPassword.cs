@@ -26,7 +26,8 @@ namespace FluentMigrator.SqlAnywhere
     {
         public static ICreateSchemaOptionsSyntax Password(this ICreateSchemaOptionsSyntax expression, string password)
         {
-            var additionalFeatures = expression as ISupportAdditionalFeatures ?? throw new InvalidOperationException("The Password method must be called on an object that implements ISupportAdditionalFeatures.");
+            var additionalFeatures = expression as ISupportAdditionalFeatures ??
+                throw new InvalidOperationException(UnsupportedMethodMessage(nameof(Password), nameof(ISupportAdditionalFeatures)));
             additionalFeatures.SetAdditionalFeature(SchemaPassword, password);
             return expression;
         }
