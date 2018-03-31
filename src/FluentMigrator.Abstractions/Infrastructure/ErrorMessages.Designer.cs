@@ -169,6 +169,15 @@ namespace FluentMigrator.Infrastructure {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die The {0} method must be called on an object that implements {1}. ähnelt.
+        /// </summary>
+        internal static string MethodXMustBeCalledOnObjectImplementingY {
+            get {
+                return ResourceManager.GetString("MethodXMustBeCalledOnObjectImplementingY", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die The new column name cannot be null or empty. ähnelt.
         /// </summary>
         internal static string NewColumnNameCannotBeNullOrEmpty {

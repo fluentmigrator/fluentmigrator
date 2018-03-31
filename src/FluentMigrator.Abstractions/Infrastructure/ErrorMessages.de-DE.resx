@@ -87,4 +87,7 @@
   <data name="UpdateDataExpressionMustSpecifyWhereClauseOrAllRows" xml:space="preserve">
     <value>Der Update-Anweisung fehlt eine Bedingung, wie z.B. .Where() für einen oder mehrere Datensätze oder .AllRows() für alle Datensätze.</value>
   </data>
+  <data name="MethodXMustBeCalledOnObjectImplementingY" xml:space="preserve">
+    <value>Die Methode {0} darf nur auf einem Objekt aufgerufen werden, dass {1} implementiert.</value>
+  </data>
 </root>
