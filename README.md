@@ -1,3 +1,7 @@
+# Contribution
+
+Every contributor implicitly transfers the copyright for its changes of the project (e.g. pull requests or patch sets) to the "Fluent Migrator Project" itself.
+
 # Goals and changes for 2.x
 
 ## New features
