@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Firebird
@@ -30,6 +30,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             SetTypeMap(DbType.Currency, "DECIMAL(18, 4)");
             SetTypeMap(DbType.Date, "DATE");
             SetTypeMap(DbType.DateTime, "TIMESTAMP");
+            SetTypeMap(DbType.DateTime2, "TIMESTAMP");
             SetTypeMap(DbType.Decimal, "DECIMAL(18, 4)");
             SetTypeMap(DbType.Decimal, "DECIMAL($size, $precision)", DecimalCapacity);
             SetTypeMap(DbType.Double, "DOUBLE PRECISION"); //64 bit double precision

@@ -1,4 +1,4 @@
-﻿
+
 
 namespace FluentMigrator.Runner.Generators.SQLite
 {
@@ -38,6 +38,7 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
             SetTypeMap(DbType.Date, "DATETIME");
             SetTypeMap(DbType.DateTime, "DATETIME");
+            SetTypeMap(DbType.DateTime2, "DATETIME");
             SetTypeMap(DbType.Time, "DATETIME");
             SetTypeMap(DbType.Boolean, "INTEGER");
             SetTypeMap(DbType.Guid, "UNIQUEIDENTIFIER");

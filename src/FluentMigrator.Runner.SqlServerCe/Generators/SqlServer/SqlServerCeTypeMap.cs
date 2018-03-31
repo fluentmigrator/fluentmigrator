@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // 
 // Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
 // Copyright (c) 2010, Nathan Brown
@@ -44,6 +44,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             SetTypeMap(DbType.Currency, "MONEY");
             SetTypeMap(DbType.Date, "DATETIME");
             SetTypeMap(DbType.DateTime, "DATETIME");
+            SetTypeMap(DbType.DateTime2, "DATETIME");
             SetTypeMap(DbType.Decimal, "NUMERIC(19,5)");
             SetTypeMap(DbType.Decimal, "NUMERIC($size,$precision)", DecimalCapacity);
             SetTypeMap(DbType.Double, "FLOAT");

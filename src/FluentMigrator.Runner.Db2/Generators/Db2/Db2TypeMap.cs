@@ -1,4 +1,4 @@
-﻿namespace FluentMigrator.Runner.Generators.DB2
+namespace FluentMigrator.Runner.Generators.DB2
 {
     using System.Data;
 
@@ -30,6 +30,7 @@
             this.SetTypeMap(DbType.Time, "TIME");
             this.SetTypeMap(DbType.Date, "DATE");
             this.SetTypeMap(DbType.DateTime, "TIMESTAMP");
+            this.SetTypeMap(DbType.DateTime2, "TIMESTAMP");
             this.SetTypeMap(DbType.Decimal, "NUMERIC(19,5)");
             this.SetTypeMap(DbType.Decimal, "NUMERIC($size,$precision)", 31);
             this.SetTypeMap(DbType.Decimal, "DECIMAL(19,5)");
