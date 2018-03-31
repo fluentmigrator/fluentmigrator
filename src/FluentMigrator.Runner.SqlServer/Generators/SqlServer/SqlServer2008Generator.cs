@@ -16,6 +16,7 @@
 //
 #endregion
 
+using System.Collections.Generic;
 using System.Linq;
 
 using FluentMigrator.Expressions;
@@ -27,6 +28,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 {
     public class SqlServer2008Generator : SqlServer2005Generator
     {
+        private static readonly HashSet<string> _supportedAdditionalFeatures = new HashSet<string>
+        {
+            SqlServerExtensions.IndexColumnNullsDistinct,
+        };
+
         public SqlServer2008Generator()
             : base(new SqlServer2008Column(new SqlServer2008TypeMap()), new SqlServer2005DescriptionGenerator())
         {
@@ -35,6 +41,12 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         protected SqlServer2008Generator(IColumn column, IDescriptionGenerator descriptionGenerator)
             :base(column, descriptionGenerator)
         {
+        }
+
+        public override bool IsAdditionalFeatureSupported(string feature)
+        {
+            return _supportedAdditionalFeatures.Contains(feature)
+             || base.IsAdditionalFeatureSupported(feature);
         }
 
         public virtual string GetWithNullsDistinctString(IndexDefinition index)

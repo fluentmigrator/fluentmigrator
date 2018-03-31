@@ -32,6 +32,13 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
     public class SqlServer2005Generator : SqlServer2000Generator
     {
+        private static readonly HashSet<string> _supportedAdditionalFeatures = new HashSet<string>
+        {
+            SqlServerExtensions.IncludesList,
+            SqlServerExtensions.OnlineIndex,
+            SqlServerExtensions.RowGuidColumn,
+        };
+
         public SqlServer2005Generator()
             : base(new SqlServer2005Column(new SqlServer2005TypeMap()), new SqlServer2005DescriptionGenerator())
         {
@@ -80,6 +87,12 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             }
 
             return string.Join(", ", items);
+        }
+
+        public override bool IsAdditionalFeatureSupported(string feature)
+        {
+            return _supportedAdditionalFeatures.Contains(feature)
+             || base.IsAdditionalFeatureSupported(feature);
         }
 
         public override string Generate(CreateTableExpression expression)
