@@ -40,10 +40,10 @@ msbuild ./FluentMigrator.sln /v:m  /t:Pack /p:PackageOutputPath="/tmp/fluentmigr
 
 * [ ] Port sample application
 * [ ] Test [PR #798](https://github.com/fluentmigrator/fluentmigrator/pull/798)
-* [ ] Implement Distinct NULL unique constraints for SQL Anywhere, affected by:
-  * [ ] [Support SQLAnywhere](https://github.com/fluentmigrator/fluentmigrator/pull/659)
-  * [ ] [Unique index with support for multiple null values per column](https://github.com/fluentmigrator/fluentmigrator/pull/717)
-  * [ ] [Unique index with support for multiple null values](https://github.com/fluentmigrator/fluentmigrator/pull/716)
+* [x] Implement Distinct NULL unique constraints for SQL Anywhere, affected by:
+  * [x] [Support SQLAnywhere](https://github.com/fluentmigrator/fluentmigrator/pull/659)
+  * [x] [Unique index with support for multiple null values per column](https://github.com/fluentmigrator/fluentmigrator/pull/717)
+  * [x] [Unique index with support for multiple null values](https://github.com/fluentmigrator/fluentmigrator/pull/716)
 * [x] [Travis CI](https://travis-ci.org/fluentmigrator/fluentmigrator)
 * [x] [JetBrains TeamCity Build Server](https://teamcity.jetbrains.com/project.html?projectId=FluentMigrator)
 
@@ -105,12 +105,6 @@ msbuild ./FluentMigrator.sln /v:m  /t:Pack /p:PackageOutputPath="/tmp/fluentmigr
 
 ## Not sure about priority/effort/correctness
 
-* [Feature/idempotent migrations](https://github.com/fluentmigrator/fluentmigrator/pull/664)
-  seems to be SQL Server specific, but PR changes generic structures.
-* [Update column data with other column in the same table](https://github.com/fluentmigrator/fluentmigrator/pull/695):
-  not sure if it's really useful, because a custom SQL statement seems to be a better fit.
-* [Unique index with support for multiple null values per column](https://github.com/fluentmigrator/fluentmigrator/pull/717)
-* [Unique index with support for multiple null values](https://github.com/fluentmigrator/fluentmigrator/pull/716)
 * [Execute.Sql option to enable echoing command; changed timestamps](https://github.com/fluentmigrator/fluentmigrator/pull/742):
   This PR changes two things at once and I'm not sure if using CURRENT_TIMESTAMP works everywhere. Investigation needed.
 * [use unique constraint instead of unique index in ColumnExpressionBuilderHelper.Unique](https://github.com/fluentmigrator/fluentmigrator/pull/753)
@@ -118,5 +112,3 @@ msbuild ./FluentMigrator.sln /v:m  /t:Pack /p:PackageOutputPath="/tmp/fluentmigr
 * [Add Delete.UniqueConstraint() based on conventions name](https://github.com/fluentmigrator/fluentmigrator/pull/754)
   is interesting. Does it have a relation to PR #753?
 * [Refactor tests](https://github.com/fluentmigrator/fluentmigrator/pull/784)
-* [Migration gate date](https://github.com/fluentmigrator/fluentmigrator/pull/796):
-  maybe something more generic would be useful?
