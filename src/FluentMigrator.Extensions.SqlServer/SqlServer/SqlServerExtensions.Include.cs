@@ -43,7 +43,7 @@ namespace FluentMigrator.SqlServer
         internal static void Include(this ISupportAdditionalFeatures additionalFeatures, string columnName)
         {
             if (additionalFeatures == null)
-                throw new InvalidOperationException("The Include method must be called on an object that implements IColumnExpressionBuilder.");
+                throw new InvalidOperationException(UnsupportedMethodMessage(nameof(Include), nameof(ISupportAdditionalFeatures)));
             var includes = additionalFeatures.GetAdditionalFeature<IList<IndexIncludeDefinition>>(IncludesList, () => new List<IndexIncludeDefinition>());
             includes.Add(new IndexIncludeDefinition { Name = columnName });
         }

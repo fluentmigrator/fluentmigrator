@@ -39,7 +39,8 @@ namespace FluentMigrator.SqlServer
         /// </param>
         public static IDeleteIndexOptionsSyntax Online(this IDeleteIndexOptionsSyntax expression, bool active = true)
         {
-            var additionalFeatures = expression as ISupportAdditionalFeatures ?? throw new InvalidOperationException("The Online method must be called on an object that implements ISupportAdditionalFeatures.");
+            var additionalFeatures = expression as ISupportAdditionalFeatures ??
+                throw new InvalidOperationException(UnsupportedMethodMessage(nameof(Online), nameof(ISupportAdditionalFeatures)));
             additionalFeatures.AdditionalFeatures[OnlineIndex] = active;
             return expression;
         }
@@ -57,7 +58,8 @@ namespace FluentMigrator.SqlServer
         /// </param>
         public static IDeleteConstraintInSchemaOptionsSyntax Online(this IDeleteConstraintInSchemaOptionsSyntax expression, bool active = true)
         {
-            var additionalFeatures = expression as ISupportAdditionalFeatures ?? throw new InvalidOperationException("The Online method must be called on an object that implements ISupportAdditionalFeatures.");
+            var additionalFeatures = expression as ISupportAdditionalFeatures ??
+                throw new InvalidOperationException(UnsupportedMethodMessage(nameof(Online), nameof(ISupportAdditionalFeatures)));
             additionalFeatures.AdditionalFeatures[OnlineIndex] = active;
             return expression;
         }
@@ -75,7 +77,8 @@ namespace FluentMigrator.SqlServer
         /// </param>
         public static ICreateIndexOptionsSyntax Online(this ICreateIndexOptionsSyntax expression, bool active = true)
         {
-            var additionalFeatures = expression as ISupportAdditionalFeatures ?? throw new InvalidOperationException("The Online method must be called on an object that implements ISupportAdditionalFeatures.");
+            var additionalFeatures = expression as ISupportAdditionalFeatures ??
+                throw new InvalidOperationException(UnsupportedMethodMessage(nameof(Online), nameof(ISupportAdditionalFeatures)));
             additionalFeatures.AdditionalFeatures[OnlineIndex] = active;
             return expression;
         }
@@ -93,7 +96,8 @@ namespace FluentMigrator.SqlServer
         /// </param>
         public static ICreateConstraintOptionsSyntax Online(this ICreateConstraintOptionsSyntax expression, bool active = true)
         {
-            var additionalFeatures = expression as ISupportAdditionalFeatures ?? throw new InvalidOperationException("The Online method must be called on an object that implements ISupportAdditionalFeatures.");
+            var additionalFeatures = expression as ISupportAdditionalFeatures ??
+                throw new InvalidOperationException(UnsupportedMethodMessage(nameof(Online), nameof(ISupportAdditionalFeatures)));
             additionalFeatures.AdditionalFeatures[OnlineIndex] = active;
             return expression;
         }

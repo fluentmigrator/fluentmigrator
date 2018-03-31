@@ -42,18 +42,16 @@ namespace FluentMigrator.SqlServer
         /// <returns></returns>
         public static IInsertDataSyntax WithIdentityInsert(this IInsertDataSyntax expression)
         {
-            ISupportAdditionalFeatures castExpression = expression as ISupportAdditionalFeatures;
-            if (castExpression == null)
-            {
-                throw new InvalidOperationException("WithIdentityInsert must be called on an object that implements ISupportAdditionalFeatures.");
-            }
+            var castExpression = expression as ISupportAdditionalFeatures ??
+                throw new InvalidOperationException(UnsupportedMethodMessage(nameof(WithIdentityInsert), nameof(ISupportAdditionalFeatures)));
             castExpression.AdditionalFeatures[IdentityInsert] = true;
             return expression;
         }
 
         private static void SetConstraintType(ICreateConstraintOptionsSyntax expression, SqlServerConstraintType type)
         {
-            if (!(expression is ISupportAdditionalFeatures additionalFeatures)) throw new InvalidOperationException(type + " must be called on an object that implements ISupportAdditionalFeatures.");
+            if (!(expression is ISupportAdditionalFeatures additionalFeatures))
+                throw new InvalidOperationException(UnsupportedMethodMessage(type, nameof(ISupportAdditionalFeatures)));
 
             additionalFeatures.AdditionalFeatures[ConstraintType] = type;
         }
@@ -70,16 +68,16 @@ namespace FluentMigrator.SqlServer
 
         public static ICreateTableColumnOptionOrWithColumnSyntax RowGuid(this ICreateTableColumnOptionOrWithColumnSyntax expression)
         {
-            var columnExpression = expression as IColumnExpressionBuilder ?? throw new InvalidOperationException("The Include method must be called on an object that implements IColumnExpressionBuilder.");
+            var columnExpression = expression as IColumnExpressionBuilder ??
+                throw new InvalidOperationException(UnsupportedMethodMessage(nameof(RowGuid), nameof(IColumnExpressionBuilder)));
             columnExpression.Column.AdditionalFeatures[RowGuidColumn] = true;
             return expression;
         }
 
-        private static ISupportAdditionalFeatures GetColumn<TNext, TNextFk>(IColumnOptionSyntax<TNext, TNextFk> expression) where TNext : IFluentSyntax where TNextFk : IFluentSyntax
+        private static string UnsupportedMethodMessage(object methodName, string interfaceName)
         {
-            if (expression is IColumnExpressionBuilder cast1) return cast1.Column;
-
-            throw new InvalidOperationException("The seeded identity method can only be called on a valid object.");
+            var msg = string.Format(ErrorMessages.MethodXMustBeCalledOnObjectImplementingY, methodName, interfaceName);
+            return msg;
         }
     }
 }

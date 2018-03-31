@@ -68,5 +68,13 @@ namespace FluentMigrator.SqlServer
             castColumn.AdditionalFeatures[IdentityIncrement] = increment;
             return expression.Identity();
         }
+
+        private static ISupportAdditionalFeatures GetColumn<TNext, TNextFk>(IColumnOptionSyntax<TNext, TNextFk> expression) where TNext : IFluentSyntax where TNextFk : IFluentSyntax
+        {
+            if (expression is IColumnExpressionBuilder cast1)
+                return cast1.Column;
+
+            throw new InvalidOperationException(UnsupportedMethodMessage(nameof(IdentityIncrement), nameof(IColumnExpressionBuilder)));
+        }
     }
 }
