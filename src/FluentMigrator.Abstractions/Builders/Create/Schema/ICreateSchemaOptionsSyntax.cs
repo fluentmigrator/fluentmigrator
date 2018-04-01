@@ -14,9 +14,11 @@
 // limitations under the License.
 #endregion
 
+using FluentMigrator.Infrastructure;
+
 namespace FluentMigrator.Builders.Create.Schema
 {
-    public interface ICreateSchemaOptionsSyntax
+    public interface ICreateSchemaOptionsSyntax : IFluentSyntax
     {
     }
 }

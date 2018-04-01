@@ -14,9 +14,11 @@
 // limitations under the License.
 #endregion
 
+using FluentMigrator.Infrastructure;
+
 namespace FluentMigrator.Builders.Delete.Constraint
 {
-    public interface IDeleteConstraintInSchemaOptionsSyntax
+    public interface IDeleteConstraintInSchemaOptionsSyntax : IFluentSyntax
     {
         IDeleteConstraintInSchemaOptionsSyntax InSchema(string schemaName);
     }

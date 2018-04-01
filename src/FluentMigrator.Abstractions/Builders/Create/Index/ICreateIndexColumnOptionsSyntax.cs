@@ -16,9 +16,11 @@
 //
 #endregion
 
+using FluentMigrator.Infrastructure;
+
 namespace FluentMigrator.Builders.Create.Index
 {
-    public interface ICreateIndexColumnOptionsSyntax
+    public interface ICreateIndexColumnOptionsSyntax : IFluentSyntax
     {
         ICreateIndexMoreColumnOptionsSyntax Ascending();
         ICreateIndexMoreColumnOptionsSyntax Descending();

@@ -14,9 +14,11 @@
 // limitations under the License.
 #endregion
 
+using FluentMigrator.Infrastructure;
+
 namespace FluentMigrator.Builders.Delete.Index
 {
-    public interface IDeleteIndexOptionsSyntax
+    public interface IDeleteIndexOptionsSyntax : IFluentSyntax
     {
     }
 }
