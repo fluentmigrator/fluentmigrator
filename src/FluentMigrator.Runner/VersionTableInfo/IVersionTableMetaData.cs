@@ -1,5 +1,4 @@
 #region License
-
 //
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 //
@@ -15,23 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-
 #endregion
 
-namespace FluentMigrator.VersionTableInfo
+namespace FluentMigrator.Runner.VersionTableInfo
 {
-    public class DefaultVersionTableMetaData : IVersionTableMetaData
+    public interface IVersionTableMetaData
     {
-        public DefaultVersionTableMetaData()
-            : this(string.Empty)
-        {
-        }
-
-        public DefaultVersionTableMetaData(string schemaName)
-        {
-            SchemaName = schemaName ?? string.Empty;
-        }
-
         /// <summary>
         /// Provides access to <code>ApplicationContext</code> object.
         /// </summary>
@@ -40,20 +28,13 @@ namespace FluentMigrator.VersionTableInfo
         /// implementing <code>IVersionTableMetaData</code> and before any of properties of <code>IVersionTableMetaData</code>
         /// is called. Properties can use <code>ApplicationContext</code> value to implement context-depending logic.
         /// </remarks>
-        public object ApplicationContext { get; set; }
-
-        public virtual string SchemaName { get; }
-
-        public virtual string TableName => "VersionInfo";
-
-        public virtual string ColumnName => "Version";
-
-        public virtual string UniqueIndexName => "UC_Version";
-
-        public virtual string AppliedOnColumnName => "AppliedOn";
-
-        public virtual string DescriptionColumnName => "Description";
-
-        public virtual bool OwnsSchema => true;
+        object ApplicationContext { get; set; }
+        bool OwnsSchema { get; }
+        string SchemaName { get; }
+        string TableName { get; }
+        string ColumnName { get; }
+        string DescriptionColumnName { get; }
+        string UniqueIndexName { get; }
+        string AppliedOnColumnName { get; }
     }
 }

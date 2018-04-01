@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -18,17 +18,20 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Tests.Integration.Migrations;
+
 using Moq;
+
 using NUnit.Framework;
 using NUnit.Should;
-using System.Linq;
 
 namespace FluentMigrator.Tests.Unit
 {
@@ -219,7 +222,7 @@ namespace FluentMigrator.Tests.Unit
             _processorMock.Setup(x => x.Process(It.IsAny<CreateTableExpression>())).Throws(new Exception("Oops"));
 
             var exception = Assert.Throws<Exception>(() => _runner.Up(new TestMigration()));
-            
+
             Assert.That(exception.Message, Does.Contain("Oops"));
         }
 
@@ -417,7 +420,7 @@ namespace FluentMigrator.Tests.Unit
             _fakeVersionLoader.LoadVersionInfo();
 
             _runner.RollbackToVersion(2011010101);
-            
+
             _fakeVersionLoader.Versions.ShouldContain(fakeMigration1);
             _fakeVersionLoader.Versions.ShouldContain(fakeMigration2);
             _fakeVersionLoader.Versions.ShouldNotContain(fakeMigration3);
@@ -504,7 +507,7 @@ namespace FluentMigrator.Tests.Unit
 
             _announcer.Verify(a => a.Say("Version ordering valid."));
 
-            _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();		
+            _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();
         }
 
         [Test]
@@ -526,7 +529,7 @@ namespace FluentMigrator.Tests.Unit
 
             _announcer.Verify(a => a.Say("Version ordering valid."));
 
-            _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();		
+            _fakeVersionLoader.DidRemoveVersionTableGetCalled.ShouldBeFalse();
         }
 
         [Test]
@@ -541,7 +544,7 @@ namespace FluentMigrator.Tests.Unit
             var mockMigration2 = new Mock<IMigration>();
             var mockMigration3 = new Mock<IMigration>();
             var mockMigration4 = new Mock<IMigration>();
-            
+
             LoadVersionData(version1, version4);
 
             _migrationList.Clear();

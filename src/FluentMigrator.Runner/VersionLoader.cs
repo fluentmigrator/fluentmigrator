@@ -25,7 +25,7 @@ using System.Reflection;
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Versioning;
-using FluentMigrator.VersionTableInfo;
+using FluentMigrator.Runner.VersionTableInfo;
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Runner

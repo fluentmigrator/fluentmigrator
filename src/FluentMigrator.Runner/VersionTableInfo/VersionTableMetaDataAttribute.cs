@@ -18,7 +18,7 @@
 
 using System;
 
-namespace FluentMigrator.VersionTableInfo
+namespace FluentMigrator.Runner.VersionTableInfo
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class VersionTableMetaDataAttribute : Attribute
