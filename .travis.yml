@@ -18,5 +18,5 @@ script:
   - msbuild ./FluentMigrator.sln /v:m /p:VersionSuffix="$VERSION_SUFFIX"
   - dotnet vstest test/FluentMigrator.Tests/bin/Debug/net47/FluentMigrator.Tests.dll --TestCaseFilter:'TestCategory!=NotWorkingOnMono&(TestCategory!=Integration|(TestCategory=Integration&(TestCategory=SQLite)))'
   - rm -f "$TRAVIS_BUILD_DIR/output"/*
-  - msbuild ./FluentMigrator.sln /v:m /p:VersionSuffix="$VERSION_SUFFIX" /t:Pack /p:PackageOutputPath="$TRAVIS_BUILD_DIR/output"
+  - msbuild ./FluentMigrator.sln /v:m /p:VersionSuffix="$VERSION_SUFFIX" /t:Pack /p:PackageOutputPath="$TRAVIS_BUILD_DIR/output" /p:Configuration=Release
   - for pkg in output/* ; do [ -e "$pkg" ] || continue; nuget push "$pkg" "$MYGET_API_KEY" -Source "https://www.myget.org/F/fluent-migrator/api/v2/package" ; done
