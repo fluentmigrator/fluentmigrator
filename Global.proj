@@ -31,7 +31,7 @@
     <DebugType>portable</DebugType> <!-- Required for EmbedSources -->
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(AssemblyName)' != 'FluentMigrator.Tests' ">
+  <ItemGroup Condition=" '$(Configuration)' == 'Release' and '$(AssemblyName)' != 'FluentMigrator.Tests' ">
     <PackageReference Include="SourceLink.Embed.AllSourceFiles" Version="2.8.0" PrivateAssets="all" />
     <PackageReference Include="SourceLink.Copy.PdbFiles" Version="2.8.0" PrivateAssets="All" />
   </ItemGroup>
