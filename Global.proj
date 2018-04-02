@@ -31,12 +31,17 @@
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <DebugType>portable</DebugType>
+  <PropertyGroup Condition=" '$(AssemblyName)' != 'FluentMigrator.Tests' ">
+    <DebugType>portable</DebugType> <!-- Required for EmbedSources -->
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DebugType>none</DebugType>
+  <ItemGroup Condition=" '$(Configuration)' == 'Release' and '$(AssemblyName)' != 'FluentMigrator.Tests' ">
+    <PackageReference Include="SourceLink.Embed.AllSourceFiles" Version="2.8.0" PrivateAssets="all" />
+    <PackageReference Include="SourceLink.Copy.PdbFiles" Version="2.8.0" PrivateAssets="All" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(AssemblyName)' == 'FluentMigrator.Tests' ">
+    <DebugType>full</DebugType>
   </PropertyGroup>
 
 </Project>

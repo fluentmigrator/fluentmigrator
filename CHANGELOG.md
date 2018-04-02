@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - SQL Server 2005
     - `WITH (ONLINE=ON/OFF)` support
     - 64 bit identity support
+  - Redshift (Amazon, experimental)
 - Unique Constraints: Non-Distinct NULL support (SQL Server 2008 and SQL Anywhere 16)
 - Types: DateTime2 support
 - Dialect: SQLite foreign key support
