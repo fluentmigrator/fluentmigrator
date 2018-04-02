@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,12 +14,9 @@
 // limitations under the License.
 #endregion
 
-using System;
-using System.Collections.ObjectModel;
-
-namespace FluentMigrator.Runner
+namespace FluentMigrator.Runner.Exceptions
 {
-    public class InvalidMigrationException : Exception
+    public class InvalidMigrationException : RunnerException
     {
         private readonly IMigration _migration;
         private readonly string _errors;
