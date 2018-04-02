@@ -28,15 +28,12 @@
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(AssemblyName)' != 'FluentMigrator.Tests' ">
-    <IncludeSymbolsInPackage>true</IncludeSymbolsInPackage>
-    <DebugSymbols>true</DebugSymbols>
     <DebugType>portable</DebugType> <!-- Required for EmbedSources -->
-    <EmbedSources>true</EmbedSources>
   </PropertyGroup>
 
   <ItemGroup Condition=" '$(AssemblyName)' != 'FluentMigrator.Tests' ">
-    <!-- Does the equivalent of EmbedSources in MSBuild (hopefully won't be needed long term) -->
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    <PackageReference Include="SourceLink.Embed.AllSourceFiles" Version="2.8.0" PrivateAssets="all" />
+    <PackageReference Include="SourceLink.Copy.PdbFiles" Version="2.8.0" PrivateAssets="All" />
   </ItemGroup>
 
   <PropertyGroup Condition=" '$(AssemblyName)' == 'FluentMigrator.Tests' ">
