@@ -1,6 +1,6 @@
-﻿#region License
+#region License
 // 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -50,6 +50,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             SetTypeMap(DbType.Currency, "NUMBER(19,4)");
             SetTypeMap(DbType.Date, "DATE");
             SetTypeMap(DbType.DateTime, "TIMESTAMP(4)");
+            SetTypeMap(DbType.DateTime2, "TIMESTAMP(4)");
             SetTypeMap(DbType.DateTimeOffset, "TIMESTAMP(4) WITH TIME ZONE");
             SetTypeMap(DbType.Decimal, "NUMBER(19,5)");
             SetTypeMap(DbType.Decimal, "NUMBER($size,$precision)", DecimalCapacity);

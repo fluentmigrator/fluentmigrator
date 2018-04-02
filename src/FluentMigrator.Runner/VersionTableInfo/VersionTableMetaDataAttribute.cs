@@ -1,6 +1,6 @@
 #region License
 // 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@
 
 using System;
 
-namespace FluentMigrator.VersionTableInfo
+namespace FluentMigrator.Runner.VersionTableInfo
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
     public class VersionTableMetaDataAttribute : Attribute

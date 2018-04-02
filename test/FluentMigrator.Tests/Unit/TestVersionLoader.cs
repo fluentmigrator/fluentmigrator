@@ -1,24 +1,40 @@
-﻿using System;
+﻿#region License
+//
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//   http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+//
+#endregion
+
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Versioning;
-using FluentMigrator.Runner.Initialization;
+using FluentMigrator.Runner.VersionTableInfo;
 
 namespace FluentMigrator.Tests.Unit
 {
     public class TestVersionLoader
         : IVersionLoader
     {
-        private VersionTableInfo.IVersionTableMetaData versionTableMetaData;
+        private IVersionTableMetaData versionTableMetaData;
 
-        public TestVersionLoader(IMigrationRunner runner, VersionTableInfo.IVersionTableMetaData versionTableMetaData)
+        public TestVersionLoader(IMigrationRunner runner, IVersionTableMetaData versionTableMetaData)
         {
             this.versionTableMetaData = versionTableMetaData;
-            this.Runner = runner;
-            this.VersionInfo = new VersionInfo();
-            this.Versions = new List<long>();
+            Runner = runner;
+            VersionInfo = new VersionInfo();
+            Versions = new List<long>();
         }
 
         public bool AlreadyCreatedVersionSchema { get; set; }
@@ -27,31 +43,31 @@ namespace FluentMigrator.Tests.Unit
 
         public void DeleteVersion(long version)
         {
-            this.Versions.Remove(version);
+            Versions.Remove(version);
         }
 
-        public VersionTableInfo.IVersionTableMetaData GetVersionTableMetaData()
+        public IVersionTableMetaData GetVersionTableMetaData()
         {
             return versionTableMetaData;
         }
 
         public void LoadVersionInfo()
         {
-            this.VersionInfo = new VersionInfo();
+            VersionInfo = new VersionInfo();
 
             foreach (var version in Versions)
             {
-                this.VersionInfo.AddAppliedMigration(version);
+                VersionInfo.AddAppliedMigration(version);
             }
 
-            this.DidLoadVersionInfoGetCalled = true;
+            DidLoadVersionInfoGetCalled = true;
         }
 
         public bool DidLoadVersionInfoGetCalled { get; private set; }
 
         public void RemoveVersionTable()
         {
-            this.DidRemoveVersionTableGetCalled = true;
+            DidRemoveVersionTableGetCalled = true;
         }
 
         public bool DidRemoveVersionTableGetCalled { get; private set; }
@@ -65,16 +81,16 @@ namespace FluentMigrator.Tests.Unit
 
         public void UpdateVersionInfo(long version, string description)
         {
-            this.Versions.Add(version);
+            Versions.Add(version);
 
-            this.DidUpdateVersionInfoGetCalled = true;
+            DidUpdateVersionInfoGetCalled = true;
         }
 
         public bool DidUpdateVersionInfoGetCalled { get; private set; }
 
-        public Runner.Versioning.IVersionInfo VersionInfo { get; set; }
+        public IVersionInfo VersionInfo { get; set; }
 
-        public VersionTableInfo.IVersionTableMetaData VersionTableMetaData
+        public IVersionTableMetaData VersionTableMetaData
         {
             get { return versionTableMetaData; }
         }

@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #endregion
 
 using System.Reflection;
+
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Initialization;
@@ -24,8 +25,9 @@ using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Versioning;
+using FluentMigrator.Runner.VersionTableInfo;
 using FluentMigrator.Tests.Unit;
-using FluentMigrator.VersionTableInfo;
+
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -71,7 +73,7 @@ namespace FluentMigrator.Tests.Integration
             {
                 var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3" }, processor);
 
-                IVersionTableMetaData tableMetaData = new TestVersionTableMetaData();
+                var tableMetaData = new TestVersionTableMetaData();
 
                 //ensure table doesn't exist
                 if (processor.TableExists(tableMetaData.SchemaName, tableMetaData.TableName))

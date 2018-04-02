@@ -51,6 +51,7 @@ namespace FluentMigrator.Runner.Generators.MySql
             SetTypeMap(DbType.Currency, "DECIMAL(19,4)");
             SetTypeMap(DbType.Date, "DATE");
             SetTypeMap(DbType.DateTime, "DATETIME");
+            SetTypeMap(DbType.DateTime2, "DATETIME");
             SetTypeMap(DbType.Decimal, "DECIMAL(19,5)");
             SetTypeMap(DbType.Decimal, "DECIMAL($size,$precision)", DecimalCapacity);
             SetTypeMap(DbType.Double, "DOUBLE");

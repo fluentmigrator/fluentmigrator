@@ -16,7 +16,7 @@
 
 namespace FluentMigrator.Builders.Delete.Constraint
 {
-    public interface IDeleteConstraintInSchemaOptionsSyntax
+    public interface IDeleteConstraintInSchemaOptionsSyntax : IDeleteConstraintColumnSyntax
     {
         IDeleteConstraintInSchemaOptionsSyntax InSchema(string schemaName);
     }

@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,7 +22,8 @@ using System.Linq;
 
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
-using FluentMigrator.VersionTableInfo;
+using FluentMigrator.Model;
+using FluentMigrator.Runner.VersionTableInfo;
 
 namespace FluentMigrator.Runner.Infrastructure
 {

@@ -1,6 +1,6 @@
-﻿#region License
+#region License
 // 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 // Copyright (c) 2010, Nathan Brown
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +18,7 @@
 #endregion
 
 using System.Data;
+
 using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
@@ -44,6 +45,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             SetTypeMap(DbType.Currency, "MONEY");
             SetTypeMap(DbType.Date, "DATETIME");
             SetTypeMap(DbType.DateTime, "DATETIME");
+            SetTypeMap(DbType.DateTime2, "DATETIME");
             SetTypeMap(DbType.Decimal, "NUMERIC(19,5)");
             SetTypeMap(DbType.Decimal, "NUMERIC($size,$precision)", DecimalCapacity);
             SetTypeMap(DbType.Double, "FLOAT");

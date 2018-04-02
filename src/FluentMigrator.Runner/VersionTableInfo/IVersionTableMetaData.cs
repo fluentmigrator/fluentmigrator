@@ -1,7 +1,7 @@
 #region License
-// 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
+// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -16,7 +16,7 @@
 //
 #endregion
 
-namespace FluentMigrator.VersionTableInfo
+namespace FluentMigrator.Runner.VersionTableInfo
 {
     public interface IVersionTableMetaData
     {
@@ -24,7 +24,7 @@ namespace FluentMigrator.VersionTableInfo
         /// Provides access to <code>ApplicationContext</code> object.
         /// </summary>
         /// <remarks>
-        /// ApplicationContext value is set by FluentMigrator immediately after instantiation of a class 
+        /// ApplicationContext value is set by FluentMigrator immediately after instantiation of a class
         /// implementing <code>IVersionTableMetaData</code> and before any of properties of <code>IVersionTableMetaData</code>
         /// is called. Properties can use <code>ApplicationContext</code> value to implement context-depending logic.
         /// </remarks>

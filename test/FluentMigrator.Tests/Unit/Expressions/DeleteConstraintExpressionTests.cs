@@ -1,4 +1,6 @@
 using System;
+
+using FluentMigrator.Builders.Delete.Constraint;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
@@ -34,6 +36,18 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var expression = new DeleteConstraintExpression(ConstraintType.Unique) { Constraint = { TableName = "aTable" } };
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldNotContain(ErrorMessages.TableNameCannotBeNullOrEmpty);
+        }
+
+        [Test]
+        public void ApplyDefaultContraintName()
+        {
+            var expression = new DeleteConstraintExpression(ConstraintType.Unique);
+            var builder = new DeleteConstraintExpressionBuilder(expression);
+            builder.FromTable("Users").Column("AccountId");
+
+            var processed = expression.Apply(ConventionSets.NoSchemaName);
+
+            Assert.That(processed.Constraint.ConstraintName, Is.EqualTo("UC_Users_AccountId"));
         }
 
         [Test]

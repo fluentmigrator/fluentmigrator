@@ -1,6 +1,6 @@
-﻿#region License
+#region License
 // 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,7 @@
 #endregion
 
 using System.Data;
+
 using FluentMigrator.Runner.Generators.Base;
 
 namespace FluentMigrator.Runner.Generators.Hana
@@ -47,6 +48,7 @@ namespace FluentMigrator.Runner.Generators.Hana
             SetTypeMap(DbType.Currency, "MONEY");
             SetTypeMap(DbType.Date, "DATETIME");
             SetTypeMap(DbType.DateTime, "DATETIME");
+            SetTypeMap(DbType.DateTime2, "DATETIME");
             SetTypeMap(DbType.Decimal, "DECIMAL(19,5)");
             SetTypeMap(DbType.Decimal, "DECIMAL($size,$precision)", DecimalCapacity);
             SetTypeMap(DbType.Double, "DOUBLE PRECISION");

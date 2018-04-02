@@ -1,8 +1,8 @@
 #region License
 
-// 
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
-// 
+//
+// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -19,10 +19,11 @@
 #endregion
 
 using FluentMigrator.Builders.Schema.Table;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Builders.Schema.Schema
 {
-    public interface ISchemaSchemaSyntax
+    public interface ISchemaSchemaSyntax : IFluentSyntax
     {
         bool Exists();
         ISchemaTableSyntax Table(string tableName);

@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2009, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,17 +18,20 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Tests.Integration.Migrations;
+
 using Moq;
+
 using NUnit.Framework;
 using NUnit.Should;
-using System.Linq;
 
 namespace FluentMigrator.Tests.Unit
 {
