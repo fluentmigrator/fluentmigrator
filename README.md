@@ -101,7 +101,8 @@ msbuild ./FluentMigrator.sln /v:m  /t:Pack /p:PackageOutputPath="/tmp/fluentmigr
 
 ### New features
 
-* [ ] [Fluent API](https://github.com/fluentmigrator/fluentmigrator/pull/386)
+* [x] [Add Delete.UniqueConstraint() based on conventions name](https://github.com/fluentmigrator/fluentmigrator/pull/754)
+  is interesting. Does it have a relation to PR #753?
 * [ ] [Pass arguments to scripts](https://github.com/fluentmigrator/fluentmigrator/pull/666)
 * [ ] [add delete.Table.IfExists() syntax and support generators](https://github.com/fluentmigrator/fluentmigrator/pull/684/files)
   seems to be a more generic take than PR #664.
@@ -113,6 +114,4 @@ msbuild ./FluentMigrator.sln /v:m  /t:Pack /p:PackageOutputPath="/tmp/fluentmigr
   This PR changes two things at once and I'm not sure if using CURRENT_TIMESTAMP works everywhere. Investigation needed.
 * [use unique constraint instead of unique index in ColumnExpressionBuilderHelper.Unique](https://github.com/fluentmigrator/fluentmigrator/pull/753)
   might be a breaking change
-* [Add Delete.UniqueConstraint() based on conventions name](https://github.com/fluentmigrator/fluentmigrator/pull/754)
-  is interesting. Does it have a relation to PR #753?
 * [Refactor tests](https://github.com/fluentmigrator/fluentmigrator/pull/784)
