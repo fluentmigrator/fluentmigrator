@@ -28,19 +28,21 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 {
     public class SqlServer2000Generator : GenericGenerator
     {
+        private static readonly SqlServerQuoter _quoter = new SqlServerQuoter();
+
         public SqlServer2000Generator()
-            : base(new SqlServer2000Column(new SqlServer2000TypeMap()), new SqlServerQuoter(), new EmptyDescriptionGenerator())
+            : base(new SqlServer2000Column(new SqlServer2000TypeMap()), _quoter, new EmptyDescriptionGenerator())
         {
         }
 
         protected SqlServer2000Generator(IColumn column, IDescriptionGenerator descriptionGenerator)
-            : base(column, new SqlServerQuoter(), descriptionGenerator)
+            : base(column, _quoter, descriptionGenerator)
         {
         }
 
-        public override string RenameTable { get { return "sp_rename '{0}', '{1}'"; } }
+        public override string RenameTable { get { return "sp_rename {0}, {1}"; } }
 
-        public override string RenameColumn { get { return "sp_rename '{0}.{1}', '{2}'"; } }
+        public override string RenameColumn { get { return "sp_rename {0}, {1}"; } }
 
         public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
 
@@ -83,12 +85,18 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(RenameTableExpression expression)
         {
-            return String.Format(RenameTable, Quoter.QuoteTableName(Quoter.QuoteCommand(expression.OldName)), Quoter.QuoteCommand(expression.NewName));
+            var sourceParam = Quoter.QuoteValue(Quoter.QuoteTableName(expression.OldName));
+            var destinationParam = Quoter.QuoteValue(expression.NewName);
+            return string.Format(RenameTable, sourceParam, destinationParam);
         }
 
         public override string Generate(RenameColumnExpression expression)
         {
-            return String.Format(RenameColumn, Quoter.QuoteTableName(expression.TableName), Quoter.QuoteColumnName(Quoter.QuoteCommand(expression.OldName)), Quoter.QuoteCommand(expression.NewName));
+            var tableName = Quoter.QuoteTableName(expression.TableName);
+            var columnName = Quoter.QuoteColumnName(expression.OldName);
+            var sourceParam = Quoter.QuoteValue($"{tableName}.{columnName}");
+            var destinationParam = Quoter.QuoteValue(expression.NewName);
+            return string.Format(RenameColumn, sourceParam, destinationParam);
         }
 
         public override string Generate(DeleteColumnExpression expression)

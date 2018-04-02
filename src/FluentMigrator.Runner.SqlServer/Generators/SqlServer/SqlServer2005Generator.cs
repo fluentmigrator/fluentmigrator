@@ -56,9 +56,6 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string AlterColumn { get { return "{0} ALTER COLUMN {1}"; } }
 
-        public override string RenameColumn { get { return "{0}.{1}', '{2}'"; } }
-        public override string RenameTable { get { return "{0}', '{1}'"; } }
-
         public override string CreateIndex { get { return "CREATE {0}{1}INDEX {2} ON {3}.{4} ({5}{6}{7}){8}"; } }
         public override string DropIndex { get { return "DROP INDEX {0} ON {1}.{2}{3}"; } }
 
@@ -146,12 +143,21 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(RenameColumnExpression expression)
         {
-            return string.Format("sp_rename '{0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            var schemaName = Quoter.QuoteSchemaName(expression.SchemaName);
+            var tableName = Quoter.QuoteTableName(expression.TableName);
+            var columnName = Quoter.QuoteColumnName(expression.OldName);
+            var sourceParam = Quoter.QuoteValue($"{schemaName}.{tableName}.{columnName}");
+            var destinationParam = Quoter.QuoteValue(expression.NewName);
+            return string.Format(RenameColumn, sourceParam, destinationParam);
         }
 
         public override string Generate(RenameTableExpression expression)
         {
-            return string.Format("sp_rename '{0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
+            var schemaName = Quoter.QuoteSchemaName(expression.SchemaName);
+            var tableName = Quoter.QuoteTableName(expression.OldName);
+            var sourceParam = Quoter.QuoteValue($"{schemaName}.{tableName}");
+            var destinationParam = Quoter.QuoteValue(expression.NewName);
+            return string.Format(RenameTable, sourceParam, destinationParam);
         }
 
         public override string Generate(UpdateDataExpression expression)

@@ -135,10 +135,6 @@ namespace FluentMigrator.Runner.Generators.Generic
             return (name.StartsWith(OpenQuote) && name.EndsWith(CloseQuote));
         }
 
-        public virtual string QuoteCommand(string command){
-            return command.Replace("\'","\'\'");
-        }
-
         protected virtual bool ShouldQuote(string name)
         {
             return (!string.IsNullOrEmpty(OpenQuote) || !string.IsNullOrEmpty(CloseQuote)) && !string.IsNullOrEmpty(name);
