@@ -27,12 +27,20 @@
     <DocumentationFile>bin\$(Configuration)\$(TargetFramework)\$(AssemblyName).xml</DocumentationFile>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
-    <DebugType>portable</DebugType>
+  <PropertyGroup Condition=" '$(AssemblyName)' != 'FluentMigrator.Tests' ">
+    <IncludeSymbolsInPackage>true</IncludeSymbolsInPackage>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>portable</DebugType> <!-- Required for EmbedSources -->
+    <EmbedSources>true</EmbedSources>
   </PropertyGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DebugType>none</DebugType>
+  <ItemGroup Condition=" '$(AssemblyName)' != 'FluentMigrator.Tests' ">
+    <!-- Does the equivalent of EmbedSources in MSBuild (hopefully won't be needed long term) -->
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(AssemblyName)' == 'FluentMigrator.Tests' ">
+    <DebugType>full</DebugType>
   </PropertyGroup>
 
 </Project>
