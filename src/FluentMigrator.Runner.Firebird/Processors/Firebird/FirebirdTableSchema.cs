@@ -34,6 +34,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public List<TriggerInfo> Triggers { get; private set; }
 
         public string TableName { get; private set; }
+        public bool Exists => TableMeta?.Exists ?? false;
         public FirebirdProcessor Processor { get; private set; }
         public FirebirdTableDefinition Definition { get; private set; }
         public bool HasPrimaryKey { get { return Definition.Columns.Any(x => x.IsPrimaryKey); } }

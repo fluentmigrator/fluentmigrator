@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using FluentMigrator.Runner.Generators.Firebird;
@@ -25,23 +25,33 @@ namespace FluentMigrator.Runner.Processors.Firebird
         }
 
     }
-    
+
     public sealed class TableInfo
     {
         private static readonly string query = "select rdb$relation_name from rdb$relations where lower(rdb$relation_name) = lower('{0}')";
 
-        public string Name { get; private set; }
+        public string Name { get; }
+        public bool Exists { get; }
 
         public TableInfo(DataRow drMeta)
+            : this(drMeta["rdb$relation_name"].ToString().Trim(), true)
         {
-            Name = drMeta["rdb$relation_name"].ToString().Trim();
+        }
+
+        public TableInfo(string name, bool exists)
+        {
+            Name = name;
+            Exists = exists;
         }
 
         public static TableInfo Read(FirebirdProcessor processor, string tableName)
         {
             var quoter = new FirebirdQuoter();
             var fbTableName = quoter.ToFbObjectName(tableName);
-            return new TableInfo(processor.Read(query, AdoHelper.FormatValue(fbTableName)).Tables[0].Rows[0]);
+            var table = processor.Read(query, AdoHelper.FormatValue(fbTableName)).Tables[0];
+            if (table.Rows.Count == 0)
+                return new TableInfo(tableName, false);
+            return new TableInfo(table.Rows[0]);
         }
     }
 
@@ -186,7 +196,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 {
                     return SystemMethods.NewGuid;
                 }
-                else 
+                else
                 {
                     int res = 0;
                     if (int.TryParse(value, out res))

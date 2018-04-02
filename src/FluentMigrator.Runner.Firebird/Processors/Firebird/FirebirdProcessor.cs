@@ -347,14 +347,14 @@ namespace FluentMigrator.Runner.Processors.Firebird
             CheckColumn(expression.TableName, expression.Column.Name);
             FirebirdSchemaProvider schema = new FirebirdSchemaProvider(this);
             FirebirdTableSchema table = schema.GetTableSchema(expression.TableName);
-            ColumnDefinition colDef = table.Definition.Columns.First(x => x.Name == quoter.ToFbObjectName(expression.Column.Name));
+            ColumnDefinition colDef = table.Definition.Columns.FirstOrDefault(x => x.Name == quoter.ToFbObjectName(expression.Column.Name));
 
             var generator = (FirebirdGenerator) Generator;
 
             var tableName = expression.Column.TableName ?? expression.TableName;
 
             //Change nullable constraint
-            if (colDef.IsNullable != expression.Column.IsNullable)
+            if (colDef == null || colDef.IsNullable != expression.Column.IsNullable)
             {
                 string nullConstraintCommand;
                 if (IsFirebird3)
@@ -370,7 +370,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
 
             //Change default value
-            if (!FirebirdGenerator.DefaultValuesMatch(colDef, expression.Column))
+            if (colDef == null || !FirebirdGenerator.DefaultValuesMatch(colDef, expression.Column))
             {
                 IMigrationExpression defaultConstraint;
                 if (expression.Column.DefaultValue is ColumnDefinition.UndefinedDefaultValue)
@@ -408,7 +408,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
 
             //Change type
-            if (!FirebirdGenerator.ColumnTypesMatch(colDef, expression.Column))
+            if (colDef == null || !FirebirdGenerator.ColumnTypesMatch(colDef, expression.Column))
             {
                 InternalProcess(generator.GenerateSetType(tableName, expression.Column));
             }
