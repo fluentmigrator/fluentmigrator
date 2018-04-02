@@ -57,7 +57,7 @@ msbuild ./FluentMigrator.sln /v:m  /t:Pack /p:PackageOutputPath="/tmp/fluentmigr
 
 ### New providers
 
-- [ ] [Redshift provider](https://github.com/fluentmigrator/fluentmigrator/pull/605)
+- [x] [Redshift provider](https://github.com/fluentmigrator/fluentmigrator/pull/605)
 - [x] [Support SQLAnywhere](https://github.com/fluentmigrator/fluentmigrator/pull/659)
 - [x] [SQL Server 2016](https://github.com/fluentmigrator/fluentmigrator/pull/833)
 

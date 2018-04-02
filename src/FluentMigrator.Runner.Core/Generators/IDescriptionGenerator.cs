@@ -3,6 +3,9 @@ using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Generators
 {
+    /// <summary>
+    /// Generate SQL statements to set descriptions for tables and columns
+    /// </summary>
     public interface IDescriptionGenerator
     {
         IEnumerable<string> GenerateDescriptionStatements(CreateTableExpression expression);
