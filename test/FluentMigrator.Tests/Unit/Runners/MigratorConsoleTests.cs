@@ -191,15 +191,15 @@ namespace FluentMigrator.Tests.Unit.Runners
         [Test]
         public void MustInitializeConsoleWithConnectionArgument()
         {
-            new MigratorConsole().Run("/db", Database);
-            Assert.That(Environment.ExitCode == 1);
+            var exitCode = new MigratorConsole().Run("/db", Database);
+            Assert.That(exitCode, Is.EqualTo(1));
         }
 
         [Test]
         public void MustInitializeConsoleWithDatabaseArgument()
         {
-            new MigratorConsole().Run("/connection", Connection);
-            Assert.That(Environment.ExitCode == 1);
+            var exitCode = new MigratorConsole().Run("/connection", Connection);
+            Assert.That(exitCode, Is.EqualTo(1));
         }
 
         [Test]
