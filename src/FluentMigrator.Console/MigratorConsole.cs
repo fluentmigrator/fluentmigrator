@@ -19,8 +19,10 @@
 using System;
 using System.Collections.Generic;
 
+using FluentMigrator.Exceptions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
+using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.Initialization;
 using FluentMigrator.Runner.Processors;
 
@@ -229,6 +231,21 @@ namespace FluentMigrator.Console
                 }
 
                 return ExecuteMigrations();
+            }
+            catch (MissingMigrationsException ex)
+            {
+                consoleAnnouncer.Error(ex);
+                return 6;
+            }
+            catch (RunnerException ex)
+            {
+                consoleAnnouncer.Error(ex);
+                return 5;
+            }
+            catch (FluentMigratorException ex)
+            {
+                consoleAnnouncer.Error(ex);
+                return 4;
             }
             catch (Exception ex)
             {
