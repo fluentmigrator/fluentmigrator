@@ -22,15 +22,23 @@ namespace FluentMigrator.Console
 {
     class Program
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
             try
             {
-                new MigratorConsole(args);
+                try
+                {
+                    return new MigratorConsole().Run(args);
+                }
+                finally
+                {
+                    System.Console.ResetColor();
+                }
             }
             catch (ArgumentException ex)
             {
                 System.Console.WriteLine(ex.Message);
+                return 4;
             }
         }
     }

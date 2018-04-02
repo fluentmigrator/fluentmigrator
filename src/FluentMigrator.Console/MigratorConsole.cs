@@ -58,7 +58,7 @@ namespace FluentMigrator.Console
 
         public RunnerContext RunnerContext { get; private set;}
 
-        public MigratorConsole(params string[] args)
+        internal int Run(params string[] args)
         {
             consoleAnnouncer.Header();
 
@@ -205,7 +205,7 @@ namespace FluentMigrator.Console
                 {
                     consoleAnnouncer.Error(e);
                     consoleAnnouncer.Say("Try 'migrate --help' for more information.");
-                    return;
+                    return 2;
                 }
 
                 if (string.IsNullOrEmpty(Task))
@@ -214,30 +214,27 @@ namespace FluentMigrator.Console
                 if (!ValidateArguments(optionSet))
                 {
                     DisplayHelp(optionSet);
-                    Environment.ExitCode = 1;
-                    return;
+                    return 1;
                 }
 
                 if (ShowHelp)
                 {
                     DisplayHelp(optionSet);
-                    return;
+                    return 0;
                 }
 
                 if (Output)
                 {
-                    ExecuteMigrations(OutputFilename);
+                    return ExecuteMigrations(OutputFilename);
                 }
-                else
-                    ExecuteMigrations();
+
+                return ExecuteMigrations();
             }
             catch (Exception ex)
             {
                 consoleAnnouncer.Error(ex);
-                Environment.ExitCode = 1;
+                return 3;
             }
-
-            System.Console.ResetColor();
         }
 
         private bool ValidateArguments(OptionSet optionSet)
@@ -282,7 +279,7 @@ namespace FluentMigrator.Console
             p.WriteOptionDescriptions(System.Console.Out);
         }
 
-        private void ExecuteMigrations()
+        private int ExecuteMigrations()
         {
             consoleAnnouncer.ShowElapsedTime = Verbose;
             consoleAnnouncer.ShowSql = Verbose;
@@ -291,10 +288,10 @@ namespace FluentMigrator.Console
                 ? (IAnnouncer)new CompositeAnnouncer(consoleAnnouncer, new StopOnErrorAnnouncer())
                 : consoleAnnouncer;
 
-            ExecuteMigrations(announcer);
+            return ExecuteMigrations(announcer);
         }
 
-        private void ExecuteMigrations(string outputTo)
+        private int ExecuteMigrations(string outputTo)
         {
             consoleAnnouncer.ShowElapsedTime = Verbose;
             consoleAnnouncer.ShowSql = Verbose;
@@ -305,7 +302,7 @@ namespace FluentMigrator.Console
 
             using (var announcer = new LateInitAnnouncer(innerAnnouncer, ExecutingAgainstMsSql, outputTo))
             {
-                ExecuteMigrations(announcer);
+                return ExecuteMigrations(announcer);
             }
         }
 
@@ -317,7 +314,7 @@ namespace FluentMigrator.Console
             }
         }
 
-        private void ExecuteMigrations(IAnnouncer announcer)
+        private int ExecuteMigrations(IAnnouncer announcer)
         {
             RunnerContext = new RunnerContext(announcer)
             {
@@ -343,6 +340,7 @@ namespace FluentMigrator.Console
             };
 
             new LateInitTaskExecutor(RunnerContext).Execute();
+            return 0;
         }
     }
 }
