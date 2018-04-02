@@ -82,7 +82,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1_TestColumn2\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\")");
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
@@ -91,7 +91,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateMultiColumnPrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1_TestColumn2\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\")");
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
@@ -101,7 +101,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"UC_TestTable1_TestColumn1_TestColumn2\" UNIQUE (\"TestColumn1\", \"TestColumn2\")");
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
@@ -110,7 +110,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"UC_TestTable1_TestColumn1_TestColumn2\" UNIQUE (\"TestColumn1\", \"TestColumn2\")");
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
@@ -211,7 +211,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"TESTPRIMARYKEY\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\")");
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
@@ -220,7 +220,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnPrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"TESTPRIMARYKEY\" PRIMARY KEY (\"TestColumn1\", \"TestColumn2\")");
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
@@ -230,7 +230,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"TESTUNIQUECONSTRAINT\" UNIQUE (\"TestColumn1\", \"TestColumn2\")");
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
@@ -239,7 +239,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"TESTUNIQUECONSTRAINT\" UNIQUE (\"TestColumn1\", \"TestColumn2\")");
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
@@ -249,7 +249,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"TESTPRIMARYKEY\" PRIMARY KEY (\"TestColumn1\")");
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
@@ -258,7 +258,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"TESTPRIMARYKEY\" PRIMARY KEY (\"TestColumn1\")");
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
@@ -268,7 +268,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"TESTUNIQUECONSTRAINT\" UNIQUE (\"TestColumn1\")");
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
@@ -277,7 +277,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"TESTUNIQUECONSTRAINT\" UNIQUE (\"TestColumn1\")");
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
@@ -287,7 +287,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1\" PRIMARY KEY (\"TestColumn1\")");
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
@@ -296,7 +296,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"PK_TestTable1_TestColumn1\" PRIMARY KEY (\"TestColumn1\")");
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
@@ -306,7 +306,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"UC_TestTable1_TestColumn1\" UNIQUE (\"TestColumn1\")");
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
@@ -315,7 +315,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" ADD CONSTRAINT \"UC_TestTable1_TestColumn1\" UNIQUE (\"TestColumn1\")");
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
@@ -344,7 +344,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" DROP CONSTRAINT \"TESTPRIMARYKEY\"");
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
@@ -353,7 +353,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" DROP CONSTRAINT \"TESTPRIMARYKEY\"");
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
@@ -363,7 +363,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" DROP CONSTRAINT \"TESTUNIQUECONSTRAINT\"");
+            result.ShouldBe(string.Empty);
         }
 
         [Test]
@@ -372,7 +372,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
             var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" DROP CONSTRAINT \"TESTUNIQUECONSTRAINT\"");
+            result.ShouldBe(string.Empty);
         }
     }
 }
