@@ -57,8 +57,17 @@ namespace FluentMigrator.Runner.Generators.Firebird
             "WRITE", "YEAR", "YEARDAY" },
             StringComparer.OrdinalIgnoreCase);
 
+        private readonly bool _forceQuote;
+
+        public FirebirdQuoter(bool forceQuote)
+        {
+            _forceQuote = forceQuote;
+        }
+
         protected override bool ShouldQuote(string name)
         {
+            if (_forceQuote)
+                return true;
             if (_keywords.Contains(name))
                 return true;
             if (name.StartsWith("_"))
@@ -80,8 +89,7 @@ namespace FluentMigrator.Runner.Generators.Firebird
             var potentiallyQuoted = Quote(objName);
             if (IsQuoted(potentiallyQuoted))
                 return objName;
-            else
-                return objName.ToUpper();
+            return objName.ToUpper();
         }
     }
 }

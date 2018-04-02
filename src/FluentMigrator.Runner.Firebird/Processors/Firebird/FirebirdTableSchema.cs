@@ -21,12 +21,14 @@ using System.Collections.Generic;
 using System.Linq;
 
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Models;
 
 namespace FluentMigrator.Runner.Processors.Firebird
 {
     internal sealed class FirebirdTableSchema
     {
+        private readonly FirebirdQuoter _quoter;
         public TableInfo TableMeta { get; private set; }
         public List<ColumnInfo> Columns { get; private set; }
         public List<IndexInfo> Indexes { get; private set; }
@@ -39,8 +41,9 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public FirebirdTableDefinition Definition { get; private set; }
         public bool HasPrimaryKey { get { return Definition.Columns.Any(x => x.IsPrimaryKey); } }
 
-        public FirebirdTableSchema(string tableName, FirebirdProcessor processor)
+        public FirebirdTableSchema(string tableName, FirebirdProcessor processor, FirebirdQuoter quoter)
         {
+            _quoter = quoter;
             TableName = tableName;
             Processor = processor;
             Definition = new FirebirdTableDefinition()
@@ -62,7 +65,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         private void LoadMeta()
         {
-            TableMeta = TableInfo.Read(Processor, TableName);
+            TableMeta = TableInfo.Read(Processor, TableName, _quoter);
         }
 
         private void LoadColumns()

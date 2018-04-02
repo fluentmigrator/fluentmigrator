@@ -18,10 +18,10 @@
 
 using System;
 
+using FluentMigrator.Runner.Generators.Firebird;
+
 namespace FluentMigrator.Runner.Processors.Firebird
 {
-    using Generators.Firebird;
-
     public class FirebirdProcessorFactory : MigrationProcessorFactory
     {
         public FirebirdOptions FbOptions { get; set; }
@@ -34,9 +34,11 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
+            var fbOpt = ((FirebirdOptions) FbOptions.Clone())
+                .ApplyProviderSwitches(options.ProviderSwitches);
             var factory = new FirebirdDbFactory();
             var connection = factory.CreateConnection(connectionString);
-            return new FirebirdProcessor(connection, new FirebirdGenerator(FbOptions), announcer, options, factory, FbOptions);
+            return new FirebirdProcessor(connection, new FirebirdGenerator(FbOptions), announcer, options, factory, fbOpt);
         }
     }
 }

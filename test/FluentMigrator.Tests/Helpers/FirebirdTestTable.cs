@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using FirebirdSql.Data.FirebirdClient;
@@ -9,7 +9,7 @@ namespace FluentMigrator.Tests.Helpers
 {
     public class FirebirdTestTable : IDisposable
     {
-        private readonly FirebirdQuoter quoter = new FirebirdQuoter();
+        private readonly FirebirdQuoter quoter = new FirebirdQuoter(false);
         private readonly FirebirdProcessor processor;
 
         public FbConnection Connection
