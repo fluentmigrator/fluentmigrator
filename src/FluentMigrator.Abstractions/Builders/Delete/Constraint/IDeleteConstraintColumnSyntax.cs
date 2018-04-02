@@ -1,4 +1,4 @@
-#region License
+﻿#region License
 // Copyright (c) 2007-2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,10 +14,13 @@
 // limitations under the License.
 #endregion
 
+using FluentMigrator.Infrastructure;
+
 namespace FluentMigrator.Builders.Delete.Constraint
 {
-    public interface IDeleteConstraintInSchemaOptionsSyntax : IDeleteConstraintColumnSyntax
+    public interface IDeleteConstraintColumnSyntax : IFluentSyntax
     {
-        IDeleteConstraintInSchemaOptionsSyntax InSchema(string schemaName);
+        void Column(string columnName);
+        void Columns(params string[] columnNames);
     }
 }
