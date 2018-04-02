@@ -60,7 +60,7 @@ namespace FluentMigrator.Console
 
         public RunnerContext RunnerContext { get; private set;}
 
-        internal int Run(params string[] args)
+        public int Run(params string[] args)
         {
             consoleAnnouncer.Header();
 
