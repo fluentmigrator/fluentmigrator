@@ -32,14 +32,17 @@
     </Content>
     <Content Include="FluentMigrator.Runner.SqlServerCe.targets">
       <Pack>True</Pack>
-      <PackagePath>build/</PackagePath>
+      <PackagePath>build/netstandard2.0/</PackagePath>
     </Content>
     <Content Include="../../lib/SQLServerCE4/*.dll">
       <Pack>True</Pack>
-      <PackagePath>lib/net40;lib/net45;lib/netstandard2.0</PackagePath>
+      <PackagePath>lib/netstandard2.0</PackagePath>
     </Content>
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net40' or '$(TargetFramework)' == 'net45' ">
+    <PackageReference Include="Microsoft.SqlServer.Compact" Version="4.0.8876.1" />
+  </ItemGroup>
+  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard20' ">
     <Reference Include="System.Data.SqlServerCe, Version=4.0.0.1, Culture=neutral, PublicKeyToken=89845dcd8080cc91">
       <Private>True</Private>
       <HintPath>..\..\lib\SQLServerCE4\System.Data.SqlServerCe.dll</HintPath>
