@@ -34,17 +34,26 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
         }
 
-        public override bool SupportsTransactions
+        public override bool SupportsTransactions => true;
+
+        public override string DatabaseType => "SqlServer2000";
+
+        public override void BeginTransaction()
         {
-            get
-            {
-                return true;
-            }
+            base.BeginTransaction();
+            Announcer.Sql("BEGIN TRANSACTION");
         }
 
-        public override string DatabaseType
+        public override void CommitTransaction()
         {
-            get { return "SqlServer2000"; }
+            base.CommitTransaction();
+            Announcer.Sql("COMMIT TRANSACTION");
+        }
+
+        public override void RollbackTransaction()
+        {
+            base.RollbackTransaction();
+            Announcer.Sql("ROLLBACK TRANSACTION");
         }
 
         public override bool SchemaExists(string schemaName)

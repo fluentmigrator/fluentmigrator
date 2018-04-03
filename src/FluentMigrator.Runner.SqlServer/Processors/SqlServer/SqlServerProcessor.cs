@@ -53,6 +53,24 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             return string.IsNullOrEmpty(schemaName) ? "dbo" : FormatHelper.FormatSqlEscape(schemaName);
         }
 
+        public override void BeginTransaction()
+        {
+            base.BeginTransaction();
+            Announcer.Sql("BEGIN TRANSACTION");
+        }
+
+        public override void CommitTransaction()
+        {
+            base.CommitTransaction();
+            Announcer.Sql("COMMIT TRANSACTION");
+        }
+
+        public override void RollbackTransaction()
+        {
+            base.RollbackTransaction();
+            Announcer.Sql("ROLLBACK TRANSACTION");
+        }
+
         public override bool SchemaExists(string schemaName)
         {
             return Exists(SqlSchemaExists, SafeSchemaName(schemaName));
