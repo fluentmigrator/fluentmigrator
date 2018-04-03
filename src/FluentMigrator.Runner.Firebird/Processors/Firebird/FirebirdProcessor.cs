@@ -18,7 +18,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
     {
         private readonly Lazy<Version> _firebirdVersionFunc;
         protected readonly FirebirdTruncator truncator;
-        readonly FirebirdQuoter quoter = new FirebirdQuoter();
+        private readonly FirebirdQuoter quoter;
         public FirebirdOptions FBOptions { get; private set; }
         public bool IsFirebird3 => _firebirdVersionFunc.Value >= new Version(3, 0);
         public new IMigrationGenerator Generator { get { return base.Generator; } }
@@ -47,6 +47,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             if (fbOptions == null)
                 throw new ArgumentNullException("fbOptions");
             _firebirdVersionFunc = new Lazy<Version>(GetFirebirdVersion);
+            quoter = new FirebirdQuoter(fbOptions.ForceQuote);
             FBOptions = fbOptions;
             truncator = new FirebirdTruncator(FBOptions.TruncateLongNames, FBOptions.PackKeyNames);
             ClearLocks();
@@ -345,16 +346,16 @@ namespace FluentMigrator.Runner.Processors.Firebird
         {
             truncator.Truncate(expression);
             CheckColumn(expression.TableName, expression.Column.Name);
-            FirebirdSchemaProvider schema = new FirebirdSchemaProvider(this);
+            FirebirdSchemaProvider schema = new FirebirdSchemaProvider(this, quoter);
             FirebirdTableSchema table = schema.GetTableSchema(expression.TableName);
-            ColumnDefinition colDef = table.Definition.Columns.First(x => x.Name == quoter.ToFbObjectName(expression.Column.Name));
+            ColumnDefinition colDef = table.Definition.Columns.FirstOrDefault(x => x.Name == quoter.ToFbObjectName(expression.Column.Name));
 
             var generator = (FirebirdGenerator) Generator;
 
             var tableName = expression.Column.TableName ?? expression.TableName;
 
             //Change nullable constraint
-            if (colDef.IsNullable != expression.Column.IsNullable)
+            if (colDef == null || colDef.IsNullable != expression.Column.IsNullable)
             {
                 string nullConstraintCommand;
                 if (IsFirebird3)
@@ -370,7 +371,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
 
             //Change default value
-            if (!FirebirdGenerator.DefaultValuesMatch(colDef, expression.Column))
+            if (colDef == null || !FirebirdGenerator.DefaultValuesMatch(colDef, expression.Column))
             {
                 IMigrationExpression defaultConstraint;
                 if (expression.Column.DefaultValue is ColumnDefinition.UndefinedDefaultValue)
@@ -408,7 +409,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
 
             //Change type
-            if (!FirebirdGenerator.ColumnTypesMatch(colDef, expression.Column))
+            if (colDef == null || !FirebirdGenerator.ColumnTypesMatch(colDef, expression.Column))
             {
                 InternalProcess(generator.GenerateSetType(tableName, expression.Column));
             }
@@ -501,7 +502,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public override void Process(Expressions.RenameTableExpression expression)
         {
             truncator.Truncate(expression);
-            FirebirdSchemaProvider schema = new FirebirdSchemaProvider(this);
+            FirebirdSchemaProvider schema = new FirebirdSchemaProvider(this, quoter);
             FirebirdTableDefinition firebirdTableDef = schema.GetTableDefinition(expression.OldName);
             firebirdTableDef.Name = expression.NewName;
             CreateTableExpression createNew = new CreateTableExpression()

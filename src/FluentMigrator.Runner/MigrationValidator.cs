@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Conventions;
+using FluentMigrator.Runner.Exceptions;
 
 namespace FluentMigrator.Runner
 {

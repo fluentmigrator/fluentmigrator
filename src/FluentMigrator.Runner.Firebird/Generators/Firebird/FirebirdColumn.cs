@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentMigrator.Model;
@@ -11,11 +11,9 @@ namespace FluentMigrator.Runner.Generators.Firebird
     {
         protected FirebirdOptions FBOptions { get; private set; }
 
-        public FirebirdColumn(FirebirdOptions fbOptions) : base(new FirebirdTypeMap(), new FirebirdQuoter()) 
+        public FirebirdColumn(FirebirdOptions fbOptions) : base(new FirebirdTypeMap(), new FirebirdQuoter(fbOptions.ForceQuote)) 
         {
-            if (fbOptions == null)
-                throw new ArgumentNullException("fbOptions");
-            FBOptions = fbOptions;
+            FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
 
             //In firebird DEFAULT clause precedes NULLABLE clause
             ClauseOrder = new List<Func<ColumnDefinition, string>> { FormatString, FormatType, FormatDefaultValue, FormatNullable, FormatPrimaryKey, FormatIdentity };

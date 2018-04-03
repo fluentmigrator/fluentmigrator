@@ -42,7 +42,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
             MakeTask("rollback", migrationsNamespace).Execute();
         }
 
-        protected TaskExecutor MakeTask(string task, string migrationsNamespace)
+        protected TaskExecutor MakeTask(string task, string migrationsNamespace, Action<RunnerContext> configureContext = null)
         {
             var consoleAnnouncer = new TextWriterAnnouncer(System.Console.Out);
             var debugAnnouncer = new TextWriterAnnouncer(msg => Debug.WriteLine(msg));
@@ -55,6 +55,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
                 Namespace = migrationsNamespace,
                 Task = task
             };
+
+            configureContext?.Invoke(runnerContext);
             return new TaskExecutor(runnerContext);
         }
 

@@ -1,5 +1,7 @@
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Exceptions;
+
 using Moq;
 using NUnit.Framework;
 

@@ -37,7 +37,8 @@ namespace FluentMigrator.Tests.Unit.Runners
         [Test]
         public void CanInitMigratorConsoleWithValidArguments()
         {
-            var console = new MigratorConsole(
+            var console = new MigratorConsole();
+            console.Run(
                 "/db", Database,
                 "/connection", Connection,
                 "/target", Target,
@@ -56,7 +57,8 @@ namespace FluentMigrator.Tests.Unit.Runners
         [Test]
         public void CanInitMigratorConsoleWithValidArgumentsRegardlessOfCase()
         {
-            var console = new MigratorConsole(
+            var console = new MigratorConsole();
+            console.Run(
                 "/db", Database,
                 "/Connection", Connection,
                 "/target", Target,
@@ -79,7 +81,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             var stringWriterNonVerbose = new StringWriter(sbNonVerbose);
             System.Console.SetOut(stringWriterNonVerbose);
 
-            new MigratorConsole(
+            new MigratorConsole().Run(
                 "/db", Database,
                 "/connection", Connection,
                 "/target", Target,
@@ -91,7 +93,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             var stringWriterVerbose = new StringWriter(sbVerbose);
             System.Console.SetOut(stringWriterVerbose);
 
-            new MigratorConsole(
+            new MigratorConsole().Run(
                 "/db", Database,
                 "/connection", Connection,
                 "/verbose", "1",
@@ -109,7 +111,7 @@ namespace FluentMigrator.Tests.Unit.Runners
             var sb = new StringBuilder();
             var stringWriter = new StringWriter(sb);
             System.Console.SetOut(stringWriter);
-            new MigratorConsole(
+            new MigratorConsole().Run(
                 "/db", Database,
                 "/connection", Connection,
                 "/target", Target,
@@ -129,7 +131,7 @@ namespace FluentMigrator.Tests.Unit.Runners
 
             System.Console.SetOut(stringWriter);
 
-            new MigratorConsole(
+            new MigratorConsole().Run(
                 "/db", Database,
                 "/connection", Connection,
                 "/target", Target,
@@ -151,7 +153,7 @@ namespace FluentMigrator.Tests.Unit.Runners
 
             Assert.IsFalse(File.Exists(outputFileName));
 
-            new MigratorConsole(
+            new MigratorConsole().Run(
                 "/db", Database,
                 "/connection", Connection,
                 "/target", Target,
@@ -172,7 +174,7 @@ namespace FluentMigrator.Tests.Unit.Runners
 
             Assert.IsFalse(File.Exists(outputFileName));
 
-            new MigratorConsole(
+            new MigratorConsole().Run(
                 "/db", Database,
                 "/connection", Connection,
                 "/target", Target,
@@ -189,21 +191,22 @@ namespace FluentMigrator.Tests.Unit.Runners
         [Test]
         public void MustInitializeConsoleWithConnectionArgument()
         {
-            new MigratorConsole("/db", Database);
-            Assert.That(Environment.ExitCode == 1);
+            var exitCode = new MigratorConsole().Run("/db", Database);
+            Assert.That(exitCode, Is.EqualTo(1));
         }
 
         [Test]
         public void MustInitializeConsoleWithDatabaseArgument()
         {
-            new MigratorConsole("/connection", Connection);
-            Assert.That(Environment.ExitCode == 1);
+            var exitCode = new MigratorConsole().Run("/connection", Connection);
+            Assert.That(exitCode, Is.EqualTo(1));
         }
 
         [Test]
         public void TagsPassedToRunnerContextOnExecuteMigrations()
         {
-            var migratorConsole = new MigratorConsole(
+            var migratorConsole = new MigratorConsole();
+            migratorConsole.Run(
                 "/db", Database,
                 "/connection", Connection,
                 "/verbose", "1",
@@ -222,7 +225,8 @@ namespace FluentMigrator.Tests.Unit.Runners
         [Test]
         public void TransactionPerSessionShouldBeSetOnRunnerContextWithShortSwitch()
         {
-            var console = new MigratorConsole(
+            var console = new MigratorConsole();
+            console.Run(
                 "/db", Database,
                 "/connection", Connection,
                 "/target", Target,
@@ -236,7 +240,8 @@ namespace FluentMigrator.Tests.Unit.Runners
         [Test]
         public void TransactionPerSessionShouldBeSetOnRunnerContextWithLongSwitch()
         {
-            var console = new MigratorConsole(
+            var console = new MigratorConsole();
+            console.Run(
                 "/db", Database,
                 "/connection", Connection,
                 "/target", Target,
@@ -250,7 +255,8 @@ namespace FluentMigrator.Tests.Unit.Runners
         [Test]
         public void ProviderSwitchesPassedToRunnerContextOnExecuteMigrations()
         {
-            var migratorConsole = new MigratorConsole(
+            var migratorConsole = new MigratorConsole();
+            migratorConsole.Run(
                 "/db", Database,
                 "/connection", Connection,
                 "/target", Target,

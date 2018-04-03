@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
 using FluentMigrator.Exceptions;
 using FluentMigrator.Infrastructure;
+using FluentMigrator.Runner.Exceptions;
 
 namespace FluentMigrator.Runner
 {
@@ -74,12 +75,21 @@ namespace FluentMigrator.Runner
 
         private IEnumerable<Type> FindMigrationTypes()
         {
-            return Assemblies.GetExportedTypes()
+            var migrations = Assemblies.GetExportedTypes()
                 .FilterByNamespace(Namespace, LoadNestedNamespaces)
-                .Where(t => Conventions.TypeIsMigration(t)
-                            &&
-                            (Conventions.TypeHasMatchingTags(t, TagsToMatch) ||
-                             !Conventions.TypeHasTags(t)));
+                .Where(t => Conventions.TypeIsMigration(t))
+                .ToList();
+            if (migrations.Count == 0)
+            {
+                throw new MissingMigrationsException($"No migrations found in the namespace {Namespace}");
+            }
+
+            var tagMatchingMigrations = migrations
+                .Where(t =>
+                    Conventions.TypeHasMatchingTags(t, TagsToMatch)
+                 || !Conventions.TypeHasTags(t));
+
+            return tagMatchingMigrations;
         }
     }
 }

@@ -1,4 +1,7 @@
 
+using System;
+using System.Data.Common;
+
 namespace FluentMigrator.Runner.Processors.Firebird
 {
     public enum FirebirdTransactionModel
@@ -17,9 +20,9 @@ namespace FluentMigrator.Runner.Processors.Firebird
         /// Don't manage transactions
         /// </summary>
         None
-
     }
-    public class FirebirdOptions
+
+    public class FirebirdOptions : ICloneable
     {
         /// <summary>
         /// Maximum internal length of names in firebird is 31 characters
@@ -37,6 +40,11 @@ namespace FluentMigrator.Runner.Processors.Firebird
         /// Virtually lock tables and columns touched by DDL statements in a transaction
         /// </summary>
         public bool VirtualLock { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether all names should be quoted unconditionally.
+        /// </summary>
+        public bool ForceQuote { get; set; }
 
         /// <summary>
         /// Which transaction model to use if any to work around firebird's DDL restrictions
@@ -78,6 +86,42 @@ namespace FluentMigrator.Runner.Processors.Firebird
                 TruncateLongNames = true,
                 VirtualLock = false,
             };
+        }
+
+        public FirebirdOptions ApplyProviderSwitches(string providerSwitches)
+        {
+            var csb = new DbConnectionStringBuilder {ConnectionString = providerSwitches};
+            if (csb.TryGetValue("Force Quote", out var forceQuoteObj))
+            {
+                ForceQuote = ConvertToBoolean(forceQuoteObj);
+            }
+
+            return this;
+        }
+
+        public object Clone()
+        {
+            return MemberwiseClone();
+        }
+
+        private static bool ConvertToBoolean(object value)
+        {
+            if (value is bool b)
+                return b;
+            if (value is string s)
+                return ConvertToBoolean(s);
+            return Convert.ToInt32(value) != 0;
+        }
+
+        private static bool ConvertToBoolean(string value)
+        {
+            if (string.Equals(value, "yes", StringComparison.OrdinalIgnoreCase))
+                return true;
+            if (string.Equals(value, "true", StringComparison.OrdinalIgnoreCase))
+                return true;
+            if (string.Equals(value, "1", StringComparison.OrdinalIgnoreCase))
+                return true;
+            return false;
         }
     }
 }

@@ -15,12 +15,9 @@ namespace FluentMigrator.Runner.Generators.Firebird
         protected readonly FirebirdTruncator truncator;
         protected Processors.Firebird.FirebirdOptions FBOptions { get; private set; }
 
-        public FirebirdGenerator(Processors.Firebird.FirebirdOptions fbOptions) : base(new FirebirdColumn(fbOptions), new FirebirdQuoter(), new EmptyDescriptionGenerator())
+        public FirebirdGenerator(Processors.Firebird.FirebirdOptions fbOptions) : base(new FirebirdColumn(fbOptions), new FirebirdQuoter(fbOptions.ForceQuote), new EmptyDescriptionGenerator())
         {
-            if (fbOptions == null)
-                throw new ArgumentNullException("fbOptions");
-
-            FBOptions = fbOptions;
+            FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
             truncator = new FirebirdTruncator(FBOptions.TruncateLongNames, FBOptions.PackKeyNames);
         }
 

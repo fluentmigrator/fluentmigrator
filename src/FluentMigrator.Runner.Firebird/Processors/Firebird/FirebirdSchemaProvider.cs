@@ -20,17 +20,20 @@ using System.Collections.Generic;
 using System.Linq;
 
 using FluentMigrator.Model;
+using FluentMigrator.Runner.Generators.Firebird;
 using FluentMigrator.Runner.Models;
 
 namespace FluentMigrator.Runner.Processors.Firebird
 {
     public class FirebirdSchemaProvider
     {
+        private readonly FirebirdQuoter _quoter;
         internal Dictionary<string, FirebirdTableSchema> TableSchemas = new Dictionary<string, FirebirdTableSchema>();
         public FirebirdProcessor Processor { get; protected set; }
 
-        public FirebirdSchemaProvider(FirebirdProcessor processor)
+        public FirebirdSchemaProvider(FirebirdProcessor processor, FirebirdQuoter quoter)
         {
+            _quoter = quoter;
             Processor = processor;
         }
 
@@ -54,7 +57,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         internal FirebirdTableSchema LoadTableSchema(string tableName)
         {
-            FirebirdTableSchema schema = new FirebirdTableSchema(tableName, Processor);
+            FirebirdTableSchema schema = new FirebirdTableSchema(tableName, Processor, _quoter);
             TableSchemas.Add(tableName, schema);
             return schema;
         }
@@ -69,10 +72,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
 
         public SequenceInfo GetSequence(string sequenceName)
         {
-            return SequenceInfo.Read(Processor, sequenceName);
+            return SequenceInfo.Read(Processor, sequenceName, _quoter);
         }
-        
     }
-
-    
 }

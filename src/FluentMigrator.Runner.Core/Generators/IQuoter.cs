@@ -1,4 +1,4 @@
-﻿namespace FluentMigrator.Runner.Generators
+namespace FluentMigrator.Runner.Generators
 {
     public interface IQuoter
     {
@@ -11,7 +11,6 @@
         string QuoteIndexName(string indexName);
         string QuoteConstraintName(string contraintName);
         string QuoteSchemaName(string schemaName);
-        string QuoteCommand(string command);
         string QuoteSequenceName(string sequenceName);
     }
 }
