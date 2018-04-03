@@ -505,7 +505,7 @@ namespace FluentMigrator.Tests.Integration
                 return;
 
             var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
-            var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerDbFactory());
+            var processor = new SqlServerProcessor("SqlServer2008", connection, new SqlServer2008Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerDbFactory());
 
             MigrationRunner runner = SetupMigrationRunner(processor);
             runner.MigrateUp();
@@ -528,7 +528,7 @@ namespace FluentMigrator.Tests.Integration
                 return;
 
             var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
-            var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerDbFactory());
+            var processor = new SqlServerProcessor("SqlServer2008", connection, new SqlServer2008Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerDbFactory());
 
             MigrationRunner runner = SetupMigrationRunner(processor);
             runner.MigrateUp(1);
@@ -691,7 +691,7 @@ namespace FluentMigrator.Tests.Integration
             var outputSql = new StringWriter();
             var announcer = new TextWriterAnnouncer(outputSql){ ShowSql = true };
 
-            var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), announcer, processorOptions, new SqlServerDbFactory());
+            var processor = new SqlServerProcessor("SqlServer2008", connection, new SqlServer2008Generator(), announcer, processorOptions, new SqlServerDbFactory());
 
             try
             {
@@ -849,18 +849,17 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
-        [Category("SqlServer2012")]
         public void CanCreateSequence()
         {
-            var opt = IntegrationTestOptions.SqlServer2012;
-            if (!opt.IsEnabled)
-            {
-                Assert.Ignore("No processor found for the given action.");
-            }
-
-            ExecuteWithSqlServer2012(
+            ExecuteWithSupportedProcessors(
                 processor =>
                 {
+                    if (processor.DatabaseType != "SqlServer2012")
+                    {
+                        Assert.Ignore("A processor of type {0} isn't supported", processor.DatabaseType);
+                        return;
+                    }
+
                     var runner = new MigrationRunner(Assembly.GetExecutingAssembly(), _runnerContext, processor);
 
                     runner.Up(new TestCreateSequence());
@@ -868,12 +867,10 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateSequence());
                     processor.SequenceExists(null, "TestSequence").ShouldBeFalse();
-                }, true, opt);
+                }, true, pt => pt == typeof(SqlServerProcessor));
         }
 
         [Test]
-        [Category("SqlServer2012")]
-        [Category("Postgres")]
         public void CanCreateSequenceWithSchema()
         {
             if (!IntegrationTestOptions.SqlServer2012.IsEnabled && !IntegrationTestOptions.Postgres.IsEnabled)
@@ -1251,7 +1248,7 @@ namespace FluentMigrator.Tests.Integration
             {
                 connection.Close();
 
-                var cleanupProcessor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerDbFactory());
+                var cleanupProcessor = new SqlServerProcessor(origProcessor.DatabaseType, connection, new SqlServer2008Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerDbFactory());
                 MigrationRunner cleanupRunner = SetupMigrationRunner(cleanupProcessor);
                 cleanupRunner.RollbackToVersion(0);
 

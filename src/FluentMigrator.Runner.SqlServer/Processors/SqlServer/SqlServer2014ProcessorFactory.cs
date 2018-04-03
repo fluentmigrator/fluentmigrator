@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Runner.Generators.SqlServer;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
@@ -8,7 +8,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             var factory = new SqlServerDbFactory();
             var connection = factory.CreateConnection(connectionString);
-            return new SqlServerProcessor(connection, new SqlServer2014Generator(), announcer, options, factory);
+            return new SqlServerProcessor("SqlServer2014", connection, new SqlServer2014Generator(), announcer, options, factory);
         }
     }
 }

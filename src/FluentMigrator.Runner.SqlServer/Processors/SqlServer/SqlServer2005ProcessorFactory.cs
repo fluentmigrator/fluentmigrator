@@ -27,7 +27,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             var factory = new SqlServerDbFactory();
             var connection = factory.CreateConnection(connectionString);
-            return new SqlServerProcessor(connection, new SqlServer2005Generator(), announcer, options, factory);
+            return new SqlServerProcessor("SqlServer2005", connection, new SqlServer2005Generator(), announcer, options, factory);
         }
     }
 }
