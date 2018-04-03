@@ -138,7 +138,7 @@ namespace FluentMigrator.Tests.Integration
         {
             Debug.Assert(serverOptions.IsEnabled);
 
-            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            var announcer = new TextWriterAnnouncer(TestContext.Out);
             announcer.Heading("Testing Migration against MS SQL Server 2016");
             var generator = new SqlServer2016Generator();
 
@@ -149,7 +149,7 @@ namespace FluentMigrator.Tests.Integration
         {
             Debug.Assert(serverOptions.IsEnabled);
 
-            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            var announcer = new TextWriterAnnouncer(TestContext.Out);
             announcer.Heading("Testing Migration against MS SQL Server 2014");
             var generator = new SqlServer2014Generator();
 
@@ -160,7 +160,7 @@ namespace FluentMigrator.Tests.Integration
         {
             Debug.Assert(serverOptions.IsEnabled);
 
-            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            var announcer = new TextWriterAnnouncer(TestContext.Out);
             announcer.Heading("Testing Migration against MS SQL Server 2012");
             var generator = new SqlServer2012Generator();
 
@@ -171,7 +171,7 @@ namespace FluentMigrator.Tests.Integration
         {
             Debug.Assert(serverOptions.IsEnabled);
 
-            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            var announcer = new TextWriterAnnouncer(TestContext.Out);
             announcer.Heading("Testing Migration against MS SQL Server 2008");
             var generator = new SqlServer2008Generator();
 
@@ -182,7 +182,7 @@ namespace FluentMigrator.Tests.Integration
         {
             Debug.Assert(serverOptions.IsEnabled);
 
-            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            var announcer = new TextWriterAnnouncer(TestContext.Out);
             announcer.Heading("Testing Migration against MS SQL Server 2005");
             var generator = new SqlServer2005Generator();
 
@@ -208,7 +208,7 @@ namespace FluentMigrator.Tests.Integration
             if (!serverOptions.IsEnabled)
                 return;
 
-            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            var announcer = new TextWriterAnnouncer(TestContext.Out);
             announcer.Heading("Testing Migration against SQLite");
 
             var factory = new SQLiteDbFactory();
@@ -229,13 +229,13 @@ namespace FluentMigrator.Tests.Integration
             if (!serverOptions.IsEnabled)
                 return;
 
-            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            var announcer = new TextWriterAnnouncer(TestContext.Out);
             announcer.Heading("Testing Migration against Postgres");
 
             var factory = new SqlAnywhereDbFactory();
             using (var connection = factory.CreateConnection(serverOptions.ConnectionString))
             {
-                var processor = new SqlAnywhereProcessor(connection, new SqlAnywhere16Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), factory);
+                var processor = new SqlAnywhereProcessor(connection, new SqlAnywhere16Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), factory);
 
                 test(processor);
 
@@ -251,12 +251,12 @@ namespace FluentMigrator.Tests.Integration
             if (!serverOptions.IsEnabled)
                 return;
 
-            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            var announcer = new TextWriterAnnouncer(TestContext.Out);
             announcer.Heading("Testing Migration against Postgres");
 
             using (var connection = new NpgsqlConnection(serverOptions.ConnectionString))
             {
-                var processor = new PostgresProcessor(connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new PostgresDbFactory());
+                var processor = new PostgresProcessor(connection, new PostgresGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new PostgresDbFactory());
 
                 test(processor);
 
@@ -272,7 +272,7 @@ namespace FluentMigrator.Tests.Integration
             if (!serverOptions.IsEnabled)
                 return;
 
-            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            var announcer = new TextWriterAnnouncer(TestContext.Out);
             announcer.Heading("Testing Migration against MySQL Server");
 
             using (var connection = new MySqlConnection(serverOptions.ConnectionString))
@@ -292,7 +292,7 @@ namespace FluentMigrator.Tests.Integration
             if (!serverOptions.IsEnabled)
                 return;
 
-            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            var announcer = new TextWriterAnnouncer(TestContext.Out);
             announcer.ShowSql = true;
             announcer.Heading("Testing Migration against Firebird Server");
 

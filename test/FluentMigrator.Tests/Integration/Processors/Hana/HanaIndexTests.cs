@@ -22,7 +22,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         public void SetUp()
         {
             Connection = new HanaConnection(IntegrationTestOptions.Hana.ConnectionString);
-            Processor = new HanaProcessor(Connection, new HanaGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new HanaDbFactory());
+            Processor = new HanaProcessor(Connection, new HanaGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new HanaDbFactory());
             Quoter = new HanaQuoter();
             Connection.Open();
             Processor.BeginTransaction();

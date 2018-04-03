@@ -36,7 +36,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
         public void SetUp()
         {
             Connection = new OleDbConnection(IntegrationTestOptions.Jet.ConnectionString);
-            Processor = new JetProcessor(Connection, new JetGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions());
+            Processor = new JetProcessor(Connection, new JetGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions());
             Connection.Open();
         }
 

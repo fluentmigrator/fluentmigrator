@@ -66,7 +66,7 @@ namespace FluentMigrator.Tests.Integration
         [SetUp]
         public void SetUp()
         {
-            _runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+            _runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
                                         {
                                             Namespace = "FluentMigrator.Tests.Integration.Migrations"
                                         };
@@ -377,7 +377,7 @@ namespace FluentMigrator.Tests.Integration
         {
             ExecuteWithSupportedProcessors(processor =>
             {
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
                 {
                     Namespace = typeof(TestMigration).Namespace,
                 };
@@ -395,7 +395,7 @@ namespace FluentMigrator.Tests.Integration
         {
             ExecuteWithSupportedProcessors(processor =>
             {
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
                 {
                     Namespace = typeof(TestMigration).Namespace,
                 };
@@ -505,7 +505,7 @@ namespace FluentMigrator.Tests.Integration
                 return;
 
             var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
-            var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
+            var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerDbFactory());
 
             MigrationRunner runner = SetupMigrationRunner(processor);
             runner.MigrateUp();
@@ -528,7 +528,7 @@ namespace FluentMigrator.Tests.Integration
                 return;
 
             var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
-            var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
+            var processor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerDbFactory());
 
             MigrationRunner runner = SetupMigrationRunner(processor);
             runner.MigrateUp(1);
@@ -551,7 +551,7 @@ namespace FluentMigrator.Tests.Integration
             {
                 var assembly = typeof(TenantATable).Assembly;
 
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
                 {
                     Namespace = typeof(TenantATable).Namespace,
                     Tags = new[] { "TenantA" }
@@ -582,7 +582,7 @@ namespace FluentMigrator.Tests.Integration
             {
                 var assembly = typeof(TenantATable).Assembly;
 
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
                 {
                     Namespace = typeof(TenantATable).Namespace,
                     Tags = new[] { "TenantA", "TenantB" }
@@ -613,7 +613,7 @@ namespace FluentMigrator.Tests.Integration
             {
                 var assembly = typeof(TenantATable).Assembly;
 
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
                 {
                     Namespace = typeof(TenantATable).Namespace,
                     Tags = new[] { "TenantB" }
@@ -642,7 +642,7 @@ namespace FluentMigrator.Tests.Integration
             var assembly = typeof(TenantATable).Assembly;
             var migrationsNamespace = typeof(TenantATable).Namespace;
 
-            var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+            var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
             {
                 Namespace = migrationsNamespace,
             };
@@ -738,7 +738,7 @@ namespace FluentMigrator.Tests.Integration
             {
                 var assembly = typeof(TenantATable).Assembly;
 
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
                 {
                     Namespace = typeof(TenantATable).Namespace
                 };
@@ -770,8 +770,8 @@ namespace FluentMigrator.Tests.Integration
 
             var assembly = typeof(User).Assembly;
 
-            var runnerContext1 = new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = typeof(Migrations.Interleaved.Pass2.User).Namespace };
-            var runnerContext2 = new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = typeof(Migrations.Interleaved.Pass3.User).Namespace };
+            var runnerContext1 = new RunnerContext(new TextWriterAnnouncer(TestContext.Out)) { Namespace = typeof(Migrations.Interleaved.Pass2.User).Namespace };
+            var runnerContext2 = new RunnerContext(new TextWriterAnnouncer(TestContext.Out)) { Namespace = typeof(Migrations.Interleaved.Pass3.User).Namespace };
 
             try
             {
@@ -807,8 +807,8 @@ namespace FluentMigrator.Tests.Integration
 
             var assembly = typeof(User).Assembly;
 
-            var runnerContext1 = new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = typeof(Migrations.Interleaved.Pass2.User).Namespace };
-            var runnerContext2 = new RunnerContext(new TextWriterAnnouncer(System.Console.Out)) { Namespace = typeof(Migrations.Interleaved.Pass3.User).Namespace };
+            var runnerContext1 = new RunnerContext(new TextWriterAnnouncer(TestContext.Out)) { Namespace = typeof(Migrations.Interleaved.Pass2.User).Namespace };
+            var runnerContext2 = new RunnerContext(new TextWriterAnnouncer(TestContext.Out)) { Namespace = typeof(Migrations.Interleaved.Pass3.User).Namespace };
 
             VersionOrderInvalidException caughtException = null;
 
@@ -1237,7 +1237,7 @@ namespace FluentMigrator.Tests.Integration
         private static MigrationRunner SetupMigrationRunner(IMigrationProcessor processor)
         {
             Assembly asm = typeof(MigrationRunnerTests).Assembly;
-            var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+            var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
             {
                 Namespace = "FluentMigrator.Tests.Integration.Migrations"
             };
@@ -1251,7 +1251,7 @@ namespace FluentMigrator.Tests.Integration
             {
                 connection.Close();
 
-                var cleanupProcessor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerDbFactory());
+                var cleanupProcessor = new SqlServerProcessor(connection, new SqlServer2008Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerDbFactory());
                 MigrationRunner cleanupRunner = SetupMigrationRunner(cleanupProcessor);
                 cleanupRunner.RollbackToVersion(0);
 

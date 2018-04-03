@@ -39,7 +39,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana.EndToEnd
 
         protected TaskExecutor MakeTask(string task, string migrationsNamespace)
         {
-            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            var announcer = new TextWriterAnnouncer(TestContext.Out);
             var runnerContext = new RunnerContext(announcer)
             {
                 Database = "Hana",

@@ -27,7 +27,7 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
         {
             Connection = new MySqlConnection(IntegrationTestOptions.MySql.ConnectionString);
             Processor = new MySqlProcessor(Connection, new MySql4Generator(),
-                new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new MySqlDbFactory());
+                new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new MySqlDbFactory());
             Connection.Open();
         }
 

@@ -28,7 +28,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		{
 			this.Factory = dbFactory;
 			this.Connection = this.Factory.CreateConnection(IntegrationTestOptions.Oracle.ConnectionString);
-			this.Processor = new OracleProcessor(this.Connection, new OracleGenerator(), new TextWriterAnnouncer(System.Console.Out), new TestMigrationProcessorOptions(), this.Factory);
+			this.Processor = new OracleProcessor(this.Connection, new OracleGenerator(), new TextWriterAnnouncer(TestContext.Out), new TestMigrationProcessorOptions(), this.Factory);
 			this.Connection.Open();
 		}
 
