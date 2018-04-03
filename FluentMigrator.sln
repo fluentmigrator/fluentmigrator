@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2AC15906-580E-4530-A860-6BA6301CAD2E}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.travis.yml = .travis.yml
 		CHANGELOG.md = CHANGELOG.md
 		Global.proj = Global.proj
 		README.md = README.md
@@ -61,7 +62,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentMigrator.Runner.SqlAn
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentMigrator.Extensions.SqlAnywhere", "src\FluentMigrator.Extensions.SqlAnywhere\FluentMigrator.Extensions.SqlAnywhere.csproj", "{7A12D84F-564F-4B3B-8DEF-336D3037B896}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Runner.Redshift", "src\FluentMigrator.Runner.Redshift\FluentMigrator.Runner.Redshift.csproj", "{84556028-BC75-4C2C-B943-532F49A8DBF6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentMigrator.Runner.Redshift", "src\FluentMigrator.Runner.Redshift\FluentMigrator.Runner.Redshift.csproj", "{84556028-BC75-4C2C-B943-532F49A8DBF6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
