@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - `IQuerySchema.DatabaseType` now returns `SqlServer2016`, etc... and not `SqlServer` any more
 - Database specific code was moved into its own assemblies
+- `IMigrationConventions` was renamed to `IMigrationRunnerConventions`
+- `IMigrationContext` doesn't contain the `IMigrationConventions` any more
+  - Expression conventions are now bundled in the new `IConventionSet`
+- `ICanBeConventional` was removed during the overhaul of the expression convention system
 
 ### Added
 
