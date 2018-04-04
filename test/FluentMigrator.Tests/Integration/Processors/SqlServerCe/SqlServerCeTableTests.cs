@@ -1,4 +1,4 @@
-﻿using System.Data.SqlServerCe;
+using System.Data.SqlServerCe;
 using System.IO;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.SqlServer;
@@ -12,6 +12,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
 {
     [TestFixture]
     [Category("Integration")]
+    [Category("SqlServerCe")]
     public class SqlServerCeTableTests : BaseTableTests
     {
         public string DatabaseFilename { get; set; }
@@ -21,7 +22,8 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         [SetUp]
         public void SetUp()
         {
-            DatabaseFilename = "TestDatabase.sdf";
+            var csb = new SqlCeConnectionStringBuilder(IntegrationTestOptions.SqlServerCe.ConnectionString);
+            DatabaseFilename = HostUtilities.ReplaceDataDirectory(csb.DataSource);
             RecreateDatabase();
             Connection = new SqlCeConnection(IntegrationTestOptions.SqlServerCe.ConnectionString);
             Processor = new SqlServerCeProcessor(Connection, new SqlServerCeGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerCeDbFactory());
