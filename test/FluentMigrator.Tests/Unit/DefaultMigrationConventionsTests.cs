@@ -408,7 +408,7 @@ namespace FluentMigrator.Tests.Unit
         public void GetAutoScriptUpName()
         {
             var querySchema = new SqlServerProcessor("SqlServer", null, null, null, null, null);
-            var context = new MigrationContext(null, querySchema, null, null, null);
+            var context = new MigrationContext(querySchema, null, null, null);
             var expr = new AutoScriptMigrationFake();
             expr.GetUpExpressions(context);
 
@@ -422,7 +422,7 @@ namespace FluentMigrator.Tests.Unit
         public void GetAutoScriptDownName()
         {
             var querySchema = new SqlServerProcessor("SqlServer", null, null, null, null, null);
-            var context = new MigrationContext(null, querySchema, null, null, null);
+            var context = new MigrationContext(querySchema, null, null, null);
             var expr = new AutoScriptMigrationFake();
             expr.GetDownExpressions(context);
 

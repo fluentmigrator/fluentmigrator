@@ -18,9 +18,10 @@
 
 using System;
 using System.Collections.Generic;
+
 using FluentMigrator.Infrastructure;
 
-namespace FluentMigrator
+namespace FluentMigrator.Runner
 {
     public interface IMigrationConventions
     {

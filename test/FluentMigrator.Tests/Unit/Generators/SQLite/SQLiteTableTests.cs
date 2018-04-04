@@ -301,9 +301,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
         [Test]
         public void Issue804()
         {
-            var context = new MigrationContext(
-                DefaultMigrationConventions.Instance,
-                null, null, null, null);
+            var context = new MigrationContext(null, null, null, null);
 
             var expression = new CreateTableExpression()
             {

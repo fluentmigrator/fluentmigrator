@@ -24,9 +24,8 @@ namespace FluentMigrator.Infrastructure
 {
     public class MigrationContext : IMigrationContext
     {
-        public MigrationContext(IMigrationConventions conventions, IQuerySchema querySchema, IAssemblyCollection migrationAssemblies, object context, string connection)
+        public MigrationContext(IQuerySchema querySchema, IAssemblyCollection migrationAssemblies, object context, string connection)
         {
-            Conventions = conventions;
             Expressions = new List<IMigrationExpression>();
             QuerySchema = querySchema;
             MigrationAssemblies = migrationAssemblies;
@@ -34,7 +33,6 @@ namespace FluentMigrator.Infrastructure
             this.Connection = connection;
         }
 
-        public virtual IMigrationConventions Conventions { get; set; }
         public virtual ICollection<IMigrationExpression> Expressions { get; set; }
         public virtual IQuerySchema QuerySchema { get; set; }
         public virtual IAssemblyCollection MigrationAssemblies { get; set; }
