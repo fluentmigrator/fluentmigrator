@@ -151,15 +151,6 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        public void WorkingDirectoryConventionDefaultsToAssemblyFolder()
-        {
-            var defaultWorkingDirectory = _default.GetWorkingDirectory();
-
-            defaultWorkingDirectory.ShouldNotBeNull();
-            defaultWorkingDirectory.Contains("bin").ShouldBeTrue();
-        }
-
-        [Test]
         public void DefaultSchemaConventionDefaultsToNull()
         {
             _default.GetDefaultSchema()
