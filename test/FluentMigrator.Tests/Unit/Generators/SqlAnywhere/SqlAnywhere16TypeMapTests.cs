@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         public class AnsistringTests : SqlAnywhere16TypeMapTests
         {
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_maps_ansistring_by_default_to_varchar_255()
             {
                 var template = TypeMap.GetTypeMap(DbType.AnsiString, 0, 0);
@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             [TestCase(1)]
             [TestCase(4000)]
             [TestCase(8000)]
@@ -45,7 +45,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             [TestCase(8001)]
             [TestCase(2147483647)]
             public void it_maps_ansistring_with_size_above_8000_to_text(int size)
@@ -60,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         public class AnsistringFixedLengthTests : SqlAnywhere16TypeMapTests
         {
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_maps_ansistring_fixed_length_by_default_to_char_255()
             {
                 var template = TypeMap.GetTypeMap(DbType.AnsiStringFixedLength, 0, 0);
@@ -69,7 +69,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             [TestCase(1)]
             [TestCase(4000)]
             [TestCase(8000)]
@@ -81,7 +81,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_throws_if_ansistring_fixed_length_has_size_above_8000()
             {
                 Should.Throw<NotSupportedException>(
@@ -93,7 +93,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         public class StringTests : SqlAnywhere16TypeMapTests
         {
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_maps_string_by_default_to_nvarchar_255()
             {
                 var template = TypeMap.GetTypeMap(DbType.String, 0, 0);
@@ -102,7 +102,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             [TestCase(1)]
             [TestCase(4000)]
             public void it_maps_string_with_size_to_nvarchar_of_size(int size)
@@ -113,7 +113,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             [TestCase(4001)]
             [TestCase(1073741823)]
             public void it_maps_string_with_size_above_4000_to_ntext(int size)
@@ -124,7 +124,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_maps_string_with_size_above_1073741823_to_ntext_to_allow_int_maxvalue_convention()
             {
                 var template = TypeMap.GetTypeMap(DbType.String, int.MaxValue, 0);
@@ -137,7 +137,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         public class StringFixedLengthTests : SqlAnywhere16TypeMapTests
         {
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_maps_string_fixed_length_by_default_to_nchar_255()
             {
                 var template = TypeMap.GetTypeMap(DbType.StringFixedLength, 0, 0);
@@ -147,7 +147,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
 
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             [TestCase(1)]
             [TestCase(4000)]
             public void it_maps_string_fixed_length_with_size_to_nchar_of_size(int size)
@@ -158,7 +158,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_throws_if_string_fixed_length_has_size_above_4000()
             {
                 Should.Throw<NotSupportedException>(
@@ -170,7 +170,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         public class BinaryTests : SqlAnywhere16TypeMapTests
         {
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_maps_binary_by_default_to_varbinary_8000()
             {
                 var template = TypeMap.GetTypeMap(DbType.Binary, 0, 0);
@@ -179,7 +179,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             [TestCase(1)]
             [TestCase(4000)]
             [TestCase(8000)]
@@ -191,7 +191,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             [TestCase(8001)]
             [TestCase(int.MaxValue)]
             public void it_maps_binary_with_size_above_8000_to_image(int size)
@@ -206,7 +206,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         public class NumericTests : SqlAnywhere16TypeMapTests
         {
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_maps_boolean_to_bit()
             {
                 var template = TypeMap.GetTypeMap(DbType.Boolean, 0, 0);
@@ -215,7 +215,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_maps_byte_to_tinyint()
             {
                 var template = TypeMap.GetTypeMap(DbType.Byte, 0, 0);
@@ -224,7 +224,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_maps_int16_to_smallint()
             {
                 var template = TypeMap.GetTypeMap(DbType.Int16, 0, 0);
@@ -233,7 +233,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_maps_int32_to_integer()
             {
                 var template = TypeMap.GetTypeMap(DbType.Int32, 0, 0);
@@ -242,7 +242,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_maps_int64_to_bigint()
             {
                 var template = TypeMap.GetTypeMap(DbType.Int64, 0, 0);
@@ -251,7 +251,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_maps_single_to_real()
             {
                 var template = TypeMap.GetTypeMap(DbType.Single, 0, 0);
@@ -260,7 +260,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_maps_double_to_double_precision()
             {
                 var template = TypeMap.GetTypeMap(DbType.Double, 0, 0);
@@ -269,7 +269,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_maps_currency_to_money()
             {
                 var template = TypeMap.GetTypeMap(DbType.Currency, 0, 0);
@@ -278,7 +278,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_maps_decimal_by_default_to_decimal_30_6()
             {
                 var template = TypeMap.GetTypeMap(DbType.Decimal, 0, 0);
@@ -287,7 +287,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             [TestCase(1)]
             [TestCase(20)]
             [TestCase(38)]
@@ -299,7 +299,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_throws_if_decimal_precision_is_above_127()
             {
                 Should.Throw<NotSupportedException>(
@@ -307,7 +307,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_maps_varnumeric_by_default_to_numeric_19_5()
             {
                 var template = TypeMap.GetTypeMap(DbType.VarNumeric, 0, 0);
@@ -316,7 +316,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             [TestCase(1)]
             [TestCase(20)]
             [TestCase(38)]
@@ -328,7 +328,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_throws_if_varnumeric_precision_is_above_127()
             {
                 Should.Throw<NotSupportedException>(
@@ -340,7 +340,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         public class GuidTests : SqlAnywhere16TypeMapTests
         {
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_maps_guid_to_uniqueidentifier()
             {
                 var template = TypeMap.GetTypeMap(DbType.Guid, 0, 0);
@@ -353,7 +353,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         public class DateTimeTests : SqlAnywhere16TypeMapTests
         {
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_maps_time_to_datetime()
             {
                 var template = TypeMap.GetTypeMap(DbType.Time, 0, 0);
@@ -362,7 +362,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_maps_date_to_date()
             {
                 var template = TypeMap.GetTypeMap(DbType.Date, 0, 0);
@@ -371,7 +371,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             }
 
             [Test]
-            [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("TypeMap")]
+            [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("TypeMap")]
             public void it_maps_datetime_to_datetime()
             {
                 var template = TypeMap.GetTypeMap(DbType.DateTime, 0, 0);

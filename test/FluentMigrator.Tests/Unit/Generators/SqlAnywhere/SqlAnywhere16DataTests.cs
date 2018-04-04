@@ -17,7 +17,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Delete")]
+        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Delete")]
         public override void CanDeleteDataForAllRowsWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
@@ -28,7 +28,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Delete")]
+        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Delete")]
         public override void CanDeleteDataForAllRowsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
@@ -38,7 +38,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Delete")]
+        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Delete")]
         public override void CanDeleteDataForMultipleRowsWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
@@ -49,7 +49,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Delete")]
+        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Delete")]
         public override void CanDeleteDataForMultipleRowsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
@@ -59,7 +59,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Delete")]
+        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Delete")]
         public override void CanDeleteDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
@@ -70,7 +70,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Delete")]
+        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Delete")]
         public override void CanDeleteDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
@@ -87,7 +87,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Insert")]
+        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Insert")]
         public override void CanInsertDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
@@ -101,7 +101,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Insert")]
+        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Insert")]
         public override void CanInsertDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
@@ -114,7 +114,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Insert")]
+        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Insert")]
         public override void CanInsertGuidDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
@@ -125,7 +125,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Insert")]
+        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Insert")]
         public override void CanInsertGuidDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
@@ -135,7 +135,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Update")]
+        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Update")]
         public override void CanUpdateDataForAllDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
@@ -146,7 +146,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Update")]
+        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Update")]
         public override void CanUpdateDataForAllDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
@@ -156,7 +156,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Update")]
+        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Update")]
         public override void CanUpdateDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
@@ -167,7 +167,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Update")]
+        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Update")]
         public override void CanUpdateDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
