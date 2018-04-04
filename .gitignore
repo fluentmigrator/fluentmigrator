@@ -263,3 +263,7 @@ __pycache__/
 GitVersion\.CommandLine\.*/
 
 \.vscode/
+
+*.ncrunchproject
+
+*.ncrunchsolution
