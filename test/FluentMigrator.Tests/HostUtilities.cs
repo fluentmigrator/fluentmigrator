@@ -15,7 +15,10 @@
 #endregion
 
 using System;
+using System.Data.SqlServerCe;
+using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 
 namespace FluentMigrator.Tests
 {
@@ -40,6 +43,39 @@ namespace FluentMigrator.Tests
                 str = Path.Combine(path1, inputString.Substring(length));
             }
             return str;
+        }
+
+        public static bool ProbeSqlServerCeBehavior()
+        {
+            var asm = typeof(System.Data.SqlServerCe.SqlCeConnection).Assembly;
+            var type = asm.GetType("System.Data.SqlServerCe.NativeMethods");
+            if (SqlServerCeCanFindItsLibraries(type))
+                return true;
+
+            return SqlServerCeLoadBinaries(type);
+        }
+
+        private static bool SqlServerCeLoadBinaries(Type type)
+        {
+            var method = type.GetMethod("LoadNativeBinariesFromPrivateFolder", BindingFlags.NonPublic | BindingFlags.InvokeMethod | BindingFlags.Static);
+            Debug.Assert(method != null, nameof(method) + " != null");
+            var result = (bool)method.Invoke(null, new object[] { AppContext.BaseDirectory });
+            return result;
+        }
+
+        private static bool SqlServerCeCanFindItsLibraries(Type type)
+        {
+            var method = type.GetMethod("LoadNativeBinaries", BindingFlags.NonPublic | BindingFlags.InvokeMethod | BindingFlags.Static);
+            try
+            {
+                Debug.Assert(method != null, nameof(method) + " != null");
+                method.Invoke(null, null);
+                return true;
+            }
+            catch (TargetInvocationException ex) when (ex.InnerException is SqlCeException sce && sce.NativeError == -1)
+            {
+                return false;
+            }
         }
     }
 }

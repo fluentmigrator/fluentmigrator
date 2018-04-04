@@ -24,6 +24,11 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         [SetUp]
         public void SetUp()
         {
+            if (!HostUtilities.ProbeSqlServerCeBehavior())
+            {
+                Assert.Ignore("SQL Server CE binaries not found");
+            }
+
             var csb = new SqlCeConnectionStringBuilder(IntegrationTestOptions.SqlServerCe.ConnectionString);
             DatabaseFilename = HostUtilities.ReplaceDataDirectory(csb.DataSource);
             RecreateDatabase();
