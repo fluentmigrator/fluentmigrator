@@ -56,16 +56,37 @@ namespace FluentMigrator.Runner
                 schemaConvention,
             };
 
+            AutoNameConventions = new List<IAutoNameConvention>()
+            {
+                new DefaultAutoNameConvention(),
+            };
+
             SchemaConvention = schemaConvention;
             RootPathConvention = new DefaultRootPathConvention(runnerContext?.WorkingDirectory);
         }
 
+        /// <inheritdoc />
         public IRootPathConvention RootPathConvention { get; }
+
+        /// <inheritdoc />
         public DefaultSchemaConvention SchemaConvention { get; }
+
+        /// <inheritdoc />
         public IList<IColumnsConvention> ColumnsConventions { get; }
+
+        /// <inheritdoc />
         public IList<IConstraintConvention> ConstraintConventions { get; }
+
+        /// <inheritdoc />
         public IList<IForeignKeyConvention> ForeignKeyConventions { get; }
+
+        /// <inheritdoc />
         public IList<IIndexConvention> IndexConventions { get; }
+
+        /// <inheritdoc />
         public IList<ISequenceConvention> SequenceConventions { get; }
+
+        /// <inheritdoc />
+        public IList<IAutoNameConvention> AutoNameConventions { get; }
     }
 }

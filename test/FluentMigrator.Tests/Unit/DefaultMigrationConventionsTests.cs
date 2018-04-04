@@ -16,10 +16,14 @@
 //
 #endregion
 
+using System.Linq;
+
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Infrastructure;
+using FluentMigrator.Runner.Processors.SqlServer;
 
 using NUnit.Framework;
 using NUnit.Should;
@@ -403,21 +407,30 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void GetAutoScriptUpName()
         {
-            var type = typeof(AutoScriptMigrationFake);
-            var databaseType = "sqlserver";
+            var querySchema = new SqlServerProcessor("SqlServer", null, null, null, null, null);
+            var context = new MigrationContext(null, querySchema, null, null, null);
+            var expr = new AutoScriptMigrationFake();
+            expr.GetUpExpressions(context);
 
-            _default.GetAutoScriptUpName(type, databaseType)
-                .ShouldBe("Scripts.Up.20130508175300_AutoScriptMigrationFake_sqlserver.sql");
+            var expression = context.Expressions.Single();
+            var processed = (IAutoNameExpression)expression.Apply(ConventionSets.NoSchemaName);
+            processed.AutoName
+                .ShouldBe("Scripts.Up.20130508175300_AutoScriptMigrationFake_SqlServer.sql");
         }
 
         [Test]
         public void GetAutoScriptDownName()
         {
-            var type = typeof(AutoScriptMigrationFake);
-            var databaseType = "sqlserver";
+            var querySchema = new SqlServerProcessor("SqlServer", null, null, null, null, null);
+            var context = new MigrationContext(null, querySchema, null, null, null);
+            var expr = new AutoScriptMigrationFake();
+            expr.GetDownExpressions(context);
 
-            _default.GetAutoScriptDownName(type, databaseType)
-                .ShouldBe("Scripts.Down.20130508175300_AutoScriptMigrationFake_sqlserver.sql");
+            var expression = context.Expressions.Single();
+            var processed = (IAutoNameExpression)expression.Apply(ConventionSets.NoSchemaName);
+
+            processed.AutoName
+                .ShouldBe("Scripts.Down.20130508175300_AutoScriptMigrationFake_SqlServer.sql");
         }
 
         private class ConventionsTestClass : ISchemaExpression, IFileSystemExpression

@@ -32,7 +32,7 @@ namespace FluentMigrator.Runner.Processors
 
             // Prefetch connectionstring as after opening the security info could no longer be present
             // for instance on sql server
-            connectionString = connection.ConnectionString;
+            connectionString = connection?.ConnectionString;
 
             Factory = factory;
         }

@@ -39,29 +39,22 @@ namespace FluentMigrator.Runner.Conventions
         /// </remarks>
         public DefaultSchemaConvention SchemaConvention { get; set; }
 
-        /// <summary>
-        /// Gets or sets the conventions to be applied to <see cref="IColumnsExpression"/> implementations
-        /// </summary>
+        /// <inheritdoc />
         public IList<IColumnsConvention> ColumnsConventions { get; } = new List<IColumnsConvention>();
 
-        /// <summary>
-        /// Gets or sets the conventions to be applied to <see cref="IConstraintExpression"/> implementations
-        /// </summary>
+        /// <inheritdoc />
         public IList<IConstraintConvention> ConstraintConventions { get; } = new List<IConstraintConvention>();
 
-        /// <summary>
-        /// Gets or sets the conventions to be applied to <see cref="IForeignKeyExpression"/> implementations
-        /// </summary>
+        /// <inheritdoc />
         public IList<IForeignKeyConvention> ForeignKeyConventions { get; } = new List<IForeignKeyConvention>();
 
-        /// <summary>
-        /// Gets or sets the conventions to be applied to <see cref="IIndexExpression"/> implementations
-        /// </summary>
+        /// <inheritdoc />
         public IList<IIndexConvention> IndexConventions { get; } = new List<IIndexConvention>();
 
-        /// <summary>
-        /// Gets or sets the conventions to be applied to <see cref="ISequenceExpression"/> implementations
-        /// </summary>
+        /// <inheritdoc />
         public IList<ISequenceConvention> SequenceConventions { get; } = new List<ISequenceConvention>();
+
+        /// <inheritdoc />
+        public IList<IAutoNameConvention> AutoNameConventions { get; } = new List<IAutoNameConvention>();
     }
 }

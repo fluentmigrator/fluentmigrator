@@ -62,6 +62,10 @@ namespace FluentMigrator.Tests
                 {
                     schemaConvention,
                 },
+                AutoNameConventions =
+                {
+                    new DefaultAutoNameConvention(),
+                }
             };
         }
     }

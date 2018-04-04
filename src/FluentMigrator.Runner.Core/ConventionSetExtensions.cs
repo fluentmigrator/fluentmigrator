@@ -113,6 +113,16 @@ namespace FluentMigrator.Runner
                 expression = (T) sequenceExpression;
             }
 
+            if (expression is IAutoNameExpression autoNameExpression)
+            {
+                foreach (var convention in conventionSet.AutoNameConventions)
+                {
+                    autoNameExpression = convention.Apply(autoNameExpression);
+                }
+
+                expression = (T) autoNameExpression;
+            }
+
             return expression;
         }
     }

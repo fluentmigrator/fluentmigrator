@@ -63,5 +63,10 @@ namespace FluentMigrator.Runner.Conventions
         /// Gets the conventions to be applied to <see cref="ISequenceExpression"/> implementations
         /// </summary>
         IList<ISequenceConvention> SequenceConventions { get; }
+
+        /// <summary>
+        /// Gets the conventions to be applied to <see cref="IAutoNameExpression"/> implementations
+        /// </summary>
+        IList<IAutoNameConvention> AutoNameConventions { get; }
     }
 }

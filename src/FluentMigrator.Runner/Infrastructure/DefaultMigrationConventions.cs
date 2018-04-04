@@ -42,8 +42,6 @@ namespace FluentMigrator.Runner.Infrastructure
         public Func<Type, IMigrationInfo> GetMigrationInfo => GetMigrationInfoForImpl;
         public Func<Type, bool> TypeHasTags => TypeHasTagsImpl;
         public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags => TypeHasMatchingTagsImpl;
-        public Func<Type, string, string> GetAutoScriptUpName => GetAutoScriptUpNameImpl;
-        public Func<Type, string, string> GetAutoScriptDownName => GetAutoScriptDownNameImpl;
 
         private static bool TypeIsMigrationImpl(Type type)
         {
@@ -110,32 +108,6 @@ namespace FluentMigrator.Runner.Infrastructure
             }
 
             return false;
-        }
-
-        private static string GetAutoScriptUpNameImpl(Type type, string databaseType)
-        {
-            if (TypeIsMigrationImpl(type))
-            {
-                var version = type.GetOneAttribute<MigrationAttribute>().Version;
-                return string.Format("Scripts.Up.{0}_{1}_{2}.sql"
-                        , version
-                        , type.Name
-                        , databaseType);
-            }
-            return string.Empty;
-        }
-
-        private static string GetAutoScriptDownNameImpl(Type type, string databaseType)
-        {
-            if (TypeIsMigrationImpl(type))
-            {
-                var version = type.GetOneAttribute<MigrationAttribute>().Version;
-                return string.Format("Scripts.Down.{0}_{1}_{2}.sql"
-                        , version
-                        , type.Name
-                        , databaseType);
-            }
-            return string.Empty;
         }
     }
 }
