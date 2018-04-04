@@ -17,7 +17,6 @@
 //
 #endregion
 
-
 using System;
 using System.Data;
 using System.Data.SqlClient;
@@ -25,6 +24,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
@@ -41,7 +41,9 @@ using FluentMigrator.Tests.Integration.Migrations;
 using FluentMigrator.Tests.Integration.Migrations.Tagged;
 using FluentMigrator.Tests.Unit;
 using FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass3;
+
 using Moq;
+
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -49,16 +51,6 @@ namespace FluentMigrator.Tests.Integration
 {
     [TestFixture]
     [Category("Integration")]
-    [Category("Firebird")]
-    [Category("MySql")]
-    [Category("SQLite")]
-    [Category("Postgres")]
-    [Category("SqlServer2005")]
-    [Category("SqlServer2008")]
-    [Category("SqlServer2012")]
-    [Category("SqlServer2014")]
-    [Category("SqlServer2016")]
-    [Category("SqlAnywhere16")]
     public class MigrationRunnerTests : IntegrationTestBase
     {
         private IRunnerContext _runnerContext;
@@ -73,6 +65,16 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanRunMigration()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -92,6 +94,16 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanSilentlyFail()
         {
             try
@@ -124,6 +136,15 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanApplyForeignKeyConvention()
         {
             ExecuteWithSupportedProcessors(
@@ -140,6 +161,14 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("MySql")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanApplyForeignKeyConventionWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -155,6 +184,16 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanApplyIndexConvention()
         {
             ExecuteWithSupportedProcessors(
@@ -173,6 +212,15 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanApplyUniqueConvention()
         {
             ExecuteWithSupportedProcessors(
@@ -195,6 +243,16 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanApplyIndexConventionWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -213,6 +271,16 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanCreateAndDropIndex()
         {
             ExecuteWithSupportedProcessors(
@@ -237,6 +305,14 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("MySql")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanCreateAndDropIndexWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -264,6 +340,16 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanRenameTable()
         {
             ExecuteWithSupportedProcessors(
@@ -291,6 +377,16 @@ namespace FluentMigrator.Tests.Integration
 
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanRenameTableWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -321,6 +417,15 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanRenameColumn()
         {
             ExecuteWithSupportedProcessors(
@@ -345,6 +450,14 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("MySql")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanRenameColumnWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -373,6 +486,16 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanLoadMigrations()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -391,6 +514,16 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanLoadVersion()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -408,6 +541,16 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanRunMigrations()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -428,6 +571,16 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanMigrateASpecificVersion()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -448,6 +601,15 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanMigrateASpecificVersionDown()
         {
             try
@@ -499,6 +661,7 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("SqlServer2008")]
         public void MigrateUpWithSqlServerProcessorShouldCommitItsTransaction()
         {
             if (!IntegrationTestOptions.SqlServer2008.IsEnabled)
@@ -522,6 +685,7 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("SqlServer2008")]
         public void MigrateUpSpecificVersionWithSqlServerProcessorShouldCommitItsTransaction()
         {
             if (!IntegrationTestOptions.SqlServer2008.IsEnabled)
@@ -545,6 +709,16 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void MigrateUpWithTaggedMigrationsShouldOnlyApplyMatchedMigrations()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -576,6 +750,16 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void MigrateUpWithTaggedMigrationsAndUsingMultipleTagsShouldOnlyApplyMatchedMigrations()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -607,6 +791,16 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void MigrateUpWithDifferentTaggedShouldIgnoreConcreteOfTagged()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -637,6 +831,15 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void MigrateDownWithDifferentTagsToMigrateUpShouldApplyMatchedMigrations()
         {
             var assembly = typeof(TenantATable).Assembly;
@@ -680,6 +883,7 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("SqlServer2008")]
         public void VersionInfoCreationScriptsOnlyGeneratedOnceInPreviewMode()
         {
             if (!IntegrationTestOptions.SqlServer2008.IsEnabled)
@@ -732,6 +936,16 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void MigrateUpWithTaggedMigrationsShouldNotApplyAnyMigrationsIfNoTagsParameterIsPassedIntoTheRunner()
         {
             ExecuteWithSupportedProcessors(processor =>
@@ -762,6 +976,13 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void ValidateVersionOrderShouldDoNothingIfUnappliedMigrationVersionIsGreaterThanLatestAppliedMigration()
         {
 
@@ -800,6 +1021,14 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void ValidateVersionOrderShouldThrowExceptionIfUnappliedMigrationVersionIsLessThanLatestAppliedMigration()
         {
             // Using SqlServer instead of SqlLite as versions not deleted from VersionInfo table when using Sqlite.
@@ -849,6 +1078,7 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("SqlServer2012")]
         public void CanCreateSequence()
         {
             ExecuteWithSupportedProcessors(
@@ -871,6 +1101,8 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Postgres")]
+        [Category("SqlServer2012")]
         public void CanCreateSequenceWithSchema()
         {
             if (!IntegrationTestOptions.SqlServer2012.IsEnabled && !IntegrationTestOptions.Postgres.IsEnabled)
@@ -906,6 +1138,14 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("MySql")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanAlterColumnWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -933,6 +1173,14 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("MySql")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanAlterTableWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -958,6 +1206,14 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("MySql")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanAlterTablesSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -983,6 +1239,15 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanCreateUniqueConstraint()
         {
             ExecuteWithSupportedProcessors(
@@ -1005,6 +1270,14 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("MySql")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanCreateUniqueConstraintWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -1030,6 +1303,15 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanInsertData()
         {
             ExecuteWithSupportedProcessors(
@@ -1048,6 +1330,14 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("MySql")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanInsertDataWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -1069,6 +1359,14 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("MySql")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanUpdateData()
         {
             ExecuteWithSupportedProcessors(
@@ -1097,6 +1395,15 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanDeleteData()
         {
             ExecuteWithSupportedProcessors(
@@ -1121,6 +1428,14 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("MySql")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanDeleteDataWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -1148,6 +1463,15 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanReverseCreateIndex()
         {
             ExecuteWithSupportedProcessors(
@@ -1172,6 +1496,15 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanReverseCreateUniqueConstraint()
         {
             ExecuteWithSupportedProcessors(
@@ -1193,6 +1526,15 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanReverseCreateUniqueConstraintWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -1218,6 +1560,15 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void CanExecuteSql()
         {
             ExecuteWithSupportedProcessors(
