@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using FluentMigrator.Infrastructure;
 
@@ -26,7 +27,9 @@ namespace FluentMigrator.Builders.Execute
     {
         void Sql(string sqlStatement);
         void Script(string pathToSqlScript);
+        void Script(string pathToSqlScript, IDictionary<string, string> parameters);
         void WithConnection(Action<IDbConnection, IDbTransaction> operation);
-        void EmbeddedScript(string EmbeddedSqlScriptName);
+        void EmbeddedScript(string embeddedSqlScriptName);
+        void EmbeddedScript(string embeddedSqlScriptName, IDictionary<string, string> parameters);
     }
 }
