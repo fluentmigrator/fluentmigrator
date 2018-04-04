@@ -1,4 +1,4 @@
-﻿namespace FluentMigrator.Tests.Integration.Processors.Db2
+namespace FluentMigrator.Tests.Integration.Processors.Db2
 {
     using System;
     using System.Collections.Generic;
@@ -16,6 +16,7 @@
 
     [TestFixture]
     [Category("Integration")]
+    [Category("Db2")]
     public class Db2TableTests : BaseTableTests
     {
         #region Properties

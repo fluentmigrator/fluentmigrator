@@ -15,6 +15,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
 {
     [TestFixture]
     [Category("Integration")]
+    [Category("Hana")]
     public class HanaProcessorTests
     {
         public HanaConnection Connection { get; set; }

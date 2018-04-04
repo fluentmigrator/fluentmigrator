@@ -12,6 +12,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
 {
     [TestFixture]
     [Category("Integration")]
+    [Category("Hana")]
     public class HanaColumnTests : BaseColumnTests
     {
         public HanaConnection Connection { get; set; }
@@ -79,7 +80,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
 
             Processor.ColumnExists("test_schema", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
-        
+
         [Test]
         public override void CallingColumnExistsReturnsTrueIfColumnExists()
         {

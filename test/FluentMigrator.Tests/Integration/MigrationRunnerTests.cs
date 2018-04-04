@@ -640,6 +640,16 @@ namespace FluentMigrator.Tests.Integration
         }
 
         [Test]
+        [Category("Firebird")]
+        [Category("MySql")]
+        [Category("SQLite")]
+        [Category("Postgres")]
+        [Category("SqlServer2005")]
+        [Category("SqlServer2008")]
+        [Category("SqlServer2012")]
+        [Category("SqlServer2014")]
+        [Category("SqlServer2016")]
+        [Category("SqlAnywhere16")]
         public void RollbackAllShouldRemoveVersionInfoTable()
         {
             ExecuteWithSupportedProcessors(processor =>

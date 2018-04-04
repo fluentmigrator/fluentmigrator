@@ -11,6 +11,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
 {
     [TestFixture]
     [Category("Integration")]
+    [Category("SqlServer2012")]
     public class SqlServerSequenceTests : BaseSequenceTests
     {
         public SqlConnection Connection { get; set; }

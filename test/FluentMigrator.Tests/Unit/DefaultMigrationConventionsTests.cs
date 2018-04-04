@@ -151,7 +151,6 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        [Category("Integration")]
         public void WorkingDirectoryConventionDefaultsToAssemblyFolder()
         {
             var defaultWorkingDirectory = _default.GetWorkingDirectory();

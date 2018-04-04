@@ -11,6 +11,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
 {
     [TestFixture]
     [Category("Integration")]
+    [Category("SqlServer2012")]
     public class SqlServerTableTests : BaseTableTests
     {
         public SqlConnection Connection { get; set; }
@@ -57,7 +58,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
             using (var table = new SqlServerTestTable(Processor, null, "id int"))
                 Processor.TableExists(null, table.Name).ShouldBeTrue();
         }
-        
+
         [Test]
         public override void CallingTableExistsReturnsTrueIfTableExistsWithSchema()
         {

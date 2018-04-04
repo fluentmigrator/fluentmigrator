@@ -14,7 +14,8 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 	[Category("Integration")]
-	public abstract class OracleIndexTestsBase : BaseIndexTests
+	[Category("Oracle")]
+    public abstract class OracleIndexTestsBase : BaseIndexTests
 	{
 		private const string SchemaName = "test";
 		private IDbConnection Connection { get; set; }

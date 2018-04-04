@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Collections.Generic;
 using System;
 
@@ -12,7 +12,8 @@ using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 	[Category( "Integration" )]
-	public abstract class OracleProcessorFactoryTestsBase
+	[Category("Oracle")]
+    public abstract class OracleProcessorFactoryTestsBase
 	{
 		private IMigrationProcessorFactory factory;
 		private string connectionString;
