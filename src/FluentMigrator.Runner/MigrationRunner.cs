@@ -52,7 +52,7 @@ namespace FluentMigrator.Runner
         public IMigrationInformationLoader MigrationLoader { get; set; }
         public IProfileLoader ProfileLoader { get; set; }
         public IMaintenanceLoader MaintenanceLoader { get; set; }
-        public IMigrationConventions Conventions { get; private set; }
+        public IMigrationRunnerConventions Conventions { get; private set; }
         public IList<Exception> CaughtExceptions { get; private set; }
 
         public IMigrationScope CurrentScope
@@ -77,7 +77,7 @@ namespace FluentMigrator.Runner
         public MigrationRunner(
             IAssemblyCollection assemblies, IRunnerContext runnerContext,
             IMigrationProcessor processor, IVersionTableMetaData versionTableMetaData = null,
-            IMigrationConventions migrationConventions = null)
+            IMigrationRunnerConventions migrationRunnerConventions = null)
         {
             _migrationAssemblies = assemblies;
             _announcer = runnerContext.Announcer;
@@ -88,7 +88,7 @@ namespace FluentMigrator.Runner
             SilentlyFail = false;
             CaughtExceptions = null;
 
-            Conventions = migrationConventions ?? GetMigrationConventions(runnerContext);
+            Conventions = migrationRunnerConventions ?? GetMigrationRunnerConventions(runnerContext);
 
             var convSet = new DefaultConventionSet(runnerContext);
 
@@ -180,18 +180,18 @@ namespace FluentMigrator.Runner
             VersionLoader.LoadVersionInfo();
         }
 
-        private IMigrationConventions GetMigrationConventions(IRunnerContext runnerContext)
+        private IMigrationRunnerConventions GetMigrationRunnerConventions(IRunnerContext runnerContext)
         {
             var matchedType = _migrationAssemblies
                 .GetExportedTypes()
-                .FirstOrDefault(t => typeof(IMigrationConventions).IsAssignableFrom(t));
+                .FirstOrDefault(t => typeof(IMigrationRunnerConventions).IsAssignableFrom(t));
 
             if (matchedType != null)
             {
-                return (IMigrationConventions) Activator.CreateInstance(matchedType);
+                return (IMigrationRunnerConventions) Activator.CreateInstance(matchedType);
             }
 
-            return new MigrationConventions();
+            return new MigrationRunnerConventions();
         }
 
         private IEnumerable<IMigrationInfo> GetUpMigrationsToApply(long version)

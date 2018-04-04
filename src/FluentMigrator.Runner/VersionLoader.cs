@@ -39,7 +39,7 @@ namespace FluentMigrator.Runner
         private bool _versionUniqueMigrationAlreadyRun;
         private bool _versionDescriptionMigrationAlreadyRun;
         private IVersionInfo _versionInfo;
-        private IMigrationConventions Conventions { get; set; }
+        private IMigrationRunnerConventions Conventions { get; set; }
         private IMigrationProcessor Processor { get; set; }
         protected IAssemblyCollection Assemblies { get; set; }
         public IVersionTableMetaData VersionTableMetaData { get; }
@@ -49,14 +49,14 @@ namespace FluentMigrator.Runner
         public IMigration VersionUniqueMigration { get; }
         public IMigration VersionDescriptionMigration { get; }
 
-        public VersionLoader(IMigrationRunner runner, Assembly assembly, IConventionSet conventionSet, IMigrationConventions conventions)
+        public VersionLoader(IMigrationRunner runner, Assembly assembly, IConventionSet conventionSet, IMigrationRunnerConventions conventions)
             : this(runner, new SingleAssembly(assembly), conventionSet, conventions)
         {
         }
 
         public VersionLoader(IMigrationRunner runner, IAssemblyCollection assemblies,
             IConventionSet conventionSet,
-            IMigrationConventions conventions,
+            IMigrationRunnerConventions conventions,
             IVersionTableMetaData versionTableMetaData = null)
         {
             _conventionSet = conventionSet;

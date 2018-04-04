@@ -10,7 +10,7 @@ namespace FluentMigrator.Runner
 {
     public class ProfileLoader : IProfileLoader
     {
-        public ProfileLoader(IRunnerContext runnerContext, IMigrationRunner runner, IMigrationConventions conventions)
+        public ProfileLoader(IRunnerContext runnerContext, IMigrationRunner runner, IMigrationRunnerConventions conventions)
         {
             Runner = runner;
             Assemblies = runner.MigrationAssemblies;
@@ -22,7 +22,7 @@ namespace FluentMigrator.Runner
 
         private IAssemblyCollection Assemblies { get; set; }
         private string Profile { get; set; }
-        protected IMigrationConventions Conventions { get; set; }
+        protected IMigrationRunnerConventions Conventions { get; set; }
         private IMigrationRunner Runner { get; set; }
 
         private IEnumerable<IMigration> _profiles;

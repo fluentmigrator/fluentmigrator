@@ -36,7 +36,7 @@ namespace FluentMigrator.Runner
 
         public ConnectionlessVersionLoader(IMigrationRunner runner, IAssemblyCollection assemblies,
             IConventionSet conventionSet,
-            IMigrationConventions conventions, long startVersion, long targetVersion,
+            IMigrationRunnerConventions conventions, long startVersion, long targetVersion,
             IVersionTableMetaData versionTableMetaData = null)
         {
             _conventionSet = conventionSet;
@@ -60,7 +60,7 @@ namespace FluentMigrator.Runner
 
         private IMigrationProcessor Processor { get; set; }
         protected IAssemblyCollection Assemblies { get; set; }
-        public IMigrationConventions Conventions { get; set; }
+        public IMigrationRunnerConventions Conventions { get; set; }
         public long StartVersion { get; set; }
         public long TargetVersion { get; set; }
         public VersionSchemaMigration VersionSchemaMigration { get; }

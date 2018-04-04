@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -34,17 +34,17 @@ namespace FluentMigrator.Tests.Unit.Runners
         public const string Tag2 = "MaintenanceTestTag2";
         private string[] _tags = {Tag1, Tag2};
 
-        private Mock<IMigrationConventions> _migrationConventions;
+        private Mock<IMigrationRunnerConventions> _migrationConventions;
         private MaintenanceLoader _maintenanceLoader;
         private MaintenanceLoader _maintenanceLoaderNoTags;
 
         [SetUp]
         public void Setup()
         {
-            _migrationConventions = new Mock<IMigrationConventions>();
-            _migrationConventions.Setup(x => x.GetMaintenanceStage).Returns(DefaultMigrationConventions.Instance.GetMaintenanceStage);
-            _migrationConventions.Setup(x => x.TypeHasTags).Returns(DefaultMigrationConventions.Instance.TypeHasTags);
-            _migrationConventions.Setup(x => x.TypeHasMatchingTags).Returns(DefaultMigrationConventions.Instance.TypeHasMatchingTags);
+            _migrationConventions = new Mock<IMigrationRunnerConventions>();
+            _migrationConventions.Setup(x => x.GetMaintenanceStage).Returns(DefaultMigrationRunnerConventions.Instance.GetMaintenanceStage);
+            _migrationConventions.Setup(x => x.TypeHasTags).Returns(DefaultMigrationRunnerConventions.Instance.TypeHasTags);
+            _migrationConventions.Setup(x => x.TypeHasMatchingTags).Returns(DefaultMigrationRunnerConventions.Instance.TypeHasMatchingTags);
 
             _maintenanceLoader = new MaintenanceLoader(new SingleAssembly(GetType().Assembly), _tags, _migrationConventions.Object);
             _maintenanceLoaderNoTags = new MaintenanceLoader(new SingleAssembly(GetType().Assembly), null, _migrationConventions.Object);
@@ -84,9 +84,9 @@ namespace FluentMigrator.Tests.Unit.Runners
                 // The NoTag maintenance should not be found in the tagged maintenanceLoader because it wants tagged classes
                 Assert.IsFalse(migrationInfo.Migration.GetType().Equals(typeof(MaintenanceBeforeEachNoTag)));
 
-                DefaultMigrationConventions.Instance.TypeHasMatchingTags(migrationInfo.Migration.GetType(), _tags)
+                DefaultMigrationRunnerConventions.Instance.TypeHasMatchingTags(migrationInfo.Migration.GetType(), _tags)
                     .ShouldBeTrue();
-            } 
+            }
         }
 
         [Test]
@@ -114,7 +114,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 var maintenanceAttribute = migrationInfo.Migration.GetType().GetOneAttribute<MaintenanceAttribute>();
                 maintenanceAttribute.ShouldNotBeNull();
                 migrationInfo.TransactionBehavior.ShouldBe(maintenanceAttribute.TransactionBehavior);
-            } 
+            }
         }
 
         [Test]
@@ -136,7 +136,7 @@ namespace FluentMigrator.Tests.Unit.Runners
                 }
                 else
                 {
-                    DefaultMigrationConventions.Instance.TypeHasMatchingTags(migrationInfo.Migration.GetType(), _tags)
+                    DefaultMigrationRunnerConventions.Instance.TypeHasMatchingTags(migrationInfo.Migration.GetType(), _tags)
                         .ShouldBeTrue();
                 }
             }

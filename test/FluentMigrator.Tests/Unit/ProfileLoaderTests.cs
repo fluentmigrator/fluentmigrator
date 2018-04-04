@@ -17,7 +17,7 @@ namespace FluentMigrator.Tests.Unit
 		{
 			var _runnerContextMock = new Mock<IRunnerContext>();
 			var _runnerMock = new Mock<IMigrationRunner>();
-			var _conventionsMock = new Mock<IMigrationConventions>();
+			var _conventionsMock = new Mock<IMigrationRunnerConventions>();
 
             _runnerContextMock.Setup(x => x.Profile).Returns(string.Empty);
 			//_runnerContextMock.VerifyGet(x => x.Profile).Returns(string.Empty);

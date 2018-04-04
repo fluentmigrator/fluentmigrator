@@ -13,7 +13,7 @@ namespace FluentMigrator.Runner
     {
         private SortedList<long, IMigrationInfo> _migrationInfos;
 
-        public DefaultMigrationInformationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace,
+        public DefaultMigrationInformationLoader(IMigrationRunnerConventions conventions, Assembly assembly, string @namespace,
                                                    IEnumerable<string> tagsToMatch)
           : this(conventions, new SingleAssembly(assembly), @namespace, false, tagsToMatch)
         {
@@ -21,19 +21,19 @@ namespace FluentMigrator.Runner
 
 
 
-        public DefaultMigrationInformationLoader(IMigrationConventions conventions, IAssemblyCollection assemblies, string @namespace,
+        public DefaultMigrationInformationLoader(IMigrationRunnerConventions conventions, IAssemblyCollection assemblies, string @namespace,
                                                  IEnumerable<string> tagsToMatch)
             : this(conventions, assemblies, @namespace, false, tagsToMatch)
         {
         }
 
-        public DefaultMigrationInformationLoader(IMigrationConventions conventions, Assembly assembly, string @namespace,
+        public DefaultMigrationInformationLoader(IMigrationRunnerConventions conventions, Assembly assembly, string @namespace,
                                                   bool loadNestedNamespaces, IEnumerable<string> tagsToMatch)
             : this(conventions, new SingleAssembly(assembly), @namespace, loadNestedNamespaces, tagsToMatch)
         {
         }
 
-        public DefaultMigrationInformationLoader(IMigrationConventions conventions, IAssemblyCollection assemblies, string @namespace,
+        public DefaultMigrationInformationLoader(IMigrationRunnerConventions conventions, IAssemblyCollection assemblies, string @namespace,
                                                  bool loadNestedNamespaces, IEnumerable<string> tagsToMatch)
         {
             Conventions = conventions;
@@ -43,7 +43,7 @@ namespace FluentMigrator.Runner
             TagsToMatch = tagsToMatch ?? new string[] { };
         }
 
-        public IMigrationConventions Conventions { get; private set; }
+        public IMigrationRunnerConventions Conventions { get; private set; }
         public IAssemblyCollection Assemblies { get; private set; }
         public string Namespace { get; private set; }
         public bool LoadNestedNamespaces { get; private set; }

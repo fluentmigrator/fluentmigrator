@@ -33,7 +33,7 @@ namespace FluentMigrator.Tests.Unit
     [TestFixture]
     public class DefaultMigrationConventionsTests
     {
-        private static readonly IMigrationConventions _default = DefaultMigrationConventions.Instance;
+        private static readonly IMigrationRunnerConventions _default = DefaultMigrationRunnerConventions.Instance;
 
         [Test]
         public void GetPrimaryKeyNamePrefixesTableNameWithPKAndUnderscore()

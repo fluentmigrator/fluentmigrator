@@ -24,9 +24,9 @@ using FluentMigrator.Runner.Infrastructure;
 
 namespace FluentMigrator.Runner
 {
-    public class MigrationConventions : IMigrationConventions
+    public class MigrationRunnerConventions : IMigrationRunnerConventions
     {
-        private static readonly IMigrationConventions _default = DefaultMigrationConventions.Instance;
+        private static readonly IMigrationRunnerConventions _default = DefaultMigrationRunnerConventions.Instance;
 
         public Func<Type, bool> TypeIsMigration { get; set; }
         public Func<Type, bool> TypeIsProfile { get; set; }
@@ -36,7 +36,7 @@ namespace FluentMigrator.Runner
         public Func<Type, bool> TypeHasTags { get; set; }
         public Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags { get; set; }
 
-        public MigrationConventions()
+        public MigrationRunnerConventions()
         {
             TypeIsMigration = _default.TypeIsMigration;
             TypeIsProfile = _default.TypeIsProfile;

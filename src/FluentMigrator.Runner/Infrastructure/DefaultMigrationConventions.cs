@@ -27,13 +27,13 @@ using FluentMigrator.Runner.VersionTableInfo;
 
 namespace FluentMigrator.Runner.Infrastructure
 {
-    public class DefaultMigrationConventions : IMigrationConventions
+    public class DefaultMigrationRunnerConventions : IMigrationRunnerConventions
     {
-        private DefaultMigrationConventions()
+        private DefaultMigrationRunnerConventions()
         {
         }
 
-        public static DefaultMigrationConventions Instance { get; } = new DefaultMigrationConventions();
+        public static DefaultMigrationRunnerConventions Instance { get; } = new DefaultMigrationRunnerConventions();
 
         public Func<Type, bool> TypeIsMigration => TypeIsMigrationImpl;
         public Func<Type, bool> TypeIsProfile => TypeIsProfileImpl;

@@ -651,10 +651,10 @@ namespace FluentMigrator.Tests.Unit
 
             var runner = new MigrationRunner(asm, _runnerContextMock.Object, processorMock.Object);
 
-            Assert.That(runner.Conventions, Is.TypeOf<MigrationConventions>());
+            Assert.That(runner.Conventions, Is.TypeOf<MigrationRunnerConventions>());
         }
 
-        public class CustomMigrationConventions : MigrationConventions
+        public class CustomMigrationConventions : MigrationRunnerConventions
         {
         }
     }

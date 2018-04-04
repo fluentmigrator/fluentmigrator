@@ -23,7 +23,7 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Runner
 {
-    public interface IMigrationConventions
+    public interface IMigrationRunnerConventions
     {
         Func<Type, bool> TypeIsMigration { get; }
         Func<Type, bool> TypeIsProfile { get; }
