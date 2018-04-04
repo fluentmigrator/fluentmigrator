@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             DatabaseFilename = "TestDatabase.sdf";
             RecreateDatabase();
             Connection = new SqlCeConnection(IntegrationTestOptions.SqlServerCe.ConnectionString);
-            Processor = new SqlServerCeProcessor(Connection, new SqlServerCeGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new SqlServerCeDbFactory());
+            Processor = new SqlServerCeProcessor(Connection, new SqlServerCeGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerCeDbFactory());
             Connection.Open();
             Processor.BeginTransaction();
         }

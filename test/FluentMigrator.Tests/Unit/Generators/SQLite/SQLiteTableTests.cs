@@ -1,4 +1,9 @@
+using FluentMigrator.Builders.Create.Table;
+using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Generators.SQLite;
+using FluentMigrator.Runner.Infrastructure;
+
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -291,6 +296,29 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"TestTable1\" RENAME TO \"TestTable2\"");
+        }
+
+        [Test]
+        public void Issue804()
+        {
+            var context = new MigrationContext(
+                DefaultMigrationConventions.Instance,
+                null, null, null, null);
+
+            var expression = new CreateTableExpression()
+            {
+                TableName = "Contact",
+            };
+
+            var builder = new CreateTableExpressionBuilder(expression, context);
+            builder
+                .WithColumn("Id").AsInt32().NotNullable().PrimaryKey().Identity()
+                .WithColumn("FirstName").AsString(30).Nullable()
+                .WithColumn("FamilyName").AsString(50).NotNullable()
+                .WithColumn("Whatever1");
+
+            var result = Generator.Generate(expression);
+
         }
     }
 }

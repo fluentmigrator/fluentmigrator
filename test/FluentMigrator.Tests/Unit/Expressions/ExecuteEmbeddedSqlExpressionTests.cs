@@ -5,6 +5,7 @@ using FluentMigrator.Infrastructure;
 using Moq;
 using NUnit.Should;
 using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace FluentMigrator.Tests.Unit.Expressions
@@ -31,6 +32,24 @@ namespace FluentMigrator.Tests.Unit.Expressions
 
             var processor = new Mock<IMigrationProcessor>();
             processor.Setup(x => x.Execute(scriptContents)).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
+        }
+
+        [Test]
+        public void ExecutesTheStatementWithParameters()
+        {
+            const string scriptContentsWithParameters = "TEST SCRIPT ParameterValue $(escaped_parameter) $(missing_parameter)";
+            var expression = new ExecuteEmbeddedSqlScriptExpression
+            {
+                SqlScript = "EmbeddedTestScriptWithParameters.sql",
+                MigrationAssemblies = new SingleAssembly(Assembly.GetExecutingAssembly()),
+                Parameters = new Dictionary<string, string> { { "parameter", "ParameterValue" } }
+            };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute(scriptContentsWithParameters)).Verifiable();
 
             expression.ExecuteWith(processor.Object);
             processor.Verify();

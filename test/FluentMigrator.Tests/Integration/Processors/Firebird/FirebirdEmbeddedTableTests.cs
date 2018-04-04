@@ -76,7 +76,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             {
                 var connectionString = tempDb.ConnectionString;
 
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
                 {
                     Namespace = "FluentMigrator.Tests.Integration.Migrations"
                 };
@@ -122,7 +122,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             {
                 var connectionString = tempDb.ConnectionString;
 
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
                 {
                     Namespace = "FluentMigrator.Tests.Integration.Migrations"
                 };
@@ -190,7 +190,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             {
                 var connectionString = tempDb.ConnectionString;
 
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
                                             {
                                                 Namespace = "FluentMigrator.Tests.Integration.Migrations"
                                             };
@@ -251,7 +251,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             {
                 var connectionString = tempDb.ConnectionString;
 
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
                                             {
                                                 Namespace = "FluentMigrator.Tests.Integration.Migrations"
                                             };
@@ -324,7 +324,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             {
                 var connectionString = tempDb.ConnectionString;
 
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
                                             {
                                                 Namespace = "FluentMigrator.Tests.Integration.Migrations"
                                             };
@@ -385,7 +385,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             {
                 var connectionString = tempDb.ConnectionString;
 
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
                                             {
                                                 Namespace = "FluentMigrator.Tests.Integration.Migrations"
                                             };
@@ -431,7 +431,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             {
                 var connectionString = tempDb.ConnectionString;
 
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
                                             {
                                                 Namespace = "FluentMigrator.Tests.Integration.Migrations"
                                             };
@@ -486,7 +486,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             {
                 var connectionString = tempDb.ConnectionString;
 
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
                                             {
                                                 Namespace = "FluentMigrator.Tests.Integration.Migrations"
                                             };
@@ -565,7 +565,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 
         private static MigrationRunner CreateFirebirdEmbeddedRunnerFor(FbConnection connection, RunnerContext runnerContext, out FirebirdProcessor processor)
         {
-            var announcer = new TextWriterAnnouncer(System.Console.Out);
+            var announcer = new TextWriterAnnouncer(TestContext.Out);
             announcer.ShowSql = true;
             var options = FirebirdOptions.AutoCommitBehaviour();
             processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,
@@ -606,7 +606,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             {
                 var connectionString = tempDb.ConnectionString;
 
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
                                             {
                                                 Namespace = "FluentMigrator.Tests.Integration.Migrations"
                                             };
@@ -672,7 +672,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
             {
                 var connectionString = tempDb.ConnectionString;
 
-                var runnerContext = new RunnerContext(new TextWriterAnnouncer(System.Console.Out))
+                var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
                 {
                     Namespace = "FluentMigrator.Tests.Integration.Migrations"
                 };
@@ -680,7 +680,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 using (var connection = new FbConnection(connectionString))
                 {
                     FirebirdProcessor processor;
-                    var announcer = new TextWriterAnnouncer(System.Console.Out);
+                    var announcer = new TextWriterAnnouncer(TestContext.Out);
                     announcer.ShowSql = true;
                     var options = FirebirdOptions.AutoCommitBehaviour();
                     options.TruncateLongNames = false;
@@ -698,7 +698,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
                 using (var connection = new FbConnection(connectionString))
                 {
                     FirebirdProcessor processor;
-                    var announcer = new TextWriterAnnouncer(System.Console.Out);
+                    var announcer = new TextWriterAnnouncer(TestContext.Out);
                     announcer.ShowSql = true;
                     var options = FirebirdOptions.AutoCommitBehaviour();
                     processor = new FirebirdProcessor(connection, new FirebirdGenerator(options), announcer,

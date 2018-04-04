@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -49,6 +49,11 @@ namespace FluentMigrator.Expressions
             }
         }
 
+        /// <summary>
+        /// Gets or sets parameters to be replaced before script execution
+        /// </summary>
+        public IDictionary<string, string> Parameters { get; set; }
+
         public override void ExecuteWith(IMigrationProcessor processor)
         {
             string sqlText;
@@ -57,9 +62,8 @@ namespace FluentMigrator.Expressions
                 sqlText = reader.ReadToEnd();
             }
 
-            // since all the Processors are using String.Format() in their Execute method
-            //  we need to escape the brackets with double brackets or else it throws an incorrect format error on the String.Format call
-            sqlText = sqlText.Replace("{", "{{").Replace("}", "}}");
+            sqlText = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(sqlText, Parameters);
+
             processor.Execute(sqlText);
         }
 

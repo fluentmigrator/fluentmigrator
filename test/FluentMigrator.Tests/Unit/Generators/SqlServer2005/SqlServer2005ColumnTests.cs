@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Runner.Generators.SqlServer;
+using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -113,7 +113,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
                          "AND name = 'TestColumn1'" + System.Environment.NewLine +
                          ");" + System.Environment.NewLine + System.Environment.NewLine +
                          "-- create alter table command to drop constraint as string and run it" + System.Environment.NewLine +
-                         "SET @sql = N'ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT ' + @default;" + System.Environment.NewLine +
+                         "SET @sql = N'ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT ' + QUOTENAME(@default);" + System.Environment.NewLine +
                          "EXEC sp_executesql @sql;" + System.Environment.NewLine + System.Environment.NewLine +
                          "-- now we can finally drop column" + System.Environment.NewLine +
                          "ALTER TABLE [TestSchema].[TestTable1] DROP COLUMN [TestColumn1];" + System.Environment.NewLine;
@@ -141,7 +141,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
                         "AND name = 'TestColumn1'" + System.Environment.NewLine +
                         ");" + System.Environment.NewLine + System.Environment.NewLine +
                         "-- create alter table command to drop constraint as string and run it" + System.Environment.NewLine +
-                        "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + @default;" + System.Environment.NewLine +
+                        "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + QUOTENAME(@default);" + System.Environment.NewLine +
                         "EXEC sp_executesql @sql;" + System.Environment.NewLine + System.Environment.NewLine +
                         "-- now we can finally drop column" + System.Environment.NewLine +
                         "ALTER TABLE [dbo].[TestTable1] DROP COLUMN [TestColumn1];" + System.Environment.NewLine;
@@ -170,7 +170,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
                          "AND name = 'TestColumn1'" + System.Environment.NewLine +
                          ");" + System.Environment.NewLine + System.Environment.NewLine +
                          "-- create alter table command to drop constraint as string and run it" + System.Environment.NewLine +
-                         "SET @sql = N'ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT ' + @default;" + System.Environment.NewLine +
+                         "SET @sql = N'ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT ' + QUOTENAME(@default);" + System.Environment.NewLine +
                          "EXEC sp_executesql @sql;" + System.Environment.NewLine + System.Environment.NewLine +
                          "-- now we can finally drop column" + System.Environment.NewLine +
                          "ALTER TABLE [TestSchema].[TestTable1] DROP COLUMN [TestColumn1];" + System.Environment.NewLine +
@@ -188,7 +188,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
                          "AND name = 'TestColumn2'" + System.Environment.NewLine +
                          ");" + System.Environment.NewLine + System.Environment.NewLine +
                          "-- create alter table command to drop constraint as string and run it" + System.Environment.NewLine +
-                         "SET @sql = N'ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT ' + @default;" + System.Environment.NewLine +
+                         "SET @sql = N'ALTER TABLE [TestSchema].[TestTable1] DROP CONSTRAINT ' + QUOTENAME(@default);" + System.Environment.NewLine +
                          "EXEC sp_executesql @sql;" + System.Environment.NewLine + System.Environment.NewLine +
                          "-- now we can finally drop column" + System.Environment.NewLine +
                          "ALTER TABLE [TestSchema].[TestTable1] DROP COLUMN [TestColumn2];" + System.Environment.NewLine;
@@ -216,7 +216,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
                         "AND name = 'TestColumn1'" + System.Environment.NewLine +
                         ");" + System.Environment.NewLine + System.Environment.NewLine +
                         "-- create alter table command to drop constraint as string and run it" + System.Environment.NewLine +
-                        "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + @default;" + System.Environment.NewLine +
+                        "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + QUOTENAME(@default);" + System.Environment.NewLine +
                         "EXEC sp_executesql @sql;" + System.Environment.NewLine + System.Environment.NewLine +
                         "-- now we can finally drop column" + System.Environment.NewLine +
                         "ALTER TABLE [dbo].[TestTable1] DROP COLUMN [TestColumn1];" + System.Environment.NewLine +
@@ -234,7 +234,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
                         "AND name = 'TestColumn2'" + System.Environment.NewLine +
                         ");" + System.Environment.NewLine + System.Environment.NewLine +
                         "-- create alter table command to drop constraint as string and run it" + System.Environment.NewLine +
-                        "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + @default;" + System.Environment.NewLine +
+                        "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + QUOTENAME(@default);" + System.Environment.NewLine +
                         "EXEC sp_executesql @sql;" + System.Environment.NewLine + System.Environment.NewLine +
                         "-- now we can finally drop column" + System.Environment.NewLine +
                         "ALTER TABLE [dbo].[TestTable1] DROP COLUMN [TestColumn2];" + System.Environment.NewLine;

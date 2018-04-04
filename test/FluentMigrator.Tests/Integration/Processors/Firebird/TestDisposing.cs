@@ -68,7 +68,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 		private FirebirdProcessor MakeProcessor()
 		{
 			var options = FirebirdOptions.AutoCommitBehaviour();
-			return new FirebirdProcessor(_connection, new FirebirdGenerator(options), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new FirebirdDbFactory(), options);
+			return new FirebirdProcessor(_connection, new FirebirdGenerator(options), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new FirebirdDbFactory(), options);
 		}
 
 	}

@@ -23,7 +23,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         public void SetUp()
         {
             Connection = new NpgsqlConnection(IntegrationTestOptions.Postgres.ConnectionString);
-            Processor = new PostgresProcessor(Connection, new PostgresGenerator(), new TextWriterAnnouncer(System.Console.Out), new ProcessorOptions(), new PostgresDbFactory());
+            Processor = new PostgresProcessor(Connection, new PostgresGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new PostgresDbFactory());
             Quoter = new PostgresQuoter();
             Connection.Open();
         }

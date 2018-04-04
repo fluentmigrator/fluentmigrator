@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
 
         protected TaskExecutor MakeTask(string task, string migrationsNamespace, Action<RunnerContext> configureContext = null)
         {
-            var consoleAnnouncer = new TextWriterAnnouncer(System.Console.Out);
+            var consoleAnnouncer = new TextWriterAnnouncer(TestContext.Out);
             var debugAnnouncer = new TextWriterAnnouncer(msg => Debug.WriteLine(msg));
             var announcer = new CompositeAnnouncer(consoleAnnouncer, debugAnnouncer);
             var runnerContext = new RunnerContext(announcer)

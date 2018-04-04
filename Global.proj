@@ -19,7 +19,7 @@
     <Compile Include="$(MSBuildThisFileDirectory)src/GlobalAssemblyInfo.cs" Link="Properties\GlobalAssemblyInfo.cs" />
   </ItemGroup>
 
-  <PropertyGroup Condition=" '$(Configuration)'=='Debug' ">
+  <PropertyGroup>
     <NoWarn>$(NoWarn);1591</NoWarn>
   </PropertyGroup>
 

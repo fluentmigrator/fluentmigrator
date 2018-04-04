@@ -410,7 +410,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 "AND name = '{1}'" + Environment.NewLine +
                 ");" + Environment.NewLine + Environment.NewLine +
                 "-- create alter table command to drop constraint as string and run it" + Environment.NewLine +
-                "SET @sql = N'ALTER TABLE {2}.{0} DROP CONSTRAINT ' + @default;" + Environment.NewLine +
+                "SET @sql = N'ALTER TABLE {2}.{0} DROP CONSTRAINT ' + QUOTENAME(@default);" + Environment.NewLine +
                 "EXEC sp_executesql @sql;";
             return String.Format(sql, Quoter.QuoteTableName(expression.TableName), expression.ColumnName, Quoter.QuoteSchemaName(expression.SchemaName));
         }

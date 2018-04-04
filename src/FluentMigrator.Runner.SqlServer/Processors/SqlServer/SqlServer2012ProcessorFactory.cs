@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // 
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 // Copyright (c) 2012, Daniel Lee
@@ -27,7 +27,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             var factory = new SqlServerDbFactory();
             var connection = factory.CreateConnection(connectionString);
-            return new SqlServerProcessor(connection, new SqlServer2012Generator(), announcer, options, factory);
+            return new SqlServerProcessor("SqlServer2012", connection, new SqlServer2012Generator(), announcer, options, factory);
         }
     }
 }

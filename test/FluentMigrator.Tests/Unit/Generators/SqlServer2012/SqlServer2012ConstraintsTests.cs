@@ -53,7 +53,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2012
             "AND name = 'TestColumn1'" + Environment.NewLine +
             ");" + Environment.NewLine + Environment.NewLine +
             "-- create alter table command to drop constraint as string and run it" + Environment.NewLine +
-            "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + @default;" + Environment.NewLine +
+            "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + QUOTENAME(@default);" + Environment.NewLine +
             "EXEC sp_executesql @sql;" + Environment.NewLine + Environment.NewLine +
             "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
             "ALTER TABLE [dbo].[TestTable1] WITH NOCHECK ADD CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT(SYSDATETIMEOFFSET()) FOR [TestColumn1];";

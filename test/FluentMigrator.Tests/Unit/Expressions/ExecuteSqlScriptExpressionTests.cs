@@ -17,7 +17,10 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
@@ -40,6 +43,23 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var expression = new ExecuteSqlScriptExpression { SqlScript = null };
             var errors = ValidationHelper.CollectErrors(expression);
             errors.ShouldContain(ErrorMessages.SqlScriptCannotBeNullOrEmpty);
+        }
+
+        [Test]
+        public void ExecutesTheStatementWithParameters()
+        {
+            const string scriptContentsWithParameters = "TEST SCRIPT ParameterValue $(escaped_parameter) $(missing_parameter)";
+            var expression = new ExecuteSqlScriptExpression()
+            {
+                SqlScript = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestScriptWithParameters.sql"),
+                Parameters = new Dictionary<string, string> { { "parameter", "ParameterValue" } }
+            };
+
+            var processor = new Mock<IMigrationProcessor>();
+            processor.Setup(x => x.Execute(scriptContentsWithParameters)).Verifiable();
+
+            expression.ExecuteWith(processor.Object);
+            processor.Verify();
         }
 
         [Test]

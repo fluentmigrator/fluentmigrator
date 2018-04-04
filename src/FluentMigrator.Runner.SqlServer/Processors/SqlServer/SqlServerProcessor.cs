@@ -22,7 +22,6 @@ using FluentMigrator.Runner.Helpers;
 using System;
 using System.Data;
 using System.IO;
-using System.Linq;
 using System.Text;
 
 using FluentMigrator.Expressions;
@@ -39,27 +38,37 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         private const string SEQUENCES_EXISTS = "SELECT 1 WHERE EXISTS (SELECT * FROM INFORMATION_SCHEMA.SEQUENCES WHERE SEQUENCE_SCHEMA = '{0}' AND SEQUENCE_NAME = '{1}' )";
         private const string DEFAULTVALUE_EXISTS = "SELECT 1 WHERE EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}' AND COLUMN_DEFAULT LIKE '{3}')";
 
-        public override string DatabaseType
-        {
-            get { return "SqlServer"; }
-        }
+        public override string DatabaseType { get;}
 
-        public override bool SupportsTransactions
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool SupportsTransactions => true;
 
-        public SqlServerProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public SqlServerProcessor(string databaseType, IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
+            DatabaseType = databaseType;
         }
 
         private static string SafeSchemaName(string schemaName)
         {
             return string.IsNullOrEmpty(schemaName) ? "dbo" : FormatHelper.FormatSqlEscape(schemaName);
+        }
+
+        public override void BeginTransaction()
+        {
+            base.BeginTransaction();
+            Announcer.Sql("BEGIN TRANSACTION");
+        }
+
+        public override void CommitTransaction()
+        {
+            base.CommitTransaction();
+            Announcer.Sql("COMMIT TRANSACTION");
+        }
+
+        public override void RollbackTransaction()
+        {
+            base.RollbackTransaction();
+            Announcer.Sql("ROLLBACK TRANSACTION");
         }
 
         public override bool SchemaExists(string schemaName)

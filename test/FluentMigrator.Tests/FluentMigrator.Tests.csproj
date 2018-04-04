@@ -54,8 +54,8 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="testscript.sql">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    <None Update="*.sql">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="Unit\Initialization\Fixtures\*.*">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
