@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+### Breaking changes
+
+- `IQuerySchema.DatabaseType` now returns `SqlServer2016`, etc... and not `SqlServer` any more
+- Database specific code was moved into its own assemblies
+
 ### Added
 
 - Framework: .NET Standard 2.0 support
