@@ -33,6 +33,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.T4", "src\Fl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.T4.Tests", "src\FluentMigrator.T4.Tests\FluentMigrator.T4.Tests.csproj", "{A68E6543-6DB8-4AFF-A9B1-0F928B34EAA9}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Log4NetAnnouncer", "src\FluentMigrator.Runner\Announcers\FluentMigrator.Log4NetAnnouncer\FluentMigrator.Log4NetAnnouncer.csproj", "{8433BCB1-F692-42FE-824C-070E19C3F6D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Log4NetAnnouncer.Tests", "src\FluentMigrator.Log4NetAnnouncer.Tests\FluentMigrator.Log4NetAnnouncer.Tests.csproj", "{B641AE83-6214-4521-B08B-90BD5E540DB8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		AutomatedRelease|Any CPU = AutomatedRelease|Any CPU

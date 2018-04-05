@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>FluentMigrator.Log4NetAnnouncer</id>
+    <version>1.6.2</version>
+    <authors>Josh Coffman, Tom Marien</authors>
+    <owners>Sean Chambers</owners>
+    <licenseUrl>https://github.com/schambers/fluentmigrator/blob/master/LICENSE.txt</licenseUrl>
+    <projectUrl>https://github.com/schambers/fluentmigrator/wiki/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>FluentMigrator is a database migration framework for .NET written in C#. The basic idea is that you can create migrations which are simply classes that derive from the Migration base class and have a Migration attribute with a unique version number attached to them. Upon executing FluentMigrator, you tell it which version to migrate to and it will run all necessary migrations in order to bring your database up to that version.
+      In addition to forward migration support, FluentMigrator also supports different ways to execute the migrations along with selective migrations called profiles and executing arbitrary SQL.</description>
+    <summary>FluentMigrator is a database migration framework for .NET written in C#.</summary>
+    <releaseNotes>https://github.com/schambers/fluentmigrator/releases</releaseNotes>
+    <language>en-US</language>
+    <dependencies>
+      <dependency id="FluentMigrator.Runner" version="1.6.2" />
+      <dependency id="log4net" version="2.0.5" />      
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\Release\FluentMigrator.Log4NetAnnouncer.dll" target="lib\35" />
+    <file src="bin\Release\FluentMigrator.Log4NetAnnouncer.pdb" target="lib\35" />
+    <file src="readme.txt" target="" />
+  </files>
+</package>

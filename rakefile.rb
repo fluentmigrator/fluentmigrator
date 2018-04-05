@@ -81,7 +81,7 @@ end
 
 desc 'run the unit tests'
 test_runner :test do |tests|
-  tests.files = FileList['**/src/FluentMigrator.Tests/bin/Debug/FluentMigrator.Tests.dll'] # dll files with test
+  tests.files = FileList['**/src/FluentMigrator.Tests/bin/Debug/FluentMigrator.Tests.dll', '**/src/FluentMigrator.Log4NetAnnouncer.Tests/bin/Debug/FluentMigrator.Log4NetAnnouncer.Tests.dll'] # dll files with test
   tests.exe = "tools/NUnit/nunit-console.exe" # executable to run tests with
   tests.copy_local # when running from network share
   tests.native_exe # when you don't want to use 'mono' as the native executable on non-windows systems

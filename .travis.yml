@@ -12,3 +12,4 @@ script:
   - for f in $(dpkg -L libfbembed2.5 | grep libfbembed.so); do cp $f ./src/FluentMigrator.Tests/bin/Debug; done
   - for f in $(dpkg -L libfbembed2.5 | grep libfbembed.so); do cp $f ./src/FluentMigrator.Tests/bin/Debug/libfbembed.so; done
   - nunit-console -framework=4.0 ./src/FluentMigrator.Tests/bin/Debug/FluentMigrator.Tests.dll -exclude Integration,NotWorkingOnMono
+  - nunit-console -framework=4.0 ./src/FluentMigrator.Log4NetAnnouncer.Tests/bin/Debug/FluentMigrator.Log4NetAnnouncer.Tests.dll
