@@ -19,7 +19,9 @@
 
 using System;
 using System.Data;
+using System.Data.Common;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 
 using FluentMigrator.Expressions;
@@ -112,13 +114,20 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             if (string.IsNullOrEmpty(password))
                 throw new Exception("Create schema requires connection for the schema user. No password specified in CreateSchemaExpression.");
 
+            if (!Exists("SELECT count(*) FROM \"dbo\".\"syslogins\" WHERE \"name\"='{0}'", FormatHelper.FormatSqlEscape(expression.SchemaName)))
+            {
+                // Try to automatically generate the user
+                Announcer.Say("Creating user {0}.", expression.SchemaName);
+                Execute("CREATE USER \"{0}\" IDENTIFIED BY \"{1}\"", expression.SchemaName, password);
+            }
+
+            var sql = Generator.Generate(expression);
             string connectionString = ReplaceUserIdAndPasswordInConnectionString(expression.SchemaName, password);
-            string sql = Generator.Generate(expression);
             Announcer.Say("Creating connection for user {0} to create schema.", expression.SchemaName);
-            IDbConnection connection = Factory.CreateConnection(connectionString);
+            var connection = Factory.CreateConnection(connectionString);
             EnsureConnectionIsOpen(connection);
             Announcer.Say("Beginning out of scope transaction to create schema.");
-            IDbTransaction transaction = connection.BeginTransaction();
+            var transaction = connection.BeginTransaction();
 
             try
             {
@@ -314,3 +323,4 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
         }
     }
 }
+

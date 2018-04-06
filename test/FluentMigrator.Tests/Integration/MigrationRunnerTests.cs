@@ -19,6 +19,7 @@
 
 using System;
 using System.Data;
+using System.Data.Common;
 using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
@@ -35,8 +36,10 @@ using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Firebird;
 using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.Postgres;
+using FluentMigrator.Runner.Processors.SqlAnywhere;
 using FluentMigrator.Runner.Processors.SQLite;
 using FluentMigrator.Runner.Processors.SqlServer;
+using FluentMigrator.SqlAnywhere;
 using FluentMigrator.Tests.Integration.Migrations;
 using FluentMigrator.Tests.Integration.Migrations.Tagged;
 using FluentMigrator.Tests.Unit;
@@ -1155,7 +1158,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanAlterColumnWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -1179,7 +1181,7 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
 
                     runner.Down(new TestCreateSchema());
-                }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
+                }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor), typeof(SqlAnywhereProcessor) });
         }
 
         [Test]
@@ -1223,7 +1225,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanAlterTablesSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -1245,7 +1246,7 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
 
                     runner.Down(new TestCreateSchema());
-                }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
+                }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor), typeof(SqlAnywhereProcessor) });
         }
 
         [Test]
@@ -1257,7 +1258,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanCreateUniqueConstraint()
         {
             ExecuteWithSupportedProcessors(
@@ -1276,7 +1276,7 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateAndDropTableMigration());
 
-                }, true, typeof(SQLiteProcessor));
+                }, true, typeof(SQLiteProcessor), typeof(SqlAnywhereProcessor));
         }
 
         [Test]
@@ -1287,7 +1287,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanCreateUniqueConstraintWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -1309,7 +1308,7 @@ namespace FluentMigrator.Tests.Integration
                     runner.Down(new TestCreateAndDropTableMigrationWithSchema());
 
                     runner.Down(new TestCreateSchema());
-                }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor) });
+                }, true, new[] { typeof(SQLiteProcessor), typeof(FirebirdProcessor), typeof(SqlAnywhereProcessor) });
         }
 
         [Test]
@@ -1514,7 +1513,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanReverseCreateUniqueConstraint()
         {
             ExecuteWithSupportedProcessors(
@@ -1532,7 +1530,7 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateAndDropTableMigration());
 
-                }, true, new[] { typeof(SQLiteProcessor) });
+                }, true, new[] { typeof(SQLiteProcessor), typeof(SqlAnywhereProcessor) });
         }
 
         [Test]
@@ -1544,7 +1542,6 @@ namespace FluentMigrator.Tests.Integration
         [Category("SqlServer2012")]
         [Category("SqlServer2014")]
         [Category("SqlServer2016")]
-        [Category("SqlAnywhere16")]
         public void CanReverseCreateUniqueConstraintWithSchema()
         {
             ExecuteWithSupportedProcessors(
@@ -1566,7 +1563,7 @@ namespace FluentMigrator.Tests.Integration
 
                     runner.Down(new TestCreateSchema());
 
-                }, true, new[] { typeof(SQLiteProcessor) });
+                }, true, new[] { typeof(SQLiteProcessor), typeof(SqlAnywhereProcessor) });
         }
 
         [Test]
@@ -1781,7 +1778,9 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
-            Create.Schema("TestSchema");
+            var createSchemaExpr = Create.Schema("TestSchema");
+            IfDatabase(t => t.StartsWith("SqlAnywhere"))
+                .Delegate(() => createSchemaExpr.Password("TestSchemaPassword"));
             Create.Table("Users")
                 .InSchema("TestSchema")
                 .WithColumn("UserId").AsInt32().Identity().PrimaryKey()
@@ -1809,7 +1808,9 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
-            Create.Schema("TestSchema");
+            var createSchemaExpr = Create.Schema("TestSchema");
+            IfDatabase(t => t.StartsWith("SqlAnywhere"))
+                .Delegate(() => createSchemaExpr.Password("TestSchemaPassword"));
 
             Create.Table("Users")
                 .InSchema("TestSchema")
@@ -1896,7 +1897,9 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
-            Create.Schema("TestSchema");
+            var createSchemaExpr = Create.Schema("TestSchema");
+            IfDatabase(t => t.StartsWith("SqlAnywhere"))
+                .Delegate(() => createSchemaExpr.Password("TestSchemaPassword"));
         }
 
         public override void Down()
@@ -1961,7 +1964,9 @@ namespace FluentMigrator.Tests.Integration
     {
         public override void Up()
         {
-            Create.Schema("NewSchema");
+            var createSchemaExpr = Create.Schema("NewSchema");
+            IfDatabase(t => t.StartsWith("SqlAnywhere"))
+                .Delegate(() => createSchemaExpr.Password("NewSchemaPassword"));
             Alter.Table("TestTable").InSchema("TestSchema").ToSchema("NewSchema");
         }
 
