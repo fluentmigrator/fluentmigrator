@@ -157,8 +157,10 @@ namespace FluentMigrator.Tests.Unit.Expressions
                     PrimaryTable = "User",
                 }
             };
-            expression.ApplyConventions(new MigrationConventions());
-            var reverse = expression.Reverse();
+
+            var processed = expression.Apply(ConventionSets.WithSchemaName);
+
+            var reverse = processed.Reverse();
             reverse.ShouldBeOfType<CreateForeignKeyExpression>();
         }
 
@@ -175,7 +177,8 @@ namespace FluentMigrator.Tests.Unit.Expressions
                     PrimaryTable = "User",
                 }
             };
-            var reverse = expression.Reverse() as CreateForeignKeyExpression;
+
+            var reverse = (CreateForeignKeyExpression)expression.Reverse();
             reverse.ForeignKey.ForeignTable.ShouldBe("User");
             reverse.ForeignKey.PrimaryTable.ShouldBe("UserRoles");
             reverse.ForeignKey.ForeignColumns.First().ShouldBe("PrimaryId");
@@ -187,10 +190,10 @@ namespace FluentMigrator.Tests.Unit.Expressions
         {
             var expression = new DeleteForeignKeyExpression();
 
-            expression.ApplyConventions(new MigrationConventions());
+            var processed = expression.Apply(ConventionSets.NoSchemaName);
 
-            Assert.That(expression.ForeignKey.ForeignTableSchema, Is.Null);
-            Assert.That(expression.ForeignKey.PrimaryTableSchema, Is.Null);
+            Assert.That(processed.ForeignKey.ForeignTableSchema, Is.Null);
+            Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.Null);
         }
 
         [Test]
@@ -205,10 +208,10 @@ namespace FluentMigrator.Tests.Unit.Expressions
                 },
             };
 
-            expression.ApplyConventions(new MigrationConventions());
+            var processed = expression.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(expression.ForeignKey.ForeignTableSchema, Is.EqualTo("testschema"));
-            Assert.That(expression.ForeignKey.PrimaryTableSchema, Is.EqualTo("testschema"));
+            Assert.That(processed.ForeignKey.ForeignTableSchema, Is.EqualTo("testschema"));
+            Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.EqualTo("testschema"));
         }
 
         [Test]
@@ -216,12 +219,10 @@ namespace FluentMigrator.Tests.Unit.Expressions
         {
             var expression = new DeleteForeignKeyExpression();
 
-            var migrationConventions = new MigrationConventions { GetDefaultSchema = () => "testdefault" };
+            var processed = expression.Apply(ConventionSets.WithSchemaName);
 
-            expression.ApplyConventions(migrationConventions);
-
-            Assert.That(expression.ForeignKey.ForeignTableSchema, Is.EqualTo("testdefault"));
-            Assert.That(expression.ForeignKey.PrimaryTableSchema, Is.EqualTo("testdefault"));
+            Assert.That(processed.ForeignKey.ForeignTableSchema, Is.EqualTo("testdefault"));
+            Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.EqualTo("testdefault"));
         }
     }
 }

@@ -4,20 +4,13 @@ using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
-    public class AlterDefaultConstraintExpression : MigrationExpressionBase
+    public class AlterDefaultConstraintExpression : MigrationExpressionBase,
+        ISchemaExpression
     {
         public virtual string SchemaName { get; set; }
         public virtual string TableName { get; set; }
         public virtual string ColumnName { get; set; }
         public virtual object DefaultValue { get; set; }
-
-        public override void ApplyConventions(IMigrationConventions conventions)
-        {
-            if (string.IsNullOrEmpty(SchemaName))
-            {
-                SchemaName = conventions.GetDefaultSchema();
-            }
-        }
 
         public override void CollectValidationErrors(ICollection<string> errors)
         {

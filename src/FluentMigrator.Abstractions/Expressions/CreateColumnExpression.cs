@@ -23,26 +23,14 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-    public class CreateColumnExpression : MigrationExpressionBase
+    public class CreateColumnExpression : MigrationExpressionBase,
+        ISchemaExpression, IColumnsExpression
     {
         public virtual string SchemaName { get; set; }
         public virtual string TableName { get; set; }
-        public virtual ColumnDefinition Column { get; set; }
+        public virtual ColumnDefinition Column { get; set; } = new ColumnDefinition { ModificationType = ColumnModificationType.Create };
 
-        public CreateColumnExpression()
-        {
-            Column = new ColumnDefinition { ModificationType = ColumnModificationType.Create};
-        }
-
-        public override void ApplyConventions(IMigrationConventions conventions)
-        {
-            if (string.IsNullOrEmpty(SchemaName))
-            {
-                SchemaName = conventions.GetDefaultSchema();
-            }
-
-            Column.ApplyConventions(conventions);
-        }
+        IEnumerable<ColumnDefinition> IColumnsExpression.Columns => new[] { Column };
 
         public override void CollectValidationErrors(ICollection<string> errors)
         {

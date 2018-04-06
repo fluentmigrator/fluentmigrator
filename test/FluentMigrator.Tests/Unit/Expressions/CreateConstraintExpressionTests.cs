@@ -58,15 +58,15 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var errors = ValidationHelper.CollectErrors(expression);
             Assert.That(errors.Count, Is.EqualTo(0));
         }
-  
+
         [Test]
         public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
         {
             var expression = new CreateConstraintExpression(ConstraintType.Unique);
 
-            expression.ApplyConventions(new MigrationConventions());
+            var processed = expression.Apply(ConventionSets.NoSchemaName);
 
-            Assert.That(expression.Constraint.SchemaName, Is.Null);
+            Assert.That(processed.Constraint.SchemaName, Is.Null);
         }
 
         [Test]
@@ -74,20 +74,19 @@ namespace FluentMigrator.Tests.Unit.Expressions
         {
             var expression = new CreateConstraintExpression(ConstraintType.Unique) { Constraint = { SchemaName = "testschema" } };
 
-            expression.ApplyConventions(new MigrationConventions());
+            var processed = expression.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(expression.Constraint.SchemaName, Is.EqualTo("testschema"));
+            Assert.That(processed.Constraint.SchemaName, Is.EqualTo("testschema"));
         }
 
         [Test]
         public void WhenDefaultSchemaConventionIsChangedAndSchemaIsNotSetThenSetSchema()
         {
             var expression = new CreateConstraintExpression(ConstraintType.Unique);
-            var migrationConventions = new MigrationConventions { GetDefaultSchema = () => "testdefault" };
 
-            expression.ApplyConventions(migrationConventions);
+            var processed = expression.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(expression.Constraint.SchemaName, Is.EqualTo("testdefault"));
+            Assert.That(processed.Constraint.SchemaName, Is.EqualTo("testdefault"));
         }
     }
 }

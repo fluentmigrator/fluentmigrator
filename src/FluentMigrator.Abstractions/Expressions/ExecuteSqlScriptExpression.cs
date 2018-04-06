@@ -18,13 +18,36 @@
 
 using System.Collections.Generic;
 using System.IO;
+
 using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator.Expressions
 {
-    public class ExecuteSqlScriptExpression : MigrationExpressionBase
+    public class ExecuteSqlScriptExpression : MigrationExpressionBase, IFileSystemExpression
     {
-        public string SqlScript { get; set; }
+        private string _rootPath;
+        private string _sqlScript;
+        private string _unchangedSqlScript;
+
+        public string SqlScript
+        {
+            get => _sqlScript;
+            set
+            {
+                _unchangedSqlScript =  value;
+                UpdateSqlScript();
+            }
+        }
+
+        public string RootPath
+        {
+            get => _rootPath;
+            set
+            {
+                _rootPath = value;
+                UpdateSqlScript();
+            }
+        }
 
         /// <summary>
         /// Gets or sets parameters to be replaced before script execution
@@ -35,16 +58,13 @@ namespace FluentMigrator.Expressions
         {
             string sqlText;
             using (var reader = File.OpenText(SqlScript))
+            {
                 sqlText = reader.ReadToEnd();
+            }
 
             sqlText = SqlScriptTokenReplacer.ReplaceSqlScriptTokens(sqlText, Parameters);
 
             processor.Execute(sqlText);
-        }
-
-        public override void ApplyConventions(IMigrationConventions conventions)
-        {
-            SqlScript = Path.Combine(conventions.GetWorkingDirectory(), SqlScript);
         }
 
         public override void CollectValidationErrors(ICollection<string> errors)
@@ -56,6 +76,18 @@ namespace FluentMigrator.Expressions
         public override string ToString()
         {
             return base.ToString() + SqlScript;
+        }
+
+        private void UpdateSqlScript()
+        {
+            if (!string.IsNullOrEmpty(_rootPath))
+            {
+                _sqlScript = Path.Combine(_rootPath, _unchangedSqlScript);
+            }
+            else
+            {
+                _sqlScript = _unchangedSqlScript;
+            }
         }
     }
 }

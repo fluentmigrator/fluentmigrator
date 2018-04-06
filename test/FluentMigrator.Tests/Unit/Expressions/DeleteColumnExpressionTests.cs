@@ -70,7 +70,7 @@ namespace FluentMigrator.Tests.Unit.Expressions
         }
 
         [Test]
-        public void ErrorIsReturnedWhenColumnIsSpecifiedMultipleTimes() 
+        public void ErrorIsReturnedWhenColumnIsSpecifiedMultipleTimes()
         {
             var expression = new DeleteColumnExpression { ColumnNames = { "Bacon", "Bacon" } };
             var errors = ValidationHelper.CollectErrors(expression);
@@ -97,15 +97,15 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var expression = new DeleteColumnExpression { TableName = "Test", ColumnNames = {"Bacon"} };
             expression.ToString().ShouldBe("DeleteColumn Test Bacon");
         }
- 
+
         [Test]
         public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
         {
             var expression = new DeleteColumnExpression { TableName = "Test", ColumnNames = { "Bacon" } };
 
-            expression.ApplyConventions(new MigrationConventions());
+            var processed = expression.Apply(ConventionSets.NoSchemaName);
 
-            Assert.That(expression.SchemaName, Is.Null);
+            Assert.That(processed.SchemaName, Is.Null);
         }
 
         [Test]
@@ -113,20 +113,19 @@ namespace FluentMigrator.Tests.Unit.Expressions
         {
             var expression = new DeleteColumnExpression { SchemaName = "testschema", TableName = "Test", ColumnNames = { "Bacon" } };
 
-            expression.ApplyConventions(new MigrationConventions());
+            var processed = expression.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(expression.SchemaName, Is.EqualTo("testschema"));
+            Assert.That(processed.SchemaName, Is.EqualTo("testschema"));
         }
 
         [Test]
         public void WhenDefaultSchemaConventionIsChangedAndSchemaIsNotSetThenSetSchema()
         {
             var expression = new DeleteColumnExpression { TableName = "Test", ColumnNames = { "Bacon" } };
-            var migrationConventions = new MigrationConventions { GetDefaultSchema = () => "testdefault" };
 
-            expression.ApplyConventions(migrationConventions);
+            var processed = expression.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(expression.SchemaName, Is.EqualTo("testdefault"));
+            Assert.That(processed.SchemaName, Is.EqualTo("testdefault"));
         }
     }
 }

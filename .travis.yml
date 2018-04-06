@@ -14,9 +14,10 @@ before_script:
   - export VERSION_SUFFIX=$(mono GitVersion.CommandLine.4.0.0-beta0012/tools/GitVersion.exe /showvariable NuGetVersion | sed -r 's/^[^-]+-(.*)$/\1/')
   - echo Using VersionSuffix=$VERSION_SUFFIX
 script:
+  - rm -f "$TRAVIS_BUILD_DIR/output"/*
   - dotnet restore ./FluentMigrator.sln
   - msbuild ./FluentMigrator.sln /v:m /p:VersionSuffix="$VERSION_SUFFIX"
-  - dotnet vstest test/FluentMigrator.Tests/bin/Debug/net47/FluentMigrator.Tests.dll --TestCaseFilter:'TestCategory!=NotWorkingOnMono&(TestCategory!=Integration|(TestCategory=Integration&(TestCategory=SQLite)))'
-  - rm -f "$TRAVIS_BUILD_DIR/output"/*
-  - msbuild ./FluentMigrator.sln /v:m /p:VersionSuffix="$VERSION_SUFFIX" /t:Pack /p:PackageOutputPath="$TRAVIS_BUILD_DIR/output" /p:Configuration=Release
-  - for pkg in output/* ; do [ -e "$pkg" ] || continue; nuget push "$pkg" "$MYGET_API_KEY" -Source "https://www.myget.org/F/fluent-migrator/api/v2/package" ; done
+  - dotnet vstest test/FluentMigrator.Tests/bin/Debug/net461/FluentMigrator.Tests.dll --TestCaseFilter:'TestCategory!=NotWorkingOnMono&(TestCategory!=Integration|(TestCategory=Integration&(TestCategory=SQLite)))'
+after_success:
+  - msbuild ./FluentMigrator.sln /v:m /p:VersionSuffix="$VERSION_SUFFIX" /t:Pack /p:PackageOutputPath="$TRAVIS_BUILD_DIR/output"
+  - if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then for pkg in output/* ; do [ -e "$pkg" ] || continue; nuget push "$pkg" "$MYGET_API_KEY" -Source "https://www.myget.org/F/fluent-migrator/api/v2/package" ; done; fi

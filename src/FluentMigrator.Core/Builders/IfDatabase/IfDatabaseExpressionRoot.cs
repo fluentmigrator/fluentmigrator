@@ -181,7 +181,6 @@ namespace FluentMigrator.Builders.IfDatabase
         private static IMigrationContext CreateEmptyMigrationContext(IMigrationContext originalContext)
         {
             var result = new MigrationContext(
-                originalContext.Conventions,
                 new NullIfDatabaseProcessor(),
                 originalContext.MigrationAssemblies,
                 originalContext.ApplicationContext,

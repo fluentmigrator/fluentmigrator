@@ -633,7 +633,6 @@ namespace FluentMigrator.Tests.Unit
         public void CanLoadCustomMigrationConventions()
         {
             Assert.That(_runner.Conventions, Is.TypeOf<CustomMigrationConventions>());
-            Assert.That(_runner.Conventions.GetWorkingDirectory.Invoke(), Is.EqualTo("testwd"));
         }
 
         [Test]
@@ -652,16 +651,11 @@ namespace FluentMigrator.Tests.Unit
 
             var runner = new MigrationRunner(asm, _runnerContextMock.Object, processorMock.Object);
 
-            Assert.That(runner.Conventions, Is.TypeOf<MigrationConventions>());
-            Assert.That(runner.Conventions.GetDefaultSchema.Invoke(), Is.Null);
+            Assert.That(runner.Conventions, Is.TypeOf<MigrationRunnerConventions>());
         }
 
-        public class CustomMigrationConventions : MigrationConventions
+        public class CustomMigrationConventions : MigrationRunnerConventions
         {
-            public CustomMigrationConventions()
-            {
-                GetWorkingDirectory = () => "testwd";
-            }
         }
     }
 }

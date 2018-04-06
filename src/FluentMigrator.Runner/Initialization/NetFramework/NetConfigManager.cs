@@ -1,4 +1,4 @@
-﻿#if NET40 || NET45
+#if NETFRAMEWORK
 using System;
 using System.Configuration;
 using System.IO;

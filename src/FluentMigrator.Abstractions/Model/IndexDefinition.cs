@@ -18,14 +18,14 @@
 
 using System;
 using System.Collections.Generic;
-using System.Dynamic;
 using System.Linq;
+
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 
 namespace FluentMigrator.Model
 {
-    public class IndexDefinition : ICloneable, ICanBeConventional, ICanBeValidated, ISupportAdditionalFeatures
+    public class IndexDefinition : ICloneable, ICanBeValidated, ISupportAdditionalFeatures
     {
         private readonly IDictionary<string, object> _additionalFeatures = new Dictionary<string, object>();
 
@@ -42,19 +42,6 @@ namespace FluentMigrator.Model
         }
 
         public virtual IDictionary<string, object> AdditionalFeatures => _additionalFeatures;
-
-        public virtual void ApplyConventions(IMigrationConventions conventions)
-        {
-            if (string.IsNullOrEmpty(SchemaName))
-            {
-                SchemaName = conventions.GetDefaultSchema();
-            }
-
-            if (String.IsNullOrEmpty(Name))
-            {
-                Name = conventions.GetIndexName(this);
-            }
-        }
 
         public virtual void CollectValidationErrors(ICollection<string> errors)
         {

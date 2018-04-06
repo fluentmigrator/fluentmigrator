@@ -24,7 +24,6 @@ namespace FluentMigrator.Infrastructure
 {
     public interface IMigrationContext
     {
-        IMigrationConventions Conventions { get; }
         ICollection<IMigrationExpression> Expressions { get; set; }
         IQuerySchema QuerySchema { get; }
         IAssemblyCollection MigrationAssemblies { get; set; }

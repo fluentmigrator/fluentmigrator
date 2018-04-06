@@ -22,7 +22,7 @@ namespace FluentMigrator.Runner.Infrastructure
 {
     public static class RuntimeHost
     {
-#if NET40 || NET45
+#if NETFRAMEWORK
         private static readonly IHostAbstraction _currentHost = new NetFrameworkHost();
 #else
         private static readonly IHostAbstraction _currentHost = new NetCoreHost();

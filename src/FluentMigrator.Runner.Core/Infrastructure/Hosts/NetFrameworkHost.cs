@@ -16,7 +16,7 @@
 //
 #endregion
 
-#if NET40 || NET45
+#if NETFRAMEWORK
 
 using System;
 using System.Collections.Generic;

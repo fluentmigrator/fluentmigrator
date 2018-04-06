@@ -35,7 +35,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
                 TableName = "TestTable1",
             };
 
-            new CreateTableExpressionBuilder(expression, new MigrationContext(null, null, null, null, null))
+            new CreateTableExpressionBuilder(expression, new MigrationContext(null, null, null, null))
                 .WithColumn("Id").AsGuid().PrimaryKey().RowGuid();
 
             var result = Generator.Generate(expression);
@@ -257,9 +257,9 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var createTableExpression = migrationContext.Expressions.OfType<CreateTableExpression>().First();
             var createForeignKeyExpression = migrationContext.Expressions.OfType<CreateForeignKeyExpression>().First();
 
-            createForeignKeyExpression.ApplyConventions(new MigrationConventions());
+            var processed = createForeignKeyExpression.Apply(ConventionSets.NoSchemaName);
             string createTableResult = Generator.Generate(createTableExpression);
-            string createForeignKeyResult = Generator.Generate(createForeignKeyExpression);
+            string createForeignKeyResult = Generator.Generate(processed);
             createTableResult.ShouldBe("CREATE TABLE [dbo].[FooTable] ([FooColumn] INT NOT NULL)");
             createForeignKeyResult.ShouldBe("ALTER TABLE [dbo].[FooTable] ADD CONSTRAINT [FK_FooTable_FooColumn_BarTable_BarColumn] FOREIGN KEY ([FooColumn]) REFERENCES [dbo].[BarTable] ([BarColumn])");
         }

@@ -24,19 +24,9 @@ using System.Linq;
 
 namespace FluentMigrator.Expressions
 {
-    public class DeleteForeignKeyExpression : MigrationExpressionBase
+    public class DeleteForeignKeyExpression : MigrationExpressionBase, IForeignKeyExpression
     {
-        public virtual ForeignKeyDefinition ForeignKey { get; set; }
-
-        public DeleteForeignKeyExpression()
-        {
-            ForeignKey = new ForeignKeyDefinition();
-        }
-
-        public override void ApplyConventions(IMigrationConventions conventions)
-        {
-            ForeignKey.ApplyConventions(conventions);
-        }
+        public virtual ForeignKeyDefinition ForeignKey { get; set; } = new ForeignKeyDefinition();
 
         public override void CollectValidationErrors(ICollection<string> errors)
         {

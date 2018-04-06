@@ -17,6 +17,8 @@
 #endregion
 
 using System;
+
+using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
@@ -124,39 +126,58 @@ namespace FluentMigrator.Tests.Unit.Definitions
             var errors = ValidationHelper.CollectErrors(column);
             errors.ShouldNotContain(ErrorMessages.ForeignKeyMustHaveOneOrMorePrimaryColumns);
         }
- 
+
         [Test]
         public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
         {
-            var foreignKeyDefinition = new ForeignKeyDefinition { Name = "Test" };
+            var expr = new CreateForeignKeyExpression()
+            {
+                ForeignKey =
+                {
+                    Name = "Test"
+                }
+            };
 
-            foreignKeyDefinition.ApplyConventions(new MigrationConventions());
+            var processed = expr.Apply(ConventionSets.NoSchemaName);
 
-            Assert.That(foreignKeyDefinition.ForeignTableSchema, Is.Null);
-            Assert.That(foreignKeyDefinition.PrimaryTableSchema, Is.Null);
+            Assert.That(processed.ForeignKey.ForeignTableSchema, Is.Null);
+            Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.Null);
         }
 
         [Test]
         public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsSetThenSchemaShouldNotBeChanged()
         {
-            var foreignKeyDefinition = new ForeignKeyDefinition { Name = "Test", ForeignTableSchema = "testschema", PrimaryTableSchema = "testschema" };
+            var expr = new CreateForeignKeyExpression()
+            {
+                ForeignKey =
+                {
+                    Name = "Test",
+                    ForeignTableSchema = "testschema",
+                    PrimaryTableSchema = "testschema"
+                }
+            };
 
-            foreignKeyDefinition.ApplyConventions(new MigrationConventions());
+            var processed = expr.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(foreignKeyDefinition.ForeignTableSchema, Is.EqualTo("testschema"));
-            Assert.That(foreignKeyDefinition.PrimaryTableSchema, Is.EqualTo("testschema"));
+            Assert.That(processed.ForeignKey.ForeignTableSchema, Is.EqualTo("testschema"));
+            Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.EqualTo("testschema"));
         }
 
         [Test]
         public void WhenDefaultSchemaConventionIsChangedAndSchemaIsNotSetThenSetSchema()
         {
-            var foreignKeyDefinition = new ForeignKeyDefinition { Name = "Test" };
-            var migrationConventions = new MigrationConventions { GetDefaultSchema = () => "testdefault" };
+            var expr = new CreateForeignKeyExpression()
+            {
+                ForeignKey =
+                {
+                    Name = "Test"
+                }
+            };
 
-            foreignKeyDefinition.ApplyConventions(migrationConventions);
+            var processed = expr.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(foreignKeyDefinition.ForeignTableSchema, Is.EqualTo("testdefault"));
-            Assert.That(foreignKeyDefinition.PrimaryTableSchema, Is.EqualTo("testdefault"));
+            Assert.That(processed.ForeignKey.ForeignTableSchema, Is.EqualTo("testdefault"));
+            Assert.That(processed.ForeignKey.PrimaryTableSchema, Is.EqualTo("testdefault"));
         }
     }
 }

@@ -16,8 +16,14 @@
 //
 #endregion
 
+using System.Linq;
+
+using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
+using FluentMigrator.Runner;
 using FluentMigrator.Runner.Infrastructure;
+using FluentMigrator.Runner.Processors.SqlServer;
 
 using NUnit.Framework;
 using NUnit.Should;
@@ -27,67 +33,101 @@ namespace FluentMigrator.Tests.Unit
     [TestFixture]
     public class DefaultMigrationConventionsTests
     {
-        private static readonly IMigrationConventions _default = DefaultMigrationConventions.Instance;
+        private static readonly IMigrationRunnerConventions _default = DefaultMigrationRunnerConventions.Instance;
 
         [Test]
         public void GetPrimaryKeyNamePrefixesTableNameWithPKAndUnderscore()
         {
-            _default.GetPrimaryKeyName("Foo").ShouldBe("PK_Foo");
+            var expr = new CreateColumnExpression()
+            {
+                Column =
+                {
+                    TableName = "Foo",
+                    IsPrimaryKey = true,
+                }
+            };
+
+            var processed = expr.Apply(ConventionSets.NoSchemaName);
+            processed.Column.PrimaryKeyName.ShouldBe("PK_Foo");
         }
 
         [Test]
         public void GetForeignKeyNameReturnsValidForeignKeyNameForSimpleForeignKey()
         {
-            var foreignKey = new ForeignKeyDefinition
+            var expr = new CreateForeignKeyExpression()
             {
-                ForeignTable = "Users", ForeignColumns = new[] { "GroupId" },
-                PrimaryTable = "Groups", PrimaryColumns = new[] { "Id" }
+                ForeignKey =
+                {
+                    ForeignTable = "Users",
+                    ForeignColumns = new[] { "GroupId" },
+                    PrimaryTable = "Groups",
+                    PrimaryColumns = new[] { "Id" }
+                }
             };
 
-            _default.GetForeignKeyName(foreignKey).ShouldBe("FK_Users_GroupId_Groups_Id");
+            var processed = expr.Apply(ConventionSets.NoSchemaName);
+
+            processed.ForeignKey.Name.ShouldBe("FK_Users_GroupId_Groups_Id");
         }
 
         [Test]
         public void GetForeignKeyNameReturnsValidForeignKeyNameForComplexForeignKey()
         {
-            var foreignKey = new ForeignKeyDefinition
+            var expr = new CreateForeignKeyExpression()
             {
-                ForeignTable = "Users", ForeignColumns = new[] { "ColumnA", "ColumnB" },
-                PrimaryTable = "Groups", PrimaryColumns = new[] { "ColumnC", "ColumnD" }
+                ForeignKey =
+                {
+                    ForeignTable = "Users",
+                    ForeignColumns = new[] { "ColumnA", "ColumnB" },
+                    PrimaryTable = "Groups",
+                    PrimaryColumns = new[] { "ColumnC", "ColumnD" }
+                }
             };
 
-            _default.GetForeignKeyName(foreignKey).ShouldBe("FK_Users_ColumnA_ColumnB_Groups_ColumnC_ColumnD");
+            var processed = expr.Apply(ConventionSets.NoSchemaName);
+
+            processed.ForeignKey.Name.ShouldBe("FK_Users_ColumnA_ColumnB_Groups_ColumnC_ColumnD");
         }
 
         [Test]
         public void GetIndexNameReturnsValidIndexNameForSimpleIndex()
         {
-            var index = new IndexDefinition
+            var expr = new CreateIndexExpression()
             {
-                TableName = "Bacon",
-                Columns =
+                Index =
                 {
-                    new IndexColumnDefinition { Name = "BaconName", Direction = Direction.Ascending }
+                    TableName = "Bacon",
+                    Columns =
+                    {
+                        new IndexColumnDefinition { Name = "BaconName", Direction = Direction.Ascending }
+                    }
                 }
             };
 
-            _default.GetIndexName(index).ShouldBe("IX_Bacon_BaconName");
+            var processed = expr.Apply(ConventionSets.NoSchemaName);
+
+            processed.Index.Name.ShouldBe("IX_Bacon_BaconName");
         }
 
         [Test]
         public void GetIndexNameReturnsValidIndexNameForComplexIndex()
         {
-            var index = new IndexDefinition
+            var expr = new CreateIndexExpression()
             {
-                TableName = "Bacon",
-                Columns =
+                Index =
                 {
-                    new IndexColumnDefinition { Name = "BaconName", Direction = Direction.Ascending },
-                    new IndexColumnDefinition { Name = "BaconSpice", Direction = Direction.Descending }
+                    TableName = "Bacon",
+                    Columns =
+                    {
+                        new IndexColumnDefinition { Name = "BaconName", Direction = Direction.Ascending },
+                        new IndexColumnDefinition { Name = "BaconSpice", Direction = Direction.Descending }
+                    }
                 }
             };
 
-            _default.GetIndexName(index).ShouldBe("IX_Bacon_BaconName_BaconSpice");
+            var processed = expr.Apply(ConventionSets.NoSchemaName);
+
+            processed.Index.Name.ShouldBe("IX_Bacon_BaconName_BaconSpice");
         }
 
         [Test]
@@ -153,8 +193,9 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void DefaultSchemaConventionDefaultsToNull()
         {
-            _default.GetDefaultSchema()
-                .ShouldBeNull();
+            var expr = new ConventionsTestClass();
+            var processed = ConventionSets.NoSchemaName.SchemaConvention.Apply(expr);
+            processed.SchemaName.ShouldBeNull();
         }
 
         [Test]
@@ -356,21 +397,36 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void GetAutoScriptUpName()
         {
-            var type = typeof(AutoScriptMigrationFake);
-            var databaseType = "sqlserver";
+            var querySchema = new SqlServerProcessor("SqlServer", null, null, null, null, null);
+            var context = new MigrationContext(querySchema, null, null, null);
+            var expr = new AutoScriptMigrationFake();
+            expr.GetUpExpressions(context);
 
-            _default.GetAutoScriptUpName(type, databaseType)
-                .ShouldBe("Scripts.Up.20130508175300_AutoScriptMigrationFake_sqlserver.sql");
+            var expression = context.Expressions.Single();
+            var processed = (IAutoNameExpression)expression.Apply(ConventionSets.NoSchemaName);
+            processed.AutoName
+                .ShouldBe("Scripts.Up.20130508175300_AutoScriptMigrationFake_SqlServer.sql");
         }
 
         [Test]
         public void GetAutoScriptDownName()
         {
-            var type = typeof(AutoScriptMigrationFake);
-            var databaseType = "sqlserver";
+            var querySchema = new SqlServerProcessor("SqlServer", null, null, null, null, null);
+            var context = new MigrationContext(querySchema, null, null, null);
+            var expr = new AutoScriptMigrationFake();
+            expr.GetDownExpressions(context);
 
-            _default.GetAutoScriptDownName(type, databaseType)
-                .ShouldBe("Scripts.Down.20130508175300_AutoScriptMigrationFake_sqlserver.sql");
+            var expression = context.Expressions.Single();
+            var processed = (IAutoNameExpression)expression.Apply(ConventionSets.NoSchemaName);
+
+            processed.AutoName
+                .ShouldBe("Scripts.Down.20130508175300_AutoScriptMigrationFake_SqlServer.sql");
+        }
+
+        private class ConventionsTestClass : ISchemaExpression, IFileSystemExpression
+        {
+            public string SchemaName { get; set; }
+            public string RootPath { get; set; }
         }
     }
 
@@ -459,5 +515,4 @@ namespace FluentMigrator.Tests.Unit
         public override void Up() { }
         public override void Down() { }
     }
-
 }

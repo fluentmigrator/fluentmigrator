@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -24,6 +24,7 @@ using System.Linq;
 using FluentMigrator.Exceptions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
+using FluentMigrator.Runner.Exceptions;
 using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Tests.Integration.Migrations;
 using FluentMigrator.Tests.Unit.TaggingTestFakes;
@@ -42,10 +43,10 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanFindMigrationsInAssembly()
         {
-            var conventions = new MigrationConventions();
+            var conventions = new MigrationRunnerConventions();
             var asm = Assembly.GetExecutingAssembly();
             var loader = new DefaultMigrationInformationLoader( conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1", null);
-            
+
             SortedList<long, IMigrationInfo> migrationList = loader.LoadMigrations();
 
             //if this works, there will be at least one migration class because i've included on in this code file
@@ -60,7 +61,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void CanFindMigrationsInNamespace()
         {
-            var conventions = new MigrationConventions();
+            var conventions = new MigrationRunnerConventions();
             var asm = Assembly.GetExecutingAssembly();
             var loader = new DefaultMigrationInformationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Interleaved.Pass1", null);
 
@@ -72,7 +73,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void DefaultBehaviorIsToNotLoadNestedNamespaces()
         {
-            var conventions = new MigrationConventions();
+            var conventions = new MigrationRunnerConventions();
             var asm = Assembly.GetExecutingAssembly();
             var loader = new DefaultMigrationInformationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Nested", null);
 
@@ -82,7 +83,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void FindsMigrationsInNestedNamespaceWhenLoadNestedNamespacesEnabled()
         {
-            var conventions = new MigrationConventions();
+            var conventions = new MigrationRunnerConventions();
             var asm = Assembly.GetExecutingAssembly();
             var loader = new DefaultMigrationInformationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Nested", true, null);
 
@@ -103,7 +104,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void DoesNotFindsMigrationsInNestedNamespaceWhenLoadNestedNamespacesDisabled()
         {
-            var conventions = new MigrationConventions();
+            var conventions = new MigrationRunnerConventions();
             var asm = Assembly.GetExecutingAssembly();
             var loader = new DefaultMigrationInformationLoader(conventions, asm, "FluentMigrator.Tests.Integration.Migrations.Nested", false, null);
 
@@ -125,8 +126,8 @@ namespace FluentMigrator.Tests.Unit
             var migrationType = typeof(TaggedMigraion);
             var tagsToMatch = new[] { "UK", "Production" };
 
-            var conventionsMock = new Mock<IMigrationConventions>();
-            conventionsMock.SetupGet(m => m.GetMigrationInfo).Returns(DefaultMigrationConventions.Instance.GetMigrationInfo);
+            var conventionsMock = new Mock<IMigrationRunnerConventions>();
+            conventionsMock.SetupGet(m => m.GetMigrationInfo).Returns(DefaultMigrationRunnerConventions.Instance.GetMigrationInfo);
             conventionsMock.SetupGet(m => m.TypeIsMigration).Returns(t => true);
             conventionsMock.SetupGet(m => m.TypeHasTags).Returns(t => migrationType == t);
             conventionsMock.SetupGet(m => m.TypeHasMatchingTags).Returns((type, tags) => (migrationType == type && tagsToMatch == tags));
@@ -147,8 +148,8 @@ namespace FluentMigrator.Tests.Unit
             var migrationType = typeof(TaggedMigraion);
             var tagsToMatch = new[] { "UK", "Production" };
 
-            var conventionsMock = new Mock<IMigrationConventions>();
-            conventionsMock.SetupGet(m => m.GetMigrationInfo).Returns(DefaultMigrationConventions.Instance.GetMigrationInfo);
+            var conventionsMock = new Mock<IMigrationRunnerConventions>();
+            conventionsMock.SetupGet(m => m.GetMigrationInfo).Returns(DefaultMigrationRunnerConventions.Instance.GetMigrationInfo);
             conventionsMock.SetupGet(m => m.TypeIsMigration).Returns(t => true);
             conventionsMock.SetupGet(m => m.TypeHasTags).Returns(t => migrationType == t);
             conventionsMock.SetupGet(m => m.TypeHasMatchingTags).Returns((type, tags) => false);
@@ -162,22 +163,19 @@ namespace FluentMigrator.Tests.Unit
             CollectionAssert.AreEquivalent(expected, actual);
         }
 
+        [Test]
         public void HandlesNotFindingMigrations()
         {
-            var conventions = new MigrationConventions();
+            var conventions = new MigrationRunnerConventions();
             var asm = Assembly.GetExecutingAssembly();
             var loader = new DefaultMigrationInformationLoader(conventions, asm, "FluentMigrator.Tests.Unit.EmptyNamespace", null);
-
-            var list = loader.LoadMigrations();
-
-            Assert.That(list, Is.Not.Null);
-            Assert.That(list.Count(), Is.EqualTo(0));
+            Assert.Throws<MissingMigrationsException>(() => loader.LoadMigrations());
         }
 
         [Test]
         public void ShouldThrowExceptionIfDuplicateVersionNumbersAreLoaded()
         {
-            var conventions = new MigrationConventions();
+            var conventions = new MigrationRunnerConventions();
             var asm = Assembly.GetExecutingAssembly();
             var migrationLoader = new DefaultMigrationInformationLoader(conventions, asm, "FluentMigrator.Tests.Unit.DuplicateVersionNumbers", null);
             Assert.Throws<DuplicateMigrationException>(() => migrationLoader.LoadMigrations());
@@ -186,7 +184,7 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void HandlesMigrationThatDoesNotInheritFromMigrationBaseClass()
         {
-            var conventions = new MigrationConventions();
+            var conventions = new MigrationRunnerConventions();
             var asm = Assembly.GetExecutingAssembly();
             var loader = new DefaultMigrationInformationLoader(conventions, asm, "FluentMigrator.Tests.Unit.DoesNotInheritFromBaseClass", null);
 
@@ -196,14 +194,14 @@ namespace FluentMigrator.Tests.Unit
         [Test]
         public void ShouldHandleTransactionlessMigrations()
         {
-            var conventions = new MigrationConventions();
+            var conventions = new MigrationRunnerConventions();
             var asm = Assembly.GetExecutingAssembly();
             var loader = new DefaultMigrationInformationLoader(conventions, asm, "FluentMigrator.Tests.Unit.DoesHandleTransactionLessMigrations", null);
 
             var list = loader.LoadMigrations().ToList();
 
             list.Count().ShouldBe(2);
-            
+
             list[0].Value.Migration.GetType().ShouldBe(typeof(DoesHandleTransactionLessMigrations.MigrationThatIsTransactionLess));
             list[0].Value.TransactionBehavior.ShouldBe(TransactionBehavior.None);
             list[0].Value.Version.ShouldBe(1);

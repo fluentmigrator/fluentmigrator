@@ -1,9 +1,22 @@
+#region License
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+#endregion
+
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using FluentMigrator.Infrastructure;
-using FluentMigrator.Builders.Execute;
+
+using FluentMigrator.Expressions;
 
 namespace FluentMigrator
 {
@@ -11,16 +24,44 @@ namespace FluentMigrator
     {
         public sealed override void Up()
         {
-            var root = new ExecuteExpressionRoot(_context);
-            root.EmbeddedScript(_context.Conventions
-                .GetAutoScriptUpName(GetType(),_context.QuerySchema.DatabaseType));
+            var expression = new ExecuteEmbeddedAutoSqlScriptExpression(
+                GetType(),
+                _context.QuerySchema.DatabaseType,
+                MigrationDirection.Up)
+            {
+                MigrationAssemblies = _context.MigrationAssemblies,
+            };
+            _context.Expressions.Add(expression);
         }
 
         public sealed override void Down()
         {
-            var root = new ExecuteExpressionRoot(_context);
-            root.EmbeddedScript(_context.Conventions
-                .GetAutoScriptDownName(GetType(), _context.QuerySchema.DatabaseType));
+            var expression = new ExecuteEmbeddedAutoSqlScriptExpression(
+                GetType(),
+                _context.QuerySchema.DatabaseType,
+                MigrationDirection.Down)
+            {
+                MigrationAssemblies = _context.MigrationAssemblies,
+            };
+            _context.Expressions.Add(expression);
+        }
+
+        private class ExecuteEmbeddedAutoSqlScriptExpression :
+            ExecuteEmbeddedSqlScriptExpression,
+            IAutoNameExpression
+        {
+            public ExecuteEmbeddedAutoSqlScriptExpression(Type migrationType, string databaseName, MigrationDirection direction)
+            {
+                MigrationType = migrationType;
+                DatabaseName = databaseName;
+                Direction = direction;
+            }
+
+            public string AutoName { get; set; }
+            public AutoNameContext AutoNameContext { get; } = AutoNameContext.EmbeddedResource;
+            public Type MigrationType { get; }
+            public string DatabaseName { get; }
+            public MigrationDirection Direction { get; }
         }
     }
 }

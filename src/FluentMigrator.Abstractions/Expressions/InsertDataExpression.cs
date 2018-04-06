@@ -16,7 +16,6 @@
 //
 #endregion
 
-using System;
 using System.Collections.Generic;
 
 using FluentMigrator.Infrastructure;
@@ -24,7 +23,7 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-    public class InsertDataExpression : IMigrationExpression, ISupportAdditionalFeatures
+    public class InsertDataExpression : IMigrationExpression, ISupportAdditionalFeatures, ISchemaExpression
     {
         public string SchemaName { get; set; }
         public string TableName { get; set; }
@@ -59,14 +58,6 @@ namespace FluentMigrator.Expressions
             }
 
             return expression;
-        }
-
-        public void ApplyConventions(IMigrationConventions conventions)
-        {
-            if (string.IsNullOrEmpty(SchemaName))
-            {
-                SchemaName = conventions.GetDefaultSchema();
-            }
         }
     }
 }

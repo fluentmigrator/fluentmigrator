@@ -1,12 +1,12 @@
 #region License
 // Copyright (c) 2007-2018, FluentMigrator Project
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-// 
+//
 // http://www.apache.org/licenses/LICENSE-2.0
-// 
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
 
@@ -27,32 +28,44 @@ namespace FluentMigrator.Tests.Unit.Definitions
         [Test]
         public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
         {
-            var sequenceDefinition = new SequenceDefinition { Name = "Test" };
+            var expr = new CreateSequenceExpression()
+            {
+                Sequence = new SequenceDefinition { Name = "Test" },
+            };
 
-            sequenceDefinition.ApplyConventions(new MigrationConventions());
+            var processed = expr.Apply(ConventionSets.NoSchemaName);
 
-            Assert.That(sequenceDefinition.SchemaName, Is.Null);
+            Assert.That(processed.Sequence.SchemaName, Is.Null);
         }
 
         [Test]
         public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsSetThenSchemaShouldNotBeChanged()
         {
-            var sequenceDefinition = new SequenceDefinition { Name = "Test", SchemaName = "testschema" };
+            var expr = new CreateSequenceExpression()
+            {
+                Sequence =
+                {
+                    Name = "Test",
+                    SchemaName = "testschema"
+                }
+            };
 
-            sequenceDefinition.ApplyConventions(new MigrationConventions());
+            var processed = expr.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(sequenceDefinition.SchemaName, Is.EqualTo("testschema"));
+            Assert.That(processed.Sequence.SchemaName, Is.EqualTo("testschema"));
         }
 
         [Test]
         public void WhenDefaultSchemaConventionIsChangedAndSchemaIsNotSetThenSetSchema()
         {
-            var sequenceDefinition = new SequenceDefinition { Name = "Test" };
-            var migrationConventions = new MigrationConventions { GetDefaultSchema = () => "testdefault" };
+            var expr = new CreateSequenceExpression()
+            {
+                Sequence = new SequenceDefinition { Name = "Test" },
+            };
 
-            sequenceDefinition.ApplyConventions(migrationConventions);
+            var processed = expr.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(sequenceDefinition.SchemaName, Is.EqualTo("testdefault"));
-        } 
+            Assert.That(processed.Sequence.SchemaName, Is.EqualTo("testdefault"));
+        }
     }
 }

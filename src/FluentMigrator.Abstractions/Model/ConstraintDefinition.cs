@@ -12,7 +12,7 @@ namespace FluentMigrator.Model
         Unique
     }
 
-    public class ConstraintDefinition : ICloneable, ICanBeConventional, ICanBeValidated, ISupportAdditionalFeatures
+    public class ConstraintDefinition : ICloneable, ICanBeValidated, ISupportAdditionalFeatures
     {
         private ConstraintType constraintType;
         public bool IsPrimaryKeyConstraint { get { return ConstraintType.PrimaryKey == constraintType; } }
@@ -50,23 +50,6 @@ namespace FluentMigrator.Model
             AdditionalFeatures.CloneTo(result.AdditionalFeatures);
 
             return result;
-        }
-
-        #endregion
-
-        #region ICanBeConventional Members
-
-        public void ApplyConventions(IMigrationConventions conventions)
-        {
-            if (string.IsNullOrEmpty(SchemaName))
-            {
-                SchemaName = conventions.GetDefaultSchema();
-            }
-
-            if (String.IsNullOrEmpty(ConstraintName))
-            {
-                ConstraintName = conventions.GetConstraintName(this);
-            }
         }
 
         #endregion

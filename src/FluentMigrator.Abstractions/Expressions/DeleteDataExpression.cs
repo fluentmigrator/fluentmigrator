@@ -21,7 +21,7 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-    public class DeleteDataExpression : IMigrationExpression
+    public class DeleteDataExpression : IMigrationExpression, ISchemaExpression
     {
         public virtual string SchemaName { get; set; }
         public string TableName { get; set; }
@@ -55,14 +55,6 @@ namespace FluentMigrator.Expressions
             }
 
             return expression;
-        }
-
-        public void ApplyConventions(IMigrationConventions conventions)
-        {
-            if (string.IsNullOrEmpty(SchemaName))
-            {
-                SchemaName = conventions.GetDefaultSchema();
-            }
         }
     }
 }

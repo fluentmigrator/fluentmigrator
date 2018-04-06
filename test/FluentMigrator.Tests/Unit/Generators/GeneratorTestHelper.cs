@@ -531,26 +531,38 @@ namespace FluentMigrator.Tests.Unit.Generators
 
         public static CreateForeignKeyExpression GetCreateForeignKeyExpression()
         {
-            var expression = new CreateForeignKeyExpression();
-            expression.ForeignKey.PrimaryTable = TestTableName2;
-            expression.ForeignKey.ForeignTable = TestTableName1;
-            expression.ForeignKey.PrimaryColumns = new[] { TestColumnName2 };
-            expression.ForeignKey.ForeignColumns = new[] { TestColumnName1 };
+            var expression = new CreateForeignKeyExpression
+            {
+                ForeignKey =
+                {
+                    PrimaryTable = TestTableName2,
+                    ForeignTable = TestTableName1,
+                    PrimaryColumns = new[] {TestColumnName2},
+                    ForeignColumns = new[] {TestColumnName1}
+                }
+            };
 
-            expression.ApplyConventions(new MigrationConventions());
-            return expression;
+            var processed = expression.Apply(ConventionSets.NoSchemaName);
+
+            return processed;
         }
 
         public static CreateForeignKeyExpression GetCreateMultiColumnForeignKeyExpression()
         {
-            var expression = new CreateForeignKeyExpression();
-            expression.ForeignKey.PrimaryTable = TestTableName2;
-            expression.ForeignKey.ForeignTable = TestTableName1;
-            expression.ForeignKey.PrimaryColumns = new[] { TestColumnName2, "TestColumn4" };
-            expression.ForeignKey.ForeignColumns = new[] { TestColumnName1, "TestColumn3" };
+            var expression = new CreateForeignKeyExpression
+            {
+                ForeignKey =
+                {
+                    PrimaryTable = TestTableName2,
+                    ForeignTable = TestTableName1,
+                    PrimaryColumns = new[] {TestColumnName2, "TestColumn4"},
+                    ForeignColumns = new[] {TestColumnName1, "TestColumn3"}
+                }
+            };
 
-            expression.ApplyConventions(new MigrationConventions());
-            return expression;
+            var processed = expression.Apply(ConventionSets.NoSchemaName);
+
+            return processed;
         }
 
         public static CreateForeignKeyExpression GetCreateNamedForeignKeyExpression()
@@ -638,8 +650,8 @@ namespace FluentMigrator.Tests.Unit.Generators
             var expression = new CreateConstraintExpression(ConstraintType.PrimaryKey);
             expression.Constraint.TableName = TestTableName1;
             expression.Constraint.Columns.Add(TestColumnName1);
-            expression.ApplyConventions(new MigrationConventions());
-            return expression;
+            var processed = expression.Apply(ConventionSets.NoSchemaName);
+            return processed;
         }
 
         public static CreateConstraintExpression GetCreateNamedPrimaryKeyExpression()
@@ -657,8 +669,8 @@ namespace FluentMigrator.Tests.Unit.Generators
             expression.Constraint.TableName = TestTableName1;
             expression.Constraint.Columns.Add(TestColumnName1);
             expression.Constraint.Columns.Add(TestColumnName2);
-            expression.ApplyConventions(new MigrationConventions());
-            return expression;
+            var processed = expression.Apply(ConventionSets.NoSchemaName);
+            return processed;
         }
 
         public static CreateConstraintExpression GetCreateNamedMultiColumnPrimaryKeyExpression()
@@ -676,8 +688,8 @@ namespace FluentMigrator.Tests.Unit.Generators
             var expression = new CreateConstraintExpression(ConstraintType.Unique);
             expression.Constraint.TableName = TestTableName1;
             expression.Constraint.Columns.Add(TestColumnName1);
-            expression.ApplyConventions(new MigrationConventions());
-            return expression;
+            var processed = expression.Apply(ConventionSets.NoSchemaName);
+            return processed;
         }
 
         public static CreateConstraintExpression GetCreateNamedUniqueConstraintExpression()
@@ -695,8 +707,8 @@ namespace FluentMigrator.Tests.Unit.Generators
             expression.Constraint.TableName = TestTableName1;
             expression.Constraint.Columns.Add(TestColumnName1);
             expression.Constraint.Columns.Add(TestColumnName2);
-            expression.ApplyConventions(new MigrationConventions());
-            return expression;
+            var processed = expression.Apply(ConventionSets.NoSchemaName);
+            return processed;
         }
 
         public static CreateConstraintExpression GetCreateNamedMultiColumnUniqueConstraintExpression()

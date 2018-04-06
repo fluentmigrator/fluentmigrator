@@ -88,10 +88,11 @@ namespace FluentMigrator.Tests.Unit.Expressions
             var scriptOnAnotherDrive = "z" + Path.VolumeSeparatorChar + Path.DirectorySeparatorChar + testSqlScript;
             var expression = new ExecuteSqlScriptExpression { SqlScript = scriptOnAnotherDrive };
 
-            var conventions = new MigrationConventions { GetWorkingDirectory = () => "c" + Path.VolumeSeparatorChar + Path.DirectorySeparatorChar + "code" };
-            expression.ApplyConventions(conventions);
+            var defaultRootPath = "c" + Path.VolumeSeparatorChar + Path.DirectorySeparatorChar + "code";
+            var conventionSet = ConventionSets.CreateNoSchemaName(defaultRootPath);
+            var processed = expression.Apply(conventionSet);
 
-            expression.SqlScript.ShouldBe(scriptOnAnotherDrive);
+            processed.SqlScript.ShouldBe(scriptOnAnotherDrive);
         }
     }
 }

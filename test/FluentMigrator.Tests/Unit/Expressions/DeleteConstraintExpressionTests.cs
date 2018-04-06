@@ -1,4 +1,6 @@
 using System;
+
+using FluentMigrator.Builders.Delete.Constraint;
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
@@ -37,13 +39,25 @@ namespace FluentMigrator.Tests.Unit.Expressions
         }
 
         [Test]
+        public void ApplyDefaultContraintName()
+        {
+            var expression = new DeleteConstraintExpression(ConstraintType.Unique);
+            var builder = new DeleteConstraintExpressionBuilder(expression);
+            builder.FromTable("Users").Column("AccountId");
+
+            var processed = expression.Apply(ConventionSets.NoSchemaName);
+
+            Assert.That(processed.Constraint.ConstraintName, Is.EqualTo("UC_Users_AccountId"));
+        }
+
+        [Test]
         public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
         {
             var expression = new DeleteConstraintExpression(ConstraintType.Unique);
 
-            expression.ApplyConventions(new MigrationConventions());
+            var processed = expression.Apply(ConventionSets.NoSchemaName);
 
-            Assert.That(expression.Constraint.SchemaName, Is.Null);
+            Assert.That(processed.Constraint.SchemaName, Is.Null);
         }
 
         [Test]
@@ -57,9 +71,9 @@ namespace FluentMigrator.Tests.Unit.Expressions
                 },
             };
 
-            expression.ApplyConventions(new MigrationConventions());
+            var processed = expression.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(expression.Constraint.SchemaName, Is.EqualTo("testschema"));
+            Assert.That(processed.Constraint.SchemaName, Is.EqualTo("testschema"));
         }
 
         [Test]
@@ -67,11 +81,9 @@ namespace FluentMigrator.Tests.Unit.Expressions
         {
             var expression = new DeleteConstraintExpression(ConstraintType.Unique);
 
-            var migrationConventions = new MigrationConventions { GetDefaultSchema = () => "testdefault" };
+            var processed = expression.Apply(ConventionSets.WithSchemaName);
 
-            expression.ApplyConventions(migrationConventions);
-
-            Assert.That(expression.Constraint.SchemaName, Is.EqualTo("testdefault"));
+            Assert.That(processed.Constraint.SchemaName, Is.EqualTo("testdefault"));
         }
     }
 }

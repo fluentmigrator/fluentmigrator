@@ -43,7 +43,7 @@ namespace FluentMigrator.MSBuild
 {
     [CLSCompliant(false)]
     public class Migrate :
-#if NET40 || NET45
+#if NETFRAMEWORK
         AppDomainIsolatedTask
 #else
         Task

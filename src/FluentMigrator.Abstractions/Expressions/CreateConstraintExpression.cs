@@ -5,7 +5,7 @@ using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-    public class CreateConstraintExpression : MigrationExpressionBase, ISupportAdditionalFeatures
+    public class CreateConstraintExpression : MigrationExpressionBase, ISupportAdditionalFeatures, IConstraintExpression
     {
         public virtual ConstraintDefinition Constraint { get; set; }
 
@@ -27,11 +27,6 @@ namespace FluentMigrator.Expressions
         public override void CollectValidationErrors(ICollection<string> errors)
         {
             Constraint.CollectValidationErrors(errors);
-        }
-
-        public override void ApplyConventions(IMigrationConventions conventions)
-        {
-            Constraint.ApplyConventions(conventions);
         }
 
         public override IMigrationExpression Reverse()

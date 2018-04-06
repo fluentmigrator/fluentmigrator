@@ -17,6 +17,8 @@
 #endregion
 
 using System;
+
+using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
@@ -83,35 +85,54 @@ namespace FluentMigrator.Tests.Unit.Definitions
             var errors = ValidationHelper.CollectErrors(column);
             errors.ShouldNotContain(ErrorMessages.ColumnNameCannotBeNullOrEmpty);
         }
- 
+
         [Test]
         public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsNotSetThenSchemaShouldBeNull()
         {
-            var indexDefinition = new IndexDefinition { Name = "Test" };
+            var expr = new CreateIndexExpression()
+            {
+                Index =
+                {
+                    Name = "Test"
+                }
+            };
 
-            indexDefinition.ApplyConventions(new MigrationConventions());
+            var processed = expr.Apply(ConventionSets.NoSchemaName);
 
-            Assert.That(indexDefinition.SchemaName, Is.Null);
+            Assert.That(processed.Index.SchemaName, Is.Null);
         }
 
         [Test]
         public void WhenDefaultSchemaConventionIsAppliedAndSchemaIsSetThenSchemaShouldNotBeChanged()
         {
-            var indexDefinition = new IndexDefinition{ Name = "Test", SchemaName = "testschema" };
+            var expr = new CreateIndexExpression()
+            {
+                Index =
+                {
+                    Name = "Test",
+                    SchemaName = "testschema"
+                }
+            };
 
-            indexDefinition.ApplyConventions(new MigrationConventions());
+            var processed = expr.Apply(ConventionSets.WithSchemaName);
 
-            Assert.That(indexDefinition.SchemaName, Is.EqualTo("testschema"));
+            Assert.That(processed.Index.SchemaName, Is.EqualTo("testschema"));
         }
 
         [Test]
         public void WhenDefaultSchemaConventionIsChangedAndSchemaIsNotSetThenSetSchema()
         {
-            var indexDefinition = new IndexDefinition { Name = "Test" };
-            var migrationConventions = new MigrationConventions {GetDefaultSchema = () => "testdefault"};
-            indexDefinition.ApplyConventions(migrationConventions);
+            var expr = new CreateIndexExpression()
+            {
+                Index =
+                {
+                    Name = "Test"
+                }
+            };
 
-            Assert.That(indexDefinition.SchemaName, Is.EqualTo("testdefault"));
+            var processed = expr.Apply(ConventionSets.WithSchemaName);
+
+            Assert.That(processed.Index.SchemaName, Is.EqualTo("testdefault"));
         }
     }
 }

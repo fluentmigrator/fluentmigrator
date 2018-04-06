@@ -16,32 +16,20 @@
 //
 #endregion
 
-using System;
 using System.Collections.Generic;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 
 namespace FluentMigrator.Expressions
 {
-    public class CreateTableExpression : MigrationExpressionBase
+    public class CreateTableExpression : MigrationExpressionBase, ISchemaExpression, IColumnsExpression
     {
         public virtual string SchemaName { get; set; }
         public virtual string TableName { get; set; }
         public virtual IList<ColumnDefinition> Columns { get; set; } = new List<ColumnDefinition>();
         public virtual string TableDescription { get; set; }
 
-        public override void ApplyConventions(IMigrationConventions conventions)
-        {
-            if (string.IsNullOrEmpty(SchemaName))
-            {
-                SchemaName = conventions.GetDefaultSchema();
-            }
-
-            foreach (var column in Columns)
-            {
-                column.ApplyConventions(conventions);
-            }
-        }
+        IEnumerable<ColumnDefinition> IColumnsExpression.Columns => Columns;
 
         public override void CollectValidationErrors(ICollection<string> errors)
         {

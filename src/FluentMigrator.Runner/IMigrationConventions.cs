@@ -18,26 +18,19 @@
 
 using System;
 using System.Collections.Generic;
+
 using FluentMigrator.Infrastructure;
 
-namespace FluentMigrator
+namespace FluentMigrator.Runner
 {
-    public interface IMigrationConventions
+    public interface IMigrationRunnerConventions
     {
-        Func<Model.ForeignKeyDefinition, string> GetForeignKeyName { get; }
-        Func<Model.IndexDefinition, string> GetIndexName { get; }
-        Func<string, string> GetPrimaryKeyName { get; }
         Func<Type, bool> TypeIsMigration { get; }
         Func<Type, bool> TypeIsProfile { get; }
         Func<Type, MigrationStage?> GetMaintenanceStage { get; }
         Func<Type, bool> TypeIsVersionTableMetaData { get; }
-        Func<string> GetWorkingDirectory { get; }
         Func<Type, IMigrationInfo> GetMigrationInfo { get; }
-        Func<Model.ConstraintDefinition, string> GetConstraintName { get; }
         Func<Type, bool> TypeHasTags { get; }
         Func<Type, IEnumerable<string>, bool> TypeHasMatchingTags { get; }
-        Func<Type, string, string> GetAutoScriptUpName { get; }
-        Func<Type, string, string> GetAutoScriptDownName { get; }
-        Func<string> GetDefaultSchema { get; }
     }
 }
