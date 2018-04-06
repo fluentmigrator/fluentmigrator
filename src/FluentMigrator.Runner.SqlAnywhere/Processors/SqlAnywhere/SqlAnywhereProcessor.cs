@@ -162,7 +162,7 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
             {
                 var result = command.ExecuteScalar();
-                return DBNull.Value != result && Convert.ToInt32(result) == 1;
+                return DBNull.Value != result && Convert.ToInt32(result) != 0;
             }
         }
 
