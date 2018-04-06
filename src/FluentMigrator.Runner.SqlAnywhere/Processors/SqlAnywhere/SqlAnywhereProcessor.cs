@@ -24,6 +24,9 @@ using System.Text.RegularExpressions;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.Runner.BatchParser;
+using FluentMigrator.Runner.BatchParser.Sources;
+using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
 using FluentMigrator.Runner.Helpers;
 using FluentMigrator.SqlAnywhere;
 
@@ -182,32 +185,35 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
 
         protected override void Process(string sql)
         {
-            ProcessWithConnection(Connection, Transaction, sql);
-        }
-
-        private void ProcessWithConnection(IDbConnection connection, IDbTransaction transaction, string sql)
-        {
             Announcer.Sql(sql);
 
             if (Options.PreviewOnly || string.IsNullOrEmpty(sql))
                 return;
 
-            EnsureConnectionIsOpen(connection);
+            EnsureConnectionIsOpen();
 
-            if (sql.IndexOf("GO", StringComparison.OrdinalIgnoreCase) >= 0)
+            if (ContainsGo(sql))
             {
-                ExecuteBatchNonQuery(connection, transaction, sql);
+                ExecuteBatchNonQuery(sql);
 
             }
             else
             {
-                ExecuteNonQuery(connection, transaction, sql);
+                ExecuteNonQuery(Connection, Transaction, sql);
             }
         }
 
-        protected override void EnsureConnectionIsOpen()
+        private static bool ContainsGo(string sql)
         {
-            EnsureConnectionIsOpen(Connection);
+            var containsGo = false;
+            var parser = new SqlAnywhereBatchParser();
+            parser.SpecialToken += (sender, args) => containsGo = true;
+            using (var source = new TextReaderSource(new StringReader(sql), true))
+            {
+                parser.Process(source);
+            }
+
+            return containsGo;
         }
 
         private void EnsureConnectionIsOpen(IDbConnection connection)
@@ -238,42 +244,58 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
             }
         }
 
-        private void ExecuteBatchNonQuery(IDbConnection connection, IDbTransaction transaction, string sql)
+        private void ExecuteBatchNonQuery(string sql)
         {
-            sql += "\nGO";   // make sure last batch is executed.
-            string sqlBatch = string.Empty;
+            var sqlBatch = string.Empty;
 
-            using (var command = Factory.CreateCommand(string.Empty, connection, transaction, Options))
+            try
             {
-                try
+                var parser = new SqlAnywhereBatchParser();
+                parser.SqlText += (sender, args) => { sqlBatch = args.SqlText.Trim(); };
+                parser.SpecialToken += (sender, args) =>
                 {
-                    foreach (string line in sql.Split(new[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries))
+                    if (string.IsNullOrEmpty(sqlBatch))
+                        return;
+
+                    if (args.Opaque is GoSearcher.GoSearcherParameters goParams)
                     {
-                        if (line.ToUpperInvariant().Trim() == "GO")
+                        using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
                         {
-                            if (!string.IsNullOrEmpty(sqlBatch))
+                            command.CommandText = sqlBatch;
+
+                            for (var i = 0; i != goParams.Count; ++i)
                             {
-                                command.CommandText = sqlBatch;
                                 command.ExecuteNonQuery();
-                                sqlBatch = string.Empty;
                             }
                         }
-                        else
-                        {
-                            sqlBatch += line + "\n";
-                        }
+                    }
+
+                    sqlBatch = null;
+                };
+
+                using (var source = new TextReaderSource(new StringReader(sql), true))
+                {
+                    parser.Process(source, stripComments: true);
+                }
+
+                if (!string.IsNullOrEmpty(sqlBatch))
+                {
+                    using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
+                    {
+                        command.CommandText = sqlBatch;
+                        command.ExecuteNonQuery();
                     }
                 }
-                catch (Exception ex)
+            }
+            catch (Exception ex)
+            {
+                using (var message = new StringWriter())
                 {
-                    using (var message = new StringWriter())
-                    {
-                        message.WriteLine("An error occurred executing the following sql:");
-                        message.WriteLine(sql);
-                        message.WriteLine("The error was {0}", ex.Message);
+                    message.WriteLine("An error occured executing the following sql:");
+                    message.WriteLine(string.IsNullOrEmpty(sqlBatch) ? sql : sqlBatch);
+                    message.WriteLine("The error was {0}", ex.Message);
 
-                        throw new Exception(message.ToString(), ex);
-                    }
+                    throw new Exception(message.ToString(), ex);
                 }
             }
         }

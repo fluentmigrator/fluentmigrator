@@ -24,6 +24,9 @@ using System.Data;
 using System.IO;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.BatchParser;
+using FluentMigrator.Runner.BatchParser.Sources;
+using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
@@ -143,7 +146,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             EnsureConnectionIsOpen();
 
-            if (sql.Contains("GO"))
+            if (ContainsGo(sql))
             {
                 ExecuteBatchNonQuery(sql);
 
@@ -152,6 +155,19 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             {
                 ExecuteNonQuery(sql);
             }
+        }
+
+        private static bool ContainsGo(string sql)
+        {
+            var containsGo = false;
+            var parser = new SqlServerBatchParser();
+            parser.SpecialToken += (sender, args) => containsGo = true;
+            using (var source = new TextReaderSource(new StringReader(sql), true))
+            {
+                parser.Process(source);
+            }
+
+            return containsGo;
         }
 
         private void ExecuteNonQuery(string sql)
@@ -178,40 +194,48 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         private void ExecuteBatchNonQuery(string sql)
         {
-            sql += "\nGO";   // make sure last batch is executed.
-            string sqlBatch = string.Empty;
+            sql += "\nGO"; // make sure last batch is executed.
+            var sqlBatch = string.Empty;
 
-            using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
+            try
             {
-                try
+                var parser = new SqlServerBatchParser();
+                parser.SqlText += (sender, args) => { sqlBatch = args.SqlText.Trim(); };
+                parser.SpecialToken += (sender, args) =>
                 {
-                    foreach (string line in sql.Split(new[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries))
+                    if (string.IsNullOrEmpty(sqlBatch))
+                        return;
+
+                    if (args.Opaque is GoSearcher.GoSearcherParameters goParams)
                     {
-                        if (line.ToUpperInvariant().Trim() == "GO")
+                        using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
                         {
-                            if (!string.IsNullOrEmpty(sqlBatch))
+                            command.CommandText = sqlBatch;
+
+                            for (var i = 0; i != goParams.Count; ++i)
                             {
-                                command.CommandText = sqlBatch;
                                 command.ExecuteNonQuery();
-                                sqlBatch = string.Empty;
                             }
                         }
-                        else
-                        {
-                            sqlBatch += line + "\n";
-                        }
                     }
-                }
-                catch (Exception ex)
-                {
-                    using (var message = new StringWriter())
-                    {
-                        message.WriteLine("An error occured executing the following sql:");
-                        message.WriteLine(sql);
-                        message.WriteLine("The error was {0}", ex.Message);
 
-                        throw new Exception(message.ToString(), ex);
-                    }
+                    sqlBatch = null;
+                };
+
+                using (var source = new TextReaderSource(new StringReader(sql), true))
+                {
+                    parser.Process(source, stripComments: true);
+                }
+            }
+            catch (Exception ex)
+            {
+                using (var message = new StringWriter())
+                {
+                    message.WriteLine("An error occured executing the following sql:");
+                    message.WriteLine(string.IsNullOrEmpty(sqlBatch) ? sql : sqlBatch);
+                    message.WriteLine("The error was {0}", ex.Message);
+
+                    throw new Exception(message.ToString(), ex);
                 }
             }
         }
@@ -220,8 +244,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             EnsureConnectionIsOpen();
 
-            if (expression.Operation != null)
-                expression.Operation(Connection, Transaction);
+            expression.Operation?.Invoke(Connection, Transaction);
         }
     }
 }
