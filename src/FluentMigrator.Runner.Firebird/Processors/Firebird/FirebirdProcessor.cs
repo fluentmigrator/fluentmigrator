@@ -33,14 +33,6 @@ namespace FluentMigrator.Runner.Processors.Firebird
             get { return "Firebird"; }
         }
 
-        public override bool SupportsTransactions
-        {
-            get
-            {
-                return true;
-            }
-        }
-
         public FirebirdProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory, FirebirdOptions fbOptions)
             : base(connection, factory, generator, announcer, options)
         {

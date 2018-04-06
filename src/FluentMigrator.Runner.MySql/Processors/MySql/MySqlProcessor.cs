@@ -98,7 +98,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(commandText, Connection, Options))
+            using (var command = Factory.CreateCommand(commandText, Connection, Transaction, Options))
             {
                 command.ExecuteNonQuery();
             }
@@ -108,7 +108,7 @@ namespace FluentMigrator.Runner.Processors.MySql
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Options))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
             {
                 using (var reader = command.ExecuteReader())
                 {
@@ -134,7 +134,7 @@ namespace FluentMigrator.Runner.Processors.MySql
             EnsureConnectionIsOpen();
 
             var ds = new DataSet();
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Options))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
             {
                 var adapter = Factory.CreateDataAdapter(command);
                 adapter.Fill(ds);
@@ -151,7 +151,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(sql, Connection, Options))
+            using (var command = Factory.CreateCommand(sql, Connection, Transaction, Options))
             {
                 command.ExecuteNonQuery();
             }

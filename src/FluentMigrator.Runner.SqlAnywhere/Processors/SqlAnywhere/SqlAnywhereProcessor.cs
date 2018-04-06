@@ -42,8 +42,6 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
 
         public override string DatabaseType => "SqlAnywhere";
 
-        public override bool SupportsTransactions => true;
-
         public SqlAnywhereProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {

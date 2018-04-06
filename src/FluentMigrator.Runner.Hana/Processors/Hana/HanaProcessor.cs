@@ -17,11 +17,6 @@ namespace FluentMigrator.Runner.Processors.Hana
             get { return "Hana"; }
         }
 
-        public override bool SupportsTransactions
-        {
-            get { return true; }
-        }
-
         public HanaProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
@@ -120,7 +115,7 @@ namespace FluentMigrator.Runner.Processors.Hana
 
             Announcer.Sql(string.Format("{0};", querySql));
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Options))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
             using (var reader = command.ExecuteReader())
             {
                 return reader.Read();
@@ -146,7 +141,7 @@ namespace FluentMigrator.Runner.Processors.Hana
             EnsureConnectionIsOpen();
 
             var result = new DataSet();
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Options))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
             {
                 var adapter = Factory.CreateDataAdapter(command);
                 adapter.Fill(result);
@@ -186,7 +181,7 @@ namespace FluentMigrator.Runner.Processors.Hana
                     ? batch.Remove(batch.Length - 1)
                     : batch;
 
-                using (var command = Factory.CreateCommand(batchCommand, Connection, Options))
+                using (var command = Factory.CreateCommand(batchCommand, Connection, Transaction, Options))
                     command.ExecuteNonQuery();
             }
         }

@@ -40,8 +40,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override string DatabaseType { get;}
 
-        public override bool SupportsTransactions => true;
-
         public SqlServerProcessor(string databaseType, IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {

@@ -34,8 +34,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
         }
 
-        public override bool SupportsTransactions => true;
-
         public override string DatabaseType => "SqlServer2000";
 
         public override void BeginTransaction()

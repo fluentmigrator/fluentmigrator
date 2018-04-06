@@ -39,28 +39,28 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		[Test]
 		public override void CallingColumnExistsCanAcceptColumnNameWithSingleQuote()
 		{
-			using (var table = new OracleTestTable(this.Connection, null, this.Factory, "\"i'd\" int"))
+			using (var table = new OracleTestTable(Processor, null, "\"i'd\" int"))
 				this.Processor.ColumnExists(null, table.Name, "i'd").ShouldBeTrue();
 		}
 
 		[Test]
 		public override void CallingColumnExistsCanAcceptTableNameWithSingleQuote()
 		{
-			using( var table = new OracleTestTable( "Test'Table", this.Connection, null, this.Factory, "id int" ) )
+			using( var table = new OracleTestTable( "Test'Table", Processor, null, "id int" ) )
 				this.Processor.ColumnExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
 		}
 
 		[Test]
 		public override void CallingColumnExistsReturnsFalseIfColumnDoesNotExist()
 		{
-			using (var table = new OracleTestTable(this.Connection, null, this.Factory, "id int"))
+			using (var table = new OracleTestTable(Processor, null, "id int"))
 				this.Processor.ColumnExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
 		}
 
 		[Test]
 		public override void CallingColumnExistsReturnsFalseIfColumnDoesNotExistWithSchema()
 		{
-			using (var table = new OracleTestTable(this.Connection, SchemaName, this.Factory, "id int"))
+			using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
 				this.Processor.ColumnExists(SchemaName, table.Name, "DoesNotExist").ShouldBeFalse();
 		}
 
@@ -79,14 +79,14 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		[Test]
 		public override void CallingColumnExistsReturnsTrueIfColumnExists()
 		{
-			using (var table = new OracleTestTable(this.Connection, null, this.Factory, "id int"))
+			using (var table = new OracleTestTable(Processor, null, "id int"))
 				this.Processor.ColumnExists(null, table.Name, "id").ShouldBeTrue();
 		}
 
 		[Test]
 		public override void CallingColumnExistsReturnsTrueIfColumnExistsWithSchema()
 		{
-			using (var table = new OracleTestTable(this.Connection, SchemaName, this.Factory, "id int"))
+			using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
 				this.Processor.ColumnExists(SchemaName, table.Name, "id").ShouldBeTrue();
 		}
 	}

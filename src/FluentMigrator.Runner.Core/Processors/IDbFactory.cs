@@ -7,6 +7,5 @@ namespace FluentMigrator.Runner.Processors
         IDbConnection CreateConnection(string connectionString);
         IDbCommand CreateCommand(string commandText, IDbConnection connection, IDbTransaction transaction, IMigrationProcessorOptions options);
         IDbDataAdapter CreateDataAdapter(IDbCommand command);
-        IDbCommand CreateCommand(string commandText, IDbConnection connection, IMigrationProcessorOptions options);
     }
 }

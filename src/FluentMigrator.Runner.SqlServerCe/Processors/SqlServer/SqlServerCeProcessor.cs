@@ -36,14 +36,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             get { return "SqlServerCe"; }
         }
 
-        public override bool SupportsTransactions
-        {
-            get
-            {
-                return true;
-            }
-        }
-
         public SqlServerCeProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {

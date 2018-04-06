@@ -43,11 +43,6 @@ namespace FluentMigrator.Runner.Processors
         public IDbFactory Factory { get; protected set; }
         public IDbTransaction Transaction { get; protected set; }
 
-        public virtual bool SupportsTransactions
-        {
-            get { return false; }
-        }
-
         protected virtual void EnsureConnectionIsOpen()
         {
             if (Connection.State != ConnectionState.Open)
@@ -66,7 +61,7 @@ namespace FluentMigrator.Runner.Processors
 
         public override void BeginTransaction()
         {
-            if (!SupportsTransactions || Transaction != null) return;
+            if (Transaction != null) return;
 
             EnsureConnectionIsOpen();
 

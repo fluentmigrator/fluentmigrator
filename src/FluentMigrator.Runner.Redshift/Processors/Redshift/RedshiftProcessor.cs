@@ -32,8 +32,6 @@ namespace FluentMigrator.Runner.Processors.Redshift
 
         public override string DatabaseType => "Redshift";
 
-        public override bool SupportsTransactions => true;
-
         public RedshiftProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
