@@ -16,7 +16,8 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 	[Category("Integration")]
-	public abstract class OracleProcessorTestsBase
+	[Category("Oracle")]
+    public abstract class OracleProcessorTestsBase
 	{
 		private const string SchemaName = "test";
 		private IDbConnection Connection { get; set; }
@@ -41,14 +42,14 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		[Test]
 		public void CallingColumnExistsReturnsFalseIfColumnExistsInDifferentSchema()
 		{
-			using (var table = new OracleTestTable(this.Connection, SchemaName, this.Factory, "id int"))
+			using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
 				this.Processor.ColumnExists("testschema", table.Name, "ID").ShouldBeFalse();
 		}
 
 		[Test]
 		public void CallingConstraintExistsReturnsFalseIfConstraintExistsInDifferentSchema()
 		{
-			using (var table = new OracleTestTable(this.Connection, SchemaName, this.Factory, "id int"))
+			using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
 			{
 				table.WithUniqueConstraintOn("ID");
 				this.Processor.ConstraintExists("testschema", table.Name, "UC_id").ShouldBeFalse();
@@ -58,7 +59,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		[Test]
 		public void CallingTableExistsReturnsFalseIfTableExistsInDifferentSchema()
 		{
-			using (var table = new OracleTestTable(this.Connection, SchemaName, this.Factory, "id int"))
+			using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
 				this.Processor.TableExists("testschema", table.Name).ShouldBeFalse();
 		}
 
@@ -66,7 +67,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		public void CallingColumnExistsWithIncorrectCaseReturnsTrueIfColumnExists()
 		{
 			//the ColumnExisits() function is'nt case sensitive
-			using (var table = new OracleTestTable(this.Connection, null, this.Factory, "id int"))
+			using (var table = new OracleTestTable(Processor, null, "id int"))
 				this.Processor.ColumnExists(null, table.Name, "Id").ShouldBeTrue();
 		}
 
@@ -74,7 +75,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		public void CallingConstraintExistsWithIncorrectCaseReturnsTrueIfConstraintExists()
 		{
 			//the ConstraintExists() function is'nt case sensitive
-			using (var table = new OracleTestTable(this.Connection, null, this.Factory, "id int"))
+			using (var table = new OracleTestTable(Processor, null, "id int"))
 			{
 				table.WithUniqueConstraintOn("ID", "uc_id");
 				this.Processor.ConstraintExists(null, table.Name, "Uc_Id").ShouldBeTrue();
@@ -85,7 +86,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		public void CallingIndexExistsWithIncorrectCaseReturnsFalseIfIndexExist()
 		{
 			//the IndexExists() function is'nt case sensitive
-			using (var table = new OracleTestTable(this.Connection, null, this.Factory, "id int"))
+			using (var table = new OracleTestTable(Processor, null, "id int"))
 			{
 				table.WithIndexOn("ID", "ui_id");
 				this.Processor.IndexExists(null, table.Name, "Ui_Id").ShouldBeTrue();
@@ -97,7 +98,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		{
 			string sql = "SELECT SYSDATE FROM " + this.Quoter.QuoteTableName("DUAL");
 			var ds = new DataSet();
-			using (var command = this.Factory.CreateCommand(sql, this.Connection, Processor.Options))
+			using (var command = this.Factory.CreateCommand(sql, Processor.Connection, Processor.Transaction, Processor.Options))
 			{
 				var adapter = this.Factory.CreateDataAdapter(command);
 				adapter.Fill(ds);

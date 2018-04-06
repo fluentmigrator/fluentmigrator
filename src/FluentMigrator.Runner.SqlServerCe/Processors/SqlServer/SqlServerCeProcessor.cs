@@ -26,6 +26,10 @@ using System.Text;
 using System.Collections.Generic;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.BatchParser;
+using FluentMigrator.Runner.BatchParser.RangeSearchers;
+using FluentMigrator.Runner.BatchParser.Sources;
+using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
@@ -34,14 +38,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         public override string DatabaseType
         {
             get { return "SqlServerCe"; }
-        }
-
-        public override bool SupportsTransactions
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public SqlServerCeProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
@@ -155,28 +151,41 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         private IEnumerable<string> SplitIntoSingleStatements(string sql)
         {
-            StringBuilder builder = null;
-            foreach (string line in sql.Split(new string[] { Environment.NewLine }, StringSplitOptions.None))
-            {
-                if (!string.IsNullOrEmpty(line.Trim()) && !(line.TrimStart().StartsWith("--")) && (!line.ToUpper().Equals("GO")))
-                {
-                    if (builder == null)
-                    {
-                        builder = new StringBuilder();
-                    }
-                    builder.AppendLine(line);
+            var sqlStatements = new List<string>();
 
-                    if (line.TrimEnd().EndsWith(";"))
-                    {
-                        yield return builder.ToString();
-                        builder = null;
-                    }
-                }
-            }
-            if (builder != null)
+            // The default range searchers
+            var rangeSearchers = new List<IRangeSearcher>
             {
-                yield return builder.ToString();
+                new MultiLineComment(),
+                new DoubleDashSingleLineComment(),
+                new PoundSignSingleLineComment(),
+                new SqlString(),
+                new SqlServerIdentifier(),
+            };
+
+            // The special token searchers
+            var specialTokenSearchers = new List<ISpecialTokenSearcher>()
+            {
+                new GoSearcher(),
+                new SemicolonSearcher(),
+            };
+
+            var parser = new SqlBatchParser(rangeSearchers, specialTokenSearchers);
+            parser.SqlText += (sender, args) =>
+            {
+                var content = args.SqlText.Trim();
+                if (!string.IsNullOrEmpty(content))
+                {
+                    sqlStatements.Add(content + ";");
+                }
+            };
+
+            using (var source = new TextReaderSource(new StringReader(sql), true))
+            {
+                parser.Process(source);
             }
+
+            return sqlStatements;
         }
 
         public override void Process(PerformDBOperationExpression expression)

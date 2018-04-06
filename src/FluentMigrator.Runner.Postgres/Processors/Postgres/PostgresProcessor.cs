@@ -17,14 +17,6 @@ namespace FluentMigrator.Runner.Processors.Postgres
             get { return "Postgres"; }
         }
 
-        public override bool SupportsTransactions
-        {
-            get
-            {
-                return true;
-            }
-        }
-
         public PostgresProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {

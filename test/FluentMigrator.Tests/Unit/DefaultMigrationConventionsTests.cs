@@ -191,16 +191,6 @@ namespace FluentMigrator.Tests.Unit
         }
 
         [Test]
-        [Category("Integration")]
-        public void WorkingDirectoryConventionDefaultsToAssemblyFolder()
-        {
-            var expr = new ConventionsTestClass();
-            var processed = ConventionSets.NoSchemaName.RootPathConvention.Apply(expr);
-            processed.RootPath.ShouldNotBeNull();
-            processed.RootPath.Contains("bin").ShouldBeTrue();
-        }
-
-        [Test]
         public void DefaultSchemaConventionDefaultsToNull()
         {
             var expr = new ConventionsTestClass();

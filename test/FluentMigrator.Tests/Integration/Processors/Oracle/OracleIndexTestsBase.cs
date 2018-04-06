@@ -14,7 +14,8 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 	[Category("Integration")]
-	public abstract class OracleIndexTestsBase : BaseIndexTests
+	[Category("Oracle")]
+    public abstract class OracleIndexTestsBase : BaseIndexTests
 	{
 		private const string SchemaName = "test";
 		private IDbConnection Connection { get; set; }
@@ -38,7 +39,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		[Test]
 		public override void CallingIndexExistsCanAcceptIndexNameWithSingleQuote()
 		{
-			using (var table = new OracleTestTable(this.Connection, null, this.Factory, "id int"))
+			using (var table = new OracleTestTable(Processor, null, "id int"))
 			{
 				table.WithIndexOn("ID", "UI'id");
 				this.Processor.IndexExists(null, table.Name, "UI'id").ShouldBeTrue();
@@ -48,7 +49,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		[Test]
 		public override void CallingIndexExistsCanAcceptTableNameWithSingleQuote()
 		{
-			using (var table = new OracleTestTable("Test'Table", this.Connection, null, this.Factory, "id int"))
+			using (var table = new OracleTestTable("Test'Table", Processor, null, "id int"))
 			{
 				table.WithIndexOn("ID");
 				this.Processor.IndexExists(null, table.Name, "UI_id").ShouldBeTrue();
@@ -58,7 +59,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		[Test]
 		public override void CallingIndexExistsReturnsFalseIfIndexDoesNotExist()
 		{
-			using (var table = new OracleTestTable(this.Connection, null, this.Factory, "id int"))
+			using (var table = new OracleTestTable(Processor, null, "id int"))
 			{
 				table.WithIndexOn("ID");
 				this.Processor.IndexExists(null, table.Name, "DoesNotExist").ShouldBeFalse();
@@ -68,7 +69,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		[Test]
 		public override void CallingIndexExistsReturnsFalseIfIndexDoesNotExistWithSchema()
 		{
-			using (var table = new OracleTestTable(this.Connection, SchemaName, this.Factory, "id int"))
+			using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
 			{
 				table.WithIndexOn("ID");
 				this.Processor.IndexExists(SchemaName, table.Name, "DoesNotExist").ShouldBeFalse();
@@ -90,7 +91,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		[Test]
 		public override void CallingIndexExistsReturnsTrueIfIndexExists()
 		{
-			using (var table = new OracleTestTable(this.Connection, null, this.Factory, "id int"))
+			using (var table = new OracleTestTable(Processor, null, "id int"))
 			{
 				table.WithIndexOn("ID");
 				this.Processor.IndexExists(null, table.Name, "UI_id").ShouldBeTrue();
@@ -100,7 +101,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		[Test]
 		public override void CallingIndexExistsReturnsTrueIfIndexExistsWithSchema()
 		{
-			using (var table = new OracleTestTable(this.Connection, SchemaName, this.Factory, "id int"))
+			using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
 			{
 				table.WithIndexOn("ID");
 				this.Processor.IndexExists(SchemaName, table.Name, "UI_id").ShouldBeTrue();

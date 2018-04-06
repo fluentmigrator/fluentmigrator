@@ -12,6 +12,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
 {
     [TestFixture]
     [Category("Integration")]
+    [Category("Hana")]
     public class HanaTableTests : BaseTableTests
     {
         public HanaConnection Connection { get; set; }
@@ -60,7 +61,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
             using (var table = new HanaTestTable(Processor, null, "id int"))
                 Processor.TableExists(null, table.Name).ShouldBeTrue();
         }
-        
+
         [Test]
         public override void CallingTableExistsReturnsTrueIfTableExistsWithSchema()
         {

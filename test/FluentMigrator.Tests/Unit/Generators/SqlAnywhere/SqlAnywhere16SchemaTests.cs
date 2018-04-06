@@ -18,7 +18,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Schema")]
+        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Schema")]
         public override void CanAlterSchema()
         {
             var expression = GeneratorTestHelper.GetAlterSchemaExpression();
@@ -36,7 +36,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Schema")]
+        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Schema")]
         public override void CanCreateSchema()
         {
             var expression = GeneratorTestHelper.GetCreateSchemaExpression();
@@ -46,7 +46,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Schema")]
+        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Schema")]
         public override void CanDropSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteSchemaExpression();

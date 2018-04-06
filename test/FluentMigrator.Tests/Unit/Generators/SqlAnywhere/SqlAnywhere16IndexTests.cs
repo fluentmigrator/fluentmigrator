@@ -9,7 +9,7 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
 {
     [TestFixture]
-    [Category("SQLAnywhere"), Category("SQLAnywhere16"), Category("Generator"), Category("Index")]
+    [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Index")]
     public class SqlAnywhere16IndexTests : BaseIndexTests
     {
         protected SqlAnywhere16Generator Generator;

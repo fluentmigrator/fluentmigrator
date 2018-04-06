@@ -22,9 +22,11 @@ using FluentMigrator.Runner.Helpers;
 using System;
 using System.Data;
 using System.IO;
-using System.Text;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.BatchParser;
+using FluentMigrator.Runner.BatchParser.Sources;
+using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
 
 namespace FluentMigrator.Runner.Processors.SqlServer
 {
@@ -39,8 +41,6 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         private const string DEFAULTVALUE_EXISTS = "SELECT 1 WHERE EXISTS (SELECT * FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = '{0}' AND TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}' AND COLUMN_DEFAULT LIKE '{3}')";
 
         public override string DatabaseType { get;}
-
-        public override bool SupportsTransactions => true;
 
         public SqlServerProcessor(string databaseType, IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
@@ -165,7 +165,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
             EnsureConnectionIsOpen();
 
-            if (sql.IndexOf("GO", StringComparison.OrdinalIgnoreCase) >= 0)
+            if (ContainsGo(sql))
             {
                 ExecuteBatchNonQuery(sql);
 
@@ -174,6 +174,19 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             {
                 ExecuteNonQuery(sql);
             }
+        }
+
+        private static bool ContainsGo(string sql)
+        {
+            var containsGo = false;
+            var parser = new SqlServerBatchParser();
+            parser.SpecialToken += (sender, args) => containsGo = true;
+            using (var source = new TextReaderSource(new StringReader(sql), true))
+            {
+                parser.Process(source);
+            }
+
+            return containsGo;
         }
 
         private void ExecuteNonQuery(string sql)
@@ -200,47 +213,56 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         private void ExecuteBatchNonQuery(string sql)
         {
-            var sqlBatch = new StringBuilder();
+            var sqlBatch = string.Empty;
 
-            using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
+            try
             {
-                try
+                var parser = new SqlServerBatchParser();
+                parser.SqlText += (sender, args) => { sqlBatch = args.SqlText.Trim(); };
+                parser.SpecialToken += (sender, args) =>
                 {
-                    var lines = sql.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                    if (string.IsNullOrEmpty(sqlBatch))
+                        return;
 
-                    foreach (var line in lines)
+                    if (args.Opaque is GoSearcher.GoSearcherParameters goParams)
                     {
-                        if (string.Equals(line, "GO", StringComparison.OrdinalIgnoreCase))
+                        using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
                         {
-                            if (sqlBatch.Length > 0)
+                            command.CommandText = sqlBatch;
+
+                            for (var i = 0; i != goParams.Count; ++i)
                             {
-                                command.CommandText = sqlBatch.ToString();
                                 command.ExecuteNonQuery();
-                                sqlBatch.Clear();
                             }
-                        }
-                        else
-                        {
-                            sqlBatch.AppendLine(line);
                         }
                     }
 
-                    if (sqlBatch.Length > 0)
+                    sqlBatch = null;
+                };
+
+                using (var source = new TextReaderSource(new StringReader(sql), true))
+                {
+                    parser.Process(source, stripComments: true);
+                }
+
+                if (!string.IsNullOrEmpty(sqlBatch))
+                {
+                    using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
                     {
-                        command.CommandText = sqlBatch.ToString();
+                        command.CommandText = sqlBatch;
                         command.ExecuteNonQuery();
                     }
                 }
-                catch (Exception ex)
+            }
+            catch (Exception ex)
+            {
+                using (var message = new StringWriter())
                 {
-                    using (var message = new StringWriter())
-                    {
-                        message.WriteLine("An error occurred executing the following sql:");
-                        message.WriteLine(command.CommandText);
-                        message.WriteLine("The error was {0}", ex.Message);
+                    message.WriteLine("An error occured executing the following sql:");
+                    message.WriteLine(string.IsNullOrEmpty(sqlBatch) ? sql : sqlBatch);
+                    message.WriteLine("The error was {0}", ex.Message);
 
-                        throw new Exception(message.ToString(), ex);
-                    }
+                    throw new Exception(message.ToString(), ex);
                 }
             }
         }

@@ -82,11 +82,6 @@ namespace FluentMigrator.Runner.Processors
             return dataAdapter;
         }
 
-        public IDbCommand CreateCommand(string commandText, IDbConnection connection, IMigrationProcessorOptions options)
-        {
-            return CreateCommand(commandText, connection, null, options);
-        }
-
         #endregion
     }
 }

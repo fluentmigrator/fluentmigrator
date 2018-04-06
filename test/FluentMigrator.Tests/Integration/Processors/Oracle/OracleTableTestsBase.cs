@@ -14,7 +14,8 @@ using NUnit.Should;
 
 namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 	[Category("Integration")]
-	public abstract class OracleTableTestsBase : BaseTableTests
+	[Category("Oracle")]
+    public abstract class OracleTableTestsBase : BaseTableTests
 	{
 		private const string SchemaName = "test";
 		private IDbConnection Connection { get; set; }
@@ -38,7 +39,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		[Test]
 		public override void CallingTableExistsCanAcceptTableNameWithSingleQuote()
 		{
-			using (var table = new OracleTestTable("Test'Table", this.Connection, null, this.Factory, "id int"))
+			using (var table = new OracleTestTable("Test'Table", Processor, null, "id int"))
 				this.Processor.TableExists(null, table.Name).ShouldBeTrue();
 		}
 
@@ -57,14 +58,14 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 		[Test]
 		public override void CallingTableExistsReturnsTrueIfTableExists()
 		{
-			using (var table = new OracleTestTable(this.Connection, null, this.Factory, "id int"))
+			using (var table = new OracleTestTable(Processor, null, "id int"))
 				this.Processor.TableExists(null, table.Name).ShouldBeTrue();
 		}
 
 		[Test]
 		public override void CallingTableExistsReturnsTrueIfTableExistsWithSchema()
 		{
-			using (var table = new OracleTestTable(this.Connection, SchemaName, this.Factory, "id int"))
+			using (var table = new OracleTestTable(Processor, SchemaName, "id int"))
 				this.Processor.TableExists(SchemaName, table.Name).ShouldBeTrue();
 		}
 	}

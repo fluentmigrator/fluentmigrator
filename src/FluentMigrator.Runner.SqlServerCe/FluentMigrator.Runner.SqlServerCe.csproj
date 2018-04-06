@@ -43,13 +43,9 @@
     <PackageReference Include="Microsoft.SqlServer.Compact" Version="4.0.8876.1" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard20' ">
-    <Reference Include="System.Data.SqlServerCe, Version=4.0.0.1, Culture=neutral, PublicKeyToken=89845dcd8080cc91">
+    <Reference Include="System.Data.SqlServerCe">
       <Private>True</Private>
       <HintPath>..\..\lib\SQLServerCE4\System.Data.SqlServerCe.dll</HintPath>
-    </Reference>
-    <Reference Include="System.Data.SqlServerCe.Entity, Version=4.0.0.1, Culture=neutral, PublicKeyToken=89845dcd8080cc91">
-      <Private>True</Private>
-      <HintPath>..\..\lib\SQLServerCE4\System.Data.SqlServerCe.Entity.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>

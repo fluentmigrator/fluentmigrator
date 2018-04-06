@@ -53,14 +53,6 @@ namespace FluentMigrator.Runner.Processors.DB2
             set;
         }
 
-        public override bool SupportsTransactions
-        {
-            get
-            {
-                return true;
-            }
-        }
-
         #endregion Properties
 
         #region Methods
@@ -180,7 +172,7 @@ namespace FluentMigrator.Runner.Processors.DB2
 
             this.EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(sql, Connection, Options))
+            using (var command = Factory.CreateCommand(sql, Connection, Transaction, Options))
             {
                 command.ExecuteNonQuery();
             }

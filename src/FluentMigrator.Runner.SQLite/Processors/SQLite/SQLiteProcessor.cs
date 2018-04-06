@@ -20,8 +20,12 @@
 using System;
 using System.Data;
 using System.Data.Common;
+using System.IO;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.BatchParser;
+using FluentMigrator.Runner.BatchParser.Sources;
+using FluentMigrator.Runner.BatchParser.SpecialTokenSearchers;
 
 namespace FluentMigrator.Runner.Processors.SQLite
 {
@@ -78,7 +82,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
         {
             EnsureConnectionIsOpen();
 
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Options))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
             using (var reader = command.ExecuteReader())
             {
                 try
@@ -126,7 +130,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
             EnsureConnectionIsOpen();
 
-            if (sql.IndexOf("GO", StringComparison.OrdinalIgnoreCase) >= 0)
+            if (ContainsGo(sql))
             {
                 ExecuteBatchNonQuery(sql);
 
@@ -139,9 +143,22 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         }
 
+        private static bool ContainsGo(string sql)
+        {
+            var containsGo = false;
+            var parser = new SQLiteBatchParser();
+            parser.SpecialToken += (sender, args) => containsGo = true;
+            using (var source = new TextReaderSource(new StringReader(sql), true))
+            {
+                parser.Process(source);
+            }
+
+            return containsGo;
+        }
+
         private void ExecuteNonQuery(string sql)
         {
-            using (var command = Factory.CreateCommand(sql, Connection, Options))
+            using (var command = Factory.CreateCommand(sql, Connection, Transaction, Options))
             {
                 try
                 {
@@ -156,34 +173,50 @@ namespace FluentMigrator.Runner.Processors.SQLite
 
         private void ExecuteBatchNonQuery(string sql)
         {
-            sql += "\nGO";   // make sure last batch is executed.
             string sqlBatch = string.Empty;
 
-            using (var command = Factory.CreateCommand(sql, Connection, Options))
+            try
             {
-                try
+                var parser = new SQLiteBatchParser();
+                parser.SqlText += (sender, args) => { sqlBatch = args.SqlText.Trim(); };
+                parser.SpecialToken += (sender, args) =>
                 {
-                    foreach (string line in sql.Split(new[] { "\n", "\r" }, StringSplitOptions.RemoveEmptyEntries))
+                    if (string.IsNullOrEmpty(sqlBatch))
+                        return;
+
+                    if (args.Opaque is GoSearcher.GoSearcherParameters goParams)
                     {
-                        if (line.ToUpperInvariant().Trim() == "GO")
+                        using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
                         {
-                            if (!string.IsNullOrEmpty(sqlBatch))
+                            command.CommandText = sqlBatch;
+
+                            for (var i = 0; i != goParams.Count; ++i)
                             {
-                                command.CommandText = sqlBatch;
                                 command.ExecuteNonQuery();
-                                sqlBatch = string.Empty;
                             }
                         }
-                        else
-                        {
-                            sqlBatch += line + "\n";
-                        }
+                    }
+
+                    sqlBatch = null;
+                };
+
+                using (var source = new TextReaderSource(new StringReader(sql), true))
+                {
+                    parser.Process(source, stripComments: true);
+                }
+
+                if (!string.IsNullOrEmpty(sqlBatch))
+                {
+                    using (var command = Factory.CreateCommand(string.Empty, Connection, Transaction, Options))
+                    {
+                        command.CommandText = sqlBatch;
+                        command.ExecuteNonQuery();
                     }
                 }
-                catch (DbException ex)
-                {
-                    throw new Exception(ex.Message + "\r\nWhile Processing:\r\n\"" + command.CommandText + "\"", ex);
-                }
+            }
+            catch (DbException ex)
+            {
+                throw new Exception(ex.Message + "\r\nWhile Processing:\r\n\"" + sqlBatch + "\"", ex);
             }
         }
 
@@ -192,7 +225,7 @@ namespace FluentMigrator.Runner.Processors.SQLite
             EnsureConnectionIsOpen();
 
             var ds = new DataSet();
-            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Options))
+            using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
             {
                 var adapter = Factory.CreateDataAdapter(command);
                 adapter.Fill(ds);

@@ -12,6 +12,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
 {
     [TestFixture]
     [Category("Integration")]
+    [Category("SqlServer2012")]
     public class SqlServerColumnTests : BaseColumnTests
     {
         public SqlConnection Connection { get; set; }
@@ -75,7 +76,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
         {
             Processor.ColumnExists("test_schema", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
-        
+
         [Test]
         public override void CallingColumnExistsReturnsTrueIfColumnExists()
         {
