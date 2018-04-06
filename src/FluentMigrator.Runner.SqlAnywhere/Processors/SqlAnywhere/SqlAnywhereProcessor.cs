@@ -141,12 +141,13 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
 
         private string ReplaceUserIdAndPasswordInConnectionString(string userId, string password)
         {
-            string mtsConnectionString = ConnectionString;
+            var csb = new DbConnectionStringBuilder { ConnectionString = ConnectionString };
+            var uidKey = new[] { "uid", "userid" }.FirstOrDefault(x => csb.ContainsKey(x)) ?? "uid";
+            var pwdKey = new[] { "pwd", "password" }.FirstOrDefault(x => csb.ContainsKey(x)) ?? "pwd";
+            csb[uidKey] = userId;
+            csb[pwdKey] = password;
 
-            mtsConnectionString = Regex.Replace(mtsConnectionString, "(.*)(uid=|userid=)([^;]+)(.+)", "${1}${2}" + userId + "${4}", RegexOptions.IgnoreCase);
-            mtsConnectionString = Regex.Replace(mtsConnectionString, "(.+)(pwd=|password=)([^;]+)(.+)", "${1}${2}" + password + "${4}", RegexOptions.IgnoreCase);
-
-            return mtsConnectionString;
+            return csb.ConnectionString;
         }
 
         public override void Execute(string template, params object[] args)
