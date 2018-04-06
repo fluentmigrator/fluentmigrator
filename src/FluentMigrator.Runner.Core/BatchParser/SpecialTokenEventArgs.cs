@@ -29,9 +29,11 @@ namespace FluentMigrator.Runner.BatchParser
         /// Initializes a new instance of the <see cref="SpecialTokenEventArgs"/> class.
         /// </summary>
         /// <param name="token">The found token</param>
-        public SpecialTokenEventArgs([NotNull] string token)
+        /// <param name="opaque">An opaque (token specific) value</param>
+        public SpecialTokenEventArgs([NotNull] string token, object opaque)
         {
             Token = token;
+            Opaque = opaque;
         }
 
         /// <summary>
@@ -39,5 +41,11 @@ namespace FluentMigrator.Runner.BatchParser
         /// </summary>
         [NotNull]
         public string Token { get; }
+
+        /// <summary>
+        /// Gets an opaque (token specific) value
+        /// </summary>
+        [CanBeNull]
+        public object Opaque { get; }
     }
 }

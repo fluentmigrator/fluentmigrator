@@ -29,16 +29,18 @@ namespace FluentMigrator.Runner.BatchParser
         /// <param name="index">The index to the first character that is assigned to the <paramref name="token"/></param>
         /// <param name="length">The content length that is assigned to the <paramref name="token"/></param>
         /// <param name="token">The found token</param>
+        /// <param name="opaque">An opaque (token specific) value</param>
         /// <remarks>
         /// The <paramref name="index"/> may not point to the real token text and the <paramref name="length"/> might be longer
         /// than the <paramref name="token"/> itself. This is usually the case when the token should be the only text on the line,
         /// but is instead surrounded by whitespace.
         /// </remarks>
-        public SpecialTokenInfo(int index, int length, [NotNull] string token)
+        public SpecialTokenInfo(int index, int length, [NotNull] string token, object opaque = null)
         {
             Index = index;
             Length = length;
             Token = token;
+            Opaque = opaque;
         }
 
         /// <summary>
@@ -56,5 +58,11 @@ namespace FluentMigrator.Runner.BatchParser
         /// </summary>
         [NotNull]
         public string Token { get; }
+
+        /// <summary>
+        /// Gets an opaque (token specific) value
+        /// </summary>
+        [CanBeNull]
+        public object Opaque { get; }
     }
 }

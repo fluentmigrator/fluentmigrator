@@ -52,16 +52,16 @@ namespace FluentMigrator.Tests.Unit.BatchParser
             Assert.IsNull(result);
         }
 
-        [TestCase("GO", "GO")]
-        [TestCase(" GO ", "GO")]
-        [TestCase(" GO", "GO")]
-        [TestCase("GO ", "GO")]
-        [TestCase("GO 123", "GO 123")]
-        [TestCase("  GO 123  ", "GO 123")]
-        [TestCase("  gO 123  ", "gO 123")]
-        [TestCase("  gO 123", "gO 123")]
-        [TestCase("gO 123", "gO 123")]
-        public void TestIfGoExists(string input, string expected)
+        [TestCase("GO", "GO", 1)]
+        [TestCase(" GO ", "GO", 1)]
+        [TestCase(" GO", "GO", 1)]
+        [TestCase("GO ", "GO", 1)]
+        [TestCase("GO 123", "GO 123", 123)]
+        [TestCase("  GO 123  ", "GO 123", 123)]
+        [TestCase("  gO 123  ", "gO 123", 123)]
+        [TestCase("  gO 123", "gO 123", 123)]
+        [TestCase("gO 123", "gO 123", 123)]
+        public void TestIfGoExists(string input, string expected, int expectedCount)
         {
             var source = new LinesSource(new[] { input });
             var reader = source.CreateReader();
@@ -72,6 +72,10 @@ namespace FluentMigrator.Tests.Unit.BatchParser
             Assert.AreEqual(0, result.Index);
             Assert.AreEqual(input.Length, result.Length);
             Assert.AreEqual(expected, result.Token);
+            Assert.IsInstanceOf<GoSearcher.GoSearcherParameters>(result.Opaque);
+            var goParams = (GoSearcher.GoSearcherParameters) result.Opaque;
+            Assert.NotNull(goParams);
+            Assert.AreEqual(expectedCount, goParams.Count);
         }
 
         [TestCase("x GO")]

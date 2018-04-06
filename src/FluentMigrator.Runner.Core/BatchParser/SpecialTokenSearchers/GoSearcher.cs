@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.Text.RegularExpressions;
 
 namespace FluentMigrator.Runner.BatchParser.SpecialTokenSearchers
@@ -23,7 +24,7 @@ namespace FluentMigrator.Runner.BatchParser.SpecialTokenSearchers
     /// </summary>
     public class GoSearcher : ISpecialTokenSearcher
     {
-        private static readonly Regex _regex = new Regex(@"^\s*(?<statement>GO(\s+(?<count>\d)+)?)\s*$", RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.IgnoreCase);
+        private static readonly Regex _regex = new Regex(@"^\s*(?<statement>GO(\s+(?<count>\d+))?)\s*$", RegexOptions.CultureInvariant | RegexOptions.Compiled | RegexOptions.IgnoreCase);
 
         /// <inheritdoc />
         public SpecialTokenInfo Find(ILineReader reader)
@@ -35,7 +36,49 @@ namespace FluentMigrator.Runner.BatchParser.SpecialTokenSearchers
             if (!match.Success)
                 return null;
 
-            return new SpecialTokenInfo(0, reader.Line.Length, match.Groups["statement"].Value);
+            var token = match.Groups["statement"].Value;
+            var count = GetGoCount(match) ?? 1;
+            var parameters = new GoSearcherParameters(count);
+
+            return new SpecialTokenInfo(0, reader.Line.Length, token, parameters);
+        }
+
+        public static int? GetGoCount(string sql)
+        {
+            var match = _regex.Match(sql);
+            return GetGoCount(match);
+        }
+
+        private static int? GetGoCount(Match match)
+        {
+            if (!match.Success)
+                return null;
+
+            var countGroup = match.Groups["count"];
+            if (!countGroup.Success || countGroup.Length == 0)
+                return 1;
+
+            return Convert.ToInt32(countGroup.Value, 10);
+        }
+
+        /// <summary>
+        /// Additional values for the GO token
+        /// </summary>
+        public class GoSearcherParameters
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="GoSearcherParameters"/> class.
+            /// </summary>
+            /// <param name="count">the number of times the batch should be executed</param>
+            internal GoSearcherParameters(int count)
+            {
+                Count = count;
+            }
+
+            /// <summary>
+            /// Gets the number of times the batch should be executed
+            /// </summary>
+            public int Count { get; }
         }
     }
 }

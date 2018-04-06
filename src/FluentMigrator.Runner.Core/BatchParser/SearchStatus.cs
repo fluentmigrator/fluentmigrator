@@ -198,7 +198,7 @@ namespace FluentMigrator.Runner.BatchParser
                 if (rangeStart == null || rangeStart.Index > tokenInfo.Index)
                 {
                     var reader = WriteSql(_reader, tokenInfo.Index, tokenInfo.Length);
-                    _context.OnSpecialToken(new SpecialTokenEventArgs(tokenInfo.Token));
+                    _context.OnSpecialToken(new SpecialTokenEventArgs(tokenInfo.Token, tokenInfo.Opaque));
                     if (reader == null)
                         return null;
                     return new SearchStatus(_context, reader, _activeRanges, tokenInfo);
