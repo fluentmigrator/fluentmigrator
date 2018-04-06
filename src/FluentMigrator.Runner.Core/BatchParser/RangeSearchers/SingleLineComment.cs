@@ -12,6 +12,7 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+//
 #endregion
 
 using System.Text.RegularExpressions;
@@ -19,14 +20,24 @@ using System.Text.RegularExpressions;
 namespace FluentMigrator.Runner.BatchParser.RangeSearchers
 {
     /// <summary>
-    /// A single line comment starting with two dashes (<c>-- comment</c>)
+    /// A single line comment starting with the specified start code
     /// </summary>
-    public sealed class SingleLineComment : IRangeSearcher
+    public class SingleLineComment : IRangeSearcher
     {
-        private static readonly Regex _startCodeRegex = new Regex("--", RegexOptions.CultureInvariant | RegexOptions.Compiled);
+        private readonly Regex _startCodeRegex;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SingleLineComment"/> class.
+        /// </summary>
+        /// <param name="startCode">The start code for the single line comment</param>
+        public SingleLineComment(string startCode)
+        {
+            _startCodeRegex = new Regex(Regex.Escape(startCode), RegexOptions.CultureInvariant | RegexOptions.Compiled);
+            StartCodeLength = startCode.Length;
+        }
 
         /// <inheritdoc />
-        public int StartCodeLength => 2;
+        public int StartCodeLength { get; }
 
         /// <inheritdoc />
         public int EndCodeLength => 0;

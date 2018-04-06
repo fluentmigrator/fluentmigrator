@@ -27,7 +27,8 @@ namespace FluentMigrator.Runner.BatchParser
     /// A specialization of the <see cref="SqlBatchParser"/> for the Microsoft SQL Server
     /// </summary>
     /// <remarks>
-    /// It uses the following range searchers: <see cref="MultiLineComment"/>, <see cref="SingleLineComment"/>, <see cref="SqlServerIdentifier"/>, <see cref="SqlString"/>
+    /// It uses the following range searchers: <see cref="MultiLineComment"/>, <see cref="DoubleDashSingleLineComment"/>,
+    /// <see cref="PoundSignSingleLineComment"/>, <see cref="SqlServerIdentifier"/>, <see cref="SqlString"/>
     /// and the following token searchers: <see cref="GoSearcher"/>.
     /// </remarks>
     public class SqlServerBatchParser : SqlBatchParser
@@ -36,7 +37,8 @@ namespace FluentMigrator.Runner.BatchParser
         private static readonly IEnumerable<IRangeSearcher> _rangeSearchers = new IRangeSearcher[]
         {
             new MultiLineComment(),
-            new SingleLineComment(),
+            new DoubleDashSingleLineComment(),
+            new PoundSignSingleLineComment(),
             new SqlServerIdentifier(),
             new SqlString(),
         };
