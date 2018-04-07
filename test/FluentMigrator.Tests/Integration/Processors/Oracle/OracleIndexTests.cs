@@ -5,12 +5,12 @@ using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Integration.Processors.Oracle
 {
-	[TestFixture]
-	[Category( "Integration" )]
-	public class OracleIndexTests : OracleIndexTestsBase {
-		[SetUp]
-		public void SetUp( ) {
-			base.SetUp( new OracleDbFactory() );
-		}
-	}
+    [TestFixture]
+    [Category( "Integration" )]
+    public class OracleIndexTests : OracleIndexTestsBase {
+        [SetUp]
+        public void SetUp( ) {
+            base.SetUp( new OracleDbFactory() );
+        }
+    }
 }

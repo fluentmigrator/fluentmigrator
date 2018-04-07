@@ -18,16 +18,16 @@
 
 namespace FluentMigrator.Tests.Unit.Runners.Migrations
 {
-	[Migration(2)]
-	public class UserEmail : Migration
-	{
-		public override void Up()
-		{
-			Create.Column("Email").OnTable("User").AsString().Nullable();
-		}
+    [Migration(2)]
+    public class UserEmail : Migration
+    {
+        public override void Up()
+        {
+            Create.Column("Email").OnTable("User").AsString().Nullable();
+        }
 
-		public override void Down()
-		{
-		}
-	}
+        public override void Down()
+        {
+        }
+    }
 }

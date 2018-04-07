@@ -17,7 +17,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
     [TestFixture]
     [Category("Firebird")]
-	[Category("Integration")]
+    [Category("Integration")]
     public class FirebirdEmbeddedTableTests
     {
         private readonly FirebirdLibraryProber _firebirdLibraryProber = new FirebirdLibraryProber();

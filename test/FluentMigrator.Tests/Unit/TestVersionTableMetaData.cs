@@ -21,50 +21,50 @@ using FluentMigrator.Runner.VersionTableInfo;
 #pragma warning disable 3005
 namespace FluentMigrator.Tests.Unit
 {
-	[VersionTableMetaData]
-	public class TestVersionTableMetaData : IVersionTableMetaData
-	{
+    [VersionTableMetaData]
+    public class TestVersionTableMetaData : IVersionTableMetaData
+    {
         public const string TABLENAME = "testVersionTableName";
-		public const string COLUMNNAME = "testColumnName";
-		public const string UNIQUEINDEXNAME = "testUniqueIndexName";
+        public const string COLUMNNAME = "testColumnName";
+        public const string UNIQUEINDEXNAME = "testUniqueIndexName";
         public const string DESCRIPTIONCOLUMNNAME = "testDescriptionColumnName";
-	    public const string APPLIEDONCOLUMNNAME = "testAppliedOnColumnName";
+        public const string APPLIEDONCOLUMNNAME = "testAppliedOnColumnName";
 
         public TestVersionTableMetaData()
-		{
-			SchemaName = "testSchemaName";
+        {
+            SchemaName = "testSchemaName";
             OwnsSchema = true;
-		}
+        }
 
         public object ApplicationContext { get; set; }
 
-		public string SchemaName { get; set; }
+        public string SchemaName { get; set; }
 
         public string TableName
         {
-			get { return TABLENAME; }
-		}
+            get { return TABLENAME; }
+        }
 
-		public string ColumnName
-		{
-			get { return COLUMNNAME; }
-		}
+        public string ColumnName
+        {
+            get { return COLUMNNAME; }
+        }
 
-		public string UniqueIndexName
-		{
-			get { return UNIQUEINDEXNAME; }
-		}
+        public string UniqueIndexName
+        {
+            get { return UNIQUEINDEXNAME; }
+        }
 
-	    public string AppliedOnColumnName
-	    {
-	        get { return APPLIEDONCOLUMNNAME; }
-	    }
+        public string AppliedOnColumnName
+        {
+            get { return APPLIEDONCOLUMNNAME; }
+        }
 
-	    public string DescriptionColumnName
+        public string DescriptionColumnName
         {
             get { return DESCRIPTIONCOLUMNNAME; }
         }
 
-	    public bool OwnsSchema { get; set; }
-	}
+        public bool OwnsSchema { get; set; }
+    }
 }

@@ -21,7 +21,7 @@ namespace FluentMigrator.Builders.Create.Column
     public interface ICreateColumnOptionOrForeignKeyCascadeSyntax :
         ICreateColumnOptionSyntax,
         IForeignKeyCascadeSyntax<ICreateColumnOptionSyntax,ICreateColumnOptionOrForeignKeyCascadeSyntax>
-	{
+    {
         
     }
 }
