@@ -63,7 +63,7 @@ namespace FluentMigrator.Runner.Processors
             Register(new SqlServer2016ProcessorFactory());
             Register(new SqlServerProcessorFactory());
             Register(new SqlServerCeProcessorFactory());
-            Register(new SqlAnywhereProcessorFactory());
+            Register(new SqlAnywhere16ProcessorFactory());
 
 #if NETFRAMEWORK
             Register(new Hana.HanaProcessorFactory());

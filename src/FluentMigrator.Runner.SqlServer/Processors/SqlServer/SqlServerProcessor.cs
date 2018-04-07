@@ -20,8 +20,10 @@ using FluentMigrator.Runner.Helpers;
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Linq;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.BatchParser;
@@ -42,10 +44,14 @@ namespace FluentMigrator.Runner.Processors.SqlServer
 
         public override string DatabaseType { get;}
 
-        public SqlServerProcessor(string databaseType, IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public override IList<string> DatabaseTypeAliases { get; }
+
+        public SqlServerProcessor(IEnumerable<string> databaseTypes, IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
-            DatabaseType = databaseType;
+            var dbTypes = databaseTypes.ToList();
+            DatabaseType = dbTypes.First();
+            DatabaseTypeAliases = dbTypes.Skip(1).ToList();
         }
 
         private static string SafeSchemaName(string schemaName)

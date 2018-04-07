@@ -18,6 +18,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.IO;
@@ -45,11 +46,14 @@ namespace FluentMigrator.Runner.Processors.SqlAnywhere
         private const string SEQUENCES_EXISTS = "SELECT 1 WHERE EXISTS (SELECT s.* FROM sys.syssequence AS s INNER JOIN sys.sysuserperm AS up ON up.user_id = s.owner WHERE up.user_name = '{0}' AND s.sequence_name = '{1}' )";
         private const string DEFAULTVALUE_EXISTS = "SELECT 1 WHERE EXISTS (SELECT c.* FROM sys.syscolumn AS c INNER JOIN sys.systable AS t ON t.table_id = c.table_id INNER JOIN sys.sysuserperm AS up ON up.user_id = t.creator WHERE up.user_name = '{0}' AND t.table_name = '{1}' AND c.column_name = '{2}' AND c.default LIKE '{3}')";
 
-        public override string DatabaseType => "SqlAnywhere";
+        public override string DatabaseType { get; }
 
-        public SqlAnywhereProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "SqlAnywhere" };
+
+        public SqlAnywhereProcessor(string databaseType, IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
+            DatabaseType = databaseType;
         }
 
         private static string SafeSchemaName(string schemaName)

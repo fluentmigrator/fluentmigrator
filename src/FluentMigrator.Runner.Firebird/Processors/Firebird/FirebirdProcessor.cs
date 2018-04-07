@@ -33,6 +33,8 @@ namespace FluentMigrator.Runner.Processors.Firebird
             get { return "Firebird"; }
         }
 
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
+
         public FirebirdProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory, FirebirdOptions fbOptions)
             : base(connection, factory, generator, announcer, options)
         {
@@ -854,7 +856,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             PerformDBOperationExpression createTrigger = new PerformDBOperationExpression();
             createTrigger.Operation = (connection, transaction) =>
             {
-                string triggerSql = String.Format(@"CREATE TRIGGER {0} FOR {1} ACTIVE {2} {3} POSITION 0 
+                string triggerSql = String.Format(@"CREATE TRIGGER {0} FOR {1} ACTIVE {2} {3} POSITION 0
                     {4}
                     ", quoter.Quote(triggerName), quoter.Quote(tableName),
                      onBefore ? "before" : "after",

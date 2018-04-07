@@ -40,6 +40,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
             get { return "SqlServerCe"; }
         }
 
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "SqlServer" };
+
         public SqlServerCeProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {

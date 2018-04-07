@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -16,6 +17,8 @@ namespace FluentMigrator.Runner.Processors.Hana
         {
             get { return "Hana"; }
         }
+
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
         public HanaProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)

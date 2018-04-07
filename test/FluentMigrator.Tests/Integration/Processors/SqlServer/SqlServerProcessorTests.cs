@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
         public void SetUp()
         {
             Connection = new SqlConnection(IntegrationTestOptions.SqlServer2012.ConnectionString);
-            Processor = new SqlServerProcessor("SqlServer2012", Connection, new SqlServer2012Generator(),
+            Processor = new SqlServerProcessor(new[] { "SqlServer2012" }, Connection, new SqlServer2012Generator(),
                 new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerDbFactory());
             Connection.Open();
             Processor.BeginTransaction();
@@ -68,7 +68,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
             var connection = new SqlConnection(IntegrationTestOptions.SqlServer2012.ConnectionString);
 
             var processor = new SqlServerProcessor(
-                "SqlServer2012",
+                new[] { "SqlServer2012" },
                 connection,
                 new SqlServer2012Generator(),
                 new TextWriterAnnouncer(output),

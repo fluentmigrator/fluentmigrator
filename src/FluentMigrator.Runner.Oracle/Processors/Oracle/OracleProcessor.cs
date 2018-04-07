@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -35,6 +36,8 @@ namespace FluentMigrator.Runner.Processors.Oracle
         {
             get { return "Oracle"; }
         }
+
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
         public OracleProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer,
             IMigrationProcessorOptions options, IDbFactory factory)

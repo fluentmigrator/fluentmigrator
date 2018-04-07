@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 
@@ -31,6 +32,8 @@ namespace FluentMigrator.Runner.Processors.Redshift
         readonly RedshiftQuoter quoter = new RedshiftQuoter();
 
         public override string DatabaseType => "Redshift";
+
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
         public RedshiftProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)

@@ -28,7 +28,7 @@ namespace FluentMigrator.Tests.Unit.Processors.SqlServer2016
         protected override IMigrationProcessor CreateProcessor()
         {
             return new SqlServerProcessor(
-                "SqlServer2016",
+                new[] { "SqlServer2016" },
                 MockedConnection.Object,
                 new SqlServer2016Generator(),
                 new NullAnnouncer(),

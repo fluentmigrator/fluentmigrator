@@ -52,36 +52,6 @@ namespace FluentMigrator.Expressions
             processor.Execute(sqlText);
         }
 
-        private ManifestResourceNameWithAssembly GetQualifiedResourcePath()
-        {
-            var resources = MigrationAssemblies.GetManifestResourceNames();
-
-            //resource full name is in format `namespace.resourceName`
-            var sqlScriptParts = SqlScript.Split('.').Reverse().ToArray();
-            Func<ManifestResourceNameWithAssembly, bool> isNameMatch = x =>
-                x.Name.Split('.')
-                .Reverse()
-                .Take(sqlScriptParts.Length)
-                .SequenceEqual(sqlScriptParts, StringComparer.InvariantCultureIgnoreCase);
-
-            var foundResources = resources.Where(isNameMatch).ToArray();
-
-            if (foundResources.Length == 0)
-                throw new InvalidOperationException(string.Format("Could not find resource named {0} in assemblies {1}", SqlScript, string.Join(", ", MigrationAssemblies.Assemblies.Select(a => a.FullName).ToArray())));
-
-            if (foundResources.Length > 1)
-                throw new InvalidOperationException(string.Format(@"Could not find unique resource named {0} in assemblies {1}.
-Possible candidates are:
-
-{2}
-",
- SqlScript,
- string.Join(", ", MigrationAssemblies.Assemblies.Select(a => a.FullName).ToArray()),
- string.Join(Environment.NewLine + "\t", foundResources.Select(r => r.Name).ToArray())));
-
-            return foundResources[0];
-        }
-
         public override void CollectValidationErrors(ICollection<string> errors)
         {
             if (string.IsNullOrEmpty(SqlScript))
@@ -91,6 +61,52 @@ Possible candidates are:
         public override string ToString()
         {
             return base.ToString() + SqlScript;
+        }
+
+        protected Exception NewNotFoundException(string sqlScript)
+        {
+            return new InvalidOperationException(string.Format("Could not find resource named {0} in assemblies {1}", sqlScript, string.Join(", ", MigrationAssemblies.Assemblies.Select(a => a.FullName).ToArray())));
+        }
+
+        protected Exception NewNoUniqueResourceException(string sqlScript, IEnumerable<ManifestResourceNameWithAssembly> foundResources)
+        {
+            return new InvalidOperationException(string.Format(@"Could not find unique resource named {0} in assemblies {1}.
+Possible candidates are:
+
+{2}
+",
+                sqlScript,
+                string.Join(", ", MigrationAssemblies.Assemblies.Select(a => a.FullName).ToArray()),
+                string.Join(Environment.NewLine + "\t", foundResources.Select(r => r.Name).ToArray())));
+        }
+
+        protected virtual ManifestResourceNameWithAssembly GetQualifiedResourcePath()
+        {
+            var foundResources = FindResourceName(SqlScript);
+
+            if (foundResources.Length == 0)
+                throw NewNotFoundException(SqlScript);
+
+            if (foundResources.Length > 1)
+                throw NewNoUniqueResourceException(SqlScript, foundResources);
+
+            return foundResources[0];
+        }
+
+        protected virtual ManifestResourceNameWithAssembly[] FindResourceName(string sqlScript)
+        {
+            var resources = MigrationAssemblies.GetManifestResourceNames();
+
+            //resource full name is in format `namespace.resourceName`
+            var sqlScriptParts = sqlScript.Split('.').Reverse().ToArray();
+            Func<ManifestResourceNameWithAssembly, bool> isNameMatch = x =>
+                x.Name.Split('.')
+                    .Reverse()
+                    .Take(sqlScriptParts.Length)
+                    .SequenceEqual(sqlScriptParts, StringComparer.InvariantCultureIgnoreCase);
+
+            var foundResources = resources.Where(isNameMatch).ToArray();
+            return foundResources;
         }
     }
 }

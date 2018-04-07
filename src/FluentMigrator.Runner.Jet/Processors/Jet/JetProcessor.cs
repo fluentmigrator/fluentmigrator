@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.OleDb;
 
@@ -19,6 +20,8 @@ namespace FluentMigrator.Runner.Processors.Jet
         {
             get { return "Jet"; }
         }
+
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
         public JetProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options)
             : base(generator, announcer, options)

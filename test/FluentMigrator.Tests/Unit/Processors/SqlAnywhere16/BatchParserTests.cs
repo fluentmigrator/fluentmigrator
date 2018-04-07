@@ -28,6 +28,7 @@ namespace FluentMigrator.Tests.Unit.Processors.SqlAnywhere16
         protected override IMigrationProcessor CreateProcessor()
         {
             return new SqlAnywhereProcessor(
+                "SqlAnywhere16",
                 MockedConnection.Object,
                 new SqlAnywhere16Generator(),
                 new NullAnnouncer(),

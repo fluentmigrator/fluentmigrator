@@ -15,6 +15,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 
 namespace FluentMigrator.Expressions
 {
@@ -24,9 +25,9 @@ namespace FluentMigrator.Expressions
     public interface IAutoNameExpression
     {
         /// <summary>
-        /// Gets or sets the automatically generated name
+        /// Gets or sets the automatically generated names
         /// </summary>
-        string AutoName { get; set; }
+        IList<string> AutoNames { get; set; }
 
         /// <summary>
         /// Gets or sets the context in which the automatically generated name gets used
@@ -39,9 +40,9 @@ namespace FluentMigrator.Expressions
         Type MigrationType { get; }
 
         /// <summary>
-        /// Gets the database name
+        /// Gets the database names
         /// </summary>
-        string DatabaseName { get; }
+        IList<string> DatabaseNames { get; }
 
         /// <summary>
         /// Gets the direction of the migration

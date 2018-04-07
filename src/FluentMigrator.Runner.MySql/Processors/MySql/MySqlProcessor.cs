@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 
 using FluentMigrator.Expressions;
@@ -33,6 +34,8 @@ namespace FluentMigrator.Runner.Processors.MySql
         {
             get { return "MySql"; }
         }
+
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "MariaDB" };
 
         public MySqlProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)

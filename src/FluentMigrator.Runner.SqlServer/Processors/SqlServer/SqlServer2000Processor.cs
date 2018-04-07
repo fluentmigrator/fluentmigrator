@@ -20,6 +20,7 @@ using FluentMigrator.Runner.Helpers;
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 
@@ -38,6 +39,8 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         }
 
         public override string DatabaseType => "SqlServer2000";
+
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string>() { "SqlServer" };
 
         public override void BeginTransaction()
         {

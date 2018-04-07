@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -16,7 +16,8 @@
 //
 #endregion
 
-using FluentMigrator.Builders.Execute;
+using System.Collections.Generic;
+
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Processors
@@ -30,6 +31,8 @@ namespace FluentMigrator.Runner.Processors
         public abstract string ConnectionString { get; }
 
         public abstract string DatabaseType { get; }
+
+        public abstract IList<string> DatabaseTypeAliases { get; }
 
         public bool WasCommitted { get; protected set; }
 

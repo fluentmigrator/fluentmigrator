@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.IO;
 
@@ -16,6 +17,8 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
             get { return "Postgres"; }
         }
+
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "PostgreSQL" };
 
         public PostgresProcessor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)

@@ -15,8 +15,11 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 
 namespace FluentMigrator
 {
@@ -26,7 +29,7 @@ namespace FluentMigrator
         {
             var expression = new ExecuteEmbeddedAutoSqlScriptExpression(
                 GetType(),
-                _context.QuerySchema.DatabaseType,
+                GetDatabaseNames(),
                 MigrationDirection.Up)
             {
                 MigrationAssemblies = _context.MigrationAssemblies,
@@ -38,7 +41,7 @@ namespace FluentMigrator
         {
             var expression = new ExecuteEmbeddedAutoSqlScriptExpression(
                 GetType(),
-                _context.QuerySchema.DatabaseType,
+                GetDatabaseNames(),
                 MigrationDirection.Down)
             {
                 MigrationAssemblies = _context.MigrationAssemblies,
@@ -46,22 +49,44 @@ namespace FluentMigrator
             _context.Expressions.Add(expression);
         }
 
-        private class ExecuteEmbeddedAutoSqlScriptExpression :
+        private IList<string> GetDatabaseNames()
+        {
+            var dbNames = new List<string>() { _context.QuerySchema.DatabaseType };
+            dbNames.AddRange(_context.QuerySchema.DatabaseTypeAliases);
+            return dbNames;
+        }
+
+        private sealed class ExecuteEmbeddedAutoSqlScriptExpression :
             ExecuteEmbeddedSqlScriptExpression,
             IAutoNameExpression
         {
-            public ExecuteEmbeddedAutoSqlScriptExpression(Type migrationType, string databaseName, MigrationDirection direction)
+            public ExecuteEmbeddedAutoSqlScriptExpression(Type migrationType, IList<string> databaseNames, MigrationDirection direction)
             {
                 MigrationType = migrationType;
-                DatabaseName = databaseName;
+                DatabaseNames = databaseNames;
                 Direction = direction;
             }
 
-            public string AutoName { get; set; }
+            public IList<string> AutoNames { get; set; }
             public AutoNameContext AutoNameContext { get; } = AutoNameContext.EmbeddedResource;
             public Type MigrationType { get; }
-            public string DatabaseName { get; }
+            public IList<string> DatabaseNames { get; }
             public MigrationDirection Direction { get; }
+
+            protected override ManifestResourceNameWithAssembly GetQualifiedResourcePath()
+            {
+                foreach (var sqlScript in AutoNames)
+                {
+                    var res = FindResourceName(sqlScript);
+                    if (res.Length > 1)
+                        throw NewNoUniqueResourceException(sqlScript, res);
+                    if (res.Length == 1)
+                        return res[0];
+                }
+
+                var sqlScripts = string.Concat("(", string.Join(",", AutoNames), ")");
+                throw NewNotFoundException(sqlScripts);
+            }
         }
     }
 }

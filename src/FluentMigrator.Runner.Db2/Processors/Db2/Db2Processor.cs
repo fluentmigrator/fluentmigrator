@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System.Collections.Generic;
+
 using FluentMigrator.Expressions;
 
 namespace FluentMigrator.Runner.Processors.DB2
@@ -46,6 +48,8 @@ namespace FluentMigrator.Runner.Processors.DB2
         {
             get { return "IBM DB2"; }
         }
+
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "DB2" };
 
         public IQuoter Quoter
         {

@@ -18,6 +18,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
@@ -681,7 +682,7 @@ namespace FluentMigrator.Tests.Integration
                 return;
 
             var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
-            var processor = new SqlServerProcessor("SqlServer2008", connection, new SqlServer2008Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerDbFactory());
+            var processor = new SqlServerProcessor(new[] { "SqlServer2008" }, connection, new SqlServer2008Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerDbFactory());
 
             MigrationRunner runner = SetupMigrationRunner(processor);
             runner.MigrateUp();
@@ -705,7 +706,7 @@ namespace FluentMigrator.Tests.Integration
                 return;
 
             var connection = new SqlConnection(IntegrationTestOptions.SqlServer2008.ConnectionString);
-            var processor = new SqlServerProcessor("SqlServer2008", connection, new SqlServer2008Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerDbFactory());
+            var processor = new SqlServerProcessor(new[] { "SqlServer2008" }, connection, new SqlServer2008Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerDbFactory());
 
             MigrationRunner runner = SetupMigrationRunner(processor);
             runner.MigrateUp(1);
@@ -908,7 +909,7 @@ namespace FluentMigrator.Tests.Integration
             var outputSql = new StringWriter();
             var announcer = new TextWriterAnnouncer(outputSql){ ShowSql = true };
 
-            var processor = new SqlServerProcessor("SqlServer2008", connection, new SqlServer2008Generator(), announcer, processorOptions, new SqlServerDbFactory());
+            var processor = new SqlServerProcessor(new[] { "SqlServer2008" }, connection, new SqlServer2008Generator(), announcer, processorOptions, new SqlServerDbFactory());
 
             try
             {
@@ -1606,7 +1607,13 @@ namespace FluentMigrator.Tests.Integration
             {
                 connection.Close();
 
-                var cleanupProcessor = new SqlServerProcessor(origProcessor.DatabaseType, connection, new SqlServer2008Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerDbFactory());
+                var dbTypes = new List<string>
+                {
+                    origProcessor.DatabaseType
+                };
+                dbTypes.AddRange(origProcessor.DatabaseTypeAliases);
+
+                var cleanupProcessor = new SqlServerProcessor(dbTypes, connection, new SqlServer2008Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerDbFactory());
                 MigrationRunner cleanupRunner = SetupMigrationRunner(cleanupProcessor);
                 cleanupRunner.RollbackToVersion(0);
 

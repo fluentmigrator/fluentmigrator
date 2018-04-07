@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -16,6 +16,8 @@
 //
 #endregion
 
+using System.Collections.Generic;
+
 namespace FluentMigrator
 {
     public interface IQuerySchema
@@ -28,5 +30,6 @@ namespace FluentMigrator
         bool SequenceExists(string schemaName, string sequenceName);
         bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue);
         string DatabaseType { get; }
+        IList<string> DatabaseTypeAliases { get; }
     }
 }

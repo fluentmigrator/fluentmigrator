@@ -8,7 +8,7 @@ namespace FluentMigrator.Runner.Processors.SqlServer
         {
             var factory = new SqlServerDbFactory();
             var connection = factory.CreateConnection(connectionString);
-            return new SqlServerProcessor("SqlServer2014", connection, new SqlServer2014Generator(), announcer, options, factory);
+            return new SqlServerProcessor(new[] { "SqlServer2014", "SqlServer" }, connection, new SqlServer2014Generator(), announcer, options, factory);
         }
     }
 }

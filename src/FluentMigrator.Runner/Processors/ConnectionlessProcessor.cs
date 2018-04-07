@@ -17,6 +17,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Initialization;
@@ -247,6 +248,8 @@ namespace FluentMigrator.Runner.Processors
         {
             get { return Context.Database; }
         }
+
+        public IList<string> DatabaseTypeAliases { get; } = new List<string>();
 
         public void Dispose()
         {

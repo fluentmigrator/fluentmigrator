@@ -155,7 +155,7 @@ namespace FluentMigrator.Tests.Integration
             announcer.Heading("Testing Migration against MS SQL Server 2016");
             var generator = new SqlServer2016Generator();
 
-            ExecuteWithSqlServer("SqlServer2016", serverOptions, announcer, generator, test, tryRollback);
+            ExecuteWithSqlServer(new[] { "SqlServer2016" }, serverOptions, announcer, generator, test, tryRollback);
         }
 
         protected static void ExecuteWithSqlServer2014(Action<IMigrationProcessor> test, bool tryRollback, IntegrationTestOptions.DatabaseServerOptions serverOptions)
@@ -166,7 +166,7 @@ namespace FluentMigrator.Tests.Integration
             announcer.Heading("Testing Migration against MS SQL Server 2014");
             var generator = new SqlServer2014Generator();
 
-            ExecuteWithSqlServer("SqlServer2014", serverOptions, announcer, generator, test, tryRollback);
+            ExecuteWithSqlServer(new[] { "SqlServer2014" }, serverOptions, announcer, generator, test, tryRollback);
         }
 
         protected static void ExecuteWithSqlServer2012(Action<IMigrationProcessor> test, bool tryRollback, IntegrationTestOptions.DatabaseServerOptions serverOptions)
@@ -177,7 +177,7 @@ namespace FluentMigrator.Tests.Integration
             announcer.Heading("Testing Migration against MS SQL Server 2012");
             var generator = new SqlServer2012Generator();
 
-            ExecuteWithSqlServer("SqlServer2012", serverOptions, announcer, generator, test, tryRollback);
+            ExecuteWithSqlServer(new[] { "SqlServer2012" }, serverOptions, announcer, generator, test, tryRollback);
         }
 
         protected static void ExecuteWithSqlServer2008(Action<IMigrationProcessor> test, bool tryRollback, IntegrationTestOptions.DatabaseServerOptions serverOptions)
@@ -188,7 +188,7 @@ namespace FluentMigrator.Tests.Integration
             announcer.Heading("Testing Migration against MS SQL Server 2008");
             var generator = new SqlServer2008Generator();
 
-            ExecuteWithSqlServer("SqlServer2008", serverOptions, announcer, generator, test, tryRollback);
+            ExecuteWithSqlServer(new[] { "SqlServer2008" }, serverOptions, announcer, generator, test, tryRollback);
         }
 
         protected static void ExecuteWithSqlServer2005(Action<IMigrationProcessor> test, bool tryRollback, IntegrationTestOptions.DatabaseServerOptions serverOptions)
@@ -199,14 +199,14 @@ namespace FluentMigrator.Tests.Integration
             announcer.Heading("Testing Migration against MS SQL Server 2005");
             var generator = new SqlServer2005Generator();
 
-            ExecuteWithSqlServer("SqlServer2005", serverOptions, announcer, generator, test, tryRollback);
+            ExecuteWithSqlServer(new[] { "SqlServer2005" }, serverOptions, announcer, generator, test, tryRollback);
         }
 
-        private static void ExecuteWithSqlServer(string databaseType, IntegrationTestOptions.DatabaseServerOptions serverOptions, TextWriterAnnouncer announcer, SqlServer2005Generator generator, Action<IMigrationProcessor> test, bool tryRollback)
+        private static void ExecuteWithSqlServer(IEnumerable<string> databaseTypes, IntegrationTestOptions.DatabaseServerOptions serverOptions, TextWriterAnnouncer announcer, SqlServer2005Generator generator, Action<IMigrationProcessor> test, bool tryRollback)
         {
             using (var connection = new SqlConnection(serverOptions.ConnectionString))
             {
-                var processor = new SqlServerProcessor(databaseType, connection, generator, announcer, new ProcessorOptions(), new SqlServerDbFactory());
+                var processor = new SqlServerProcessor(databaseTypes, connection, generator, announcer, new ProcessorOptions(), new SqlServerDbFactory());
                 test(processor);
 
                 if (tryRollback && !processor.WasCommitted)
@@ -248,7 +248,7 @@ namespace FluentMigrator.Tests.Integration
             var factory = new SqlAnywhereDbFactory();
             using (var connection = factory.CreateConnection(serverOptions.ConnectionString))
             {
-                var processor = new SqlAnywhereProcessor(connection, new SqlAnywhere16Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), factory);
+                var processor = new SqlAnywhereProcessor("SqlAnywhere16", connection, new SqlAnywhere16Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), factory);
 
                 test(processor);
 

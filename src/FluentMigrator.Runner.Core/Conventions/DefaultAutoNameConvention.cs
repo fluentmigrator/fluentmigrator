@@ -15,6 +15,7 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 using FluentMigrator.Expressions;
@@ -28,19 +29,20 @@ namespace FluentMigrator.Runner.Conventions
             if (expression.AutoNameContext != AutoNameContext.EmbeddedResource)
                 return expression;
 
+            var dbTypeNames = new List<string>(expression.DatabaseNames) { "Generic" };
             if (expression.Direction == MigrationDirection.Up)
             {
-                expression.AutoName = GetAutoScriptUpNameImpl(expression.MigrationType, expression.DatabaseName);
+                expression.AutoNames = GetAutoScriptUpNameImpl(expression.MigrationType, dbTypeNames).ToList();
             }
             else
             {
-                expression.AutoName = GetAutoScriptDownNameImpl(expression.MigrationType, expression.DatabaseName);
+                expression.AutoNames = GetAutoScriptDownNameImpl(expression.MigrationType, dbTypeNames).ToList();
             }
 
             return expression;
         }
 
-        private static string GetAutoScriptUpNameImpl(Type type, string databaseType)
+        private static IEnumerable<string> GetAutoScriptUpNameImpl(Type type, IEnumerable<string> databaseTypes)
         {
             var migrationAttribute = type
                 .GetCustomAttributes(typeof(MigrationAttribute), false)
@@ -49,15 +51,17 @@ namespace FluentMigrator.Runner.Conventions
             if (migrationAttribute != null)
             {
                 var version = migrationAttribute.Version;
-                return string.Format("Scripts.Up.{0}_{1}_{2}.sql"
-                    , version
-                    , type.Name
-                    , databaseType);
+                foreach (var databaseType in databaseTypes)
+                {
+                    yield return string.Format("Scripts.Up.{0}_{1}_{2}.sql"
+                        , version
+                        , type.Name
+                        , databaseType);
+                }
             }
-            return string.Empty;
         }
 
-        private static string GetAutoScriptDownNameImpl(Type type, string databaseType)
+        private static IEnumerable<string> GetAutoScriptDownNameImpl(Type type, IEnumerable<string> databaseTypes)
         {
             var migrationAttribute = type
                 .GetCustomAttributes(typeof(MigrationAttribute), false)
@@ -66,12 +70,14 @@ namespace FluentMigrator.Runner.Conventions
             if (migrationAttribute != null)
             {
                 var version = migrationAttribute.Version;
-                return string.Format("Scripts.Down.{0}_{1}_{2}.sql"
-                    , version
-                    , type.Name
-                    , databaseType);
+                foreach (var databaseType in databaseTypes)
+                {
+                    yield return string.Format("Scripts.Down.{0}_{1}_{2}.sql"
+                        , version
+                        , type.Name
+                        , databaseType);
+                }
             }
-            return string.Empty;
         }
     }
 }
