@@ -27,7 +27,7 @@
 
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.0'">
     <PackageReference Include="Microsoft.Build.Utilities.Core">
-      <Version>15.1.548</Version>
+      <Version>15.6.85</Version>
     </PackageReference>
   </ItemGroup>
 

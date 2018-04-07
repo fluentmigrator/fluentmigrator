@@ -18,7 +18,7 @@
     <PackageReference Include="FirebirdSql.Data.FirebirdClient" Version="5.12.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.0.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="2.0.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.6.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
     <PackageReference Include="Moq" Version="4.8.2" />
     <PackageReference Include="MySql.Data" Version="6.10.6" />
     <PackageReference Include="Npgsql" Version="3.2.7" />
