@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.0</TargetFramework>
     <OutputType>Exe</OutputType>
-    <AssemblyName>dotnet-fluentmigrator</AssemblyName>
+    <AssemblyName>dotnet-fm</AssemblyName>
     <PackageId>FluentMigrator.DotNet.Cli</PackageId>
     <DefineConstants>NOT_CLS_COMPLIANT;$(DefineConstants)</DefineConstants>
   </PropertyGroup>
