@@ -16,7 +16,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
@@ -86,6 +85,12 @@ namespace FluentMigrator
 
                 var sqlScripts = string.Concat("(", string.Join(",", AutoNames), ")");
                 throw NewNotFoundException(sqlScripts);
+            }
+
+            public override void CollectValidationErrors(ICollection<string> errors)
+            {
+                if (AutoNames.Count == 0)
+                    errors.Add(ErrorMessages.SqlScriptCannotBeNullOrEmpty);
             }
         }
     }
