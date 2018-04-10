@@ -33,12 +33,9 @@ namespace FluentMigrator.Runner.Infrastructure.Hosts
         {
             var asm = GetAssembly(assemblyName);
             var type = asm.GetType(typeName, true);
-            if (serviceProvider != null)
-            {
-                var result = serviceProvider.GetService(type);
-                if (result != null)
-                    return result;
-            }
+            var result = serviceProvider?.GetService(type);
+            if (result != null)
+                return result;
 
             return Activator.CreateInstance(type);
         }
