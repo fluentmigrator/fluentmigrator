@@ -568,7 +568,8 @@ namespace FluentMigrator.Tests.Integration
                 runner.VersionLoader.VersionInfo.HasAppliedMigration(3).ShouldBeTrue();
                 runner.VersionLoader.VersionInfo.HasAppliedMigration(4).ShouldBeTrue();
                 runner.VersionLoader.VersionInfo.HasAppliedMigration(5).ShouldBeTrue();
-                runner.VersionLoader.VersionInfo.Latest().ShouldBe(5);
+                runner.VersionLoader.VersionInfo.HasAppliedMigration(6).ShouldBeTrue();
+                runner.VersionLoader.VersionInfo.Latest().ShouldBe(6);
 
                 runner.RollbackToVersion(0, false);
             });
@@ -1595,7 +1596,8 @@ namespace FluentMigrator.Tests.Integration
             Assembly asm = typeof(MigrationRunnerTests).Assembly;
             var runnerContext = new RunnerContext(new TextWriterAnnouncer(TestContext.Out))
             {
-                Namespace = "FluentMigrator.Tests.Integration.Migrations"
+                Namespace = "FluentMigrator.Tests.Integration.Migrations",
+                AllowBreakingChange = true,
             };
 
             return new MigrationRunner(asm, runnerContext, processor);
