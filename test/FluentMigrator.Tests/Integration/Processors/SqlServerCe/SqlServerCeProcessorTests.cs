@@ -16,6 +16,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
     public class SqlServerCeProcessorTests
     {
         private string _tempDataDirectory;
+
         public string DatabaseFilename { get; set; }
         public SqlCeConnection Connection { get; set; }
         public SqlServerCeProcessor Processor { get; set; }
