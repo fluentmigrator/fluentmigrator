@@ -20,12 +20,10 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.SQLite;
 using System.Linq;
 
 using FluentMigrator.Builders.IfDatabase;
 using FluentMigrator.Infrastructure;
-using FluentMigrator.Runner;
 using FluentMigrator.Runner.Processors.SQLite;
 
 using Moq;
