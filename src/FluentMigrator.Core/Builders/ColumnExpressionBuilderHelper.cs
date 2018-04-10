@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Expressions;
+using FluentMigrator.Expressions;
 using FluentMigrator.Infrastructure;
 using FluentMigrator.Model;
 using System;
@@ -128,7 +128,7 @@ namespace FluentMigrator.Builders
                     };
                     _context.Expressions.Add(exRowExpr.SetExistingRowsExpression);
 
-                    //Call SetNullable, to ensure that not-null columns are correctly set to 
+                    //Call SetNullable, to ensure that not-null columns are correctly set to
                     //not null after existing rows have data populated.
                     SetNullable(column.IsNullable ?? true);
                 }

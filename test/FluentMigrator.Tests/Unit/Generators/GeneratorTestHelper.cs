@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+
+using FluentMigrator.Builders.Create.Column;
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Infrastructure.Extensions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner;
@@ -449,6 +452,21 @@ namespace FluentMigrator.Tests.Unit.Generators
         {
             ColumnDefinition column = new ColumnDefinition { Name = TestColumnName1, Type = DbType.String, Size = 5 };
             return new CreateColumnExpression { TableName = TestTableName1, Column = column };
+        }
+
+        public static ICollection<IMigrationExpression> GetCreateColumnWithSystemMethodExpression(string schemaName = null)
+        {
+            var context = new MigrationContext(null, null, null, null);
+            var expr = new CreateColumnExpression
+            {
+                TableName = TestTableName1,
+                SchemaName = schemaName,
+                Column = new ColumnDefinition { Name = TestColumnName1, Type = DbType.String, Size = 5 }
+            };
+            context.Expressions.Add(expr);
+            var builder = new CreateColumnExpressionBuilder(expr, context);
+            builder.SetExistingRowsTo(SystemMethods.CurrentDateTime);
+            return context.Expressions;
         }
 
         public static CreateColumnExpression GetCreateColumnExpressionWithDescription()

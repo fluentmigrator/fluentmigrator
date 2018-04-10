@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+
 using FluentMigrator.Runner.Generators.MySql;
 using NUnit.Framework;
 using NUnit.Should;
@@ -70,6 +73,26 @@ namespace FluentMigrator.Tests.Unit.Generators.MySql4
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` VARCHAR(5) NOT NULL");
+        }
+
+        [Test]
+        public override void CanCreateColumnWithSystemMethodAndCustomSchema()
+        {
+            var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
+            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
+            result.ShouldBe(
+                @"ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` VARCHAR(5)" + Environment.NewLine +
+                "UPDATE `TestTable1` SET `TestColumn1` = CURRENT_TIMESTAMP WHERE 1 = 1");
+        }
+
+        [Test]
+        public override void CanCreateColumnWithSystemMethodAndDefaultSchema()
+        {
+            var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression();
+            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
+            result.ShouldBe(
+                @"ALTER TABLE `TestTable1` ADD COLUMN `TestColumn1` VARCHAR(5)" + Environment.NewLine +
+                "UPDATE `TestTable1` SET `TestColumn1` = CURRENT_TIMESTAMP WHERE 1 = 1");
         }
 
         [Test]

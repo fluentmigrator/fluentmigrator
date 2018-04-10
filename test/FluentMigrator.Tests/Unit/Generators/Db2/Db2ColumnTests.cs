@@ -1,4 +1,4 @@
-﻿namespace FluentMigrator.Tests.Unit.Generators.Db2
+namespace FluentMigrator.Tests.Unit.Generators.Db2
 {
     using System;
     using System.Collections.Generic;
@@ -81,6 +81,26 @@
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE TestTable1 ADD COLUMN TestColumn1 VARGRAPHIC(5) CCSID 1200 NOT NULL DEFAULT");
+        }
+
+        [Test]
+        public override void CanCreateColumnWithSystemMethodAndCustomSchema()
+        {
+            var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
+            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
+            result.ShouldBe(
+                @"ALTER TABLE TestSchema.TestTable1 ADD COLUMN TestColumn1 VARGRAPHIC(5) CCSID 1200 DEFAULT" + Environment.NewLine +
+                @"UPDATE TestSchema.TestTable1 SET TestColumn1 = CURRENT_TIMESTAMP");
+        }
+
+        [Test]
+        public override void CanCreateColumnWithSystemMethodAndDefaultSchema()
+        {
+            var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression();
+            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
+            result.ShouldBe(
+                @"ALTER TABLE TestTable1 ADD COLUMN TestColumn1 VARGRAPHIC(5) CCSID 1200 DEFAULT" + Environment.NewLine +
+                @"UPDATE TestTable1 SET TestColumn1 = CURRENT_TIMESTAMP");
         }
 
         [Test]

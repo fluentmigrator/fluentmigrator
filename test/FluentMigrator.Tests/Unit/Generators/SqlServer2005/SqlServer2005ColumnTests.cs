@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+
 using FluentMigrator.Runner.Generators.SqlServer;
 using NUnit.Framework;
 using NUnit.Should;
@@ -18,7 +21,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         [Test]
         public override void CanAlterColumnWithCustomSchema()
         {
-            //TODO: This will fail if there are any keys attached 
+            //TODO: This will fail if there are any keys attached
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
             expression.SchemaName = "TestSchema";
 
@@ -29,7 +32,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
         [Test]
         public override void CanAlterColumnWithDefaultSchema()
         {
-            //TODO: This will fail if there are any keys attached 
+            //TODO: This will fail if there are any keys attached
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
 
             var result = Generator.Generate(expression);
@@ -72,6 +75,26 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL");
+        }
+
+        [Test]
+        public override void CanCreateColumnWithSystemMethodAndCustomSchema()
+        {
+            var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
+            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
+            result.ShouldBe(
+                @"ALTER TABLE [TestSchema].[TestTable1] ADD [TestColumn1] NVARCHAR(5)" + Environment.NewLine +
+                "UPDATE [TestSchema].[TestTable1] SET [TestColumn1] = GETDATE() WHERE 1 = 1");
+        }
+
+        [Test]
+        public override void CanCreateColumnWithSystemMethodAndDefaultSchema()
+        {
+            var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression();
+            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
+            result.ShouldBe(
+                @"ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5)" + Environment.NewLine +
+                "UPDATE [dbo].[TestTable1] SET [TestColumn1] = GETDATE() WHERE 1 = 1");
         }
 
         [Test]

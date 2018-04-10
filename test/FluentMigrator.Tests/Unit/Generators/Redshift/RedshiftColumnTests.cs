@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2007-2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -13,6 +13,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 #endregion
+
+using System;
+using System.Linq;
 
 using FluentMigrator.Runner.Generators.Redshift;
 
@@ -89,6 +92,26 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
 
             var result = _generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD \"TestColumn1\" varchar(5) NOT NULL;");
+        }
+
+        [Test]
+        public override void CanCreateColumnWithSystemMethodAndCustomSchema()
+        {
+            var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
+            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)_generator.Generate((dynamic)x)));
+            result.ShouldBe(
+                @"ALTER TABLE ""TestSchema"".""TestTable1"" ADD ""TestColumn1"" varchar(5);" + Environment.NewLine +
+                @"UPDATE ""TestSchema"".""TestTable1"" SET ""TestColumn1"" = SYSDATE WHERE 1 = 1;");
+        }
+
+        [Test]
+        public override void CanCreateColumnWithSystemMethodAndDefaultSchema()
+        {
+            var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression();
+            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)_generator.Generate((dynamic)x)));
+            result.ShouldBe(
+                @"ALTER TABLE ""public"".""TestTable1"" ADD ""TestColumn1"" varchar(5);" + Environment.NewLine +
+                @"UPDATE ""public"".""TestTable1"" SET ""TestColumn1"" = SYSDATE WHERE 1 = 1;");
         }
 
         [Test]

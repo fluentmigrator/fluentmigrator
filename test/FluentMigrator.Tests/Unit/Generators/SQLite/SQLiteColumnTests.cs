@@ -1,4 +1,7 @@
-﻿using FluentMigrator.Runner.Generators.SQLite;
+using System;
+using System.Linq;
+
+using FluentMigrator.Runner.Generators.SQLite;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -72,6 +75,26 @@ namespace FluentMigrator.Tests.Unit.Generators.SQLite
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"TestTable1\" ADD COLUMN \"TestColumn1\" TEXT NOT NULL");
+        }
+
+        [Test]
+        public override void CanCreateColumnWithSystemMethodAndCustomSchema()
+        {
+            var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
+            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
+            result.ShouldBe(
+                @"ALTER TABLE ""TestTable1"" ADD COLUMN ""TestColumn1"" TEXT" + Environment.NewLine +
+                @"UPDATE ""TestTable1"" SET ""TestColumn1"" = (datetime('now','localtime')) WHERE 1 = 1");
+        }
+
+        [Test]
+        public override void CanCreateColumnWithSystemMethodAndDefaultSchema()
+        {
+            var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression();
+            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
+            result.ShouldBe(
+                @"ALTER TABLE ""TestTable1"" ADD COLUMN ""TestColumn1"" TEXT" + Environment.NewLine +
+                @"UPDATE ""TestTable1"" SET ""TestColumn1"" = (datetime('now','localtime')) WHERE 1 = 1");
         }
 
         [Test]

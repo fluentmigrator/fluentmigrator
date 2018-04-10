@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text;
 
 using FluentMigrator.Runner.Generators.SqlAnywhere;
@@ -10,6 +11,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
 {
     [TestFixture]
+    [Category("SqlAnywhere")]
+    [Category("SqlAnywhere16")]
     public class SqlAnywhere16ColumnTests : BaseColumnTests
     {
         protected SqlAnywhere16Generator Generator;
@@ -46,7 +49,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanAlterColumnWithCustomSchema()
         {
-            //TODO: This will fail if there are any keys attached 
+            //TODO: This will fail if there are any keys attached
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
             expression.SchemaName = "TestSchema";
 
@@ -58,7 +61,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanAlterColumnWithDefaultSchema()
         {
-            //TODO: This will fail if there are any keys attached 
+            //TODO: This will fail if there are any keys attached
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
 
             var result = Generator.Generate(expression);
@@ -105,6 +108,26 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5) NOT NULL");
+        }
+
+        [Test]
+        public override void CanCreateColumnWithSystemMethodAndCustomSchema()
+        {
+            var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
+            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
+            result.ShouldBe(
+                @"ALTER TABLE [TestSchema].[TestTable1] ADD [TestColumn1] NVARCHAR(5) NULL" + Environment.NewLine +
+                "UPDATE [TestSchema].[TestTable1] SET [TestColumn1] = CURRENT TIMESTAMP WHERE 1 = 1");
+        }
+
+        [Test]
+        public override void CanCreateColumnWithSystemMethodAndDefaultSchema()
+        {
+            var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression();
+            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
+            result.ShouldBe(
+                @"ALTER TABLE [dbo].[TestTable1] ADD [TestColumn1] NVARCHAR(5) NULL" + Environment.NewLine +
+                "UPDATE [dbo].[TestTable1] SET [TestColumn1] = CURRENT TIMESTAMP WHERE 1 = 1");
         }
 
         [Test]

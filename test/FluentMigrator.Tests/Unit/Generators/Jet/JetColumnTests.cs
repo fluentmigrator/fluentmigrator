@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+
 using FluentMigrator.Runner.Generators.Jet;
 using NUnit.Framework;
 using NUnit.Should;
@@ -70,6 +73,20 @@ namespace FluentMigrator.Tests.Unit.Generators.Jet
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE [TestTable1] ADD COLUMN [TestColumn1] VARCHAR(5) NOT NULL");
+        }
+
+        [Test]
+        public override void CanCreateColumnWithSystemMethodAndCustomSchema()
+        {
+            var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
+            Assert.Throws<NotSupportedException>(() => string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x))));
+        }
+
+        [Test]
+        public override void CanCreateColumnWithSystemMethodAndDefaultSchema()
+        {
+            var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression();
+            Assert.Throws<NotSupportedException>(() => string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x))));
         }
 
         [Test]

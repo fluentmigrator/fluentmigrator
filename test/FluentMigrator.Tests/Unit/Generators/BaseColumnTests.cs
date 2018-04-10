@@ -1,7 +1,11 @@
-﻿using System.Data;
+using System.Data;
+
+using NUnit.Framework;
 
 namespace FluentMigrator.Tests.Unit.Generators
 {
+    [Category("Generator")]
+    [Category("Column")]
     public abstract class BaseColumnTests
     {
         public abstract void CanAlterColumnWithCustomSchema();
@@ -10,6 +14,8 @@ namespace FluentMigrator.Tests.Unit.Generators
         public abstract void CanCreateAutoIncrementColumnWithDefaultSchema();
         public abstract void CanCreateColumnWithCustomSchema();
         public abstract void CanCreateColumnWithDefaultSchema();
+        public abstract void CanCreateColumnWithSystemMethodAndCustomSchema();
+        public abstract void CanCreateColumnWithSystemMethodAndDefaultSchema();
         public abstract void CanCreateDecimalColumnWithCustomSchema();
         public abstract void CanCreateDecimalColumnWithDefaultSchema();
         public abstract void CanDropColumnWithCustomSchema();

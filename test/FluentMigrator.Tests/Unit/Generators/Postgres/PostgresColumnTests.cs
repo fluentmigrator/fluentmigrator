@@ -1,4 +1,7 @@
-﻿using FluentMigrator.Runner.Generators.Postgres;
+using System;
+using System.Linq;
+
+using FluentMigrator.Runner.Generators.Postgres;
 using NUnit.Framework;
 using NUnit.Should;
 
@@ -72,6 +75,26 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"public\".\"TestTable1\" ADD \"TestColumn1\" varchar(5) NOT NULL;");
+        }
+
+        [Test]
+        public override void CanCreateColumnWithSystemMethodAndCustomSchema()
+        {
+            var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
+            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
+            result.ShouldBe(
+                @"ALTER TABLE ""TestSchema"".""TestTable1"" ADD ""TestColumn1"" varchar(5);" + Environment.NewLine +
+                @"UPDATE ""TestSchema"".""TestTable1"" SET ""TestColumn1"" = now() WHERE 1 = 1;");
+        }
+
+        [Test]
+        public override void CanCreateColumnWithSystemMethodAndDefaultSchema()
+        {
+            var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression();
+            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
+            result.ShouldBe(
+                @"ALTER TABLE ""public"".""TestTable1"" ADD ""TestColumn1"" varchar(5);" + Environment.NewLine +
+                @"UPDATE ""public"".""TestTable1"" SET ""TestColumn1"" = now() WHERE 1 = 1;");
         }
 
         [Test]

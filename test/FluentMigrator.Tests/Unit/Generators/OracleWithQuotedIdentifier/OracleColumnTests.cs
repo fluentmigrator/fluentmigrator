@@ -1,3 +1,6 @@
+using System;
+using System.Linq;
+
 using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Framework;
@@ -69,6 +72,26 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
 
             var result = Generator.Generate(expression);
             result.ShouldBe("ALTER TABLE \"TestTable1\" ADD \"TestColumn1\" NVARCHAR2(5) NOT NULL");
+        }
+
+        [Test]
+        public override void CanCreateColumnWithSystemMethodAndCustomSchema()
+        {
+            var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression("TestSchema");
+            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
+            result.ShouldBe(
+                @"ALTER TABLE ""TestTable1"" ADD ""TestColumn1"" NVARCHAR2(5)" + Environment.NewLine +
+                @"UPDATE ""TestTable1"" SET ""TestColumn1"" = LOCALTIMESTAMP WHERE 1 = 1");
+        }
+
+        [Test]
+        public override void CanCreateColumnWithSystemMethodAndDefaultSchema()
+        {
+            var expressions = GeneratorTestHelper.GetCreateColumnWithSystemMethodExpression();
+            var result = string.Join(Environment.NewLine, expressions.Select(x => (string)Generator.Generate((dynamic)x)));
+            result.ShouldBe(
+                @"ALTER TABLE ""TestTable1"" ADD ""TestColumn1"" NVARCHAR2(5)" + Environment.NewLine +
+                @"UPDATE ""TestTable1"" SET ""TestColumn1"" = LOCALTIMESTAMP WHERE 1 = 1");
         }
 
         [Test]
