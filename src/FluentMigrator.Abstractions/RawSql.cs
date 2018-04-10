@@ -4,21 +4,12 @@ namespace FluentMigrator
 {
     public class RawSql
     {
-        private readonly string _underlyingSql;
-
         private RawSql(string underlyingSql)
         {
-            if (underlyingSql == null) throw new ArgumentNullException("underlyingSql");
-            _underlyingSql = underlyingSql;
+            Value = underlyingSql ?? throw new ArgumentNullException(nameof(underlyingSql));
         }
 
-        public string Value
-        {
-            get
-            {
-                return _underlyingSql;
-            }
-        }
+        public string Value { get; }
 
         public static RawSql Insert(string sqlToRun)
         {
