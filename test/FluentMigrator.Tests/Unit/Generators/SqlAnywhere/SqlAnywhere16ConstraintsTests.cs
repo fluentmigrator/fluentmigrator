@@ -10,6 +10,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
 {
     [TestFixture]
+    [Category("SqlAnywhere")]
+    [Category("SqlAnywhere16")]
     public class SqlAnywhere16ConstraintsTests : BaseConstraintsTests
     {
         protected SqlAnywhere16Generator Generator;
@@ -21,7 +23,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public void CanAlterDefaultConstraintWithCurrentUserAsDefault()
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
@@ -36,7 +37,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public void CanAlterDefaultConstraintWithCurrentDateAsDefault()
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
@@ -51,7 +51,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public void CanAlterDefaultConstraintWithCurrentUtcDateAsDefault()
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
@@ -66,7 +65,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public void CanAlterDefaultConstraintWithNewGuidAsDefault()
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
@@ -81,7 +79,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public void CanAlterDefaultConstraintWithStringAsDefault()
         {
             var expression = GeneratorTestHelper.GetAlterDefaultConstraintExpression();
@@ -96,7 +93,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
@@ -108,7 +104,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
@@ -118,7 +113,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateForeignKeyWithDifferentSchemas()
         {
             var expression = GeneratorTestHelper.GetCreateForeignKeyExpression();
@@ -129,7 +123,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateMultiColumnForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
@@ -141,7 +134,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateMultiColumnForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
@@ -151,7 +143,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateMultiColumnForeignKeyWithDifferentSchemas()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnForeignKeyExpression();
@@ -162,7 +153,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateMultiColumnPrimaryKeyConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnPrimaryKeyExpression();
@@ -173,7 +163,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateMultiColumnPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnPrimaryKeyExpression();
@@ -183,7 +172,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateMultiColumnUniqueConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
@@ -194,7 +182,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateMultiColumnUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateMultiColumnUniqueConstraintExpression();
@@ -204,7 +191,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateNamedForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
@@ -216,7 +202,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateNamedForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
@@ -226,7 +211,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateNamedForeignKeyWithDifferentSchemas()
         {
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
@@ -237,7 +221,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateNamedForeignKeyWithOnDeleteAndOnUpdateOptions()
         {
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
@@ -249,7 +232,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateNamedForeignKeyWithOnDeleteOptions(Rule rule, string output)
         {
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
@@ -260,7 +242,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [TestCase(Rule.SetDefault, "SET DEFAULT"), TestCase(Rule.SetNull, "SET NULL"), TestCase(Rule.Cascade, "CASCADE")]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateNamedForeignKeyWithOnUpdateOptions(Rule rule, string output)
         {
             var expression = GeneratorTestHelper.GetCreateNamedForeignKeyExpression();
@@ -271,7 +252,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateNamedMultiColumnForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnForeignKeyExpression();
@@ -283,7 +263,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateNamedMultiColumnForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnForeignKeyExpression();
@@ -293,7 +272,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateNamedMultiColumnForeignKeyWithDifferentSchemas()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnForeignKeyExpression();
@@ -304,7 +282,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateNamedMultiColumnPrimaryKeyConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnPrimaryKeyExpression();
@@ -315,7 +292,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateNamedMultiColumnPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnPrimaryKeyExpression();
@@ -325,7 +301,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateNamedMultiColumnUniqueConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
@@ -336,7 +311,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateNamedMultiColumnUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedMultiColumnUniqueConstraintExpression();
@@ -346,7 +320,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateNamedPrimaryKeyConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
@@ -357,7 +330,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateNamedPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedPrimaryKeyExpression();
@@ -367,7 +339,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateNamedUniqueConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
@@ -378,7 +349,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateNamedUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateNamedUniqueConstraintExpression();
@@ -388,7 +358,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreatePrimaryKeyConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
@@ -399,7 +368,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreatePrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreatePrimaryKeyExpression();
@@ -409,7 +377,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateUniqueConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
@@ -420,7 +387,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanCreateUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateUniqueConstraintExpression();
@@ -430,7 +396,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanDropForeignKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
@@ -441,7 +406,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanDropForeignKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteForeignKeyExpression();
@@ -451,7 +415,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanDropPrimaryKeyConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
@@ -462,7 +425,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanDropPrimaryKeyConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeletePrimaryKeyExpression();
@@ -472,7 +434,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanDropUniqueConstraintWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();
@@ -483,7 +444,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Constraint")]
         public override void CanDropUniqueConstraintWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteUniqueConstraintExpression();

@@ -7,6 +7,8 @@ using Shouldly;
 namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
 {
     [TestFixture]
+    [Category("SqlAnywhere")]
+    [Category("SqlAnywhere16")]
     public class SqlAnywhere16TableTests : BaseTableTests
     {
         protected SqlAnywhere16Generator Generator;
@@ -18,7 +20,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithCustomColumnTypeWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -32,7 +33,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithCustomColumnTypeWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -45,7 +45,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -56,7 +55,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -66,7 +64,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNullWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -79,7 +76,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithDefaultValueExplicitlySetToNullWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -91,7 +87,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithDefaultValueWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
@@ -102,7 +97,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithDefaultValueWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
@@ -112,7 +106,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithIdentityWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
@@ -123,7 +116,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithIdentityWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithAutoIncrementExpression();
@@ -133,7 +125,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithMultiColumnPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
@@ -143,7 +134,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithMultiColumnPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithMultiColumnPrimaryKeyExpression();
@@ -154,7 +144,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithNamedMultiColumnPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
@@ -165,7 +154,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithNamedMultiColumnPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedMultiColumnPrimaryKeyExpression();
@@ -175,7 +163,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithNamedPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
@@ -186,7 +173,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithNamedPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithNamedPrimaryKeyExpression();
@@ -196,7 +182,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithNullableFieldWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -208,7 +193,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithNullableFieldWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableExpression();
@@ -219,7 +203,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithPrimaryKeyWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
@@ -230,7 +213,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanCreateTableWithPrimaryKeyWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateTableWithPrimaryKeyExpression();
@@ -240,7 +222,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanDropTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
@@ -251,7 +232,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanDropTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteTableExpression();
@@ -261,7 +241,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanRenameTableWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
@@ -272,7 +251,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Table")]
         public override void CanRenameTableWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameTableExpression();
