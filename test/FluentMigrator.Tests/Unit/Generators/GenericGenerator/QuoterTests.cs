@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.Threading;
 using FluentMigrator.Model;
@@ -23,7 +23,7 @@ namespace FluentMigrator.Tests.Unit.Generators
             quoter = new GenericQuoter();
         }
 
-        private IQuoter quoter = default(GenericQuoter);
+        private IQuoter quoter;
         private readonly CultureInfo currentCulture = Thread.CurrentThread.CurrentCulture;
 
         private void RestoreCulture()
@@ -222,7 +222,7 @@ namespace FluentMigrator.Tests.Unit.Generators
         [Test]
         public void ShouldEscapeSqlServerObjectNames()
         {
-            SqlServerQuoter quoter = new SqlServerQuoter();
+            SqlServer2000Quoter quoter = new SqlServer2000Quoter();
             quoter.Quote("[Table]Name").ShouldBe("[[Table]]Name]");
         }
 
@@ -293,12 +293,26 @@ namespace FluentMigrator.Tests.Unit.Generators
         }
 
         [Test]
+        public void NonUnicodeStringIsFormattedAsNormalString()
+        {
+            quoter.QuoteValue(new NonUnicodeString("Test String")).ShouldBe("'Test String'");
+        }
+
+        [Test]
+        public void NonUnicodeStringIsFormattedAsNormalStringQuotes()
+        {
+            quoter.QuoteValue(new NonUnicodeString("Test ' String")).ShouldBe("'Test '' String'");
+        }
+
+        [Test]
+        [Obsolete]
         public void ExplicitUnicodeStringIsFormattedAsNormalString()
         {
             quoter.QuoteValue(new ExplicitUnicodeString("Test String")).ShouldBe("'Test String'");
         }
 
         [Test]
+        [Obsolete]
         public void ExplicitUnicodeStringIsFormattedAsNormalStringQuotes()
         {
             quoter.QuoteValue(new ExplicitUnicodeString("Test ' String")).ShouldBe("'Test '' String'");

@@ -184,7 +184,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             "SET @sql = N'ALTER TABLE [dbo].[TestTable1] DROP CONSTRAINT ' + QUOTENAME(@default);" + Environment.NewLine +
             "EXEC sp_executesql @sql;" + Environment.NewLine + Environment.NewLine +
             "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
-            "ALTER TABLE [dbo].[TestTable1] WITH NOCHECK ADD CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT('TestString') FOR [TestColumn1];";
+            "ALTER TABLE [dbo].[TestTable1] WITH NOCHECK ADD CONSTRAINT [DF_TestTable1_TestColumn1] DEFAULT(N'TestString') FOR [TestColumn1];";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);

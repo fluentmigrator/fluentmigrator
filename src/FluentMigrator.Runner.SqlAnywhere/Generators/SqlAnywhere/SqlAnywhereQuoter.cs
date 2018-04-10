@@ -59,14 +59,9 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             return (string.IsNullOrEmpty(schemaName)) ? "[dbo]" : Quote(schemaName);
         }
 
-        public override string QuoteValue(object value)
+        public override string FormatNationalString(string value)
         {
-            if (value is ExplicitUnicodeString)
-            {
-                return $"N{FormatString(value.ToString())}";
-            }
-
-            return base.QuoteValue(value);
+            return $"N{FormatAnsiString(value)}";
         }
     }
 }

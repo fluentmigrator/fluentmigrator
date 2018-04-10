@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using FluentMigrator.Expressions;
@@ -81,19 +82,31 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
         }
 
         [Test]
+        public void NonUnicodeQuotesCorrectly()
+        {
+            var expression = new InsertDataExpression { TableName = "TestTable" };
+            expression.Rows.Add(new InsertionDataDefinition
+            {
+                new KeyValuePair<string, object>("NonUnicodeStringValue", new NonUnicodeString("NonUnicodeString")),
+            });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([NonUnicodeStringValue]) VALUES ('NonUnicodeString')");
+        }
+
+        [Test]
+        [Obsolete]
         public void ExplicitUnicodeQuotesCorrectly()
         {
             var expression = new InsertDataExpression {TableName = "TestTable"};
             expression.Rows.Add(new InsertionDataDefinition
                                     {
                                         new KeyValuePair<string, object>("UnicodeStringValue", new ExplicitUnicodeString("UnicodeString")),
-                                        new KeyValuePair<string, object>("StringValue", "AnsiiString")
+                                        new KeyValuePair<string, object>("StringValue", "String")
                                     });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([UnicodeStringValue], [StringValue]) VALUES (N'UnicodeString', 'AnsiiString')");
-
+            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([UnicodeStringValue], [StringValue]) VALUES (N'UnicodeString', N'String')");
         }
-
     }
 }

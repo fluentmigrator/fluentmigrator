@@ -24,7 +24,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
         {
             Connection = new SqlConnection(IntegrationTestOptions.SqlServer2012.ConnectionString);
             Processor = new SqlServerProcessor(new[] { "SqlServer2012" }, Connection, new SqlServer2012Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerDbFactory());
-            Quoter = new SqlServerQuoter();
+            Quoter = new SqlServer2008Quoter();
             Connection.Open();
             Processor.BeginTransaction();
         }

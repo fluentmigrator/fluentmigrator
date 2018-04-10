@@ -5,9 +5,10 @@ namespace FluentMigrator.Runner.Generators.Hana
 {
     public class HanaQuoter : GenericQuoter
     {
-        public override string OpenQuote { get { return "\""; } }
-
-        public override string CloseQuote { get { return "\""; } }
+        public override string FormatNationalString(string value)
+        {
+            return $"N{FormatAnsiString(value)}";
+        }
 
         public override string QuoteValue(object value)
         {

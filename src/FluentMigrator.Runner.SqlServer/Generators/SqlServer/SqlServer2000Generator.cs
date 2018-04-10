@@ -28,7 +28,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 {
     public class SqlServer2000Generator : GenericGenerator
     {
-        private static readonly SqlServerQuoter _quoter = new SqlServerQuoter();
+        private static readonly SqlServer2000Quoter _quoter = new SqlServer2000Quoter();
 
         public SqlServer2000Generator()
             : base(new SqlServer2000Column(new SqlServer2000TypeMap()), _quoter, new EmptyDescriptionGenerator())

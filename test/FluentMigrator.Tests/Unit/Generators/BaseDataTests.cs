@@ -1,5 +1,8 @@
+using System.ComponentModel;
+
 namespace FluentMigrator.Tests.Unit.Generators
 {
+    [Category("Generator")]
     public abstract class BaseDataTests
     {
         public abstract void CanDeleteDataForAllRowsWithCustomSchema();

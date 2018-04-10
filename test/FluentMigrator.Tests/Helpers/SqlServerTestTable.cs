@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,14 +20,15 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Text;
-using FluentMigrator.Runner.Generators.SqlServer;
+
+using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Processors.SqlServer;
 
 namespace FluentMigrator.Tests.Helpers
 {
     public class SqlServerTestTable : IDisposable
     {
-        private readonly SqlServerQuoter quoter = new SqlServerQuoter();
+        private readonly IQuoter quoter;
         private readonly string schemaName;
         private SqlConnection Connection { get; set; }
         private List<string> indexies = new List<string>();
@@ -39,6 +40,7 @@ namespace FluentMigrator.Tests.Helpers
             this.schemaName = schemaName;
             Connection = (SqlConnection)processor.Connection;
             Transaction = (SqlTransaction)processor.Transaction;
+            quoter = processor.Quoter;
 
             Name = "TestTable";
 
@@ -49,6 +51,7 @@ namespace FluentMigrator.Tests.Helpers
             this.schemaName = schemaName;
             Connection = (SqlConnection)processor.Connection;
             Transaction = (SqlTransaction)processor.Transaction;
+            quoter = processor.Quoter;
 
             Name = table;
 

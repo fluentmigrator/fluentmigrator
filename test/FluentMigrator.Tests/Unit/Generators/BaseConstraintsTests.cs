@@ -1,5 +1,9 @@
-﻿namespace FluentMigrator.Tests.Unit.Generators
+using NUnit.Framework;
+
+namespace FluentMigrator.Tests.Unit.Generators
 {
+    [Category("Generator")]
+    [Category("Constraint")]
     public abstract class BaseConstraintsTests
     {
         public abstract void CanCreateForeignKeyWithCustomSchema();

@@ -6,6 +6,8 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
 {
     [TestFixture]
+    [Category("SqlAnywhere")]
+    [Category("SqlAnywhere16")]
     public class SqlAnywhere16DataTests : BaseDataTests
     {
         protected SqlAnywhere16Generator Generator;
@@ -17,7 +19,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Delete")]
+        [Category("Delete")]
         public override void CanDeleteDataForAllRowsWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
@@ -28,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Delete")]
+        [Category("Delete")]
         public override void CanDeleteDataForAllRowsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataAllRowsExpression();
@@ -38,83 +40,83 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Delete")]
+        [Category("Delete")]
         public override void CanDeleteDataForMultipleRowsWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM [TestSchema].[TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL; DELETE FROM [TestSchema].[TestTable1] WHERE [Website] = 'github.com'");
+            result.ShouldBe("DELETE FROM [TestSchema].[TestTable1] WHERE [Name] = N'Just''in' AND [Website] IS NULL; DELETE FROM [TestSchema].[TestTable1] WHERE [Website] = N'github.com'");
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Delete")]
+        [Category("Delete")]
         public override void CanDeleteDataForMultipleRowsWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM [dbo].[TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL; DELETE FROM [dbo].[TestTable1] WHERE [Website] = 'github.com'");
+            result.ShouldBe("DELETE FROM [dbo].[TestTable1] WHERE [Name] = N'Just''in' AND [Website] IS NULL; DELETE FROM [dbo].[TestTable1] WHERE [Website] = N'github.com'");
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Delete")]
+        [Category("Delete")]
         public override void CanDeleteDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM [TestSchema].[TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL");
+            result.ShouldBe("DELETE FROM [TestSchema].[TestTable1] WHERE [Name] = N'Just''in' AND [Website] IS NULL");
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Delete")]
+        [Category("Delete")]
         public override void CanDeleteDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM [dbo].[TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL");
+            result.ShouldBe("DELETE FROM [dbo].[TestTable1] WHERE [Name] = N'Just''in' AND [Website] IS NULL");
         }
 
         public override void CanDeleteDataWithDbNullCriteria()
         {
             var expression = GeneratorTestHelper.GetDeleteDataExpressionWithDbNullValue();
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM [dbo].[TestTable1] WHERE [Name] = 'Just''in' AND [Website] IS NULL");
+            result.ShouldBe("DELETE FROM [dbo].[TestTable1] WHERE [Name] = N'Just''in' AND [Website] IS NULL");
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Insert")]
+        [Category("Insert")]
         public override void CanInsertDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
             expression.SchemaName = "TestSchema";
 
-            var expected = "INSERT INTO [TestSchema].[TestTable1] ([Id], [Name], [Website]) VALUES (1, 'Just''in', 'codethinked.com');";
-            expected += @" INSERT INTO [TestSchema].[TestTable1] ([Id], [Name], [Website]) VALUES (2, 'Na\te', 'kohari.org')";
+            var expected = "INSERT INTO [TestSchema].[TestTable1] ([Id], [Name], [Website]) VALUES (1, N'Just''in', N'codethinked.com');";
+            expected += @" INSERT INTO [TestSchema].[TestTable1] ([Id], [Name], [Website]) VALUES (2, N'Na\te', N'kohari.org')";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Insert")]
+        [Category("Insert")]
         public override void CanInsertDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetInsertDataExpression();
 
-            var expected = "INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (1, 'Just''in', 'codethinked.com');";
-            expected += @" INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (2, 'Na\te', 'kohari.org')";
+            var expected = "INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (1, N'Just''in', N'codethinked.com');";
+            expected += @" INSERT INTO [dbo].[TestTable1] ([Id], [Name], [Website]) VALUES (2, N'Na\te', N'kohari.org')";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Insert")]
+        [Category("Insert")]
         public override void CanInsertGuidDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
@@ -125,7 +127,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Insert")]
+        [Category("Insert")]
         public override void CanInsertGuidDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetInsertGUIDExpression();
@@ -135,53 +137,55 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Update")]
+        [Category("Update")]
         public override void CanUpdateDataForAllDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE [TestSchema].[TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE 1 = 1");
+            result.ShouldBe("UPDATE [TestSchema].[TestTable1] SET [Name] = N'Just''in', [Age] = 25 WHERE 1 = 1");
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Update")]
+        [Category("Update")]
         public override void CanUpdateDataForAllDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithAllRows();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE [dbo].[TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE 1 = 1");
+            result.ShouldBe("UPDATE [dbo].[TestTable1] SET [Name] = N'Just''in', [Age] = 25 WHERE 1 = 1");
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Update")]
+        [Category("Update")]
         public override void CanUpdateDataWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE [TestSchema].[TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL");
+            result.ShouldBe("UPDATE [TestSchema].[TestTable1] SET [Name] = N'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL");
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Update")]
+        [Category("Update")]
         public override void CanUpdateDataWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE [dbo].[TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL");
+            result.ShouldBe("UPDATE [dbo].[TestTable1] SET [Name] = N'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL");
         }
 
+        [Test]
+        [Category("Update")]
         public override void CanUpdateDataWithDbNullCriteria()
         {
             var expression = GeneratorTestHelper.GetUpdateDataExpressionWithDbNullValue();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("UPDATE [dbo].[TestTable1] SET [Name] = 'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL");
+            result.ShouldBe("UPDATE [dbo].[TestTable1] SET [Name] = N'Just''in', [Age] = 25 WHERE [Id] = 9 AND [Homepage] IS NULL");
         }
     }
 }

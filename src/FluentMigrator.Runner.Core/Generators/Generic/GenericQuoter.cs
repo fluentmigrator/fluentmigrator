@@ -1,5 +1,20 @@
+#region License
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+#endregion
+
 using System.Globalization;
-using FluentMigrator.Model;
 
 namespace FluentMigrator.Runner.Generators.Generic
 {
@@ -9,29 +24,44 @@ namespace FluentMigrator.Runner.Generators.Generic
     {
         public virtual string QuoteValue(object value)
         {
-            if (value == null || value is DBNull) { return FormatNull(); }
-
-            string stringValue = value as string;
-            if (stringValue != null) { return FormatString(stringValue); }
-
-            if (value is ExplicitUnicodeString)
+            switch (value)
             {
-                return FormatString(value.ToString());
+                case null:
+                case DBNull _:
+                    return FormatNull();
+#pragma warning disable 618
+                case ExplicitUnicodeString _:
+#pragma warning restore 618
+                case string _:
+                    return FormatNationalString(value.ToString());
+                case NonUnicodeString _:
+                    return FormatAnsiString(value.ToString());
+                case char v:
+                    return FormatChar(v);
+                case bool v:
+                    return FormatBool(v);
+                case Guid v:
+                    return FormatGuid(v);
+                case DateTime v:
+                    return FormatDateTime(v);
+                case DateTimeOffset v:
+                    return FormatDateTimeOffset(v);
+                case double v:
+                    return FormatDouble(v);
+                case float v:
+                    return FormatFloat(v);
+                case Enum v:
+                    return FormatEnum(v);
+                case decimal v:
+                    return FormatDecimal(v);
+                case RawSql v:
+                    return v.Value;
+                case byte[] v:
+                    return FormatByteArray(v);
+                case TimeSpan v:
+                    return FromTimeSpan(v);
             }
 
-            if (value is char) { return FormatChar((char)value); }
-            if (value is bool) { return FormatBool((bool)value); }
-            if (value is Guid) { return FormatGuid((Guid)value); }
-            if (value is DateTime) { return FormatDateTime((DateTime)value); }
-            if (value is DateTimeOffset) { return FormatDateTimeOffset((DateTimeOffset)value); }
-            if (value.GetType().IsEnum) { return FormatEnum(value); }
-            if (value is double) {return FormatDouble((double)value);}
-            if (value is float) {return FormatFloat((float)value);}
-            if (value is decimal) { return FormatDecimal((decimal)value); }
-            if (value is RawSql) { return ((RawSql) value).Value; }
-            if (value is byte[]) { return FormatByteArray((byte[])value); }
-            if (value is TimeSpan) { return FromTimeSpan((TimeSpan)value); }
-            
             return value.ToString();
         }
 
@@ -69,9 +99,19 @@ namespace FluentMigrator.Runner.Generators.Generic
             return "NULL";
         }
 
-        public virtual string FormatString(string value)
+        public virtual string FormatAnsiString(string value)
         {
             return ValueQuote + value.Replace(ValueQuote, EscapeValueQuote) + ValueQuote;
+        }
+
+        public virtual string FormatNationalString(string value)
+        {
+            return ValueQuote + value.Replace(ValueQuote, EscapeValueQuote) + ValueQuote;
+        }
+
+        public virtual string FormatSystemMethods(SystemMethods value)
+        {
+            throw new NotSupportedException($"The system method {value} is not supported.");
         }
 
         public virtual string FormatChar(char value)
@@ -94,7 +134,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             return ValueQuote + (value).ToString("yyyy-MM-ddTHH:mm:ss",CultureInfo.InvariantCulture) + ValueQuote;
         }
 
-        public virtual string FormatDateTimeOffset(DateTimeOffset value) 
+        public virtual string FormatDateTimeOffset(DateTimeOffset value)
         {
             return ValueQuote + (value).ToString("yyyy-MM-ddTHH:mm:ss zzz", CultureInfo.InvariantCulture) + ValueQuote;
         }
@@ -113,12 +153,12 @@ namespace FluentMigrator.Runner.Generators.Generic
         /// <summary>
         /// Returns the opening quote identifier - " is the standard according to the specification
         /// </summary>
-        public virtual string OpenQuote { get { return "\""; } }
+        public virtual string OpenQuote => "\"";
 
         /// <summary>
         /// Returns the closing quote identifier - " is the standard according to the specification
         /// </summary>
-        public virtual string CloseQuote { get { return "\""; } }
+        public virtual string CloseQuote => "\"";
 
         public virtual string OpenQuoteEscapeString { get { return OpenQuote.PadRight(2, OpenQuote.ToCharArray()[0]); } }
         public virtual string CloseQuoteEscapeString { get { return CloseQuote.PadRight(2, CloseQuote.ToCharArray()[0]); } }
@@ -131,7 +171,7 @@ namespace FluentMigrator.Runner.Generators.Generic
             if (String.IsNullOrEmpty(name)) return false;
             //This can return true incorrectly in some cases edge cases.
             //If a string say [myname]] is passed in this is not correctly quote for MSSQL but this function will
-            //return true. 
+            //return true.
             return (name.StartsWith(OpenQuote) && name.EndsWith(CloseQuote));
         }
 

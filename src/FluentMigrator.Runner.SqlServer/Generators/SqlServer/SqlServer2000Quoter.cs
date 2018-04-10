@@ -20,7 +20,7 @@ using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
-    public class SqlServerQuoter : GenericQuoter
+    public class SqlServer2000Quoter : GenericQuoter
     {
         public override string OpenQuote { get { return "["; } }
 
@@ -35,29 +35,29 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return (string.IsNullOrEmpty(schemaName)) ? "[dbo]" : Quote(schemaName);
         }
 
-        public override string QuoteValue(object value)
+        public override string FormatNationalString(string value)
         {
-            if (value != null && value is ExplicitUnicodeString)
+            return $"N{FormatAnsiString(value)}";
+        }
+
+        public override string FormatSystemMethods(SystemMethods value)
+        {
+            switch (value)
             {
-                return string.Format("N{0}", FormatString(value.ToString()));
+                case SystemMethods.NewGuid:
+                    return "NEWID()";
+                case SystemMethods.NewSequentialId:
+                    return "NEWSEQUENTIALID()";
+                case SystemMethods.CurrentDateTime:
+                    return "GETDATE()";
+                case SystemMethods.CurrentDateTimeOffset:
+                case SystemMethods.CurrentUTCDateTime:
+                    return "GETUTCDATE()";
+                case SystemMethods.CurrentUser:
+                    return "CURRENT_USER";
             }
 
-            if (value != null && value is SystemMethods)
-            {
-                switch ((SystemMethods)value)
-                {
-                    case SystemMethods.NewGuid:
-                        return "NEWID()";
-                    case SystemMethods.NewSequentialId:
-                        return "NEWSEQUENTIALID()";
-                    case SystemMethods.CurrentDateTime:
-                        return "GETDATE()";
-                    case SystemMethods.CurrentUTCDateTime:
-                        return "GETUTCDATE()";
-                }
-            }
-
-            return base.QuoteValue(value);
+            return base.FormatSystemMethods(value);
         }
     }
 }

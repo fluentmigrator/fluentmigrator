@@ -1,5 +1,9 @@
-﻿namespace FluentMigrator.Tests.Unit.Generators
+using NUnit.Framework;
+
+namespace FluentMigrator.Tests.Unit.Generators
 {
+    [Category("Generator")]
+    [Category("Table")]
     public abstract class BaseTableTests
     {
         public abstract void CanCreateTableWithCustomColumnTypeWithCustomSchema();

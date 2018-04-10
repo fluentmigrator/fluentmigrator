@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Expressions;
+using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.DB2;
 using NUnit.Framework;
@@ -77,6 +77,21 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
         }
 
         [Test]
+        public void NonUnicodeQuotesCorrectly()
+        {
+            var expression = new InsertDataExpression { TableName = "TestTable" };
+            expression.Rows.Add(new InsertionDataDefinition
+            {
+                new KeyValuePair<string, object>("NormalString", "Just'in"),
+                new KeyValuePair<string, object>("UnicodeString", new NonUnicodeString("codethinked'.com"))
+            });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("INSERT INTO TestTable (NormalString, UnicodeString) VALUES ('Just''in', 'codethinked''.com')");
+        }
+
+        [Test]
+        [Obsolete]
         public void ExplicitUnicodeStringIgnoredForNonSqlServer()
         {
             var expression = new InsertDataExpression { TableName = "TestTable" };

@@ -89,7 +89,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
 
             string expected = "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DROP DEFAULT;" + Environment.NewLine +
             "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
-            "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DEFAULT 'TestString';";
+            "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DEFAULT N'TestString';";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);

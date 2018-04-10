@@ -20,7 +20,7 @@ namespace FluentMigrator.Tests.Helpers
         public SqlServerCeTestTable(string table, SqlServerCeProcessor processor, params string[] columnDefinitions)
         {
             Connection = (SqlCeConnection)processor.Connection;
-            Quoter = new SqlServerQuoter();
+            Quoter = new SqlServer2000Quoter();
 
             Name = table;
             Create(columnDefinitions);
@@ -29,7 +29,7 @@ namespace FluentMigrator.Tests.Helpers
         public SqlServerCeTestTable(SqlServerCeProcessor processor, params string[] columnDefinitions)
         {
             Connection = (SqlCeConnection)processor.Connection;
-            Quoter = new SqlServerQuoter();
+            Quoter = new SqlServer2000Quoter();
 
             Name = "TestTable";
             Create(columnDefinitions);

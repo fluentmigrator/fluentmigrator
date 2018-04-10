@@ -1,5 +1,5 @@
 #region License
-// Copyright (c) 2018, Fluent Migrator Project
+// Copyright (c) 2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,33 +14,36 @@
 // limitations under the License.
 #endregion
 
-using System;
-
 namespace FluentMigrator
 {
     /// <summary>
-    /// Insert text with unicode data. Primarily for Sql Server, it prefixes the string with 'N
+    /// An explicitly non-Unicode string literal ('some string' in T-SQL)
     /// </summary>
-    [Obsolete("Use normal CLR strings instead, as they will be formatted to SQL Server Unicode strings")]
-    public class ExplicitUnicodeString
+    public class NonUnicodeString
     {
         /// <summary>
-        /// Gets the text of the unicode string literal
+        /// Gets the value of the non-Unicode string literal
         /// </summary>
-        public string Text { get; set; }
+        public string Value { get; }
 
         /// <summary>
-        /// Insert text with unicode data. Primarily for Sql Server, it prefixes the string with 'N
+        /// Used for explicitly creating a non-Unicode string literal in Transact SQL
         /// </summary>
-        /// <param name="text">Unicode string</param>
-        public ExplicitUnicodeString(string text)
+        /// <param name="value">The value of the non-Unicode string literal</param>
+        public NonUnicodeString(string value)
         {
-            Text = text;
+            Value = value;
         }
 
+        /// <summary>
+        /// Overrides ToString() to return the value.
+        /// </summary>
+        /// <returns>
+        /// The value of the non-Unicode string literal.
+        /// </returns>
         public override string ToString()
         {
-            return Text;
+            return Value;
         }
     }
 }

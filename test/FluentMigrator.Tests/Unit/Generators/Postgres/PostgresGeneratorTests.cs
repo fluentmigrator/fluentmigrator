@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using FluentMigrator.Expressions;
@@ -87,14 +88,29 @@ namespace FluentMigrator.Tests.Unit.Generators.Postgres
         }
 
         [Test]
-        public void ExplicitUnicodeStringIgnoredForNonSqlServer()
+        public void NonUnicodeQuotesCorrectly()
         {
             var expression = new InsertDataExpression {TableName = "TestTable"};
             expression.Rows.Add(new InsertionDataDefinition
                                     {
                                         new KeyValuePair<string, object>("NormalString", "Just'in"),
-                                        new KeyValuePair<string, object>("UnicodeString", new ExplicitUnicodeString("codethinked'.com"))
+                                        new KeyValuePair<string, object>("UnicodeString", new NonUnicodeString("codethinked'.com"))
                                     });
+
+            var result = Generator.Generate(expression);
+            result.ShouldBe("INSERT INTO \"public\".\"TestTable\" (\"NormalString\",\"UnicodeString\") VALUES ('Just''in','codethinked''.com');");
+        }
+
+        [Test]
+        [Obsolete]
+        public void ExplicitUnicodeStringIgnoredForNonSqlServer()
+        {
+            var expression = new InsertDataExpression { TableName = "TestTable" };
+            expression.Rows.Add(new InsertionDataDefinition
+            {
+                new KeyValuePair<string, object>("NormalString", "Just'in"),
+                new KeyValuePair<string, object>("UnicodeString", new ExplicitUnicodeString("codethinked'.com"))
+            });
 
             var result = Generator.Generate(expression);
             result.ShouldBe("INSERT INTO \"public\".\"TestTable\" (\"NormalString\",\"UnicodeString\") VALUES ('Just''in','codethinked''.com');");

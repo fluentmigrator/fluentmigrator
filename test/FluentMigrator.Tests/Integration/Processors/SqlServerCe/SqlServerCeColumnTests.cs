@@ -34,7 +34,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             RecreateDatabase();
             Connection = new SqlCeConnection(IntegrationTestOptions.SqlServerCe.ConnectionString);
             Processor = new SqlServerCeProcessor(Connection, new SqlServerCeGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerCeDbFactory());
-            Quoter = new SqlServerQuoter();
+            Quoter = new SqlServer2000Quoter();
             Connection.Open();
             Processor.BeginTransaction();
         }

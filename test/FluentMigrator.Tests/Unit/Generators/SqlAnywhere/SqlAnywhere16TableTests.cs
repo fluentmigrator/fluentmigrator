@@ -98,7 +98,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL DEFAULT 'Default', [TestColumn2] INTEGER NOT NULL DEFAULT 0)");
+            result.ShouldBe("CREATE TABLE [TestSchema].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL DEFAULT N'Default', [TestColumn2] INTEGER NOT NULL DEFAULT 0)");
         }
 
         [Test]
@@ -108,7 +108,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             var expression = GeneratorTestHelper.GetCreateTableWithDefaultValue();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL DEFAULT 'Default', [TestColumn2] INTEGER NOT NULL DEFAULT 0)");
+            result.ShouldBe("CREATE TABLE [dbo].[TestTable1] ([TestColumn1] NVARCHAR(255) NOT NULL DEFAULT N'Default', [TestColumn2] INTEGER NOT NULL DEFAULT 0)");
         }
 
         [Test]

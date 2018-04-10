@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2007-2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.Data;
 
@@ -70,6 +71,21 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
         }
 
         [Test]
+        public void NonUnicodeQuotesCorrectly()
+        {
+            var expression = new InsertDataExpression { TableName = "TestTable" };
+            expression.Rows.Add(new InsertionDataDefinition
+            {
+                new KeyValuePair<string, object>("NormalString", "Just'in"),
+                new KeyValuePair<string, object>("UnicodeString", new NonUnicodeString("codethinked'.com"))
+            });
+
+            var result = _generator.Generate(expression);
+            result.ShouldBe("INSERT INTO \"public\".\"TestTable\" (\"NormalString\",\"UnicodeString\") VALUES ('Just''in','codethinked''.com');");
+        }
+
+        [Test]
+        [Obsolete]
         public void ExplicitUnicodeStringIgnoredForNonSqlServer()
         {
             var expression = new InsertDataExpression {TableName = "TestTable"};
