@@ -20,12 +20,18 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
+using JetBrains.Annotations;
+
 namespace FluentMigrator.Runner.Infrastructure
 {
     public interface IHostAbstraction
     {
         string BaseDirectory { get; }
-        object CreateInstance(IServiceProvider serviceProvider, string assemblyName, string typeName);
+
+        [NotNull]
+        object CreateInstance([CanBeNull] IServiceProvider serviceProvider, [NotNull] string assemblyName, [NotNull] string typeName);
+
+        [NotNull, ItemNotNull]
         IEnumerable<Assembly> GetLoadedAssemblies();
     }
 }
