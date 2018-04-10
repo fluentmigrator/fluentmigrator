@@ -309,7 +309,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("sp_rename '[TestSchema].[TestTable1]', 'TestTable2'");
+            result.ShouldBe("sp_rename N'[TestSchema].[TestTable1]', N'TestTable2'");
         }
 
         [Test]
@@ -318,7 +318,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2005
             var expression = GeneratorTestHelper.GetRenameTableExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("sp_rename '[dbo].[TestTable1]', 'TestTable2'");
+            result.ShouldBe("sp_rename N'[dbo].[TestTable1]', N'TestTable2'");
         }
     }
 }

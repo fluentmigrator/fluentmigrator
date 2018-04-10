@@ -91,7 +91,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("CREATE COLUMN TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR(255) DEFAULT 'Default', \"TestColumn2\" INTEGER DEFAULT 0);");
+            result.ShouldBe("CREATE COLUMN TABLE \"TestTable1\" (\"TestColumn1\" NVARCHAR(255) DEFAULT N'Default', \"TestColumn2\" INTEGER DEFAULT 0);");
         }
 
         [Test]

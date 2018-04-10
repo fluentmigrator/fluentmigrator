@@ -63,7 +63,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
                                     });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([Id], [Name], [Website]) VALUES (1, SCOPE_IDENTITY(), 'codethinked.com')");
+            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([Id], [Name], [Website]) VALUES (1, SCOPE_IDENTITY(), N'codethinked.com')");
         }
 
         [Test]
@@ -78,7 +78,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2008
                                     });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([Id], [Name], [Website]) VALUES (1, @@IDENTITY, 'codethinked.com')");
+            result.ShouldBe("INSERT INTO [dbo].[TestTable] ([Id], [Name], [Website]) VALUES (1, @@IDENTITY, N'codethinked.com')");
         }
 
         [Test]

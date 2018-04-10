@@ -172,8 +172,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             expression.AdditionalFeatures.Add(SqlServerExtensions.IdentityInsert, true);
 
             var expected = "SET IDENTITY_INSERT [TestTable1] ON;";
-            expected += " INSERT INTO [TestTable1] ([Id], [Name], [Website]) VALUES (1, N'Just''in', 'codethinked.com');";
-            expected += @" INSERT INTO [TestTable1] ([Id], [Name], [Website]) VALUES (2, N'Na\te', 'kohari.org');";
+            expected += " INSERT INTO [TestTable1] ([Id], [Name], [Website]) VALUES (1, N'Just''in', N'codethinked.com');";
+            expected += @" INSERT INTO [TestTable1] ([Id], [Name], [Website]) VALUES (2, N'Na\te', N'kohari.org');";
             expected += " SET IDENTITY_INSERT [TestTable1] OFF";
 
             var result = Generator.Generate(expression);
@@ -188,8 +188,8 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlServer2000
             Generator.compatabilityMode = Runner.CompatabilityMode.STRICT;
 
             var expected = "SET IDENTITY_INSERT [TestTable1] ON;";
-            expected += " INSERT INTO [TestTable1] ([Id], [Name], [Website]) VALUES (1, N'Just''in', 'codethinked.com');";
-            expected += @" INSERT INTO [TestTable1] ([Id], [Name], [Website]) VALUES (2, N'Na\te', 'kohari.org');";
+            expected += " INSERT INTO [TestTable1] ([Id], [Name], [Website]) VALUES (1, N'Just''in', N'codethinked.com');";
+            expected += @" INSERT INTO [TestTable1] ([Id], [Name], [Website]) VALUES (2, N'Na\te', N'kohari.org');";
             expected += " SET IDENTITY_INSERT [TestTable1] OFF";
 
             var result = Generator.Generate(expression);
