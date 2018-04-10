@@ -138,7 +138,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public virtual string FormatDateTimeOffset(DateTimeOffset value)
         {
-            return ValueQuote + (value).ToString("yyyy-MM-ddTHH:mm:ss zzz", CultureInfo.InvariantCulture) + ValueQuote;
+            return ValueQuote + (value).ToString("yyyy-MM-ddTHH:mm:sszzz", CultureInfo.InvariantCulture) + ValueQuote;
         }
 
         public virtual string FormatEnum(object value)

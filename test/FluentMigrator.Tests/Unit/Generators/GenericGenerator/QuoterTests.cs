@@ -131,8 +131,8 @@ namespace FluentMigrator.Tests.Unit.Generators
             DateTime date = new DateTime(2010, 1, 2, 18, 4, 5, 123);
             quoter.QuoteValue(date)
                 .ShouldBe("'2010-01-02T18:04:05'");
-        } 
-        
+        }
+
         [Test]
         public void DateTimeIsFormattedIso8601WithQuotes_WithItalyAsCulture()
         {
@@ -143,20 +143,20 @@ namespace FluentMigrator.Tests.Unit.Generators
         }
 
         [Test]
-        public void DateTimeOffsetIsFormattedIso8601WithQuotes() 
+        public void DateTimeOffsetIsFormattedIso8601WithQuotes()
         {
             ChangeCulture();
             DateTimeOffset date = new DateTimeOffset(2010, 1, 2, 18, 4, 5, 123, TimeSpan.FromHours(-4));
-            quoter.QuoteValue(date).ShouldBe("'2010-01-02T18:04:05 -04:00'");
+            quoter.QuoteValue(date).ShouldBe("'2010-01-02T18:04:05-04:00'");
         }
 
         [Test]
-        public void DateTimeOffsetIsFormattedIso8601WithQuotes_WithItalyAsCulture() 
+        public void DateTimeOffsetIsFormattedIso8601WithQuotes_WithItalyAsCulture()
         {
             Thread.CurrentThread.CurrentCulture = new CultureInfo("it-IT");
             DateTimeOffset date = new DateTimeOffset(2010, 1, 2, 18, 4, 5, 123, TimeSpan.FromHours(-4));
             quoter.QuoteValue(date)
-                .ShouldBe("'2010-01-02T18:04:05 -04:00'");
+                .ShouldBe("'2010-01-02T18:04:05-04:00'");
         }
 
         [Test]
