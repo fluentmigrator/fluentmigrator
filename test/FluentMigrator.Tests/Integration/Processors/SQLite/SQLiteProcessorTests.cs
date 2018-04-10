@@ -50,7 +50,7 @@ namespace FluentMigrator.Tests.Integration.Processors.SQLite
         {
             // This connection used in the tests
             _dbFactory = new SQLiteDbFactory();
-            _connection = _dbFactory.CreateConnection("Data Source=:memory:;Version=3;New=True;");
+            _connection = _dbFactory.CreateConnection(IntegrationTestOptions.SqlLite.ConnectionString);
             _connection.Open();
             _command = _connection.CreateCommand();
 
