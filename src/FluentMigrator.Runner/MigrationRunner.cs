@@ -308,6 +308,15 @@ namespace FluentMigrator.Runner
                 {
                     try
                     {
+                        if (migrationInfo.IsAttributed() && migrationInfo.IsBreakingChange &&
+                            !RunnerContext.PreviewOnly && !RunnerContext.AllowBreakingChange)
+                        {
+                            throw new InvalidOperationException(
+                                string.Format(
+                                    "The migration {0} is identified as a breaking change, and will not be executed unless the necessary flag (allow-breaking-changes|abc) is passed to the runner.",
+                                    migrationInfo.GetName()));
+                        }
+
                         ExecuteMigration(migrationInfo.Migration, (m, c) => m.GetUpExpressions(c));
 
                         if (migrationInfo.IsAttributed())
@@ -547,28 +556,68 @@ namespace FluentMigrator.Runner
 
         public void ListMigrations()
         {
-            IVersionInfo currentVersionInfo = this.VersionLoader.VersionInfo;
-            long currentVersion = currentVersionInfo.Latest();
+            var currentVersionInfo = this.VersionLoader.VersionInfo;
+            var currentVersion = currentVersionInfo.Latest();
 
             _announcer.Heading("Migrations");
 
-            foreach(KeyValuePair<long, IMigrationInfo> migration in MigrationLoader.LoadMigrations())
+            foreach(var migration in MigrationLoader.LoadMigrations())
             {
-                string migrationName = migration.Value.GetName();
-                bool isCurrent = migration.Key == currentVersion;
-                bool isApplied = VersionLoader.VersionInfo.HasAppliedMigration(migration.Value.Version);
-                var status =
-                    isCurrent ? " (current)" :
-                    isApplied ? string.Empty : " (not applied)";
-                string message = string.Format("{0}{1}",
-                                                migrationName,
-                                                status);
+                var migrationName = migration.Value.GetName();
+                var status = GetStatus(migration, currentVersion);
+                var statusString = string.Join(", ", GetStatusStrings(status));
+                var message = $"{migrationName}{(string.IsNullOrEmpty(statusString) ? string.Empty : $" ({statusString})")}";
 
-                if(isCurrent)
+                var isCurrent = (status & MigrationStatus.AppliedMask) == MigrationStatus.Current;
+                var isBreaking = (status & MigrationStatus.Breaking) == MigrationStatus.Breaking;
+                if(isCurrent || isBreaking)
                     _announcer.Emphasize(message);
                 else
                     _announcer.Say(message);
             }
+        }
+
+        private IEnumerable<string> GetStatusStrings(MigrationStatus status)
+        {
+            switch (status & MigrationStatus.AppliedMask)
+            {
+                case MigrationStatus.Applied:
+                    break;
+                case MigrationStatus.Current:
+                    yield return "current";
+                    break;
+                default:
+                    yield return "not applied";
+                    break;
+            }
+
+            if ((status & MigrationStatus.Breaking) == MigrationStatus.Breaking)
+                yield return "BREAKING";
+        }
+
+        private MigrationStatus GetStatus(KeyValuePair<long, IMigrationInfo> migration, long currentVersion)
+        {
+            MigrationStatus status;
+
+            if (migration.Key == currentVersion)
+            {
+                status = MigrationStatus.Current;
+            }
+            else if (VersionLoader.VersionInfo.HasAppliedMigration(migration.Value.Version))
+            {
+                status = MigrationStatus.Applied;
+            }
+            else
+            {
+                status = MigrationStatus.NotApplied;
+            }
+
+            if (migration.Value.IsBreakingChange)
+            {
+                status |= MigrationStatus.Breaking;
+            }
+
+            return status;
         }
 
         private bool MigrationVersionLessThanGreatestAppliedMigration(long version)
@@ -579,6 +628,16 @@ namespace FluentMigrator.Runner
         public IMigrationScope BeginScope()
         {
             return _migrationScopeHandler.BeginScope();
+        }
+
+        [Flags]
+        private enum MigrationStatus
+        {
+            Applied = 0,
+            Current = 1,
+            NotApplied = 2,
+            AppliedMask = 3,
+            Breaking = 4,
         }
     }
 }

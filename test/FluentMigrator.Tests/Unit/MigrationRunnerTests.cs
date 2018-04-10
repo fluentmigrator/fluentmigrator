@@ -569,10 +569,12 @@ namespace FluentMigrator.Tests.Unit
             const long version1 = 2011010101;
             const long version2 = 2011010102;
             const long version3 = 2011010103;
+            const long version4 = 2011010104;
 
             var mockMigration1 = new Mock<IMigration>();
             var mockMigration2 = new Mock<IMigration>();
             var mockMigration3 = new Mock<IMigration>();
+            var mockMigration4 = new Mock<IMigration>();
 
             LoadVersionData(version1, version3);
 
@@ -580,12 +582,14 @@ namespace FluentMigrator.Tests.Unit
             _migrationList.Add(version1, new MigrationInfo(version1, TransactionBehavior.Default, mockMigration1.Object));
             _migrationList.Add(version2, new MigrationInfo(version2, TransactionBehavior.Default, mockMigration2.Object));
             _migrationList.Add(version3, new MigrationInfo(version3, TransactionBehavior.Default, mockMigration3.Object));
+            _migrationList.Add(version4, new MigrationInfo(version4, TransactionBehavior.Default, true, mockMigration4.Object));
 
             _runner.ListMigrations();
 
             _announcer.Verify(a => a.Say("2011010101: IMigrationProxy"));
             _announcer.Verify(a => a.Say("2011010102: IMigrationProxy (not applied)"));
             _announcer.Verify(a => a.Emphasize("2011010103: IMigrationProxy (current)"));
+            _announcer.Verify(a => a.Emphasize("2011010104: IMigrationProxy (not applied, BREAKING)"));
         }
 
         [Test]
@@ -652,6 +656,42 @@ namespace FluentMigrator.Tests.Unit
             var runner = new MigrationRunner(asm, _runnerContextMock.Object, processorMock.Object);
 
             Assert.That(runner.Conventions, Is.TypeOf<MigrationRunnerConventions>());
+        }
+
+        [Test]
+        public void CanBlockBreakingChangesByDefault()
+        {
+            InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() =>
+                _runner.ApplyMigrationUp(
+                    new MigrationInfo(7, TransactionBehavior.Default, true, new TestBreakingMigration()), true));
+
+            Assert.NotNull(ex);
+
+            Assert.AreEqual(
+                "The migration 7: TestBreakingMigration is identified as a breaking change, and will not be executed unless the necessary flag (allow-breaking-changes|abc) is passed to the runner.",
+                ex.Message);
+        }
+
+        [Test]
+        public void CanRunBreakingChangesIfSpecified()
+        {
+            _runnerContextMock.SetupGet(rcm => rcm.AllowBreakingChange).Returns(true);
+
+            Assert.DoesNotThrow(() =>
+                _runner.ApplyMigrationUp(
+                    new MigrationInfo(7, TransactionBehavior.Default, true, new TestBreakingMigration()), true));
+        }
+
+        [Test]
+        public void CanRunBreakingChangesInPreview()
+        {
+            _runnerContextMock.SetupGet(rcm => rcm.PreviewOnly).Returns(true);
+
+            _runnerContextMock.SetupGet(rcm => rcm.AllowBreakingChange).Returns(true);
+
+            Assert.DoesNotThrow(() =>
+                _runner.ApplyMigrationUp(
+                    new MigrationInfo(7, TransactionBehavior.Default, true, new TestBreakingMigration()), true));
         }
 
         public class CustomMigrationConventions : MigrationRunnerConventions

@@ -26,17 +26,28 @@ namespace FluentMigrator.Infrastructure
         private Lazy<IMigration> _lazyMigration;
 
         public MigrationInfo(long version, TransactionBehavior transactionBehavior, IMigration migration)
-            : this(version, null, transactionBehavior, () => migration)
+            : this(version, null, transactionBehavior, false, () => migration)
         {
         }
 
-        public MigrationInfo(long version, string description, TransactionBehavior transactionBehavior, Func<IMigration> migrationFunc)
+        public MigrationInfo(long version, TransactionBehavior transactionBehavior, bool isBreakingChange, IMigration migration)
+            : this(version, null, transactionBehavior, isBreakingChange, () => migration)
         {
-            if (migrationFunc == null) throw new ArgumentNullException("migrationFunc");
+        }
+
+        public MigrationInfo(
+            long version,
+            string description,
+            TransactionBehavior transactionBehavior,
+            bool isBreakingChange,
+            Func<IMigration> migrationFunc)
+        {
+            if (migrationFunc == null) throw new ArgumentNullException(nameof(migrationFunc));
 
             Version = version;
             Description = description;
             TransactionBehavior = transactionBehavior;
+            IsBreakingChange = isBreakingChange;
             _lazyMigration = new Lazy<IMigration>(migrationFunc);
         }
 
@@ -50,6 +61,7 @@ namespace FluentMigrator.Infrastructure
                 return _lazyMigration.Value;
             }
         }
+        public bool IsBreakingChange { get; }
 
         public object Trait(string name)
         {

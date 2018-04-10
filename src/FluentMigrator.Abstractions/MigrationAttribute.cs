@@ -40,5 +40,6 @@ namespace FluentMigrator
         public long Version { get; }
         public TransactionBehavior TransactionBehavior { get; }
         public string Description { get; }
+        public bool BreakingChange { get; set; }
     }
 }

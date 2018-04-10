@@ -44,6 +44,8 @@ namespace FluentMigrator.Infrastructure
 
         public IMigration Migration { get; private set; }
 
+        public bool IsBreakingChange => false;
+
         public object Trait(string name)
         {
             return null;
