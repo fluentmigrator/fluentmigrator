@@ -1,3 +1,4 @@
+using System;
 using System.Data.SqlServerCe;
 using System.IO;
 using FluentMigrator.Runner.Announcers;
@@ -16,6 +17,8 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
     [Category("SqlServerCe")]
     public class SqlServerCeColumnTests : BaseColumnTests
     {
+        private string _tempDataDirectory;
+
         public string DatabaseFilename { get; set; }
         public SqlCeConnection Connection { get; set; }
         public SqlServerCeProcessor Processor { get; set; }
@@ -28,6 +31,10 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
             {
                 Assert.Ignore("SQL Server CE binaries not found");
             }
+
+            _tempDataDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(_tempDataDirectory);
+            AppDomain.CurrentDomain.SetData("DataDirectory", _tempDataDirectory);
 
             var csb = new SqlCeConnectionStringBuilder(IntegrationTestOptions.SqlServerCe.ConnectionString);
             DatabaseFilename = HostUtilities.ReplaceDataDirectory(csb.DataSource);
@@ -44,8 +51,14 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         {
             if (Processor == null)
                 return;
+
             Processor.CommitTransaction();
             Processor.Dispose();
+
+            if (!string.IsNullOrEmpty(_tempDataDirectory) && Directory.Exists(_tempDataDirectory))
+            {
+                Directory.Delete(_tempDataDirectory, true);
+            }
         }
 
         private void RecreateDatabase()
