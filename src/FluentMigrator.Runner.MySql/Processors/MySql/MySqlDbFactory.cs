@@ -25,14 +25,5 @@ namespace FluentMigrator.Runner.Processors.MySql
             : base("MySql.Data", "MySql.Data.MySqlClient.MySqlClientFactory")
         {
         }
-
-        public override IDbDataAdapter CreateDataAdapter(IDbCommand command)
-        {
-            var dataAdapter =
-                Factory.CreateDataAdapter()
-             ?? (IDbDataAdapter)Activator.CreateInstance(Factory.GetType().Assembly.GetType("MySql.Data.MySqlClient.MySqlDataAdapter"));
-            dataAdapter.SelectCommand = command;
-            return dataAdapter;
-        }
     }
 }

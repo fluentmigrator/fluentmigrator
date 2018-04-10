@@ -74,14 +74,6 @@ namespace FluentMigrator.Runner.Processors
             return command;
         }
 
-        public virtual IDbDataAdapter CreateDataAdapter(IDbCommand command)
-        {
-            IDbDataAdapter dataAdapter = Factory.CreateDataAdapter();
-            Debug.Assert(dataAdapter != null, nameof(dataAdapter) + " != null");
-            dataAdapter.SelectCommand = command;
-            return dataAdapter;
-        }
-
         #endregion
     }
 }
