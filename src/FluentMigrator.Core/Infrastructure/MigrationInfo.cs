@@ -17,14 +17,13 @@
 #endregion
 using System;
 using System.Collections.Generic;
-using FluentMigrator.Helpers;
 
 namespace FluentMigrator.Infrastructure
 {
     public class MigrationInfo : IMigrationInfo
     {
         private readonly Dictionary<string, object> _traits = new Dictionary<string, object>();
-        private LazyLoader<IMigration> _lazyMigration;
+        private Lazy<IMigration> _lazyMigration;
 
         public MigrationInfo(long version, TransactionBehavior transactionBehavior, IMigration migration)
             : this(version, null, transactionBehavior, () => migration)
@@ -38,7 +37,7 @@ namespace FluentMigrator.Infrastructure
             Version = version;
             Description = description;
             TransactionBehavior = transactionBehavior;
-            _lazyMigration = new LazyLoader<IMigration>(migrationFunc);
+            _lazyMigration = new Lazy<IMigration>(migrationFunc);
         }
 
         public long Version { get; private set; }
