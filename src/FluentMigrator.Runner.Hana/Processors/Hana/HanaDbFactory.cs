@@ -1,12 +1,10 @@
-﻿using System.Data.Common;
-
-namespace FluentMigrator.Runner.Processors.Hana
+﻿namespace FluentMigrator.Runner.Processors.Hana
 {
-    public class HanaDbFactory : DbFactoryBase
+    public class HanaDbFactory : ReflectionBasedDbFactory
     {
-        protected override DbProviderFactory CreateFactory()
+        public HanaDbFactory()
+            : base("Sap.Data.Hana", "Sap.Data.Hana.HanaFactory")
         {
-            return DbProviderFactories.GetFactory("Sap.Data.Hana");
         }
     }
 }

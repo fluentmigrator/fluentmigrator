@@ -25,6 +25,7 @@ using FluentMigrator.Runner.Infrastructure;
 using FluentMigrator.Runner.Processors.DB2;
 using FluentMigrator.Runner.Processors.DotConnectOracle;
 using FluentMigrator.Runner.Processors.Firebird;
+using FluentMigrator.Runner.Processors.Hana;
 using FluentMigrator.Runner.Processors.MySql;
 using FluentMigrator.Runner.Processors.Oracle;
 using FluentMigrator.Runner.Processors.Postgres;
@@ -64,9 +65,9 @@ namespace FluentMigrator.Runner.Processors
             Register(new SqlServerProcessorFactory());
             Register(new SqlServerCeProcessorFactory());
             Register(new SqlAnywhere16ProcessorFactory());
+            Register(new HanaProcessorFactory());
 
 #if NETFRAMEWORK
-            Register(new Hana.HanaProcessorFactory());
             Register(new Jet.JetProcessorFactory());
 #endif
         }
