@@ -34,7 +34,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
         public const int RawCapacity = 2000;
         public const int UnicodeStringCapacity = 4000;
         public const int UnicodeTextCapacity = int.MaxValue;
-        
+
         protected override void SetupTypeMaps()
         {
             SetTypeMap(DbType.AnsiStringFixedLength, "CHAR(255 CHAR)");
