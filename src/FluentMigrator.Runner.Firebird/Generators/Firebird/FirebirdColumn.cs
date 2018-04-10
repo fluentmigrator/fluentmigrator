@@ -25,19 +25,6 @@ namespace FluentMigrator.Runner.Generators.Firebird
            return string.Empty;
         }
 
-        protected override string FormatSystemMethods(SystemMethods systemMethod)
-        {
-            switch (systemMethod)
-            {
-                case SystemMethods.NewGuid:
-                    return "gen_uuid()";
-                case SystemMethods.CurrentDateTime:
-                    return "CURRENT_TIMESTAMP";
-            }
-
-            throw new NotImplementedException();
-        }
-
         protected override string GetPrimaryKeyConstraintName(IEnumerable<ColumnDefinition> primaryKeyColumns, string tableName)
         {
             string primaryKeyName = primaryKeyColumns.Select(x => x.PrimaryKeyName).FirstOrDefault();

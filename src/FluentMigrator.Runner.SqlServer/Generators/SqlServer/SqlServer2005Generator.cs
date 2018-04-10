@@ -39,13 +39,15 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             SqlServerExtensions.RowGuidColumn,
         };
 
+        private static readonly IQuoter _quoter = new SqlServer2000Quoter();
+
         public SqlServer2005Generator()
-            : base(new SqlServer2005Column(new SqlServer2005TypeMap()), new SqlServer2005DescriptionGenerator())
+            : base(new SqlServer2005Column(new SqlServer2005TypeMap(), _quoter), _quoter, new SqlServer2005DescriptionGenerator())
         {
         }
 
-        protected SqlServer2005Generator(IColumn column, IDescriptionGenerator descriptionGenerator)
-            : base(column, descriptionGenerator)
+        protected SqlServer2005Generator(IColumn column, IQuoter quoter, IDescriptionGenerator descriptionGenerator)
+            : base(column, quoter, descriptionGenerator)
         {
         }
 

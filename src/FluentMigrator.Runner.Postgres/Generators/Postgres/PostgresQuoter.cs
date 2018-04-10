@@ -1,4 +1,21 @@
+#region License
+// Copyright (c) 2018, Fluent Migrator Project
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+// http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+#endregion
+
 using System.Linq;
+
 using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.Postgres
@@ -26,6 +43,26 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 return "public";
 
             return UnQuote(quoted);
+        }
+
+        public override string FormatSystemMethods(SystemMethods value)
+        {
+            switch (value)
+            {
+                case SystemMethods.NewGuid:
+                    //need to run the script share/contrib/uuid-ossp.sql to install the uuid_generate4 function
+                    return "uuid_generate_v4()";
+                case SystemMethods.NewSequentialId:
+                    return "uuid_generate_v1()";
+                case SystemMethods.CurrentDateTime:
+                    return "now()";
+                case SystemMethods.CurrentUTCDateTime:
+                    return "(now() at time zone 'UTC')";
+                case SystemMethods.CurrentUser:
+                    return "current_user";
+            }
+
+            return base.FormatSystemMethods(value);
         }
     }
 }

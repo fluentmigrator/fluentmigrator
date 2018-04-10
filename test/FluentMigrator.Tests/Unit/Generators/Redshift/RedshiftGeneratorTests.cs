@@ -67,7 +67,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var expression = new CreateColumnExpression { Column = columnDefinition, TableName = tableName };
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"public\".\"NewTable\" ADD \"NewColumn\" varchar(5) NOT NULL DEFAULT (now() at time zone 'UTC');");
+            result.ShouldBe("ALTER TABLE \"public\".\"NewTable\" ADD \"NewColumn\" varchar(5) NOT NULL DEFAULT (SYSDATE at time zone 'UTC');");
         }
 
         [Test]
@@ -160,7 +160,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             expression.SchemaName = "TestSchema";
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ALTER \"TestColumn1\" DROP DEFAULT, ALTER \"TestColumn1\" SET DEFAULT now();");
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ALTER \"TestColumn1\" DROP DEFAULT, ALTER \"TestColumn1\" SET DEFAULT SYSDATE;");
         }
 
         [Test]
@@ -171,7 +171,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             expression.SchemaName = "TestSchema";
 
             var result = _generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ALTER \"TestColumn1\" DROP DEFAULT, ALTER \"TestColumn1\" SET DEFAULT (now() at time zone 'UTC');");
+            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" ALTER \"TestColumn1\" DROP DEFAULT, ALTER \"TestColumn1\" SET DEFAULT (SYSDATE at time zone 'UTC');");
         }
 
         [Test]

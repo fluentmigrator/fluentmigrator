@@ -74,32 +74,10 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             return "DEFAULT AUTOINCREMENT";
         }
 
-        protected override string FormatSystemMethods(SystemMethods systemMethod)
-        {
-            switch (systemMethod)
-            {
-                case SystemMethods.NewGuid:
-                    return "NEWID()";
-                case SystemMethods.NewSequentialId:
-                    return "NEWSEQUENTIALID()";
-                case SystemMethods.CurrentDateTime:
-                    return "GETDATE()";
-                case SystemMethods.CurrentUTCDateTime:
-                    return "GETUTCDATE()";
-                case SystemMethods.CurrentUser:
-                    return "CURRENT_USER";
-            }
-
-            return null;
-        }
-
         public string FormatDefaultValue(object defaultValue)
         {
             if (DefaultValueIsSqlFunction(defaultValue))
                 return defaultValue.ToString();
-
-            if (defaultValue is SystemMethods methods)
-                return FormatSystemMethods(methods);
 
             return Quoter.QuoteValue(defaultValue);
         }

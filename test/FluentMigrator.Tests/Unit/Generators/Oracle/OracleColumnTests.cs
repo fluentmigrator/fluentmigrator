@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Exceptions;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Framework;
 using NUnit.Should;
@@ -188,7 +188,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
 
             var result = Generator.Generate(expression);
 
-            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NVARCHAR2(5) DEFAULT CURRENT_TIMESTAMP NOT NULL");
+            result.ShouldBe("ALTER TABLE TestTable1 ADD TestColumn1 NVARCHAR2(5) DEFAULT LOCALTIMESTAMP NOT NULL");
         }
 
         [Test]

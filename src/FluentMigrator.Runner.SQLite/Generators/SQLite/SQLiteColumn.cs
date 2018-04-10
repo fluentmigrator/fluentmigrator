@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -47,19 +47,6 @@ namespace FluentMigrator.Runner.Generators.SQLite
             if (!column.IsPrimaryKey) return string.Empty;
 
             return column.IsIdentity ? "PRIMARY KEY AUTOINCREMENT" : string.Empty;
-        }
-
-        protected override string FormatSystemMethods(SystemMethods systemMethod)
-        {
-            switch (systemMethod)
-            {
-                case SystemMethods.CurrentUTCDateTime:
-                    return "CURRENT_TIMESTAMP";
-                case SystemMethods.CurrentDateTime:
-                    return "(datetime('now','localtime'))";
-            }
-
-            return null;
         }
     }
 }

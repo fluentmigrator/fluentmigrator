@@ -30,7 +30,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
 
             string expected = "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DROP DEFAULT;" + Environment.NewLine +
             "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
-            "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DEFAULT LAST USER;";
+            "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DEFAULT CURRENT USER;";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
 
             string expected = "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DROP DEFAULT;" + Environment.NewLine +
             "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
-            "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DEFAULT TIMESTAMP;";
+            "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DEFAULT CURRENT TIMESTAMP;";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
@@ -58,7 +58,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
 
             string expected = "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DROP DEFAULT;" + Environment.NewLine +
                         "-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +
-                        "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DEFAULT UTC TIMESTAMP;";
+                        "ALTER TABLE [dbo].[TestTable1] ALTER [TestColumn1] DEFAULT CURRENT UTC TIMESTAMP;";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);

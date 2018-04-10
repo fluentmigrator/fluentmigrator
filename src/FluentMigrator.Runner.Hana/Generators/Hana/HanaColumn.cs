@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentMigrator.Exceptions;
@@ -36,22 +36,9 @@ namespace FluentMigrator.Runner.Generators.Hana
             if (!(column.DefaultValue is ColumnDefinition.UndefinedDefaultValue))
                 return string.Empty;
 
-            return column.IsNullable.HasValue 
-                ? (column.IsNullable.Value ? "NULL" : "NOT NULL") 
+            return column.IsNullable.HasValue
+                ? (column.IsNullable.Value ? "NULL" : "NOT NULL")
                 : String.Empty;
-        }        
-
-        protected override string FormatSystemMethods(SystemMethods systemMethod)
-        {
-            switch (systemMethod)
-            {
-                case SystemMethods.CurrentDateTime:
-                    return "CURRENT_TIMESTAMP";
-                case SystemMethods.CurrentUTCDateTime:
-                    return "CURRENT_UTCTIMESTAMP";
-            }
-
-            return null;
         }
 
         protected override string GetPrimaryKeyConstraintName(IEnumerable<ColumnDefinition> primaryKeyColumns, string tableName)

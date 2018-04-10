@@ -50,6 +50,8 @@ namespace FluentMigrator.Runner.Generators.Generic
                     return FormatDouble(v);
                 case float v:
                     return FormatFloat(v);
+                case SystemMethods v:
+                    return FormatSystemMethods(v);
                 case Enum v:
                     return FormatEnum(v);
                 case decimal v:

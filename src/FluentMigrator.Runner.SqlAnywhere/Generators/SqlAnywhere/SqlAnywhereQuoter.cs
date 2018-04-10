@@ -14,38 +14,12 @@
 // limitations under the License.
 #endregion
 
-using System;
-
 using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.SqlAnywhere
 {
     public class SqlAnywhereQuoter : GenericQuoter
     {
-        public override string FormatEnum(object value)
-        {
-            if (value is SystemMethods methods)
-            {
-                switch(methods)
-                {
-                    case SystemMethods.NewGuid:
-                        return "NEWID()";
-                    case SystemMethods.NewSequentialId:
-                        return "AUTOINCREMENT";
-                    case SystemMethods.CurrentDateTime:
-                        return "TIMESTAMP";
-                    case SystemMethods.CurrentUTCDateTime:
-                        return "UTC TIMESTAMP";
-                    case SystemMethods.CurrentUser:
-                        return "LAST USER";
-                    default:
-                        throw new NotImplementedException("FormatEnum not implemented for SystemMethods." + methods.ToString());
-                }
-            }
-
-            return base.FormatEnum(value);
-        }
-
         public override string OpenQuote => "[";
 
         public override string CloseQuote => "]";
@@ -62,6 +36,25 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
         public override string FormatNationalString(string value)
         {
             return $"N{FormatAnsiString(value)}";
+        }
+
+        public override string FormatSystemMethods(SystemMethods value)
+        {
+            switch (value)
+            {
+                case SystemMethods.NewSequentialId:
+                case SystemMethods.NewGuid:
+                    return "NEWID()";
+                case SystemMethods.CurrentDateTimeOffset:
+                case SystemMethods.CurrentDateTime:
+                    return "CURRENT TIMESTAMP";
+                case SystemMethods.CurrentUTCDateTime:
+                    return "CURRENT UTC TIMESTAMP";
+                case SystemMethods.CurrentUser:
+                    return "CURRENT USER";
+            }
+
+            return base.FormatSystemMethods(value);
         }
     }
 }

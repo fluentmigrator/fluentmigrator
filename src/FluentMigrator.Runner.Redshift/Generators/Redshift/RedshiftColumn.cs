@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2018, Fluent Migrator Project
 //
@@ -18,7 +18,6 @@
 
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 
 using FluentMigrator.Model;
@@ -86,21 +85,6 @@ namespace FluentMigrator.Runner.Generators.Redshift
                 return string.Format(", PRIMARY KEY ({0})", cols);
 
             return string.Format(", {0}PRIMARY KEY ({1})", pkName, cols);
-        }
-
-        protected override string FormatSystemMethods(SystemMethods systemMethod)
-        {
-            switch (systemMethod)
-            {
-                case SystemMethods.CurrentDateTime:
-                    return "now()";
-                case SystemMethods.CurrentUTCDateTime:
-                    return "(now() at time zone 'UTC')";
-                case SystemMethods.CurrentUser:
-                    return "current_user";
-            }
-
-            throw new NotImplementedException(string.Format("System method {0} is not implemented.", systemMethod));
         }
 
         public string GetColumnType(ColumnDefinition column)

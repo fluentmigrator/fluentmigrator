@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Infrastructure.Extensions;
+using FluentMigrator.Infrastructure.Extensions;
 
 namespace FluentMigrator.Runner.Generators.DB2
 {
@@ -37,9 +37,7 @@ namespace FluentMigrator.Runner.Generators.DB2
 
         public string FormatAlterDefaultValue(string column, object defaultValue)
         {
-            return defaultValue is SystemMethods
-                ? this.FormatSystemMethods((SystemMethods)defaultValue)
-                : Quoter.QuoteValue(defaultValue);
+            return Quoter.QuoteValue(defaultValue);
         }
 
         public string GenerateAlterClause(ColumnDefinition column)
@@ -102,13 +100,7 @@ namespace FluentMigrator.Runner.Generators.DB2
                 return string.Empty;
             }
 
-            // see if this is for a system method
-            if (!(column.DefaultValue is SystemMethods))
-            {
-                return "DEFAULT " + this.Quoter.QuoteValue(column.DefaultValue);
-            }
-
-            var method = this.FormatSystemMethods((SystemMethods)column.DefaultValue);
+            var method = Quoter.QuoteValue(column.DefaultValue);
             if (string.IsNullOrEmpty(method))
             {
                 return string.Empty;
@@ -130,21 +122,6 @@ namespace FluentMigrator.Runner.Generators.DB2
             }
 
             return "NOT NULL";
-        }
-
-        protected override string FormatSystemMethods(SystemMethods systemMethod)
-        {
-            switch (systemMethod)
-            {
-                case SystemMethods.CurrentUTCDateTime:
-                    return "(CURRENT_TIMESTAMP - CURRENT_TIMEZONE)";
-                case SystemMethods.CurrentDateTime:
-                    return "CURRENT_TIMESTAMP";
-                case SystemMethods.CurrentUser:
-                    return "USER";
-            }
-
-            throw new NotImplementedException();
         }
 
         #endregion Methods

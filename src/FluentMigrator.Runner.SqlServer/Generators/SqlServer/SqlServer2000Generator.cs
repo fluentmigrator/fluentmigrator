@@ -31,12 +31,12 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         private static readonly SqlServer2000Quoter _quoter = new SqlServer2000Quoter();
 
         public SqlServer2000Generator()
-            : base(new SqlServer2000Column(new SqlServer2000TypeMap()), _quoter, new EmptyDescriptionGenerator())
+            : base(new SqlServer2000Column(new SqlServer2000TypeMap(), _quoter), _quoter, new EmptyDescriptionGenerator())
         {
         }
 
-        protected SqlServer2000Generator(IColumn column, IDescriptionGenerator descriptionGenerator)
-            : base(column, _quoter, descriptionGenerator)
+        protected SqlServer2000Generator(IColumn column, IQuoter quoter, IDescriptionGenerator descriptionGenerator)
+            : base(column, quoter, descriptionGenerator)
         {
         }
 

@@ -22,8 +22,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
         }
 
-        protected SqlServer2016Generator(IColumn column, IDescriptionGenerator descriptionGenerator)
-            :base(column, descriptionGenerator)
+        protected SqlServer2016Generator(IColumn column, IQuoter quoter, IDescriptionGenerator descriptionGenerator)
+            :base(column, quoter, descriptionGenerator)
         {
         }
     }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using FluentMigrator.Model;
@@ -75,26 +75,6 @@ namespace FluentMigrator.Runner.Generators.Postgres
                 return string.Format(", PRIMARY KEY ({0})", cols);
 
             return string.Format(", {0}PRIMARY KEY ({1})", pkName, cols);
-        }
-
-        protected override string FormatSystemMethods(SystemMethods systemMethod)
-        {
-            switch (systemMethod)
-            {
-                case SystemMethods.NewGuid:
-                    //need to run the script share/contrib/uuid-ossp.sql to install the uuid_generate4 function
-                    return "uuid_generate_v4()";
-                case SystemMethods.NewSequentialId:
-                    return "uuid_generate_v1()";
-                case SystemMethods.CurrentDateTime:
-                    return "now()";
-                case SystemMethods.CurrentUTCDateTime:
-                    return "(now() at time zone 'UTC')";
-                case SystemMethods.CurrentUser:
-                    return "current_user";
-            }
-
-            throw new NotImplementedException(string.Format("System method {0} is not implemented.", systemMethod));
         }
 
         protected override string FormatType(ColumnDefinition column)

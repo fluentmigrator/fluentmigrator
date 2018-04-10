@@ -73,9 +73,9 @@ namespace FluentMigrator.Runner.Generators.Base
                 return string.Empty;
 
             // see if this is for a system method
-            if (column.DefaultValue is SystemMethods)
+            if (column.DefaultValue is SystemMethods methods)
             {
-                string method = FormatSystemMethods((SystemMethods)column.DefaultValue);
+                string method = Quoter.QuoteValue(methods);
                 if (string.IsNullOrEmpty(method))
                     return string.Empty;
 
@@ -86,8 +86,6 @@ namespace FluentMigrator.Runner.Generators.Base
         }
 
         protected abstract string FormatIdentity(ColumnDefinition column);
-
-        protected abstract string FormatSystemMethods(SystemMethods systemMethod);
 
         protected virtual string FormatPrimaryKey(ColumnDefinition column)
         {

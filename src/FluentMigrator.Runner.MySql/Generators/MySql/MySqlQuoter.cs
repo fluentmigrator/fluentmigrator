@@ -37,5 +37,23 @@ namespace FluentMigrator.Runner.Generators.MySql
                 , value.Minutes
                 , value.Seconds);
         }
+
+        public override string FormatSystemMethods(SystemMethods value)
+        {
+            switch (value)
+            {
+                case SystemMethods.NewGuid:
+                case SystemMethods.NewSequentialId:
+                    return "(SELECT UUID())";
+                case SystemMethods.CurrentDateTime:
+                    return "CURRENT_TIMESTAMP";
+                case SystemMethods.CurrentUTCDateTime:
+                    return "UTC_TIMESTAMP";
+                case SystemMethods.CurrentUser:
+                    return "CURRENT_USER()";
+            }
+
+            return base.FormatSystemMethods(value);
+        }
     }
 }

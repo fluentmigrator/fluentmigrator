@@ -46,16 +46,5 @@ namespace FluentMigrator.Runner.Generators.MySql
         {
             return column.IsIdentity ? "AUTO_INCREMENT" : string.Empty;
         }
-
-        protected override string FormatSystemMethods(SystemMethods systemMethod)
-        {
-            switch (systemMethod)
-            {
-                case SystemMethods.CurrentDateTime:
-                    return "CURRENT_TIMESTAMP";
-            }
-
-            throw new NotImplementedException();
-        }
     }
 }

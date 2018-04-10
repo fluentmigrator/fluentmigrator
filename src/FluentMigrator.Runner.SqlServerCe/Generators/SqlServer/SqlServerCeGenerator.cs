@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 // Copyright (c) 2010, Nathan Brown
@@ -18,7 +18,6 @@
 #endregion
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using FluentMigrator.Exceptions;
 using FluentMigrator.Expressions;
@@ -27,8 +26,10 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 {
     public class SqlServerCeGenerator : SqlServer2000Generator
     {
+        private static readonly IQuoter _quoter = new SqlServer2000Quoter();
+
         public SqlServerCeGenerator()
-            : base(new SqlServerCeColumn(new SqlServerCeTypeMap()), new EmptyDescriptionGenerator())
+            : base(new SqlServerCeColumn(new SqlServerCeTypeMap(), _quoter), _quoter, new EmptyDescriptionGenerator())
         {
         }
 

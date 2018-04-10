@@ -1,4 +1,4 @@
-﻿using System.Data;
+using System.Data;
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Framework;
 using NUnit.Should;
@@ -416,7 +416,7 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
 
             var result = Generator.Generate(expression);
 
-            result.ShouldBe("ALTER TABLE \"TestTable1\" MODIFY \"TestColumn1\" DEFAULT CURRENT_TIMESTAMP");
+            result.ShouldBe("ALTER TABLE \"TestTable1\" MODIFY \"TestColumn1\" DEFAULT LOCALTIMESTAMP");
         }
 
         [Test]

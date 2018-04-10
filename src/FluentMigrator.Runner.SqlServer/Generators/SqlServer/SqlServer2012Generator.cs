@@ -1,8 +1,8 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 // Copyright (c) 2012, Daniel Lee
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -26,9 +26,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         public SqlServer2012Generator()
         {
         }
-        
-        protected SqlServer2012Generator(IColumn column, IDescriptionGenerator descriptionGenerator)
-            :base(column, descriptionGenerator)
+
+        protected SqlServer2012Generator(IColumn column, IQuoter quoter, IDescriptionGenerator descriptionGenerator)
+            :base(column, quoter, descriptionGenerator)
         {
         }
 

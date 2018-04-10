@@ -23,8 +23,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 {
     internal class SqlServer2000Column : ColumnBase
     {
-        public SqlServer2000Column(ITypeMap typeMap)
-            : base(typeMap, new SqlServerQuoter())
+        public SqlServer2000Column(ITypeMap typeMap, IQuoter quoter)
+            : base(typeMap, quoter)
         {
         }
 
@@ -58,33 +58,10 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 column.GetAdditionalFeature(SqlServerExtensions.IdentityIncrement, 1));
         }
 
-        protected override string FormatSystemMethods(SystemMethods systemMethod)
-        {
-            switch (systemMethod)
-            {
-                case SystemMethods.NewGuid:
-                    return "NEWID()";
-                case SystemMethods.NewSequentialId:
-                    return "NEWSEQUENTIALID()";
-                case SystemMethods.CurrentDateTime:
-                    return "GETDATE()";
-                case SystemMethods.CurrentDateTimeOffset:
-                case SystemMethods.CurrentUTCDateTime:
-                    return "GETUTCDATE()";
-                case SystemMethods.CurrentUser:
-                    return "CURRENT_USER";
-            }
-
-            return null;
-        }
-
         public string FormatDefaultValue(object defaultValue)
         {
             if (DefaultValueIsSqlFunction(defaultValue))
                 return defaultValue.ToString();
-
-            if (defaultValue is SystemMethods)
-                return FormatSystemMethods((SystemMethods)defaultValue);
 
             return Quoter.QuoteValue(defaultValue);
         }

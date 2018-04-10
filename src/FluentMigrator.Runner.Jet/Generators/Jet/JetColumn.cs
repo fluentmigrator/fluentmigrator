@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
@@ -32,11 +32,6 @@ namespace FluentMigrator.Runner.Generators.Jet
         {
             //Identity type is handled by FormatType
             return string.Empty;
-        }
-
-        protected override string FormatSystemMethods(SystemMethods systemMethod)
-        {
-            throw new NotImplementedException();
         }
     }
 }

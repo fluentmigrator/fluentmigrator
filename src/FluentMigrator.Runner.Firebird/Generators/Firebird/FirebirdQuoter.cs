@@ -77,6 +77,19 @@ namespace FluentMigrator.Runner.Generators.Firebird
             return false;
         }
 
+        public override string FormatSystemMethods(SystemMethods value)
+        {
+            switch (value)
+            {
+                case SystemMethods.NewGuid:
+                    return "gen_uuid()";
+                case SystemMethods.CurrentDateTime:
+                    return "CURRENT_TIMESTAMP";
+            }
+
+            return base.FormatSystemMethods(value);
+        }
+
         public override string FormatDateTime(DateTime value)
         {
             return ValueQuote + (value).ToString("yyyy-MM-dd HH:mm:ss") + ValueQuote;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using FluentMigrator.Exceptions;
@@ -54,21 +54,6 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 return String.Empty;
             }
 
-        }
-
-        protected override string FormatSystemMethods(SystemMethods systemMethod)
-        {
-            switch (systemMethod)
-            {
-                case SystemMethods.NewGuid:
-                    return "sys_guid()";
-                case SystemMethods.CurrentDateTime:
-                    return "CURRENT_TIMESTAMP";
-                case SystemMethods.CurrentUser:
-                    return "USER";
-            }
-
-            throw new NotImplementedException();
         }
 
         protected override string GetPrimaryKeyConstraintName(IEnumerable<ColumnDefinition> primaryKeyColumns, string tableName)

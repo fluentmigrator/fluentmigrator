@@ -46,5 +46,21 @@ namespace FluentMigrator.Runner.Generators.Redshift
 
             return UnQuote(quoted);
         }
+
+        public override string FormatSystemMethods(SystemMethods value)
+        {
+            switch (value)
+            {
+                case SystemMethods.CurrentDateTimeOffset:
+                case SystemMethods.CurrentDateTime:
+                    return "SYSDATE";
+                case SystemMethods.CurrentUTCDateTime:
+                    return "(SYSDATE at time zone 'UTC')";
+                case SystemMethods.CurrentUser:
+                    return "current_user";
+            }
+
+            return base.FormatSystemMethods(value);
+        }
     }
 }
