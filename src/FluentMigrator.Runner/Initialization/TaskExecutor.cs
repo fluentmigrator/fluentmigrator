@@ -17,13 +17,14 @@
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Reflection;
+
 using FluentMigrator.Exceptions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Initialization.AssemblyLoader;
 using FluentMigrator.Runner.Processors;
-using FluentMigrator.Infrastructure;
-using System.Reflection;
-using System.Collections.Generic;
 
 namespace FluentMigrator.Runner.Initialization
 {

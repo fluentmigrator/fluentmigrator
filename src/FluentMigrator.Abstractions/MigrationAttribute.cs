@@ -1,8 +1,8 @@
 #region License
 
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -22,33 +22,23 @@ using System;
 
 namespace FluentMigrator
 {
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class MigrationAttribute : Attribute
     {
-        public MigrationAttribute(long version)
-            : this(version, TransactionBehavior.Default)
-        {
-        }
-
         public MigrationAttribute(long version, string description)
             : this(version, TransactionBehavior.Default, description)
         {
         }
 
-        public MigrationAttribute(long version, TransactionBehavior transactionBehavior)
-            : this(version, transactionBehavior, null)
-        {
-        }
-
-        public MigrationAttribute(long version, TransactionBehavior transactionBehavior, string description)
+        public MigrationAttribute(long version, TransactionBehavior transactionBehavior = TransactionBehavior.Default, string description = null)
         {
             Version = version;
             TransactionBehavior = transactionBehavior;
             Description = description;
         }
 
-        public long Version { get; private set; }
-        public TransactionBehavior TransactionBehavior { get; private set; }
-        public string Description { get; private set; }
+        public long Version { get; }
+        public TransactionBehavior TransactionBehavior { get; }
+        public string Description { get; }
     }
 }
