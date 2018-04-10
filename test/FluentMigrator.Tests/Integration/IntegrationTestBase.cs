@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 
 using FirebirdSql.Data.FirebirdClient;
@@ -55,6 +56,8 @@ namespace FluentMigrator.Tests.Integration
 
         private bool _isFirstExecuteForFirebird = true;
 
+        private string _tempDataDirectory;
+
         protected IntegrationTestBase()
         {
             _processors = new List<(Type, Func<IntegrationTestOptions.DatabaseServerOptions>, ExecuteTestDelegate)>
@@ -76,6 +79,23 @@ namespace FluentMigrator.Tests.Integration
         public void SetUpFirebird()
         {
             _isFirstExecuteForFirebird = true;
+        }
+
+        [SetUp]
+        public void SetUpDataDirectory()
+        {
+            _tempDataDirectory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(_tempDataDirectory);
+            AppDomain.CurrentDomain.SetData("DataDirectory", _tempDataDirectory);
+        }
+
+        [TearDown]
+        public void TearDownDataDirectory()
+        {
+            if (!string.IsNullOrEmpty(_tempDataDirectory) && Directory.Exists(_tempDataDirectory))
+            {
+                Directory.Delete(_tempDataDirectory, true);
+            }
         }
 
         protected bool IsAnyServerEnabled(params Type[] exceptProcessors)
@@ -312,14 +332,6 @@ namespace FluentMigrator.Tests.Integration
             if (_isFirstExecuteForFirebird)
             {
                 _isFirstExecuteForFirebird = false;
-
-                var dataDir = (string) AppDomain.CurrentDomain.GetData("DataDirectory");
-                if (string.IsNullOrEmpty(dataDir))
-                {
-                    dataDir = AppContext.BaseDirectory;
-                    AppDomain.CurrentDomain.SetData("DataDirectory", dataDir);
-                }
-
                 FbConnection.CreateDatabase(serverOptions.ConnectionString, true);
             }
 
