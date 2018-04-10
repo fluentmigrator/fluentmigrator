@@ -285,7 +285,7 @@ namespace FluentMigrator.Console
             consoleAnnouncer.Write("Example Connection Strings:");
             consoleAnnouncer.Write("  MySql: Data Source=172.0.0.1;Database=Foo;User Id=USERNAME;Password=BLAH");
             consoleAnnouncer.Write("  Oracle: Server=172.0.0.1;Database=Foo;Uid=USERNAME;Pwd=BLAH");
-            consoleAnnouncer.Write("  SqlLite: Data Source=:memory:;Version=3;New=True");
+            consoleAnnouncer.Write("  SqlLite: Data Source=:memory:");
             consoleAnnouncer.Write("  SqlServer: server=127.0.0.1;database=Foo;user id=USERNAME;password=BLAH");
             consoleAnnouncer.Write("             server=.\\SQLExpress;database=Foo;trusted_connection=true");
             consoleAnnouncer.Write("   ");
