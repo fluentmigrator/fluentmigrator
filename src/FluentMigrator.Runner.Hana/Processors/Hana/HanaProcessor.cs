@@ -143,12 +143,10 @@ namespace FluentMigrator.Runner.Processors.Hana
 
             EnsureConnectionIsOpen();
 
-            var result = new DataSet();
             using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var reader = command.ExecuteReader())
             {
-                var adapter = Factory.CreateDataAdapter(command);
-                adapter.Fill(result);
-                return result;
+                return reader.ReadDataSet();
             }
         }
 

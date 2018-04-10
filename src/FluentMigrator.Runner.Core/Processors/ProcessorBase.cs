@@ -17,6 +17,7 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Data;
 
 using FluentMigrator.Expressions;
 
@@ -26,7 +27,7 @@ namespace FluentMigrator.Runner.Processors
     {
         protected readonly IMigrationGenerator Generator;
         protected readonly IAnnouncer Announcer;
-        public IMigrationProcessorOptions Options { get; private set; }
+        public IMigrationProcessorOptions Options { get; }
 
         public abstract string ConnectionString { get; }
 
@@ -179,9 +180,9 @@ namespace FluentMigrator.Runner.Processors
         {
         }
 
-        public abstract System.Data.DataSet ReadTableData(string schemaName, string tableName);
+        public abstract DataSet ReadTableData(string schemaName, string tableName);
 
-        public abstract System.Data.DataSet Read(string template, params object[] args);
+        public abstract DataSet Read(string template, params object[] args);
 
         public abstract bool Exists(string template, params object[] args);
 

@@ -75,12 +75,10 @@ namespace FluentMigrator.Runner.Processors.Postgres
         {
             EnsureConnectionIsOpen();
 
-            var ds = new DataSet();
             using (var command = Factory.CreateCommand(String.Format(template, args), Connection, Transaction, Options))
+            using (var reader = command.ExecuteReader())
             {
-                var adapter = Factory.CreateDataAdapter(command);
-                adapter.Fill(ds);
-                return ds;
+                return reader.ReadDataSet();
             }
         }
 
