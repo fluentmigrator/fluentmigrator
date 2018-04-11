@@ -30,15 +30,15 @@ namespace FluentMigrator.Tests
         public static string ReplaceDataDirectory(string inputString)
         {
             string str = inputString.Trim();
-            if (!string.IsNullOrEmpty(inputString) && inputString.StartsWith("|DataDirectory|", StringComparison.InvariantCultureIgnoreCase))
+            if (!string.IsNullOrEmpty(inputString) && inputString.StartsWith(DataDirectoryMacro, StringComparison.InvariantCultureIgnoreCase))
             {
-                string path1 = AppDomain.CurrentDomain.GetData("DataDirectory") as string;
+                string path1 = AppDomain.CurrentDomain.GetData(DataDirectory) as string;
                 if (string.IsNullOrEmpty(path1))
                     path1 = AppDomain.CurrentDomain.BaseDirectory ?? Environment.CurrentDirectory;
                 if (string.IsNullOrEmpty(path1))
                     path1 = string.Empty;
-                int length = "|DataDirectory|".Length;
-                if (inputString.Length > "|DataDirectory|".Length && 92 == (int)inputString["|DataDirectory|".Length])
+                int length = DataDirectoryMacro.Length;
+                if (inputString.Length > DataDirectoryMacro.Length && 92 == (int)inputString[DataDirectoryMacro.Length])
                     ++length;
                 str = Path.Combine(path1, inputString.Substring(length));
             }
