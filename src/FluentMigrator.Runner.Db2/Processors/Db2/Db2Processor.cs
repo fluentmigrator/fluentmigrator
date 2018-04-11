@@ -63,25 +63,25 @@ namespace FluentMigrator.Runner.Processors.DB2
 
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
-            var schema = string.IsNullOrEmpty(schemaName) ? string.Empty : "TABLE_SCHEMA = '" + this.FormatToSafeName(schemaName) + "' AND ";
+            var schema = string.IsNullOrEmpty(schemaName) ? string.Empty : "TABSCHEMA = '" + this.FormatToSafeName(schemaName) + "' AND ";
 
-            var doesExist = this.Exists("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE {0} TABLE_NAME = '{1}' AND COLUMN_NAME='{2}'", schema, this.FormatToSafeName(tableName), this.FormatToSafeName(columnName));
+            var doesExist = this.Exists("SELECT COLNAME FROM SYSCAT.COLUMNS WHERE {0} TABNAME = '{1}' AND COLNAME='{2}'", schema, this.FormatToSafeName(tableName), this.FormatToSafeName(columnName));
             return doesExist;
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
-            var schema = string.IsNullOrEmpty(schemaName) ? string.Empty : "TABLE_SCHEMA = '" + this.FormatToSafeName(schemaName) + "' AND ";
+            var schema = string.IsNullOrEmpty(schemaName) ? string.Empty : "TABSCHEMA = '" + this.FormatToSafeName(schemaName) + "' AND ";
 
             return this.Exists("SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE {0} TABLE_NAME = '{1}' AND CONSTRAINT_NAME='{2}'", schema, this.FormatToSafeName(tableName), this.FormatToSafeName(constraintName));
         }
 
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
-            var schema = string.IsNullOrEmpty(schemaName) ? string.Empty : "TABLE_SCHEMA = '" + this.FormatToSafeName(schemaName) + "' AND ";
+            var schema = string.IsNullOrEmpty(schemaName) ? string.Empty : "TABSCHEMA = '" + this.FormatToSafeName(schemaName) + "' AND ";
             var defaultValueAsString = string.Format("%{0}%", FormatHelper.FormatSqlEscape(defaultValue.ToString()));
 
-            return this.Exists("SELECT COLUMN_DEFAULT FROM INFORMATION_SCHEMA.COLUMNS WHERE {0} TABLE_NAME = '{1}' AND COLUMN_NAME = '{2}' AND COLUMN_DEFAULT LIKE '{3}'", schema, this.FormatToSafeName(tableName), columnName.ToUpper(), defaultValueAsString);
+            return this.Exists("SELECT COLUMN_DEFAULT FROM SYSCAT.COLUMNS WHERE {0} TABNAME = '{1}' AND COLNAME = '{2}' AND \"DEFAULT\" LIKE '{3}'", schema, this.FormatToSafeName(tableName), columnName.ToUpper(), defaultValueAsString);
         }
 
         public override void Execute(string template, params object[] args)

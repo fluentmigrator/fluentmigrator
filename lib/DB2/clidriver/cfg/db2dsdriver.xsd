@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="utf-8"?>
+<xs:schema id="configuration" xmlns="" xmlns:xs="http://www.w3.org/2001/XMLSchema" >
+  <xs:element name="parameter">
+    <xs:complexType>
+      <xs:attribute name="name" type="xs:string" />
+      <xs:attribute name="value" type="xs:string" />
+    </xs:complexType>
+  </xs:element>
+  <xs:simpleType name="whitespacesonly">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="\s*" />
+    </xs:restriction>
+  </xs:simpleType>
+  <xs:element name="client">
+    <xs:complexType>
+     <xs:simpleContent>
+       <xs:extension base="whitespacesonly">
+        <xs:attribute name="name" type="xs:string" />
+        <xs:attribute name="hostname" type="xs:string" />
+        <xs:attribute name="listname" type="xs:string" />
+      </xs:extension>
+     </xs:simpleContent>  
+    </xs:complexType>
+  </xs:element>
+  <xs:element name="configuration" >
+    <xs:complexType>
+      <xs:all>
+        <xs:element name="dsncollection" minOccurs="0">
+          <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded"> 
+              <xs:element name="dsn" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="parameter" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="specialregisters" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element ref="parameter" minOccurs="0" maxOccurs="unbounded" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="sessionglobalvariables" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element ref="parameter" minOccurs="0" maxOccurs="unbounded" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:choice>
+                  <xs:attribute name="alias" type="xs:string" />
+                  <xs:attribute name="description" type="xs:string" />
+                  <xs:attribute name="name" type="xs:string" />
+                  <xs:attribute name="host" type="xs:string" />
+                  <xs:attribute name="port" type="xs:string" />
+                  <xs:attribute name="ldap" type="xs:integer" />
+                </xs:complexType>
+              </xs:element> 
+              <xs:element name="defaultdsn" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="parameter" minOccurs="0" maxOccurs="unbounded" />
+                  </xs:sequence>
+                  <xs:attribute name="alias" type="xs:string" />
+                  <xs:attribute name="name" type="xs:string" />
+                  <xs:attribute name="host" type="xs:string" />
+                  <xs:attribute name="port" type="xs:string" />
+                </xs:complexType>
+              </xs:element>
+            </xs:choice>
+          </xs:complexType>
+          <xs:unique name="oneDSNforEachAlias">
+            <xs:selector xpath="dsn"/>
+            <xs:field xpath="@alias"/>
+          </xs:unique>
+        </xs:element>
+        <xs:element name="databases" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="database" minOccurs="0" maxOccurs="unbounded">
+                <xs:complexType>
+                  <xs:choice minOccurs="0" maxOccurs="unbounded">
+                    <xs:element ref="parameter" minOccurs="0" maxOccurs="unbounded" />
+                    <xs:element name="specialregisters" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element ref="parameter" minOccurs="0" maxOccurs="unbounded" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="sessionglobalvariables" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element ref="parameter" minOccurs="0" maxOccurs="unbounded" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="wlb" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element ref="parameter" minOccurs="0" maxOccurs="unbounded" />
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                    <xs:element name="acr" minOccurs="0" maxOccurs="1">
+                      <xs:complexType>
+                        <xs:choice minOccurs="0" maxOccurs="unbounded">
+                          <xs:element ref="parameter" minOccurs="0" maxOccurs="unbounded" />
+                          <xs:element name="alternateserverlist" minOccurs="0" maxOccurs="1">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="server" minOccurs="0" maxOccurs="unbounded">
+                                  <xs:complexType>
+                                    <xs:simpleContent>
+                                      <xs:extension base="whitespacesonly">
+                                        <xs:attribute name="name" type="xs:string" />
+                                        <xs:attribute name="hostname" type="xs:string" />
+                                        <xs:attribute name="port" type="xs:string" />
+                                      </xs:extension>                                    
+                                    </xs:simpleContent>                                    
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="alternategroup" minOccurs="0" maxOccurs="1">
+                            <xs:complexType>
+                              <xs:choice minOccurs="0" maxOccurs="unbounded"> 
+                                <xs:element ref="parameter" minOccurs="0" maxOccurs="unbounded" />
+                                <xs:element name="database" minOccurs="0" maxOccurs="unbounded">
+                                  <xs:complexType>
+                                    <xs:simpleContent>
+                                      <xs:extension base="whitespacesonly">
+                                        <xs:attribute name="name" type="xs:string" />
+                                        <xs:attribute name="host" type="xs:string" />
+                                        <xs:attribute name="port" type="xs:string" />
+                                      </xs:extension>
+                                    </xs:simpleContent>
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:choice>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="affinitylist" minOccurs="0" maxOccurs="1">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element name="list" minOccurs="0" maxOccurs="unbounded">
+                                  <xs:complexType>
+                                    <xs:simpleContent>
+                                      <xs:extension base="whitespacesonly">
+                                        <xs:attribute name="name" type="xs:string" />
+                                        <xs:attribute name="serverorder" type="xs:string" />
+                                      </xs:extension>
+                                    </xs:simpleContent>  
+                                  </xs:complexType>
+                                </xs:element>
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="clientaffinitydefined" minOccurs="0" maxOccurs="1">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element ref="client" minOccurs="0" maxOccurs="unbounded" />
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                          <xs:element name="clientaffinityroundrobin" minOccurs="0" maxOccurs="1">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element ref="client" minOccurs="0" maxOccurs="unbounded" />
+                              </xs:sequence>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:choice>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:choice>
+                  <xs:attribute name="name" type="xs:string" />
+                  <xs:attribute name="host" type="xs:string" />
+                  <xs:attribute name="port" type="xs:string" />
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="parameters" minOccurs="0">
+          <xs:complexType>
+            <xs:choice minOccurs="0" maxOccurs="unbounded">
+              <xs:element ref="parameter" minOccurs="0" maxOccurs="unbounded" />
+              <xs:element name="specialregisters" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="parameter" minOccurs="0" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="sessionglobalvariables" minOccurs="0" maxOccurs="1">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element ref="parameter" minOccurs="0" maxOccurs="unbounded" />
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:choice>
+          </xs:complexType>
+        </xs:element>
+        <xs:element name="ldapserver" minOccurs="0">
+         <xs:complexType>
+            <xs:sequence>
+              <xs:element ref="parameter" minOccurs="0" maxOccurs="unbounded" />
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:all>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

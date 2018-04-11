@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 namespace FluentMigrator.Tests.Integration.Processors.Db2
 {
     using System;
@@ -42,6 +44,13 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
         }
 
         #endregion Properties
+
+        static Db2ProcessorTests()
+        {
+            // This is here to avoid the removal of the referenced assembly
+            Debug.WriteLine(typeof(IBM.Data.DB2.DB2Factory));
+        }
+
 
         #region Methods
 
