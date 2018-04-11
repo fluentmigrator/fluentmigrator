@@ -15,6 +15,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - `IMigrationContext` doesn't contain the `IMigrationConventions` any more
   - Expression conventions are now bundled in the new `IConventionSet`
 - `ICanBeConventional` was removed during the overhaul of the expression convention system
+- Strings are now Unicode by default. Use `NonUnicodeString` for ANSI strings
 
 ### Added
 
@@ -31,6 +32,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
     - `WITH (ONLINE=ON/OFF)` support
     - 64 bit identity support
   - Redshift (Amazon, experimental)
+  - Firebird
+    - New provider option: `Force Quote=true` to enforce quotes
 - Unique Constraints: Non-Distinct NULL support (SQL Server 2008 and SQL Anywhere 16)
 - Types: DateTime2 support
 - Dialect: SQLite foreign key support
@@ -40,6 +43,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - IfDatabase: Method delegation support
   - Index: Creation with non-key columns
   - Conventions: Default schema name support
+  - `SetExistingRowsTo` supports `SystemMethods`
+  - Passing arguments to embedded SQL scripts
 - Runner:
   - TaskExecutor: HasMigrationsToApply support
   - Case insensitive arguments support
@@ -56,6 +61,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Runner:
   - Better error messages
   - ListMigrations: showing `(not applied)` for unapplied migrations
+  - Show `(BREAKING)` for migrations with breaking changes
   - MSBuild task is available as separate package (with custom .targets file)
   - Use provider default command timeout when no global timeout is set
 
@@ -79,6 +85,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Runner:
   - Match `TagAttribute` by inheritance
+- Processors (database specific processing of expressions):
+  - Using the new `SqlBatchParser` to parse batches of SQL statements (`GO` statement support)
 - Database:
   - Hana: Fixed syntax for dropping a primary key
 - Tests:
