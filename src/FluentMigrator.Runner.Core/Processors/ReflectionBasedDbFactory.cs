@@ -49,25 +49,26 @@ namespace FluentMigrator.Runner.Processors
             if (_instance != null)
                 return _instance;
 
-            if (TryCreateFactory(_testEntries, out var factory))
+            var exceptions = new List<Exception>();
+            if (TryCreateFactory(_testEntries, exceptions, out var factory))
             {
                 _instance = factory;
                 return factory;
             }
 
             var assemblyNames = string.Join(", ", _testEntries.Select(x => x.AssemblyName));
-            throw new FileNotFoundException($"Unable to load the driver. Attempted to load: {assemblyNames}");
+            throw new AggregateException($"Unable to load the driver. Attempted to load: {assemblyNames}", exceptions);
         }
 
-        protected static bool TryCreateFactory(IEnumerable<TestEntry> entries, out DbProviderFactory factory)
+        protected static bool TryCreateFactory(IEnumerable<TestEntry> entries, ICollection<Exception> exceptions, out DbProviderFactory factory)
         {
             foreach (var entry in entries)
             {
-                if (TryCreateFromCurrentDomain(entry, out factory))
+                if (TryCreateFromCurrentDomain(entry, exceptions, out factory))
                     return true;
-                if (TryCreateFactoryFromFile(entry, out factory))
+                if (TryCreateFactoryFromFile(entry, exceptions, out factory))
                     return true;
-                if (TryCreateFromGac(entry, out factory))
+                if (TryCreateFromGac(entry, exceptions, out factory))
                     return true;
             }
 
@@ -75,7 +76,7 @@ namespace FluentMigrator.Runner.Processors
             return false;
         }
 
-        protected static bool TryCreateFactoryFromFile(TestEntry entry, out DbProviderFactory factory)
+        protected static bool TryCreateFactoryFromFile(TestEntry entry, ICollection<Exception> exceptions, out DbProviderFactory factory)
         {
             try
             {
@@ -85,16 +86,17 @@ namespace FluentMigrator.Runner.Processors
                     entry.DBProviderFactoryTypeName);
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
                 // Ignore, check if we could load the assembly
+                exceptions.Add(ex);
             }
 
             // Try to create from current domain in case of a successfully loaded assembly
-            return TryCreateFromCurrentDomain(entry, out factory);
+            return TryCreateFromCurrentDomain(entry, exceptions, out factory);
         }
 
-        private static bool TryCreateFromGac(TestEntry entry, out DbProviderFactory factory)
+        private static bool TryCreateFromGac(TestEntry entry, ICollection<Exception> exceptions, out DbProviderFactory factory)
         {
             var asmNames = FindAssembliesInGac(entry.AssemblyName);
             var asmName = asmNames.OrderByDescending(n => n.Version).FirstOrDefault();
@@ -115,16 +117,17 @@ namespace FluentMigrator.Runner.Processors
                 factory = (DbProviderFactory) Activator.CreateInstance(type);
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                exceptions.Add(ex);
                 factory = null;
                 return false;
             }
         }
 
-        private static bool TryCreateFromCurrentDomain(TestEntry entry, out DbProviderFactory factory)
+        private static bool TryCreateFromCurrentDomain(TestEntry entry, ICollection<Exception> exceptions, out DbProviderFactory factory)
         {
-            if (TryLoadAssemblyFromCurrentDomain(entry.AssemblyName, out var assembly))
+            if (TryLoadAssemblyFromCurrentDomain(entry.AssemblyName, exceptions, out var assembly))
             {
                 try
                 {
@@ -135,9 +138,10 @@ namespace FluentMigrator.Runner.Processors
                     factory = (DbProviderFactory) Activator.CreateInstance(type);
                     return true;
                 }
-                catch
+                catch (Exception ex)
                 {
                     // Ignore
+                    exceptions.Add(ex);
                 }
             }
 
@@ -145,15 +149,16 @@ namespace FluentMigrator.Runner.Processors
             return false;
         }
 
-        private static bool TryLoadAssemblyFromCurrentDomain(string assemblyName, out Assembly assembly)
+        private static bool TryLoadAssemblyFromCurrentDomain(string assemblyName, ICollection<Exception> exceptions, out Assembly assembly)
         {
             try
             {
                 assembly = AppDomain.CurrentDomain.Load(new AssemblyName(assemblyName));
                 return true;
             }
-            catch
+            catch (Exception ex)
             {
+                exceptions.Add(ex);
                 assembly = null;
                 return false;
             }
