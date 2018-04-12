@@ -14,6 +14,8 @@
 // limitations under the License.
 #endregion
 
+using System;
+
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.Hana;
 using FluentMigrator.Runner.Processors;
@@ -30,44 +32,30 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana.EndToEnd
     [Category("Hana")]
     public class TestRollbackColumnCreation : HanaEndToEndFixture
     {
-        public HanaConnection Connection { get; set; }
-
-        public HanaProcessor Processor { get; set; }
-
         [SetUp]
         public void SetUp()
         {
             if (!IntegrationTestOptions.Hana.IsEnabled)
                 Assert.Ignore();
-            Connection = new HanaConnection(IntegrationTestOptions.Hana.ConnectionString);
-            Processor = new HanaProcessor(Connection, new HanaGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new HanaDbFactory());
-            Connection.Open();
-            Processor.BeginTransaction();
-        }
-
-        [TearDown]
-        public void TearDown()
-        {
-            Processor?.CommitTransaction();
-            Processor?.Dispose();
         }
 
         [Test]
         public void Delete_ColumnCreateOnTableWithExplicitPk_ColumnShouldBeDropped()
         {
             DeleteTableIfExists("Teste", "Teste1");
-
             Migrate(typeof(ImplicitlyCreatedFkForHana.CreateImplicitFk).Namespace);
         }
 
         private void DeleteTableIfExists(params string[] tableNames)
         {
-            foreach (var tableName in tableNames)
+            using (var sc = new ScopedConnection())
             {
-                if (Processor.TableExists(null, tableName))
-                    Processor.Execute(string.Format("DROP TABLE \"{0}\"", tableName));
+                foreach (var tableName in tableNames)
+                {
+                    if (sc.Processor.TableExists(null, tableName))
+                        sc.Processor.Execute(string.Format("DROP TABLE \"{0}\"", tableName));
+                }
             }
-
         }
     }
 

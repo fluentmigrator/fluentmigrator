@@ -449,7 +449,7 @@
         </member>
         <member name="M:Sap.Data.Hana.HanaCommand.ResetCommandTimeout">
             <summary>
-            <para>Resets the CommandTimeout property to its default value of 30 seconds.</para>
+            <para>Resets the CommandTimeout property to its default value of 0 seconds (no timeout).</para>
         </summary>
         </member>
         <member name="M:Sap.Data.Hana.HanaCommand.CreateDbParameter">
@@ -815,8 +815,8 @@ private void DoStuff() {
         </member>
         <member name="P:Sap.Data.Hana.HanaCommand.CommandTimeout">
             <summary>
-            <para>This feature is not supported by the data provider.</para>
-        </summary>	
+            <para>Gets or sets a timeout (in seconds) for the command.</para>
+        </summary><value>The number of seconds before timing out the query. The default value is 0 (no timeout).</value><seealso cref="M:Sap.Data.Hana.HanaCommand.#ctor"/>	
         </member>
         <member name="P:Sap.Data.Hana.HanaCommand.CommandType">
             <summary>
@@ -1927,6 +1927,11 @@ conn.Open();</code>
         <member name="P:Sap.Data.Hana.HanaConnectionStringBuilder.ConnectionLifetime">
             <summary>
    <para>Gets or sets the ConnectionLifetime connection property.</para>
+  </summary>
+        </member>
+        <member name="P:Sap.Data.Hana.HanaConnectionStringBuilder.Enlist">
+            <summary>
+   <para>Gets or sets the Enlist connection property.</para>
   </summary>
         </member>
         <member name="P:Sap.Data.Hana.HanaConnectionStringBuilder.MinPoolSize">
@@ -4157,6 +4162,9 @@ parm.Value = HanaDefault.Value;</code>
             <para>Parallel transactions are not supported. Therefore, the HanaIsolationLevel applies to the entire transaction.</para>
             <para>If ReadUncommitted is specified, then ReadCommitted is used instead.</para>
         </remarks>
+        </member>
+        <member name="T:Sap.Data.Hana.HanaDurableResourceManager">
+            @internal
         </member>
         <member name="T:Sap.Data.Hana.HanaUnmanagedDll">
             @internal

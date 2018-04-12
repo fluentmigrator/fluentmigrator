@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using FluentMigrator.Runner.Generators.Hana;
@@ -117,9 +117,9 @@ namespace FluentMigrator.Tests.Helpers
         {
             var sb = new StringBuilder();
             sb.Append(string.Format("ALTER TABLE {0} ADD CONSTRAINT {1} UNIQUE ({2})", quoter.QuoteTableName(Name), quoter.QuoteConstraintName(name), quoter.QuoteColumnName(column)));
-            using (var command = new HanaCommand(sb.ToString(), Connection))
+            using (var command = new HanaCommand(sb.ToString(), Connection, Transaction))
                 command.ExecuteNonQuery();
-            
+
             constraints.Add(name);
         }
     }

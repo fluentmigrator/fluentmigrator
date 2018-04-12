@@ -1,3 +1,5 @@
+using System.Diagnostics;
+
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators;
 using FluentMigrator.Runner.Generators.Hana;
