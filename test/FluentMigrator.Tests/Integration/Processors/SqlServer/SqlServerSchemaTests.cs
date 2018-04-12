@@ -19,6 +19,8 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
         [SetUp]
         public void SetUp()
         {
+            if (!IntegrationTestOptions.SqlServer2012.IsEnabled)
+                Assert.Ignore();
             Connection = new SqlConnection(IntegrationTestOptions.SqlServer2012.ConnectionString);
             Processor = new SqlServerProcessor(new[] { "SqlServer2012" }, Connection, new SqlServer2012Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new SqlServerDbFactory());
             Connection.Open();
@@ -28,8 +30,8 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
         [TearDown]
         public void TearDown()
         {
-            Processor.CommitTransaction();
-            Processor.Dispose();
+            Processor?.CommitTransaction();
+            Processor?.Dispose();
         }
 
         [Test]

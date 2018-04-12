@@ -24,6 +24,9 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         [SetUp]
         public void SetUp()
         {
+            if (!IntegrationTestOptions.SqlServerCe.IsEnabled)
+                Assert.Ignore();
+
             if (!HostUtilities.ProbeSqlServerCeBehavior())
             {
                 Assert.Ignore("SQL Server CE binaries not found");
@@ -45,8 +48,8 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         [TearDown]
         public void TearDown()
         {
-            Processor.CommitTransaction();
-            Processor.Dispose();
+            Processor?.CommitTransaction();
+            Processor?.Dispose();
 
             if (!string.IsNullOrEmpty(_tempDataDirectory) && Directory.Exists(_tempDataDirectory))
             {

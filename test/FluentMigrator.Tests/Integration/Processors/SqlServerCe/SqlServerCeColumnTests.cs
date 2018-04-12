@@ -27,6 +27,9 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServerCe
         [SetUp]
         public void SetUp()
         {
+            if (!IntegrationTestOptions.SqlServerCe.IsEnabled)
+                Assert.Ignore();
+
             if (!HostUtilities.ProbeSqlServerCeBehavior())
             {
                 Assert.Ignore("SQL Server CE binaries not found");

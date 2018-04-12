@@ -24,8 +24,10 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [SetUp]
         public void SetUp()
         {
+            if (!IntegrationTestOptions.Firebird.IsEnabled)
+                Assert.Ignore();
             _temporaryDatabase = new TemporaryDatabase(
-                IntegrationTestOptions.Firebird.ConnectionString,
+                IntegrationTestOptions.Firebird,
                 _prober);
             _connection = new FbConnection(_temporaryDatabase.ConnectionString);
             _processor = MakeProcessor();

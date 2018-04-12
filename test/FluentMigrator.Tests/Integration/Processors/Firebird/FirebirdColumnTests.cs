@@ -25,8 +25,10 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [SetUp]
         public void SetUp()
         {
+            if (!IntegrationTestOptions.Firebird.IsEnabled)
+                Assert.Ignore();
             _temporaryDatabase = new TemporaryDatabase(
-                IntegrationTestOptions.Firebird.ConnectionString,
+                IntegrationTestOptions.Firebird,
                 _prober);
             Connection = new FbConnection(_temporaryDatabase.ConnectionString);
             var options = FirebirdOptions.AutoCommitBehaviour();

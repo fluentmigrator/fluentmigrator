@@ -44,6 +44,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         [SetUp]
         public void SetUp()
         {
+            if (!IntegrationTestOptions.Postgres.IsEnabled)
+                Assert.Ignore();
             Connection = new NpgsqlConnection(IntegrationTestOptions.Postgres.ConnectionString);
             Processor = new PostgresProcessor(Connection, new PostgresGenerator(),
                 new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new PostgresDbFactory());

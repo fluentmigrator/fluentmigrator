@@ -72,7 +72,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         public void RenameTable_WhenOriginalTableExistsAndContainsDataWithNulls_ShouldNotThrowException()
         {
             //---------------Set up test pack-------------------
-            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird.ConnectionString, _firebirdLibraryProber))
+            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
                 var connectionString = tempDb.ConnectionString;
 
@@ -118,7 +118,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         public void RenameTable_WhenOriginalTableContainsMultipleRows_ShouldNotFailToMigrate()
         {
             //---------------Set up test pack-------------------
-            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird.ConnectionString, _firebirdLibraryProber))
+            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
                 var connectionString = tempDb.ConnectionString;
 
@@ -186,7 +186,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         public void OneMigrationWithOneDelete_ShouldDeleteAffectedRow()
         {
             //---------------Set up test pack-------------------
-            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird.ConnectionString, _firebirdLibraryProber))
+            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
                 var connectionString = tempDb.ConnectionString;
 
@@ -247,7 +247,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         public void OneMigrationWithMultipleDeletes_ShouldDeleteAffectedRow()
         {
             //---------------Set up test pack-------------------
-            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird.ConnectionString, _firebirdLibraryProber))
+            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
                 var connectionString = tempDb.ConnectionString;
 
@@ -320,7 +320,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         public void MigrationWithcAllRowsDelete_ShouldDeleteAllRows()
         {
             //---------------Set up test pack-------------------
-            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird.ConnectionString, _firebirdLibraryProber))
+            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
                 var connectionString = tempDb.ConnectionString;
 
@@ -381,7 +381,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         public void OneMigrationWithOneSpecificUpdate_ShouldUpdateAffectedRow()
         {
             //---------------Set up test pack-------------------
-            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird.ConnectionString, _firebirdLibraryProber))
+            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
                 var connectionString = tempDb.ConnectionString;
 
@@ -427,7 +427,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         public void TwoMigrationsWithSpecificUpdates_ShouldUpdateAffectedRows()
         {
             //---------------Set up test pack-------------------
-            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird.ConnectionString, _firebirdLibraryProber))
+            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
                 var connectionString = tempDb.ConnectionString;
 
@@ -482,7 +482,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         public void OneMigrationWithOneBlanketUpdate_ShouldUpdateAffectedRow()
         {
             //---------------Set up test pack-------------------
-            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird.ConnectionString, _firebirdLibraryProber))
+            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
                 var connectionString = tempDb.ConnectionString;
 
@@ -602,7 +602,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void RenamingTable_WhenTableHasTextBlobs_ShouldCreateNewTableWithTextBlobsNotBinaryBlobs()
         {
-            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird.ConnectionString, _firebirdLibraryProber))
+            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
                 var connectionString = tempDb.ConnectionString;
 
@@ -668,7 +668,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [Test]
         public void AlterTable_MigrationRequiresAutomaticDelete_AndProcessorHasUndoDisabled_ShouldNotThrow()
         {
-            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird.ConnectionString, _firebirdLibraryProber))
+            using (var tempDb = new TemporaryDatabase(IntegrationTestOptions.Firebird, _firebirdLibraryProber))
             {
                 var connectionString = tempDb.ConnectionString;
 
