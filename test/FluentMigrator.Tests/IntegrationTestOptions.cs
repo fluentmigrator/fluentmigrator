@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -68,7 +69,7 @@ namespace FluentMigrator.Tests
 
         public static DatabaseServerOptions Oracle => GetOptions("Oracle");
 
-        public static DatabaseServerOptions Db2 => GetOptions("Db2");
+        public static DatabaseServerOptions Db2 => Environment.Is64BitProcess ? GetOptions("Db2") : DatabaseServerOptions.Empty;
 
         public static DatabaseServerOptions Hana => GetOptions("Hana");
 
