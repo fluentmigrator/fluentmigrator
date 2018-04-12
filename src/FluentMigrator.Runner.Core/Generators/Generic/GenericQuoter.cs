@@ -22,6 +22,7 @@ namespace FluentMigrator.Runner.Generators.Generic
 
     public class GenericQuoter : IQuoter
     {
+        /// <inheritdoc />
         public virtual string QuoteValue(object value)
         {
             switch (value)
@@ -150,7 +151,10 @@ namespace FluentMigrator.Runner.Generators.Generic
 
         public virtual string EscapeValueQuote { get { return ValueQuote + ValueQuote; } }
 
-
+        /// <summary>
+        /// Gets the separator between identifiers (e.g. the dot between SCHEMA.TABLENAME)
+        /// </summary>
+        public virtual string IdentifierSeparator { get; } = ".";
 
         /// <summary>
         /// Returns the opening quote identifier - " is the standard according to the specification
@@ -165,9 +169,7 @@ namespace FluentMigrator.Runner.Generators.Generic
         public virtual string OpenQuoteEscapeString { get { return OpenQuote.PadRight(2, OpenQuote.ToCharArray()[0]); } }
         public virtual string CloseQuoteEscapeString { get { return CloseQuote.PadRight(2, CloseQuote.ToCharArray()[0]); } }
 
-        /// <summary>
-        /// Returns true is the value starts and ends with a close quote
-        /// </summary>
+        /// <inheritdoc />
         public virtual bool IsQuoted(string name)
         {
             if (String.IsNullOrEmpty(name)) return false;
@@ -182,13 +184,14 @@ namespace FluentMigrator.Runner.Generators.Generic
             return (!string.IsNullOrEmpty(OpenQuote) || !string.IsNullOrEmpty(CloseQuote)) && !string.IsNullOrEmpty(name);
         }
 
-        /// <summary>
-        /// Returns a quoted string that has been correctly escaped
-        /// </summary>
+        /// <inheritdoc />
         public virtual string Quote(string name)
         {
             //Exit early if not quoting is needed
             if (!ShouldQuote(name))
+                return name;
+
+            if (IsQuoted(name))
                 return name;
 
             string quotedName = name;
@@ -209,71 +212,55 @@ namespace FluentMigrator.Runner.Generators.Generic
             return OpenQuote + quotedName + CloseQuote;
         }
 
-        /// <summary>
-        /// Quotes a column name
-        /// </summary>
+        /// <inheritdoc />
         public virtual string QuoteColumnName(string columnName)
         {
             return IsQuoted(columnName) ? columnName : Quote(columnName);
         }
 
-        /// <summary>
-        /// Quotes a constraint name
-        /// </summary>
-        public virtual string QuoteConstraintName(string constraintName)
+        /// <inheritdoc />
+        public virtual string QuoteConstraintName(string constraintName, string schemaName)
         {
             return IsQuoted(constraintName) ? constraintName : Quote(constraintName);
         }
 
-        /// <summary>
-        /// Quote an index name
-        /// </summary>
-        /// <param name="indexName"></param>
-        /// <returns></returns>
-        public virtual string QuoteIndexName(string indexName)
+        /// <inheritdoc />
+        public virtual string QuoteIndexName(string indexName, string schemaName)
         {
             return IsQuoted(indexName) ? indexName : Quote(indexName);
         }
 
-        /// <summary>
-        /// Quotes a Table name
-        /// </summary>
-        public virtual string QuoteTableName(string tableName)
+        /// <inheritdoc />
+        public virtual string QuoteTableName(string tableName, string schemaName)
         {
-            return IsQuoted(tableName) ? tableName : Quote(tableName);
+            return CreateSchemaPrefixedQuotedIdentifier(
+                QuoteSchemaName(schemaName),
+                IsQuoted(tableName) ? tableName : Quote(tableName));
         }
 
-        /// <summary>
-        /// Quotes a Schema Name
-        /// </summary>
+        /// <inheritdoc />
+        public virtual string QuoteSequenceName(string sequenceName, string schemaName)
+        {
+            return CreateSchemaPrefixedQuotedIdentifier(
+                QuoteSchemaName(schemaName),
+                IsQuoted(sequenceName) ? sequenceName : Quote(sequenceName));
+        }
+
+        /// <inheritdoc />
         public virtual string QuoteSchemaName(string schemaName)
         {
+            if (string.IsNullOrEmpty(schemaName))
+                return string.Empty;
             return IsQuoted(schemaName) ? schemaName : Quote(schemaName);
         }
 
-        /// <summary>
-        /// Quotes a Sequence name
-        /// </summary>
-        public virtual string QuoteSequenceName(string sequenceName)
-        {
-            return IsQuoted(sequenceName) ? sequenceName : Quote(sequenceName);
-        }
-
-        /// <summary>
-        /// Provides and unquoted, unescaped string
-        /// </summary>
+        /// <inheritdoc />
         public virtual string UnQuote(string quoted)
         {
-            string unquoted;
+            if (string.IsNullOrEmpty(quoted) || !IsQuoted(quoted))
+                return quoted ?? string.Empty;
 
-            if (IsQuoted(quoted))
-            {
-                unquoted = quoted.Substring(1, quoted.Length - 2);
-            }
-            else
-            {
-                unquoted = quoted;
-            }
+            var unquoted = quoted.Substring(1, quoted.Length - 2);
 
             unquoted = unquoted.Replace(OpenQuoteEscapeString, OpenQuote);
 
@@ -283,6 +270,13 @@ namespace FluentMigrator.Runner.Generators.Generic
             }
 
             return unquoted;
+        }
+
+        protected virtual string CreateSchemaPrefixedQuotedIdentifier(string quotedSchemaName, string quotedIdentifier)
+        {
+            if (string.IsNullOrEmpty(quotedSchemaName))
+                return quotedIdentifier;
+            return $"{quotedSchemaName}{IdentifierSeparator}{quotedIdentifier}";
         }
     }
 }

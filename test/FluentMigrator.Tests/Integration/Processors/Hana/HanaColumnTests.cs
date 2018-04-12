@@ -65,8 +65,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [Test]
         public override void CallingColumnExistsReturnsFalseIfColumnDoesNotExistWithSchema()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
-
             using (var table = new HanaTestTable(Processor, "test_schema", "id int"))
                 Processor.ColumnExists("test_schema", table.Name, "DoesNotExist").ShouldBeFalse();
         }
@@ -80,8 +78,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [Test]
         public override void CallingColumnExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
-
             Processor.ColumnExists("test_schema", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
@@ -95,8 +91,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [Test]
         public override void CallingColumnExistsReturnsTrueIfColumnExistsWithSchema()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
-
             using (var table = new HanaTestTable(Processor, "test_schema", "id int"))
                 Processor.ColumnExists("test_schema", table.Name, "id").ShouldBeTrue();
         }

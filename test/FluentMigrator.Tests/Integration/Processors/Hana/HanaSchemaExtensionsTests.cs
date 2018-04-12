@@ -42,8 +42,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [Test]
         public override void CallingColumnExistsCanAcceptSchemaNameWithSingleQuote()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
-
             using (var table = new HanaTestTable(Processor, "test'schema", "id int"))
                 Processor.ColumnExists("test'schema", table.Name, "id").ShouldBeTrue();
         }
@@ -51,7 +49,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [Test]
         public override void CallingConstraintExistsCanAcceptSchemaNameWithSingleQuote()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
+            Assert.Ignore("Hana doesn't support check constraints");
 
             using (var table = new HanaTestTable(Processor, "test'schema", "id int", "wibble int CONSTRAINT c1 CHECK(wibble > 0)"))
                 Processor.ConstraintExists("test'schema", table.Name, "c1").ShouldBeTrue();
@@ -60,9 +58,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [Test]
         public override void CallingIndexExistsCanAcceptSchemaNameWithSingleQuote()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
-
-            using (var table = new HanaTestTable(Processor, "test'schema", "id int"))
+            using (var table = new HanaTestTable(Processor, "test'schema", "\"id\" int"))
             {
                 var indexName = table.WithIndexOn("id");
                 Processor.IndexExists("test'schema", table.Name, indexName).ShouldBeTrue();
@@ -72,7 +68,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [Test]
         public override void CallingSchemaExistsCanAcceptSchemaNameWithSingleQuote()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
+            Assert.Ignore("Schemas aren't supported by this SAP Hana runner");
 
             using (new HanaTestTable(Processor, "test'schema", Quoter.QuoteColumnName("id") + " int"))
                 Processor.SchemaExists("test'schema").ShouldBeTrue();
@@ -81,8 +77,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [Test]
         public override void CallingTableExistsCanAcceptSchemaNameWithSingleQuote()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
-
             using (var table = new HanaTestTable(Processor, "test'schema", "id int"))
                 Processor.TableExists("test'schema", table.Name).ShouldBeTrue();
         }
@@ -90,9 +84,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [Test]
         public void CallingDefaultValueExistsCanAcceptSchemaNameWithSingleQuote()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
+            Assert.Ignore("Hana doesn't support changing a columns default constraint");
 
-            using (var table = new HanaTestTable(Processor, "test'schema", "id int"))
+            using (var table = new HanaTestTable(Processor, "test'schema", "\"id\" int"))
             {
                 table.WithDefaultValueOn("id");
                 Processor.DefaultValueExists("test'schema", table.Name, "id", 1).ShouldBeTrue();

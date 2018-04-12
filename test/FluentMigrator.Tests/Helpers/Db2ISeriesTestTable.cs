@@ -12,7 +12,7 @@ namespace FluentMigrator.Tests.Helpers
     using FluentMigrator.Runner.Processors;
     using FluentMigrator.Runner.Processors.DB2;
 
-    public class Db2TestTable : IDisposable
+    public class Db2ISeriesTestTable : IDisposable
     {
         #region Fields
 
@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Helpers
 
         #region Constructors
 
-        public Db2TestTable(Db2Processor processor, string schema, params string[] columnDefinitions)
+        public Db2ISeriesTestTable(Db2Processor processor, string schema, params string[] columnDefinitions)
         {
             Connection = processor.Connection;
             Transaction = processor.Transaction;
@@ -41,7 +41,7 @@ namespace FluentMigrator.Tests.Helpers
             Create(columnDefinitions);
         }
 
-        public Db2TestTable(string table, Db2Processor processor, string schema, params string[] columnDefinitions)
+        public Db2ISeriesTestTable(string table, Db2Processor processor, string schema, params string[] columnDefinitions)
         {
             Connection = processor.Connection;
             Transaction = processor.Transaction;
@@ -101,7 +101,7 @@ namespace FluentMigrator.Tests.Helpers
 
             if (!string.IsNullOrEmpty(_schema))
             {
-                sb.AppendFormat("CREATE SCHEMA {0};", quoter.QuoteSchemaName(_schema));
+                sb.AppendFormat("CREATE SCHEMA {0} ", quoter.QuoteSchemaName(_schema));
             }
 
             var columns = string.Join(", ", columnDefinitions);
@@ -141,7 +141,7 @@ namespace FluentMigrator.Tests.Helpers
         public void WithIndexOn(string column, string name)
         {
             var query = string.Format("CREATE UNIQUE INDEX {0} ON {1} ({2})",
-                quoter.QuoteIndexName(name, _schema),
+                quoter.QuoteIndexName(name),
                 NameWithSchema,
                 quoter.QuoteColumnName(column)
                 );

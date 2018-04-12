@@ -36,7 +36,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         {
             var result = new StringBuilder("CREATE SEQUENCE ");
             var seq = expression.Sequence;
-            result.AppendFormat("{0}.{1}", Quoter.QuoteSchemaName(seq.SchemaName), Quoter.QuoteSequenceName(seq.Name));
+            result.Append(Quoter.QuoteSequenceName(seq.Name, seq.SchemaName));
 
             if (seq.Increment.HasValue)
             {
@@ -73,10 +73,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(Expressions.DeleteSequenceExpression expression)
         {
-            var result = new StringBuilder("DROP SEQUENCE ");
-            result.AppendFormat("{0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteSequenceName(expression.SequenceName));
-
-            return result.ToString();
+            return $"DROP SEQUENCE {Quoter.QuoteSequenceName(expression.SequenceName, expression.SchemaName)}";
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -38,7 +38,7 @@ namespace FluentMigrator.Tests.Helpers
 
         public JetTestTable(string tableName, JetProcessor processor, params string[] columnDefinitions)
         {
-            Name = quoter.QuoteTableName(tableName);
+            Name = quoter.QuoteTableName(tableName, null);
             Init(processor, columnDefinitions);
         }
 

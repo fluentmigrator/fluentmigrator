@@ -28,6 +28,7 @@ using System.Reflection;
 using System.Text.RegularExpressions;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Infrastructure;
 using FluentMigrator.Runner;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Exceptions;
@@ -914,6 +915,7 @@ namespace FluentMigrator.Tests.Integration
 
             try
             {
+                var versionTableMetaData = new TestVersionTableMetaData();
                 var asm = typeof(MigrationRunnerTests).Assembly;
                 var runnerContext = new RunnerContext(announcer)
                 {
@@ -921,26 +923,30 @@ namespace FluentMigrator.Tests.Integration
                     PreviewOnly = true
                 };
 
-                var runner = new MigrationRunner(asm, runnerContext, processor);
+                var runner = new MigrationRunner(new SingleAssembly(asm), runnerContext, processor, versionTableMetaData);
                 runner.MigrateUp(1, false);
 
                 processor.CommitTransaction();
 
-                string schemaName = new TestVersionTableMetaData().SchemaName;
-                var schemaAndTableName = string.Format("\\[{0}\\]\\.\\[{1}\\]", schemaName, TestVersionTableMetaData.TABLENAME);
+                string schemaName = versionTableMetaData.SchemaName;
+                var schemaAndTableName = string.Format("[{0}].[{1}]", schemaName, TestVersionTableMetaData.TABLENAME);
 
                 var outputSqlString = outputSql.ToString();
 
-                var createSchemaMatches = new Regex(string.Format("CREATE SCHEMA \\[{0}\\]", schemaName)).Matches(outputSqlString).Count;
-                var createTableMatches = new Regex("CREATE TABLE " + schemaAndTableName).Matches(outputSqlString).Count;
-                var createIndexMatches = new Regex("CREATE UNIQUE CLUSTERED INDEX \\[" + TestVersionTableMetaData.UNIQUEINDEXNAME + "\\] ON " + schemaAndTableName).Matches(outputSqlString).Count;
-                var alterTableMatches = new Regex("ALTER TABLE " + schemaAndTableName).Matches(outputSqlString).Count;
+                var createSchemaMatches = new Regex(Regex.Escape(string.Format("CREATE SCHEMA [{0}]", schemaName)))
+                    .Matches(outputSqlString).Count;
+                var createTableMatches = new Regex(Regex.Escape("CREATE TABLE " + schemaAndTableName))
+                    .Matches(outputSqlString).Count;
+                var createIndexMatches = new Regex(Regex.Escape("CREATE UNIQUE CLUSTERED INDEX [" + TestVersionTableMetaData.UNIQUEINDEXNAME + "] ON " + schemaAndTableName))
+                    .Matches(outputSqlString).Count;
+                var alterTableMatches = new Regex(Regex.Escape("ALTER TABLE " + schemaAndTableName))
+                    .Matches(outputSqlString).Count;
 
                 System.Console.WriteLine(outputSqlString);
 
                 createSchemaMatches.ShouldBe(1);
                 createTableMatches.ShouldBe(1);
-                alterTableMatches.ShouldBe(1);
+                alterTableMatches.ShouldBe(2);
                 createIndexMatches.ShouldBe(1);
 
             }

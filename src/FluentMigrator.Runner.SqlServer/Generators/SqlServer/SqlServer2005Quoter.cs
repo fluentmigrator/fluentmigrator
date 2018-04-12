@@ -1,6 +1,6 @@
 #region License
 //
-// Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
+// Copyright (c) 2018, Fluent Migrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,19 +16,15 @@
 //
 #endregion
 
-namespace FluentMigrator.Runner.Processors.DB2
+namespace FluentMigrator.Runner.Generators.SqlServer
 {
-    public class Db2DbFactory : ReflectionBasedDbFactory
+    public class SqlServer2005Quoter : SqlServer2000Quoter
     {
-        private static readonly TestEntry[] _testEntries =
+        public override string QuoteSchemaName(string schemaName)
         {
-            new TestEntry("IBM.Data.DB2.Core", "IBM.Data.DB2.Core.DB2Factory"),
-            new TestEntry("IBM.Data.DB2", "IBM.Data.DB2.DB2Factory"),
-        };
-
-        public Db2DbFactory()
-            : base(_testEntries)
-        {
+            if (string.IsNullOrEmpty(schemaName))
+                return "[dbo]";
+            return Quote(schemaName);
         }
     }
 }

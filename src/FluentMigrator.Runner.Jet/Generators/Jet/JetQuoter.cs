@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using FluentMigrator.Runner.Generators.Generic;
 
 namespace FluentMigrator.Runner.Generators.Jet
@@ -16,6 +16,11 @@ namespace FluentMigrator.Runner.Generators.Jet
         public override string FormatDateTime(DateTime value)
         {
             return ValueQuote + (value).ToString("yyyy-MM-dd HH:mm:ss") + ValueQuote;
+        }
+
+        public override string QuoteSchemaName(string schemaName)
+        {
+            return string.Empty;
         }
     }
 }

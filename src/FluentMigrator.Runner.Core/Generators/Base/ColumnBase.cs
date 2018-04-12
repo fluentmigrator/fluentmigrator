@@ -162,7 +162,7 @@ namespace FluentMigrator.Runner.Generators.Base
                 ForeignKeyConstraint,
                 constraintClause,
                 String.Join(", ", foreignColumns.ToArray()),
-                Quoter.QuoteTableName(foreignKey.PrimaryTable),
+                Quoter.QuoteTableName(foreignKey.PrimaryTable, foreignKey.PrimaryTableSchema),
                 String.Join(", ", primaryColumns.ToArray()),
                 FormatCascade("DELETE", foreignKey.OnDelete),
                 FormatCascade("UPDATE", foreignKey.OnUpdate)

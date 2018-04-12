@@ -72,8 +72,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [Test]
         public override void CallingConstraintExistsReturnsFalseIfConstraintDoesNotExistWithSchema()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
-
             using (var table = new HanaTestTable(Processor, "schemaName", "id int"))
             {
                 table.WithUniqueConstraintOn("ID");
@@ -90,8 +88,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [Test]
         public override void CallingConstraintExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
-
             this.Processor.ConstraintExists("SchemaName", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
@@ -108,8 +104,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [Test]
         public override void CallingConstraintExistsReturnsTrueIfConstraintExistsWithSchema()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
-
             using (var table = new HanaTestTable(Processor, "schema", "id int"))
             {
                 table.WithUniqueConstraintOn("ID");

@@ -73,7 +73,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
             Factory = new Db2DbFactory();
             Connection = Factory.CreateConnection(IntegrationTestOptions.Db2.ConnectionString);
             Quoter = new Db2Quoter();
-            Processor = new Db2Processor(Connection, new Db2Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), Factory);
+            Processor = new Db2Processor(Connection, new Db2Generator(Quoter), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), Factory);
             Connection.Open();
         }
 
@@ -95,7 +95,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
         [Test]
         public void CallingConstraintExistsReturnsFalseIfConstraintExistsInDifferentSchema()
         {
-            using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT"))
+            using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT NOT NULL"))
             {
                 table.WithUniqueConstraintOn("ID", "c1");
                 Processor.ConstraintExists("DNE", table.Name, "c1").ShouldBeFalse();

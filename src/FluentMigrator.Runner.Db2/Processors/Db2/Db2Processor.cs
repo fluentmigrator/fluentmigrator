@@ -17,39 +17,26 @@
 #endregion
 
 using System.Collections.Generic;
+using System.Data;
 
 using FluentMigrator.Expressions;
+using FluentMigrator.Runner.Generators;
+using FluentMigrator.Runner.Generators.DB2;
+using FluentMigrator.Runner.Helpers;
 
 namespace FluentMigrator.Runner.Processors.DB2
 {
-    using System.Data;
-    using System.Linq;
-
-    using FluentMigrator.Builders.Execute;
-    using FluentMigrator.Runner.Generators;
-    using FluentMigrator.Runner.Generators.DB2;
-    using FluentMigrator.Runner.Helpers;
-
     public class Db2Processor : GenericProcessorBase
     {
-        #region Constructors
-
         public Db2Processor(IDbConnection connection, IMigrationGenerator generator, IAnnouncer announcer, IMigrationProcessorOptions options, IDbFactory factory)
             : base(connection, factory, generator, announcer, options)
         {
-            this.Quoter = new Db2Quoter();
+            Quoter = new Db2Quoter();
         }
 
-        #endregion Constructors
+        public override string DatabaseType => "DB2";
 
-        #region Properties
-
-        public override string DatabaseType
-        {
-            get { return "IBM DB2"; }
-        }
-
-        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "DB2" };
+        public override IList<string> DatabaseTypeAliases { get; } = new List<string> { "IBM DB2" };
 
         public IQuoter Quoter
         {
@@ -57,41 +44,66 @@ namespace FluentMigrator.Runner.Processors.DB2
             set;
         }
 
-        #endregion Properties
-
-        #region Methods
-
         public override bool ColumnExists(string schemaName, string tableName, string columnName)
         {
-            var schema = string.IsNullOrEmpty(schemaName) ? string.Empty : "TABSCHEMA = '" + this.FormatToSafeName(schemaName) + "' AND ";
+            var conditions = new List<string>
+            {
+                BuildEqualityComparison("TABNAME", tableName),
+                BuildEqualityComparison("COLNAME", columnName),
+            };
 
-            var doesExist = this.Exists("SELECT COLNAME FROM SYSCAT.COLUMNS WHERE {0} TABNAME = '{1}' AND COLNAME='{2}'", schema, this.FormatToSafeName(tableName), this.FormatToSafeName(columnName));
+            if (!string.IsNullOrEmpty(schemaName))
+                conditions.Add(BuildEqualityComparison("TABSCHEMA", schemaName));
+
+            var condition = string.Join(" AND ", conditions);
+
+            var doesExist = Exists("SELECT COLNAME FROM SYSCAT.COLUMNS WHERE {0}", condition);
             return doesExist;
         }
 
         public override bool ConstraintExists(string schemaName, string tableName, string constraintName)
         {
-            var schema = string.IsNullOrEmpty(schemaName) ? string.Empty : "TABSCHEMA = '" + this.FormatToSafeName(schemaName) + "' AND ";
+            var conditions = new List<string>
+            {
+                BuildEqualityComparison("TABNAME", tableName),
+                BuildEqualityComparison("CONSTNAME", constraintName),
+            };
 
-            return this.Exists("SELECT CONSTRAINT_NAME FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS WHERE {0} TABLE_NAME = '{1}' AND CONSTRAINT_NAME='{2}'", schema, this.FormatToSafeName(tableName), this.FormatToSafeName(constraintName));
+            if (!string.IsNullOrEmpty(schemaName))
+                conditions.Add(BuildEqualityComparison("TABSCHEMA", schemaName));
+
+            var condition = string.Join(" AND ", conditions);
+
+            return Exists("SELECT CONSTNAME FROM SYSCAT.TABCONST WHERE {0}", condition);
         }
 
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)
         {
-            var schema = string.IsNullOrEmpty(schemaName) ? string.Empty : "TABSCHEMA = '" + this.FormatToSafeName(schemaName) + "' AND ";
             var defaultValueAsString = string.Format("%{0}%", FormatHelper.FormatSqlEscape(defaultValue.ToString()));
 
-            return this.Exists("SELECT COLUMN_DEFAULT FROM SYSCAT.COLUMNS WHERE {0} TABNAME = '{1}' AND COLNAME = '{2}' AND \"DEFAULT\" LIKE '{3}'", schema, this.FormatToSafeName(tableName), columnName.ToUpper(), defaultValueAsString);
+            var conditions = new List<string>
+            {
+                BuildEqualityComparison("TABNAME", tableName),
+                BuildEqualityComparison("COLNAME", columnName),
+                $"\"DEFAULT\" LIKE '{defaultValueAsString}'",
+            };
+
+            if (!string.IsNullOrEmpty(schemaName))
+                conditions.Add(BuildEqualityComparison("TABSCHEMA", schemaName));
+
+            var condition = string.Join(" AND ", conditions);
+
+            return Exists("SELECT \"DEFAULT\" FROM SYSCAT.COLUMNS WHERE {0}", condition);
         }
 
         public override void Execute(string template, params object[] args)
         {
-            this.Process(string.Format(template, args));
+            Process(string.Format(template, args));
         }
 
         public override bool Exists(string template, params object[] args)
         {
-            this.EnsureConnectionIsOpen();
+            EnsureConnectionIsOpen();
 
             using (var command = Factory.CreateCommand(string.Format(template, args), Connection, Transaction, Options))
             using (var reader = command.ExecuteReader())
@@ -102,12 +114,18 @@ namespace FluentMigrator.Runner.Processors.DB2
 
         public override bool IndexExists(string schemaName, string tableName, string indexName)
         {
-            var schema = !string.IsNullOrEmpty(schemaName) ? this.Quoter.QuoteSchemaName(schemaName) + "." : string.Empty;
-            var doesExist = this.Exists(
-                "SELECT NAME FROM INFORMATION_SCHEMA.SYSINDEXES WHERE TABLE_NAME = '{1}' AND NAME = '{2}'",
-                schema,
-                this.FormatToSafeName(tableName),
-                this.FormatToSafeName(indexName));
+            var conditions = new List<string>
+            {
+                BuildEqualityComparison("TABNAME", tableName),
+                BuildEqualityComparison("INDNAME", indexName),
+            };
+
+            if (!string.IsNullOrEmpty(schemaName))
+                conditions.Add(BuildEqualityComparison("INDSCHEMA", schemaName));
+
+            var condition = string.Join(" AND ", conditions);
+
+            var doesExist = Exists("SELECT INDNAME FROM SYSCAT.INDEXES WHERE {0}", condition);
 
             return doesExist;
         }
@@ -121,17 +139,14 @@ namespace FluentMigrator.Runner.Processors.DB2
                 return;
             }
 
-            this.EnsureConnectionIsOpen();
+            EnsureConnectionIsOpen();
 
-            if (expression.Operation != null)
-            {
-                expression.Operation(this.Connection, this.Transaction);
-            }
+            expression.Operation?.Invoke(Connection, Transaction);
         }
 
         public override DataSet Read(string template, params object[] args)
         {
-            this.EnsureConnectionIsOpen();
+            EnsureConnectionIsOpen();
 
             using (var command = Factory.CreateCommand(string.Format(template, args), Connection, Transaction, Options))
             using (var reader = command.ExecuteReader())
@@ -142,13 +157,19 @@ namespace FluentMigrator.Runner.Processors.DB2
 
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
-            var schemaAndTable = !string.IsNullOrEmpty(schemaName) ? this.Quoter.QuoteSchemaName(schemaName) + "." + this.Quoter.QuoteTableName(tableName) : this.Quoter.QuoteTableName(tableName);
-            return this.Read("SELECT * FROM {0}", schemaAndTable);
+            return Read("SELECT * FROM {0}", Quoter.QuoteTableName(tableName, schemaName));
         }
 
         public override bool SchemaExists(string schemaName)
         {
-            return this.Exists("SELECT SCHEMA_NAME FROM INFORMATION_SCHEMA.SCHEMATA WHERE SCHEMA_NAME = '{0}'", this.FormatToSafeName(schemaName));
+            var conditions = new List<string>
+            {
+                BuildEqualityComparison("SCHEMANAME", schemaName),
+            };
+
+            var condition = string.Join(" AND ", conditions);
+
+            return Exists("SELECT SCHEMANAME FROM SYSCAT.SCHEMATA WHERE {0}", condition);
         }
 
         public override bool SequenceExists(string schemaName, string sequenceName)
@@ -158,9 +179,17 @@ namespace FluentMigrator.Runner.Processors.DB2
 
         public override bool TableExists(string schemaName, string tableName)
         {
-            var schema = string.IsNullOrEmpty(schemaName) ? string.Empty : "TABLE_SCHEMA = '" + this.FormatToSafeName(schemaName) + "' AND ";
+            var conditions = new List<string>
+            {
+                BuildEqualityComparison("TABNAME", tableName),
+            };
 
-            return this.Exists("SELECT TABLE_NAME FROM INFORMATION_SCHEMA.TABLES WHERE {0} TABLE_NAME = '{1}'", schema, this.FormatToSafeName(tableName));
+            if (!string.IsNullOrEmpty(schemaName))
+                conditions.Add(BuildEqualityComparison("TABSCHEMA", schemaName));
+
+            var condition = string.Join(" AND ", conditions);
+
+            return Exists("SELECT TABNAME FROM SYSCAT.TABLES WHERE {0}", condition);
         }
 
         protected override void Process(string sql)
@@ -172,7 +201,7 @@ namespace FluentMigrator.Runner.Processors.DB2
                 return;
             }
 
-            this.EnsureConnectionIsOpen();
+            EnsureConnectionIsOpen();
 
             using (var command = Factory.CreateCommand(sql, Connection, Transaction, Options))
             {
@@ -180,13 +209,14 @@ namespace FluentMigrator.Runner.Processors.DB2
             }
         }
 
-        private string FormatToSafeName(string sqlName)
+        private string BuildEqualityComparison(string columnName, string value)
         {
-            var rawName = this.Quoter.UnQuote(sqlName);
+            if (Quoter.IsQuoted(value))
+            {
+                return $"{Quoter.QuoteColumnName(columnName)}='{FormatHelper.FormatSqlEscape(Quoter.UnQuote(value))}'";
+            }
 
-            return rawName.Contains('\'') ? FormatHelper.FormatSqlEscape(rawName) : rawName.ToUpper();
+            return $"LCASE({Quoter.QuoteColumnName(columnName)})=LCASE('{FormatHelper.FormatSqlEscape(Quoter.UnQuote(value))}')";
         }
-
-        #endregion Methods
     }
 }

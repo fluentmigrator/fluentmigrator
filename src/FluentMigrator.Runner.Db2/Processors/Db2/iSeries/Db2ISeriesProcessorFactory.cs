@@ -16,21 +16,18 @@
 //
 #endregion
 
-namespace FluentMigrator.Runner.Processors.DB2
+using FluentMigrator.Runner.Generators.DB2;
+using FluentMigrator.Runner.Generators.DB2.iSeries;
+
+namespace FluentMigrator.Runner.Processors.DB2.iSeries
 {
-    using FluentMigrator.Runner.Generators.DB2;
-
-    public class Db2ProcessorFactory : MigrationProcessorFactory
+    public class Db2ISeriesProcessorFactory : MigrationProcessorFactory
     {
-        #region Methods
-
         public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
         {
-            var factory = new Db2DbFactory();
+            var factory = new Db2ISeriesDbFactory();
             var connection = factory.CreateConnection(connectionString);
-            return new Db2Processor(connection, new Db2Generator(new Db2Quoter()), announcer, options, factory);
+            return new Db2ISeriesProcessor(connection, new Db2Generator(new Db2ISeriesQuoter()), announcer, options, factory);
         }
-
-        #endregion Methods
     }
 }

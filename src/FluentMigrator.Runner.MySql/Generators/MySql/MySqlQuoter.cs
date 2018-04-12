@@ -55,5 +55,11 @@ namespace FluentMigrator.Runner.Generators.MySql
 
             return base.FormatSystemMethods(value);
         }
+
+        public override string QuoteSchemaName(string schemaName)
+        {
+            // This database doesn't support schemata
+            return string.Empty;
+        }
     }
 }

@@ -46,8 +46,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [Test]
         public override void CallingSequenceExistsReturnsFalseIfSequenceDoesNotExistWithSchema()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
-
             Processor.SequenceExists("test_schema", "DoesNotExist").ShouldBeFalse();
         }
 
@@ -61,7 +59,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [Test]
         public override void CallingSequenceExistsReturnsTrueIfSequenceExistsWithSchema()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
+            Assert.Ignore("Schemas aren't supported by this SAP Hana runner");
 
             using (new HanaTestSequence(Processor, "test_schema", "test_sequence"))
                 Processor.SequenceExists("test_schema", "test_sequence").ShouldBeTrue();

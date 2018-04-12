@@ -55,6 +55,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         [TearDown]
         public void TearDown()
         {
+            if (Processor == null)
+                return;
+
             Processor.CommitTransaction();
             Processor.Dispose();
         }
@@ -88,7 +91,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
             {
                 AddTestData(table);
 
-                DataSet ds = Processor.Read("SELECT * FROM {0}", table.Name);
+                DataSet ds = Processor.Read("SELECT * FROM \"{0}\"", table.Name);
 
                 ds.ShouldNotBeNull();
                 ds.Tables.Count.ShouldBe(1);

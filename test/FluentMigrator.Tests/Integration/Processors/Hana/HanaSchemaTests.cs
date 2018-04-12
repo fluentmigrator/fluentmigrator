@@ -38,17 +38,15 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [Test]
         public override void CallingSchemaExistsReturnsFalseIfSchemaDoesNotExist()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
-
             Processor.SchemaExists("DoesNotExist").ShouldBeFalse();
         }
 
         [Test]
         public override void CallingSchemaExistsReturnsTrueIfSchemaExists()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
+            Assert.Ignore("Schemas aren't supported by this SAP Hana runner");
 
-            Processor.SchemaExists("dbo").ShouldBeTrue();
+            Processor.SchemaExists("SYSTEM").ShouldBeTrue();
         }
     }
 }

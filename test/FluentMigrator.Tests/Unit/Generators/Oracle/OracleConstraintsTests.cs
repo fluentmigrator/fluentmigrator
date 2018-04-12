@@ -25,7 +25,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.ForeignKey.PrimaryTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT FK_TestTable1_TestColumn1_TestTable2_TestColumn2 FOREIGN KEY (TestColumn1) REFERENCES TestTable2 (TestColumn2)");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ADD CONSTRAINT FK_TestTable1_TestColumn1_TestTable2_TestColumn2 FOREIGN KEY (TestColumn1) REFERENCES TestSchema.TestTable2 (TestColumn2)");
         }
 
         [Test]
@@ -44,7 +44,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT FK_TestTable1_TestColumn1_TestTable2_TestColumn2 FOREIGN KEY (TestColumn1) REFERENCES TestTable2 (TestColumn2)");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ADD CONSTRAINT FK_TestTable1_TestColumn1_TestTable2_TestColumn2 FOREIGN KEY (TestColumn1) REFERENCES TestTable2 (TestColumn2)");
         }
 
         [Test]
@@ -55,7 +55,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.ForeignKey.PrimaryTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4 FOREIGN KEY (TestColumn1, TestColumn3) REFERENCES TestTable2 (TestColumn2, TestColumn4)");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ADD CONSTRAINT FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4 FOREIGN KEY (TestColumn1, TestColumn3) REFERENCES TestSchema.TestTable2 (TestColumn2, TestColumn4)");
         }
 
         [Test]
@@ -74,7 +74,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4 FOREIGN KEY (TestColumn1, TestColumn3) REFERENCES TestTable2 (TestColumn2, TestColumn4)");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ADD CONSTRAINT FK_TestTable1_TestColumn1_TestColumn3_TestTable2_TestColumn2_TestColumn4 FOREIGN KEY (TestColumn1, TestColumn3) REFERENCES TestTable2 (TestColumn2, TestColumn4)");
         }
 
         [Test]
@@ -84,7 +84,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT PK_TestTable1_TestColumn1_TestColumn2 PRIMARY KEY (TestColumn1, TestColumn2)");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ADD CONSTRAINT PK_TestTable1_TestColumn1_TestColumn2 PRIMARY KEY (TestColumn1, TestColumn2)");
         }
 
         [Test]
@@ -103,7 +103,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT UC_TestTable1_TestColumn1_TestColumn2 UNIQUE (TestColumn1, TestColumn2)");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ADD CONSTRAINT UC_TestTable1_TestColumn1_TestColumn2 UNIQUE (TestColumn1, TestColumn2)");
         }
 
         [Test]
@@ -123,7 +123,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.ForeignKey.PrimaryTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT FK_Test FOREIGN KEY (TestColumn1) REFERENCES TestTable2 (TestColumn2)");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ADD CONSTRAINT FK_Test FOREIGN KEY (TestColumn1) REFERENCES TestSchema.TestTable2 (TestColumn2)");
         }
 
         [Test]
@@ -142,7 +142,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT FK_Test FOREIGN KEY (TestColumn1) REFERENCES TestTable2 (TestColumn2)");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ADD CONSTRAINT FK_Test FOREIGN KEY (TestColumn1) REFERENCES TestTable2 (TestColumn2)");
         }
 
         [Test]
@@ -184,7 +184,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.ForeignKey.PrimaryTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT FK_Test FOREIGN KEY (TestColumn1, TestColumn3) REFERENCES TestTable2 (TestColumn2, TestColumn4)");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ADD CONSTRAINT FK_Test FOREIGN KEY (TestColumn1, TestColumn3) REFERENCES TestSchema.TestTable2 (TestColumn2, TestColumn4)");
         }
 
         [Test]
@@ -203,7 +203,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT FK_Test FOREIGN KEY (TestColumn1, TestColumn3) REFERENCES TestTable2 (TestColumn2, TestColumn4)");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ADD CONSTRAINT FK_Test FOREIGN KEY (TestColumn1, TestColumn3) REFERENCES TestTable2 (TestColumn2, TestColumn4)");
         }
 
         [Test]
@@ -213,7 +213,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT TESTPRIMARYKEY PRIMARY KEY (TestColumn1, TestColumn2)");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ADD CONSTRAINT TESTPRIMARYKEY PRIMARY KEY (TestColumn1, TestColumn2)");
         }
 
         [Test]
@@ -232,7 +232,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT TESTUNIQUECONSTRAINT UNIQUE (TestColumn1, TestColumn2)");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ADD CONSTRAINT TESTUNIQUECONSTRAINT UNIQUE (TestColumn1, TestColumn2)");
         }
 
         [Test]
@@ -251,7 +251,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT TESTPRIMARYKEY PRIMARY KEY (TestColumn1)");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ADD CONSTRAINT TESTPRIMARYKEY PRIMARY KEY (TestColumn1)");
         }
 
         [Test]
@@ -270,7 +270,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT TESTUNIQUECONSTRAINT UNIQUE (TestColumn1)");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ADD CONSTRAINT TESTUNIQUECONSTRAINT UNIQUE (TestColumn1)");
         }
 
         [Test]
@@ -289,7 +289,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT PK_TestTable1_TestColumn1 PRIMARY KEY (TestColumn1)");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ADD CONSTRAINT PK_TestTable1_TestColumn1 PRIMARY KEY (TestColumn1)");
         }
 
         [Test]
@@ -308,7 +308,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 ADD CONSTRAINT UC_TestTable1_TestColumn1 UNIQUE (TestColumn1)");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 ADD CONSTRAINT UC_TestTable1_TestColumn1 UNIQUE (TestColumn1)");
         }
 
         [Test]
@@ -327,7 +327,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.ForeignKey.ForeignTableSchema = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 DROP CONSTRAINT FK_Test");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 DROP CONSTRAINT FK_Test");
         }
 
         [Test]
@@ -346,7 +346,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 DROP CONSTRAINT TESTPRIMARYKEY");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 DROP CONSTRAINT TESTPRIMARYKEY");
         }
 
         [Test]
@@ -365,7 +365,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.Constraint.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 DROP CONSTRAINT TESTUNIQUECONSTRAINT");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 DROP CONSTRAINT TESTUNIQUECONSTRAINT");
         }
 
         [Test]
@@ -435,7 +435,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
         public void CanRemoveDefaultConstraint()
         {
             var expression = GeneratorTestHelper.GetDeleteDefaultConstraintExpression();
-            
+
             var result = Generator.Generate(expression);
 
             result.ShouldBe("ALTER TABLE TestTable1 MODIFY TestColumn1 DEFAULT NULL");

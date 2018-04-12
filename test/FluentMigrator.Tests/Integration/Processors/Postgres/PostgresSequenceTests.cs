@@ -30,6 +30,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         [TearDown]
         public void TearDown()
         {
+            if (Processor == null)
+                return;
+
             Processor.CommitTransaction();
             Processor.Dispose();
         }

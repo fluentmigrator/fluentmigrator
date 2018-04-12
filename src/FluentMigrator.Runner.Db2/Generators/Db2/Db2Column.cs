@@ -15,8 +15,8 @@ namespace FluentMigrator.Runner.Generators.DB2
     {
         #region Constructors
 
-        public Db2Column()
-            : base(new Db2TypeMap(), new Db2Quoter())
+        public Db2Column(IQuoter quoter)
+            : base(new Db2TypeMap(), quoter)
         {
             this.ClauseOrder = new List<Func<ColumnDefinition, string>> { FormatString, FormatType, this.FormatCCSID, this.FormatNullable, this.FormatDefaultValue, this.FormatIdentity };
             this.AlterClauseOrder = new List<Func<ColumnDefinition, string>> { FormatType, this.FormatCCSID, this.FormatNullable, this.FormatDefaultValue, this.FormatIdentity };

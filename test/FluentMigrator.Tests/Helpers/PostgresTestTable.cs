@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using FluentMigrator.Runner.Generators.Postgres;
@@ -19,7 +19,7 @@ namespace FluentMigrator.Tests.Helpers
         public PostgresTestTable(PostgresProcessor processor, string schemaName, params string[] columnDefinitions)
         {
             _schemaName = schemaName;
-            Name = "\"Table" + Guid.NewGuid().ToString("N") + "\"";
+            Name = "Table" + Guid.NewGuid().ToString("N");
             Init(processor, columnDefinitions);
 
         }
@@ -28,7 +28,7 @@ namespace FluentMigrator.Tests.Helpers
         {
             _schemaName = schemaName;
 
-            Name = quoter.QuoteTableName(tableName);
+            Name = quoter.UnQuote(tableName);
             Init(processor, columnDefinitions);
         }
 
@@ -37,7 +37,7 @@ namespace FluentMigrator.Tests.Helpers
             Connection = (NpgsqlConnection)processor.Connection;
             Transaction = (NpgsqlTransaction)processor.Transaction;
 
-            NameWithSchema = string.IsNullOrEmpty(_schemaName) ? Name : string.Format("\"{0}\".{1}", _schemaName, Name);
+            NameWithSchema = quoter.QuoteTableName(Name, _schemaName);
             Create(columnDefinitions);
         }
 
@@ -86,7 +86,7 @@ namespace FluentMigrator.Tests.Helpers
         public void WithDefaultValueOn(string column)
         {
             const int defaultValue = 1;
-            using (var command = new NpgsqlCommand(string.Format(" ALTER TABLE {0}.{1} ALTER {2} SET DEFAULT {3}", quoter.QuoteSchemaName(_schemaName), quoter.QuoteTableName(Name), quoter.QuoteColumnName(column), defaultValue), Connection, Transaction))
+            using (var command = new NpgsqlCommand(string.Format(" ALTER TABLE {0} ALTER {1} SET DEFAULT {2}", quoter.QuoteTableName(Name, _schemaName), quoter.QuoteColumnName(column), defaultValue), Connection, Transaction))
                 command.ExecuteNonQuery();
         }
     }

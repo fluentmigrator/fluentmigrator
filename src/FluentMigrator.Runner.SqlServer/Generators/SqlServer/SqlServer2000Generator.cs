@@ -1,7 +1,7 @@
 #region License
-// 
+//
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
-// 
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Generators.Generic;
 using FluentMigrator.SqlServer;
@@ -31,7 +32,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         private static readonly SqlServer2000Quoter _quoter = new SqlServer2000Quoter();
 
         public SqlServer2000Generator()
-            : base(new SqlServer2000Column(new SqlServer2000TypeMap(), _quoter), _quoter, new EmptyDescriptionGenerator())
+            : this(new SqlServer2000Column(new SqlServer2000TypeMap(), _quoter), _quoter, new EmptyDescriptionGenerator())
         {
         }
 
@@ -76,7 +77,8 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             string columns = String.Join(", ", expression.Constraint.Columns.Select(x => Quoter.QuoteColumnName(x)).ToArray());
 
-            return string.Format(CreateConstraint, Quoter.QuoteTableName(expression.Constraint.TableName),
+            return string.Format(CreateConstraint,
+                Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName),
                 Quoter.Quote(expression.Constraint.ConstraintName),
                 constraintType,
                 constraintClustering,
@@ -85,14 +87,14 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string Generate(RenameTableExpression expression)
         {
-            var sourceParam = Quoter.QuoteValue(Quoter.QuoteTableName(expression.OldName));
+            var sourceParam = Quoter.QuoteValue(Quoter.QuoteTableName(expression.OldName, expression.SchemaName));
             var destinationParam = Quoter.QuoteValue(expression.NewName);
             return string.Format(RenameTable, sourceParam, destinationParam);
         }
 
         public override string Generate(RenameColumnExpression expression)
         {
-            var tableName = Quoter.QuoteTableName(expression.TableName);
+            var tableName = Quoter.QuoteTableName(expression.TableName, expression.SchemaName);
             var columnName = Quoter.QuoteColumnName(expression.OldName);
             var sourceParam = Quoter.QuoteValue($"{tableName}.{columnName}");
             var destinationParam = Quoter.QuoteValue(expression.NewName);
@@ -104,27 +106,30 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             // before we drop a column, we have to drop any default value constraints in SQL Server
             var builder = new StringBuilder();
 
-            foreach (string column in expression.ColumnNames) 
+            foreach (string column in expression.ColumnNames)
             {
                 if (expression.ColumnNames.First() != column) builder.AppendLine("GO");
-                BuildDelete(expression, column, builder);  
+                BuildDelete(expression, column, builder);
             }
-            
+
             return builder.ToString();
         }
 
-        protected virtual void BuildDelete(DeleteColumnExpression expression, string columnName, StringBuilder builder) 
+        protected virtual void BuildDelete(DeleteColumnExpression expression, string columnName, StringBuilder builder)
         {
-            builder.AppendLine(Generate(new DeleteDefaultConstraintExpression {
-                                                                                  ColumnName = columnName,
-                                                                                  SchemaName = expression.SchemaName,
-                                                                                  TableName = expression.TableName
-                                                                              }));
+            builder.AppendLine(
+                Generate(
+                    new DeleteDefaultConstraintExpression
+                    {
+                        ColumnName = columnName,
+                        SchemaName = expression.SchemaName,
+                        TableName = expression.TableName
+                    }));
 
             builder.AppendLine();
 
             builder.AppendLine(String.Format("-- now we can finally drop column" + Environment.NewLine + "ALTER TABLE {0} DROP COLUMN {1};",
-                                         Quoter.QuoteTableName(expression.TableName),
+                                         Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                                          Quoter.QuoteColumnName(columnName)));
         }
 
@@ -142,11 +147,11 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
             builder.AppendLine();
 
-            builder.Append(String.Format("-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +"ALTER TABLE {0} WITH NOCHECK ADD CONSTRAINT {3} DEFAULT({2}) FOR {1};",
-                Quoter.QuoteTableName(expression.TableName),
+            builder.AppendFormat("-- create alter table command to create new default constraint as string and run it" + Environment.NewLine +"ALTER TABLE {0} WITH NOCHECK ADD CONSTRAINT {3} DEFAULT({2}) FOR {1};",
+                Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                 Quoter.QuoteColumnName(expression.ColumnName),
-                Quoter.QuoteValue(expression.DefaultValue),
-                Quoter.QuoteConstraintName(SqlServer2000Column.GetDefaultConstraintName(expression.TableName, expression.ColumnName))));
+                SqlServer2000Column.FormatDefaultValue(expression.DefaultValue, Quoter),
+                Quoter.QuoteConstraintName(SqlServer2000Column.GetDefaultConstraintName(expression.TableName, expression.ColumnName)));
 
             return builder.ToString();
         }
@@ -156,9 +161,9 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             if (IsUsingIdentityInsert(expression))
             {
                 return string.Format("{0}; {1}; {2}",
-                            string.Format(IdentityInsert, Quoter.QuoteTableName(expression.TableName), "ON"),
+                            string.Format(IdentityInsert, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), "ON"),
                             base.Generate(expression),
-                            string.Format(IdentityInsert, Quoter.QuoteTableName(expression.TableName), "OFF"));
+                            string.Format(IdentityInsert, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), "OFF"));
             }
             return base.Generate(expression);
         }
@@ -199,10 +204,10 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 "AND name = '{1}'" + Environment.NewLine +
                 ");" + Environment.NewLine + Environment.NewLine +
                 "-- create alter table command to drop constraint as string and run it" + Environment.NewLine +
-                "SET @sql = N'ALTER TABLE {0} DROP CONSTRAINT ' + QUOTENAME(@default);" + Environment.NewLine + 
+                "SET @sql = N'ALTER TABLE {0} DROP CONSTRAINT ' + QUOTENAME(@default);" + Environment.NewLine +
                 "EXEC sp_executesql @sql;";
 
-            return String.Format(sql, Quoter.QuoteTableName(expression.TableName), expression.ColumnName);
+            return String.Format(sql, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), expression.ColumnName);
         }
 
         public override bool IsAdditionalFeatureSupported(string feature)
@@ -210,7 +215,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
             return _supportedAdditionalFeatures.Any(x => x == feature);
         }
 
-        private readonly IEnumerable<string> _supportedAdditionalFeatures = new List<string> 
+        private readonly IEnumerable<string> _supportedAdditionalFeatures = new List<string>
         {
             SqlServerExtensions.IdentityInsert,
             SqlServerExtensions.IdentitySeed,

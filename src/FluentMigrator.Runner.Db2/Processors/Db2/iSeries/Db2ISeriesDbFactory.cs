@@ -16,21 +16,18 @@
 //
 #endregion
 
-namespace FluentMigrator.Runner.Processors.DB2
+namespace FluentMigrator.Runner.Processors.DB2.iSeries
 {
-    using FluentMigrator.Runner.Generators.DB2;
-
-    public class Db2ProcessorFactory : MigrationProcessorFactory
+    public class Db2ISeriesDbFactory : ReflectionBasedDbFactory
     {
-        #region Methods
-
-        public override IMigrationProcessor Create(string connectionString, IAnnouncer announcer, IMigrationProcessorOptions options)
+        private static readonly TestEntry[] _testEntries =
         {
-            var factory = new Db2DbFactory();
-            var connection = factory.CreateConnection(connectionString);
-            return new Db2Processor(connection, new Db2Generator(new Db2Quoter()), announcer, options, factory);
-        }
+            new TestEntry("IBM.Data.DB2.iSeries", "IBM.Data.DB2.iSeries.iDB2Factory"),
+        };
 
-        #endregion Methods
+        public Db2ISeriesDbFactory()
+            : base(_testEntries)
+        {
+        }
     }
 }

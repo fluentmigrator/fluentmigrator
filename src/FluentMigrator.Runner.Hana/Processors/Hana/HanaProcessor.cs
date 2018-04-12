@@ -130,10 +130,7 @@ namespace FluentMigrator.Runner.Processors.Hana
             if (tableName == null)
                 throw new ArgumentNullException("tableName");
 
-            if (String.IsNullOrEmpty(schemaName))
-                return Read("SELECT * FROM {0}", Quoter.QuoteTableName(tableName));
-
-            return Read("SELECT * FROM {0}.{1}", Quoter.QuoteSchemaName(schemaName), Quoter.QuoteTableName(tableName));
+            return Read("SELECT * FROM {0}", Quoter.QuoteTableName(tableName, schemaName));
         }
 
         public override DataSet Read(string template, params object[] args)

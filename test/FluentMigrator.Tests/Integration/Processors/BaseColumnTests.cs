@@ -1,5 +1,9 @@
+using NUnit.Framework;
+
 namespace FluentMigrator.Tests.Integration.Processors
 {
+    [Category("Integration")]
+    [Category("Column")]
     public abstract class BaseColumnTests
     {
         public abstract void CallingColumnExistsCanAcceptColumnNameWithSingleQuote();

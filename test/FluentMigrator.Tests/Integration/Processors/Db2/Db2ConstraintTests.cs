@@ -30,7 +30,6 @@ using NUnit.Should;
 namespace FluentMigrator.Tests.Integration.Processors.Db2
 {
     [TestFixture]
-    [Category("Integration")]
     [Category("Db2")]
     public class Db2ConstraintTests : BaseConstraintTests
     {
@@ -68,7 +67,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
         [Test]
         public override void CallingConstraintExistsCanAcceptConstraintNameWithSingleQuote()
         {
-            using (var table = new Db2TestTable(Processor, null, "ID INT"))
+            using (var table = new Db2TestTable(Processor, null, "ID INT NOT NULL"))
             {
                 table.WithUniqueConstraintOn("ID", "C'1");
                 Processor.ConstraintExists(null, table.Name, "C'1").ShouldBeTrue();
@@ -78,7 +77,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
         [Test]
         public override void CallingConstraintExistsCanAcceptTableNameWithSingleQuote()
         {
-            using (var table = new Db2TestTable("Test'Table", Processor, null, "ID INT"))
+            using (var table = new Db2TestTable("Test'Table", Processor, null, "ID INT NOT NULL"))
             {
                 table.WithUniqueConstraintOn("ID", "C'1");
                 Processor.ConstraintExists(null, table.Name, "C'1").ShouldBeTrue();
@@ -118,7 +117,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
         [Test]
         public override void CallingConstraintExistsReturnsTrueIfConstraintExists()
         {
-            using (var table = new Db2TestTable(Processor, null, "ID INT"))
+            using (var table = new Db2TestTable(Processor, null, "ID INT NOT NULL"))
             {
                 table.WithUniqueConstraintOn("ID", "C1");
                 Processor.ConstraintExists(null, table.Name, "C1").ShouldBeTrue();
@@ -128,7 +127,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
         [Test]
         public override void CallingConstraintExistsReturnsTrueIfConstraintExistsWithSchema()
         {
-            using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT"))
+            using (var table = new Db2TestTable(Processor, "TstSchma", "ID INT NOT NULL"))
             {
                 table.WithUniqueConstraintOn("ID", "C1");
                 Processor.ConstraintExists("TstSchma", table.Name, "C1").ShouldBeTrue();
@@ -143,7 +142,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
             Factory = new Db2DbFactory();
             Connection = Factory.CreateConnection(IntegrationTestOptions.Db2.ConnectionString);
             Quoter = new Db2Quoter();
-            Processor = new Db2Processor(Connection, new Db2Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), Factory);
+            Processor = new Db2Processor(Connection, new Db2Generator(Quoter), new TextWriterAnnouncer(TestContext.Out) { ShowSql = true }, new ProcessorOptions(), Factory);
             Connection.Open();
         }
 

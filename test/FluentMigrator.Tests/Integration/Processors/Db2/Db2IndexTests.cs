@@ -143,7 +143,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Db2
             Factory = new Db2DbFactory();
             Connection = Factory.CreateConnection(IntegrationTestOptions.Db2.ConnectionString);
             Quoter = new Db2Quoter();
-            Processor = new Db2Processor(Connection, new Db2Generator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), Factory);
+            Processor = new Db2Processor(Connection, new Db2Generator(Quoter), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), Factory);
             Connection.Open();
         }
 

@@ -38,6 +38,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird
         [TearDown]
         public void TearDown()
         {
+            if (Processor == null)
+                return;
+
             if (!Processor.WasCommitted)
                 Processor.CommitTransaction();
             Connection.Close();

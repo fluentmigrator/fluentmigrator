@@ -118,7 +118,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
             CheckTable(tableName);
-            return Read("SELECT * FROM {0}", quoter.QuoteTableName(tableName));
+            return Read("SELECT * FROM {0}", quoter.QuoteTableName(tableName, schemaName));
         }
 
         public override DataSet Read(string template, params object[] args)
@@ -806,7 +806,7 @@ namespace FluentMigrator.Runner.Processors.Firebird
             }
             string triggerName = GetIdentityTriggerName(tableName, columnName);
             string quotedColumn = quoter.Quote(columnName);
-            string trigger = String.Format("as begin if (NEW.{0} is NULL) then NEW.{1} = GEN_ID({2}, 1); end", quotedColumn, quotedColumn, quoter.QuoteSequenceName(sequenceName));
+            string trigger = String.Format("as begin if (NEW.{0} is NULL) then NEW.{1} = GEN_ID({2}, 1); end", quotedColumn, quotedColumn, quoter.QuoteSequenceName(sequenceName, string.Empty));
 
             PerformDBOperationExpression createTrigger = CreateTriggerExpression(tableName, triggerName, true, TriggerEvent.Insert, trigger);
             Process(createTrigger);

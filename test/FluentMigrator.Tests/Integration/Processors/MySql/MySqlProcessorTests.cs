@@ -36,7 +36,7 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
         [TearDown]
         public void TearDown()
         {
-            Processor.Dispose();
+            Processor?.Dispose();
         }
 
         [Test]

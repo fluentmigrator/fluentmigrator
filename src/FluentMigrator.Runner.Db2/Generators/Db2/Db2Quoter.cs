@@ -22,23 +22,24 @@ namespace FluentMigrator.Runner.Generators.DB2
 {
     public class Db2Quoter : GenericQuoter
     {
-        #region Fields
-
         public readonly char[] SpecialChars = "\"%'()*+|,{}-./:;<=>?^[]".ToCharArray();
-
-        #endregion Fields
-
-        #region Methods
 
         public override string FormatDateTime(DateTime value)
         {
-            return this.ValueQuote + value.ToString("yyyy-MM-dd-HH.mm.ss") + this.ValueQuote;
+            return ValueQuote + value.ToString("yyyy-MM-dd-HH.mm.ss") + ValueQuote;
         }
 
-        public override string Quote(string name)
+        protected override bool ShouldQuote(string name)
         {
             // Quotes are only included if the name contains a special character, in order to preserve case insensitivity where possible.
-            return name.IndexOfAny(this.SpecialChars) != -1 ? base.Quote(name) : name;
+            return name.IndexOfAny(SpecialChars) != -1;
+        }
+
+        public override string QuoteIndexName(string indexName, string schemaName)
+        {
+            return CreateSchemaPrefixedQuotedIdentifier(
+                QuoteSchemaName(schemaName),
+                IsQuoted(indexName) ? indexName : Quote(indexName));
         }
 
         public override string FormatSystemMethods(SystemMethods value)
@@ -55,7 +56,5 @@ namespace FluentMigrator.Runner.Generators.DB2
 
             return base.FormatSystemMethods(value);
         }
-
-        #endregion Methods
     }
 }

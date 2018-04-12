@@ -30,8 +30,12 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
         [TearDown]
         public void TearDown()
         {
+            if (_temporaryDatabase == null)
+                return;
+
             FbDatabase.DropDatabase(_temporaryDatabase.ConnectionString);
             _temporaryDatabase.Dispose();
+            _temporaryDatabase = null;
         }
 
         protected void Migrate(string migrationsNamespace)

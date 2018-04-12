@@ -1,35 +1,30 @@
-﻿namespace FluentMigrator.Runner.Generators.Oracle
+namespace FluentMigrator.Runner.Generators.Oracle
 {
     public class OracleQuoter : OracleQuoterQuotedIdentifier
     {
-        public override string QuoteColumnName(string columnName)
+        public override string Quote(string name)
         {
-            return columnName;
+            return UnQuote(name);
         }
 
-        public override string QuoteConstraintName(string constraintName)
+        public override string QuoteConstraintName(string constraintName, string schemaName)
         {
-            return constraintName;
+            return base.QuoteConstraintName(UnQuote(constraintName), UnQuote(schemaName));
         }
 
-        public override string QuoteIndexName(string indexName)
+        public override string QuoteIndexName(string indexName, string schemaName)
         {
-            return indexName;
+            return base.QuoteIndexName(UnQuote(indexName), UnQuote(schemaName));
         }
 
-        public override string QuoteSchemaName(string schemaName)
+        public override string QuoteTableName(string tableName, string schemaName)
         {
-            return schemaName;
+            return base.QuoteTableName(UnQuote(tableName), UnQuote(schemaName));
         }
 
-        public override string QuoteTableName(string tableName)
+        public override string QuoteSequenceName(string sequenceName, string schemaName)
         {
-            return tableName;
-        }
-
-        public override string QuoteSequenceName(string sequenceName)
-        {
-            return sequenceName;
+            return base.QuoteTableName(UnQuote(sequenceName), UnQuote(schemaName));
         }
     }
 }
