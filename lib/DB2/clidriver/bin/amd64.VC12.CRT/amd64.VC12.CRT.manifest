@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!--- Copyright xxxx-xxxx IBM Corporation -->
+<assembly xmlns="urn:schemas-microsoft-com:asm.v1" manifestVersion="1.0">
+<assemblyIdentity
+   type="win32"
+   name="amd64.VC12.CRT"
+   version="9.1.0.000"
+   processorArchitecture="amd64"
+/>
+<file name="msvcr120.dll"/>
+<file name="msvcp120.dll"/>
+<description>Microsoft MSVC CRT libraries</description>
+</assembly>

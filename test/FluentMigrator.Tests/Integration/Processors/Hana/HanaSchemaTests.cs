@@ -20,6 +20,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [SetUp]
         public void SetUp()
         {
+            if (!IntegrationTestOptions.Hana.IsEnabled)
+                Assert.Ignore();
             Connection = new HanaConnection(IntegrationTestOptions.Hana.ConnectionString);
             Processor = new HanaProcessor(Connection, new HanaGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new HanaDbFactory());
             Connection.Open();
@@ -29,24 +31,22 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [TearDown]
         public void TearDown()
         {
-            Processor.CommitTransaction();
-            Processor.Dispose();
+            Processor?.CommitTransaction();
+            Processor?.Dispose();
         }
 
         [Test]
         public override void CallingSchemaExistsReturnsFalseIfSchemaDoesNotExist()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
-
             Processor.SchemaExists("DoesNotExist").ShouldBeFalse();
         }
 
         [Test]
         public override void CallingSchemaExistsReturnsTrueIfSchemaExists()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
+            Assert.Ignore("Schemas aren't supported by this SAP Hana runner");
 
-            Processor.SchemaExists("dbo").ShouldBeTrue();
+            Processor.SchemaExists("SYSTEM").ShouldBeTrue();
         }
     }
 }

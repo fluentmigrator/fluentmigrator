@@ -25,6 +25,8 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
         [SetUp]
         public void SetUp()
         {
+            if (!IntegrationTestOptions.MySql.IsEnabled)
+                Assert.Ignore();
             Connection = new MySqlConnection(IntegrationTestOptions.MySql.ConnectionString);
             Processor = new MySqlProcessor(Connection, new MySql4Generator(),
                 new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new MySqlDbFactory());
@@ -34,7 +36,7 @@ namespace FluentMigrator.Tests.Integration.Processors.MySql
         [TearDown]
         public void TearDown()
         {
-            Processor.Dispose();
+            Processor?.Dispose();
         }
 
         [Test]

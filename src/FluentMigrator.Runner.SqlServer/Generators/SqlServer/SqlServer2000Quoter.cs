@@ -32,7 +32,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
 
         public override string QuoteSchemaName(string schemaName)
         {
-            return (string.IsNullOrEmpty(schemaName)) ? "[dbo]" : Quote(schemaName);
+            return string.Empty;
         }
 
         public override string FormatNationalString(string value)

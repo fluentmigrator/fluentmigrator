@@ -129,7 +129,7 @@ namespace FluentMigrator.Runner.Processors.MySql
 
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
-            return Read("select * from {0}", _quoter.QuoteTableName(tableName));
+            return Read("select * from {0}", _quoter.QuoteTableName(tableName, schemaName));
         }
 
         public override DataSet Read(string template, params object[] args)

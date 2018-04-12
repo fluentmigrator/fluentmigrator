@@ -1,5 +1,9 @@
+using NUnit.Framework;
+
 namespace FluentMigrator.Tests.Integration.Processors
 {
+    [Category("Integration")]
+    [Category("Constraint")]
     public abstract class BaseConstraintTests
     {
         public abstract void CallingConstraintExistsCanAcceptConstraintNameWithSingleQuote();

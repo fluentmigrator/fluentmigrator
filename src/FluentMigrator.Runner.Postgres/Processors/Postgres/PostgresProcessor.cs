@@ -62,7 +62,7 @@ namespace FluentMigrator.Runner.Processors.Postgres
 
         public override DataSet ReadTableData(string schemaName, string tableName)
         {
-            return Read("SELECT * FROM {0}.{1}", quoter.QuoteSchemaName(schemaName), quoter.QuoteTableName(tableName));
+            return Read("SELECT * FROM {0}", quoter.QuoteTableName(tableName, schemaName));
         }
 
         public override bool DefaultValueExists(string schemaName, string tableName, string columnName, object defaultValue)

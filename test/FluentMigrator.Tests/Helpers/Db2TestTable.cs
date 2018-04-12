@@ -1,3 +1,5 @@
+using FluentMigrator.Runner.Generators;
+
 namespace FluentMigrator.Tests.Helpers
 {
     using System;
@@ -14,7 +16,7 @@ namespace FluentMigrator.Tests.Helpers
     {
         #region Fields
 
-        private readonly Db2Quoter quoter = new Db2Quoter();
+        private readonly IQuoter quoter = new Db2Quoter();
 
         private List<string> constraints = new List<string>();
         private string _schema;
@@ -35,7 +37,7 @@ namespace FluentMigrator.Tests.Helpers
                 Connection.Open();
 
             Name = "TestTable";
-            NameWithSchema = !string.IsNullOrEmpty(_schema) ? string.Format("{0}.{1}", quoter.QuoteSchemaName(_schema), quoter.QuoteTableName(Name)) : quoter.QuoteTableName(Name);
+            NameWithSchema = quoter.QuoteTableName(Name, _schema);
             Create(columnDefinitions);
         }
 
@@ -51,7 +53,7 @@ namespace FluentMigrator.Tests.Helpers
                 Connection.Open();
 
             Name = quoter.UnQuote(table);
-            NameWithSchema = !string.IsNullOrEmpty(_schema) ? string.Format("{0}.{1}", quoter.QuoteSchemaName(_schema), quoter.QuoteTableName(Name)) : quoter.QuoteTableName(Name);
+            NameWithSchema = quoter.QuoteTableName(Name, _schema);
             Create(columnDefinitions);
         }
 
@@ -99,7 +101,7 @@ namespace FluentMigrator.Tests.Helpers
 
             if (!string.IsNullOrEmpty(_schema))
             {
-                sb.AppendFormat("CREATE SCHEMA {0} ", quoter.QuoteSchemaName(_schema));
+                sb.AppendFormat("CREATE SCHEMA {0};", quoter.QuoteSchemaName(_schema));
             }
 
             var columns = string.Join(", ", columnDefinitions);
@@ -139,7 +141,7 @@ namespace FluentMigrator.Tests.Helpers
         public void WithIndexOn(string column, string name)
         {
             var query = string.Format("CREATE UNIQUE INDEX {0} ON {1} ({2})",
-                quoter.QuoteIndexName(name),
+                quoter.QuoteIndexName(name, _schema),
                 NameWithSchema,
                 quoter.QuoteColumnName(column)
                 );
@@ -152,7 +154,7 @@ namespace FluentMigrator.Tests.Helpers
 
         public void WithUniqueConstraintOn(string column, string name)
         {
-            var constraintName = !string.IsNullOrEmpty(_schema) ? quoter.QuoteSchemaName(_schema) + "." + quoter.QuoteConstraintName(name) : quoter.QuoteConstraintName(name);
+            var constraintName = quoter.QuoteConstraintName(name, _schema);
 
             var query = string.Format("ALTER TABLE {0} ADD CONSTRAINT {1} UNIQUE ({2})",
                 NameWithSchema,

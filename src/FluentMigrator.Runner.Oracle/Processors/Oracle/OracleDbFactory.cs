@@ -1,9 +1,15 @@
-﻿namespace FluentMigrator.Runner.Processors.Oracle
+namespace FluentMigrator.Runner.Processors.Oracle
 {
     public class OracleDbFactory : ReflectionBasedDbFactory
     {
+        private static readonly TestEntry[] _testEntries =
+        {
+            new TestEntry("Oracle.DataAccess", "Oracle.DataAccess.Client.OracleClientFactory"),
+            new TestEntry("Oracle.ManagedDataAccess", "Oracle.ManagedDataAccess.Client.OracleClientFactory"),
+        };
+
         public OracleDbFactory()
-            : base("Oracle.DataAccess", "Oracle.DataAccess.Client.OracleClientFactory")
+            : base(_testEntries)
         {
         }
     }

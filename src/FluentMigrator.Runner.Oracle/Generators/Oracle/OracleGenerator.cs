@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,8 +11,6 @@ namespace FluentMigrator.Runner.Generators.Oracle
 {
     public class OracleGenerator : GenericGenerator
     {
-
-        
         public OracleGenerator()
             : base(new OracleColumn(new OracleQuoter()), new OracleQuoter(), new OracleDescriptionGenerator())
         {
@@ -51,7 +49,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
             }
             else
             {
-                result.AppendFormat("{0}.{1}", Quoter.QuoteSchemaName(seq.SchemaName), Quoter.QuoteSequenceName(seq.Name));
+                result.AppendFormat("{0}", Quoter.QuoteSequenceName(seq.Name, seq.SchemaName));
             }
 
             if (seq.Increment.HasValue)
@@ -108,7 +106,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
         }
 
         private string ExpandTableName(string schema, string table)
-        { 
+        {
             return String.IsNullOrEmpty(schema) ? table : String.Concat(schema,".",table);
         }
 
@@ -116,7 +114,7 @@ namespace FluentMigrator.Runner.Generators.Oracle
         {
             var tableName = Quoter.QuoteTableName(expression.TableName);
             var schemaName = Quoter.QuoteSchemaName(expression.SchemaName);
-             
+
             return string.Format("CREATE TABLE {0} ({1})",ExpandTableName(schemaName,tableName), Column.Generate(expression.Columns, tableName));
         }
 
@@ -225,6 +223,14 @@ namespace FluentMigrator.Runner.Generators.Oracle
                 ColumnName = expression.ColumnName,
                 DefaultValue = null
             });
+        }
+
+        public override string Generate(DeleteIndexExpression expression)
+        {
+            var quotedSchema = Quoter.QuoteSchemaName(expression.Index.SchemaName);
+            var quotedIndex = Quoter.QuoteIndexName(expression.Index.Name);
+            var indexName = string.IsNullOrEmpty(quotedSchema) ? quotedIndex : $"{quotedSchema}.{quotedIndex}";
+            return string.Format("DROP INDEX {0}", indexName);
         }
 
         private string WrapStatementInExecuteImmediateBlock(string statement)

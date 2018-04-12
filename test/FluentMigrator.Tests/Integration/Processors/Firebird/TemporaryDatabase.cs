@@ -19,18 +19,23 @@ using System.IO;
 
 using FirebirdSql.Data.FirebirdClient;
 
+using NUnit.Framework;
+
 namespace FluentMigrator.Tests.Integration.Processors.Firebird
 {
     public class TemporaryDatabase : IDisposable
     {
         private readonly Lazy<string> _connectionString;
 
-        public TemporaryDatabase(string defaultConnectionString, FirebirdLibraryProber prober)
+        public TemporaryDatabase(IntegrationTestOptions.DatabaseServerOptions connectionOptions, FirebirdLibraryProber prober)
         {
+            if (!connectionOptions.IsEnabled)
+                Assert.Ignore();
+
             DbFileName = Path.GetTempFileName();
             _connectionString = new Lazy<string>(() =>
             {
-                var csb = new FbConnectionStringBuilder(defaultConnectionString)
+                var csb = new FbConnectionStringBuilder(connectionOptions.ConnectionString)
                 {
                     Pooling = false,
                     Database = DbFileName,

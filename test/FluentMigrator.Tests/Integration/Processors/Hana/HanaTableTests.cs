@@ -1,11 +1,12 @@
-using System.Data.SqlClient;
 using FluentMigrator.Runner.Announcers;
 using FluentMigrator.Runner.Generators.Hana;
 using FluentMigrator.Runner.Processors;
 using FluentMigrator.Runner.Processors.Hana;
 using FluentMigrator.Tests.Helpers;
+
 using NUnit.Framework;
 using NUnit.Should;
+
 using Sap.Data.Hana;
 
 namespace FluentMigrator.Tests.Integration.Processors.Hana
@@ -21,6 +22,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [SetUp]
         public void SetUp()
         {
+            if (!IntegrationTestOptions.Hana.IsEnabled)
+                Assert.Ignore();
             Connection = new HanaConnection(IntegrationTestOptions.Hana.ConnectionString);
             Processor = new HanaProcessor(Connection, new HanaGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new HanaDbFactory());
             Connection.Open();
@@ -30,8 +33,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [TearDown]
         public void TearDown()
         {
-            Processor.CommitTransaction();
-            Processor.Dispose();
+            Processor?.CommitTransaction();
+            Processor?.Dispose();
         }
 
         [Test]
@@ -50,8 +53,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [Test]
         public override void CallingTableExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
-
             Processor.TableExists("test_schema", "DoesNotExist").ShouldBeFalse();
         }
 
@@ -65,7 +66,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [Test]
         public override void CallingTableExistsReturnsTrueIfTableExistsWithSchema()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
+            Assert.Ignore("Schemas aren't supported by this SAP Hana runner");
 
             using (var table = new HanaTestTable(Processor, "test_schema", "id int"))
                 Processor.TableExists("test_schema", table.Name).ShouldBeTrue();

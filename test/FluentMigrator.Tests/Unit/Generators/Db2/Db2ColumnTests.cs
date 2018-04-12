@@ -1,28 +1,21 @@
+using System;
+using System.Linq;
+
+using FluentMigrator.Runner.Generators.DB2;
+using FluentMigrator.Runner.Generators.DB2.iSeries;
+
+using NUnit.Framework;
+using NUnit.Should;
+
 namespace FluentMigrator.Tests.Unit.Generators.Db2
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-
-    using FluentMigrator.Runner.Generators.DB2;
-
-    using NUnit.Framework;
-    using NUnit.Should;
-
     [TestFixture]
     public class Db2ColumnTests : BaseColumnTests
     {
-        #region Properties
-
         public Db2Generator Generator
         {
             get; set;
         }
-
-        #endregion Properties
-
-        #region Methods
 
         [Test]
         public override void CanAlterColumnWithCustomSchema()
@@ -181,9 +174,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
         [SetUp]
         public void SetUp()
         {
-            Generator = new Db2Generator();
+            Generator = new Db2Generator(new Db2ISeriesQuoter());
         }
-
-        #endregion Methods
     }
 }

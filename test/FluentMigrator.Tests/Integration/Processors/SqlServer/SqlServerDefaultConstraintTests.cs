@@ -30,6 +30,13 @@ namespace FluentMigrator.Tests.Integration.Processors.SqlServer
     [Category("SqlServer2016")]
     public class SqlServerDefaultConstraintTests
     {
+        [SetUp]
+        public void SetUp()
+        {
+            if (!IntegrationTestOptions.SqlServer2016.IsEnabled)
+                Assert.Ignore();
+        }
+
         [Test]
         public void Issue715()
         {

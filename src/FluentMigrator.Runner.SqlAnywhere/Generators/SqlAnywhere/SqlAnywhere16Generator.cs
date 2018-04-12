@@ -45,37 +45,23 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 
         public override string DropSchema => "DROP USER {0}";
 
-        public override string CreateTable => "{0} ({1})";
-
-        public override string DropTable => "{0}";
-
         public override string RenameTable => "ALTER TABLE {0} RENAME {1}";
 
-        public override string CreateIndex => "CREATE {0}{1}INDEX {2} ON {3}.{4} ({5}){6}";
+        public override string CreateIndex => "CREATE {0}{1}INDEX {2} ON {3} ({4}){5}";
 
-        public override string DropIndex => "DROP INDEX {0}.{1}.{2}";
+        public override string DropIndex => "DROP INDEX {0}.{1}";
 
-        public override string AddColumn => "{0} ADD {1}";
+        public override string AddColumn => "ALTER TABLE {0} ADD {1}";
 
         public override string DropColumn => "ALTER TABLE {0} DROP {1}";
 
-        public override string AlterColumn => "{0} ALTER {1}";
+        public override string AlterColumn => "ALTER TABLE {0} ALTER {1}";
 
-        public override string RenameColumn => "{0} RENAME {1} TO {2}";
+        public override string RenameColumn => "ALTER TABLE {0} RENAME {1} TO {2}";
 
-        public override string InsertData => "INSERT INTO {0}.{1} ({2}) VALUES ({3})";
-
-        public override string UpdateData => "{0} SET {1} WHERE {2}";
-
-        public override string DeleteData => "DELETE FROM {0}.{1} WHERE {2}";
-
-        public virtual string IdentityInsert => "SET IDENTITY_INSERT {0} {1}";
-
-        public override string CreateForeignKeyConstraint => "ALTER TABLE {0}.{1} ADD CONSTRAINT {2} FOREIGN KEY ({3}) REFERENCES {4}.{5} ({6}){7}{8}";
+        public override string CreateForeignKeyConstraint => "ALTER TABLE {0} ADD CONSTRAINT {1} FOREIGN KEY ({2}) REFERENCES {3} ({4}){5}{6}";
 
         public override string CreateConstraint => "ALTER TABLE {0} ADD CONSTRAINT {1} {2}{3} ({4})";
-
-        public override string DeleteConstraint => "{0} DROP CONSTRAINT {1}";
 
         //Not need for the nonclusted keyword as it is the default mode
         public override string GetClusterTypeString(CreateIndexExpression column)
@@ -94,7 +80,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
         public override string Generate(CreateTableExpression expression)
         {
             var descriptionStatements = DescriptionGenerator.GenerateDescriptionStatements(expression);
-            var createTableStatement = $"CREATE TABLE {Quoter.QuoteSchemaName(expression.SchemaName)}.{base.Generate(expression)}";
+            var createTableStatement = base.Generate(expression);
             var descriptionStatementsArray = descriptionStatements as string[] ?? descriptionStatements.ToArray();
 
             if (!descriptionStatementsArray.Any())
@@ -103,14 +89,9 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             return ComposeStatements(createTableStatement, descriptionStatementsArray);
         }
 
-        public override string Generate(DeleteTableExpression expression)
-        {
-            return $"DROP TABLE {Quoter.QuoteSchemaName(expression.SchemaName)}.{base.Generate(expression)}";
-        }
-
         public override string Generate(CreateColumnExpression expression)
         {
-            var alterTableStatement = $"ALTER TABLE {Quoter.QuoteSchemaName(expression.SchemaName)}.{base.Generate(expression)}";
+            var alterTableStatement = base.Generate(expression);
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
 
             if (string.IsNullOrEmpty(descriptionStatement))
@@ -121,7 +102,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 
         public override string Generate(AlterColumnExpression expression)
         {
-            var alterTableStatement = $"ALTER TABLE {Quoter.QuoteSchemaName(expression.SchemaName)}.{base.Generate(expression)}";
+            var alterTableStatement = base.Generate(expression);
             var descriptionStatement = DescriptionGenerator.GenerateDescriptionStatement(expression);
 
             if (string.IsNullOrEmpty(descriptionStatement))
@@ -138,47 +119,13 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 
             string columns = String.Join(", ", expression.Constraint.Columns.Select(x => Quoter.QuoteColumnName(x)).ToArray());
 
-            string schemaTableName = $"{Quoter.QuoteSchemaName(expression.Constraint.SchemaName)}.{Quoter.QuoteTableName(expression.Constraint.TableName)}";
+            string schemaTableName = Quoter.QuoteTableName(expression.Constraint.TableName, expression.Constraint.SchemaName);
 
             return string.Format(CreateConstraint, schemaTableName,
                 Quoter.Quote(expression.Constraint.ConstraintName),
                 constraintType,
                 constraintClustering,
                 columns);
-        }
-
-        public override string Generate(DeleteConstraintExpression expression)
-        {
-            return $"ALTER TABLE {Quoter.QuoteSchemaName(expression.Constraint.SchemaName)}.{base.Generate(expression)}";
-        }
-
-        public override string Generate(RenameTableExpression expression)
-        {
-            string oldSchemaTableName = $"{Quoter.QuoteSchemaName(expression.SchemaName)}.{Quoter.QuoteTableName(expression.OldName)}";
-            return String.Format(RenameTable, oldSchemaTableName, Quoter.QuoteTableName(expression.NewName));
-        }
-
-        public override string Generate(RenameColumnExpression expression)
-        {
-            return $"ALTER TABLE {Quoter.QuoteSchemaName(expression.SchemaName)}.{base.Generate(expression)}";
-            //return String.Format(RenameColumn, alterTableStatement, Quoter.QuoteColumnName(Quoter.QuoteCommand(expression.OldName)), Quoter.QuoteCommand(expression.NewName));
-        }
-
-        public override string Generate(DeleteColumnExpression expression)
-        {
-            // Create an ALTER TABLE statement for each column to be deleted
-            var builder = new StringBuilder();
-
-            foreach (string column in expression.ColumnNames)
-                BuildDelete(expression, column, builder);
-
-            return builder.ToString();
-        }
-
-        protected virtual void BuildDelete(DeleteColumnExpression expression, string columnName, StringBuilder builder)
-        {
-            string schemaAndTable = $"{Quoter.QuoteSchemaName(expression.SchemaName)}.{Quoter.QuoteTableName(expression.TableName)}";
-            builder.AppendLine(string.Format(DropColumn, schemaAndTable, Quoter.QuoteColumnName(columnName)));
         }
 
         public override string Generate(AlterDefaultConstraintExpression expression)
@@ -193,103 +140,13 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
             }) + ";";
             builder.AppendLine(deleteDefault);
 
-            builder.Append(String.Format("-- create alter table command to create new default constraint as string and run it" + Environment.NewLine + "ALTER TABLE {0}.{1} ALTER {2} DEFAULT {3};",
-                Quoter.QuoteSchemaName(expression.SchemaName),
-                Quoter.QuoteTableName(expression.TableName),
+            builder.Append(String.Format("-- create alter table command to create new default constraint as string and run it" + Environment.NewLine + "ALTER TABLE {0} ALTER {1} DEFAULT {2};",
+                Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
                 Quoter.QuoteColumnName(expression.ColumnName),
                 Quoter.QuoteValue(expression.DefaultValue)));
 
             return builder.ToString();
         }
-
-        public override string Generate(DeleteForeignKeyExpression expression)
-        {
-            return $"ALTER TABLE {Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema)}.{base.Generate(expression)}";
-        }
-
-        public override string Generate(InsertDataExpression expression)
-        {
-            List<string> columnNames = new List<string>();
-            List<string> columnValues = new List<string>();
-            List<string> insertStrings = new List<string>();
-
-            foreach (InsertionDataDefinition row in expression.Rows)
-            {
-                columnNames.Clear();
-                columnValues.Clear();
-                foreach (KeyValuePair<string, object> item in row)
-                {
-                    columnNames.Add(Quoter.QuoteColumnName(item.Key));
-                    columnValues.Add(Quoter.QuoteValue(item.Value));
-                }
-
-                string columns = String.Join(", ", columnNames.ToArray());
-                string values = String.Join(", ", columnValues.ToArray());
-                insertStrings.Add(String.Format(InsertData
-                    , Quoter.QuoteSchemaName(expression.SchemaName)
-                    , Quoter.QuoteTableName(expression.TableName)
-                    , columns
-                    , values));
-            }
-
-            return String.Join("; ", insertStrings.ToArray());
-        }
-
-        public override string Generate(UpdateDataExpression expression)
-        {
-            // TODO: Uncomment line below and delete custom implementation once pull request #672 (https://github.com/schambers/fluentmigrator/pull/672)
-            //       has been accepted into the master branch.
-            //return string.Format("UPDATE {0}.{1}", Quoter.QuoteSchemaName(expression.SchemaName), base.Generate(expression));
-
-            List<string> updateItems = new List<string>();
-            List<string> whereClauses = new List<string>();
-
-            foreach (var item in expression.Set)
-            {
-                updateItems.Add($"{Quoter.QuoteColumnName(item.Key)} = {Quoter.QuoteValue(item.Value)}");
-            }
-
-            if (expression.IsAllRows)
-            {
-                whereClauses.Add("1 = 1");
-            }
-            else
-            {
-                foreach (var item in expression.Where)
-                {
-                    whereClauses.Add($"{Quoter.QuoteColumnName(item.Key)} {((item.Value == null || item.Value == DBNull.Value) ? "IS" : "=")} {Quoter.QuoteValue(item.Value)}");
-                }
-            }
-            var genericGeneratorSql = String.Format(UpdateData, Quoter.QuoteTableName(expression.TableName), String.Join(", ", updateItems.ToArray()), String.Join(" AND ", whereClauses.ToArray()));
-            return $"UPDATE {Quoter.QuoteSchemaName(expression.SchemaName)}.{genericGeneratorSql}";
-        }
-
-        public override string Generate(DeleteDataExpression expression)
-        {
-            var deleteItems = new List<string>();
-
-
-            if (expression.IsAllRows)
-            {
-                deleteItems.Add(string.Format(DeleteData, Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), "1 = 1"));
-            }
-            else
-            {
-                foreach (var row in expression.Rows)
-                {
-                    var whereClauses = new List<string>();
-                    foreach (KeyValuePair<string, object> item in row)
-                    {
-                        whereClauses.Add($"{Quoter.QuoteColumnName(item.Key)} {((item.Value == null || item.Value == DBNull.Value) ? "IS" : "=")} {Quoter.QuoteValue(item.Value)}");
-                    }
-
-                    deleteItems.Add(string.Format(DeleteData, Quoter.QuoteSchemaName(expression.SchemaName), Quoter.QuoteTableName(expression.TableName), String.Join(" AND ", whereClauses.ToArray())));
-                }
-            }
-
-            return String.Join("; ", deleteItems.ToArray());
-        }
-
 
         public override string Generate(CreateForeignKeyExpression expression)
         {
@@ -312,12 +169,10 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
 
             return string.Format(
                 CreateForeignKeyConstraint,
-                Quoter.QuoteSchemaName(expression.ForeignKey.ForeignTableSchema),
-                Quoter.QuoteTableName(expression.ForeignKey.ForeignTable),
+                Quoter.QuoteTableName(expression.ForeignKey.ForeignTable, expression.ForeignKey.ForeignTableSchema),
                 Quoter.QuoteColumnName(expression.ForeignKey.Name),
                 String.Join(", ", foreignColumns.ToArray()),
-                Quoter.QuoteSchemaName(expression.ForeignKey.PrimaryTableSchema),
-                Quoter.QuoteTableName(expression.ForeignKey.PrimaryTable),
+                Quoter.QuoteTableName(expression.ForeignKey.PrimaryTable, expression.ForeignKey.PrimaryTableSchema),
                 String.Join(", ", primaryColumns.ToArray()),
                 Column.FormatCascade("DELETE", expression.ForeignKey.OnDelete),
                 Column.FormatCascade("UPDATE", expression.ForeignKey.OnUpdate)
@@ -345,15 +200,14 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
                 , GetUniqueString(expression)
                 , GetClusterTypeString(expression)
                 , Quoter.QuoteIndexName(expression.Index.Name)
-                , Quoter.QuoteSchemaName(expression.Index.SchemaName)
-                , Quoter.QuoteTableName(expression.Index.TableName)
+                , Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName)
                 , string.Join(", ", indexColumns)
                 , GetWithNullsDistinctString(expression.Index));
         }
 
         public override string Generate(DeleteIndexExpression expression)
         {
-            return String.Format(DropIndex, Quoter.QuoteSchemaName(expression.Index.SchemaName), Quoter.QuoteTableName(expression.Index.TableName), Quoter.QuoteIndexName(expression.Index.Name));
+            return String.Format(DropIndex, Quoter.QuoteTableName(expression.Index.TableName, expression.Index.SchemaName), Quoter.QuoteIndexName(expression.Index.Name));
         }
 
         public override string Generate(AlterSchemaExpression expression)
@@ -384,7 +238,7 @@ namespace FluentMigrator.Runner.Generators.SqlAnywhere
         public override string Generate(DeleteDefaultConstraintExpression expression)
         {
             string sql = "ALTER TABLE {0} ALTER {1} DROP DEFAULT";
-            string schemaAndTable = $"{Quoter.QuoteSchemaName(expression.SchemaName)}.{Quoter.QuoteTableName(expression.TableName)}";
+            string schemaAndTable = Quoter.QuoteTableName(expression.TableName, expression.SchemaName);
             return String.Format(sql, schemaAndTable, Quoter.QuoteColumnName(expression.ColumnName));
         }
 

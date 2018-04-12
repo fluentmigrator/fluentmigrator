@@ -24,7 +24,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Column")]
         public void CanAlterColumnToSetNullableTrue()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
@@ -35,7 +34,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Column")]
         public void CanAlterColumnToSetNullableFalse()
         {
             var expression = GeneratorTestHelper.GetAlterColumnExpression();
@@ -46,7 +44,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanAlterColumnWithCustomSchema()
         {
             //TODO: This will fail if there are any keys attached
@@ -58,7 +55,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanAlterColumnWithDefaultSchema()
         {
             //TODO: This will fail if there are any keys attached
@@ -69,7 +65,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanCreateAutoIncrementColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
@@ -80,7 +75,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanCreateAutoIncrementColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetAlterColumnAddAutoIncrementExpression();
@@ -90,7 +84,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanCreateColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -101,7 +94,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanCreateColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateColumnExpression();
@@ -131,7 +123,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanCreateDecimalColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
@@ -142,7 +133,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanCreateDecimalColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetCreateDecimalColumnExpression();
@@ -152,34 +142,31 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanDropColumnWithCustomSchema()
         {
             //This does not work if it is a primary key
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
             expression.SchemaName = "TestSchema";
 
-            var expected = "ALTER TABLE [TestSchema].[TestTable1] DROP [TestColumn1]" + Environment.NewLine;
+            var expected = "ALTER TABLE [TestSchema].[TestTable1] DROP [TestColumn1]";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanDropColumnWithDefaultSchema()
         {
             //This does not work if it is a primary key
             var expression = GeneratorTestHelper.GetDeleteColumnExpression();
 
-            var expected = "ALTER TABLE [dbo].[TestTable1] DROP [TestColumn1]" + Environment.NewLine;
+            var expected = "ALTER TABLE [dbo].[TestTable1] DROP [TestColumn1]";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected);
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanDropMultipleColumnsWithCustomSchema()
         {
             //This does not work if it is a primary key
@@ -187,30 +174,28 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             expression.SchemaName = "TestSchema";
 
             StringBuilder expected = new StringBuilder();
-            expected.AppendLine("ALTER TABLE [TestSchema].[TestTable1] DROP [TestColumn1]");
-            expected.AppendLine("ALTER TABLE [TestSchema].[TestTable1] DROP [TestColumn2]");
+            expected.AppendLine("ALTER TABLE [TestSchema].[TestTable1] DROP [TestColumn1];");
+            expected.Append("ALTER TABLE [TestSchema].[TestTable1] DROP [TestColumn2]");
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected.ToString());
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanDropMultipleColumnsWithDefaultSchema()
         {
             //This does not work if it is a primary key
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "TestColumn1", "TestColumn2" });
 
             StringBuilder expected = new StringBuilder();
-            expected.AppendLine("ALTER TABLE [dbo].[TestTable1] DROP [TestColumn1]");
-            expected.AppendLine("ALTER TABLE [dbo].[TestTable1] DROP [TestColumn2]");
+            expected.AppendLine("ALTER TABLE [dbo].[TestTable1] DROP [TestColumn1];");
+            expected.Append("ALTER TABLE [dbo].[TestTable1] DROP [TestColumn2]");
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected.ToString());
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanRenameColumnWithCustomSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();
@@ -221,7 +206,6 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
         }
 
         [Test]
-        [Category("SqlAnywhere"), Category("SqlAnywhere16"), Category("Generator"), Category("Column")]
         public override void CanRenameColumnWithDefaultSchema()
         {
             var expression = GeneratorTestHelper.GetRenameColumnExpression();

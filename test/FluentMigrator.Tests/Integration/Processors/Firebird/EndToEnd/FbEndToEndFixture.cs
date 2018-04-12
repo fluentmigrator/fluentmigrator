@@ -20,16 +20,22 @@ namespace FluentMigrator.Tests.Integration.Processors.Firebird.EndToEnd
         [SetUp]
         public void SetUp()
         {
+            if (!IntegrationTestOptions.Firebird.IsEnabled)
+                Assert.Ignore();
             _temporaryDatabase = new TemporaryDatabase(
-                IntegrationTestOptions.Firebird.ConnectionString,
+                IntegrationTestOptions.Firebird,
                 _firebirdLibraryProber);
         }
 
         [TearDown]
         public void TearDown()
         {
+            if (_temporaryDatabase == null)
+                return;
+
             FbDatabase.DropDatabase(_temporaryDatabase.ConnectionString);
             _temporaryDatabase.Dispose();
+            _temporaryDatabase = null;
         }
 
         protected void Migrate(string migrationsNamespace)

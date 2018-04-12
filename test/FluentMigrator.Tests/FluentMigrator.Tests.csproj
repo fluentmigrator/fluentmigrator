@@ -43,8 +43,11 @@
     <ProjectReference Include="..\..\src\FluentMigrator.Runner.SqlServer\FluentMigrator.Runner.SqlServer.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="Sap.Data.Hana.v3.5">
-      <HintPath>..\..\lib\Hana\Sap.Data.Hana.v3.5.dll</HintPath>
+    <Reference Include="IBM.Data.DB2">
+      <HintPath>..\..\lib\DB2\amd64\IBM.Data.DB2.dll</HintPath>
+    </Reference>
+    <Reference Include="Sap.Data.Hana.v4.5">
+      <HintPath>..\..\lib\Hana\ado.net\v4.5\Sap.Data.Hana.v4.5.dll</HintPath>
     </Reference>
     <Reference Include="System.Data.SqlServerCe">
       <Private>True</Private>
@@ -58,6 +61,14 @@
     </Content>
     <Content Include="../../lib/SQLServerCE4/x86/**/*.*">
       <Link>x86/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="../../lib/DB2/clidriver/**/*.*">
+      <Link>clidriver/%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="../../lib/Hana/*.*">
+      <Link>%(Filename)%(Extension)</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
@@ -74,8 +85,5 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82a7f48d-3b50-4b1e-b82e-3ada8210c358}" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Unit\BatchParser" />
   </ItemGroup>
 </Project>

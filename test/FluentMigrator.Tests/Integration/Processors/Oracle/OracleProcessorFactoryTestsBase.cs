@@ -22,6 +22,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 
         protected void SetUp(IMigrationProcessorFactory processorFactory)
         {
+            if (!IntegrationTestOptions.Oracle.IsEnabled)
+                Assert.Ignore();
             this.factory = processorFactory;
             this.connectionString = "Data Source=localhost/XE;User Id=Something;Password=Something";
             this.announcer = new NullAnnouncer();

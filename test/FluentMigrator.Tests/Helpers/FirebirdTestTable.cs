@@ -56,7 +56,7 @@ namespace FluentMigrator.Tests.Helpers
 
             sb.Append("CREATE TABLE ");
 
-            sb.Append(quoter.QuoteTableName(Name));
+            sb.Append(quoter.QuoteTableName(Name, string.Empty));
             sb.Append(" (");
 
             foreach (string definition in columnDefinitions)
@@ -83,7 +83,7 @@ namespace FluentMigrator.Tests.Helpers
         {
             processor.CheckTable(Name);
             var sb = new StringBuilder();
-            sb.AppendFormat("DROP TABLE {0}", quoter.QuoteTableName(Name));
+            sb.AppendFormat("DROP TABLE {0}", quoter.QuoteTableName(Name, null));
 
             using (var command = new FbCommand(sb.ToString(), Connection, Transaction))
                 command.ExecuteNonQuery();

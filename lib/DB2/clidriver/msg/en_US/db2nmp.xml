@@ -1,0 +1,651 @@
+<?xml version="1.0" encoding="windows-1252" ?>
+<NLS_STRINGS>
+  <!--  NOTE: don't use \", use ' instead -->
+  <!--  NOTE: leave the [strings] alone -->
+
+  <!--  These are the managed resources for IBM.Data.DB2.dll.   -->
+
+  <!-- To Translators:
+
+  I) Encoding
+     Although most (if not all) XML editors automatically insert the proper
+     encoding data in the XML prolog section of the db2vsnls.xml, it is
+     beneficial for the translators to note the following:
+
+     For European/Unicode languages the xml prolog must be:
+       <?xml version="1.0" encoding="ISO-8859-X" ?>
+       where X is the specific number for the region.
+
+     For Japanese the xml prolog must be:
+       <?xml version="1.0" encoding="Shift-JIS" ?>
+
+     For Chinese the xml prolog must be one of the following:
+
+       Traditional Chinese
+         <?xml version="1.0" encoding="Big5" ?>
+       Simplified Chinese
+         <?xml version="1.0" encoding="GB2312" ?>
+
+  II) String substitution
+      Please note that the tokens %1, %2, %3, etc. appearing in strings are
+      place holders for  text substitutions. So for example:
+              Hello my name is %1 and I work at %2
+      Above string indicates that at runtime the caller will pass
+      a name to be replaced in place of %1, and a location name to replace
+      %2. So for example in this case the program will pass the string
+      "John" and "SVL" the returned string would be
+      "Hello my name is John and I work at SVL".
+  -->
+
+  <DataCategory_Behavior>Behavior</DataCategory_Behavior>
+  <DataCategory_Data>Data</DataCategory_Data>
+  <DataCategory_Fill>Fill</DataCategory_Fill>
+  <DataCategory_InfoMessage>InfoMessage</DataCategory_InfoMessage>
+  <DataCategory_StateChange>StateChange</DataCategory_StateChange>
+  <DataCategory_Update>Update</DataCategory_Update>
+
+  <!--  ConnectionStringPermission -->
+  <ADP_NotAPermissionElement>'elem' was not a permission element.</ADP_NotAPermissionElement>
+  <ADP_InvalidXMLBadVersion>Invalid Xml; can only parse elements of version one.</ADP_InvalidXMLBadVersion>
+  <ADP_WrongType>Operation on type %1 attempted with target of wrong type.</ADP_WrongType>
+
+  <!--  CommandBuilder -->
+  <ADP_NoQuoteChange>The QuotePrefix and QuoteSuffix properties can't be changed once an Insert, Update, or Delete command has been generated.</ADP_NoQuoteChange>
+  <ADP_MissingSourceCommand>The DataAdapter.SelectCommand property needs to be initialized.</ADP_MissingSourceCommand>
+  <ADP_MissingSourceCommandConnection>The DataAdapter.SelectCommand.Connection property needs to be initialized;</ADP_MissingSourceCommandConnection>
+
+  <!--  Data Provider Collection -->
+  <!--  ArgumentException -->
+  <ADP_CollectionUniqueValue>The %1.%2 is required to be unique, '%3' already exists in the collection.</ADP_CollectionUniqueValue>
+  <ADP_CollectionIsNotParent>The %1 with %2 '%3' is already contained by another %4.</ADP_CollectionIsNotParent>
+  <ADP_CollectionIsParent>The %1 with %2 '%3' is already contained by this %4.</ADP_CollectionIsParent>
+  <ADP_CollectionRemoveInvalidObject>Attempted to remove an %1 that is not contained by this %2.</ADP_CollectionRemoveInvalidObject>
+  <!--  IndexOutOfRangeException -->
+  <ADP_CollectionIndexInt32>Invalid index %1 for this %2 with Count=%3.</ADP_CollectionIndexInt32>
+  <ADP_CollectionIndexString>An %1 with %2 '%3' is not contained by this %4.</ADP_CollectionIndexString>
+  <!--  InvalidCastException -->
+  <ADP_CollectionNullValue>The %1 only accepts non-null %2 type objects.</ADP_CollectionNullValue>
+  <ADP_CollectionInvalidType>The %1 only accepts non-null %2 type objects, not %3 objects.</ADP_CollectionInvalidType>
+
+  <!--  DataColumnMapping -->
+  <!--  ArgumentNullException -->
+  <ADP_NullDataTable>Unexpected null DataTable argument</ADP_NullDataTable>
+  <!--  DataMappingException -->
+  <ADP_ColumnSchemaExpression>The column mapping from SourceColumn '%1' failed because the DataColumn '%2' is a computed column.</ADP_ColumnSchemaExpression>
+  <ADP_ColumnSchemaMismatch>Inconvertable type mismatch between SourceColumn '%1' of %2 and the DataColumn '%3' of %4.</ADP_ColumnSchemaMismatch>
+  <ADP_ColumnSchemaMissing1>Missing the DataColumn '%1' for the SourceColumn '%2'.</ADP_ColumnSchemaMissing1>
+  <ADP_ColumnSchemaMissing2>Missing the DataColumn '%1' in the DataTable '%2' for the SourceColumn '%3'.</ADP_ColumnSchemaMissing2>
+
+  <!--  DataColumnMappingsCollection -->
+  <!--  ArgumentException -->
+  <ADP_InvalidSourceColumn>SourceColumn is required to be a non-empty string.</ADP_InvalidSourceColumn>
+  <!--  DataMappingException -->
+  <ADP_MissingColumnMapping>Missing SourceColumn mapping for '%1'.</ADP_MissingColumnMapping>
+
+  <!--  DataAdapter -->
+  <!--  ArgumentException -->
+  <ADP_InvalidAction>The %1 enumeration value, %2, is invalid.</ADP_InvalidAction>
+
+  <!--  DataTableMapping -->
+  <!--  ArgumentNullException -->
+  <ADP_NullDataSet>Unexpected null DataSet argument.</ADP_NullDataSet>
+  <!--  SystemException -->
+  <ADP_MissingTableSchema>Missing the '%1' DataTable for the '%2' SourceTable.</ADP_MissingTableSchema>
+
+  <!--  Adapter.DataTableMappingsCollection -->
+  <!--  ArgumentException -->
+  <ADP_InvalidSourceTable>SourceTable is required to be a non-empty string</ADP_InvalidSourceTable>
+  <!--  DataMappingException -->
+  <ADP_MissingTableMapping>Missing SourceTable mapping: '%1'</ADP_MissingTableMapping>
+
+  <!--  IDbCommand -->
+  <!--  ArgumentException -->
+  <ADP_InvalidCommandType>The CommandType enumeration value, %1, is invalid.</ADP_InvalidCommandType>
+  <ADP_InvalidUpdateRowSource>The UpdateRowSource enumeration value, %1, is invalid.</ADP_InvalidUpdateRowSource>
+  <!--  InvalidOperationException -->
+  <ADP_CommandTextRequired>%1: CommandText property has not been initialized</ADP_CommandTextRequired>
+  <ADP_ConnectionRequired>%1: %2 property has not been initialized.</ADP_ConnectionRequired>
+  <ADP_NoStoredProcedureExists>The stored procedure '%1' doesn't exist.</ADP_NoStoredProcedureExists>
+  <ADP_OpenConnectionRequired>%1 requires an open connection. The connection's current state is %2.</ADP_OpenConnectionRequired>
+  <ADP_TransactionConnectionMismatch>The transaction object is not associated with the connection object.</ADP_TransactionConnectionMismatch>
+  <ADP_TransactionRequired_Execute>Execute requires the command to have a transaction object when the connection assigned to the command is in a pending local transaction.  The Transaction property of the command has not been initialized.</ADP_TransactionRequired_Execute>
+  <ADP_TransactionCompleted>The transaction assigned to this command must be the most nested pending local transaction.</ADP_TransactionCompleted>
+  <ADP_OpenReaderExists>There is already an open DataReader associated with this Command which must be closed first.</ADP_OpenReaderExists>
+  <ADP_DeriveParametersNotSupported>%1 DeriveParameters only supports CommandType.StoredProcedure, not CommandType.%2</ADP_DeriveParametersNotSupported>
+
+  <!--  DbDataAdapter -->
+  <!--  InvalidCastException -->
+  <ADP_MissingSelectCommand>The SelectCommand property has not been initialized before calling '%1'.</ADP_MissingSelectCommand>
+
+  <!--  DbDataAdapter.FillSchema -->
+  <!--  ArgumentException -->
+  <ADP_InvalidSchemaType>Invalid SchemaType enumeration value=%1.</ADP_InvalidSchemaType>
+  <!--  System -->
+  <ADP_FillSchemaRequiresSourceTableName>FillSchema: expected a non-empty string for the SourceTable name.</ADP_FillSchemaRequiresSourceTableName>
+
+  <!--  DbDataAdapter.Fill -->
+  <!--  ArgumentException -->
+  <ADP_InvalidMaxRecords>The MaxRecords value of %1 is invalid; the value must be >= 0.</ADP_InvalidMaxRecords>
+  <ADP_InvalidStartRecord>The StartRecord value of %1 is invalid; the value must be >= 0.</ADP_InvalidStartRecord>
+  <!--  SystemException -->
+  <ADP_FillRequiresSourceTableName>Fill: expected a non-empty string for the SourceTable name.</ADP_FillRequiresSourceTableName>
+  <ADP_FillChapterAutoIncrement>Hierarchial chapters columns must map to an AutoIncrement DataColumn.</ADP_FillChapterAutoIncrement>
+
+  <!--  DbDataAdapter.Update -->
+  <!--  InvalidOperationException -->
+  <ADP_UpdateRequiresSourceTable>Update unable to find TableMapping['%1'] or DataTable '%1'.</ADP_UpdateRequiresSourceTable>
+  <ADP_InvalidUpdateStatus>Invalid UpdateStatus: %1</ADP_InvalidUpdateStatus>
+  <ADP_UpdateRequiresSourceTableName>Update: expected a non-empty SourceTable name.</ADP_UpdateRequiresSourceTableName>
+  <ADP_MissingTableMappingDestination>Missing TableMapping when TableMapping.DataSetTable='%1'.</ADP_MissingTableMappingDestination>
+
+  <ADP_UpdateRequiresCommandClone>Update requires the command clone to be valid.</ADP_UpdateRequiresCommandClone>
+  <ADP_UpdateRequiresCommandSelect>Auto SQL generation during Update requires a valid SelectCommand.</ADP_UpdateRequiresCommandSelect>
+  <ADP_UpdateRequiresCommandInsert>Update requires a valid InsertCommand when passed DataRow collection with new rows.</ADP_UpdateRequiresCommandInsert>
+  <ADP_UpdateRequiresCommandUpdate>Update requires a valid UpdateCommand when passed DataRow collection with modified rows.</ADP_UpdateRequiresCommandUpdate>
+  <ADP_UpdateRequiresCommandDelete>Update requires a valid DeleteCommand when passed DataRow collection with deleted rows.</ADP_UpdateRequiresCommandDelete>
+
+  <!--  SystemException -->
+  <ADP_UpdateNullRow>dataRows[%1].</ADP_UpdateNullRow>
+  <ADP_UpdateNullRowTable>DataRow does not belong to a DataTable.</ADP_UpdateNullRowTable>
+  <ADP_UpdateMismatchRowTable>DataRow[%1] is from a different DataTable than DataRow[0].</ADP_UpdateMismatchRowTable>
+  <ADP_RowUpdateErrors>%1: Errors occurred; no additional is information available.</ADP_RowUpdateErrors>
+  <ADP_UpdateConcurrencyViolation>Concurrency violation: the %1 affected 0 records.</ADP_UpdateConcurrencyViolation>
+  <ADP_SumOverflow>%1: The sum of %2 and %3 can not exceed %4.</ADP_SumOverflow>
+  <ADP_Interrupted>%1 was interrupted because %2 has expired.</ADP_Interrupted>
+
+  <!--  WFCInvalidStateException -->
+  <ADP_UpdateUnknownRowState>Adapter.Update: encountered an unexpected DataRowStateEnum: %1.</ADP_UpdateUnknownRowState>
+
+  <!--  : IDbCommand -->
+  <ADP_InvalidCommandTimeout>Invalid CommandTimeout value %1; the value must be >= 0.</ADP_InvalidCommandTimeout>
+  <!--  InvalidOperationException -->
+  <ADP_CommandIsActive>The %1 is currently busy %2.</ADP_CommandIsActive>
+  <ADP_UninitializedParameterSize>Parameter %1: '%2' of type: %3, the property Size has an invalid size: %4</ADP_UninitializedParameterSize>
+  <ADP_PrepareParameterType>%1.Prepare requires all parameters to have an explictly set type.</ADP_PrepareParameterType>
+  <ADP_PrepareParameterSize>%1.Prepare requires all variable length parameters to have an explictly set non-zero Size.</ADP_PrepareParameterSize>
+  <ADP_PrepareParameterScale>%1.Prepare requires parameters of type '%2' have an explictly set Precision and Scale.</ADP_PrepareParameterScale>
+
+  <!--  : IDbConnection -->
+  <!--  InvalidOperationException -->
+  <ADP_ClosedConnectionError>Invalid operation. The connection is closed.</ADP_ClosedConnectionError>
+  <ADP_ConnectionAlreadyOpen>The connection is already Open (state=%1).</ADP_ConnectionAlreadyOpen>
+  <ADP_NoConnectionString>The ConnectionString property has not been initialized.</ADP_NoConnectionString>
+  <ADP_OpenConnectionPropertySet>Not allowed to change the '%1' property while the connection (state=%2).</ADP_OpenConnectionPropertySet>
+  <ADP_EmptyDatabaseName>Database cannot be null, the empty string, or string of only whitespace.</ADP_EmptyDatabaseName>
+  <ADP_InvalidConnectTimeoutValue>Invalid 'Connect Timeout' value of '%1'. the value must be an integer >= 0.</ADP_InvalidConnectTimeoutValue>
+  <ADP_InvalidIsolationLevel>The IsolationLevel value %1 is invalid.</ADP_InvalidIsolationLevel>
+  <ADP_InvalidPersistSecurityInfo>Invalid 'Persist Security Info' value of '%1'. The value must be a boolean of 'true' or 'false'.</ADP_InvalidPersistSecurityInfo>
+  <ADP_PoolFull>Connection Pool has reached the maximum number of connections.</ADP_PoolFull>
+
+  <!--  : DBDataReader -->
+  <!--  ArgumentException -->
+  <ADP_InvalidSourceBufferIndex>Invalid source buffer (size of %1) offset: %2</ADP_InvalidSourceBufferIndex>
+  <ADP_InvalidDestinationBufferIndex>Invalid destination buffer (size of %1) offset: %2</ADP_InvalidDestinationBufferIndex>
+  <!--  InvalidCast -->
+  <ADP_DataReaderNoData>No data exists for the row/column.</ADP_DataReaderNoData>
+  <!--  InvalidOperationException -->
+  <ADP_DataReaderClosed>Invalid attempt to %1 when reader is closed.</ADP_DataReaderClosed>
+
+  <!--  : DbDataStream -->
+  <ADP_StreamClosed>Invalid attempt to %1 when stream is closed.</ADP_StreamClosed>
+
+  <!--  : DbDataAdapter -->
+  <ADP_DynamicSQLJoinUnsupported>Dynamic SQL generation is not supported against multiple base tables.</ADP_DynamicSQLJoinUnsupported>
+  <ADP_DynamicSQLNoTableInfo>Dynamic SQL generation is not supported against a SelectCommand that does not return any base table information.</ADP_DynamicSQLNoTableInfo>
+  <ADP_DynamicSQLNoKeyInfo>Dynamic SQL generation for the %1 is not supported against a SelectCommand that does not return any key column information.</ADP_DynamicSQLNoKeyInfo>
+  <ADP_DynamicSQLReadOnly>Dynamic SQL generation for the %1 is not supported against a SelectCommand that does not return any modifiable columns.</ADP_DynamicSQLReadOnly>
+  <ADP_DynamicSQLNestedQuote>Dynamic SQL generation not supported against table names '%1' that contain the QuotePrefix or QuoteSuffic character '%2'.</ADP_DynamicSQLNestedQuote>
+  <ADP_NonSequentialColumnAccess>Invalid attempt to read from column ordinal '%1'.  With CommandBehavior.SequentialAccess, you may only read from column ordinal '%2' or greater.  </ADP_NonSequentialColumnAccess>
+
+  <!--  : IDataParameter -->
+  <!--  ArgumentException -->
+  <ADP_InvalidDataRowVersion>%1: Invalid DataRow Version enumeration value: %2.</ADP_InvalidDataRowVersion>
+  <ADP_InvalidParameterDirection>Invalid direction '%1' for '%2' parameter.</ADP_InvalidParameterDirection>
+  <ADP_InvalidDataType>The parameter data type of %1 is invalid.</ADP_InvalidDataType>
+  <ADP_UnknownDataType>No mapping exists from DbType %1 to a known %2.</ADP_UnknownDataType>
+  <ADP_UnknownDataTypeCode>Unable to handle an unknown TypeCode of %1 with DataType of %1.</ADP_UnknownDataTypeCode>
+  <ADP_InvalidSizeValue>Invalid parameter Size value '%1'. The value must be greater than or equal to 0.</ADP_InvalidSizeValue>
+  <ADP_WhereClauseUnspecifiedValue>Parameter['%1'] contained within auto gen WHERE clause with SourceColumn '%2' has an unspecified Original value in the DataRow at column '%3'.</ADP_WhereClauseUnspecifiedValue>
+  <ADP_TruncatedBytes>Error: byte array truncation to a length of %1.</ADP_TruncatedBytes>
+  <ADP_TruncatedString>Error: string truncation: max=%1, len=%2, value='%3'</ADP_TruncatedString>
+  <ArrayLength_InvalidParameterValue>Value of parameter '%1' should be a one-dimensional array when %2 is set.</ArrayLength_InvalidParameterValue>
+  <ArrayLength_InvalidParameterPrecisionOrScale>Both Precision and Scale of parameter '%1' must be initialized when %2 is set.</ArrayLength_InvalidParameterPrecisionOrScale>
+  <ArrayLength_InvalidParameterDirection>%1 property is only supported for Input parameters.</ArrayLength_InvalidParameterDirection>
+  <ArrayLength_InvalidValue>Invalid ArrayLength value for parameter '%1'. It must be between 0 and %2 (inclusive).</ArrayLength_InvalidValue>
+  <ADP_PropertyOrKeywordNotSupported>The Property/Keyword '%1' is not supported with the connected server.</ADP_PropertyOrKeywordNotSupported>
+
+  <!--  : IDbTransaction -->
+  <!--  InvalidOperationException -->
+  <ADP_ParallelTransactionsNotSupported>%1 does not support parallel transactions.</ADP_ParallelTransactionsNotSupported>
+  <ADP_TransactionZombied>This %1 has completed; it is no longer usable.</ADP_TransactionZombied>
+  <ADP_Reenlist>Connection currently has transaction enlisted.  Finish current transaction and retry.</ADP_Reenlist>
+
+  <!--  : IDbConnection Property/Method Descriptions -->
+  <DbConnection_InfoMessage>Event triggered when messages arrive from the DataSource.</DbConnection_InfoMessage>
+  <DbConnection_StateChange>Event triggered when the connection changes state.</DbConnection_StateChange>
+  <DbConnection_State>ConnectionState indiciating if the connection is open or closed.</DbConnection_State>
+
+  <!--  Data.DB2 -->
+  <!--  ArgumentException -->
+  <DB2Connection_ConnectionStringTooLong>Connection string exceeds maximum allowed length of %1.</DB2Connection_ConnectionStringTooLong>
+  <!--  SystemException -->
+  <DB2_UnknownSQLType>Unknown SQL type - %1.</DB2_UnknownSQLType>
+  <DB2_UnknownURTType>Unknown URT type - %1.</DB2_UnknownURTType>
+  <DB2_InvalidHandle>Invalid Handle</DB2_InvalidHandle>
+  <DB2_UnsupportedCommandTypeTableDirect>The DB2 .NET Data Provider does not support CommandType.TableDirect</DB2_UnsupportedCommandTypeTableDirect>
+  <DB2_NegativeArgument>Invalid negative argument</DB2_NegativeArgument>
+  <DB2_InvalidArgument>Invalid argument</DB2_InvalidArgument>
+  <DB2_CantSetPropertyOnOpenConnection>Can't set property on an open connection.</DB2_CantSetPropertyOnOpenConnection>
+  <DB2_UnsupportedIsolationLevel>Not supported isolationlevel - %1</DB2_UnsupportedIsolationLevel>
+  <DB2_CantEnableConnectionpooling>%1 - unable to enable connection pooling...</DB2_CantEnableConnectionpooling>
+  <DB2_CantAllocateEnvironmentHandle>%1 - unable to allocate an environment handle.</DB2_CantAllocateEnvironmentHandle>
+  <DB2_NotInTransaction>Not in a transaction</DB2_NotInTransaction>
+  <DB2_UnknownSQLCType>Unknown SQL C type - %1</DB2_UnknownSQLCType>
+  <DB2_UnknownDB2Type>Invalid DB2 Type enumeration value=%1.</DB2_UnknownDB2Type>
+  <DB2_ExceptionMessage>%1 [%2] %3</DB2_ExceptionMessage>
+  <DB2_ExceptionNoInfoMsg>%1 - no error information available</DB2_ExceptionNoInfoMsg>
+  <DB2_MissingProperty>%1 requires a value for the property %2.</DB2_MissingProperty>
+
+  <DB2CommandBuilder_DataAdapter>The DataAdapter for which to automatically generate DB2Commands</DB2CommandBuilder_DataAdapter>
+  <DB2CommandBuilder_QuotePrefix>The character used in a text command as the opening quote for quoting identifiers that contain special characters.</DB2CommandBuilder_QuotePrefix>
+  <DB2CommandBuilder_QuoteSuffix>The character used in a text command as the closing quote for quoting identifiers that contain special characters.</DB2CommandBuilder_QuoteSuffix>
+
+  <DB2Parameter_DB2Type>The parameter native type.</DB2Parameter_DB2Type>
+  <DB2Types_NullValue>The value of the DB2Type is null.</DB2Types_NullValue>
+  <DB2Types_TruncateValue>This value of the DB2Type will be truncated.</DB2Types_TruncateValue>
+  <DB2Types_DecimalOverflow>Value was either too large or too small for a Decimal.</DB2Types_DecimalOverflow>
+  <DB2Types_InvalidFormat>Input string was not in a correct format.</DB2Types_InvalidFormat>
+
+  <DB2MetaDataFactory_TooManyRestrictions>More restrictions were provided than the requested schema '%1' supports.</DB2MetaDataFactory_TooManyRestrictions>
+  <DB2MetaDataFactory_NullOrPatternRestrictionValueSpecified>The value specified for restriction '%2' cannot be null or a pattern for the GetSchema '%1' collection.</DB2MetaDataFactory_NullOrPatternRestrictionValueSpecified>
+
+  <DB2ResultSet_ColumnNotUpdatable>Column %1 is not updatable.</DB2ResultSet_ColumnNotUpdatable>
+  <DB2ResultSet_CanNotUpdateNewRow>Newly insert rows of a keyset cursor are not updatable.</DB2ResultSet_CanNotUpdateNewRow>
+  <DB2ResultSet_NeedsUpdatableCursor>%1: Method requires an updatable cursor.</DB2ResultSet_NeedsUpdatableCursor>
+  <DB2ResultSet_NeedsScrollableCursor>%1: Method requires a scrollable cursor.</DB2ResultSet_NeedsScrollableCursor>
+  <DB2ResultSet_InvalidResultSetOptions>(%1) is an invalid combination for DB2ResultSetOptions.</DB2ResultSet_InvalidResultSetOptions>
+  <DB2ResultSet_CursorDowngraded>Cursor downgraded from %1 to %2.</DB2ResultSet_CursorDowngraded>
+  <DB2ResultSet_UpdatableRecordNotCreatedByResultSet>DB2UpdatableRecord was not created by this instance of DB2ResultSet.</DB2ResultSet_UpdatableRecordNotCreatedByResultSet>
+  <DB2ResultSet_RowsHasBeenDeleted>Invalid operation %1.  The row has been deleted.</DB2ResultSet_RowsHasBeenDeleted>
+  <DB2ResultSet_CursorClosed>Invalid attempt to %1 when cursor is closed.</DB2ResultSet_CursorClosed>
+  <DB2_ExclusiveUseOfConnection>%1 requires exclusive access to database connection.</DB2_ExclusiveUseOfConnection>
+
+  <DB2BulkCopy_MappingConflict>Source column '%1' and '%2' both map the same destination column '%3'.</DB2BulkCopy_MappingConflict>
+  <DB2BulkCopy_DestinationNotExist>The destination column '%1' in the column mapping does not exist in the destination table.</DB2BulkCopy_DestinationNotExist>
+  <DB2BulkCopy_SourceNotExist>The source column '%1' in the column mapping does not exist in the source.</DB2BulkCopy_SourceNotExist>
+  <DB2BulkCopy_LeftOverMapping>Mapping for source column '%1' exists in DB2BulkCopyColumnMappingCollection but does not exist in the source.</DB2BulkCopy_LeftOverMapping>
+  <DB2BulkCopy_InvalidSourceColumnType>Source column '%1' is of type '%2' and destination column '%3' is of type '%4'.</DB2BulkCopy_InvalidSourceColumnType>
+  <DB2BulkCopy_NumSrcColumnsGtDest>There are more source columns the there are at the destination table.</DB2BulkCopy_NumSrcColumnsGtDest>
+  <DB2BulkCopy_InTransaction>DB2BulkCopy can not operate under transactional control.</DB2BulkCopy_InTransaction>
+  <DB2BulkCopy_Aborted>DB2BulkCopy.WriteToServer was interrupted due to application setting DB2RowsCopiedEventArgs.Abort to true.</DB2BulkCopy_Aborted>
+
+  <DB2Command_SelectOnly>%1 supports SELECT and VALUES statements only.</DB2Command_SelectOnly>
+  
+  <DB2XmlCommand_InvalidCommandText>%1 is not a valid CommandText for DB2XmlCommand. </DB2XmlCommand_InvalidCommandText>
+  <DB2XmlCommand_InvalidRootTag>%1 is not a valid RootTag for DB2XmlCommand. </DB2XmlCommand_InvalidRootTag>
+  
+  <ADP_InvalidConnectionOption>The connection option value specified is invalid for %1.</ADP_InvalidConnectionOption>
+  <DB2ConnectionStringBuilder_Category_Source>Source</DB2ConnectionStringBuilder_Category_Source>
+  <DB2ConnectionStringBuilder_Category_Security>Security</DB2ConnectionStringBuilder_Category_Security>
+  <DB2ConnectionStringBuilder_Category_Pooling>Pooling</DB2ConnectionStringBuilder_Category_Pooling>
+  <DB2ConnectionStringBuilder_Category_Initialization>Initialization</DB2ConnectionStringBuilder_Category_Initialization>
+  <DB2ConnectionStringBuilder_Category_SchemaKeywords>SchemaKeywords</DB2ConnectionStringBuilder_Category_SchemaKeywords>
+  <DB2ConnectionStringBuilder_Category_pureQuery>pureQuery</DB2ConnectionStringBuilder_Category_pureQuery>
+
+  <DB2ConnectionStringBuilder_Database>The name of the database to connect to.</DB2ConnectionStringBuilder_Database>
+  <DB2ConnectionStringBuilder_UserID>The value representing the user name</DB2ConnectionStringBuilder_UserID>
+  <DB2ConnectionStringBuilder_Password>The value representing the user password</DB2ConnectionStringBuilder_Password>
+  <DB2ConnectionStringBuilder_ServerType> The type of server to which you want to connect (UniData, UniVerse)</DB2ConnectionStringBuilder_ServerType>
+  <DB2ConnectionStringBuilder_CodePage>The code page identifier of the encoding.</DB2ConnectionStringBuilder_CodePage>
+  <DB2ConnectionStringBuilder_WalletID>The ID of the encryption key wallet for U2 Data Server.</DB2ConnectionStringBuilder_WalletID>
+  <DB2ConnectionStringBuilder_WalletPwd>The password for the encryption key wallet for U2 Data Server.</DB2ConnectionStringBuilder_WalletPwd>
+  <DB2ConnectionStringBuilder_Server>
+The server name with optional port number for direct connection.
+Syntax: server name[:port]
+  </DB2ConnectionStringBuilder_Server>
+  <DB2ConnectionStringBuilder_Pooling>Connection pooling switch (true/false) </DB2ConnectionStringBuilder_Pooling>
+  <DB2ConnectionStringBuilder_MinPoolSize>The value representing the minimum number of connections to be held in the pool </DB2ConnectionStringBuilder_MinPoolSize>
+  <DB2ConnectionStringBuilder_MaxPoolSize>The value representing the maximum number of connections in each pool </DB2ConnectionStringBuilder_MaxPoolSize>
+  <DB2ConnectionStringBuilder_ConnectionReset>
+True - This particular connection will be put into the connection pool when it is closed.
+False - This particular connection will not be put into the connection pool when it is closed
+  </DB2ConnectionStringBuilder_ConnectionReset>
+  <DB2ConnectionStringBuilder_ConnectionLifetime>The Amount of time (seconds) that the connection can remain idle in the connection pool. Default is 60 seconds.</DB2ConnectionStringBuilder_ConnectionLifetime>
+  <DB2ConnectionStringBuilder_Enlist>
+True - Enlistment to Distributed Transaction Coordinator (DTC) is allowed (this will only enlist if a COM+ transaction is in progress at connect time)
+False - enlistment to Distributed Transaction Coordinator (DTC) is not allowed </DB2ConnectionStringBuilder_Enlist>
+  <DB2ConnectionStringBuilder_PersistSecurityInfo>
+True - Allow security-sensitive information, such as password, to be returned as part of the connection string after the connection has been opened or if the connection has ever been in an opened state.
+False - Security-sensitive information is not returned as part of the connection string. False is strongly recommended.
+   </DB2ConnectionStringBuilder_PersistSecurityInfo>
+  <DB2ConnectionStringBuilder_ConnectionTimeout>The value representing the number of seconds for a connection attempt to wait before it times out </DB2ConnectionStringBuilder_ConnectionTimeout>
+  <DB2ConnectionStringBuilder_QueryTimeout>The value representing the interval in seconds between query timeout checks </DB2ConnectionStringBuilder_QueryTimeout>
+  <DB2ConnectionStringBuilder_IsolationLevel>
+Isolation level for the connection; possible values are:
+ReadCommitted
+ReadUncommitted
+RepeatableRead
+Serializable
+This keyword is only supported for applications participating in a distributed transaction, such as a COM+ application. For applications that do not participate in a distributed transaction, this keyword is not supported and an InvalidArgument exception is thrown.
+</DB2ConnectionStringBuilder_IsolationLevel>
+  <DB2ConnectionStringBuilder_CurrentSchema>The value of the schema name used for all unqualified SQL objects used in the connection</DB2ConnectionStringBuilder_CurrentSchema>
+  <DB2ConnectionStringBuilder_CLISchema>This keyword indicates that a set of db2ocat tables should be queried to generate the schema function result sets.
+  The string value setting is the schema name of the db2ocat tables.
+  For example, CLISCHEMA=CAT001 uses CAT001 as the schema of the db2ocat tables.
+  </DB2ConnectionStringBuilder_CLISchema>
+  <DB2ConnectionStringBuilder_SysSchema>This keyword indicates that a set of shadow catalog tables should be used instead of the actual system catalog tables.
+  The schemaName value is the schema for the shadow catalog tables.
+  </DB2ConnectionStringBuilder_SysSchema>
+  <DB2ConnectionStringBuilder_DBName>The value specifies the database name to reduce the time it takes for the application to query z/OS or OS/390 table information.</DB2ConnectionStringBuilder_DBName>
+  <DB2ConnectionStringBuilder_TableType>
+The TABLETYPE keyword is used to restrict the result sets of the SQLTables stored procedure to a set of table types.
+Syntax: TABLETYPE="type1,type2,typeN"
+  </DB2ConnectionStringBuilder_TableType>
+  <DB2ConnectionStringBuilder_SchemaList>
+The SCHEMALIST keyword is used to restrict the result sets of the schema functions to a set of schemas.
+Syntax: SCHEMALIST ="schema1,schema2,schema3,..."
+  </DB2ConnectionStringBuilder_SchemaList>
+  <DB2ConnectionStringBuilder_MapDate>
+The MAPDATE keyword indicates that DATE types should be reported as a different data type.
+Syntax: MAPDATE = 0 | 1 | 2   (default is 0)
+0 - No mapping is performed
+1 - Report DATE columns as SQL_CHAR (1)
+2 - Report DATE columns as SQL_WCHAR ( -8 )
+  </DB2ConnectionStringBuilder_MapDate>
+  <DB2ConnectionStringBuilder_MapTime>
+The MAPTIME keyword indicates that TIME types should be reported as a different data type.
+Syntax: MAPTIME = 0 | 1 | 2  (default is 0)
+0 - No mapping is performed
+1 - Report TIME columns as SQL_CHAR (1)
+2 - Report TIME columns as SQL_WCHAR ( -8 )
+  </DB2ConnectionStringBuilder_MapTime>
+  <DB2ConnectionStringBuilder_MapTimestamp>
+The MAPTIMESTAMP keyword indicates that TIMESTAMP types should be reported as a different data type.
+Syntax: MAPTIMESTAMP = 0 | 1 | 2  (default is 0)
+0 - No mapping is performed
+1 - Report TIMESTAMP columns as SQL_CHAR (1)
+2 - Report TIMESTAMP columns as SQL_WCHAR ( -8 )
+  </DB2ConnectionStringBuilder_MapTimestamp>
+  <DB2ConnectionStringBuilder_StaticLatch>
+Turn on static latching
+  </DB2ConnectionStringBuilder_StaticLatch>
+  <DB2ConnectionStringBuilder_Graphic>
+Turn on graphic
+  </DB2ConnectionStringBuilder_Graphic>
+  <DB2ConnectionStringBuilder_ConvertToLong>
+Turn on convert to long
+  </DB2ConnectionStringBuilder_ConvertToLong>
+
+  <!--  SQLServer.SQLServerDataReader -->
+  <!--  NotSupportedException -->
+  <ADP_NonSeqByteAccess>Invalid %3 attempt at dataIndex '%1'.  With CommandBehavior.SequentialAccess, you may only read from dataIndex '%2' or greater.</ADP_NonSeqByteAccess>
+
+  <!--  DbCommand Property/Method Descriptions -->
+  <DbCommand_CommandText>Command text to execute.</DbCommand_CommandText>
+  <DbCommand_CommandTimeout>Time to wait for command to execute.</DbCommand_CommandTimeout>
+  <DbCommand_CommandType>How to interpret the CommandText.</DbCommand_CommandType>
+  <DbCommand_Connection>Connection used by the command.</DbCommand_Connection>
+  <DbCommand_Parameters>The parameters collection.</DbCommand_Parameters>
+  <DbCommand_Transaction>The transaction used by the command.</DbCommand_Transaction>
+  <DbCommand_UpdatedRowSource>When used by a DataAdapter.Update, how command results are applied to the current DataRow.</DbCommand_UpdatedRowSource>
+  <DB2Command_DisableCursorHold>The value representing whether or not cursors should be left open after committing a transaction.</DB2Command_DisableCursorHold>
+
+  <!--  -->
+  <!--  XXX Connection Property/Method Descriptions -->
+  <DB2Connection_ConnectionString>Information used to connect to a Data Source.</DB2Connection_ConnectionString>
+  <DB2Connection_ConnectionTimeout>Current connection timeout value, not settable in the ConnectionString.</DB2Connection_ConnectionTimeout>
+  <DB2Connection_Database>Current data source catalog value, 'Database=X' in the connection string.</DB2Connection_Database>
+  <DB2Connection_DataSource>Current data source, 'Server=X' in the connection string.</DB2Connection_DataSource>
+  <DB2Connection_Driver>Current DB2 driver.</DB2Connection_Driver>
+  <DB2Connection_ServerVersion>Version of the server accessed by the DB2 driver.</DB2Connection_ServerVersion>
+  <DB2Connection_ServerType>Type of the server accessed by the DB2 driver.</DB2Connection_ServerType>
+  <DB2Connection_ClientUser>The client user ID that is sent to a database.</DB2Connection_ClientUser>
+  <DB2Connection_ClientWorkStation>The client workstation name sent to the database.</DB2Connection_ClientWorkStation>
+  <DB2Connection_ClientAccountingInformation>The client accounting string that is sent to a database.</DB2Connection_ClientAccountingInformation>
+  <DB2Connection_ClientApplicationInformation>The client application name that is sent to a database.</DB2Connection_ClientApplicationInformation>
+  <DB2Connection_ClientProgramName>The default client application name to a user-defined name which is used to identify the application at the server when monitoring.</DB2Connection_ClientProgramName>
+  <DB2Connection_ClientProgramID>The user-defined character string that associates an application with a connection.</DB2Connection_ClientProgramID>
+  <DB2Connection_ConnectionBusyWithUpdateBatch>%1: Connection is busy with an Update Batch</DB2Connection_ConnectionBusyWithUpdateBatch>
+  <DB2Connection_ServerFunctionalLevel>Functional level of the server accessed by the DB2 driver.</DB2Connection_ServerFunctionalLevel>
+  
+  <!--  DbDataAdapter Property/Method Descriptions -->
+  <DbDataAdapter_DeleteCommand>Used during Update for deleted rows in DataSet.</DbDataAdapter_DeleteCommand>
+  <DbDataAdapter_InsertCommand>Used during Update for new rows in DataSet.</DbDataAdapter_InsertCommand>
+  <DbDataAdapter_SelectCommand>Used during Fill/FillSchema.</DbDataAdapter_SelectCommand>
+  <DbDataAdapter_UpdateCommand>Used during Update for modified rows in DataSet.</DbDataAdapter_UpdateCommand>
+
+  <!--  XXX Parameter Property/Method Descriptions -->
+  <DataParameter_DbType>The parameter generic type.</DataParameter_DbType>
+  <DataParameter_Direction>Input, output, or bidirectional parameter.</DataParameter_Direction>
+  <DataParameter_IsNullable>Property that indicates whether the parameter is nullable.</DataParameter_IsNullable>
+  <DataParameter_ParameterName>Name of the parameter.</DataParameter_ParameterName>
+  <DataParameter_SourceColumn>When used by a DataAdapter.Update, the source column name that is used to find the DataSetColumn name in the ColumnMappings. This is to copy a value between the parameter and a datarow.</DataParameter_SourceColumn>
+  <DataParameter_SourceVersion>When used by a DataAdapter.Update (UpdateCommand only), the version of the DataRow value that is used to update the data source.</DataParameter_SourceVersion>
+  <DataParameter_Value>Value of the parameter.</DataParameter_Value>
+  <DbDataParameter_Precision>For decimal, numeric, varnumeric DBTypes.</DbDataParameter_Precision>
+  <DbDataParameter_Scale>For decimal, numeric, varnumeric DBTypes.</DbDataParameter_Scale>
+  <DbDataParameter_Size>Size of variable length data types (string &amp; arrays).</DbDataParameter_Size>
+  <DB2Parameter_ArrayLength>Indicates the number of elements to consider from the given input array.</DB2Parameter_ArrayLength>
+
+  <DB2DataAdapter_UpdateNotAllowedWhenChainingOn>DataAdapter.Update not supported when Chaining is on</DB2DataAdapter_UpdateNotAllowedWhenChainingOn>
+  <DB2_ObjectNotAccessibleFromCurrentRow>The object is not accessible from the current row.</DB2_ObjectNotAccessibleFromCurrentRow>
+  <DB2_NoMoreData>There is no more data to return.</DB2_NoMoreData>
+  <DB2_CanNotMixStreaming>Can not mix streaming and non-streaming data access methods when data caching is disabled.</DB2_CanNotMixStreaming>
+  <DB2ConnectionStringBuilder_Authentication>
+Server authentication mode
+  </DB2ConnectionStringBuilder_Authentication>
+  <DB2ConnectionStringBuilder_Instance>
+Specify specific instance
+  </DB2ConnectionStringBuilder_Instance>
+  <DB2ConnectionStringBuilder_Interrupt>
+Set interrupt mode
+  </DB2ConnectionStringBuilder_Interrupt>
+  <DB2ConnectionStringBuilder_ClientEncAlg>
+Turn on AES Encryption
+  </DB2ConnectionStringBuilder_ClientEncAlg>
+  <DB2ConnectionStringBuilder_captureMode>
+Specifies whether to capture information about SQL statements.
+  </DB2ConnectionStringBuilder_captureMode>
+  <DB2ConnectionStringBuilder_executionMode>
+Specifies whether to run statically the SQL statements in the capture file that is specified by the pureQueryXml option.
+  </DB2ConnectionStringBuilder_executionMode>
+  <DB2ConnectionStringBuilder_pureQueryXML>
+Specifies the fully-qualified, or relative path to, the file that is created by the process of capturing SQL statements or that is read from if the .NET application is run with executionMode set to STATIC.
+  </DB2ConnectionStringBuilder_pureQueryXML>
+  <DB2ConnectionStringBuilder_collection>
+The qualifier for the packages.
+  </DB2ConnectionStringBuilder_collection>
+  <DB2ConnectionStringBuilder_rootPkgName>
+Specifies the stem of the name to use for DB2 packages.
+  </DB2ConnectionStringBuilder_rootPkgName>
+  <DB2ConnectionStringBuilder_traceFile>
+Enables tracing for pureQuery activities and specifies the physical file to write the log into.
+  </DB2ConnectionStringBuilder_traceFile>
+  <DB2ConnectionStringBuilder_allowDynamicSQL>
+    Specifies whether to allow an application to run the following types of SQL statements dynamically: SQL statements that are not captured in a pureQueryXML file, and SQL statements that are captured in a pureQueryXML file but which have not been bound by the StaticBinder utility.
+  </DB2ConnectionStringBuilder_allowDynamicSQL>
+  <DB2ConnectionStringBuilder_capturedOnly>
+    Specifies whether to run only the SQL statements that are in the pureQueryXML file.
+  </DB2ConnectionStringBuilder_capturedOnly>
+  <DB2ConnectionStringBuilder_enableDynamicSQLReplacement>
+    Specifies whether to run alternative SQL statements in a pureQueryXML file, where neither those alternative statements nor the corresponding original statements were bound by the StaticBinder utility.
+  </DB2ConnectionStringBuilder_enableDynamicSQLReplacement>
+  <DB2ConnectionStringBuilder_maxNonParmSQL>
+    Specifies the maximum number of non-parameterized SQL statements to capture. This option applies only when the value of captureMode is ON. When captureMode is OFF, pureQuery ignores this parameter.
+  </DB2ConnectionStringBuilder_maxNonParmSQL>
+  <DB2ConnectionStringBuilder_sqlLiteralSubstitution>    
+    Specifies whether to perform literal substitution. When this option is enabled, pureQuery Runtime attempts to replace literal values in SQL statements with parameter markers and capture the parameterized versions of the statements.
+  </DB2ConnectionStringBuilder_sqlLiteralSubstitution>
+  <DB2ConnectionStringBuilder_traceLevel>
+    Specifies the level of detail to write to the log file.
+  </DB2ConnectionStringBuilder_traceLevel>
+  <DB2ConnectionStringBuilder_propertiesGroupId>
+    Specifies a runtime group ID in a repository that is created in a database.
+  </DB2ConnectionStringBuilder_propertiesGroupId>
+  <DB2ConnectionStringBuilder_pureQueryXmlRepository>
+    Specifies the repository location of the PDQXML file to be used with a pureQuery enabled application.
+  </DB2ConnectionStringBuilder_pureQueryXmlRepository>
+  <DB2ConnectionStringBuilder_repositoryRequired>
+    Specifies the pureQuery client optimization behavior if errors occur during retrieving or writing pureQuery data.
+  </DB2ConnectionStringBuilder_repositoryRequired>
+  <DB2Connection_SystemNaming>Sets the system naming or the SQL naming mode when used against DB2 for i server which supports both modes.</DB2Connection_SystemNaming>
+  <DB2Connection_BatchCommandTimeout>Gets or sets the command timeout for chaining.</DB2Connection_BatchCommandTimeout>  
+  <DB2Connection_GetSchema_MissingDescribeInfo>GetSchema is unable to determine the complete describe information for the result set</DB2Connection_GetSchema_MissingDescribeInfo>  
+  <Auth_rule_names_cant_contain_char>Authorization rule names cannot contain the '%1' character.</Auth_rule_names_cant_contain_char>
+  <Connection_name_not_specified>The attribute 'connectionStringName' is missing or empty.</Connection_name_not_specified>
+  <Connection_string_not_found>The connection name '%1' was not found in the applications configuration or the connection string is empty.</Connection_string_not_found>
+  <Membership_AccountLockOut>The user account has been locked out.</Membership_AccountLockOut>
+  <Membership_Custom_Password_Validation_Failure>The custom password validation failed.</Membership_Custom_Password_Validation_Failure>
+  <Membership_InvalidAnswer>The password-answer supplied is invalid.</Membership_InvalidAnswer>
+  <Membership_InvalidEmail>The E-mail supplied is invalid.</Membership_InvalidEmail>
+  <Membership_InvalidPassword>The password supplied is invalid.  Passwords must conform to the password strength requirements configured for the default provider.</Membership_InvalidPassword>
+  <Membership_InvalidProviderUserKey>The provider user key supplied is invalid.  It must be of type System.Guid.</Membership_InvalidProviderUserKey>
+  <Membership_InvalidQuestion>The password-question supplied is invalid.  Note that the current provider configuration requires a valid password question and answer.  As a result, a CreateUser overload that accepts question and answer parameters must also be used.</Membership_InvalidQuestion>
+  <Membership_more_than_one_user_with_email>More than one user has the specified e-mail address.</Membership_more_than_one_user_with_email>
+  <Membership_password_too_long>The password is too long: it must not exceed 128 chars after encrypting.</Membership_password_too_long>
+  <Membership_PasswordRetrieval_not_supported>This Membership Provider has not been configured to support password retrieval.</Membership_PasswordRetrieval_not_supported>
+  <Membership_PasswordReset_not_supported>This Membership Provider has not been configured to support password reset.</Membership_PasswordReset_not_supported>
+  <Membership_UserNotFound>The user was not found.</Membership_UserNotFound>
+  <Membership_WrongAnswer>The password-answer supplied is wrong.</Membership_WrongAnswer>
+  <Membership_WrongPassword>The password supplied is wrong.</Membership_WrongPassword>
+  <PageIndex_bad>The pageIndex must be greater than or equal to zero.</PageIndex_bad>
+  <PageIndex_PageSize_bad>The combination of pageIndex and pageSize cannot exceed the maximum value of System.Int32.</PageIndex_PageSize_bad>
+  <PageSize_bad>The pageSize must be greater than zero.</PageSize_bad>
+  <Parameter_array_empty>The array parameter '%1' should not be empty.</Parameter_array_empty>
+  <Parameter_can_not_be_empty>The parameter '%1' must not be empty.</Parameter_can_not_be_empty>
+  <Parameter_can_not_contain_comma>The parameter '%1' must not contain commas.</Parameter_can_not_contain_comma>
+  <Parameter_duplicate_array_element>The array '%1' should not contain duplicate values.</Parameter_duplicate_array_element>
+  <Parameter_too_long>The parameter '%1' is too long: it must not exceed %2 chars in length.</Parameter_too_long>
+  <Password_does_not_match_regular_expression>The parameter '%1' does not match the regular expression specified in config file.</Password_does_not_match_regular_expression>
+  <Password_need_more_non_alpha_numeric_chars>Non alpha numeric characters in '%1' needs to be greater than or equal to '%2'.</Password_need_more_non_alpha_numeric_chars>
+  <Password_too_short>The length of parameter '%1' needs to be greater or equal to '%2'.</Password_too_short>
+  <PersonalizationProvider_ApplicationNameExceedMaxLength>The ApplicationName cannot exceed character length %1.</PersonalizationProvider_ApplicationNameExceedMaxLength>
+  <PersonalizationProvider_BadConnection>The specified connectionStringName, '%1', was not registered.</PersonalizationProvider_BadConnection>
+  <PersonalizationProvider_CantAccess>A connection could not be made by the %1 personalization provider using the specified registration.</PersonalizationProvider_CantAccess>
+  <PersonalizationProvider_NoConnection>The connectionStringName attribute must be specified when registering a personalization provider.</PersonalizationProvider_NoConnection>
+  <PersonalizationProvider_UnknownProp>Invalid attribute '%1', specified in the '%2' personalization provider registration.</PersonalizationProvider_UnknownProp>
+  <ProfileDB2Provider_description>DB2 profile provider.</ProfileDB2Provider_description>
+  <Profile_empty>Profiles collection is empty</Profile_empty>
+  <Property_Had_Malformed_Url>The '%1' property had a malformed URL: %2.</Property_Had_Malformed_Url>
+  <Provider_application_name_too_long>The application name is too long.</Provider_application_name_too_long>
+  <Provider_bad_password_format>Password format specified is invalid.</Provider_bad_password_format>
+  <Provider_can_not_retrieve_hashed_password>Configured settings are invalid: Hashed passwords cannot be retrieved. Either set the password format to different type, or set supportsPasswordRetrieval to false.</Provider_can_not_retrieve_hashed_password>
+  <Provider_Error>The Provider encountered an unknown error.</Provider_Error>
+  <Provider_Not_Found>Provider '%1' was not found.</Provider_Not_Found>
+  <Provider_role_already_exists>The role '%1' already exists.</Provider_role_already_exists>
+  <Provider_role_not_found>The role '%1' was not found.</Provider_role_not_found>
+  <Provider_Schema_Version_Not_Match>The '%1' requires a database schema compatible with schema version '%2'.  However, the current database schema is not compatible with this version.  You may need to either install a compatible schema with aspnet_regsql.exe (available in the framework installation directory), or upgrade the provider to a newer version.</Provider_Schema_Version_Not_Match>
+  <Provider_this_user_already_in_role>The user '%1' is already in role '%2'.</Provider_this_user_already_in_role>
+  <Provider_this_user_not_found>The user '%1' was not found.</Provider_this_user_not_found>
+  <Provider_unknown_failure>Unknown provider failure.</Provider_unknown_failure>
+  <Provider_unrecognized_attribute>Attribute not recognized '%1'</Provider_unrecognized_attribute>
+  <Provider_user_not_found>The user was not found in the database.</Provider_user_not_found>
+  <Role_is_not_empty>This role cannot be deleted because there are users present in it.</Role_is_not_empty>
+  <RoleDB2Provider_description>DB2 role provider.</RoleDB2Provider_description>
+  <SiteMapProvider_description>DB2 site map provider</SiteMapProvider_description>
+  <SiteMapProvider_cannot_remove_root_node>Root node cannot be removed from the providers, use RemoveProvider(string providerName) instead.</SiteMapProvider_cannot_remove_root_node>
+  <DB2Error_Connection_String>An error occurred while attempting to initialize a IBM.Data.DB2.DB2Connection object. The value that was provided for the connection string may be wrong, or it may contain an invalid syntax.</DB2Error_Connection_String>
+  <DB2Express_file_not_found_in_connection_string>SQL Express filename was not found in the connection string.</DB2Express_file_not_found_in_connection_string>
+  <DB2PersonalizationProvider_Description>Personalization provider that stores data in a IBM Data server database.</DB2PersonalizationProvider_Description>
+  <Value_must_be_boolean>The value must be boolean (true or false) for property '%1'.</Value_must_be_boolean>
+  <Value_must_be_non_negative_integer>The value must be a non-negative 32-bit integer for property '%1'.</Value_must_be_non_negative_integer>
+  <Value_must_be_positive_integer>The value must be a positive 32-bit integer for property '%1'.</Value_must_be_positive_integer>
+  <Value_too_big>The value '%1' can not be greater than '%2'.</Value_too_big>
+  <PersonalizationProviderHelper_TrimmedEmptyString>Input parameter '%1' cannot be an empty string.</PersonalizationProviderHelper_TrimmedEmptyString>
+  <StringUtil_Trimmed_String_Exceed_Maximum_Length>Trimmed string value '%1' of input parameter '%2' cannot exceed character length %3.</StringUtil_Trimmed_String_Exceed_Maximum_Length>
+  <MembershipDB2Provider_description>DB2 membership provider.</MembershipDB2Provider_description>
+  <MinRequiredNonalphanumericChars_can_not_be_more_than_MinRequiredPasswordLen>The minRequiredNonalphanumericCharacters can not be greater than minRequiredPasswordLength.</MinRequiredNonalphanumericChars_can_not_be_more_than_MinRequiredPasswordLen>
+  <PersonalizationProviderHelper_Empty_Collection>Input parameter '%1' cannot be an empty collection.</PersonalizationProviderHelper_Empty_Collection>
+  <PersonalizationProviderHelper_Null_Or_Empty_String_Entries>Input parameter '%1' cannot contain null or empty string entries.</PersonalizationProviderHelper_Null_Or_Empty_String_Entries>
+  <PersonalizationProviderHelper_CannotHaveCommaInString>Input parameter '%1' cannot have comma in string value '%2'.</PersonalizationProviderHelper_CannotHaveCommaInString>
+  <PersonalizationProviderHelper_Trimmed_Entry_Value_Exceed_Maximum_Length>Trimmed entry value '%1' of input parameter '%2' cannot exceed character length %3.</PersonalizationProviderHelper_Trimmed_Entry_Value_Exceed_Maximum_Length>
+  <PersonalizationProviderHelper_More_Than_One_Path>Input parameter '%1' cannot contain more than one entry when '%2' contains some entries.</PersonalizationProviderHelper_More_Than_One_Path>
+  <PersonalizationProviderHelper_Negative_Integer>The input parameter cannot be negative.</PersonalizationProviderHelper_Negative_Integer>
+  <PersonalizationAdmin_UnexpectedPersonalizationProviderReturnValue>The negative value '%1' is returned when calling provider's '%2' method.  The method should return non-negative integer.</PersonalizationAdmin_UnexpectedPersonalizationProviderReturnValue>
+  <PersonaliizationProviderHelper_Null_Entries>Input parameter '%1' cannot contain null entries.</PersonaliizationProviderHelper_Null_Entries>
+  <PersonalizationProviderHelper_Invalid_Less_Than_Parameter>Input parameter '%1' must be greater than or equal to %2.</PersonalizationProviderHelper_Invalid_Less_Than_Parameter>
+  <PersonalizationProviderHelper_No_Usernames_Set_In_Shared_Scope>Input parameter '%1' cannot be provided when '%2' is set to '%3'.</PersonalizationProviderHelper_No_Usernames_Set_In_Shared_Scope>
+  <Provider_this_user_already_not_in_role>The user '%1' is already not in role '%2'.</Provider_this_user_already_not_in_role>
+  <Not_configured_to_support_password_resets>This provider is not configured to allow password resets. To enable password reset, set enablePasswordReset to \"true\" in the configuration file.</Not_configured_to_support_password_resets>
+  <Parameter_collection_empty>The collection parameter '%1' should not be empty.</Parameter_collection_empty>
+  <Provider_can_not_decode_hashed_password>Hashed passwords cannot be decoded.</Provider_can_not_decode_hashed_password>
+  <DbFileName_can_not_contain_invalid_chars>The database filename can not contain the following 3 characters: [ (open square brace), ] (close square brace) and ' (single quote)</DbFileName_can_not_contain_invalid_chars>
+  <Error_parsing_sql_partition_resolver_string>Error parsing the SQL connection string returned by an instance of the IPartitionResolver type '%1': %2</Error_parsing_sql_partition_resolver_string>
+  <Error_parsing_session_sqlConnectionString>Error parsing sessionState sqlConnectionString attribute: %1</Error_parsing_session_sqlConnectionString>
+  <No_database_allowed_in_sqlConnectionString>The sqlConnectionString attribute or the connection string it refers to cannot contain the connection options 'Database', 'Initial Catalog' or 'AttachDbFileName'. In order to allow this, allowCustomDB2Database attribute must be set to true and the application needs to be granted unrestricted DB2ClientPermission. Please check with your administrator if the application does not have this permission.</No_database_allowed_in_sqlConnectionString>
+  <No_database_allowed_in_sql_partition_resolver_string>The SQL connection string (server='%2', database='%3') returned by an instance of the IPartitionResolver type '%1' cannot contain the connection options 'Database', 'Initial Catalog' or 'AttachDbFileName'. In order to allow this, allowCustomDB2Database attribute must be set to true and the application needs to be granted unrestricted DB2ClientPermission. Please check with your administrator if the application does not have this permission.</No_database_allowed_in_sql_partition_resolver_string>
+  <Cant_connect_sql_session_database>Unable to connect to IBM Data Server session database.</Cant_connect_sql_session_database>
+  <Cant_connect_sql_session_database_partition_resolver>Unable to connect to IBM Data Server session database. The connection string (server='%2', database='%3') was returned by an instance of the IPartitionResolver type '%1'.</Cant_connect_sql_session_database_partition_resolver>
+  <Login_failed_sql_session_database>Failed to login to session state IBM Data server for user '%1'.</Login_failed_sql_session_database>
+  <Invalid_session_state>The session state information is invalid and might be corrupted.</Invalid_session_state>
+  <Missing_required_attribute>The '%1' attribute must be specified on the '%2' tag.</Missing_required_attribute>
+  <Invalid_boolean_attribute>The '%1' attribute must be set to 'true' or 'false'.</Invalid_boolean_attribute>
+  <Empty_attribute>The '%1' attribute cannot be an empty string.</Empty_attribute>
+  <Config_base_unrecognized_attribute>Unrecognized attribute '%1'. Note that attribute names are case-sensitive.</Config_base_unrecognized_attribute>
+  <Config_base_no_child_nodes>Child nodes are not allowed.</Config_base_no_child_nodes>
+  <Unexpected_provider_attribute>The attribute '%1' is unexpected in the configuration of the '%2' provider.</Unexpected_provider_attribute>
+  <Only_one_connection_string_allowed>DB2WebEventProvider: Specify either a connectionString or connectionStringName, not both.</Only_one_connection_string_allowed>
+  <Cannot_use_integrated_security>DB2WebEventProvider: connectionString can only contain connection strings that use DB2 Server authentication.  Trusted Connection security is not supported.</Cannot_use_integrated_security>
+  <Must_specify_connection_string_or_name>DB2WebEventProvider: Either a connectionString or connectionStringName must be specified.</Must_specify_connection_string_or_name>
+  <Invalid_max_event_details_length>The value '%2' specified for the maxEventDetailsLength attribute of the '%1' provider is invalid. It should be between 0 and 1073741823.</Invalid_max_event_details_length>
+  <DB2_webevent_provider_events_dropped>%1 events were discarded since last notification was made at %2 because the event buffer capacity was exceeded.</DB2_webevent_provider_events_dropped>
+  <Invalid_provider_positive_attributes>The attribute '%1' is invalid in the configuration of the '%2' provider. The attribute must be set to a non-negative integer.</Invalid_provider_positive_attributes>
+  <ApplicationId_not_found>Failed to get ApplicationID</ApplicationId_not_found>
+  <SessionStateStore_Description>DB2 Session State Provider</SessionStateStore_Description>
+  <SiteMapProvider_MissingNodeID>Missing node ID</SiteMapProvider_MissingNodeID>
+  <SiteMapProvider_Duplicate_NodeID>Duplicate node ID</SiteMapProvider_Duplicate_NodeID>
+  <SiteMapProvider_MissingParentID>Missing parent ID</SiteMapProvider_MissingParentID>
+  <SiteMapParovider_Invalid_ParentID>Invalid parent ID</SiteMapParovider_Invalid_ParentID>
+  <SiteMapProvider_Invalid_ConnString>Empty or missing connectionStringName</SiteMapProvider_Invalid_ConnString>
+  <SiteMapProvider_Missing_ConnString>Missing connection string</SiteMapProvider_Missing_ConnString>
+  <SiteMapProvider_Empty_ConnString>Empty connection string</SiteMapProvider_Empty_ConnString>
+  <DB2ConnectionStringBuilder_Security>To enable SSL, set this value to SSL</DB2ConnectionStringBuilder_Security>
+  <DB2ConnectionStringBuilder_SSLClientKeystoredb>Set SSLClientKeystoredb to the fully-qualified key database file name.</DB2ConnectionStringBuilder_SSLClientKeystoredb>
+  <DB2ConnectionStringBuilder_SSLClientKeystash>Set SSLClientKeystash to the fully-qualified stash file name.</DB2ConnectionStringBuilder_SSLClientKeystash>
+  <DB2ConnectionStringBuilder_SSLClientLabel>The value indicates a SSL label uniquely identifying a certificate within keystore database.</DB2ConnectionStringBuilder_SSLClientLabel>
+  <DB2ConnectionStringBuilder_SSLClientKeystoreDBPassword>The value indicates keystore database password.</DB2ConnectionStringBuilder_SSLClientKeystoreDBPassword>  
+  <DB2ConnectionStringBuilder_TrustedContextSystemUserID>The value representing the SYSTEM AUTHID of the trusted context</DB2ConnectionStringBuilder_TrustedContextSystemUserID>
+  <DB2ConnectionStringBuilder_TrustedContextSystemPassword>The value representing the password for the SYSTEM AUTHID of the trusted context</DB2ConnectionStringBuilder_TrustedContextSystemPassword>
+  <DB2ConnectionStringBuilder_ConcurrentAccessResolution>The value representing the mode which the database manager will use when accessing rows that are in the process of being inserted, updated or deleted</DB2ConnectionStringBuilder_ConcurrentAccessResolution>
+  <DB2ConnectionStringBuilder_HostVarParameters>The value representing whether or not host variable style parameters are processed in SQL statements.</DB2ConnectionStringBuilder_HostVarParameters>
+  <DB2ConnectionStringBuilder_NamedParameters>The value representing whether or not named parameters are processed in SQL statements.</DB2ConnectionStringBuilder_NamedParameters>
+  <DB2ConnectionStringBuilder_EnsureDefaultDFRM>The value representing whether or not to ensure DecimalFloatRoundingMode is set to HalfEven.</DB2ConnectionStringBuilder_EnsureDefaultDFRM>
+  <DB2ConnectionStringBuilder_DelimIdent>The value representing whether or not double-quoted strings are delimited database identifiers.</DB2ConnectionStringBuilder_DelimIdent>
+  <DB2ConnectionStringBuilder_UseIsnullSP>The value representing whether or not to use the IsNull stored procedure</DB2ConnectionStringBuilder_UseIsnullSP>
+  <DB2ConnectionStringBuilder_DisableCursorHold>The value representing whether or not cursors should be left open after committing a transaction.</DB2ConnectionStringBuilder_DisableCursorHold>
+  <DB2ConnectionStringBuilder_RetrieveXmlInBinaryFormat>The value representing whether or not XML data should be returned in binary format.</DB2ConnectionStringBuilder_RetrieveXmlInBinaryFormat>
+  <DB2ConnectionStringBuilder_StatementConcentrator>The value configuring StatementConcentrator setting on the server.</DB2ConnectionStringBuilder_StatementConcentrator>
+  <DB2ConnectionStringBuilder_SkipSynonymProcessing>The value representing whether the connection string must be processed to handle synonyms before adding it to a permission set.</DB2ConnectionStringBuilder_SkipSynonymProcessing>
+  <DB2Connection_ExtendedIndicatorsUnsupported>Extended Indicators are not supported by this database server.</DB2Connection_ExtendedIndicatorsUnsupported>
+  <DB2Parameter_ExtendedIndicatorsNotEnabled>Extended indicators support has not been enabled for this command.</DB2Parameter_ExtendedIndicatorsNotEnabled>
+  <DB2Parameter_Default_Unassigned_Conflict>IsDefault and IsUnassigned can not both be enabled.</DB2Parameter_Default_Unassigned_Conflict>
+  <DB2ConnectionStringBuilder_DB2Explain>The value representing how the Explain information should be generated by the server.</DB2ConnectionStringBuilder_DB2Explain>
+  <DB2ConnectionStringBuilder_SessionTimeZone>The value used for setting the SESSION TIMEZONE special register on the zOS server.</DB2ConnectionStringBuilder_SessionTimeZone>
+  <ExtendedIndicators_WrongValue>Extended indicators cannot be explicitly disabled.</ExtendedIndicators_WrongValue>
+  <DB2Command_ExtendedIndicators_Prepared>Extended Indicators cannot be enabled on a prepared command.</DB2Command_ExtendedIndicators_Prepared>
+  <DB2Connection_ExtendedIndicators_Prepared>One or more commands associated with this connection are in a prepared state.</DB2Connection_ExtendedIndicators_Prepared>
+  <DB2Parameter_CursorOutparam_ExecNonQuery>A cursor can only be accessed from an output parameter if the query has been executed with ExecuteNonQuery</DB2Parameter_CursorOutparam_ExecNonQuery>
+  <DB2ConnectionStringBuilder_FitHighPrecisionType>The value indicating how high precision data types are handled when returning .NET system types</DB2ConnectionStringBuilder_FitHighPrecisionType>
+  <DB2ConnectionStringBuilder_TargetPrincipal>The value representing fully qualified Kerberos principal name for the target server.</DB2ConnectionStringBuilder_TargetPrincipal>
+  <DB2Command_ArrayBindCount>The value indicating the number of expected elements in the array to be bound for every parameter.</DB2Command_ArrayBindCount>
+  <DB2Command_AtomicArrayInput>The value indicating, when ArrayBindCount property is set, whether the underlying processing should be done as atomic or non-atomic.</DB2Command_AtomicArrayInput>
+  <DB2Parameter_ArrayLength_Error>Array data type is not supported with DB2Command.ArrayBindCount setting.</DB2Parameter_ArrayLength_Error>
+  <DB2Parameter_ArrayLength_ArrayBindCount_Error>DB2Parameter.ArraySize property must not be set when DB2Command.ArrayBindCount property is set.</DB2Parameter_ArrayLength_ArrayBindCount_Error>
+  <BlockForNRows_WrongValue>The BlockForNRows must be greater than or equal to zero.</BlockForNRows_WrongValue>
+  <DB2ConnectionStringBuilder_ConnectNodeNumber>The value indicates the database partition number to which connection is to be made.</DB2ConnectionStringBuilder_ConnectNodeNumber>
+  <DB2ConnectionStringBuilder_CurrentPackageSet>The value indicates the collection identifier to be used to select the package to use for subsequent SQL statements.</DB2ConnectionStringBuilder_CurrentPackageSet>
+  <DB2ConnectionStringBuilder_CurrentSQLID>The value indicates the SQLID to be used for the connection.</DB2ConnectionStringBuilder_CurrentSQLID>
+  <DB2ConnectionStringBuilder_NewPWD>The value of the new password for the user.</DB2ConnectionStringBuilder_NewPWD>   
+  <DB2ConnectionStringBuilder_RetryParameterBindingOnError>The value indicating whether or not the provider will re-execute statements failed due to parameter type mismatch.</DB2ConnectionStringBuilder_RetryParameterBindingOnError>   
+  <DB2ConnectionStringBuilder_ClientCorrelationToken>The value helps in correlating the processing between the application server and the application requester.</DB2ConnectionStringBuilder_ClientCorrelationToken>   
+  <DB2Connection_ClientCorrelationToken>The value helps in correlating the processing between the application server and the application requester.</DB2Connection_ClientCorrelationToken>
+  <DB2ConnectionStringBuilder_CurrentFunctionPath>The property indicates the schemas that are used to resolve function references and data type references in dynamic SQL statements.</DB2ConnectionStringBuilder_CurrentFunctionPath>
+  <DB2ConnectionStringBuilder_EnableEFCaseSensitivity>Sets the Entity Data Model property to indicate whether the Entity Data Model objects are case-sensitive.</DB2ConnectionStringBuilder_EnableEFCaseSensitivity>
+  <DB2ConnectionStringBuilder_SSLServerCertificate>The value indicates the fully qualified file name of server's self-signed certificate or server's CA Certificate.</DB2ConnectionStringBuilder_SSLServerCertificate>
+  <DB2ConnectionStringBuilder_Db2dumpSQLCodes>Specifies whether diagnostic logs are gathered when specified SQL Codes are encountered in a connection to the zOS server.</DB2ConnectionStringBuilder_Db2dumpSQLCodes>
+  <DB2ConnectionStringBuilder_Db2DumpSQLCodesInterval>Specifies the time period in seconds during which the log information for the SQLCODE is not captured.</DB2ConnectionStringBuilder_Db2DumpSQLCodesInterval>
+  <DB2ConnectionStringBuilder_TrustedContextUserRegistryName>Sends the user registry name in the connection string while switching to a trusted connection</DB2ConnectionStringBuilder_TrustedContextUserRegistryName>
+  <DB2ConnectionStringBuilder_LibraryList>The list of Libraries to be loaded at the server. This value is space separated.</DB2ConnectionStringBuilder_LibraryList>
+  <DB2ConnectionStringBuilder_FetchBufferSize>Specifies the default query block size to optimize the data flow.</DB2ConnectionStringBuilder_FetchBufferSize>  
+  
+</NLS_STRINGS>

@@ -16,5 +16,10 @@ namespace FluentMigrator.Runner.Generators.SQLite
 
             return base.FormatSystemMethods(value);
         }
+
+        public override string QuoteSchemaName(string schemaName)
+        {
+            return string.Empty;
+        }
     }
 }

@@ -22,6 +22,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [SetUp]
         public void SetUp()
         {
+            if (!IntegrationTestOptions.Hana.IsEnabled)
+                Assert.Ignore();
             Connection = new HanaConnection(IntegrationTestOptions.Hana.ConnectionString);
             Processor = new HanaProcessor(Connection, new HanaGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new HanaDbFactory());
             Quoter = new HanaQuoter();
@@ -32,8 +34,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [TearDown]
         public void TearDown()
         {
-            Processor.CommitTransaction();
-            Processor.Dispose();
+            Processor?.CommitTransaction();
+            Processor?.Dispose();
         }
 
         [Test]
@@ -67,8 +69,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [Test]
         public override void CallingIndexExistsReturnsFalseIfIndexDoesNotExistWithSchema()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
-
             using (var table = new HanaTestTable(Processor, "test_schema", "id int"))
                 Processor.IndexExists("test_schema", table.Name, "DoesNotExist").ShouldBeFalse();
         }
@@ -82,8 +82,6 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [Test]
         public override void CallingIndexExistsReturnsFalseIfTableDoesNotExistWithSchema()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
-
             Processor.IndexExists("test_schema", "DoesNotExist", "DoesNotExist").ShouldBeFalse();
         }
 
@@ -100,9 +98,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [Test]
         public override void CallingIndexExistsReturnsTrueIfIndexExistsWithSchema()
         {
-            Assert.Ignore("HANA does not support schema like us know schema in hana is a database name");
-
-            using (var table = new HanaTestTable(Processor, "test_schema", "id int"))
+            using (var table = new HanaTestTable(Processor, "test_schema", "\"id\" int"))
             {
                 var indexName = table.WithIndexOn("id");
                 Processor.IndexExists("test_schema", table.Name, indexName).ShouldBeTrue();

@@ -1,4 +1,4 @@
-﻿using FluentMigrator.Exceptions;
+using FluentMigrator.Exceptions;
 using FluentMigrator.Runner.Generators.Oracle;
 using NUnit.Framework;
 using NUnit.Should;
@@ -238,7 +238,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE TestTable1 RENAME TO TestTable2");
+            result.ShouldBe("ALTER TABLE TestSchema.TestTable1 RENAME TO TestTable2");
         }
 
         [Test]

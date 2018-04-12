@@ -22,6 +22,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         [SetUp]
         public void SetUp()
         {
+            if (!IntegrationTestOptions.Postgres.IsEnabled)
+                Assert.Ignore();
             Connection = new NpgsqlConnection(IntegrationTestOptions.Postgres.ConnectionString);
             Processor = new PostgresProcessor(Connection, new PostgresGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), new PostgresDbFactory());
             Quoter = new PostgresQuoter();
@@ -31,6 +33,9 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
         [TearDown]
         public void TearDown()
         {
+            if (Processor == null)
+                return;
+
             Processor.CommitTransaction();
             Processor.Dispose();
         }
@@ -44,7 +49,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
 
                 var cmd = table.Connection.CreateCommand();
                 cmd.Transaction = table.Transaction;
-                cmd.CommandText = string.Format("CREATE INDEX {0} ON {1} (id)", idxName, table.Name);
+                cmd.CommandText = string.Format("CREATE INDEX {0} ON \"{1}\" (id)", idxName, table.Name);
                 cmd.ExecuteNonQuery();
 
                 Processor.IndexExists(null, table.Name, idxName).ShouldBeTrue();
@@ -60,7 +65,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
 
                 var cmd = table.Connection.CreateCommand();
                 cmd.Transaction = table.Transaction;
-                cmd.CommandText = string.Format("CREATE INDEX {0} ON {1} (id)", idxName, table.Name);
+                cmd.CommandText = string.Format("CREATE INDEX {0} ON \"{1}\" (id)", idxName, table.Name);
                 cmd.ExecuteNonQuery();
 
                 Processor.IndexExists(null, table.Name, idxName).ShouldBeTrue();
@@ -102,7 +107,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Postgres
 
                 var cmd = table.Connection.CreateCommand();
                 cmd.Transaction = table.Transaction;
-                cmd.CommandText = string.Format("CREATE INDEX {0} ON {1} (id)", idxName, table.Name);
+                cmd.CommandText = string.Format("CREATE INDEX {0} ON \"{1}\" (id)", idxName, table.Name);
                 cmd.ExecuteNonQuery();
 
                 Processor.IndexExists(null, table.Name, idxName).ShouldBeTrue();

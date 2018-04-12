@@ -31,7 +31,7 @@ namespace FluentMigrator.Runner.Generators.SqlServer
         protected override string FormatDefaultValue(ColumnDefinition column)
         {
             if (DefaultValueIsSqlFunction(column.DefaultValue))
-                return "DEFAULT " + column.DefaultValue.ToString();
+                return "DEFAULT " + column.DefaultValue;
 
             var defaultValue = base.FormatDefaultValue(column);
 
@@ -58,12 +58,12 @@ namespace FluentMigrator.Runner.Generators.SqlServer
                 column.GetAdditionalFeature(SqlServerExtensions.IdentityIncrement, 1));
         }
 
-        public string FormatDefaultValue(object defaultValue)
+        public static string FormatDefaultValue(object defaultValue, IQuoter quoter)
         {
             if (DefaultValueIsSqlFunction(defaultValue))
                 return defaultValue.ToString();
 
-            return Quoter.QuoteValue(defaultValue);
+            return quoter.QuoteValue(defaultValue);
         }
 
         public static string GetDefaultConstraintName(string tableName, string columnName)

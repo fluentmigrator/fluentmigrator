@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 // 
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -33,11 +33,11 @@ namespace FluentMigrator.Tests.Helpers
         public PostgresTestSequence(PostgresProcessor processor, string schemaName, string sequenceName)
         {
             _schemaName = schemaName;
-            Name = quoter.QuoteSequenceName(sequenceName);
+            Name = quoter.QuoteSequenceName(sequenceName, null);
 
             Connection = (NpgsqlConnection)processor.Connection;
             Transaction = (NpgsqlTransaction)processor.Transaction;
-            NameWithSchema = string.IsNullOrEmpty(_schemaName) ? Name : string.Format("\"{0}\".{1}", _schemaName, Name);
+            NameWithSchema = quoter.QuoteSequenceName(sequenceName, schemaName);
             Create();
         }
 

@@ -1,13 +1,14 @@
-using FluentMigrator.Expressions;
-using FluentMigrator.Model;
-using FluentMigrator.Runner.Generators.DB2;
-using NUnit.Framework;
-using NUnit.Should;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
-using System.Text;
+
+using FluentMigrator.Expressions;
+using FluentMigrator.Model;
+using FluentMigrator.Runner.Generators.DB2;
+using FluentMigrator.Runner.Generators.DB2.iSeries;
+
+using NUnit.Framework;
+using NUnit.Should;
 
 namespace FluentMigrator.Tests.Unit.Generators.Db2
 {
@@ -19,7 +20,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Db2
         [SetUp]
         public void Setup()
         {
-            Generator = new Db2Generator();
+            Generator = new Db2Generator(new Db2ISeriesQuoter());
         }
 
         [Test]

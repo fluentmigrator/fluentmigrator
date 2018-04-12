@@ -104,5 +104,11 @@ namespace FluentMigrator.Runner.Generators.Firebird
                 return objName;
             return objName.ToUpper();
         }
+
+        public override string QuoteSchemaName(string schemaName)
+        {
+            // This database doesn't support schemata
+            return string.Empty;
+        }
     }
 }

@@ -16,7 +16,7 @@
 
 namespace FluentMigrator.Runner.Generators.SqlServer
 {
-    public class SqlServer2008Quoter : SqlServer2000Quoter
+    public class SqlServer2008Quoter : SqlServer2005Quoter
     {
         public override string FormatSystemMethods(SystemMethods value)
         {

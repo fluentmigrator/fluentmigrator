@@ -31,6 +31,13 @@ namespace FluentMigrator.Runner.Generators.Postgres
             return base.QuoteSchemaName(schemaName);
         }
 
+        public override string QuoteSequenceName(string sequenceName, string schemaName)
+        {
+            return CreateSchemaPrefixedQuotedIdentifier(
+                string.IsNullOrEmpty(schemaName) ? string.Empty : Quote(schemaName),
+                IsQuoted(sequenceName) ? sequenceName : Quote(sequenceName));
+        }
+
         protected override string FormatByteArray(byte[] array)
         {
             var arrayAsHex = array.Select(b => b.ToString("X2")).ToArray();

@@ -24,6 +24,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
 
         protected void SetUp(IDbFactory dbFactory)
         {
+            if (!IntegrationTestOptions.Oracle.IsEnabled)
+                Assert.Ignore();
             this.Factory = dbFactory;
             this.Connection = this.Factory.CreateConnection(IntegrationTestOptions.Oracle.ConnectionString);
             this.Processor = new OracleProcessor(this.Connection, new OracleGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions(), this.Factory);
@@ -33,7 +35,7 @@ namespace FluentMigrator.Tests.Integration.Processors.Oracle {
         [TearDown]
         public void TearDown()
         {
-            this.Processor.Dispose();
+            this.Processor?.Dispose();
         }
 
         [Test]

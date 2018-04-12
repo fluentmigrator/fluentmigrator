@@ -14,6 +14,7 @@
 // limitations under the License.
 #endregion
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -54,7 +55,7 @@ namespace FluentMigrator.Tests
 
         public static DatabaseServerOptions SqlServerCe => GetOptions("SqlServerCe");
 
-        public static DatabaseServerOptions SqlAnywhere16 => GetOptions("SqlAnywhere16");
+        public static DatabaseServerOptions SqlAnywhere16 => !Environment.Is64BitProcess ? GetOptions("SqlAnywhere16") : DatabaseServerOptions.Empty;
 
         public static DatabaseServerOptions Jet => GetOptions("Jet");
 
@@ -64,13 +65,13 @@ namespace FluentMigrator.Tests
 
         public static DatabaseServerOptions Postgres => GetOptions("Postgres");
 
-        public static DatabaseServerOptions Firebird => GetOptions("Firebird");
+        public static DatabaseServerOptions Firebird => !Environment.Is64BitProcess ? GetOptions("Firebird") : DatabaseServerOptions.Empty;
 
         public static DatabaseServerOptions Oracle => GetOptions("Oracle");
 
-        public static DatabaseServerOptions Db2 => GetOptions("Db2");
+        public static DatabaseServerOptions Db2 => Environment.Is64BitProcess ? GetOptions("Db2") : DatabaseServerOptions.Empty;
 
-        public static DatabaseServerOptions Hana => GetOptions("Hana");
+        public static DatabaseServerOptions Hana => Environment.Is64BitProcess ? GetOptions("Hana") : DatabaseServerOptions.Empty;
 
         public class DatabaseServerOptions
         {

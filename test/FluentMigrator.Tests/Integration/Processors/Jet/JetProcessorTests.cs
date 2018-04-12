@@ -36,6 +36,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
         [SetUp]
         public void SetUp()
         {
+            if (!IntegrationTestOptions.Jet.IsEnabled)
+                Assert.Ignore();
             Connection = new OleDbConnection(IntegrationTestOptions.Jet.ConnectionString);
             Processor = new JetProcessor(Connection, new JetGenerator(), new TextWriterAnnouncer(TestContext.Out), new ProcessorOptions());
             Connection.Open();
@@ -120,8 +122,8 @@ namespace FluentMigrator.Tests.Integration.Processors.Jet
         [TearDown]
         public void TearDown()
         {
-            Processor.CommitTransaction();
-            Processor.Dispose();
+            Processor?.CommitTransaction();
+            Processor?.Dispose();
         }
     }
 }

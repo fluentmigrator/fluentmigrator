@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 //
@@ -28,7 +28,7 @@ namespace FluentMigrator.Runner.Processors.DB2
         {
             var factory = new Db2DbFactory();
             var connection = factory.CreateConnection(connectionString);
-            return new Db2Processor(connection, new Db2Generator(), announcer, options, factory);
+            return new Db2Processor(connection, new Db2Generator(new Db2Quoter()), announcer, options, factory);
         }
 
         #endregion Methods

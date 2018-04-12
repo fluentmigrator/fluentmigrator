@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 // Copyright (c) 2007-2018, FluentMigrator Project
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -39,7 +39,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var statements = descriptionGenerator.GenerateDescriptionStatements(createTableExpression);
 
             var result = statements.First();
-            result.ShouldBe("COMMENT ON TABLE \"TestTable1\" IS 'TestDescription';");
+            result.ShouldBe("COMMENT ON TABLE \"public\".\"TestTable1\" IS 'TestDescription';");
         }
 
         [Test]
@@ -51,7 +51,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
 
             var result = string.Join(string.Empty, statements);
             result.ShouldBe(
-                "COMMENT ON TABLE \"TestTable1\" IS 'TestDescription';COMMENT ON COLUMN \"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';COMMENT ON COLUMN \"TestTable1\".\"TestColumn2\" IS 'TestColumn2Description';");
+                "COMMENT ON TABLE \"public\".\"TestTable1\" IS 'TestDescription';COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn2\" IS 'TestColumn2Description';");
         }
 
         [Test]
@@ -60,7 +60,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var alterTableExpression = GeneratorTestHelper.GetAlterTableWithDescriptionExpression();
             var statement = descriptionGenerator.GenerateDescriptionStatement(alterTableExpression);
 
-            statement.ShouldBe("COMMENT ON TABLE \"TestTable1\" IS 'TestDescription';");
+            statement.ShouldBe("COMMENT ON TABLE \"public\".\"TestTable1\" IS 'TestDescription';");
         }
 
         [Test]
@@ -69,7 +69,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var createColumnExpression = GeneratorTestHelper.GetCreateColumnExpressionWithDescription();
             var statement = descriptionGenerator.GenerateDescriptionStatement(createColumnExpression);
 
-            statement.ShouldBe("COMMENT ON COLUMN \"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';");
+            statement.ShouldBe("COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';");
         }
 
         [Test]
@@ -78,7 +78,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Redshift
             var alterColumnExpression = GeneratorTestHelper.GetAlterColumnExpressionWithDescription();
             var statement = descriptionGenerator.GenerateDescriptionStatement(alterColumnExpression);
 
-            statement.ShouldBe("COMMENT ON COLUMN \"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';");
+            statement.ShouldBe("COMMENT ON COLUMN \"public\".\"TestTable1\".\"TestColumn1\" IS 'TestColumn1Description';");
         }
     }
 }

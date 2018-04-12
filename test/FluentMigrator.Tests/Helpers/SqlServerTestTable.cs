@@ -43,8 +43,7 @@ namespace FluentMigrator.Tests.Helpers
             quoter = processor.Quoter;
 
             Name = "TestTable";
-
-            Create(columnDefinitions);
+            Create(processor, columnDefinitions);
         }
         public SqlServerTestTable(string table, SqlServerProcessor processor, string schemaName, params string[] columnDefinitions)
         {
@@ -55,7 +54,7 @@ namespace FluentMigrator.Tests.Helpers
 
             Name = table;
 
-            Create(columnDefinitions);
+            Create(processor, columnDefinitions);
         }
 
         public void Dispose()
@@ -63,15 +62,15 @@ namespace FluentMigrator.Tests.Helpers
             Drop();
         }
 
-        public void Create(IEnumerable<string> columnDefinitions)
+        public void Create(SqlServerProcessor processor, IEnumerable<string> columnDefinitions)
         {
-            if (!string.IsNullOrEmpty(schemaName))
+            if (!string.IsNullOrEmpty(schemaName) && !processor.SchemaExists(schemaName))
             {
                 using (var command = new SqlCommand(string.Format("CREATE SCHEMA {0}", quoter.QuoteSchemaName(schemaName)), Connection, Transaction))
                     command.ExecuteNonQuery();
             }
 
-            var quotedObjectName = string.Format(string.IsNullOrEmpty(schemaName) ? "{1}" : "{0}.{1}", quoter.QuoteSchemaName(schemaName), quoter.QuoteTableName(Name));
+            var quotedObjectName = quoter.QuoteTableName(Name, schemaName);
 
             var sb = new StringBuilder();
             sb.AppendFormat("CREATE TABLE ");
@@ -95,7 +94,7 @@ namespace FluentMigrator.Tests.Helpers
         {
             var quotedSchema = quoter.QuoteSchemaName(schemaName);
 
-            var quotedObjectName = string.Format(string.IsNullOrEmpty(schemaName) ? "{1}" : "{0}.{1}", quoter.QuoteSchemaName(schemaName), quoter.QuoteTableName(Name));
+            var quotedObjectName = quoter.QuoteTableName(Name, schemaName);
 
             foreach (var quoteIndexName in indexies)
             {
@@ -117,7 +116,7 @@ namespace FluentMigrator.Tests.Helpers
         {
             var indexName = string.Format("idx_{0}", column);
 
-            var quotedObjectName = string.Format(string.IsNullOrEmpty(schemaName) ? "{1}" : "{0}.{1}", quoter.QuoteSchemaName(schemaName), quoter.QuoteTableName(Name));
+            var quotedObjectName = quoter.QuoteTableName(Name, schemaName);
 
             var quotedIndexName = quoter.QuoteIndexName(indexName);
 
@@ -133,7 +132,7 @@ namespace FluentMigrator.Tests.Helpers
         {
             var defaultConstraintName = string.Format("[DF_{0}_{1}]", Name, column);
             const int defaultValue = 1;
-            using (var command = new SqlCommand(string.Format(" ALTER TABLE {0}.{1} ADD CONSTRAINT {2} DEFAULT ({3}) FOR {4}", quoter.QuoteSchemaName(schemaName), quoter.QuoteTableName(Name), defaultConstraintName, defaultValue, quoter.QuoteColumnName(column)), Connection, Transaction))
+            using (var command = new SqlCommand(string.Format(" ALTER TABLE {0} ADD CONSTRAINT {1} DEFAULT ({2}) FOR {3}", quoter.QuoteTableName(Name, schemaName), defaultConstraintName, defaultValue, quoter.QuoteColumnName(column)), Connection, Transaction))
                 command.ExecuteNonQuery();
         }
     }

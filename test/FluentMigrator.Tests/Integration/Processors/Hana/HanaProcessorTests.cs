@@ -1,4 +1,5 @@
 using System.IO;
+using System.Text;
 
 using FluentMigrator.Expressions;
 using FluentMigrator.Runner.Announcers;
@@ -21,12 +22,17 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         public HanaConnection Connection { get; set; }
         public HanaProcessor Processor { get; set; }
 
+        public StringWriter Output { get; set; }
+
         [SetUp]
         public void SetUp()
         {
+            if (!IntegrationTestOptions.Hana.IsEnabled)
+                Assert.Ignore();
+            Output = new StringWriter();
             Connection = new HanaConnection(IntegrationTestOptions.Hana.ConnectionString);
-            Processor = new HanaProcessor(Connection, new HanaGenerator(), new TextWriterAnnouncer(TestContext.Out),
-                new ProcessorOptions(), new HanaDbFactory());
+            Processor = new HanaProcessor(Connection, new HanaGenerator(), new TextWriterAnnouncer(Output),
+                new ProcessorOptions() { PreviewOnly = true }, new HanaDbFactory());
             Connection.Open();
             Processor.BeginTransaction();
         }
@@ -34,24 +40,13 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
         [TearDown]
         public void TearDown()
         {
-            Processor.CommitTransaction();
-            Processor.Dispose();
+            Processor?.CommitTransaction();
+            Processor?.Dispose();
         }
 
         [Test]
         public void CallingProcessWithPerformDbOperationExpressionWhenInPreviewOnlyModeWillNotMakeDbChanges()
         {
-            var output = new StringWriter();
-
-            var connection = new HanaConnection(IntegrationTestOptions.Hana.ConnectionString);
-
-            var processor = new HanaProcessor(
-                connection,
-                new HanaGenerator(),
-                new TextWriterAnnouncer(output),
-                new ProcessorOptions { PreviewOnly = true },
-                new HanaDbFactory());
-
             bool tableExists;
 
             try
@@ -69,18 +64,18 @@ namespace FluentMigrator.Tests.Integration.Processors.Hana
                         }
                     };
 
-                processor.Process(expression);
+                Processor.Process(expression);
 
-                tableExists = processor.TableExists("", "ProcessTestTable");
+                tableExists = Processor.TableExists("", "ProcessTestTable");
             }
             finally
             {
-                processor.RollbackTransaction();
+                Processor.RollbackTransaction();
             }
 
             tableExists.ShouldBeFalse();
 
-            var fmOutput = output.ToString();
+            var fmOutput = Output.ToString();
             Assert.That(fmOutput, Does.Contain("/* Performing DB Operation */"));
         }
     }
