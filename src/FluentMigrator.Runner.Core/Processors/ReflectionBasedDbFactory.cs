@@ -275,9 +275,19 @@ namespace FluentMigrator.Runner.Processors
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                var assemblyDirectory = Path.GetDirectoryName(assembly.Location);
-                if (assemblyDirectory == null)
+                string assemblyDirectory;
+                try
+                {
+                    assemblyDirectory = Path.GetDirectoryName(assembly.Location);
+                    if (assemblyDirectory == null)
+                        continue;
+                }
+                catch
+                {
+                    // Ignore error caused by dynamic assembly
                     continue;
+                }
+
                 yield return assemblyDirectory;
             }
         }
