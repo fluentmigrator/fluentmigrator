@@ -175,7 +175,10 @@ namespace FluentMigrator.Runner.Initialization
                 ProviderSwitches = RunnerContext.ProviderSwitches
             };
 
-            var generator = new MigrationGeneratorFactory().GetGenerator(RunnerContext.Database);
+            var generatorFactory = new MigrationGeneratorFactory();
+            var generator = generatorFactory.GetGenerator(RunnerContext.Database);
+            if (generator == null)
+                throw new ProcessorFactoryNotFoundException(string.Format("The provider or dbtype parameter is incorrect. Available choices are {0}: ", generatorFactory.ListAvailableGeneratorTypes()));
 
             var processor = new ConnectionlessProcessor(generator, RunnerContext, options);
 
