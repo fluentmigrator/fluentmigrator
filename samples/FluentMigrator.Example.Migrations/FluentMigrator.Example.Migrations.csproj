@@ -7,10 +7,5 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\FluentMigrator.Core\FluentMigrator.Core.csproj" />
-    <ProjectReference Include="..\..\src\FluentMigrator.MSBuild\FluentMigrator.MSBuild.csproj" />
   </ItemGroup>
-  <UsingTask TaskName="Migrate" AssemblyFile="$(MSBuildProjectDirectory)..\FluentMigrator.MSBuild\bin\$(Configuration)\$(TargetFramework)\FluentMigrator.MSBuild.dll" />
-  <Target Name="AfterBuild">
-    <Migrate DatabaseType="SQLite" Connection="Data Source=:memory:" />
-  </Target>
 </Project>
