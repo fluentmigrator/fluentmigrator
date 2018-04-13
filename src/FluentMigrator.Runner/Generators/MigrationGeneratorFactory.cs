@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 //
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 //
@@ -19,7 +19,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 using FluentMigrator.Runner.Extensions;
 using FluentMigrator.Runner.Processors;
@@ -28,16 +27,16 @@ namespace FluentMigrator.Runner.Generators
 {
     public class MigrationGeneratorFactory
     {
-        private static readonly IDictionary<string, IMigrationGenerator> MigrationGenerators;
+        private static readonly IDictionary<string, IMigrationGenerator> _migrationGenerators;
 
         static MigrationGeneratorFactory()
         {
-            Assembly assembly = typeof(IMigrationProcessorFactory).Assembly;
+            var assemblies = MigrationProcessorFactoryProvider.RegisteredFactories.Select(x => x.GetType().Assembly);
 
-            List<Type> types = assembly
-                               .GetExportedTypes()
-                               .Where(type => type.IsConcrete() && type.Is<IMigrationGenerator>())
-                               .ToList();
+            var types = assemblies
+                .SelectMany(a => a.GetExportedTypes())
+                .Where(type => type.IsConcrete() && type.Is<IMigrationGenerator>())
+                .ToList();
 
             var available = new SortedDictionary<string, IMigrationGenerator>();
             foreach (Type type in types)
@@ -53,20 +52,20 @@ namespace FluentMigrator.Runner.Generators
                 }
             }
 
-            MigrationGenerators = available;
+            _migrationGenerators = available;
         }
 
         public virtual IMigrationGenerator GetGenerator(string name)
         {
-            return MigrationGenerators
+            return _migrationGenerators
                    .Where(pair => pair.Key.Equals(name, StringComparison.OrdinalIgnoreCase))
                    .Select(pair => pair.Value)
                    .FirstOrDefault();
         }
 
-        public string ListAvailableProcessorTypes()
+        public string ListAvailableGeneratorTypes()
         {
-            return string.Join(", ", MigrationGenerators.Keys.ToArray());
+            return string.Join(", ", _migrationGenerators.Keys.ToArray());
         }
     }
 }
