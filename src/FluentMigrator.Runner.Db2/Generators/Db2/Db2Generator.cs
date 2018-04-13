@@ -12,6 +12,11 @@ namespace FluentMigrator.Runner.Generators.DB2
     {
         #region Constructors
 
+        public Db2Generator()
+            : this(new Db2Quoter())
+        {
+        }
+
         public Db2Generator(IQuoter quoter)
             : base(new Db2Column(quoter), quoter, new EmptyDescriptionGenerator())
         {

@@ -16,7 +16,6 @@
 //
 #endregion
 
-using FluentMigrator.Runner.Generators.DB2;
 using FluentMigrator.Runner.Generators.DB2.iSeries;
 
 namespace FluentMigrator.Runner.Processors.DB2.iSeries
@@ -27,7 +26,7 @@ namespace FluentMigrator.Runner.Processors.DB2.iSeries
         {
             var factory = new Db2ISeriesDbFactory();
             var connection = factory.CreateConnection(connectionString);
-            return new Db2ISeriesProcessor(connection, new Db2Generator(new Db2ISeriesQuoter()), announcer, options, factory);
+            return new Db2ISeriesProcessor(connection, new Db2ISeriesGenerator(), announcer, options, factory);
         }
     }
 }

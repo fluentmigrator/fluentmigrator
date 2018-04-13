@@ -15,6 +15,11 @@ namespace FluentMigrator.Runner.Generators.Firebird
         protected readonly FirebirdTruncator truncator;
         protected Processors.Firebird.FirebirdOptions FBOptions { get; private set; }
 
+        public FirebirdGenerator()
+            : this(new FirebirdOptions())
+        {
+        }
+
         public FirebirdGenerator(Processors.Firebird.FirebirdOptions fbOptions) : base(new FirebirdColumn(fbOptions), new FirebirdQuoter(fbOptions.ForceQuote), new EmptyDescriptionGenerator())
         {
             FBOptions = fbOptions ?? throw new ArgumentNullException(nameof(fbOptions));
