@@ -143,9 +143,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" DROP (\"TestColumn1\");"
-                + System.Environment.NewLine +
-                "ALTER TABLE \"TestTable1\" DROP (\"TestColumn2\");");
+            result.ShouldBe("ALTER TABLE \"TestTable1\" DROP (\"TestColumn1\"); ALTER TABLE \"TestTable1\" DROP (\"TestColumn2\");");
         }
 
         [Test]
@@ -154,9 +152,7 @@ namespace FluentMigrator.Tests.Unit.Generators.Hana
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "TestColumn1", "TestColumn2" });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" DROP (\"TestColumn1\");"
-                + System.Environment.NewLine +
-                "ALTER TABLE \"TestTable1\" DROP (\"TestColumn2\");");
+            result.ShouldBe("ALTER TABLE \"TestTable1\" DROP (\"TestColumn1\"); ALTER TABLE \"TestTable1\" DROP (\"TestColumn2\");");
         }
 
         [Test]

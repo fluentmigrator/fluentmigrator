@@ -173,9 +173,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "TestColumn1", "TestColumn2" });
             expression.SchemaName = "TestSchema";
 
-            StringBuilder expected = new StringBuilder();
-            expected.AppendLine("ALTER TABLE [TestSchema].[TestTable1] DROP [TestColumn1];");
-            expected.Append("ALTER TABLE [TestSchema].[TestTable1] DROP [TestColumn2]");
+            var expected = "ALTER TABLE [TestSchema].[TestTable1] DROP [TestColumn1]; ALTER TABLE [TestSchema].[TestTable1] DROP [TestColumn2]";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected.ToString());
@@ -187,9 +185,7 @@ namespace FluentMigrator.Tests.Unit.Generators.SqlAnywhere
             //This does not work if it is a primary key
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "TestColumn1", "TestColumn2" });
 
-            StringBuilder expected = new StringBuilder();
-            expected.AppendLine("ALTER TABLE [dbo].[TestTable1] DROP [TestColumn1];");
-            expected.Append("ALTER TABLE [dbo].[TestTable1] DROP [TestColumn2]");
+            var expected = "ALTER TABLE [dbo].[TestTable1] DROP [TestColumn1]; ALTER TABLE [dbo].[TestTable1] DROP [TestColumn2]";
 
             var result = Generator.Generate(expression);
             result.ShouldBe(expected.ToString());

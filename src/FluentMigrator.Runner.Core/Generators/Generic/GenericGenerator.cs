@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Text;
+
 using FluentMigrator.Expressions;
 using FluentMigrator.Model;
 using FluentMigrator.Runner.Generators.Base;
@@ -104,7 +104,11 @@ namespace FluentMigrator.Runner.Generators.Generic
             StringBuilder builder = new StringBuilder();
             foreach (string columnName in expression.ColumnNames)
             {
-                if (expression.ColumnNames.First() != columnName) builder.AppendLine(";");
+                if (expression.ColumnNames.First() != columnName)
+                {
+                    AppendSqlStatementEndToken(builder);
+                }
+
                 builder.AppendFormat(DropColumn, Quoter.QuoteTableName(expression.TableName, expression.SchemaName), Quoter.QuoteColumnName(columnName));
             }
             return builder.ToString();
@@ -201,8 +205,27 @@ namespace FluentMigrator.Runner.Generators.Generic
             string errors = ValidateAdditionalFeatureCompatibility(expression.AdditionalFeatures);
             if (!string.IsNullOrEmpty(errors)) return errors;
 
-            var insertStrings = GenerateColumnNamesAndValues(expression).Select(x => String.Format(InsertData, Quoter.QuoteTableName(expression.TableName, expression.SchemaName),x.Key, x.Value));
-            return String.Join("; ", insertStrings.ToArray());
+            var output = new StringBuilder();
+            foreach (var pair in GenerateColumnNamesAndValues(expression))
+            {
+                if (output.Length != 0)
+                {
+                    AppendSqlStatementEndToken(output);
+                }
+
+                output.AppendFormat(
+                    InsertData,
+                    Quoter.QuoteTableName(expression.TableName, expression.SchemaName),
+                    pair.Key,
+                    pair.Value);
+            }
+
+            return output.ToString();
+        }
+
+        protected virtual StringBuilder AppendSqlStatementEndToken(StringBuilder stringBuilder)
+        {
+            return stringBuilder.Append("; ");
         }
 
         protected List<KeyValuePair<string,string>> GenerateColumnNamesAndValues(InsertDataExpression expression)
@@ -302,7 +325,18 @@ namespace FluentMigrator.Runner.Generators.Generic
                 }
             }
 
-            return String.Join("; ", deleteItems.ToArray());
+            var output = new StringBuilder();
+            foreach (var deleteItem in deleteItems)
+            {
+                if (output.Length != 0)
+                {
+                    AppendSqlStatementEndToken(output);
+                }
+
+                output.Append(deleteItem);
+            }
+
+            return output.ToString();
         }
 
 
