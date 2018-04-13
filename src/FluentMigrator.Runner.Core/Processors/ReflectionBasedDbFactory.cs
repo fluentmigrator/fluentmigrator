@@ -22,6 +22,8 @@ using System.Reflection;
 
 using FluentMigrator.Runner.Infrastructure;
 
+using JetBrains.Annotations;
+
 namespace FluentMigrator.Runner.Processors
 {
     using System.Data.Common;
@@ -40,7 +42,7 @@ namespace FluentMigrator.Runner.Processors
         protected ReflectionBasedDbFactory(params TestEntry[] testEntries)
         {
             if (testEntries.Length == 0)
-                throw new ArgumentException(nameof(testEntries), "At least one test entry must be specified");
+                throw new ArgumentException(@"At least one test entry must be specified", nameof(testEntries));
             _testEntries = testEntries;
         }
 
@@ -57,7 +59,9 @@ namespace FluentMigrator.Runner.Processors
             }
 
             var assemblyNames = string.Join(", ", _testEntries.Select(x => x.AssemblyName));
-            throw new AggregateException($"Unable to load the driver. Attempted to load: {assemblyNames}", exceptions);
+            var fullExceptionOutput = string.Join(Environment.NewLine, exceptions.Select(x => x.ToString()));
+
+            throw new AggregateException($"Unable to load the driver. Attempted to load: {assemblyNames}, with {fullExceptionOutput}", exceptions);
         }
 
         protected static bool TryCreateFactory(IEnumerable<TestEntry> entries, ICollection<Exception> exceptions, out DbProviderFactory factory)
@@ -66,7 +70,9 @@ namespace FluentMigrator.Runner.Processors
             {
                 if (TryCreateFromCurrentDomain(entry, exceptions, out factory))
                     return true;
-                if (TryCreateFactoryFromFile(entry, exceptions, out factory))
+                if (TryCreateFactoryFromRuntimeHost(entry, exceptions, out factory))
+                    return true;
+                if (TryCreateFromAppDomainPaths(entry, exceptions, out factory))
                     return true;
                 if (TryCreateFromGac(entry, exceptions, out factory))
                     return true;
@@ -76,7 +82,34 @@ namespace FluentMigrator.Runner.Processors
             return false;
         }
 
-        protected static bool TryCreateFactoryFromFile(TestEntry entry, ICollection<Exception> exceptions, out DbProviderFactory factory)
+        protected static bool TryCreateFromAppDomainPaths(
+            TestEntry entry,
+            ICollection<Exception> exceptions,
+            out DbProviderFactory factory)
+        {
+            if (TryLoadAssemblyFromAppDomainDirectories(entry.AssemblyName, exceptions, out var assembly))
+            {
+                try
+                {
+                    var type = assembly.GetType(entry.DBProviderFactoryTypeName, true);
+                    if (TryGetInstance(type, out factory))
+                        return true;
+
+                    factory = (DbProviderFactory) Activator.CreateInstance(type);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    // Ignore
+                    exceptions.Add(ex);
+                }
+            }
+
+            factory = null;
+            return false;
+        }
+
+        protected static bool TryCreateFactoryFromRuntimeHost(TestEntry entry, ICollection<Exception> exceptions, out DbProviderFactory factory)
         {
             try
             {
@@ -164,6 +197,43 @@ namespace FluentMigrator.Runner.Processors
             }
         }
 
+        protected static bool TryLoadAssemblyFromAppDomainDirectories(
+            string assemblyName,
+            ICollection<Exception> exceptions,
+            out Assembly assembly)
+        {
+            return TryLoadAssemblyFromDirectories(
+                GetPathsFromAppDomain(),
+                assemblyName,
+                exceptions,
+                out assembly);
+        }
+
+        protected static bool TryLoadAssemblyFromDirectories(IEnumerable<string> directories, string assemblyName, ICollection<Exception> exceptions, out Assembly assembly)
+        {
+            var alreadyTested = new HashSet<string>(StringComparer.InvariantCulture);
+            var assemblyFileName = $"{assemblyName}.dll";
+            foreach (var directory in directories)
+            {
+                var path = Path.Combine(directory, assemblyFileName);
+                if (!alreadyTested.Add(path))
+                    continue;
+
+                try
+                {
+                    assembly = Assembly.LoadFile(path);
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    exceptions.Add(new Exception($"Failed to load file {path}", ex));
+                }
+            }
+
+            assembly = null;
+            return false;
+        }
+
         private static IEnumerable<AssemblyName> FindAssembliesInGac(params string[] names)
         {
             foreach (var name in names)
@@ -198,6 +268,18 @@ namespace FluentMigrator.Runner.Processors
         {
             factory = value as DbProviderFactory;
             return factory != null;
+        }
+
+        [NotNull, ItemNotNull]
+        private static IEnumerable<string> GetPathsFromAppDomain()
+        {
+            foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                var assemblyDirectory = Path.GetDirectoryName(assembly.Location);
+                if (assemblyDirectory == null)
+                    continue;
+                yield return assemblyDirectory;
+            }
         }
 
         protected class TestEntry
