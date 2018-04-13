@@ -221,7 +221,6 @@ namespace FluentMigrator.Console
 
                 if (!ValidateArguments(optionSet))
                 {
-                    DisplayHelp(optionSet);
                     return 1;
                 }
 
