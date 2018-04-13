@@ -139,7 +139,10 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestSchema\".\"TestTable1\" DROP COLUMN \"TestColumn1\";" + System.Environment.NewLine + "ALTER TABLE \"TestSchema\".\"TestTable1\" DROP COLUMN \"TestColumn2\"");
+            result.ShouldBe(
+                "ALTER TABLE \"TestSchema\".\"TestTable1\" DROP COLUMN \"TestColumn1\"" + Environment.NewLine +
+                ";" + Environment.NewLine +
+                "ALTER TABLE \"TestSchema\".\"TestTable1\" DROP COLUMN \"TestColumn2\"");
         }
 
         [Test]
@@ -148,7 +151,10 @@ namespace FluentMigrator.Tests.Unit.Generators.OracleWithQuotedIdentifier
             var expression = GeneratorTestHelper.GetDeleteColumnExpression(new[] { "\"TestColumn1\"", "\"TestColumn2\"" });
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("ALTER TABLE \"TestTable1\" DROP COLUMN \"TestColumn1\";" + System.Environment.NewLine + "ALTER TABLE \"TestTable1\" DROP COLUMN \"TestColumn2\"");
+            result.ShouldBe(
+                "ALTER TABLE \"TestTable1\" DROP COLUMN \"TestColumn1\"" + Environment.NewLine +
+                ";" + Environment.NewLine +
+                "ALTER TABLE \"TestTable1\" DROP COLUMN \"TestColumn2\"");
         }
 
         [Test]

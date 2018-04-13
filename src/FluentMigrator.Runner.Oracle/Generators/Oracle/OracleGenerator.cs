@@ -233,6 +233,11 @@ namespace FluentMigrator.Runner.Generators.Oracle
             return string.Format("DROP INDEX {0}", indexName);
         }
 
+        protected override StringBuilder AppendSqlStatementEndToken(StringBuilder stringBuilder)
+        {
+            return stringBuilder.AppendLine().AppendLine(";");
+        }
+
         private string WrapStatementInExecuteImmediateBlock(string statement)
         {
             if (string.IsNullOrEmpty(statement))

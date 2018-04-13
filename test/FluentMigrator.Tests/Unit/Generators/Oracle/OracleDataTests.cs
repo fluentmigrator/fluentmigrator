@@ -42,7 +42,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             expression.SchemaName = "TestSchema";
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM TestSchema.TestTable1 WHERE Name = 'Just''in' AND Website IS NULL; DELETE FROM TestSchema.TestTable1 WHERE Website = 'github.com'");
+            result.ShouldBe(
+                "DELETE FROM TestSchema.TestTable1 WHERE Name = 'Just''in' AND Website IS NULL" + Environment.NewLine +
+                ";" + Environment.NewLine +
+                "DELETE FROM TestSchema.TestTable1 WHERE Website = 'github.com'");
         }
 
         [Test]
@@ -51,7 +54,10 @@ namespace FluentMigrator.Tests.Unit.Generators.Oracle
             var expression = GeneratorTestHelper.GetDeleteDataMultipleRowsExpression();
 
             var result = Generator.Generate(expression);
-            result.ShouldBe("DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL; DELETE FROM TestTable1 WHERE Website = 'github.com'");
+            result.ShouldBe(
+                "DELETE FROM TestTable1 WHERE Name = 'Just''in' AND Website IS NULL" + Environment.NewLine +
+                ";" + Environment.NewLine +
+                "DELETE FROM TestTable1 WHERE Website = 'github.com'");
         }
 
         [Test]
