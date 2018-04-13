@@ -70,7 +70,9 @@ namespace FluentMigrator.Runner.Initialization
             string assemblyLocation,
             string database)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(connection))
+                throw new NotImplementedException();
+            return connection;
         }
 #endif
     }
