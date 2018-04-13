@@ -85,6 +85,9 @@ namespace FluentMigrator.Runner.Processors
             }
         }
 
+        public static IEnumerable<IMigrationProcessorFactory> RegisteredFactories
+            => MigrationProcessorFactories.Values;
+
         public static void Register(IMigrationProcessorFactory factory)
         {
             lock (_lock)
