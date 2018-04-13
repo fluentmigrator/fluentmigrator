@@ -16,7 +16,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 
 using Microsoft.Extensions.Configuration;
@@ -25,6 +27,8 @@ namespace FluentMigrator.Tests
 {
     public static class IntegrationTestOptions
     {
+        private static readonly ISet<string> _platformIdentifiers;
+
         static IntegrationTestOptions()
         {
             var asmPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
@@ -33,15 +37,26 @@ namespace FluentMigrator.Tests
                 .AddJsonFile("appsettings.json")
                 .AddUserSecrets("FluentMigrator.Tests")
                 .Build();
-            Configuration = config;
             DatabaseServers = config
                 .GetSection("TestConnectionStrings")
                 .Get<IReadOnlyDictionary<string, DatabaseServerOptions>>();
+            if (Environment.Is64BitProcess)
+            {
+                _platformIdentifiers = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    "amd64", "x64", "x86-64"
+                };
+            }
+            else
+            {
+                _platformIdentifiers = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+                {
+                    "x86", "x86-32", "x32"
+                };
+            }
         }
 
-        public static IConfigurationRoot Configuration { get; }
-
-        public static IReadOnlyDictionary<string, DatabaseServerOptions> DatabaseServers { get;}
+        private static IReadOnlyDictionary<string, DatabaseServerOptions> DatabaseServers { get;}
 
         public static DatabaseServerOptions SqlServer2005 => GetOptions("SqlServer2005");
 
@@ -55,7 +70,7 @@ namespace FluentMigrator.Tests
 
         public static DatabaseServerOptions SqlServerCe => GetOptions("SqlServerCe");
 
-        public static DatabaseServerOptions SqlAnywhere16 => !Environment.Is64BitProcess ? GetOptions("SqlAnywhere16") : DatabaseServerOptions.Empty;
+        public static DatabaseServerOptions SqlAnywhere16 => GetOptions("SqlAnywhere16").GetOptionsForPlatform();
 
         public static DatabaseServerOptions Jet => GetOptions("Jet");
 
@@ -65,7 +80,7 @@ namespace FluentMigrator.Tests
 
         public static DatabaseServerOptions Postgres => GetOptions("Postgres");
 
-        public static DatabaseServerOptions Firebird => !Environment.Is64BitProcess ? GetOptions("Firebird") : DatabaseServerOptions.Empty;
+        public static DatabaseServerOptions Firebird => GetOptions("Firebird").GetOptionsForPlatform();
 
         public static DatabaseServerOptions Oracle => GetOptions("Oracle");
 
@@ -75,10 +90,44 @@ namespace FluentMigrator.Tests
 
         public class DatabaseServerOptions
         {
+            private ISet<string> _supportedPlatforms;
+            private string _supportedPlatformsValue;
+
             public static DatabaseServerOptions Empty { get; } = new DatabaseServerOptions() { IsEnabled = false };
 
+            [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global", Justification = "Set by JSON serializer")]
             public string ConnectionString { get; set; }
-            public bool IsEnabled { get; set; } = true;
+
+            [SuppressMessage("ReSharper", "MemberCanBePrivate.Global", Justification = "Set by JSON serializer")]
+            public bool IsEnabled { get; set; }
+
+            [SuppressMessage("ReSharper", "UnusedMember.Global", Justification = "Set by JSON serializer")]
+            public string SupportedPlatforms
+            {
+                get => _supportedPlatformsValue;
+                set
+                {
+                    _supportedPlatformsValue = value;
+                    var items = value.Split(',', ';')
+                        .Where(x => !string.IsNullOrWhiteSpace(x))
+                        .Select(x => x.Trim());
+                    _supportedPlatforms = new HashSet<string>(items, StringComparer.OrdinalIgnoreCase);
+                }
+            }
+
+            public DatabaseServerOptions GetOptionsForPlatform()
+            {
+                return GetOptionsForPlatform(_platformIdentifiers);
+            }
+
+            private DatabaseServerOptions GetOptionsForPlatform(ISet<string> platforms)
+            {
+                if (_supportedPlatforms == null || _supportedPlatforms.Count == 0 || !IsEnabled)
+                    return this;
+                if (_supportedPlatforms.Any(platforms.Contains))
+                    return this;
+                return Empty;
+            }
         }
 
         private static DatabaseServerOptions GetOptions(string key)
