@@ -22,13 +22,6 @@ namespace FluentMigrator.Example.Migrations
 {
     internal static class MigrationExtensions
     {
-        static MigrationExtensions()
-        {
-            // This is here to avoid the removal of the referenced assembly
-            var provider = Microsoft.Data.Sqlite.SqliteFactory.Instance;
-            provider.CreateParameter();
-        }
-
         public static ICreateTableColumnOptionOrWithColumnSyntax WithIdColumn(this ICreateTableWithColumnSyntax tableWithColumnSyntax)
         {
             return tableWithColumnSyntax
