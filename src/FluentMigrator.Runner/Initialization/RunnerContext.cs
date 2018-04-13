@@ -27,6 +27,8 @@ namespace FluentMigrator.Runner.Initialization
         public string ConnectionStringConfigPath { get; set; }
         public IEnumerable<string> Tags { get; set; }
         public bool TransactionPerSession { get; set; }
+
+        /// <inheritdoc />
         public bool AllowBreakingChange { get; set; }
         public string ProviderSwitches { get; set; }
 
@@ -34,7 +36,7 @@ namespace FluentMigrator.Runner.Initialization
 
         public IStopWatch StopWatch { get; }
 
-        /// <summary>The arbitrary application context passed to the task runner.</summary>
+        /// <inheritdoc />
         public object ApplicationContext { get; set; }
 
         /// <inheritdoc />
