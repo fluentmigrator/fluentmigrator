@@ -1,4 +1,4 @@
-﻿#region License
+#region License
 
 // Copyright (c) 2007-2018, Sean Chambers <schambers80@gmail.com>
 //
@@ -29,9 +29,9 @@ namespace FluentMigrator.Runner.Announcers
             Write("=============================== FluentMigrator ================================");
             HorizontalRule();
             Write("Source Code:");
-            Write("  http://github.com/fluentmigrator/fluentmigrator");
+            Write("  https://github.com/fluentmigrator/fluentmigrator");
             Write("Ask For Help:");
-            Write("  http://groups.google.com/group/fluentmigrator-google-group");
+            Write("  https://gitter.im/FluentMigrator/fluentmigrator");
             HorizontalRule();
             Console.ResetColor();
         }
