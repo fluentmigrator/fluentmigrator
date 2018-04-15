@@ -13,6 +13,7 @@ before_script:
   - nuget install GitVersion.CommandLine -Version 4.0.0-beta0012 -Prerelease
   - export VERSION_SUFFIX=$(mono GitVersion.CommandLine.4.0.0-beta0012/tools/GitVersion.exe /showvariable NuGetVersion | sed -r 's/^[^-]+-(.*)$/\1/')
   - echo Using VersionSuffix=$VERSION_SUFFIX
+  - printenv
 script:
   - rm -f "$TRAVIS_BUILD_DIR/output"/*
   - dotnet restore ./FluentMigrator.sln
