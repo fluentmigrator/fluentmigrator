@@ -1,6 +1,8 @@
 assembly-versioning-scheme: MajorMinorPatch
-mode: ContinuousDeployment
+# mode: ContinuousDeployment
 next-version: 2.0.0
-branches: {}
+branches:
+  release:
+    mode: ContinuousDeployment
 ignore:
   sha: []
