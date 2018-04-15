@@ -20,6 +20,7 @@ script:
 - rm -f "$TRAVIS_BUILD_DIR/output"/*
 - dotnet restore ./FluentMigrator.sln
 - msbuild ./FluentMigrator.sln /v:m /p:VersionSuffix="$VERSION_SUFFIX"
+- msbuild ./FluentMigrator.sln /v:m /p:VersionSuffix="$VERSION_SUFFIX" /p:Configuration=Release
 - dotnet vstest test/FluentMigrator.Tests/bin/Debug/net461/FluentMigrator.Tests.dll
   --TestCaseFilter:'TestCategory!=NotWorkingOnMono&(TestCategory!=Integration|(TestCategory=Integration&(TestCategory=SQLite)))'
 after_success:
