@@ -4,8 +4,8 @@ namespace FluentMigrator.Runner.Processors.Oracle
     {
         private static readonly TestEntry[] _testEntries =
         {
-            new TestEntry("Oracle.DataAccess", "Oracle.DataAccess.Client.OracleClientFactory"),
             new TestEntry("Oracle.ManagedDataAccess", "Oracle.ManagedDataAccess.Client.OracleClientFactory"),
+            new TestEntry("Oracle.DataAccess", "Oracle.DataAccess.Client.OracleClientFactory"),
         };
 
         public OracleDbFactory()
