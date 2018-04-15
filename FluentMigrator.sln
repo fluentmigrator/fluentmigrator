@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2005
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentMigrator.Core", "src\FluentMigrator.Core\FluentMigrator.Core.csproj", "{91ECEBA8-5A7E-44C6-8378-66C675336521}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{2AC15906-580E-4530-A860-6BA6301CAD2E}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
@@ -71,16 +69,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FluentMigrator.Example.Migr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator.Example.Migrator", "samples\FluentMigrator.Example.Migrator\FluentMigrator.Example.Migrator.csproj", "{7B2CE1AA-0FEC-44D9-9643-990D70318F40}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentMigrator", "src\FluentMigrator\FluentMigrator.csproj", "{9485E0CB-384C-4B28-AE97-5C34367D2CA9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{91ECEBA8-5A7E-44C6-8378-66C675336521}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{91ECEBA8-5A7E-44C6-8378-66C675336521}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{91ECEBA8-5A7E-44C6-8378-66C675336521}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{91ECEBA8-5A7E-44C6-8378-66C675336521}.Release|Any CPU.Build.0 = Release|Any CPU
 		{0433595D-963A-49BE-BF05-9F293D88C7B2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{0433595D-963A-49BE-BF05-9F293D88C7B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0433595D-963A-49BE-BF05-9F293D88C7B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -173,12 +169,15 @@ Global
 		{7B2CE1AA-0FEC-44D9-9643-990D70318F40}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7B2CE1AA-0FEC-44D9-9643-990D70318F40}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7B2CE1AA-0FEC-44D9-9643-990D70318F40}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9485E0CB-384C-4B28-AE97-5C34367D2CA9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9485E0CB-384C-4B28-AE97-5C34367D2CA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9485E0CB-384C-4B28-AE97-5C34367D2CA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9485E0CB-384C-4B28-AE97-5C34367D2CA9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{91ECEBA8-5A7E-44C6-8378-66C675336521} = {16DED0B3-1401-43AD-9402-3DC90918FFD7}
 		{0433595D-963A-49BE-BF05-9F293D88C7B2} = {9D911F62-908F-4067-A487-73D146993031}
 		{BA16361A-27F8-45AD-BACD-357EA181AF25} = {9D911F62-908F-4067-A487-73D146993031}
 		{49EEA395-BF7E-470C-8302-802C455C478F} = {9D911F62-908F-4067-A487-73D146993031}
@@ -204,6 +203,7 @@ Global
 		{84556028-BC75-4C2C-B943-532F49A8DBF6} = {BFDA3B73-2F8E-4AFF-A6EF-322B9FECD3D1}
 		{391CBF2A-03C3-4E72-A8F1-1F195EA59BBA} = {DE3C74CA-1396-44E6-B46B-5536BC9771DB}
 		{7B2CE1AA-0FEC-44D9-9643-990D70318F40} = {DE3C74CA-1396-44E6-B46B-5536BC9771DB}
+		{9485E0CB-384C-4B28-AE97-5C34367D2CA9} = {16DED0B3-1401-43AD-9402-3DC90918FFD7}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {722C9D0D-FAB6-4CCE-9A4A-56E24235A9E0}

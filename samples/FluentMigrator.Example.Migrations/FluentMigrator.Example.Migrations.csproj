@@ -3,6 +3,6 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\src\FluentMigrator.Core\FluentMigrator.Core.csproj" />
+    <ProjectReference Include="..\..\src\FluentMigrator\FluentMigrator.csproj" />
   </ItemGroup>
 </Project>

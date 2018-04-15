@@ -11,7 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FluentMigrator.Runner.Core\FluentMigrator.Runner.Core.csproj" />
-    <ProjectReference Include="..\FluentMigrator.Core\FluentMigrator.Core.csproj" />
+    <ProjectReference Include="..\FluentMigrator\FluentMigrator.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Db2\FluentMigrator.Runner.Db2.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.Firebird\FluentMigrator.Runner.Firebird.csproj" />
     <ProjectReference Include="..\FluentMigrator.Runner.MySql\FluentMigrator.Runner.MySql.csproj" />

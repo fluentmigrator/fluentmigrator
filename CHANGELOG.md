@@ -54,7 +54,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Project:
   - Moving database specific code from `FluentMigrator.Runner` to `FluentMigrator.Runner.<Database>`
-  - `FluentMigrator` is now `FluentMigrator.Core`
   - Extension methods for - e.g. SqlServer - are now in `FluentMigrator.Extensions.SqlServer`
 - Database:
   - MySQL: Now announcing SQL scripts
