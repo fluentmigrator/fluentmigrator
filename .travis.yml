@@ -8,18 +8,21 @@ git:
   depth: false
 env:
   global:
-    secure: LBwjIieB3lGAb21LFO75eW42F3gm4Af+Wd/y37gbAJC9WXLO6i4aLOIDjaheq9wZEWAjsjLrG9aDf2YgCoiboGLhIVVS2CUEcLL8v9A8fdwG0MMdNbJ+HiwOCro97lZywT32yQ6dDzTf2xcUWufQ2YhQXBE52Ym6hMjkm5iaWnY=
+  - secure: LBwjIieB3lGAb21LFO75eW42F3gm4Af+Wd/y37gbAJC9WXLO6i4aLOIDjaheq9wZEWAjsjLrG9aDf2YgCoiboGLhIVVS2CUEcLL8v9A8fdwG0MMdNbJ+HiwOCro97lZywT32yQ6dDzTf2xcUWufQ2YhQXBE52Ym6hMjkm5iaWnY=
+  - secure: HoLUbTEIa48m8llZgKQPjNIDxJrA+ENX+ofaIhHXAJlBzzbrfFkLcrC09v0T40MQFZvdnNfo/YoJ3bNJYWonWiIAe5k0Iv6F/a0gWMVmSjdAeDru+2Xh7DwD/LiEjW9wzKBS4TmImxcPGr4o4bXjD7SMc/WYxES3sTlJY0cyGEE=
 before_script:
-  - nuget install GitVersion.CommandLine -Version 4.0.0-beta0012 -Prerelease
-  - export VERSION_SUFFIX=$(mono GitVersion.CommandLine.4.0.0-beta0012/tools/GitVersion.exe /showvariable NuGetVersion | sed -r 's/^[^-]+-(.*)$/\1/')
-  - echo Using VersionSuffix=$VERSION_SUFFIX
-  - chmod a+x ./nuget-upload.sh
+- nuget install GitVersion.CommandLine -Version 4.0.0-beta0012 -Prerelease
+- export VERSION_SUFFIX=$(mono GitVersion.CommandLine.4.0.0-beta0012/tools/GitVersion.exe
+  /showvariable NuGetVersion | sed -r 's/^[^-]+-(.*)$/\1/')
+- echo Using VersionSuffix=$VERSION_SUFFIX
+- chmod a+x ./nuget-upload.sh
 script:
-  - rm -f "$TRAVIS_BUILD_DIR/output"/*
-  - dotnet restore ./FluentMigrator.sln
-  - msbuild ./FluentMigrator.sln /v:m /p:VersionSuffix="$VERSION_SUFFIX"
-  - dotnet vstest test/FluentMigrator.Tests/bin/Debug/net461/FluentMigrator.Tests.dll --TestCaseFilter:'TestCategory!=NotWorkingOnMono&(TestCategory!=Integration|(TestCategory=Integration&(TestCategory=SQLite)))'
+- rm -f "$TRAVIS_BUILD_DIR/output"/*
+- dotnet restore ./FluentMigrator.sln
+- msbuild ./FluentMigrator.sln /v:m /p:VersionSuffix="$VERSION_SUFFIX"
+- dotnet vstest test/FluentMigrator.Tests/bin/Debug/net461/FluentMigrator.Tests.dll
+  --TestCaseFilter:'TestCategory!=NotWorkingOnMono&(TestCategory!=Integration|(TestCategory=Integration&(TestCategory=SQLite)))'
 after_success:
-  - msbuild ./FluentMigrator.sln /v:m /p:VersionSuffix="$VERSION_SUFFIX" /t:Pack /p:PackageOutputPath="$TRAVIS_BUILD_DIR/output"
-  - [[ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_BRANCH" == release/* ]] && ./nuget-upload.sh
-  - [[ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_TAG" != "" ]] && ./nuget-upload.sh
+- msbuild ./FluentMigrator.sln /v:m /p:VersionSuffix="$VERSION_SUFFIX" /t:Pack /p:PackageOutputPath="$TRAVIS_BUILD_DIR/output"
+- '[[ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_BRANCH" == release/* ]] && ./myget-upload.sh'
+- '[[ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_TAG" != "" ]] && ./nuget-upload.sh'
