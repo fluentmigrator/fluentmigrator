@@ -24,7 +24,7 @@ while the CI builds are stored on [MyGet](https://www.myget.org/feed/Packages/fl
 
 Build-Server | Status
 -------------|----------
-TeamCity     | [![TeamCity (full build status)](https://img.shields.io/teamcity/http/teamcity.jetbrains.com/e/bt82.svg)](https://teamcity.jetbrains.com/viewType.html?buildTypeId=bt82&guest=1)
+TeamCity     | [![TeamCity (full build status)](https://img.shields.io/teamcity/http/teamcity.jetbrains.com/e/FluentMigrator_MasterAndPullRequests.svg)](https://teamcity.jetbrains.com/viewType.html?buildTypeId=FluentMigrator_MasterAndPullRequests&guest=1)
 Travis CI    | [![Travis](https://img.shields.io/travis/fluentmigrator/fluentmigrator.svg)](https://travis-ci.org/fluentmigrator/fluentmigrator)
 
 
