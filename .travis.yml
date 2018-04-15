@@ -15,7 +15,7 @@ before_script:
 - export VERSION_SUFFIX=$(mono GitVersion.CommandLine.4.0.0-beta0012/tools/GitVersion.exe
   /showvariable NuGetVersion | sed -r 's/^[^-]+-(.*)$/\1/')
 - echo Using VersionSuffix=$VERSION_SUFFIX
-- chmod a+x ./nuget-upload.sh
+- chmod a+x ./*.sh
 script:
 - rm -f "$TRAVIS_BUILD_DIR/output"/*
 - dotnet restore ./FluentMigrator.sln
@@ -23,6 +23,6 @@ script:
 - dotnet vstest test/FluentMigrator.Tests/bin/Debug/net461/FluentMigrator.Tests.dll
   --TestCaseFilter:'TestCategory!=NotWorkingOnMono&(TestCategory!=Integration|(TestCategory=Integration&(TestCategory=SQLite)))'
 after_success:
-- msbuild ./FluentMigrator.sln /v:m /p:VersionSuffix="$VERSION_SUFFIX" /t:Pack /p:PackageOutputPath="$TRAVIS_BUILD_DIR/output"
+- msbuild ./FluentMigrator.sln /v:m /p:VersionSuffix="$VERSION_SUFFIX" /p:Configuration=Release /t:Pack /p:PackageOutputPath="$TRAVIS_BUILD_DIR/output"
 - '[[ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_BRANCH" == release/* ]] && ./myget-upload.sh'
 - '[[ "$TRAVIS_PULL_REQUEST" == "false" && "$TRAVIS_TAG" != "" ]] && ./nuget-upload.sh'
