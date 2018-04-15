@@ -2,12 +2,18 @@
 
 Fluent Migrator is a migration framework for .NET much like Ruby on Rails Migrations. Migrations are a structured way to alter your database schema and are an alternative to creating lots of sql scripts that have to be run manually by every developer involved. Migrations solve the problem of evolving a database schema for multiple databases (for example, the developer's local database, the test database and the production database). Database schema changes are described in classes written in C# that can be checked into a version control system.
 
+# News
+
+Finally, version 2.0.0 is released!
+
+Please read the [changelog](https://github.com/fluentmigrator/fluentmigrator/blob/master/CHANGELOG.md)
+
 # Packages
 
 Source              | Status
 --------------------|----------
-NuGet (Releases)    | ![NuGet](https://img.shields.io/nuget/v/FluentMigrator.svg)
-MyGet (Prerelease)  | ![MyGet](https://img.shields.io/myget/fluent-migrator/vpre/FluentMigrator.svg)
+NuGet (Releases)    | [![NuGet](https://img.shields.io/nuget/v/FluentMigrator.svg)](https://www.nuget.org/packages/FluentMigrator/)
+MyGet (Prerelease)  | [![MyGet](https://img.shields.io/myget/fluent-migrator/vpre/FluentMigrator.svg)](https://www.myget.org/feed/Packages/fluent-migrator)
 
 The releases are stored on [nuget.org](https://nuget.org)
 while the CI builds are stored on [MyGet](https://www.myget.org/feed/Packages/fluent-migrator).

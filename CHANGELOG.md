@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## 2.0.0 (2018-04-15)
 
 ### Breaking changes
 
@@ -34,6 +34,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Redshift (Amazon, experimental)
   - Firebird
     - New provider option: `Force Quote=true` to enforce quotes
+  - All supported databases
+    - Streamlined table/index schema quoting
 - Unique Constraints: Non-Distinct NULL support (SQL Server 2008 and SQL Anywhere 16)
 - Types: DateTime2 support
 - Dialect: SQLite foreign key support
@@ -88,5 +90,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Using the new `SqlBatchParser` to parse batches of SQL statements (`GO` statement support)
 - Database:
   - Hana: Fixed syntax for dropping a primary key
+  - Oracle: Table schema now added more consistently
 - Tests:
   - Mark integration tests as ignored when no active processor could be found
